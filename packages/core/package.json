@@ -51,7 +51,7 @@
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "@pgsql/types": "^17.6.2",
-    "create-gen-app": "^0.3.3",
+    "create-gen-app": "^0.3.5",
     "csv-to-pg": "^2.0.10",
     "glob": "^13.0.0",
     "komoji": "^0.7.8",
@@ -61,7 +61,7 @@
     "pg-env": "workspace:^",
     "pgsql-deparser": "^17.12.2",
     "pgsql-parser": "^17.9.2",
-    "yanse": "^0.1.5"
+    "yanse": "^0.1.7"
   },
   "peerDependencies": {
     "@pgsql/types": "^17.6.1"
