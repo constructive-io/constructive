@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.1](https://github.com/constructive-io/constructive/compare/@launchql/s3-streamer@2.8.0...@launchql/s3-streamer@2.8.1) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/s3-streamer
+
 # [2.8.0](https://github.com/constructive-io/constructive/compare/@launchql/s3-streamer@2.7.2...@launchql/s3-streamer@2.8.0) (2025-12-14)
 
 ### Features

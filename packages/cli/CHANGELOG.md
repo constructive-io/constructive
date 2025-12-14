@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.21.0](https://github.com/constructive-io/constructive/compare/@launchql/cli@4.20.0...@launchql/cli@4.21.0) (2025-12-14)
+
+### Features
+
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+
 # [4.20.0](https://github.com/constructive-io/constructive/compare/@launchql/cli@4.19.3...@launchql/cli@4.20.0) (2025-12-14)
 
 ### Bug Fixes

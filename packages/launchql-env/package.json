@@ -1,6 +1,6 @@
 {
   "name": "@launchql/env",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL environment configuration with GraphQL/Graphile support",
   "main": "index.js",

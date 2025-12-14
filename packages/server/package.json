@@ -1,6 +1,6 @@
 {
   "name": "@launchql/server",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL Server",
   "main": "index.js",
@@ -38,13 +38,13 @@
     "launchql",
     "backend"
   ],
-    "dependencies": {
-      "@graphile-contrib/pg-many-to-many": "^1.0.2",
-      "@launchql/env": "workspace:^",
-      "@launchql/s3-utils": "workspace:^",
-      "@launchql/types": "workspace:^",
-      "@launchql/upload-names": "workspace:^",
-      "@launchql/url-domains": "workspace:^",
+  "dependencies": {
+    "@graphile-contrib/pg-many-to-many": "^1.0.2",
+    "@launchql/env": "workspace:^",
+    "@launchql/s3-utils": "workspace:^",
+    "@launchql/types": "workspace:^",
+    "@launchql/upload-names": "workspace:^",
+    "@launchql/url-domains": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",

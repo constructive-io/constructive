@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.9.0](https://github.com/constructive-io/constructive/compare/graphile-settings@2.8.0...graphile-settings@2.9.0) (2025-12-14)
+
+### Features
+
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+- separate GraphQL types into @launchql/types package ([6359f58](https://github.com/constructive-io/constructive/commit/6359f5895790593759e3cea9872fad5c119063ef))
+
 # [2.8.0](https://github.com/constructive-io/constructive/compare/graphile-settings@2.7.3...graphile-settings@2.8.0) (2025-12-14)
 
 ### Bug Fixes

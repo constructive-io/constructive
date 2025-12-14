@@ -1,6 +1,6 @@
 {
   "name": "@launchql/types",
-  "version": "2.11.0",
+  "version": "2.12.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL GraphQL/Graphile types for PostGraphile integration",
   "main": "index.js",
