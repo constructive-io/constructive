@@ -15,8 +15,8 @@ TODO
     } else {
 
 
-- [ ] does every proj.deploy() use proj.getModuleName()? ^^^^
-- [ ] not just projectName? but also database???? 
+- [x] does every proj.deploy() use proj.getModuleName()? ^^^^
+- [x] not just projectName? but also database???? 
 packages/pgsql-test/src/seed/sqitch.ts
 await proj.deploy(
     getEnvOptions({ 
@@ -30,7 +30,7 @@ await proj.deploy(
     );
 
 
-- [ ] fix/manage function sqitch(cwd?: string): SeedAdapter 
+- [x] fix/manage function sqitch(cwd?: string): SeedAdapter 
 
 
 - [ ] DB_CWD, db.cwd ???? in types/src
@@ -79,8 +79,8 @@ Naming & Typing
 Migration & History
 -------------------
 - [ ] Get this PR from launchql-gen: https://github.com/constructive-io/constructive-gen/pull/19
-- [ ] Move postgraphile-* plugins over (preserve import history)
-- [ ] Import original LaunchQL history (preserve git log)
+- [x] Move postgraphile-* plugins over (preserve import history)
+- [x] Import original LaunchQL history (preserve git log)
 
 Misc
 ----
