@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/pgpm@0.5.1...pgpm@0.6.0) (2025-12-14)
+
+### Features
+
+- **pgpm:** add aliased npm package name lookup for CLI commands ([198a8af](https://github.com/constructive-io/constructive/commit/198a8af7eebf1009af279c69d7e0351c7eb83e51))
+
 ## [0.5.1](https://github.com/constructive-io/constructive/compare/pgpm@0.5.0...pgpm@0.5.1) (2025-12-14)
 
 **Note:** Version bump only for package pgpm

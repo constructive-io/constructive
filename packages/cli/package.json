@@ -1,6 +1,6 @@
 {
   "name": "@launchql/cli",
-  "version": "4.21.0",
+  "version": "4.21.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL CLI",
   "main": "index.js",
