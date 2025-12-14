@@ -29,18 +29,18 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@types/pluralize": "0.0.33",
+    "launchql-test": "workspace:^",
+    "makage": "^0.1.8"
+  },
+  "dependencies": {
     "@graphql-codegen/core": "^5.0.0",
     "@graphql-codegen/typescript": "^5.0.5",
     "@graphql-codegen/typescript-graphql-request": "^6.0.1",
     "@graphql-codegen/typescript-operations": "^5.0.5",
     "@graphql-codegen/typescript-react-query": "^6.1.1",
-    "@types/pluralize": "0.0.33",
-    "graphql": "15.10.1",
-    "launchql-test": "workspace:^",
-    "makage": "^0.1.8"
-  },
-  "dependencies": {
     "gql-ast": "workspace:^",
+    "graphql": "15.10.1",
     "graphql-request": "^6.1.0",
     "graphql-tag": "^2.12.6",
     "inflection": "^1.12.0",
