@@ -52,6 +52,8 @@ psql -d mydb1 -c "SELECT faker.city('MI');"
 
 ## 🛠️ Commands
 
+Here are some useful commands for reference:
+
 ### Getting Started
 
 - `pgpm init` - Initialize a new module
