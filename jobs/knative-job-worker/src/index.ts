@@ -190,7 +190,7 @@ export default class Worker {
       });
       client.query('LISTEN "jobs:insert"');
       client.on('error', (e: unknown) => {
-        log.error('Error with database notify listener');
+        log.error('Error with database notify listener', String(e));
         release();
         this.listen();
       });
