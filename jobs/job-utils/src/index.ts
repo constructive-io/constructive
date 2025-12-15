@@ -98,7 +98,7 @@ export const getScheduledJob = async <T = any>(
 
 export const runScheduledJob = async (
   client: PgClientLike,
-  { jobId }: RunScheduledJobParams & { jobExpiryInterval?: string }
+  { jobId }: RunScheduledJobParams
 ): Promise<any | null> => {
   log.info(`runScheduledJob job[${jobId}]`);
   try {
