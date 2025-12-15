@@ -193,7 +193,7 @@ export default class Scheduler {
     ) => {
       if (err) {
         log.error('Error connecting with notify listener', err);
-        if (err.stack) {
+        if (err instanceof Error && err.stack) {
           log.debug(err.stack);
         }
         // Try again in 5 seconds
