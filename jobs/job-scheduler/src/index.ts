@@ -120,7 +120,7 @@ export default class Scheduler {
           log.info(`spinning up job[${newjob.task_identifier}]`);
         } else {
           // this means the scheduled_job has been deleted from db, so cancel it
-          console.log(
+          log.info(
             `attempted job[${job.task_identifier}] but it's probably non existent, unscheduling...`
           );
           const scheduledJob = this.jobs[job.id];
