@@ -186,7 +186,7 @@ export default class Scheduler {
     }
   }
   listen() {
-      const listenForChanges = (
+    const listenForChanges = (
       err: Error | null,
       client: PoolClient,
       release: () => void
