@@ -66,6 +66,9 @@ const request = (
       function (error: unknown) {
         if (error) {
           log.error(`request error for job[${jobId}] fn[${fn}]`, error);
+          if (error instanceof Error && error.stack) {
+            log.debug(error.stack);
+          }
           return reject(error);
         }
         log.debug(`request success for job[${jobId}] fn[${fn}]`);
