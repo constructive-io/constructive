@@ -111,7 +111,13 @@ export const getJobGatewayDevMap = ():
   if (!map) return null;
   try {
     return JSON.parse(map);
-  } catch {
+  } catch (err) {
+    console.warn(
+      '[getJobGatewayDevMap] Failed to parse INTERNAL_GATEWAY_DEVELOPMENT_MAP as JSON:',
+      err,
+      'Value:',
+      map
+    );
     return null;
   }
 };
