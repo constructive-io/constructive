@@ -88,13 +88,14 @@ At this point, the app schema and `database-jobs` should be installed and `app_j
 With Postgres initialized, bring up the jobs-related services using `docker-compose.jobs.yml`:
 
 ```sh
+docker compose -f docker-compose.jobs.yml build
 docker compose -f docker-compose.jobs.yml up
 ```
 
 Or run detached:
 
 ```sh
-docker compose -f docker-compose.jobs.yml up -d
+docker compose -f docker-compose.jobs.yml up -d --build
 ```
 
 This starts:
@@ -102,26 +103,6 @@ This starts:
 - `launchql-server` – GraphQL API server
 - `simple-email` – Knative-style HTTP function
 - `knative-job-service` – jobs runtime (callback server + worker + scheduler)
-
-By default, all three services use the published image:
-
-```text
-ghcr.io/constructive-io/launchql:b88e3d1
-```
-
-If you want to test a local build instead, build the image from the `constructive/` workspace and update `image:` in `docker-compose.jobs.yml` to point to your local tag, for example:
-
-```sh
-docker build -t constructive-local .
-```
-
-Then in `docker-compose.jobs.yml`:
-
-```yaml
-image: constructive-local
-```
-
-All services are attached to the shared `constructive-net` network and talk to the `postgres` container by hostname `postgres`.
 
 ---
 

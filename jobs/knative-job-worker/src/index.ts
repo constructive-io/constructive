@@ -99,6 +99,11 @@ export default class Worker {
   }
   async doWork(job: JobRow) {
     const { payload, task_identifier } = job;
+    log.debug('starting work on job', {
+      id: job.id,
+      task: task_identifier,
+      databaseId: job.database_id
+    });
     if (
       !jobs.getJobSupportAny() &&
       !this.supportedTaskNames.includes(task_identifier)

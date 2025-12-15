@@ -43,6 +43,7 @@ services:
     environment:
       NODE_ENV: development
       LOG_LEVEL: info
+      SIMPLE_EMAIL_DRY_RUN: "true"
       # Mailgun / email provider configuration for @launchql/postmaster
       # Replace with real credentials for local testing.
       MAILGUN_API_KEY: "change-me-mailgun-api-key"
@@ -82,11 +83,13 @@ services:
 
       # Callback HTTP server (job completion callbacks)
       INTERNAL_JOBS_CALLBACK_PORT: "8080"
+      INTERNAL_JOBS_CALLBACK_URL: "http://knative-job-service:8080/callback"
       # Hostname used by job-utils.getCallbackBaseUrl for callbacks
       JOBS_CALLBACK_HOST: "knative-job-service"
 
       # Function gateway base URL (used by worker when no dev map is present)
-      KNATIVE_SERVICE_URL: "dev.internal"
+      KNATIVE_SERVICE_URL: "http://simple-email:8080"
+      INTERNAL_GATEWAY_URL: "http://simple-email:8080"
 
       # Development-only map from task identifier -> function URL
       # Used by @launchql/knative-job-worker when NODE_ENV !== 'production'.

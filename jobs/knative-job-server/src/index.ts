@@ -91,7 +91,7 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     const errorMessage = req.body.error || req.body.message || 'UNKNOWN_ERROR';
 
     console.log(
-      `server: Failed task ${jobIdHeader} with error: \n${req.body.message}\n\n`
+      `server: Failed task ${jobIdHeader} with error: \n${errorMessage}\n\n`
     );
 
     await jobs.failJob(client, {

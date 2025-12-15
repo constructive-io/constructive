@@ -113,6 +113,14 @@ const sendJobCallback = async (
   }
 
   try {
+    // eslint-disable-next-line no-console
+    console.log('[knative-job-fn] Sending job callback', {
+      status,
+      target: normalizeCallbackUrl(callbackUrl),
+      workerId,
+      jobId,
+      databaseId
+    });
     await postJson(target, headers, body);
   } catch (err) {
     // eslint-disable-next-line no-console

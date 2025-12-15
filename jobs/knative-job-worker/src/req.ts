@@ -1,6 +1,9 @@
 import env from './env';
 import requestLib from 'request';
 import { getCallbackBaseUrl } from '@launchql/job-utils';
+import { Logger } from '@pgpmjs/logger';
+
+const log = new Logger('jobs:req');
 
 // callback URL for job completion
 const completeUrl = getCallbackBaseUrl();
@@ -34,6 +37,14 @@ const request = (
   { body, databaseId, workerId, jobId }: RequestOptions
 ) => {
   const url = getFunctionUrl(fn);
+  log.info(`dispatching job`, {
+    fn,
+    url,
+    callbackUrl: completeUrl,
+    workerId,
+    jobId,
+    databaseId
+  });
   return new Promise<boolean>((resolve, reject) => {
     requestLib.post(
       {
@@ -53,10 +64,12 @@ const request = (
         body
       },
       function (error: unknown) {
-        // NOTE should we hit the error URL!??
-        // probably not because it would be an error in the actual
-        // creation of the job...
-        return error ? reject(error) : resolve(true);
+        if (error) {
+          log.error(`request error for job[${jobId}] fn[${fn}]`, error);
+          return reject(error);
+        }
+        log.debug(`request success for job[${jobId}] fn[${fn}]`);
+        return resolve(true);
       }
     );
   });
