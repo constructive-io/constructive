@@ -13,7 +13,6 @@ export default {
     .map(s => s.trim())
     .filter(Boolean),
   HOSTNAME: process.env.HOSTNAME || 'worker-0',
-  INTERNAL_GATEWAY_URL: process.env.INTERNAL_GATEWAY_URL,
   INTERNAL_JOBS_CALLBACK_URL: process.env.INTERNAL_JOBS_CALLBACK_URL,
   INTERNAL_JOBS_CALLBACK_PORT:
     Number(process.env.INTERNAL_JOBS_CALLBACK_PORT) || 12345
