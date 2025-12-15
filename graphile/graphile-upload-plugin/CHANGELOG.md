@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.5.0...graphile-upload-plugin@0.5.1) (2025-12-14)
+
+**Note:** Version bump only for package graphile-upload-plugin
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.4.0...graphile-upload-plugin@0.5.0) (2025-12-14)
+
+### Features
+
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+
+# [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.3.3...graphile-upload-plugin@0.4.0) (2025-12-14)
+
+### Features
+
+- rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
+
+## [0.3.3](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.3.2...graphile-upload-plugin@0.3.3) (2025-12-13)
+
+**Note:** Version bump only for package graphile-upload-plugin
+
 ## [0.3.2](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.3.1...graphile-upload-plugin@0.3.2) (2025-12-12)
 
 **Note:** Version bump only for package graphile-upload-plugin

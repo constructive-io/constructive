@@ -22,8 +22,8 @@ importers:
         specifier: ^20.12.7
         version: 20.19.25
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.48.0
         version: 8.49.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1)(typescript@5.9.3))(eslint@9.39.1)(typescript@5.9.3)
@@ -58,8 +58,8 @@ importers:
         specifier: ^3.0.2
         version: 3.6.2
       ts-jest:
-        specifier: ^29.1.1
-        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3)
+        specifier: ^29.4.6
+        version: 29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
@@ -99,14 +99,14 @@ importers:
 
   graphile/graphile-cache:
     dependencies:
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../packages/logger/dist
       lru-cache:
-        specifier: ^11.1.0
-        version: 11.2.2
+        specifier: ^11.2.4
+        version: 11.2.4
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
@@ -116,8 +116,8 @@ importers:
         version: 4.14.1
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -126,7 +126,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-i18n:
@@ -156,15 +156,15 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@types/accept-language-parser':
         specifier: ^1.5.4
         version: 1.5.8
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
@@ -178,6 +178,9 @@ importers:
 
   graphile/graphile-many-to-many:
     dependencies:
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -259,6 +262,9 @@ importers:
 
   graphile/graphile-plugin-connection-filter:
     dependencies:
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -276,8 +282,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0
       '@types/pg':
-        specifier: ^8.15.6
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
@@ -285,7 +291,7 @@ importers:
         specifier: ^0.1.6
         version: 0.1.8
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pgsql-test:
         specifier: workspace:^
@@ -294,6 +300,9 @@ importers:
 
   graphile/graphile-plugin-connection-filter-postgis:
     dependencies:
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -308,8 +317,8 @@ importers:
         version: link:../graphile-postgis/dist
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.6
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
@@ -320,7 +329,7 @@ importers:
         specifier: ^0.1.6
         version: 0.1.8
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pgsql-test:
         specifier: workspace:^
@@ -364,6 +373,9 @@ importers:
 
   graphile/graphile-postgis:
     dependencies:
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -377,7 +389,7 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@types/geojson':
@@ -400,15 +412,15 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       postgraphile:
         specifier: ^4.14.1
         version: 4.14.1
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -450,8 +462,11 @@ importers:
         version: 1.0.2
       '@launchql/env':
         specifier: workspace:^
-        version: link:../../packages/env/dist
+        version: link:../../packages/launchql-env/dist
       '@launchql/types':
+        specifier: workspace:^
+        version: link:../../packages/launchql-types/dist
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../packages/types/dist
       cors:
@@ -506,10 +521,10 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0(graphql@15.10.1)
       lru-cache:
-        specifier: ^11.1.0
-        version: 11.2.2
+        specifier: ^11.2.4
+        version: 11.2.4
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       postgraphile:
         specifier: ^4.14.1
@@ -522,11 +537,11 @@ importers:
         specifier: ^2.8.17
         version: 2.8.19
       '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.5
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@types/request-ip':
         specifier: ^0.0.41
         version: 0.0.41
@@ -538,7 +553,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-simple-inflector:
@@ -563,7 +578,13 @@ importers:
 
   graphile/graphile-test:
     dependencies:
+      '@launchql/env':
+        specifier: workspace:^
+        version: link:../../packages/launchql-env/dist
       '@launchql/types':
+        specifier: workspace:^
+        version: link:../../packages/launchql-types/dist
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../packages/types/dist
       graphql:
@@ -573,7 +594,7 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pgsql-test:
         specifier: workspace:^
@@ -583,8 +604,8 @@ importers:
         version: 4.14.1
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphql-tag:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
@@ -609,17 +630,17 @@ importers:
         version: 15.10.1
     devDependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.0.0
-        version: 3.947.0
+        specifier: ^3.948.0
+        version: 3.948.0
       '@launchql/env':
         specifier: workspace:^
-        version: link:../../packages/env/dist
+        version: link:../../packages/launchql-env/dist
       '@launchql/s3-utils':
         specifier: workspace:^
         version: link:../../packages/s3-utils/dist
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
@@ -633,8 +654,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/pgsql-test/dist
       ts-jest:
-        specifier: ^29.1.0
-        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3)
+        specifier: ^29.4.6
+        version: 29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3)
     publishDirectory: dist
 
   jobs/job-pg:
@@ -643,8 +664,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pg:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 8.16.3
+        version: 8.16.3
 
   jobs/job-scheduler:
     dependencies:
@@ -663,7 +684,7 @@ importers:
 
   jobs/job-utils:
     dependencies:
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../packages/types/dist
       envalid:
@@ -679,8 +700,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pg:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 8.16.3
+        version: 8.16.3
 
   jobs/knative-job-example:
     dependencies:
@@ -718,8 +739,8 @@ importers:
         specifier: 4.17.1
         version: 4.17.1
       pg:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 8.16.3
+        version: 8.16.3
 
   jobs/knative-job-service:
     dependencies:
@@ -742,12 +763,12 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pg:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 8.16.3
+        version: 8.16.3
     devDependencies:
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
 
   jobs/knative-job-worker:
     dependencies:
@@ -761,45 +782,48 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pg:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 8.16.3
+        version: 8.16.3
       request:
         specifier: 2.88.2
         version: 2.88.2
     devDependencies:
       pgsql-test:
-        specifier: ^2.15.2
-        version: 2.15.2(@babel/core@7.28.5)(@pgsql/types@17.6.1)(graphql@15.10.1)
+        specifier: workspace:^
+        version: link:../../packages/pgsql-test/dist
 
   packages/cli:
     dependencies:
       '@launchql/codegen':
         specifier: workspace:^
         version: link:../launchql-gen/dist
-      '@launchql/core':
-        specifier: workspace:^
-        version: link:../core/dist
       '@launchql/env':
         specifier: workspace:^
-        version: link:../env/dist
+        version: link:../launchql-env/dist
       '@launchql/explorer':
         specifier: workspace:^
         version: link:../explorer/dist
-      '@launchql/logger':
-        specifier: workspace:^
-        version: link:../logger/dist
       '@launchql/server':
         specifier: workspace:^
         version: link:../server/dist
-      '@launchql/server-utils':
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../core/dist
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../logger/dist
+      '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../server-utils/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       inquirerer:
-        specifier: ^2.1.8
-        version: 2.1.9
+        specifier: ^2.1.13
+        version: 2.1.13
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -819,8 +843,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       yanse:
-        specifier: ^0.1.5
-        version: 0.1.6
+        specifier: ^0.1.7
+        version: 0.1.7
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -832,14 +856,14 @@ importers:
         specifier: ^20.12.7
         version: 20.19.25
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@types/shelljs':
         specifier: ^0.8.16
         version: 0.8.17
       clean-ansi:
-        specifier: 0.1.1
-        version: 0.1.1
+        specifier: 0.1.4
+        version: 0.1.4
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -847,7 +871,7 @@ importers:
         specifier: ^0.1.8
         version: 0.1.8
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       ts-node:
         specifier: ^10.9.2
@@ -857,12 +881,12 @@ importers:
   packages/client:
     dependencies:
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -887,24 +911,24 @@ importers:
 
   packages/core:
     dependencies:
-      '@launchql/env':
+      '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/server-utils':
+      '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../server-utils/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       '@pgsql/types':
-        specifier: ^17.6.1
-        version: 17.6.1
+        specifier: ^17.6.2
+        version: 17.6.2
       create-gen-app:
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.3.5
+        version: 0.3.5
       csv-to-pg:
         specifier: ^2.0.10
         version: 2.0.10(@babel/core@7.28.5)
@@ -918,7 +942,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
@@ -927,18 +951,18 @@ importers:
         specifier: workspace:^
         version: link:../pg-env/dist
       pgsql-deparser:
-        specifier: ^17.12.1
-        version: 17.12.1
+        specifier: ^17.12.2
+        version: 17.12.2
       pgsql-parser:
-        specifier: ^17.9.1
-        version: 17.9.1
+        specifier: ^17.9.2
+        version: 17.9.2
       yanse:
-        specifier: ^0.1.5
-        version: 0.1.6
+        specifier: ^0.1.7
+        version: 0.1.7
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       copyfiles:
         specifier: ^2.4.1
         version: 2.4.1
@@ -957,11 +981,11 @@ importers:
         version: link:../pgsql-test/dist
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       drizzle-orm:
-        specifier: ^0.44.7
-        version: 0.44.7(@types/pg@8.15.6)(pg@8.16.3)
+        specifier: ^0.45.1
+        version: 0.45.1(@types/pg@8.16.0)(pg@8.16.3)
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -969,7 +993,7 @@ importers:
 
   packages/env:
     dependencies:
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       deepmerge:
@@ -1006,22 +1030,25 @@ importers:
     dependencies:
       '@launchql/env':
         specifier: workspace:^
-        version: link:../env/dist
+        version: link:../launchql-env/dist
       '@launchql/s3-streamer':
         specifier: workspace:^
         version: link:../s3-streamer/dist
-      '@launchql/server-utils':
-        specifier: workspace:^
-        version: link:../server-utils/dist
       '@launchql/types':
         specifier: workspace:^
-        version: link:../types/dist
+        version: link:../launchql-types/dist
       '@launchql/upload-names':
         specifier: workspace:^
         version: link:../upload-names/dist
       '@launchql/url-domains':
         specifier: workspace:^
         version: link:../url-domains/dist
+      '@pgpmjs/server-utils':
+        specifier: workspace:^
+        version: link:../server-utils/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../types/dist
       express:
         specifier: ^5.1.0
         version: 5.1.0
@@ -1051,8 +1078,8 @@ importers:
         version: 4.14.1
     devDependencies:
       '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.5
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/graphql-upload':
         specifier: ^8.0.12
         version: 8.0.12
@@ -1064,7 +1091,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/gql-ast:
@@ -1087,15 +1114,15 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@jest/test-sequencer':
         specifier: ^30.2.0
         version: 30.2.0
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       launchql-test:
         specifier: workspace:^
         version: link:../launchql-test/dist
@@ -1107,24 +1134,25 @@ importers:
         version: link:../pgsql-test/dist
     publishDirectory: dist
 
+  packages/launchql-env:
+    dependencies:
+      '@launchql/types':
+        specifier: workspace:^
+        version: link:../launchql-types/dist
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../env/dist
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
+    devDependencies:
+      makage:
+        specifier: ^0.1.8
+        version: 0.1.8
+    publishDirectory: dist
+
   packages/launchql-gen:
     dependencies:
-      gql-ast:
-        specifier: workspace:^
-        version: link:../gql-ast/dist
-      graphql-request:
-        specifier: ^6.1.0
-        version: 6.1.0(encoding@0.1.13)(graphql@15.10.1)
-      graphql-tag:
-        specifier: ^2.12.6
-        version: 2.12.6(graphql@15.10.1)
-      inflection:
-        specifier: ^1.12.0
-        version: 1.12.0
-      pluralize:
-        specifier: ^8.0.0
-        version: 8.0.0
-    devDependencies:
       '@graphql-codegen/core':
         specifier: ^5.0.0
         version: 5.0.0(graphql@15.10.1)
@@ -1140,15 +1168,31 @@ importers:
       '@graphql-codegen/typescript-react-query':
         specifier: ^6.1.1
         version: 6.1.1(encoding@0.1.13)(graphql@15.10.1)
-      '@types/pluralize':
-        specifier: 0.0.33
-        version: 0.0.33
+      gql-ast:
+        specifier: workspace:^
+        version: link:../gql-ast/dist
       graphql:
         specifier: 15.10.1
         version: 15.10.1
+      graphql-request:
+        specifier: ^6.1.0
+        version: 6.1.0(encoding@0.1.13)(graphql@15.10.1)
+      graphql-tag:
+        specifier: ^2.12.6
+        version: 2.12.6(graphql@15.10.1)
+      inflection:
+        specifier: ^1.12.0
+        version: 1.12.0
       introspectron:
         specifier: workspace:^
         version: link:../introspectron/dist
+      pluralize:
+        specifier: ^8.0.0
+        version: 8.0.0
+    devDependencies:
+      '@types/pluralize':
+        specifier: 0.0.33
+        version: 0.0.33
       launchql-test:
         specifier: workspace:^
         version: link:../launchql-test/dist
@@ -1159,7 +1203,13 @@ importers:
 
   packages/launchql-test:
     dependencies:
+      '@launchql/env':
+        specifier: workspace:^
+        version: link:../launchql-env/dist
       '@launchql/types':
+        specifier: workspace:^
+        version: link:../launchql-types/dist
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       graphile-settings:
@@ -1175,7 +1225,7 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pgsql-test:
         specifier: workspace:^
@@ -1185,8 +1235,8 @@ importers:
         version: 4.14.1
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       graphql-tag:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
@@ -1195,11 +1245,34 @@ importers:
         version: 0.1.8
     publishDirectory: dist
 
+  packages/launchql-types:
+    dependencies:
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../types/dist
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
+      graphile-build:
+        specifier: ^4.14.1
+        version: 4.14.1(graphql@15.10.1)
+      pg-env:
+        specifier: workspace:^
+        version: link:../pg-env/dist
+      postgraphile:
+        specifier: ^4.14.1
+        version: 4.14.1
+    devDependencies:
+      makage:
+        specifier: ^0.1.8
+        version: 0.1.8
+    publishDirectory: dist
+
   packages/logger:
     dependencies:
       yanse:
-        specifier: ^0.1.5
-        version: 0.1.6
+        specifier: ^0.1.7
+        version: 0.1.7
     devDependencies:
       makage:
         specifier: ^0.1.8
@@ -1219,12 +1292,12 @@ importers:
   packages/orm:
     dependencies:
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1233,44 +1306,44 @@ importers:
   packages/pg-ast:
     dependencies:
       '@pgsql/types':
-        specifier: ^17.6.1
-        version: 17.6.1
+        specifier: ^17.6.2
+        version: 17.6.2
       nested-obj:
-        specifier: 0.1.4
-        version: 0.1.4
+        specifier: 0.1.6
+        version: 0.1.6
     devDependencies:
       makage:
         specifier: ^0.1.8
         version: 0.1.8
       pg-proto-parser:
-        specifier: ^1.30.1
-        version: 1.30.1
+        specifier: ^1.30.2
+        version: 1.30.2
       pgsql-deparser:
-        specifier: ^17.12.1
-        version: 17.12.1
+        specifier: ^17.12.2
+        version: 17.12.2
     publishDirectory: dist
 
   packages/pg-cache:
     dependencies:
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       lru-cache:
-        specifier: ^11.1.0
-        version: 11.2.2
+        specifier: ^11.2.4
+        version: 11.2.4
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-env:
         specifier: workspace:^
         version: link:../pg-env/dist
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1284,17 +1357,17 @@ importers:
       '@babel/types':
         specifier: ^7.26.3
         version: 7.28.5
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/server-utils':
+      '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../server-utils/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
@@ -1310,8 +1383,8 @@ importers:
         specifier: ^7.6.8
         version: 7.27.0
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1327,12 +1400,12 @@ importers:
   packages/pg-query-context:
     dependencies:
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1340,27 +1413,30 @@ importers:
 
   packages/pgpm:
     dependencies:
-      '@launchql/core':
+      '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
-      '@launchql/env':
+      '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       appstash:
-        specifier: ^0.2.4
-        version: 0.2.4
+        specifier: ^0.2.5
+        version: 0.2.5
       create-gen-app:
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.3.5
+        version: 0.3.5
+      find-and-require-package-json:
+        specifier: ^0.8.1
+        version: 0.8.1
       inquirerer:
-        specifier: ^2.1.8
-        version: 2.1.9
+        specifier: ^2.1.13
+        version: 2.1.13
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1380,8 +1456,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       yanse:
-        specifier: ^0.1.5
-        version: 0.1.6
+        specifier: ^0.1.7
+        version: 0.1.7
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1393,8 +1469,8 @@ importers:
         specifier: ^20.12.7
         version: 20.19.25
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@types/semver':
         specifier: ^7.5.8
         version: 7.7.1
@@ -1408,7 +1484,7 @@ importers:
         specifier: ^0.1.8
         version: 0.1.8
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       ts-node:
         specifier: ^10.9.2
@@ -1417,26 +1493,26 @@ importers:
 
   packages/pgsql-test:
     dependencies:
-      '@launchql/core':
+      '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
-      '@launchql/env':
+      '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/server-utils':
+      '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../server-utils/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       csv-parse:
         specifier: ^6.1.0
         version: 6.1.0
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
@@ -1449,8 +1525,8 @@ importers:
         version: link:../pg-env/dist
     devDependencies:
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@types/pg-copy-streams':
         specifier: ^1.2.5
         version: 1.2.5
@@ -1527,24 +1603,24 @@ importers:
   packages/s3-streamer:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.940.0
-        version: 3.947.0
+        specifier: ^3.948.0
+        version: 3.948.0
       '@aws-sdk/lib-storage':
         specifier: ^3.940.0
-        version: 3.947.0(@aws-sdk/client-s3@3.947.0)
+        version: 3.947.0(@aws-sdk/client-s3@3.948.0)
       '@launchql/content-type-stream':
         specifier: workspace:^
         version: link:../content-type-stream/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
     devDependencies:
-      '@launchql/env':
-        specifier: workspace:^
-        version: link:../env/dist
       '@launchql/s3-utils':
         specifier: workspace:^
         version: link:../s3-utils/dist
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../env/dist
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1556,11 +1632,11 @@ importers:
   packages/s3-utils:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.940.0
-        version: 3.947.0
+        specifier: ^3.948.0
+        version: 3.948.0
       '@aws-sdk/lib-storage':
         specifier: ^3.940.0
-        version: 3.947.0(@aws-sdk/client-s3@3.947.0)
+        version: 3.947.0(@aws-sdk/client-s3@3.948.0)
     devDependencies:
       '@types/node':
         specifier: ^18.19.69
@@ -1577,25 +1653,28 @@ importers:
         version: 1.0.2
       '@launchql/env':
         specifier: workspace:^
-        version: link:../env/dist
-      '@launchql/logger':
-        specifier: workspace:^
-        version: link:../logger/dist
+        version: link:../launchql-env/dist
       '@launchql/s3-utils':
         specifier: workspace:^
         version: link:../s3-utils/dist
-      '@launchql/server-utils':
-        specifier: workspace:^
-        version: link:../server-utils/dist
       '@launchql/types':
         specifier: workspace:^
-        version: link:../types/dist
+        version: link:../launchql-types/dist
       '@launchql/upload-names':
         specifier: workspace:^
         version: link:../upload-names/dist
       '@launchql/url-domains':
         specifier: workspace:^
         version: link:../url-domains/dist
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../logger/dist
+      '@pgpmjs/server-utils':
+        specifier: workspace:^
+        version: link:../server-utils/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../types/dist
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -1651,10 +1730,10 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0(graphql@15.10.1)
       lru-cache:
-        specifier: ^11.1.0
-        version: 11.2.2
+        specifier: ^11.2.4
+        version: 11.2.4
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
@@ -1670,20 +1749,20 @@ importers:
         version: 3.3.0
     devDependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.940.0
-        version: 3.947.0
+        specifier: ^3.948.0
+        version: 3.948.0
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
       '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.5
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/graphql-upload':
         specifier: ^8.0.12
         version: 8.0.12
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       '@types/request-ip':
         specifier: ^0.0.41
         version: 0.0.41
@@ -1695,15 +1774,15 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/server-utils:
     dependencies:
-      '@launchql/logger':
+      '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       cors:
@@ -1713,21 +1792,21 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
       lru-cache:
-        specifier: ^11.1.0
-        version: 11.2.2
+        specifier: ^11.2.4
+        version: 11.2.4
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
       '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.5
+        specifier: ^5.0.6
+        version: 5.0.6
       makage:
         specifier: ^0.1.8
         version: 0.1.8
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/stream-to-etag:
@@ -1746,7 +1825,7 @@ importers:
 
   packages/supabase-test:
     dependencies:
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
       pg-env:
@@ -1763,18 +1842,9 @@ importers:
 
   packages/types:
     dependencies:
-      deepmerge:
-        specifier: ^4.3.1
-        version: 4.3.1
-      graphile-build:
-        specifier: ^4.14.1
-        version: 4.14.1(graphql@15.10.1)
       pg-env:
         specifier: workspace:^
         version: link:../pg-env/dist
-      postgraphile:
-        specifier: ^4.14.1
-        version: 4.14.1
     devDependencies:
       makage:
         specifier: ^0.1.8
@@ -1798,8 +1868,8 @@ importers:
         version: 5.1.0
     devDependencies:
       '@types/express':
-        specifier: ^5.0.1
-        version: 5.0.5
+        specifier: ^5.0.6
+        version: 5.0.6
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1837,10 +1907,10 @@ importers:
 
   sandbox/my-third:
     devDependencies:
-      '@launchql/core':
+      '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../packages/core/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../packages/types/dist
       makage:
@@ -1853,18 +1923,18 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
       pg:
-        specifier: ^8.16.0
+        specifier: ^8.16.3
         version: 8.16.3
     devDependencies:
-      '@launchql/core':
+      '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../packages/core/dist
-      '@launchql/types':
+      '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../packages/types/dist
       '@types/pg':
-        specifier: ^8.15.2
-        version: 8.15.6
+        specifier: ^8.16.0
+        version: 8.16.0
       makage:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1941,17 +2011,17 @@ packages:
         integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==,
       }
 
-  '@aws-sdk/client-s3@3.947.0':
+  '@aws-sdk/client-s3@3.948.0':
     resolution:
       {
-        integrity: sha512-ICgnI8D3ccIX9alsLksPFY2bX5CAIbyB+q19sXJgPhzCJ5kWeQ6LQ5xBmRVT5kccmsVGbbJdhnLXHyiN5LZsWg==,
+        integrity: sha512-uvEjds8aYA9SzhBS8RKDtsDUhNV9VhqKiHTcmvhM7gJO92q0WTn8/QeFTdNyLc6RxpiDyz+uBxS7PcdNiZzqfA==,
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/client-sso@3.947.0':
+  '@aws-sdk/client-sso@3.948.0':
     resolution:
       {
-        integrity: sha512-sDwcO8SP290WSErY1S8pz8hTafeghKmmWjNVks86jDK30wx62CfazOTeU70IpWgrUBEygyXk/zPogHsUMbW2Rg==,
+        integrity: sha512-iWjchXy8bIAVBUsKnbfKYXRwhLgRg3EqCQ5FTr3JbR+QR75rZm4ZOYXlvHGztVTmtAZ+PQVA1Y4zO7v7N87C0A==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -1976,24 +2046,24 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/credential-provider-ini@3.947.0':
+  '@aws-sdk/credential-provider-ini@3.948.0':
     resolution:
       {
-        integrity: sha512-A2ZUgJUJZERjSzvCi2NR/hBVbVkTXPD0SdKcR/aITb30XwF+n3T963b+pJl90qhOspoy7h0IVYNR7u5Nr9tJdQ==,
+        integrity: sha512-Cl//Qh88e8HBL7yYkJNpF5eq76IO6rq8GsatKcfVBm7RFVxCqYEPSSBtkHdbtNwQdRQqAMXc6E/lEB/CZUDxnA==,
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/credential-provider-login@3.947.0':
+  '@aws-sdk/credential-provider-login@3.948.0':
     resolution:
       {
-        integrity: sha512-u7M3hazcB7aJiVwosNdJRbIJDzbwQ861NTtl6S0HmvWpixaVb7iyhJZWg8/plyUznboZGBm7JVEdxtxv3u0bTA==,
+        integrity: sha512-gcKO2b6eeTuZGp3Vvgr/9OxajMrD3W+FZ2FCyJox363ZgMoYJsyNid1vuZrEuAGkx0jvveLXfwiVS0UXyPkgtw==,
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/credential-provider-node@3.947.0':
+  '@aws-sdk/credential-provider-node@3.948.0':
     resolution:
       {
-        integrity: sha512-S0Zqebr71KyrT6J4uYPhwV65g4V5uDPHnd7dt2W34FcyPu+hVC7Hx4MFmsPyVLeT5cMCkkZvmY3kAoEzgUPJJg==,
+        integrity: sha512-ep5vRLnrRdcsP17Ef31sNN4g8Nqk/4JBydcUJuFRbGuyQtrZZrVT81UeH2xhz6d0BK6ejafDB9+ZpBjXuWT5/Q==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -2004,17 +2074,17 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/credential-provider-sso@3.947.0':
+  '@aws-sdk/credential-provider-sso@3.948.0':
     resolution:
       {
-        integrity: sha512-NktnVHTGaUMaozxycYrepvb3yfFquHTQ53lt6hBEVjYBzK3C4tVz0siUpr+5RMGLSiZ5bLBp2UjJPgwx4i4waQ==,
+        integrity: sha512-gqLhX1L+zb/ZDnnYbILQqJ46j735StfWV5PbDjxRzBKS7GzsiYoaf6MyHseEopmWrez5zl5l6aWzig7UpzSeQQ==,
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/credential-provider-web-identity@3.947.0':
+  '@aws-sdk/credential-provider-web-identity@3.948.0':
     resolution:
       {
-        integrity: sha512-gokm/e/YHiHLrZgLq4j8tNAn8RJDPbIcglFRKgy08q8DmAqHQ8MXAKW3eS0QjAuRXU9mcMmUo1NrX6FRNBCCPw==,
+        integrity: sha512-MvYQlXVoJyfF3/SmnNzOVEtANRAiJIObEUYYyjTqKZTmcRIVVky0tPuG26XnB8LmTYgtESwJIZJj/Eyyc9WURQ==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -2069,10 +2139,10 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/middleware-recursion-detection@3.936.0':
+  '@aws-sdk/middleware-recursion-detection@3.948.0':
     resolution:
       {
-        integrity: sha512-l4aGbHpXM45YNgXggIux1HgsCVAvvBoqHPkqLnqMl9QVapfuSTjJHfDYDsx1Xxct6/m7qSMUzanBALhiaGO2fA==,
+        integrity: sha512-Qa8Zj+EAqA0VlAVvxpRnpBpIWJI9KUwaioY1vkeNVwXPlNaz9y9zCKVM9iU9OZ5HXpoUg6TnhATAHXHAE8+QsQ==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -2097,10 +2167,10 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/nested-clients@3.947.0':
+  '@aws-sdk/nested-clients@3.948.0':
     resolution:
       {
-        integrity: sha512-DjRJEYNnHUTu9kGPPQDTSXquwSEd6myKR4ssI4FaYLFhdT3ldWpj73yYt807H3tdmhS7vPmdVqchSJnjurUQAw==,
+        integrity: sha512-zcbJfBsB6h254o3NuoEkf0+UY1GpE9ioiQdENWv7odo69s8iaGBEQ4BDpsIMqcuiiUXw1uKIVNxCB1gUGYz8lw==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -2118,10 +2188,10 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws-sdk/token-providers@3.947.0':
+  '@aws-sdk/token-providers@3.948.0':
     resolution:
       {
-        integrity: sha512-X/DyB8GuK44rsE89Tn5+s542B3PhGbXQSgV8lvqHDzvicwCt0tWny6790st6CPETrVVV2K3oJMfG5U3/jAmaZA==,
+        integrity: sha512-V487/kM4Teq5dcr1t5K6eoUKuqlGr9FRWL3MIMukMERJXHZvio6kox60FZ/YtciRHRI75u14YUqm2Dzddcu3+A==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -2178,10 +2248,10 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
-  '@aws/lambda-invoke-store@0.2.1':
+  '@aws/lambda-invoke-store@0.2.2':
     resolution:
       {
-        integrity: sha512-sIyFcoPZkTtNu9xFeEoynMef3bPJIAbOfUh+ueYcfhVl6xm2VRtMcMclSxmZCMnHHd4hlYKJeq/aggmBEWynww==,
+        integrity: sha512-C0NBLsIqzDIae8HFw9YIrIBsbc0xTiOtt7fAukGPnqQ/+zZNaq+4jhuccltK0QuWHBnNm/a6kLIRA6GFiM10eg==,
       }
     engines: { node: '>=18.0.0' }
 
@@ -3303,17 +3373,6 @@ packages:
         integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==,
       }
 
-  '@launchql/core@2.18.2':
-    resolution: {integrity: sha512-xVoWbbGarvj15ve2xujtOiB+zDat8A//hXugH5kDDPriTXp792Xspysrfo2oxQRFiUlpOC5lRY2AAxEsq7UuRg==}
-    peerDependencies:
-      '@pgsql/types': ^17.6.1
-
-  '@launchql/env@2.6.1':
-    resolution: {integrity: sha512-L8IkcN1gzSJZnO3dO/3aL8AdpDFGkPBgb0f8j9nquLXj611PltNoLCNUS2/Q6aTeF7hogycSx5+7+N4LftU8IQ==}
-
-  '@launchql/logger@1.2.1':
-    resolution: {integrity: sha512-ZR2DZtfvWjGHQXXw4Tvmsi8VtJuvXqLbmjcK8ldjI7wbH/3SlYujYpiKJAxU/SdPpAD7/a6QmNdHzMeyfjwDIg==}
-
   '@launchql/mjml@0.1.1':
     resolution:
       {
@@ -3336,9 +3395,6 @@ packages:
       }
     engines: { node: '>=12.0.0' }
 
-  '@launchql/server-utils@2.7.1':
-    resolution: {integrity: sha512-UWsQnRrfbwA5QpllXIHCLS+xsh7SGLh5tA3xqVialJTB07N61NQhb7/xxKkW/X440ZNrD18HHZxLJkiBg9LzeQ==}
-
   '@launchql/styled-email@0.1.0':
     resolution:
       {
@@ -3347,9 +3403,6 @@ packages:
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
-
-  '@launchql/types@2.10.1':
-    resolution: {integrity: sha512-Qxz/Si7DdZdVGlJM0+J4GgNE5yK6hieGeaG5se/OvXaJYVP49vZx4yKXu5lPvx+6MkJ1PQbQxQ5+6+fE/5TR/w==}
 
   '@lerna/create@8.2.4':
     resolution:
@@ -3689,10 +3742,10 @@ packages:
         integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==,
       }
 
-  '@pgsql/types@17.6.1':
+  '@pgsql/types@17.6.2':
     resolution:
       {
-        integrity: sha512-Hk51+nyOxS7Dy5oySWywyNZxo5HndX1VDXT4ZEBD+p+vvMFM2Vc+sKSuByCiI8banou4edbgdnOC251IOuq7QQ==,
+        integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -4465,10 +4518,10 @@ packages:
         integrity: sha512-jnHMsrd0Mwa9Cf4IdOzbz543y4XJepXrbia2T4b6+spXC2We3t1y6K44D3mR8XMFSXMCf3/l7rCgddfx7UNVBA==,
       }
 
-  '@types/express@5.0.5':
+  '@types/express@5.0.6':
     resolution:
       {
-        integrity: sha512-LuIQOcb6UmnF7C1PCFmEU1u2hmiHL43fgFQX67sN3H4Z+0Yk0Neo++mFsBjhOAuLzvlQeqAAkeDOZrJs9rzumQ==,
+        integrity: sha512-sKYVuV7Sv9fbPIt/442koC7+IIwK5olP1KWeD88e/idgoJqDm3JV/YUiPwkoKK92ylff2MGxSz1CSjsXelx0YA==,
       }
 
   '@types/geojson@7946.0.16':
@@ -4567,12 +4620,6 @@ packages:
         integrity: sha512-VkB6WJUQSe0zBpR+Q7/YIUESGp5wPHcaXr0xueU5W0EOUWtlSbblsl+Kl31lyRQ63nIILh0e/7gXjQ09JXJIHw==,
       }
 
-  '@types/mime@1.3.5':
-    resolution:
-      {
-        integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==,
-      }
-
   '@types/minimatch@3.0.5':
     resolution:
       {
@@ -4603,10 +4650,10 @@ packages:
         integrity: sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==,
       }
 
-  '@types/node@24.10.1':
+  '@types/node@25.0.1':
     resolution:
       {
-        integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==,
+        integrity: sha512-czWPzKIAXucn9PtsttxmumiQ9N0ok9FrBwgRWrwmVLlp86BrMExzvXRLFYRJ+Ex3g6yqj+KuaxfX1JTgV2lpfg==,
       }
 
   '@types/normalize-package-data@2.4.4':
@@ -4621,10 +4668,10 @@ packages:
         integrity: sha512-7D6/GYW2uHIaVU6S/5omI+6RZnwlZBpLQDZAH83xX1rjxAOK0f6/deKyyUTewxqts145VIGn6XWYz1YGf50G5g==,
       }
 
-  '@types/pg@8.15.6':
+  '@types/pg@8.16.0':
     resolution:
       {
-        integrity: sha512-NoaMtzhxOrubeL/7UZuNTrejB4MPAJ0RpxZqXQf2qXuVlTPuG6Y8p4u9dKRaue4yjmC7ZhzVO2/Yyyn25znrPQ==,
+        integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==,
       }
 
   '@types/pluralize@0.0.33':
@@ -4663,22 +4710,16 @@ packages:
         integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==,
       }
 
-  '@types/send@0.17.6':
-    resolution:
-      {
-        integrity: sha512-Uqt8rPBE8SY0RK8JB1EzVOIZ32uqy8HwdxCnoCOsYrvnswqmFZ/k+9Ikidlk/ImhsdvBsloHbAlewb2IEBV/Og==,
-      }
-
   '@types/send@1.2.1':
     resolution:
       {
         integrity: sha512-arsCikDvlU99zl1g69TcAB3mzZPpxgw0UQnaHeC1Nwb015xp8bknZv5rIfri9xTOcMuaVgvabfIRA7PSZVuZIQ==,
       }
 
-  '@types/serve-static@1.15.10':
+  '@types/serve-static@2.2.0':
     resolution:
       {
-        integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==,
+        integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==,
       }
 
   '@types/shelljs@0.8.17':
@@ -5205,10 +5246,10 @@ packages:
       }
     engines: { node: '>= 8' }
 
-  appstash@0.2.4:
+  appstash@0.2.5:
     resolution:
       {
-        integrity: sha512-PVxldYSpOeALUpGdwPxw6pIJdcoeTO4HkvkcoqYb+70Nz6t5WBB25bvseWpIiHBkkOEzJnUiwkieo4Xtqi6OOQ==,
+        integrity: sha512-mx9ka33Se2B6lyrTDTWZyhjedenYEeHmk6OX4gctuFNn/hvU/nXcyKa+qn/+HN7jnHgUBL5ZIk0gHAYclLwNbg==,
       }
 
   aproba@2.0.0:
@@ -5517,10 +5558,10 @@ packages:
         integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==,
       }
 
-  bowser@2.12.1:
+  bowser@2.13.1:
     resolution:
       {
-        integrity: sha512-z4rE2Gxh7tvshQ4hluIT7XcFrgLIQaw9X3A+kTTRdovCz5PMukm/0QC/BKSYPj3omF5Qfypn9O/c5kgpmvYUCw==,
+        integrity: sha512-OHawaAbjwx6rqICCKgSG0SAnT05bzd7ppyKLVUITZpANBaaMFBAsaNkto3LoQ31tyFP5kNujE8Cdx85G9VzOkw==,
       }
 
   brace-expansion@1.1.12:
@@ -5580,13 +5621,6 @@ packages:
       {
         integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==,
       }
-
-  buffer-writer@2.0.0:
-    resolution:
-      {
-        integrity: sha512-a7ZpuTZU1TRtnwyCNW3I5dc0wWNC3VR9S++Ewyk2HHZdrO3CQJqSpd+95Us590V6AL7JqUAH2IwZ/398PmNFgw==,
-      }
-    engines: { node: '>=4' }
 
   buffer@5.6.0:
     resolution:
@@ -5853,10 +5887,10 @@ packages:
         integrity: sha512-+CmxIZ/L2vNcEfvNtLdU0ZQ6mbq3FZnwAP2PPTiKP+1QOoKwlKlPgb8UKV0Dds7QVaMnHm+FwSft2VB0s/SLjQ==,
       }
 
-  clean-ansi@0.1.1:
+  clean-ansi@0.1.4:
     resolution:
       {
-        integrity: sha512-kvIBPG9kkcwQD8oQydvUET0VQFJ3Btbj/8fH0Ra/mSz7280T70in4GG/zBuwtjjtraLPFL+n7eOKgxp6ncnMSg==,
+        integrity: sha512-MeD6lxldmKZnllotJlxn0FhKwcB5UAY20Ck4uQX0EXKBQxtJwGiJmw4NIDT0fo1xa8hlxwB8QPw7v8Z2kHciIw==,
       }
 
   clean-css@4.2.4:
@@ -6259,10 +6293,10 @@ packages:
       typescript:
         optional: true
 
-  create-gen-app@0.3.1:
+  create-gen-app@0.3.5:
     resolution:
       {
-        integrity: sha512-8bcXtuz2Azkefy1pgLfnSkVQpAzSY9nKufq5Wm8/1h85VbEfUxtov7FVmyJDMs45rh7FwL3waLmWmJpesPt/QQ==,
+        integrity: sha512-Am092pSKR0DZLbnHE+mdv277pz410qaRmfh7a5s96a02yDK45RHuIDJDIRky1VI5r9HCkWyZMLTY03EFTuuaAA==,
       }
 
   create-require@1.1.1:
@@ -6783,10 +6817,10 @@ packages:
         integrity: sha512-VJzcXJZEckXowvj6yGJC2JH66DLEEm1d1QOB0hik1EvlbUpULvcYt411JeFuy8rNC96FG8V2N7pMkyjvK8LYwQ==,
       }
 
-  drizzle-orm@0.44.7:
+  drizzle-orm@0.45.1:
     resolution:
       {
-        integrity: sha512-quIpnYznjU9lHshEOAYLoZ9s3jweleHlZIAWR/jX9gAWNg/JhQ1wj0KGRf7/Zm+obRrYd9GjPVJg790QY9N5AQ==,
+        integrity: sha512-Te0FOdKIistGNPMq2jscdqngBRfBpC8uMFVwqjf6gtTVJHIQ/dosgV/CLBU2N4ZJBsXL5savCba9b0YJskKdcA==,
       }
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -7495,6 +7529,12 @@ packages:
         integrity: sha512-/t88Ty3d5JWQbWYgaOGCCYfXRwV1+be02WqYYlL6h0lEiUAMPM8o8qKGO01YIkOHzka2up08wvgYD0mDiI+q3Q==,
       }
     engines: { node: '>= 0.8' }
+
+  find-and-require-package-json@0.8.1:
+    resolution:
+      {
+        integrity: sha512-OWzw3mJzpO2RSogTWJReP24qmvDsdd+3VCWj3bCfuCtA0Yf7EHvc33XSzwk5OvvxEW5KQNiacZvbVgBhr2d/vA==,
+      }
 
   find-up@2.1.0:
     resolution:
@@ -8360,10 +8400,10 @@ packages:
       }
     engines: { node: '>=12.0.0' }
 
-  inquirerer@2.1.9:
+  inquirerer@2.1.13:
     resolution:
       {
-        integrity: sha512-Q0DBdouMQ6ZenNiVvrggBOI2kpfWsB5Pw/KLM0N04i5gXe+Z+p6D7FR0y4x+Fvw/yy34cRdpVfU51N7wwPYgNw==,
+        integrity: sha512-oPvyYAJ9YUGIqT0K/Zpw5GsjMpfByNtqneYDMvn0RLBo6uAUxcdSUsc06rJ0B9AfKvM/qHufuVzYX4F3lmII/g==,
       }
 
   invariant@2.2.4:
@@ -9198,10 +9238,10 @@ packages:
       }
     engines: { node: ^16.14.0 || >=18.0.0 }
 
-  libpg-query@17.6.0:
+  libpg-query@17.7.3:
     resolution:
       {
-        integrity: sha512-r4zOTcLTGYS5PlLQAicJ6Yi/tvZFag42YUuNEO8pi8bwt/ZZ4kj514J4QV5bOx0mZzPLF6agbfNXQVxGgmHR8g==,
+        integrity: sha512-lHKBvoWRsXt/9bJxpAeFxkLu0CA6tELusqy3o1z6/DwGXSETxhKJDaNlNdrNV8msvXDLBhpg/4RE/fKKs5rYFA==,
       }
 
   lines-and-columns@1.2.4:
@@ -9374,10 +9414,10 @@ packages:
         integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==,
       }
 
-  lru-cache@11.2.2:
+  lru-cache@11.2.4:
     resolution:
       {
-        integrity: sha512-F9ODfyqML2coTIsQpSkRHnLSZMtkU8Q+mSfcaIyKwy58u+8k5nvAYeiNhsyMARvzNcXJ9QfWVrcPsC9e9rAxtg==,
+        integrity: sha512-B5Y16Jr9LB9dHVkh6ZevG+vAbOsNOYCX+sXvFWFu7B3Iz5mijW3zdbMyhsh8ANd2mSWBYdJgnqi+mL7/LrOPYg==,
       }
     engines: { node: 20 || >=22 }
 
@@ -10099,10 +10139,10 @@ packages:
         integrity: sha512-kB1WKTng+IePQhZVs1UXtFaHBx4QEM5a0XKGAzYfCKvdx5DhNjCytNDWMUGpNNpHLotln+tiwcA52kWCIgGq1Q==,
       }
 
-  nested-obj@0.1.4:
+  nested-obj@0.1.6:
     resolution:
       {
-        integrity: sha512-LfINBgHccDULRxSApd4A7atKiFJDd5k2tpWb5C6DuV5fUnE+USuqUauOA5AiAht2UyDtFVfuzdxiDLp/JwS9ug==,
+        integrity: sha512-C3BoUpys5XTk3pLxaT9Z47xNz6Lh8LHwcR3Nn7wWBDpQGH0zP9RSGadfiPHysPpxbLh+yS+HUJW5IPBygyA4FQ==,
       }
 
   netmask@1.0.6:
@@ -10564,12 +10604,6 @@ packages:
         integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==,
       }
 
-  packet-reader@1.0.0:
-    resolution:
-      {
-        integrity: sha512-HAKu/fG3HpHFO0AA8WE8q2g+gBJaZ9MG7fcKk+IJPLTGAD6Psw4443l+9DGRbOIh3/aXr7Phy0TjilYivJo5XQ==,
-      }
-
   pacote@18.0.6:
     resolution:
       {
@@ -10785,9 +10819,6 @@ packages:
         integrity: sha512-1YnCY5EDcrjl0HIa/w6CFFxkUi7UIvGwWqmqKfV//SK6e+3JuCYUMQ4IQUSO64DYAvUnUhYz0X8yY7pcfRXH9A==,
       }
 
-  pg-cache@1.5.1:
-    resolution: {integrity: sha512-rOKJVSKIrMg7dpTykTVpAJCH34l79h7Rdp6Db2pNHsI0/Bpe3SZbqD/ZUPktiZ1zSIhuZ0gq5x8qms019Qz7Dg==}
-
   pg-cloudflare@1.2.7:
     resolution:
       {
@@ -10806,9 +10837,6 @@ packages:
         integrity: sha512-zBvnY6wtaBRE2ae2xXWOOGMaNVPkXh1vhypAkNSKgMdciJeTyIQAHZaEeRAxUjs/p1El5jgzYmwG5u871Zj3dQ==,
       }
 
-  pg-env@1.2.1:
-    resolution: {integrity: sha512-J1p3sxIoguVtOpkCsloM11R3H/F4OOfvMYc4zFl38Uu0p61w7tvOfy/xsKboH/UwcLieg4cNAPuzbzcDlfI0zA==}
-
   pg-int8@1.0.1:
     resolution:
       {
@@ -10824,10 +10852,10 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-proto-parser@1.30.1:
+  pg-proto-parser@1.30.2:
     resolution:
       {
-        integrity: sha512-0Ng4SeZT6B43tNVRmnvN0/xp9PUtiO2NfXjRl3J73K2J5Hvkq31gREAOvbn6hGpxvB7mZ6Ib5ZJxQH5oeoJ8kQ==,
+        integrity: sha512-yeOA93aZx0AUtuduaW1uZfm2etQVR1JCMmXTaEQLTIE8blwqHGgOuGkxZpZOtCYi1jMCnLFF/LEqiQJPgEnXgA==,
       }
 
   pg-protocol@1.10.3:
@@ -10871,13 +10899,6 @@ packages:
       pg-native:
         optional: true
 
-  pg@8.3.3:
-    resolution:
-      {
-        integrity: sha512-wmUyoQM/Xzmo62wgOdQAn5tl7u+IA1ZYK7qbuppi+3E+Gj4hlUxVHjInulieWrd0SfHi/ADriTb5ILJ/lsJrSg==,
-      }
-    engines: { node: '>= 8.0.0' }
-
   pgpass@1.0.5:
     resolution:
       {
@@ -10890,10 +10911,10 @@ packages:
         integrity: sha512-TQ+cGdpvjoVlPoWjrEUcIvHI32+IGPevJQopAFtfKUIOV8dIQ6HxWCgLriwc6LCGkMnorp2n1jX0k7HVnlzgIg==,
       }
 
-  pgsql-deparser@17.12.1:
+  pgsql-deparser@17.12.2:
     resolution:
       {
-        integrity: sha512-G27wb4rhXNwaV8+/ni3RlGV+CMk753ErX341c4rY98hI8xPbPI07dYGxT3asur0HW4SyyNZ4cS1vhfwLfxPLaA==,
+        integrity: sha512-R/2BFqeAhUWK64c8RluoXR2f2+U/UZAPRG7KFsTXzrTX3HUQsYK/IYaWRyzJCST/HmeGXMLtXq3UeSd7xTUmOw==,
       }
 
   pgsql-enums@1.1.1:
@@ -10902,14 +10923,11 @@ packages:
         integrity: sha512-Qfqw/tnSG4+ceC311Gzuf45QYavCbKbXOiXdVyie0n0ukR797sWhJvEUYPCx9MtO/OKEKtkoSQfzW1mq4kKTrg==,
       }
 
-  pgsql-parser@17.9.1:
+  pgsql-parser@17.9.2:
     resolution:
       {
-        integrity: sha512-k6jtq+/dxRB2HxzrUlzdoDGA1Dim5n2IL2i93pP0UQCWZF3hQYYf09p5DdHBhxazLX8R/nw5NxfXoA4j1hwgxg==,
+        integrity: sha512-1S8nva/PkJBr8oBT6xIEVpUPupd4WqqKH9sPGlk3t1hbehF0Fp3O3DskQ3dOZctEsnK62pIrqCImngWkvRzaJA==,
       }
-
-  pgsql-test@2.15.2:
-    resolution: {integrity: sha512-ygCSJASj/2NcB2jYLi6PODdMM0LxC5lY33Zzh5UreLb6UC0Ow6Gl8/o3ylzxCqsPApXkcy/N9cUiVBEky4y6og==}
 
   picocolors@1.1.1:
     resolution:
@@ -11621,13 +11639,6 @@ packages:
         integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==,
       }
 
-  semver@4.3.2:
-    resolution:
-      {
-        integrity: sha512-VyFUffiBx8hABJ9HYSTXLRwyZtdDHMzMtFmID1aiNAD2BZppBmJm0Hqw3p2jkgxP9BNt1pQ9RnC49P0EcXf6cA==,
-      }
-    hasBin: true
-
   semver@5.7.2:
     resolution:
       {
@@ -12008,10 +12019,10 @@ packages:
       }
     engines: { node: '>=0.8.0' }
 
-  strfy-js@3.1.1:
+  strfy-js@3.1.5:
     resolution:
       {
-        integrity: sha512-dlb74GjRp1aMGD1ZAWp90KvjBsAoufdn2k2QSbVL62tw1ry7qTHozqUHpLdCY2EAbdw+cAxCptreEENaTKmx0Q==,
+        integrity: sha512-FsH+1Y+6AeJuw+yMNpxrAHDzkezgAzoL5txSj+DUoTvmZxq3hOFFsiTI0+IC6Y4nt6o4HPQqLeWL3lstTjKoHA==,
       }
 
   string-length@4.0.2:
@@ -12130,10 +12141,10 @@ packages:
       }
     engines: { node: '>=8' }
 
-  strnum@2.1.1:
+  strnum@2.1.2:
     resolution:
       {
-        integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==,
+        integrity: sha512-l63NF9y/cLROq/yqKXSLtcMeeyOfnSQlfMSlzFt/K73oIaD8DGaQWd7Z34X9GPiKqP5rbSh84Hl4bOlLcjiSrQ==,
       }
 
   styled-components@5.3.11:
@@ -12380,10 +12391,10 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-jest@29.4.5:
+  ts-jest@29.4.6:
     resolution:
       {
-        integrity: sha512-HO3GyiWn2qvTQA4kTgjDcXiMwYQt68a1Y8+JuLRVpdIzm+UOLSHgl/XqR4c6nzJkq5rOkjc02O2I7P7l/Yof0Q==,
+        integrity: sha512-fSpWtOO/1AjSNQguk43hb/JCo16oJDnMJf3CdEGNkqsEX3t0KX96xvyX1D7PfLCpVoKu4MfVrqUkFyblYoY4lA==,
       }
     engines: { node: ^14.15.0 || ^16.10.0 || ^18.0.0 || >=20.0.0 }
     hasBin: true
@@ -13043,10 +13054,10 @@ packages:
     engines: { node: '>= 14.6' }
     hasBin: true
 
-  yanse@0.1.6:
+  yanse@0.1.7:
     resolution:
       {
-        integrity: sha512-7nDeQ8fWtK6BWrWH1SxfT1hYrYmq2WUYIo/pScf1OljDT/W9Kmj8C1f0bsAo4t7/lvlXJTnbCUNiDGJPpwdmPw==,
+        integrity: sha512-KD+zPrAu7W01mh34LEjkKyCTZjOt/VHxR/CFvjmem4B7XRpyF7CrGoHeMciSAegDn2Uc/B9XBn28cHOK9IoZsQ==,
       }
 
   yargs-parser@18.1.3:
@@ -13198,20 +13209,20 @@ snapshots:
       '@smithy/util-utf8': 2.3.0
       tslib: 2.8.1
 
-  '@aws-sdk/client-s3@3.947.0':
+  '@aws-sdk/client-s3@3.948.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.947.0
-      '@aws-sdk/credential-provider-node': 3.947.0
+      '@aws-sdk/credential-provider-node': 3.948.0
       '@aws-sdk/middleware-bucket-endpoint': 3.936.0
       '@aws-sdk/middleware-expect-continue': 3.936.0
       '@aws-sdk/middleware-flexible-checksums': 3.947.0
       '@aws-sdk/middleware-host-header': 3.936.0
       '@aws-sdk/middleware-location-constraint': 3.936.0
       '@aws-sdk/middleware-logger': 3.936.0
-      '@aws-sdk/middleware-recursion-detection': 3.936.0
+      '@aws-sdk/middleware-recursion-detection': 3.948.0
       '@aws-sdk/middleware-sdk-s3': 3.947.0
       '@aws-sdk/middleware-ssec': 3.936.0
       '@aws-sdk/middleware-user-agent': 3.947.0
@@ -13258,14 +13269,14 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso@3.947.0':
+  '@aws-sdk/client-sso@3.948.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.947.0
       '@aws-sdk/middleware-host-header': 3.936.0
       '@aws-sdk/middleware-logger': 3.936.0
-      '@aws-sdk/middleware-recursion-detection': 3.936.0
+      '@aws-sdk/middleware-recursion-detection': 3.948.0
       '@aws-sdk/middleware-user-agent': 3.947.0
       '@aws-sdk/region-config-resolver': 3.936.0
       '@aws-sdk/types': 3.936.0
@@ -13338,16 +13349,16 @@ snapshots:
       '@smithy/util-stream': 4.5.6
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.947.0':
+  '@aws-sdk/credential-provider-ini@3.948.0':
     dependencies:
       '@aws-sdk/core': 3.947.0
       '@aws-sdk/credential-provider-env': 3.947.0
       '@aws-sdk/credential-provider-http': 3.947.0
-      '@aws-sdk/credential-provider-login': 3.947.0
+      '@aws-sdk/credential-provider-login': 3.948.0
       '@aws-sdk/credential-provider-process': 3.947.0
-      '@aws-sdk/credential-provider-sso': 3.947.0
-      '@aws-sdk/credential-provider-web-identity': 3.947.0
-      '@aws-sdk/nested-clients': 3.947.0
+      '@aws-sdk/credential-provider-sso': 3.948.0
+      '@aws-sdk/credential-provider-web-identity': 3.948.0
+      '@aws-sdk/nested-clients': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/credential-provider-imds': 4.2.5
       '@smithy/property-provider': 4.2.5
@@ -13357,10 +13368,10 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-login@3.947.0':
+  '@aws-sdk/credential-provider-login@3.948.0':
     dependencies:
       '@aws-sdk/core': 3.947.0
-      '@aws-sdk/nested-clients': 3.947.0
+      '@aws-sdk/nested-clients': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/property-provider': 4.2.5
       '@smithy/protocol-http': 5.3.5
@@ -13370,14 +13381,14 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-node@3.947.0':
+  '@aws-sdk/credential-provider-node@3.948.0':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.947.0
       '@aws-sdk/credential-provider-http': 3.947.0
-      '@aws-sdk/credential-provider-ini': 3.947.0
+      '@aws-sdk/credential-provider-ini': 3.948.0
       '@aws-sdk/credential-provider-process': 3.947.0
-      '@aws-sdk/credential-provider-sso': 3.947.0
-      '@aws-sdk/credential-provider-web-identity': 3.947.0
+      '@aws-sdk/credential-provider-sso': 3.948.0
+      '@aws-sdk/credential-provider-web-identity': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/credential-provider-imds': 4.2.5
       '@smithy/property-provider': 4.2.5
@@ -13396,11 +13407,11 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.947.0':
+  '@aws-sdk/credential-provider-sso@3.948.0':
     dependencies:
-      '@aws-sdk/client-sso': 3.947.0
+      '@aws-sdk/client-sso': 3.948.0
       '@aws-sdk/core': 3.947.0
-      '@aws-sdk/token-providers': 3.947.0
+      '@aws-sdk/token-providers': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/property-provider': 4.2.5
       '@smithy/shared-ini-file-loader': 4.4.0
@@ -13409,10 +13420,10 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-web-identity@3.947.0':
+  '@aws-sdk/credential-provider-web-identity@3.948.0':
     dependencies:
       '@aws-sdk/core': 3.947.0
-      '@aws-sdk/nested-clients': 3.947.0
+      '@aws-sdk/nested-clients': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/property-provider': 4.2.5
       '@smithy/shared-ini-file-loader': 4.4.0
@@ -13421,9 +13432,9 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/lib-storage@3.947.0(@aws-sdk/client-s3@3.947.0)':
+  '@aws-sdk/lib-storage@3.947.0(@aws-sdk/client-s3@3.948.0)':
     dependencies:
-      '@aws-sdk/client-s3': 3.947.0
+      '@aws-sdk/client-s3': 3.948.0
       '@smithy/abort-controller': 4.2.5
       '@smithy/middleware-endpoint': 4.3.14
       '@smithy/smithy-client': 4.9.10
@@ -13484,10 +13495,10 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-recursion-detection@3.936.0':
+  '@aws-sdk/middleware-recursion-detection@3.948.0':
     dependencies:
       '@aws-sdk/types': 3.936.0
-      '@aws/lambda-invoke-store': 0.2.1
+      '@aws/lambda-invoke-store': 0.2.2
       '@smithy/protocol-http': 5.3.5
       '@smithy/types': 4.9.0
       tslib: 2.8.1
@@ -13525,14 +13536,14 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-  '@aws-sdk/nested-clients@3.947.0':
+  '@aws-sdk/nested-clients@3.948.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.947.0
       '@aws-sdk/middleware-host-header': 3.936.0
       '@aws-sdk/middleware-logger': 3.936.0
-      '@aws-sdk/middleware-recursion-detection': 3.936.0
+      '@aws-sdk/middleware-recursion-detection': 3.948.0
       '@aws-sdk/middleware-user-agent': 3.947.0
       '@aws-sdk/region-config-resolver': 3.936.0
       '@aws-sdk/types': 3.936.0
@@ -13585,10 +13596,10 @@ snapshots:
       '@smithy/types': 4.9.0
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.947.0':
+  '@aws-sdk/token-providers@3.948.0':
     dependencies:
       '@aws-sdk/core': 3.947.0
-      '@aws-sdk/nested-clients': 3.947.0
+      '@aws-sdk/nested-clients': 3.948.0
       '@aws-sdk/types': 3.936.0
       '@smithy/property-provider': 4.2.5
       '@smithy/shared-ini-file-loader': 4.4.0
@@ -13622,7 +13633,7 @@ snapshots:
     dependencies:
       '@aws-sdk/types': 3.936.0
       '@smithy/types': 4.9.0
-      bowser: 2.12.1
+      bowser: 2.13.1
       tslib: 2.8.1
 
   '@aws-sdk/util-user-agent-node@3.947.0':
@@ -13639,7 +13650,7 @@ snapshots:
       fast-xml-parser: 5.2.5
       tslib: 2.8.1
 
-  '@aws/lambda-invoke-store@0.2.1': {}
+  '@aws/lambda-invoke-store@0.2.2': {}
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -14554,47 +14565,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@launchql/core@2.18.2(@babel/core@7.28.5)(@pgsql/types@17.6.1)(graphql@15.10.1)':
-    dependencies:
-      '@launchql/env': 2.6.1(graphql@15.10.1)
-      '@launchql/logger': 1.2.1
-      '@launchql/server-utils': 2.7.1(graphql@15.10.1)
-      '@launchql/types': 2.10.1(graphql@15.10.1)
-      '@pgsql/types': 17.6.1
-      create-gen-app: 0.3.1
-      csv-to-pg: 2.0.10(@babel/core@7.28.5)
-      glob: 13.0.0
-      komoji: 0.7.9
-      parse-package-name: 1.0.0
-      pg: 8.16.3
-      pg-cache: 1.5.1(graphql@15.10.1)
-      pg-env: 1.2.1
-      pgsql-deparser: 17.12.1
-      pgsql-parser: 17.9.1
-      yanse: 0.1.6
-    transitivePeerDependencies:
-      - '@babel/core'
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
-
-  '@launchql/env@2.6.1(graphql@15.10.1)':
-    dependencies:
-      '@launchql/types': 2.10.1(graphql@15.10.1)
-      deepmerge: 4.3.1
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
-
-  '@launchql/logger@1.2.1':
-    dependencies:
-      yanse: 0.1.6
-
   '@launchql/mjml@0.1.1(@babel/core@7.28.5)(encoding@0.1.13)(react-dom@19.2.0(react@19.2.0))(react-is@18.3.1)(react@19.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
@@ -14629,22 +14599,8 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 24.10.1
+      '@types/node': 25.0.1
       long: 5.3.2
-
-  '@launchql/server-utils@2.7.1(graphql@15.10.1)':
-    dependencies:
-      '@launchql/logger': 1.2.1
-      '@launchql/types': 2.10.1(graphql@15.10.1)
-      cors: 2.8.5
-      express: 5.1.0
-      lru-cache: 11.2.2
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
 
   '@launchql/styled-email@0.1.0(@babel/core@7.28.5)(encoding@0.1.13)(react-dom@19.2.0(react@19.2.0))(react-is@18.3.1)(react@19.2.0)':
     dependencies:
@@ -14658,19 +14614,6 @@ snapshots:
       - '@babel/core'
       - encoding
       - react-is
-
-  '@launchql/types@2.10.1(graphql@15.10.1)':
-    dependencies:
-      deepmerge: 4.3.1
-      graphile-build: 4.14.1(graphql@15.10.1)
-      pg-env: 1.2.1
-      postgraphile: 4.14.1
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
 
   '@lerna/create@8.2.4(@types/node@20.19.25)(encoding@0.1.13)(typescript@5.9.3)':
     dependencies:
@@ -15018,7 +14961,7 @@ snapshots:
 
   '@one-ini/wasm@0.1.1': {}
 
-  '@pgsql/types@17.6.1': {}
+  '@pgsql/types@17.6.2': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -15580,18 +15523,18 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.19.25
+      '@types/node': 25.0.1
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.19.25
+      '@types/node': 25.0.1
 
   '@types/content-disposition@0.5.9': {}
 
   '@types/cookies@0.9.2':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/express': 5.0.5
+      '@types/express': 5.0.6
       '@types/keygrip': 1.0.6
       '@types/node': 20.19.25
 
@@ -15603,22 +15546,22 @@ snapshots:
 
   '@types/express-serve-static-core@5.1.0':
     dependencies:
-      '@types/node': 20.19.25
+      '@types/node': 25.0.1
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
 
-  '@types/express@5.0.5':
+  '@types/express@5.0.6':
     dependencies:
       '@types/body-parser': 1.19.6
       '@types/express-serve-static-core': 5.1.0
-      '@types/serve-static': 1.15.10
+      '@types/serve-static': 2.2.0
 
   '@types/geojson@7946.0.16': {}
 
   '@types/graphql-upload@8.0.12':
     dependencies:
-      '@types/express': 5.0.5
+      '@types/express': 5.0.6
       '@types/koa': 3.0.1
       fs-capacitor: 8.0.0
       graphql: 15.10.1
@@ -15675,8 +15618,6 @@ snapshots:
       '@types/koa-compose': 3.2.9
       '@types/node': 20.19.25
 
-  '@types/mime@1.3.5': {}
-
   '@types/minimatch@3.0.5': {}
 
   '@types/minimist@1.2.5': {}
@@ -15691,7 +15632,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@24.10.1':
+  '@types/node@25.0.1':
     dependencies:
       undici-types: 7.16.0
 
@@ -15700,9 +15641,9 @@ snapshots:
   '@types/pg-copy-streams@1.2.5':
     dependencies:
       '@types/node': 20.19.25
-      '@types/pg': 8.15.6
+      '@types/pg': 8.16.0
 
-  '@types/pg@8.15.6':
+  '@types/pg@8.16.0':
     dependencies:
       '@types/node': 20.19.25
       pg-protocol: 1.10.3
@@ -15724,20 +15665,14 @@ snapshots:
 
   '@types/semver@7.7.1': {}
 
-  '@types/send@0.17.6':
-    dependencies:
-      '@types/mime': 1.3.5
-      '@types/node': 20.19.25
-
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 20.19.25
+      '@types/node': 25.0.1
 
-  '@types/serve-static@1.15.10':
+  '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 20.19.25
-      '@types/send': 0.17.6
+      '@types/node': 25.0.1
 
   '@types/shelljs@0.8.17':
     dependencies:
@@ -16030,7 +15965,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  appstash@0.2.4: {}
+  appstash@0.2.5: {}
 
   aproba@2.0.0: {}
 
@@ -16265,7 +16200,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bowser@2.12.1: {}
+  bowser@2.13.1: {}
 
   brace-expansion@1.1.12:
     dependencies:
@@ -16310,8 +16245,6 @@ snapshots:
   buffer-equal-constant-time@1.0.1: {}
 
   buffer-from@1.1.2: {}
-
-  buffer-writer@2.0.0: {}
 
   buffer@5.6.0:
     dependencies:
@@ -16518,7 +16451,7 @@ snapshots:
 
   cjs-module-lexer@2.1.1: {}
 
-  clean-ansi@0.1.1: {}
+  clean-ansi@0.1.4: {}
 
   clean-css@4.2.4:
     dependencies:
@@ -16742,10 +16675,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  create-gen-app@0.3.1:
+  create-gen-app@0.3.5:
     dependencies:
-      appstash: 0.2.4
-      inquirerer: 2.1.9
+      appstash: 0.2.5
+      inquirerer: 2.1.13
 
   create-require@1.1.1: {}
 
@@ -17018,9 +16951,9 @@ snapshots:
 
   dotty@0.1.0: {}
 
-  drizzle-orm@0.44.7(@types/pg@8.15.6)(pg@8.16.3):
+  drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.16.3):
     optionalDependencies:
-      '@types/pg': 8.15.6
+      '@types/pg': 8.16.0
       pg: 8.16.3
 
   dunder-proto@1.0.1:
@@ -17384,7 +17317,7 @@ snapshots:
 
   fast-xml-parser@5.2.5:
     dependencies:
-      strnum: 2.1.1
+      strnum: 2.1.2
 
   fastq@1.19.1:
     dependencies:
@@ -17468,6 +17401,8 @@ snapshots:
       statuses: 2.0.2
     transitivePeerDependencies:
       - supports-color
+
+  find-and-require-package-json@0.8.1: {}
 
   find-up@2.1.0:
     dependencies:
@@ -18079,12 +18014,13 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@2.1.9:
+  inquirerer@2.1.13:
     dependencies:
       deepmerge: 4.3.1
+      find-and-require-package-json: 0.8.1
       js-yaml: 4.1.1
       minimist: 1.2.8
-      yanse: 0.1.6
+      yanse: 0.1.7
 
   invariant@2.2.4:
     dependencies:
@@ -18815,9 +18751,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  libpg-query@17.6.0:
+  libpg-query@17.7.3:
     dependencies:
-      '@pgsql/types': 17.6.1
+      '@pgsql/types': 17.6.2
 
   lines-and-columns@1.2.4: {}
 
@@ -18899,7 +18835,7 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  lru-cache@11.2.2: {}
+  lru-cache@11.2.4: {}
 
   lru-cache@4.1.5:
     dependencies:
@@ -19462,7 +19398,7 @@ snapshots:
 
   nested-obj@0.0.1: {}
 
-  nested-obj@0.1.4: {}
+  nested-obj@0.1.6: {}
 
   netmask@1.0.6: {}
 
@@ -19820,8 +19756,6 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  packet-reader@1.0.0: {}
-
   pacote@18.0.6:
     dependencies:
       '@npmcli/git': 5.0.8
@@ -19903,7 +19837,7 @@ snapshots:
 
   parse5@3.0.3:
     dependencies:
-      '@types/node': 20.19.25
+      '@types/node': 25.0.1
 
   parse5@7.3.0:
     dependencies:
@@ -19948,7 +19882,7 @@ snapshots:
 
   path-scurry@2.0.1:
     dependencies:
-      lru-cache: 11.2.2
+      lru-cache: 11.2.4
       minipass: 7.1.2
 
   path-to-regexp@0.1.7: {}
@@ -19963,22 +19897,8 @@ snapshots:
 
   pg-ast@2.3.5:
     dependencies:
-      '@pgsql/types': 17.6.1
+      '@pgsql/types': 17.6.2
       nested-obj: 0.0.1
-
-  pg-cache@1.5.1(graphql@15.10.1):
-    dependencies:
-      '@launchql/logger': 1.2.1
-      '@launchql/types': 2.10.1(graphql@15.10.1)
-      lru-cache: 11.2.2
-      pg: 8.16.3
-      pg-env: 1.2.1
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
 
   pg-cloudflare@1.2.7:
     optional: true
@@ -19987,19 +19907,13 @@ snapshots:
 
   pg-copy-streams@7.0.0: {}
 
-  pg-env@1.2.1: {}
-
   pg-int8@1.0.1: {}
 
   pg-pool@3.10.1(pg@8.16.3):
     dependencies:
       pg: 8.16.3
 
-  pg-pool@3.10.1(pg@8.3.3):
-    dependencies:
-      pg: 8.3.3
-
-  pg-proto-parser@1.30.1:
+  pg-proto-parser@1.30.2:
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
@@ -20008,8 +19922,8 @@ snapshots:
       '@launchql/protobufjs': 7.2.6
       case: 1.6.3
       deepmerge: 4.3.1
-      nested-obj: 0.1.4
-      strfy-js: 3.1.1
+      nested-obj: 0.1.6
+      strfy-js: 3.1.5
     transitivePeerDependencies:
       - supports-color
 
@@ -20018,7 +19932,7 @@ snapshots:
   pg-sql2@4.14.1(pg@8.16.3):
     dependencies:
       '@graphile/lru': 4.11.0
-      '@types/pg': 8.15.6
+      '@types/pg': 8.16.0
       debug: 4.4.3(supports-color@5.5.0)
       pg: 8.16.3
       tslib: 2.8.1
@@ -20045,17 +19959,6 @@ snapshots:
     optionalDependencies:
       pg-cloudflare: 1.2.7
 
-  pg@8.3.3:
-    dependencies:
-      buffer-writer: 2.0.0
-      packet-reader: 1.0.0
-      pg-connection-string: 2.9.1
-      pg-pool: 3.10.1(pg@8.3.3)
-      pg-protocol: 1.10.3
-      pg-types: 2.2.0
-      pgpass: 1.0.5
-      semver: 4.3.2
-
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
@@ -20067,40 +19970,19 @@ snapshots:
       lodash: 4.17.20
       pgsql-enums: 1.1.1
 
-  pgsql-deparser@17.12.1:
+  pgsql-deparser@17.12.2:
     dependencies:
-      '@pgsql/types': 17.6.1
+      '@pgsql/types': 17.6.2
 
   pgsql-enums@1.1.1:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  pgsql-parser@17.9.1:
+  pgsql-parser@17.9.2:
     dependencies:
-      '@pgsql/types': 17.6.1
-      libpg-query: 17.6.0
-      pgsql-deparser: 17.12.1
-
-  pgsql-test@2.15.2(@babel/core@7.28.5)(@pgsql/types@17.6.1)(graphql@15.10.1):
-    dependencies:
-      '@launchql/core': 2.18.2(@babel/core@7.28.5)(@pgsql/types@17.6.1)(graphql@15.10.1)
-      '@launchql/env': 2.6.1(graphql@15.10.1)
-      '@launchql/logger': 1.2.1
-      '@launchql/server-utils': 2.7.1(graphql@15.10.1)
-      '@launchql/types': 2.10.1(graphql@15.10.1)
-      csv-parse: 6.1.0
-      pg: 8.16.3
-      pg-cache: 1.5.1(graphql@15.10.1)
-      pg-copy-streams: 7.0.0
-      pg-env: 1.2.1
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@pgsql/types'
-      - bufferutil
-      - graphql
-      - pg-native
-      - supports-color
-      - utf-8-validate
+      '@pgsql/types': 17.6.2
+      libpg-query: 17.7.3
+      pgsql-deparser: 17.12.2
 
   picocolors@1.1.1: {}
 
@@ -20148,7 +20030,7 @@ snapshots:
       '@graphile/lru': 4.11.0
       '@types/json5': 0.0.30
       '@types/jsonwebtoken': 9.0.10
-      '@types/pg': 8.15.6
+      '@types/pg': 8.16.0
       '@types/ws': 7.4.7
       body-parser: 1.19.0
       chalk: 2.4.2
@@ -20523,8 +20405,6 @@ snapshots:
 
   scheduler@0.27.0: {}
 
-  semver@4.3.2: {}
-
   semver@5.7.2: {}
 
   semver@6.3.1: {}
@@ -20787,7 +20667,7 @@ snapshots:
 
   streamsearch@0.1.2: {}
 
-  strfy-js@3.1.1:
+  strfy-js@3.1.5:
     dependencies:
       minimatch: 10.1.1
 
@@ -20855,7 +20735,7 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  strnum@2.1.1: {}
+  strnum@2.1.2: {}
 
   styled-components@5.3.11(@babel/core@7.28.5)(react-dom@19.2.0(react@19.2.0))(react-is@18.3.1)(react@19.2.0):
     dependencies:
@@ -21017,7 +20897,7 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-jest@29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3):
+  ts-jest@29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
@@ -21045,6 +20925,24 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.19.25
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+
+  ts-node@10.9.2(@types/node@25.0.1)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 25.0.1
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -21372,7 +21270,7 @@ snapshots:
 
   yaml@2.8.1: {}
 
-  yanse@0.1.6: {}
+  yanse@0.1.7: {}
 
   yargs-parser@18.1.3:
     dependencies:

@@ -1,6 +1,6 @@
 {
   "name": "@launchql/job-utils",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "description": "job utils",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/launchql/jobs/tree/master/packages/job-utils#readme",
@@ -28,7 +28,7 @@
     "url": "https://github.com/launchql/jobs/issues"
   },
   "dependencies": {
-    "@launchql/types": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "envalid": "6.0.2"
   }
 }

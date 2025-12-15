@@ -1,8 +1,8 @@
 {
-  "name": "@launchql/core",
-  "version": "2.18.2",
+  "name": "@pgpmjs/core",
+  "version": "3.0.2",
   "author": "Constructive <developers@constructive.io>",
-  "description": "LaunchQL Package and Migration Tools",
+  "description": "PGPM Package and Migration Tools",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -35,32 +35,33 @@
     "database",
     "migration",
     "postgresql",
-    "launchql",
+    "pgpm",
+    "pgpmjs",
     "schema",
     "sqitch"
   ],
   "devDependencies": {
-    "@types/pg": "^8.15.2",
+    "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
     "makage": "^0.1.8"
   },
   "dependencies": {
-    "@launchql/env": "workspace:^",
-    "@launchql/logger": "workspace:^",
-    "@launchql/server-utils": "workspace:^",
-    "@launchql/types": "workspace:^",
-    "@pgsql/types": "^17.6.1",
-    "create-gen-app": "^0.3.1",
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/server-utils": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "@pgsql/types": "^17.6.2",
+    "create-gen-app": "^0.3.5",
     "csv-to-pg": "^2.0.10",
     "glob": "^13.0.0",
     "komoji": "^0.7.8",
     "parse-package-name": "^1.0.0",
-    "pg": "^8.16.0",
+    "pg": "^8.16.3",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.12.1",
-    "pgsql-parser": "^17.9.1",
-    "yanse": "^0.1.5"
+    "pgsql-deparser": "^17.12.2",
+    "pgsql-parser": "^17.9.2",
+    "yanse": "^0.1.7"
   },
   "peerDependencies": {
     "@pgsql/types": "^17.6.1"

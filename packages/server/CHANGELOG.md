@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.1](https://github.com/constructive-io/constructive/compare/@launchql/server@2.10.0...@launchql/server@2.10.1) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/server
+
+# [2.10.0](https://github.com/constructive-io/constructive/compare/@launchql/server@2.9.0...@launchql/server@2.10.0) (2025-12-14)
+
+### Features
+
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+- separate GraphQL types into @launchql/types package ([6359f58](https://github.com/constructive-io/constructive/commit/6359f5895790593759e3cea9872fad5c119063ef))
+
+# [2.9.0](https://github.com/constructive-io/constructive/compare/@launchql/server@2.8.3...@launchql/server@2.9.0) (2025-12-14)
+
+### Bug Fixes
+
+- remove all backward compatibility and update all LaunchQL* references to Pgpm* ([f513aa9](https://github.com/constructive-io/constructive/commit/f513aa972f375819d94c819d1b260df9a12a9a62))
+
+### Features
+
+- rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
+
+## [2.8.3](https://github.com/constructive-io/constructive/compare/@launchql/server@2.8.2...@launchql/server@2.8.3) (2025-12-13)
+
+**Note:** Version bump only for package @launchql/server
+
 ## [2.8.2](https://github.com/constructive-io/constructive/compare/@launchql/server@2.8.1...@launchql/server@2.8.2) (2025-12-12)
 
 **Note:** Version bump only for package @launchql/server

@@ -1,6 +1,6 @@
 {
   "name": "@launchql/knative-job-service",
-  "version": "0.4.2",
+  "version": "0.4.6",
   "description": "knative job service",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/launchql/jobs/tree/master/packages/knative-job-service#readme",
@@ -42,6 +42,6 @@
     "@launchql/knative-job-worker": "workspace:^",
     "async-retry": "1.3.1",
     "envalid": "6.0.2",
-    "pg": "8.3.3"
+    "pg": "8.16.3"
   }
 }

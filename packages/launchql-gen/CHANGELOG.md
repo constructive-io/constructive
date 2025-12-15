@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.7](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.6...@launchql/codegen@2.17.7) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/codegen
+
+## [2.17.6](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.5...@launchql/codegen@2.17.6) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/codegen
+
+## [2.17.5](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.4...@launchql/codegen@2.17.5) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/codegen
+
+## [2.17.4](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.3...@launchql/codegen@2.17.4) (2025-12-14)
+
+**Note:** Version bump only for package @launchql/codegen
+
+## [2.17.3](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.2...@launchql/codegen@2.17.3) (2025-12-13)
+
+**Note:** Version bump only for package @launchql/codegen
+
 ## [2.17.2](https://github.com/constructive-io/constructive/compare/@launchql/codegen@2.17.1...@launchql/codegen@2.17.2) (2025-12-12)
 
 **Note:** Version bump only for package @launchql/codegen

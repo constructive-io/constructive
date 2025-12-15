@@ -1,6 +1,6 @@
 {
-  "name": "@launchql/client",
-  "version": "2.3.1",
+  "name": "@pgpmjs/client",
+  "version": "2.4.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Client",
   "main": "index.js",
@@ -31,15 +31,16 @@
   "keywords": [
     "client",
     "graphql",
-    "launchql",
+    "pgpm",
+    "pgpmjs",
     "frontend",
     "api"
   ],
   "devDependencies": {
-    "@types/pg": "^8.15.2",
+    "@types/pg": "^8.16.0",
     "makage": "^0.1.8"
   },
   "dependencies": {
-    "pg": "^8.16.0"
+    "pg": "^8.16.3"
   }
 }

@@ -1,7 +1,5 @@
 import { execSync } from 'child_process';
-import type { Plugin } from 'graphile-build';
 import { PgConfig } from 'pg-env';
-import { PostGraphileOptions } from 'postgraphile';
 import { JobsConfig } from './jobs';
 
 /**
@@ -97,32 +95,6 @@ export interface ServerOptions {
 }
 
 /**
- * Feature flags and toggles
- */
-export interface FeatureOptions {
-    /** Use simple inflection for GraphQL field names */
-    simpleInflection?: boolean;
-    /** Use opposite base names for relationships */
-    oppositeBaseNames?: boolean;
-    /** Enable PostGIS spatial database support */
-    postgis?: boolean;
-}
-
-/**
- * PostGraphile/Graphile configuration
- */
-export interface GraphileOptions {
-    /** Database schema(s) to expose through GraphQL */
-    schema?: string | string[];
-    /** Additional Graphile plugins to load */
-    appendPlugins?: Plugin[];
-    /** Build options for Graphile */
-    graphileBuildOptions?: PostGraphileOptions['graphileBuildOptions'];
-    /** Override settings for PostGraphile */
-    overrideSettings?: Partial<PostGraphileOptions>;
-}
-
-/**
  * CDN and file storage configuration
  */
 export interface CDNOptions {
@@ -155,29 +127,9 @@ export interface MigrationOptions {
 }
 
 /**
- * Configuration options for the LaunchQL API
+ * Configuration for PGPM workspace
  */
-export interface ApiOptions {
-    /** Whether to enable the meta API endpoints */
-    enableMetaApi?: boolean;
-    /** Database schemas to expose through the API */
-    exposedSchemas?: string[];
-    /** Anonymous role name for unauthenticated requests */
-    anonRole?: string;
-    /** Default role name for authenticated requests */
-    roleName?: string;
-    /** Default database identifier to use */
-    defaultDatabaseId?: string;
-    /** Whether the API is publicly accessible */
-    isPublic?: boolean;
-    /** Schemas containing metadata tables */
-    metaSchemas?: string[];
-}
-
-/**
- * Configuration for LaunchQL workspace
- */
-export interface LaunchQLWorkspaceConfig {
+export interface PgpmWorkspaceConfig {
   /** Glob patterns for package directories */
   packages: string[];
   /** Optional workspace metadata */
@@ -216,21 +168,16 @@ export interface DeploymentOptions {
 }
 
 /**
- * Main configuration options for the LaunchQL framework
+ * Main configuration options for the PGPM framework
+ * Note: GraphQL/Graphile options (graphile, api, features) are in @launchql/types
  */
-export interface LaunchQLOptions {
+export interface PgpmOptions {
     /** Test database configuration options */
     db?: Partial<PgTestConnectionOptions>;
     /** PostgreSQL connection configuration */
     pg?: Partial<PgConfig>;
-    /** PostGraphile/Graphile configuration */
-    graphile?: GraphileOptions;
     /** HTTP server configuration */
     server?: ServerOptions;
-    /** Feature flags and toggles */
-    features?: FeatureOptions;
-    /** API configuration options */
-    api?: ApiOptions;
     /** CDN and file storage configuration */
     cdn?: CDNOptions;
     /** Module deployment configuration */
@@ -242,9 +189,9 @@ export interface LaunchQLOptions {
 }
 
 /**
- * Default configuration values for LaunchQL framework
+ * Default configuration values for PGPM framework
  */
-export const pgpmDefaults: LaunchQLOptions = {
+export const pgpmDefaults: PgpmOptions = {
   db: {
     rootDb: 'postgres',
     prefix: 'db-',
@@ -270,31 +217,11 @@ export const pgpmDefaults: LaunchQLOptions = {
     password: 'password',
     database: 'postgres',
   },
-  graphile: {
-    schema: [],
-    appendPlugins: [],
-    overrideSettings: {},
-    graphileBuildOptions: {},
-  },
   server: {
     host: 'localhost',
     port: 3000,
     trustProxy: false,
     strictAuth: false,
-  },
-  features: {
-    simpleInflection: true,
-    oppositeBaseNames: true,
-    postgis: true
-  },
-  api: {
-    enableMetaApi: true,
-    exposedSchemas: [],
-    anonRole: 'administrator',
-    roleName: 'administrator',
-    defaultDatabaseId: 'hard-coded',
-    isPublic: true,
-    metaSchemas: ['collections_public', 'meta_public']
   },
   cdn: {
     bucketName: 'test-bucket',

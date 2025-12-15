@@ -1,8 +1,10 @@
-import { LaunchQLPackage } from '@launchql/core';
-import { Logger } from '@launchql/logger';
-import { errors } from '@launchql/types';
+import { PgpmPackage } from '@pgpmjs/core';
+import { Logger } from '@pgpmjs/logger';
+import { errors } from '@pgpmjs/types';
 import { Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
+
+import { resolvePackageAlias } from './package-alias';
 
 /**
  * Handle package selection for operations that need a specific package
@@ -15,7 +17,7 @@ export async function selectPackage(
   operationName: string,
   log?: Logger
 ): Promise<string | undefined> {
-  const pkg = new LaunchQLPackage(cwd);
+  const pkg = new PgpmPackage(cwd);
   const modules = await pkg.getModules();
   const moduleNames = modules.map(mod => mod.getModuleName());
 
@@ -33,7 +35,8 @@ export async function selectPackage(
 
   // If a specific package was provided, validate it
   if (argv.package) {
-    const packageName = argv.package as string;
+    const inputPackage = argv.package as string;
+    const packageName = resolvePackageAlias(inputPackage, cwd);
     if (log) log.info(`Using specified package: ${packageName}`);
     
     if (!moduleNames.includes(packageName)) {

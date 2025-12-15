@@ -2,15 +2,15 @@
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
   "npmClient": "pnpm",
-  "npmClientArgs": [
-    "--frozen-lockfile"
-  ],
   "registry": "https://registry.npmjs.org",
   "command": {
     "create": {
       "homepage": "https://github.com/constructive-io/constructive",
       "license": "MIT",
       "access": "restricted"
+    },
+    "version": {
+      "syncWorkspaceLock": true
     },
     "publish": {
       "allowBranch": "main",

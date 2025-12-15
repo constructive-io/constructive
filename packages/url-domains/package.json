@@ -1,6 +1,6 @@
 {
   "name": "@launchql/url-domains",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "url domains",
   "main": "index.js",
@@ -32,7 +32,7 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.6",
     "makage": "^0.1.8"
   },
   "keywords": []

@@ -1,8 +1,8 @@
 {
-  "name": "@launchql/server-utils",
-  "version": "2.7.1",
+  "name": "@pgpmjs/server-utils",
+  "version": "2.8.2",
   "author": "Constructive <developers@constructive.io>",
-  "description": "LaunchQL server utils",
+  "description": "PGPM server utils",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,15 +29,15 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@launchql/logger": "workspace:^",
-    "@launchql/types": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "lru-cache": "^11.1.0"
+    "lru-cache": "^11.2.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.6",
     "makage": "^0.1.8",
     "ts-node": "^10.9.2"
   },
@@ -45,7 +45,8 @@
     "server",
     "utilities",
     "express",
-    "launchql",
+    "pgpm",
+    "pgpmjs",
     "helpers"
   ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "pg-cache",
-  "version": "1.5.1",
+  "version": "1.6.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL connection pool LRU cache manager",
   "main": "index.js",
@@ -29,14 +29,14 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@launchql/logger": "workspace:^",
-    "@launchql/types": "workspace:^",
-    "lru-cache": "^11.1.0",
-    "pg": "^8.16.0",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "lru-cache": "^11.2.4",
+    "pg": "^8.16.3",
     "pg-env": "workspace:^"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.2",
+    "@types/pg": "^8.16.0",
     "makage": "^0.1.8"
   },
   "keywords": [

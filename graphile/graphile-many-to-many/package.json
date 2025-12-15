@@ -1,6 +1,6 @@
 {
   "name": "graphile-many-to-many",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "description": "Add connection fields for many-to-many relations",
   "author": "Matt Bretl",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -37,6 +37,7 @@
     "plugin"
   ],
   "dependencies": {
+    "find-and-require-package-json": "^0.8.1",
     "graphile-build": "^4.14.1",
     "graphile-build-pg": "^4.14.1"
   },

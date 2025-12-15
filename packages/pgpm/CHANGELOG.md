@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/constructive-io/constructive/compare/pgpm@0.6.0...pgpm@0.6.1) (2025-12-14)
+
+**Note:** Version bump only for package pgpm
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/pgpm@0.5.1...pgpm@0.6.0) (2025-12-14)
+
+### Features
+
+- **pgpm:** add aliased npm package name lookup for CLI commands ([198a8af](https://github.com/constructive-io/constructive/commit/198a8af7eebf1009af279c69d7e0351c7eb83e51))
+
+## [0.5.1](https://github.com/constructive-io/constructive/compare/pgpm@0.5.0...pgpm@0.5.1) (2025-12-14)
+
+**Note:** Version bump only for package pgpm
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/pgpm@0.4.3...pgpm@0.5.0) (2025-12-14)
+
+### Bug Fixes
+
+- remove all backward compatibility and update all LaunchQL* references to Pgpm* ([f513aa9](https://github.com/constructive-io/constructive/commit/f513aa972f375819d94c819d1b260df9a12a9a62))
+- update remaining LaunchQL references to PGPM ([9b4aa91](https://github.com/constructive-io/constructive/commit/9b4aa91d7ccadecd3538c395f39c4eb86a57d6c7))
+
+### Features
+
+- rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
+
+## [0.4.3](https://github.com/constructive-io/constructive/compare/pgpm@0.4.2...pgpm@0.4.3) (2025-12-13)
+
+### Bug Fixes
+
+- pass \_\_dirname to findAndRequirePackageJson for correct package.json resolution ([8fc4a97](https://github.com/constructive-io/constructive/commit/8fc4a9796bede5b556e42df9f82a627d008e1d20))
+
 ## [0.4.2](https://github.com/constructive-io/constructive/compare/pgpm@0.4.1...pgpm@0.4.2) (2025-12-12)
 
 **Note:** Version bump only for package pgpm

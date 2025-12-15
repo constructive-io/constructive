@@ -1,6 +1,6 @@
 {
   "name": "launchql-test",
-  "version": "2.9.2",
+  "version": "2.11.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL Testing with all plugins loaded",
   "main": "index.js",
@@ -29,17 +29,19 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.2",
+    "@types/pg": "^8.16.0",
     "graphql-tag": "2.12.6",
     "makage": "^0.1.8"
   },
   "dependencies": {
+    "@launchql/env": "workspace:^",
     "@launchql/types": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "graphile-settings": "workspace:^",
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
     "mock-req": "^0.2.0",
-    "pg": "^8.16.0",
+    "pg": "^8.16.3",
     "pgsql-test": "workspace:^",
     "postgraphile": "^4.14.1"
   },

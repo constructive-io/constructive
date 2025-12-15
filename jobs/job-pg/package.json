@@ -1,6 +1,6 @@
 {
   "name": "@launchql/job-pg",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "job pg",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/launchql/jobs/tree/master/packages/job-pg#readme",
@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "envalid": "6.0.2",
-    "pg": "8.3.3"
+    "pg": "8.16.3"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "my-third",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.5.2",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
   "module": "esm/index.js",
@@ -12,8 +12,8 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@launchql/core": "workspace:^",
-    "@launchql/types": "workspace:^",
+    "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "makage": "^0.1.8"
   }
 }

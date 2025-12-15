@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.11.1](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.0...graphile-test@2.11.1) (2025-12-14)
+
+**Note:** Version bump only for package graphile-test
+
+# [2.11.0](https://github.com/constructive-io/constructive/compare/graphile-test@2.10.0...graphile-test@2.11.0) (2025-12-14)
+
+### Features
+
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+- separate GraphQL types into @launchql/types package ([6359f58](https://github.com/constructive-io/constructive/commit/6359f5895790593759e3cea9872fad5c119063ef))
+
+# [2.10.0](https://github.com/constructive-io/constructive/compare/graphile-test@2.9.3...graphile-test@2.10.0) (2025-12-14)
+
+### Features
+
+- rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
+
+## [2.9.3](https://github.com/constructive-io/constructive/compare/graphile-test@2.9.2...graphile-test@2.9.3) (2025-12-13)
+
+**Note:** Version bump only for package graphile-test
+
 ## [2.9.2](https://github.com/constructive-io/constructive/compare/graphile-test@2.9.1...graphile-test@2.9.2) (2025-12-12)
 
 **Note:** Version bump only for package graphile-test

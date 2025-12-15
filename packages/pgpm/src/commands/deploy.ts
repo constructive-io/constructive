@@ -1,6 +1,6 @@
-import { LaunchQLPackage } from '@launchql/core';
-import { getEnvOptions } from '@launchql/env';
-import { Logger } from '@launchql/logger';
+import { PgpmPackage } from '@pgpmjs/core';
+import { getEnvOptions } from '@pgpmjs/env';
+import { Logger } from '@pgpmjs/logger';
 import { execSync } from 'child_process';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -9,7 +9,7 @@ import {
   getSpawnEnvWithPg,
 } from 'pg-env';
 
-import { getTargetDatabase } from '../utils';
+import { getTargetDatabase, resolvePackageAlias } from '../utils';
 import { selectPackage } from '../utils/module-utils';
 
 const deployUsageText = `
@@ -146,7 +146,7 @@ export default async (
   
   const opts = getEnvOptions(cliOverrides);
 
-  const project = new LaunchQLPackage(cwd);
+  const project = new PgpmPackage(cwd);
   
   let target: string | undefined;
   if (packageName && argv.to) {
@@ -154,9 +154,10 @@ export default async (
   } else if (packageName) {
     target = packageName;
   } else if (argv.package && argv.to) {
-    target = `${argv.package}:${argv.to}`;
+    const resolvedPackage = resolvePackageAlias(argv.package as string, cwd);
+    target = `${resolvedPackage}:${argv.to}`;
   } else if (argv.package) {
-    target = argv.package as string;
+    target = resolvePackageAlias(argv.package as string, cwd);
   }
   
   await project.deploy(
