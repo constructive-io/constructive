@@ -2,6 +2,7 @@ import { getEnvOptions, getNodeEnv } from '@pgpmjs/env';
 import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 import { getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
+import type { PgpmOptions } from '@pgpmjs/types';
 
 type Maybe<T> = T | null | undefined;
 
@@ -18,7 +19,7 @@ const toStrArray = (v: Maybe<string>): string[] | undefined =>
 
 // ---- PG config ----
 export const getJobPgConfig = (): PgConfig => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   const envOnly = getPgEnvVars();
 
   return {
@@ -34,7 +35,7 @@ export const getJobPool = (): Pool =>
 
 // ---- Schema ----
 export const getJobSchema = (): string => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   const fromOpts: string | undefined = opts.jobs?.schema?.schema;
   const fromEnv = process.env.JOBS_SCHEMA;
   return fromEnv || fromOpts || 'app_jobs';
@@ -42,7 +43,7 @@ export const getJobSchema = (): string => {
 
 // ---- SupportAny / Supported ----
 export const getJobSupportAny = (): boolean => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   const envVal = toBool(process.env.JOBS_SUPPORT_ANY);
   if (typeof envVal === 'boolean') return envVal;
 
@@ -53,7 +54,7 @@ export const getJobSupportAny = (): boolean => {
 };
 
 export const getJobSupported = (): string[] => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   const envVal = toStrArray(process.env.JOBS_SUPPORTED);
   if (envVal) return envVal;
 
@@ -65,7 +66,7 @@ export const getJobSupported = (): string[] => {
 
 // ---- Hostnames ----
 export const getWorkerHostname = (): string => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   return (
     process.env.HOSTNAME ||
     opts.jobs?.worker?.hostname ||
@@ -74,7 +75,7 @@ export const getWorkerHostname = (): string => {
 };
 
 export const getSchedulerHostname = (): string => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   return (
     process.env.HOSTNAME ||
     opts.jobs?.scheduler?.hostname ||
@@ -84,7 +85,7 @@ export const getSchedulerHostname = (): string => {
 
 // ---- Job gateway config (generic HTTP gateway) ----
 export const getJobGatewayConfig = () => {
-  const opts = getEnvOptions() as any;
+  const opts: PgpmOptions = getEnvOptions();
   const gateway = opts.jobs?.gateway ?? {};
   const envCbPort = Number(process.env.INTERNAL_JOBS_CALLBACK_PORT);
 
