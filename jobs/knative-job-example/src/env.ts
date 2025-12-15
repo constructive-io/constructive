@@ -1,9 +1,4 @@
-import { cleanEnv, port } from 'envalid';
-
-export default cleanEnv(
-  process.env,
-  {
-    PORT: port({ default: 10101 })
-  },
-  { dotEnvPath: null }
-);
+// Simple example env wrapper; kept minimal on purpose.
+export default {
+  PORT: Number(process.env.PORT) || 10101
+};

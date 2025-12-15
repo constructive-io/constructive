@@ -1,34 +1,51 @@
 #!/usr/bin/env node
 
-import env from './env';
 import Scheduler from '@launchql/job-scheduler';
 import Worker from '@launchql/knative-job-worker';
 import server from '@launchql/knative-job-server';
 import poolManager from '@launchql/job-pg';
 import { Client } from 'pg';
 import retry from 'async-retry';
+import {
+  getJobPgConfig,
+  getJobSchema,
+  getSchedulerHostname,
+  getWorkerHostname,
+  getJobSupported,
+  getJobsCallbackPort
+} from '@launchql/job-utils';
 
-export const getDbConnectionString = (): string =>
-  `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}`;
+export const getDbConnectionString = (): string => {
+  const cfg = getJobPgConfig();
+  const auth = cfg.user
+    ? `${cfg.user}${cfg.password ? `:${cfg.password}` : ''}@`
+    : '';
+  return `postgres://${auth}${cfg.host}:${cfg.port}/${cfg.database}`;
+};
 
 export const startJobsServices = () => {
+  // eslint-disable-next-line no-console
   console.log('starting jobs services...');
   const pgPool = poolManager.getPool();
   const app = server(pgPool);
 
-  const httpServer = app.listen(env.INTERNAL_JOBS_CALLBACK_PORT, () => {
-    console.log(`[cb] listening ON ${env.INTERNAL_JOBS_CALLBACK_PORT}`);
+  const callbackPort = getJobsCallbackPort();
+  const httpServer = app.listen(callbackPort, () => {
+    // eslint-disable-next-line no-console
+    console.log(`[cb] listening ON ${callbackPort}`);
+
+    const tasks = getJobSupported();
 
     const worker = new Worker({
       pgPool,
-      workerId: env.HOSTNAME,
-      tasks: env.JOBS_SUPPORTED
+      workerId: getWorkerHostname(),
+      tasks
     });
 
     const scheduler = new Scheduler({
       pgPool,
-      workerId: env.HOSTNAME,
-      tasks: env.JOBS_SUPPORTED
+      workerId: getSchedulerHostname(),
+      tasks
     });
 
     worker.listen();
@@ -39,23 +56,34 @@ export const startJobsServices = () => {
 };
 
 export const waitForJobsPrereqs = async (): Promise<void> => {
+  // eslint-disable-next-line no-console
   console.log('waiting for jobs prereqs');
   let client: Client | null = null;
   try {
-    client = new Client(getDbConnectionString());
+    const cfg = getJobPgConfig();
+    client = new Client({
+      host: cfg.host,
+      port: cfg.port,
+      user: cfg.user,
+      password: cfg.password,
+      database: cfg.database
+    });
     await client.connect();
-    await client.query(`SELECT * FROM "${env.JOBS_SCHEMA}".jobs LIMIT 1;`);
+    const schema = getJobSchema();
+    await client.query(`SELECT * FROM "${schema}".jobs LIMIT 1;`);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     throw new Error('jobs server boot failed...');
   } finally {
     if (client) {
-      client.end();
+      void client.end();
     }
   }
 };
 
 export const bootJobs = async (): Promise<void> => {
+  // eslint-disable-next-line no-console
   console.log('attempting to boot jobs');
   await retry(
     async () => {

@@ -23,7 +23,7 @@ COPY . .
 
 # Install and build all workspaces
 RUN set -eux; \
-    pnpm install --frozen-lockfile; \
+    CI=true pnpm install --frozen-lockfile; \
     pnpm run build
 
 ################################################################################

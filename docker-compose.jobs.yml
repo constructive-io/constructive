@@ -2,7 +2,10 @@ services:
   # LaunchQL API server (GraphQL)
   launchql-server:
     container_name: launchql-server
-    image: ghcr.io/constructive-io/launchql:b88e3d1
+    image: constructive-launchql:dev
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     # The image entrypoint already runs the LaunchQL CLI (`lql`).
     # We only need to provide the subcommand and flags here.
     entrypoint: ["lql", "server", "--port", "3000", "--origin", "*", "--strictAuth", "false"]
@@ -34,7 +37,7 @@ services:
   # Simple email function (Knative-style HTTP function)
   simple-email:
     container_name: simple-email
-    image: ghcr.io/constructive-io/launchql:b88e3d1
+    image: constructive-launchql:dev
     # Override the image entrypoint (LaunchQL CLI) and run the Node function directly.
     entrypoint: ["node", "functions/simple-email/dist/index.js"]
     environment:
@@ -43,8 +46,10 @@ services:
       # Mailgun / email provider configuration for @launchql/postmaster
       # Replace with real credentials for local testing.
       MAILGUN_API_KEY: "change-me-mailgun-api-key"
+      MAILGUN_KEY: "change-me-mailgun-api-key"
       MAILGUN_DOMAIN: "mg.constructive.io"
       MAILGUN_FROM: "no-reply@mg.constructive.io"
+      MAILGUN_REPLY: "info@mg.constructive.io"
     ports:
       # Expose function locally (optional)
       - "8081:8080"
@@ -54,7 +59,7 @@ services:
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
     container_name: knative-job-service
-    image: ghcr.io/constructive-io/launchql:b88e3d1
+    image: constructive-launchql:dev
     # Override the image entrypoint and run the jobs runtime directly.
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
@@ -77,12 +82,11 @@ services:
 
       # Callback HTTP server (job completion callbacks)
       INTERNAL_JOBS_CALLBACK_PORT: "8080"
-      INTERNAL_JOBS_CALLBACK_URL: "http://knative-job-service:8080"
+      # Hostname used by job-utils.getCallbackBaseUrl for callbacks
+      JOBS_CALLBACK_HOST: "knative-job-service"
 
       # Function gateway base URL (used by worker when no dev map is present)
-      # Not used in dev when INTERNAL_GATEWAY_DEVELOPMENT_MAP is set, but required for validation.
       KNATIVE_SERVICE_URL: "dev.internal"
-      INTERNAL_GATEWAY_URL: "http://simple-email:8080"
 
       # Development-only map from task identifier -> function URL
       # Used by @launchql/knative-job-worker when NODE_ENV !== 'production'.

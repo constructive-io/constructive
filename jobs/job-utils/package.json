@@ -29,6 +29,9 @@
   },
   "dependencies": {
     "@pgpmjs/types": "workspace:^",
-    "envalid": "6.0.2"
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "pg-env": "workspace:^",
+    "pg-cache": "workspace:^"
   }
 }

@@ -56,7 +56,7 @@ This ensures all subsequent `pgpm` and `psql` commands point at the same local d
 
 Make sure `pgpm` is installed and up to date.
 
-From the `constructive/` directory (with `pgenv` applied):
+From the `constructive-db/` directory (with `pgenv` applied):
 
 1. Bootstrap admin users:
 

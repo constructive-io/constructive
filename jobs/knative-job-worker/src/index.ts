@@ -2,8 +2,8 @@ import poolManager from '@launchql/job-pg';
 import * as jobs from '@launchql/job-utils';
 import type { PgClientLike } from '@launchql/job-utils';
 import type { Pool, PoolClient } from 'pg';
+import { Logger } from '@pgpmjs/logger';
 import { request as req } from './req';
-import env from './env';
 
 export interface JobRow {
   id: number | string;
@@ -12,7 +12,8 @@ export interface JobRow {
   database_id?: string;
 }
 
-/* eslint-disable no-console */
+const log = new Logger('jobs:worker');
+
 export default class Worker {
   idleDelay: number;
   supportedTaskNames: string[];
@@ -67,22 +68,21 @@ export default class Worker {
     }: { err?: Error; fatalError: unknown; jobId: JobRow['id'] }
   ) {
     const when = err ? `after failure '${err.message}'` : 'after success';
-    console.error(
-      `worker: Failed to release job '${jobId}' ${when}; committing seppuku`
-    );
+    log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
     await poolManager.close();
-    console.error(fatalError);
+    log.error(String(fatalError));
     process.exit(1);
   }
   async handleError(
     client: PgClientLike,
     { err, job, duration }: { err: Error; job: JobRow; duration: string }
   ) {
-    console.error(
-      `worker: Failed task ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`,
-      { err, stack: err.stack }
+    log.error(
+      `Failed task ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`
     );
-    console.error(err.stack);
+    if (err.stack) {
+      log.debug(err.stack);
+    }
     await jobs.failJob(client, {
       workerId: this.workerId,
       jobId: job.id,
@@ -93,14 +93,14 @@ export default class Worker {
     client: PgClientLike,
     { job, duration }: { job: JobRow; duration: string }
   ) {
-    console.log(
-      `worker: Async task ${job.id} (${job.task_identifier}) to be processed`
+    log.info(
+      `Async task ${job.id} (${job.task_identifier}) to be processed`
     );
   }
   async doWork(job: JobRow) {
     const { payload, task_identifier } = job;
     if (
-      !env.JOBS_SUPPORT_ANY &&
+      !jobs.getJobSupportAny() &&
       !this.supportedTaskNames.includes(task_identifier)
     ) {
       throw new Error('Unsupported task');
@@ -117,7 +117,7 @@ export default class Worker {
       return await this.initialize(client);
     }
 
-    console.log('worker: checking for jobs...');
+    log.debug('checking for jobs...');
     if (this.doNextTimer) {
       clearTimeout(this.doNextTimer);
       this.doNextTimer = undefined;
@@ -125,7 +125,7 @@ export default class Worker {
     try {
       const job = (await jobs.getJob<JobRow>(client, {
         workerId: this.workerId,
-        supportedTaskNames: env.JOBS_SUPPORT_ANY
+        supportedTaskNames: jobs.getJobSupportAny()
           ? null
           : this.supportedTaskNames
       })) as JobRow | undefined;
@@ -165,13 +165,13 @@ export default class Worker {
     }
   }
   listen() {
-    const listenForChanges = (
+      const listenForChanges = (
       err: Error | null,
       client: PoolClient,
       release: () => void
     ) => {
       if (err) {
-        console.error('worker: Error connecting with notify listener', err);
+        log.error('Error connecting with notify listener');
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
@@ -185,11 +185,11 @@ export default class Worker {
       });
       client.query('LISTEN "jobs:insert"');
       client.on('error', (e: unknown) => {
-        console.error('worker: Error with database notify listener', e);
+        log.error('Error with database notify listener');
         release();
         this.listen();
       });
-      console.log(`worker: ${this.workerId} connected and looking for jobs...`);
+      log.info(`${this.workerId} connected and looking for jobs...`);
       this.doNext(client);
     };
     this.pgPool.connect(listenForChanges);

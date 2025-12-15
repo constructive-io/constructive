@@ -1,8 +1,9 @@
 import env from './env';
 import requestLib from 'request';
+import { getCallbackBaseUrl } from '@launchql/job-utils';
 
-// for completion
-const completeUrl = env.INTERNAL_JOBS_CALLBACK_URL;
+// callback URL for job completion
+const completeUrl = getCallbackBaseUrl();
 
 let hasDevMap = false;
 let DEV_MAP: Record<string, string> = {};
@@ -44,7 +45,7 @@ const request = (
           'X-Job-Id': jobId,
           'X-Database-Id': databaseId,
 
-          // this one is used by OpenFAAS
+          // async HTTP completion callback
           'X-Callback-Url': completeUrl
         },
         url,
