@@ -35,7 +35,7 @@ beforeAll(async () => {
     __dirname,
     '../../../extensions/@pgpm/database-jobs'
   );
-  ({ db, teardown } = await getConnections({}, [seed.launchql(modulePath)]));
+  ({ db, teardown } = await getConnections({}, [seed.loadPgpm(modulePath)]));
   db.setContext({ role: 'administrator' });
 });
 

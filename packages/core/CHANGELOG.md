@@ -100,154 +100,154 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - **core): add analyzeModule and renameModule; feat(cli:** add analyze and rename commands ([90c3fdc](https://github.com/constructive-io/constructive/commit/90c3fdc888305ace8586e442c1928a34da6ecda5))
 - **core/cli:** simplify plan options to useTags; default CLI to packages+useTags (non-blocking). Keep preferPackageTags/tags as aliases for backward compatibility; update usage text ([f3db407](https://github.com/constructive-io/constructive/commit/f3db407c93f9f48bb57e7a2c9ac153dc30c5ce7c))
 - **core:** add file creation logging to pgpm add command ([67e9083](https://github.com/constructive-io/constructive/commit/67e9083756bb7d869a32bcf2f58b337fed63d510))
-- **core:** plan-only dependency resolution; thread usePlan through DeployOptions and LaunchQLMigrate; use plan graph when usePlan=true ([571f37f](https://github.com/constructive-io/constructive/commit/571f37f5bdc1128398d8750b0bbe6261c31516ac))
+- **core:** plan-only dependency resolution; thread usePlan through DeployOptions and PgpmMigrate; use plan graph when usePlan=true ([571f37f](https://github.com/constructive-io/constructive/commit/571f37f5bdc1128398d8750b0bbe6261c31516ac))
 - **core:** prefer [@latest](https://github.com/latest) tag for external packages in plan generation; expose tags option; add stage fixture test (unique-names) for packages+tags ([8656acb](https://github.com/constructive-io/constructive/commit/8656acb6af508561b616c96422660577eeb50902))
 - **core:** simplify deploy script headers while maintaining backwards compatibility ([62298ac](https://github.com/constructive-io/constructive/commit/62298ac92f82cab0b7d975efa0214f3a1610fae1))
-- **core:** thread usePlan into DeployOptions and LaunchQLMigrate; add plan-only mode to resolveDependencies to avoid SQL scanning when requested ([9c9e4e3](https://github.com/constructive-io/constructive/commit/9c9e4e3523d220b4b96bbc360dfb50789d69d8e2))
+- **core:** thread usePlan into DeployOptions and PgpmMigrate; add plan-only mode to resolveDependencies to avoid SQL scanning when requested ([9c9e4e3](https://github.com/constructive-io/constructive/commit/9c9e4e3523d220b4b96bbc360dfb50789d69d8e2))
 - create @launchql/env package for consolidated environment management ([004c78e](https://github.com/constructive-io/constructive/commit/004c78e87ceddfc2d0a3f74e79affe13c8a628d1))
 - enhance event logging to persist outside transactions ([12c20ad](https://github.com/constructive-io/constructive/commit/12c20ad6cc8b17c564b4b19cf9531f8eca8cc8cf))
 - expand error system with templated error types ([e08e1c1](https://github.com/constructive-io/constructive/commit/e08e1c1b3c4925807d59831695591a53ca8ebb9b))
 - merge packages/migrate into packages/core ([0a615a7](https://github.com/constructive-io/constructive/commit/0a615a7ea28b42bb37b611364384a2e39ac8dfaf))
 - rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
-- remove all sqitch.conf references, use launchql.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
+- remove all sqitch.conf references, use pgpm.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
 
 ### BREAKING CHANGES
 
-- Modules are now identified by launchql.plan files instead of sqitch.conf
+- Modules are now identified by pgpm.plan files instead of sqitch.conf
 
-## [2.18.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.18.2...@launchql/core@2.18.3) (2025-12-13)
+## [2.18.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.18.2...@pgpmjs/core@2.18.3) (2025-12-13)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.18.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.18.1...@launchql/core@2.18.2) (2025-12-12)
+## [2.18.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.18.1...@pgpmjs/core@2.18.2) (2025-12-12)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.18.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.18.0...@launchql/core@2.18.1) (2025-12-11)
+## [2.18.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.18.0...@pgpmjs/core@2.18.1) (2025-12-11)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.18.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.8...@launchql/core@2.18.0) (2025-12-11)
+# [2.18.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.8...@pgpmjs/core@2.18.0) (2025-12-11)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.8](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.7...@launchql/core@2.17.8) (2025-12-11)
+## [2.17.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.7...@pgpmjs/core@2.17.8) (2025-12-11)
 
 ### Bug Fixes
 
 - **core:** validate and repair cached template repos ([d87df58](https://github.com/constructive-io/constructive/commit/d87df5867c480ec0b0953434e5135ff3628dd9dc))
 
-## [2.17.7](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.6...@launchql/core@2.17.7) (2025-12-10)
+## [2.17.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.6...@pgpmjs/core@2.17.7) (2025-12-10)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.6](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.5...@launchql/core@2.17.6) (2025-11-28)
+## [2.17.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.5...@pgpmjs/core@2.17.6) (2025-11-28)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.5](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.4...@launchql/core@2.17.5) (2025-11-27)
+## [2.17.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.4...@pgpmjs/core@2.17.5) (2025-11-27)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.3...@launchql/core@2.17.4) (2025-11-25)
+## [2.17.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.3...@pgpmjs/core@2.17.4) (2025-11-25)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.2...@launchql/core@2.17.3) (2025-11-25)
+## [2.17.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.2...@pgpmjs/core@2.17.3) (2025-11-25)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.1...@launchql/core@2.17.2) (2025-11-25)
+## [2.17.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.1...@pgpmjs/core@2.17.2) (2025-11-25)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.17.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.17.0...@launchql/core@2.17.1) (2025-11-24)
+## [2.17.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.17.0...@pgpmjs/core@2.17.1) (2025-11-24)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.17.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.4...@launchql/core@2.17.0) (2025-11-22)
-
-### Features
-
-- **core:** add file creation logging to pgpm add command ([67e9083](https://github.com/constructive-io/constructive/commit/67e9083756bb7d869a32bcf2f58b337fed63d510))
-
-# [2.16.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.4...@launchql/core@2.16.0) (2025-11-22)
+# [2.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.4...@pgpmjs/core@2.17.0) (2025-11-22)
 
 ### Features
 
 - **core:** add file creation logging to pgpm add command ([67e9083](https://github.com/constructive-io/constructive/commit/67e9083756bb7d869a32bcf2f58b337fed63d510))
 
-## [2.15.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.3...@launchql/core@2.15.4) (2025-11-21)
+# [2.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.4...@pgpmjs/core@2.16.0) (2025-11-22)
 
-**Note:** Version bump only for package @launchql/core
+### Features
 
-## [2.15.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.2...@launchql/core@2.15.3) (2025-11-21)
+- **core:** add file creation logging to pgpm add command ([67e9083](https://github.com/constructive-io/constructive/commit/67e9083756bb7d869a32bcf2f58b337fed63d510))
 
-**Note:** Version bump only for package @launchql/core
+## [2.15.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.3...@pgpmjs/core@2.15.4) (2025-11-21)
 
-## [2.15.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.1...@launchql/core@2.15.2) (2025-11-20)
+**Note:** Version bump only for package @pgpmjs/core
 
-**Note:** Version bump only for package @launchql/core
+## [2.15.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.2...@pgpmjs/core@2.15.3) (2025-11-21)
 
-## [2.15.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.15.0...@launchql/core@2.15.1) (2025-11-16)
+**Note:** Version bump only for package @pgpmjs/core
+
+## [2.15.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.1...@pgpmjs/core@2.15.2) (2025-11-20)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [2.15.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.15.0...@pgpmjs/core@2.15.1) (2025-11-16)
 
 ### Bug Fixes
 
 - handle missing requires line in .control file during install ([7ed402a](https://github.com/constructive-io/constructive/commit/7ed402a305289638dcfd48cb4d4c19bec484d518)), closes [#291](https://github.com/constructive-io/constructive/issues/291)
 
-# [2.15.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.5...@launchql/core@2.15.0) (2025-11-16)
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.5...@pgpmjs/core@2.15.0) (2025-11-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.14.5](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.4...@launchql/core@2.14.5) (2025-11-15)
+## [2.14.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.4...@pgpmjs/core@2.14.5) (2025-11-15)
 
 ### Bug Fixes
 
 - stop pnpm install command from triggering every build ([ce88a6e](https://github.com/constructive-io/constructive/commit/ce88a6ece261ef02201d417bf3a9446a69df6618))
 
-## [2.14.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.3...@launchql/core@2.14.4) (2025-11-14)
+## [2.14.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.3...@pgpmjs/core@2.14.4) (2025-11-14)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.14.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.2...@launchql/core@2.14.3) (2025-11-14)
+## [2.14.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.2...@pgpmjs/core@2.14.3) (2025-11-14)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.14.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.1...@launchql/core@2.14.2) (2025-11-14)
+## [2.14.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.1...@pgpmjs/core@2.14.2) (2025-11-14)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.14.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.14.0...@launchql/core@2.14.1) (2025-11-14)
+## [2.14.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.14.0...@pgpmjs/core@2.14.1) (2025-11-14)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.14.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.13.0...@launchql/core@2.14.0) (2025-11-14)
+# [2.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.13.0...@pgpmjs/core@2.14.0) (2025-11-14)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.13.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.12.4...@launchql/core@2.13.0) (2025-11-14)
+# [2.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.12.4...@pgpmjs/core@2.13.0) (2025-11-14)
 
 ### Features
 
 - **core:** simplify deploy script headers while maintaining backwards compatibility ([62298ac](https://github.com/constructive-io/constructive/commit/62298ac92f82cab0b7d975efa0214f3a1610fae1))
 
-## [2.12.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.12.3...@launchql/core@2.12.4) (2025-11-13)
+## [2.12.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.12.3...@pgpmjs/core@2.12.4) (2025-11-13)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.12.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.12.2...@launchql/core@2.12.3) (2025-11-13)
+## [2.12.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.12.2...@pgpmjs/core@2.12.3) (2025-11-13)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.12.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.12.1...@launchql/core@2.12.2) (2025-11-12)
+## [2.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.12.1...@pgpmjs/core@2.12.2) (2025-11-12)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.12.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.12.0...@launchql/core@2.12.1) (2025-11-12)
+## [2.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.12.0...@pgpmjs/core@2.12.1) (2025-11-12)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.12.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.7...@launchql/core@2.12.0) (2025-11-12)
+# [2.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.7...@pgpmjs/core@2.12.0) (2025-11-12)
 
 ### Bug Fixes
 
@@ -260,39 +260,39 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **cli:** add custom template support for init command ([4e2cd3f](https://github.com/constructive-io/constructive/commit/4e2cd3fd1377860f29b02b59e72af91cb017b225))
 
-## [2.11.7](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.6...@launchql/core@2.11.7) (2025-11-07)
+## [2.11.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.6...@pgpmjs/core@2.11.7) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.6](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.5...@launchql/core@2.11.6) (2025-11-07)
+## [2.11.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.5...@pgpmjs/core@2.11.6) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.5](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.4...@launchql/core@2.11.5) (2025-11-07)
+## [2.11.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.4...@pgpmjs/core@2.11.5) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.3...@launchql/core@2.11.4) (2025-11-07)
+## [2.11.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.3...@pgpmjs/core@2.11.4) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.2...@launchql/core@2.11.3) (2025-11-07)
+## [2.11.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.2...@pgpmjs/core@2.11.3) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.1...@launchql/core@2.11.2) (2025-11-07)
+## [2.11.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.1...@pgpmjs/core@2.11.2) (2025-11-07)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.11.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.11.0...@launchql/core@2.11.1) (2025-10-18)
+## [2.11.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.11.0...@pgpmjs/core@2.11.1) (2025-10-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.11.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.10.0...@launchql/core@2.11.0) (2025-10-04)
+# [2.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.10.0...@pgpmjs/core@2.11.0) (2025-10-04)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.10.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.9.0...@launchql/core@2.10.0) (2025-09-17)
+# [2.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.9.0...@pgpmjs/core@2.10.0) (2025-09-17)
 
 ### Bug Fixes
 
@@ -305,21 +305,21 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - add CLI command for creating database changes ([a44b643](https://github.com/constructive-io/constructive/commit/a44b643dbba2b93f14aab3828d1c0cc95ee34f6c))
 
-# [2.9.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.8.0...@launchql/core@2.9.0) (2025-09-04)
+# [2.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.8.0...@pgpmjs/core@2.9.0) (2025-09-04)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.8.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.7.1...@launchql/core@2.8.0) (2025-08-20)
+# [2.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.7.1...@pgpmjs/core@2.8.0) (2025-08-20)
 
 ### Features
 
 - **core): add analyzeModule and renameModule; feat(cli:** add analyze and rename commands ([90c3fdc](https://github.com/constructive-io/constructive/commit/90c3fdc888305ace8586e442c1928a34da6ecda5))
 
-## [2.7.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.7.0...@launchql/core@2.7.1) (2025-08-08)
+## [2.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.7.0...@pgpmjs/core@2.7.1) (2025-08-08)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.7.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.6.0...@launchql/core@2.7.0) (2025-08-08)
+# [2.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.6.0...@pgpmjs/core@2.7.0) (2025-08-08)
 
 ### Bug Fixes
 
@@ -337,12 +337,12 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - add LaunchQLInit class and CLI commands for bootstrap roles ([202fb2c](https://github.com/constructive-io/constructive/commit/202fb2cd312de3416521366b2e4ecdfa77a5ab63))
 - **cli): default lql plan to include packages and prefer tags via non-blocking prompts; update usage text; keep advanced tags internal\n\nfix(core:** only prefer package tags when explicitly enabled; preserve prior default behavior in core API ([b770560](https://github.com/constructive-io/constructive/commit/b77056050337fad4f6387b78a79032a88a95e964))
 - **core/cli:** simplify plan options to useTags; default CLI to packages+useTags (non-blocking). Keep preferPackageTags/tags as aliases for backward compatibility; update usage text ([f3db407](https://github.com/constructive-io/constructive/commit/f3db407c93f9f48bb57e7a2c9ac153dc30c5ce7c))
-- **core:** plan-only dependency resolution; thread usePlan through DeployOptions and LaunchQLMigrate; use plan graph when usePlan=true ([571f37f](https://github.com/constructive-io/constructive/commit/571f37f5bdc1128398d8750b0bbe6261c31516ac))
+- **core:** plan-only dependency resolution; thread usePlan through DeployOptions and PgpmMigrate; use plan graph when usePlan=true ([571f37f](https://github.com/constructive-io/constructive/commit/571f37f5bdc1128398d8750b0bbe6261c31516ac))
 - **core:** prefer [@latest](https://github.com/latest) tag for external packages in plan generation; expose tags option; add stage fixture test (unique-names) for packages+tags ([8656acb](https://github.com/constructive-io/constructive/commit/8656acb6af508561b616c96422660577eeb50902))
-- **core:** thread usePlan into DeployOptions and LaunchQLMigrate; add plan-only mode to resolveDependencies to avoid SQL scanning when requested ([9c9e4e3](https://github.com/constructive-io/constructive/commit/9c9e4e3523d220b4b96bbc360dfb50789d69d8e2))
+- **core:** thread usePlan into DeployOptions and PgpmMigrate; add plan-only mode to resolveDependencies to avoid SQL scanning when requested ([9c9e4e3](https://github.com/constructive-io/constructive/commit/9c9e4e3523d220b4b96bbc360dfb50789d69d8e2))
 - expand error system with templated error types ([e08e1c1](https://github.com/constructive-io/constructive/commit/e08e1c1b3c4925807d59831695591a53ca8ebb9b))
 
-# [2.6.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.5.0...@launchql/core@2.6.0) (2025-07-31)
+# [2.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.5.0...@pgpmjs/core@2.6.0) (2025-07-31)
 
 ### Bug Fixes
 
@@ -404,174 +404,174 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - enhance event logging to persist outside transactions ([12c20ad](https://github.com/constructive-io/constructive/commit/12c20ad6cc8b17c564b4b19cf9531f8eca8cc8cf))
 - merge packages/migrate into packages/core ([0a615a7](https://github.com/constructive-io/constructive/commit/0a615a7ea28b42bb37b611364384a2e39ac8dfaf))
 
-# [2.5.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.4.0...@launchql/core@2.5.0) (2025-07-15)
+# [2.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.4.0...@pgpmjs/core@2.5.0) (2025-07-15)
 
 ### Features
 
-- remove all sqitch.conf references, use launchql.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
+- remove all sqitch.conf references, use pgpm.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
 
 ### BREAKING CHANGES
 
-- Modules are now identified by launchql.plan files instead of sqitch.conf
+- Modules are now identified by pgpm.plan files instead of sqitch.conf
 
-# [2.4.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.3.1...@launchql/core@2.4.0) (2025-06-30)
+# [2.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.3.1...@pgpmjs/core@2.4.0) (2025-06-30)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.3.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.3.0...@launchql/core@2.3.1) (2025-06-28)
+## [2.3.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.3.0...@pgpmjs/core@2.3.1) (2025-06-28)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.3.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.2.0...@launchql/core@2.3.0) (2025-06-27)
+# [2.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.2.0...@pgpmjs/core@2.3.0) (2025-06-27)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.2.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.20...@launchql/core@2.2.0) (2025-06-25)
+# [2.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.20...@pgpmjs/core@2.2.0) (2025-06-25)
 
 ### Bug Fixes
 
 - add function delimeter ([e099e39](https://github.com/constructive-io/constructive/commit/e099e3935412fba88fc74325d7cb7013cfe60336))
 
-## [2.1.20](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.19...@launchql/core@2.1.20) (2025-05-30)
+## [2.1.20](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.19...@pgpmjs/core@2.1.20) (2025-05-30)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.19](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.18...@launchql/core@2.1.19) (2025-05-30)
+## [2.1.19](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.18...@pgpmjs/core@2.1.19) (2025-05-30)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.18](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.17...@launchql/core@2.1.18) (2025-05-29)
+## [2.1.18](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.17...@pgpmjs/core@2.1.18) (2025-05-29)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.17](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.16...@launchql/core@2.1.17) (2025-05-27)
+## [2.1.17](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.16...@pgpmjs/core@2.1.17) (2025-05-27)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.16](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.15...@launchql/core@2.1.16) (2025-05-25)
+## [2.1.16](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.15...@pgpmjs/core@2.1.16) (2025-05-25)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
 ## 2.1.15 (2025-05-24)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.14](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.13...@launchql/core@2.1.14) (2025-05-24)
+## [2.1.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.13...@pgpmjs/core@2.1.14) (2025-05-24)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.13](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.12...@launchql/core@2.1.13) (2025-05-20)
+## [2.1.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.12...@pgpmjs/core@2.1.13) (2025-05-20)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.12](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.11...@launchql/core@2.1.12) (2025-05-20)
+## [2.1.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.11...@pgpmjs/core@2.1.12) (2025-05-20)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.11](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.10...@launchql/core@2.1.11) (2025-05-19)
+## [2.1.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.10...@pgpmjs/core@2.1.11) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.10](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.9...@launchql/core@2.1.10) (2025-05-19)
+## [2.1.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.9...@pgpmjs/core@2.1.10) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.9](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.8...@launchql/core@2.1.9) (2025-05-19)
+## [2.1.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.8...@pgpmjs/core@2.1.9) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.8](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.7...@launchql/core@2.1.8) (2025-05-19)
+## [2.1.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.7...@pgpmjs/core@2.1.8) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.7](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.6...@launchql/core@2.1.7) (2025-05-19)
+## [2.1.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.6...@pgpmjs/core@2.1.7) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.6](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.5...@launchql/core@2.1.6) (2025-05-19)
+## [2.1.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.5...@pgpmjs/core@2.1.6) (2025-05-19)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.5](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.4...@launchql/core@2.1.5) (2025-05-18)
+## [2.1.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.4...@pgpmjs/core@2.1.5) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.3...@launchql/core@2.1.4) (2025-05-18)
+## [2.1.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.3...@pgpmjs/core@2.1.4) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.2...@launchql/core@2.1.3) (2025-05-18)
+## [2.1.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.2...@pgpmjs/core@2.1.3) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.1...@launchql/core@2.1.2) (2025-05-18)
+## [2.1.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.1...@pgpmjs/core@2.1.2) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.1.1](https://github.com/constructive-io/constructive/compare/@launchql/core@2.1.0...@launchql/core@2.1.1) (2025-05-18)
+## [2.1.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.1.0...@pgpmjs/core@2.1.1) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-# [2.1.0](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.15...@launchql/core@2.1.0) (2025-05-18)
+# [2.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.15...@pgpmjs/core@2.1.0) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.15](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.14...@launchql/core@2.0.15) (2025-05-18)
+## [2.0.15](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.14...@pgpmjs/core@2.0.15) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.14](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.13...@launchql/core@2.0.14) (2025-05-18)
+## [2.0.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.13...@pgpmjs/core@2.0.14) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.13](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.12...@launchql/core@2.0.13) (2025-05-18)
+## [2.0.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.12...@pgpmjs/core@2.0.13) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.12](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.11...@launchql/core@2.0.12) (2025-05-18)
+## [2.0.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.11...@pgpmjs/core@2.0.12) (2025-05-18)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.11](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.10...@launchql/core@2.0.11) (2025-05-16)
+## [2.0.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.10...@pgpmjs/core@2.0.11) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.10](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.9...@launchql/core@2.0.10) (2025-05-16)
+## [2.0.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.9...@pgpmjs/core@2.0.10) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.9](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.8...@launchql/core@2.0.9) (2025-05-16)
+## [2.0.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.8...@pgpmjs/core@2.0.9) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.8](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.7...@launchql/core@2.0.8) (2025-05-16)
+## [2.0.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.7...@pgpmjs/core@2.0.8) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.7](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.6...@launchql/core@2.0.7) (2025-05-16)
+## [2.0.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.6...@pgpmjs/core@2.0.7) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.6](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.5...@launchql/core@2.0.6) (2025-05-16)
+## [2.0.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.5...@pgpmjs/core@2.0.6) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.5](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.4...@launchql/core@2.0.5) (2025-05-16)
+## [2.0.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.4...@pgpmjs/core@2.0.5) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.4](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.3...@launchql/core@2.0.4) (2025-05-16)
+## [2.0.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.3...@pgpmjs/core@2.0.4) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.3](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.2...@launchql/core@2.0.3) (2025-05-16)
+## [2.0.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.2...@pgpmjs/core@2.0.3) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
-## [2.0.2](https://github.com/constructive-io/constructive/compare/@launchql/core@2.0.1...@launchql/core@2.0.2) (2025-05-16)
+## [2.0.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@2.0.1...@pgpmjs/core@2.0.2) (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core
 
 ## 2.0.1 (2025-05-16)
 
-**Note:** Version bump only for package @launchql/core
+**Note:** Version bump only for package @pgpmjs/core

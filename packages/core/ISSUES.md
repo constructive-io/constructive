@@ -18,7 +18,7 @@ you'll see some commented out code:
 
 please carefully make sure that we can revert back to a change, and also revert a tag. 
 
-our tag resolution should be higher up in the API surface, but I believe the LaunchQLMigrate class already handles this, we should check
+our tag resolution should be higher up in the API surface, but I believe the PgpmMigrate class already handles this, we should check
 
 
 

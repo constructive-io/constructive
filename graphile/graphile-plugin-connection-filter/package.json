@@ -33,7 +33,8 @@
     "postgres",
     "graphql",
     "filters",
-    "launchql"
+    "constructive",
+    "pgpm"
   ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"

@@ -37,7 +37,8 @@
     "postgresql",
     "postgis",
     "filters",
-    "launchql"
+    "constructive",
+    "pgpm"
   ],
   "dependencies": {
     "find-and-require-package-json": "^0.8.1",

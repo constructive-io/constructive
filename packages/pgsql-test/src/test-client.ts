@@ -6,7 +6,7 @@ import { generateContextStatements } from './context-utils';
 import { insertJson, type JsonSeedMap } from './seed/json';
 import { loadCsvMap, type CsvSeedMap } from './seed/csv';
 import { loadSqlFiles } from './seed/sql';
-import { deployLaunchql } from './seed/launchql';
+import { deployLaunchql } from './seed/pgpm';
 
 export type PgTestClientOpts = {
   deferConnect?: boolean;

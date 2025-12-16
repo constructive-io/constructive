@@ -155,8 +155,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- remove all sqitch.conf references, use launchql.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive-2.0/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
+- remove all sqitch.conf references, use pgpm.plan for module discovery ([59c5003](https://github.com/constructive-io/constructive-2.0/commit/59c500304da69efc3cdb8111ffbac22af80e3189))
 
 ### BREAKING CHANGES
 
-- Modules are now identified by launchql.plan files instead of sqitch.conf
+- Modules are now identified by pgpm.plan files instead of sqitch.conf
