@@ -16,7 +16,7 @@ describe('Template scaffolding', () => {
       type: 'workspace',
       outputDir: outDir,
       templateRepo: TEMPLATE_REPO,
-      branch: 'restructuring', // TODO: remove after merging restructuring to main
+      branch: 'main',
       templatePath: 'default/workspace',
       answers: { 
         name: 'demo-workspace',
@@ -41,7 +41,7 @@ describe('Template scaffolding', () => {
       type: 'module',
       outputDir: outDir,
       templateRepo: TEMPLATE_REPO,
-      branch: 'restructuring', // TODO: remove after merging restructuring to main
+      branch: 'main',
       templatePath: 'default/module',
       answers: { 
         name: 'demo-module',
