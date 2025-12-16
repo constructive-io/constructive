@@ -2,6 +2,7 @@ import { getConnEnvOptions } from '@pgpmjs/env';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { randomUUID } from 'crypto';
 import { teardownPgPools } from 'pg-cache';
+
 import {
   getPgEnvOptions,
   PgConfig,
@@ -55,7 +56,7 @@ export interface GetConnectionResult {
 
 export const getConnections = async (
   cn: GetConnectionOpts = {},
-  seedAdapters: SeedAdapter[] = [ seed.launchql() ]
+  seedAdapters: SeedAdapter[] = [ seed.pgpm() ]
 ): Promise<GetConnectionResult> => {
 
   cn = getConnOopts(cn);

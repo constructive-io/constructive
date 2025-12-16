@@ -42,6 +42,7 @@
     "query",
     "builder",
     "graphile",
-    "launchql"
+    "constructive",
+    "pgpm"
   ]
 }

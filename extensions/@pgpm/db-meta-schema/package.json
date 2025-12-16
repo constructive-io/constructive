@@ -31,10 +31,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/launchql/pgpm-modules"
+    "url": "https://github.com/constructive-io/pgpm-modules"
   },
-  "homepage": "https://github.com/launchql/pgpm-modules",
+  "homepage": "https://github.com/constructive-io/pgpm-modules",
   "bugs": {
-    "url": "https://github.com/launchql/pgpm-modules/issues"
+    "url": "https://github.com/constructive-io/pgpm-modules/issues"
   }
 }

@@ -1,4 +1,4 @@
-# @launchql/logger
+# @pgpmjs/logger
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -9,7 +9,7 @@ Simple logger utility with yanse colors for consistent logging across packages.
 ## Installation
 
 ```bash
-npm install @launchql/logger
+npm install @pgpmjs/logger
 ```
 
 ## Features
@@ -22,7 +22,7 @@ npm install @launchql/logger
 ## Usage
 
 ```typescript
-import { Logger } from '@launchql/logger';
+import { Logger } from '@pgpmjs/logger';
 
 // Create a logger with a namespace
 const log = new Logger('my-module');
@@ -51,7 +51,7 @@ Creates a new logger instance with the given namespace.
 ## Example
 
 ```typescript
-import { Logger } from '@launchql/logger';
+import { Logger } from '@pgpmjs/logger';
 
 const dbLog = new Logger('database');
 const apiLog = new Logger('api');

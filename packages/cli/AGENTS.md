@@ -111,7 +111,7 @@ export default async (
   }
 
   // 5. Execute deployment
-  const project = new LaunchQLPackage(cwd);
+  const project = new PgpmPackage(cwd);
   await project.deploy(opts, target, recursive);
 }
 ```
@@ -209,7 +209,7 @@ export default async (
   }
 
   // 4. Core logic execution
-  const project = new LaunchQLPackage(cwd);
+  const project = new PgpmPackage(cwd);
   await project.someOperation(options);
 
   // 5. Success reporting
@@ -443,13 +443,13 @@ lql revert --to @v1.0.0
 
 ## 🔍 Integration with Core Classes
 
-### LaunchQLPackage Integration
-Commands primarily use `LaunchQLPackage` for operations:
+### PgpmPackage Integration
+Commands primarily use `PgpmPackage` for operations:
 
 ```typescript
-import { LaunchQLPackage } from '@launchql/core';
+import { PgpmPackage } from '@pgpmjs/core';
 
-const project = new LaunchQLPackage(cwd);
+const project = new PgpmPackage(cwd);
 
 // Context-aware operations
 if (project.isInWorkspace()) {
@@ -462,13 +462,13 @@ if (project.isInWorkspace()) {
 await project.deploy(opts, target, recursive);
 ```
 
-### LaunchQLMigrate Integration
-Some commands use `LaunchQLMigrate` directly:
+### PgpmMigrate Integration
+Some commands use `PgpmMigrate` directly:
 
 ```typescript
-import { LaunchQLMigrate } from '@launchql/core';
+import { PgpmMigrate } from '@pgpmjs/core';
 
-const migrate = new LaunchQLMigrate(pgConfig);
+const migrate = new PgpmMigrate(pgConfig);
 const result = await migrate.status();
 ```
 

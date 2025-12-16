@@ -5,12 +5,12 @@ import type { PgConfig } from 'pg-env';
 import { SeedAdapter, SeedContext } from './types';
 
 /**
- * Standalone helper function to deploy LaunchQL package
+ * Standalone helper function to deploy pgpm package
  * @param config - PostgreSQL configuration
  * @param cwd - Current working directory (defaults to process.cwd())
  * @param cache - Whether to enable caching (defaults to false)
  */
-export async function deployLaunchql(
+export async function deployPgpm(
   config: PgConfig,
   cwd?: string,
   cache: boolean = false
@@ -31,10 +31,10 @@ export async function deployLaunchql(
   );
 }
 
-export function launchql(cwd?: string, cache: boolean = false): SeedAdapter {
+export function pgpm(cwd?: string, cache: boolean = false): SeedAdapter {
   return {
     async seed(ctx: SeedContext) {
-      await deployLaunchql(ctx.config, cwd ?? ctx.connect.cwd, cache);
+      await deployPgpm(ctx.config, cwd ?? ctx.connect.cwd, cache);
     }
   };
 }

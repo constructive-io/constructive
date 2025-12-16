@@ -60,7 +60,7 @@ Part of the [pgpm](https://pgpm.io) ecosystem, `pgsql-test` is built to pair sea
    * [Programmatic Seeding](#-programmatic-seeding)
    * [CSV Seeding](#️-csv-seeding)
    * [JSON Seeding](#️-json-seeding)
-   * [LaunchQL Seeding](#-launchql-seeding)
+   * [pgpm Seeding](#-pgpm-seeding)
 7. [`getConnections() Options` ](#getconnections-options)
 8. [Disclaimer](#disclaimer)
 
@@ -241,9 +241,9 @@ This array lets you fully customize how your test database is seeded. You can co
 * [`seed.fn()`](#-programmatic-seeding) – Run JavaScript/TypeScript logic to programmatically insert data
 * [`seed.csv()`](#️-csv-seeding) – Load tabular data from CSV files
 * [`seed.json()`](#️-json-seeding) – Use in-memory objects as seed data
-* [`seed.launchql()`](#-launchql-seeding) – Apply a LaunchQL project or set of packages (compatible with sqitch)
+* [`seed.loadPgpm()`](#-pgpm-seeding) – Apply a pgpm project or set of packages (compatible with sqitch)
 
-> ✨ **Default Behavior:** If no `SeedAdapter[]` is passed, LaunchQL seeding is assumed. This makes `pgsql-test` zero-config for LaunchQL-based projects.
+> ✨ **Default Behavior:** If no `SeedAdapter[]` is passed, pgpm seeding is assumed. This makes `pgsql-test` zero-config for pgpm-based projects.
 
 This composable system allows you to mix-and-match data setup strategies for flexible, realistic, and fast database tests.
 
@@ -265,7 +265,7 @@ await db.loadCsv({ 'users': '/path/to/users.csv' });
 await db.loadSql(['/path/to/schema.sql']);
 ```
 
-> **Note:** `loadCsv()` and `loadLaunchql()` do not apply RLS context (PostgreSQL limitation). Use `loadJson()` or `loadSql()` for RLS-aware seeding.
+> **Note:** `loadCsv()` and `loadPgpm()` do not apply RLS context (PostgreSQL limitation). Use `loadJson()` or `loadSql()` for RLS-aware seeding.
 
 ### 🔌 SQL File Seeding
 
@@ -506,32 +506,32 @@ it('has loaded rows', async () => {
 
 </details>
 
-## 🚀 LaunchQL Seeding
+## 🚀 pgpm Seeding
 
 **Zero Configuration (Default):**
 ```ts
-// LaunchQL migrate is used automatically
+// pgpm migrate is used automatically
 const { db, teardown } = await getConnections();
 ```
 
 **Adapter Pattern (Custom Path):**
 ```ts
 const { db, teardown } = await getConnections({}, [
-  seed.launchql('/path/to/launchql', true) // with cache
+  seed.loadPgpm('/path/to/pgpm-workspace', true) // with cache
 ]);
 ```
 
 **Direct Load Method:**
 ```ts
-await db.loadLaunchql('/path/to/launchql', true); // with cache
+await db.loadPpgm('/path/to/pgpm-workspace', true); // with cache
 ```
 
-> **Note:** LaunchQL deployment has its own client handling and does not apply RLS context.
+> **Note:** pgpm deployment has its own client handling and does not apply RLS context.
 
 <details>
 <summary>Full example</summary>
 
-If your project uses LaunchQL modules with a precompiled `launchql.plan`, you can use `pgsql-test` with **zero configuration**. Just call `getConnections()` — and it *just works*:
+If your project uses pgpm modules with a precompiled `pgpm.plan`, you can use `pgsql-test` with **zero configuration**. Just call `getConnections()` — and it *just works*:
 
 ```ts
 import { getConnections } from 'pgsql-test';
@@ -539,50 +539,39 @@ import { getConnections } from 'pgsql-test';
 let db, teardown;
 
 beforeAll(async () => {
-  ({ db, teardown } = await getConnections()); // LaunchQL module is deployed automatically
+  ({ db, teardown } = await getConnections()); // pgpm module is deployed automatically
 });
 ```
 
-LaunchQL uses Sqitch-compatible syntax with a TypeScript-based migration engine. By default, `pgsql-test` automatically deploys any LaunchQL module found in the current working directory (`process.cwd()`).
+pgpm uses Sqitch-compatible syntax with a TypeScript-based migration engine. By default, `pgsql-test` automatically deploys any pgpm module found in the current working directory (`process.cwd()`).
 
-To specify a custom path to your LaunchQL module, use `seed.launchql()` explicitly:
+To specify a custom path to your pgpm module, use `seed.loadPgpm()` explicitly:
 
 ```ts
 import path from 'path';
 import { getConnections, seed } from 'pgsql-test';
 
-const cwd = path.resolve(__dirname, '../path/to/launchql');
+const cwd = path.resolve(__dirname, '../path/to/pgpm-workspace');
 
 beforeAll(async () => {
   ({ db, teardown } = await getConnections({}, [
-    seed.launchql(cwd)
+    seed.loadPgpm(cwd)
   ]));
 });
 ```
 
 </details>
 
-## Why LaunchQL's Approach?
+## Why pgpm's Approach?
 
-LaunchQL provides the best of both worlds:
-
-1. **Sqitch Compatibility**: Keep your familiar Sqitch syntax and migration approach
-2. **TypeScript Performance**: Our TS-rewritten deployment engine delivers up to 10x faster schema deployments
-3. **Developer Experience**: Tight feedback loops with near-instant schema setup for tests
-4. **CI Optimization**: Dramatically reduced test suite run times with optimized deployment
-
-By maintaining Sqitch compatibility while supercharging performance, LaunchQL enables you to keep your existing migration patterns while enjoying the speed benefits of our TypeScript engine.
-
-## Why LaunchQL's Approach?
-
-LaunchQL provides the best of both worlds:
+pgpm provides the best of both worlds:
 
 1. **Sqitch Compatibility**: Keep your familiar Sqitch syntax and migration approach
 2. **TypeScript Performance**: Our TS-rewritten deployment engine delivers up to 10x faster schema deployments
 3. **Developer Experience**: Tight feedback loops with near-instant schema setup for tests
 4. **CI Optimization**: Dramatically reduced test suite run times with optimized deployment
 
-By maintaining Sqitch compatibility while supercharging performance, LaunchQL enables you to keep your existing migration patterns while enjoying the speed benefits of our TypeScript engine.
+By maintaining Sqitch compatibility while supercharging performance, pgpm enables you to keep your existing migration patterns while enjoying the speed benefits of our TypeScript engine.
 
 ## `getConnections` Options
 
@@ -593,7 +582,7 @@ This table documents the available options for the `getConnections` function. Th
 | Option                   | Type       | Default          | Description                                                                 |
 | ------------------------ | ---------- | ---------------- | --------------------------------------------------------------------------- |
 | `db.extensions`          | `string[]` | `[]`             | Array of PostgreSQL extensions to include in the test database              |
-| `db.cwd`                 | `string`   | `process.cwd()`  | Working directory used for LaunchQL or Sqitch projects                         |
+| `db.cwd`                 | `string`   | `process.cwd()`  | Working directory used for pgpm or Sqitch projects                         |
 | `db.connection.user`     | `string`   | `'app_user'`     | User for simulating RLS via `setContext()`                                  |
 | `db.connection.password` | `string`   | `'app_password'` | Password for RLS test user                                                  |
 | `db.connection.role`     | `string`   | `'anonymous'`    | Default role used during `setContext()`                                     |

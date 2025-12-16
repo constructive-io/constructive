@@ -1,6 +1,6 @@
-# LaunchQL Agent Navigation Guide
+# Constructive Agent Navigation Guide
 
-This guide helps AI agents quickly navigate and understand the LaunchQL codebase without having to read everything. LaunchQL is a comprehensive full-stack framework for building secure, role-aware GraphQL APIs backed by PostgreSQL databases.
+This guide helps AI agents quickly navigate and understand the Constructive codebase without having to read everything. Constructive is a comprehensive full-stack framework for building secure, role-aware GraphQL APIs backed by PostgreSQL databases.
 
 ## 🎯 Quick Start for Agents
 
@@ -12,17 +12,17 @@ This guide helps AI agents quickly navigate and understand the LaunchQL codebase
 5. **`packages/types`** - TypeScript type definitions
 
 **Key Classes to Understand:**
-- **`LaunchQLPackage`** (`packages/core/src/core/class/launchql.ts`) - Workspace and module management
-- **`LaunchQLMigrate`** (`packages/core/src/migrate/client.ts`) - Database migration operations
+- **`PgpmPackage`** (`packages/core/src/core/class/pgpm.ts`) - Workspace and module management
+- **`PgpmMigrate`** (`packages/core/src/migrate/client.ts`) - Database migration operations
 
 ## 📦 Package Categories
 
 ### 🏗️ Core Framework
 | Package | Purpose | Key Files |
 |---------|---------|-----------|
-| **`core`** | Main orchestration, migrations, dependency resolution | `src/core/class/launchql.ts`, `src/migrate/client.ts` |
+| **`core`** | Main orchestration, migrations, dependency resolution | `src/core/class/pgpm.ts`, `src/migrate/client.ts` |
 | **`cli`** | Command-line interface (`lql` command) | `src/commands.ts`, `src/commands/deploy.ts` |
-| **`types`** | TypeScript type definitions | `src/launchql.ts` |
+| **`types`** | TypeScript type definitions | `src/pgpm.ts` |
 | **`env`** | Environment and configuration management | - |
 
 ### 🚀 API & Server
@@ -89,8 +89,8 @@ This guide helps AI agents quickly navigate and understand the LaunchQL codebase
 
 ## 🔑 Key Classes and Entry Points
 
-### LaunchQLPackage Class
-**Location:** `packages/core/src/core/class/launchql.ts`
+### PgpmPackage Class
+**Location:** `packages/core/src/core/class/pgpm.ts`
 
 **Purpose:** High-level orchestration for workspace and module management
 
@@ -107,7 +107,7 @@ This guide helps AI agents quickly navigate and understand the LaunchQL codebase
 - `getContext()` - Determine if in workspace, module, or outside
 - `isInWorkspace()` / `isInModule()` - Context checks
 
-### LaunchQLMigrate Class
+### PgpmMigrate Class
 **Location:** `packages/core/src/migrate/client.ts`
 
 **Purpose:** Low-level database migration operations
@@ -122,7 +122,7 @@ This guide helps AI agents quickly navigate and understand the LaunchQL codebase
 
 **Configuration:**
 - Supports `content` or `ast` hash methods for SQL files
-- Configurable via `LaunchQLMigrateOptions`
+- Configurable via `PgpmMigrateOptions`
 
 ### CLI Command Structure
 **Location:** `packages/cli/src/commands.ts`
@@ -150,7 +150,7 @@ export default async (argv: ParsedArgs, prompter: Inquirerer, options: CLIOption
 ### 1. Module Development Workflow
 ```typescript
 // 1. Initialize workspace
-const pkg = new LaunchQLPackage(cwd);
+const pkg = new PgpmPackage(cwd);
 pkg.initWorkspace();
 
 // 2. Create module
@@ -177,7 +177,7 @@ await db.query('SELECT 1'); // Ready for testing
 ### 3. Migration Workflow
 ```typescript
 // Direct migration operations
-const migrate = new LaunchQLMigrate(pgConfig);
+const migrate = new PgpmMigrate(pgConfig);
 await migrate.deploy({ modulePath: './my-module' });
 await migrate.verify({ modulePath: './my-module' });
 ```
@@ -187,7 +187,7 @@ await migrate.verify({ modulePath: './my-module' });
 ### Module Structure
 ```
 my-module/
-├── launchql.plan          # Migration plan
+├── pgpm.plan          # Migration plan
 ├── my-module.control      # Extension metadata
 ├── Makefile              # Build configuration
 ├── deploy/               # Deploy scripts

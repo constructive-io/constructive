@@ -288,13 +288,13 @@ This architecture eliminates the traditional ORM layer and API boilerplate, lett
 
 - **[pgpm](https://github.com/constructive-io/constructive/tree/main/packages/pgpm)** - PostgreSQL Package Manager for modular database development with npm-style dependency management
 - **[@launchql/cli](https://github.com/constructive-io/constructive/tree/main/packages/cli)** - Full-featured command-line toolkit for LaunchQL projects with scaffolding, migrations, and deployment
-- **[@launchql/core](https://github.com/constructive-io/constructive/tree/main/packages/core)** - Core migration engine with module orchestration and dependency resolution
+- **[@pgpmjs/core](https://github.com/constructive-io/constructive/tree/main/packages/core)** - Core migration engine with module orchestration and dependency resolution
 
 ### 🚀 GraphQL API & Server
 
 - **[@launchql/server](https://github.com/constructive-io/constructive/tree/main/packages/server)** - Express-based API server powered by PostGraphile with RLS integration and JWT authentication
 - **[@launchql/explorer](https://github.com/constructive-io/constructive/tree/main/packages/explorer)** - GraphiQL interface for exploring your auto-generated GraphQL API
-- **[@launchql/graphile-settings](https://github.com/constructive-io/constructive/tree/main/packages/graphile-settings)** - Centralized PostGraphile plugin configuration with connection filters, PostGIS, and full-text search
+- **[graphile-settings](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-settings)** - Centralized PostGraphile plugin configuration with connection filters, PostGIS, and full-text search
 
 ### 🧪 Testing & Quality Assurance
 
