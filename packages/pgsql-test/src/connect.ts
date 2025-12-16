@@ -55,7 +55,7 @@ export interface GetConnectionResult {
 
 export const getConnections = async (
   cn: GetConnectionOpts = {},
-  seedAdapters: SeedAdapter[] = [ seed.loadPgpm() ]
+  seedAdapters: SeedAdapter[] = [ seed.pgpm() ]
 ): Promise<GetConnectionResult> => {
 
   cn = getConnOopts(cn);
