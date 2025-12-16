@@ -26,8 +26,7 @@ export const withInitDefaults = (argv: ParsedArgs, defaultRepo: string = DEFAULT
   return {
     ...args,
     repo: args.repo ?? defaultRepo,
-    // TODO: remove fromBranch after merging restructuring to main
-    fromBranch: args.fromBranch ?? 'restructuring'
+    fromBranch: args.fromBranch ?? 'main'
     // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution from .boilerplates.json
   };
 };
