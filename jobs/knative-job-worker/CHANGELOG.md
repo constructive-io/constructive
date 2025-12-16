@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.7](https://github.com/constructive-io/jobs/compare/@launchql/knative-job-worker@0.5.6...@launchql/knative-job-worker@0.5.7) (2025-12-16)
+
+**Note:** Version bump only for package @launchql/knative-job-worker
+
 ## [0.5.6](https://github.com/constructive-io/jobs/compare/@launchql/knative-job-worker@0.5.5...@launchql/knative-job-worker@0.5.6) (2025-12-14)
 
 **Note:** Version bump only for package @launchql/knative-job-worker

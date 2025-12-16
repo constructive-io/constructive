@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/constructive-io/constructive/compare/my-ollama@0.5.2...my-ollama@0.5.3) (2025-12-16)
+
+**Note:** Version bump only for package my-ollama
+
 ## [0.5.2](https://github.com/constructive-io/constructive/compare/my-ollama@0.5.1...my-ollama@0.5.2) (2025-12-14)
 
 **Note:** Version bump only for package my-ollama
