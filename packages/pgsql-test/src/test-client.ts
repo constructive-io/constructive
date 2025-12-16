@@ -6,7 +6,7 @@ import { generateContextStatements } from './context-utils';
 import { insertJson, type JsonSeedMap } from './seed/json';
 import { loadCsvMap, type CsvSeedMap } from './seed/csv';
 import { loadSqlFiles } from './seed/sql';
-import { deployLaunchql } from './seed/pgpm';
+import { deployPgpm } from './seed/pgpm';
 
 export type PgTestClientOpts = {
   deferConnect?: boolean;
@@ -199,11 +199,11 @@ export class PgTestClient {
     await loadCsvMap(this.client, tables);
   }
 
-  async loadLaunchql(cwd?: string, cache: boolean = false): Promise<void> {
+  async loadPgpm(cwd?: string, cache: boolean = false): Promise<void> {
     // await this.ctxQuery(); // no point to call ctxQuery() here
-    // because deployLaunchql() has it's own way of getting the client...
+    // because deployPgpm() has it's own way of getting the client...
     // so for now, we'll expose this but it's limited
-    await deployLaunchql(this.config, cwd, cache);
+    await deployPgpm(this.config, cwd, cache);
   }
 
 }
