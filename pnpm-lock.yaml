@@ -70,6 +70,9 @@ importers:
 
   functions/send-email-link:
     dependencies:
+      '@launchql/job-utils':
+        specifier: workspace:^
+        version: link:../../jobs/job-utils
       '@launchql/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
@@ -91,6 +94,9 @@ importers:
 
   functions/simple-email:
     dependencies:
+      '@launchql/job-utils':
+        specifier: workspace:^
+        version: link:../../jobs/job-utils
       '@launchql/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn

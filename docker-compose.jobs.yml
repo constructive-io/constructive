@@ -57,6 +57,30 @@ services:
     networks:
       - constructive-net
 
+  # Send email link function (invite, password reset, verification)
+  send-email-link:
+    container_name: send-email-link
+    image: constructive-launchql:dev
+    entrypoint: ["node", "functions/send-email-link/dist/index.js"]
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      DEFAULT_DATABASE_ID: "dbe"
+      GRAPHQL_URL: "http://launchql-server:3000/graphql"
+      META_GRAPHQL_URL: "http://launchql-server:3000/graphql"
+      # Mailgun / email provider configuration for @launchql/postmaster
+      MAILGUN_API_KEY: "change-me-mailgun-api-key"
+      MAILGUN_KEY: "change-me-mailgun-api-key"
+      MAILGUN_DOMAIN: "mg.constructive.io"
+      MAILGUN_FROM: "no-reply@mg.constructive.io"
+      MAILGUN_REPLY: "info@mg.constructive.io"
+      SEND_EMAIL_LINK_DRY_RUN: "true"
+    ports:
+      # Expose function locally (optional)
+      - "8082:8080"
+    networks:
+      - constructive-net
+
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
     container_name: knative-job-service
@@ -65,6 +89,7 @@ services:
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
       - simple-email
+      - send-email-link
     environment:
       NODE_ENV: development
 
@@ -78,7 +103,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "simple-email"
+      JOBS_SUPPORTED: "simple-email,send-email-link"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -93,8 +118,8 @@ services:
 
       # Development-only map from task identifier -> function URL
       # Used by @launchql/knative-job-worker when NODE_ENV !== 'production'.
-      # This lets the worker call the simple-email container directly in docker-compose.
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"simple-email":"http://simple-email:8080"}'
+      # This lets the worker call the function containers directly in docker-compose.
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"simple-email":"http://simple-email:8080","send-email-link":"http://send-email-link:8080"}'
 
     ports:
       - "8080:8080"

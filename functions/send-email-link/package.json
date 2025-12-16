@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@launchql/knative-job-fn": "workspace:^",
+    "@launchql/job-utils": "workspace:^",
     "@launchql/mjml": "0.1.1",
     "@launchql/postmaster": "0.1.4",
     "@launchql/styled-email": "0.1.0",

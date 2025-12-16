@@ -139,3 +139,13 @@ export const getCallbackBaseUrl = (): string => {
   const port = getJobsCallbackPort();
   return `http://${host}:${port}/callback`;
 };
+
+// ---- Generic env helpers ----
+export const parseEnvBoolean = (
+  name: string,
+  defaultValue = false
+): boolean => {
+  const parsed = toBool(process.env[name]);
+  if (typeof parsed === 'boolean') return parsed;
+  return defaultValue;
+};
