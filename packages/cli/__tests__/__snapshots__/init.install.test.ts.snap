@@ -12,7 +12,7 @@ exports[`cmds:install - with initialized workspace and module installs a module 
   "description": "my-module",
   "devDependencies": {
     "makage": "0.1.8",
-    "pgsql-test": "^2.14.12",
+    "pgsql-test": "^2.16.2",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
@@ -29,7 +29,7 @@ exports[`cmds:install - with initialized workspace and module installs a module 
   "scripts": {
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "makage test --watch deploy --ext sql",
+    "test:watch": "jest --watch",
   },
   "version": "0.0.1",
 }
@@ -151,7 +151,7 @@ exports[`cmds:install - with initialized workspace and module installs two modul
   "description": "my-module",
   "devDependencies": {
     "makage": "0.1.8",
-    "pgsql-test": "^2.14.12",
+    "pgsql-test": "^2.16.2",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
@@ -168,7 +168,7 @@ exports[`cmds:install - with initialized workspace and module installs two modul
   "scripts": {
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "makage test --watch deploy --ext sql",
+    "test:watch": "jest --watch",
   },
   "version": "0.0.1",
 }
