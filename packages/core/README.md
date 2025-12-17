@@ -14,7 +14,7 @@
 
 ## Overview
 
-LaunchQL Core is the main package for LaunchQL, providing tools for database migrations, package management, and package scaffolding. It includes functionality for:
+pgpm Core is the main package for pgpm, providing tools for database migrations, package management, and package scaffolding. It includes functionality for:
 
 - Managing PostgreSQL extensions and modules
 - Deploying, reverting, and verifying migrations
