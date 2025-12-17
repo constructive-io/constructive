@@ -23,7 +23,7 @@ const getFunctionUrl = (fn: string): string => {
 
   const { gatewayUrl } = getJobGatewayConfig();
   const base = gatewayUrl.replace(/\/$/, '');
-  return `http://${fn}.${base}`;
+  return `${base}/${fn}`;
 };
 
 interface RequestOptions {

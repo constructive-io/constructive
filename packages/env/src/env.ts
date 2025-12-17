@@ -62,7 +62,10 @@ export const getEnvVars = (): PgpmOptions => {
     // Jobs-related env vars
     JOBS_SCHEMA,
     JOBS_SUPPORT_ANY,
-    JOBS_SUPPORTED
+    JOBS_SUPPORTED,
+    INTERNAL_GATEWAY_URL,
+    INTERNAL_JOBS_CALLBACK_URL,
+    INTERNAL_JOBS_CALLBACK_PORT
   } = process.env;
 
   return {
@@ -136,6 +139,21 @@ export const getEnvVars = (): PgpmOptions => {
           }),
           ...(JOBS_SUPPORTED && {
             supported: parseEnvStringArray(JOBS_SUPPORTED)
+          })
+        }
+      }),
+      ...((INTERNAL_GATEWAY_URL ||
+        INTERNAL_JOBS_CALLBACK_URL ||
+        INTERNAL_JOBS_CALLBACK_PORT) && {
+        gateway: {
+          ...(INTERNAL_GATEWAY_URL && {
+            gatewayUrl: INTERNAL_GATEWAY_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_URL && {
+            callbackUrl: INTERNAL_JOBS_CALLBACK_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_PORT && {
+            callbackPort: parseEnvNumber(INTERNAL_JOBS_CALLBACK_PORT)
           })
         }
       })
