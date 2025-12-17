@@ -10,9 +10,9 @@ This directory contains Dockerfiles for PostgreSQL-based images that extend the 
 - **pgvector-postgis** - PostgreSQL with both pgvector and PostGIS extensions, plus CloudNativePG compatibility (pgaudit, pg-failover-slots, barman-cloud)
 - **node-sqitch** - Node.js with Sqitch for database change management
 
-## LaunchQL Main Image
+## Constructive Main Image
 
-The main LaunchQL application image (built from the codebase) is now at the **root** of the repository:
+The main Constructive application image (built from the codebase) is now at the **root** of the repository:
 - **Dockerfile**: `/Dockerfile` (root level)
 - **GitHub Action**: `.github/workflows/docker-launchql.yaml`
 
@@ -36,7 +36,7 @@ make PROCESS=pgvector-postgis build-push-process
 make build-push-all
 ```
 
-### Building LaunchQL Image (root level)
+### Building Constructive Image (root level)
 
 ```bash
 # From the root of the repository (uses default versions from Dockerfile)

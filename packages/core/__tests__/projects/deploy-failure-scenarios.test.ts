@@ -23,7 +23,7 @@ describe('Deploy Failure Scenarios', () => {
     /*
      * SCENARIO: Transaction-based deployment with constraint violation
      * 
-     * This test demonstrates LaunchQL's automatic rollback behavior when useTransaction: true (default).
+     * This test demonstrates pgpm's automatic rollback behavior when useTransaction: true (default).
      * When ANY change fails during deployment, ALL changes are automatically rolled back.
      * 
      * Expected behavior:
@@ -77,7 +77,7 @@ describe('Deploy Failure Scenarios', () => {
     /*
      * SCENARIO: Non-transaction deployment with constraint violation
      * 
-     * This test demonstrates LaunchQL's behavior when useTransaction: false.
+     * This test demonstrates pgpm's behavior when useTransaction: false.
      * Each change is deployed individually - successful changes remain deployed
      * even when later changes fail. Manual cleanup is required.
      * 
@@ -148,7 +148,7 @@ describe('Deploy Failure Scenarios', () => {
     /*
      * SCENARIO: Transaction-based deployment with constraint failure
      * 
-     * This test demonstrates LaunchQL's complete rollback behavior when useTransaction: true (default).
+     * This test demonstrates pgpm's complete rollback behavior when useTransaction: true (default).
      * When ANY change fails during deployment, ALL changes are automatically rolled back.
      * 
      * Expected behavior:
@@ -208,7 +208,7 @@ describe('Deploy Failure Scenarios', () => {
     /*
      * SCENARIO: Non-transaction deployment with constraint failure
      * 
-     * This test demonstrates LaunchQL's partial deployment behavior when useTransaction: false.
+     * This test demonstrates pgpm's partial deployment behavior when useTransaction: false.
      * Each change is deployed individually - successful changes remain deployed
      * even when later changes fail. Deployment stops at first failure.
      * 
@@ -282,7 +282,7 @@ describe('Deploy Failure Scenarios', () => {
     /*
      * SCENARIO: Verify script references a table that doesn't exist
      * 
-     * This test demonstrates LaunchQL's verify failure behavior when a verify script
+     * This test demonstrates pgpm's verify failure behavior when a verify script
      * tries to check a table that was never created or was dropped.
      * 
      * Expected behavior:
