@@ -1,10 +1,10 @@
 {
   "name": "@pgpm/uuid",
-  "version": "0.13.0",
+  "version": "0.15.0",
   "description": "UUID utilities and extensions for PostgreSQL",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
-    "Interweb <developers@interweb.co>"
+    "Constructive <developers@constructive.io>"
   ],
   "keywords": [
     "postgresql",
@@ -21,10 +21,10 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/verify": "0.13.0"
+    "@pgpm/verify": "0.15.0"
   },
   "devDependencies": {
-    "pgpm": "^0.2.0"
+    "pgpm": "^1.0.0"
   },
   "repository": {
     "type": "git",

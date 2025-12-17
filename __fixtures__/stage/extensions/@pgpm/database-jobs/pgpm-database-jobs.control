@@ -1,0 +1,8 @@
+# pgpm-database-jobs extension
+comment = 'pgpm-database-jobs extension'
+default_version = '0.14.0'
+module_pathname = '$libdir/pgpm-database-jobs'
+requires = 'plpgsql,uuid-ossp,pgcrypto,pgpm-default-roles,pgpm-verify'
+relocatable = false
+superuser = false
+  

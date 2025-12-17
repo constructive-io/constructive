@@ -5,6 +5,6 @@
 BEGIN;
 
 CREATE DOMAIN geopolygon AS geometry (Polygon, 4326);
-COMMENT ON DOMAIN geopolygon IS E'@name launchqlInternalTypeGeoPolygon';
+COMMENT ON DOMAIN geopolygon IS E'@name pgpmInternalTypeGeoPolygon';
 
 COMMIT;

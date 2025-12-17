@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-uuid
-%uri=launchql-uuid
+%project=pgpm-uuid
+%uri=pgpm-uuid
   
 schemas/uuids/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/uuids/schema
 schemas/uuids/procedures/pseudo_order_seed_uuid [schemas/uuids/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/uuids/procedures/pseudo_order_seed_uuid

@@ -36,7 +36,7 @@ describe('Staging Fixture Tests', () => {
       
       const moduleNames = modules.map(m => m.getModuleName());
       expect(moduleNames).toContain('unique-names');
-      expect(moduleNames.some(name => name.includes('launchql-uuid'))).toBe(true);
+      expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
     });
   });
 
@@ -63,8 +63,8 @@ describe('Staging Fixture Tests', () => {
 
       expect(moduleNames).toContain('unique-names');
 
-      expect(moduleNames.some(name => name.includes('launchql-uuid'))).toBe(true);
-      expect(moduleNames.some(name => name.includes('launchql-base32'))).toBe(true);
+      expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
+      expect(moduleNames.some(name => name.includes('pgpm-base32'))).toBe(true);
 
       expect(moduleNames.some(name => name.includes('db-meta'))).toBe(true);
 
@@ -122,7 +122,7 @@ describe('Staging Fixture Tests', () => {
       expect(project.isInModule()).toBe(true);
       
       const name = project.getModuleName();
-      expect(name).toBe('launchql-uuid');
+      expect(name).toBe('pgpm-uuid');
     });
 
     it('gets module info with version and paths for extensions', async () => {
@@ -175,20 +175,20 @@ describe('Staging Fixture Tests', () => {
       const { native, modules: deps } = project.getModuleDependencies('unique-names');
 
       expect(Array.isArray(deps)).toBe(true);
-      expect(deps.some(dep => dep.includes('launchql-default-roles'))).toBe(true);
-      expect(deps.some(dep => dep.includes('launchql-defaults'))).toBe(true);
-      expect(deps.some(dep => dep.includes('launchql-verify'))).toBe(true);
+      expect(deps.some(dep => dep.includes('pgpm-default-roles'))).toBe(true);
+      expect(deps.some(dep => dep.includes('pgpm-defaults'))).toBe(true);
+      expect(deps.some(dep => dep.includes('pgpm-verify'))).toBe(true);
     });
 
     it('verifies cross-module dependencies work between extensions', async () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const uuidDeps = project.getModuleDependencies('launchql-uuid');
+      const uuidDeps = project.getModuleDependencies('pgpm-uuid');
       expect(uuidDeps.modules).toBeDefined();
       expect(Array.isArray(uuidDeps.modules)).toBe(true);
       
-      const result = await project.getModuleDependencyChanges('launchql-uuid');
+      const result = await project.getModuleDependencyChanges('pgpm-uuid');
       expect(result.modules).toBeDefined();
       expect(Array.isArray(result.modules)).toBe(true);
     });
@@ -202,7 +202,7 @@ describe('Staging Fixture Tests', () => {
       expect(result.modules.length).toBeGreaterThan(0);
       
       const dependencyNames = result.modules.map(dep => dep.name);
-      expect(dependencyNames.some(name => name.includes('launchql-default-roles'))).toBe(true);
+      expect(dependencyNames.some(name => name.includes('pgpm-default-roles'))).toBe(true);
       
       result.modules.forEach(dep => {
         expect(dep).toHaveProperty('name');
@@ -223,7 +223,7 @@ describe('Staging Fixture Tests', () => {
       const dependencyChanges = await project.getModuleDependencyChanges('unique-names');
 
       const defaultRolesDep = dependencyChanges.modules.find(dep =>
-        dep.name.includes('launchql-default-roles')
+        dep.name.includes('pgpm-default-roles')
       );
       
       if (defaultRolesDep) {

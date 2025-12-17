@@ -1,4 +1,4 @@
--- Verify launchql-verify:procedures/list_memberships on pg
+-- Verify pgpm-verify:procedures/list_memberships on pg
 
 BEGIN;
 

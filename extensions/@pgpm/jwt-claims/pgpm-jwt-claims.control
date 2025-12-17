@@ -1,0 +1,8 @@
+# pgpm-jwt-claims extension
+comment = 'pgpm-jwt-claims extension'
+default_version = '0.14.0'
+module_pathname = '$libdir/pgpm-jwt-claims'
+requires = 'plpgsql,uuid-ossp,pgpm-types,pgpm-verify'
+relocatable = false
+superuser = false
+  

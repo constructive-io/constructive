@@ -16,7 +16,7 @@ Module metadata handling and dependency tracking.
 
 ## Overview
 
-`@pgpm/db-meta-modules` extends the `@pgpm/db-meta-schema` package with module-specific metadata tables. This package provides tables for tracking various LaunchQL modules including authentication, permissions, memberships, encrypted secrets, and more. It enables configuration and metadata storage for modular application features.
+`@pgpm/db-meta-modules` extends the `@pgpm/db-meta-schema` package with module-specific metadata tables. This package provides tables for tracking various pgpm modules including authentication, permissions, memberships, encrypted secrets, and more. It enables configuration and metadata storage for modular application features.
 
 ## Features
 
@@ -66,7 +66,7 @@ pgpm deploy
 
 ```bash
 # 1. Create a workspace
-pgpm init --workspace
+pgpm init workspace
 
 # 2. Create your first module
 cd my-workspace

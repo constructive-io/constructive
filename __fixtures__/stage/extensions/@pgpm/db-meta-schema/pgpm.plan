@@ -2,7 +2,7 @@
 %project=db-meta-schema
 %uri=db-meta-schema
   
-schemas/collections_private/schema [launchql-inflection:schemas/inflection/tables/inflection_rules/indexes/inflection_rules_type_idx launchql-database-jobs:schemas/app_jobs/triggers/tg_add_job_with_row launchql-types:schemas/public/domains/url] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/collections_private/schema
+schemas/collections_private/schema [pgpm-inflection:schemas/inflection/tables/inflection_rules/indexes/inflection_rules_type_idx pgpm-database-jobs:schemas/app_jobs/triggers/tg_add_job_with_row pgpm-types:schemas/public/domains/url] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/collections_private/schema
 schemas/collections_public/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/collections_public/schema
 schemas/collections_public/tables/database/table [schemas/collections_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/collections_public/tables/database/table
 schemas/collections_public/tables/schema/table [schemas/collections_public/schema schemas/collections_public/tables/database/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/collections_public/tables/schema/table

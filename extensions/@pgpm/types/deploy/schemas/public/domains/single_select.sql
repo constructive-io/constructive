@@ -7,6 +7,6 @@ BEGIN;
 CREATE DOMAIN single_select AS jsonb CHECK (
   value ?& ARRAY['value']
 );
-COMMENT ON DOMAIN single_select IS E'@name launchqlInternalTypeSingleSelect';
+COMMENT ON DOMAIN single_select IS E'@name pgpmInternalTypeSingleSelect';
 
 COMMIT;

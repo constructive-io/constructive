@@ -3,6 +3,6 @@
 
 BEGIN;
 CREATE DOMAIN origin AS text CHECK (VALUE = substring(VALUE from '^(https?://[^/]*)'));
-COMMENT ON DOMAIN origin IS E'@name launchqlInternalTypeOrigin';
+COMMENT ON DOMAIN origin IS E'@name pgpmInternalTypeOrigin';
 COMMIT;
 

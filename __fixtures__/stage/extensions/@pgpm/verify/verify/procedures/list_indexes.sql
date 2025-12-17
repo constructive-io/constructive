@@ -1,4 +1,4 @@
--- Verify launchql-verify:procedures/list_indexes on pg
+-- Verify pgpm-verify:procedures/list_indexes on pg
 
 BEGIN;
 

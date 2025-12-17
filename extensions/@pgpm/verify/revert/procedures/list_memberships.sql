@@ -1,4 +1,4 @@
--- Revert launchql-verify:procedures/list_memberships from pg
+-- Revert pgpm-verify:procedures/list_memberships from pg
 
 BEGIN;
 

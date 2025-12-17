@@ -1,4 +1,4 @@
--- Revert launchql-verify:procedures/list_indexes from pg
+-- Revert pgpm-verify:procedures/list_indexes from pg
 
 BEGIN;
 

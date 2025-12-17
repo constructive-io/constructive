@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-utils
-%uri=launchql-utils
+%project=pgpm-utils
+%uri=pgpm-utils
   
 schemas/utils/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/utils/schema
 schemas/utils/procedures/mask_pad [schemas/utils/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/utils/procedures/mask_pad

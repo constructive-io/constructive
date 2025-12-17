@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-totp
-%uri=launchql-totp
+%project=pgpm-totp
+%uri=pgpm-totp
   
 schemas/totp/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/totp/schema
 schemas/totp/procedures/urlencode [schemas/totp/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/totp/procedures/urlencode

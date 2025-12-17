@@ -5,6 +5,6 @@
 BEGIN;
 
 CREATE DOMAIN geolocation AS geometry (Point, 4326);
-COMMENT ON DOMAIN geolocation IS E'@name launchqlInternalTypeGeoLocation';
+COMMENT ON DOMAIN geolocation IS E'@name pgpmInternalTypeGeoLocation';
 
 COMMIT;
