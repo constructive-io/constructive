@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/knative-job-example",
+  "name": "@constructive-io/knative-job-example",
   "version": "0.2.3",
   "description": "job example",
   "author": "Constructive <developers@constructive.io>",
@@ -26,6 +26,6 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@launchql/knative-job-fn": "workspace:^"
+    "@constructive-io/knative-job-fn": "workspace:^"
   }
 }

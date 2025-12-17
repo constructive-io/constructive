@@ -4,7 +4,7 @@ import {
   getJobGatewayConfig,
   getJobGatewayDevMap,
   getNodeEnvironment
-} from '@launchql/job-utils';
+} from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
 
 const log = new Logger('jobs:req');

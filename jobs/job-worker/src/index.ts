@@ -1,7 +1,7 @@
 import pg from 'pg';
 import type { Pool, PoolClient } from 'pg';
-import * as jobs from '@launchql/job-utils';
-import type { PgClientLike } from '@launchql/job-utils';
+import * as jobs from '@constructive-io/job-utils';
+import type { PgClientLike } from '@constructive-io/job-utils';
 
 const pgPoolConfig = {
   connectionString: jobs.getJobConnectionString()

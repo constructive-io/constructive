@@ -12,7 +12,7 @@ jest.mock('request', () => ({
   post: postMock
 }));
 
-jest.mock('@launchql/job-pg', () => ({
+jest.mock('@constructive-io/job-pg', () => ({
   __esModule: true,
   default: {
     getPool: jest.fn(),
@@ -24,7 +24,7 @@ jest.mock('@launchql/job-pg', () => ({
 import path from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import * as jobUtils from '@launchql/job-utils';
+import * as jobUtils from '@constructive-io/job-utils';
 import Worker from '../src';
 
 let db: PgTestClient;

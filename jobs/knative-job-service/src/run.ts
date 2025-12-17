@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import Scheduler from '@launchql/job-scheduler';
-import Worker from '@launchql/knative-job-worker';
-import server from '@launchql/knative-job-server';
-import poolManager from '@launchql/job-pg';
+import Scheduler from '@constructive-io/job-scheduler';
+import Worker from '@constructive-io/knative-job-worker';
+import server from '@constructive-io/knative-job-server';
+import poolManager from '@constructive-io/job-pg';
 import { Client } from 'pg';
 import retry from 'async-retry';
 import {
@@ -13,7 +13,7 @@ import {
   getWorkerHostname,
   getJobSupported,
   getJobsCallbackPort,
-} from '@launchql/job-utils';
+} from '@constructive-io/job-utils';
 
 export const startJobsServices = () => {
   // eslint-disable-next-line no-console

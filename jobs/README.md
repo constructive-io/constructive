@@ -1,12 +1,10 @@
-# LaunchQL Jobs (Knative)
+n# Jobs (Knative)
 
 This document describes the **current** jobs setup using:
 
 - PostgreSQL + `pgpm-database-jobs` (`app_jobs.*`)
-- `@launchql/knative-job-service` + `@launchql/knative-job-worker`
+- `@constructive-io/knative-job-service` + `@constructive-io/knative-job-worker`
 - Knative functions (example: `simple-email`)
-
-> The old OpenFaaS-based flow that used `@launchql/openfaas-job-worker` is now legacy.
 
 ---
 
@@ -29,7 +27,7 @@ Key pieces:
   - `app_jobs.fail_job(...)`
   - `app_jobs.run_scheduled_job(...)`
 
-Install the extension into your **app database** (the same DB your LaunchQL API uses). In SQL:
+Install the extension into your **app database** (the same DB your API uses). In SQL:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pgpm-database-jobs;
@@ -49,12 +47,12 @@ and at least `app_jobs.jobs` and `app_jobs.scheduled_jobs` present.
 
 The jobs runtime consists of:
 
-- `@launchql/knative-job-service`
+- `@constructive-io/knative-job-service`
   - Starts:
-    - an HTTP callback server (`@launchql/knative-job-server`)
-    - a Knative job worker (`@launchql/knative-job-worker`)
-    - a scheduler (`@launchql/job-scheduler`)
-- `@launchql/knative-job-worker`
+    - an HTTP callback server (`@constructive-io/knative-job-server`)
+    - a Knative job worker (`@constructive-io/knative-job-worker`)
+    - a scheduler (`@constructive-io/job-scheduler`)
+- `@constructive-io/knative-job-worker`
   - Polls `app_jobs.jobs` for work
   - For each job, `POST`s to `${KNATIVE_SERVICE_URL}/${task_identifier}`
   - Uses `X-Worker-Id`, `X-Job-Id`, `X-Database-Id` headers and JSON payload
@@ -92,7 +90,7 @@ From `jobs/knative-job-service/src/env.ts`:
 
 The `functions/simple-email` package is a **Knative function** that:
 
-- Uses `@launchql/knative-job-fn` as the HTTP wrapper
+- Uses `@constructive-io/knative-job-fn` as the HTTP wrapper
 - Expects JSON payload:
 
 ```json
@@ -173,7 +171,7 @@ SELECT app_jobs.add_job(
   'simple-email',                                -- task_identifier (must match function name)
   json_build_object(
     'to',      'user@example.com',
-    'subject', 'Hello from LaunchQL jobs',
+    'subject', 'Hello from Constructive jobs',
     'html',    '<p>Hi from simple-email (dry run)</p>'
   )::json                                         -- payload
 );
@@ -182,7 +180,7 @@ SELECT app_jobs.add_job(
 Flow:
 
 1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`.
-2. `@launchql/knative-job-worker` receives the notification, calls `getJob`, and picks up the row.
+2. `@constructive-io/knative-job-worker` receives the notification, calls `getJob`, and picks up the row.
 3. The worker `POST`s the payload to `KNATIVE_SERVICE_URL + '/simple-email'`.
 4. `simple-email` logs the email and payload, then returns `{ complete: true }`.
 5. The worker logs success. (In the current Knative flow we rely on immediate responses; callback-based completion can be added later if needed.)
@@ -211,7 +209,7 @@ Completed jobs are removed from `app_jobs.jobs` by the completion logic; failed 
 
 ## 5. Scheduled jobs (optional)
 
-You can also use `app_jobs.scheduled_jobs` and `@launchql/job-scheduler` to run recurring jobs.
+You can also use `app_jobs.scheduled_jobs` and `@constructive-io/job-scheduler` to run recurring jobs.
 
 Example (generic, not specific to `simple-email`):
 
@@ -249,7 +247,3 @@ ORDER BY id DESC;
 ```
 
 ---
-
-## 6. Legacy OpenFaaS notes
-
-The previous OpenFaaS-based setup (gateway, `OPENFAAS_URL`, `@launchql/openfaas-job-worker`, etc.) is no longer the primary path and has been removed from this guide. If you need those details for migration or debugging, refer to the git history of this file prior to the Knative migration. 

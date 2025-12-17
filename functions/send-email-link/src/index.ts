@@ -1,4 +1,4 @@
-import app from '@launchql/knative-job-fn';
+import app from '@constructive-io/knative-job-fn';
 import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';

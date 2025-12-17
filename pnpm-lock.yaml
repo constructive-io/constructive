@@ -70,7 +70,7 @@ importers:
 
   functions/send-email-link:
     dependencies:
-      '@launchql/knative-job-fn':
+      '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
       '@launchql/mjml':
@@ -94,7 +94,7 @@ importers:
 
   functions/simple-email:
     dependencies:
-      '@launchql/knative-job-fn':
+      '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
       '@launchql/postmaster':
@@ -133,7 +133,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-i18n:
@@ -560,7 +560,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-simple-inflector:
@@ -667,7 +667,7 @@ importers:
 
   jobs/job-pg:
     dependencies:
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
       pg:
@@ -676,10 +676,10 @@ importers:
 
   jobs/job-scheduler:
     dependencies:
-      '@launchql/job-pg':
+      '@constructive-io/job-pg':
         specifier: workspace:^
         version: link:../job-pg
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
       '@pgpmjs/logger':
@@ -709,7 +709,7 @@ importers:
 
   jobs/job-worker:
     dependencies:
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
       pg:
@@ -718,7 +718,7 @@ importers:
 
   jobs/knative-job-example:
     dependencies:
-      '@launchql/knative-job-fn':
+      '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../knative-job-fn
 
@@ -733,10 +733,10 @@ importers:
 
   jobs/knative-job-server:
     dependencies:
-      '@launchql/job-pg':
+      '@constructive-io/job-pg':
         specifier: workspace:^
         version: link:../job-pg
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
       body-parser:
@@ -751,19 +751,19 @@ importers:
 
   jobs/knative-job-service:
     dependencies:
-      '@launchql/job-pg':
+      '@constructive-io/job-pg':
         specifier: workspace:^
         version: link:../job-pg
-      '@launchql/job-scheduler':
+      '@constructive-io/job-scheduler':
         specifier: workspace:^
         version: link:../job-scheduler
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
-      '@launchql/knative-job-server':
+      '@constructive-io/knative-job-server':
         specifier: workspace:^
         version: link:../knative-job-server
-      '@launchql/knative-job-worker':
+      '@constructive-io/knative-job-worker':
         specifier: workspace:^
         version: link:../knative-job-worker
       async-retry:
@@ -775,14 +775,14 @@ importers:
     devDependencies:
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
 
   jobs/knative-job-worker:
     dependencies:
-      '@launchql/job-pg':
+      '@constructive-io/job-pg':
         specifier: workspace:^
         version: link:../job-pg
-      '@launchql/job-utils':
+      '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
       '@pgpmjs/logger':
@@ -1098,7 +1098,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/gql-ast:
@@ -1793,7 +1793,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/server-utils:
@@ -1825,7 +1825,7 @@ importers:
         version: 0.1.8
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.0.1)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/stream-to-etag:
@@ -16361,6 +16361,24 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.19.25
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+
+  ts-node@10.9.2(@types/node@25.0.1)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 25.0.1
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3

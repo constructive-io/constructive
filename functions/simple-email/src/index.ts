@@ -1,4 +1,4 @@
-import app from '@launchql/knative-job-fn';
+import app from '@constructive-io/knative-job-fn';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 

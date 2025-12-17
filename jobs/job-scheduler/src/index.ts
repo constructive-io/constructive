@@ -1,7 +1,7 @@
-import * as jobs from '@launchql/job-utils';
-import type { PgClientLike } from '@launchql/job-utils';
+import * as jobs from '@constructive-io/job-utils';
+import type { PgClientLike } from '@constructive-io/job-utils';
 import schedule from 'node-schedule';
-import poolManager from '@launchql/job-pg';
+import poolManager from '@constructive-io/job-pg';
 import type { Pool, PoolClient } from 'pg';
 import { Logger } from '@pgpmjs/logger';
 

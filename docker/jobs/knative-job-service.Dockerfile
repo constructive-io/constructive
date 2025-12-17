@@ -20,7 +20,7 @@ COPY . .
 # Install dependencies and build the knative job service workspace
 RUN set -eux; \
     pnpm install --frozen-lockfile; \
-    pnpm --filter "@launchql/knative-job-service" build
+    pnpm --filter "@constructive-io/knative-job-service" build
 
 ################################################################################
 FROM ${BASE}:${BASE_VERSION}
@@ -43,4 +43,3 @@ WORKDIR /app/jobs/knative-job-service
 
 # run.ts compiles to dist/run.js and boots worker + scheduler + callback server
 CMD ["node", "dist/run.js"]
-

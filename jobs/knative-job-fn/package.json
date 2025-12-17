@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/knative-job-fn",
+  "name": "@constructive-io/knative-job-fn",
   "version": "0.2.3",
   "description": "knative job fn",
   "author": "Constructive <developers@constructive.io>",
