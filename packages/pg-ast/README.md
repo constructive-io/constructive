@@ -34,7 +34,7 @@ const node = ast.A_Expr({
 
 ## Pairs well with `pgsql-deparser`
 
-https://github.com/constructive-iopgsql-parser
+https://github.com/constructive-io/pgsql-parser
 
 You can create ASTs manually, and then generate your SQL:
 

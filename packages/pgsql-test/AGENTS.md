@@ -206,9 +206,9 @@ const { db, teardown } = await getConnections({}, [
 const { db, teardown } = await getConnections();
 
 // Or specify custom path
-const cwd = path.resolve(__dirname, '../path/to/launchql');
+const cwd = path.resolve(__dirname, '../path/to/pgpm-workspace');
 const { db, teardown } = await getConnections({}, [
-  seed.launchql(cwd)  // Uses deployFast() - up to 10x faster than traditional Sqitch
+  seed.loadPgpm(cwd)  // Uses deployFast() - up to 10x faster than traditional Sqitch
 ]);
 ```
 
@@ -217,7 +217,7 @@ const { db, teardown } = await getConnections({}, [
 
 ```typescript
 const { db, teardown } = await getConnections({}, [
-  seed.launchql('./my-module'),           // Deploy LaunchQL module
+  seed.loadPgpm('./my-module'),           // Deploy LaunchQL module
   seed.sqlfile(['./fixtures/data.sql']),  // Add fixture data
   seed.fn(async ({ pg }) => {             // Programmatic setup
     await pg.query(`SELECT setval('users_id_seq', 1000);`);

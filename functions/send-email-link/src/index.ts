@@ -3,6 +3,9 @@ import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send } from '@launchql/postmaster';
+import { parseEnvBoolean } from '@pgpmjs/env';
+
+const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 
 const GetUser = gql`
   query GetUser($userId: UUID!) {
@@ -84,11 +87,38 @@ export const sendEmailLink = async (
 ) => {
   const { client, meta, databaseId } = context;
 
+  const validateForType = (): { missing?: string } | null => {
+    switch (params.email_type) {
+      case 'invite_email':
+        if (!params.invite_token || !params.sender_id) {
+          return { missing: 'invite_token_or_sender_id' };
+        }
+        return null;
+      case 'forgot_password':
+        if (!params.user_id || !params.reset_token) {
+          return { missing: 'user_id_or_reset_token' };
+        }
+        return null;
+      case 'email_verification':
+        if (!params.email_id || !params.verification_token) {
+          return { missing: 'email_id_or_verification_token' };
+        }
+        return null;
+      default:
+        return { missing: 'email_type' };
+    }
+  };
+
   if (!params.email_type) {
     return { missing: 'email_type' };
   }
   if (!params.email) {
     return { missing: 'email' };
+  }
+
+  const typeValidation = validateForType();
+  if (typeValidation) {
+    return typeValidation;
   }
 
   const databaseInfo = await meta.request<any>(GetDatabaseInfo, {
@@ -209,14 +239,25 @@ export const sendEmailLink = async (
     }
   });
 
-  await send({
-    to: params.email,
-    subject,
-    html
-  });
+  if (isDryRun) {
+    // eslint-disable-next-line no-console
+    console.log('[send-email-link] DRY RUN email (skipping send)', {
+      email_type: params.email_type,
+      email: params.email,
+      subject,
+      link
+    });
+  } else {
+    await send({
+      to: params.email,
+      subject,
+      html
+    });
+  }
 
   return {
-    complete: true
+    complete: true,
+    ...(isDryRun ? { dryRun: true } : null)
   };
 };
 
@@ -251,3 +292,12 @@ app.post('*', async (req: any, res: any, next: any) => {
 
 export default app;
 
+// When executed directly (e.g. via `node dist/index.js`), start an HTTP server.
+if (require.main === module) {
+  const port = Number(process.env.PORT ?? 8080);
+  // @launchql/knative-job-fn exposes a .listen method that delegates to the Express app
+  (app as any).listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`[send-email-link] listening on port ${port}`);
+  });
+}

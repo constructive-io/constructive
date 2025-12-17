@@ -17,8 +17,12 @@ export interface BoilerplateQuestion {
   type?: 'text' | 'list' | 'checkbox';
   /** Options for list or checkbox types */
   options?: string[];
+  /** Static default value when no resolver is provided */
+  default?: any;
   /** Source to derive default value from (e.g., "git.user.name", "npm.whoami") */
   defaultFrom?: string;
+  /** Auto-set value from resolver, skipping the prompt entirely */
+  setFrom?: string;
 }
 
 /**
@@ -54,4 +58,3 @@ export interface ScannedBoilerplate {
   /** Questions from the boilerplate config */
   questions?: BoilerplateQuestion[];
 }
-

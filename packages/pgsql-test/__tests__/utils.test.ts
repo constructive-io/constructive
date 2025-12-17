@@ -5,7 +5,8 @@ import {
   pruneIds,
   pruneIdArrays,
   pruneUUIDs,
-  pruneHashes
+  pruneHashes,
+  IdHash
 } from '../src/utils';
 
 describe('snapshot utilities', () => {
@@ -46,6 +47,7 @@ describe('snapshot utilities', () => {
       const row: Record<string, unknown> = { id: null, user_id: undefined };
       expect(pruneIds(row)).toEqual({ id: null, user_id: undefined });
     });
+
   });
 
   describe('pruneIdArrays', () => {
@@ -113,6 +115,7 @@ describe('snapshot utilities', () => {
         name: 'Alice'
       });
     });
+
   });
 
   describe('snapshot', () => {
@@ -176,6 +179,73 @@ describe('snapshot utilities', () => {
       expect(snapshot(42)).toBe(42);
       expect(snapshot(null)).toBe(null);
       expect(snapshot(undefined)).toBe(undefined);
+    });
+
+  });
+
+  describe('IdHash support', () => {
+    it('pruneIds uses IdHash to map IDs to numbered placeholders', () => {
+      const idHash: IdHash = { 'uuid-1': 1, 'uuid-2': 2 };
+      const row = { id: 'uuid-1', user_id: 'uuid-2', org_id: 'unknown', name: 'Alice' };
+      expect(pruneIds(row, idHash)).toEqual({
+        id: '[ID-1]',
+        user_id: '[ID-2]',
+        org_id: '[ID]',
+        name: 'Alice'
+      });
+    });
+
+    it('prune applies IdHash mapping when provided', () => {
+      const idHash: IdHash = { '1': 1, '2': 2 };
+      const row = { id: 1, user_id: 2, name: 'Alice' };
+      expect(prune(row, idHash)).toEqual({
+        id: '[ID-1]',
+        user_id: '[ID-2]',
+        name: 'Alice'
+      });
+    });
+
+    it('snapshot uses IdHash to preserve ID relationships', () => {
+      const idHash: IdHash = {
+        'user-uuid-1': 1,
+        'user-uuid-2': 2,
+        'post-uuid-1': 3
+      };
+      const data = [
+        { id: 'user-uuid-1', name: 'Alice', post_id: 'post-uuid-1' },
+        { id: 'user-uuid-2', name: 'Bob', post_id: 'post-uuid-1' }
+      ];
+      expect(snapshot(data, idHash)).toEqual([
+        { id: '[ID-1]', name: 'Alice', post_id: '[ID-3]' },
+        { id: '[ID-2]', name: 'Bob', post_id: '[ID-3]' }
+      ]);
+    });
+
+    it('snapshot uses IdHash with nested objects', () => {
+      const idHash: IdHash = { 'org-1': 1, 'user-1': 2 };
+      const data = {
+        org: { id: 'org-1', name: 'Acme' },
+        user: { id: 'user-1', org_id: 'org-1' }
+      };
+      expect(snapshot(data, idHash)).toEqual({
+        org: { id: '[ID-1]', name: 'Acme' },
+        user: { id: '[ID-2]', org_id: '[ID-1]' }
+      });
+    });
+
+    it('snapshot uses IdHash with string labels', () => {
+      const idHash: IdHash = {
+        'uuid-user-1': 'user1',
+        'uuid-user-2': 'user2',
+        'uuid-group-1': 'group1',
+        'uuid-group-2': 'group2'
+      };
+      const data = [
+        { actor_id: 'uuid-user-2', entity_id: 'uuid-group-2', is_admin: true }
+      ];
+      expect(snapshot(data, idHash)).toEqual([
+        { actor_id: '[ID-user2]', entity_id: '[ID-group2]', is_admin: true }
+      ]);
     });
   });
 });

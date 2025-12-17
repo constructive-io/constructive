@@ -1,6 +1,6 @@
 {
   "name": "graphile-test",
-  "version": "2.11.1",
+  "version": "2.11.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGraphile Testing",
   "main": "index.js",
@@ -47,7 +47,8 @@
     "testing",
     "graphql",
     "graphile",
-    "launchql",
+    "constructive",
+    "pgpm",
     "test"
   ]
 }

@@ -236,7 +236,7 @@ describe('cmds:init', () => {
           cwd: fixture.tempDir,
           name: 'test-workspace-branch',
           workspace: true,
-          fromBranch: 'restructuring' // TODO: change back to 'main' after restructuring is merged
+          fromBranch: 'main'
         });
 
         await commands(argv, prompter, {

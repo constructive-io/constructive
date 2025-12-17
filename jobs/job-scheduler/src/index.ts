@@ -192,7 +192,7 @@ export default class Scheduler {
       release: () => void
     ) => {
       if (err) {
-        log.error('Error connecting with notify listener');
+        log.error('Error connecting with notify listener', err);
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);

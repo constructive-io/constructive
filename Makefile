@@ -31,5 +31,5 @@ openhands:
 		-v ~/.openhands:/.openhands \
 		-p 4444:3000 \
 		--add-host host.docker.internal:host-gateway \
-		--name launchql-openhands \
+		--name constructive-openhands \
 		docker.all-hands.dev/all-hands-ai/openhands:0.44  
