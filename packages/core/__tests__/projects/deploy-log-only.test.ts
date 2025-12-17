@@ -5,7 +5,7 @@ import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
  * LOG-ONLY DEPLOYMENT USE CASE & SETUP
  * 
  * Log-only deployment is used when you have an existing database that already contains
- * schema changes, but you want to start using LaunchQL for future migrations.
+ * schema changes, but you want to start using pgpm for future migrations.
  * 
  * What it does:
  * - Records deployment metadata in the migration tracking tables
@@ -13,7 +13,7 @@ import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
  * - Marks changes as "deployed" without running them
  * 
  * When to use:
- * - Converting an existing database to use LaunchQL
+ * - Converting an existing database to use pgpm
  * - The database already has schema objects that match your migration scripts
  * - You need to "catch up" the migration history without re-creating existing objects
  * 

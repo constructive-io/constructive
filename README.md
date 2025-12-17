@@ -82,21 +82,21 @@ pnpm test:watch
 ```
 
 
-## What is LaunchQL?
+## What is Constructive?
 
-LaunchQL transforms how you build PostgreSQL applications by treating your database as a modular, version-controlled system. At its core is **pgpm** (PostgreSQL Package Manager), which brings npm-style package management to Postgres. Write SQL migrations, organize them into reusable modules, install database packages as dependencies, and deploy with deterministic, plan-driven migrations.
+Constructive transforms how you build PostgreSQL applications by treating your database as a modular, version-controlled system. At its core is **pgpm** (PostgreSQL Package Manager), which brings npm-style package management to Postgres. Write SQL migrations, organize them into reusable modules, install database packages as dependencies, and deploy with deterministic, plan-driven migrations.
 
-The framework automatically generates a secure, role-aware GraphQL API from your PostgreSQL schema using PostGraphile. This means you design your database once, and LaunchQL handles the API layer, authentication middleware, and developer tooling.
+The framework automatically generates a secure, role-aware GraphQL API from your PostgreSQL schema using PostGraphile. This means you design your database once, and Constructive handles the API layer, authentication middleware, and developer tooling.
 
 ### Core Philosophy
 
-LaunchQL embraces a database-first development approach where your PostgreSQL schema is the source of truth. Row-Level Security (RLS) policies become your authorization layer, database functions become your business logic, and the GraphQL API is automatically derived from your carefully designed schema. This eliminates the impedance mismatch between your database and API while giving you the full power of SQL.
+Constructive embraces a database-first development approach where your PostgreSQL schema is the source of truth. Row-Level Security (RLS) policies become your authorization layer, database functions become your business logic, and the GraphQL API is automatically derived from your carefully designed schema. This eliminates the impedance mismatch between your database and API while giving you the full power of SQL.
 
 ## Key Components
 
 ### 📦 pgpm - PostgreSQL Package Manager
 
-The heart of LaunchQL's modular approach. pgpm manages database schemas as versioned packages with dependency resolution, migration tracking, and reproducible deployments.
+The heart of Constructive's modular approach. pgpm manages database schemas as versioned packages with dependency resolution, migration tracking, and reproducible deployments.
 
 **Features:**
 - Reusable database modules with dependency management
@@ -109,7 +109,7 @@ The heart of LaunchQL's modular approach. pgpm manages database schemas as versi
 
 ### 🖥️ LaunchQL CLI
 
-Full-featured command-line toolkit for managing LaunchQL projects. Provides the complete development workflow from scaffolding to deployment.
+Full-featured command-line toolkit for managing Constructive projects. Provides the complete development workflow from scaffolding to deployment.
 
 **Features:**
 - Database-first development with automatic GraphQL generation
@@ -261,11 +261,11 @@ test('user authentication', async () => {
 });
 ```
 
-## Why LaunchQL?
+## Why Constructive?
 
 **Modular by Design** - Organize your database into reusable packages with clear dependencies. Share common schemas across projects, version them independently, and compose complex systems from simple building blocks.
 
-**Database-First Development** - Your PostgreSQL schema is the source of truth. Design your data model with the full power of SQL, leverage Row-Level Security for authorization, and let LaunchQL generate your API automatically.
+**Database-First Development** - Your PostgreSQL schema is the source of truth. Design your data model with the full power of SQL, leverage Row-Level Security for authorization, and let Constructive generate your API automatically.
 
 **Production-Ready** - Built for teams shipping real applications. Deterministic migrations, comprehensive testing tools, automatic API generation, and deployment automation mean you can move fast without breaking things.
 
@@ -273,7 +273,7 @@ test('user authentication', async () => {
 
 ## Architecture
 
-LaunchQL applications follow a clear architecture:
+Constructive applications follow a clear architecture:
 
 1. **Database Layer** - PostgreSQL schemas with tables, functions, views, and RLS policies organized into modules
 2. **Migration Layer** - pgpm manages schema changes with version-controlled, plan-driven deployments
@@ -287,7 +287,7 @@ This architecture eliminates the traditional ORM layer and API boilerplate, lett
 ### 📦 Package Management & Migrations
 
 - **[pgpm](https://github.com/constructive-io/constructive/tree/main/packages/pgpm)** - PostgreSQL Package Manager for modular database development with npm-style dependency management
-- **[@launchql/cli](https://github.com/constructive-io/constructive/tree/main/packages/cli)** - Full-featured command-line toolkit for LaunchQL projects with scaffolding, migrations, and deployment
+- **[@launchql/cli](https://github.com/constructive-io/constructive/tree/main/packages/cli)** - Full-featured command-line toolkit for Constructive projects with scaffolding, migrations, and deployment
 - **[@pgpmjs/core](https://github.com/constructive-io/constructive/tree/main/packages/core)** - Core migration engine with module orchestration and dependency resolution
 
 ### 🚀 GraphQL API & Server

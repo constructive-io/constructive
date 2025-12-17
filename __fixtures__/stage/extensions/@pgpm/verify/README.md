@@ -16,7 +16,7 @@ Verification utilities for PostgreSQL extensions
 
 ## Overview
 
-`@pgpm/verify` is the foundational verification package used by all LaunchQL extensions. It provides SQL functions to verify the existence and correctness of database objects during deployment, testing, and migrations. This package is essential for the deploy/verify/revert pattern, ensuring that database changes are applied correctly and can be validated programmatically.
+`@pgpm/verify` is the foundational verification package used by all PGPM modules. It provides SQL functions to verify the existence and correctness of database objects during deployment, testing, and migrations. This package is essential for the deploy/verify/revert pattern, ensuring that database changes are applied correctly and can be validated programmatically.
 
 ## Features
 
@@ -337,9 +337,9 @@ END $$;
 
 ## Integration Examples
 
-### With All LaunchQL Extensions
+### With all pgpm modules
 
-Every LaunchQL extension depends on `@pgpm/verify`:
+Every pgpm modulesdepends on `@pgpm/verify`:
 
 **package.json:**
 ```json
