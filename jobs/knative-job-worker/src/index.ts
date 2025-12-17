@@ -1,6 +1,6 @@
-import poolManager from '@launchql/job-pg';
-import * as jobs from '@launchql/job-utils';
-import type { PgClientLike } from '@launchql/job-utils';
+import poolManager from '@constructive-io/job-pg';
+import * as jobs from '@constructive-io/job-utils';
+import type { PgClientLike } from '@constructive-io/job-utils';
 import type { Pool, PoolClient } from 'pg';
 import { Logger } from '@pgpmjs/logger';
 import { request as req } from './req';

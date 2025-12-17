@@ -1,4 +1,4 @@
-import app from '@launchql/knative-job-fn';
+import app from '@constructive-io/knative-job-fn';
 
 app.post('*', async (req: any, res: any, next: any) => {
   if (req.body.throw) {

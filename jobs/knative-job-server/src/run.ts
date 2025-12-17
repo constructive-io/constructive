@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import server from './index';
-import poolManager from '@launchql/job-pg';
-import { getJobsCallbackPort } from '@launchql/job-utils';
+import poolManager from '@constructive-io/job-pg';
+import { getJobsCallbackPort } from '@constructive-io/job-utils';
 
 const pgPool = poolManager.getPool();
 const port = getJobsCallbackPort();

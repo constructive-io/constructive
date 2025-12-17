@@ -27,7 +27,7 @@ RUN set -eux; \
     pnpm run build
 
 ################################################################################
-FROM ${BASE}:${BASE_VERSION} AS launchql
+FROM ${BASE}:${BASE_VERSION} AS constructive
 
 LABEL org.opencontainers.image.source="https://github.com/constructive-io/constructive"
 WORKDIR /app

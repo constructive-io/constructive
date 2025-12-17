@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { Pool, PoolConfig } from 'pg';
-import { getJobPgConfig } from '@launchql/job-utils';
+import { getJobPgConfig } from '@constructive-io/job-utils';
 
 // k8s only does SIGINT
 // other events are bad for babel-watch

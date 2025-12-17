@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/knative-job-worker",
+  "name": "@constructive-io/knative-job-worker",
   "version": "0.5.8",
   "description": "knative job worker",
   "author": "Constructive <developers@constructive.io>",
@@ -32,8 +32,8 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@launchql/job-pg": "workspace:^",
-    "@launchql/job-utils": "workspace:^",
+    "@constructive-io/job-pg": "workspace:^",
+    "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "pg": "8.16.3",
     "request": "2.88.2"

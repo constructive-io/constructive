@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/job-pg",
+  "name": "@constructive-io/job-pg",
   "version": "0.3.4",
   "description": "job pg",
   "author": "Constructive <developers@constructive.io>",
@@ -28,7 +28,7 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@launchql/job-utils": "workspace:^",
+    "@constructive-io/job-utils": "workspace:^",
     "pg": "8.16.3"
   }
 }

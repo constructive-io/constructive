@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/job-scheduler",
+  "name": "@constructive-io/job-scheduler",
   "version": "0.3.6",
   "description": "job scheduler",
   "author": "Constructive <developers@constructive.io>",
@@ -28,8 +28,8 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@launchql/job-pg": "workspace:^",
-    "@launchql/job-utils": "workspace:^",
+    "@constructive-io/job-pg": "workspace:^",
+    "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "node-schedule": "1.3.2"
   }
