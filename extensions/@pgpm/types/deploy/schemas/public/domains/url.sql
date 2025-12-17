@@ -3,6 +3,6 @@
 
 BEGIN;
 CREATE DOMAIN url AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
-COMMENT ON DOMAIN url IS E'@name launchqlInternalTypeUrl';
+COMMENT ON DOMAIN url IS E'@name pgpmInternalTypeUrl';
 COMMIT;
 

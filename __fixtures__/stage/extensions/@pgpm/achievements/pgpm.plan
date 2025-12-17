@@ -1,8 +1,8 @@
 %syntax-version=1.0.0
-%project=launchql-achievements
-%uri=launchql-achievements
+%project=pgpm-achievements
+%uri=pgpm-achievements
   
-schemas/status_private/schema [launchql-jwt-claims:schemas/jwt_public/procedures/current_user_id] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_private/schema
+schemas/status_private/schema [pgpm-jwt-claims:schemas/jwt_public/procedures/current_user_id] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_private/schema
 schemas/status_public/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/schema
 schemas/status_public/tables/user_steps/table [schemas/status_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_public/tables/user_steps/table
 schemas/status_private/procedures/user_completed_step [schemas/status_private/schema schemas/status_public/tables/user_steps/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/status_private/procedures/user_completed_step

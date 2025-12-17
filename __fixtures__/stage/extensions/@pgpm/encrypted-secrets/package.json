@@ -1,10 +1,10 @@
 {
   "name": "@pgpm/encrypted-secrets",
-  "version": "0.13.0",
+  "version": "0.15.0",
   "description": "Encrypted secrets management for PostgreSQL",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
-    "Interweb <developers@interweb.co>"
+    "Constructive <developers@constructive.io>"
   ],
   "keywords": [
     "postgresql",
@@ -21,12 +21,12 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/default-roles": "0.13.0",
-    "@pgpm/encrypted-secrets-table": "0.13.0",
-    "@pgpm/verify": "0.13.0"
+    "@pgpm/default-roles": "0.15.0",
+    "@pgpm/encrypted-secrets-table": "0.15.0",
+    "@pgpm/verify": "0.15.0"
   },
   "devDependencies": {
-    "pgpm": "^0.2.0"
+    "pgpm": "^1.0.0"
   },
   "repository": {
     "type": "git",

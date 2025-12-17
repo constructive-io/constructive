@@ -1,8 +1,8 @@
 # db-meta-schema extension
 comment = 'db-meta-schema extension'
-default_version = '0.9.0'
+default_version = '0.14.0'
 module_pathname = '$libdir/db-meta-schema'
-requires = 'citext,hstore,launchql-inflection,launchql-database-jobs,launchql-types,pgcrypto,plpgsql,postgis,uuid-ossp,launchql-verify'
+requires = 'citext,hstore,pgpm-inflection,pgpm-database-jobs,pgpm-types,pgcrypto,plpgsql,postgis,uuid-ossp,pgpm-verify'
 relocatable = false
 superuser = false
 

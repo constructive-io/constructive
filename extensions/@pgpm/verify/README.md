@@ -12,7 +12,7 @@
    <a href="https://www.npmjs.com/package/@pgpm/verify"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/pgpm-modules?filename=packages%2Futils%2Fverify%2Fpackage.json"/></a>
 </p>
 
-Verification utilities for PostgreSQL extensions
+Verification utilities for PostgreSQL modules
 
 ## Overview
 
@@ -21,7 +21,7 @@ Verification utilities for PostgreSQL extensions
 ## Features
 
 - **Comprehensive Verification**: Verify tables, functions, schemas, indexes, triggers, views, domains, and roles
-- **Universal Dependency**: Required by all 22 LaunchQL extension packages
+- **Universal Dependency**: Required by all 22 pgpm packages
 - **Deploy/Verify/Revert Pattern**: Core component of safe database migrations
 - **Testing Support**: Essential for integration and unit tests
 - **Error Detection**: Catch deployment issues early with clear error messages
@@ -65,7 +65,7 @@ pgpm deploy
 
 ```bash
 # 1. Create a workspace
-pgpm init --workspace
+pgpm init workspace
 
 # 2. Create your first module
 cd my-workspace
@@ -337,15 +337,15 @@ END $$;
 
 ## Integration Examples
 
-### With All LaunchQL Extensions
+### With All pgpm modules
 
-Every LaunchQL extension depends on `@pgpm/verify`:
+Every pgpm module depends on `@pgpm/verify`:
 
 **package.json:**
 ```json
 {
   "dependencies": {
-    "@pgpm/verify": "workspace:*"
+    "@pgpm/verify": "0.15.0"
   }
 }
 ```

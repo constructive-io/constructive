@@ -1,5 +1,4 @@
-import { getConnections, PgTestClient } from 'pgsql-test';
-import { snapshot } from 'graphile-test';
+import { getConnections, PgTestClient, snapshot } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown:  () => Promise<void>;

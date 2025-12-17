@@ -3,6 +3,6 @@
 
 BEGIN;
 CREATE DOMAIN multiple_select AS jsonb CHECK (value ?& ARRAY['value']);
-COMMENT ON DOMAIN multiple_select IS E'@name launchqlInternalTypeMultipleSelect';
+COMMENT ON DOMAIN multiple_select IS E'@name pgpmInternalTypeMultipleSelect';
 COMMIT;
 

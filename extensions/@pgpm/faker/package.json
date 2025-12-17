@@ -1,10 +1,10 @@
 {
   "name": "@pgpm/faker",
-  "version": "0.13.0",
+  "version": "0.15.0",
   "description": "Fake data generation utilities for testing and development",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
-    "Interweb <developers@interweb.co>"
+    "Constructive <developers@constructive.io>"
   ],
   "keywords": [
     "postgresql",
@@ -21,11 +21,11 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/types": "0.13.0",
-    "@pgpm/verify": "0.13.0"
+    "@pgpm/types": "0.15.0",
+    "@pgpm/verify": "0.15.0"
   },
   "devDependencies": {
-    "pgpm": "^0.2.0"
+    "pgpm": "^1.0.0"
   },
   "repository": {
     "type": "git",

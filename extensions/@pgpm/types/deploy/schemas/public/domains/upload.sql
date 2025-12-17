@@ -9,6 +9,6 @@ CREATE DOMAIN upload AS jsonb CHECK (
   AND
   value->>'url' ~ '^(https?)://[^\s/$.?#].[^\s]*$'
 );
-COMMENT ON DOMAIN upload IS E'@name launchqlInternalTypeUpload';
+COMMENT ON DOMAIN upload IS E'@name pgpmInternalTypeUpload';
 
 COMMIT;

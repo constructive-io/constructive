@@ -1,4 +1,4 @@
--- Verify launchql-defaults:defaults/public on pg
+-- Verify pgpm-defaults:defaults/public on pg
 
 BEGIN;
 

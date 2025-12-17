@@ -1,0 +1,8 @@
+# pgpm-inflection extension
+comment = 'pgpm-inflection extension'
+default_version = '0.14.0'
+module_pathname = '$libdir/pgpm-inflection'
+requires = 'plpgsql,unaccent,uuid-ossp,pgpm-verify'
+relocatable = false
+superuser = false
+  

@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-encrypted-secrets
-%uri=launchql-encrypted-secrets
+%project=pgpm-encrypted-secrets
+%uri=pgpm-encrypted-secrets
   
 schemas/encrypted_secrets/schema 2020-11-01T21:22:30Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/encrypted_secrets/schema
 schemas/encrypted_secrets/procedures/encrypt_field_bytea_to_text [schemas/encrypted_secrets/schema] 2020-11-01T21:22:54Z Dan Lynch <dlynch@Dans-MBP-3> # add schemas/encrypted_secrets/procedures/encrypt_field_bytea_to_text

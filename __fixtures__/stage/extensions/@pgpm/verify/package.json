@@ -1,10 +1,10 @@
 {
   "name": "@pgpm/verify",
-  "version": "0.13.0",
-  "description": "Verification utilities for LaunchQL deploy/verify/revert workflow",
+  "version": "0.15.0",
+  "description": "Verification utilities for PGPM deploy/verify/revert workflow",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
-    "Interweb <developers@interweb.co>"
+    "Constructive <developers@constructive.io>"
   ],
   "keywords": [
     "postgresql",
@@ -21,7 +21,7 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "pgpm": "^0.2.0"
+    "pgpm": "^1.0.0"
   },
   "repository": {
     "type": "git",

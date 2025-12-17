@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-types
-%uri=launchql-types
+%project=pgpm-types
+%uri=pgpm-types
   
 schemas/public/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/schema
 schemas/public/domains/attachment [schemas/public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/public/domains/attachment

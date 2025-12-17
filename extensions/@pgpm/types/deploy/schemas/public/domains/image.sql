@@ -7,6 +7,6 @@ CREATE DOMAIN image AS jsonb CHECK (
   AND
   value->>'url' ~ '^(https?)://[^\s/$.?#].[^\s]*$'
 );
-COMMENT ON DOMAIN image IS E'@name launchqlInternalTypeImage';
+COMMENT ON DOMAIN image IS E'@name pgpmInternalTypeImage';
 COMMIT;
 

@@ -12,18 +12,18 @@
    <a href="https://www.npmjs.com/package/@pgpm/utils"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/pgpm-modules?filename=packages%2Futils%2Futils%2Fpackage.json"/></a>
 </p>
 
-General utility functions for PostgreSQL extensions
+General utility functions for PostgreSQL modules
 
 ## Overview
 
-`@pgpm/utils` provides essential utility functions and helper procedures used across LaunchQL extension modules. This package includes functions for error handling, data masking, and singleton pattern enforcement. These utilities form the foundation for building robust PostgreSQL extensions with consistent error handling and data protection patterns.
+`@pgpm/utils` provides essential utility functions and helper procedures used across pgpm modules. This package includes functions for error handling, data masking, and singleton pattern enforcement. These utilities form the foundation for building robust PostgreSQL modules with consistent error handling and data protection patterns.
 
 ## Features
 
 - **Error Handling**: Throw custom exceptions with detailed messages
 - **Data Masking**: Mask sensitive data with padding characters
 - **Singleton Enforcement**: Ensure tables contain exactly one row
-- **Reusable Utilities**: Common functions used across multiple extensions
+- **Reusable Utilities**: Common functions used across multiple modules
 - **Pure plpgsql**: No external dependencies required
 
 ## Installation
@@ -64,7 +64,7 @@ pgpm deploy
 
 ```bash
 # 1. Create a workspace
-pgpm init --workspace
+pgpm init workspace
 
 # 2. Create your first module
 cd my-workspace

@@ -1,4 +1,4 @@
--- Revert launchql-verify:procedures/get_entity_from_str from pg
+-- Revert pgpm-verify:procedures/get_entity_from_str from pg
 
 BEGIN;
 

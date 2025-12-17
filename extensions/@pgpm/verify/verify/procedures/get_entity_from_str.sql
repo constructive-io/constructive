@@ -1,4 +1,4 @@
--- Verify launchql-verify:procedures/get_entity_from_str on pg
+-- Verify pgpm-verify:procedures/get_entity_from_str on pg
 
 BEGIN;
 

@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-jwt-claims
-%uri=launchql-jwt-claims
+%project=pgpm-jwt-claims
+%uri=pgpm-jwt-claims
   
 schemas/ctx/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/ctx/schema
 schemas/ctx/procedures/ip_address [schemas/ctx/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/ctx/procedures/ip_address

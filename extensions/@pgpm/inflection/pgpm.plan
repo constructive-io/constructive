@@ -1,6 +1,6 @@
 %syntax-version=1.0.0
-%project=launchql-inflection
-%uri=launchql-inflection
+%project=pgpm-inflection
+%uri=pgpm-inflection
   
 schemas/inflection/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/schema
 schemas/inflection/procedures/no_consecutive_caps [schemas/inflection/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/inflection/procedures/no_consecutive_caps

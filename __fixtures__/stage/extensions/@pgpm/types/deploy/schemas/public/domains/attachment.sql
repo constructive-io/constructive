@@ -3,5 +3,5 @@
 
 BEGIN;
 CREATE DOMAIN attachment AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
-COMMENT ON DOMAIN attachment IS E'@name launchqlInternalTypeAttachment';
+COMMENT ON DOMAIN attachment IS E'@name pgpmInternalTypeAttachment';
 COMMIT;
