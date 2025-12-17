@@ -38,7 +38,7 @@ pgenv() {
   export PGPORT=5432
   export PGUSER=postgres
   export PGPASSWORD=password
-  export PGDATABASE=launchql
+  export PGDATABASE=constructive
   echo "PostgreSQL environment variables set"
 }
 ```
@@ -59,10 +59,10 @@ Make sure `pgpm` is installed and up to date.
 
 From the `constructive-db/` directory (with `pgenv` applied):
 
-1. Create the `launchql` database (if it does not already exist):
+1. Create the `constructive` database (if it does not already exist):
 
    ```sh
-   createdb launchql
+   createdb constructive
    ```
 
 2. Bootstrap admin users:
@@ -72,7 +72,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
    pgpm admin-users add --test --yes
    ```
 
-3. Deploy the main app and jobs packages into `launchql`:
+3. Deploy the main app and jobs packages into DB:
 
    ```sh
    pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
@@ -80,7 +80,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
    pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
    ```
 
-At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `launchql` database.
+At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `constructive` database.
 
 ---
 
@@ -173,7 +173,7 @@ To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_
 
 ## 5. Ensure GraphQL host routing works for `send-email-link`
 
-LaunchQL selects the API by the HTTP `Host` header using rows in `meta_public.domains`.
+Constructive selects the API by the HTTP `Host` header using rows in `meta_public.domains`.
 
 For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `launchql-server` container, and `send-email-link` uses:
 
@@ -199,19 +199,19 @@ With the jobs stack running, you can enqueue a test job from your host into the 
 First, grab a real `database_id` (required by `send-email-link`, optional for `simple-email`):
 
 ```sh
-DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM collections_public.database ORDER BY created_at LIMIT 1;')"
+DBID="$(docker exec -i postgres psql -U postgres -d constructive -Atc 'SELECT id FROM collections_public.database ORDER BY created_at LIMIT 1;')"
 echo "$DBID"
 ```
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d launchql -c "
+  psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'simple-email',
       json_build_object(
         'to',      'user@example.com',
-        'subject', 'Hello from LaunchQL jobs',
+        'subject', 'Hello from Constructive jobs',
         'html',    '<p>Hi from simple-email (dry run)</p>'
       )::json
     );
@@ -234,7 +234,7 @@ With `SEND_EMAIL_LINK_DRY_RUN=true` (default in `docker-compose.jobs.yml`), enqu
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d launchql -c "
+  psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'send-email-link',

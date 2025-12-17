@@ -1,12 +1,10 @@
-# LaunchQL Jobs (Knative)
+# Jobs (Knative)
 
 This document describes the **current** jobs setup using:
 
 - PostgreSQL + `pgpm-database-jobs` (`app_jobs.*`)
 - `@launchql/knative-job-service` + `@launchql/knative-job-worker`
 - Knative functions (example: `simple-email`)
-
-> The old OpenFaaS-based flow that used `@launchql/openfaas-job-worker` is now legacy.
 
 ---
 
@@ -29,7 +27,7 @@ Key pieces:
   - `app_jobs.fail_job(...)`
   - `app_jobs.run_scheduled_job(...)`
 
-Install the extension into your **app database** (the same DB your LaunchQL API uses). In SQL:
+Install the extension into your **app database** (the same DB your API uses). In SQL:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pgpm-database-jobs;
@@ -173,7 +171,7 @@ SELECT app_jobs.add_job(
   'simple-email',                                -- task_identifier (must match function name)
   json_build_object(
     'to',      'user@example.com',
-    'subject', 'Hello from LaunchQL jobs',
+    'subject', 'Hello from Constructive jobs',
     'html',    '<p>Hi from simple-email (dry run)</p>'
   )::json                                         -- payload
 );
@@ -249,7 +247,3 @@ ORDER BY id DESC;
 ```
 
 ---
-
-## 6. Legacy OpenFaaS notes
-
-The previous OpenFaaS-based setup (gateway, `OPENFAAS_URL`, `@launchql/openfaas-job-worker`, etc.) is no longer the primary path and has been removed from this guide. If you need those details for migration or debugging, refer to the git history of this file prior to the Knative migration. 
