@@ -11,6 +11,27 @@ import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operati
 import * as typescriptGraphqlRequestPlugin from '@graphql-codegen/typescript-graphql-request'
 import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query'
 import { GraphQLClient } from 'graphql-request'
+import { parse } from '@babel/parser'
+import generate from '@babel/generator'
+import * as t from '@babel/types'
+
+function addDocumentNodeImport(code: string): string {
+  const ast = parse(code, {
+    sourceType: 'module',
+    plugins: ['typescript']
+  })
+
+  const importDecl = t.importDeclaration(
+    [t.importSpecifier(t.identifier('DocumentNode'), t.identifier('DocumentNode'))],
+    t.stringLiteral('graphql')
+  )
+  importDecl.importKind = 'type'
+
+  ast.program.body.unshift(importDecl)
+
+  const output = generate(ast, {}, code)
+  return output.code
+}
 
 function getFilename(key: string, convention: LaunchQLGenOptions['documents']['convention']) {
   if (convention === 'underscore') return inflection.underscore(key)
@@ -124,8 +145,11 @@ export async function runCodegen(opts: LaunchQLGenOptions, cwd: string) {
     ? buildClientSchema(introspection as any)
     : buildSchema(await readFileUTF8(schemaPath))
 
-  if (options.features.emitOperations || options.features.emitSdk) {
+  if (options.features.emitOperations || options.features.emitSdk || options.features.emitReactQuery) {
     docs = generateKeyedObjFromGqlMap(gqlMap)
+  }
+
+  if (options.features.emitOperations) {
     await writeOperationsDocuments(docs, operationsDir, options.documents.format, options.documents.convention)
   }
 
@@ -165,7 +189,9 @@ export async function runCodegen(opts: LaunchQLGenOptions, cwd: string) {
         'typescript-graphql-request': typescriptGraphqlRequestPlugin as any
       }
     })
-    await writeFileUTF8(sdkFile, sdkContent)
+    // Fix TS2742: Add missing DocumentNode import using Babel AST
+    const sdkContentWithImport = addDocumentNodeImport(sdkContent)
+    await writeFileUTF8(sdkFile, sdkContentWithImport)
   }
 
   if (options.features.emitReactQuery) {
