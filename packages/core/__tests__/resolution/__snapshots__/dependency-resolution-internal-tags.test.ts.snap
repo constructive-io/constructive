@@ -97,9 +97,9 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
       "schemas/unique_names/tables/words/table",
     ],
     "/deploy/schemas/unique_names/schema.sql": [
-      "launchql-default-roles:@0.0.5",
-      "launchql-defaults:defaults/public",
-      "launchql-verify:@0.1.0",
+      "pgpm-default-roles:@0.0.5",
+      "pgpm-defaults:defaults/public",
+      "pgpm-verify:@0.1.0",
     ],
     "/deploy/schemas/unique_names/tables/words/fixtures/1589271124916_fixture.sql": [
       "schemas/unique_names/schema",
@@ -112,14 +112,14 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
     "/deploy/schemas/unique_names/tables/words/table.sql": [
       "schemas/unique_names/schema",
     ],
-    "launchql-default-roles:@0.0.5": [],
-    "launchql-defaults:defaults/public": [],
-    "launchql-verify:@0.1.0": [],
+    "pgpm-default-roles:@0.0.5": [],
+    "pgpm-defaults:defaults/public": [],
+    "pgpm-verify:@0.1.0": [],
   },
   "external": [
-    "launchql-default-roles:@0.0.5",
-    "launchql-defaults:defaults/public",
-    "launchql-verify:@0.1.0",
+    "pgpm-default-roles:@0.0.5",
+    "pgpm-defaults:defaults/public",
+    "pgpm-verify:@0.1.0",
   ],
   "resolved": [
     "schemas/unique_names/schema",
@@ -129,8 +129,8 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
     "schemas/unique_names/tables/words/indexes/words_type_idx",
   ],
   "resolvedTags": {
-    "launchql-default-roles:@0.0.5": "launchql-default-roles:roles/administrator/role",
-    "launchql-verify:@0.1.0": "launchql-verify:procedures/verify_view",
+    "pgpm-default-roles:@0.0.5": "pgpm-default-roles:roles/administrator/role",
+    "pgpm-verify:@0.1.0": "pgpm-verify:procedures/verify_view",
   },
 }
 `;
