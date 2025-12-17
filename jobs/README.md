@@ -1,9 +1,9 @@
-# Jobs (Knative)
+n# Jobs (Knative)
 
 This document describes the **current** jobs setup using:
 
 - PostgreSQL + `pgpm-database-jobs` (`app_jobs.*`)
-- `@launchql/knative-job-service` + `@launchql/knative-job-worker`
+- `@constructive-io/knative-job-service` + `@constructive-io/knative-job-worker`
 - Knative functions (example: `simple-email`)
 
 ---
@@ -47,12 +47,12 @@ and at least `app_jobs.jobs` and `app_jobs.scheduled_jobs` present.
 
 The jobs runtime consists of:
 
-- `@launchql/knative-job-service`
+- `@constructive-io/knative-job-service`
   - Starts:
-    - an HTTP callback server (`@launchql/knative-job-server`)
-    - a Knative job worker (`@launchql/knative-job-worker`)
-    - a scheduler (`@launchql/job-scheduler`)
-- `@launchql/knative-job-worker`
+    - an HTTP callback server (`@constructive-io/knative-job-server`)
+    - a Knative job worker (`@constructive-io/knative-job-worker`)
+    - a scheduler (`@constructive-io/job-scheduler`)
+- `@constructive-io/knative-job-worker`
   - Polls `app_jobs.jobs` for work
   - For each job, `POST`s to `${KNATIVE_SERVICE_URL}/${task_identifier}`
   - Uses `X-Worker-Id`, `X-Job-Id`, `X-Database-Id` headers and JSON payload
@@ -90,7 +90,7 @@ From `jobs/knative-job-service/src/env.ts`:
 
 The `functions/simple-email` package is a **Knative function** that:
 
-- Uses `@launchql/knative-job-fn` as the HTTP wrapper
+- Uses `@constructive-io/knative-job-fn` as the HTTP wrapper
 - Expects JSON payload:
 
 ```json
@@ -180,7 +180,7 @@ SELECT app_jobs.add_job(
 Flow:
 
 1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`.
-2. `@launchql/knative-job-worker` receives the notification, calls `getJob`, and picks up the row.
+2. `@constructive-io/knative-job-worker` receives the notification, calls `getJob`, and picks up the row.
 3. The worker `POST`s the payload to `KNATIVE_SERVICE_URL + '/simple-email'`.
 4. `simple-email` logs the email and payload, then returns `{ complete: true }`.
 5. The worker logs success. (In the current Knative flow we rely on immediate responses; callback-based completion can be added later if needed.)
@@ -209,7 +209,7 @@ Completed jobs are removed from `app_jobs.jobs` by the completion logic; failed 
 
 ## 5. Scheduled jobs (optional)
 
-You can also use `app_jobs.scheduled_jobs` and `@launchql/job-scheduler` to run recurring jobs.
+You can also use `app_jobs.scheduled_jobs` and `@constructive-io/job-scheduler` to run recurring jobs.
 
 Example (generic, not specific to `simple-email`):
 
