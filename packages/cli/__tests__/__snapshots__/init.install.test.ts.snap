@@ -29,7 +29,7 @@ exports[`cmds:install - with initialized workspace and module installs a module 
   "scripts": {
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watchAll",
   },
   "version": "0.0.1",
 }
@@ -168,7 +168,7 @@ exports[`cmds:install - with initialized workspace and module installs two modul
   "scripts": {
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watchAll",
   },
   "version": "0.0.1",
 }
