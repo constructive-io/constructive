@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document analyzes the behavior of LaunchQL's migration system when SQL changes fail during deployment, specifically examining the state of the `pgpm_migrate` schema and tables.
+This document analyzes the behavior of pgpm's migration system when SQL changes fail during deployment, specifically examining the state of the `pgpm_migrate` schema and tables.
 
 ## Key Findings
 

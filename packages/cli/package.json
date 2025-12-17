@@ -54,15 +54,15 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "find-and-require-package-json": "^0.8.1",
-    "inquirerer": "^2.1.13",
+    "find-and-require-package-json": "^0.8.2",
+    "inquirerer": "^2.1.14",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgpm": "workspace:^",
     "shelljs": "^0.10.0",
-    "yanse": "^0.1.7"
+    "yanse": "^0.1.8"
   },
   "keywords": [
     "cli",
