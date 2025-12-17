@@ -1,6 +1,6 @@
 # LaunchQL Core Package - Agent Guide
 
-The `@launchql/core` package is the heart of the LaunchQL framework, providing the main orchestration classes and migration engine. This guide helps agents understand the key classes and their methods.
+The `@pgpmjs/core` package is the heart of the LaunchQL framework, providing the main orchestration classes and migration engine. This guide helps agents understand the key classes and their methods.
 
 ## 🎯 Overview
 
@@ -21,8 +21,8 @@ The `@launchql/core` package is the heart of the LaunchQL framework, providing t
 **Key Exports:**
 ```typescript
 // Main classes
-export { LaunchQLPackage } from './core/class/launchql';
-export { LaunchQLMigrate } from './migrate/client';
+export { PgpmPackage } from './core/class/launchql';
+export { PgpmMigrate } from './migrate/client';
 export { LaunchQLInit } from './init/client';
 
 // Migration types
@@ -33,7 +33,7 @@ export { hashFile, hashString } from './migrate/utils/hash';
 export { executeQuery, TransactionContext, TransactionOptions, withTransaction } from './migrate/utils/transaction';
 ```
 
-## 🎮 LaunchQLPackage Class
+## 🎮 PgpmPackage Class
 
 **Location:** `src/core/class/launchql.ts`
 **Purpose:** High-level orchestration for workspace and module management
@@ -59,11 +59,11 @@ enum PackageContext {
 ### Workspace Operations
 
 **Module Discovery:**
-- `getModules(): Promise<LaunchQLPackage[]>` - Get all workspace modules
+- `getModules(): Promise<PgpmPackage[]>` - Get all workspace modules
 - `listModules(): ModuleMap` - Parse .control files to find modules
 - `getModuleMap(): ModuleMap` - Get cached module map
 - `getAvailableModules(): string[]` - Get list of available module names
-- `getModuleProject(name: string): LaunchQLPackage` - Get specific module project
+- `getModuleProject(name: string): PgpmPackage` - Get specific module project
 
 **Module Creation:**
 - `initModule(options: InitModuleOptions): void` - Initialize new module
@@ -95,7 +95,7 @@ interface InitModuleOptions {
 ### Plan Management
 
 **Plan Operations:**
-- `getModulePlan(): string` - Read launchql.plan file
+- `getModulePlan(): string` - Read pgpm.plan file
 - `generateModulePlan(options): string` - Generate plan from dependencies
 - `writeModulePlan(options): void` - Write generated plan to file
 - `addTag(tagName: string, changeName?: string, comment?: string): void` - Add version tag
@@ -122,7 +122,7 @@ async deploy(
 
 **Deployment Features:**
 - **Fast Deployment:** Uses `packageModule()` for consolidated SQL
-- **Standard Deployment:** Uses `LaunchQLMigrate` for change-by-change deployment
+- **Standard Deployment:** Uses `PgpmMigrate` for change-by-change deployment
 - **Dependency Resolution:** Automatically resolves and deploys dependencies
 - **Caching:** Optional caching for fast deployments
 - **Transaction Control:** Configurable transaction usage
@@ -152,7 +152,7 @@ async verify(opts: LaunchQLOptions, target?: string): Promise<void>
 - `resolveWorkspaceExtensionDependencies()` - Get all workspace dependencies
 - `parsePackageTarget(target?: string)` - Parse deployment target strings
 
-## 🔄 LaunchQLMigrate Class
+## 🔄 PgpmMigrate Class
 
 **Location:** `src/migrate/client.ts`
 **Purpose:** Low-level database migration execution
@@ -160,7 +160,7 @@ async verify(opts: LaunchQLOptions, target?: string): Promise<void>
 ### Configuration
 
 ```typescript
-interface LaunchQLMigrateOptions {
+interface PgpmMigrateOptions {
   hashMethod?: 'content' | 'ast'; // How to hash SQL files
 }
 ```
@@ -240,7 +240,7 @@ async verify(options: VerifyOptions): Promise<VerifyResult>
 **Location:** `src/files/`
 
 **Key Functions:**
-- `parsePlanFile(planPath)` - Parse launchql.plan files
+- `parsePlanFile(planPath)` - Parse pgpm.plan files
 - `generatePlan(options)` - Generate plan content
 - `writePlan(planPath, content)` - Write plan files
 - `readScript(baseDir, type, changeName)` - Read SQL scripts
@@ -257,7 +257,7 @@ async verify(options: VerifyOptions): Promise<VerifyResult>
 
 ### 1. Workspace Setup
 ```typescript
-const pkg = new LaunchQLPackage('/path/to/workspace');
+const pkg = new PgpmPackage('/path/to/workspace');
 if (!pkg.isInWorkspace()) {
   // Initialize workspace
 }
@@ -273,7 +273,7 @@ pkg.initModule({
 
 ### 2. Module Deployment
 ```typescript
-const pkg = new LaunchQLPackage('/path/to/module');
+const pkg = new PgpmPackage('/path/to/module');
 const options = {
   pg: { database: 'mydb', host: 'localhost' },
   deployment: { useTx: true, fast: false }
@@ -291,7 +291,7 @@ await pkg.deploy(options, 'my-module:@v1.0.0');
 
 ### 3. Direct Migration Operations
 ```typescript
-const migrate = new LaunchQLMigrate(pgConfig, { hashMethod: 'ast' });
+const migrate = new PgpmMigrate(pgConfig, { hashMethod: 'ast' });
 
 // Deploy changes
 const result = await migrate.deploy({
@@ -307,7 +307,7 @@ if (result.failed) {
 
 ### 4. Dependency Management
 ```typescript
-const pkg = new LaunchQLPackage('/path/to/module');
+const pkg = new PgpmPackage('/path/to/module');
 
 // Get module dependencies
 const deps = pkg.getModuleDependencies('my-module');
@@ -320,7 +320,7 @@ await pkg.installModules('@launchql/auth', '@launchql/utils');
 
 ### 5. Plan Management
 ```typescript
-const pkg = new LaunchQLPackage('/path/to/module');
+const pkg = new PgpmPackage('/path/to/module');
 
 // Generate plan with external dependencies
 const plan = pkg.generateModulePlan({
@@ -339,7 +339,7 @@ pkg.addTag('v1.0.0', 'latest-change', 'Initial release');
 
 ### 1. Context Issues
 ```typescript
-const pkg = new LaunchQLPackage(cwd);
+const pkg = new PgpmPackage(cwd);
 console.log('Context:', pkg.getContext());
 console.log('Workspace path:', pkg.getWorkspacePath());
 console.log('Module path:', pkg.getModulePath());
@@ -358,7 +358,7 @@ console.log('Dependencies:', deps);
 
 ### 3. Migration Debugging
 ```typescript
-const migrate = new LaunchQLMigrate(pgConfig, { hashMethod: 'content' });
+const migrate = new PgpmMigrate(pgConfig, { hashMethod: 'content' });
 
 // Use debug mode for detailed error information
 await migrate.deploy({
@@ -370,8 +370,8 @@ await migrate.deploy({
 
 ## 📁 Key Files to Understand
 
-1. **`src/core/class/launchql.ts`** - Main LaunchQLPackage class (1472 lines)
-2. **`src/migrate/client.ts`** - LaunchQLMigrate class (661 lines)
+1. **`src/core/class/launchql.ts`** - Main PgpmPackage class (1472 lines)
+2. **`src/migrate/client.ts`** - PgpmMigrate class (661 lines)
 3. **`src/resolution/deps.ts`** - Dependency resolution algorithms
 4. **`src/files/plan/parser.ts`** - Plan file parsing
 5. **`src/modules/modules.ts`** - Module discovery and management

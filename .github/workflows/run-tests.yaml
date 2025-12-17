@@ -1,4 +1,4 @@
-name: Constructive matrix tests
+name: CI tests
 on:
   push:
     branches:
@@ -148,8 +148,8 @@ jobs:
 
       - name: seed app_user
         run: |
-          pnpm --filter @launchql/cli exec node dist/index.js admin-users bootstrap --yes
-          pnpm --filter @launchql/cli exec node dist/index.js admin-users add --test --yes
+          pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
+          pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 
       - name: Test ${{ matrix.package }}
         run: cd ./${{ matrix.package }} && pnpm test

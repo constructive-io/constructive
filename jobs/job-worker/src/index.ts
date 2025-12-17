@@ -1,14 +1,10 @@
-import env from './env';
 import pg from 'pg';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@launchql/job-utils';
 import type { PgClientLike } from '@launchql/job-utils';
 
-const getDbString = () =>
-  `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}`;
-
 const pgPoolConfig = {
-  connectionString: getDbString()
+  connectionString: jobs.getJobConnectionString()
 };
 
 function once<T extends (...args: unknown[]) => unknown>(
@@ -57,7 +53,7 @@ export default class Worker {
     tasks,
     idleDelay = 15000,
     pgPool = new (pg as any).Pool(pgPoolConfig),
-    workerId = 'worker-0'
+    workerId = jobs.getWorkerHostname()
   }: {
     tasks: Record<string, TaskHandler>;
     idleDelay?: number;

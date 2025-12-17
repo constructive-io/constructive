@@ -12,6 +12,7 @@ import {
   getJobSchema,
   getJobPgConfig,
   getJobPool,
+  getJobConnectionString,
   getJobSupportAny,
   getJobSupported,
   getWorkerHostname,
@@ -19,7 +20,8 @@ import {
   getJobGatewayConfig,
   getJobGatewayDevMap,
   getJobsCallbackPort,
-  getCallbackBaseUrl
+  getCallbackBaseUrl,
+  getNodeEnvironment
 } from './runtime';
 
 import { Logger } from '@pgpmjs/logger';
@@ -34,6 +36,7 @@ export {
   getJobSchema,
   getJobPgConfig,
   getJobPool,
+  getJobConnectionString,
   getJobSupportAny,
   getJobSupported,
   getWorkerHostname,
@@ -41,7 +44,8 @@ export {
   getJobGatewayConfig,
   getJobGatewayDevMap,
   getJobsCallbackPort,
-  getCallbackBaseUrl
+  getCallbackBaseUrl,
+  getNodeEnvironment
 };
 
 const JOBS_SCHEMA = getJobSchema();

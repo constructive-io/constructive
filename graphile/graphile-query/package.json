@@ -1,6 +1,6 @@
 {
   "name": "graphile-query",
-  "version": "2.4.2",
+  "version": "2.4.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile query",
   "main": "index.js",
@@ -42,6 +42,7 @@
     "query",
     "builder",
     "graphile",
-    "launchql"
+    "constructive",
+    "pgpm"
   ]
 }

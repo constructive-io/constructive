@@ -34,7 +34,7 @@ import gql from 'graphql-tag';
 const SCHEMA = process.env.SCHEMA ?? 'app_public';
 const sql = (f: string) => join(__dirname, '../sql', f);
 
-// Use LaunchQL defaults with optional overrides
+// Use defaults with optional overrides
 const config = getEnvOptions({
   cdn: {
     bucketName: 'test-upload-bucket'

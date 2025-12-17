@@ -1,9 +1,9 @@
 {
   "name": "@launchql/knative-job-service",
-  "version": "0.4.6",
+  "version": "0.4.8",
   "description": "knative job service",
   "author": "Constructive <developers@constructive.io>",
-  "homepage": "https://github.com/launchql/jobs/tree/master/packages/knative-job-service#readme",
+  "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-service#readme",
   "license": "SEE LICENSE IN LICENSE",
   "main": "dist/index.js",
   "directories": {
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/launchql/jobs"
+    "url": "https://github.com/constructive-io/jobs"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -30,7 +30,7 @@
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand"
   },
   "bugs": {
-    "url": "https://github.com/launchql/jobs/issues"
+    "url": "https://github.com/constructive-io/jobs/issues"
   },
   "devDependencies": {
     "ts-node": "^10.9.2"

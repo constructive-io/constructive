@@ -1,6 +1,10 @@
-import env from './env';
 import requestLib from 'request';
-import { getCallbackBaseUrl } from '@launchql/job-utils';
+import {
+  getCallbackBaseUrl,
+  getJobGatewayConfig,
+  getJobGatewayDevMap,
+  getNodeEnvironment
+} from '@launchql/job-utils';
 import { Logger } from '@pgpmjs/logger';
 
 const log = new Logger('jobs:req');
@@ -8,21 +12,18 @@ const log = new Logger('jobs:req');
 // callback URL for job completion
 const completeUrl = getCallbackBaseUrl();
 
-let hasDevMap = false;
-let DEV_MAP: Record<string, string> = {};
-
-const nodeEnv = process.env.NODE_ENV;
-
-if (nodeEnv !== 'production' && env.INTERNAL_GATEWAY_DEVELOPMENT_MAP) {
-  hasDevMap = true;
-  DEV_MAP = JSON.parse(env.INTERNAL_GATEWAY_DEVELOPMENT_MAP as string);
-}
+// Development override map (e.g. point a function name at localhost)
+const nodeEnv = getNodeEnvironment();
+const DEV_MAP = nodeEnv !== 'production' ? getJobGatewayDevMap() : null;
 
 const getFunctionUrl = (fn: string): string => {
-  if (hasDevMap) {
+  if (DEV_MAP && DEV_MAP[fn]) {
     return DEV_MAP[fn] || completeUrl;
   }
-  return `http://${fn}.${env.KNATIVE_SERVICE_URL}`;
+
+  const { gatewayUrl } = getJobGatewayConfig();
+  const base = gatewayUrl.replace(/\/$/, '');
+  return `${base}/${fn}`;
 };
 
 interface RequestOptions {
