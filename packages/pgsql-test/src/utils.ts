@@ -1,6 +1,15 @@
 const uuidRegexp = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const idReplacement = (v: unknown): string | unknown => (!v ? v : '[ID]');
+// ID hash map for tracking ID relationships in snapshots
+// Values can be numbers (e.g., 1 -> [ID-1]) or strings (e.g., 'user2' -> [ID-user2])
+export type IdHash = Record<string, number | string>;
+
+const idReplacement = (v: unknown, idHash?: IdHash): string | unknown => {
+  if (!v) return v;
+  if (!idHash) return '[ID]';
+  const key = String(v);
+  return idHash[key] !== undefined ? `[ID-${idHash[key]}]` : '[ID]';
+};
 
 // Generic object type for any key-value mapping
 type AnyObject = Record<string, any>;
@@ -32,11 +41,11 @@ export const pruneDates = (row: AnyObject): AnyObject =>
     return v;
   });
 
-export const pruneIds = (row: AnyObject): AnyObject =>
+export const pruneIds = (row: AnyObject, idHash?: IdHash): AnyObject =>
   mapValues(row, (v, k) =>
     (k === 'id' || (typeof k === 'string' && k.endsWith('_id'))) &&
       (typeof v === 'string' || typeof v === 'number')
-      ? idReplacement(v)
+      ? idReplacement(v, idHash)
       : v
   );
 
@@ -95,27 +104,35 @@ export const composePruners = (...pruners: Pruner[]): Pruner =>
   (row: AnyObject): AnyObject =>
     pruners.reduce((acc, pruner) => pruner(acc), row);
 
-// Default pruners used by prune/snapshot
+// Pruner with optional IdHash support
+type PrunerWithIdHash = (row: AnyObject, idHash?: IdHash) => AnyObject;
+
+// Default pruners used by prune/snapshot (without IdHash)
 export const defaultPruners: Pruner[] = [
   pruneTokens,
   prunePeoplestamps,
   pruneDates,
   pruneIdArrays,
-  pruneIds,
   pruneUUIDs,
   pruneHashes
 ];
 
-export const prune = composePruners(...defaultPruners);
+// Compose pruners and apply pruneIds with IdHash support
+export const prune = (row: AnyObject, idHash?: IdHash): AnyObject => {
+  const pruned = composePruners(...defaultPruners)(row);
+  return pruneIds(pruned, idHash);
+};
 
 // Factory to create a snapshot function with custom pruners
 export const createSnapshot = (pruners: Pruner[]) => {
   const pruneFn = composePruners(...pruners);
-  const snap = (obj: unknown): unknown => {
+  const snap = (obj: unknown, idHash?: IdHash): unknown => {
     if (Array.isArray(obj)) {
-      return obj.map(snap);
+      return obj.map((el) => snap(el, idHash));
     } else if (obj && typeof obj === 'object') {
-      return mapValues(pruneFn(obj as AnyObject), snap);
+      const pruned = pruneFn(obj as AnyObject);
+      const prunedWithIds = pruneIds(pruned, idHash);
+      return mapValues(prunedWithIds, (v) => snap(v, idHash));
     }
     return obj;
   };
