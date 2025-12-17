@@ -18,7 +18,7 @@
 
 `drizzle-orm-test` is a Drizzle ORM-optimized version of [`pgsql-test`](https://www.npmjs.com/package/pgsql-test) designed to work work seamlessly with context management and RLS (Row-Level Security) testing. It provides instant, isolated PostgreSQL databases for testing with automatic transaction rollbacks, context switching, and clean seeding — configured for local-first development environment. It's also great for GitHub Actions and CI/CD testing.
 
-Explore a full working example (including GitHub Actions CI/CD) in the [`drizzle-test-suite`](https://github.com/constructive-iodrizzle-test-suite) repo.
+Explore a full working example (including GitHub Actions CI/CD) in the [`drizzle-test-suite`](https://github.com/constructive-io/drizzle-test-suite) repo.
 
 ## Install
 

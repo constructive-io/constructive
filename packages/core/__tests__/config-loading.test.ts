@@ -32,7 +32,7 @@ describe('Config Loading', () => {
   });
 
   it('should load JS config with JSDoc types', () => {
-    const configContent = `/** @type {import('@pgpmjs/types').LaunchQLWorkspaceConfig} */
+    const configContent = `/** @type {import('@pgpmjs/types').PgpmWorkspaceConfig} */
 module.exports = {
   packages: ['packages/*', 'extensions/*'],
   name: 'test-workspace',
