@@ -108,16 +108,16 @@ const exportMigrationsToDisk = async ({
         'postgis',
         'hstore',
         'db-meta-schema',
-        'launchql-inflection',
-        'launchql-uuid',
-        'launchql-utils',
-        'launchql-database-jobs',
-        'launchql-jwt-claims',
-        'launchql-stamps',
-        'launchql-base32',
-        'launchql-totp',
-        'launchql-types',
-        'launchql-default-roles'
+        'pgpm-inflection',
+        'pgpm-uuid',
+        'pgpm-utils',
+        'pgpm-database-jobs',
+        'pgpm-jwt-claims',
+        'pgpm-stamps',
+        'pgpm-base32',
+        'pgpm-totp',
+        'pgpm-types',
+        'pgpm-default-roles'
       ]
     });
 

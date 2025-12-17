@@ -2,7 +2,7 @@
 
 This guide covers a local development workflow for the jobs stack:
 
-- Postgres + `launchql-database-jobs`
+- Postgres + `pgpm-database-jobs`
 - LaunchQL API server
 - `simple-email` function
 - `send-email-link` function
@@ -77,7 +77,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
    ```sh
    pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
    pgpm deploy --yes --database "$PGDATABASE" --package db-meta
-   pgpm deploy --yes --database "$PGDATABASE" --package launchql-database-jobs
+   pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
    ```
 
 At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `launchql` database.
