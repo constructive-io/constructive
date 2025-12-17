@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@launchql/knative-job-fn": "workspace:^",
-    "@launchql/job-utils": "workspace:^",
-    "@launchql/postmaster": "0.1.4"
+    "@launchql/postmaster": "0.1.4",
+    "@pgpmjs/env": "workspace:^"
   }
 }

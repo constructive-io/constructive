@@ -3,9 +3,9 @@ import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send } from '@launchql/postmaster';
-import { parseEnvBoolean } from '@launchql/job-utils';
+import { parseEnvBoolean } from '@pgpmjs/env';
 
-const isDryRun = parseEnvBoolean('SEND_EMAIL_LINK_DRY_RUN', false);
+const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 
 const GetUser = gql`
   query GetUser($userId: UUID!) {

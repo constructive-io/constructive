@@ -57,6 +57,10 @@
           "@jest/test-sequencer": "^29.7.0"
         }
       }
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@launchql/protobufjs",
+      "core-js-pure"
+    ]
   }
 }

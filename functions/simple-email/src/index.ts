@@ -1,5 +1,5 @@
 import app from '@launchql/knative-job-fn';
-import { parseEnvBoolean } from '@launchql/job-utils';
+import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 
 type SimpleEmailPayload = {
@@ -25,7 +25,7 @@ const getRequiredField = (
   return value;
 };
 
-const isDryRun = parseEnvBoolean('SIMPLE_EMAIL_DRY_RUN', false);
+const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
 
 app.post('*', async (req: any, res: any, next: any) => {
   try {

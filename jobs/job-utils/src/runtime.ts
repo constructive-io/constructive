@@ -1,18 +1,10 @@
-import { getEnvOptions, getNodeEnv } from '@pgpmjs/env';
+import { getEnvOptions, getNodeEnv, parseEnvBoolean } from '@pgpmjs/env';
 import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 import { getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
 import type { PgpmOptions } from '@pgpmjs/types';
 
 type Maybe<T> = T | null | undefined;
-
-const toBool = (v: Maybe<unknown>): boolean | undefined => {
-  if (v == null) return undefined;
-  const s = String(v).toLowerCase();
-  if (['true', '1', 'yes', 'y'].includes(s)) return true;
-  if (['false', '0', 'no', 'n'].includes(s)) return false;
-  return undefined;
-};
 
 const toStrArray = (v: Maybe<string>): string[] | undefined =>
   v ? v.split(',').map(s => s.trim()).filter(Boolean) : undefined;
@@ -44,7 +36,7 @@ export const getJobSchema = (): string => {
 // ---- SupportAny / Supported ----
 export const getJobSupportAny = (): boolean => {
   const opts: PgpmOptions = getEnvOptions();
-  const envVal = toBool(process.env.JOBS_SUPPORT_ANY);
+  const envVal = parseEnvBoolean(process.env.JOBS_SUPPORT_ANY);
   if (typeof envVal === 'boolean') return envVal;
 
   const worker: boolean | undefined = opts.jobs?.worker?.supportAny;
@@ -138,14 +130,4 @@ export const getCallbackBaseUrl = (): string => {
   const host = process.env.JOBS_CALLBACK_HOST || 'jobs-callback';
   const port = getJobsCallbackPort();
   return `http://${host}:${port}/callback`;
-};
-
-// ---- Generic env helpers ----
-export const parseEnvBoolean = (
-  name: string,
-  defaultValue = false
-): boolean => {
-  const parsed = toBool(process.env[name]);
-  if (typeof parsed === 'boolean') return parsed;
-  return defaultValue;
 };

@@ -5,7 +5,7 @@ const parseEnvNumber = (val?: string): number | undefined => {
   return !isNaN(num) ? num : undefined;
 };
 
-const parseEnvBoolean = (val?: string): boolean | undefined => {
+export const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
   return ['true', '1', 'yes'].includes(val.toLowerCase());
 };
