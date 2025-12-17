@@ -1,11 +1,9 @@
-import env from './env';
 import * as jobs from '@launchql/job-utils';
 import type { PgClientLike } from '@launchql/job-utils';
 import schedule from 'node-schedule';
 import poolManager from '@launchql/job-pg';
 import type { Pool, PoolClient } from 'pg';
-
-/* eslint-disable no-console */
+import { Logger } from '@pgpmjs/logger';
 
 export interface ScheduledJobRow {
   id: number | string;
@@ -16,6 +14,8 @@ export interface ScheduledJobRow {
 interface SchedulerJobHandle {
   cancel(): void;
 }
+
+const log = new Logger('jobs:scheduler');
 
 export default class Scheduler {
   idleDelay: number;
@@ -77,10 +77,8 @@ export default class Scheduler {
     }: { err?: Error; fatalError: unknown; jobId: ScheduledJobRow['id'] }
   ) {
     const when = err ? `after failure '${err.message}'` : 'after success';
-    console.error(
-      `Failed to release job '${jobId}' ${when}; committing seppuku`
-    );
-    console.error(fatalError);
+    log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
+    log.error(String(fatalError));
     await poolManager.close();
     process.exit(1);
   }
@@ -92,9 +90,8 @@ export default class Scheduler {
       duration
     }: { err: Error; job: ScheduledJobRow; duration: string }
   ) {
-    console.error(
-      `scheduler: Failed to initialize scheduler for ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`,
-      { err, stack: err.stack }
+    log.error(
+      `Failed to initialize scheduler for ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`
     );
     const j = this.jobs[job.id];
     if (j) j.cancel();
@@ -107,8 +104,8 @@ export default class Scheduler {
     client: PgClientLike,
     { job, duration }: { job: ScheduledJobRow; duration: string }
   ) {
-    console.log(
-      `scheduler: initialized ${job.id} (${job.task_identifier}) with success (${duration}ms)`
+    log.info(
+      `initialized ${job.id} (${job.task_identifier}) with success (${duration}ms)`
     );
   }
   async scheduleJob(client: PgClientLike, job: ScheduledJobRow) {
@@ -120,18 +117,18 @@ export default class Scheduler {
 
       if (newjob) {
         if (newjob.id) {
-          console.log(`spinning up job[${newjob.task_identifier}]`);
+          log.info(`spinning up job[${newjob.task_identifier}]`);
         } else {
           // this means the scheduled_job has been deleted from db, so cancel it
-          console.log(
-            `scheduler: attempted job[${job.task_identifier}] but it's probably non existent, unscheduling...`
+          log.info(
+            `attempted job[${job.task_identifier}] but it's probably non existent, unscheduling...`
           );
           const scheduledJob = this.jobs[job.id];
           if (scheduledJob) scheduledJob.cancel();
         }
       } else {
-        console.log(
-          `scheduler: job already scheduled but not yet run or complete: [${job.task_identifier}]`
+        log.info(
+          `job already scheduled but not yet run or complete: [${job.task_identifier}]`
         );
       }
     });
@@ -149,7 +146,7 @@ export default class Scheduler {
     try {
       const job = await jobs.getScheduledJob<ScheduledJobRow>(client, {
         workerId: this.workerId,
-        supportedTaskNames: env.JOBS_SUPPORT_ANY
+        supportedTaskNames: jobs.getJobSupportAny()
           ? null
           : this.supportedTaskNames
       });
@@ -195,14 +192,17 @@ export default class Scheduler {
       release: () => void
     ) => {
       if (err) {
-        console.error('scheduler: Error connecting with notify listener', err);
+        log.error('Error connecting with notify listener', err);
+        if (err instanceof Error && err.stack) {
+          log.debug(err.stack);
+        }
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
         return;
       }
       client.on('notification', () => {
-        console.log('scheduler: a NEW scheduled JOB!');
+        log.info('a NEW scheduled JOB!');
         if (this.doNextTimer) {
           // Must be idle, do something!
           this.doNext(client);
@@ -210,12 +210,15 @@ export default class Scheduler {
       });
       client.query('LISTEN "scheduled_jobs:insert"');
       client.on('error', (e: unknown) => {
-        console.error('scheduler: Error with database notify listener', e);
+        log.error('Error with database notify listener', e);
+        if (e instanceof Error && e.stack) {
+          log.debug(e.stack);
+        }
         release();
         this.listen();
       });
-      console.log(
-        `scheduler: ${this.workerId} connected and looking for scheduled jobs...`
+      log.info(
+        `${this.workerId} connected and looking for scheduled jobs...`
       );
       this.doNext(client);
     };

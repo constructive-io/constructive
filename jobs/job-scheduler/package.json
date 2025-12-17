@@ -30,7 +30,7 @@
   "dependencies": {
     "@launchql/job-pg": "workspace:^",
     "@launchql/job-utils": "workspace:^",
-    "envalid": "6.0.2",
+    "@pgpmjs/logger": "workspace:^",
     "node-schedule": "1.3.2"
   }
 }

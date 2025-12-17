@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { Pool, PoolConfig } from 'pg';
-import env from './env';
+import { getJobPgConfig } from '@launchql/job-utils';
 
 // k8s only does SIGINT
 // other events are bad for babel-watch
@@ -31,12 +31,7 @@ function once<T extends (...args: unknown[]) => unknown>(
   };
 }
 
-const getDbString = (): string =>
-  `postgres://${env.PGUSER}:${env.PGPASSWORD}@${env.PGHOST}:${env.PGPORT}/${env.PGDATABASE}`;
-
-const pgPoolConfig: PoolConfig = {
-  connectionString: getDbString()
-};
+const pgPoolConfig: PoolConfig = getJobPgConfig() as PoolConfig;
 
 const end = (pool: Pool): void => {
   try {

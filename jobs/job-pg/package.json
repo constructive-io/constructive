@@ -28,7 +28,7 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "envalid": "6.0.2",
+    "@launchql/job-utils": "workspace:^",
     "pg": "8.16.3"
   }
 }

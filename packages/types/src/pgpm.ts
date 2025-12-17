@@ -279,18 +279,6 @@ export const pgpmDefaults: PgpmOptions = {
       supported: [],
       pollInterval: 1000,
       gracefulShutdown: true
-    },
-    openFaas: {
-      gateway: {
-        gatewayUrl: 'http://gateway:8080',
-        callbackUrl: 'http://callback:12345',
-        callbackPort: 12345
-      },
-      server: {
-        schema: 'app_jobs',
-        port: 3000,
-        host: 'localhost'
-      }
     }
   }
 };

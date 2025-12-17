@@ -36,10 +36,10 @@ export interface JobTaskSupportConfig {
 }
 
 /**
- * OpenFaaS job system gateway configuration
+ * Job HTTP gateway configuration
  */
 export interface JobGatewayConfig {
-  /** Internal gateway URL for OpenFaaS function calls */
+  /** Internal gateway URL for job HTTP function calls */
   gatewayUrl: string;
   /** Callback URL for job completion notifications */
   callbackUrl: string;
@@ -173,21 +173,6 @@ export interface JobSchedulerConfig extends JobPgConfig, JobSchemaConfig, JobHos
 }
 
 /**
- * OpenFaaS worker configuration
- */
-export interface OpenFaasJobWorkerConfig extends JobWorkerConfig, JobGatewayConfig {}
-
-/**
- * OpenFaaS server configuration
- */
-export interface OpenFaasJobServerConfig extends JobSchemaConfig {
-  /** Port for the job server */
-  port: number;
-  /** Host address for the job server */
-  host?: string;
-}
-
-/**
  * Complete job system configuration
  */
 export interface JobsConfig {
@@ -199,15 +184,8 @@ export interface JobsConfig {
   worker?: Partial<JobWorkerConfig>;
   /** Scheduler configuration */
   scheduler?: Partial<JobSchedulerConfig>;
-  /** OpenFaaS specific configuration */
-  openFaas?: {
-    /** OpenFaaS worker config */
-    worker?: Partial<OpenFaasJobWorkerConfig>;
-    /** OpenFaaS server config */
-    server?: Partial<OpenFaasJobServerConfig>;
-    /** Gateway config */
-    gateway?: Partial<JobGatewayConfig>;
-  };
+  /** Job HTTP gateway configuration */
+  gateway?: Partial<JobGatewayConfig>;
 }
 
 /**
@@ -250,16 +228,9 @@ export const jobsDefaults: JobsConfig = {
     pollInterval: 1000,
     gracefulShutdown: true
   },
-  openFaas: {
-    gateway: {
-      gatewayUrl: 'http://gateway:8080',
-      callbackUrl: 'http://callback:12345',
-      callbackPort: 12345
-    },
-    server: {
-      schema: 'app_jobs',
-      port: 3000,
-      host: 'localhost'
-    }
+  gateway: {
+    gatewayUrl: 'http://gateway:8080',
+    callbackUrl: 'http://callback:12345',
+    callbackPort: 12345
   }
 };

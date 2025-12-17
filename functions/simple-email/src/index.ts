@@ -1,4 +1,5 @@
 import app from '@launchql/knative-job-fn';
+import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 
 type SimpleEmailPayload = {
@@ -23,6 +24,8 @@ const getRequiredField = (
   }
   return value;
 };
+
+const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
 
 app.post('*', async (req: any, res: any, next: any) => {
   try {
@@ -49,25 +52,32 @@ app.post('*', async (req: any, res: any, next: any) => {
       ? payload.replyTo
       : undefined;
 
-    // Send via @launchql/postmaster (Mailgun or configured provider)
-    await sendEmail({
-      to,
-      subject,
-      ...(html && { html }),
-      ...(text && { text }),
-      ...(from && { from }),
-      ...(replyTo && { replyTo })
-    });
-
-    // eslint-disable-next-line no-console
-    console.log('[simple-email] Sent email', {
+    const logContext = {
       to,
       subject,
       from,
       replyTo,
       hasHtml: Boolean(html),
       hasText: Boolean(text)
-    });
+    };
+
+    if (isDryRun) {
+      // eslint-disable-next-line no-console
+      console.log('[simple-email] DRY RUN email (no send)', logContext);
+    } else {
+      // Send via @launchql/postmaster (Mailgun or configured provider)
+      await sendEmail({
+        to,
+        subject,
+        ...(html && { html }),
+        ...(text && { text }),
+        ...(from && { from }),
+        ...(replyTo && { replyTo })
+      });
+
+      // eslint-disable-next-line no-console
+      console.log('[simple-email] Sent email', logContext);
+    }
 
     res.status(200).json({ complete: true });
   } catch (err) {

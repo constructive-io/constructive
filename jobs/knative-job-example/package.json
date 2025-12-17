@@ -26,7 +26,6 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@launchql/knative-job-fn": "workspace:^",
-    "envalid": "6.0.2"
+    "@launchql/knative-job-fn": "workspace:^"
   }
 }

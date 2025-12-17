@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import server from './index';
-import env from './env';
 import poolManager from '@launchql/job-pg';
+import { getJobsCallbackPort } from '@launchql/job-utils';
 
 const pgPool = poolManager.getPool();
+const port = getJobsCallbackPort();
 
-server(pgPool).listen(env.INTERNAL_JOBS_CALLBACK_PORT, () => {
-  console.log(`listening ON ${env.INTERNAL_JOBS_CALLBACK_PORT}`);
+server(pgPool).listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`listening ON ${port}`);
 });

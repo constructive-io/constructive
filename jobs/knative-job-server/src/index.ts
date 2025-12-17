@@ -6,6 +6,7 @@ import poolManager from '@launchql/job-pg';
 
 type JobRequestBody = {
   message?: string;
+  error?: string;
   // allow additional fields without typing everything
   [key: string]: unknown;
 };
@@ -87,14 +88,16 @@ export default (pgPool: Pool = poolManager.getPool()) => {
       return;
     }
 
+    const errorMessage = req.body.error || req.body.message || 'UNKNOWN_ERROR';
+
     console.log(
-      `server: Failed task ${jobIdHeader} with error: \n${req.body.message}\n\n`
+      `server: Failed task ${jobIdHeader} with error: \n${errorMessage}\n\n`
     );
 
     await jobs.failJob(client, {
       workerId,
       jobId: jobIdHeader,
-      message: req.body.message
+      message: errorMessage
     });
 
     res.status(200).json({ workerId, jobId: jobIdHeader });

@@ -1,4 +1,4 @@
-FROM pyramation/openfaas-node:0.7.2-12.18.2-alpine3.11
+FROM node:22-alpine
 
 RUN addgroup -S app && adduser -S -g app app
 RUN mkdir -p /home/app
