@@ -58,17 +58,17 @@ Make sure `pgpm` is installed and up to date.
 
 From the `constructive-db/` directory (with `pgenv` applied):
 
-1. Bootstrap admin users:
+1. Create the `launchql` database (if it does not already exist):
+
+   ```sh
+   createdb launchql
+   ```
+
+2. Bootstrap admin users:
 
    ```sh
    pgpm admin-users bootstrap --yes
    pgpm admin-users add --test --yes
-   ```
-
-2. Create the `launchql` database (if it does not already exist):
-
-   ```sh
-   createdb launchql
    ```
 
 3. Deploy the main app and jobs packages into `launchql`:

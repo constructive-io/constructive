@@ -1,5 +1,4 @@
 import app from '@launchql/knative-job-fn';
-import env from './env';
 
 app.post('*', async (req: any, res: any, next: any) => {
   if (req.body.throw) {
@@ -13,4 +12,5 @@ app.post('*', async (req: any, res: any, next: any) => {
   }
 });
 
-app.listen(env.PORT);
+const port = Number(process.env.PORT) || 10101;
+app.listen(port);
