@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/orm",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ORM",
   "main": "index.js",

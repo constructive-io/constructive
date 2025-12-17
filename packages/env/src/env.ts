@@ -10,6 +10,14 @@ export const parseEnvBoolean = (val?: string): boolean | undefined => {
   return ['true', '1', 'yes'].includes(val.toLowerCase());
 };
 
+const parseEnvStringArray = (val?: string): string[] | undefined => {
+  if (!val) return undefined;
+  return val
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+};
+
 /**
  * Parse core PGPM environment variables.
  * GraphQL-related env vars (GRAPHILE_*, FEATURES_*, API_*) are handled by @launchql/env.
@@ -50,6 +58,14 @@ export const getEnvVars = (): PgpmOptions => {
     DEPLOYMENT_TO_CHANGE,
 
     MIGRATIONS_CODEGEN_USE_TX,
+
+    // Jobs-related env vars
+    JOBS_SCHEMA,
+    JOBS_SUPPORT_ANY,
+    JOBS_SUPPORTED,
+    INTERNAL_GATEWAY_URL,
+    INTERNAL_JOBS_CALLBACK_URL,
+    INTERNAL_JOBS_CALLBACK_PORT
   } = process.env;
 
   return {
@@ -101,6 +117,46 @@ export const getEnvVars = (): PgpmOptions => {
           useTx: parseEnvBoolean(MIGRATIONS_CODEGEN_USE_TX)
         }
       }),
+    },
+    jobs: {
+      ...(JOBS_SCHEMA && {
+        schema: {
+          schema: JOBS_SCHEMA
+        }
+      }),
+      ...((JOBS_SUPPORT_ANY || JOBS_SUPPORTED) && {
+        worker: {
+          ...(JOBS_SUPPORT_ANY && {
+            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
+          }),
+          ...(JOBS_SUPPORTED && {
+            supported: parseEnvStringArray(JOBS_SUPPORTED)
+          })
+        },
+        scheduler: {
+          ...(JOBS_SUPPORT_ANY && {
+            supportAny: parseEnvBoolean(JOBS_SUPPORT_ANY)
+          }),
+          ...(JOBS_SUPPORTED && {
+            supported: parseEnvStringArray(JOBS_SUPPORTED)
+          })
+        }
+      }),
+      ...((INTERNAL_GATEWAY_URL ||
+        INTERNAL_JOBS_CALLBACK_URL ||
+        INTERNAL_JOBS_CALLBACK_PORT) && {
+        gateway: {
+          ...(INTERNAL_GATEWAY_URL && {
+            gatewayUrl: INTERNAL_GATEWAY_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_URL && {
+            callbackUrl: INTERNAL_JOBS_CALLBACK_URL
+          }),
+          ...(INTERNAL_JOBS_CALLBACK_PORT && {
+            callbackPort: parseEnvNumber(INTERNAL_JOBS_CALLBACK_PORT)
+          })
+        }
+      })
     }
   };
 };

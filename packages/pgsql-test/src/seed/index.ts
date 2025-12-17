@@ -1,12 +1,12 @@
-import { compose,fn, sqlfile } from './adapters';
+import { compose, fn, sqlfile } from './adapters';
 import { csv } from './csv';
 import { json } from './json';
-import { launchql } from './launchql';
+import { pgpm } from './pgpm';
 export * from './csv';
 export * from './types';
 
 export const seed = {
-  launchql,
+  pgpm,
   json,
   csv,
   compose,

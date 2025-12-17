@@ -1,5 +1,7 @@
 # 🚀 Quickstart: LaunchQL CLI Basics
 
+LaunchQL is different from PGPM in that it ships with a GraphQL server. All commands are the same except pgpm has no explorer/server.
+
 ### 1. Install the CLI
 
 Make sure you have the LaunchQL CLI available:

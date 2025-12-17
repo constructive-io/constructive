@@ -12,16 +12,8 @@ import {
   getSchedulerHostname,
   getWorkerHostname,
   getJobSupported,
-  getJobsCallbackPort
+  getJobsCallbackPort,
 } from '@launchql/job-utils';
-
-export const getDbConnectionString = (): string => {
-  const cfg = getJobPgConfig();
-  const auth = cfg.user
-    ? `${cfg.user}${cfg.password ? `:${cfg.password}` : ''}@`
-    : '';
-  return `postgres://${auth}${cfg.host}:${cfg.port}/${cfg.database}`;
-};
 
 export const startJobsServices = () => {
   // eslint-disable-next-line no-console

@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter",
-  "version": "2.4.6",
+  "version": "2.4.8",
   "description": "Filtering on PostGraphile connections",
   "author": "Matt Bretl",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -33,13 +33,14 @@
     "postgres",
     "graphql",
     "filters",
-    "launchql"
+    "constructive",
+    "pgpm"
   ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "find-and-require-package-json": "^0.8.1",
+    "find-and-require-package-json": "^0.8.2",
     "graphile-build": "^4.14.1",
     "graphile-build-pg": "^4.14.1",
     "graphql": "15.10.1"

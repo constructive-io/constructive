@@ -19,7 +19,7 @@ export const usageText = `
     revert             Revert database changes and migrations
   
   Project Management:
-    init               Initialize LaunchQL workspace or module
+    init               Initialize pgpm workspace or module
     extension          Manage module dependencies
     plan               Generate module deployment plans
     package            Package module for distribution
@@ -27,14 +27,14 @@ export const usageText = `
     cache              Manage cached templates (clean)
   
   Development Tools:
-    server             Start LaunchQL GraphQL server
+    server             Start a GraphQL server
     explorer           Launch GraphiQL explorer interface
     docker             Manage PostgreSQL Docker containers (start/stop)
     export             Export database migrations from existing databases
   
   Database Administration:
     kill               Terminate database connections and optionally drop databases
-    install            Install LaunchQL modules
+    install            Install pgpm modules
     tag                Add tags to changes for versioning
   
   Migration Tools:
