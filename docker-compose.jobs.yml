@@ -32,7 +32,10 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - constructive-net
+      constructive-net:
+        aliases:
+          # Let other containers call the admin API using the seeded domain route.
+          - admin.localhost
 
   # Simple email function (Knative-style HTTP function)
   simple-email:
@@ -66,8 +69,11 @@ services:
       NODE_ENV: development
       LOG_LEVEL: info
       DEFAULT_DATABASE_ID: "dbe"
-      GRAPHQL_URL: "http://launchql-server:3000/graphql"
-      META_GRAPHQL_URL: "http://launchql-server:3000/graphql"
+      # LaunchQL selects the API by Host header; use a seeded domain route.
+      GRAPHQL_URL: "http://admin.localhost:3000/graphql"
+      META_GRAPHQL_URL: "http://admin.localhost:3000/graphql"
+      # Optional: provide an existing API token (Bearer) if your server requires it.
+      GRAPHQL_AUTH_TOKEN: "${GRAPHQL_AUTH_TOKEN:-}"
       # Mailgun / email provider configuration for @launchql/postmaster
       MAILGUN_API_KEY: "change-me-mailgun-api-key"
       MAILGUN_KEY: "change-me-mailgun-api-key"

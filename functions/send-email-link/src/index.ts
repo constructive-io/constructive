@@ -121,19 +121,6 @@ export const sendEmailLink = async (
     return typeValidation;
   }
 
-  if (isDryRun) {
-    // eslint-disable-next-line no-console
-    console.log('[send-email-link] DRY RUN email (skipping GraphQL and send)', {
-      email_type: params.email_type,
-      email: params.email,
-      hasInviteToken: Boolean(params.invite_token),
-      hasSenderId: Boolean(params.sender_id),
-      hasResetToken: Boolean(params.reset_token),
-      hasVerificationToken: Boolean(params.verification_token)
-    });
-    return { complete: true, dryRun: true };
-  }
-
   const databaseInfo = await meta.request<any>(GetDatabaseInfo, {
     databaseId
   });
@@ -252,14 +239,25 @@ export const sendEmailLink = async (
     }
   });
 
-  await send({
-    to: params.email,
-    subject,
-    html
-  });
+  if (isDryRun) {
+    // eslint-disable-next-line no-console
+    console.log('[send-email-link] DRY RUN email (skipping send)', {
+      email_type: params.email_type,
+      email: params.email,
+      subject,
+      link
+    });
+  } else {
+    await send({
+      to: params.email,
+      subject,
+      html
+    });
+  }
 
   return {
-    complete: true
+    complete: true,
+    ...(isDryRun ? { dryRun: true } : null)
   };
 };
 
