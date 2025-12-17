@@ -46,11 +46,11 @@ services:
     environment:
       NODE_ENV: development
       LOG_LEVEL: info
-      SIMPLE_EMAIL_DRY_RUN: "true"
+      SIMPLE_EMAIL_DRY_RUN: "${SIMPLE_EMAIL_DRY_RUN:-true}"
       # Mailgun / email provider configuration for @launchql/postmaster
       # Replace with real credentials for local testing.
-      MAILGUN_API_KEY: "change-me-mailgun-api-key"
-      MAILGUN_KEY: "change-me-mailgun-api-key"
+      MAILGUN_API_KEY: "${MAILGUN_API_KEY:-change-me-mailgun-api-key}"
+      MAILGUN_KEY: "${MAILGUN_KEY:-change-me-mailgun-api-key}"
       MAILGUN_DOMAIN: "mg.constructive.io"
       MAILGUN_FROM: "no-reply@mg.constructive.io"
       MAILGUN_REPLY: "info@mg.constructive.io"
@@ -75,12 +75,12 @@ services:
       # Optional: provide an existing API token (Bearer) if your server requires it.
       GRAPHQL_AUTH_TOKEN: "${GRAPHQL_AUTH_TOKEN:-}"
       # Mailgun / email provider configuration for @launchql/postmaster
-      MAILGUN_API_KEY: "change-me-mailgun-api-key"
-      MAILGUN_KEY: "change-me-mailgun-api-key"
+      MAILGUN_API_KEY: "${MAILGUN_API_KEY:-change-me-mailgun-api-key}"
+      MAILGUN_KEY: "${MAILGUN_KEY:-change-me-mailgun-api-key}"
       MAILGUN_DOMAIN: "mg.constructive.io"
       MAILGUN_FROM: "no-reply@mg.constructive.io"
       MAILGUN_REPLY: "info@mg.constructive.io"
-      SEND_EMAIL_LINK_DRY_RUN: "true"
+      SEND_EMAIL_LINK_DRY_RUN: "${SEND_EMAIL_LINK_DRY_RUN:-true}"
     ports:
       # Expose function locally (optional)
       - "8082:8080"

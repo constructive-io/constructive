@@ -108,6 +108,69 @@ This starts:
 
 ---
 
+### Switching dry run vs real Mailgun sending
+
+By default, `docker-compose.jobs.yml` runs both email functions in dry-run mode (no real email is sent), and it uses placeholder Mailgun credentials unless you provide `MAILGUN_API_KEY` / `MAILGUN_KEY`.
+
+Quick start commands:
+
+Dry run:
+
+```sh
+docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
+```
+
+Real sending (Mailgun):
+
+```sh
+MAILGUN_API_KEY="your-mailgun-key" MAILGUN_KEY="your-mailgun-key" SIMPLE_EMAIL_DRY_RUN=false SEND_EMAIL_LINK_DRY_RUN=false docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
+```
+
+To use a real Mailgun key without editing `docker-compose.jobs.yml`, set these env vars before starting the stack (or put them in a local `.env` file in the `constructive/` directory). Don't commit your `.env`.
+
+```sh
+export MAILGUN_API_KEY="your-mailgun-key"
+export MAILGUN_KEY="your-mailgun-key"
+```
+
+If you're not using `mg.constructive.io`, also override `MAILGUN_DOMAIN`, `MAILGUN_FROM`, and `MAILGUN_REPLY` (for example in the override file below) to match your Mailgun setup.
+
+To actually send email (instead of dry-run), set these env vars (or put them in your local `.env`):
+
+```sh
+export SIMPLE_EMAIL_DRY_RUN=false
+export SEND_EMAIL_LINK_DRY_RUN=false
+```
+
+Then recreate the stack so the new env is applied:
+
+```sh
+docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
+```
+
+If you prefer not to export env vars, create a local override file (don't commit it) at `docker-compose.jobs.override.yml`:
+
+```yml
+services:
+  simple-email:
+    environment:
+      SIMPLE_EMAIL_DRY_RUN: "false"
+
+  send-email-link:
+    environment:
+      SEND_EMAIL_LINK_DRY_RUN: "false"
+```
+
+Start the stack with both files:
+
+```sh
+docker compose -f docker-compose.jobs.yml -f docker-compose.jobs.override.yml up -d --build --force-recreate
+```
+
+To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
+
+---
+
 ## 5. Ensure GraphQL host routing works for `send-email-link`
 
 LaunchQL selects the API by the HTTP `Host` header using rows in `meta_public.domains`.
