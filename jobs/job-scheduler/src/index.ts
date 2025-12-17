@@ -193,6 +193,9 @@ export default class Scheduler {
     ) => {
       if (err) {
         log.error('Error connecting with notify listener', err);
+        if (err instanceof Error && err.stack) {
+          log.debug(err.stack);
+        }
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
@@ -207,7 +210,10 @@ export default class Scheduler {
       });
       client.query('LISTEN "scheduled_jobs:insert"');
       client.on('error', (e: unknown) => {
-        log.error('Error with database notify listener');
+        log.error('Error with database notify listener', e);
+        if (e instanceof Error && e.stack) {
+          log.debug(e.stack);
+        }
         release();
         this.listen();
       });
