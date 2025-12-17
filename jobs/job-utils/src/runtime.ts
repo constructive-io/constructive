@@ -33,6 +33,14 @@ export const getJobPgConfig = (): PgConfig => {
 export const getJobPool = (): Pool =>
   getPgPool(getJobPgConfig());
 
+export const getJobConnectionString = (): string => {
+  const cfg = getJobPgConfig();
+  const auth = cfg.user
+    ? `${cfg.user}${cfg.password ? `:${cfg.password}` : ''}@`
+    : '';
+  return `postgres://${auth}${cfg.host}:${cfg.port}/${cfg.database}`;
+};
+
 // ---- Schema ----
 export const getJobSchema = (): string => {
   const opts: PgpmOptions = getEnvOptions();
