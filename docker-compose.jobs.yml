@@ -88,7 +88,6 @@ services:
       JOBS_CALLBACK_HOST: "knative-job-service"
 
       # Function gateway base URL (used by worker when no dev map is present)
-      KNATIVE_SERVICE_URL: "http://simple-email:8080"
       INTERNAL_GATEWAY_URL: "http://simple-email:8080"
 
       # Development-only map from task identifier -> function URL
