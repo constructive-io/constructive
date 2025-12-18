@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/job-utils",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "job utils",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/job-utils#readme",
@@ -28,10 +28,10 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "dependencies": {
-    "@pgpmjs/types": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "pg-env": "workspace:^",
-    "pg-cache": "workspace:^"
+    "@pgpmjs/types": "workspace:^",
+    "pg-cache": "workspace:^",
+    "pg-env": "workspace:^"
   }
 }

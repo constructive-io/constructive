@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-service",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "knative job service",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-service#readme",
@@ -38,9 +38,9 @@
   "dependencies": {
     "@constructive-io/job-pg": "workspace:^",
     "@constructive-io/job-scheduler": "workspace:^",
+    "@constructive-io/job-utils": "workspace:^",
     "@constructive-io/knative-job-server": "workspace:^",
     "@constructive-io/knative-job-worker": "workspace:^",
-    "@constructive-io/job-utils": "workspace:^",
     "async-retry": "1.3.1",
     "pg": "8.16.3"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@launchql/send-email-link-fn",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Knative function to send email links (invite, password reset, email verification) using LaunchQL jobs",
   "author": "LaunchQL",
   "private": true,

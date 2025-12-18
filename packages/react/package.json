@@ -1,6 +1,6 @@
 {
   "name": "@launchql/react",
-  "version": "2.14.8",
+  "version": "2.14.9",
   "author": "Constructive <developers@constructive.io>",
   "description": "LaunchQL React",
   "main": "index.js",
