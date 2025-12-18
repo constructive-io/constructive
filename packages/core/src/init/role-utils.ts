@@ -1,6 +1,4 @@
 import { Logger } from '@pgpmjs/logger';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { Pool } from 'pg';
 
 import {
@@ -16,11 +14,21 @@ import {
 const log = new Logger('role-utils');
 
 /**
- * Load a SQL template file from the sql directory
+ * Escape a SQL identifier (role name, database name, etc.)
+ * This prevents SQL injection by properly quoting identifiers
  */
-function loadSqlTemplate(templateName: string): string {
-  const sqlPath = join(__dirname, 'sql', `${templateName}.sql`);
-  return readFileSync(sqlPath, 'utf-8');
+function escapeIdentifier(identifier: string): string {
+  // Double any double quotes and wrap in double quotes
+  return '"' + identifier.replace(/"/g, '""') + '"';
+}
+
+/**
+ * Escape a SQL literal (string value)
+ * This prevents SQL injection by properly quoting string literals
+ */
+function escapeLiteral(value: string): string {
+  // Double any single quotes and wrap in single quotes
+  return "'" + value.replace(/'/g, "''") + "'";
 }
 
 /**
@@ -45,9 +53,48 @@ export async function ensureBaseRoles(
   
   log.info('Ensuring base roles exist...');
   
-  const sql = loadSqlTemplate('ensure-base-roles');
+  // DO blocks don't support parameterized queries, so we use safe string interpolation
+  // with format() inside PL/pgSQL for identifier escaping
+  const sql = `
+DO $do$
+DECLARE
+  v_anonymous TEXT := ${escapeLiteral(names.anonymous)};
+  v_authenticated TEXT := ${escapeLiteral(names.authenticated)};
+  v_administrator TEXT := ${escapeLiteral(names.administrator)};
+BEGIN
+  -- Create anonymous role
+  BEGIN
+    EXECUTE format('CREATE ROLE %I', v_anonymous);
+  EXCEPTION
+    WHEN duplicate_object THEN
+      NULL;
+  END;
   
-  await pool.query(sql, [names.anonymous, names.authenticated, names.administrator]);
+  -- Create authenticated role
+  BEGIN
+    EXECUTE format('CREATE ROLE %I', v_authenticated);
+  EXCEPTION
+    WHEN duplicate_object THEN
+      NULL;
+  END;
+  
+  -- Create administrator role
+  BEGIN
+    EXECUTE format('CREATE ROLE %I', v_administrator);
+  EXCEPTION
+    WHEN duplicate_object THEN
+      NULL;
+  END;
+  
+  -- Set role attributes (safe to run even if role already exists)
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_anonymous);
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_authenticated);
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION BYPASSRLS', v_administrator);
+END
+$do$;
+  `;
+  
+  await pool.query(sql);
   
   log.success('Base roles ensured successfully');
 }
@@ -64,9 +111,31 @@ export async function ensureLoginRole(
   
   log.info(`Ensuring login role exists: ${username}...`);
   
-  const sql = loadSqlTemplate('ensure-login-role');
+  // DO blocks don't support parameterized queries, so we use safe string interpolation
+  const sql = `
+DO $do$
+DECLARE
+  v_username TEXT := ${escapeLiteral(username)};
+  v_password TEXT := ${escapeLiteral(password)};
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_username) THEN
+    BEGIN
+      ${useLocks ? `PERFORM pg_advisory_xact_lock(${lockNamespace}, hashtext(v_username));` : '-- Locks disabled'}
+      EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_username, v_password);
+    EXCEPTION
+      WHEN duplicate_object THEN
+        NULL;
+      WHEN unique_violation THEN
+        NULL;
+      WHEN insufficient_privilege THEN
+        RAISE EXCEPTION 'Insufficient privileges to create role %: ensure the connecting user has CREATEROLE', v_username;
+    END;
+  END IF;
+END
+$do$;
+  `;
   
-  await pool.query(sql, [username, password, useLocks, lockNamespace]);
+  await pool.query(sql);
   
   log.success(`Login role ensured: ${username}`);
 }
@@ -87,9 +156,44 @@ export async function ensureRoleMembership(
 ): Promise<void> {
   const { useLocks = false, lockNamespace = 43, onMissingRole = 'notice' } = options;
   
-  const sql = loadSqlTemplate('ensure-membership');
+  // Build the exception handler based on onMissingRole option
+  let undefinedObjectHandler: string;
+  if (onMissingRole === 'error') {
+    undefinedObjectHandler = `RAISE EXCEPTION 'Missing role when granting % to %', v_role_to_grant, v_username;`;
+  } else if (onMissingRole === 'ignore') {
+    undefinedObjectHandler = `NULL;`;
+  } else {
+    undefinedObjectHandler = `RAISE NOTICE 'Missing role when granting % to %', v_role_to_grant, v_username;`;
+  }
   
-  await pool.query(sql, [roleToGrant, username, useLocks, lockNamespace, onMissingRole]);
+  // DO blocks don't support parameterized queries, so we use safe string interpolation
+  const sql = `
+DO $do$
+DECLARE
+  v_role_to_grant TEXT := ${escapeLiteral(roleToGrant)};
+  v_username TEXT := ${escapeLiteral(username)};
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_auth_members am
+    JOIN pg_roles r1 ON am.roleid = r1.oid
+    JOIN pg_roles r2 ON am.member = r2.oid
+    WHERE r1.rolname = v_role_to_grant AND r2.rolname = v_username
+  ) THEN
+    BEGIN
+      ${useLocks ? `PERFORM pg_advisory_xact_lock(${lockNamespace}, hashtext(v_role_to_grant || ':' || v_username));` : '-- Locks disabled'}
+      EXECUTE format('GRANT %I TO %I', v_role_to_grant, v_username);
+    EXCEPTION
+      WHEN unique_violation THEN
+        NULL;
+      WHEN undefined_object THEN
+        ${undefinedObjectHandler}
+    END;
+  END IF;
+END
+$do$;
+  `;
+  
+  await pool.query(sql);
 }
 
 /**
@@ -132,9 +236,26 @@ export async function grantConnect(
   
   log.info(`Granting CONNECT on ${dbName} to ${roleName}...`);
   
-  const sql = loadSqlTemplate('grant-connect');
+  // DO blocks don't support parameterized queries, so we use safe string interpolation
+  const sql = `
+DO $do$
+DECLARE
+  v_role_name TEXT := ${escapeLiteral(roleName)};
+  v_db_name TEXT := ${escapeLiteral(dbName)};
+BEGIN
+  BEGIN
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', v_db_name, v_role_name);
+  EXCEPTION
+    WHEN undefined_object THEN
+      RAISE NOTICE 'Role % does not exist, skipping GRANT CONNECT', v_role_name;
+    WHEN invalid_catalog_name THEN
+      RAISE NOTICE 'Database % does not exist, skipping GRANT CONNECT', v_db_name;
+  END;
+END
+$do$;
+  `;
   
-  await pool.query(sql, [roleName, dbName]);
+  await pool.query(sql);
   
   log.success(`CONNECT granted on ${dbName} to ${roleName}`);
 }
