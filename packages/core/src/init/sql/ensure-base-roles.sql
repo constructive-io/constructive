@@ -1,6 +1,6 @@
 -- Ensure base roles exist (anonymous, authenticated, administrator)
 -- Parameters: $1 = anonymous role name, $2 = authenticated role name, $3 = administrator role name
-BEGIN;
+-- Note: This is a single DO block to work with parameterized queries (pg library limitation)
 DO $do$
 DECLARE
   v_anonymous TEXT := COALESCE($1, 'anonymous');
@@ -30,17 +30,8 @@ BEGIN
     WHEN duplicate_object THEN
       NULL;
   END;
-END
-$do$;
-
--- Set role attributes (safe to run even if role already exists)
--- These use dynamic SQL to support custom role names
-DO $do$
-DECLARE
-  v_anonymous TEXT := COALESCE($1, 'anonymous');
-  v_authenticated TEXT := COALESCE($2, 'authenticated');
-  v_administrator TEXT := COALESCE($3, 'administrator');
-BEGIN
+  
+  -- Set role attributes (safe to run even if role already exists)
   -- Anonymous role attributes
   EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_anonymous);
   
@@ -51,4 +42,3 @@ BEGIN
   EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION BYPASSRLS', v_administrator);
 END
 $do$;
-COMMIT;
