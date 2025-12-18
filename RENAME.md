@@ -66,7 +66,7 @@ packages:
 | `packages/launchql-test` | `graphql/test` | `launchql-test` | `@constructive-io/graphql-test` |
 | `packages/query` | `graphql/query` | `@launchql/query` | `@constructive-io/graphql-query` |
 | `packages/react` | `graphql/react` | `@launchql/react` | `@constructive-io/graphql-react` |
-| `packages/gql-ast` | `graphql/gql-ast` | `gql-ast` | `@constructive-io/gql-ast` |
+| `packages/gql-ast` | `graphql/gql-ast` | `gql-ast` | `gql-ast` |
 
 ### streaming/ - File Streaming and S3 Utilities
 
@@ -76,26 +76,26 @@ packages:
 | `packages/s3-utils` | `streaming/s3-utils` | `@launchql/s3-utils` | `@constructive-io/s3-utils` |
 | `packages/content-type-stream` | `streaming/content-type-stream` | `@launchql/content-type-stream` | `@constructive-io/content-type-stream` |
 | `packages/upload-names` | `streaming/upload-names` | `@launchql/upload-names` | `@constructive-io/upload-names` |
-| `packages/etag-hash` | `streaming/etag-hash` | `etag-hash` | `@constructive-io/etag-hash` |
-| `packages/etag-stream` | `streaming/etag-stream` | `etag-stream` | `@constructive-io/etag-stream` |
-| `packages/stream-to-etag` | `streaming/stream-to-etag` | `stream-to-etag` | `@constructive-io/stream-to-etag` |
-| `packages/uuid-hash` | `streaming/uuid-hash` | `uuid-hash` | `@constructive-io/uuid-hash` |
-| `packages/uuid-stream` | `streaming/uuid-stream` | `uuid-stream` | `@constructive-io/uuid-stream` |
-| `packages/mime-bytes` | `streaming/mime-bytes` | `mime-bytes` | `@constructive-io/mime-bytes` |
+| `packages/etag-hash` | `streaming/etag-hash` | `etag-hash` | `etag-hash` |
+| `packages/etag-stream` | `streaming/etag-stream` | `etag-stream` | `etag-stream` |
+| `packages/stream-to-etag` | `streaming/stream-to-etag` | `stream-to-etag` | `stream-to-etag` |
+| `packages/uuid-hash` | `streaming/uuid-hash` | `uuid-hash` | `uuid-hash` |
+| `packages/uuid-stream` | `streaming/uuid-stream` | `uuid-stream` | `uuid-stream` |
+| `packages/mime-bytes` | `streaming/mime-bytes` | `mime-bytes` | `mime-bytes` |
 
 ### postgres/ - PostgreSQL-Specific Packages
 
 | Current Location | New Location | Current Package Name | New Package Name |
 |-----------------|--------------|---------------------|------------------|
-| `packages/pg-ast` | `postgres/pg-ast` | `pg-ast` | `@constructive-io/pg-ast` |
-| `packages/pg-cache` | `postgres/pg-cache` | `pg-cache` | `@constructive-io/pg-cache` |
-| `packages/pg-codegen` | `postgres/pg-codegen` | `pg-codegen` | `@constructive-io/pg-codegen` |
-| `packages/pg-env` | `postgres/pg-env` | `pg-env` | `@constructive-io/pg-env` |
-| `packages/pg-query-context` | `postgres/pg-query-context` | `pg-query-context` | `@constructive-io/pg-query-context` |
-| `packages/introspectron` | `postgres/introspectron` | `introspectron` | `@constructive-io/introspectron` |
-| `packages/pgsql-test` | `postgres/pgsql-test` | `pgsql-test` | `@constructive-io/pgsql-test` |
-| `packages/supabase-test` | `postgres/supabase-test` | `supabase-test` | `@constructive-io/supabase-test` |
-| `packages/drizzle-orm-test` | `postgres/drizzle-orm-test` | `drizzle-orm-test` | `@constructive-io/drizzle-orm-test` |
+| `packages/pg-ast` | `postgres/pg-ast` | `pg-ast` | `pg-ast` |
+| `packages/pg-cache` | `postgres/pg-cache` | `pg-cache` | `pg-cache` |
+| `packages/pg-codegen` | `postgres/pg-codegen` | `pg-codegen` | `pg-codegen` |
+| `packages/pg-env` | `postgres/pg-env` | `pg-env` | `pg-env` |
+| `packages/pg-query-context` | `postgres/pg-query-context` | `pg-query-context` | `pg-query-context` |
+| `packages/introspectron` | `postgres/introspectron` | `introspectron` | `introspectron` |
+| `packages/pgsql-test` | `postgres/pgsql-test` | `pgsql-test` | `pgsql-test` |
+| `packages/supabase-test` | `postgres/supabase-test` | `supabase-test` | `supabase-test` |
+| `packages/drizzle-orm-test` | `postgres/drizzle-orm-test` | `drizzle-orm-test` | `drizzle-orm-test` |
 
 ### packages/ - Core Packages (Remain in packages/)
 
