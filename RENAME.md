@@ -117,8 +117,8 @@ packages:
 
 | Current Binary | New Binary | Location |
 |---------------|------------|----------|
-| `lql` | `constructive` | `packages/cli/package.json` |
-| `launchql` | `constructive` | `packages/cli/package.json` |
+| `lql` | `cnc` (shorthand) | `packages/cli/package.json` |
+| `launchql` | `constructive` (full name) | `packages/cli/package.json` |
 
 ```json
 // Before
@@ -129,9 +129,12 @@ packages:
 
 // After
 "bin": {
+  "cnc": "index.js",
   "constructive": "index.js"
 }
 ```
+
+Both `cnc` and `constructive` will be available as CLI commands, with `cnc` serving as the shorthand.
 
 ## Class and Type Renames
 
