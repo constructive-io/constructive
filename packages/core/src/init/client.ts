@@ -5,6 +5,20 @@ import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
 
+import {
+  ensureBaseRoles,
+  ensureLoginRole,
+  ensureRoleMemberships,
+  createDbUser,
+  createTestUsers,
+  getRoleNames
+} from './role-utils';
+import {
+  CreateDbUserOptions,
+  BootstrapTestUsersOptions,
+  RoleNameMapping
+} from './types';
+
 const log = new Logger('init');
 
 export class PgpmInit {
@@ -18,15 +32,13 @@ export class PgpmInit {
 
   /**
    * Bootstrap standard roles (anonymous, authenticated, administrator)
+   * Uses the new modular ensureBaseRoles function
    */
-  async bootstrapRoles(): Promise<void> {
+  async bootstrapRoles(options?: { roleNames?: RoleNameMapping }): Promise<void> {
     try {
       log.info('Bootstrapping PGPM roles...');
       
-      const sqlPath = join(__dirname, 'sql', 'bootstrap-roles.sql');
-      const sql = readFileSync(sqlPath, 'utf-8');
-      
-      await this.pool.query(sql);
+      await ensureBaseRoles(this.pool, options);
       
       log.success('Successfully bootstrapped PGPM roles');
     } catch (error) {
@@ -36,81 +48,50 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap test roles (roles only, no users)
+   * Bootstrap test users (app_user and app_admin) with appropriate role memberships
+   * WARNING: This should NEVER be run on a production database!
    */
-  async bootstrapTestRoles(): Promise<void> {
+  async bootstrapTestRoles(options?: BootstrapTestUsersOptions): Promise<void> {
     try {
-      log.warn('WARNING: This command creates test roles and should NEVER be run on a production database!');
-      log.info('Bootstrapping PGPM test roles...');
+      log.warn('WARNING: This command creates test users and should NEVER be run on a production database!');
+      log.info('Bootstrapping PGPM test users...');
       
-      const sqlPath = join(__dirname, 'sql', 'bootstrap-test-roles.sql');
-      const sql = readFileSync(sqlPath, 'utf-8');
+      await createTestUsers(this.pool, options);
       
-      await this.pool.query(sql);
-      
-      log.success('Successfully bootstrapped PGPM test roles');
+      log.success('Successfully bootstrapped PGPM test users');
     } catch (error) {
-      log.error('Failed to bootstrap test roles:', error);
+      log.error('Failed to bootstrap test users:', error);
       throw error;
     }
   }
 
   /**
    * Bootstrap database roles with custom username and password
+   * Creates a login role and grants anonymous + authenticated memberships
+   * 
+   * @param username - The username for the new role
+   * @param password - The password for the new role
+   * @param options - Optional configuration for locks and role names
    */
-  async bootstrapDbRoles(username: string, password: string): Promise<void> {
+  async bootstrapDbRoles(
+    username: string,
+    password: string,
+    options?: Omit<CreateDbUserOptions, 'username' | 'password'>
+  ): Promise<void> {
     try {
       log.info(`Bootstrapping PGPM database roles for user: ${username}...`);
       
-      const sql = `
-BEGIN;
-DO $do$
-DECLARE
-  v_username TEXT := '${username.replace(/'/g, "''")}';
-  v_password TEXT := '${password.replace(/'/g, "''")}';
-BEGIN
-  BEGIN
-    EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_username, v_password);
-  EXCEPTION
-    WHEN duplicate_object THEN
-      -- Role already exists; optionally sync attributes here with ALTER ROLE
-      NULL;
-  END;
-END
-$do$;
-
--- Robust GRANTs under concurrency: GRANT can race on pg_auth_members unique index.
--- Catch unique_violation (23505) and continue so CI/CD concurrent jobs don't fail.
-DO $do$
-DECLARE
-  v_username TEXT := '${username.replace(/'/g, "''")}';
-BEGIN
-  BEGIN
-    EXECUTE format('GRANT %I TO %I', 'anonymous', v_username);
-  EXCEPTION
-    WHEN unique_violation THEN
-      -- Membership was granted concurrently; ignore.
-      NULL;
-    WHEN undefined_object THEN
-      -- One of the roles doesn't exist yet; order operations as needed.
-      RAISE NOTICE 'Missing role when granting % to %', 'anonymous', v_username;
-  END;
-
-  BEGIN
-    EXECUTE format('GRANT %I TO %I', 'authenticated', v_username);
-  EXCEPTION
-    WHEN unique_violation THEN
-      -- Membership was granted concurrently; ignore.
-      NULL;
-    WHEN undefined_object THEN
-      RAISE NOTICE 'Missing role when granting % to %', 'authenticated', v_username;
-  END;
-END
-$do$;
-COMMIT;
-      `;
+      const names = getRoleNames(options?.roleNames);
       
-      await this.pool.query(sql);
+      await createDbUser(this.pool, {
+        username,
+        password,
+        rolesToGrant: options?.rolesToGrant || [names.anonymous, names.authenticated],
+        useLocks: options?.useLocks,
+        lockNamespace: options?.lockNamespace,
+        onMissingRole: options?.onMissingRole,
+        roleNames: options?.roleNames
+      });
       
       log.success(`Successfully bootstrapped PGPM database roles for user: ${username}`);
     } catch (error) {
@@ -122,30 +103,45 @@ COMMIT;
   /**
    * Remove database roles and revoke grants
    */
-  async removeDbRoles(username: string): Promise<void> {
+  async removeDbRoles(username: string, options?: { roleNames?: RoleNameMapping }): Promise<void> {
     try {
       log.info(`Removing PGPM database roles for user: ${username}...`);
+      
+      const names = getRoleNames(options?.roleNames);
       
       const sql = `
 BEGIN;
 DO $do$
+DECLARE
+  v_username TEXT := $1;
+  v_anonymous TEXT := $2;
+  v_authenticated TEXT := $3;
 BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM
-            pg_catalog.pg_roles
-        WHERE
-            rolname = '${username}') THEN
-    REVOKE anonymous FROM ${username};
-    REVOKE authenticated FROM ${username};
-    DROP ROLE ${username};
-END IF;
+  IF EXISTS (
+    SELECT 1
+    FROM pg_catalog.pg_roles
+    WHERE rolname = v_username
+  ) THEN
+    BEGIN
+      EXECUTE format('REVOKE %I FROM %I', v_anonymous, v_username);
+    EXCEPTION
+      WHEN undefined_object THEN
+        NULL;
+    END;
+    BEGIN
+      EXECUTE format('REVOKE %I FROM %I', v_authenticated, v_username);
+    EXCEPTION
+      WHEN undefined_object THEN
+        NULL;
+    END;
+    EXECUTE format('DROP ROLE %I', v_username);
+  END IF;
 END
 $do$;
 COMMIT;
       `;
       
-      await this.pool.query(sql);
+      await this.pool.query(sql, [username, names.anonymous, names.authenticated]);
       
       log.success(`Successfully removed PGPM database roles for user: ${username}`);
     } catch (error) {

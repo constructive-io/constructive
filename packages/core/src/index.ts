@@ -18,8 +18,29 @@ export * from './files';
 export { cleanSql } from './migrate/clean';
 export { PgpmMigrate } from './migrate/client';
 export { PgpmInit } from './init/client';
+export {
+  ensureBaseRoles,
+  ensureLoginRole,
+  ensureRoleMembership,
+  ensureRoleMemberships,
+  grantConnect,
+  createDbUser,
+  createTestUsers,
+  getRoleNames
+} from './init/role-utils';
+export {
+  RoleNameMapping,
+  DEFAULT_ROLE_NAMES,
+  OnMissingRoleAction,
+  EnsureLoginRoleOptions,
+  EnsureRoleMembershipsOptions,
+  EnsureBaseRolesOptions,
+  GrantConnectOptions,
+  CreateDbUserOptions,
+  BootstrapTestUsersOptions
+} from './init/types';
 export { 
-  DeployOptions, 
+  DeployOptions,
   DeployResult, 
   MigrateChange, 
   MigratePlanFile, 
