@@ -2,7 +2,6 @@ import { Logger } from '@pgpmjs/logger';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
-import { Client } from 'pg';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
 
 import { getRoleName } from './roles';
@@ -10,6 +9,14 @@ import { SeedAdapter } from './seed/types';
 import { streamSql as stream } from './stream';
 
 const log = new Logger('db-admin');
+
+/**
+ * Escape a SQL literal (string value)
+ * This prevents SQL injection by properly quoting string literals
+ */
+function escapeLiteral(value: string): string {
+  return "'" + value.replace(/'/g, "''") + "'";
+}
 
 /**
  * Options for creating a user role in the test framework
@@ -134,14 +141,22 @@ export class DbAdmin {
     const db = dbName ?? this.config.database;
     const { useLocks = false, lockNamespace = 43, onMissingRole = 'notice' } = options || {};
     
+    // Build the exception handler based on onMissingRole option
+    let undefinedObjectHandler: string;
+    if (onMissingRole === 'error') {
+      undefinedObjectHandler = `RAISE EXCEPTION 'Role % does not exist when granting to %', v_role, v_user;`;
+    } else if (onMissingRole === 'ignore') {
+      undefinedObjectHandler = `NULL;`;
+    } else {
+      undefinedObjectHandler = `RAISE NOTICE 'Missing role when granting % to %', v_role, v_user;`;
+    }
+    
+    // DO blocks don't support parameterized queries, so we use safe string interpolation
     const sql = `
 DO $$
 DECLARE
-  v_user TEXT := $1;
-  v_role TEXT := $2;
-  v_use_locks BOOLEAN := $3;
-  v_lock_namespace INT := $4;
-  v_on_missing_role TEXT := $5;
+  v_user TEXT := ${escapeLiteral(user)};
+  v_role TEXT := ${escapeLiteral(role)};
 BEGIN
   -- Pre-check to avoid unnecessary GRANTs; still catch TOCTOU under concurrency
   IF NOT EXISTS (
@@ -151,11 +166,7 @@ BEGIN
     WHERE r1.rolname = v_role AND r2.rolname = v_user
   ) THEN
     BEGIN
-      -- Acquire advisory lock if requested (prevents race conditions in concurrent CI/CD)
-      IF v_use_locks THEN
-        PERFORM pg_advisory_xact_lock(v_lock_namespace, hashtext(v_role || ':' || v_user));
-      END IF;
-      
+      ${useLocks ? `PERFORM pg_advisory_xact_lock(${lockNamespace}, hashtext(v_role || ':' || v_user));` : '-- Locks disabled'}
       EXECUTE format('GRANT %I TO %I', v_role, v_user);
     EXCEPTION
       WHEN unique_violation THEN
@@ -163,16 +174,7 @@ BEGIN
         NULL;
       WHEN undefined_object THEN
         -- Role or user missing
-        CASE v_on_missing_role
-          WHEN 'error' THEN
-            RAISE EXCEPTION 'Role % does not exist when granting to %', v_role, v_user;
-          WHEN 'notice' THEN
-            RAISE NOTICE 'Missing role when granting % to %', v_role, v_user;
-          WHEN 'ignore' THEN
-            NULL;
-          ELSE
-            RAISE NOTICE 'Missing role when granting % to %', v_role, v_user;
-        END CASE;
+        ${undefinedObjectHandler}
       WHEN insufficient_privilege THEN
         RAISE EXCEPTION 'Insufficient privileges to grant % to %', v_role, v_user;
     END;
@@ -180,7 +182,7 @@ BEGIN
 END
 $$;
     `;
-    await this.streamSqlWithParams(sql, [user, role, useLocks, lockNamespace, onMissingRole], db);
+    await this.streamSql(sql, db);
   }
 
   async grantConnect(role: string, dbName?: string): Promise<void> {
@@ -226,21 +228,16 @@ $$;
     }
     
     // Create the login role with optional advisory locks
+    // DO blocks don't support parameterized queries, so we use safe string interpolation
     const createRoleSql = `
 DO $$
 DECLARE
-  v_user TEXT := $1;
-  v_password TEXT := $2;
-  v_use_locks BOOLEAN := $3;
-  v_lock_namespace INT := $4;
+  v_user TEXT := ${escapeLiteral(user)};
+  v_password TEXT := ${escapeLiteral(password)};
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_user) THEN
     BEGIN
-      -- Acquire advisory lock if requested (prevents race conditions in concurrent CI/CD)
-      IF v_use_locks THEN
-        PERFORM pg_advisory_xact_lock(v_lock_namespace, hashtext(v_user));
-      END IF;
-      
+      ${useLocks ? `PERFORM pg_advisory_xact_lock(${lockNamespace}, hashtext(v_user));` : '-- Locks disabled'}
       EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_user, v_password);
     EXCEPTION
       WHEN duplicate_object THEN
@@ -257,7 +254,7 @@ END
 $$;
     `;
     
-    await this.streamSqlWithParams(createRoleSql, [user, password, useLocks, lockNamespace], dbName);
+    await this.streamSql(createRoleSql, dbName);
     
     // Grant role memberships
     for (const role of rolesToGrant) {
@@ -284,27 +281,6 @@ $$;
       },
       sql
     );
-  }
-
-  /**
-   * Execute SQL with parameterized values using pg Client
-   * This is safer than string interpolation for user-provided values
-   */
-  async streamSqlWithParams(sql: string, params: any[], dbName: string): Promise<void> {
-    const client = new Client({
-      host: this.config.host,
-      port: this.config.port,
-      user: this.config.user,
-      password: this.config.password,
-      database: dbName
-    });
-    
-    try {
-      await client.connect();
-      await client.query(sql, params);
-    } finally {
-      await client.end();
-    }
   }
 
   async createSeededTemplate(templateName: string, adapter: SeedAdapter): Promise<void> {
