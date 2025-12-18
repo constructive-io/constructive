@@ -108,13 +108,13 @@ packages:
 | `packages/types` | `pgpm/types` | `@pgpmjs/types` | `@pgpmjs/types` |
 | `packages/env` | `pgpm/env` | `@pgpmjs/env` | `@pgpmjs/env` |
 | `packages/logger` | `pgpm/logger` | `@pgpmjs/logger` | `@pgpmjs/logger` |
-| `packages/server-utils` | `pgpm/server-utils` | `@pgpmjs/server-utils` | `@pgpmjs/server-utils` |
 
 ### packages/ - Constructive CLI and Misc Packages (Remain in packages/)
 
 | Current Package Name | New Package Name | Notes |
 |---------------------|------------------|-------|
 | `@launchql/cli` | `@constructive-io/cli` | Rename only |
+| `@pgpmjs/server-utils` | `@pgpmjs/server-utils` | No change (PGPM branding) |
 | `client` | `@constructive-io/client` | Rename only |
 | `orm` | `@constructive-io/orm` | Rename only |
 | `@launchql/query-builder` | `@constructive-io/query-builder` | Rename only |
@@ -272,8 +272,8 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 
 | Folder | Purpose | Package Count |
 |--------|---------|---------------|
-| `packages/` | Constructive CLI and misc packages | 5 |
-| `pgpm/` | PGPM (PostgreSQL Package Manager) core, types, env, logger, server-utils | 6 |
+| `packages/` | Constructive CLI, server-utils, and misc packages | 6 |
+| `pgpm/` | PGPM (PostgreSQL Package Manager) core, types, env, logger | 5 |
 | `graphql/` | GraphQL server, explorer, codegen, types, env, test, query, react, gql-ast | 9 |
 | `streaming/` | S3, file streaming, etag, uuid, mime utilities | 10 |
 | `postgres/` | PostgreSQL AST, cache, codegen, env, context, introspection, testing | 9 |
@@ -325,7 +325,8 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 
 ## Notes
 
-- The `@pgpmjs/*` packages (core, types, env, logger, server-utils, pgpm) are being moved to the new `pgpm/` folder but NOT renamed as they are part of the PGPM (PostgreSQL Package Manager) branding
+- The `@pgpmjs/*` packages (core, types, env, logger, pgpm) are being moved to the new `pgpm/` folder but NOT renamed as they are part of the PGPM (PostgreSQL Package Manager) branding
+- The `@pgpmjs/server-utils` package remains in `packages/` and is NOT renamed
 - The `graphile-*` packages in the `graphile/` directory are NOT being renamed as they are Graphile ecosystem plugins
 - Fixture files in `__fixtures__/` may contain LaunchQL references for testing purposes and should be evaluated case-by-case
 - The `jobs/` and `functions/` directories remain unchanged as they are separate systems
