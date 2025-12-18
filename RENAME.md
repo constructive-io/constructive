@@ -28,7 +28,8 @@ constructive/
 
 ```
 constructive/
-├── packages/           # Core PGPM packages
+├── packages/           # Constructive CLI and misc packages
+├── pgpm/               # NEW: PGPM (PostgreSQL Package Manager) packages
 ├── graphql/            # NEW: GraphQL-related packages
 ├── streaming/          # NEW: File streaming and S3 utilities
 ├── postgres/           # NEW: PostgreSQL-specific packages
@@ -43,6 +44,7 @@ constructive/
 ```yaml
 packages:
   - 'packages/*'
+  - 'pgpm/*'
   - 'graphql/*'
   - 'streaming/*'
   - 'postgres/*'
@@ -97,17 +99,22 @@ packages:
 | `packages/supabase-test` | `postgres/supabase-test` | `supabase-test` | `supabase-test` |
 | `packages/drizzle-orm-test` | `postgres/drizzle-orm-test` | `drizzle-orm-test` | `drizzle-orm-test` |
 
-### packages/ - Core Packages (Remain in packages/)
+### pgpm/ - PGPM (PostgreSQL Package Manager) Packages
+
+| Current Location | New Location | Current Package Name | New Package Name |
+|-----------------|--------------|---------------------|------------------|
+| `packages/core` | `pgpm/core` | `@pgpmjs/core` | `@pgpmjs/core` |
+| `packages/pgpm` | `pgpm/pgpm` | `pgpm` | `pgpm` |
+| `packages/types` | `pgpm/types` | `@pgpmjs/types` | `@pgpmjs/types` |
+| `packages/env` | `pgpm/env` | `@pgpmjs/env` | `@pgpmjs/env` |
+| `packages/logger` | `pgpm/logger` | `@pgpmjs/logger` | `@pgpmjs/logger` |
+| `packages/server-utils` | `pgpm/server-utils` | `@pgpmjs/server-utils` | `@pgpmjs/server-utils` |
+
+### packages/ - Constructive CLI and Misc Packages (Remain in packages/)
 
 | Current Package Name | New Package Name | Notes |
 |---------------------|------------------|-------|
-| `@pgpmjs/core` | `@pgpmjs/core` | No change (PGPM branding) |
-| `pgpm` | `pgpm` | No change (PGPM branding) |
 | `@launchql/cli` | `@constructive-io/cli` | Rename only |
-| `@pgpmjs/types` | `@pgpmjs/types` | No change (PGPM branding) |
-| `@pgpmjs/env` | `@pgpmjs/env` | No change (PGPM branding) |
-| `@pgpmjs/logger` | `@pgpmjs/logger` | No change (PGPM branding) |
-| `@pgpmjs/server-utils` | `@pgpmjs/server-utils` | No change (PGPM branding) |
 | `client` | `@constructive-io/client` | Rename only |
 | `orm` | `@constructive-io/orm` | Rename only |
 | `@launchql/query-builder` | `@constructive-io/query-builder` | Rename only |
@@ -210,9 +217,9 @@ app.use(poweredBy('constructive'));
 
 ### Error Messages
 
-Update error messages in `packages/core/src/workspace/paths.ts`:
-- `"You must be in a LaunchQL workspace"` -> `"You must be in a Constructive workspace"`
-- `"You must be in a LaunchQL module"` -> `"You must be in a Constructive module"`
+Update error messages in `pgpm/core/src/workspace/paths.ts` (after move):
+- `"You must be in a LaunchQL workspace"` -> `"You must be in a pgpm workspace"`
+- `"You must be in a LaunchQL module"` -> `"You must be in a pgpm module"`
 
 ## Package.json Updates
 
@@ -265,7 +272,8 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 
 | Folder | Purpose | Package Count |
 |--------|---------|---------------|
-| `packages/` | Core PGPM packages and CLI | 11 |
+| `packages/` | Constructive CLI and misc packages | 5 |
+| `pgpm/` | PGPM (PostgreSQL Package Manager) core, types, env, logger, server-utils | 6 |
 | `graphql/` | GraphQL server, explorer, codegen, types, env, test, query, react, gql-ast | 9 |
 | `streaming/` | S3, file streaming, etag, uuid, mime utilities | 10 |
 | `postgres/` | PostgreSQL AST, cache, codegen, env, context, introspection, testing | 9 |
@@ -277,7 +285,7 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 ## Implementation Order
 
 1. **Phase 1: Create New Folder Structure**
-   - Create `graphql/`, `streaming/`, `postgres/` directories
+   - Create `pgpm/`, `graphql/`, `streaming/`, `postgres/` directories
    - Update `pnpm-workspace.yaml`
 
 2. **Phase 2: Move Packages**
@@ -317,7 +325,7 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 
 ## Notes
 
-- The `@pgpmjs/*` packages (core, types, env, logger, server-utils) are NOT being renamed as they are part of the PGPM (PostgreSQL Package Manager) branding which is separate from LaunchQL
+- The `@pgpmjs/*` packages (core, types, env, logger, server-utils, pgpm) are being moved to the new `pgpm/` folder but NOT renamed as they are part of the PGPM (PostgreSQL Package Manager) branding
 - The `graphile-*` packages in the `graphile/` directory are NOT being renamed as they are Graphile ecosystem plugins
 - Fixture files in `__fixtures__/` may contain LaunchQL references for testing purposes and should be evaluated case-by-case
 - The `jobs/` and `functions/` directories remain unchanged as they are separate systems
@@ -336,6 +344,7 @@ The following documentation files contain LaunchQL references and need updating:
 - `packages/*/CHANGELOG.md`
 - `packages/core/AGENTS.md`
 - `packages/cli/AGENTS.md`
+- `pgpm/*/README.md` (after move)
 - `graphql/*/README.md` (after move)
 - `streaming/*/README.md` (after move)
 - `postgres/*/README.md` (after move)
