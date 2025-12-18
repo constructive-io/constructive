@@ -1,6 +1,6 @@
-import { getEnvOptions } from '@launchql/env';
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { LaunchQLServer as server } from '@launchql/server';
+import { GraphQLServer as server } from '@constructive-io/graphql-server';
 import { PgpmOptions } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
@@ -8,11 +8,11 @@ import { getPgPool } from 'pg-cache';
 const log = new Logger('server');
 
 const serverUsageText = `
-LaunchQL Server Command:
+Constructive GraphQL Server:
 
-  lql server [OPTIONS]
+  cnc server [OPTIONS]
 
-  Start LaunchQL GraphQL development server.
+  Start Constructive GraphQL development server.
 
 Options:
   --help, -h              Show this help message
@@ -24,9 +24,9 @@ Options:
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
-  lql server                    Start server with defaults
-  lql server --port 8080        Start server on custom port
-  lql server --no-postgis       Start server without PostGIS
+  cnc server                    Start server with defaults
+  cnc server --port 8080        Start server on custom port
+  cnc server --no-postgis       Start server without PostGIS
 `;
 
 const questions: Question[] = [
@@ -90,7 +90,7 @@ export default async (
     process.exit(0);
   }
 
-  log.info('🔧 LaunchQL Server Configuration:\n');
+  log.info('🔧 Constructive GraphQL Server Configuration:\n');
 
   let selectedDb: string | undefined = process.env.PGDATABASE;
 

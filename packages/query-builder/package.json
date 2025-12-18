@@ -1,5 +1,5 @@
 {
-  "name": "@launchql/query-builder",
+  "name": "@constructive-io/query-builder",
   "version": "2.3.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Query Builder",
@@ -25,14 +25,14 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "keywords": [
     "query",
     "builder",
     "sql",
-    "launchql",
+    "constructive",
     "database"
   ],
   "devDependencies": {

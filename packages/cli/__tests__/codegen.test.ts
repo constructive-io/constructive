@@ -2,7 +2,7 @@ import path from 'path'
 import type { ParsedArgs } from 'minimist'
 import codegenCommand from '../src/commands/codegen'
 
-jest.mock('@launchql/codegen', () => {
+jest.mock('@constructive-io/graphql-codegen', () => {
   const deepMerge = (a: any, b: any) => ({
     ...a,
     ...b,
@@ -13,12 +13,12 @@ jest.mock('@launchql/codegen', () => {
   })
   return {
     runCodegen: jest.fn(async () => ({ root: '/tmp/generated', typesFile: '', operationsDir: '', sdkFile: '' })),
-    defaultLaunchQLGenOptions: { input: {}, output: { root: 'packages/launchql-gen/dist' }, documents: {}, features: { emitTypes: true, emitOperations: true, emitSdk: true } },
-    mergeLaunchQLGenOptions: deepMerge
+    defaultGraphQLCodegenOptions: { input: {}, output: { root: 'graphql/codegen/dist' }, documents: {}, features: { emitTypes: true, emitOperations: true, emitSdk: true } },
+    mergeGraphQLCodegenOptions: deepMerge
   }
 })
 
-jest.mock('@launchql/server', () => ({
+jest.mock('@constructive-io/graphql-server', () => ({
   fetchEndpointSchemaSDL: jest.fn(async () => 'schema { query: Query } type Query { hello: String }')
 }))
 
@@ -44,15 +44,15 @@ describe('codegen command', () => {
     await expect(codegenCommand(argv, {} as any, {} as any)).rejects.toThrow('exit:0')
     expect(spyLog).toHaveBeenCalled()
     const first = (spyLog.mock.calls[0]?.[0] as string) || ''
-    expect(first).toContain('LaunchQL Codegen')
+    expect(first).toContain('Constructive GraphQL Codegen')
 
     spyLog.mockRestore()
     spyExit.mockRestore()
   })
 
   it('fetches schema via endpoint, writes temp SDL, and runs codegen', async () => {
-    const { fetchEndpointSchemaSDL } = require('@launchql/server')
-    const { runCodegen } = require('@launchql/codegen')
+    const { fetchEndpointSchemaSDL } = require('@constructive-io/graphql-server')
+    const { runCodegen } = require('@constructive-io/graphql-codegen')
     const fs = require('fs').promises
     const spyLog = jest.spyOn(console, 'log').mockImplementation(() => {})
 
@@ -62,13 +62,13 @@ describe('codegen command', () => {
       headerHost: 'meta8.localhost',
       auth: 'Bearer testtoken',
       header: 'X-Test: 1',
-      out: 'packages/launchql-gen/dist'
+      out: 'graphql/codegen/dist'
     }
 
     await codegenCommand(argv, {} as any, {} as any)
 
     expect(fetchEndpointSchemaSDL).toHaveBeenCalledWith('http://localhost:3000/graphql', expect.objectContaining({ headerHost: 'meta8.localhost', auth: 'Bearer testtoken', headers: expect.objectContaining({ 'X-Test': '1' }) }))
-    expect(fs.writeFile).toHaveBeenCalledWith(path.join(cwd, '.lql-codegen-schema.graphql'), expect.any(String), 'utf8')
+    expect(fs.writeFile).toHaveBeenCalledWith(path.join(cwd, '.constructive-codegen-schema.graphql'), expect.any(String), 'utf8')
     expect(runCodegen).toHaveBeenCalled()
     // ensure it prints the output root location
     expect(spyLog).toHaveBeenCalledWith(expect.stringContaining('/tmp/generated'))
@@ -77,14 +77,14 @@ describe('codegen command', () => {
   })
 
   it('uses local schema when --schema is provided and runs codegen', async () => {
-    const { fetchEndpointSchemaSDL } = require('@launchql/server')
-    const { runCodegen } = require('@launchql/codegen')
+    const { fetchEndpointSchemaSDL } = require('@constructive-io/graphql-server')
+    const { runCodegen } = require('@constructive-io/graphql-codegen')
     const spyLog = jest.spyOn(console, 'log').mockImplementation(() => {})
 
     const schemaPath = path.join(process.cwd(), 'local-schema.graphql')
     const argv: Partial<ParsedArgs> = {
       schema: schemaPath,
-      out: 'packages/launchql-gen/dist'
+      out: 'graphql/codegen/dist'
     }
 
     await codegenCommand(argv, {} as any, {} as any)
@@ -96,7 +96,7 @@ describe('codegen command', () => {
   })
 
   it('loads config file and merges overrides', async () => {
-    const { runCodegen, mergeLaunchQLGenOptions } = require('@launchql/codegen')
+    const { runCodegen, mergeGraphQLCodegenOptions } = require('@constructive-io/graphql-codegen')
     const fs = require('fs').promises
     const spyLog = jest.spyOn(console, 'log').mockImplementation(() => {})
 
@@ -110,7 +110,7 @@ describe('codegen command', () => {
 
     const argv: Partial<ParsedArgs> = {
       config: '/tmp/codegen.json',
-      out: 'packages/launchql-gen/dist',
+      out: 'graphql/codegen/dist',
       emitSdk: false
     }
 
@@ -120,7 +120,7 @@ describe('codegen command', () => {
     const call = (runCodegen as jest.Mock).mock.calls[0]
     const options = call[0]
     expect(options.input.schema).toBe('from-config.graphql')
-    expect(options.output.root).toBe('packages/launchql-gen/dist')
+    expect(options.output.root).toBe('graphql/codegen/dist')
     expect(options.documents.format).toBe('ts')
     expect(options.features.emitSdk).toBe(false)
     expect(spyLog).toHaveBeenCalledWith(expect.stringContaining('/tmp/generated'))

@@ -1,0 +1,69 @@
+{
+  "name": "@pgpmjs/core",
+  "version": "3.0.5",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PGPM Package and Migration Tools",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "copy": "npm run copy:pkg; npm run copy:sql",
+    "copy:pkg": "makage assets",
+    "copy:sql": "copyfiles -f src/migrate/sql/* dist/migrate/sql && copyfiles -f src/migrate/sql/* dist/esm/migrate/sql && copyfiles -f src/init/sql/* dist/init/sql && copyfiles -f src/init/sql/* dist/esm/init/sql",
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build && npm run copy",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "database",
+    "migration",
+    "postgresql",
+    "pgpm",
+    "pgpmjs",
+    "schema",
+    "sqitch"
+  ],
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "copyfiles": "^2.4.1",
+    "makage": "^0.1.8"
+  },
+  "dependencies": {
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/server-utils": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "@pgsql/types": "^17.6.2",
+    "create-gen-app": "^0.3.6",
+    "csv-to-pg": "^2.0.10",
+    "glob": "^13.0.0",
+    "komoji": "^0.7.11",
+    "parse-package-name": "^1.0.0",
+    "pg": "^8.16.3",
+    "pg-cache": "workspace:^",
+    "pg-env": "workspace:^",
+    "pgsql-deparser": "^17.12.2",
+    "pgsql-parser": "^17.9.2",
+    "yanse": "^0.1.8"
+  },
+  "peerDependencies": {
+    "@pgsql/types": "^17.6.1"
+  }
+}

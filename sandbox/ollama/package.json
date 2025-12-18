@@ -13,7 +13,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "ollama:setup": "ts-node scripts/setup-ollama.ts"
   },

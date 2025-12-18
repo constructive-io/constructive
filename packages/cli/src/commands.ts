@@ -31,7 +31,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
       command: command || 'help',
       pkgName: pkg.name,
       pkgVersion: pkg.version,
-      toolName: 'lql',
+      toolName: 'constructive',
       key: pkg.name,
       updateCommand: `Run npm i -g ${pkg.name}@latest to upgrade.`
     });
@@ -59,7 +59,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
 
   // Command-specific help for init
   if (command === 'init' && (argv.help || argv.h)) {
-    console.log(createInitUsageText('lql', 'LaunchQL'));
+    console.log(createInitUsageText('constructive', 'Constructive'));
     process.exit(0);
   }
 

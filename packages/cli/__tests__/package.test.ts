@@ -19,7 +19,7 @@ describe('cmds:package', () => {
   let tempDir: string;
 
   beforeAll(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'launchql-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-io-graphql-test-'));
   });
 
   afterAll(() => {
@@ -42,8 +42,8 @@ describe('cmds:package', () => {
   };
 
   it('updates module with `extension` and `package` commands in copied fixture workspace', async () => {
-    const fixtureWorkspace = fixture('launchql');
-    const workspacePath = path.join(tempDir, 'launchql');
+    const fixtureWorkspace = fixture('constructive');
+    const workspacePath = path.join(tempDir, 'constructive');
     fs.cpSync(fixtureWorkspace, workspacePath, { recursive: true });
 
     const modulePath = path.join(workspacePath, 'packages', 'secrets');

@@ -1,8 +1,8 @@
 {
-  "name": "@launchql/cli",
+  "name": "@constructive-io/cli",
   "version": "5.0.3",
   "author": "Constructive <developers@constructive.io>",
-  "description": "LaunchQL CLI",
+  "description": "Constructive CLI",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -13,8 +13,8 @@
     "directory": "dist"
   },
   "bin": {
-    "lql": "index.js",
-    "launchql": "index.js"
+    "cnc": "index.js",
+    "constructive": "index.js"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
@@ -46,10 +46,10 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@launchql/codegen": "workspace:^",
-    "@launchql/env": "workspace:^",
-    "@launchql/explorer": "workspace:^",
-    "@launchql/server": "workspace:^",
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@constructive-io/graphql-env": "workspace:^",
+    "@constructive-io/graphql-explorer": "workspace:^",
+    "@constructive-io/graphql-server": "workspace:^",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
@@ -68,7 +68,7 @@
     "cli",
     "command-line",
     "tool",
-    "launchql",
+    "constructive",
     "utilities",
     "pg",
     "pgsql",

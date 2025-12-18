@@ -1,6 +1,6 @@
 {
   "name": "totp",
   "version": "0.0.1",
-  "description": "LaunchQL totp module",
+  "description": "Constructive totp module",
   "author": "Dan Lynch <pyramation@gmail.com>"
 }

@@ -3,13 +3,13 @@ import { ParsedArgs } from 'minimist'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import yaml from 'js-yaml'
-import { runCodegen, defaultLaunchQLGenOptions, mergeLaunchQLGenOptions, LaunchQLGenOptions } from '@launchql/codegen'
-import { fetchEndpointSchemaSDL } from '@launchql/server'
+import { runCodegen, defaultGraphQLCodegenOptions, mergeGraphQLCodegenOptions, GraphQLCodegenOptions } from '@constructive-io/graphql-codegen'
+import { fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
 
 const usage = `
-LaunchQL Codegen:
+Constructive GraphQL Codegen:
 
-  lql codegen [OPTIONS]
+  cnc codegen [OPTIONS]
 
 Options:
   --help, -h                 Show this help message
@@ -19,7 +19,7 @@ Options:
   --headerHost <host>        Optional Host header to send with endpoint requests
   --auth <token>             Optional Authorization header value (e.g., "Bearer 123")
   --header "Name: Value"    Optional HTTP header; repeat to add multiple headers
-  --out <dir>                Output root directory (default: packages/launchql-gen/dist)
+  --out <dir>                Output root directory (default: graphql/codegen/dist)
   --format <gql|ts>          Document format (default: gql)
   --convention <style>       Filename convention (dashed|underscore|camelcase|camelUpper)
   --emitTypes <bool>         Emit types (default: true)
@@ -39,7 +39,7 @@ function parseBool(v: any, d: boolean): boolean {
   return d
 }
 
-async function loadConfig(path: string): Promise<Partial<LaunchQLGenOptions>> {
+async function loadConfig(path: string): Promise<Partial<GraphQLCodegenOptions>> {
   const content = await fs.readFile(path, 'utf8')
   if (/\.ya?ml$/i.test(path)) return yaml.load(content) as any
   if (/\.json$/i.test(path)) return JSON.parse(content)
@@ -59,10 +59,10 @@ export default async (
   const cwd = (argv.cwd as string) || process.cwd()
   const configPath = (argv.config as string) || ''
 
-  let fileOpts: Partial<LaunchQLGenOptions> = {}
+  let fileOpts: Partial<GraphQLCodegenOptions> = {}
   if (configPath) fileOpts = await loadConfig(configPath)
 
-  const overrides: Partial<LaunchQLGenOptions> = {}
+  const overrides: Partial<GraphQLCodegenOptions> = {}
   if (argv.schema) overrides.input = { ...(overrides.input || {}), schema: String(argv.schema) }
   if (argv.endpoint) overrides.input = { ...(overrides.input || {}), endpoint: String(argv.endpoint) } as any
   const headerHost = (argv.headerHost as string) ?? ''
@@ -97,8 +97,8 @@ export default async (
   const emitSdk = parseBool(argv.emitSdk, true)
   overrides.features = { emitTypes, emitOperations, emitSdk }
 
-  const merged = mergeLaunchQLGenOptions(defaultLaunchQLGenOptions, fileOpts as any)
-  const finalOptions = mergeLaunchQLGenOptions(merged, overrides)
+  const merged = mergeGraphQLCodegenOptions(defaultGraphQLCodegenOptions, fileOpts as any)
+  const finalOptions = mergeGraphQLCodegenOptions(merged, overrides)
 
   if (finalOptions.input.endpoint && headerHost) {
     const opts: any = {}
@@ -106,7 +106,7 @@ export default async (
     if (auth) opts.auth = auth
     if (Object.keys(headers).length) opts.headers = headers
     const sdl = await (fetchEndpointSchemaSDL as any)(String(finalOptions.input.endpoint), opts)
-    const tmpSchemaPath = join(cwd, '.lql-codegen-schema.graphql')
+    const tmpSchemaPath = join(cwd, '.constructive-codegen-schema.graphql')
     await fs.writeFile(tmpSchemaPath, sdl, 'utf8')
     finalOptions.input.schema = tmpSchemaPath as any
     ;(finalOptions.input as any).endpoint = ''

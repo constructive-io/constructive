@@ -33,7 +33,7 @@ describe('CLIDeployTestFixture', () => {
   });
 
   it('should handle CLI command execution with database', async () => {
-    const commands = `lql migrate status --database ${testDb.name}`;
+    const commands = `cnc migrate status --database ${testDb.name}`;
     const results = await fixture.runTerminalCommands(commands, { database: testDb.name }, false);
     
     expect(results).toHaveLength(1);
@@ -44,7 +44,7 @@ describe('CLIDeployTestFixture', () => {
   });
 
   it('should initialize workspace via CLI', async () => {
-    const commands = `lql init workspace test-workspace`;
+    const commands = `cnc init workspace test-workspace`;
     const results = await fixture.runTerminalCommands(commands, {}, false);
     
     expect(results).toHaveLength(1);
@@ -54,7 +54,7 @@ describe('CLIDeployTestFixture', () => {
   });
 
   it('should initialize module via CLI', async () => {
-    const commands = `lql init test-module`;
+    const commands = `cnc init test-module`;
     const results = await fixture.runTerminalCommands(commands, {}, false);
     
     expect(results).toHaveLength(1);
@@ -66,8 +66,8 @@ describe('CLIDeployTestFixture', () => {
   it('should emulate terminal commands with database operations', async () => {
     const terminalCommands = `
       cd packages/
-      lql deploy --recursive --database ${testDb.name} --yes --package my-first
-      lql revert --recursive --database ${testDb.name} --yes --package my-first
+      cnc deploy --recursive --database ${testDb.name} --yes --package my-first
+      cnc revert --recursive --database ${testDb.name} --yes --package my-first
     `;
     
     const results = await fixture.runTerminalCommands(terminalCommands, {
@@ -97,7 +97,7 @@ describe('CLIDeployTestFixture', () => {
   it('should work with fixture directories like sqitch-w-tags', async () => {
     const commands = `
       cd packages/
-      lql deploy --recursive --database test_db --createdb --yes --package my-first
+      cnc deploy --recursive --database test_db --createdb --yes --package my-first
     `;
     
     const results = await fixture.runTerminalCommands(commands, {

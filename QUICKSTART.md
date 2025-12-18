@@ -1,13 +1,13 @@
-# 🚀 Quickstart: LaunchQL CLI Basics
+# 🚀 Quickstart: Constructive CLI Basics
 
-LaunchQL is different from PGPM in that it ships with a GraphQL server. All commands are the same except pgpm has no explorer/server.
+Constructive is different from PGPM in that it ships with a GraphQL server and explorer. All PGPM commands are available under `constructive`, but `pgpm` does not include `server` or `explorer`.
 
 ### 1. Install the CLI
 
-Make sure you have the LaunchQL CLI available:
+Make sure you have the Constructive CLI available:
 
 ```bash
-npm install -g @launchql/cli
+npm install -g @constructive-io/cli
 ```
 
 ### 2. Initialize a workspace
@@ -15,7 +15,7 @@ npm install -g @launchql/cli
 Generate a workspace along with its default services configuration:
 
 ```bash
-lql init workspace # then enter workspace name
+constructive init workspace # then enter workspace name
 cd myworkspace
 ```
 
@@ -32,14 +32,14 @@ If you already have Postgres installed locally, just ensure it is running and ac
 ### 4. Create a module & add changes
 
 ```bash
-lql init
+constructive init
 cd packages/mymodule
 
 # Add schema
-lql add --change schemas/myschema
+constructive add --change schemas/myschema
 
 # Add table (depends on schema)
-lql add --change schemas/myschema/tables/mytable --requires schemas/myschema
+constructive add --change schemas/myschema/tables/mytable --requires schemas/myschema
 ```
 
 ### 5. Example generated SQL
@@ -68,7 +68,7 @@ CREATE TABLE myschema.mytable (
 ### 6. Deploy to Postgres
 
 ```bash
-lql deploy --database testdb --createdb --yes
+constructive deploy --database testdb --createdb --yes
 ```
 
 **Sample output highlights:**
@@ -88,7 +88,7 @@ lql deploy --database testdb --createdb --yes
 ### 7. Explore
 
 ```bash
-lql explorer
+constructive explorer
 ```
 
 http://localhost:5555/graphiql (default)
@@ -98,5 +98,5 @@ http://myschema.testdb.localhost:5555/graphiql (specific to a schema)
 ### 8. Server
 
 ```bash
-lql server
+constructive server
 ```

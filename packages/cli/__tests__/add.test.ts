@@ -49,7 +49,9 @@ describe('cmds:add', () => {
       absolute: true
     });
 
-    const relativeFiles = absoluteFiles.map(file => path.relative(argv.cwd, file));
+    const relativeFiles = absoluteFiles
+      .map((file) => path.relative(argv.cwd, file))
+      .sort();
     argv.cwd = '<CWD>';
 
     expect(argv).toMatchSnapshot(`${label} - argv`);
@@ -60,24 +62,26 @@ describe('cmds:add', () => {
   };
 
   const setupModule = async (moduleDir: string) => {
+    const moduleName = path.basename(moduleDir);
     fs.mkdirSync(moduleDir, { recursive: true });
     fs.mkdirSync(path.join(moduleDir, 'deploy'), { recursive: true });
     fs.mkdirSync(path.join(moduleDir, 'revert'), { recursive: true });
     fs.mkdirSync(path.join(moduleDir, 'verify'), { recursive: true });
     
     const planContent = `%syntax-version=1.0.0
-%project=test-module
-%uri=https://github.com/test/test-module
+%project=${moduleName}
+%uri=https://github.com/test/${moduleName}
 
 `;
     fs.writeFileSync(path.join(moduleDir, 'pgpm.plan'), planContent);
     
-    const controlContent = `{
-  "name": "test-module",
-  "version": "0.1.0",
-  "description": "Test module"
-}`;
-    fs.writeFileSync(path.join(moduleDir, 'launchql.control'), controlContent);
+    const controlContent = `# ${moduleName} extension
+comment = 'Test module'
+default_version = '0.1.0'
+relocatable = false
+superuser = false
+`;
+    fs.writeFileSync(path.join(moduleDir, `${moduleName}.control`), controlContent);
   };
 
   it('adds simple change', async () => {

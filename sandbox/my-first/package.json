@@ -8,7 +8,7 @@
   "types": "index.d.ts",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "keywords": [],

@@ -7,6 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @constructive-io/knative-job-worker
 
-## [0.5.8](https://github.com/constructive-io/jobs/compare/@launchql/knative-job-worker@0.5.7...@launchql/knative-job-worker@0.5.8) (2025-12-17)
+## [0.5.8](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.5.7...@constructive-io/knative-job-worker@0.5.8) (2025-12-17)
 
-**Note:** Version bump only for package @launchql/knative-job-worker
+**Note:** Version bump only for package @constructive-io/knative-job-worker

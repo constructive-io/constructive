@@ -1,0 +1,76 @@
+{
+  "name": "pgpm",
+  "version": "1.0.3",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PostgreSQL Package Manager - Database migration and package management CLI",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "bin": {
+    "pgpm": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "dev": "ts-node ./src/index.ts",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.12.7",
+    "@types/pg": "^8.16.0",
+    "@types/semver": "^7.5.8",
+    "@types/shelljs": "^0.8.16",
+    "glob": "^13.0.0",
+    "makage": "^0.1.8",
+    "pg": "^8.16.3",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "appstash": "^0.2.6",
+    "create-gen-app": "^0.3.6",
+    "find-and-require-package-json": "^0.8.2",
+    "inquirerer": "^2.1.14",
+    "js-yaml": "^4.1.0",
+    "minimist": "^1.2.8",
+    "pg-cache": "workspace:^",
+    "pg-env": "workspace:^",
+    "semver": "^7.6.2",
+    "shelljs": "^0.10.0",
+    "yanse": "^0.1.8"
+  },
+  "keywords": [
+    "cli",
+    "command-line",
+    "tool",
+    "postgres",
+    "postgresql",
+    "migration",
+    "package-manager",
+    "database",
+    "pg",
+    "pgsql"
+  ]
+}

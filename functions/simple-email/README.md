@@ -1,6 +1,6 @@
-# @launchql/simple-email-fn
+# @constructive-io/simple-email-fn
 
-Simple Knative-compatible email function used with the LaunchQL jobs system.
+Simple Knative-compatible email function used with the Constructive jobs system.
 
 This function is intentionally minimal: it reads an email payload from the job
 body and **logs it only** (dry‑run mode). It does **not** send any email. This
@@ -31,15 +31,15 @@ Supported fields:
 
 At least one of `html` or `text` must be provided. If required fields are
 missing, the function throws and the error is propagated via the
-`@launchql/knative-job-fn` wrapper as a job error.
+`@constructive-io/knative-job-fn` wrapper as a job error.
 
 ## HTTP contract (with knative-job-worker)
 
-The function is wrapped by `@launchql/knative-job-fn`, so it expects:
+The function is wrapped by `@constructive-io/knative-job-fn`, so it expects:
 
 - HTTP method: `POST`
 - Body: JSON job payload (see above)
-- Headers (set by `@launchql/knative-job-worker`):
+- Headers (set by `@constructive-io/knative-job-worker`):
   - `X-Worker-Id`
   - `X-Job-Id`
   - `X-Database-Id`
@@ -57,7 +57,7 @@ The handler:
 ```
 
 Errors bubble into the error middleware installed by
-`@launchql/knative-job-fn`, so they are translated into an `X-Job-Error`
+`@constructive-io/knative-job-fn`, so they are translated into an `X-Job-Error`
 callback for the worker.
 
 ## Environment variables
@@ -72,7 +72,7 @@ response.
 From the repo root:
 
 ```bash
-pnpm --filter="@launchql/simple-email-fn" build
+pnpm --filter="@constructive-io/simple-email-fn" build
 ```
 
 This compiles TypeScript into `dist/`.

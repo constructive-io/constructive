@@ -16,7 +16,7 @@
     "url": "https://github.com/constructive-io/jobs"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "build": "tsc -p tsconfig.json",

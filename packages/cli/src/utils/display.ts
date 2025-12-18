@@ -9,8 +9,8 @@ export function displayVersion() {
 }
 
 export const usageText = `
-  Usage: lql <command> [options]
-         launchql <command> [options]
+  Usage: cnc <command> [options]
+         constructive <command> [options]
   
   Core Database Operations:
     add                Add database changes to plans and create SQL files
@@ -50,13 +50,13 @@ export const usageText = `
     --cwd <directory>  Working directory (default: current directory)
   
   Individual Command Help:
-    lql <command> --help    Display detailed help for specific command
-    lql <command> -h        Display detailed help for specific command
+    constructive <command> --help    Display detailed help for specific command
+    constructive <command> -h        Display detailed help for specific command
   
   Examples:
-    lql deploy --help       Show deploy command options
-    lql server --port 8080  Start server on port 8080
-    lql init workspace      Initialize new workspace
+    cnc deploy --help       Show deploy command options
+    cnc server --port 8080  Start server on port 8080
+    cnc init workspace      Initialize new workspace
   `;
 
 export function displayUsage() {

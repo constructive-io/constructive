@@ -3,15 +3,15 @@ import os from 'os';
 import path from 'path';
 import runGetGraphqlSchema from '../src/commands/get-graphql-schema';
 
-jest.mock('@launchql/server', () => ({
+jest.mock('@constructive-io/graphql-server', () => ({
   buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\n'),
   fetchEndpointSchemaSDL: jest.fn(async () => 'type Query { greeting: String }\n')
 }));
 
 jest.setTimeout(15000);
 
-describe('lql get-graphql-schema (mocked)', () => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'launchql-cli-test-'));
+describe('cnc get-graphql-schema (mocked)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-cli-test-'));
   const outDbFile = path.join(tempDir, 'schema.db.graphql');
   const outEndpointFile = path.join(tempDir, 'schema.endpoint.graphql');
   const outEndpointHeaderHostFile = path.join(tempDir, 'schema.endpoint.headerhost.graphql');
@@ -80,7 +80,7 @@ describe('lql get-graphql-schema (mocked)', () => {
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the headerHost argument
-    const server = jest.requireMock('@launchql/server') as any;
+    const server = jest.requireMock('@constructive-io/graphql-server') as any;
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
@@ -104,7 +104,7 @@ describe('lql get-graphql-schema (mocked)', () => {
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the auth argument
-    const server = jest.requireMock('@launchql/server') as any;
+    const server = jest.requireMock('@constructive-io/graphql-server') as any;
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
@@ -128,7 +128,7 @@ describe('lql get-graphql-schema (mocked)', () => {
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the headers argument
-    const server = jest.requireMock('@launchql/server') as any;
+    const server = jest.requireMock('@constructive-io/graphql-server') as any;
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
@@ -153,7 +153,7 @@ describe('lql get-graphql-schema (mocked)', () => {
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received both auth and headers
-    const server = jest.requireMock('@launchql/server') as any;
+    const server = jest.requireMock('@constructive-io/graphql-server') as any;
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');

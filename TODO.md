@@ -17,7 +17,7 @@ TODO
 
 - [x] does every proj.deploy() use proj.getModuleName()? ^^^^
 - [x] not just projectName? but also database???? 
-packages/pgsql-test/src/seed/sqitch.ts
+postgres/pgsql-test/src/seed/sqitch.ts
 await proj.deploy(
     getEnvOptions({ 
         pg: ctx.config,
@@ -51,7 +51,7 @@ CI / Workflow
 Testing & Stability
 -------------------
 - [ ] Fix 'getOne(): handles missing selection gracefully' test (currently failing)
-- [ ] Add tests for @launchql/react
+- [ ] Add tests for @constructive-io/graphql-react
 - [x] Get testing framework working (this will be huge)
 
 Package Cleanup
@@ -78,9 +78,9 @@ Naming & Typing
 
 Migration & History
 -------------------
-- [ ] Get this PR from launchql-gen: https://github.com/constructive-io/constructive-gen/pull/19
+- [ ] Get this PR for GraphQL codegen: https://github.com/constructive-io/constructive-gen/pull/19
 - [x] Move postgraphile-* plugins over (preserve import history)
-- [x] Import original LaunchQL history (preserve git log)
+- [x] Import original legacy history (preserve git log)
 
 Misc
 ----
@@ -90,7 +90,7 @@ Good Next Steps
 ---------------
 - [x] Demo script using meta API to create tables
 - [x] Get export working
-- [x] Get boilerplate (`lql init`) working
+- [x] Get boilerplate (`constructive init`) working
 - [ ] Get testing framework finalized
 
 Other
@@ -100,5 +100,5 @@ https://www.npmjs.com/package/pg-copy-streams-binary
 New
 ---
 - [ ] Investigate deployment failure when generating plans without packages and tags
-      - Context: stage fixture (unique-names) pre-generated plan with includePackages=false and includeTags=false currently fails deployment (see test in packages/core/__tests__/migration/stage-deployment-with-plan.test.ts)
+      - Context: stage fixture (unique-names) pre-generated plan with includePackages=false and includeTags=false currently fails deployment (see test in pgpm/core/__tests__/migration/stage-deployment-with-plan.test.ts)
       - Follow-up: decide whether deploying with no external packages/tags should be supported or explicitly disallowed with clearer error messaging

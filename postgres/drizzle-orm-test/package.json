@@ -1,0 +1,60 @@
+{
+  "name": "drizzle-orm-test",
+  "version": "0.3.9",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Drop-in replacement for pgsql-test that enables Drizzle ORM to work seamlessly with context management and RLS testing",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "drizzle",
+    "drizzle-orm",
+    "testing",
+    "integration-tests",
+    "database-testing",
+    "pg",
+    "rls",
+    "role-based-access",
+    "test-database",
+    "pgsql-test",
+    "jest",
+    "mocha"
+  ],
+  "scripts": {
+    "clean": "makage clean",
+    "copy": "makage assets",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "drizzle-orm": "^0.45.1",
+    "makage": "^0.1.8"
+  },
+  "dependencies": {
+    "pgsql-test": "workspace:^"
+  },
+  "peerDependencies": {
+    "drizzle-orm": ">=0.30.0",
+    "pg": "^8.16.0"
+  }
+}

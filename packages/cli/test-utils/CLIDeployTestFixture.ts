@@ -181,8 +181,8 @@ export class CLIDeployTestFixture extends TestFixture {
           currentDir = require('path').resolve(currentDir, targetDir);
         }
         results.push({ command: processedCommand, type: 'cd', result: { cwd: currentDir } });
-      } else if (tokens[0] === 'lql' || tokens[0] === 'launchql') {
-        // Handle LaunchQL CLI commands
+      } else if (tokens[0] === 'cnc' || tokens[0] === 'constructive') {
+        // Handle Constructive CLI commands
         const argv = this.parseCliCommand(tokens.slice(1), currentDir);
         if (executeCommands) {
           const result = await this.runCliCommand(argv);

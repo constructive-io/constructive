@@ -3,7 +3,7 @@
 This guide covers a local development workflow for the jobs stack:
 
 - Postgres + `pgpm-database-jobs`
-- LaunchQL API server
+- Constructive GraphQL API server
 - `simple-email` function
 - `send-email-link` function
 - `knative-job-service`
@@ -11,7 +11,7 @@ This guide covers a local development workflow for the jobs stack:
 It assumes:
 
 - You have Docker / Docker Compose v2 installed.
-- You are using `pgpm` (not `lql`) for database initialization.
+- You are using `pgpm` for database initialization.
 - You have the latest `pgpm` installed (`npm i -g pgpm` or equivalent).
 
 ---
@@ -101,7 +101,7 @@ docker compose -f docker-compose.jobs.yml up -d --build
 
 This starts:
 
-- `launchql-server` – GraphQL API server
+- `constructive-server` – GraphQL API server
 - `simple-email` – Knative-style HTTP function
 - `send-email-link` – Knative-style HTTP function
 - `knative-job-service` – jobs runtime (callback server + worker + scheduler)
@@ -175,7 +175,7 @@ To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_
 
 Constructive selects the API by the HTTP `Host` header using rows in `meta_public.domains`.
 
-For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `launchql-server` container, and `send-email-link` uses:
+For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
 
 - `GRAPHQL_URL=http://admin.localhost:3000/graphql`
 
@@ -264,7 +264,7 @@ docker compose -f docker-compose.jobs.yml logs -f
 
 Useful containers:
 
-- `launchql-server`
+- `constructive-server`
 - `simple-email`
 - `knative-job-service`
 - `postgres` (from `docker-compose.yml`)

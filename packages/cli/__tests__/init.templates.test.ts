@@ -10,7 +10,7 @@ const TEMPLATE_REPO = 'https://github.com/constructive-io/pgpm-boilerplates.git'
 
 describe('Template scaffolding', () => {
   it('processes workspace template from default repo', async () => {
-    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'launchql-workspace-'));
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-workspace-'));
 
     await scaffoldTemplate({
       type: 'workspace',
@@ -35,7 +35,7 @@ describe('Template scaffolding', () => {
   });
 
   it('processes module template from default repo', async () => {
-    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'launchql-module-'));
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-module-'));
 
     await scaffoldTemplate({
       type: 'module',

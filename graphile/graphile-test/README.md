@@ -16,18 +16,18 @@
   </a>
 </p>
 
-`graphile-test` builds on top of [`pgsql-test`](https://github.com/constructive-io/constructive/tree/main/packages/pgsql-test) to provide robust GraphQL testing utilities for PostGraphile-based projects.
+`graphile-test` builds on top of [`pgsql-test`](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-test) to provide robust GraphQL testing utilities for PostGraphile-based projects.
 
 It provides a seamless setup for isolated, seeded, role-aware Postgres databases and injects GraphQL helpers for snapshot testing, role context, and mutation/query assertions.
 
-**Note:** This is a bare-bones package with no defaults or settings applied. For a batteries-included version with all LaunchQL plugins pre-configured, use [`launchql-test`](https://github.com/constructive-io/constructive/tree/main/packages/launchql-test) instead.
+**Note:** This is a bare-bones package with no defaults or settings applied. For a batteries-included version with all Constructive plugins pre-configured, use [`@constructive-io/graphql-test`](https://github.com/constructive-io/constructive/tree/main/graphql/test) instead.
 
 ## 🚀 Features
 
 * 🔁 **Per-test rollback** via savepoints for isolation
 * 🔐 **RLS-aware context injection** (`setContext`)
 * 🧪 **GraphQL integration testing** with `query()` and snapshot support
-* 📦 **Seed support** for `.sql`, JSON, CSV, LaunchQL, or Sqitch
+* 📦 **Seed support** for `.sql`, JSON, CSV, Constructive, or Sqitch
 * 📊 **Introspection query snapshotting**
 * 🔧 **Raw SQL fallback** via `pg.client.query`
 

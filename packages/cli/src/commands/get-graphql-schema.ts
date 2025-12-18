@@ -1,16 +1,16 @@
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
 import { promises as fs } from 'fs'
-import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@launchql/server'
+import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
 
 const usage = `
-LaunchQL Get GraphQL Schema:
+Constructive Get GraphQL Schema:
 
-  lql get-graphql-schema [OPTIONS]
+  cnc get-graphql-schema [OPTIONS]
 
 Options:
   --help, -h              Show this help message
-  --database <name>       Database name (default: launchql)
+  --database <name>       Database name (default: constructive)
   --schemas <list>        Comma-separated schemas to include
   --endpoint <url>        GraphQL endpoint to fetch schema via introspection
   --headerHost <host>     Optional Host header to send with endpoint requests
@@ -37,7 +37,7 @@ export default async (
   const endpoint = (argv.endpoint as string) ?? ''
   const headerHost = (argv.headerHost as string) ?? ''
   const auth = (argv.auth as string) ?? ''
-  const database = (argv.database as string) ?? 'launchql'
+  const database = (argv.database as string) ?? 'constructive'
   const schemasArg = (argv.schemas as string) ?? defaultSchemas.join(',')
   const out = (argv.out as string) ?? ''
 

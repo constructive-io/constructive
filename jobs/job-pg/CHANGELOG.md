@@ -7,6 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @constructive-io/job-pg
 
-## [0.3.4](https://github.com/constructive-io/jobs/compare/@launchql/job-pg@0.3.3...@launchql/job-pg@0.3.4) (2025-12-17)
+## [0.3.4](https://github.com/constructive-io/jobs/compare/@constructive-io/job-pg@0.3.3...@constructive-io/job-pg@0.3.4) (2025-12-17)
 
-**Note:** Version bump only for package @launchql/job-pg
+**Note:** Version bump only for package @constructive-io/job-pg

@@ -16,7 +16,7 @@
   </a>
 </p>
 
-**`graphile-settings`** is a batteries-included configuration builder for [PostGraphile](https://www.graphile.org/postgraphile/), purpose-built for the [LaunchQL](https://github.com/constructive-io/constructive) ecosystem. It centralizes plugin setup, schema wiring, and feature flags into a single, composable interface — enabling consistent, high-performance GraphQL APIs across projects.
+**`graphile-settings`** is a batteries-included configuration builder for [PostGraphile](https://www.graphile.org/postgraphile/), purpose-built for the Constructive ecosystem. It centralizes plugin setup, schema wiring, and feature flags into a single, composable interface — enabling consistent, high-performance GraphQL APIs across projects.
 
 ## 🚀 Installation
 
@@ -83,7 +83,7 @@ app.listen(settings.port);
 
 ## 🧰 Configuration Options
 
-### `LaunchQLOptions`
+### `ConstructiveOptions`
 
 #### `server`
 

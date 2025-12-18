@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
 
 it('dashboard', async () => {
-    const project = new PgpmPackage(process.env.LQL_DASHBOARD);
+    const project = new PgpmPackage(process.env.CONSTRUCTIVE_DASHBOARD);
     const opts = getEnvOptions({
         pg: {
             database: 'db-dbe-'+randomUUID()
@@ -21,11 +21,11 @@ it('dashboard', async () => {
     });
 });
 
-it('LaunchQL', async () => {
-    const project = new PgpmPackage(process.env.LQL_LAUNCHQL);
+it('Constructive', async () => {
+    const project = new PgpmPackage(process.env.CONSTRUCTIVE_WORKSPACE);
     const opts = getEnvOptions({
         pg: {
-            database: 'db-lql-'+randomUUID()
+            database: 'db-constructive-'+randomUUID()
         }
     })
     execSync(`createdb ${opts.pg.database}`);

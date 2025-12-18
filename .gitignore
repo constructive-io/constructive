@@ -5,6 +5,6 @@
 lerna-debug.log
 .vscode
 ignore
-packages/pgsql-test/output/
+postgres/pgsql-test/output/
 .claude
 *.tsbuildinfo
