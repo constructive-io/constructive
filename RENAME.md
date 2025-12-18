@@ -1,41 +1,117 @@
 # Constructive Rename Plan
 
-This document outlines the comprehensive plan to rename all LaunchQL references to Constructive across the codebase.
+This document outlines the comprehensive plan to rename all LaunchQL references to Constructive across the codebase, including reorganizing packages into logical folder groupings.
 
 ## Overview
 
-The goal is to replace all instances of "LaunchQL" and "launchql" with "Constructive" and "constructive" respectively, using the `@constructive-io` npm scope for packages.
+The goal is to:
+1. Replace all instances of "LaunchQL" and "launchql" with "Constructive" and "constructive"
+2. Use the `@constructive-io` npm scope for packages
+3. Reorganize packages into logical folder groupings (similar to how `graphile/` is organized)
+4. Rename all `launchql-*` folders
+5. Rename exported classes to use `GraphQL` prefix where appropriate
 
-## Package Renames
+## Folder Reorganization
 
-### Core Packages (packages/)
+### Current Structure
 
-| Current Package Name | New Package Name | Directory |
-|---------------------|------------------|-----------|
-| `@launchql/cli` | `@constructive-io/cli` | `packages/cli` |
-| `@launchql/server` | `@constructive-io/graphql-server` | `packages/server` |
-| `@launchql/explorer` | `@constructive-io/graphql-explorer` | `packages/explorer` |
-| `@launchql/codegen` | `@constructive-io/graphql-codegen` | `packages/launchql-gen` |
-| `@launchql/types` | `@constructive-io/graphql-types` | `packages/launchql-types` |
-| `@launchql/env` | `@constructive-io/graphql-env` | `packages/launchql-env` |
-| `@launchql/query` | `@constructive-io/graphql-query` | `packages/query` |
-| `@launchql/query-builder` | `@constructive-io/query-builder` | `packages/query-builder` |
-| `@launchql/react` | `@constructive-io/react` | `packages/react` |
-| `@launchql/s3-streamer` | `@constructive-io/s3-streamer` | `packages/s3-streamer` |
-| `@launchql/s3-utils` | `@constructive-io/s3-utils` | `packages/s3-utils` |
-| `@launchql/upload-names` | `@constructive-io/upload-names` | `packages/upload-names` |
-| `@launchql/url-domains` | `@constructive-io/url-domains` | `packages/url-domains` |
-| `@launchql/content-type-stream` | `@constructive-io/content-type-stream` | `packages/content-type-stream` |
-| `launchql-test` | `@constructive-io/graphql-test` | `packages/launchql-test` |
+```
+constructive/
+├── packages/           # All packages mixed together
+├── graphile/           # Graphile plugins
+├── jobs/               # Job system
+├── functions/          # Cloud functions
+└── sandbox/            # Development sandbox
+```
 
-### Directory Renames (packages/)
+### New Structure
 
-| Current Directory | New Directory |
-|------------------|---------------|
-| `packages/launchql-gen` | `packages/graphql-codegen` |
-| `packages/launchql-types` | `packages/graphql-types` |
-| `packages/launchql-env` | `packages/graphql-env` |
-| `packages/launchql-test` | `packages/graphql-test` |
+```
+constructive/
+├── packages/           # Core PGPM packages
+├── graphql/            # NEW: GraphQL-related packages
+├── streaming/          # NEW: File streaming and S3 utilities
+├── postgres/           # NEW: PostgreSQL-specific packages
+├── graphile/           # Graphile plugins (unchanged)
+├── jobs/               # Job system (unchanged)
+├── functions/          # Cloud functions (unchanged)
+└── sandbox/            # Development sandbox (unchanged)
+```
+
+### pnpm-workspace.yaml Update
+
+```yaml
+packages:
+  - 'packages/*'
+  - 'graphql/*'
+  - 'streaming/*'
+  - 'postgres/*'
+  - 'graphile/*'
+  - 'jobs/*'
+  - 'functions/*'
+  - 'sandbox/*'
+```
+
+## Package Moves and Renames
+
+### graphql/ - GraphQL-Related Packages
+
+| Current Location | New Location | Current Package Name | New Package Name |
+|-----------------|--------------|---------------------|------------------|
+| `packages/server` | `graphql/server` | `@launchql/server` | `@constructive-io/graphql-server` |
+| `packages/explorer` | `graphql/explorer` | `@launchql/explorer` | `@constructive-io/graphql-explorer` |
+| `packages/launchql-gen` | `graphql/codegen` | `@launchql/codegen` | `@constructive-io/graphql-codegen` |
+| `packages/launchql-types` | `graphql/types` | `@launchql/types` | `@constructive-io/graphql-types` |
+| `packages/launchql-env` | `graphql/env` | `@launchql/env` | `@constructive-io/graphql-env` |
+| `packages/launchql-test` | `graphql/test` | `launchql-test` | `@constructive-io/graphql-test` |
+| `packages/query` | `graphql/query` | `@launchql/query` | `@constructive-io/graphql-query` |
+| `packages/react` | `graphql/react` | `@launchql/react` | `@constructive-io/graphql-react` |
+| `packages/gql-ast` | `graphql/gql-ast` | `gql-ast` | `@constructive-io/gql-ast` |
+
+### streaming/ - File Streaming and S3 Utilities
+
+| Current Location | New Location | Current Package Name | New Package Name |
+|-----------------|--------------|---------------------|------------------|
+| `packages/s3-streamer` | `streaming/s3-streamer` | `@launchql/s3-streamer` | `@constructive-io/s3-streamer` |
+| `packages/s3-utils` | `streaming/s3-utils` | `@launchql/s3-utils` | `@constructive-io/s3-utils` |
+| `packages/content-type-stream` | `streaming/content-type-stream` | `@launchql/content-type-stream` | `@constructive-io/content-type-stream` |
+| `packages/upload-names` | `streaming/upload-names` | `@launchql/upload-names` | `@constructive-io/upload-names` |
+| `packages/etag-hash` | `streaming/etag-hash` | `etag-hash` | `@constructive-io/etag-hash` |
+| `packages/etag-stream` | `streaming/etag-stream` | `etag-stream` | `@constructive-io/etag-stream` |
+| `packages/stream-to-etag` | `streaming/stream-to-etag` | `stream-to-etag` | `@constructive-io/stream-to-etag` |
+| `packages/uuid-hash` | `streaming/uuid-hash` | `uuid-hash` | `@constructive-io/uuid-hash` |
+| `packages/uuid-stream` | `streaming/uuid-stream` | `uuid-stream` | `@constructive-io/uuid-stream` |
+| `packages/mime-bytes` | `streaming/mime-bytes` | `mime-bytes` | `@constructive-io/mime-bytes` |
+
+### postgres/ - PostgreSQL-Specific Packages
+
+| Current Location | New Location | Current Package Name | New Package Name |
+|-----------------|--------------|---------------------|------------------|
+| `packages/pg-ast` | `postgres/pg-ast` | `pg-ast` | `@constructive-io/pg-ast` |
+| `packages/pg-cache` | `postgres/pg-cache` | `pg-cache` | `@constructive-io/pg-cache` |
+| `packages/pg-codegen` | `postgres/pg-codegen` | `pg-codegen` | `@constructive-io/pg-codegen` |
+| `packages/pg-env` | `postgres/pg-env` | `pg-env` | `@constructive-io/pg-env` |
+| `packages/pg-query-context` | `postgres/pg-query-context` | `pg-query-context` | `@constructive-io/pg-query-context` |
+| `packages/introspectron` | `postgres/introspectron` | `introspectron` | `@constructive-io/introspectron` |
+| `packages/pgsql-test` | `postgres/pgsql-test` | `pgsql-test` | `@constructive-io/pgsql-test` |
+| `packages/supabase-test` | `postgres/supabase-test` | `supabase-test` | `@constructive-io/supabase-test` |
+| `packages/drizzle-orm-test` | `postgres/drizzle-orm-test` | `drizzle-orm-test` | `@constructive-io/drizzle-orm-test` |
+
+### packages/ - Core Packages (Remain in packages/)
+
+| Current Package Name | New Package Name | Notes |
+|---------------------|------------------|-------|
+| `@pgpmjs/core` | `@pgpmjs/core` | No change (PGPM branding) |
+| `pgpm` | `pgpm` | No change (PGPM branding) |
+| `@launchql/cli` | `@constructive-io/cli` | Rename only |
+| `@pgpmjs/types` | `@pgpmjs/types` | No change (PGPM branding) |
+| `@pgpmjs/env` | `@pgpmjs/env` | No change (PGPM branding) |
+| `@pgpmjs/logger` | `@pgpmjs/logger` | No change (PGPM branding) |
+| `@pgpmjs/server-utils` | `@pgpmjs/server-utils` | No change (PGPM branding) |
+| `client` | `@constructive-io/client` | Rename only |
+| `orm` | `@constructive-io/orm` | Rename only |
+| `@launchql/query-builder` | `@constructive-io/query-builder` | Rename only |
+| `@launchql/url-domains` | `@constructive-io/url-domains` | Rename only |
 
 ## CLI Binary Renames
 
@@ -44,16 +120,14 @@ The goal is to replace all instances of "LaunchQL" and "launchql" with "Construc
 | `lql` | `constructive` | `packages/cli/package.json` |
 | `launchql` | `constructive` | `packages/cli/package.json` |
 
-The CLI package currently defines these binaries in `packages/cli/package.json`:
 ```json
+// Before
 "bin": {
   "lql": "index.js",
   "launchql": "index.js"
 }
-```
 
-Should be changed to:
-```json
+// After
 "bin": {
   "constructive": "index.js"
 }
@@ -65,67 +139,54 @@ Should be changed to:
 
 | Current Name | New Name | Location |
 |-------------|----------|----------|
-| `LaunchQLServer` | `ConstructiveServer` | `packages/server/src/server.ts` |
-| `LaunchQLExplorer` | `ConstructiveExplorer` | `packages/explorer/src/server.ts` |
+| `LaunchQLServer` | `GraphQLServer` | `graphql/server/src/server.ts` |
+| `LaunchQLExplorer` | `GraphQLExplorer` | `graphql/explorer/src/server.ts` |
 
 ### TypeScript Interfaces and Types
 
 | Current Name | New Name | Location |
 |-------------|----------|----------|
-| `LaunchQLOptions` | `ConstructiveOptions` | `packages/launchql-types/src/launchql.ts` |
-| `LaunchQLGraphQLOptions` | `ConstructiveGraphQLOptions` | `packages/launchql-types/src/launchql.ts` |
-| `LaunchQLAPIToken` | `ConstructiveAPIToken` | `packages/server/src/middleware/types.ts` |
-| `LaunchQLGenOptions` | `ConstructiveCodegenOptions` | `packages/launchql-gen/src/options.ts` |
+| `LaunchQLOptions` | `ConstructiveOptions` | `graphql/types/src/constructive.ts` |
+| `LaunchQLGraphQLOptions` | `ConstructiveGraphQLOptions` | `graphql/types/src/constructive.ts` |
+| `LaunchQLAPIToken` | `ConstructiveAPIToken` | `graphql/server/src/middleware/types.ts` |
+| `LaunchQLGenOptions` | `GraphQLCodegenOptions` | `graphql/codegen/src/options.ts` |
 
 ### Exported Constants and Functions
 
 | Current Name | New Name | Location |
 |-------------|----------|----------|
-| `launchqlDefaults` | `constructiveDefaults` | `packages/launchql-types/src/launchql.ts` |
-| `launchqlGraphqlDefaults` | `constructiveGraphqlDefaults` | `packages/launchql-types/src/launchql.ts` |
-| `defaultLaunchQLGenOptions` | `defaultConstructiveCodegenOptions` | `packages/launchql-gen/src/options.ts` |
-| `mergeLaunchQLGenOptions` | `mergeConstructiveCodegenOptions` | `packages/launchql-gen/src/options.ts` |
+| `launchqlDefaults` | `constructiveDefaults` | `graphql/types/src/constructive.ts` |
+| `launchqlGraphqlDefaults` | `constructiveGraphqlDefaults` | `graphql/types/src/constructive.ts` |
+| `defaultLaunchQLGenOptions` | `defaultGraphQLCodegenOptions` | `graphql/codegen/src/options.ts` |
+| `mergeLaunchQLGenOptions` | `mergeGraphQLCodegenOptions` | `graphql/codegen/src/options.ts` |
 
 ### React Hooks
 
 | Current Name | New Name | Location |
 |-------------|----------|----------|
-| `useLaunchqlQuery` | `useConstructiveQuery` | `packages/react/src/use-launchql-client.ts` |
-
-The file `packages/react/src/use-launchql-client.ts` should be renamed to `packages/react/src/use-constructive-client.ts`.
+| `useLaunchqlQuery` | `useConstructiveQuery` | `graphql/react/src/use-constructive-client.ts` |
 
 ## Source File Renames
 
 | Current File | New File |
 |-------------|----------|
-| `packages/launchql-types/src/launchql.ts` | `packages/graphql-types/src/constructive.ts` |
-| `packages/react/src/use-launchql-client.ts` | `packages/react/src/use-constructive-client.ts` |
-
-## Configuration File References
-
-### Config File Names
-
-The workspace configuration file name referenced in documentation:
-- `launchql.config.js` should be renamed to `constructive.config.js` (if applicable)
-
-Note: The actual config file resolution is handled by `@pgpmjs/env` which uses `pgpm.json` and `pgpm.config.js`, so this may not require changes.
+| `packages/launchql-types/src/launchql.ts` | `graphql/types/src/constructive.ts` |
+| `packages/react/src/use-launchql-client.ts` | `graphql/react/src/use-constructive-client.ts` |
 
 ## String Literals and Comments
 
 ### Powered-By Header
 
-In `packages/explorer/src/server.ts`:
+In `graphql/explorer/src/server.ts`:
 ```typescript
+// Before
 app.use(poweredBy('launchql'));
-```
-Should be changed to:
-```typescript
+
+// After
 app.use(poweredBy('constructive'));
 ```
 
 ### CLI Help Text
-
-Update all CLI help text and usage messages that reference "LaunchQL":
 
 | File | Current Text | New Text |
 |------|-------------|----------|
@@ -136,8 +197,6 @@ Update all CLI help text and usage messages that reference "LaunchQL":
 | `packages/cli/src/commands/get-graphql-schema.ts` | `LaunchQL Get GraphQL Schema:` | `Constructive Get GraphQL Schema:` |
 
 ### Log Messages
-
-Update log messages that reference "LaunchQL":
 
 | File | Current Message | New Message |
 |------|----------------|-------------|
@@ -164,12 +223,101 @@ Update error messages in `packages/core/src/workspace/paths.ts`:
 | `@launchql/types` | `LaunchQL GraphQL/Graphile types...` | `Constructive GraphQL/Graphile types...` |
 | `@launchql/env` | `LaunchQL environment configuration...` | `Constructive environment configuration...` |
 | `@launchql/query` | `LaunchQL Query` | `Constructive GraphQL Query` |
-| `@launchql/react` | `LaunchQL React` | `Constructive React` |
+| `@launchql/react` | `LaunchQL React` | `Constructive GraphQL React` |
 | `launchql-test` | `LaunchQL Testing...` | `Constructive GraphQL Testing...` |
 
 ### Keywords Updates
 
 Remove `launchql` keyword and add `constructive` keyword in all package.json files.
+
+## Import Statement Updates
+
+After renaming packages, all import statements need to be updated:
+
+```typescript
+// Before
+import { LaunchQLOptions } from '@launchql/types';
+import { getEnvOptions } from '@launchql/env';
+import { LaunchQLServer } from '@launchql/server';
+
+// After
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import { GraphQLServer } from '@constructive-io/graphql-server';
+```
+
+## Summary of Product Names
+
+| Component | New Name |
+|-----------|----------|
+| CLI Tool | Constructive CLI |
+| GraphQL Server | Constructive GraphQL Server |
+| GraphQL Explorer | Constructive GraphQL Explorer |
+| Code Generator | Constructive GraphQL Codegen |
+| React Integration | Constructive GraphQL React |
+| Query Builder | Constructive Query Builder |
+| Testing Framework | Constructive GraphQL Test |
+
+## Folder Summary
+
+| Folder | Purpose | Package Count |
+|--------|---------|---------------|
+| `packages/` | Core PGPM packages and CLI | 11 |
+| `graphql/` | GraphQL server, explorer, codegen, types, env, test, query, react, gql-ast | 9 |
+| `streaming/` | S3, file streaming, etag, uuid, mime utilities | 10 |
+| `postgres/` | PostgreSQL AST, cache, codegen, env, context, introspection, testing | 9 |
+| `graphile/` | Graphile/PostGraphile plugins (unchanged) | 15 |
+| `jobs/` | Job system packages (unchanged) | 9 |
+| `functions/` | Cloud functions (unchanged) | 2 |
+| `sandbox/` | Development sandbox (unchanged) | 4 |
+
+## Implementation Order
+
+1. **Phase 1: Create New Folder Structure**
+   - Create `graphql/`, `streaming/`, `postgres/` directories
+   - Update `pnpm-workspace.yaml`
+
+2. **Phase 2: Move Packages**
+   - Move packages to their new locations
+   - Update package.json names and descriptions
+   - Update internal workspace references
+
+3. **Phase 3: Class and Type Renames**
+   - Rename `LaunchQLServer` -> `GraphQLServer`
+   - Rename `LaunchQLExplorer` -> `GraphQLExplorer`
+   - Rename TypeScript interfaces and types
+   - Rename exported constants and functions
+
+4. **Phase 4: Import Updates**
+   - Update all import statements across the codebase
+   - Update internal package dependencies
+
+5. **Phase 5: CLI and Binary Updates**
+   - Update CLI binary names
+   - Update CLI help text and usage messages
+
+6. **Phase 6: String Literals and Comments**
+   - Update log messages
+   - Update error messages
+   - Update powered-by headers
+
+7. **Phase 7: Documentation**
+   - Update README files
+   - Update AGENTS.md files
+   - Update CHANGELOG files
+   - Update other documentation
+
+8. **Phase 8: Testing**
+   - Run full test suite
+   - Verify all packages build correctly
+   - Test CLI commands
+
+## Notes
+
+- The `@pgpmjs/*` packages (core, types, env, logger, server-utils) are NOT being renamed as they are part of the PGPM (PostgreSQL Package Manager) branding which is separate from LaunchQL
+- The `graphile-*` packages in the `graphile/` directory are NOT being renamed as they are Graphile ecosystem plugins
+- Fixture files in `__fixtures__/` may contain LaunchQL references for testing purposes and should be evaluated case-by-case
+- The `jobs/` and `functions/` directories remain unchanged as they are separate systems
 
 ## Documentation Updates
 
@@ -185,80 +333,13 @@ The following documentation files contain LaunchQL references and need updating:
 - `packages/*/CHANGELOG.md`
 - `packages/core/AGENTS.md`
 - `packages/cli/AGENTS.md`
+- `graphql/*/README.md` (after move)
+- `streaming/*/README.md` (after move)
+- `postgres/*/README.md` (after move)
 
 ## Test File Updates
 
 Update test files that reference LaunchQL:
-- `packages/launchql-gen/__tests__/options.test.ts`
+- `graphql/codegen/__tests__/options.test.ts` (after move)
 - `packages/cli/__tests__/codegen.test.ts`
 - `packages/core/__tests__/resolution/dependency-resolution-error-handling.test.ts`
-
-## Import Statement Updates
-
-After renaming packages, all import statements need to be updated:
-
-```typescript
-// Before
-import { LaunchQLOptions } from '@launchql/types';
-import { getEnvOptions } from '@launchql/env';
-import { LaunchQLServer } from '@launchql/server';
-
-// After
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { getEnvOptions } from '@constructive-io/graphql-env';
-import { ConstructiveServer } from '@constructive-io/graphql-server';
-```
-
-## Summary of Product Names
-
-| Component | New Name |
-|-----------|----------|
-| CLI Tool | Constructive CLI |
-| GraphQL Server | Constructive GraphQL Server |
-| GraphQL Explorer | Constructive GraphQL Explorer |
-| Code Generator | Constructive GraphQL Codegen |
-| React Integration | Constructive React |
-| Query Builder | Constructive Query Builder |
-| Testing Framework | Constructive GraphQL Test |
-
-## Implementation Order
-
-1. **Phase 1: Package Names and Directories**
-   - Rename package directories
-   - Update package.json names and descriptions
-   - Update workspace references
-
-2. **Phase 2: Class and Type Renames**
-   - Rename exported classes
-   - Rename TypeScript interfaces and types
-   - Rename exported constants and functions
-
-3. **Phase 3: Import Updates**
-   - Update all import statements across the codebase
-   - Update internal package dependencies
-
-4. **Phase 4: CLI and Binary Updates**
-   - Update CLI binary names
-   - Update CLI help text and usage messages
-
-5. **Phase 5: String Literals and Comments**
-   - Update log messages
-   - Update error messages
-   - Update powered-by headers
-
-6. **Phase 6: Documentation**
-   - Update README files
-   - Update AGENTS.md files
-   - Update CHANGELOG files
-   - Update other documentation
-
-7. **Phase 7: Testing**
-   - Run full test suite
-   - Verify all packages build correctly
-   - Test CLI commands
-
-## Notes
-
-- The `@pgpmjs/*` packages (core, types, env, logger, server-utils) are NOT being renamed as they are part of the PGPM (PostgreSQL Package Manager) branding which is separate from LaunchQL
-- The `graphile-*` packages in the `graphile/` directory are NOT being renamed as they are Graphile ecosystem plugins
-- Fixture files in `__fixtures__/` may contain LaunchQL references for testing purposes and should be evaluated case-by-case
