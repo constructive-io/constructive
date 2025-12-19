@@ -33,7 +33,9 @@ export const options: Partial<CLIOptions> = {
   minimistOpts: {
     alias: {
       v: 'version',
-      h: 'help'
+      h: 'help',
+      'from-branch': 'fromBranch',
+      'template-path': 'templatePath'
     }
   }
 };
@@ -48,7 +50,7 @@ if (require.main === module) {
 
   const app = new CLI(commands, options);
 
-  app.run().then(()=> {
+  app.run().then(() => {
   }).catch(error => {
     console.error('Unexpected error:', error);
     process.exit(1);
