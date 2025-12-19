@@ -44,11 +44,11 @@ my-module/
 
 Most users hit this via the CLI layer:
 
-- `pgpm init workspace` / `constructive init workspace`
-- `pgpm init` / `constructive init`
-- `pgpm add <change>` / `constructive add <change>`
-- `pgpm deploy` / `constructive deploy`
-- `pgpm verify` / `constructive verify`
-- `pgpm revert` / `constructive revert`
+- `pgpm init workspace` / `cnc init workspace`
+- `pgpm init` / `cnc init`
+- `pgpm add <change>` / `cnc add <change>`
+- `pgpm deploy` / `cnc deploy`
+- `pgpm verify` / `cnc verify`
+- `pgpm revert` / `cnc revert`
 
 CLI implementations live in `pgpm/pgpm/src/commands/*`.

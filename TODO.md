@@ -90,7 +90,7 @@ Good Next Steps
 ---------------
 - [x] Demo script using meta API to create tables
 - [x] Get export working
-- [x] Get boilerplate (`constructive init`) working
+- [x] Get boilerplate (`cnc init`) working
 - [ ] Get testing framework finalized
 
 Other

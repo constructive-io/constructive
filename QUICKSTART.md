@@ -15,7 +15,7 @@ npm install -g @constructive-io/cli
 Generate a workspace along with its default services configuration:
 
 ```bash
-constructive init workspace # then enter workspace name
+cnc init workspace # then enter workspace name
 cd myworkspace
 ```
 
@@ -32,14 +32,14 @@ If you already have Postgres installed locally, just ensure it is running and ac
 ### 4. Create a module & add changes
 
 ```bash
-constructive init
+cnc init
 cd packages/mymodule
 
 # Add schema
-constructive add --change schemas/myschema
+cnc add --change schemas/myschema
 
 # Add table (depends on schema)
-constructive add --change schemas/myschema/tables/mytable --requires schemas/myschema
+cnc add --change schemas/myschema/tables/mytable --requires schemas/myschema
 ```
 
 ### 5. Example generated SQL
@@ -68,7 +68,7 @@ CREATE TABLE myschema.mytable (
 ### 6. Deploy to Postgres
 
 ```bash
-constructive deploy --database testdb --createdb --yes
+cnc deploy --database testdb --createdb --yes
 ```
 
 **Sample output highlights:**
@@ -88,7 +88,7 @@ constructive deploy --database testdb --createdb --yes
 ### 7. Explore
 
 ```bash
-constructive explorer
+cnc explorer
 ```
 
 http://localhost:5555/graphiql (default)
@@ -98,5 +98,5 @@ http://myschema.testdb.localhost:5555/graphiql (specific to a schema)
 ### 8. Server
 
 ```bash
-constructive server
+cnc server
 ```

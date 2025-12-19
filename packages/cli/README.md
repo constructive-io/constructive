@@ -24,17 +24,17 @@ npm install -g @constructive-io/cli
 
 ```bash
 # Initialize a new workspace
-constructive init workspace
+cnc init workspace
 cd my-project
 
 # Create your first module
-constructive init
+cnc init
 
 # Deploy to your database
-constructive deploy --createdb
+cnc deploy --createdb
 
 # Start the development server
-constructive server
+cnc server
 ```
 
 Visit `http://localhost:5555` to explore your GraphQL API!
@@ -50,7 +50,7 @@ Visit `http://localhost:5555` to explore your GraphQL API!
 ### Database-First Workflow
 
 1. **Design** your database schema using SQL migrations
-2. **Deploy** changes with `constructive deploy`
+2. **Deploy** changes with `cnc deploy`
 3. **Develop** against the auto-generated GraphQL API
 4. **Version** and **package** your modules for distribution
 
@@ -58,24 +58,24 @@ Visit `http://localhost:5555` to explore your GraphQL API!
 
 ### Getting Started
 
-#### `constructive init`
+#### `cnc init`
 
 Initialize a new Constructive workspace or module.
 
 ```bash
 # Create a new workspace
-constructive init workspace
+cnc init workspace
 
 # Create a new module (run inside workspace)
-constructive init
+cnc init
 
 # Use templates from GitHub repository (defaults to constructive-io/pgpm-boilerplates.git)
-constructive init workspace --repo owner/repo
-constructive init --repo owner/repo --from-branch develop
+cnc init workspace --repo owner/repo
+cnc init --repo owner/repo --from-branch develop
 
 # Use templates from custom paths
-constructive init workspace --template-path ./custom-templates
-constructive init --template-path ./custom-templates/module
+cnc init workspace --template-path ./custom-templates
+cnc init --template-path ./custom-templates/module
 ```
 
 **Options:**
@@ -84,181 +84,181 @@ constructive init --template-path ./custom-templates/module
 - `--template-path <path>` - Template sub-path (defaults to `workspace`/`module`) or local path override
 - `--from-branch <branch>` - Branch/tag when cloning the template repo
 
-Templates are cached for one week under the `pgpm` tool namespace. Run `constructive cache clean` if you need to refresh the boilerplates.
+Templates are cached for one week under the `pgpm` tool namespace. Run `cnc cache clean` if you need to refresh the boilerplates.
 
 ### Development
 
-#### `constructive server`
+#### `cnc server`
 
 Start the GraphQL development server with hot-reload.
 
 ```bash
 # Start with defaults (port 5555)
-constructive server
+cnc server
 
 # Custom port and options
-constructive server --port 8080 --no-postgis
+cnc server --port 8080 --no-postgis
 ```
 
-#### `constructive explorer`
+#### `cnc explorer`
 
 Launch GraphiQL explorer for your API.
 
 ```bash
 # Launch explorer
-constructive explorer
+cnc explorer
 
 # With custom CORS origin
-constructive explorer --origin http://localhost:3000
+cnc explorer --origin http://localhost:3000
 ```
 
 ## 🔄 Updates
 
-The CLI performs a lightweight npm version check at most once per week (skipped in CI or when `PGPM_SKIP_UPDATE_CHECK` is set). Use `constructive update` to install the latest release (installs `pgpm` by default; pass `--package @constructive-io/cli` to target the CLI package).
+The CLI performs a lightweight npm version check at most once per week (skipped in CI or when `PGPM_SKIP_UPDATE_CHECK` is set). Use `cnc update` to install the latest release (installs `pgpm` by default; pass `--package @constructive-io/cli` to target the CLI package).
 
 ### Database Operations
 
-#### `constructive deploy`
+#### `cnc deploy`
 
 Deploy your database changes and migrations.
 
 ```bash
 # Deploy to selected database
-constructive deploy
+cnc deploy
 
 # Create database if it doesn't exist
-constructive deploy --createdb
+cnc deploy --createdb
 
 # Deploy specific package to a tag
-constructive deploy --package mypackage --to @v1.0.0
+cnc deploy --package mypackage --to @v1.0.0
 
 # Fast deployment without transactions
-constructive deploy --fast --no-tx
+cnc deploy --fast --no-tx
 ```
 
-#### `constructive verify`
+#### `cnc verify`
 
 Verify your database state matches expected migrations.
 
 ```bash
 # Verify current state
-constructive verify
+cnc verify
 
 # Verify specific package
-constructive verify --package mypackage
+cnc verify --package mypackage
 ```
 
-#### `constructive revert`
+#### `cnc revert`
 
 Safely revert database changes.
 
 ```bash
 # Revert latest changes
-constructive revert
+cnc revert
 
 # Revert to specific tag
-constructive revert --to @v1.0.0
+cnc revert --to @v1.0.0
 ```
 
 ### Migration Management
 
-#### `constructive migrate`
+#### `cnc migrate`
 
 Comprehensive migration management.
 
 ```bash
 # Initialize migration tracking
-constructive migrate init
+cnc migrate init
 
 # Check migration status
-constructive migrate status
+cnc migrate status
 
 # List all changes
-constructive migrate list
+cnc migrate list
 
 # Show change dependencies
-constructive migrate deps
+cnc migrate deps
 ```
 
 ### Module Management
 
-#### `constructive install`
+#### `cnc install`
 
 Install PGPM modules as dependencies.
 
 ```bash
 # Install single package
-constructive install @constructive-io/auth
+cnc install @constructive-io/auth
 
 # Install multiple packages
-constructive install @constructive-io/auth @constructive-io/utils
+cnc install @constructive-io/auth @constructive-io/utils
 ```
 
-#### `constructive extension`
+#### `cnc extension`
 
 Interactively manage module dependencies.
 
 ```bash
-constructive extension
+cnc extension
 ```
 
-#### `constructive tag`
+#### `cnc tag`
 
 Version your changes with tags.
 
 ```bash
 # Tag latest change
-constructive tag v1.0.0
+cnc tag v1.0.0
 
 # Tag with comment
-constructive tag v1.0.0 --comment "Initial release"
+cnc tag v1.0.0 --comment "Initial release"
 
 # Tag specific change
-constructive tag v1.1.0 --package mypackage --changeName my-change
+cnc tag v1.1.0 --package mypackage --changeName my-change
 ```
 
 ### Packaging and Distribution
 
-#### `constructive plan`
+#### `cnc plan`
 
 Generate deployment plans for your modules.
 
 ```bash
-constructive plan
+cnc plan
 ```
 
-#### `constructive package`
+#### `cnc package`
 
 Package your module for distribution.
 
 ```bash
 # Package with defaults
-constructive package
+cnc package
 
 # Package without deployment plan
-constructive package --no-plan
+cnc package --no-plan
 ```
 
 ### Utilities
 
-#### `constructive export`
+#### `cnc export`
 
 Export migrations from existing databases.
 
 ```bash
-constructive export
+cnc export
 ```
 
-#### `constructive kill`
+#### `cnc kill`
 
 Clean up database connections and optionally drop databases.
 
 ```bash
 # Kill connections and drop databases
-constructive kill
+cnc kill
 
 # Only kill connections
-constructive kill --no-drop
+cnc kill --no-drop
 ```
 
 ## 💡 Common Workflows
@@ -268,17 +268,17 @@ constructive kill --no-drop
 ```bash
 # 1. Create workspace
 mkdir my-app && cd my-app
-constructive init workspace
+cnc init workspace
 
 # 2. Create your first module
-constructive init
+cnc init
 
 # 3. Add some SQL migrations to sql/ directory
 # 4. Deploy to database
-constructive deploy --createdb
+cnc deploy --createdb
 
 # 5. Start developing
-constructive server
+cnc server
 ```
 
 ### Using Custom Templates
@@ -287,16 +287,16 @@ You can use custom templates from GitHub repositories or local paths:
 
 ```bash
 # Initialize workspace with templates from GitHub
-constructive init workspace --repo owner/repo
+cnc init workspace --repo owner/repo
 
 # Initialize workspace with templates from local path
-constructive init workspace --template-path ./my-custom-templates
+cnc init workspace --template-path ./my-custom-templates
 
 # Initialize module with custom templates
-constructive init --template-path ./my-custom-templates
+cnc init --template-path ./my-custom-templates
 
 # Use specific branch from GitHub repository
-constructive init workspace --repo owner/repo --from-branch develop
+cnc init workspace --repo owner/repo --from-branch develop
 ```
 
 **Template Structure:**
@@ -313,29 +313,29 @@ Custom templates should follow the same structure as the default templates:
 git clone <repo> && cd <project>
 
 # 2. Install dependencies
-constructive install
+cnc install
 
 # 3. Deploy to local database
-constructive deploy --createdb
+cnc deploy --createdb
 
 # 4. Start development server
-constructive server
+cnc server
 ```
 
 ### Production Deployment
 
 ```bash
 # 1. Create deployment plan
-constructive plan
+cnc plan
 
 # 2. Package module
-constructive package
+cnc package
 
 # 3. Deploy to production
-constructive deploy --package myapp --to @production
+cnc deploy --package myapp --to @production
 
 # 4. Verify deployment
-constructive verify --package myapp
+cnc verify --package myapp
 ```
 
 ### Get Graphql Schema
@@ -344,15 +344,15 @@ Fetch and output your GraphQL schema in SDL.
 
   - Option 1 – Programmatic builder (from database schemas):
   - Write to file:
-    - `constructive get-graphql-schema --database constructive --schemas myapp,public --out ./schema.graphql`
+    - `cnc get-graphql-schema --database constructive --schemas myapp,public --out ./schema.graphql`
   - Print to stdout:
-    - `constructive get-graphql-schema --database constructive --schemas myapp,public`
+    - `cnc get-graphql-schema --database constructive --schemas myapp,public`
 
   - Option 2 – Fetch from running server (via endpoint introspection):
   - Write to file:
-    - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./schema.graphql`
+    - `cnc get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./schema.graphql`
   - Print to stdout:
-    - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
+    - `cnc get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
 
 Options:
 - `--database <name>` (Option 1)
@@ -365,7 +365,7 @@ Options:
 
 Notes:
 - If your local dev server routes by hostname (e.g., `meta8.localhost`), but is reachable at `http://localhost:<port>`, use:
-  - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
+  - `cnc get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
 - You can repeat `--header` to add multiple headers, e.g.: `--header 'X-Mode: fast' --header 'Authorization: Bearer abc123'`
 
 Tip:
@@ -392,11 +392,11 @@ export PGPASSWORD=password
 
 ```bash
 # Global help
-constructive --help
+cnc --help
 
 # Command-specific help
-constructive deploy --help
-constructive server -h
+cnc deploy --help
+cnc server -h
 ```
 
 ### Common Options
@@ -412,10 +412,10 @@ Generate types, operations, and SDK from a schema or endpoint.
 
 ```bash
 # From SDL file
-constructive codegen --schema ./schema.graphql --out ./codegen
+cnc codegen --schema ./schema.graphql --out ./codegen
 
 # From endpoint with Host override
-constructive codegen --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./codegen
+cnc codegen --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./codegen
 ```
 
 Options:
@@ -434,7 +434,7 @@ Config file (JSON/YAML):
 
 ```bash
 # Use a JSON config to override defaults
-constructive codegen --config ./my-options.json
+cnc codegen --config ./my-options.json
 ```
 
 Example `my-options.json`:
