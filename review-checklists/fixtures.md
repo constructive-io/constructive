@@ -1,0 +1,156 @@
+# Review checklist — `__fixtures__`
+
+## Context
+- Compare: `main...HEAD` (merge base `86d74dc4fce9051df0d2b5bcc163607aba42f009`)
+- Branch: `refactor/ensure-new-name-mappings`
+- Pathspec: `__fixtures__`
+
+## How to read linked diffs
+- Module entries link to `review-checklists/diffs/*.md` with side-by-side output (`diff -y`).
+- Left = `main`, Right = `HEAD`
+- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+
+## Renamed / moved (no content changes) (111)
+<details>
+<summary>Show 111 rename-only paths</summary>
+
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/Makefile` → `__fixtures__/sqitch/constructive/packages/secrets/Makefile`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/deploy/procedures/secretfunction.sql` → `__fixtures__/sqitch/constructive/packages/secrets/deploy/procedures/secretfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/package.json` → `__fixtures__/sqitch/constructive/packages/secrets/package.json`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/pgpm.plan` → `__fixtures__/sqitch/constructive/packages/secrets/pgpm.plan`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/revert/procedures/secretfunction.sql` → `__fixtures__/sqitch/constructive/packages/secrets/revert/procedures/secretfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/secrets.control` → `__fixtures__/sqitch/constructive/packages/secrets/secrets.control`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/sql/secrets--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/secrets/sql/secrets--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/sql/utils--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/secrets/sql/utils--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/secrets/verify/procedures/secretfunction.sql` → `__fixtures__/sqitch/constructive/packages/secrets/verify/procedures/secretfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/Makefile` → `__fixtures__/sqitch/constructive/packages/totp/Makefile`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/deploy/procedures/generate_secret.sql` → `__fixtures__/sqitch/constructive/packages/totp/deploy/procedures/generate_secret.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/package.json` → `__fixtures__/sqitch/constructive/packages/totp/package.json`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/pgpm.plan` → `__fixtures__/sqitch/constructive/packages/totp/pgpm.plan`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/revert/procedures/generate_secret.sql` → `__fixtures__/sqitch/constructive/packages/totp/revert/procedures/generate_secret.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/sql/totp--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/totp/sql/totp--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/totp.control` → `__fixtures__/sqitch/constructive/packages/totp/totp.control`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/totp/verify/procedures/generate_secret.sql` → `__fixtures__/sqitch/constructive/packages/totp/verify/procedures/generate_secret.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/.babelrc` → `__fixtures__/sqitch/constructive/packages/utilities/.babelrc`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/.env` → `__fixtures__/sqitch/constructive/packages/utilities/.env`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/Makefile` → `__fixtures__/sqitch/constructive/packages/utilities/Makefile`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/drop_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/drop_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/get_entity_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/get_entity_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/get_schema_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/get_schema_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/grant_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/grant_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/list_indexes.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/list_indexes.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/list_memberships.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/list_memberships.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/revoke_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/revoke_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/deploy/procedures/tg_update_timestamps.sql` → `__fixtures__/sqitch/constructive/packages/utilities/deploy/procedures/tg_update_timestamps.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/package.json` → `__fixtures__/sqitch/constructive/packages/utilities/package.json`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/pg-utilities.control` → `__fixtures__/sqitch/constructive/packages/utilities/pg-utilities.control`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/pgpm.plan` → `__fixtures__/sqitch/constructive/packages/utilities/pgpm.plan`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/drop_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/drop_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/get_entity_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/get_entity_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/get_schema_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/get_schema_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/grant_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/grant_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/list_indexes.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/list_indexes.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/list_memberships.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/list_memberships.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/revoke_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/revoke_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/revert/procedures/tg_update_timestamps.sql` → `__fixtures__/sqitch/constructive/packages/utilities/revert/procedures/tg_update_timestamps.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/sql/pg-utilities--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/utilities/sql/pg-utilities--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/test/utils/index.js` → `__fixtures__/sqitch/constructive/packages/utilities/test/utils/index.js`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/drop_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/drop_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/get_entity_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/get_entity_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/get_schema_from_str.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/get_schema_from_str.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/grant_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/grant_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/list_indexes.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/list_indexes.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/list_memberships.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/list_memberships.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/revoke_execute_on_function.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/revoke_execute_on_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utilities/verify/procedures/tg_update_timestamps.sql` → `__fixtures__/sqitch/constructive/packages/utilities/verify/procedures/tg_update_timestamps.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/Makefile` → `__fixtures__/sqitch/constructive/packages/utils/Makefile`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/deploy/procedures/myfunction.sql` → `__fixtures__/sqitch/constructive/packages/utils/deploy/procedures/myfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/package.json` → `__fixtures__/sqitch/constructive/packages/utils/package.json`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/pgpm.plan` → `__fixtures__/sqitch/constructive/packages/utils/pgpm.plan`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/revert/procedures/myfunction.sql` → `__fixtures__/sqitch/constructive/packages/utils/revert/procedures/myfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/sql/utils--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/utils/sql/utils--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/utils.control` → `__fixtures__/sqitch/constructive/packages/utils/utils.control`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/utils/verify/procedures/myfunction.sql` → `__fixtures__/sqitch/constructive/packages/utils/verify/procedures/myfunction.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/.babelrc` → `__fixtures__/sqitch/constructive/packages/verify/.babelrc`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/.env` → `__fixtures__/sqitch/constructive/packages/verify/.env`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/Makefile` → `__fixtures__/sqitch/constructive/packages/verify/Makefile`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_constraint.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_constraint.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_domain.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_domain.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_extension.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_extension.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_function.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_index.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_index.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_membership.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_membership.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_policy.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_policy.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_role.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_role.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_schema.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_schema.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_security.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_security.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_table.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_table.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_table_grant.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_table_grant.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_trigger.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_trigger.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_type.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_type.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/deploy/procedures/verify_view.sql` → `__fixtures__/sqitch/constructive/packages/verify/deploy/procedures/verify_view.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/package.json` → `__fixtures__/sqitch/constructive/packages/verify/package.json`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/pg-verify.control` → `__fixtures__/sqitch/constructive/packages/verify/pg-verify.control`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/pgpm.plan` → `__fixtures__/sqitch/constructive/packages/verify/pgpm.plan`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_constraint.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_constraint.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_domain.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_domain.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_extension.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_extension.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_function.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_index.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_index.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_membership.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_membership.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_policy.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_policy.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_role.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_role.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_schema.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_schema.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_security.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_security.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_table.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_table.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_table_grant.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_table_grant.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_trigger.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_trigger.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_type.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_type.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/revert/procedures/verify_view.sql` → `__fixtures__/sqitch/constructive/packages/verify/revert/procedures/verify_view.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/sql/pg-verify--0.0.1.sql` → `__fixtures__/sqitch/constructive/packages/verify/sql/pg-verify--0.0.1.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/test/utils/index.js` → `__fixtures__/sqitch/constructive/packages/verify/test/utils/index.js`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_constraint.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_constraint.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_domain.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_domain.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_extension.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_extension.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_function.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_function.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_index.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_index.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_membership.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_membership.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_policy.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_policy.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_role.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_role.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_schema.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_schema.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_security.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_security.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_table.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_table.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_table_grant.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_table_grant.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_trigger.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_trigger.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_type.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_type.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/packages/verify/verify/procedures/verify_view.sql` → `__fixtures__/sqitch/constructive/packages/verify/verify/procedures/verify_view.sql`
+- [ ] `R100` `__fixtures__/sqitch/launchql/pgpm.json` → `__fixtures__/sqitch/constructive/pgpm.json`
+
+</details>
+
+## Modified (content changes) (25)
+- [ ] `M` `__fixtures__/sqitch/publish/packages/totp/package.json` (`+1/-1`) — diff: [M_7deb7f7c7c43.md](diffs/M_7deb7f7c7c43.md)
+- [ ] `M` `__fixtures__/sqitch/simple-w-tags/packages/my-first/pgpm.plan` (`+5/-5`) — diff: [M_913f29e8cd2c.md](diffs/M_913f29e8cd2c.md)
+- [ ] `M` `__fixtures__/sqitch/simple/packages/my-first/pgpm.plan` (`+3/-3`) — diff: [M_10df4bad8553.md](diffs/M_10df4bad8553.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/achievements/README.md` (`+4/-4`) — diff: [M_aebb849cccb0.md](diffs/M_aebb849cccb0.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/base32/README.md` (`+4/-4`) — diff: [M_23d73f75fef9.md](diffs/M_23d73f75fef9.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/database-jobs/README.md` (`+4/-4`) — diff: [M_7457a9a1fe75.md](diffs/M_7457a9a1fe75.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/db-meta-modules/README.md` (`+4/-4`) — diff: [M_527dcc126d4f.md](diffs/M_527dcc126d4f.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/db-meta-schema/README.md` (`+4/-4`) — diff: [M_9e05b02bc54f.md](diffs/M_9e05b02bc54f.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/default-roles/README.md` (`+4/-4`) — diff: [M_f496d6e16dde.md](diffs/M_f496d6e16dde.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/defaults/README.md` (`+4/-4`) — diff: [M_9eeae4727520.md](diffs/M_9eeae4727520.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/encrypted-secrets-table/README.md` (`+4/-4`) — diff: [M_711d9ede7e44.md](diffs/M_711d9ede7e44.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/encrypted-secrets/README.md` (`+4/-4`) — diff: [M_f084ce3df6d7.md](diffs/M_f084ce3df6d7.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/faker/README.md` (`+4/-4`) — diff: [M_856b0a86d0a5.md](diffs/M_856b0a86d0a5.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/geotypes/README.md` (`+4/-4`) — diff: [M_7055b6a41ce4.md](diffs/M_7055b6a41ce4.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/inflection/README.md` (`+4/-4`) — diff: [M_0c8a5e0883d6.md](diffs/M_0c8a5e0883d6.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/jobs/README.md` (`+4/-4`) — diff: [M_3bfb48896b7c.md](diffs/M_3bfb48896b7c.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/jwt-claims/README.md` (`+4/-4`) — diff: [M_2aa847336921.md](diffs/M_2aa847336921.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/measurements/README.md` (`+4/-4`) — diff: [M_b990c7758d6c.md](diffs/M_b990c7758d6c.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/stamps/README.md` (`+4/-4`) — diff: [M_1d7e57c83167.md](diffs/M_1d7e57c83167.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/totp/README.md` (`+4/-4`) — diff: [M_295b810d7698.md](diffs/M_295b810d7698.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/types/README.md` (`+4/-4`) — diff: [M_e3274b8aedb2.md](diffs/M_e3274b8aedb2.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/utils/README.md` (`+4/-4`) — diff: [M_e9759fd610af.md](diffs/M_e9759fd610af.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/uuid/README.md` (`+4/-4`) — diff: [M_7ea4093b865c.md](diffs/M_7ea4093b865c.md)
+- [ ] `M` `__fixtures__/stage/extensions/@pgpm/verify/README.md` (`+4/-4`) — diff: [M_12cfed60a0b1.md](diffs/M_12cfed60a0b1.md)
+- [ ] `M` `__fixtures__/stage/packages/unique-names/package.json` (`+2/-2`) — diff: [M_af49997a58fa.md](diffs/M_af49997a58fa.md)
