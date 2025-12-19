@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 5.1.0 (2025-12-19)
+
+### Bug Fixes
+
+- add explicit tsconfig.json path to build:dev script ([309dba1](https://github.com/constructive-io/constructive/commit/309dba1abd2c461803ffe2015cf82d1d3b1e6ee7))
+- add function delimeter ([e099e39](https://github.com/constructive-io/constructive/commit/e099e3935412fba88fc74325d7cb7013cfe60336))
+- add missing dependencies and remove resolutions for pnpm ([8c4a3cd](https://github.com/constructive-io/constructive/commit/8c4a3cd836dbffc5e86466a95ca086c9e8a5d351))
+- **cli:** add Jest moduleNameMapper for workspace dependencies ([06ae90d](https://github.com/constructive-io/constructive/commit/06ae90d17dd1aa2bcb761089f48e182e43e297e6))
+- **cli:** add missing pg dependencies and fix template build script ([9c0e242](https://github.com/constructive-io/constructive/commit/9c0e2427dd2573232aa341e5635801b6ddb77147))
+- **cli:** use exact cwd handling pattern in lql plan command ([dca0e50](https://github.com/constructive-io/constructive/commit/dca0e5030bb5e2ae81eab3e9c6b0977ed2cd3ddc))
+- correct tag command logic to handle workspace vs module scenarios properly ([84833a6](https://github.com/constructive-io/constructive/commit/84833a6031e8b962e126e1d783a99decf70ca861))
+- **docs:** use asterisk for list markers in CLI README ([aadd06f](https://github.com/constructive-io/constructive/commit/aadd06f72227cd590c7a66a28194ed4c309e10a5))
+- pass \_\_dirname to findAndRequirePackageJson for correct package.json resolution ([8fc4a97](https://github.com/constructive-io/constructive/commit/8fc4a9796bede5b556e42df9f82a627d008e1d20))
+- remove all backward compatibility and update all LaunchQL* references to Pgpm* ([f513aa9](https://github.com/constructive-io/constructive/commit/f513aa972f375819d94c819d1b260df9a12a9a62))
+- replace workspace:\* with specific version ^2.1.13 for @launchql/env dependencies ([2fb68f2](https://github.com/constructive-io/constructive/commit/2fb68f247fd2aa9d966bafe19986db016c2be3c3))
+- resolve tag command path issues and update test data for proper test isolation ([6bc6fae](https://github.com/constructive-io/constructive/commit/6bc6fae3f1f1f1207fed64deb8df35ca58f0cf42))
+- resolve TypeScript errors in CLI tests and add core tests for tag functionality ([44fc18d](https://github.com/constructive-io/constructive/commit/44fc18dc6865e34cc6a9455bcb922b17ced5eb4e))
+- resolve workspace dependency resolution issues in tests ([b9ea117](https://github.com/constructive-io/constructive/commit/b9ea11781aebd211a08d1e3c15c0ed6fda4c7930))
+- restructure tag command logic to properly handle --package flag in workspace scenarios ([7612519](https://github.com/constructive-io/constructive/commit/76125193d9e451b1b9b1154b4a13cb60cd2c4a12))
+- stop pnpm install command from triggering every build ([ce88a6e](https://github.com/constructive-io/constructive/commit/ce88a6ece261ef02201d417bf3a9446a69df6618))
+- update package selection logic and add tests for tag command ([a7ff548](https://github.com/constructive-io/constructive/commit/a7ff54899804cda653c963c60930054fafdb253e))
+- update remaining LaunchQL references to PGPM ([9b4aa91](https://github.com/constructive-io/constructive/commit/9b4aa91d7ccadecd3538c395f39c4eb86a57d6c7))
+- update tags test expectation for CHANGE_NOT_FOUND error format ([df1f383](https://github.com/constructive-io/constructive/commit/df1f383a7578bc5275d41e7e0908e9a5f232b715)), closes [#200](https://github.com/constructive-io/constructive/issues/200)
+
+### Features
+
+- add --log-only flag for deployment logging ([a3071ee](https://github.com/constructive-io/constructive/commit/a3071ee03780f5d40e772594159840c973f95a85))
+- add bootstrap-db-roles CLI command with username/password parameters ([81e88ee](https://github.com/constructive-io/constructive/commit/81e88ee9352ca1edd7a8229a6e70d3e5e308a167))
+- add CLI command for creating database changes ([a44b643](https://github.com/constructive-io/constructive/commit/a44b643dbba2b93f14aab3828d1c0cc95ee34f6c))
+- add LaunchQLInit class and CLI commands for bootstrap roles ([202fb2c](https://github.com/constructive-io/constructive/commit/202fb2cd312de3416521366b2e4ecdfa77a5ab63))
+- add lql bootstrap command that calls both bootstrap-roles and bootstrap-test-roles ([65d2cae](https://github.com/constructive-io/constructive/commit/65d2caebd8ec7d711df0c68cded789a8417dad0d))
+- add tag functionality to LaunchQL packages ([bd1ebaa](https://github.com/constructive-io/constructive/commit/bd1ebaa0c94552a1210378c103e78a8bc4843d14))
+- **cli): default lql plan to include packages and prefer tags via non-blocking prompts; update usage text; keep advanced tags internal\n\nfix(core:** only prefer package tags when explicitly enabled; preserve prior default behavior in core API ([b770560](https://github.com/constructive-io/constructive/commit/b77056050337fad4f6387b78a79032a88a95e964))
+- **cli:** add custom template support for init command ([4e2cd3f](https://github.com/constructive-io/constructive/commit/4e2cd3fd1377860f29b02b59e72af91cb017b225))
+- **cli:** add docker command for managing PostgreSQL containers ([810cbdf](https://github.com/constructive-io/constructive/commit/810cbdf5deb77ae91e89c29419c3c699dc38683e))
+- **core): add analyzeModule and renameModule; feat(cli:** add analyze and rename commands ([90c3fdc](https://github.com/constructive-io/constructive/commit/90c3fdc888305ace8586e442c1928a34da6ecda5))
+- **core/cli:** simplify plan options to useTags; default CLI to packages+useTags (non-blocking). Keep preferPackageTags/tags as aliases for backward compatibility; update usage text ([f3db407](https://github.com/constructive-io/constructive/commit/f3db407c93f9f48bb57e7a2c9ac153dc30c5ce7c))
+- create @launchql/env package for complete GraphQL separation ([32758e5](https://github.com/constructive-io/constructive/commit/32758e57701c426eff94b905f22c739e5bcfb29d))
+- create @launchql/env package for consolidated environment management ([004c78e](https://github.com/constructive-io/constructive/commit/004c78e87ceddfc2d0a3f74e79affe13c8a628d1))
+- create pgpm CLI tool and refactor @launchql/cli to import from it ([756d44c](https://github.com/constructive-io/constructive/commit/756d44c430f11c115cbc52db74c9dffadea405eb))
+- enhance update check in CLI commands ([1caa1eb](https://github.com/constructive-io/constructive/commit/1caa1eb1d756383535071c8a5b834de750078ada))
+- expand error system with templated error types ([e08e1c1](https://github.com/constructive-io/constructive/commit/e08e1c1b3c4925807d59831695591a53ca8ebb9b))
+- merge packages/migrate into packages/core ([0a615a7](https://github.com/constructive-io/constructive/commit/0a615a7ea28b42bb37b611364384a2e39ac8dfaf))
+- rebrand PGPM packages from @launchql/_ to @pgpmjs/_ ([734d865](https://github.com/constructive-io/constructive/commit/734d8655ced175f51567c513ac1ee4c843df98b7))
+- **update-check:** add update command instruction to version check warnings ([4fffce8](https://github.com/constructive-io/constructive/commit/4fffce89cf046e9784198e52a071ff999e51cb3e))
+
 ## [5.0.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.0.2...@constructive-io/cli@5.0.3) (2025-12-18)
 
 **Note:** Version bump only for package @constructive-io/cli

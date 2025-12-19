@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.17.10",
+  "version": "2.17.11",
   "description": "Generate queries and mutations for use with Graphile",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -29,9 +29,9 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@constructive-io/graphql-test": "workspace:^",
     "@types/babel__generator": "^7.27.0",
     "@types/pluralize": "0.0.33",
-    "@constructive-io/graphql-test": "workspace:^",
     "makage": "^0.1.8"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "2.9.4",
+  "version": "2.9.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",
@@ -29,9 +29,9 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@graphile-contrib/pg-many-to-many": "^1.0.2",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@graphile-contrib/pg-many-to-many": "^1.0.2",
     "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.5",
     "express": "^5.1.0",

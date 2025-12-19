@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-explorer",
-  "version": "2.10.4",
+  "version": "2.10.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Explorer",
   "main": "index.js",
@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/s3-streamer": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/s3-streamer": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",

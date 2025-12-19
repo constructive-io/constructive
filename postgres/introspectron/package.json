@@ -1,6 +1,6 @@
 {
   "name": "introspectron",
-  "version": "2.14.9",
+  "version": "2.14.10",
   "description": "introspect your Postgres database and generate an SDK",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -29,9 +29,9 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@constructive-io/graphql-test": "workspace:^",
     "@jest/test-sequencer": "^30.2.0",
     "@types/pg": "^8.16.0",
-    "@constructive-io/graphql-test": "workspace:^",
     "makage": "^0.1.8",
     "pgsql-test": "workspace:^"
   },

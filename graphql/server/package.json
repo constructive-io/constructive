@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "2.10.4",
+  "version": "2.10.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -39,12 +39,12 @@
     "backend"
   ],
   "dependencies": {
-    "@graphile-contrib/pg-many-to-many": "^1.0.2",
     "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
+    "@graphile-contrib/pg-many-to-many": "^1.0.2",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
