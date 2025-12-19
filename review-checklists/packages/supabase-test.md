@@ -5,10 +5,9 @@
 - Branch: `refactor/ensure-new-name-mappings`
 - Folder move: `packages/supabase-test` → `postgres/supabase-test`
 
-## How to read linked diffs
-- Module entries link to `review-checklists/diffs/*.md` with side-by-side output (`diff -y`).
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## How to review
+- Content changes link to per-file diff docs under `review-checklists/diffs/`
+- Each diff doc includes Prev/Next navigation
 
 ## Package.json checks
 - [ ] `name` unchanged: `supabase-test`

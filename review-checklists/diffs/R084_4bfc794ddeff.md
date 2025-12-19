@@ -1,19 +1,51 @@
 # Diff — `R084` `packages/core/__tests__/core/launchql-project.test.ts` → `pgpm/core/__tests__/core/constructive-project.test.ts`
 
+## Navigation
+- Prev: [R096_477208b0821c.md](R096_477208b0821c.md) | Up: [packages/core.md](../packages/core.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [R079_c3cdb788ca7c.md](R079_c3cdb788ca7c.md)
+
 ## Context
-- Base: `main` @ `86d74dc4fce9051df0d2b5bcc163607aba42f009`
-- Head: `refactor/ensure-new-name-mappings` @ `bd9be723c96aeb1f9f69e4946acbd9241ee8da50`
-- Merge base: `86d74dc4fce9051df0d2b5bcc163607aba42f009`
+- Diff base (merge base for `main...HEAD`): `86d74dc4fce9051df0d2b5bcc163607aba42f009`
+- Main tip: `2492d840ab18e5c30cc7a24a7b4959abf5d6b21e`
+- Head: `refactor/ensure-new-name-mappings` @ `27ba20cfc1e66cb921f229963ca63a201fcf6952`
+- Module: `packages/core`
 - Type: rename/copy (similarity `84`)
 - Numstat: `+13/-13`
 - Reproduce: `git diff -M main...HEAD -- packages/core/__tests__/core/launchql-project.test.ts pgpm/core/__tests__/core/constructive-project.test.ts`
 
-## Guideline token summary
-- Deltas: `constructive`: 0 → 13; `launchql`: 13 → 0
+## Changes (line-aligned)
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive', 'packages', 'secrets');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive', 'packages', 'secrets');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive', 'packages', 'secrets');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive', 'packages', 'secrets');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive', 'packages', 'secrets');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
+- `    const cwd = fixture.getFixturePath('constructive');`
+  - `launchql` → `constructive`
 
-## Side-by-side diff (only changed lines)
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## Full diff (side-by-side, changed lines only)
+<details>
+<summary>Show</summary>
+
+- Left = diff base, Right = `HEAD`
+- Legend: `|` changed, `<` only in base, `>` only in `HEAD`
 
 ```text
     const cwd = fixture.getFixturePath('launchql');								      |	    const cwd = fixture.getFixturePath('constructive');
@@ -30,3 +62,8 @@
     const cwd = fixture.getFixturePath('launchql');								      |	    const cwd = fixture.getFixturePath('constructive');
     const cwd = fixture.getFixturePath('launchql');								      |	    const cwd = fixture.getFixturePath('constructive');
 ```
+
+</details>
+
+## Navigation
+- Prev: [R096_477208b0821c.md](R096_477208b0821c.md) | Up: [packages/core.md](../packages/core.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [R079_c3cdb788ca7c.md](R079_c3cdb788ca7c.md)

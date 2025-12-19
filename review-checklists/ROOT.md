@@ -4,10 +4,9 @@
 - Compare: `main...HEAD` (merge base `86d74dc4fce9051df0d2b5bcc163607aba42f009`)
 - Branch: `refactor/ensure-new-name-mappings`
 
-## How to read linked diffs
-- Module entries link to `review-checklists/diffs/*.md` with side-by-side output (`diff -y`).
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## How to review
+- Content changes link to per-file diff docs under `review-checklists/diffs/`
+- Each diff doc includes Prev/Next navigation
 
 ## Modified (content changes) (12)
 - [ ] `M` `.gitignore` (`+2/-2`) — diff: [M_c1da9b300c28.md](diffs/M_c1da9b300c28.md)

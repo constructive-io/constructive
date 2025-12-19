@@ -1,18 +1,28 @@
 # Diff — `M` `jobs/job-worker/CHANGELOG.md`
 
+## Navigation
+- Prev: [M_d908a39a71f3.md](M_d908a39a71f3.md) | Up: [jobs.md](../jobs.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_56147b9cb06e.md](M_56147b9cb06e.md)
+
 ## Context
-- Base: `main` @ `86d74dc4fce9051df0d2b5bcc163607aba42f009`
-- Head: `refactor/ensure-new-name-mappings` @ `bd9be723c96aeb1f9f69e4946acbd9241ee8da50`
-- Merge base: `86d74dc4fce9051df0d2b5bcc163607aba42f009`
+- Diff base (merge base for `main...HEAD`): `86d74dc4fce9051df0d2b5bcc163607aba42f009`
+- Main tip: `2492d840ab18e5c30cc7a24a7b4959abf5d6b21e`
+- Head: `refactor/ensure-new-name-mappings` @ `27ba20cfc1e66cb921f229963ca63a201fcf6952`
+- Module: `jobs`
 - Numstat: `+2/-2`
 - Reproduce: `git diff main...HEAD -- jobs/job-worker/CHANGELOG.md`
 
-## Guideline token summary
-- Deltas: `@constructive-io/`: 1 → 4; `@launchql/`: 3 → 0; `constructive`: 2 → 5; `launchql`: 3 → 0
+## Changes (line-aligned)
+- `## [0.3.6](https://github.com/constructive-io/jobs/compare/@constructive-io/job-worker@0.3.5...@constructive-io/job-worker@0.3.6) (2025-12-17)`
+  - `launchql` → `constructive-io`
+- `**Note:** Version bump only for package @constructive-io/job-worker`
+  - `launchql` → `constructive-io`
 
-## Side-by-side diff (only changed lines)
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## Full diff (side-by-side, changed lines only)
+<details>
+<summary>Show</summary>
+
+- Left = diff base, Right = `HEAD`
+- Legend: `|` changed, `<` only in base, `>` only in `HEAD`
 
 ```text
 ## [0.3.6](https://github.com/constructive-io/jobs/compare/@launchql/job-worker@0.3.5...@launchql/job-worker@0.3.6) ( |	## [0.3.6](https://github.com/constructive-io/jobs/compare/@constructive-io/job-worker@0.3.5...@constructive-io/job-w
@@ -21,3 +31,8 @@
 							      |	**Note:** Version bump only for package @constructive-io/job-worker
 \ No newline at end of file
 ```
+
+</details>
+
+## Navigation
+- Prev: [M_d908a39a71f3.md](M_d908a39a71f3.md) | Up: [jobs.md](../jobs.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_56147b9cb06e.md](M_56147b9cb06e.md)

@@ -3,12 +3,10 @@
 ## Context
 - Compare: `main...HEAD` (merge base `86d74dc4fce9051df0d2b5bcc163607aba42f009`)
 - Branch: `refactor/ensure-new-name-mappings`
-- Pathspec: `graphile`
 
-## How to read linked diffs
-- Module entries link to `review-checklists/diffs/*.md` with side-by-side output (`diff -y`).
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## How to review
+- Content changes link to per-file diff docs under `review-checklists/diffs/`
+- Each diff doc includes Prev/Next navigation
 
 ## Modified (content changes) (23)
 - [ ] `M` `graphile/graphile-cache/package.json` (`+2/-2`) — diff: [M_6660ff80b5d6.md](diffs/M_6660ff80b5d6.md)

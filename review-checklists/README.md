@@ -1,22 +1,18 @@
 # Branch review checklists — `refactor/ensure-new-name-mappings` vs `main`
 
 ## Context
-- Base: `main` @ `86d74dc4fce9051df0d2b5bcc163607aba42f009`
-- Head: `refactor/ensure-new-name-mappings` @ `bd9be723c96aeb1f9f69e4946acbd9241ee8da50`
-- Merge base: `86d74dc4fce9051df0d2b5bcc163607aba42f009`
-- Stats: 929 files changed, 5270 insertions(+), 12669 deletions(-)
+- Main tip: `2492d840ab18e5c30cc7a24a7b4959abf5d6b21e`
+- Head: `refactor/ensure-new-name-mappings` @ `27ba20cfc1e66cb921f229963ca63a201fcf6952`
+- Merge base (`main...HEAD`): `86d74dc4fce9051df0d2b5bcc163607aba42f009`
+- Stats (merge-base diff): 1291 files changed, 15663 insertions(+), 10668 deletions(-)
 
-## Global checklist (guideline-driven)
-- [ ] `pnpm-workspace.yaml` includes new folder globs (`pgpm/*`, `graphql/*`, `streaming/*`, `postgres/*`)
-- [ ] `rg -n 'LaunchQL|launchql' .` has no unexpected hits (allow fixtures as needed)
-- [ ] `rg -n '@launchql/' .` has no remaining imports/deps
-- [ ] CLI bins renamed (`lql`/`launchql` → `cnc`/`constructive`) where applicable
-- [ ] Key class/type renames verified (e.g., `LaunchQLServer` → `GraphQLServer`)
+## High-priority
+- [ ] [Snapshot checklist](SNAPSHOTS.md) (10 content changes)
+- [ ] [Diffs index](diffs/README.md) (325 diffs; matches Prev/Next)
 
 ## How to review
-- Module checklists link to per-file diffs in `review-checklists/diffs/`
-- Full diff: `git diff -M main...HEAD`
-- Folder diff: `git diff -M main...HEAD -- <old-dir> <new-dir>`
+- Start from `SNAPSHOTS.md`, then open `diffs/README.md` and use Prev/Next navigation inside diff docs.
+- Full diff (merge-base): `git diff -M main...HEAD`
 
 ## Modules
 - [ ] [`packages/cli`](packages/cli.md) (M:27, D:1)

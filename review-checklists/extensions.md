@@ -3,12 +3,10 @@
 ## Context
 - Compare: `main...HEAD` (merge base `86d74dc4fce9051df0d2b5bcc163607aba42f009`)
 - Branch: `refactor/ensure-new-name-mappings`
-- Pathspec: `extensions`
 
-## How to read linked diffs
-- Module entries link to `review-checklists/diffs/*.md` with side-by-side output (`diff -y`).
-- Left = `main`, Right = `HEAD`
-- Legend: `|` changed, `<` only in `main`, `>` only in `HEAD`
+## How to review
+- Content changes link to per-file diff docs under `review-checklists/diffs/`
+- Each diff doc includes Prev/Next navigation
 
 ## Modified (content changes) (21)
 - [ ] `M` `extensions/@pgpm/achievements/README.md` (`+4/-4`) — diff: [M_b63863f61f79.md](diffs/M_b63863f61f79.md)
