@@ -4,25 +4,24 @@
 - Jest snapshots are high-signal; review these carefully.
 - Content changes link to `review-checklists/diffs/` files with Prev/Next navigation.
 
-## Snapshot content changes (10)
+## Snapshot content changes (8)
 - [ ] `M` `packages/cli/__tests__/__snapshots__/add.test.ts.snap` — diff: [M_d3c17cd8814b.md](diffs/M_d3c17cd8814b.md)
-- [ ] `M` `packages/cli/__tests__/__snapshots__/init.install.test.ts.snap` — diff: [M_48805f780565.md](diffs/M_48805f780565.md)
 - [ ] `A` `pgpm/core/__tests__/core/__snapshots__/plan-writing.test.ts.snap` — diff: [A_ba7ad044fe2c.md](diffs/A_ba7ad044fe2c.md)
 - [ ] `D` `packages/core/__tests__/core/__snapshots__/plan-writing.test.ts.snap` — diff: [D_60d8d90811f6.md](diffs/D_60d8d90811f6.md)
 - [ ] `R053` `packages/core/__tests__/core/__snapshots__/module-extensions-with-tags.test.ts.snap` → `pgpm/core/__tests__/core/__snapshots__/module-extensions-with-tags.test.ts.snap` — diff: [R053_dd6fedbb2e8a.md](diffs/R053_dd6fedbb2e8a.md)
 - [ ] `R096` `packages/core/__tests__/core/__snapshots__/workspace-extensions-dependency-order.test.ts.snap` → `pgpm/core/__tests__/core/__snapshots__/workspace-extensions-dependency-order.test.ts.snap` — diff: [R096_0f47d0214543.md](diffs/R096_0f47d0214543.md)
 - [ ] `R057` `packages/core/__tests__/files/plan/__snapshots__/module-plan-generation.test.ts.snap` → `pgpm/core/__tests__/files/plan/__snapshots__/module-plan-generation.test.ts.snap` — diff: [R057_329fe5d77d48.md](diffs/R057_329fe5d77d48.md)
 - [ ] `R054` `packages/core/__tests__/files/plan/__snapshots__/stage-unique-names-plan.test.ts.snap` → `pgpm/core/__tests__/files/plan/__snapshots__/stage-unique-names-plan.test.ts.snap` — diff: [R054_c0b825129654.md](diffs/R054_c0b825129654.md)
-- [ ] `R089` `packages/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` — diff: [R089_f827260d9159.md](diffs/R089_f827260d9159.md)
 - [ ] `R080` `packages/core/__tests__/resolution/__snapshots__/dependency-resolution-error-handling.test.ts.snap` → `pgpm/core/__tests__/resolution/__snapshots__/dependency-resolution-error-handling.test.ts.snap` — diff: [R080_c09609f903d7.md](diffs/R080_c09609f903d7.md)
 
-## Snapshot rename/move only (39)
+## Snapshot rename/move only (40)
 <details>
-<summary>Show 39 rename-only snapshot paths</summary>
+<summary>Show 40 rename-only snapshot paths</summary>
 
 - [ ] `R100` `packages/content-type-stream/__tests__/__snapshots__/mimetypes.test.ts.snap` → `streaming/content-type-stream/__tests__/__snapshots__/mimetypes.test.ts.snap` (module `packages/content-type-stream`)
 - [ ] `R100` `packages/core/__tests__/core/__snapshots__/module-extensions.test.ts.snap` → `pgpm/core/__tests__/core/__snapshots__/module-extensions.test.ts.snap` (module `packages/core`)
 - [ ] `R100` `packages/core/__tests__/files/plan/__snapshots__/plan-parsing-invalid-fixtures.test.ts.snap` → `pgpm/core/__tests__/files/plan/__snapshots__/plan-parsing-invalid-fixtures.test.ts.snap` (module `packages/core`)
+- [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` (module `packages/core`)
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-packaging-tags.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-packaging-tags.test.ts.snap` (module `packages/core`)
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-packaging.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-packaging.test.ts.snap` (module `packages/core`)
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-publishing.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-publishing.test.ts.snap` (module `packages/core`)

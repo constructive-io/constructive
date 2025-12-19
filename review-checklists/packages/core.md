@@ -12,9 +12,9 @@
 ## Package.json checks
 - [ ] `name` unchanged: `@pgpmjs/core`
 
-## Renamed / moved (no content changes) (92)
+## Renamed / moved (no content changes) (94)
 <details>
-<summary>Show 92 rename-only paths</summary>
+<summary>Show 94 rename-only paths</summary>
 
 - [ ] `R100` `packages/core/CHANGELOG.md` → `pgpm/core/CHANGELOG.md`
 - [ ] `R100` `packages/core/README.md` → `pgpm/core/README.md`
@@ -39,6 +39,8 @@
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-packaging-tags.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-packaging-tags.test.ts.snap`
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-packaging.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-packaging.test.ts.snap`
 - [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-publishing.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-publishing.test.ts.snap`
+- [ ] `R100` `packages/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap`
+- [ ] `R100` `packages/core/__tests__/modules/module-installation.test.ts` → `pgpm/core/__tests__/modules/module-installation.test.ts`
 - [ ] `R100` `packages/core/__tests__/modules/module-packaging-tags.test.ts` → `pgpm/core/__tests__/modules/module-packaging-tags.test.ts`
 - [ ] `R100` `packages/core/__tests__/modules/module-publishing.test.ts` → `pgpm/core/__tests__/modules/module-publishing.test.ts`
 - [ ] `R100` `packages/core/__tests__/projects/__snapshots__/deploy-failure-scenarios.test.ts.snap` → `pgpm/core/__tests__/projects/__snapshots__/deploy-failure-scenarios.test.ts.snap`
@@ -111,7 +113,7 @@
 
 </details>
 
-## Renamed / moved (with content changes) (43)
+## Renamed / moved (with content changes) (41)
 - [ ] `R094` `packages/core/DEPS.md` → `pgpm/core/DEPS.md` (`+4/-4`) — diff: [R094_96a5c9420185.md](../diffs/R094_96a5c9420185.md)
 - [ ] `R096` `packages/core/__tests__/config-loading.test.ts` → `pgpm/core/__tests__/config-loading.test.ts` (`+1/-1`) — diff: [R096_3a78d6312c48.md](../diffs/R096_3a78d6312c48.md)
 - [ ] `R053` `packages/core/__tests__/core/__snapshots__/module-extensions-with-tags.test.ts.snap` → `pgpm/core/__tests__/core/__snapshots__/module-extensions-with-tags.test.ts.snap` (`+17/-16`) — diff: [R053_dd6fedbb2e8a.md](../diffs/R053_dd6fedbb2e8a.md)
@@ -128,8 +130,6 @@
 - [ ] `R054` `packages/core/__tests__/files/plan/__snapshots__/stage-unique-names-plan.test.ts.snap` → `pgpm/core/__tests__/files/plan/__snapshots__/stage-unique-names-plan.test.ts.snap` (`+15/-15`) — diff: [R054_c0b825129654.md](../diffs/R054_c0b825129654.md)
 - [ ] `R073` `packages/core/__tests__/files/plan/module-plan-generation.test.ts` → `pgpm/core/__tests__/files/plan/module-plan-generation.test.ts` (`+12/-12`) — diff: [R073_8c967a90f870.md](../diffs/R073_8c967a90f870.md)
 - [ ] `R097` `packages/core/__tests__/migrate/tag-fallback.test.ts` → `pgpm/core/__tests__/migrate/tag-fallback.test.ts` (`+1/-1`) — diff: [R097_ca5451878ad7.md](../diffs/R097_ca5451878ad7.md)
-- [ ] `R089` `packages/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` → `pgpm/core/__tests__/modules/__snapshots__/module-installation.test.ts.snap` (`+3/-3`) — diff: [R089_f827260d9159.md](../diffs/R089_f827260d9159.md)
-- [ ] `R084` `packages/core/__tests__/modules/module-installation.test.ts` → `pgpm/core/__tests__/modules/module-installation.test.ts` (`+4/-4`) — diff: [R084_34f3e1695844.md](../diffs/R084_34f3e1695844.md)
 - [ ] `R088` `packages/core/__tests__/modules/module-packaging.test.ts` → `pgpm/core/__tests__/modules/module-packaging.test.ts` (`+1/-1`) — diff: [R088_23fae48e2d84.md](../diffs/R088_23fae48e2d84.md)
 - [ ] `R095` `packages/core/__tests__/projects/DEPLOYMENT_FAILURE_ANALYSIS.md` → `pgpm/core/__tests__/projects/DEPLOYMENT_FAILURE_ANALYSIS.md` (`+2/-2`) — diff: [R095_004eed484e04.md](../diffs/R095_004eed484e04.md)
 - [ ] `R096` `packages/core/__tests__/projects/deploy-log-only.test.ts` → `pgpm/core/__tests__/projects/deploy-log-only.test.ts` (`+1/-1`) — diff: [R096_fba77e6af677.md](../diffs/R096_fba77e6af677.md)

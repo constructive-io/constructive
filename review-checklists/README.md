@@ -4,18 +4,18 @@
 - Main tip: `2492d840ab18e5c30cc7a24a7b4959abf5d6b21e`
 - Head: `refactor/ensure-new-name-mappings` @ `27ba20cfc1e66cb921f229963ca63a201fcf6952`
 - Merge base (`main...HEAD`): `86d74dc4fce9051df0d2b5bcc163607aba42f009`
-- Stats (merge-base diff): 1291 files changed, 15663 insertions(+), 10668 deletions(-)
+- Stats (merge-base diff): 1295 files changed, 21983 insertions(+), 10550 deletions(-)
 
 ## High-priority
-- [ ] [Snapshot checklist](SNAPSHOTS.md) (10 content changes)
-- [ ] [Diffs index](diffs/README.md) (325 diffs; matches Prev/Next)
+- [ ] [Snapshot checklist](SNAPSHOTS.md) (8 content changes)
+- [ ] [Diffs index](diffs/README.md) (321 diffs; matches Prev/Next)
 
 ## How to review
 - Start from `SNAPSHOTS.md`, then open `diffs/README.md` and use Prev/Next navigation inside diff docs.
 - Full diff (merge-base): `git diff -M main...HEAD`
 
 ## Modules
-- [ ] [`packages/cli`](packages/cli.md) (M:27, D:1)
+- [ ] [`packages/cli`](packages/cli.md) (M:25, D:1)
 - [ ] [`packages/client`](packages/client.md) (M:3)
 - [ ] [`packages/content-type-stream` → `streaming/content-type-stream`](packages/content-type-stream.md) (R:11)
 - [ ] [`packages/core` → `pgpm/core`](packages/core.md) (R:135, A:2, D:2)

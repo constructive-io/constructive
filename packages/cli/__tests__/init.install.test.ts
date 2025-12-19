@@ -44,8 +44,8 @@ describe('cmds:install - with initialized workspace and module', () => {
   });
 
   it('installs a module package', async () => {
-    const pkg = '@pgpm/base32';
-    const version = '0.15.1';
+    const pkg = '@pgpm-testing/base32';
+    const version = '1.0.0';
 
     await fixture.runCmd({
       _: ['install', `${pkg}@${version}`],
@@ -78,13 +78,13 @@ describe('cmds:install - with initialized workspace and module', () => {
 
   it('installs two modules', async () => {
     const base32 = {
-      name: '@pgpm/base32',
-      version: '0.15.1',
+      name: '@pgpm-testing/base32',
+      version: '1.0.0',
     };
 
     const utils = {
-      name: '@pgpm/utils',
-      version: '0.15.1',
+      name: '@pgpm-testing/utils',
+      version: '1.0.0',
     };
 
     const pkgs = [base32, utils];

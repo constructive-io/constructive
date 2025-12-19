@@ -1,7 +1,7 @@
 # Diff — `M` `packages/cli/__tests__/add.test.ts`
 
 ## Navigation
-- Prev: [M_48805f780565.md](M_48805f780565.md) | Up: [packages/cli.md](../packages/cli.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_082c64c6daa1.md](M_082c64c6daa1.md)
+- Prev: [M_d3c17cd8814b.md](M_d3c17cd8814b.md) | Up: [packages/cli.md](../packages/cli.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_082c64c6daa1.md](M_082c64c6daa1.md)
 
 ## Context
 - Diff base (merge base for `main...HEAD`): `86d74dc4fce9051df0d2b5bcc163607aba42f009`
@@ -70,4 +70,4 @@
 </details>
 
 ## Navigation
-- Prev: [M_48805f780565.md](M_48805f780565.md) | Up: [packages/cli.md](../packages/cli.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_082c64c6daa1.md](M_082c64c6daa1.md)
+- Prev: [M_d3c17cd8814b.md](M_d3c17cd8814b.md) | Up: [packages/cli.md](../packages/cli.md) | Index: [README.md](../README.md) | Diffs: [diffs/README.md](README.md) | Snapshots: [SNAPSHOTS.md](../SNAPSHOTS.md) | Next: [M_082c64c6daa1.md](M_082c64c6daa1.md)

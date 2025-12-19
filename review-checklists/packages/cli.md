@@ -15,12 +15,11 @@
 - [ ] `keywords` updated
 - [ ] `dependencies` updated
 
-## Modified (content changes) (27)
+## Modified (content changes) (25)
 - [ ] `M` `packages/cli/AGENTS.md` (`+27/-478`) — diff: [M_36ef7b79657e.md](../diffs/M_36ef7b79657e.md)
 - [ ] `M` `packages/cli/CHANGELOG.md` (`+4/-4`) — diff: [M_aaab89ad9ede.md](../diffs/M_aaab89ad9ede.md)
 - [ ] `M` `packages/cli/README.md` (`+92/-92`) — diff: [M_78732f3c004f.md](../diffs/M_78732f3c004f.md)
 - [ ] `M` `packages/cli/__tests__/__snapshots__/add.test.ts.snap` (`+24/-24`) — diff: [M_d3c17cd8814b.md](../diffs/M_d3c17cd8814b.md)
-- [ ] `M` `packages/cli/__tests__/__snapshots__/init.install.test.ts.snap` (`+201/-201`) — diff: [M_48805f780565.md](../diffs/M_48805f780565.md)
 - [ ] `M` `packages/cli/__tests__/add.test.ts` (`+13/-9`) — diff: [M_c890f80cecb9.md](../diffs/M_c890f80cecb9.md)
 - [ ] `M` `packages/cli/__tests__/cli-deploy-fixture.test.ts` (`+6/-6`) — diff: [M_082c64c6daa1.md](../diffs/M_082c64c6daa1.md)
 - [ ] `M` `packages/cli/__tests__/cli-deploy-stage-unique-names.test.ts` (`+2/-2`) — diff: [M_61580404e6fb.md](../diffs/M_61580404e6fb.md)
@@ -28,7 +27,6 @@
 - [ ] `M` `packages/cli/__tests__/deploy-revert-w-tags.test.ts` (`+5/-5`) — diff: [M_b0cbf04212b2.md](../diffs/M_b0cbf04212b2.md)
 - [ ] `M` `packages/cli/__tests__/deploy.test.ts` (`+8/-8`) — diff: [M_40292114cc73.md](../diffs/M_40292114cc73.md)
 - [ ] `M` `packages/cli/__tests__/get-graphql-schema.test.ts` (`+8/-8`) — diff: [M_ae8271207e9c.md](../diffs/M_ae8271207e9c.md)
-- [ ] `M` `packages/cli/__tests__/init.install.test.ts` (`+6/-6`) — diff: [M_6e01fe15586d.md](../diffs/M_6e01fe15586d.md)
 - [ ] `M` `packages/cli/__tests__/init.templates.test.ts` (`+2/-2`) — diff: [M_515d6a62ef7d.md](../diffs/M_515d6a62ef7d.md)
 - [ ] `M` `packages/cli/__tests__/init.test.ts` (`+2/-2`) — diff: [M_5489b74dbfb0.md](../diffs/M_5489b74dbfb0.md)
 - [ ] `M` `packages/cli/__tests__/package-alias.test.ts` (`+5/-5`) — diff: [M_8a5d80b661d6.md](../diffs/M_8a5d80b661d6.md)

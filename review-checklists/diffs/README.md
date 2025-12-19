@@ -1,7 +1,7 @@
 # Diffs — `refactor/ensure-new-name-mappings` vs `main`
 
 - This is the global diff review order (matches Prev/Next navigation).
-- Total: `325` diffs
+- Total: `321` diffs
 
 ## `packages/cli`
 - [ ] `D` [D_1d58a19ddb53.md](D_1d58a19ddb53.md)
@@ -9,7 +9,6 @@
 - [ ] `M` [M_aaab89ad9ede.md](M_aaab89ad9ede.md)
 - [ ] `M` [M_78732f3c004f.md](M_78732f3c004f.md)
 - [ ] `M` [M_d3c17cd8814b.md](M_d3c17cd8814b.md)
-- [ ] `M` [M_48805f780565.md](M_48805f780565.md)
 - [ ] `M` [M_c890f80cecb9.md](M_c890f80cecb9.md)
 - [ ] `M` [M_082c64c6daa1.md](M_082c64c6daa1.md)
 - [ ] `M` [M_61580404e6fb.md](M_61580404e6fb.md)
@@ -17,7 +16,6 @@
 - [ ] `M` [M_b0cbf04212b2.md](M_b0cbf04212b2.md)
 - [ ] `M` [M_40292114cc73.md](M_40292114cc73.md)
 - [ ] `M` [M_ae8271207e9c.md](M_ae8271207e9c.md)
-- [ ] `M` [M_6e01fe15586d.md](M_6e01fe15586d.md)
 - [ ] `M` [M_515d6a62ef7d.md](M_515d6a62ef7d.md)
 - [ ] `M` [M_5489b74dbfb0.md](M_5489b74dbfb0.md)
 - [ ] `M` [M_8a5d80b661d6.md](M_8a5d80b661d6.md)
@@ -61,8 +59,6 @@
 - [ ] `R054` [R054_c0b825129654.md](R054_c0b825129654.md)
 - [ ] `R073` [R073_8c967a90f870.md](R073_8c967a90f870.md)
 - [ ] `R097` [R097_ca5451878ad7.md](R097_ca5451878ad7.md)
-- [ ] `R089` [R089_f827260d9159.md](R089_f827260d9159.md)
-- [ ] `R084` [R084_34f3e1695844.md](R084_34f3e1695844.md)
 - [ ] `R088` [R088_23fae48e2d84.md](R088_23fae48e2d84.md)
 - [ ] `R095` [R095_004eed484e04.md](R095_004eed484e04.md)
 - [ ] `R096` [R096_fba77e6af677.md](R096_fba77e6af677.md)
