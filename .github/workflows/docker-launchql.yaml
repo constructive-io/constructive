@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build-push-launchql:
-    if: github.event_name != 'pull_request' || matrix.platform == 'linux/amd64'
+    if: github.event_name != 'pull_request'
     strategy:
       fail-fast: false
       matrix:
