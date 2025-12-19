@@ -15,7 +15,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "publishConfig": {
@@ -29,7 +29,7 @@
   "keywords": [
     "postgraphile",
     "graphile",
-    "launchql",
+    "constructive",
     "plugin",
     "postgres",
     "graphql"

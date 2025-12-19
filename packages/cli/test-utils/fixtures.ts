@@ -23,7 +23,7 @@ export class TestFixture {
   private environment: TestEnvironment;
 
   constructor(...fixturePath: string[]) {
-    this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'launchql-test-'));
+    this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'constructive-io-graphql-test-'));
 
     if (fixturePath.length > 0) {
       const originalFixtureDir = getFixturePath(...fixturePath);

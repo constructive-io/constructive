@@ -24,43 +24,43 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - package: packages/mime-bytes
+          - package: streaming/mime-bytes
             env: {}
-          - package: packages/core
+          - package: pgpm/core
             env: {}
           - package: packages/cli
             env: {}
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@pg_db:5432/postgres
-          - package: packages/pgsql-test
+          - package: postgres/pgsql-test
             env: {}
           - package: packages/orm
             env: {}
           - package: packages/url-domains
             env: {}
-          - package: packages/uuid-hash
+          - package: streaming/uuid-hash
             env: {}
-          - package: packages/uuid-stream
+          - package: streaming/uuid-stream
             env: {}
-          - package: packages/introspectron
+          - package: postgres/introspectron
             env: {}
           - package: packages/query-builder
             env: {}
-          - package: packages/query
+          - package: graphql/query
             env: {}
-          - package: packages/launchql-gen
+          - package: graphql/codegen
             env: {}
-          - package: packages/pg-ast
+          - package: postgres/pg-ast
             env: {}
-          - package: packages/pg-codegen
+          - package: postgres/pg-codegen
             env: {}
-          - package: packages/content-type-stream
+          - package: streaming/content-type-stream
             env: {}
-          - package: packages/s3-streamer
+          - package: streaming/s3-streamer
             env:
               BUCKET_NAME: test-bucket
-          - package: packages/upload-names
+          - package: streaming/upload-names
             env: {}
           - package: graphile/graphile-test
             env: {}

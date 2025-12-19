@@ -261,7 +261,7 @@ export const sendEmailLink = async (
   };
 };
 
-// HTTP/Knative entrypoint (used by @launchql/knative-job-fn wrapper)
+// HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
 app.post('*', async (req: any, res: any, next: any) => {
   try {
     const params = (req.body || {}) as SendEmailParams;
@@ -295,7 +295,7 @@ export default app;
 // When executed directly (e.g. via `node dist/index.js`), start an HTTP server.
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
-  // @launchql/knative-job-fn exposes a .listen method that delegates to the Express app
+  // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`[send-email-link] listening on port ${port}`);

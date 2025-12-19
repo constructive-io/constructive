@@ -46,10 +46,10 @@ COPY --from=build /app /app
 # Lightweight shims to expose CLI on PATH
 RUN set -eux; \
     install -d /usr/local/bin; \
-    printf '#!/usr/bin/env bash\nnode /app/packages/cli/dist/index.js "$@"\n' > /usr/local/bin/lql; \
-    printf '#!/usr/bin/env bash\nnode /app/packages/cli/dist/index.js "$@"\n' > /usr/local/bin/launchql; \
-    printf '#!/usr/bin/env bash\nnode /app/packages/pgpm/dist/index.js "$@"\n' > /usr/local/bin/pgpm; \
-    chmod +x /usr/local/bin/lql /usr/local/bin/launchql /usr/local/bin/pgpm
+    printf '#!/usr/bin/env bash\nnode /app/packages/cli/dist/index.js "$@"\n' > /usr/local/bin/cnc; \
+    printf '#!/usr/bin/env bash\nnode /app/packages/cli/dist/index.js "$@"\n' > /usr/local/bin/constructive; \
+    printf '#!/usr/bin/env bash\nnode /app/pgpm/pgpm/dist/index.js "$@"\n' > /usr/local/bin/pgpm; \
+    chmod +x /usr/local/bin/cnc /usr/local/bin/constructive /usr/local/bin/pgpm
 
-ENTRYPOINT ["/usr/local/bin/lql"]
+ENTRYPOINT ["/usr/local/bin/constructive"]
 CMD ["--help"]

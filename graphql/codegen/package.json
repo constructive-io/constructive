@@ -1,0 +1,61 @@
+{
+  "name": "@constructive-io/graphql-codegen",
+  "version": "2.17.10",
+  "description": "Generate queries and mutations for use with Graphile",
+  "author": "Constructive <developers@constructive.io>",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.27.0",
+    "@types/pluralize": "0.0.33",
+    "@constructive-io/graphql-test": "workspace:^",
+    "makage": "^0.1.8"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.26.3",
+    "@babel/parser": "^7.28.5",
+    "@babel/types": "^7.26.3",
+    "@graphql-codegen/core": "^5.0.0",
+    "@graphql-codegen/typescript": "^5.0.5",
+    "@graphql-codegen/typescript-graphql-request": "^6.0.1",
+    "@graphql-codegen/typescript-operations": "^5.0.5",
+    "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "gql-ast": "workspace:^",
+    "graphql": "15.10.1",
+    "graphql-request": "^6.1.0",
+    "graphql-tag": "^2.12.6",
+    "inflection": "^1.12.0",
+    "introspectron": "workspace:^",
+    "pluralize": "^8.0.0"
+  },
+  "keywords": [
+    "graphql",
+    "codegen",
+    "generator",
+    "graphile",
+    "constructive"
+  ]
+}

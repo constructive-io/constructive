@@ -4,7 +4,7 @@ import { getEnvOptions } from '@pgpmjs/env';
 import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
 
-it('LaunchQL', async () => {
+it('Constructive', async () => {
     const project = new PgpmPackage(resolve(__dirname+'/../'));
     console.log(project);
 

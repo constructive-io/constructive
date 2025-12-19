@@ -1,0 +1,46 @@
+{
+  "name": "@pgpmjs/env",
+  "version": "2.8.3",
+  "author": "Dan Lynch <Dan Lynch>",
+  "description": "PGPM environment management",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@pgpmjs/types": "workspace:^",
+    "deepmerge": "^4.3.1"
+  },
+  "keywords": [
+    "environment",
+    "config",
+    "typescript",
+    "pgpm",
+    "pgpmjs",
+    "env"
+  ],
+  "devDependencies": {
+    "makage": "^0.1.8"
+  }
+}

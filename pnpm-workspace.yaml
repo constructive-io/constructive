@@ -1,6 +1,10 @@
 packages:
   - 'packages/*'
-  - 'sandbox/*'
+  - 'pgpm/*'
+  - 'graphql/*'
+  - 'streaming/*'
+  - 'postgres/*'
   - 'graphile/*'
   - 'jobs/*'
   - 'functions/*'
+  - 'sandbox/*'

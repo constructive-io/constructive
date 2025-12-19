@@ -25,10 +25,10 @@ Common issues and solutions for pgpm, PostgreSQL, and testing.
 
 ### 🧪 Testing
 
-* [pgsql-test](https://github.com/constructive-io/constructive/tree/main/packages/pgsql-test): **📊 Isolated testing environments** with per-test transaction rollbacks—ideal for integration tests, complex migrations, and RLS simulation.
-* [supabase-test](https://github.com/constructive-io/constructive/tree/main/packages/supabase-test): **🧪 Supabase-native test harness** preconfigured for the local Supabase stack—per-test rollbacks, JWT/role context helpers, and CI/GitHub Actions ready.
-* [graphile-test](https://github.com/constructive-io/constructive/tree/main/packages/graphile-test): **🔐 Authentication mocking** for Graphile-focused test helpers and emulating row-level security contexts.
-* [pg-query-context](https://github.com/constructive-io/constructive/tree/main/packages/pg-query-context): **🔒 Session context injection** to add session-local context (e.g., `SET LOCAL`) into queries—ideal for setting `role`, `jwt.claims`, and other session settings.
+* [pgsql-test](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-test): **📊 Isolated testing environments** with per-test transaction rollbacks—ideal for integration tests, complex migrations, and RLS simulation.
+* [supabase-test](https://github.com/constructive-io/constructive/tree/main/postgres/supabase-test): **🧪 Supabase-native test harness** preconfigured for the local Supabase stack—per-test rollbacks, JWT/role context helpers, and CI/GitHub Actions ready.
+* [graphile-test](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-test): **🔐 Authentication mocking** for Graphile-focused test helpers and emulating row-level security contexts.
+* [pg-query-context](https://github.com/constructive-io/constructive/tree/main/postgres/pg-query-context): **🔒 Session context injection** to add session-local context (e.g., `SET LOCAL`) into queries—ideal for setting `role`, `jwt.claims`, and other session settings.
 
 ### 🧠 Parsing & AST
 
@@ -42,25 +42,25 @@ Common issues and solutions for pgpm, PostgreSQL, and testing.
 
 ### 🚀 API & Dev Tools
 
-* [launchql/server](https://github.com/constructive-io/constructive/tree/main/packages/server): **⚡ Express-based API server** powered by PostGraphile to expose a secure, scalable GraphQL API over your Postgres database.
-* [launchql/explorer](https://github.com/constructive-io/constructive/tree/main/packages/explorer): **🔎 Visual API explorer** with GraphiQL for browsing across all databases and schemas—useful for debugging, documentation, and API prototyping.
+* [@constructive-io/graphql-server](https://github.com/constructive-io/constructive/tree/main/graphql/server): **⚡ Express-based API server** powered by PostGraphile to expose a secure, scalable GraphQL API over your Postgres database.
+* [@constructive-io/graphql-explorer](https://github.com/constructive-io/constructive/tree/main/graphql/explorer): **🔎 Visual API explorer** with GraphiQL for browsing across all databases and schemas—useful for debugging, documentation, and API prototyping.
 
 ### 🔁 Streaming & Uploads
 
-* [etag-hash](https://github.com/constructive-io/constructive/tree/main/packages/etag-hash): **🏷️ S3-compatible ETags** created by streaming and hashing file uploads in chunks.
-* [etag-stream](https://github.com/constructive-io/constructive/tree/main/packages/etag-stream): **🔄 ETag computation** via Node stream transformer during upload or transfer.
-* [uuid-hash](https://github.com/constructive-io/constructive/tree/main/packages/uuid-hash): **🆔 Deterministic UUIDs** generated from hashed content, great for deduplication and asset referencing.
-* [uuid-stream](https://github.com/constructive-io/constructive/tree/main/packages/uuid-stream): **🌊 Streaming UUID generation** based on piped file content—ideal for upload pipelines.
-* [launchql/s3-streamer](https://github.com/constructive-io/constructive/tree/main/packages/s3-streamer): **📤 Direct S3 streaming** for large files with support for metadata injection and content validation.
-* [launchql/upload-names](https://github.com/constructive-io/constructive/tree/main/packages/upload-names): **📂 Collision-resistant filenames** utility for structured and unique file names for uploads.
+* [etag-hash](https://github.com/constructive-io/constructive/tree/main/streaming/etag-hash): **🏷️ S3-compatible ETags** created by streaming and hashing file uploads in chunks.
+* [etag-stream](https://github.com/constructive-io/constructive/tree/main/streaming/etag-stream): **🔄 ETag computation** via Node stream transformer during upload or transfer.
+* [uuid-hash](https://github.com/constructive-io/constructive/tree/main/streaming/uuid-hash): **🆔 Deterministic UUIDs** generated from hashed content, great for deduplication and asset referencing.
+* [uuid-stream](https://github.com/constructive-io/constructive/tree/main/streaming/uuid-stream): **🌊 Streaming UUID generation** based on piped file content—ideal for upload pipelines.
+* [@constructive-io/s3-streamer](https://github.com/constructive-io/constructive/tree/main/streaming/s3-streamer): **📤 Direct S3 streaming** for large files with support for metadata injection and content validation.
+* [@constructive-io/upload-names](https://github.com/constructive-io/constructive/tree/main/streaming/upload-names): **📂 Collision-resistant filenames** utility for structured and unique file names for uploads.
 
 ### 🧰 CLI & Codegen
 
-* [pgpm](https://github.com/constructive-io/constructive/tree/main/packages/pgpm): **🖥️ PostgreSQL Package Manager** for modular Postgres development. Works with database workspaces, scaffolding, migrations, seeding, and installing database packages.
-* [@launchql/cli](https://github.com/constructive-io/constructive/tree/main/packages/cli): **🖥️ Command-line toolkit** for managing LaunchQL projects—supports database scaffolding, migrations, seeding, code generation, and automation.
-* [launchql-gen](https://github.com/constructive-io/constructive/tree/main/packages/launchql-gen): **✨ Auto-generated GraphQL** mutations and queries dynamically built from introspected schema data.
-* [@launchql/query-builder](https://github.com/constructive-io/constructive/tree/main/packages/query-builder): **🏗️ SQL constructor** providing a robust TypeScript-based query builder for dynamic generation of `SELECT`, `INSERT`, `UPDATE`, `DELETE`, and stored procedure calls—supports advanced SQL features like `JOIN`, `GROUP BY`, and schema-qualified queries.
-* [@launchql/query](https://github.com/constructive-io/constructive/tree/main/packages/query): **🧩 Fluent GraphQL builder** for PostGraphile schemas. ⚡ Schema-aware via introspection, 🧩 composable and ergonomic for building deeply nested queries.
+* [pgpm](https://github.com/constructive-io/constructive/tree/main/pgpm/pgpm): **🖥️ PostgreSQL Package Manager** for modular Postgres development. Works with database workspaces, scaffolding, migrations, seeding, and installing database packages.
+* [@constructive-io/cli](https://github.com/constructive-io/constructive/tree/main/packages/cli): **🖥️ Command-line toolkit** for managing Constructive projects—supports database scaffolding, migrations, seeding, code generation, and automation.
+* [@constructive-io/graphql-codegen](https://github.com/constructive-io/constructive/tree/main/graphql/codegen): **✨ GraphQL code generation** (types, operations, SDK) from schema/endpoint introspection.
+* [@constructive-io/query-builder](https://github.com/constructive-io/constructive/tree/main/packages/query-builder): **🏗️ SQL constructor** providing a robust TypeScript-based query builder for dynamic generation of `SELECT`, `INSERT`, `UPDATE`, `DELETE`, and stored procedure calls—supports advanced SQL features like `JOIN`, `GROUP BY`, and schema-qualified queries.
+* [@constructive-io/graphql-query](https://github.com/constructive-io/constructive/tree/main/graphql/query): **🧩 Fluent GraphQL builder** for PostGraphile schemas. ⚡ Schema-aware via introspection, 🧩 composable and ergonomic for building deeply nested queries.
 
 ## Credits
 

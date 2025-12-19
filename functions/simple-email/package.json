@@ -1,8 +1,8 @@
 {
-  "name": "@launchql/simple-email-fn",
+  "name": "@constructive-io/simple-email-fn",
   "version": "0.2.5",
   "description": "Simple Knative email function that sends emails directly from job payload",
-  "author": "LaunchQL",
+  "author": "Constructive",
   "private": true,
   "main": "dist/index.js",
   "directories": {

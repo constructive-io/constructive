@@ -1,7 +1,5 @@
 import { Plugin } from 'graphile-build';
 
-// formerly lql-types.js
-
 export interface TypeMapping {
   name: string;
   namespaceName: string;

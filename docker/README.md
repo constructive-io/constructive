@@ -14,7 +14,7 @@ This directory contains Dockerfiles for PostgreSQL-based images that extend the 
 
 The main Constructive application image (built from the codebase) is now at the **root** of the repository:
 - **Dockerfile**: `/Dockerfile` (root level)
-- **GitHub Action**: `.github/workflows/docker-launchql.yaml`
+- **GitHub Action**: `.github/workflows/docker-constructive.yaml`
 
 The base image and version are specified directly in the Dockerfile using ARG directives. This separation keeps codebase-dependent images separate from extension-only images.
 
@@ -59,7 +59,7 @@ docker buildx build \
 ## GitHub Actions
 
 - **docker.yaml** - Builds extension images from this directory (pgvector, postgis, etc.)
-- **docker-launchql.yaml** - Builds the main LaunchQL image from the root Dockerfile
+- **docker-constructive.yaml** - Builds the main Constructive image from the root Dockerfile
 
 ## Version Configuration
 
@@ -75,4 +75,3 @@ versions:
   - 15
   - 16
 ```
-

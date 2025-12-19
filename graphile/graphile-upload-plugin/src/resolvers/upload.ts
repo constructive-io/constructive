@@ -1,5 +1,5 @@
-import streamer from '@launchql/s3-streamer';
-import uploadNames from '@launchql/upload-names';
+import streamer from '@constructive-io/s3-streamer';
+import uploadNames from '@constructive-io/upload-names';
 
 export interface UploaderOptions {
   bucketName: string;

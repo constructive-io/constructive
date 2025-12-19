@@ -9,7 +9,7 @@
     <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/query-builder"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Fquery-builder%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/query-builder"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Fquery-builder%2Fpackage.json"/></a>
 </p>
 
 A robust TypeScript-based SQL query builder that supports dynamic generation of `SELECT`, `INSERT`, `UPDATE`, `DELETE`, and stored procedure/function calls. Designed with flexibility and ease of use in mind, it handles advanced SQL features like `JOIN`, `GROUP BY`, `ORDER BY`, and schema-qualified queries.
@@ -36,7 +36,7 @@ A robust TypeScript-based SQL query builder that supports dynamic generation of 
 Install via npm:
 
 ```sh
-npm install @launchql/query-builder
+npm install @constructive-io/query-builder
 ```
 
 ## Getting Started
@@ -44,7 +44,7 @@ npm install @launchql/query-builder
 ### Import the Library
 
 ```ts
-import { QueryBuilder } from '@launchql/query-builder';
+import { QueryBuilder } from '@constructive-io/query-builder';
 ```
 
 ## Usage

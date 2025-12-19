@@ -1,6 +1,6 @@
 import PgManyToMany from '@graphile-contrib/pg-many-to-many';
-import { getEnvOptions } from '@launchql/env';
-import { LaunchQLOptions } from '@launchql/types';
+import { getEnvOptions } from '@constructive-io/graphql-env';
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import PgPostgis from 'graphile-postgis';
 import FulltextFilterPlugin from 'graphile-plugin-fulltext-filter';
 import { NodePlugin, Plugin } from 'graphile-build';
@@ -19,7 +19,7 @@ import CustomPgTypeMappingsPlugin from 'graphile-pg-type-mappings';
 import UploadPostGraphilePlugin, { Uploader } from 'graphile-upload-plugin';
 
 export const getGraphileSettings = (
-  rawOpts: LaunchQLOptions
+  rawOpts: ConstructiveOptions
 ): PostGraphileOptions => {
   const opts = getEnvOptions(rawOpts);
 

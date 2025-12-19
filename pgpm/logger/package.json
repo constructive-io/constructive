@@ -1,0 +1,45 @@
+{
+  "name": "@pgpmjs/logger",
+  "version": "1.3.3",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Simple logger utility",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "yanse": "^0.1.8"
+  },
+  "keywords": [
+    "logger",
+    "logging",
+    "yanse",
+    "console",
+    "pgpm",
+    "pgpmjs"
+  ],
+  "devDependencies": {
+    "makage": "^0.1.8"
+  }
+}

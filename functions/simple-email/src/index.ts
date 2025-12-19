@@ -65,7 +65,7 @@ app.post('*', async (req: any, res: any, next: any) => {
       // eslint-disable-next-line no-console
       console.log('[simple-email] DRY RUN email (no send)', logContext);
     } else {
-      // Send via @launchql/postmaster (Mailgun or configured provider)
+      // Send via the Postmaster package (Mailgun or configured provider)
       await sendEmail({
         to,
         subject,
@@ -91,7 +91,7 @@ export default app;
 // start an HTTP server on the provided PORT (default 8080).
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
-  // @launchql/knative-job-fn exposes a .listen method that delegates to the underlying Express app
+  // @constructive-io/knative-job-fn exposes a .listen method that delegates to the underlying Express app
   (app as any).listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`[simple-email] listening on port ${port}`);

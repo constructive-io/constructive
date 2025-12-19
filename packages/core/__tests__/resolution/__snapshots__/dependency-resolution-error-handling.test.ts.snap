@@ -1,8 +1,0 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
-
-exports[`should validate LaunchQL package dependencies 1`] = `
-"Mismatched project name in deploy file:
-          Expected project: secrets
-          Found in line   : not_secrets
-          Line            : -- Deploy not_secrets:procedures/secretfunction to pg"
-`;

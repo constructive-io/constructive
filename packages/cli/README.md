@@ -1,8 +1,8 @@
-# LaunchQL CLI
+# Constructive CLI
 
 > Build secure, role-aware GraphQL backends powered by PostgreSQL with database-first development
 
-LaunchQL CLI is a comprehensive command-line tool that transforms your PostgreSQL database into a powerful GraphQL API. With automated schema generation, sophisticated migration management, and robust deployment capabilities, you can focus on building great applications instead of boilerplate code.
+Constructive CLI is a comprehensive command-line tool that transforms your PostgreSQL database into a powerful GraphQL API. With automated schema generation, sophisticated migration management, and robust deployment capabilities, you can focus on building great applications instead of boilerplate code.
 
 ## ✨ Features
 
@@ -17,24 +17,24 @@ LaunchQL CLI is a comprehensive command-line tool that transforms your PostgreSQ
 ### Installation
 
 ```bash
-npm install -g @launchql/cli
+npm install -g @constructive-io/cli
 ```
 
 ### Create Your First Project
 
 ```bash
 # Initialize a new workspace
-lql init workspace
+constructive init workspace
 cd my-project
 
 # Create your first module
-lql init
+constructive init
 
 # Deploy to your database
-lql deploy --createdb
+constructive deploy --createdb
 
 # Start the development server
-lql server
+constructive server
 ```
 
 Visit `http://localhost:5555` to explore your GraphQL API!
@@ -50,7 +50,7 @@ Visit `http://localhost:5555` to explore your GraphQL API!
 ### Database-First Workflow
 
 1. **Design** your database schema using SQL migrations
-2. **Deploy** changes with `lql deploy`
+2. **Deploy** changes with `constructive deploy`
 3. **Develop** against the auto-generated GraphQL API
 4. **Version** and **package** your modules for distribution
 
@@ -58,24 +58,24 @@ Visit `http://localhost:5555` to explore your GraphQL API!
 
 ### Getting Started
 
-#### `lql init`
+#### `constructive init`
 
-Initialize a new LaunchQL workspace or module.
+Initialize a new Constructive workspace or module.
 
 ```bash
 # Create a new workspace
-lql init workspace
+constructive init workspace
 
 # Create a new module (run inside workspace)
-lql init
+constructive init
 
-# Use templates from GitHub repository (defaults to launchql/pgpm-boilerplates.git)
-lql init workspace --repo owner/repo
-lql init --repo owner/repo --from-branch develop
+# Use templates from GitHub repository (defaults to constructive-io/pgpm-boilerplates.git)
+constructive init workspace --repo owner/repo
+constructive init --repo owner/repo --from-branch develop
 
 # Use templates from custom paths
-lql init workspace --template-path ./custom-templates
-lql init --template-path ./custom-templates/module
+constructive init workspace --template-path ./custom-templates
+constructive init --template-path ./custom-templates/module
 ```
 
 **Options:**
@@ -84,181 +84,181 @@ lql init --template-path ./custom-templates/module
 - `--template-path <path>` - Template sub-path (defaults to `workspace`/`module`) or local path override
 - `--from-branch <branch>` - Branch/tag when cloning the template repo
 
-Templates are cached for one week under the `pgpm` tool namespace. Run `lql cache clean` if you need to refresh the boilerplates.
+Templates are cached for one week under the `pgpm` tool namespace. Run `constructive cache clean` if you need to refresh the boilerplates.
 
 ### Development
 
-#### `lql server`
+#### `constructive server`
 
 Start the GraphQL development server with hot-reload.
 
 ```bash
 # Start with defaults (port 5555)
-lql server
+constructive server
 
 # Custom port and options
-lql server --port 8080 --no-postgis
+constructive server --port 8080 --no-postgis
 ```
 
-#### `lql explorer`
+#### `constructive explorer`
 
 Launch GraphiQL explorer for your API.
 
 ```bash
 # Launch explorer
-lql explorer
+constructive explorer
 
 # With custom CORS origin
-lql explorer --origin http://localhost:3000
+constructive explorer --origin http://localhost:3000
 ```
 
 ## 🔄 Updates
 
-The CLI performs a lightweight npm version check at most once per week (skipped in CI or when `PGPM_SKIP_UPDATE_CHECK` is set). Use `lql update` to install the latest release (installs `pgpm` by default; pass `--package @launchql/cli` to target the CLI package).
+The CLI performs a lightweight npm version check at most once per week (skipped in CI or when `PGPM_SKIP_UPDATE_CHECK` is set). Use `constructive update` to install the latest release (installs `pgpm` by default; pass `--package @constructive-io/cli` to target the CLI package).
 
 ### Database Operations
 
-#### `lql deploy`
+#### `constructive deploy`
 
 Deploy your database changes and migrations.
 
 ```bash
 # Deploy to selected database
-lql deploy
+constructive deploy
 
 # Create database if it doesn't exist
-lql deploy --createdb
+constructive deploy --createdb
 
 # Deploy specific package to a tag
-lql deploy --package mypackage --to @v1.0.0
+constructive deploy --package mypackage --to @v1.0.0
 
 # Fast deployment without transactions
-lql deploy --fast --no-tx
+constructive deploy --fast --no-tx
 ```
 
-#### `lql verify`
+#### `constructive verify`
 
 Verify your database state matches expected migrations.
 
 ```bash
 # Verify current state
-lql verify
+constructive verify
 
 # Verify specific package
-lql verify --package mypackage
+constructive verify --package mypackage
 ```
 
-#### `lql revert`
+#### `constructive revert`
 
 Safely revert database changes.
 
 ```bash
 # Revert latest changes
-lql revert
+constructive revert
 
 # Revert to specific tag
-lql revert --to @v1.0.0
+constructive revert --to @v1.0.0
 ```
 
 ### Migration Management
 
-#### `lql migrate`
+#### `constructive migrate`
 
 Comprehensive migration management.
 
 ```bash
 # Initialize migration tracking
-lql migrate init
+constructive migrate init
 
 # Check migration status
-lql migrate status
+constructive migrate status
 
 # List all changes
-lql migrate list
+constructive migrate list
 
 # Show change dependencies
-lql migrate deps
+constructive migrate deps
 ```
 
 ### Module Management
 
-#### `lql install`
+#### `constructive install`
 
-Install LaunchQL modules as dependencies.
+Install PGPM modules as dependencies.
 
 ```bash
 # Install single package
-lql install @launchql/auth
+constructive install @constructive-io/auth
 
 # Install multiple packages
-lql install @launchql/auth @launchql/utils
+constructive install @constructive-io/auth @constructive-io/utils
 ```
 
-#### `lql extension`
+#### `constructive extension`
 
 Interactively manage module dependencies.
 
 ```bash
-lql extension
+constructive extension
 ```
 
-#### `lql tag`
+#### `constructive tag`
 
 Version your changes with tags.
 
 ```bash
 # Tag latest change
-lql tag v1.0.0
+constructive tag v1.0.0
 
 # Tag with comment
-lql tag v1.0.0 --comment "Initial release"
+constructive tag v1.0.0 --comment "Initial release"
 
 # Tag specific change
-lql tag v1.1.0 --package mypackage --changeName my-change
+constructive tag v1.1.0 --package mypackage --changeName my-change
 ```
 
 ### Packaging and Distribution
 
-#### `lql plan`
+#### `constructive plan`
 
 Generate deployment plans for your modules.
 
 ```bash
-lql plan
+constructive plan
 ```
 
-#### `lql package`
+#### `constructive package`
 
 Package your module for distribution.
 
 ```bash
 # Package with defaults
-lql package
+constructive package
 
 # Package without deployment plan
-lql package --no-plan
+constructive package --no-plan
 ```
 
 ### Utilities
 
-#### `lql export`
+#### `constructive export`
 
 Export migrations from existing databases.
 
 ```bash
-lql export
+constructive export
 ```
 
-#### `lql kill`
+#### `constructive kill`
 
 Clean up database connections and optionally drop databases.
 
 ```bash
 # Kill connections and drop databases
-lql kill
+constructive kill
 
 # Only kill connections
-lql kill --no-drop
+constructive kill --no-drop
 ```
 
 ## 💡 Common Workflows
@@ -268,17 +268,17 @@ lql kill --no-drop
 ```bash
 # 1. Create workspace
 mkdir my-app && cd my-app
-lql init workspace
+constructive init workspace
 
 # 2. Create your first module
-lql init
+constructive init
 
 # 3. Add some SQL migrations to sql/ directory
 # 4. Deploy to database
-lql deploy --createdb
+constructive deploy --createdb
 
 # 5. Start developing
-lql server
+constructive server
 ```
 
 ### Using Custom Templates
@@ -287,16 +287,16 @@ You can use custom templates from GitHub repositories or local paths:
 
 ```bash
 # Initialize workspace with templates from GitHub
-lql init workspace --repo owner/repo
+constructive init workspace --repo owner/repo
 
 # Initialize workspace with templates from local path
-lql init workspace --template-path ./my-custom-templates
+constructive init workspace --template-path ./my-custom-templates
 
 # Initialize module with custom templates
-lql init --template-path ./my-custom-templates
+constructive init --template-path ./my-custom-templates
 
 # Use specific branch from GitHub repository
-lql init workspace --repo owner/repo --from-branch develop
+constructive init workspace --repo owner/repo --from-branch develop
 ```
 
 **Template Structure:**
@@ -313,46 +313,46 @@ Custom templates should follow the same structure as the default templates:
 git clone <repo> && cd <project>
 
 # 2. Install dependencies
-lql install
+constructive install
 
 # 3. Deploy to local database
-lql deploy --createdb
+constructive deploy --createdb
 
 # 4. Start development server
-lql server
+constructive server
 ```
 
 ### Production Deployment
 
 ```bash
 # 1. Create deployment plan
-lql plan
+constructive plan
 
 # 2. Package module
-lql package
+constructive package
 
 # 3. Deploy to production
-lql deploy --package myapp --to @production
+constructive deploy --package myapp --to @production
 
 # 4. Verify deployment
-lql verify --package myapp
+constructive verify --package myapp
 ```
 
 ### Get Graphql Schema
 
 Fetch and output your GraphQL schema in SDL.
 
-- Option 1 – Programmatic builder (from database schemas):
+  - Option 1 – Programmatic builder (from database schemas):
   - Write to file:
-    - `lql get-graphql-schema --database launchql --schemas myapp,public --out ./schema.graphql`
+    - `constructive get-graphql-schema --database constructive --schemas myapp,public --out ./schema.graphql`
   - Print to stdout:
-    - `lql get-graphql-schema --database launchql --schemas myapp,public`
+    - `constructive get-graphql-schema --database constructive --schemas myapp,public`
 
-- Option 2 – Fetch from running server (via endpoint introspection):
+  - Option 2 – Fetch from running server (via endpoint introspection):
   - Write to file:
-    - `lql get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./schema.graphql`
+    - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./schema.graphql`
   - Print to stdout:
-    - `lql get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
+    - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
 
 Options:
 - `--database <name>` (Option 1)
@@ -365,7 +365,7 @@ Options:
 
 Notes:
 - If your local dev server routes by hostname (e.g., `meta8.localhost`), but is reachable at `http://localhost:<port>`, use:
-  - `lql get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
+  - `constructive get-graphql-schema --endpoint http://localhost:3000/graphql --headerHost meta8.localhost`
 - You can repeat `--header` to add multiple headers, e.g.: `--header 'X-Mode: fast' --header 'Authorization: Bearer abc123'`
 
 Tip:
@@ -376,7 +376,7 @@ Tip:
 
 ### Environment Variables
 
-LaunchQL respects standard PostgreSQL environment variables:
+Constructive respects standard PostgreSQL environment variables:
 
 ```bash
 export PGHOST=localhost
@@ -392,11 +392,11 @@ export PGPASSWORD=password
 
 ```bash
 # Global help
-lql --help
+constructive --help
 
 # Command-specific help
-lql deploy --help
-lql server -h
+constructive deploy --help
+constructive server -h
 ```
 
 ### Common Options
@@ -412,15 +412,15 @@ Generate types, operations, and SDK from a schema or endpoint.
 
 ```bash
 # From SDL file
-lql codegen --schema ./schema.graphql --out ./codegen
+constructive codegen --schema ./schema.graphql --out ./codegen
 
 # From endpoint with Host override
-lql codegen --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./codegen
+constructive codegen --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./codegen
 ```
 
 Options:
 - `--schema <path>` or `--endpoint <url>`
-- `--out <dir>` output root (default: `packages/launchql-gen/dist`)
+- `--out <dir>` output root (default: `graphql/codegen/dist`)
 - `--format <gql|ts>` documents format
 - `--convention <dashed|underscore|camelcase|camelUpper>` filenames
 - `--headerHost <host>` optional HTTP Host header for endpoint requests
@@ -434,7 +434,7 @@ Config file (JSON/YAML):
 
 ```bash
 # Use a JSON config to override defaults
-lql codegen --config ./my-options.json
+constructive codegen --config ./my-options.json
 ```
 
 Example `my-options.json`:
@@ -446,7 +446,7 @@ Example `my-options.json`:
     "headers": { "Host": "meta8.localhost" }
   },
   "output": {
-    "root": "packages/launchql-gen/dist/codegen-config",
+    "root": "graphql/codegen/dist/codegen-config",
     "reactQueryFile": "react-query.ts"
   },
   "documents": {

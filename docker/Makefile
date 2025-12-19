@@ -7,7 +7,7 @@ PLATFORMS?=linux/arm64
 # default process if none specified (can be overridden: `make PROCESS=postgis build-process`)
 PROCESS?=pgvector
 
-# Convenience: list of known processes (launchql moved to root Dockerfile)
+# Convenience: list of known processes (constructive moved to root Dockerfile)
 PROCESSES:=pgvector node-sqitch postgis pgvector-postgis
 
 CONTAINER_NAME?=$(PROCESS)

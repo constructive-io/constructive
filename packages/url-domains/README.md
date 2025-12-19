@@ -1,4 +1,4 @@
-# @launchql/url-domains
+# @constructive-io/url-domains
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -9,7 +9,7 @@
     <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
   </a>
    <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-   <a href="https://www.npmjs.com/package/@launchql/url-domains"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Furl-domains%2Fpackage.json"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/url-domains"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Furl-domains%2Fpackage.json"/></a>
 </p>
 
 for use with express
@@ -31,7 +31,7 @@ So why not just make a `subdomains` object you can trust no matter what?
 ## install
 
 ```sh
-pnpm add @launchql/url-domains
+pnpm add @constructive-io/url-domains
 ```
 
 ### middleware
@@ -39,7 +39,7 @@ pnpm add @launchql/url-domains
 ```js
   import {
     middleware as parseDomains
-  } from '@launchql/url-domains';
+  } from '@constructive-io/url-domains';
 
 
   app.use(parseDomains());
@@ -55,7 +55,7 @@ pnpm add @launchql/url-domains
 ```js
   import {
     parseReq
-  } from '@launchql/url-domains';
+  } from '@constructive-io/url-domains';
 
   app.use(async (req, res, next) => {
     const {

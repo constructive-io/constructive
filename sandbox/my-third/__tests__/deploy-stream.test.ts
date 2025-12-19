@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
 import { getPgPool } from 'pg-cache';
 
-it('LaunchQL', async () => {
+it('Constructive', async () => {
     const db = 'db-'+randomUUID();
     const project = new PgpmPackage(resolve(__dirname+'/../'));
     const opts = getEnvOptions({

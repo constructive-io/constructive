@@ -1,6 +1,6 @@
-# @launchql/send-email-link-fn
+# @constructive-io/send-email-link-fn
 
-Knative-compatible email link function used with the LaunchQL jobs system. It is designed to be invoked by `@launchql/knative-job-worker` as an HTTP function named `send-email-link`.
+Knative-compatible email link function used with the Constructive jobs system. It is designed to be invoked by `@constructive-io/knative-job-worker` as an HTTP function named `send-email-link`.
 
 The function:
 - Reads metadata about the tenant/site from a GraphQL API
@@ -44,11 +44,11 @@ If required fields are missing the function returns a small JSON object like:
 
 ## HTTP contract (with knative-job-worker)
 
-The function is wrapped by `@launchql/knative-job-fn`, so it expects:
+The function is wrapped by `@constructive-io/knative-job-fn`, so it expects:
 
 - HTTP method: `POST`
 - Body: JSON job payload (see above)
-- Headers (set by `@launchql/knative-job-worker`):
+- Headers (set by `@constructive-io/knative-job-worker`):
   - `X-Worker-Id`
   - `X-Job-Id`
   - `X-Database-Id`
@@ -65,7 +65,7 @@ The handler will:
 { "complete": true }
 ```
 
-Errors are propagated through the Express error middleware installed by `@launchql/knative-job-fn`, so they can be translated into `X-Job-Error` callbacks by your gateway/callback server.
+Errors are propagated through the Express error middleware installed by `@constructive-io/knative-job-fn`, so they can be translated into `X-Job-Error` callbacks by your gateway/callback server.
 
 ## Environment variables
 
@@ -95,7 +95,7 @@ Email delivery (used by `@launchql/postmaster`):
 From the repo root:
 
 ```bash
-pnpm --filter="@launchql/send-email-link-fn" build
+pnpm --filter="@constructive-io/send-email-link-fn" build
 ```
 
 This compiles TypeScript into `dist/`.
@@ -125,7 +125,7 @@ CMD ["node", "dist/index.js"]
 Build and push:
 
 ```bash
-pnpm --filter="@launchql/send-email-link-fn" build
+pnpm --filter="@constructive-io/send-email-link-fn" build
 docker build -t your-registry/send-email-link-fn:latest functions/send-email-link
 docker push your-registry/send-email-link-fn:latest
 ```
@@ -161,8 +161,7 @@ spec:
                   key: api-key
 ```
 
-Once deployed, point `@launchql/knative-job-worker` at this service by configuring:
+Once deployed, point `@constructive-io/knative-job-worker` at this service by configuring:
 
 - `KNATIVE_SERVICE_URL` to route `/send-email-link` to this function
 - `JOBS_SUPPORTED=send-email-link` (or `JOBS_SUPPORT_ANY=true`)
-

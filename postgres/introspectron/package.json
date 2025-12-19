@@ -1,0 +1,51 @@
+{
+  "name": "introspectron",
+  "version": "2.14.9",
+  "description": "introspect your Postgres database and generate an SDK",
+  "author": "Constructive <developers@constructive.io>",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@jest/test-sequencer": "^30.2.0",
+    "@types/pg": "^8.16.0",
+    "@constructive-io/graphql-test": "workspace:^",
+    "makage": "^0.1.8",
+    "pgsql-test": "workspace:^"
+  },
+  "dependencies": {
+    "graphql": "15.10.1",
+    "graphql-tag": "2.12.6",
+    "pg": "^8.16.3"
+  },
+  "keywords": [
+    "graphql",
+    "introspection",
+    "pg",
+    "schema",
+    "graphile",
+    "constructive"
+  ]
+}

@@ -25,7 +25,7 @@ describe('CLI Deploy Command', () => {
   });
 
   it('should deploy single schema via CLI', async () => {
-    const commands = `lql deploy --database ${testDb.name} --package my-first --to schema_myfirstapp --yes`;
+    const commands = `cnc deploy --database ${testDb.name} --package my-first --to schema_myfirstapp --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name
@@ -40,7 +40,7 @@ describe('CLI Deploy Command', () => {
   });
 
   it('should deploy full project with tables via CLI', async () => {
-    const commands = `lql deploy --database ${testDb.name} --package my-first --yes`;
+    const commands = `cnc deploy --database ${testDb.name} --package my-first --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name
@@ -59,9 +59,9 @@ describe('CLI Deploy Command', () => {
   it('should deploy multiple packages via CLI', async () => {
     const commands = `
       cd packages/
-      lql deploy --database ${testDb.name} --package my-first --yes
-      lql deploy --database ${testDb.name} --package my-second --yes
-      lql deploy --database ${testDb.name} --package my-third --yes
+      cnc deploy --database ${testDb.name} --package my-first --yes
+      cnc deploy --database ${testDb.name} --package my-second --yes
+      cnc deploy --database ${testDb.name} --package my-third --yes
     `;
     
     await fixture.runTerminalCommands(commands, {
@@ -82,7 +82,7 @@ describe('CLI Deploy Command', () => {
   });
 
   it('should revert changes via CLI', async () => {
-    const deployCommands = `lql deploy --database ${testDb.name} --package my-first --yes`;
+    const deployCommands = `cnc deploy --database ${testDb.name} --package my-first --yes`;
     await fixture.runTerminalCommands(deployCommands, {
       database: testDb.name
     }, true);
@@ -91,7 +91,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('table', 'myfirstapp.users')).toBe(true);
     expect(await testDb.exists('table', 'myfirstapp.products')).toBe(true);
     
-    const revertCommands = `lql revert --database $database  --package my-first --yes`;
+    const revertCommands = `cnc revert --database $database  --package my-first --yes`;
     await fixture.runTerminalCommands(revertCommands, {
       database: testDb.name
     }, true);
@@ -103,7 +103,7 @@ describe('CLI Deploy Command', () => {
 
 
   it('should deploy with --no-recursive flag', async () => {
-    const commands = `lql deploy --database ${testDb.name} --package my-first --no-recursive --yes`;
+    const commands = `cnc deploy --database ${testDb.name} --package my-first --no-recursive --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name

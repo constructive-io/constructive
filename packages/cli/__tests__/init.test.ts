@@ -105,8 +105,8 @@ describe('cmds:init', () => {
       'module-only'
     );
 
-    const lql = new PgpmPackage(moduleDir);
-    expect(lql.getModuleControlFile()).toMatchSnapshot();
+    const cnc = new PgpmPackage(moduleDir);
+    expect(cnc.getModuleControlFile()).toMatchSnapshot();
   });
 
   describe('with custom templates', () => {

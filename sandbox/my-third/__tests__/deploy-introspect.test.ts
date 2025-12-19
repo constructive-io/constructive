@@ -5,8 +5,8 @@ import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
 
 it('GraphQL query', async () => {
-    const newDb = 'db-lql-'+randomUUID();
-    const project = new PgpmPackage(process.env.LQL_LAUNCHQL);
+    const newDb = 'db-constructive-'+randomUUID();
+    const project = new PgpmPackage(process.env.CONSTRUCTIVE_WORKSPACE);
     const opts = getEnvOptions({
         pg: {
             database: newDb
