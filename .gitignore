@@ -7,4 +7,5 @@ lerna-debug.log
 ignore
 postgres/pgsql-test/output/
 .claude
+.kiro
 *.tsbuildinfo
