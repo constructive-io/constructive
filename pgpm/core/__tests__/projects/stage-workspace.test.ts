@@ -175,7 +175,6 @@ describe('Staging Fixture Tests', () => {
       const { native, modules: deps } = project.getModuleDependencies('unique-names');
 
       expect(Array.isArray(deps)).toBe(true);
-      expect(deps.some(dep => dep.includes('pgpm-default-roles'))).toBe(true);
       expect(deps.some(dep => dep.includes('pgpm-defaults'))).toBe(true);
       expect(deps.some(dep => dep.includes('pgpm-verify'))).toBe(true);
     });
@@ -202,7 +201,7 @@ describe('Staging Fixture Tests', () => {
       expect(result.modules.length).toBeGreaterThan(0);
       
       const dependencyNames = result.modules.map(dep => dep.name);
-      expect(dependencyNames.some(name => name.includes('pgpm-default-roles'))).toBe(true);
+      expect(dependencyNames.some(name => name.includes('pgpm-defaults'))).toBe(true);
       
       result.modules.forEach(dep => {
         expect(dep).toHaveProperty('name');
@@ -222,14 +221,14 @@ describe('Staging Fixture Tests', () => {
       
       const dependencyChanges = await project.getModuleDependencyChanges('unique-names');
 
-      const defaultRolesDep = dependencyChanges.modules.find(dep =>
-        dep.name.includes('pgpm-default-roles')
+      const defaultsDep = dependencyChanges.modules.find(dep =>
+        dep.name.includes('pgpm-defaults')
       );
       
-      if (defaultRolesDep) {
-        expect(defaultRolesDep.name).toBeTruthy();
-        expect(defaultRolesDep.latest).toBeTruthy();
-        expect(defaultRolesDep.version).toBeTruthy();
+      if (defaultsDep) {
+        expect(defaultsDep.name).toBeTruthy();
+        expect(defaultsDep.latest).toBeTruthy();
+        expect(defaultsDep.version).toBeTruthy();
       }
     });
 

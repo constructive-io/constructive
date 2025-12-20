@@ -1,7 +1,7 @@
 %syntax-version=1.0.0
 %project=pgpm-database-jobs
 %uri=pgpm-database-jobs
-schemas/app_jobs/schema [pgpm-default-roles:@0.0.5 pgpm-verify:@0.1.0] 2025-08-26T23:57:41Z pgpm <pgpm@5b0c196eeb62> # add schemas/app_jobs/schema
+schemas/app_jobs/schema [pgpm-verify:@0.1.0] 2025-08-26T23:57:41Z pgpm <pgpm@5b0c196eeb62> # add schemas/app_jobs/schema
 schemas/app_jobs/triggers/tg_update_timestamps [schemas/app_jobs/schema] 2025-08-26T23:57:41Z pgpm <pgpm@5b0c196eeb62> # add schemas/app_jobs/triggers/tg_update_timestamps
 schemas/app_jobs/triggers/tg_add_job_with_row_id [schemas/app_jobs/schema] 2025-08-26T23:57:41Z pgpm <pgpm@5b0c196eeb62> # add schemas/app_jobs/triggers/tg_add_job_with_row_id
 schemas/app_jobs/triggers/tg_add_job_with_row [schemas/app_jobs/schema] 2025-08-26T23:57:41Z pgpm <pgpm@5b0c196eeb62> # add schemas/app_jobs/triggers/tg_add_job_with_row

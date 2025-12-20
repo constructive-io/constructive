@@ -1,6 +1,6 @@
 {
   "name": "@pgpm/db-meta-modules",
-  "version": "0.15.0",
+  "version": "0.15.2",
   "description": "Module metadata handling and dependency tracking",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
@@ -21,8 +21,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/db-meta-schema": "0.15.0",
-    "@pgpm/verify": "0.15.0"
+    "@pgpm/db-meta-schema": "0.15.2",
+    "@pgpm/verify": "0.15.2"
   },
   "devDependencies": {
     "pgpm": "^1.0.0"

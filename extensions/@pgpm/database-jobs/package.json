@@ -1,6 +1,6 @@
 {
   "name": "@pgpm/database-jobs",
-  "version": "0.15.0",
+  "version": "0.15.2",
   "description": "Database-specific job handling and queue management",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
@@ -24,8 +24,7 @@
     "pgpm": "^1.0.0"
   },
   "dependencies": {
-    "@pgpm/default-roles": "0.15.0",
-    "@pgpm/verify": "0.15.0"
+    "@pgpm/verify": "0.15.2"
   },
   "repository": {
     "type": "git",

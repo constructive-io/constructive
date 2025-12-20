@@ -279,30 +279,6 @@ SELECT * FROM status_public.steps_required('newbie');
 -- Uses jwt_public.current_user_id() internally
 ```
 
-### With @pgpm/default-roles
-
-Combine JWT claims with role-based access:
-
-```sql
--- Set role based on JWT claim
-CREATE FUNCTION set_user_role()
-RETURNS void AS $$
-DECLARE
-  user_role text;
-BEGIN
-  user_role := current_setting('jwt.claims.role', true);
-  
-  IF user_role = 'admin' THEN
-    SET LOCAL ROLE administrator;
-  ELSIF user_role = 'user' THEN
-    SET LOCAL ROLE authenticated;
-  ELSE
-    SET LOCAL ROLE anonymous;
-  END IF;
-END;
-$$ LANGUAGE plpgsql;
-```
-
 ## Error Handling
 
 All functions include error handling for invalid claim values:

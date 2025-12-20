@@ -1,8 +1,0 @@
-# pgpm-default-roles extension
-comment = 'pgpm-default-roles extension'
-default_version = '0.14.0'
-module_pathname = '$libdir/pgpm-default-roles'
-requires = 'plpgsql,pgpm-verify'
-relocatable = false
-superuser = false
-  

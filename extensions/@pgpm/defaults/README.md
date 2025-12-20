@@ -165,22 +165,6 @@ All access must be explicitly granted:
 
 ## Integration with Other Packages
 
-### With @pgpm/default-roles
-
-```bash
-# Deploy both packages from their directories
-cd packages/security/defaults && pgpm deploy --createdb
-cd packages/security/default-roles && pgpm deploy --createdb
-```
-
-Then grant permissions to roles:
-
-```sql
--- Grant permissions to roles
-GRANT CONNECT ON DATABASE mydb TO anonymous, authenticated, administrator;
-GRANT USAGE ON SCHEMA public TO anonymous, authenticated, administrator;
-```
-
 ### With Application Tables
 
 ```sql

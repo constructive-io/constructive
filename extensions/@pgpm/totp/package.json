@@ -1,6 +1,6 @@
 {
   "name": "@pgpm/totp",
-  "version": "0.15.0",
+  "version": "0.15.2",
   "description": "Time-based One-Time Password (TOTP) authentication",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
@@ -21,8 +21,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/base32": "0.15.0",
-    "@pgpm/verify": "0.15.0"
+    "@pgpm/base32": "0.15.2",
+    "@pgpm/verify": "0.15.2"
   },
   "devDependencies": {
     "pgpm": "^1.0.0"
