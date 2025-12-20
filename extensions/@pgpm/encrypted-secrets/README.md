@@ -446,6 +446,22 @@ SELECT encrypted_secrets.secrets_upsert('uuid', 'key', 'value');
 SELECT * FROM secrets_schema.secrets_table WHERE secrets_owned_field = 'uuid';
 ```
 
+### With PGPM roles
+
+Ensure the standard roles exist before granting:
+
+```bash
+pgpm admin-users bootstrap
+```
+
+```sql
+-- Only authenticated users can manage secrets
+GRANT EXECUTE ON FUNCTION encrypted_secrets.secrets_upsert TO authenticated;
+GRANT EXECUTE ON FUNCTION encrypted_secrets.secrets_getter TO authenticated;
+GRANT EXECUTE ON FUNCTION encrypted_secrets.secrets_verify TO authenticated;
+GRANT EXECUTE ON FUNCTION encrypted_secrets.secrets_delete TO authenticated;
+```
+
 ### With @pgpm/jwt-claims
 
 Use JWT claims for owner context:
@@ -468,6 +484,7 @@ SELECT encrypted_secrets.secrets_getter(
 
 ## Dependencies
 
+- PGPM roles (anonymous, authenticated, administrator)
 - `@pgpm/encrypted-secrets-table`: Storage layer
 - `@pgpm/verify`: Verification utilities
 - PostgreSQL pgcrypto extension (for encryption functions)

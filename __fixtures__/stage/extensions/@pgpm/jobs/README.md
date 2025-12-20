@@ -290,6 +290,7 @@ Executes a scheduled job.
 
 ## Dependencies
 
+- PGPM roles (anonymous, authenticated, administrator)
 - `@pgpm/verify`: Verification utilities
 
 ## Testing

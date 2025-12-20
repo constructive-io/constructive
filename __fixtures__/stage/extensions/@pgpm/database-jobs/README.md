@@ -331,6 +331,7 @@ The package includes several triggers for automatic management:
 
 ## Dependencies
 
+- PGPM roles (anonymous, authenticated, administrator)
 - `@pgpm/verify`: Verification utilities for database objects
 
 ## Testing

@@ -165,6 +165,21 @@ All access must be explicitly granted:
 
 ## Integration with Other Packages
 
+### With PGPM roles
+
+```bash
+# Ensure standard roles exist
+pgpm admin-users bootstrap
+```
+
+Then grant permissions to roles:
+
+```sql
+-- Grant permissions to roles
+GRANT CONNECT ON DATABASE mydb TO anonymous, authenticated, administrator;
+GRANT USAGE ON SCHEMA public TO anonymous, authenticated, administrator;
+```
+
 ### With Application Tables
 
 ```sql
