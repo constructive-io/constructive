@@ -1,6 +1,6 @@
 {
   "name": "@pgpm/base32",
-  "version": "0.15.0",
+  "version": "0.15.2",
   "description": "Base32 encoding and decoding functions for PostgreSQL",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
@@ -21,7 +21,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/verify": "0.15.0"
+    "@pgpm/verify": "0.15.2"
   },
   "devDependencies": {
     "pgpm": "^1.0.0"

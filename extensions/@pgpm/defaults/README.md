@@ -165,12 +165,11 @@ All access must be explicitly granted:
 
 ## Integration with Other Packages
 
-### With @pgpm/default-roles
+### With PGPM roles
 
 ```bash
-# Deploy both packages from their directories
-cd packages/security/defaults && pgpm deploy --createdb
-cd packages/security/default-roles && pgpm deploy --createdb
+# Ensure standard roles exist
+pgpm admin-users bootstrap
 ```
 
 Then grant permissions to roles:

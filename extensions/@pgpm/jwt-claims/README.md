@@ -41,7 +41,7 @@ This is a quick way to get started. The sections below provide more detailed ins
 ### Prerequisites
 
 ```bash
-# Install pgpm CLI 
+# Install pgpm CLI
 npm install -g pgpm
 
 # Start local Postgres (via Docker) and export env vars
@@ -58,7 +58,7 @@ eval "$(pgpm env)"
 pgpm install @pgpm/jwt-claims
 
 # 2. Deploy locally
-pgpm deploy 
+pgpm deploy
 ```
 
 ### **Add to a New Project**
@@ -195,7 +195,7 @@ BEGIN
   INSERT INTO posts (user_id, title, content)
   VALUES (jwt_public.current_user_id(), title, content)
   RETURNING id INTO new_post_id;
-  
+
   RETURN new_post_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -279,9 +279,9 @@ SELECT * FROM status_public.steps_required('newbie');
 -- Uses jwt_public.current_user_id() internally
 ```
 
-### With @pgpm/default-roles
+### With PGPM roles
 
-Combine JWT claims with role-based access:
+Ensure the standard roles exist (pgpm admin-users bootstrap), then combine JWT claims with role-based access:
 
 ```sql
 -- Set role based on JWT claim
@@ -291,7 +291,7 @@ DECLARE
   user_role text;
 BEGIN
   user_role := current_setting('jwt.claims.role', true);
-  
+
   IF user_role = 'admin' THEN
     SET LOCAL ROLE administrator;
   ELSIF user_role = 'user' THEN

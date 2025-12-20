@@ -42,7 +42,7 @@ describe('PgpmMigrate.deploy tag fallback bug reproduction', () => {
 
     const plan = [
       `%project=${packageName}`,
-      `${changeName} [pgpm-default-roles:@0.0.5]`,
+      `${changeName} [pgpm-defaults:@0.0.5]`,
     ].join('\n');
 
     mkdirSync(join(dir, 'deploy'), { recursive: true });

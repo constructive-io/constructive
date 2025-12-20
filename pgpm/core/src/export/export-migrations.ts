@@ -116,8 +116,7 @@ const exportMigrationsToDisk = async ({
         'pgpm-stamps',
         'pgpm-base32',
         'pgpm-totp',
-        'pgpm-types',
-        'pgpm-default-roles'
+        'pgpm-types'
       ]
     });
 

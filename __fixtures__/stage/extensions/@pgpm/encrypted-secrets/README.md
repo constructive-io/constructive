@@ -446,9 +446,13 @@ SELECT encrypted_secrets.secrets_upsert('uuid', 'key', 'value');
 SELECT * FROM secrets_schema.secrets_table WHERE secrets_owned_field = 'uuid';
 ```
 
-### With @pgpm/default-roles
+### With PGPM roles
 
-Combine with role-based access control:
+Ensure the standard roles exist before granting:
+
+```bash
+pgpm admin-users bootstrap
+```
 
 ```sql
 -- Only authenticated users can manage secrets
@@ -480,7 +484,7 @@ SELECT encrypted_secrets.secrets_getter(
 
 ## Dependencies
 
-- `@pgpm/default-roles`: Role-based access control
+- PGPM roles (anonymous, authenticated, administrator)
 - `@pgpm/encrypted-secrets-table`: Storage layer
 - `@pgpm/verify`: Verification utilities
 - PostgreSQL pgcrypto extension (for encryption functions)

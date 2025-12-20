@@ -331,7 +331,7 @@ The package includes several triggers for automatic management:
 
 ## Dependencies
 
-- `@pgpm/default-roles`: Role-based access control definitions
+- PGPM roles (anonymous, authenticated, administrator)
 - `@pgpm/verify`: Verification utilities for database objects
 
 ## Testing

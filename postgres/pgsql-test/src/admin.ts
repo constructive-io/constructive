@@ -162,6 +162,9 @@ $$;
           WHEN duplicate_object THEN
             -- Role already exists; optionally sync attributes here with ALTER ROLE
             NULL;
+          WHEN unique_violation THEN
+            -- Concurrent CREATE ROLE hit unique index; safe to ignore
+            NULL;
         END;
 
         -- CI/CD concurrency note: GRANT role membership can race on pg_auth_members unique index

@@ -97,7 +97,6 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
       "schemas/unique_names/tables/words/table",
     ],
     "/deploy/schemas/unique_names/schema.sql": [
-      "pgpm-default-roles:@0.0.5",
       "pgpm-defaults:defaults/public",
       "pgpm-verify:@0.1.0",
     ],
@@ -112,12 +111,10 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
     "/deploy/schemas/unique_names/tables/words/table.sql": [
       "schemas/unique_names/schema",
     ],
-    "pgpm-default-roles:@0.0.5": [],
     "pgpm-defaults:defaults/public": [],
     "pgpm-verify:@0.1.0": [],
   },
   "external": [
-    "pgpm-default-roles:@0.0.5",
     "pgpm-defaults:defaults/public",
     "pgpm-verify:@0.1.0",
   ],
@@ -129,7 +126,6 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
     "schemas/unique_names/tables/words/indexes/words_type_idx",
   ],
   "resolvedTags": {
-    "pgpm-default-roles:@0.0.5": "pgpm-default-roles:roles/administrator/role",
     "pgpm-verify:@0.1.0": "pgpm-verify:procedures/verify_view",
   },
 }
