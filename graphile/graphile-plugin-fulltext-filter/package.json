@@ -47,11 +47,9 @@
     "pg-tsquery": "^8.1.0"
   },
   "peerDependencies": {
-    "graphile-plugin-connection-filter": "workspace:^",
     "postgraphile-core": "^4.2.0"
   },
   "devDependencies": {
-    "graphile-plugin-connection-filter": "workspace:^",
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
     "makage": "^0.1.8",
