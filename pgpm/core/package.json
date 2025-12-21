@@ -44,14 +44,14 @@
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
-    "makage": "^0.1.8"
+    "makage": "^0.1.9"
   },
   "dependencies": {
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "create-gen-app": "^0.3.6",
+    "create-gen-app": "^0.4.0",
     "csv-to-pg": "^2.0.10",
     "glob": "^13.0.0",
     "komoji": "^0.7.11",

@@ -40,7 +40,7 @@
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.16",
     "glob": "^13.0.0",
-    "makage": "^0.1.8",
+    "makage": "^0.1.9",
     "pg": "^8.16.3",
     "ts-node": "^10.9.2"
   },
@@ -50,7 +50,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.2.6",
-    "create-gen-app": "^0.3.6",
+    "create-gen-app": "^0.4.0",
     "find-and-require-package-json": "^0.8.2",
     "inquirerer": "^2.1.14",
     "js-yaml": "^4.1.0",

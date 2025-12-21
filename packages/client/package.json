@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.8"
+    "makage": "^0.1.9"
   },
   "dependencies": {
     "pg": "^8.16.3"

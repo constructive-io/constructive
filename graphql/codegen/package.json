@@ -32,7 +32,7 @@
     "@constructive-io/graphql-test": "workspace:^",
     "@types/babel__generator": "^7.27.0",
     "@types/pluralize": "0.0.33",
-    "makage": "^0.1.8"
+    "makage": "^0.1.9"
   },
   "dependencies": {
     "@babel/generator": "^7.26.3",

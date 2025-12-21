@@ -39,13 +39,13 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.952.0",
+    "@aws-sdk/client-s3": "^3.956.0",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
     "graphql-tag": "^2.12.6",
-    "makage": "^0.1.6",
+    "makage": "^0.1.9",
     "pgsql-test": "workspace:^",
     "ts-jest": "^29.4.6"
   },
