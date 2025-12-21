@@ -1,6 +1,6 @@
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { Inquirerer, Question } from 'inquirerer';
+import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
 import path from 'path';
 
 const log = new Logger('workspace-init');
@@ -27,6 +27,11 @@ export default async function runWorkspaceSetup(
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
   const templatePath = argv.templatePath as string | undefined;
+
+  // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
+  // This provides the intended workspace directory name before the folder is created
+  const dirName = path.basename(targetPath);
+  registerDefaultResolver('workspace.dirname', () => dirName);
 
   const scaffoldResult = await scaffoldTemplate({
     type: 'workspace',
