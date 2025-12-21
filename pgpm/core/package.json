@@ -62,8 +62,5 @@
     "pgsql-deparser": "^17.12.2",
     "pgsql-parser": "^17.9.2",
     "yanse": "^0.1.8"
-  },
-  "peerDependencies": {
-    "@pgsql/types": "^17.6.2"
   }
 }
