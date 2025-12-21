@@ -1,6 +1,6 @@
 # Role Management in Constructive
 
-This document explains the role management system in Constructive, covering when static SQL files vs dynamic TypeScript helpers are used, and the call paths for each.
+This document explains the role management system in Constructive, covering the unified dynamic implementation with configurable role names.
 
 ## Overview: The Role Model
 
@@ -20,23 +20,40 @@ These are group roles that define permission levels. They cannot log in directly
 
 Users are roles with LOGIN capability that can connect to the database. They are granted membership in base roles to inherit permissions.
 
-## Two Mechanisms: Static SQL vs Dynamic TypeScript
+## Unified Dynamic Implementation
 
-Role management uses two distinct mechanisms depending on the use case:
+All role management is now handled by a single shared module in `@pgpmjs/core/src/roles/index.ts`. This provides:
 
-### Static SQL Files
+1. **Configurable role names** - defaults to canonical names (`anonymous`, `authenticated`, `administrator`) but can be customized
+2. **Single source of truth** - both `PgpmInit` (CLI) and `DbAdmin` (test harness) use the same SQL generators
+3. **Concurrency safety** - all operations include IF NOT EXISTS pre-checks and exception handling for TOCTOU safety
+4. **Optional advisory locking** - when `useLocks: true`, wraps CREATE ROLE operations with `pg_advisory_xact_lock`
 
-Located in `pgpm/core/src/init/sql/`, these are used when:
-- Inputs are fixed and known at development time
-- The operation is intended as a reproducible, auditable bootstrap
-- Human operators run the commands via CLI
+### SQL Generators
 
-### Dynamic TypeScript Helpers
+The shared module exports these SQL generators:
 
-Located in `pgpm/core/src/init/client.ts` and `postgres/pgsql-test/src/admin.ts`, these are used when:
-- Inputs are runtime values (username/password provided by user)
-- Role names can be configured (test environments)
-- The operation is consumed as a library API rather than an operator-run command
+| Function | Purpose |
+|----------|---------|
+| `generateCreateBaseRolesSQL(roles?)` | Create base roles (anonymous, authenticated, administrator) |
+| `generateCreateUserSQL(username, password, roles?, options?)` | Create a user with grants to base roles |
+| `generateCreateTestUsersSQL(roles?)` | Create test users (app_user, app_admin) |
+| `generateCreateUserWithGrantsSQL(username, password, rolesToGrant, options?)` | Create a user with grants to specified roles |
+| `generateGrantRoleSQL(role, user)` | Grant a single role to a user |
+| `generateRemoveUserSQL(username, roles?, options?)` | Remove a user and revoke grants |
+
+### Role Mapping
+
+Role names are configurable via the `RoleMapping` interface from `@pgpmjs/types`:
+
+```typescript
+interface RoleMapping {
+  anonymous?: string;      // default: 'anonymous'
+  authenticated?: string;  // default: 'authenticated'
+  administrator?: string;  // default: 'administrator'
+  default?: string;        // default: 'anonymous'
+}
+```
 
 ## Entry Points and Call Paths
 
@@ -245,9 +262,18 @@ All role management operations are designed to be idempotent and safe under conc
 
 | File | Purpose |
 |------|---------|
-| `pgpm/core/src/init/sql/bootstrap-roles.sql` | Create base roles |
-| `pgpm/core/src/init/sql/bootstrap-test-roles.sql` | Create test users |
-| `pgpm/core/src/init/client.ts` | PgpmInit class (CLI operations) |
-| `postgres/pgsql-test/src/admin.ts` | DbAdmin class (test operations) |
+| `pgpm/core/src/roles/index.ts` | **Shared SQL generators** (single source of truth) |
+| `pgpm/core/src/init/client.ts` | PgpmInit class (CLI operations, uses shared module) |
+| `postgres/pgsql-test/src/admin.ts` | DbAdmin class (test operations, uses shared module) |
 | `postgres/pgsql-test/src/roles.ts` | Role name configuration helpers |
 | `postgres/pgsql-test/src/connect.ts` | Test connection setup |
+| `pgpm/types/src/pgpm.ts` | RoleMapping interface and defaults |
+
+### Legacy SQL Files (Reference Only)
+
+The following SQL files are kept for reference but are no longer executed directly:
+
+| File | Purpose |
+|------|---------|
+| `pgpm/core/src/init/sql/bootstrap-roles.sql` | Reference: base role creation SQL |
+| `pgpm/core/src/init/sql/bootstrap-test-roles.sql` | Reference: test user creation SQL |
