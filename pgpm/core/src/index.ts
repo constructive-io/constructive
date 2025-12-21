@@ -18,7 +18,8 @@ export * from './files';
 export { cleanSql } from './migrate/clean';
 export { PgpmMigrate } from './migrate/client';
 export { PgpmInit } from './init/client';
-export { 
+export * from './roles';
+export {
   DeployOptions, 
   DeployResult, 
   MigrateChange, 
