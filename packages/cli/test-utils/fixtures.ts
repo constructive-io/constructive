@@ -6,12 +6,9 @@ import path from 'path';
 
 import { commands } from '../src/commands';
 import { setupTests, TestEnvironment } from './cli';
-import { withInitDefaults } from './init-argv';
+import { TEST_TEMPLATE_REPO, withInitDefaults } from './init-argv';
 
-// Use testing boilerplate repo for tests to avoid breaking snapshots when production templates change
-export const TEST_TEMPLATE_REPO =
-  process.env.PGPM_TEST_TEMPLATE_REPO ??
-  'https://github.com/constructive-io/pgpm-boilerplates-testing.git';
+export { TEST_TEMPLATE_REPO };
 
 const { mkdtempSync, rmSync, cpSync } = fs;
 

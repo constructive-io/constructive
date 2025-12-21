@@ -1,5 +1,10 @@
 import { ParsedArgs } from 'minimist';
-import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
+
+// Use testing boilerplate repo for tests to avoid breaking snapshots when production templates change
+// Can be overridden via PGPM_TEST_TEMPLATE_REPO env var if needed
+export const TEST_TEMPLATE_REPO =
+  process.env.PGPM_TEST_TEMPLATE_REPO ??
+  'https://github.com/constructive-io/pgpm-boilerplates-testing.git';
 
 export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {
   const baseName = (argv.moduleName as string) || (argv.name as string) || 'module';
@@ -19,7 +24,7 @@ export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {
   return { ...defaults, ...argv };
 };
 
-export const withInitDefaults = (argv: ParsedArgs, defaultRepo: string = DEFAULT_TEMPLATE_REPO): ParsedArgs => {
+export const withInitDefaults = (argv: ParsedArgs, defaultRepo: string = TEST_TEMPLATE_REPO): ParsedArgs => {
   const args = addInitDefaults(argv);
   if (!Array.isArray(args._) || !args._.includes('init')) return args;
 
