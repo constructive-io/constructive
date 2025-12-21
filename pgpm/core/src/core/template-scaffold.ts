@@ -50,27 +50,6 @@ const looksLikePath = (value: string): boolean => {
   );
 };
 
-const normalizeQuestions = (questions?: BoilerplateQuestion[]) =>
-  questions?.map((q) => ({
-    ...q,
-    type: q.type || 'text',
-  }));
-
-const attachQuestionsToTemplatizer = (
-  templ: any,
-  questions?: BoilerplateQuestion[]
-) => {
-  if (!questions?.length || typeof templ?.extract !== 'function') return;
-  const originalExtract = templ.extract.bind(templ);
-  templ.extract = async (templateDir: string) => {
-    const extracted = await originalExtract(templateDir);
-    extracted.projectQuestions = {
-      questions: normalizeQuestions(questions),
-    };
-    return extracted;
-  };
-};
-
 /**
  * Resolve the template path using the new metadata-driven resolution.
  *
@@ -175,11 +154,8 @@ export async function scaffoldTemplate(
       dir
     );
 
-    // Read boilerplate config for questions
+    // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
     const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
-
-    // Inject questions into the templatizer pipeline so prompt types and defaults are applied
-    attachQuestionsToTemplatizer(templatizer, boilerplateConfig?.questions);
 
     await templatizer.process(resolvedRepo, outputDir, {
       argv: answers,
@@ -240,11 +216,8 @@ export async function scaffoldTemplate(
     dir
   );
 
-  // Read boilerplate config for questions
+  // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
   const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
-
-  // Inject questions into the templatizer pipeline so prompt types and defaults are applied
-  attachQuestionsToTemplatizer(templatizer, boilerplateConfig?.questions);
 
   await templatizer.process(templateDir, outputDir, {
     argv: answers,
