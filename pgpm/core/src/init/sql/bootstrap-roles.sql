@@ -1,32 +1,56 @@
 BEGIN;
 DO $do$
 BEGIN
-  -- anonymous
-  BEGIN
-    EXECUTE format('CREATE ROLE %I', 'anonymous');
-  EXCEPTION
-    WHEN duplicate_object THEN
-      -- Role already exists; optionally sync attributes here with ALTER ROLE
-      NULL;
-  END;
+  -- anonymous: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'anonymous') THEN
+    BEGIN
+      EXECUTE format('CREATE ROLE %I', 'anonymous');
+    EXCEPTION
+      WHEN duplicate_object THEN
+        -- 42710: Role already exists (race condition); safe to ignore
+        NULL;
+      WHEN unique_violation THEN
+        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
+        NULL;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+    END;
+  END IF;
   
-  -- authenticated
-  BEGIN
-    EXECUTE format('CREATE ROLE %I', 'authenticated');
-  EXCEPTION
-    WHEN duplicate_object THEN
-      -- Role already exists; optionally sync attributes here with ALTER ROLE
-      NULL;
-  END;
+  -- authenticated: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
+    BEGIN
+      EXECUTE format('CREATE ROLE %I', 'authenticated');
+    EXCEPTION
+      WHEN duplicate_object THEN
+        -- 42710: Role already exists (race condition); safe to ignore
+        NULL;
+      WHEN unique_violation THEN
+        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
+        NULL;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+    END;
+  END IF;
   
-  -- administrator
-  BEGIN
-    EXECUTE format('CREATE ROLE %I', 'administrator');
-  EXCEPTION
-    WHEN duplicate_object THEN
-      -- Role already exists; optionally sync attributes here with ALTER ROLE
-      NULL;
-  END;
+  -- administrator: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'administrator') THEN
+    BEGIN
+      EXECUTE format('CREATE ROLE %I', 'administrator');
+    EXCEPTION
+      WHEN duplicate_object THEN
+        -- 42710: Role already exists (race condition); safe to ignore
+        NULL;
+      WHEN unique_violation THEN
+        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
+        NULL;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+    END;
+  END IF;
 END
 $do$;
 

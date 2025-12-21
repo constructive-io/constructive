@@ -10,6 +10,10 @@ import { streamSql as stream } from './stream';
 
 const log = new Logger('db-admin');
 
+export interface RoleManagementOptions {
+  useLocks?: boolean;
+}
+
 export class DbAdmin {
   constructor(
     private config: PgConfig,
@@ -103,14 +107,19 @@ export class DbAdmin {
     this.safeDropDb(template);
   }
   
-  async grantRole(role: string, user: string, dbName?: string): Promise<void> {
+  async grantRole(role: string, user: string, dbName?: string, options?: RoleManagementOptions): Promise<void> {
     const db = dbName ?? this.config.database;
+    const useLocks = options?.useLocks ?? false;
+    const lockStatement = useLocks 
+      ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_user));`
+      : '';
     const sql = `
 DO $$
 DECLARE
   v_user TEXT := '${user.replace(/'/g, "''")}';
   v_role TEXT := '${role.replace(/'/g, "''")}';
 BEGIN
+  ${lockStatement}
   -- Pre-check to avoid unnecessary GRANTs; still catch TOCTOU under concurrency
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
@@ -122,11 +131,17 @@ BEGIN
       EXECUTE format('GRANT %I TO %I', v_role, v_user);
     EXCEPTION
       WHEN unique_violation THEN
-        -- Concurrent membership grant; safe to ignore
+        -- 23505: Concurrent membership grant; safe to ignore
         NULL;
       WHEN undefined_object THEN
-        -- Role or user missing; emit notice and continue
+        -- 42704: Role or user missing; emit notice and continue
         RAISE NOTICE 'Missing role when granting % to %', v_role, v_user;
+      WHEN insufficient_privilege THEN
+        -- 42501: Must surface this error - caller lacks permission
+        RAISE;
+      WHEN invalid_grant_operation THEN
+        -- 0LP01: Must surface this error - invalid grant operation
+        RAISE;
     END;
   END IF;
 END
@@ -144,10 +159,14 @@ $$;
   // TODO: make adminRole a configurable option
   // ONLY granting admin role for testing purposes, normally the db connection for apps won't have admin role
   // DO NOT USE THIS FOR PRODUCTION
-  async createUserRole(user: string, password: string, dbName: string): Promise<void> {
+  async createUserRole(user: string, password: string, dbName: string, options?: RoleManagementOptions): Promise<void> {
     const anonRole = getRoleName('anonymous', this.roleConfig);
     const authRole = getRoleName('authenticated', this.roleConfig);
     const adminRole = getRoleName('administrator', this.roleConfig);
+    const useLocks = options?.useLocks ?? false;
+    const lockStatement = useLocks 
+      ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_user));`
+      : '';
     
     const sql = `
       DO $$
@@ -155,20 +174,25 @@ $$;
         v_user TEXT := '${user.replace(/'/g, "''")}';
         v_password TEXT := '${password.replace(/'/g, "''")}';
       BEGIN
-        -- Create role if it doesn't exist
-        BEGIN
-          EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_user, v_password);
-        EXCEPTION
-          WHEN duplicate_object THEN
-            -- Role already exists; optionally sync attributes here with ALTER ROLE
-            NULL;
-          WHEN unique_violation THEN
-            -- Concurrent CREATE ROLE hit unique index; safe to ignore
-            NULL;
-        END;
+        ${lockStatement}
+        -- Create role: pre-check + exception handling for TOCTOU safety
+        IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_user) THEN
+          BEGIN
+            EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_user, v_password);
+          EXCEPTION
+            WHEN duplicate_object THEN
+              -- 42710: Role already exists (race condition); safe to ignore
+              NULL;
+            WHEN unique_violation THEN
+              -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
+              NULL;
+            WHEN insufficient_privilege THEN
+              -- 42501: Must surface this error - caller lacks permission
+              RAISE;
+          END;
+        END IF;
 
-        -- CI/CD concurrency note: GRANT role membership can race on pg_auth_members unique index
-        -- We pre-check membership and still catch unique_violation to handle TOCTOU safely.
+        -- Grant anonymous: pre-check + exception handling for TOCTOU safety
         IF NOT EXISTS (
           SELECT 1 FROM pg_auth_members am
           JOIN pg_roles r1 ON am.roleid = r1.oid
@@ -179,12 +203,21 @@ $$;
             EXECUTE format('GRANT %I TO %I', '${anonRole.replace(/'/g, "''")}', v_user);
           EXCEPTION
             WHEN unique_violation THEN
+              -- 23505: Membership was granted concurrently; safe to ignore
               NULL;
             WHEN undefined_object THEN
+              -- 42704: One of the roles doesn't exist; log notice and continue
               RAISE NOTICE 'Missing role when granting % to %', '${anonRole.replace(/'/g, "''")}', v_user;
+            WHEN insufficient_privilege THEN
+              -- 42501: Must surface this error - caller lacks permission
+              RAISE;
+            WHEN invalid_grant_operation THEN
+              -- 0LP01: Must surface this error - invalid grant operation
+              RAISE;
           END;
         END IF;
 
+        -- Grant authenticated: pre-check + exception handling for TOCTOU safety
         IF NOT EXISTS (
           SELECT 1 FROM pg_auth_members am
           JOIN pg_roles r1 ON am.roleid = r1.oid
@@ -195,12 +228,21 @@ $$;
             EXECUTE format('GRANT %I TO %I', '${authRole.replace(/'/g, "''")}', v_user);
           EXCEPTION
             WHEN unique_violation THEN
+              -- 23505: Membership was granted concurrently; safe to ignore
               NULL;
             WHEN undefined_object THEN
+              -- 42704: One of the roles doesn't exist; log notice and continue
               RAISE NOTICE 'Missing role when granting % to %', '${authRole.replace(/'/g, "''")}', v_user;
+            WHEN insufficient_privilege THEN
+              -- 42501: Must surface this error - caller lacks permission
+              RAISE;
+            WHEN invalid_grant_operation THEN
+              -- 0LP01: Must surface this error - invalid grant operation
+              RAISE;
           END;
         END IF;
 
+        -- Grant administrator: pre-check + exception handling for TOCTOU safety
         IF NOT EXISTS (
           SELECT 1 FROM pg_auth_members am
           JOIN pg_roles r1 ON am.roleid = r1.oid
@@ -211,9 +253,17 @@ $$;
             EXECUTE format('GRANT %I TO %I', '${adminRole.replace(/'/g, "''")}', v_user);
           EXCEPTION
             WHEN unique_violation THEN
+              -- 23505: Membership was granted concurrently; safe to ignore
               NULL;
             WHEN undefined_object THEN
+              -- 42704: One of the roles doesn't exist; log notice and continue
               RAISE NOTICE 'Missing role when granting % to %', '${adminRole.replace(/'/g, "''")}', v_user;
+            WHEN insufficient_privilege THEN
+              -- 42501: Must surface this error - caller lacks permission
+              RAISE;
+            WHEN invalid_grant_operation THEN
+              -- 0LP01: Must surface this error - invalid grant operation
+              RAISE;
           END;
         END IF;
       END $$;
