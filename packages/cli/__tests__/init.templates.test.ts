@@ -6,7 +6,7 @@ import path from 'path';
 
 import { scaffoldTemplate } from '@pgpmjs/core';
 
-const TEMPLATE_REPO = 'https://github.com/constructive-io/pgpm-boilerplates.git';
+import { TEST_TEMPLATE_REPO } from '../test-utils/fixtures';
 
 describe('Template scaffolding', () => {
   it('processes workspace template from default repo', async () => {
@@ -15,7 +15,7 @@ describe('Template scaffolding', () => {
     await scaffoldTemplate({
       type: 'workspace',
       outputDir: outDir,
-      templateRepo: TEMPLATE_REPO,
+      templateRepo: TEST_TEMPLATE_REPO,
       branch: 'main',
       templatePath: 'default/workspace',
       answers: { 
@@ -40,7 +40,7 @@ describe('Template scaffolding', () => {
     await scaffoldTemplate({
       type: 'module',
       outputDir: outDir,
-      templateRepo: TEMPLATE_REPO,
+      templateRepo: TEST_TEMPLATE_REPO,
       branch: 'main',
       templatePath: 'default/module',
       answers: { 
