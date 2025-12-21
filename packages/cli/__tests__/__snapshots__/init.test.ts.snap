@@ -48,7 +48,6 @@ exports[`cmds:init initializes module: module-only - files 1`] = `
   ".prettierrc.json",
   ".gitignore",
   ".eslintrc.json",
-  ".boilerplate.json",
   "packages/my-module/pgpm.plan",
   "packages/my-module/package.json",
   "packages/my-module/my-module.control",
@@ -56,7 +55,6 @@ exports[`cmds:init initializes module: module-only - files 1`] = `
   "packages/my-module/README.md",
   "packages/my-module/Makefile",
   "packages/my-module/LICENSE",
-  "packages/my-module/.boilerplate.json",
   "packages/my-module/__tests__/basic.test.ts",
   ".github/ci.yaml",
 ]
@@ -126,7 +124,6 @@ exports[`cmds:init initializes workspace: workspace - files 1`] = `
   "my-workspace/.prettierrc.json",
   "my-workspace/.gitignore",
   "my-workspace/.eslintrc.json",
-  "my-workspace/.boilerplate.json",
   "my-workspace/.github/ci.yaml",
 ]
 `;
