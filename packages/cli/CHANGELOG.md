@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.0...@constructive-io/cli@5.1.1) (2025-12-21)
+
+### Bug Fixes
+
+- **cli:** update snapshots for .boilerplate.json exclusion ([33c3e62](https://github.com/constructive-io/constructive/commit/33c3e629ab5cfd24451709d1689b67597f62a996))
+
 # 5.1.0 (2025-12-19)
 
 ### Bug Fixes
