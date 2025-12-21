@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/constructive-io/constructive/compare/pgpm@1.0.6...pgpm@1.1.0) (2025-12-21)
+
+### Features
+
+- **pgpm:** add workspace.dirname resolver for boilerplate templates ([e42ee61](https://github.com/constructive-io/constructive/commit/e42ee611d2a62d0ce911b1820ccea0011ef50e75))
+
 ## [1.0.6](https://github.com/constructive-io/constructive/compare/pgpm@1.0.5...pgpm@1.0.6) (2025-12-21)
 
 **Note:** Version bump only for package pgpm
