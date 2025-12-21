@@ -1,0 +1,253 @@
+# Role Management in Constructive
+
+This document explains the role management system in Constructive, covering when static SQL files vs dynamic TypeScript helpers are used, and the call paths for each.
+
+## Overview: The Role Model
+
+Constructive uses PostgreSQL roles for authorization, following a membership-based model where users (LOGIN roles) are granted membership in base roles (NOLOGIN group roles).
+
+### Base Roles (NOLOGIN)
+
+These are group roles that define permission levels. They cannot log in directly but are granted to users:
+
+| Role | Purpose | RLS Behavior |
+|------|---------|--------------|
+| `anonymous` | Unauthenticated access | Subject to RLS |
+| `authenticated` | Authenticated user access | Subject to RLS |
+| `administrator` | Admin access | Bypasses RLS |
+
+### Users (LOGIN roles)
+
+Users are roles with LOGIN capability that can connect to the database. They are granted membership in base roles to inherit permissions.
+
+## Two Mechanisms: Static SQL vs Dynamic TypeScript
+
+Role management uses two distinct mechanisms depending on the use case:
+
+### Static SQL Files
+
+Located in `pgpm/core/src/init/sql/`, these are used when:
+- Inputs are fixed and known at development time
+- The operation is intended as a reproducible, auditable bootstrap
+- Human operators run the commands via CLI
+
+### Dynamic TypeScript Helpers
+
+Located in `pgpm/core/src/init/client.ts` and `postgres/pgsql-test/src/admin.ts`, these are used when:
+- Inputs are runtime values (username/password provided by user)
+- Role names can be configured (test environments)
+- The operation is consumed as a library API rather than an operator-run command
+
+## Entry Points and Call Paths
+
+### 1. Bootstrap Base Roles (Static SQL)
+
+**Command:** `pgpm admin-users bootstrap`
+
+**Call Path:**
+```
+pgpm admin-users bootstrap
+  -> pgpm/pgpm/src/commands/admin-users/bootstrap.ts
+    -> new PgpmInit(pgEnv)
+      -> init.bootstrapRoles()
+        -> pgpm/core/src/init/sql/bootstrap-roles.sql
+```
+
+**What it does:**
+- Creates the three base roles: `anonymous`, `authenticated`, `administrator`
+- Sets role attributes (NOLOGIN, NOCREATEDB, etc.)
+- Administrator gets BYPASSRLS, others do not
+
+**When to use:**
+- One-time setup when initializing a new database
+- Must be run before adding any users
+
+### 2. Add Test Users (Static SQL)
+
+**Command:** `pgpm admin-users add --test`
+
+**Call Path:**
+```
+pgpm admin-users add --test
+  -> pgpm/pgpm/src/commands/admin-users/add.ts
+    -> new PgpmInit(pgEnv)
+      -> init.bootstrapTestRoles()
+        -> pgpm/core/src/init/sql/bootstrap-test-roles.sql
+```
+
+**What it does:**
+- Creates `app_user` (password: `app_password`) and `app_admin` (password: `admin_password`)
+- Grants `anonymous` and `authenticated` to `app_user`
+- Grants `anonymous`, `authenticated`, and `administrator` to `app_admin`
+
+**When to use:**
+- Local development only
+- Never on production (hardcoded passwords)
+
+**Prerequisites:**
+- Base roles must exist (run `pgpm admin-users bootstrap` first)
+
+### 3. Add Custom User (Dynamic TypeScript)
+
+**Command:** `pgpm admin-users add --username X --password Y`
+
+**Call Path:**
+```
+pgpm admin-users add --username myuser --password mypass
+  -> pgpm/pgpm/src/commands/admin-users/add.ts
+    -> new PgpmInit(pgEnv)
+      -> init.bootstrapDbRoles(username, password, options?)
+        -> Dynamic SQL with parameterized username/password
+```
+
+**What it does:**
+- Creates a LOGIN role with the provided username and password
+- Grants `anonymous` and `authenticated` to the new user
+
+**When to use:**
+- Production user creation
+- Any time you need a user with custom credentials
+
+**Prerequisites:**
+- Base roles must exist (run `pgpm admin-users bootstrap` first)
+
+### 4. Remove User (Dynamic TypeScript)
+
+**Command:** `pgpm admin-users remove --username X` or `pgpm admin-users remove --test`
+
+**Call Path:**
+```
+pgpm admin-users remove --username myuser
+  -> pgpm/pgpm/src/commands/admin-users/remove.ts
+    -> new PgpmInit(pgEnv)
+      -> init.removeDbRoles(username, options?)
+        -> Dynamic SQL with parameterized username
+```
+
+**What it does:**
+- Revokes `anonymous` and `authenticated` memberships
+- Drops the role
+
+### 5. Test Harness User Creation (Dynamic TypeScript)
+
+**Entry Point:** `getConnections()` in `postgres/pgsql-test/src/connect.ts`
+
+**Call Path:**
+```
+getConnections(options, seedAdapters)
+  -> getPgRootAdmin(config, connOpts)
+    -> new DbAdmin(opts, false, connOpts)
+  -> root.createUserRole(user, password, dbName, options?)
+    -> Dynamic SQL with configurable role names via getRoleName()
+```
+
+**What it does:**
+- Creates a test user for connecting to the test database
+- Grants `anonymous`, `authenticated`, and `administrator` roles
+- Uses `getRoleName()` to support configurable role names via `PgTestConnectionOptions.roles`
+
+**When to use:**
+- Automated test setup (Jest, etc.)
+- CI/CD pipelines
+- Any programmatic test database creation
+
+**Key Difference from CLI:**
+- Role names are configurable via `PgTestConnectionOptions.roles`
+- Grants administrator role (for testing purposes only)
+
+### 6. Grant Single Role (Dynamic TypeScript)
+
+**Entry Point:** `DbAdmin.grantRole()` in `postgres/pgsql-test/src/admin.ts`
+
+**Call Path:**
+```
+admin.grantRole(role, user, dbName, options?)
+  -> Dynamic SQL with pre-check and exception handling
+```
+
+**What it does:**
+- Grants a single role to a user
+- Pre-checks membership to avoid unnecessary operations
+- Handles concurrent grant attempts gracefully
+
+**When to use:**
+- Flexible role granting in tests
+- When you need to grant a specific role outside the standard patterns
+
+## Where Base Roles Come From in Tests
+
+When running tests via `getConnections()`, base roles must already exist. They are typically created by:
+
+1. **PGPM deployment via seed adapter:** The default `seed.pgpm()` adapter deploys the PGPM module which may include role creation in migrations
+2. **Container initialization:** Docker images may have roles pre-created
+3. **Manual bootstrap:** Running `pgpm admin-users bootstrap` before tests
+
+The `getConnections()` function assumes base roles exist when it calls `createUserRole()` to grant them.
+
+## Role Name Configuration
+
+### Static SQL (Hardcoded)
+
+The SQL files use hardcoded role names:
+- `anonymous`
+- `authenticated`
+- `administrator`
+
+### Dynamic TypeScript (Configurable in pgsql-test)
+
+The `pgsql-test` package supports configurable role names via `PgTestConnectionOptions.roles`:
+
+```typescript
+const connections = await getConnections({
+  db: {
+    roles: {
+      anonymous: 'custom_anon',
+      authenticated: 'custom_auth',
+      administrator: 'custom_admin',
+      default: 'custom_anon'
+    }
+  }
+});
+```
+
+This is useful when:
+- Testing with non-standard role names
+- Running tests against databases with different role configurations
+
+## Concurrency Safety
+
+All role management operations are designed to be idempotent and safe under concurrent execution:
+
+1. **IF NOT EXISTS pre-checks:** Avoid unnecessary CREATE/GRANT attempts
+2. **Exception handling:** Catch and ignore race conditions (duplicate_object, unique_violation)
+3. **Optional advisory locking:** When `useLocks: true`, wraps CREATE ROLE operations with `pg_advisory_xact_lock(42, hashtext(username))`
+
+### Error Handling by Operation
+
+| Operation | Ignored Errors | Surfaced Errors |
+|-----------|---------------|-----------------|
+| CREATE ROLE | 42710 (duplicate_object), 23505 (unique_violation) | 42501 (insufficient_privilege) |
+| GRANT | 23505 (unique_violation), 42704 (undefined_object) | 42501 (insufficient_privilege), 0LP01 (invalid_grant_operation) |
+| REVOKE/DROP | 42704 (undefined_object) | 2BP01 (dependent_objects_still_exist), 55006 (object_in_use), 42501 (insufficient_privilege) |
+
+## Summary: When to Use What
+
+| Scenario | Mechanism | Entry Point |
+|----------|-----------|-------------|
+| Initialize base roles | Static SQL | `pgpm admin-users bootstrap` |
+| Add test users (dev only) | Static SQL | `pgpm admin-users add --test` |
+| Add production user | Dynamic TS | `pgpm admin-users add --username X --password Y` |
+| Remove user | Dynamic TS | `pgpm admin-users remove` |
+| Automated test setup | Dynamic TS | `getConnections()` -> `createUserRole()` |
+| Grant specific role | Dynamic TS | `admin.grantRole()` |
+
+## File Locations
+
+| File | Purpose |
+|------|---------|
+| `pgpm/core/src/init/sql/bootstrap-roles.sql` | Create base roles |
+| `pgpm/core/src/init/sql/bootstrap-test-roles.sql` | Create test users |
+| `pgpm/core/src/init/client.ts` | PgpmInit class (CLI operations) |
+| `postgres/pgsql-test/src/admin.ts` | DbAdmin class (test operations) |
+| `postgres/pgsql-test/src/roles.ts` | Role name configuration helpers |
+| `postgres/pgsql-test/src/connect.ts` | Test connection setup |
