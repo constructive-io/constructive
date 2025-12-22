@@ -1,3 +1,7 @@
+import { 
+  generateCreateUserWithGrantsSQL, 
+  generateGrantRoleSQL
+} from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { execSync } from 'child_process';
@@ -105,33 +109,7 @@ export class DbAdmin {
   
   async grantRole(role: string, user: string, dbName?: string): Promise<void> {
     const db = dbName ?? this.config.database;
-    const sql = `
-DO $$
-DECLARE
-  v_user TEXT := '${user.replace(/'/g, "''")}';
-  v_role TEXT := '${role.replace(/'/g, "''")}';
-BEGIN
-  -- Pre-check to avoid unnecessary GRANTs; still catch TOCTOU under concurrency
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_auth_members am
-    JOIN pg_roles r1 ON am.roleid = r1.oid
-    JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = v_role AND r2.rolname = v_user
-  ) THEN
-    BEGIN
-      EXECUTE format('GRANT %I TO %I', v_role, v_user);
-    EXCEPTION
-      WHEN unique_violation THEN
-        -- Concurrent membership grant; safe to ignore
-        NULL;
-      WHEN undefined_object THEN
-        -- Role or user missing; emit notice and continue
-        RAISE NOTICE 'Missing role when granting % to %', v_role, v_user;
-    END;
-  END IF;
-END
-$$;
-    `;
+    const sql = generateGrantRoleSQL(role, user);
     await this.streamSql(sql, db);
   }
 
@@ -141,83 +119,19 @@ $$;
     await this.streamSql(sql, db);
   }
 
-  // TODO: make adminRole a configurable option
   // ONLY granting admin role for testing purposes, normally the db connection for apps won't have admin role
   // DO NOT USE THIS FOR PRODUCTION
-  async createUserRole(user: string, password: string, dbName: string): Promise<void> {
+  async createUserRole(user: string, password: string, dbName: string, useLocksForRoles = false): Promise<void> {
     const anonRole = getRoleName('anonymous', this.roleConfig);
     const authRole = getRoleName('authenticated', this.roleConfig);
     const adminRole = getRoleName('administrator', this.roleConfig);
     
-    const sql = `
-      DO $$
-      DECLARE
-        v_user TEXT := '${user.replace(/'/g, "''")}';
-        v_password TEXT := '${password.replace(/'/g, "''")}';
-      BEGIN
-        -- Create role if it doesn't exist
-        BEGIN
-          EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_user, v_password);
-        EXCEPTION
-          WHEN duplicate_object THEN
-            -- Role already exists; optionally sync attributes here with ALTER ROLE
-            NULL;
-          WHEN unique_violation THEN
-            -- Concurrent CREATE ROLE hit unique index; safe to ignore
-            NULL;
-        END;
-
-        -- CI/CD concurrency note: GRANT role membership can race on pg_auth_members unique index
-        -- We pre-check membership and still catch unique_violation to handle TOCTOU safely.
-        IF NOT EXISTS (
-          SELECT 1 FROM pg_auth_members am
-          JOIN pg_roles r1 ON am.roleid = r1.oid
-          JOIN pg_roles r2 ON am.member = r2.oid
-          WHERE r1.rolname = '${anonRole.replace(/'/g, "''")}' AND r2.rolname = v_user
-        ) THEN
-          BEGIN
-            EXECUTE format('GRANT %I TO %I', '${anonRole.replace(/'/g, "''")}', v_user);
-          EXCEPTION
-            WHEN unique_violation THEN
-              NULL;
-            WHEN undefined_object THEN
-              RAISE NOTICE 'Missing role when granting % to %', '${anonRole.replace(/'/g, "''")}', v_user;
-          END;
-        END IF;
-
-        IF NOT EXISTS (
-          SELECT 1 FROM pg_auth_members am
-          JOIN pg_roles r1 ON am.roleid = r1.oid
-          JOIN pg_roles r2 ON am.member = r2.oid
-          WHERE r1.rolname = '${authRole.replace(/'/g, "''")}' AND r2.rolname = v_user
-        ) THEN
-          BEGIN
-            EXECUTE format('GRANT %I TO %I', '${authRole.replace(/'/g, "''")}', v_user);
-          EXCEPTION
-            WHEN unique_violation THEN
-              NULL;
-            WHEN undefined_object THEN
-              RAISE NOTICE 'Missing role when granting % to %', '${authRole.replace(/'/g, "''")}', v_user;
-          END;
-        END IF;
-
-        IF NOT EXISTS (
-          SELECT 1 FROM pg_auth_members am
-          JOIN pg_roles r1 ON am.roleid = r1.oid
-          JOIN pg_roles r2 ON am.member = r2.oid
-          WHERE r1.rolname = '${adminRole.replace(/'/g, "''")}' AND r2.rolname = v_user
-        ) THEN
-          BEGIN
-            EXECUTE format('GRANT %I TO %I', '${adminRole.replace(/'/g, "''")}', v_user);
-          EXCEPTION
-            WHEN unique_violation THEN
-              NULL;
-            WHEN undefined_object THEN
-              RAISE NOTICE 'Missing role when granting % to %', '${adminRole.replace(/'/g, "''")}', v_user;
-          END;
-        END IF;
-      END $$;
-    `.trim();
+    const sql = generateCreateUserWithGrantsSQL(
+      user, 
+      password, 
+      [anonRole, authRole, adminRole],
+      useLocksForRoles
+    );
 
     await this.streamSql(sql, dbName);
   }

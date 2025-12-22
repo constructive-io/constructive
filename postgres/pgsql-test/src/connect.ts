@@ -66,9 +66,9 @@ export const getConnections = async (
 
   const root = getPgRootAdmin(config, connOpts);
   await root.createUserRole(
-    connOpts.connection.user,
-    connOpts.connection.password,
-    connOpts.rootDb
+    connOpts.connections!.app!.user!,
+    connOpts.connections!.app!.password!,
+    connOpts.rootDb!
   );
 
   const admin = new DbAdmin(config as PgConfig, false, connOpts);
@@ -82,7 +82,7 @@ export const getConnections = async (
     admin.installExtensions(connOpts.extensions);
   }
 
-  await admin.grantConnect(connOpts.connection.user, config.database);
+  await admin.grantConnect(connOpts.connections!.app!.user!, config.database);
 
   manager = PgTestConnector.getInstance(config);
   const pg = manager.getClient(config);
@@ -116,8 +116,8 @@ export const getConnections = async (
 
   const dbConfig = {
     ...config,
-    user: connOpts.connection.user,
-    password: connOpts.connection.password
+    user: connOpts.connections!.app!.user!,
+    password: connOpts.connections!.app!.password!
   } as PgConfig;
   
   const db = manager.getClient(dbConfig, {

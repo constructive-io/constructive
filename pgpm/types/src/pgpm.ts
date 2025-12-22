@@ -28,12 +28,14 @@ export interface PgTestConnectionOptions {
     extensions?: string[];
     /** Current working directory for database operations */
     cwd?: string;
-    /** Database connection credentials */
-    connection?: DatabaseConnectionOptions;
+    /** Test user credentials for app and admin users */
+    connections?: TestUserCredentials;
     /** Role mapping configuration */
     roles?: RoleMapping;
     /** Default authentication options for db connections */
     auth?: AuthOptions;
+    /** Use advisory locks for role/user creation (for concurrency safety) */
+    useLocksForRoles?: boolean;
 }
 
 /**
@@ -76,6 +78,16 @@ export interface DatabaseConnectionOptions {
     password?: string;
     /** Database role to assume */
     role?: string;
+}
+
+/**
+ * Test user credentials for app and admin users
+ */
+export interface TestUserCredentials {
+    /** App user credentials (for RLS simulation) */
+    app?: DatabaseConnectionOptions;
+    /** Admin user credentials (for test admin operations) */
+    admin?: DatabaseConnectionOptions;
 }
 
 /**
@@ -197,18 +209,23 @@ export const pgpmDefaults: PgpmOptions = {
     prefix: 'db-',
     extensions: [],
     cwd: process.cwd(),
-    connection: {
-      user: 'app_user',
-      password: 'app_password',
-      // TODO: check if this is used vs. roles below...
-      role: 'anonymous'
+    connections: {
+      app: {
+        user: 'app_user',
+        password: 'app_password'
+      },
+      admin: {
+        user: 'app_admin',
+        password: 'admin_password'
+      }
     },
     roles: {
       anonymous: 'anonymous',
       authenticated: 'authenticated',
       administrator: 'administrator',
       default: 'anonymous'
-    }
+    },
+    useLocksForRoles: false
   },
   pg: {
     host: 'localhost',

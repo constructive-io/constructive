@@ -1,4 +1,5 @@
 import { PgpmInit } from '@pgpmjs/core';
+import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -49,10 +50,13 @@ export default async (
     return;
   }
 
+  // Get merged options (defaults + config + env + overrides)
+  const db = getConnEnvOptions();
+
   const init = new PgpmInit(pgEnv);
   
   try {
-    await init.bootstrapRoles();
+    await init.bootstrapRoles(db.roles!);
     log.success('postgres roles and permissions initialized successfully.');
   } finally {
     await init.close();

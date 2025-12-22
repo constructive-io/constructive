@@ -1,9 +1,14 @@
 import { Logger } from '@pgpmjs/logger';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import { 
+  generateCreateBaseRolesSQL, 
+  generateCreateUserSQL, 
+  generateCreateTestUsersSQL,
+  generateRemoveUserSQL
+} from '../roles';
 
 const log = new Logger('init');
 
@@ -17,15 +22,15 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap standard roles (anonymous, authenticated, administrator)
+   * Bootstrap standard roles (anonymous, authenticated, administrator).
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+   * @param roles - Role mapping from getConnEnvOptions().roles!
    */
-  async bootstrapRoles(): Promise<void> {
+  async bootstrapRoles(roles: RoleMapping): Promise<void> {
     try {
       log.info('Bootstrapping PGPM roles...');
       
-      const sqlPath = join(__dirname, 'sql', 'bootstrap-roles.sql');
-      const sql = readFileSync(sqlPath, 'utf-8');
-      
+      const sql = generateCreateBaseRolesSQL(roles);
       await this.pool.query(sql);
       
       log.success('Successfully bootstrapped PGPM roles');
@@ -36,16 +41,17 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap test roles (roles only, no users)
+   * Bootstrap test roles (app_user, app_admin with grants to base roles).
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+   * @param roles - Role mapping from getConnEnvOptions().roles!
+   * @param connections - Test user credentials from getConnEnvOptions().connections!
    */
-  async bootstrapTestRoles(): Promise<void> {
+  async bootstrapTestRoles(roles: RoleMapping, connections: TestUserCredentials): Promise<void> {
     try {
       log.warn('WARNING: This command creates test roles and should NEVER be run on a production database!');
       log.info('Bootstrapping PGPM test roles...');
       
-      const sqlPath = join(__dirname, 'sql', 'bootstrap-test-roles.sql');
-      const sql = readFileSync(sqlPath, 'utf-8');
-      
+      const sql = generateCreateTestUsersSQL(roles, connections);
       await this.pool.query(sql);
       
       log.success('Successfully bootstrapped PGPM test roles');
@@ -56,60 +62,23 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap database roles with custom username and password
+   * Bootstrap database roles with custom username and password.
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+   * @param username - The username to create
+   * @param password - The password for the user
+   * @param roles - Role mapping from getConnEnvOptions().roles!
+   * @param useLocksForRoles - Whether to use advisory locks (from getConnEnvOptions().useLocksForRoles)
    */
-  async bootstrapDbRoles(username: string, password: string): Promise<void> {
+  async bootstrapDbRoles(
+    username: string, 
+    password: string, 
+    roles: RoleMapping,
+    useLocksForRoles = false
+  ): Promise<void> {
     try {
       log.info(`Bootstrapping PGPM database roles for user: ${username}...`);
       
-      const sql = `
-BEGIN;
-DO $do$
-DECLARE
-  v_username TEXT := '${username.replace(/'/g, "''")}';
-  v_password TEXT := '${password.replace(/'/g, "''")}';
-BEGIN
-  BEGIN
-    EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_username, v_password);
-  EXCEPTION
-    WHEN duplicate_object THEN
-      -- Role already exists; optionally sync attributes here with ALTER ROLE
-      NULL;
-  END;
-END
-$do$;
-
--- Robust GRANTs under concurrency: GRANT can race on pg_auth_members unique index.
--- Catch unique_violation (23505) and continue so CI/CD concurrent jobs don't fail.
-DO $do$
-DECLARE
-  v_username TEXT := '${username.replace(/'/g, "''")}';
-BEGIN
-  BEGIN
-    EXECUTE format('GRANT %I TO %I', 'anonymous', v_username);
-  EXCEPTION
-    WHEN unique_violation THEN
-      -- Membership was granted concurrently; ignore.
-      NULL;
-    WHEN undefined_object THEN
-      -- One of the roles doesn't exist yet; order operations as needed.
-      RAISE NOTICE 'Missing role when granting % to %', 'anonymous', v_username;
-  END;
-
-  BEGIN
-    EXECUTE format('GRANT %I TO %I', 'authenticated', v_username);
-  EXCEPTION
-    WHEN unique_violation THEN
-      -- Membership was granted concurrently; ignore.
-      NULL;
-    WHEN undefined_object THEN
-      RAISE NOTICE 'Missing role when granting % to %', 'authenticated', v_username;
-  END;
-END
-$do$;
-COMMIT;
-      `;
-      
+      const sql = generateCreateUserSQL(username, password, roles, useLocksForRoles);
       await this.pool.query(sql);
       
       log.success(`Successfully bootstrapped PGPM database roles for user: ${username}`);
@@ -120,31 +89,21 @@ COMMIT;
   }
 
   /**
-   * Remove database roles and revoke grants
+   * Remove database roles and revoke grants.
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+   * @param username - The username to remove
+   * @param roles - Role mapping from getConnEnvOptions().roles!
+   * @param useLocksForRoles - Whether to use advisory locks (from getConnEnvOptions().useLocksForRoles)
    */
-  async removeDbRoles(username: string): Promise<void> {
+  async removeDbRoles(
+    username: string, 
+    roles: RoleMapping,
+    useLocksForRoles = false
+  ): Promise<void> {
     try {
       log.info(`Removing PGPM database roles for user: ${username}...`);
       
-      const sql = `
-BEGIN;
-DO $do$
-BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM
-            pg_catalog.pg_roles
-        WHERE
-            rolname = '${username}') THEN
-    REVOKE anonymous FROM ${username};
-    REVOKE authenticated FROM ${username};
-    DROP ROLE ${username};
-END IF;
-END
-$do$;
-COMMIT;
-      `;
-      
+      const sql = generateRemoveUserSQL(username, roles, useLocksForRoles);
       await this.pool.query(sql);
       
       log.success(`Successfully removed PGPM database roles for user: ${username}`);

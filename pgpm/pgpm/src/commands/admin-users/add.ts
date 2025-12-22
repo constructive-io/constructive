@@ -1,4 +1,5 @@
 import { PgpmInit } from '@pgpmjs/core';
+import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -41,6 +42,9 @@ export default async (
   const pgEnv = getPgEnvOptions();
   const isTest = argv.test;
 
+  // Get merged options (defaults + config + env + overrides)
+  const db = getConnEnvOptions();
+
   const init = new PgpmInit(pgEnv);
   
   try {
@@ -59,7 +63,7 @@ export default async (
         return;
       }
 
-      await init.bootstrapTestRoles();
+      await init.bootstrapTestRoles(db.roles!, db.connections!);
       log.success('Test users added successfully.');
     } else {
       const prompts: Question[] = [
@@ -93,7 +97,7 @@ export default async (
         return;
       }
 
-      await init.bootstrapDbRoles(username, password);
+      await init.bootstrapDbRoles(username, password, db.roles!);
       log.success(`Database user "${username}" added successfully.`);
     }
   } finally {

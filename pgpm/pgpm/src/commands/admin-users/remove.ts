@@ -1,4 +1,5 @@
 import { PgpmInit } from '@pgpmjs/core';
+import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -39,6 +40,11 @@ export default async (
   const pgEnv = getPgEnvOptions();
   const isTest = argv.test;
 
+  // Get merged options (defaults + config + env + overrides)
+  const db = getConnEnvOptions();
+  const appUser = db.connections!.app!.user!;
+  const adminUser = db.connections!.admin!.user!;
+
   const init = new PgpmInit(pgEnv);
   
   try {
@@ -47,7 +53,7 @@ export default async (
         {
           type: 'confirm',
           name: 'yes',
-          message: 'Are you sure you want to remove test users (app_user, app_admin)?',
+          message: `Are you sure you want to remove test users (${appUser}, ${adminUser})?`,
           default: false
         }
       ]);
@@ -57,8 +63,8 @@ export default async (
         return;
       }
 
-      await init.removeDbRoles('app_user');
-      await init.removeDbRoles('app_admin');
+      await init.removeDbRoles(appUser, db.roles!);
+      await init.removeDbRoles(adminUser, db.roles!);
       log.success('Test users removed successfully.');
     } else {
       const prompts: Question[] = [
@@ -86,7 +92,7 @@ export default async (
         return;
       }
 
-      await init.removeDbRoles(username);
+      await init.removeDbRoles(username, db.roles!);
       log.success(`Database user "${username}" removed successfully.`);
     }
   } finally {
