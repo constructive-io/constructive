@@ -1,5 +1,4 @@
 import { Logger } from '@pgpmjs/logger';
-import { RoleMapping } from '@pgpmjs/types';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
@@ -8,12 +7,14 @@ import {
   generateCreateUserSQL, 
   generateCreateTestUsersSQL,
   generateRemoveUserSQL,
-  RoleManagementOptions 
+  RoleManagementOptions,
+  ResolvedRoleMapping,
+  ResolvedTestUserCredentials
 } from '../roles';
 
 const log = new Logger('init');
 
-export { RoleManagementOptions } from '../roles';
+export { RoleManagementOptions, ResolvedRoleMapping, ResolvedTestUserCredentials } from '../roles';
 
 export class PgpmInit {
   private pool: Pool;
@@ -25,10 +26,11 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap standard roles (anonymous, authenticated, administrator)
-   * @param roles - Optional custom role mapping (defaults to canonical names)
+   * Bootstrap standard roles (anonymous, authenticated, administrator).
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
+   * @param roles - Resolved role mapping (use getConnEnvOptions().roles)
    */
-  async bootstrapRoles(roles?: Partial<RoleMapping>): Promise<void> {
+  async bootstrapRoles(roles: ResolvedRoleMapping): Promise<void> {
     try {
       log.info('Bootstrapping PGPM roles...');
       
@@ -43,15 +45,17 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap test roles (app_user, app_admin with grants to base roles)
-   * @param roles - Optional custom role mapping (defaults to canonical names)
+   * Bootstrap test roles (app_user, app_admin with grants to base roles).
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
+   * @param roles - Resolved role mapping (use getConnEnvOptions().roles)
+   * @param connections - Resolved test user credentials (use getConnEnvOptions().connections)
    */
-  async bootstrapTestRoles(roles?: Partial<RoleMapping>): Promise<void> {
+  async bootstrapTestRoles(roles: ResolvedRoleMapping, connections: ResolvedTestUserCredentials): Promise<void> {
     try {
       log.warn('WARNING: This command creates test roles and should NEVER be run on a production database!');
       log.info('Bootstrapping PGPM test roles...');
       
-      const sql = generateCreateTestUsersSQL(roles);
+      const sql = generateCreateTestUsersSQL(roles, connections);
       await this.pool.query(sql);
       
       log.success('Successfully bootstrapped PGPM test roles');
@@ -62,16 +66,17 @@ export class PgpmInit {
   }
 
   /**
-   * Bootstrap database roles with custom username and password
+   * Bootstrap database roles with custom username and password.
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
    * @param username - The username to create
    * @param password - The password for the user
-   * @param roles - Optional custom role mapping (defaults to canonical names)
+   * @param roles - Resolved role mapping (use getConnEnvOptions().roles)
    * @param options - Optional settings including useLocks for advisory locking
    */
   async bootstrapDbRoles(
     username: string, 
     password: string, 
-    roles?: Partial<RoleMapping>,
+    roles: ResolvedRoleMapping,
     options?: RoleManagementOptions
   ): Promise<void> {
     try {
@@ -88,14 +93,15 @@ export class PgpmInit {
   }
 
   /**
-   * Remove database roles and revoke grants
+   * Remove database roles and revoke grants.
+   * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
    * @param username - The username to remove
-   * @param roles - Optional custom role mapping (defaults to canonical names)
+   * @param roles - Resolved role mapping (use getConnEnvOptions().roles)
    * @param options - Optional settings including useLocks for advisory locking
    */
   async removeDbRoles(
     username: string, 
-    roles?: Partial<RoleMapping>,
+    roles: ResolvedRoleMapping,
     options?: RoleManagementOptions
   ): Promise<void> {
     try {

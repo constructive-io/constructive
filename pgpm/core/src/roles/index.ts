@@ -1,4 +1,4 @@
-import { pgpmDefaults, RoleMapping, DatabaseConnectionOptions } from '@pgpmjs/types';
+import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 
 /**
  * Options for role management operations
@@ -8,59 +8,22 @@ export interface RoleManagementOptions {
 }
 
 /**
- * Options for test user creation
+ * Resolved role mapping with all required fields.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
  */
-export interface TestUserOptions {
-  /** App user credentials (defaults from pgpmDefaults.db.connection) */
-  appUser?: DatabaseConnectionOptions;
-  /** App admin credentials */
-  appAdmin?: {
-    user?: string;
-    password?: string;
-  };
+export interface ResolvedRoleMapping {
+  anonymous: string;
+  authenticated: string;
+  administrator: string;
 }
 
 /**
- * Get resolved role mapping with defaults from pgpmDefaults
+ * Resolved test user credentials with all required fields.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
  */
-export function getRoleMapping(config?: Partial<RoleMapping>): Required<RoleMapping> {
-  const defaults = pgpmDefaults.db?.roles ?? {
-    anonymous: 'anonymous',
-    authenticated: 'authenticated',
-    administrator: 'administrator',
-    default: 'anonymous'
-  };
-  return {
-    anonymous: defaults.anonymous ?? 'anonymous',
-    authenticated: defaults.authenticated ?? 'authenticated',
-    administrator: defaults.administrator ?? 'administrator',
-    default: defaults.default ?? 'anonymous',
-    ...(config || {})
-  };
-}
-
-/**
- * Get resolved test user credentials with defaults from pgpmDefaults
- */
-function getTestUserDefaults(options?: TestUserOptions): {
-  appUser: { user: string; password: string };
-  appAdmin: { user: string; password: string };
-} {
-  const connDefaults = pgpmDefaults.db?.connection ?? {
-    user: 'app_user',
-    password: 'app_password'
-  };
-  
-  return {
-    appUser: {
-      user: options?.appUser?.user ?? connDefaults.user ?? 'app_user',
-      password: options?.appUser?.password ?? connDefaults.password ?? 'app_password'
-    },
-    appAdmin: {
-      user: options?.appAdmin?.user ?? 'app_admin',
-      password: options?.appAdmin?.password ?? 'admin_password'
-    }
-  };
+export interface ResolvedTestUserCredentials {
+  app: { user: string; password: string };
+  admin: { user: string; password: string };
 }
 
 /**
@@ -72,10 +35,11 @@ function sqlLiteral(value: string): string {
 }
 
 /**
- * Generate SQL to create base roles (anonymous, authenticated, administrator)
+ * Generate SQL to create base roles (anonymous, authenticated, administrator).
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
  */
-export function generateCreateBaseRolesSQL(roles?: Partial<RoleMapping>): string {
-  const r = getRoleMapping(roles);
+export function generateCreateBaseRolesSQL(roles: ResolvedRoleMapping): string {
+  const r = roles;
   
   return `
 BEGIN;
@@ -147,15 +111,16 @@ COMMIT;
 }
 
 /**
- * Generate SQL to create a user with password and grant base roles
+ * Generate SQL to create a user with password and grant base roles.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
  */
 export function generateCreateUserSQL(
   username: string, 
   password: string, 
-  roles?: Partial<RoleMapping>,
+  roles: ResolvedRoleMapping,
   options?: RoleManagementOptions
 ): string {
-  const r = getRoleMapping(roles);
+  const r = roles;
   const useLocks = options?.useLocks ?? false;
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
@@ -245,23 +210,23 @@ COMMIT;
 
 /**
  * Generate SQL to create test users with grants to base roles.
- * Defaults to app_user/app_password and app_admin/admin_password from pgpmDefaults.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
  */
 export function generateCreateTestUsersSQL(
-  roles?: Partial<RoleMapping>,
-  testUsers?: TestUserOptions
+  roles: ResolvedRoleMapping,
+  connections: ResolvedTestUserCredentials
 ): string {
-  const r = getRoleMapping(roles);
-  const users = getTestUserDefaults(testUsers);
+  const r = roles;
+  const users = connections;
   
   return `
 BEGIN;
 DO $do$
 DECLARE
-  v_app_user text := ${sqlLiteral(users.appUser.user)};
-  v_app_user_password text := ${sqlLiteral(users.appUser.password)};
-  v_app_admin text := ${sqlLiteral(users.appAdmin.user)};
-  v_app_admin_password text := ${sqlLiteral(users.appAdmin.password)};
+  v_app_user text := ${sqlLiteral(users.app.user)};
+  v_app_user_password text := ${sqlLiteral(users.app.password)};
+  v_app_admin text := ${sqlLiteral(users.admin.user)};
+  v_app_admin_password text := ${sqlLiteral(users.admin.password)};
   v_anonymous text := ${sqlLiteral(r.anonymous)};
   v_authenticated text := ${sqlLiteral(r.authenticated)};
   v_administrator text := ${sqlLiteral(r.administrator)};
@@ -421,14 +386,15 @@ $$;
 }
 
 /**
- * Generate SQL to remove a user and revoke grants
+ * Generate SQL to remove a user and revoke grants.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
  */
 export function generateRemoveUserSQL(
   username: string, 
-  roles?: Partial<RoleMapping>,
+  roles: ResolvedRoleMapping,
   options?: RoleManagementOptions
 ): string {
-  const r = getRoleMapping(roles);
+  const r = roles;
   const useLocks = options?.useLocks ?? false;
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`

@@ -1,4 +1,5 @@
-import { PgpmInit } from '@pgpmjs/core';
+import { PgpmInit, ResolvedRoleMapping } from '@pgpmjs/core';
+import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -49,10 +50,18 @@ export default async (
     return;
   }
 
+  // Get resolved options using deepmerge (defaults + config + env + overrides)
+  const dbOptions = getConnEnvOptions();
+  const roles: ResolvedRoleMapping = {
+    anonymous: dbOptions.roles?.anonymous ?? 'anonymous',
+    authenticated: dbOptions.roles?.authenticated ?? 'authenticated',
+    administrator: dbOptions.roles?.administrator ?? 'administrator'
+  };
+
   const init = new PgpmInit(pgEnv);
   
   try {
-    await init.bootstrapRoles();
+    await init.bootstrapRoles(roles);
     log.success('postgres roles and permissions initialized successfully.');
   } finally {
     await init.close();
