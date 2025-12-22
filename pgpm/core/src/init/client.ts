@@ -7,13 +7,10 @@ import {
   generateCreateBaseRolesSQL, 
   generateCreateUserSQL, 
   generateCreateTestUsersSQL,
-  generateRemoveUserSQL,
-  RoleManagementOptions
+  generateRemoveUserSQL
 } from '../roles';
 
 const log = new Logger('init');
-
-export { RoleManagementOptions } from '../roles';
 
 export class PgpmInit {
   private pool: Pool;
@@ -70,18 +67,18 @@ export class PgpmInit {
    * @param username - The username to create
    * @param password - The password for the user
    * @param roles - Role mapping from getConnEnvOptions().roles!
-   * @param options - Optional settings including useLocks for advisory locking
+   * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
    */
   async bootstrapDbRoles(
     username: string, 
     password: string, 
     roles: RoleMapping,
-    options?: RoleManagementOptions
+    useLocks = false
   ): Promise<void> {
     try {
       log.info(`Bootstrapping PGPM database roles for user: ${username}...`);
       
-      const sql = generateCreateUserSQL(username, password, roles, options);
+      const sql = generateCreateUserSQL(username, password, roles, useLocks);
       await this.pool.query(sql);
       
       log.success(`Successfully bootstrapped PGPM database roles for user: ${username}`);
@@ -96,17 +93,17 @@ export class PgpmInit {
    * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
    * @param username - The username to remove
    * @param roles - Role mapping from getConnEnvOptions().roles!
-   * @param options - Optional settings including useLocks for advisory locking
+   * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
    */
   async removeDbRoles(
     username: string, 
     roles: RoleMapping,
-    options?: RoleManagementOptions
+    useLocks = false
   ): Promise<void> {
     try {
       log.info(`Removing PGPM database roles for user: ${username}...`);
       
-      const sql = generateRemoveUserSQL(username, roles, options);
+      const sql = generateRemoveUserSQL(username, roles, useLocks);
       await this.pool.query(sql);
       
       log.success(`Successfully removed PGPM database roles for user: ${username}`);

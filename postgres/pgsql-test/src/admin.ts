@@ -1,7 +1,6 @@
 import { 
   generateCreateUserWithGrantsSQL, 
-  generateGrantRoleSQL,
-  RoleManagementOptions 
+  generateGrantRoleSQL
 } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
@@ -14,8 +13,6 @@ import { SeedAdapter } from './seed/types';
 import { streamSql as stream } from './stream';
 
 const log = new Logger('db-admin');
-
-export { RoleManagementOptions } from '@pgpmjs/core';
 
 export class DbAdmin {
   constructor(
@@ -124,7 +121,7 @@ export class DbAdmin {
 
   // ONLY granting admin role for testing purposes, normally the db connection for apps won't have admin role
   // DO NOT USE THIS FOR PRODUCTION
-  async createUserRole(user: string, password: string, dbName: string, options?: RoleManagementOptions): Promise<void> {
+  async createUserRole(user: string, password: string, dbName: string, useLocks = false): Promise<void> {
     const anonRole = getRoleName('anonymous', this.roleConfig);
     const authRole = getRoleName('authenticated', this.roleConfig);
     const adminRole = getRoleName('administrator', this.roleConfig);
@@ -133,7 +130,7 @@ export class DbAdmin {
       user, 
       password, 
       [anonRole, authRole, adminRole],
-      options
+      useLocks
     );
 
     await this.streamSql(sql, dbName);

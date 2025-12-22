@@ -1,13 +1,6 @@
 import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 
 /**
- * Options for role management operations
- */
-export interface RoleManagementOptions {
-  useLocks?: boolean;
-}
-
-/**
  * Safely escape a string for use as a SQL string literal.
  * Doubles single quotes and wraps in single quotes.
  */
@@ -100,19 +93,19 @@ COMMIT;
  * Generate SQL to create a user with password and grant base roles.
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
+ * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
  */
 export function generateCreateUserSQL(
   username: string, 
   password: string, 
   roles: RoleMapping,
-  options?: RoleManagementOptions
+  useLocks = false
 ): string {
   const r = {
     anonymous: roles.anonymous!,
     authenticated: roles.authenticated!
   };
-  const useLocks = options?.useLocks ?? false;
-  const lockStatement = useLocks 
+  const lockStatement = useLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
   
@@ -388,18 +381,18 @@ $$;
  * Generate SQL to remove a user and revoke grants.
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
+ * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
  */
 export function generateRemoveUserSQL(
   username: string, 
   roles: RoleMapping,
-  options?: RoleManagementOptions
+  useLocks = false
 ): string {
   const r = {
     anonymous: roles.anonymous!,
     authenticated: roles.authenticated!
   };
-  const useLocks = options?.useLocks ?? false;
-  const lockStatement = useLocks 
+  const lockStatement = useLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
   
@@ -467,15 +460,15 @@ COMMIT;
 
 /**
  * Generate SQL to create a user with grants to specified roles (for test harness)
+ * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
  */
 export function generateCreateUserWithGrantsSQL(
   username: string,
   password: string,
   rolesToGrant: string[],
-  options?: RoleManagementOptions
+  useLocks = false
 ): string {
-  const useLocks = options?.useLocks ?? false;
-  const lockStatement = useLocks 
+  const lockStatement = useLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_user));`
     : '';
   
