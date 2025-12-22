@@ -57,7 +57,7 @@ interface RoleMapping {
 
 ## Entry Points and Call Paths
 
-### 1. Bootstrap Base Roles (Static SQL)
+### 1. Bootstrap Base Roles (Dynamic TypeScript)
 
 **Command:** `pgpm admin-users bootstrap`
 
@@ -66,12 +66,12 @@ interface RoleMapping {
 pgpm admin-users bootstrap
   -> pgpm/pgpm/src/commands/admin-users/bootstrap.ts
     -> new PgpmInit(pgEnv)
-      -> init.bootstrapRoles()
-        -> pgpm/core/src/init/sql/bootstrap-roles.sql
+      -> init.bootstrapRoles(roles?)
+        -> generateCreateBaseRolesSQL(roles?)
 ```
 
 **What it does:**
-- Creates the three base roles: `anonymous`, `authenticated`, `administrator`
+- Creates the three base roles: `anonymous`, `authenticated`, `administrator` (or custom names via `roles` parameter)
 - Sets role attributes (NOLOGIN, NOCREATEDB, etc.)
 - Administrator gets BYPASSRLS, others do not
 
@@ -79,7 +79,7 @@ pgpm admin-users bootstrap
 - One-time setup when initializing a new database
 - Must be run before adding any users
 
-### 2. Add Test Users (Static SQL)
+### 2. Add Test Users (Dynamic TypeScript)
 
 **Command:** `pgpm admin-users add --test`
 
@@ -88,18 +88,18 @@ pgpm admin-users bootstrap
 pgpm admin-users add --test
   -> pgpm/pgpm/src/commands/admin-users/add.ts
     -> new PgpmInit(pgEnv)
-      -> init.bootstrapTestRoles()
-        -> pgpm/core/src/init/sql/bootstrap-test-roles.sql
+      -> init.bootstrapTestRoles(roles?, testUsers?)
+        -> generateCreateTestUsersSQL(roles?, testUsers?)
 ```
 
 **What it does:**
-- Creates `app_user` (password: `app_password`) and `app_admin` (password: `admin_password`)
+- Creates `app_user` and `app_admin` with credentials from `pgpmDefaults.db.connection` (or custom via `testUsers` parameter)
 - Grants `anonymous` and `authenticated` to `app_user`
 - Grants `anonymous`, `authenticated`, and `administrator` to `app_admin`
 
 **When to use:**
 - Local development only
-- Never on production (hardcoded passwords)
+- Never on production (default passwords)
 
 **Prerequisites:**
 - Base roles must exist (run `pgpm admin-users bootstrap` first)
@@ -269,11 +269,12 @@ All role management operations are designed to be idempotent and safe under conc
 | `postgres/pgsql-test/src/connect.ts` | Test connection setup |
 | `pgpm/types/src/pgpm.ts` | RoleMapping interface and defaults |
 
-### Legacy SQL Files (Reference Only)
+### Defaults
 
-The following SQL files are kept for reference but are no longer executed directly:
+All role and test user defaults are sourced from `pgpmDefaults` in `@pgpmjs/types`:
 
-| File | Purpose |
-|------|---------|
-| `pgpm/core/src/init/sql/bootstrap-roles.sql` | Reference: base role creation SQL |
-| `pgpm/core/src/init/sql/bootstrap-test-roles.sql` | Reference: test user creation SQL |
+| Default | Source |
+|---------|--------|
+| Role names | `pgpmDefaults.db.roles` (anonymous, authenticated, administrator) |
+| Test user credentials | `pgpmDefaults.db.connection` (app_user/app_password) |
+| Test admin credentials | Hardcoded (app_admin/admin_password) |
