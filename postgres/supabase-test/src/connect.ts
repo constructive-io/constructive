@@ -1,3 +1,4 @@
+import deepmerge from 'deepmerge';
 import { getPgEnvVars, PgConfig } from 'pg-env';
 import { 
   getConnections as getPgConnections,
@@ -15,6 +16,12 @@ const SUPABASE_DEFAULTS: Partial<PgTestConnectionOptions> = {
     authenticated: 'authenticated',
     administrator: 'service_role',
     default: 'anon',
+  },
+  connections: {
+    app: {
+      user: 'supabase_admin',
+      password: 'postgres',
+    }
   }
 };
 
@@ -29,52 +36,52 @@ const SUPABASE_PG_DEFAULTS: Partial<PgConfig> = {
 
 /**
  * Get connections with Supabase defaults applied.
- * Environment variables take precedence over Supabase defaults.
- * User-provided options take precedence over both.
+ * Uses deepmerge for proper nested config merging.
  * 
- * Note: Uses PGUSER/PGPASSWORD for both pg config and db.connections.app
+ * Precedence (later wins):
+ * 1. Supabase defaults
+ * 2. Environment variables (PGUSER/PGPASSWORD)
+ * 3. User-provided options
  */
 export const getConnections = async (
   cn: GetConnectionOpts = {},
   seedAdapters?: Parameters<typeof getPgConnections>[1]
 ): Promise<GetConnectionResult> => {
-  // Get environment variables - these should take precedence over our defaults
+  // Get environment variables
   const pgEnvVars = getPgEnvVars();
   
-  // Build pg config: env vars > Supabase defaults, then user overrides will override both
-  const pgConfig: Partial<PgConfig> = {};
-  pgConfig.port = pgEnvVars.port ?? SUPABASE_PG_DEFAULTS.port;
-  pgConfig.user = pgEnvVars.user ?? SUPABASE_PG_DEFAULTS.user;
-  pgConfig.password = pgEnvVars.password ?? SUPABASE_PG_DEFAULTS.password;
+  // Build env-based overrides for pg config
+  const pgEnvOverrides: Partial<PgConfig> = {};
+  if (pgEnvVars.port !== undefined) pgEnvOverrides.port = pgEnvVars.port;
+  if (pgEnvVars.user !== undefined) pgEnvOverrides.user = pgEnvVars.user;
+  if (pgEnvVars.password !== undefined) pgEnvOverrides.password = pgEnvVars.password;
   
-  // Build app connection config: use same user/password as pg config (from env vars or Supabase defaults)
-  const appConnectionConfig = {
-    user: pgConfig.user,
-    password: pgConfig.password,
-    ...cn.db?.connections?.app, // User overrides take precedence
-  };
+  // Build env-based overrides for db.connections.app (use same user/password as pg)
+  const dbEnvOverrides: Partial<PgTestConnectionOptions> = {};
+  if (pgEnvVars.user !== undefined || pgEnvVars.password !== undefined) {
+    dbEnvOverrides.connections = {
+      app: {
+        ...(pgEnvVars.user !== undefined && { user: pgEnvVars.user }),
+        ...(pgEnvVars.password !== undefined && { password: pgEnvVars.password }),
+      }
+    };
+  }
   
-  // Build roles config: Supabase defaults, then user overrides will override
-  const rolesConfig = {
-    ...SUPABASE_DEFAULTS.roles,
-    ...cn.db?.roles, // User overrides take precedence
-  };
-  
-  // Build the merged options, respecting precedence: env vars > Supabase defaults > user overrides
-  const mergedOpts: GetConnectionOpts = {
-    pg: {
-      ...pgConfig,
-      ...cn.pg, // User overrides take precedence
+  // Merge all configs: Supabase defaults -> env vars -> user overrides
+  const mergedOpts: GetConnectionOpts = deepmerge.all([
+    // Supabase defaults
+    {
+      pg: SUPABASE_PG_DEFAULTS,
+      db: SUPABASE_DEFAULTS,
     },
-    db: {
-      ...cn.db, // Other user overrides first
-      connections: {
-        app: appConnectionConfig,
-        ...cn.db?.connections, // Preserve admin if provided
-      },
-      roles: rolesConfig,
-    }
-  };
+    // Environment variable overrides
+    {
+      pg: pgEnvOverrides,
+      db: dbEnvOverrides,
+    },
+    // User-provided overrides (highest precedence)
+    cn,
+  ]) as GetConnectionOpts;
 
   return getPgConnections(mergedOpts, seedAdapters);
 };

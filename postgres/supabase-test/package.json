@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@pgpmjs/types": "workspace:^",
+    "deepmerge": "^4.3.1",
     "pg-env": "workspace:^",
     "pgsql-test": "workspace:^"
   },
