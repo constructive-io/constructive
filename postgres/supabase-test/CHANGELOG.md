@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.10](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.9...supabase-test@0.4.10) (2025-12-22)
+
+### Bug Fixes
+
+- properly set connections.app in supabase-test ([4abe1ac](https://github.com/constructive-io/constructive/commit/4abe1acccd84f0487c2404d18af4b2a017c4435a))
+
 ## [0.4.9](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.8...supabase-test@0.4.9) (2025-12-21)
 
 **Note:** Version bump only for package supabase-test

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.18.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.17.5...pgsql-test@2.18.0) (2025-12-22)
+
+### Features
+
+- make role/user creation & grants concurrency-safe with optional advisory locks ([2868769](https://github.com/constructive-io/constructive/commit/2868769bbd81248ea428c0a5c6cd780d9c220928))
+- unify role management into single dynamic implementation with configurable role names ([faf7dba](https://github.com/constructive-io/constructive/commit/faf7dbae3c3970772c5783e8443d09f1ca806322))
+
 ## [2.17.5](https://github.com/constructive-io/constructive/compare/pgsql-test@2.17.4...pgsql-test@2.17.5) (2025-12-21)
 
 **Note:** Version bump only for package pgsql-test

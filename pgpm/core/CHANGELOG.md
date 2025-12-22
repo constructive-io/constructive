@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.0.9...@pgpmjs/core@3.1.0) (2025-12-22)
+
+### Bug Fixes
+
+- use proper PL/pgSQL variable declarations for role names ([6fb1da2](https://github.com/constructive-io/constructive/commit/6fb1da25f4d25d899199ed2616290f9d42ecf0e5))
+
+### Features
+
+- make role/user creation & grants concurrency-safe with optional advisory locks ([2868769](https://github.com/constructive-io/constructive/commit/2868769bbd81248ea428c0a5c6cd780d9c220928))
+- unify role management into single dynamic implementation with configurable role names ([faf7dba](https://github.com/constructive-io/constructive/commit/faf7dbae3c3970772c5783e8443d09f1ca806322))
+
 ## [3.0.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.0.8...@pgpmjs/core@3.0.9) (2025-12-21)
 
 **Note:** Version bump only for package @pgpmjs/core
