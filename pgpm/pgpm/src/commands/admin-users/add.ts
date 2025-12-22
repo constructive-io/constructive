@@ -1,4 +1,5 @@
-import { PgpmInit } from '@pgpmjs/core';
+import { PgpmInit, ResolvedRoleMapping, ResolvedTestUserCredentials } from '@pgpmjs/core';
+import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
@@ -41,6 +42,24 @@ export default async (
   const pgEnv = getPgEnvOptions();
   const isTest = argv.test;
 
+  // Get resolved options using deepmerge (defaults + config + env + overrides)
+  const dbOptions = getConnEnvOptions();
+  const roles: ResolvedRoleMapping = {
+    anonymous: dbOptions.roles?.anonymous ?? 'anonymous',
+    authenticated: dbOptions.roles?.authenticated ?? 'authenticated',
+    administrator: dbOptions.roles?.administrator ?? 'administrator'
+  };
+  const connections: ResolvedTestUserCredentials = {
+    app: {
+      user: dbOptions.connections?.app?.user ?? 'app_user',
+      password: dbOptions.connections?.app?.password ?? 'app_password'
+    },
+    admin: {
+      user: dbOptions.connections?.admin?.user ?? 'app_admin',
+      password: dbOptions.connections?.admin?.password ?? 'admin_password'
+    }
+  };
+
   const init = new PgpmInit(pgEnv);
   
   try {
@@ -59,7 +78,7 @@ export default async (
         return;
       }
 
-      await init.bootstrapTestRoles();
+      await init.bootstrapTestRoles(roles, connections);
       log.success('Test users added successfully.');
     } else {
       const prompts: Question[] = [
@@ -93,7 +112,7 @@ export default async (
         return;
       }
 
-      await init.bootstrapDbRoles(username, password);
+      await init.bootstrapDbRoles(username, password, roles);
       log.success(`Database user "${username}" added successfully.`);
     }
   } finally {

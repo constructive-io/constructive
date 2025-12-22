@@ -23,17 +23,22 @@ const parseEnvStringArray = (val?: string): string[] | undefined => {
  * GraphQL-related env vars (GRAPHILE_*, FEATURES_*, API_*) are handled by @constructive-io/graphql-env.
  */
 export const getEnvVars = (): PgpmOptions => {
-  const {
-    PGROOTDATABASE,
-    PGTEMPLATE,
-    DB_PREFIX,
-    DB_EXTENSIONS,
-    DB_CWD,
-    DB_CONNECTION_USER,
-    DB_CONNECTION_PASSWORD,
-    DB_CONNECTION_ROLE,
+    const {
+      PGROOTDATABASE,
+      PGTEMPLATE,
+      DB_PREFIX,
+      DB_EXTENSIONS,
+      DB_CWD,
+      DB_CONNECTION_USER,
+      DB_CONNECTION_PASSWORD,
+      DB_CONNECTION_ROLE,
+      // New connections.app and connections.admin env vars
+      DB_CONNECTIONS_APP_USER,
+      DB_CONNECTIONS_APP_PASSWORD,
+      DB_CONNECTIONS_ADMIN_USER,
+      DB_CONNECTIONS_ADMIN_PASSWORD,
 
-    PORT,
+      PORT,
     SERVER_HOST,
     SERVER_TRUST_PROXY,
     SERVER_ORIGIN,
@@ -75,14 +80,30 @@ export const getEnvVars = (): PgpmOptions => {
       ...(DB_PREFIX && { prefix: DB_PREFIX }),
       ...(DB_EXTENSIONS && { extensions: DB_EXTENSIONS.split(',').map(ext => ext.trim()) }),
       ...(DB_CWD && { cwd: DB_CWD }),
-      ...((DB_CONNECTION_USER || DB_CONNECTION_PASSWORD || DB_CONNECTION_ROLE) && {
-        connection: {
-          ...(DB_CONNECTION_USER && { user: DB_CONNECTION_USER }),
-          ...(DB_CONNECTION_PASSWORD && { password: DB_CONNECTION_PASSWORD }),
-          ...(DB_CONNECTION_ROLE && { role: DB_CONNECTION_ROLE }),
-        }
-      }),
-    },
+          ...((DB_CONNECTION_USER || DB_CONNECTION_PASSWORD || DB_CONNECTION_ROLE) && {
+            connection: {
+              ...(DB_CONNECTION_USER && { user: DB_CONNECTION_USER }),
+              ...(DB_CONNECTION_PASSWORD && { password: DB_CONNECTION_PASSWORD }),
+              ...(DB_CONNECTION_ROLE && { role: DB_CONNECTION_ROLE }),
+            }
+          }),
+          ...((DB_CONNECTIONS_APP_USER || DB_CONNECTIONS_APP_PASSWORD || DB_CONNECTIONS_ADMIN_USER || DB_CONNECTIONS_ADMIN_PASSWORD) && {
+            connections: {
+              ...((DB_CONNECTIONS_APP_USER || DB_CONNECTIONS_APP_PASSWORD) && {
+                app: {
+                  ...(DB_CONNECTIONS_APP_USER && { user: DB_CONNECTIONS_APP_USER }),
+                  ...(DB_CONNECTIONS_APP_PASSWORD && { password: DB_CONNECTIONS_APP_PASSWORD }),
+                }
+              }),
+              ...((DB_CONNECTIONS_ADMIN_USER || DB_CONNECTIONS_ADMIN_PASSWORD) && {
+                admin: {
+                  ...(DB_CONNECTIONS_ADMIN_USER && { user: DB_CONNECTIONS_ADMIN_USER }),
+                  ...(DB_CONNECTIONS_ADMIN_PASSWORD && { password: DB_CONNECTIONS_ADMIN_PASSWORD }),
+                }
+              }),
+            }
+          }),
+        },
     server: {
       ...(PORT && { port: parseEnvNumber(PORT) }),
       ...(SERVER_HOST && { host: SERVER_HOST }),
