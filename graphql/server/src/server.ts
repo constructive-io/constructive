@@ -65,9 +65,21 @@ class Server {
 
   listen(): void {
     const { server } = this.opts;
-    this.app.listen(server?.port, server?.host, () =>
+    const httpServer = this.app.listen(server?.port, server?.host, () =>
       log.info(`listening at http://${server?.host}:${server?.port}`)
     );
+
+    httpServer.on('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        this.error(
+          `Port ${server?.port ?? 'unknown'} is already in use`,
+          err
+        );
+      } else {
+        this.error('Server failed to start', err);
+      }
+      throw err;
+    });
   }
 
   async flush(databaseId: string): Promise<void> {
