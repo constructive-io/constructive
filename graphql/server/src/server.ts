@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
@@ -35,13 +33,13 @@ class Server {
     this.opts = getEnvOptions(opts);
 
     const app = express();
-    const api = createApiMiddleware(opts);
-    const authenticate = createAuthenticateMiddleware(opts);
+    const api = createApiMiddleware(this.opts);
+    const authenticate = createAuthenticateMiddleware(this.opts);
 
     healthz(app);
-    trustProxy(app, opts.server.trustProxy);
+    trustProxy(app, this.opts.server.trustProxy);
     // Warn if a global CORS override is set in production
-    const fallbackOrigin = opts.server?.origin?.trim();
+    const fallbackOrigin = this.opts.server?.origin?.trim();
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
         log.warn('CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.');
@@ -57,7 +55,7 @@ class Server {
     app.use(requestIp.mw());
     app.use(api);
     app.use(authenticate);
-    app.use(graphile(opts));
+    app.use(graphile(this.opts));
     app.use(flush);
 
     this.app = app;

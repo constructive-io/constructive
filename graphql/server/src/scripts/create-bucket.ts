@@ -1,21 +1,19 @@
 // Minimal script to create a bucket in MinIO using @constructive-io/s3-utils
 // Avoid strict type coupling between different @aws-sdk/client-s3 versions
 
-// Loads graphql/server/.env by default when running via ts-node from this workspace
-import 'dotenv/config';
-
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
 
-const BUCKET = process.env.BUCKET_NAME || 'test-bucket';
-const REGION = process.env.AWS_REGION || 'us-east-1';
+const { cdn } = getEnvOptions();
+
+const BUCKET = cdn?.bucketName ?? 'test-bucket';
+const REGION = cdn?.awsRegion ?? 'us-east-1';
 const ACCESS_KEY =
-  process.env.AWS_ACCESS_KEY || process.env.AWS_ACCESS_KEY_ID || 'minioadmin';
+  process.env.AWS_ACCESS_KEY_ID || cdn?.awsAccessKey || 'minioadmin';
 const SECRET_KEY =
-  process.env.AWS_SECRET_KEY ||
-  process.env.AWS_SECRET_ACCESS_KEY ||
-  'minioadmin';
-const ENDPOINT = process.env.MINIO_ENDPOINT || 'http://localhost:9000';
+  process.env.AWS_SECRET_ACCESS_KEY || cdn?.awsSecretKey || 'minioadmin';
+const ENDPOINT = cdn?.minioEndpoint || 'http://localhost:9000';
 
 (async () => {
   try {

@@ -94,6 +94,11 @@ export const createApiMiddleware = (opts: any) => {
       };
       req.api = api;
       req.databaseId = databaseId;
+      const schemaKey =
+        Array.isArray(schemas) && schemas.length ? schemas.join(',') : 'default';
+      req.svc_key = (req as any).urlDomains?.domain
+        ? getSvcKey(opts, req)
+        : `schemata:${databaseId ?? 'default'}:${schemaKey}`;
       return next();
     }
     try {
