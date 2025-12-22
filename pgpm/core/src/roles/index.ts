@@ -12,12 +12,27 @@ function sqlLiteral(value: string): string {
  * Generate SQL to create base roles (anonymous, authenticated, administrator).
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
+ * @throws Error if roles is undefined or missing required properties
  */
 export function generateCreateBaseRolesSQL(roles: RoleMapping): string {
+  if (!roles) {
+    throw new Error(
+      'generateCreateBaseRolesSQL: roles parameter is undefined. ' +
+      'Ensure getConnEnvOptions().roles is defined. ' +
+      'Check that pgpm.config.js or pgpm.json does not set db.roles to undefined.'
+    );
+  }
+  if (!roles.anonymous || !roles.authenticated || !roles.administrator) {
+    throw new Error(
+      'generateCreateBaseRolesSQL: roles is missing required properties. ' +
+      `Got: anonymous=${roles.anonymous}, authenticated=${roles.authenticated}, administrator=${roles.administrator}. ` +
+      'Ensure all role names are defined in your configuration.'
+    );
+  }
   const r = {
-    anonymous: roles.anonymous!,
-    authenticated: roles.authenticated!,
-    administrator: roles.administrator!
+    anonymous: roles.anonymous,
+    authenticated: roles.authenticated,
+    administrator: roles.administrator
   };
   
   return `
@@ -101,9 +116,21 @@ export function generateCreateUserSQL(
   roles: RoleMapping,
   useLocksForRoles = false
 ): string {
+  if (!roles) {
+    throw new Error(
+      'generateCreateUserSQL: roles parameter is undefined. ' +
+      'Ensure getConnEnvOptions().roles is defined.'
+    );
+  }
+  if (!roles.anonymous || !roles.authenticated) {
+    throw new Error(
+      'generateCreateUserSQL: roles is missing required properties. ' +
+      `Got: anonymous=${roles.anonymous}, authenticated=${roles.authenticated}.`
+    );
+  }
   const r = {
-    anonymous: roles.anonymous!,
-    authenticated: roles.authenticated!
+    anonymous: roles.anonymous,
+    authenticated: roles.authenticated
   };
   const lockStatement = useLocksForRoles
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
@@ -201,14 +228,38 @@ export function generateCreateTestUsersSQL(
   roles: RoleMapping,
   connections: TestUserCredentials
 ): string {
+  if (!roles) {
+    throw new Error(
+      'generateCreateTestUsersSQL: roles parameter is undefined. ' +
+      'Ensure getConnEnvOptions().roles is defined.'
+    );
+  }
+  if (!roles.anonymous || !roles.authenticated || !roles.administrator) {
+    throw new Error(
+      'generateCreateTestUsersSQL: roles is missing required properties. ' +
+      `Got: anonymous=${roles.anonymous}, authenticated=${roles.authenticated}, administrator=${roles.administrator}.`
+    );
+  }
+  if (!connections) {
+    throw new Error(
+      'generateCreateTestUsersSQL: connections parameter is undefined. ' +
+      'Ensure getConnEnvOptions().connections is defined.'
+    );
+  }
+  if (!connections.app?.user || !connections.app?.password || !connections.admin?.user || !connections.admin?.password) {
+    throw new Error(
+      'generateCreateTestUsersSQL: connections is missing required properties. ' +
+      'Ensure app.user, app.password, admin.user, and admin.password are defined.'
+    );
+  }
   const r = {
-    anonymous: roles.anonymous!,
-    authenticated: roles.authenticated!,
-    administrator: roles.administrator!
+    anonymous: roles.anonymous,
+    authenticated: roles.authenticated,
+    administrator: roles.administrator
   };
   const users = {
-    app: { user: connections.app!.user!, password: connections.app!.password! },
-    admin: { user: connections.admin!.user!, password: connections.admin!.password! }
+    app: { user: connections.app.user, password: connections.app.password },
+    admin: { user: connections.admin.user, password: connections.admin.password }
   };
   
   return `
@@ -388,9 +439,21 @@ export function generateRemoveUserSQL(
   roles: RoleMapping,
   useLocksForRoles = false
 ): string {
+  if (!roles) {
+    throw new Error(
+      'generateRemoveUserSQL: roles parameter is undefined. ' +
+      'Ensure getConnEnvOptions().roles is defined.'
+    );
+  }
+  if (!roles.anonymous || !roles.authenticated) {
+    throw new Error(
+      'generateRemoveUserSQL: roles is missing required properties. ' +
+      `Got: anonymous=${roles.anonymous}, authenticated=${roles.authenticated}.`
+    );
+  }
   const r = {
-    anonymous: roles.anonymous!,
-    authenticated: roles.authenticated!
+    anonymous: roles.anonymous,
+    authenticated: roles.authenticated
   };
   const lockStatement = useLocksForRoles
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
