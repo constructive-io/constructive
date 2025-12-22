@@ -33,7 +33,6 @@ const SUPABASE_PG_DEFAULTS: Partial<PgConfig> = {
  * User-provided options take precedence over both.
  * 
  * Note: Uses PGUSER/PGPASSWORD for both pg config and db.connections.app
- * (DB_CONNECTION_ROLE can still be used to override the default role)
  */
 export const getConnections = async (
   cn: GetConnectionOpts = {},
@@ -48,9 +47,17 @@ export const getConnections = async (
   pgConfig.user = pgEnvVars.user ?? SUPABASE_PG_DEFAULTS.user;
   pgConfig.password = pgEnvVars.password ?? SUPABASE_PG_DEFAULTS.password;
   
+  // Build app connection config: use same user/password as pg config (from env vars or Supabase defaults)
+  const appConnectionConfig = {
+    user: pgConfig.user,
+    password: pgConfig.password,
+    ...cn.db?.connections?.app, // User overrides take precedence
+  };
+  
   // Build roles config: Supabase defaults, then user overrides will override
   const rolesConfig = {
     ...SUPABASE_DEFAULTS.roles,
+    ...cn.db?.roles, // User overrides take precedence
   };
   
   // Build the merged options, respecting precedence: env vars > Supabase defaults > user overrides
@@ -60,11 +67,12 @@ export const getConnections = async (
       ...cn.pg, // User overrides take precedence
     },
     db: {
-      roles: {
-        ...rolesConfig,
-        ...cn.db?.roles, // User overrides take precedence
+      ...cn.db, // Other user overrides first
+      connections: {
+        app: appConnectionConfig,
+        ...cn.db?.connections, // Preserve admin if provided
       },
-      ...cn.db, // Other user overrides
+      roles: rolesConfig,
     }
   };
 
