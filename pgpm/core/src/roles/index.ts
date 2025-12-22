@@ -93,19 +93,19 @@ COMMIT;
  * Generate SQL to create a user with password and grant base roles.
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
- * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
+ * @param useAdvisoryLocks - Whether to use advisory locks (from getConnEnvOptions().useAdvisoryLocks)
  */
 export function generateCreateUserSQL(
   username: string, 
   password: string, 
   roles: RoleMapping,
-  useLocks = false
+  useAdvisoryLocks = false
 ): string {
   const r = {
     anonymous: roles.anonymous!,
     authenticated: roles.authenticated!
   };
-  const lockStatement = useLocks
+  const lockStatement = useAdvisoryLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
   
@@ -381,18 +381,18 @@ $$;
  * Generate SQL to remove a user and revoke grants.
  * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
  * @param roles - Role mapping from getConnEnvOptions().roles!
- * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
+ * @param useAdvisoryLocks - Whether to use advisory locks (from getConnEnvOptions().useAdvisoryLocks)
  */
 export function generateRemoveUserSQL(
   username: string, 
   roles: RoleMapping,
-  useLocks = false
+  useAdvisoryLocks = false
 ): string {
   const r = {
     anonymous: roles.anonymous!,
     authenticated: roles.authenticated!
   };
-  const lockStatement = useLocks
+  const lockStatement = useAdvisoryLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
   
@@ -460,15 +460,15 @@ COMMIT;
 
 /**
  * Generate SQL to create a user with grants to specified roles (for test harness)
- * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
+ * @param useAdvisoryLocks - Whether to use advisory locks (from getConnEnvOptions().useAdvisoryLocks)
  */
 export function generateCreateUserWithGrantsSQL(
   username: string,
   password: string,
   rolesToGrant: string[],
-  useLocks = false
+  useAdvisoryLocks = false
 ): string {
-  const lockStatement = useLocks
+  const lockStatement = useAdvisoryLocks
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_user));`
     : '';
   

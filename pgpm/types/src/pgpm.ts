@@ -34,8 +34,8 @@ export interface PgTestConnectionOptions {
     roles?: RoleMapping;
     /** Default authentication options for db connections */
     auth?: AuthOptions;
-    /** Use advisory locks for role creation (for concurrency safety) */
-    useLocks?: boolean;
+    /** Use advisory locks for role/user creation (for concurrency safety) */
+    useAdvisoryLocks?: boolean;
 }
 
 /**
@@ -225,7 +225,7 @@ export const pgpmDefaults: PgpmOptions = {
       administrator: 'administrator',
       default: 'anonymous'
     },
-    useLocks: false
+    useAdvisoryLocks: false
   },
   pg: {
     host: 'localhost',

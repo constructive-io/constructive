@@ -67,18 +67,18 @@ export class PgpmInit {
    * @param username - The username to create
    * @param password - The password for the user
    * @param roles - Role mapping from getConnEnvOptions().roles!
-   * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
+   * @param useAdvisoryLocks - Whether to use advisory locks (from getConnEnvOptions().useAdvisoryLocks)
    */
   async bootstrapDbRoles(
     username: string, 
     password: string, 
     roles: RoleMapping,
-    useLocks = false
+    useAdvisoryLocks = false
   ): Promise<void> {
     try {
       log.info(`Bootstrapping PGPM database roles for user: ${username}...`);
       
-      const sql = generateCreateUserSQL(username, password, roles, useLocks);
+      const sql = generateCreateUserSQL(username, password, roles, useAdvisoryLocks);
       await this.pool.query(sql);
       
       log.success(`Successfully bootstrapped PGPM database roles for user: ${username}`);
@@ -93,17 +93,17 @@ export class PgpmInit {
    * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
    * @param username - The username to remove
    * @param roles - Role mapping from getConnEnvOptions().roles!
-   * @param useLocks - Whether to use advisory locks (from getConnEnvOptions().useLocks)
+   * @param useAdvisoryLocks - Whether to use advisory locks (from getConnEnvOptions().useAdvisoryLocks)
    */
   async removeDbRoles(
     username: string, 
     roles: RoleMapping,
-    useLocks = false
+    useAdvisoryLocks = false
   ): Promise<void> {
     try {
       log.info(`Removing PGPM database roles for user: ${username}...`);
       
-      const sql = generateRemoveUserSQL(username, roles, useLocks);
+      const sql = generateRemoveUserSQL(username, roles, useAdvisoryLocks);
       await this.pool.query(sql);
       
       log.success(`Successfully removed PGPM database roles for user: ${username}`);
