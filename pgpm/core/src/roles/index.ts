@@ -8,25 +8,6 @@ export interface RoleManagementOptions {
 }
 
 /**
- * Resolved role mapping with all required fields.
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
- */
-export interface ResolvedRoleMapping {
-  anonymous: string;
-  authenticated: string;
-  administrator: string;
-}
-
-/**
- * Resolved test user credentials with all required fields.
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
- */
-export interface ResolvedTestUserCredentials {
-  app: { user: string; password: string };
-  admin: { user: string; password: string };
-}
-
-/**
  * Safely escape a string for use as a SQL string literal.
  * Doubles single quotes and wraps in single quotes.
  */
@@ -36,10 +17,15 @@ function sqlLiteral(value: string): string {
 
 /**
  * Generate SQL to create base roles (anonymous, authenticated, administrator).
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+ * @param roles - Role mapping from getConnEnvOptions().roles!
  */
-export function generateCreateBaseRolesSQL(roles: ResolvedRoleMapping): string {
-  const r = roles;
+export function generateCreateBaseRolesSQL(roles: RoleMapping): string {
+  const r = {
+    anonymous: roles.anonymous!,
+    authenticated: roles.authenticated!,
+    administrator: roles.administrator!
+  };
   
   return `
 BEGIN;
@@ -112,15 +98,19 @@ COMMIT;
 
 /**
  * Generate SQL to create a user with password and grant base roles.
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+ * @param roles - Role mapping from getConnEnvOptions().roles!
  */
 export function generateCreateUserSQL(
   username: string, 
   password: string, 
-  roles: ResolvedRoleMapping,
+  roles: RoleMapping,
   options?: RoleManagementOptions
 ): string {
-  const r = roles;
+  const r = {
+    anonymous: roles.anonymous!,
+    authenticated: roles.authenticated!
+  };
   const useLocks = options?.useLocks ?? false;
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
@@ -210,14 +200,23 @@ COMMIT;
 
 /**
  * Generate SQL to create test users with grants to base roles.
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved values.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+ * @param roles - Role mapping from getConnEnvOptions().roles!
+ * @param connections - Test user credentials from getConnEnvOptions().connections!
  */
 export function generateCreateTestUsersSQL(
-  roles: ResolvedRoleMapping,
-  connections: ResolvedTestUserCredentials
+  roles: RoleMapping,
+  connections: TestUserCredentials
 ): string {
-  const r = roles;
-  const users = connections;
+  const r = {
+    anonymous: roles.anonymous!,
+    authenticated: roles.authenticated!,
+    administrator: roles.administrator!
+  };
+  const users = {
+    app: { user: connections.app!.user!, password: connections.app!.password! },
+    admin: { user: connections.admin!.user!, password: connections.admin!.password! }
+  };
   
   return `
 BEGIN;
@@ -387,14 +386,18 @@ $$;
 
 /**
  * Generate SQL to remove a user and revoke grants.
- * Callers should use getConnEnvOptions() from @pgpmjs/env to get resolved role values.
+ * Callers should use getConnEnvOptions() from @pgpmjs/env to get merged values.
+ * @param roles - Role mapping from getConnEnvOptions().roles!
  */
 export function generateRemoveUserSQL(
   username: string, 
-  roles: ResolvedRoleMapping,
+  roles: RoleMapping,
   options?: RoleManagementOptions
 ): string {
-  const r = roles;
+  const r = {
+    anonymous: roles.anonymous!,
+    authenticated: roles.authenticated!
+  };
   const useLocks = options?.useLocks ?? false;
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`

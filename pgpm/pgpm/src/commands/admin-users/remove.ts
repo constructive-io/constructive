@@ -1,4 +1,4 @@
-import { PgpmInit, ResolvedRoleMapping } from '@pgpmjs/core';
+import { PgpmInit } from '@pgpmjs/core';
 import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
@@ -40,15 +40,10 @@ export default async (
   const pgEnv = getPgEnvOptions();
   const isTest = argv.test;
 
-  // Get resolved options using deepmerge (defaults + config + env + overrides)
-  const dbOptions = getConnEnvOptions();
-  const roles: ResolvedRoleMapping = {
-    anonymous: dbOptions.roles?.anonymous ?? 'anonymous',
-    authenticated: dbOptions.roles?.authenticated ?? 'authenticated',
-    administrator: dbOptions.roles?.administrator ?? 'administrator'
-  };
-  const appUser = dbOptions.connections?.app?.user ?? 'app_user';
-  const adminUser = dbOptions.connections?.admin?.user ?? 'app_admin';
+  // Get merged options (defaults + config + env + overrides)
+  const db = getConnEnvOptions();
+  const appUser = db.connections!.app!.user!;
+  const adminUser = db.connections!.admin!.user!;
 
   const init = new PgpmInit(pgEnv);
   
@@ -68,8 +63,8 @@ export default async (
         return;
       }
 
-      await init.removeDbRoles(appUser, roles);
-      await init.removeDbRoles(adminUser, roles);
+      await init.removeDbRoles(appUser, db.roles!);
+      await init.removeDbRoles(adminUser, db.roles!);
       log.success('Test users removed successfully.');
     } else {
       const prompts: Question[] = [
@@ -97,7 +92,7 @@ export default async (
         return;
       }
 
-      await init.removeDbRoles(username, roles);
+      await init.removeDbRoles(username, db.roles!);
       log.success(`Database user "${username}" removed successfully.`);
     }
   } finally {
