@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.1.0...@pgpmjs/core@3.1.1) (2025-12-22)
+
+### Bug Fixes
+
+- ensure roles and connections are always resolved from defaults in getConnEnvOptions ([f73c20a](https://github.com/constructive-io/constructive/commit/f73c20ae869d6a1c43b3ffbb796053e43cce0d10))
+
 # [3.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.0.9...@pgpmjs/core@3.1.0) (2025-12-22)
 
 ### Bug Fixes
