@@ -28,14 +28,14 @@ export interface PgTestConnectionOptions {
     extensions?: string[];
     /** Current working directory for database operations */
     cwd?: string;
-    /** @deprecated Use connections.app instead */
-    connection?: DatabaseConnectionOptions;
     /** Test user credentials for app and admin users */
     connections?: TestUserCredentials;
     /** Role mapping configuration */
     roles?: RoleMapping;
     /** Default authentication options for db connections */
     auth?: AuthOptions;
+    /** Use advisory locks for role creation (for concurrency safety) */
+    useLocks?: boolean;
 }
 
 /**
@@ -209,11 +209,6 @@ export const pgpmDefaults: PgpmOptions = {
     prefix: 'db-',
     extensions: [],
     cwd: process.cwd(),
-    connection: {
-      user: 'app_user',
-      password: 'app_password',
-      role: 'anonymous'
-    },
     connections: {
       app: {
         user: 'app_user',
@@ -229,7 +224,8 @@ export const pgpmDefaults: PgpmOptions = {
       authenticated: 'authenticated',
       administrator: 'administrator',
       default: 'anonymous'
-    }
+    },
+    useLocks: false
   },
   pg: {
     host: 'localhost',

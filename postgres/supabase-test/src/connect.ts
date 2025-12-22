@@ -32,7 +32,7 @@ const SUPABASE_PG_DEFAULTS: Partial<PgConfig> = {
  * Environment variables take precedence over Supabase defaults.
  * User-provided options take precedence over both.
  * 
- * Note: Uses PGUSER/PGPASSWORD for both pg config and db.connection
+ * Note: Uses PGUSER/PGPASSWORD for both pg config and db.connections.app
  * (DB_CONNECTION_ROLE can still be used to override the default role)
  */
 export const getConnections = async (
@@ -48,12 +48,6 @@ export const getConnections = async (
   pgConfig.user = pgEnvVars.user ?? SUPABASE_PG_DEFAULTS.user;
   pgConfig.password = pgEnvVars.password ?? SUPABASE_PG_DEFAULTS.password;
   
-  // Build connection config: use same user/password as pg config (from env vars or Supabase defaults)
-  // Default role is 'anon' (Supabase default), but DB_CONNECTION_ROLE can override it
-  const connectionConfig: Partial<PgTestConnectionOptions['connection']> = {
-    role: process.env.DB_CONNECTION_ROLE ?? SUPABASE_DEFAULTS.roles!.default!,
-  };
-  
   // Build roles config: Supabase defaults, then user overrides will override
   const rolesConfig = {
     ...SUPABASE_DEFAULTS.roles,
@@ -66,10 +60,6 @@ export const getConnections = async (
       ...cn.pg, // User overrides take precedence
     },
     db: {
-      connection: {
-        ...connectionConfig,
-        ...cn.db?.connection, // User overrides take precedence
-      },
       roles: {
         ...rolesConfig,
         ...cn.db?.roles, // User overrides take precedence
