@@ -23,7 +23,29 @@ export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = 
   const opts = getEnvOptions({
     db: overrides
   }, cwd);
-  return opts.db;
+  
+  // Ensure roles is always resolved from defaults even if config/env explicitly sets it to undefined
+  const db = opts.db ?? {};
+  const defaultRoles = pgpmDefaults.db?.roles ?? {};
+  const defaultConnections = pgpmDefaults.db?.connections ?? {};
+  
+  return {
+    ...db,
+    roles: {
+      ...defaultRoles,
+      ...(db.roles ?? {})
+    },
+    connections: {
+      app: {
+        ...defaultConnections.app,
+        ...(db.connections?.app ?? {})
+      },
+      admin: {
+        ...defaultConnections.admin,
+        ...(db.connections?.admin ?? {})
+      }
+    }
+  };
 };
 
 export const getDeploymentEnvOptions = (overrides: Partial<DeploymentOptions> = {}, cwd: string = process.cwd()): DeploymentOptions => {
