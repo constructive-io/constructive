@@ -1,4 +1,4 @@
-import { RoleMapping } from '@pgpmjs/types';
+import { pgpmDefaults, RoleMapping, DatabaseConnectionOptions } from '@pgpmjs/types';
 
 /**
  * Options for role management operations
@@ -8,22 +8,58 @@ export interface RoleManagementOptions {
 }
 
 /**
- * Default role mapping - canonical role names
+ * Options for test user creation
  */
-export const DEFAULT_ROLES: Required<RoleMapping> = {
-  anonymous: 'anonymous',
-  authenticated: 'authenticated',
-  administrator: 'administrator',
-  default: 'anonymous'
-};
+export interface TestUserOptions {
+  /** App user credentials (defaults from pgpmDefaults.db.connection) */
+  appUser?: DatabaseConnectionOptions;
+  /** App admin credentials */
+  appAdmin?: {
+    user?: string;
+    password?: string;
+  };
+}
 
 /**
- * Get resolved role mapping with defaults
+ * Get resolved role mapping with defaults from pgpmDefaults
  */
 export function getRoleMapping(config?: Partial<RoleMapping>): Required<RoleMapping> {
+  const defaults = pgpmDefaults.db?.roles ?? {
+    anonymous: 'anonymous',
+    authenticated: 'authenticated',
+    administrator: 'administrator',
+    default: 'anonymous'
+  };
   return {
-    ...DEFAULT_ROLES,
+    anonymous: defaults.anonymous ?? 'anonymous',
+    authenticated: defaults.authenticated ?? 'authenticated',
+    administrator: defaults.administrator ?? 'administrator',
+    default: defaults.default ?? 'anonymous',
     ...(config || {})
+  };
+}
+
+/**
+ * Get resolved test user credentials with defaults from pgpmDefaults
+ */
+function getTestUserDefaults(options?: TestUserOptions): {
+  appUser: { user: string; password: string };
+  appAdmin: { user: string; password: string };
+} {
+  const connDefaults = pgpmDefaults.db?.connection ?? {
+    user: 'app_user',
+    password: 'app_password'
+  };
+  
+  return {
+    appUser: {
+      user: options?.appUser?.user ?? connDefaults.user ?? 'app_user',
+      password: options?.appUser?.password ?? connDefaults.password ?? 'app_password'
+    },
+    appAdmin: {
+      user: options?.appAdmin?.user ?? 'app_admin',
+      password: options?.appAdmin?.password ?? 'admin_password'
+    }
   };
 }
 
@@ -208,19 +244,24 @@ COMMIT;
 }
 
 /**
- * Generate SQL to create test users (app_user, app_admin) with hardcoded passwords
+ * Generate SQL to create test users with grants to base roles.
+ * Defaults to app_user/app_password and app_admin/admin_password from pgpmDefaults.
  */
-export function generateCreateTestUsersSQL(roles?: Partial<RoleMapping>): string {
+export function generateCreateTestUsersSQL(
+  roles?: Partial<RoleMapping>,
+  testUsers?: TestUserOptions
+): string {
   const r = getRoleMapping(roles);
+  const users = getTestUserDefaults(testUsers);
   
   return `
 BEGIN;
 DO $do$
 DECLARE
-  v_app_user text := 'app_user';
-  v_app_user_password text := 'app_password';
-  v_app_admin text := 'app_admin';
-  v_app_admin_password text := 'admin_password';
+  v_app_user text := ${sqlLiteral(users.appUser.user)};
+  v_app_user_password text := ${sqlLiteral(users.appUser.password)};
+  v_app_admin text := ${sqlLiteral(users.appAdmin.user)};
+  v_app_admin_password text := ${sqlLiteral(users.appAdmin.password)};
   v_anonymous text := ${sqlLiteral(r.anonymous)};
   v_authenticated text := ${sqlLiteral(r.authenticated)};
   v_administrator text := ${sqlLiteral(r.administrator)};
