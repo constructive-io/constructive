@@ -47,39 +47,27 @@ export const getConnections = async (
   cn: GetConnectionOpts = {},
   seedAdapters?: Parameters<typeof getPgConnections>[1]
 ): Promise<GetConnectionResult> => {
-  // Get environment variables
+  // Get environment variables (only includes defined keys)
   const pgEnvVars = getPgEnvVars();
   
-  // Build env-based overrides for pg config
-  const pgEnvOverrides: Partial<PgConfig> = {};
-  if (pgEnvVars.port !== undefined) pgEnvOverrides.port = pgEnvVars.port;
-  if (pgEnvVars.user !== undefined) pgEnvOverrides.user = pgEnvVars.user;
-  if (pgEnvVars.password !== undefined) pgEnvOverrides.password = pgEnvVars.password;
-  
-  // Build env-based overrides for db.connections.app (use same user/password as pg)
-  const dbEnvOverrides: Partial<PgTestConnectionOptions> = {};
-  if (pgEnvVars.user !== undefined || pgEnvVars.password !== undefined) {
-    dbEnvOverrides.connections = {
-      app: {
-        ...(pgEnvVars.user !== undefined && { user: pgEnvVars.user }),
-        ...(pgEnvVars.password !== undefined && { password: pgEnvVars.password }),
+  // Build env overrides - pgEnvVars already only has defined keys
+  // Mirror user/password to connections.app for the app connection
+  const envOverrides: Partial<GetConnectionOpts> = {
+    pg: pgEnvVars,
+    db: {
+      connections: {
+        app: {
+          ...(pgEnvVars.user && { user: pgEnvVars.user }),
+          ...(pgEnvVars.password && { password: pgEnvVars.password }),
+        }
       }
-    };
-  }
+    }
+  };
   
-  // Merge all configs: Supabase defaults -> env vars -> user overrides
-  const mergedOpts: GetConnectionOpts = deepmerge.all([
-    // Supabase defaults
-    {
-      pg: SUPABASE_PG_DEFAULTS,
-      db: SUPABASE_DEFAULTS,
-    },
-    // Environment variable overrides
-    {
-      pg: pgEnvOverrides,
-      db: dbEnvOverrides,
-    },
-    // User-provided overrides (highest precedence)
+  // Merge: Supabase defaults -> env vars -> user overrides
+  const mergedOpts = deepmerge.all([
+    { pg: SUPABASE_PG_DEFAULTS, db: SUPABASE_DEFAULTS },
+    envOverrides,
     cn,
   ]) as GetConnectionOpts;
 
