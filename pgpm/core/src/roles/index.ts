@@ -28,6 +28,14 @@ export function getRoleMapping(config?: Partial<RoleMapping>): Required<RoleMapp
 }
 
 /**
+ * Safely escape a string for use as a SQL string literal.
+ * Doubles single quotes and wraps in single quotes.
+ */
+function sqlLiteral(value: string): string {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
+/**
  * Generate SQL to create base roles (anonymous, authenticated, administrator)
  */
 export function generateCreateBaseRolesSQL(roles?: Partial<RoleMapping>): string {
@@ -36,11 +44,15 @@ export function generateCreateBaseRolesSQL(roles?: Partial<RoleMapping>): string
   return `
 BEGIN;
 DO $do$
+DECLARE
+  v_anonymous text := ${sqlLiteral(r.anonymous)};
+  v_authenticated text := ${sqlLiteral(r.authenticated)};
+  v_administrator text := ${sqlLiteral(r.administrator)};
 BEGIN
-  -- ${r.anonymous}: pre-check + exception handling for TOCTOU safety
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '${r.anonymous}') THEN
+  -- Create anonymous role: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_anonymous) THEN
     BEGIN
-      EXECUTE format('CREATE ROLE %I', '${r.anonymous}');
+      EXECUTE format('CREATE ROLE %I', v_anonymous);
     EXCEPTION
       WHEN duplicate_object THEN
         -- 42710: Role already exists (race condition); safe to ignore
@@ -54,10 +66,10 @@ BEGIN
     END;
   END IF;
   
-  -- ${r.authenticated}: pre-check + exception handling for TOCTOU safety
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '${r.authenticated}') THEN
+  -- Create authenticated role: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_authenticated) THEN
     BEGIN
-      EXECUTE format('CREATE ROLE %I', '${r.authenticated}');
+      EXECUTE format('CREATE ROLE %I', v_authenticated);
     EXCEPTION
       WHEN duplicate_object THEN
         -- 42710: Role already exists (race condition); safe to ignore
@@ -71,10 +83,10 @@ BEGIN
     END;
   END IF;
   
-  -- ${r.administrator}: pre-check + exception handling for TOCTOU safety
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '${r.administrator}') THEN
+  -- Create administrator role: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_administrator) THEN
     BEGIN
-      EXECUTE format('CREATE ROLE %I', '${r.administrator}');
+      EXECUTE format('CREATE ROLE %I', v_administrator);
     EXCEPTION
       WHEN duplicate_object THEN
         -- 42710: Role already exists (race condition); safe to ignore
@@ -87,31 +99,13 @@ BEGIN
         RAISE;
     END;
   END IF;
+  
+  -- Set role attributes (safe to run even if role already exists)
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_anonymous);
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION NOBYPASSRLS', v_authenticated);
+  EXECUTE format('ALTER ROLE %I WITH NOCREATEDB NOSUPERUSER NOCREATEROLE NOLOGIN NOREPLICATION BYPASSRLS', v_administrator);
 END
 $do$;
-
--- Set role attributes (safe to run even if role already exists)
-ALTER USER ${r.anonymous} WITH NOCREATEDB;
-ALTER USER ${r.anonymous} WITH NOSUPERUSER;
-ALTER USER ${r.anonymous} WITH NOCREATEROLE;
-ALTER USER ${r.anonymous} WITH NOLOGIN;
-ALTER USER ${r.anonymous} WITH NOREPLICATION;
-ALTER USER ${r.anonymous} WITH NOBYPASSRLS;
-
-ALTER USER ${r.authenticated} WITH NOCREATEDB;
-ALTER USER ${r.authenticated} WITH NOSUPERUSER;
-ALTER USER ${r.authenticated} WITH NOCREATEROLE;
-ALTER USER ${r.authenticated} WITH NOLOGIN;
-ALTER USER ${r.authenticated} WITH NOREPLICATION;
-ALTER USER ${r.authenticated} WITH NOBYPASSRLS;
-
-ALTER USER ${r.administrator} WITH NOCREATEDB;
-ALTER USER ${r.administrator} WITH NOSUPERUSER;
-ALTER USER ${r.administrator} WITH NOCREATEROLE;
-ALTER USER ${r.administrator} WITH NOLOGIN;
-ALTER USER ${r.administrator} WITH NOREPLICATION;
--- administrator CAN bypass RLS
-ALTER USER ${r.administrator} WITH BYPASSRLS;
 COMMIT;
 `;
 }
@@ -127,8 +121,6 @@ export function generateCreateUserSQL(
 ): string {
   const r = getRoleMapping(roles);
   const useLocks = options?.useLocks ?? false;
-  const escapedUsername = username.replace(/'/g, "''");
-  const escapedPassword = password.replace(/'/g, "''");
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
@@ -137,8 +129,10 @@ export function generateCreateUserSQL(
 BEGIN;
 DO $do$
 DECLARE
-  v_username TEXT := '${escapedUsername}';
-  v_password TEXT := '${escapedPassword}';
+  v_username text := ${sqlLiteral(username)};
+  v_password text := ${sqlLiteral(password)};
+  v_anonymous text := ${sqlLiteral(r.anonymous)};
+  v_authenticated text := ${sqlLiteral(r.authenticated)};
 BEGIN
   ${lockStatement}
   -- Pre-check + exception handling for TOCTOU safety
@@ -157,30 +151,23 @@ BEGIN
         RAISE;
     END;
   END IF;
-END
-$do$;
 
--- Grant base roles to user
-DO $do$
-DECLARE
-  v_username TEXT := '${escapedUsername}';
-BEGIN
-  -- Grant ${r.anonymous} to user
+  -- Grant anonymous to user
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.anonymous}' AND r2.rolname = v_username
+    WHERE r1.rolname = v_anonymous AND r2.rolname = v_username
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.anonymous}', v_username);
+      EXECUTE format('GRANT %I TO %I', v_anonymous, v_username);
     EXCEPTION
       WHEN unique_violation THEN
         -- 23505: Membership was granted concurrently; safe to ignore
         NULL;
       WHEN undefined_object THEN
         -- 42704: One of the roles doesn't exist; log notice and continue
-        RAISE NOTICE 'Missing role when granting % to %', '${r.anonymous}', v_username;
+        RAISE NOTICE 'Missing role when granting % to %', v_anonymous, v_username;
       WHEN insufficient_privilege THEN
         -- 42501: Must surface this error - caller lacks permission
         RAISE;
@@ -190,22 +177,22 @@ BEGIN
     END;
   END IF;
 
-  -- Grant ${r.authenticated} to user
+  -- Grant authenticated to user
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.authenticated}' AND r2.rolname = v_username
+    WHERE r1.rolname = v_authenticated AND r2.rolname = v_username
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.authenticated}', v_username);
+      EXECUTE format('GRANT %I TO %I', v_authenticated, v_username);
     EXCEPTION
       WHEN unique_violation THEN
         -- 23505: Membership was granted concurrently; safe to ignore
         NULL;
       WHEN undefined_object THEN
         -- 42704: One of the roles doesn't exist; log notice and continue
-        RAISE NOTICE 'Missing role when granting % to %', '${r.authenticated}', v_username;
+        RAISE NOTICE 'Missing role when granting % to %', v_authenticated, v_username;
       WHEN insufficient_privilege THEN
         -- 42501: Must surface this error - caller lacks permission
         RAISE;
@@ -229,125 +216,117 @@ export function generateCreateTestUsersSQL(roles?: Partial<RoleMapping>): string
   return `
 BEGIN;
 DO $do$
+DECLARE
+  v_app_user text := 'app_user';
+  v_app_user_password text := 'app_password';
+  v_app_admin text := 'app_admin';
+  v_app_admin_password text := 'admin_password';
+  v_anonymous text := ${sqlLiteral(r.anonymous)};
+  v_authenticated text := ${sqlLiteral(r.authenticated)};
+  v_administrator text := ${sqlLiteral(r.administrator)};
 BEGIN
-  -- app_user: pre-check + exception handling for TOCTOU safety
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'app_user') THEN
+  -- Create app_user: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_app_user) THEN
     BEGIN
-      EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', 'app_user', 'app_password');
+      EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_app_user, v_app_user_password);
     EXCEPTION
-      WHEN duplicate_object THEN
-        -- 42710: Role already exists (race condition); safe to ignore
-        NULL;
-      WHEN unique_violation THEN
-        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
-        NULL;
-      WHEN insufficient_privilege THEN
-        -- 42501: Must surface this error - caller lacks permission
-        RAISE;
+      WHEN duplicate_object THEN NULL;
+      WHEN unique_violation THEN NULL;
+      WHEN insufficient_privilege THEN RAISE;
     END;
   END IF;
   
-  -- app_admin: pre-check + exception handling for TOCTOU safety
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'app_admin') THEN
+  -- Create app_admin: pre-check + exception handling for TOCTOU safety
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_app_admin) THEN
     BEGIN
-      EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', 'app_admin', 'admin_password');
+      EXECUTE format('CREATE ROLE %I LOGIN PASSWORD %L', v_app_admin, v_app_admin_password);
     EXCEPTION
-      WHEN duplicate_object THEN
-        -- 42710: Role already exists (race condition); safe to ignore
-        NULL;
-      WHEN unique_violation THEN
-        -- 23505: Concurrent CREATE ROLE hit unique index; safe to ignore
-        NULL;
-      WHEN insufficient_privilege THEN
-        -- 42501: Must surface this error - caller lacks permission
-        RAISE;
+      WHEN duplicate_object THEN NULL;
+      WHEN unique_violation THEN NULL;
+      WHEN insufficient_privilege THEN RAISE;
     END;
   END IF;
-END
-$do$;
 
-DO $do$
-BEGIN
-  -- Grant ${r.anonymous} to app_user
+  -- Grant anonymous to app_user
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.anonymous}' AND r2.rolname = 'app_user'
+    WHERE r1.rolname = v_anonymous AND r2.rolname = v_app_user
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.anonymous}', 'app_user');
+      EXECUTE format('GRANT %I TO %I', v_anonymous, v_app_user);
     EXCEPTION
       WHEN unique_violation THEN NULL;
-      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${r.anonymous}', 'app_user';
+      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_anonymous, v_app_user;
       WHEN insufficient_privilege THEN RAISE;
       WHEN invalid_grant_operation THEN RAISE;
     END;
   END IF;
 
-  -- Grant ${r.authenticated} to app_user
+  -- Grant authenticated to app_user
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.authenticated}' AND r2.rolname = 'app_user'
+    WHERE r1.rolname = v_authenticated AND r2.rolname = v_app_user
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.authenticated}', 'app_user');
+      EXECUTE format('GRANT %I TO %I', v_authenticated, v_app_user);
     EXCEPTION
       WHEN unique_violation THEN NULL;
-      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${r.authenticated}', 'app_user';
+      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_authenticated, v_app_user;
       WHEN insufficient_privilege THEN RAISE;
       WHEN invalid_grant_operation THEN RAISE;
     END;
   END IF;
 
-  -- Grant ${r.anonymous} to ${r.administrator}
+  -- Grant anonymous to administrator
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.anonymous}' AND r2.rolname = '${r.administrator}'
+    WHERE r1.rolname = v_anonymous AND r2.rolname = v_administrator
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.anonymous}', '${r.administrator}');
+      EXECUTE format('GRANT %I TO %I', v_anonymous, v_administrator);
     EXCEPTION
       WHEN unique_violation THEN NULL;
-      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${r.anonymous}', '${r.administrator}';
+      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_anonymous, v_administrator;
       WHEN insufficient_privilege THEN RAISE;
       WHEN invalid_grant_operation THEN RAISE;
     END;
   END IF;
 
-  -- Grant ${r.authenticated} to ${r.administrator}
+  -- Grant authenticated to administrator
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.authenticated}' AND r2.rolname = '${r.administrator}'
+    WHERE r1.rolname = v_authenticated AND r2.rolname = v_administrator
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.authenticated}', '${r.administrator}');
+      EXECUTE format('GRANT %I TO %I', v_authenticated, v_administrator);
     EXCEPTION
       WHEN unique_violation THEN NULL;
-      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${r.authenticated}', '${r.administrator}';
+      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_authenticated, v_administrator;
       WHEN insufficient_privilege THEN RAISE;
       WHEN invalid_grant_operation THEN RAISE;
     END;
   END IF;
 
-  -- Grant ${r.administrator} to app_admin
+  -- Grant administrator to app_admin
   IF NOT EXISTS (
     SELECT 1 FROM pg_auth_members am
     JOIN pg_roles r1 ON am.roleid = r1.oid
     JOIN pg_roles r2 ON am.member = r2.oid
-    WHERE r1.rolname = '${r.administrator}' AND r2.rolname = 'app_admin'
+    WHERE r1.rolname = v_administrator AND r2.rolname = v_app_admin
   ) THEN
     BEGIN
-      EXECUTE format('GRANT %I TO %I', '${r.administrator}', 'app_admin');
+      EXECUTE format('GRANT %I TO %I', v_administrator, v_app_admin);
     EXCEPTION
       WHEN unique_violation THEN NULL;
-      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${r.administrator}', 'app_admin';
+      WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_administrator, v_app_admin;
       WHEN insufficient_privilege THEN RAISE;
       WHEN invalid_grant_operation THEN RAISE;
     END;
@@ -365,14 +344,11 @@ export function generateGrantRoleSQL(
   role: string, 
   user: string
 ): string {
-  const escapedRole = role.replace(/'/g, "''");
-  const escapedUser = user.replace(/'/g, "''");
-  
   return `
 DO $$
 DECLARE
-  v_user TEXT := '${escapedUser}';
-  v_role TEXT := '${escapedRole}';
+  v_user text := ${sqlLiteral(user)};
+  v_role text := ${sqlLiteral(role)};
 BEGIN
   -- Pre-check to avoid unnecessary GRANTs; still catch TOCTOU under concurrency
   IF NOT EXISTS (
@@ -413,7 +389,6 @@ export function generateRemoveUserSQL(
 ): string {
   const r = getRoleMapping(roles);
   const useLocks = options?.useLocks ?? false;
-  const escapedUsername = username.replace(/'/g, "''");
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_username));`
     : '';
@@ -422,7 +397,9 @@ export function generateRemoveUserSQL(
 BEGIN;
 DO $do$
 DECLARE
-  v_username TEXT := '${escapedUsername}';
+  v_username text := ${sqlLiteral(username)};
+  v_anonymous text := ${sqlLiteral(r.anonymous)};
+  v_authenticated text := ${sqlLiteral(r.authenticated)};
 BEGIN
   ${lockStatement}
   IF EXISTS (
@@ -430,9 +407,9 @@ BEGIN
     FROM pg_catalog.pg_roles
     WHERE rolname = v_username
   ) THEN
-    -- REVOKE ${r.anonymous} membership
+    -- REVOKE anonymous membership
     BEGIN
-      EXECUTE format('REVOKE %I FROM %I', '${r.anonymous}', v_username);
+      EXECUTE format('REVOKE %I FROM %I', v_anonymous, v_username);
     EXCEPTION
       WHEN undefined_object THEN
         -- 42704: Role doesn't exist; safe to ignore
@@ -442,9 +419,9 @@ BEGIN
         RAISE;
     END;
 
-    -- REVOKE ${r.authenticated} membership
+    -- REVOKE authenticated membership
     BEGIN
-      EXECUTE format('REVOKE %I FROM %I', '${r.authenticated}', v_username);
+      EXECUTE format('REVOKE %I FROM %I', v_authenticated, v_username);
     EXCEPTION
       WHEN undefined_object THEN
         -- 42704: Role doesn't exist; safe to ignore
@@ -488,38 +465,41 @@ export function generateCreateUserWithGrantsSQL(
   options?: RoleManagementOptions
 ): string {
   const useLocks = options?.useLocks ?? false;
-  const escapedUsername = username.replace(/'/g, "''");
-  const escapedPassword = password.replace(/'/g, "''");
   const lockStatement = useLocks 
     ? `PERFORM pg_advisory_xact_lock(42, hashtext(v_user));`
     : '';
   
-  const grantBlocks = rolesToGrant.map(role => {
-    const escapedRole = role.replace(/'/g, "''");
-    return `
-        -- Grant ${escapedRole}
+  // Generate variable declarations for all roles
+  const roleVarDeclarations = rolesToGrant.map((role, i) => 
+    `  v_role_${i} text := ${sqlLiteral(role)};`
+  ).join('\n');
+  
+  // Generate grant blocks using the variables
+  const grantBlocks = rolesToGrant.map((_, i) => `
+        -- Grant role ${i}
         IF NOT EXISTS (
           SELECT 1 FROM pg_auth_members am
           JOIN pg_roles r1 ON am.roleid = r1.oid
           JOIN pg_roles r2 ON am.member = r2.oid
-          WHERE r1.rolname = '${escapedRole}' AND r2.rolname = v_user
+          WHERE r1.rolname = v_role_${i} AND r2.rolname = v_user
         ) THEN
           BEGIN
-            EXECUTE format('GRANT %I TO %I', '${escapedRole}', v_user);
+            EXECUTE format('GRANT %I TO %I', v_role_${i}, v_user);
           EXCEPTION
             WHEN unique_violation THEN NULL;
-            WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', '${escapedRole}', v_user;
+            WHEN undefined_object THEN RAISE NOTICE 'Missing role when granting % to %', v_role_${i}, v_user;
             WHEN insufficient_privilege THEN RAISE;
             WHEN invalid_grant_operation THEN RAISE;
           END;
-        END IF;`;
-  }).join('\n');
+        END IF;`
+  ).join('\n');
   
   return `
 DO $$
 DECLARE
-  v_user TEXT := '${escapedUsername}';
-  v_password TEXT := '${escapedPassword}';
+  v_user text := ${sqlLiteral(username)};
+  v_password text := ${sqlLiteral(password)};
+${roleVarDeclarations}
 BEGIN
   ${lockStatement}
   -- Create role: pre-check + exception handling for TOCTOU safety
