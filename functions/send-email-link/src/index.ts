@@ -71,11 +71,20 @@ const getRequiredEnv = (name: string): string => {
   return value;
 };
 
-const createGraphQLClient = (url: string): GraphQLClient => {
+const createGraphQLClient = (
+  url: string,
+  hostHeaderEnvVar?: string
+): GraphQLClient => {
   const headers: Record<string, string> = {};
 
   if (process.env.GRAPHQL_AUTH_TOKEN) {
     headers.Authorization = `Bearer ${process.env.GRAPHQL_AUTH_TOKEN}`;
+  }
+
+  const envName = hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
+  const hostHeader = process.env[envName];
+  if (hostHeader) {
+    headers.host = hostHeader;
   }
 
   return new GraphQLClient(url, { headers });
@@ -275,8 +284,8 @@ app.post('*', async (req: any, res: any, next: any) => {
     const graphqlUrl = getRequiredEnv('GRAPHQL_URL');
     const metaGraphqlUrl = process.env.META_GRAPHQL_URL || graphqlUrl;
 
-    const client = createGraphQLClient(graphqlUrl);
-    const meta = createGraphQLClient(metaGraphqlUrl);
+    const client = createGraphQLClient(graphqlUrl, 'GRAPHQL_HOST_HEADER');
+    const meta = createGraphQLClient(metaGraphqlUrl, 'META_GRAPHQL_HOST_HEADER');
 
     const result = await sendEmailLink(params, {
       client,
