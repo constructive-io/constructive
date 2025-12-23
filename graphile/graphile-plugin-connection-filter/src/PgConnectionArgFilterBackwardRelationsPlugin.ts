@@ -14,16 +14,6 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
     connectionFilterUseListInflectors,
   } = rawOptions as ConnectionFilterConfig;
   const hasConnections = pgSimpleCollections !== 'only';
-  const simpleInflectorsAreShorter = pgOmitListSuffix === true;
-  if (
-    simpleInflectorsAreShorter &&
-    connectionFilterUseListInflectors === undefined
-  ) {
-    // TODO: in V3 consider doing this for the user automatically (doing it in V2 would be a breaking change)
-    console.warn(
-      `We recommend you set the 'connectionFilterUseListInflectors' option to 'true' since you've set the 'pgOmitListSuffix' option`
-    );
-  }
   const useConnectionInflectors =
     connectionFilterUseListInflectors === undefined
       ? hasConnections

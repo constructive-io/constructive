@@ -34,7 +34,6 @@ const PostgisGeometryCollectionGeometriesPlugin: Plugin = (builder) => {
       const zmflag = (hasZ ? 2 : 0) + (hasM ? 1 : 0); // Equivalent to ST_Zmflag: https://postgis.net/docs/ST_Zmflag.html
       const Interface = pgGISGraphQLInterfaceTypesByType[pgGISType.id][zmflag];
       if (!Interface) {
-        console.warn("Unexpectedly couldn't find the interface");
         return fields;
       }
 
