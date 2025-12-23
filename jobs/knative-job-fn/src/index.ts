@@ -17,6 +17,35 @@ const app: any = express();
 
 app.use(bodyParser.json());
 
+// Basic request logging for all incoming job invocations.
+app.use((req: any, res: any, next: any) => {
+  try {
+    // Log only the headers we care about plus a shallow body snapshot
+    const headers = {
+      'x-worker-id': req.get('X-Worker-Id'),
+      'x-job-id': req.get('X-Job-Id'),
+      'x-database-id': req.get('X-Database-Id'),
+      'x-callback-url': req.get('X-Callback-Url')
+    };
+
+    const body =
+      req.body && typeof req.body === 'object'
+        ? { keys: Object.keys(req.body), preview: req.body }
+        : req.body;
+
+    // eslint-disable-next-line no-console
+    console.log('[knative-job-fn] Incoming job request', {
+      method: req.method,
+      path: req.originalUrl || req.url,
+      headers,
+      body
+    });
+  } catch {
+    // best-effort logging; never block the request
+  }
+  next();
+});
+
 // Echo job headers back on responses for debugging/traceability.
 app.use((req: any, res: any, next: any) => {
   res.set({
@@ -151,6 +180,13 @@ app.use((req: any, res: any, next: any) => {
       // If an error handler already sent a callback, skip.
       if (res.locals.jobCallbackSent) return;
       res.locals.jobCallbackSent = true;
+      // eslint-disable-next-line no-console
+      console.log('[knative-job-fn] Function completed', {
+        workerId: ctx.workerId,
+        jobId: ctx.jobId,
+        databaseId: ctx.databaseId,
+        statusCode: res.statusCode
+      });
       void sendJobCallback(ctx, 'success');
     });
   }
@@ -183,6 +219,41 @@ export default {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('[knative-job-fn] Failed to send error callback', err);
+      }
+
+      // Log the full error context for debugging.
+      try {
+        const headers = {
+          'x-worker-id': req.get('X-Worker-Id'),
+          'x-job-id': req.get('X-Job-Id'),
+          'x-database-id': req.get('X-Database-Id'),
+          'x-callback-url': req.get('X-Callback-Url')
+        };
+
+        // Some error types (e.g. GraphQL ClientError) expose response info.
+        const errorDetails: any = {
+          message: error?.message,
+          name: error?.name,
+          stack: error?.stack
+        };
+
+        if (error?.response) {
+          errorDetails.response = {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            errors: error.response.errors,
+            data: error.response.data
+          };
+        }
+
+        // eslint-disable-next-line no-console
+        console.error('[knative-job-fn] Function error', {
+          headers,
+          path: req.originalUrl || req.url,
+          error: errorDetails
+        });
+      } catch {
+        // never throw from the error logger
       }
 
       res.status(200).json({ message: error.message });
