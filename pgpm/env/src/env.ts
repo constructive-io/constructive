@@ -53,7 +53,9 @@ export const getEnvVars = (): PgpmOptions => {
     BUCKET_NAME,
     AWS_REGION,
     AWS_ACCESS_KEY,
+    AWS_ACCESS_KEY_ID,
     AWS_SECRET_KEY,
+    AWS_SECRET_ACCESS_KEY,
     MINIO_ENDPOINT,
 
     DEPLOYMENT_USE_TX,
@@ -121,8 +123,8 @@ export const getEnvVars = (): PgpmOptions => {
     cdn: {
       ...(BUCKET_NAME && { bucketName: BUCKET_NAME }),
       ...(AWS_REGION && { awsRegion: AWS_REGION }),
-      ...(AWS_ACCESS_KEY && { awsAccessKey: AWS_ACCESS_KEY }),
-      ...(AWS_SECRET_KEY && { awsSecretKey: AWS_SECRET_KEY }),
+      ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && { awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID }),
+      ...((AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY) && { awsSecretKey: AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY }),
       ...(MINIO_ENDPOINT && { minioEndpoint: MINIO_ENDPOINT }),
     },
     deployment: {
