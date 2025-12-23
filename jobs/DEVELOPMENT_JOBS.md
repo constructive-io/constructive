@@ -38,7 +38,7 @@ pgenv() {
   export PGPORT=5432
   export PGUSER=postgres
   export PGPASSWORD=password
-  export PGDATABASE=constructive
+  export PGDATABASE=launchql
   echo "PostgreSQL environment variables set"
 }
 ```
@@ -62,7 +62,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
 1. Create the `constructive` database (if it does not already exist):
 
    ```sh
-   createdb constructive
+   createdb launchql
    ```
 
 2. Bootstrap admin users:
@@ -199,13 +199,13 @@ With the jobs stack running, you can enqueue a test job from your host into the 
 First, grab a real `database_id` (required by `send-email-link`, optional for `simple-email`):
 
 ```sh
-DBID="$(docker exec -i postgres psql -U postgres -d constructive -Atc 'SELECT id FROM collections_public.database ORDER BY created_at LIMIT 1;')"
+DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM collections_public.database ORDER BY created_at LIMIT 1;')"
 echo "$DBID"
 ```
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d constructive -c "
+  psql -U postgres -d launchql -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'simple-email',
@@ -234,7 +234,7 @@ With `SEND_EMAIL_LINK_DRY_RUN=true` (default in `docker-compose.jobs.yml`), enqu
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d constructive -c "
+  psql -U postgres -d launchql -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'send-email-link',
