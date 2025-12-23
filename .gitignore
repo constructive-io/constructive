@@ -9,3 +9,5 @@ postgres/pgsql-test/output/
 .claude
 .kiro
 *.tsbuildinfo
+.env
+.env.local
