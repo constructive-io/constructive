@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/constructive-io/constructive/compare/pgpm@1.1.5...pgpm@1.2.0) (2025-12-24)
+
+### Features
+
+- **pgpm:** add test-packages command for integration testing ([3c13ab9](https://github.com/constructive-io/constructive/commit/3c13ab98ddbb1a6ee214f1a472b2c02860edbe56)), closes [constructive-io/projects-issues#375](https://github.com/constructive-io/projects-issues/issues/375)
+
 ## [1.1.5](https://github.com/constructive-io/constructive/compare/pgpm@1.1.4...pgpm@1.1.5) (2025-12-24)
 
 **Note:** Version bump only for package pgpm
