@@ -80,6 +80,10 @@ services:
       MAILGUN_DOMAIN: "mg.constructive.io"
       MAILGUN_FROM: "no-reply@mg.constructive.io"
       MAILGUN_REPLY: "info@mg.constructive.io"
+      # Local dashboard port for generated links, used only for
+      # localhost-style hosts in DRY RUN mode:
+      # http://localhost:LOCAL_APP_PORT/...
+      LOCAL_APP_PORT: "3000"
       SEND_EMAIL_LINK_DRY_RUN: "${SEND_EMAIL_LINK_DRY_RUN:-true}"
     ports:
       # Expose function locally (optional)

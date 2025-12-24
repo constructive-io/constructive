@@ -13,6 +13,15 @@ type JobContext = {
   databaseId: string | undefined;
 };
 
+function getHeaders(req: any) {
+  return {
+    'x-worker-id': req.get('X-Worker-Id'),
+    'x-job-id': req.get('X-Job-Id'),
+    'x-database-id': req.get('X-Database-Id'),
+    'x-callback-url': req.get('X-Callback-Url')
+  };
+}
+
 const app: any = express();
 
 app.use(bodyParser.json());
@@ -21,12 +30,7 @@ app.use(bodyParser.json());
 app.use((req: any, res: any, next: any) => {
   try {
     // Log only the headers we care about plus a shallow body snapshot
-    const headers = {
-      'x-worker-id': req.get('X-Worker-Id'),
-      'x-job-id': req.get('X-Job-Id'),
-      'x-database-id': req.get('X-Database-Id'),
-      'x-callback-url': req.get('X-Callback-Url')
-    };
+    const headers = getHeaders(req);
 
     let body: any;
     if (req.body && typeof req.body === 'object') {
@@ -229,12 +233,7 @@ export default {
 
       // Log the full error context for debugging.
       try {
-        const headers = {
-          'x-worker-id': req.get('X-Worker-Id'),
-          'x-job-id': req.get('X-Job-Id'),
-          'x-database-id': req.get('X-Database-Id'),
-          'x-callback-url': req.get('X-Callback-Url')
-        };
+        const headers = getHeaders(req);
 
         // Some error types (e.g. GraphQL ClientError) expose response info.
         const errorDetails: any = {
