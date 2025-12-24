@@ -157,8 +157,14 @@ export const sendEmailLink = async (
   const name = company.name;
   const primary = theme.primary;
 
-  const baseUrl = 'https://' + (subdomain ? [subdomain, domain].join('.') : domain);
-  const url = new URL(baseUrl);
+  const hostname = subdomain ? [subdomain, domain].join('.') : domain;
+  const isLocalHost =
+    hostname === 'localhost' ||
+    hostname === '0.0.0.0' ||
+    hostname.endsWith('.localhost');
+
+  const protocol = isDryRun && isLocalHost ? 'http' : 'https'; // only set to http if isDryRun and host is localhost
+  const url = new URL(`${protocol}://${hostname}`);
 
   let subject: string;
   let subMessage: string;
