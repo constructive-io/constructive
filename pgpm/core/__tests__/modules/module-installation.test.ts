@@ -51,3 +51,111 @@ describe('installModule()', () => {
     ).rejects.toThrow(/No package\.json found/);
   });
 });
+
+describe('modulesInstalled()', () => {
+  it('returns empty arrays when no modules are installed', () => {
+    const result = mod.modulesInstalled(['@pgpm-testing/base32', '@pgpm-testing/faker']);
+    
+    expect(result.installed).toEqual([]);
+    expect(result.installedVersions).toEqual({});
+  });
+
+  it('returns installed modules after installation', async () => {
+    await mod.installModules('@pgpm-testing/base32@1.0.0');
+    
+    const result = mod.modulesInstalled(['@pgpm-testing/base32', '@pgpm-testing/faker']);
+    
+    expect(result.installed).toEqual(['@pgpm-testing/base32']);
+    expect(result.installedVersions).toEqual({
+      '@pgpm-testing/base32': '1.0.0'
+    });
+  });
+
+  it('returns empty arrays when package.json does not exist', () => {
+    fs.rmSync(path.join(mod.getModulePath()!, 'package.json'));
+    
+    const result = mod.modulesInstalled(['@pgpm-testing/base32']);
+    
+    expect(result.installed).toEqual([]);
+    expect(result.installedVersions).toEqual({});
+  });
+});
+
+describe('getInstalledModules()', () => {
+  it('returns empty arrays when no modules are installed', () => {
+    const result = mod.getInstalledModules();
+    
+    expect(result.installed).toEqual([]);
+    expect(result.installedVersions).toEqual({});
+  });
+
+  it('returns all installed modules after installation', async () => {
+    await mod.installModules('@pgpm-testing/base32@1.0.0');
+    
+    const result = mod.getInstalledModules();
+    
+    expect(result.installed).toEqual(['@pgpm-testing/base32']);
+    expect(result.installedVersions).toEqual({
+      '@pgpm-testing/base32': '1.0.0'
+    });
+  });
+
+  it('returns empty arrays when package.json does not exist', () => {
+    fs.rmSync(path.join(mod.getModulePath()!, 'package.json'));
+    
+    const result = mod.getInstalledModules();
+    
+    expect(result.installed).toEqual([]);
+    expect(result.installedVersions).toEqual({});
+  });
+});
+
+describe('upgradeModules()', () => {
+  it('returns empty updates when no modules are installed', async () => {
+    const result = await mod.upgradeModules();
+    
+    expect(result.updates).toEqual([]);
+    expect(result.affectedModules).toEqual([]);
+  });
+
+  it('performs dry run without making changes', async () => {
+    await mod.installModules('@pgpm-testing/base32@1.0.0');
+    
+    const result = await mod.upgradeModules({ dryRun: true });
+    
+    expect(result.updates.length).toBe(1);
+    expect(result.updates[0].name).toBe('@pgpm-testing/base32');
+    expect(result.updates[0].oldVersion).toBe('1.0.0');
+    expect(result.affectedModules).toEqual([]);
+    
+    const pkgJson = JSON.parse(
+      fs.readFileSync(path.join(mod.getModulePath()!, 'package.json'), 'utf-8')
+    );
+    expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+  });
+
+  it('upgrades specific modules when specified', async () => {
+    await mod.installModules('@pgpm-testing/base32@1.0.0');
+    
+    const result = await mod.upgradeModules({ 
+      modules: ['@pgpm-testing/base32'],
+      dryRun: true 
+    });
+    
+    expect(result.updates.length).toBe(1);
+    expect(result.updates[0].name).toBe('@pgpm-testing/base32');
+    expect(result.affectedModules).toEqual([]);
+  });
+
+  it('returns empty updates when specified modules are not installed', async () => {
+    await mod.installModules('@pgpm-testing/base32@1.0.0');
+    
+    const result = await mod.upgradeModules({ 
+      modules: ['@pgpm-testing/nonexistent'],
+      dryRun: true 
+    });
+    
+    expect(result.updates).toEqual([]);
+    expect(result.affectedModules).toEqual([]);
+  });
+});

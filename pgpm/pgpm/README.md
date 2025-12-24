@@ -82,6 +82,7 @@ Here are some useful commands for reference:
 ### Module Management
 
 - `pgpm install` - Install database modules as dependencies
+- `pgpm upgrade-modules` - Upgrade installed modules to latest versions
 - `pgpm extension` - Interactively manage module dependencies
 - `pgpm tag` - Version your changes with tags
 
@@ -238,6 +239,31 @@ pgpm install @pgpm/base32
 # Install multiple packages
 pgpm install @pgpm/base32 @pgpm/faker
 ```
+
+#### `pgpm upgrade-modules`
+
+Upgrade installed pgpm modules to their latest versions from npm.
+
+```bash
+# Interactive selection of modules to upgrade
+pgpm upgrade-modules
+
+# Upgrade all installed modules without prompting
+pgpm upgrade-modules --all
+
+# Preview available upgrades without making changes
+pgpm upgrade-modules --dry-run
+
+# Upgrade specific modules
+pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker
+```
+
+**Options:**
+
+- `--all` - Upgrade all modules without prompting
+- `--dry-run` - Show what would be upgraded without making changes
+- `--modules <names>` - Comma-separated list of specific modules to upgrade
+- `--cwd <directory>` - Working directory (default: current directory)
 
 #### `pgpm extension`
 
