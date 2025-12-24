@@ -1,12 +1,11 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { execSync } from 'child_process';
-import fs from 'fs';
 import path from 'path';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
+import { getPgEnvOptions } from 'pg-env';
+import { getPgPool } from 'pg-cache';
 
 const log = new Logger('test-packages');
 
@@ -26,264 +25,207 @@ Test Packages Command:
 
 Options:
   --help, -h           Show this help message
-  --dirs <dirs>        Comma-separated directories to search for packages (default: packages)
-  --exclude <pkgs>     Comma-separated package paths to exclude
+  --exclude <pkgs>     Comma-separated module names to exclude
   --stop-on-fail       Stop testing immediately when a package fails
   --full-cycle         Run full deploy/verify/revert/deploy cycle (default: deploy only)
   --cwd <directory>    Working directory (default: current directory)
 
 Examples:
-  pgpm test-packages                              Test all packages in packages/
-  pgpm test-packages --dirs packages,services    Test packages in multiple directories
+  pgpm test-packages                              Test all packages in workspace
   pgpm test-packages --full-cycle                Run full test cycle with verify/revert
   pgpm test-packages --stop-on-fail              Stop on first failure
-  pgpm test-packages --exclude packages/legacy   Exclude specific packages
+  pgpm test-packages --exclude my-module         Exclude specific modules
 `;
 
 interface TestResult {
-  packageName: string;
-  packagePath: string;
+  moduleName: string;
+  modulePath: string;
   success: boolean;
   error?: string;
 }
 
-function dbsafename(packagePath: string): string {
-  const packageName = path.basename(packagePath);
-  return `test_${packageName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+function dbSafeName(moduleName: string): string {
+  return `test_${moduleName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 }
 
-function getProjectName(packagePath: string, projectRoot: string): string | null {
-  const planFile = path.isAbsolute(packagePath)
-    ? path.join(packagePath, 'pgpm.plan')
-    : path.join(projectRoot, packagePath, 'pgpm.plan');
-
-  if (!fs.existsSync(planFile)) {
-    return null;
-  }
-
-  const content = fs.readFileSync(planFile, 'utf8');
-  const match = content.match(/^%project=(.+)$/m);
-  return match ? match[1].trim() : null;
-}
-
-function execCommand(command: string, options: { silent?: boolean; cwd?: string; env?: NodeJS.ProcessEnv } = {}): { success: boolean; output?: string; error?: string } {
+async function createDatabase(dbname: string, adminDb: string = 'postgres'): Promise<boolean> {
   try {
-    const result = execSync(command, {
-      encoding: 'utf8',
-      stdio: options.silent ? 'pipe' : 'inherit',
-      cwd: options.cwd,
-      env: options.env
-    });
-    return { success: true, output: result };
+    const pgEnv = getPgEnvOptions({ database: adminDb });
+    const pool = getPgPool(pgEnv);
+    
+    // Sanitize database name (only allow alphanumeric and underscore)
+    const safeName = dbname.replace(/[^a-zA-Z0-9_]/g, '_');
+    
+    await pool.query(`CREATE DATABASE "${safeName}"`);
+    log.debug(`Created database: ${safeName}`);
+    return true;
   } catch (error: any) {
-    return { success: false, error: error.message };
+    if (error.code === '42P04') {
+      // Database already exists, that's fine
+      log.debug(`Database ${dbname} already exists`);
+      return true;
+    }
+    log.error(`Failed to create database ${dbname}: ${error.message}`);
+    return false;
   }
 }
 
-function commandExists(command: string): boolean {
+async function dropDatabase(dbname: string, adminDb: string = 'postgres'): Promise<void> {
   try {
-    execSync(`command -v ${command}`, { stdio: 'ignore' });
+    const pgEnv = getPgEnvOptions({ database: adminDb });
+    const pool = getPgPool(pgEnv);
+    
+    // Sanitize database name
+    const safeName = dbname.replace(/[^a-zA-Z0-9_]/g, '_');
+    
+    // Terminate all connections to the database first
+    await pool.query(`
+      SELECT pg_terminate_backend(pid) 
+      FROM pg_stat_activity 
+      WHERE datname = $1 AND pid <> pg_backend_pid()
+    `, [safeName]);
+    
+    await pool.query(`DROP DATABASE IF EXISTS "${safeName}"`);
+    log.debug(`Dropped database: ${safeName}`);
+  } catch (error: any) {
+    // Ignore errors when dropping (database might not exist)
+    log.debug(`Could not drop database ${dbname}: ${error.message}`);
+  }
+}
+
+async function checkPostgresConnection(): Promise<boolean> {
+  try {
+    const pgEnv = getPgEnvOptions({ database: 'postgres' });
+    const pool = getPgPool(pgEnv);
+    await pool.query('SELECT 1');
     return true;
   } catch {
     return false;
   }
 }
 
-function checkDockerPostgres(): boolean {
-  if (!commandExists('docker')) {
-    return false;
-  }
-  const result = execCommand('docker exec postgres psql -U postgres -c "SELECT 1;"', { silent: true });
-  return result.success;
-}
+async function testModule(
+  workspacePkg: PgpmPackage,
+  modulePkg: PgpmPackage,
+  fullCycle: boolean
+): Promise<TestResult> {
+  const moduleName = modulePkg.getModuleName();
+  const modulePath = modulePkg.getModulePath() || '';
+  const dbname = dbSafeName(moduleName);
 
-function checkDirectPostgres(pgEnv: NodeJS.ProcessEnv): boolean {
-  if (!commandExists('psql')) {
-    return false;
-  }
-  const result = execCommand('psql -c "SELECT 1;"', { silent: true, env: pgEnv });
-  return result.success;
-}
-
-function cleanupDb(dbname: string, useDocker: boolean, pgEnv: NodeJS.ProcessEnv): void {
-  log.debug(`Cleaning up database: ${dbname}`);
-  if (useDocker) {
-    execCommand(`docker exec postgres dropdb -U postgres "${dbname}"`, { silent: true });
-  } else {
-    execCommand(`dropdb "${dbname}"`, { silent: true, env: pgEnv });
-  }
-}
-
-function createDb(dbname: string, useDocker: boolean, pgEnv: NodeJS.ProcessEnv): boolean {
-  if (useDocker) {
-    const result = execCommand(`docker exec postgres createdb -U postgres "${dbname}"`);
-    return result.success;
-  } else {
-    const result = execCommand(`createdb "${dbname}"`, { env: pgEnv });
-    return result.success;
-  }
-}
-
-function findPackages(projectRoot: string, directories: string[] = ['packages']): string[] {
-  const packages: string[] = [];
-
-  function walkDir(dir: string): void {
-    if (!fs.existsSync(dir)) {
-      return;
-    }
-
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-
-      if (entry.isDirectory()) {
-        // Skip dist and node_modules directories
-        if (entry.name === 'dist' || entry.name === 'node_modules' || fullPath.includes('/dist/') || fullPath.includes('/node_modules/')) {
-          continue;
-        }
-        walkDir(fullPath);
-      } else if (entry.isFile() && entry.name === 'pgpm.plan') {
-        const packagePath = path.relative(projectRoot, dir);
-        packages.push(packagePath);
-      }
-    }
-  }
-
-  // Walk each specified directory
-  for (const dirName of directories) {
-    const dirPath = path.join(projectRoot, dirName);
-    if (fs.existsSync(dirPath)) {
-      walkDir(dirPath);
-    }
-  }
-
-  return packages.sort();
-}
-
-function runPgpmCommand(
-  command: string,
-  dbname: string,
-  packageName: string,
-  packagePath: string,
-  projectRoot: string,
-  pgEnv: NodeJS.ProcessEnv
-): boolean {
-  const fullCommand = `pgpm ${command} --database "${dbname}" --yes --package "${packageName}"`;
-  const result = execCommand(fullCommand, {
-    cwd: path.join(projectRoot, packagePath),
-    env: pgEnv
-  });
-  return result.success;
-}
-
-function testPackage(
-  packagePath: string,
-  projectRoot: string,
-  useDocker: boolean,
-  fullCycle: boolean,
-  pgEnv: NodeJS.ProcessEnv
-): TestResult {
-  const packageName = path.basename(packagePath);
-  const dbname = dbsafename(packagePath);
-
-  const lqlPackageName = getProjectName(packagePath, projectRoot);
-
-  if (!lqlPackageName) {
-    return {
-      packageName,
-      packagePath,
-      success: false,
-      error: `Could not find %project= in ${packagePath}/pgpm.plan`
-    };
-  }
-
-  console.log(`${YELLOW}Testing package: ${packageName}${NC}`);
-  console.log(`  Package path: ${packagePath}`);
+  console.log(`${YELLOW}Testing module: ${moduleName}${NC}`);
+  console.log(`  Module path: ${modulePath}`);
   console.log(`  Database name: ${dbname}`);
 
-  cleanupDb(dbname, useDocker, pgEnv);
+  // Clean up any existing test database
+  await dropDatabase(dbname);
 
+  // Create fresh test database
   console.log(`  Creating database: ${dbname}`);
-  if (!createDb(dbname, useDocker, pgEnv)) {
+  if (!await createDatabase(dbname)) {
     return {
-      packageName,
-      packagePath,
+      moduleName,
+      modulePath,
       success: false,
       error: `Could not create database ${dbname}`
     };
   }
 
-  const packageFullPath = path.join(projectRoot, packagePath);
-  if (!fs.existsSync(packageFullPath)) {
-    cleanupDb(dbname, useDocker, pgEnv);
+  try {
+    // Create options for this test database
+    const opts = getEnvOptions({
+      pg: getPgEnvOptions({ database: dbname }),
+      deployment: {
+        useTx: true,
+        fast: false,
+        usePlan: true,
+        cache: false,
+        logOnly: false
+      }
+    });
+
+    // Deploy
+    console.log('  Running deploy...');
+    try {
+      await workspacePkg.deploy(opts, moduleName, true);
+    } catch (error: any) {
+      await dropDatabase(dbname);
+      return {
+        moduleName,
+        modulePath,
+        success: false,
+        error: `Deploy failed: ${error.message}`
+      };
+    }
+
+    if (fullCycle) {
+      // Verify
+      console.log('  Running verify...');
+      try {
+        await workspacePkg.verify(opts, moduleName, true);
+      } catch (error: any) {
+        await dropDatabase(dbname);
+        return {
+          moduleName,
+          modulePath,
+          success: false,
+          error: `Verify failed: ${error.message}`
+        };
+      }
+
+      // Revert
+      console.log('  Running revert...');
+      try {
+        await workspacePkg.revert(opts, moduleName, true);
+      } catch (error: any) {
+        await dropDatabase(dbname);
+        return {
+          moduleName,
+          modulePath,
+          success: false,
+          error: `Revert failed: ${error.message}`
+        };
+      }
+
+      // Deploy again
+      console.log('  Running deploy (second time)...');
+      try {
+        await workspacePkg.deploy(opts, moduleName, true);
+      } catch (error: any) {
+        await dropDatabase(dbname);
+        return {
+          moduleName,
+          modulePath,
+          success: false,
+          error: `Deploy (second time) failed: ${error.message}`
+        };
+      }
+    }
+
+    // Clean up test database
+    await dropDatabase(dbname);
+
+    console.log(`${GREEN}SUCCESS: Module ${moduleName} passed all tests${NC}`);
     return {
-      packageName,
-      packagePath,
+      moduleName,
+      modulePath,
+      success: true
+    };
+  } catch (error: any) {
+    // Ensure cleanup on any unexpected error
+    await dropDatabase(dbname);
+    return {
+      moduleName,
+      modulePath,
       success: false,
-      error: `Could not find directory ${packageFullPath}`
+      error: `Unexpected error: ${error.message}`
     };
   }
-
-  console.log('  Running pgpm deploy...');
-  if (!runPgpmCommand('deploy', dbname, lqlPackageName, packagePath, projectRoot, pgEnv)) {
-    cleanupDb(dbname, useDocker, pgEnv);
-    return {
-      packageName,
-      packagePath,
-      success: false,
-      error: `pgpm deploy failed for package ${lqlPackageName}`
-    };
-  }
-
-  if (fullCycle) {
-    console.log('  Running pgpm verify...');
-    if (!runPgpmCommand('verify', dbname, lqlPackageName, packagePath, projectRoot, pgEnv)) {
-      cleanupDb(dbname, useDocker, pgEnv);
-      return {
-        packageName,
-        packagePath,
-        success: false,
-        error: `pgpm verify failed for package ${lqlPackageName}`
-      };
-    }
-
-    console.log('  Running pgpm revert...');
-    if (!runPgpmCommand('revert', dbname, lqlPackageName, packagePath, projectRoot, pgEnv)) {
-      cleanupDb(dbname, useDocker, pgEnv);
-      return {
-        packageName,
-        packagePath,
-        success: false,
-        error: `pgpm revert failed for package ${lqlPackageName}`
-      };
-    }
-
-    console.log('  Running pgpm deploy (second time)...');
-    if (!runPgpmCommand('deploy', dbname, lqlPackageName, packagePath, projectRoot, pgEnv)) {
-      cleanupDb(dbname, useDocker, pgEnv);
-      return {
-        packageName,
-        packagePath,
-        success: false,
-        error: `pgpm deploy (second time) failed for package ${lqlPackageName}`
-      };
-    }
-  }
-
-  cleanupDb(dbname, useDocker, pgEnv);
-
-  console.log(`${GREEN}SUCCESS: Package ${packageName} passed all tests${NC}`);
-  return {
-    packageName,
-    packagePath,
-    success: true
-  };
 }
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  _prompter: Inquirerer,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested
@@ -292,19 +234,10 @@ export default async (
     process.exit(0);
   }
 
-  const pgEnvOptions = getPgEnvOptions();
-  const pgEnv = getSpawnEnvWithPg(pgEnvOptions);
-
   // Parse options
   const stopOnFail = argv['stop-on-fail'] === true || argv.stopOnFail === true;
   const fullCycle = argv['full-cycle'] === true || argv.fullCycle === true;
   const cwd = argv.cwd || process.cwd();
-
-  // Parse directories
-  let directories: string[] = ['packages'];
-  if (argv.dirs) {
-    directories = (argv.dirs as string).split(',').map(d => d.trim());
-  }
 
   // Parse excludes
   let excludes: string[] = [];
@@ -321,49 +254,57 @@ export default async (
   }
   console.log('');
 
-  if (!commandExists('pgpm')) {
-    log.error('pgpm CLI not found. Please install pgpm globally.');
-    console.log('Run: npm install -g pgpm');
-    process.exit(1);
-  }
-
-  const useDocker = checkDockerPostgres();
-  const useDirect = !useDocker && checkDirectPostgres(pgEnv);
-
-  if (useDocker) {
-    console.log('Using Docker PostgreSQL container');
-  } else if (useDirect) {
-    console.log('Using direct PostgreSQL connection');
-  } else {
+  // Check PostgreSQL connection
+  console.log('Checking PostgreSQL connection...');
+  if (!await checkPostgresConnection()) {
     log.error('PostgreSQL not accessible.');
+    console.log('Ensure PostgreSQL is running and connection settings are correct.');
     console.log('For local development: docker-compose up -d');
     console.log('For CI: ensure PostgreSQL service is running');
     process.exit(1);
   }
+  console.log('PostgreSQL connection successful');
+  console.log('');
 
+  // Initialize workspace package
   const projectRoot = path.resolve(cwd);
-  process.chdir(projectRoot);
+  const workspacePkg = new PgpmPackage(projectRoot);
 
-  console.log(`Finding all PGPM packages in: ${directories.join(', ')}`);
-  let packages = findPackages(projectRoot, directories);
+  if (!workspacePkg.getWorkspacePath()) {
+    log.error('Not in a PGPM workspace. Run this command from a workspace root.');
+    process.exit(1);
+  }
 
-  // Apply excludes
+  // Get all modules from workspace using internal API
+  console.log('Finding all PGPM modules in workspace...');
+  const modules = await workspacePkg.getModules();
+
+  if (modules.length === 0) {
+    log.warn('No modules found in workspace.');
+    process.exit(0);
+  }
+
+  // Filter out excluded modules
+  let filteredModules = modules;
   if (excludes.length > 0) {
-    packages = packages.filter(pkg => !excludes.includes(pkg));
+    filteredModules = modules.filter(mod => {
+      const moduleName = mod.getModuleName();
+      return !excludes.includes(moduleName);
+    });
     console.log(`Excluding: ${excludes.join(', ')}`);
   }
 
-  console.log(`Found ${packages.length} packages to test:`);
-  for (const pkg of packages) {
-    console.log(`  - ${path.basename(pkg)}`);
+  console.log(`Found ${filteredModules.length} modules to test:`);
+  for (const mod of filteredModules) {
+    console.log(`  - ${mod.getModuleName()}`);
   }
   console.log('');
 
   const failedPackages: TestResult[] = [];
   const successfulPackages: TestResult[] = [];
 
-  for (const packagePath of packages) {
-    const result = testPackage(packagePath, projectRoot, useDocker, fullCycle, pgEnv);
+  for (const modulePkg of filteredModules) {
+    const result = await testModule(workspacePkg, modulePkg, fullCycle);
 
     if (result.success) {
       successfulPackages.push(result);
@@ -372,17 +313,17 @@ export default async (
 
       if (stopOnFail) {
         console.log('');
-        console.error(`${RED}STOPPING: Test failed for package ${result.packageName} and --stop-on-fail was specified${NC}`);
+        console.error(`${RED}STOPPING: Test failed for module ${result.moduleName} and --stop-on-fail was specified${NC}`);
         console.log('');
         console.log('=== TEST SUMMARY (PARTIAL) ===');
         if (successfulPackages.length > 0) {
-          console.log(`${GREEN}Successful packages before failure (${successfulPackages.length}):${NC}`);
+          console.log(`${GREEN}Successful modules before failure (${successfulPackages.length}):${NC}`);
           for (const pkg of successfulPackages) {
-            console.log(`  ${GREEN}✓${NC} ${pkg.packageName}`);
+            console.log(`  ${GREEN}✓${NC} ${pkg.moduleName}`);
           }
           console.log('');
         }
-        console.error(`${RED}Failed package: ${result.packageName}${NC}`);
+        console.error(`${RED}Failed module: ${result.moduleName}${NC}`);
         if (result.error) {
           console.error(`  Error: ${result.error}`);
         }
@@ -395,16 +336,16 @@ export default async (
   }
 
   console.log('=== TEST SUMMARY ===');
-  console.log(`${GREEN}Successful packages (${successfulPackages.length}):${NC}`);
+  console.log(`${GREEN}Successful modules (${successfulPackages.length}):${NC}`);
   for (const pkg of successfulPackages) {
-    console.log(`  ${GREEN}✓${NC} ${pkg.packageName}`);
+    console.log(`  ${GREEN}✓${NC} ${pkg.moduleName}`);
   }
 
   if (failedPackages.length > 0) {
     console.log('');
-    console.error(`${RED}Failed packages (${failedPackages.length}):${NC}`);
+    console.error(`${RED}Failed modules (${failedPackages.length}):${NC}`);
     for (const pkg of failedPackages) {
-      console.error(`  ${RED}✗${NC} ${pkg.packageName}`);
+      console.error(`  ${RED}✗${NC} ${pkg.moduleName}`);
       if (pkg.error) {
         console.error(`    Error: ${pkg.error}`);
       }
@@ -414,7 +355,7 @@ export default async (
     process.exit(1);
   } else {
     console.log('');
-    console.log(`${GREEN}OVERALL RESULT: ALL PACKAGES PASSED${NC}`);
+    console.log(`${GREEN}OVERALL RESULT: ALL MODULES PASSED${NC}`);
     process.exit(0);
   }
 };
