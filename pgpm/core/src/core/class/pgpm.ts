@@ -1182,7 +1182,8 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           logger.warn(`  ${update.name}: ${update.oldVersion} (could not fetch latest)`);
         }
       }
-      return { updates, affectedModules: [] };
+      const updatesWithChanges = updates.filter(u => u.newVersion && u.newVersion !== u.oldVersion);
+      return { updates: updatesWithChanges, affectedModules: [] };
     }
 
     const modulesToReinstall = updates
