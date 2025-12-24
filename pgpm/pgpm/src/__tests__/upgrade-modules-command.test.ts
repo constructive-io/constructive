@@ -50,9 +50,9 @@ describe('upgrade-modules CLI integration', () => {
     });
   });
 
-  describe('with installed modules', () => {
+  describe('with installed modules at latest version', () => {
     beforeEach(async () => {
-      await mod.installModules('@pgpm-testing/base32@1.0.0');
+      await mod.installModules('@pgpm-testing/base32@1.2.0');
     });
 
     it('shows modules are up to date when at latest version', async () => {
@@ -67,7 +67,13 @@ describe('upgrade-modules CLI integration', () => {
       const pkgJson = JSON.parse(
         fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
       );
-      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
+    });
+  });
+
+  describe('with installed modules at older version (1.1.0)', () => {
+    beforeEach(async () => {
+      await mod.installModules('@pgpm-testing/base32@1.1.0');
     });
 
     it('dry run does not modify package.json', async () => {
@@ -82,11 +88,16 @@ describe('upgrade-modules CLI integration', () => {
       const pkgJson = JSON.parse(
         fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
       );
-      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
     });
 
-    it('--all flag upgrades all modules without prompting', async () => {
+    it('--all flag upgrades from 1.1.0 to 1.2.0', async () => {
       const modulePath = mod.getModulePath()!;
+      
+      let pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
       
       await upgradeModulesCommand(
         { cwd: modulePath, all: true },
@@ -94,14 +105,19 @@ describe('upgrade-modules CLI integration', () => {
         {} as any
       );
       
-      const pkgJson = JSON.parse(
+      pkgJson = JSON.parse(
         fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
       );
-      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBeDefined();
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
     });
 
-    it('--modules flag filters to specific modules', async () => {
+    it('--modules flag filters to specific modules and upgrades to 1.2.0', async () => {
       const modulePath = mod.getModulePath()!;
+      
+      let pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
       
       await upgradeModulesCommand(
         { cwd: modulePath, modules: '@pgpm-testing/base32', all: true },
@@ -109,10 +125,10 @@ describe('upgrade-modules CLI integration', () => {
         {} as any
       );
       
-      const pkgJson = JSON.parse(
+      pkgJson = JSON.parse(
         fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
       );
-      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBeDefined();
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
     });
   });
 });
