@@ -24,6 +24,7 @@ import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
 import tag from './commands/tag';
+import testPackages from './commands/test-packages';
 import verify from './commands/verify';
 import { extractFirst, usageText } from './utils';
 import { cliExitWithError } from './utils/cli-error';
@@ -62,6 +63,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     migrate: pgt(migrate),
     analyze: pgt(analyze),
     rename: pgt(renameCmd),
+    'test-packages': pgt(testPackages),
     cache,
     update: updateCmd
   };

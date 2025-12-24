@@ -261,6 +261,43 @@ cnc kill
 cnc kill --no-drop
 ```
 
+### Testing
+
+#### `cnc test-packages`
+
+Run integration tests on all modules in a workspace. Creates a temporary database for each module, deploys, and optionally runs verify/revert/deploy cycles.
+
+```bash
+# Test all modules in workspace (deploy only)
+cnc test-packages
+
+# Run full deploy/verify/revert/deploy cycle
+cnc test-packages --full-cycle
+
+# Stop on first failure
+cnc test-packages --stop-on-fail
+
+# Exclude specific modules
+cnc test-packages --exclude my-module,another-module
+
+# Combine options
+cnc test-packages --full-cycle --stop-on-fail --exclude legacy-module
+```
+
+**Options:**
+
+- `--full-cycle` - Run full deploy/verify/revert/deploy cycle (default: deploy only)
+- `--stop-on-fail` - Stop testing immediately when a module fails
+- `--exclude <modules>` - Comma-separated module names to exclude
+- `--cwd <directory>` - Working directory (default: current directory)
+
+**Notes:**
+
+- Discovers modules from workspace `pgpm.json` configuration
+- Creates isolated test databases (`test_<module_name>`) for each module
+- Automatically cleans up test databases after each test
+- Uses internal APIs for deploy/verify/revert operations
+
 ## 💡 Common Workflows
 
 ### Starting a New Project

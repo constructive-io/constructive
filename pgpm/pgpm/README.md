@@ -90,6 +90,10 @@ Here are some useful commands for reference:
 - `pgpm plan` - Generate deployment plans for your modules
 - `pgpm package` - Package your module for distribution
 
+### Testing
+
+- `pgpm test-packages` - Run integration tests on all modules in a workspace
+
 ### Utilities
 
 - `pgpm add` - Add a new database change
@@ -301,6 +305,43 @@ pgpm kill
 # Only kill connections
 pgpm kill --no-drop
 ```
+
+### Testing
+
+#### `pgpm test-packages`
+
+Run integration tests on all modules in a workspace. Creates a temporary database for each module, deploys, and optionally runs verify/revert/deploy cycles.
+
+```bash
+# Test all modules in workspace (deploy only)
+pgpm test-packages
+
+# Run full deploy/verify/revert/deploy cycle
+pgpm test-packages --full-cycle
+
+# Stop on first failure
+pgpm test-packages --stop-on-fail
+
+# Exclude specific modules
+pgpm test-packages --exclude my-module,another-module
+
+# Combine options
+pgpm test-packages --full-cycle --stop-on-fail --exclude legacy-module
+```
+
+**Options:**
+
+- `--full-cycle` - Run full deploy/verify/revert/deploy cycle (default: deploy only)
+- `--stop-on-fail` - Stop testing immediately when a module fails
+- `--exclude <modules>` - Comma-separated module names to exclude
+- `--cwd <directory>` - Working directory (default: current directory)
+
+**Notes:**
+
+- Discovers modules from workspace `pgpm.json` configuration
+- Creates isolated test databases (`test_<module_name>`) for each module
+- Automatically cleans up test databases after each test
+- Uses internal APIs for deploy/verify/revert operations
 
 ## ⚙️ Configuration
 
