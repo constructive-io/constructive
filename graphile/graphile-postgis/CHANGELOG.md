@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.18](https://github.com/constructive-io/constructive/compare/graphile-postgis@0.2.17...graphile-postgis@0.2.18) (2025-12-24)
+
+### Bug Fixes
+
+- comment out status/registration logs, restore legitimate warnings ([9bb1bc1](https://github.com/constructive-io/constructive/commit/9bb1bc15b4df7e4241a6a2c1a7fb73c711cdd8e7))
+- remove console.warn/console.log from graphile plugins ([7d58fb0](https://github.com/constructive-io/constructive/commit/7d58fb03fdf78f39c502df5944aa66ac3d3c82fc)), closes [constructive-io/projects-issues#409](https://github.com/constructive-io/projects-issues/issues/409)
+
 ## [0.2.17](https://github.com/constructive-io/constructive/compare/graphile-postgis@0.2.16...graphile-postgis@0.2.17) (2025-12-24)
 
 **Note:** Version bump only for package graphile-postgis
