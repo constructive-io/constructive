@@ -1,0 +1,67 @@
+{
+  "name": "@constructive-io/postgrest-server",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive PostgREST Server",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "dev": "ts-node src/run.ts",
+    "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/run.ts",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "server",
+    "postgrest",
+    "rest",
+    "express",
+    "constructive",
+    "backend"
+  ],
+    "dependencies": {
+      "@constructive-io/graphql-env": "workspace:^",
+      "@constructive-io/graphql-types": "workspace:^",
+      "@constructive-io/url-domains": "workspace:^",
+      "@pgpmjs/logger": "workspace:^",
+      "@pgpmjs/server-utils": "workspace:^",
+      "@pgpmjs/types": "workspace:^",
+      "cors": "^2.8.5",
+      "express": "^5.1.0",
+      "graphql-tag": "2.12.6",
+      "lru-cache": "^11.2.4",
+      "pg": "^8.16.3",
+      "pg-cache": "workspace:^",
+      "pg-query-context": "workspace:^",
+      "postgrest": "^1.2.1",
+      "request-ip": "^3.3.0"
+    },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.16.0",
+    "@types/request-ip": "^0.0.41",
+    "makage": "^0.1.9",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
+  }
+}
