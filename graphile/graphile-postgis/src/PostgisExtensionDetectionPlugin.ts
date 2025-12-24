@@ -12,6 +12,7 @@ const PostgisExtensionDetectionPlugin: Plugin = (builder) => {
     );
     // Check we have the postgis extension
     if (!pgGISExtension) {
+      console.warn('PostGIS extension not found in database; skipping');
       return postgisBuild;
     }
     // Extract the geography and geometry types
