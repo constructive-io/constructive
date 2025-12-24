@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.18.5](https://github.com/constructive-io/constructive/compare/pgsql-test@2.18.4...pgsql-test@2.18.5) (2025-12-24)
+
+### Bug Fixes
+
+- **pgsql-test:** handle PostgreSQL NOTICE messages without failing tests ([3a3e63a](https://github.com/constructive-io/constructive/commit/3a3e63adc8c3d3af884df0ed678fd5693cc54b60))
+
 ## [2.18.4](https://github.com/constructive-io/constructive/compare/pgsql-test@2.18.3...pgsql-test@2.18.4) (2025-12-24)
 
 **Note:** Version bump only for package pgsql-test
