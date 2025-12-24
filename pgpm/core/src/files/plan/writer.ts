@@ -18,8 +18,23 @@ export function writeSqitchPlan(rows: SqitchRow[], opts: PlanWriteOptions): void
   fs.mkdirSync(dir, { recursive: true });
 
   const date = (): string => '2017-08-11T08:11:51Z'; // stubbed timestamp
-  const author = opts.author || 'constructive';
-  const email = `${author}@5b0c196eeb62`;
+  
+  // Parse author string - it might contain email in format "Name <email>"
+  const authorInput = (opts.author || 'constructive').trim();
+  let authorName = authorInput;
+  let authorEmail = '';
+  
+  // Check if author already contains email in <...> format
+  const emailMatch = authorInput.match(/^(.+?)\s*<([^>]+)>\s*$/);
+  if (emailMatch) {
+    // Author already has email format: "Name <email>"
+    authorName = emailMatch[1].trim();
+    authorEmail = emailMatch[2].trim();
+  } else {
+    // No email in author, use default format
+    authorName = authorInput;
+    authorEmail = `${authorName}@5b0c196eeb62`;
+  }
 
   const duplicates: Record<string, boolean> = {};
 
@@ -36,9 +51,9 @@ ${rows
       duplicates[row.deploy] = true;
 
       if (row.deps?.length) {
-        return `${row.deploy} [${row.deps.join(' ')}] ${date()} ${author} <${email}> # add ${row.name}`;
+        return `${row.deploy} [${row.deps.join(' ')}] ${date()} ${authorName} <${authorEmail}> # add ${row.name}`;
       }
-      return `${row.deploy} ${date()} ${author} <${email}> # add ${row.name}`;
+      return `${row.deploy} ${date()} ${authorName} <${authorEmail}> # add ${row.name}`;
     })
     .join('\n')}
 `);
