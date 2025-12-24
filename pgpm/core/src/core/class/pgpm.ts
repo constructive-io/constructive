@@ -1030,6 +1030,242 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     writeExtensions(this.modulePath!, updatedDeps);
   }
 
+  /**
+   * Returns information about which of the specified modules are installed.
+   * Checks the module's package.json dependencies to determine installation status.
+   * 
+   * @param moduleNames - Array of npm package names to check (e.g., '@pgpm/base32')
+   * @returns Object with installed (array of installed module names) and 
+   *          installedVersions (map of module name to installed version)
+   */
+  modulesInstalled(moduleNames: string[]): { 
+    installed: string[]; 
+    installedVersions: Record<string, string>;
+  } {
+    this.ensureModule();
+
+    const pkgJsonPath = path.join(this.modulePath!, 'package.json');
+    
+    if (!fs.existsSync(pkgJsonPath)) {
+      return { installed: [], installedVersions: {} };
+    }
+
+    const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+    const dependencies = pkgData.dependencies || {};
+
+    const installed: string[] = [];
+    const installedVersions: Record<string, string> = {};
+
+    for (const moduleName of moduleNames) {
+      const { name } = parse(moduleName);
+      if (dependencies[name]) {
+        installed.push(name);
+        installedVersions[name] = dependencies[name];
+      }
+    }
+
+    return { installed, installedVersions };
+  }
+
+  /**
+   * Returns all installed pgpm modules from the module's package.json dependencies.
+   * Only returns dependencies that exist in the workspace extensions directory.
+   * 
+   * @returns Object with installed module names and their versions
+   */
+  getInstalledModules(): { 
+    installed: string[]; 
+    installedVersions: Record<string, string>;
+  } {
+    this.ensureModule();
+    this.ensureWorkspace();
+
+    const pkgJsonPath = path.join(this.modulePath!, 'package.json');
+    
+    if (!fs.existsSync(pkgJsonPath)) {
+      return { installed: [], installedVersions: {} };
+    }
+
+    const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+    const dependencies = pkgData.dependencies || {};
+    const skitchExtDir = path.join(this.workspacePath!, 'extensions');
+
+    const installed: string[] = [];
+    const installedVersions: Record<string, string> = {};
+
+    for (const [name, version] of Object.entries(dependencies)) {
+      const extPath = path.join(skitchExtDir, name);
+      if (fs.existsSync(extPath)) {
+        installed.push(name);
+        installedVersions[name] = version as string;
+      }
+    }
+
+    return { installed, installedVersions };
+  }
+
+  /**
+   * Updates installed pgpm modules to their latest versions from npm.
+   * Re-installs each module to get the latest version.
+   * Also updates package.json for ALL modules in the workspace that reference the upgraded packages.
+   * 
+   * Note: Extensions are installed globally in the workspace's extensions/ directory,
+   * so upgrading affects all modules that depend on the upgraded package.
+   * 
+   * @param options - Options for the update operation
+   * @param options.modules - Specific modules to update (defaults to all installed modules)
+   * @param options.dryRun - If true, only returns what would be updated without making changes
+   * @returns Object with updated modules and their old/new versions
+   */
+  async upgradeModules(options?: {
+    modules?: string[];
+    dryRun?: boolean;
+  }): Promise<{
+    updates: Array<{
+      name: string;
+      oldVersion: string;
+      newVersion: string | null;
+    }>;
+    affectedModules: string[];
+  }> {
+    this.ensureWorkspace();
+    this.ensureModule();
+
+    const { modules: specificModules, dryRun = false } = options || {};
+
+    const { installed, installedVersions } = this.getInstalledModules();
+
+    const modulesToUpdate = specificModules 
+      ? installed.filter(m => specificModules.includes(m))
+      : installed;
+
+    if (modulesToUpdate.length === 0) {
+      logger.info('No modules to update.');
+      return { updates: [], affectedModules: [] };
+    }
+
+    const updates: Array<{
+      name: string;
+      oldVersion: string;
+      newVersion: string | null;
+    }> = [];
+
+    for (const moduleName of modulesToUpdate) {
+      const oldVersion = installedVersions[moduleName];
+      
+      let newVersion: string | null = null;
+      try {
+        const result = execSync(`npm view ${moduleName} version`, {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe']
+        }).trim();
+        newVersion = result || null;
+      } catch {
+        logger.warn(`Could not fetch latest version for ${moduleName}`);
+      }
+
+      updates.push({
+        name: moduleName,
+        oldVersion,
+        newVersion
+      });
+    }
+
+    if (dryRun) {
+      logger.info('Dry run - no changes made.');
+      for (const update of updates) {
+        if (update.newVersion && update.newVersion !== update.oldVersion) {
+          logger.info(`  ${update.name}: ${update.oldVersion} -> ${update.newVersion}`);
+        } else if (update.newVersion === update.oldVersion) {
+          logger.info(`  ${update.name}: ${update.oldVersion} (already up to date)`);
+        } else {
+          logger.warn(`  ${update.name}: ${update.oldVersion} (could not fetch latest)`);
+        }
+      }
+      return { updates, affectedModules: [] };
+    }
+
+    const modulesToReinstall = updates
+      .filter(u => u.newVersion && u.newVersion !== u.oldVersion)
+      .map(u => u.name);
+
+    if (modulesToReinstall.length === 0) {
+      logger.success('All modules are already up to date.');
+      return { updates, affectedModules: [] };
+    }
+
+    logger.info(`Upgrading ${modulesToReinstall.length} module(s)...`);
+    await this.installModules(...modulesToReinstall);
+
+    const { installedVersions: newVersions } = this.getInstalledModules();
+    for (const update of updates) {
+      if (modulesToReinstall.includes(update.name)) {
+        update.newVersion = newVersions[update.name] || update.newVersion;
+      }
+    }
+
+    // Update package.json for ALL modules in the workspace that reference the upgraded packages
+    const affectedModules = this.updateWorkspaceModuleVersions(
+      modulesToReinstall.reduce((acc, name) => {
+        const update = updates.find(u => u.name === name);
+        if (update?.newVersion) {
+          acc[name] = update.newVersion;
+        }
+        return acc;
+      }, {} as Record<string, string>)
+    );
+
+    if (affectedModules.length > 0) {
+      logger.info(`Updated package.json for ${affectedModules.length} module(s) in workspace.`);
+    }
+
+    logger.success('Upgrade complete.');
+    return { updates, affectedModules };
+  }
+
+  /**
+   * Updates package.json dependencies for all modules in the workspace that reference
+   * the specified packages with their new versions.
+   * 
+   * @param packageVersions - Map of package name to new version
+   * @returns Array of module names that were updated
+   */
+  private updateWorkspaceModuleVersions(packageVersions: Record<string, string>): string[] {
+    this.ensureWorkspace();
+
+    const moduleMap = this.getModuleMap();
+    const affectedModules: string[] = [];
+
+    for (const [moduleName, moduleInfo] of Object.entries(moduleMap)) {
+      const modulePath = path.resolve(this.workspacePath!, moduleInfo.path);
+      const pkgJsonPath = path.join(modulePath, 'package.json');
+
+      if (!fs.existsSync(pkgJsonPath)) {
+        continue;
+      }
+
+      const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+      const dependencies = pkgData.dependencies || {};
+      let updated = false;
+
+      for (const [pkgName, newVersion] of Object.entries(packageVersions)) {
+        if (dependencies[pkgName] && dependencies[pkgName] !== newVersion) {
+          dependencies[pkgName] = newVersion;
+          updated = true;
+        }
+      }
+
+      if (updated) {
+        pkgData.dependencies = sortObjectByKey(dependencies);
+        fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgData, null, 2));
+        affectedModules.push(moduleName);
+        logger.info(`  Updated ${moduleName}/package.json`);
+      }
+    }
+
+    return affectedModules;
+  }
+
   // ──────────────── Package Operations ────────────────
 
   /**
