@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.11](https://github.com/constructive-io/constructive/compare/@constructive-io/simple-email-fn@0.2.10...@constructive-io/simple-email-fn@0.2.11) (2025-12-24)
+
+**Note:** Version bump only for package @constructive-io/simple-email-fn
+
 ## [0.2.10](https://github.com/constructive-io/constructive/compare/@constructive-io/simple-email-fn@0.2.9...@constructive-io/simple-email-fn@0.2.10) (2025-12-23)
 
 **Note:** Version bump only for package @constructive-io/simple-email-fn

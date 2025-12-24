@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.9](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.8...pg-cache@1.6.9) (2025-12-24)
+
+### Bug Fixes
+
+- **pg-cache:** add detailed documentation for pool error handler ([b42dff8](https://github.com/constructive-io/constructive/commit/b42dff85b9de8a4d134a76b60be60427bd603a56))
+- **pg-cache:** add error handler to prevent unhandled pool errors ([bc28792](https://github.com/constructive-io/constructive/commit/bc2879222fffb8956baf5adfd30a4d67d1d9b0f4))
+
 ## [1.6.8](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.7...pg-cache@1.6.8) (2025-12-22)
 
 **Note:** Version bump only for package pg-cache
