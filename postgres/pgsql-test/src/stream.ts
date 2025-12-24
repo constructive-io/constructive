@@ -26,10 +26,14 @@ function stringToStream(text: string): Readable {
 }
 
 export async function streamSql(config: PgConfig, sql: string): Promise<void> {
-  const args = setArgs(config);
+  const args = [
+    ...setArgs(config),
+    '-v', 'ON_ERROR_STOP=1'  // Exit with non-zero code on SQL errors
+  ];
 
   return new Promise<void>((resolve, reject) => {
     const sqlStream = stringToStream(sql);
+    let stderrBuffer = '';
 
     const proc = spawn('psql', args, {
       env: getSpawnEnvWithPg(config)
@@ -37,16 +41,20 @@ export async function streamSql(config: PgConfig, sql: string): Promise<void> {
 
     sqlStream.pipe(proc.stdin);
 
+    proc.stderr.on('data', (data: Buffer) => {
+      stderrBuffer += data.toString();
+    });
+
     proc.on('close', (code) => {
-      resolve();
+      if (code !== 0) {
+        reject(new Error(stderrBuffer || `psql exited with code ${code}`));
+      } else {
+        resolve();
+      }
     });
 
     proc.on('error', (error) => {
       reject(error);
-    });
-
-    proc.stderr.on('data', (data: Buffer) => {
-      reject(new Error(data.toString()));
     });
   });
 }
