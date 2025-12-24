@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { TestFixture } from '../../../core/test-utils';
+import { TestFixture } from '../../test-utils';
 import upgradeModulesCommand from '../commands/upgrade-modules';
 
 let fixture: TestFixture;
