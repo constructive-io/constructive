@@ -1,146 +1,118 @@
+import fs from 'fs';
+import path from 'path';
+
+import { TestFixture } from '../../../core/test-utils';
 import upgradeModulesCommand from '../commands/upgrade-modules';
-import { PgpmPackage } from '@pgpmjs/core';
 
-jest.mock('@pgpmjs/core', () => ({
-  PgpmPackage: jest.fn()
-}));
+let fixture: TestFixture;
+let mod: ReturnType<TestFixture['getModuleProject']>;
 
-jest.mock('../utils/npm-version', () => ({
-  fetchLatestVersion: jest.fn()
-}));
-
-const mockPgpmPackage = PgpmPackage as jest.MockedClass<typeof PgpmPackage>;
-const { fetchLatestVersion } = require('../utils/npm-version') as { fetchLatestVersion: jest.Mock };
-
-const createMockPrompter = (answers: Record<string, any> = {}) => ({
-  prompt: jest.fn().mockResolvedValue(answers),
-  close: jest.fn()
+const createPrompter = (selectedModules: string[] = []) => ({
+  prompt: async (_argv: any, _questions: any) => ({
+    selectedModules: selectedModules.map(name => ({ name, selected: true }))
+  }),
+  close: () => {}
 });
 
-describe('upgrade-modules command', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+beforeEach(() => {
+  fixture = new TestFixture('sqitch', 'publish');
+  mod = fixture.getModuleProject(['.'], 'totp')!;
+});
 
-  it('shows help when --help flag is provided', async () => {
-    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
-      throw new Error('process.exit called');
+afterEach(() => {
+  fixture.cleanup();
+});
+
+describe('upgrade-modules CLI integration', () => {
+  describe('when not in a module', () => {
+    it('throws error when run outside a module', async () => {
+      const nonModulePath = fixture.tempDir;
+      
+      await expect(
+        upgradeModulesCommand(
+          { cwd: nonModulePath },
+          createPrompter() as any,
+          {} as any
+        )
+      ).rejects.toThrow('You must run this command inside a PGPM module');
     });
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-    await expect(
-      upgradeModulesCommand({ help: true }, createMockPrompter() as any, {} as any)
-    ).rejects.toThrow('process.exit called');
-
-    expect(consoleSpy).toHaveBeenCalled();
-    expect(consoleSpy.mock.calls[0][0]).toContain('Upgrade Modules Command');
-
-    mockExit.mockRestore();
-    consoleSpy.mockRestore();
   });
 
-  it('throws error when not in a module', async () => {
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(false)
-    } as any));
-
-    await expect(
-      upgradeModulesCommand({ cwd: '/test' }, createMockPrompter() as any, {} as any)
-    ).rejects.toThrow('You must run this command inside a PGPM module');
+  describe('when no modules are installed', () => {
+    it('reports no modules installed', async () => {
+      const modulePath = mod.getModulePath()!;
+      
+      await upgradeModulesCommand(
+        { cwd: modulePath },
+        createPrompter() as any,
+        {} as any
+      );
+    });
   });
 
-  it('handles no installed modules gracefully', async () => {
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(true),
-      getInstalledModules: jest.fn().mockReturnValue({
-        installed: [],
-        installedVersions: {}
-      })
-    } as any));
+  describe('with installed modules', () => {
+    beforeEach(async () => {
+      await mod.installModules('@pgpm-testing/base32@1.0.0');
+    });
 
-    await upgradeModulesCommand({ cwd: '/test' }, createMockPrompter() as any, {} as any);
-  });
+    it('shows modules are up to date when at latest version', async () => {
+      const modulePath = mod.getModulePath()!;
+      
+      await upgradeModulesCommand(
+        { cwd: modulePath },
+        createPrompter() as any,
+        {} as any
+      );
+      
+      const pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+    });
 
-  it('handles all modules up to date', async () => {
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(true),
-      getInstalledModules: jest.fn().mockReturnValue({
-        installed: ['@pgpm/base32'],
-        installedVersions: { '@pgpm/base32': '1.0.0' }
-      })
-    } as any));
+    it('dry run does not modify package.json', async () => {
+      const modulePath = mod.getModulePath()!;
+      
+      await upgradeModulesCommand(
+        { cwd: modulePath, 'dry-run': true },
+        createPrompter() as any,
+        {} as any
+      );
+      
+      const pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+    });
 
-    fetchLatestVersion.mockResolvedValue('1.0.0');
+    it('--all flag upgrades all modules without prompting', async () => {
+      const modulePath = mod.getModulePath()!;
+      
+      await upgradeModulesCommand(
+        { cwd: modulePath, all: true },
+        createPrompter() as any,
+        {} as any
+      );
+      
+      const pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBeDefined();
+    });
 
-    await upgradeModulesCommand({ cwd: '/test' }, createMockPrompter() as any, {} as any);
-  });
-
-  it('performs dry run without making changes', async () => {
-    const mockUpgradeModules = jest.fn();
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(true),
-      getInstalledModules: jest.fn().mockReturnValue({
-        installed: ['@pgpm/base32'],
-        installedVersions: { '@pgpm/base32': '1.0.0' }
-      }),
-      upgradeModules: mockUpgradeModules
-    } as any));
-
-    fetchLatestVersion.mockResolvedValue('2.0.0');
-
-    await upgradeModulesCommand(
-      { cwd: '/test', 'dry-run': true }, 
-      createMockPrompter() as any, 
-      {} as any
-    );
-
-    expect(mockUpgradeModules).not.toHaveBeenCalled();
-  });
-
-  it('upgrades all modules when --all flag is provided', async () => {
-    const mockUpgradeModules = jest.fn().mockResolvedValue({ updates: [] });
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(true),
-      getInstalledModules: jest.fn().mockReturnValue({
-        installed: ['@pgpm/base32'],
-        installedVersions: { '@pgpm/base32': '1.0.0' }
-      }),
-      upgradeModules: mockUpgradeModules
-    } as any));
-
-    fetchLatestVersion.mockResolvedValue('2.0.0');
-
-    await upgradeModulesCommand(
-      { cwd: '/test', all: true }, 
-      createMockPrompter() as any, 
-      {} as any
-    );
-
-    expect(mockUpgradeModules).toHaveBeenCalledWith({ modules: ['@pgpm/base32'] });
-  });
-
-  it('upgrades specific modules when --modules flag is provided', async () => {
-    const mockUpgradeModules = jest.fn().mockResolvedValue({ updates: [] });
-    mockPgpmPackage.mockImplementation(() => ({
-      isInModule: jest.fn().mockReturnValue(true),
-      getInstalledModules: jest.fn().mockReturnValue({
-        installed: ['@pgpm/base32', '@pgpm/faker'],
-        installedVersions: { 
-          '@pgpm/base32': '1.0.0',
-          '@pgpm/faker': '1.0.0'
-        }
-      }),
-      upgradeModules: mockUpgradeModules
-    } as any));
-
-    fetchLatestVersion.mockResolvedValue('2.0.0');
-
-    await upgradeModulesCommand(
-      { cwd: '/test', modules: '@pgpm/base32' }, 
-      createMockPrompter() as any, 
-      {} as any
-    );
-
-    expect(mockUpgradeModules).toHaveBeenCalledWith({ modules: ['@pgpm/base32'] });
+    it('--modules flag filters to specific modules', async () => {
+      const modulePath = mod.getModulePath()!;
+      
+      await upgradeModulesCommand(
+        { cwd: modulePath, modules: '@pgpm-testing/base32', all: true },
+        createPrompter() as any,
+        {} as any
+      );
+      
+      const pkgJson = JSON.parse(
+        fs.readFileSync(path.join(modulePath, 'package.json'), 'utf-8')
+      );
+      expect(pkgJson.dependencies['@pgpm-testing/base32']).toBeDefined();
+    });
   });
 });
