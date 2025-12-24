@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.15](https://github.com/constructive-io/constructive/compare/my-third@0.5.14...my-third@0.5.15) (2025-12-24)
+
+**Note:** Version bump only for package my-third
+
 ## [0.5.14](https://github.com/constructive-io/constructive/compare/my-third@0.5.13...my-third@0.5.14) (2025-12-24)
 
 **Note:** Version bump only for package my-third

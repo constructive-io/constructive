@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.1.4...@pgpmjs/core@3.2.0) (2025-12-24)
+
+### Features
+
+- **pgpm:** add modulesInstalled, getInstalledModules, and upgradeModules methods ([adefc84](https://github.com/constructive-io/constructive/commit/adefc84b126816ff498a56c35c51f9a9f3844516))
+
 ## [3.1.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.1.3...@pgpmjs/core@3.1.4) (2025-12-24)
 
 **Note:** Version bump only for package @pgpmjs/core
