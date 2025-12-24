@@ -30,6 +30,8 @@ jobs:
             env: {}
           - package: pgpm/env
             env: {}
+          - package: pgpm/cli
+            env: {}
           - package: packages/cli
             env: {}
           - package: packages/client
