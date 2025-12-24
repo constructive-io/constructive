@@ -77,7 +77,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
       if (!GEOMETRY_TYPE || !GEOGRAPHY_TYPE) {
         return input;
       }
-      console.warn('PostGIS plugin enabled');
+      // console.warn('PostGIS plugin enabled');
 
       const GeoJSON = getTypeByName(inflection.builtin('GeoJSON')) as GraphQLScalarType | undefined;
       if (!GeoJSON) {
@@ -176,9 +176,9 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         const typeId = type.id;
         const typeDetails: GisTypeDetails = getGISTypeDetails(typeModifier);
         const { subtype, hasZ, hasM, srid } = typeDetails;
-        console.warn(
-          `Getting ${type.name} type ${type.id}|${typeModifier}|${subtype}|${hasZ}|${hasM}|${srid}`
-        );
+        // console.warn(
+        //   `Getting ${type.name} type ${type.id}|${typeModifier}|${subtype}|${hasZ}|${hasM}|${srid}`
+        // );
         if (!constructedTypes[typeId]) {
           constructedTypes[typeId] = {};
         }
@@ -277,7 +277,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         return constructedTypes[typeId][gisTypeKey];
       };
 
-      console.warn(`Registering handler for ${GEOGRAPHY_TYPE.id}`);
+      // console.warn(`Registering handler for ${GEOGRAPHY_TYPE.id}`);
 
       pgRegisterGqlInputTypeByTypeId(GEOGRAPHY_TYPE.id, () => GeoJSON);
       pg2GqlMapper[GEOGRAPHY_TYPE.id] = {
@@ -295,7 +295,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         return getGisType(GEOGRAPHY_TYPE, typeModifier);
       });
 
-      console.warn(`Registering handler for ${GEOMETRY_TYPE.id}`);
+      // console.warn(`Registering handler for ${GEOMETRY_TYPE.id}`);
 
       pgRegisterGqlInputTypeByTypeId(GEOMETRY_TYPE.id, () => GeoJSON);
       pg2GqlMapper[GEOMETRY_TYPE.id] = {
