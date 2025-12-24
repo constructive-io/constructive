@@ -19,7 +19,7 @@ function getHeaders(req: any) {
     'x-job-id': req.get('X-Job-Id'),
     'x-database-id': req.get('X-Database-Id'),
     'x-callback-url': req.get('X-Callback-Url')
-  }
+  };
 }
 
 const app: any = express();
