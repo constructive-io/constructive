@@ -28,10 +28,16 @@ app.use((req: any, res: any, next: any) => {
       'x-callback-url': req.get('X-Callback-Url')
     };
 
-    const body =
-      req.body && typeof req.body === 'object'
-        ? { keys: Object.keys(req.body), preview: req.body }
-        : req.body;
+    let body: any;
+    if (req.body && typeof req.body === 'object') {
+      // Only log top-level keys to avoid exposing sensitive body contents.
+      body = { keys: Object.keys(req.body) };
+    } else if (typeof req.body === 'string') {
+      // For string bodies, log only the length.
+      body = { length: req.body.length };
+    } else {
+      body = undefined;
+    }
 
     // eslint-disable-next-line no-console
     console.log('[knative-job-fn] Incoming job request', {
