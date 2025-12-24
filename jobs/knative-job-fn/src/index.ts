@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use((req: any, res: any, next: any) => {
   try {
     // Log only the headers we care about plus a shallow body snapshot
-    const headers = getHeaders(req)
+    const headers = getHeaders(req);
 
     let body: any;
     if (req.body && typeof req.body === 'object') {
