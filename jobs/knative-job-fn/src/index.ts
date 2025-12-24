@@ -233,7 +233,7 @@ export default {
 
       // Log the full error context for debugging.
       try {
-        const headers = getHeaders(req)
+        const headers = getHeaders(req);
 
         // Some error types (e.g. GraphQL ClientError) expose response info.
         const errorDetails: any = {
