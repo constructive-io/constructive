@@ -229,6 +229,10 @@ You should then see the job picked up by `knative-job-service` and the email pay
 - The app/meta packages deployed in step 3 (`app-svc-local`, `db-meta`)
 - A real `database_id` (use `$DBID` above)
 - A GraphQL hostname that matches a seeded domain route (step 5)
+- For localhost development, the site/domain metadata usually resolves to `localhost`.
+  In that case, the function will honor the `LOCAL_APP_PORT` env (default `3000` in
+  `docker-compose.jobs.yml`) and generate links like `http://localhost:3000/...`
+  when `SEND_EMAIL_LINK_DRY_RUN=true`.
 
 With `SEND_EMAIL_LINK_DRY_RUN=true` (default in `docker-compose.jobs.yml`), enqueue a job:
 

@@ -158,13 +158,27 @@ export const sendEmailLink = async (
   const primary = theme.primary;
 
   const hostname = subdomain ? [subdomain, domain].join('.') : domain;
+
+  // Treat localhost-style hosts specially so we can generate
+  // http://localhost[:port]/... links for local dev without
+  // breaking production URLs.
   const isLocalHost =
-    hostname === 'localhost' ||
-    hostname === '0.0.0.0' ||
+    hostname.startsWith('localhost') ||
+    hostname.startsWith('0.0.0.0') ||
     hostname.endsWith('.localhost');
 
-  const protocol = isDryRun && isLocalHost ? 'http' : 'https'; // only set to http if isDryRun and host is localhost
-  const url = new URL(`${protocol}://${hostname}`);
+  // Optional: LOCAL_APP_PORT lets you attach a port for local dashboards
+  // e.g. LOCAL_APP_PORT=3000 -> http://localhost:3000
+  // It is ignored for non-local hostnames. Only allow on DRY RUNs
+  const localPort =
+    isLocalHost && isDryRun && process.env.LOCAL_APP_PORT
+      ? `:${process.env.LOCAL_APP_PORT}`
+      : '';
+
+  // Use http only for local dry-run to avoid browser TLS warnings
+  // in dev; production stays https.
+  const protocol = isLocalHost && isDryRun ? 'http' : 'https';
+  const url = new URL(`${protocol}://${hostname}${localPort}`);
 
   let subject: string;
   let subMessage: string;
