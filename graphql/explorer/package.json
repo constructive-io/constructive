@@ -41,7 +41,7 @@
     "@constructive-io/url-domains": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "graphile-build": "^4.14.1",
     "graphile-cache": "workspace:^",
     "graphile-settings": "workspace:^",

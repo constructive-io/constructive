@@ -256,6 +256,9 @@ pgpm upgrade-modules --dry-run
 
 # Upgrade specific modules
 pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker
+
+# Upgrade modules across all packages in the workspace
+pgpm upgrade-modules --workspace --all
 ```
 
 **Options:**
@@ -263,6 +266,7 @@ pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker
 - `--all` - Upgrade all modules without prompting
 - `--dry-run` - Show what would be upgraded without making changes
 - `--modules <names>` - Comma-separated list of specific modules to upgrade
+- `--workspace` - Upgrade modules across all packages in the workspace
 - `--cwd <directory>` - Working directory (default: current directory)
 
 #### `pgpm extension`
@@ -345,20 +349,20 @@ pgpm test-packages
 # Run full deploy/verify/revert/deploy cycle
 pgpm test-packages --full-cycle
 
-# Stop on first failure
-pgpm test-packages --stop-on-fail
+# Continue testing all packages even after failures
+pgpm test-packages --continue-on-fail
 
 # Exclude specific modules
 pgpm test-packages --exclude my-module,another-module
 
 # Combine options
-pgpm test-packages --full-cycle --stop-on-fail --exclude legacy-module
+pgpm test-packages --full-cycle --continue-on-fail --exclude legacy-module
 ```
 
 **Options:**
 
 - `--full-cycle` - Run full deploy/verify/revert/deploy cycle (default: deploy only)
-- `--stop-on-fail` - Stop testing immediately when a module fails
+- `--continue-on-fail` - Continue testing all packages even after failures (default: stop on first failure)
 - `--exclude <modules>` - Comma-separated module names to exclude
 - `--cwd <directory>` - Working directory (default: current directory)
 
