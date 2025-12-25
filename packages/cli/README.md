@@ -98,6 +98,9 @@ cnc server
 
 # Custom port and options
 cnc server --port 8080 --no-postgis
+
+# With custom CORS origin
+cnc server --origin http://localhost:3000
 ```
 
 #### `cnc explorer`
@@ -110,6 +113,33 @@ cnc explorer
 
 # With custom CORS origin
 cnc explorer --origin http://localhost:3000
+```
+
+#### `cnc docker`
+
+Manage PostgreSQL Docker containers for local development.
+
+```bash
+# Start PostgreSQL container
+cnc docker start
+
+# Stop PostgreSQL container
+cnc docker stop
+```
+
+#### `cnc env`
+
+Display environment configuration for PostgreSQL connection.
+
+```bash
+# Print environment variables for shell export
+cnc env
+
+# Use with eval to set environment
+eval "$(cnc env)"
+
+# Print Supabase local development environment
+cnc env --supabase
 ```
 
 ## 🔄 Updates
@@ -202,6 +232,35 @@ Interactively manage module dependencies.
 cnc extension
 ```
 
+#### `cnc upgrade-modules`
+
+Upgrade installed pgpm modules to their latest versions from npm.
+
+```bash
+# Interactive selection of modules to upgrade
+cnc upgrade-modules
+
+# Upgrade all installed modules without prompting
+cnc upgrade-modules --all
+
+# Preview available upgrades without making changes
+cnc upgrade-modules --dry-run
+
+# Upgrade specific modules
+cnc upgrade-modules --modules @pgpm/base32,@pgpm/faker
+
+# Upgrade modules across all packages in the workspace
+cnc upgrade-modules --workspace --all
+```
+
+**Options:**
+
+- `--all` - Upgrade all modules without prompting
+- `--dry-run` - Show what would be upgraded without making changes
+- `--modules <names>` - Comma-separated list of specific modules to upgrade
+- `--workspace` - Upgrade modules across all packages in the workspace
+- `--cwd <directory>` - Working directory (default: current directory)
+
 #### `cnc tag`
 
 Version your changes with tags.
@@ -241,6 +300,18 @@ cnc package --no-plan
 
 ### Utilities
 
+#### `cnc add`
+
+Add a new database change to your module.
+
+```bash
+# Add a new change
+cnc add my_change
+
+# Add with specific type
+cnc add my_function --type function
+```
+
 #### `cnc export`
 
 Export migrations from existing databases.
@@ -261,6 +332,53 @@ cnc kill
 cnc kill --no-drop
 ```
 
+#### `cnc clear`
+
+Clear database state.
+
+```bash
+cnc clear
+```
+
+#### `cnc remove`
+
+Remove database changes.
+
+```bash
+cnc remove my_change
+```
+
+#### `cnc analyze`
+
+Analyze database structure.
+
+```bash
+cnc analyze
+```
+
+#### `cnc rename`
+
+Rename database changes.
+
+```bash
+cnc rename old_name new_name
+```
+
+#### `cnc admin-users`
+
+Manage admin users for your database.
+
+```bash
+# Bootstrap admin users
+cnc admin-users bootstrap
+
+# Add an admin user
+cnc admin-users add
+
+# Remove an admin user
+cnc admin-users remove
+```
+
 ### Testing
 
 #### `cnc test-packages`
@@ -274,20 +392,20 @@ cnc test-packages
 # Run full deploy/verify/revert/deploy cycle
 cnc test-packages --full-cycle
 
-# Stop on first failure
-cnc test-packages --stop-on-fail
+# Continue testing all packages even after failures
+cnc test-packages --continue-on-fail
 
 # Exclude specific modules
 cnc test-packages --exclude my-module,another-module
 
 # Combine options
-cnc test-packages --full-cycle --stop-on-fail --exclude legacy-module
+cnc test-packages --full-cycle --continue-on-fail --exclude legacy-module
 ```
 
 **Options:**
 
 - `--full-cycle` - Run full deploy/verify/revert/deploy cycle (default: deploy only)
-- `--stop-on-fail` - Stop testing immediately when a module fails
+- `--continue-on-fail` - Continue testing all packages even after failures (default: stop on first failure)
 - `--exclude <modules>` - Comma-separated module names to exclude
 - `--cwd <directory>` - Working directory (default: current directory)
 

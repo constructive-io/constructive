@@ -17,6 +17,7 @@ Constructive GraphQL Server:
 Options:
   --help, -h              Show this help message
   --port <number>         Server port (default: 5555)
+  --origin <url>          CORS origin URL (exact URL or * for wildcard)
   --simpleInflection      Use simple inflection (default: true)
   --oppositeBaseNames     Use opposite base names (default: false)
   --postgis               Enable PostGIS extension (default: true)
@@ -27,6 +28,7 @@ Examples:
   cnc server                    Start server with defaults
   cnc server --port 8080        Start server on custom port
   cnc server --no-postgis       Start server without PostGIS
+  cnc server --origin http://localhost:3000  Set CORS origin
 `;
 
 const questions: Question[] = [

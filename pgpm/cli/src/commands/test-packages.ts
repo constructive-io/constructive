@@ -26,14 +26,14 @@ Test Packages Command:
 Options:
   --help, -h           Show this help message
   --exclude <pkgs>     Comma-separated module names to exclude
-  --stop-on-fail       Stop testing immediately when a package fails
+  --continue-on-fail   Continue testing all packages even after failures
   --full-cycle         Run full deploy/verify/revert/deploy cycle (default: deploy only)
   --cwd <directory>    Working directory (default: current directory)
 
 Examples:
-  pgpm test-packages                              Test all packages in workspace
+  pgpm test-packages                              Test all packages (stops on first failure)
   pgpm test-packages --full-cycle                Run full test cycle with verify/revert
-  pgpm test-packages --stop-on-fail              Stop on first failure
+  pgpm test-packages --continue-on-fail          Test all packages, collect all failures
   pgpm test-packages --exclude my-module         Exclude specific modules
 `;
 
@@ -234,8 +234,9 @@ export default async (
     process.exit(0);
   }
 
-  // Parse options
-  const stopOnFail = argv['stop-on-fail'] === true || argv.stopOnFail === true;
+  // Parse options (stopOnFail defaults to true, use --continue-on-fail to disable)
+  const continueOnFail = argv['continue-on-fail'] === true || argv.continueOnFail === true;
+  const stopOnFail = !continueOnFail;
   const fullCycle = argv['full-cycle'] === true || argv.fullCycle === true;
   const cwd = argv.cwd || process.cwd();
 
@@ -247,9 +248,7 @@ export default async (
 
   console.log('=== PGPM Package Integration Test ===');
   console.log(`Testing all packages with ${fullCycle ? 'deploy/verify/revert/deploy cycle' : 'deploy only'}`);
-  if (stopOnFail) {
-    console.log('Mode: Stop on first failure');
-  } else {
+  if (!stopOnFail) {
     console.log('Mode: Test all packages (collect all failures)');
   }
   console.log('');
@@ -313,7 +312,7 @@ export default async (
 
       if (stopOnFail) {
         console.log('');
-        console.error(`${RED}STOPPING: Test failed for module ${result.moduleName} and --stop-on-fail was specified${NC}`);
+        console.error(`${RED}STOPPING: Test failed for module ${result.moduleName}${NC}`);
         console.log('');
         console.log('=== TEST SUMMARY (PARTIAL) ===');
         if (successfulPackages.length > 0) {
