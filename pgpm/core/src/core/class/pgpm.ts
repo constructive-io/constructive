@@ -106,6 +106,8 @@ export interface InitModuleOptions {
   branch?: string;
   templateRepo?: string;
   templatePath?: string;
+  /** Override the base directory for template resolution (e.g., 'supabase', 'drizzle') */
+  dir?: string;
   cacheTtlMs?: number;
   noTty?: boolean;
   toolName?: string;
@@ -433,12 +435,11 @@ export class PgpmPackage {
     };
 
     await scaffoldTemplate({
-      type: 'module',
+      fromPath: options.templatePath ?? 'module',
       outputDir: targetPath,
       templateRepo: options.templateRepo ?? DEFAULT_TEMPLATE_REPO,
       branch: options.branch,
-      // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
-      templatePath: options.templatePath,
+      dir: options.dir,
       answers,
       noTty: options.noTty ?? false,
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
