@@ -1,9 +1,15 @@
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
-import { Logger } from '@pgpmjs/logger';
-import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
+import fs from 'fs';
 import path from 'path';
 
-const log = new Logger('workspace-init');
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
+import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
+
+const DEFAULT_MOTD = `
+                 |              _   _
+     ===         |.===.        '\\-//\`
+    (o o)        {}o o{}        (o o)
+ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
+`;
 
 export default async function runWorkspaceSetup(
   argv: Partial<Record<string, any>>,
@@ -33,7 +39,7 @@ export default async function runWorkspaceSetup(
   const dirName = path.basename(targetPath);
   registerDefaultResolver('workspace.dirname', () => dirName);
 
-  const scaffoldResult = await scaffoldTemplate({
+  await scaffoldTemplate({
     type: 'workspace',
     outputDir: targetPath,
     templateRepo,
@@ -49,11 +55,23 @@ export default async function runWorkspaceSetup(
     cwd
   });
 
-  const cacheMessage = scaffoldResult.cacheUsed
-    ? `Using cached templates from ${scaffoldResult.templateDir}`
-    : `Fetched templates into ${scaffoldResult.templateDir}`;
-  log.success(cacheMessage);
-  log.success('Workspace templates rendered.');
+  // Check for .motd file and print it, or use default ASCII art
+  const motdPath = path.join(targetPath, '.motd');
+  let motd = DEFAULT_MOTD;
+  if (fs.existsSync(motdPath)) {
+    try {
+      motd = fs.readFileSync(motdPath, 'utf8');
+      fs.unlinkSync(motdPath);
+    } catch {
+      // Ignore errors reading/deleting .motd
+    }
+  }
+  process.stdout.write(motd);
+  if (!motd.endsWith('\n')) {
+    process.stdout.write('\n');
+  }
+
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${dirName}\n`);
 
   return { ...argv, ...answers, cwd: targetPath };
 }

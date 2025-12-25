@@ -15,10 +15,8 @@ exports[`Inquirerer prompts user and correctly processes delayed input 2`] = `
 exports[`Inquirerer prompts user and correctly processes delayed input 3`] = `
 [
   "",
-  "autocompleteField?
-Argument<SPACE>--autocompleteField<SPACE>type<SPACE>[autocomplete]
-><SPACE>Your<SPACE>input:
-$<SPACE>
+  "autocompleteField?<SPACE>(--autocompleteField)
+><SPACE>
 ",
   "><SPACE>first<SPACE>option
 ",
@@ -27,10 +25,8 @@ $<SPACE>
   "<SPACE><SPACE>firry<SPACE>third<SPACE>option
 ",
   "",
-  "autocompleteField?
-Argument<SPACE>--autocompleteField<SPACE>type<SPACE>[autocomplete]
-><SPACE>Your<SPACE>input:
-$<SPACE>
+  "autocompleteField?<SPACE>(--autocompleteField)
+><SPACE>
 ",
   "<SPACE><SPACE>first<SPACE>option
 ",
@@ -39,10 +35,8 @@ $<SPACE>
   "<SPACE><SPACE>firry<SPACE>third<SPACE>option
 ",
   "",
-  "autocompleteField?
-Argument<SPACE>--autocompleteField<SPACE>type<SPACE>[autocomplete]
-><SPACE>Your<SPACE>input:
-$<SPACE>
+  "autocompleteField?<SPACE>(--autocompleteField)
+><SPACE>
 ",
   "<SPACE><SPACE>first<SPACE>option
 ",
