@@ -1,12 +1,13 @@
+import { AuthOptions, PgTestClientContext,PgTestConnectionOptions } from '@pgpmjs/types';
 import { Client, QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
-import { AuthOptions, PgTestConnectionOptions, PgTestClientContext } from '@pgpmjs/types';
-import { getRoleName } from './roles';
+
 import { generateContextStatements } from './context-utils';
+import { getRoleName } from './roles';
+import { type CsvSeedMap,loadCsvMap } from './seed/csv';
 import { insertJson, type JsonSeedMap } from './seed/json';
-import { loadCsvMap, type CsvSeedMap } from './seed/csv';
-import { loadSqlFiles } from './seed/sql';
 import { deployPgpm } from './seed/pgpm';
+import { loadSqlFiles } from './seed/sql';
 
 export type PgTestClientOpts = {
   deferConnect?: boolean;
@@ -121,6 +122,7 @@ export class PgTestClient {
     const defaultRole = getRoleName('anonymous', this.opts);
     
     const nulledSettings: Record<string, string | null> = {};
+
     Object.keys(this.contextSettings).forEach(key => {
       nulledSettings[key] = null;
     });
@@ -133,25 +135,31 @@ export class PgTestClient {
 
   async any<T = any>(query: string, values?: any[]): Promise<T[]> {
     const result = await this.query(query, values);
+
     return result.rows;
   }
 
   async one<T = any>(query: string, values?: any[]): Promise<T> {
     const rows = await this.any<T>(query, values);
+
     if (rows.length !== 1) {
       throw new Error('Expected exactly one result');
     }
+
     return rows[0];
   }
 
   async oneOrNone<T = any>(query: string, values?: any[]): Promise<T | null> {
     const rows = await this.any<T>(query, values);
+
     return rows[0] || null;
   }
 
   async many<T = any>(query: string, values?: any[]): Promise<T[]> {
     const rows = await this.any<T>(query, values);
+
     if (rows.length === 0) throw new Error('Expected many rows, got none');
+
     return rows;
   }
 
@@ -178,6 +186,7 @@ export class PgTestClient {
   async query<T = any>(query: string, values?: any[]): Promise<QueryResult<T>> {
     await this.ctxQuery();
     const result = await this.client.query<T>(query, values);
+
     return result;
   }  
 

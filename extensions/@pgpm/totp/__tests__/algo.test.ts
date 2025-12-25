@@ -1,5 +1,5 @@
-import { getConnections, PgTestClient } from 'pgsql-test';
 import cases from 'jest-in-case';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown:  () => Promise<void>;
@@ -27,6 +27,7 @@ cases(
        )`,
       ['12345678901234567890', opts.len, opts.date, opts.algo]
     );
+
     expect(generate).toEqual(opts.result);
     expect(generate).toMatchSnapshot();
   },
@@ -54,6 +55,7 @@ cases(
        )`,
       ['12345678901234567890', opts.len, opts.date, opts.algo, opts.step]
     );
+
     expect(generate).toEqual(opts.result);
     expect(generate).toMatchSnapshot();
   },
@@ -78,6 +80,7 @@ cases(
        ) as verified`,
       ['12345678901234567890', opts.result, opts.step, opts.len, opts.date]
     );
+
     expect(verified).toBe(true);
   },
   [
@@ -107,6 +110,7 @@ cases(
        )`,
       [opts.secret, opts.step, opts.len, opts.date, opts.algo, opts.encoding]
     );
+
     expect(generate).toEqual(opts.result);
     expect(generate).toMatchSnapshot();
   },

@@ -56,11 +56,12 @@ export default async (
     },
   ];
 
-  let { recursive, cwd } = await prompter.prompt(argv, questions);
+  const { recursive, cwd } = await prompter.prompt(argv, questions);
 
   log.debug(`Using current directory: ${cwd}`);
 
   let packageName: string | undefined;
+
   if (recursive && argv.to !== true) {
     packageName = await selectDeployedPackage(database, argv, prompter, log, 'verify', cwd);
     if (!packageName) {
@@ -87,6 +88,7 @@ export default async (
     target = packageName;
   } else if (argv.package && argv.to) {
     const resolvedPackage = resolvePackageAlias(argv.package as string, cwd);
+
     target = `${resolvedPackage}:${argv.to}`;
   } else if (argv.package) {
     target = resolvePackageAlias(argv.package as string, cwd);

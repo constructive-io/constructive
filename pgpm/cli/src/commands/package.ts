@@ -54,13 +54,14 @@ export default async (
     }
   ];
 
-  let { cwd, plan, pretty, functionDelimiter } = await prompter.prompt(argv, questions);
+  const { cwd, plan, pretty, functionDelimiter } = await prompter.prompt(argv, questions);
 
   const project = new PgpmPackage(cwd);
 
   project.ensureModule();
 
   const info = project.getModuleInfo();
+
   info.version;
 
   await writePackage({

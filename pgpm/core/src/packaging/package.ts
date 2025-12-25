@@ -35,8 +35,10 @@ interface WritePackageOptions extends PackageModuleOptions {
 
 const filterStatements = (stmts: RawStmt[], extension: boolean): RawStmt[] => {
   if (!extension) return stmts;
+
   return stmts.filter(node => {
     const stmt = node.stmt;
+
     return !stmt.hasOwnProperty('TransactionStmt') && 
            !stmt.hasOwnProperty('CreateExtensionStmt');
   });
@@ -51,6 +53,7 @@ export const packageModule = async (
 
   if (!sql?.trim()) {
     log.warn(`⚠️ No SQL generated for module at ${packageDir}. Skipping.`);
+
     return { sql: '' };
   }
 
@@ -58,6 +61,7 @@ export const packageModule = async (
 
   try {
     const parsed = await parse(sql);
+
     parsed.stmts = filterStatements(parsed.stmts as any, extension);
 
     const topLine = extension
@@ -83,6 +87,7 @@ export const packageModule = async (
 
     const diff =
       JSON.stringify(cleanTree(tree1)) !== JSON.stringify(cleanTree(tree2));
+
     if (diff) {
       results.diff = true;
       results.tree1 = JSON.stringify(cleanTree(tree1), null, 2);
@@ -136,6 +141,7 @@ export const writePackage = async ({
     writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
 
     const regex = new RegExp(`${extname}--[0-9.]+.sql`);
+
     writeFileSync(makePath, Makefile.replace(regex, sqlFileName));
   }
 
@@ -147,6 +153,7 @@ export const writePackage = async ({
   }
 
   const writePath = `${outPath}/${sqlFileName}`;
+
   writeFileSync(writePath, sql);
   log.success(`${relative(packageDir, writePath)} written`);
 };

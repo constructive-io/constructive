@@ -11,6 +11,7 @@ export class ContentStream extends stream.Transform {
     this.etagsum = etag.createHash();
     this.uuidsum = uuid.createHash();
   }
+
   _write(chunk, enc, next) {
     this.shasum.update(chunk);
     this.etagsum.update(chunk);
@@ -18,6 +19,7 @@ export class ContentStream extends stream.Transform {
     this.push(chunk);
     next();
   }
+
   _flush(done) {
     this.emit('contents', {
       uuid: this.uuidsum.digest(),

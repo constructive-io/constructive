@@ -1,6 +1,6 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import { getEnvOptions } from '@pgpmjs/env';
 import { createS3Bucket } from '@constructive-io/s3-utils';
+import { getEnvOptions } from '@pgpmjs/env';
 import { createReadStream } from 'fs';
 import { sync as glob } from 'glob';
 import { basename } from 'path';
@@ -40,6 +40,7 @@ jest.setTimeout(3000000);
 beforeAll(async () => {
   process.env.IS_MINIO = 'true'; // Ensure MinIO behavior in createS3Bucket
   const result = await createS3Bucket(s3Client, BUCKET_NAME);
+
   if (!result.success) throw new Error('Failed to create test S3 bucket');
 });
 
@@ -51,8 +52,8 @@ afterAll(async () => {
 
 
 const files = []
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**'))
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**/.*'))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**`))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**/.*`))
   .filter((file) => file.split('kitchen-sink')[1] !== '')
   .map((f) => ({
     key: basename(f),
@@ -71,14 +72,16 @@ describe('uploads', () => {
 
     try {
       const res: Record<string, AsyncUploadResult> = {};
+
       for (const file of files) {
         const key = file.key;
         const readStream = createReadStream(file.path);
         const results = await streamer.upload({
           readStream,
           filename: file.path,
-          key: 'db1/assets/' + basename(file.path)
+          key: `db1/assets/${  basename(file.path)}`
         });
+
         res[key] = results;
       }
 
@@ -104,6 +107,7 @@ describe('uploads', () => {
 
     try {
       const res: Record<string, AsyncUploadResult> = {};
+
       for (const file of files) {
         const key = file.key;
         const readStream = createReadStream(file.path);
@@ -112,8 +116,9 @@ describe('uploads', () => {
           readStream,
           filename: file.path,
           bucket: BUCKET_NAME,
-          key: 'db1/assets/' + basename(file.path)
+          key: `db1/assets/${  basename(file.path)}`
         });
+
         res[key] = results;
       }
 

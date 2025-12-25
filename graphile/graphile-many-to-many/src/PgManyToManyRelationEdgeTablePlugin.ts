@@ -69,6 +69,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
         fieldWithHooks,
         Self
       } = context;
+
       if (!isPgManyToManyEdgeType || !pgManyToManyRelationship) {
         return fields;
       }
@@ -92,6 +93,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
     junctionTable.type.id,
     null
   ) as GraphQLNamedType | null;
+
       if (!JunctionTableType) {
         throw new Error(`Could not determine type for table with id ${junctionTable.type.id}`);
       }
@@ -109,6 +111,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
               junctionRightConstraint
             );
         const Type = isConnection ? JunctionTableConnectionType : JunctionTableType;
+
         if (!Type) {
           return undefined;
         }
@@ -124,6 +127,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
                 withPaginationAsFields: false,
                 asJsonAggregate: !isConnection
               };
+
               addDataGenerator((parsedResolveInfoFragment: any) => {
                 return {
                   pgQuery: (queryBuilder: any) => {
@@ -143,6 +147,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
                           const junctionPrimaryKeyConstraint = junctionTable.primaryKeyConstraint;
                           const junctionPrimaryKeyAttributes =
                             junctionPrimaryKeyConstraint && junctionPrimaryKeyConstraint.keyAttributes;
+
                           if (junctionPrimaryKeyAttributes) {
                             innerQueryBuilder.beforeLock('orderBy', () => {
                               // append order by primary key to the list of orders
@@ -178,6 +183,7 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
                         queryBuilder.context,
                         queryBuilder.rootValue
                       );
+
                       return sql.fragment`(${query})`;
                     }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                   }
@@ -192,9 +198,11 @@ const PgManyToManyRelationEdgeTablePlugin: Plugin = (builder, { pgSimpleCollecti
                 args: {},
                 resolve: (data: any, _args: any, _context: any, resolveInfo: GraphQLResolveInfo) => {
                   const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+
                   if (isConnection) {
                     return addStartEndCursor(data[safeAlias]);
                   }
+
                   return data[safeAlias];
                 }
               };

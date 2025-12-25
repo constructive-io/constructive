@@ -1,10 +1,10 @@
+import type { LineString, MultiLineString } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { LineString, MultiLineString } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisMultiLineStringLineStringsPlugin: Plugin = (builder) => {
   builder.hook(
@@ -13,6 +13,7 @@ const PostgisMultiLineStringLineStringsPlugin: Plugin = (builder) => {
       const {
         scope: { isPgGISType, pgGISType, pgGISTypeDetails }
       } = context as typeof context & { scope: GisScope };
+
       if (
         !isPgGISType ||
         !pgGISType ||
@@ -44,6 +45,7 @@ const PostgisMultiLineStringLineStringsPlugin: Plugin = (builder) => {
           type: new GraphQLList(LineString),
           resolve(data: GisFieldValue) {
             const multiLineString = data.__geojson as MultiLineString;
+
             return multiLineString.coordinates.map((coord) => ({
               __gisType: getGISTypeName(GisSubtype.LineString, hasZ, hasM),
               __srid: data.__srid,
@@ -58,4 +60,5 @@ const PostgisMultiLineStringLineStringsPlugin: Plugin = (builder) => {
     }
   );
 };
+
 export default PostgisMultiLineStringLineStringsPlugin;

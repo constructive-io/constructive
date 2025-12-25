@@ -1250,6 +1250,7 @@ export function getFileTypeByMagicBytes(magicBytes: string, offset: number = 0):
 
 export function getFileTypeByExtension(extension: string): FileTypeDefinition[] {
   const cleanExt = extension.toLowerCase().replace(/^\./, '');
+
   return FILE_TYPES.filter(type => 
     type.extensions.some(ext => ext.toLowerCase() === cleanExt)
   );
@@ -1266,6 +1267,7 @@ function matchSignatureWithWildcards(pattern: string, input: string): boolean {
   // Handle wildcards (?) in the pattern
   const regexPattern = pattern.replace(/\?/g, '[0-9a-f]{2}');
   const regex = new RegExp(`^${regexPattern}`, 'i');
+
   return regex.test(input);
 }
 
@@ -1300,6 +1302,7 @@ export function detectCharset(buffer: Buffer): string {
   
   for (let i = 0; i < sample.length; i++) {
     const byte = sample[i];
+
     if (byte === 0) nullCount++;
     // Count control characters except tab, newline, carriage return
     if (byte < 32 && byte !== 9 && byte !== 10 && byte !== 13) {
@@ -1319,6 +1322,7 @@ export function detectCharset(buffer: Buffer): string {
   try {
     // Use TextDecoder with fatal flag to validate UTF-8
     new TextDecoder('utf-8', { fatal: true }).decode(sample);
+
     return 'utf-8';
   } catch {
     // If UTF-8 decoding fails, it might be a legacy encoding
@@ -1336,6 +1340,7 @@ export function getContentTypeForExtension(extension: string, charset?: string):
     const exactMatch = CONTENT_TYPE_MAPPINGS.find(
       mapping => mapping[0].includes(ext) && mapping[2] === charset
     );
+
     if (exactMatch) {
       return exactMatch[1];
     }

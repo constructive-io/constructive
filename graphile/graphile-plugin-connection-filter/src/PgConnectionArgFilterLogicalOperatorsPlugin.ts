@@ -1,5 +1,6 @@
 import type { Plugin } from 'graphile-build';
 import type { QueryBuilder, SQL } from 'graphile-build-pg';
+
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';
 
 const PgConnectionArgFilterLogicalOperatorsPlugin: Plugin = (builder) => {
@@ -34,6 +35,7 @@ const PgConnectionArgFilterLogicalOperatorsPlugin: Plugin = (builder) => {
             connectionFilterResolve(o, sourceAlias, Self.name, queryBuilder)
           )
           .filter((x) => x != null);
+
         return sqlFragments.length === 0
           ? null
           : sql.query`(${sql.join(sqlFragments, ') and (')})`;
@@ -44,6 +46,7 @@ const PgConnectionArgFilterLogicalOperatorsPlugin: Plugin = (builder) => {
             connectionFilterResolve(o, sourceAlias, Self.name, queryBuilder)
           )
           .filter((x) => x != null);
+
         return sqlFragments.length === 0
           ? null
           : sql.query`(${sql.join(sqlFragments, ') or (')})`;
@@ -55,6 +58,7 @@ const PgConnectionArgFilterLogicalOperatorsPlugin: Plugin = (builder) => {
           Self.name,
           queryBuilder
         );
+
         return sqlFragment == null ? null : sql.query`not (${sqlFragment})`;
       },
     };

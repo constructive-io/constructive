@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import { teardownPgPools } from 'pg-cache';
 
 import { CLIDeployTestFixture } from '../test-utils';
@@ -17,6 +16,7 @@ describe('CLI Package Alias Resolution', () => {
     // This simulates the case where package.json name differs from control file name
     const packageJsonPath = fixture.fixturePath('packages', 'my-first', 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
     packageJson.name = '@test-scope/my-first';
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
   });
@@ -43,6 +43,7 @@ describe('CLI Package Alias Resolution', () => {
     
     // Verify the deployed changes are recorded under the control file name (my-first), not the npm name
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.some((change: any) => change.package === 'my-first')).toBe(true);
   });
 
@@ -58,6 +59,7 @@ describe('CLI Package Alias Resolution', () => {
     expect(await testDb.exists('schema', 'myfirstapp')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.some((change: any) => change.package === 'my-first')).toBe(true);
   });
 
@@ -73,6 +75,7 @@ describe('CLI Package Alias Resolution', () => {
     expect(await testDb.exists('schema', 'myfirstapp')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.find((change: any) => 
       change.package === 'my-first' && change.change_name === 'schema_myfirstapp'
     )).toBeTruthy();
@@ -81,6 +84,7 @@ describe('CLI Package Alias Resolution', () => {
   it('should revert using npm package name alias', async () => {
     // First deploy
     const deployCommands = `cnc deploy --database ${testDb.name} --package @test-scope/my-first --yes`;
+
     await fixture.runTerminalCommands(deployCommands, {
       database: testDb.name
     }, true);
@@ -89,6 +93,7 @@ describe('CLI Package Alias Resolution', () => {
     
     // Then revert using the aliased npm name
     const revertCommands = `cnc revert --database ${testDb.name} --package @test-scope/my-first --yes`;
+
     await fixture.runTerminalCommands(revertCommands, {
       database: testDb.name
     }, true);

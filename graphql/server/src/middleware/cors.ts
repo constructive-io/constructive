@@ -1,8 +1,10 @@
+import './types'; // for Request type
+
 import { parseUrl } from '@constructive-io/url-domains';
 import corsPlugin from 'cors';
 import type { Request, RequestHandler } from 'express';
+
 import { CorsModuleData } from '../types';
-import './types'; // for Request type
 
 /**
  * Unified CORS middleware for Constructive API
@@ -34,6 +36,7 @@ export const cors = (fallbackOrigin?: string): RequestHandler => {
     // 2) Per-API allowlist sourced from req.api (if available)
     //    createApiMiddleware runs before this in server.ts, so req.api should be set
     const api = (req as any).api as { apiModules?: any[]; domains?: string[] } | undefined;
+
     if (api) {
       const corsModules = (api.apiModules || []).filter((m: any) => m.name === 'cors') as { name: 'cors'; data: CorsModuleData }[];
       const siteUrls = api.domains || [];
@@ -48,6 +51,7 @@ export const cors = (fallbackOrigin?: string): RequestHandler => {
     if (origin) {
       try {
         const parsed = parseUrl(new URL(origin));
+
         if (parsed.domain === 'localhost') {
           return callback(null, true);
         }

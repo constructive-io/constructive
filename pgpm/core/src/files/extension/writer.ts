@@ -17,6 +17,7 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
   `;
+
   writeFileSync(outputPath, content);
 };
 
@@ -86,6 +87,7 @@ export const writeExtensionControlFile = (
     version,
     requires: extensions
   });
+
   writeFileSync(outputPath, content);
 };
 
@@ -113,6 +115,7 @@ export const writeExtensions = (
   // If extInfo is not provided, get it from packageDir
   const info = extInfo || getExtensionInfo(packageDir);
   const { controlFile, Makefile, extname, version } = info;
+
   writeExtensionControlFile(controlFile, extname, extensions, version);
   writeExtensionMakefile(Makefile, extname, version);
 };

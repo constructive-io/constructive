@@ -1,22 +1,21 @@
-import PgManyToMany from '@graphile-contrib/pg-many-to-many';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import PgPostgis from 'graphile-postgis';
-import FulltextFilterPlugin from 'graphile-plugin-fulltext-filter';
+import PgManyToMany from '@graphile-contrib/pg-many-to-many';
 import { NodePlugin, Plugin } from 'graphile-build';
 import {
   additionalGraphQLContextFromRequest as langAdditional,
   LangPlugin
 } from 'graphile-i18n';
 import PgMetaschema from 'graphile-meta-schema';
-import PgSearch from 'graphile-search-plugin';
-import PgSimpleInflector from 'graphile-simple-inflector';
-import { PostGraphileOptions } from 'postgraphile';
+import CustomPgTypeMappingsPlugin from 'graphile-pg-type-mappings';
 import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 import PgPostgisFilter from 'graphile-plugin-connection-filter-postgis';
-
-import CustomPgTypeMappingsPlugin from 'graphile-pg-type-mappings';
+import FulltextFilterPlugin from 'graphile-plugin-fulltext-filter';
+import PgPostgis from 'graphile-postgis';
+import PgSearch from 'graphile-search-plugin';
+import PgSimpleInflector from 'graphile-simple-inflector';
 import UploadPostGraphilePlugin, { Uploader } from 'graphile-upload-plugin';
+import { PostGraphileOptions } from 'postgraphile';
 
 export const getGraphileSettings = (
   rawOpts: ConstructiveOptions
@@ -109,6 +108,7 @@ export const getGraphileSettings = (
     },
     additionalGraphQLContextFromRequest: async (req, res) => {
       const langContext = await langAdditional(req, res);
+
       return {
         ...langContext,
         req,

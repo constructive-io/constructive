@@ -1,12 +1,13 @@
-import { ast, nodes } from '@pgsql/utils';
 import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import { join, resolve } from 'path';
 
 export const normalizePath = (path: string, cwd?: string): string =>
-  path.startsWith('/') ? path : resolve(join(cwd ? cwd : process.cwd(), path));
+  path.startsWith('/') ? path : resolve(join(cwd || process.cwd(), path));
 
 const lstr = (bbox: string): string => {
   const [lng1, lat1, lng2, lat2] = bbox.split(',').map((a) => a.trim());
+
   return `LINESTRING(${lng1} ${lat1}, ${lng1} ${lat2}, ${lng2} ${lat2}, ${lng2} ${lat1}, ${lng1} ${lat1})`;
 };
 
@@ -25,6 +26,7 @@ export const makeLocation = (longitude: string | number | null | undefined, lati
   if (longitude === null || longitude === undefined || latitude === null || latitude === undefined) {
     return nodes.aConst({ isnull: true });
   }
+
   return funcCall('st_setsrid', [
     funcCall('st_makepoint', [aflt(longitude), aflt(latitude)]),
     aint(4326)
@@ -39,20 +41,24 @@ export const makeBoundingBox = (bbox: string): Node => {
   }
   
   const parts = bbox.split(',').map((a) => a.trim());
+
   if (parts.length !== 4) {
     throw new Error(`Invalid bounding box: expected 4 comma-separated values, got ${parts.length}. Value: "${bbox}"`);
   }
   
   const numericParts = parts.map((p, i) => {
     const num = parseFloat(p);
+
     if (isNaN(num)) {
       throw new Error(`Invalid bounding box: part ${i + 1} ("${p}") is not a valid number. Value: "${bbox}"`);
     }
+
     return num;
   });
   
   // Validate coordinate ranges
   const [lng1, lat1, lng2, lat2] = numericParts;
+
   if (lng1 < -180 || lng1 > 180 || lng2 < -180 || lng2 > 180) {
     throw new Error(`Invalid bounding box: longitude must be between -180 and 180. Value: "${bbox}"`);
   }
@@ -133,6 +139,7 @@ import type { OnConflictClause } from '@pgsql/types';
 const makeConflictClause = (conflictElems: string[] | undefined, fields: string[]): OnConflictClause | undefined => {
   if (!conflictElems || !conflictElems.length) return undefined;
   const setElems = fields.filter((el) => !conflictElems.includes(el));
+
   if (setElems.length) {
     return {
       action: 'ONCONFLICT_UPDATE',
@@ -141,14 +148,15 @@ const makeConflictClause = (conflictElems: string[] | undefined, fields: string[
       },
       targetList: setElems.map((a) => ref(a))
     };
-  } else {
+  }
+ 
     return {
       action: 'ONCONFLICT_NOTHING',
       infer: {
         indexElems: conflictElems.map((a) => indexElem(a))
       }
     };
-  }
+  
 };
 
 interface InsertOneParams {
@@ -256,6 +264,7 @@ export const wrapValue = (val: Node, { wrap, wrapAst, cast }: WrapOptions = {}):
   }
   if (wrapAst) return wrapAst(val);
   if (cast) return makeCast(val, cast);
+
   return val;
 };
 
@@ -289,6 +298,7 @@ export const getRelatedField = ({
   let val: Node;
 
   const value = parse(record[from[0]]);
+
   if (typeof value === 'undefined') {
     return nodes.aConst({ isnull: true });
   }

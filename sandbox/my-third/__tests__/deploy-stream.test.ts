@@ -1,18 +1,19 @@
 import { deployStream, PgpmPackage } from '@pgpmjs/core';
-import { resolve } from 'path';
 import { getEnvOptions } from '@pgpmjs/env';
-import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { randomUUID } from 'crypto';
+import { resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 
 it('Constructive', async () => {
-    const db = 'db-'+randomUUID();
-    const project = new PgpmPackage(resolve(__dirname+'/../'));
+    const db = `db-${randomUUID()}`;
+    const project = new PgpmPackage(resolve(`${__dirname}/../`));
     const opts = getEnvOptions({
         pg: {
             database: db
         }
     })
+
     execSync(`createdb ${opts.pg.database}`);
     await deployStream({
         opts, 
@@ -24,5 +25,6 @@ it('Constructive', async () => {
     });
 
     const pgPool = getPgPool({ ...opts.pg, database: db });
+
     await pgPool.end();
 });

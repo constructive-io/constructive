@@ -70,11 +70,13 @@ export class DbAdmin {
 
   create(dbName?: string): void {
     const db = dbName ?? this.config.database;
+
     this.run(`createdb -U ${this.config.user} -h ${this.config.host} -p ${this.config.port} "${db}"`);
   }
 
   createFromTemplate(template: string, dbName?: string): void {
     const db = dbName ?? this.config.database;
+
     this.run(`createdb -U ${this.config.user} -h ${this.config.host} -p ${this.config.port} -e "${db}" -T "${template}"`);
   }
 
@@ -90,6 +92,7 @@ export class DbAdmin {
   connectionString(dbName?: string): string {
     const { user, password, host, port } = this.config;
     const db = dbName ?? this.config.database;
+
     return `postgres://${user}:${password}@${host}:${port}/${db}`;
   }
 
@@ -110,12 +113,14 @@ export class DbAdmin {
   async grantRole(role: string, user: string, dbName?: string): Promise<void> {
     const db = dbName ?? this.config.database;
     const sql = generateGrantRoleSQL(role, user);
+
     await this.streamSql(sql, db);
   }
 
   async grantConnect(role: string, dbName?: string): Promise<void> {
     const db = dbName ?? this.config.database;
     const sql = `GRANT CONNECT ON DATABASE "${db}" TO ${role};`;
+
     await this.streamSql(sql, db);
   }
 
@@ -155,6 +160,7 @@ export class DbAdmin {
 
   async createSeededTemplate(templateName: string, adapter: SeedAdapter): Promise<void> {
     const seedDb = this.config.database;
+
     this.create(seedDb);
 
     await adapter.seed({

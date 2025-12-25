@@ -231,6 +231,7 @@ it('getMany edges', () => {
       }
     })
     .print();
+
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
 });
@@ -267,6 +268,7 @@ it('getOne', () => {
       }
     })
     .print();
+
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
 });
@@ -304,6 +306,7 @@ it('getAll', () => {
       }
     })
     .print();
+
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
 });
@@ -347,6 +350,7 @@ it('update with default scalar selection', () => {
     introspection
   });
   const result = builder.query('Action').update().print();
+
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
 });
@@ -367,6 +371,7 @@ it('update with custom selection', () => {
       }
     })
     .print();
+
   expect(/(id)|(name)|(photo)|(title)/gm.test(result._hash)).toBe(true);
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
@@ -378,6 +383,7 @@ it('delete', () => {
     introspection
   });
   const result = builder.query('Action').delete().print();
+
   expect(result._hash).toMatchSnapshot();
   expect(result._queryName).toMatchSnapshot();
 });

@@ -44,9 +44,11 @@ describe('Cross-Project Dependencies', () => {
     
     // Verify cross-project dependencies were recorded
     const appSchemaDeps = await db.getDependencies('project-b', 'app_schema');
+
     expect(appSchemaDeps).toContain('project-a:base_schema');
     
     const appTablesDeps = await db.getDependencies('project-b', 'app_tables');
+
     expect(appTablesDeps).toContain('project-a:base_types');
   });
   
@@ -60,6 +62,7 @@ describe('Cross-Project Dependencies', () => {
     
     // Verify nothing was deployed
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(0);
   });
   
@@ -85,6 +88,7 @@ describe('Cross-Project Dependencies', () => {
     // Verify nothing was reverted
     expect(await db.exists('schema', 'base')).toBe(true);
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(4); // All 4 changes still deployed
   });
   
@@ -159,6 +163,7 @@ describe('Cross-Project Dependencies', () => {
     
     // Verify all deployed
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(6);
     
     // Try to revert a change that many depend on

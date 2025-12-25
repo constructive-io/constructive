@@ -27,6 +27,7 @@ describe('encrypted secrets table', () => {
     const schemas = await pg.any(
       `SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'secrets_schema'`
     );
+
     expect(schemas).toHaveLength(1);
     expect(schemas[0].schema_name).toBe('secrets_schema');
   });
@@ -128,6 +129,7 @@ describe('encrypted secrets table', () => {
     
     // Verify it's a bcrypt hash (starts with $2)
     const hashedValue = result.secrets_value_field.toString();
+
     expect(hashedValue).toMatch(/^\$2[aby]?\$/);
   });
 
@@ -191,6 +193,7 @@ describe('encrypted secrets table', () => {
     
     // Verify it's a bcrypt hash
     const hashedValue = updated.secrets_value_field.toString();
+
     expect(hashedValue).toMatch(/^\$2[aby]?\$/);
   });
 
@@ -234,6 +237,7 @@ describe('encrypted secrets table', () => {
 
     // The stored hash should be different from the original password
     const storedHash = result.secrets_value_field.toString();
+
     expect(storedHash).not.toBe(password);
     
     // Verify it's a proper bcrypt hash format
@@ -252,6 +256,7 @@ describe('encrypted secrets table', () => {
     );
     
     const storedHash2 = result2.secrets_value_field.toString();
+
     expect(storedHash2).not.toBe(storedHash); // Different salt = different hash
     expect(storedHash2).toMatch(/^\$2[aby]?\$/);
   });

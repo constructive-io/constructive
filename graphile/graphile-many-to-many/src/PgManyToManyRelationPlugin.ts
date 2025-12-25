@@ -1,5 +1,4 @@
 import type { Plugin } from 'graphile-build';
-import type { PgClass } from 'graphile-build-pg';
 import type {
   GraphQLFieldConfigMap,
   GraphQLNamedType,
@@ -33,6 +32,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
         fieldWithHooks,
         Self
       } = context;
+
       if (!isPgRowType || !leftTable || leftTable.kind !== 'class') {
         return fields;
       }
@@ -54,6 +54,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
             rightTable.type.id,
             null
           ) as GraphQLNamedType | null;
+
           if (!RightTableType) {
             throw new Error(`Could not determine type for table with id ${rightTable.type.id}`);
           }
@@ -114,6 +115,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
                       withPaginationAsFields: false,
                       asJsonAggregate: !isConnection
                     };
+
                     addDataGenerator((parsedResolveInfoFragment: any) => {
                       return {
                         pgQuery: (queryBuilder: any) => {
@@ -134,6 +136,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
                                 const rightPrimaryKeyConstraint = rightTable.primaryKeyConstraint;
                                 const rightPrimaryKeyAttributes =
                                   rightPrimaryKeyConstraint && rightPrimaryKeyConstraint.keyAttributes;
+
                                 if (rightPrimaryKeyAttributes) {
                                   innerQueryBuilder.beforeLock('orderBy', () => {
                                     // append order by primary key to the list of orders
@@ -167,6 +170,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
                                   sql.identifier(junctionTable.namespace.name, junctionTable.name),
                                   sql.identifier(junctionRightKeyAttribute.name)
                                 );
+
                                 subqueryBuilder.where(
                                   sql.fragment`${sql.identifier(
                                     junctionLeftKeyAttribute.name
@@ -183,6 +187,7 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
                               queryBuilder.context,
                               queryBuilder.rootValue
                             );
+
                             return sql.fragment`(${query})`;
                           }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                         }
@@ -197,9 +202,11 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
                       args: {},
                       resolve: (data: any, _args: any, _context: any, resolveInfo: GraphQLResolveInfo) => {
                         const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+
                         if (isConnection) {
                           return addStartEndCursor(data[safeAlias]);
                         }
+
                         return data[safeAlias];
                       }
                     };
@@ -227,12 +234,14 @@ const PgManyToManyRelationPlugin: Plugin = (builder, options: PgManyToManyOption
             pgSimpleCollections;
           const hasConnections = simpleCollections !== 'only';
           const hasSimpleCollections = simpleCollections === 'only' || simpleCollections === 'both';
+
           if (hasConnections) {
             makeFields(true);
           }
           if (hasSimpleCollections) {
             makeFields(false);
           }
+
           return memoWithRelations;
         },
         {}

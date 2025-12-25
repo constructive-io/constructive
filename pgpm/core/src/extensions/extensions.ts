@@ -30,6 +30,7 @@ export const getAvailableExtensions = (
 
   return Object.keys(modules).reduce<string[]>((acc, module) => {
     if (!acc.includes(module)) acc.push(module);
+
     return acc;
   }, [...coreExtensions]);
 };

@@ -1,7 +1,6 @@
 import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import yanse from 'yanse';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -10,15 +9,10 @@ import { parse } from 'parse-package-name';
 import path, { dirname, resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import yanse from 'yanse';
 
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TTL_MS, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate } from '../template-scaffold';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '../../files';
-import { Tag, ExtendedPlanFile, Change } from '../../files/types';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidTagName, isValidChangeName, parseReference } from '../../files/plan/validators';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { resolveTagToChangeName } from '../../resolution/resolve';
 import {
   ExtensionInfo,
   getExtensionInfo,
@@ -28,6 +22,11 @@ import {
   writeExtensions,
 } from '../../files';
 import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
+import { getNow as getPlanTimestamp } from '../../files/plan/generator';
+import { parsePlanFile } from '../../files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
+import { Change, Tag } from '../../files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -37,23 +36,22 @@ import {
   ModuleMap
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
-import { resolveExtensionDependencies, resolveDependencies } from '../../resolution/deps';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
-
+import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
 import { parseTarget } from '../../utils/target-utils';
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
 
 const logger = new Logger('pgpm');
 
 function getUTCTimestamp(d: Date = new Date()): string {
   return (
-    d.getUTCFullYear() +
-    '-' + String(d.getUTCMonth() + 1).padStart(2, '0') +
-    '-' + String(d.getUTCDate()).padStart(2, '0') +
-    'T' + String(d.getUTCHours()).padStart(2, '0') +
-    ':' + String(d.getUTCMinutes()).padStart(2, '0') +
-    ':' + String(d.getUTCSeconds()).padStart(2, '0') +
-    'Z'
+    `${d.getUTCFullYear() 
+    }-${  String(d.getUTCMonth() + 1).padStart(2, '0') 
+    }-${  String(d.getUTCDate()).padStart(2, '0') 
+    }T${  String(d.getUTCHours()).padStart(2, '0') 
+    }:${  String(d.getUTCMinutes()).padStart(2, '0') 
+    }:${  String(d.getUTCSeconds()).padStart(2, '0') 
+    }Z`
   );
 }
 
@@ -157,6 +155,7 @@ export class PgpmPackage {
       glob.sync(path.join(this.workspacePath!, pattern))
     );
     const resolvedDirs = dirs.map(dir => path.resolve(dir));
+
     // Remove duplicates by converting to Set and back to array
     return [...new Set(resolvedDirs)];
   }
@@ -166,8 +165,10 @@ export class PgpmPackage {
     const parentDirs = globs.map(pattern => {
       // Remove glob characters (*, **, ?, etc.) to get the base path
       const basePath = pattern.replace(/[*?[\]{}]/g, '').replace(/\/$/, '');
+
       return path.resolve(this.workspacePath!, basePath);
     });
+
     // Remove duplicates by converting to Set and back to array
     return [...new Set(parentDirs)];
   }
@@ -178,6 +179,7 @@ export class PgpmPackage {
 
   isParentOfAllowedDirs(cwd: string): boolean {
     const resolvedCwd = path.resolve(cwd);
+
     return this.allowedDirs.some(dir => dir.startsWith(resolvedCwd + path.sep)) ||
            this.allowedParentDirs.some(dir => path.resolve(dir) === resolvedCwd);
   }
@@ -192,6 +194,7 @@ export class PgpmPackage {
 
     if (isRoot) {
       const packagesDir = path.join(this.cwd, 'packages');
+
       fs.mkdirSync(packagesDir, { recursive: true });
       targetPath = path.join(packagesDir, modName);
     } else if (isParentDir) {
@@ -205,6 +208,7 @@ export class PgpmPackage {
     }
 
     fs.mkdirSync(targetPath, { recursive: true });
+
     return targetPath;
   }
 
@@ -220,11 +224,13 @@ export class PgpmPackage {
     if (this.modulePath && this.workspacePath) {
       const rel = path.relative(this.workspacePath, this.modulePath);
       const nested = !rel.startsWith('..') && !path.isAbsolute(rel);
+
       return nested ? PackageContext.ModuleInsideWorkspace : PackageContext.Module;
     }
 
     if (this.modulePath) return PackageContext.Module;
     if (this.workspacePath) return PackageContext.Workspace;
+
     return PackageContext.Outside;
   }
 
@@ -262,6 +268,7 @@ export class PgpmPackage {
 
     for (const dir of dirs) {
       const proj = new PgpmPackage(dir);
+
       if (proj.isInModule()) {
         results.push(proj);
       }
@@ -286,6 +293,7 @@ export class PgpmPackage {
     
     moduleFiles.forEach((file: string) => {
       const moduleName = path.basename(file).split('.control')[0];
+
       if (!filesByName.has(moduleName)) {
         filesByName.set(moduleName, []);
       }
@@ -294,6 +302,7 @@ export class PgpmPackage {
 
     // For each module name, pick the shortest path in case of collisions
     const selectedFiles = new Map<string, string>();
+
     filesByName.forEach((files, moduleName) => {
       if (files.length === 1) {
         selectedFiles.set(moduleName, files[0]);
@@ -302,6 +311,7 @@ export class PgpmPackage {
         const shortestFile = files.reduce((shortest, current) => 
           current.length < shortest.length ? current : shortest
         );
+
         selectedFiles.set(moduleName, shortestFile);
       }
     });
@@ -309,7 +319,9 @@ export class PgpmPackage {
     // Parse the selected control files
     return Array.from(selectedFiles.entries()).reduce<ModuleMap>((acc: ModuleMap, [moduleName, file]) => {
       const module = parseControlFile(file, this.workspacePath!);
+
       acc[moduleName] = module;
+
       return acc;
     }, {});
   }
@@ -319,11 +331,13 @@ export class PgpmPackage {
     if (this._moduleMap) return this._moduleMap;
 
     this._moduleMap = this.listModules();
+
     return this._moduleMap;
   }
 
   getAvailableModules(): string[] {
     const modules = this.getModuleMap();
+
     return getAvailableExtensions(modules);
   }
 
@@ -335,11 +349,13 @@ export class PgpmPackage {
     }
     
     const modules = this.getModuleMap();
+
     if (!modules[name]) {
       throw errors.MODULE_NOT_FOUND({ name });
     }
     
     const modulePath = path.resolve(this.workspacePath!, modules[name].path);
+
     return new PgpmPackage(modulePath);
   }
 
@@ -350,17 +366,20 @@ export class PgpmPackage {
     if (!this._moduleInfo) {
       this._moduleInfo = getExtensionInfo(this.cwd);
     }
+
     return this._moduleInfo;
   }
 
   getModuleName(): string {
     this.ensureModule();
+
     return getExtensionName(this.cwd);
   }
 
   getRequiredModules(): string[] {
     this.ensureModule();
     const info = this.getModuleInfo();
+
     return getInstalledExtensions(info.controlFile);
   }
 
@@ -407,12 +426,15 @@ export class PgpmPackage {
       uri: modName,
       entries: []
     });
+
     writePlan(path.join(targetPath, 'pgpm.plan'), plan);
     
     // Create deploy, revert, and verify directories
     const dirs = ['deploy', 'revert', 'verify'];
+
     dirs.forEach(dir => {
       const dirPath = path.join(targetPath, dir);
+
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
       }
@@ -454,11 +476,13 @@ export class PgpmPackage {
 
   getLatestChange(moduleName: string): string {
     const modules = this.getModuleMap();
+
     return latestChange(moduleName, modules, this.workspacePath!);
   }
 
   getLatestChangeAndVersion(moduleName: string): { change: string; version: string } {
     const modules = this.getModuleMap();
+
     return latestChangeAndVersion(moduleName, modules, this.workspacePath!);
   }
 
@@ -466,12 +490,14 @@ export class PgpmPackage {
     this.ensureModule();
     const moduleName = this.getModuleName();
     const moduleMap = this.getModuleMap();
+
     return resolveExtensionDependencies(moduleName, moduleMap);
   }
 
   getModuleDependencies(moduleName: string): { native: string[]; modules: string[] } {
     const modules = this.getModuleMap();
     const { native, sqitch } = getExtensionsAndModules(moduleName, modules);
+
     return { native, modules: sqitch };
   }
 
@@ -481,6 +507,7 @@ export class PgpmPackage {
   } {
     const modules = this.getModuleMap();
     const { native, sqitch } = getExtensionsAndModulesChanges(moduleName, modules, this.workspacePath!);
+
     return { native, modules: sqitch };
   }
 
@@ -489,24 +516,28 @@ export class PgpmPackage {
   getModulePlan(): string {
     this.ensureModule();
     const planPath = path.join(this.getModulePath()!, 'pgpm.plan');
+
     return fs.readFileSync(planPath, 'utf8');
   }
 
   getModuleControlFile(): string {
     this.ensureModule();
     const info = this.getModuleInfo();
+
     return fs.readFileSync(info.controlFile, 'utf8');
   }
 
   getModuleMakefile(): string {
     this.ensureModule();
     const info = this.getModuleInfo();
+
     return fs.readFileSync(info.Makefile, 'utf8');
   }
 
   getModuleSQL(): string {
     this.ensureModule();
     const info = this.getModuleInfo();
+
     return fs.readFileSync(info.sqlFile, 'utf8');
   }
 
@@ -522,12 +553,14 @@ export class PgpmPackage {
     // Helper to extract module name from a change reference
     const getModuleName = (change: string): string | null => {
       const colonIndex = change.indexOf(':');
+
       return colonIndex > 0 ? change.substring(0, colonIndex) : null;
     };
 
     // Helper to determine if a change is truly from an external package
     const isExternalChange = (change: string): boolean => {
       const changeModule = getModuleName(change);
+
       return changeModule !== null && changeModule !== moduleName;
     };
 
@@ -561,6 +594,7 @@ export class PgpmPackage {
     Object.keys(deps).forEach(key => {
       // Normalize the key - strip "/deploy/" and ".sql" if present
       let normalizedKey = key;
+
       if (normalizedKey.startsWith('/deploy/')) {
         normalizedKey = normalizedKey.substring(8); // Remove "/deploy/"
       }
@@ -582,6 +616,7 @@ export class PgpmPackage {
 
       // Add dependencies, handling both formats
       const dependencies = deps[key] || [];
+
       dependencies.forEach(dep => {
         // For truly external dependencies, keep the full reference
         if (isExternalChange(dep)) {
@@ -591,6 +626,7 @@ export class PgpmPackage {
         } else {
           // For same-package dependencies, normalize by removing prefix
           const normalizedDep = normalizeChangeName(dep);
+
           if (!normalizedDeps[standardKey].includes(normalizedDep)) {
             normalizedDeps[standardKey].push(normalizedDep);
           }
@@ -605,11 +641,13 @@ export class PgpmPackage {
     // Process external dependencies if needed
     const includePackages = options.includePackages === true;
     const preferTags = options.includeTags === true;
+
     if (includePackages && this.workspacePath) {
       const depData = this.getModuleDependencyChanges(moduleName);
 
       if (resolved.length > 0) {
         const firstKey = `/deploy/${resolved[0]}.sql`;
+
         deps[firstKey] = deps[firstKey] || [];
 
         depData.modules.forEach(m => {
@@ -625,6 +663,7 @@ export class PgpmPackage {
             try {
               const moduleMap = this.getModuleMap();
               const modInfo = moduleMap[extModuleName];
+
               if (modInfo && this.workspacePath) {
                 const planPath = path.join(this.workspacePath, modInfo.path, 'pgpm.plan');
                 const parsed = parsePlanFile(planPath);
@@ -634,6 +673,7 @@ export class PgpmPackage {
                 if (changes.length > 0 && tags.length > 0) {
                   const lastChangeName = changes[changes.length - 1]?.name;
                   const lastTag = tags[tags.length - 1];
+
                   if (lastTag && lastTag.change === lastChangeName) {
                     depToken = `${extModuleName}:@${lastTag.name}`;
                   }
@@ -712,6 +752,7 @@ export class PgpmPackage {
     
     // Parse existing plan file
     const planResult = parsePlanFile(planPath);
+
     if (!planResult.data) {
       throw errors.PLAN_PARSE_ERROR({ planPath, errors: planResult.errors.map(e => e.message).join(', ') });
     }
@@ -719,6 +760,7 @@ export class PgpmPackage {
     const plan = planResult.data;
     
     let targetChange = changeName;
+
     if (!targetChange) {
       if (plan.changes.length === 0) {
         throw new Error('No changes found in plan file. Cannot add tag without a target change.');
@@ -727,6 +769,7 @@ export class PgpmPackage {
     } else {
       // Validate that the specified change exists
       const changeExists = plan.changes.some(c => c.name === targetChange);
+
       if (!changeExists) {
         throw errors.CHANGE_NOT_FOUND({ change: targetChange });
       }
@@ -734,6 +777,7 @@ export class PgpmPackage {
     
     // Check if tag already exists
     const existingTag = plan.tags.find(t => t.name === tagName);
+
     if (existingTag) {
       throw new Error(`Tag '${tagName}' already exists and points to change '${existingTag.change}'.`);
     }
@@ -779,6 +823,7 @@ export class PgpmPackage {
       }
       
       this.addChangeToModule(changeName, dependencies, comment);
+
       return;
     }
     
@@ -793,6 +838,7 @@ export class PgpmPackage {
     
     // Parse existing plan file
     const planResult = parsePlanFile(planPath);
+
     if (!planResult.data) {
       throw errors.PLAN_PARSE_ERROR({ planPath, errors: planResult.errors.map(e => e.message).join(', ') });
     }
@@ -801,6 +847,7 @@ export class PgpmPackage {
     
     // Check if change already exists
     const existingChange = plan.changes.find(c => c.name === changeName);
+
     if (existingChange) {
       throw new Error(`Change '${changeName}' already exists in plan.`);
     }
@@ -818,6 +865,7 @@ export class PgpmPackage {
         }
         
         const depExists = plan.changes.some(c => c.name === dep);
+
         if (!depExists) {
           throw new Error(`Dependency '${dep}' not found in plan. Add dependencies before referencing them.`);
         }
@@ -865,6 +913,7 @@ export class PgpmPackage {
       
       // Track the relative path from module root
       const relativePath = path.relative(this.modulePath!, filePath);
+
       createdFiles.push(relativePath);
     };
 
@@ -872,7 +921,7 @@ export class PgpmPackage {
     const deployContent = `-- Deploy: ${changeName}
 -- made with <3 @ constructive.io
 
-${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join('\n') + '\n' : ''}
+${dependencies.length > 0 ? `${dependencies.map(dep => `-- requires: ${dep}`).join('\n')  }\n` : ''}
 -- Add your deployment SQL here
 `;
 
@@ -922,12 +971,14 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     // Add README file regardless of casing
     const readmeFile = fs.readdirSync(modPath).find(f => /^readme\.md$/i.test(f));
+
     if (readmeFile) {
       files.push(readmeFile); // Include it in the list of files to copy
     }
 
     for (const folder of folders) {
       const src = path.join(modPath, folder);
+
       if (fs.existsSync(src)) {
         fs.cpSync(src, path.join(fullDist, folder), { recursive: true });
       }
@@ -935,6 +986,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     for (const file of files) {
       const src = path.join(modPath, file);
+
       if (!fs.existsSync(src)) {
         throw new Error(`Missing required file: ${file}`);
       }
@@ -961,6 +1013,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     }
   
     const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+
     pkgData.dependencies = pkgData.dependencies || {};
   
     const newlyAdded: string[] = [];
@@ -981,6 +1034,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           const extDir = dirname(fullConf);
           const relativeDir = extDir.split('node_modules/')[1];
           const dstDir = path.join(skitchExtDir, relativeDir);
+
           return { src: extDir, dst: dstDir, pkg: relativeDir };
         });
   
@@ -994,14 +1048,17 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           logger.success(`✔ installed ${pkg}`);
   
           const pkgJsonFile = path.join(dst, 'package.json');
+
           if (!fs.existsSync(pkgJsonFile)) {
             throw new Error(`Missing package.json in installed extension: ${dst}`);
           }
   
           const { version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
+
           pkgData.dependencies[name] = `${version}`;
   
           const extensionName = getExtensionName(dst);
+
           newlyAdded.push(extensionName);
         }
   
@@ -1027,6 +1084,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     // ─── Update .control file with actual extension names ──────────────
     const currentDeps = this.getRequiredModules();
     const updatedDeps = Array.from(new Set([...currentDeps, ...newlyAdded])).sort();
+
     writeExtensions(this.modulePath!, updatedDeps);
   }
 
@@ -1058,6 +1116,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     for (const moduleName of moduleNames) {
       const { name } = parse(moduleName);
+
       if (dependencies[name]) {
         installed.push(name);
         installedVersions[name] = dependencies[name];
@@ -1095,6 +1154,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     for (const [name, version] of Object.entries(dependencies)) {
       const extPath = path.join(skitchExtDir, name);
+
       if (fs.existsSync(extPath)) {
         installed.push(name);
         installedVersions[name] = version as string;
@@ -1141,6 +1201,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     if (modulesToUpdate.length === 0) {
       logger.info('No modules to update.');
+
       return { updates: [], affectedModules: [] };
     }
 
@@ -1154,11 +1215,13 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       const oldVersion = installedVersions[moduleName];
       
       let newVersion: string | null = null;
+
       try {
         const result = execSync(`npm view ${moduleName} version`, {
           encoding: 'utf-8',
           stdio: ['pipe', 'pipe', 'pipe']
         }).trim();
+
         newVersion = result || null;
       } catch {
         logger.warn(`Could not fetch latest version for ${moduleName}`);
@@ -1183,6 +1246,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         }
       }
       const updatesWithChanges = updates.filter(u => u.newVersion && u.newVersion !== u.oldVersion);
+
       return { updates: updatesWithChanges, affectedModules: [] };
     }
 
@@ -1192,6 +1256,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     if (modulesToReinstall.length === 0) {
       logger.success('All modules are already up to date.');
+
       return { updates, affectedModules: [] };
     }
 
@@ -1199,6 +1264,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     await this.installModules(...modulesToReinstall);
 
     const { installedVersions: newVersions } = this.getInstalledModules();
+
     for (const update of updates) {
       if (modulesToReinstall.includes(update.name)) {
         update.newVersion = newVersions[update.name] || update.newVersion;
@@ -1209,9 +1275,11 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     const affectedModules = this.updateWorkspaceModuleVersions(
       modulesToReinstall.reduce((acc, name) => {
         const update = updates.find(u => u.name === name);
+
         if (update?.newVersion) {
           acc[name] = update.newVersion;
         }
+
         return acc;
       }, {} as Record<string, string>)
     );
@@ -1221,6 +1289,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     }
 
     logger.success('Upgrade complete.');
+
     return { updates, affectedModules };
   }
 
@@ -1275,9 +1344,11 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   private async getDeployedModules(pgConfig: PgConfig): Promise<Set<string>> {
     try {
       const client = new PgpmMigrate(pgConfig);
+
       await client.initialize();
       
       const status = await client.status();
+
       return new Set(status.map(s => s.package));
     } catch (error: any) {
       if (error.code === '42P01' || error.code === '3F000') {
@@ -1313,12 +1384,13 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     // Filter by deployment status if requested
     if (opts?.filterDeployed && opts?.pgConfig) {
       const deployedModules = await this.getDeployedModules(opts.pgConfig);
+
       filteredResolved = filteredResolved.filter(module => deployedModules.has(module));
     }
     
     return {
       resolved: filteredResolved,
-      external: external
+      external
     };
   }
 
@@ -1328,11 +1400,13 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     if (!target) {
       const context = this.getContext();
+
       if (context === PackageContext.Module || context === PackageContext.ModuleInsideWorkspace) {
         name = this.getModuleName();
       } else if (context === PackageContext.Workspace) {
         const modules = this.getModuleMap();
         const moduleNames = Object.keys(modules);
+
         if (moduleNames.length === 0) {
           throw new Error('No modules found in workspace');
         }
@@ -1342,6 +1416,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
     } else {
       const parsed = parseTarget(target);
+
       name = parsed.packageName;
       toChange = parsed.toChange;
     }
@@ -1368,6 +1443,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         database: string
       ): string => {
         const { host, port, user } = pg ?? {};
+
         return `${host}:${port}:${user}:${database}:${name}`;
       };
 
@@ -1380,22 +1456,26 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         extensions = await this.resolveWorkspaceExtensionDependencies();
       } else {
         const moduleProject = this.getModuleProject(name);
+
         extensions = moduleProject.getModuleExtensions();
       }
 
       const pgPool = getPgPool(opts.pg);
 
       const targetDescription = name === null ? 'all modules' : name;
+
       log.success(`🚀 Starting deployment to database ${opts.pg.database}...`);
 
       for (const extension of extensions.resolved) {
         try {
           if (extensions.external.includes(extension)) {
             const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
+
             log.info(`📥 Installing external extension: ${extension}`);
             await pgPool.query(msg);
           } else {
             const modulePath = resolve(this.workspacePath!, modules[extension].path);
+
             log.info(`📂 Deploying local module: ${extension}`);
 
             if (opts.deployment.fast) {
@@ -1409,6 +1489,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
               }
 
               let pkg;
+
               try {
                 pkg = await packageModule(localProject.modulePath, { 
                   usePlan: opts.deployment.usePlan, 
@@ -1416,6 +1497,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
                 });
               } catch (err: any) {
                 const errorLines = [];
+
                 errorLines.push(`❌ Failed to package module "${extension}" at path: ${modulePath}`);
                 errorLines.push(`   Module Path: ${modulePath}`);
                 errorLines.push(`   Workspace Path: ${this.workspacePath}`);
@@ -1481,6 +1563,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
       const moduleProject = this.getModuleProject(name);
       const modulePath = moduleProject.getModulePath();
+
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }
@@ -1534,12 +1617,14 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           filterDeployed: true,
           pgConfig: opts.pg as PgConfig
         });
+
         extensionsToRevert = truncateExtensionsToTarget(workspaceExtensions, name);
       }
 
       const pgPool = getPgPool(opts.pg);
 
       const targetDescription = name === null ? 'all modules' : name;
+
       log.success(`🧹 Starting revert process on database ${opts.pg.database}...`);
 
       const reversedExtensions = [...extensionsToRevert.resolved].reverse();
@@ -1548,6 +1633,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         try {
           if (extensionsToRevert.external.includes(extension)) {
             const msg = `DROP EXTENSION IF EXISTS "${extension}" RESTRICT;`;
+
             log.warn(`⚠️ Dropping external extension: ${extension}`);
             try {
               await pgPool.query(msg);
@@ -1560,6 +1646,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
             }
           } else {
             const modulePath = resolve(this.workspacePath!, modules[extension].path);
+
             log.info(`📂 Reverting local module: ${extension}`);
           
             try {
@@ -1595,6 +1682,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
       const moduleProject = this.getModuleProject(name);
       const modulePath = moduleProject.getModulePath();
+
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }
@@ -1633,22 +1721,26 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         extensions = await this.resolveWorkspaceExtensionDependencies();
       } else {
         const moduleProject = this.getModuleProject(name);
+
         extensions = moduleProject.getModuleExtensions();
       }
 
       const pgPool = getPgPool(opts.pg);
 
       const targetDescription = name === null ? 'all modules' : name;
+
       log.success(`🔎 Verifying deployment of ${targetDescription} on database ${opts.pg.database}...`);
 
       for (const extension of extensions.resolved) {
         try {
           if (extensions.external.includes(extension)) {
             const query = `SELECT 1/count(*) FROM pg_available_extensions WHERE name = $1`;
+
             log.info(`🔍 Verifying external extension: ${extension}`);
             await pgPool.query(query, [extension]);
           } else {
             const modulePath = resolve(this.workspacePath!, modules[extension].path);
+
             log.info(`📂 Verifying local module: ${extension}`);
 
             try {
@@ -1683,6 +1775,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       }
       const moduleProject = this.getModuleProject(name);
       const modulePath = moduleProject.getModulePath();
+
       if (!modulePath) {
         throw errors.PATH_NOT_FOUND({ path: name, type: 'module' });
       }
@@ -1704,6 +1797,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   async removeFromPlan(toChange: string): Promise<void> {
     const log = new Logger('remove');
     const modulePath = this.getModulePath();
+
     if (!modulePath) {
       throw errors.PATH_NOT_FOUND({ path: 'module path', type: 'module' });
     }
@@ -1720,16 +1814,19 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     if (toChange.startsWith('@')) {
       const tagName = toChange.substring(1); // Remove the '@' prefix
       const tagToRemove = plan.tags.find(tag => tag.name === tagName);
+
       if (!tagToRemove) {
         throw errors.TAG_NOT_FOUND({ tag: toChange });
       }
       
       const tagChangeIndex = plan.changes.findIndex(c => c.name === tagToRemove.change);
+
       if (tagChangeIndex === -1) {
         throw errors.CHANGE_NOT_FOUND({ change: tagToRemove.change, plan: `for tag '${toChange}'` });
       }
       
       const changesToRemove = plan.changes.slice(tagChangeIndex);
+
       plan.changes = plan.changes.slice(0, tagChangeIndex);
       
       plan.tags = plan.tags.filter(tag => 
@@ -1739,6 +1836,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       for (const change of changesToRemove) {
         for (const scriptType of ['deploy', 'revert', 'verify']) {
           const scriptPath = path.join(modulePath, scriptType, `${change.name}.sql`);
+
           if (fs.existsSync(scriptPath)) {
             fs.unlinkSync(scriptPath);
             log.info(`Deleted ${scriptType}/${change.name}.sql`);
@@ -1749,15 +1847,18 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       // Write updated plan file
       writePlanFile(planPath, plan);
       log.success(`Removed tag ${toChange} and ${changesToRemove.length} subsequent changes from plan`);
+
       return;
     }
 
     const targetIndex = plan.changes.findIndex(c => c.name === toChange);
+
     if (targetIndex === -1) {
       throw errors.CHANGE_NOT_FOUND({ change: toChange });
     }
 
     const changesToRemove = plan.changes.slice(targetIndex);
+
     plan.changes = plan.changes.slice(0, targetIndex);
     
     plan.tags = plan.tags.filter(tag => 
@@ -1767,6 +1868,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     for (const change of changesToRemove) {
       for (const scriptType of ['deploy', 'revert', 'verify']) {
         const scriptPath = path.join(modulePath, scriptType, `${change.name}.sql`);
+
         if (fs.existsSync(scriptPath)) {
           fs.unlinkSync(scriptPath);
           log.info(`Deleted ${scriptType}/${change.name}.sql`);
@@ -1787,28 +1889,38 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     const exists = (p: string) => fs.existsSync(p);
     const read = (p: string) => (exists(p) ? fs.readFileSync(p, 'utf8') : undefined);
     const planPath = path.join(modPath, 'pgpm.plan');
+
     if (!exists(planPath)) issues.push({ code: 'missing_plan', message: 'Missing pgpm.plan', file: planPath });
     const pkgJsonPath = path.join(modPath, 'package.json');
+
     if (!exists(pkgJsonPath)) issues.push({ code: 'missing_package_json', message: 'Missing package.json', file: pkgJsonPath });
     const makefilePath = info.Makefile;
+
     if (!exists(makefilePath)) issues.push({ code: 'missing_makefile', message: 'Missing Makefile', file: makefilePath });
     const controlPath = info.controlFile;
+
     if (!exists(controlPath)) issues.push({ code: 'missing_control', message: 'Missing control file', file: controlPath });
     const sqlCombined = info.sqlFile ? path.join(modPath, info.sqlFile) : path.join(modPath, 'sql', `${info.extname}--${info.version}.sql`);
+
     if (!exists(sqlCombined)) issues.push({ code: 'missing_sql', message: 'Missing combined sql file', file: sqlCombined });
     const deployDir = path.join(modPath, 'deploy');
+
     if (!exists(deployDir)) issues.push({ code: 'missing_deploy_dir', message: 'Missing deploy directory', file: deployDir });
     const revertDir = path.join(modPath, 'revert');
+
     if (!exists(revertDir)) issues.push({ code: 'missing_revert_dir', message: 'Missing revert directory', file: revertDir });
     const verifyDir = path.join(modPath, 'verify');
+
     if (!exists(verifyDir)) issues.push({ code: 'missing_verify_dir', message: 'Missing verify directory', file: verifyDir });
     if (exists(planPath)) {
       try {
         const parsed = parsePlanFile(planPath);
         const pkgName = parsed.data?.package;
+
         if (!pkgName) issues.push({ code: 'plan_missing_project', message: '%project missing', file: planPath });
         if (pkgName && pkgName !== info.extname) issues.push({ code: 'plan_project_mismatch', message: `pgpm.plan %project ${pkgName} != ${info.extname}`, file: planPath });
         const uri = parsed.data?.uri;
+
         if (uri && uri !== info.extname) issues.push({ code: 'plan_uri_mismatch', message: `pgpm.plan %uri ${uri} != ${info.extname}`, file: planPath });
       } catch (e: any) {
         issues.push({ code: 'plan_parse_error', message: e?.message || 'Plan parse error', file: planPath });
@@ -1818,17 +1930,21 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       const mf = read(makefilePath) || '';
       const extMatch = mf.match(/^EXTENSION\s*=\s*(.+)$/m);
       const dataMatch = mf.match(/^DATA\s*=\s*sql\/(.+)\.sql$/m);
+
       if (!extMatch) issues.push({ code: 'makefile_missing_extension', message: 'Makefile missing EXTENSION', file: makefilePath });
       if (!dataMatch) issues.push({ code: 'makefile_missing_data', message: 'Makefile missing DATA', file: makefilePath });
       if (extMatch && extMatch[1].trim() !== info.extname) issues.push({ code: 'makefile_extension_mismatch', message: `Makefile EXTENSION ${extMatch[1].trim()} != ${info.extname}`, file: makefilePath });
       const expectedData = `${info.extname}--${info.version}`;
+
       if (dataMatch && dataMatch[1].trim() !== expectedData) issues.push({ code: 'makefile_data_mismatch', message: `Makefile DATA sql/${dataMatch[1].trim()}.sql != sql/${expectedData}.sql`, file: makefilePath });
     }
     if (exists(controlPath)) {
       const base = path.basename(controlPath);
       const expected = `${info.extname}.control`;
+
       if (base !== expected) issues.push({ code: 'control_filename_mismatch', message: `Control filename ${base} != ${expected}`, file: controlPath });
     }
+
     return { ok: issues.length === 0, name: info.extname, path: modPath, issues };
   }
 
@@ -1840,13 +1956,16 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     const warnings: string[] = [];
     const dry = !!opts?.dryRun;
     const valid = /^[a-z][a-z0-9_]*$/;
+
     if (!valid.test(newName)) {
       throw errors.INVALID_NAME({ name: newName, type: 'module', rules: 'lowercase letters, digits, underscores; must start with letter' });
     }
     const planPath = path.join(modPath, 'pgpm.plan');
+
     if (fs.existsSync(planPath)) {
       try {
         const parsed = parsePlanFile(planPath);
+
         if (parsed.data) {
           parsed.data.package = newName;
           parsed.data.uri = newName;
@@ -1860,13 +1979,16 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       warnings.push('missing pgpm.plan');
     }
     const pkgJsonPath = path.join(modPath, 'package.json');
+
     if (fs.existsSync(pkgJsonPath) && opts?.syncPackageJsonName) {
       try {
         const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
         const oldName = pkg.name as string | undefined;
+
         if (oldName) {
           if (oldName.startsWith('@')) {
             const parts = oldName.split('/');
+
             if (parts.length === 2) pkg.name = `${parts[0]}/${newName}`;
             else pkg.name = newName;
           } else {
@@ -1888,15 +2010,19 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       try {
         const c = fs.readFileSync(oldControl, 'utf8');
         const line = c.split('\n').find(l => /^requires/.test(l));
+
         if (!line) return [];
+
         return line.split('=')[1].split("'")[1].split(',').map(s => s.trim()).filter(Boolean);
       } catch {
         return [];
       }
     })();
+
     if (fs.existsSync(oldControl)) {
       if (!dry) {
         const content = generateControlFileContent({ name: newName, version, requires });
+
         fs.writeFileSync(newControl, content);
         if (oldControl !== newControl && fs.existsSync(oldControl)) fs.rmSync(oldControl);
       }
@@ -1905,6 +2031,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
       warnings.push('missing control file');
     }
     const makefilePath = info.Makefile;
+
     if (fs.existsSync(makefilePath)) {
       if (!dry) writeExtensionMakefile(makefilePath, newName, version);
       changed.push(makefilePath);
@@ -1913,6 +2040,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     }
     const oldSql = path.join(modPath, 'sql', `${info.extname}--${version}.sql`);
     const newSql = path.join(modPath, 'sql', `${newName}--${version}.sql`);
+
     if (fs.existsSync(oldSql)) {
       if (!dry) {
         if (oldSql !== newSql) {
@@ -1921,14 +2049,13 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
         }
       }
       changed.push(newSql);
-    } else {
-      if (fs.existsSync(newSql)) {
+    } else if (fs.existsSync(newSql)) {
         changed.push(newSql);
       } else {
         warnings.push('missing combined sql file');
       }
-    }
     this.clearCache();
+
     return { changed, warnings };
   }
 }

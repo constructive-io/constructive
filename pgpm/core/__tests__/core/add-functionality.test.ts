@@ -1,8 +1,9 @@
+import {mkdirSync, readFileSync, writeFileSync } from 'fs';
+import * as fs from 'fs';
+import { basename, join } from 'path';
+
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { basename, join } from 'path';
-import * as fs from 'fs';
 
 describe('Add functionality', () => {
   let fixture: TestFixture;
@@ -17,6 +18,7 @@ describe('Add functionality', () => {
 
   const setupModule = (moduleDir: string) => {
     const moduleName = basename(moduleDir);
+
     mkdirSync(moduleDir, { recursive: true });
     mkdirSync(join(moduleDir, 'deploy'), { recursive: true });
     mkdirSync(join(moduleDir, 'revert'), { recursive: true });
@@ -27,6 +29,7 @@ describe('Add functionality', () => {
 %uri=https://github.com/test/${moduleName}
 
 `;
+
     writeFileSync(join(moduleDir, 'pgpm.plan'), planContent);
     
     const controlContent = `# ${moduleName} extension
@@ -35,17 +38,21 @@ default_version = '0.1.0'
 relocatable = false
 superuser = false
 `;
+
     writeFileSync(join(moduleDir, `${moduleName}.control`), controlContent);
   };
 
   test('addChange creates change in plan file and SQL files', () => {
     const moduleDir = join(fixture.tempDir, 'test-module');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
+
     pkg.addChange('organizations');
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('organizations');
     
     expect(fs.existsSync(join(moduleDir, 'deploy', 'organizations.sql'))).toBe(true);
@@ -55,6 +62,7 @@ superuser = false
 
   test('addChange with dependencies validates and includes them', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-deps');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -64,19 +72,23 @@ superuser = false
     pkg.addChange('contacts', ['users'], 'Adds contacts table');
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('users');
     expect(planContent).toContain('contacts');
     expect(planContent).toContain('Adds contacts table');
     
     const deployContent = readFileSync(join(moduleDir, 'deploy', 'contacts.sql'), 'utf8');
+
     expect(deployContent).toContain('requires: users');
   });
 
   test('addChange with nested path creates directories', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-nested');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
+
     pkg.addChange('api/v1/endpoints');
     
     expect(fs.existsSync(join(moduleDir, 'deploy', 'api', 'v1', 'endpoints.sql'))).toBe(true);
@@ -84,14 +96,17 @@ superuser = false
     expect(fs.existsSync(join(moduleDir, 'verify', 'api', 'v1', 'endpoints.sql'))).toBe(true);
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('api/v1/endpoints');
   });
 
   test('addChange with deeply nested path creates directories', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-deep-nested');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
+
     pkg.addChange('schema/myschema/tables/mytable');
     
     expect(fs.existsSync(join(moduleDir, 'deploy', 'schema', 'myschema', 'tables', 'mytable.sql'))).toBe(true);
@@ -99,11 +114,13 @@ superuser = false
     expect(fs.existsSync(join(moduleDir, 'verify', 'schema', 'myschema', 'tables', 'mytable.sql'))).toBe(true);
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('schema/myschema/tables/mytable');
   });
 
   test('addChange validates change name', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-validation');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -116,6 +133,7 @@ superuser = false
 
   test('addChange prevents duplicate changes', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-duplicates');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -127,6 +145,7 @@ superuser = false
 
   test('addChange validates dependencies exist', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-dep-validation');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -136,6 +155,7 @@ superuser = false
 
   test('addChange requires module context', () => {
     const nonModuleDir = join(fixture.tempDir, 'not-a-module');
+
     mkdirSync(nonModuleDir, { recursive: true });
     
     const pkg = new PgpmPackage(nonModuleDir);
@@ -145,9 +165,11 @@ superuser = false
 
   test('addChange creates SQL files without transaction statements', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-no-transactions');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
+
     pkg.addChange('no-transactions');
     
     const deployContent = readFileSync(join(moduleDir, 'deploy', 'no-transactions.sql'), 'utf8');
@@ -169,6 +191,7 @@ superuser = false
 
   test('addChange includes proper headers and comments in SQL files', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-headers');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -195,6 +218,7 @@ superuser = false
 
   test('addChange handles multiple dependencies', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-multi-deps');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -206,17 +230,20 @@ superuser = false
     pkg.addChange('user-permissions', ['users', 'roles', 'permissions'], 'Links users to permissions');
     
     const deployContent = readFileSync(join(moduleDir, 'deploy', 'user-permissions.sql'), 'utf8');
+
     expect(deployContent).toContain('-- requires: users');
     expect(deployContent).toContain('-- requires: roles');
     expect(deployContent).toContain('-- requires: permissions');
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('user-permissions');
     expect(planContent).toContain('Links users to permissions');
   });
 
   test('addChange allows cross-module dependencies', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-cross-deps');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -224,15 +251,18 @@ superuser = false
     pkg.addChange('adoption-history', ['pets:tables/pets'], 'Adds adoption history table');
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('adoption-history');
     expect(planContent).toContain('[pets:tables/pets]');
     
     const deployContent = readFileSync(join(moduleDir, 'deploy', 'adoption-history.sql'), 'utf8');
+
     expect(deployContent).toContain('-- requires: pets:tables/pets');
   });
 
   test('addChange validates local dependencies but not cross-module ones', () => {
     const moduleDir = join(fixture.tempDir, 'test-module-mixed-deps');
+
     setupModule(moduleDir);
     
     const pkg = new PgpmPackage(moduleDir);
@@ -244,6 +274,7 @@ superuser = false
     pkg.addChange('contacts', ['users', 'pets:tables/pets'], 'Mixed local and cross-module deps');
     
     const planContent = readFileSync(join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('contacts');
     expect(planContent).toContain('[users pets:tables/pets]');
   });

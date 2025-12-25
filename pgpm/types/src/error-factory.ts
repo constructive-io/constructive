@@ -12,6 +12,7 @@ export const makeError = <T extends ErrorContext>(
     overrideMessage?: string
   ): PgpmError => {
     const message = overrideMessage || messageFn(context);
+
     return new PgpmError(code, message, context, httpCode);
   };
 };

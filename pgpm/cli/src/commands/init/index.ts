@@ -51,6 +51,7 @@ async function handlePromptFlow(argv: Partial<Record<string, any>>, prompter: In
       ...argv,
       _: (argv._ ?? []).slice(1)
     };
+
     return runWorkspaceSetup(nextArgv, prompter);
   }
 

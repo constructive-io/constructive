@@ -56,6 +56,7 @@ it('generates _common.ts with UUID and Timestamp types', async () => {
   });
 
   const common = output['schemas/_common.ts'];
+
   expect(common).toMatchSnapshot();
 });
 
@@ -76,6 +77,7 @@ it('generates interfaces and classes for tables', async () => {
   });
 
   const schema = output['schemas/codegen_test.ts'];
+
   expect(schema).toMatchSnapshot();
 });
 
@@ -96,6 +98,7 @@ it('imports UUID and Timestamp when used in schema', async () => {
   });
 
   const schema = output['schemas/codegen_test.ts'];
+
   expect(schema).toMatch(/import\s+\{\s*UUID,\s*Timestamp\s*\}\s+from ["']\.\/_common["']/);
 });
 
@@ -116,5 +119,6 @@ it('generates an index.ts that exports schema namespace', async () => {
   });
 
   const index = output['index.ts'];
+
   expect(index).toMatchSnapshot();
 });

@@ -73,6 +73,7 @@ describe('knative request wrapper', () => {
     });
 
     const [options] = postMock.mock.calls[0];
+
     expect(options.url).toBe(
       'http://gateway.internal/async-function/example-fn'
     );
@@ -99,6 +100,7 @@ describe('knative request wrapper', () => {
     });
 
     const [options] = postMock.mock.calls[0];
+
     expect(options.url).toBe('http://localhost:3000/dev-fn');
   });
 

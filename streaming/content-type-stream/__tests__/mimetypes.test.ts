@@ -6,10 +6,11 @@ import { basename } from 'path';
 import { streamContentType } from '../src';
 
 const files = []
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**'))
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**/.*'))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**`))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**/.*`))
   .filter((file) => {
     const key = file.split('kitchen-sink')[1];
+
     return key != '';
   })
   .map((f) => ({
@@ -17,9 +18,10 @@ const files = []
     path: f
   }));
 
-const malicious = glob(__dirname + '/../../../__fixtures__/malicious/**')
+const malicious = glob(`${__dirname  }/../../../__fixtures__/malicious/**`)
   .filter((file) => {
     const key = file.split('malicious')[1];
+
     return key != '';
   })
   .map((f) => ({
@@ -42,6 +44,7 @@ describe('mimetypes', () => {
           filename: file.path
         }
       );
+
       res[key] = {
         magic,
         contentType
@@ -63,6 +66,7 @@ describe('mimetypes', () => {
           filename: file.path
         }
       );
+
       res[key] = {
         magic,
         contentType

@@ -1,13 +1,14 @@
 // @ts-nocheck
 import { useMemo } from 'react';
 import {
-  useQuery,
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient
 } from 'react-query';
-import { useGraphqlClient } from './use-graphql-client';
+
 import { useConstructiveQuery } from './use-constructive-client';
+import { useGraphqlClient } from './use-graphql-client';
 const noop = () => {};
 
 export function useTableRowsPaginated(options = {}) {
@@ -33,6 +34,7 @@ export function useTableRowsPaginated(options = {}) {
   const graphqlQuery = useMemo(() => {
     if (!queryBuilder) return null;
     const result = queryBuilder.query(tableName).getMany({ select }).print();
+
     return {
       hash: result._hash,
       key: result._key
@@ -69,6 +71,7 @@ export function useTableRowsPaginated(options = {}) {
         orderBy,
         graphqlQuery
       } = normalize(params);
+
       if (skip || !graphqlQuery) return null;
 
       const result = await graphqlClient.request(graphqlQuery.hash, {
@@ -80,6 +83,7 @@ export function useTableRowsPaginated(options = {}) {
         filter,
         orderBy
       });
+
       return result[graphqlQuery.key];
     },
     {
@@ -114,6 +118,7 @@ export function useTableRowsInfinite(options = {}) {
   const graphqlQuery = useMemo(() => {
     if (!queryBuilder) return null;
     const result = queryBuilder.query(tableName).getMany({ select }).print();
+
     return {
       hash: result._hash,
       key: result._key
@@ -135,6 +140,7 @@ export function useTableRowsInfinite(options = {}) {
     async ({ queryKey, pageParam = null }) => {
       const [, params] = queryKey;
       const { condition, filter, orderBy, graphqlQuery } = normalize(params);
+
       if (!graphqlQuery) return null;
 
       const result = await graphqlClient.request(graphqlQuery.hash, {
@@ -144,6 +150,7 @@ export function useTableRowsInfinite(options = {}) {
         filter,
         orderBy
       });
+
       return result[graphqlQuery.key];
     },
     {
@@ -168,6 +175,7 @@ export function useCreateTableRow(options = {}) {
   const graphqlMutation = useMemo(() => {
     if (!queryBuilder) return null;
     const result = queryBuilder.query(tableName).create().print();
+
     return {
       hash: result._hash,
       key: result._key
@@ -180,6 +188,7 @@ export function useCreateTableRow(options = {}) {
         graphqlMutation.hash,
         variables
       );
+
       return result[graphqlMutation.key];
     },
     {
@@ -206,6 +215,7 @@ export function useDeleteTableRow(options = {}) {
   const graphqlMutation = useMemo(() => {
     if (!queryBuilder) return null;
     const result = queryBuilder.query(tableName).delete().print();
+
     return {
       hash: result._hash,
       key: result._key
@@ -218,6 +228,7 @@ export function useDeleteTableRow(options = {}) {
         graphqlMutation.hash,
         variables
       );
+
       return result[graphqlMutation.key];
     },
     {

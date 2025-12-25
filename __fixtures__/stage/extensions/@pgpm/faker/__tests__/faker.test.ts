@@ -31,6 +31,7 @@ it('gets random words', async () => {
 
   for (const type of types) {
     const { [type]: value } = await pg.one(`SELECT faker.${type}() AS ${type}`);
+
     obj[type] = value;
   }
   console.log(obj);
@@ -39,12 +40,14 @@ it('gets random words', async () => {
 it('lnglat', async () => {
   const obj: Record<string, any> = {};
   const { lnglat } = await pg.one(`SELECT faker.lnglat() AS lnglat`);
+
   obj['lnglat'] = lnglat;
 
   const { lnglat: bbox } = await pg.one(
     `SELECT faker.lnglat($1, $2, $3, $4) AS lnglat`,
     [-118.561721, 33.59, -117.646374, 34.23302]
   );
+
   obj['bbox'] = bbox;
 
   console.log(obj);
@@ -55,18 +58,21 @@ it('tags', async () => {
   const obj: Record<string, any> = {};
 
   const { tags } = await pg.one(`SELECT faker.tags() AS tags`);
+
   obj['tags'] = tags;
 
   const { tag_with_min } = await pg.one(
     `SELECT faker.tags($1, $2, $3) AS tag_with_min`,
     [5, 10, 'tag']
   );
+
   obj['tag with min'] = tag_with_min;
 
   const { face } = await pg.one(
     `SELECT faker.tags($1, $2, $3) AS face`,
     [5, 10, 'face']
   );
+
   obj['face'] = face;
 
   console.log(obj);

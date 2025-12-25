@@ -1,14 +1,14 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
-import { join } from 'path';
 import express from 'express';
-import { postgraphile } from 'postgraphile';
 // @ts-ignore
 import { getGraphileSettings } from 'graphile-settings';
+import { getConnections,seed } from 'graphile-test';
+import { join } from 'path';
 import { getPgPool } from 'pg-cache';
+import { postgraphile } from 'postgraphile';
 
 import { buildSchemaSDL, fetchEndpointSchemaSDL } from '../src/schema';
-import { seed, getConnections } from 'graphile-test';
 
 jest.setTimeout(30000);
 
@@ -29,6 +29,7 @@ beforeAll(async () => {
       ])
     ]
   );
+
   ({ db, teardown } = connections);
 });
 
@@ -53,6 +54,7 @@ it('buildSchemaSDL returns a valid GraphQL SDL string', async () => {
     database: db.config.database,
     schemas
   });
+
   expect(typeof sdl).toBe('string');
   expect(sdl.length).toBeGreaterThan(100);
   expect(sdl).toContain('type Query');

@@ -1,9 +1,3 @@
-import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { getConnections as getPgConnections } from 'pgsql-test';
-import type { SeedAdapter } from 'pgsql-test/seed/types';
-import type { PgTestClient } from 'pgsql-test/test-client';
-
-import { GraphQLTest } from './graphile-test';
 import type {
   GetConnectionsInput,
   GraphQLQueryFn,
@@ -13,6 +7,12 @@ import type {
   GraphQLQueryUnwrappedFnObj,
   GraphQLResponse
 } from 'graphile-test';
+import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
+import { getConnections as getPgConnections } from 'pgsql-test';
+import type { SeedAdapter } from 'pgsql-test/seed/types';
+import type { PgTestClient } from 'pgsql-test/test-client';
+
+import { GraphQLTest } from './graphile-test';
 
 // Core unwrapping utility
 const unwrap = <T>(res: GraphQLResponse<T>): T => {
@@ -22,6 +22,7 @@ const unwrap = <T>(res: GraphQLResponse<T>): T => {
   if (!res.data) {
     throw new Error('No data returned from GraphQL query');
   }
+
   return res.data;
 };
 
@@ -34,6 +35,7 @@ const createConnectionsBase = async (
   const { pg, db, teardown: dbTeardown } = conn;
 
   const gqlContext = GraphQLTest(input, conn);
+
   await gqlContext.setup();
 
   const teardown = async () => {
@@ -121,7 +123,9 @@ export const getConnectionsObjectWithLogging = async (
   const query: GraphQLQueryFnObj = async (opts) => {
     console.log('Executing GraphQL query:', opts.query);
     const result = await baseQuery(opts);
+
     console.log('GraphQL result:', result);
+
     return result;
   };
 
@@ -151,7 +155,9 @@ export const getConnectionsObjectWithTiming = async (
     const start = Date.now();
     const result = await baseQuery(opts);
     const duration = Date.now() - start;
+
     console.log(`GraphQL query took ${duration}ms`);
+
     return result;
   };
 
@@ -231,7 +237,9 @@ export const getConnectionsWithLogging = async (
   const query: GraphQLQueryFn = async (query, variables, commit, reqOptions) => {
     console.log('Executing positional GraphQL query:', query);
     const result = await baseQueryPositional(query, variables, commit, reqOptions);
+
     console.log('GraphQL result:', result);
+
     return result;
   };
 
@@ -261,7 +269,9 @@ export const getConnectionsWithTiming = async (
     const start = Date.now();
     const result = await baseQueryPositional(query, variables, commit, reqOptions);
     const duration = Date.now() - start;
+
     console.log(`Positional GraphQL query took ${duration}ms`);
+
     return result;
   };
 

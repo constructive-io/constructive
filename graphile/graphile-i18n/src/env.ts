@@ -4,6 +4,7 @@ const commaSeparatedArray = makeValidator<string[]>((value) => {
   if (typeof value !== 'string') {
     throw new Error('Expected a comma separated string');
   }
+
   return value
     .split(',')
     .map((entry) => entry.trim())

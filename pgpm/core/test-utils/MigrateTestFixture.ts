@@ -27,6 +27,7 @@ export class MigrateTestFixture {
     
     // Create database using admin pool
     const adminPool = getPgPool(baseConfig);
+
     try {
       await adminPool.query(`CREATE DATABASE "${dbName}"`);
     } catch (e) {
@@ -55,10 +56,12 @@ export class MigrateTestFixture {
 
     // Initialize migrate schema
     const migrate = new PgpmMigrate(config);
+
     await migrate.initialize();
 
     // Get pool for test database operations
     const pool = getPgPool(pgConfig);
+
     this.pools.push(pool);
 
     const fixture = this;
@@ -79,8 +82,9 @@ export class MigrateTestFixture {
             ) as exists`,
             [name]
           );
+
           return result.rows[0].exists;
-        } else {
+        } 
           const [schema, table] = name.includes('.') ? name.split('.') : ['public', name];
           const result = await pool.query(
             `SELECT EXISTS (
@@ -89,8 +93,9 @@ export class MigrateTestFixture {
             ) as exists`,
             [schema, table]
           );
+
           return result.rows[0].exists;
-        }
+        
       },
 
       async getDeployedChanges() {
@@ -99,6 +104,7 @@ export class MigrateTestFixture {
            FROM pgpm_migrate.changes 
            ORDER BY deployed_at`
         );
+
         return result.rows;
       },
 
@@ -137,6 +143,7 @@ export class MigrateTestFixture {
            WHERE c.package = $1 AND c.change_name = $2`,
           [packageName, changeName]
         );
+
         return result.rows.map((row: any) => row.requires);
       },
 
@@ -147,6 +154,7 @@ export class MigrateTestFixture {
     };
 
     this.databases.push(db);
+
     return db;
   }
 
@@ -165,6 +173,7 @@ export class MigrateTestFixture {
 
   createPlanFile(packageName: string, changes: MigrateTestChange[]): string {
     const tempDir = mkdtempSync(join(tmpdir(), 'migrate-test-'));
+
     this.tempDirs.push(tempDir);
 
     const lines = [
@@ -193,6 +202,7 @@ export class MigrateTestFixture {
     }
 
     const planPath = join(tempDir, 'pgpm.plan');
+
     writeFileSync(planPath, lines.join('\n'));
     
     return tempDir;
@@ -200,6 +210,7 @@ export class MigrateTestFixture {
 
   createScript(dir: string, type: 'deploy' | 'revert' | 'verify', name: string, content: string): void {
     const scriptDir = join(dir, type);
+
     mkdirSync(scriptDir, { recursive: true });
     writeFileSync(join(scriptDir, `${name}.sql`), content);
   }

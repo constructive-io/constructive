@@ -45,6 +45,7 @@ describe('encrypted secrets', () => {
        WHERE secrets_owned_field = $1`,
       [user_id]
     );
+
     expect(encrypt_field_pgp_get).toMatchSnapshot();
   });
 
@@ -52,6 +53,7 @@ describe('encrypted secrets', () => {
     const [{ encrypt_field_set }] = await pg.any(
       `SELECT encrypted_secrets.encrypt_field_set('myvalue')`
     );
+
     expect(encrypt_field_set).toMatchSnapshot();
   });
 
@@ -61,6 +63,7 @@ describe('encrypted secrets', () => {
         encrypted_secrets.encrypt_field_set('value-there-and-back')
       )`
     );
+
     expect(encrypt_field_bytea_to_text).toMatchSnapshot();
   });
 
@@ -72,6 +75,7 @@ describe('encrypted secrets', () => {
       )`,
       [user_id]
     );
+
     expect(secrets_getter).toMatchSnapshot();
   });
 
@@ -84,6 +88,7 @@ describe('encrypted secrets', () => {
       )`,
       [user_id]
     );
+
     expect(secrets_verify).toMatchSnapshot();
   });
 
@@ -96,6 +101,7 @@ describe('encrypted secrets', () => {
       )`,
       [user_id]
     );
+
     expect(secrets_upsert).toMatchSnapshot();
     
     const [{ secrets_verify }] = await pg.any(
@@ -106,6 +112,7 @@ describe('encrypted secrets', () => {
       )`,
       [user_id]
     );
+
     expect(secrets_verify).toMatchSnapshot();
   });
 
@@ -115,6 +122,7 @@ describe('encrypted secrets', () => {
       `SELECT encrypted_secrets.secrets_getter($1::uuid, 'my-secret-name')`,
       [user_id]
     );
+
     expect(beforeDelete.secrets_getter).toBe('my-secret');
 
     // Delete the secret
@@ -128,6 +136,7 @@ describe('encrypted secrets', () => {
       `SELECT encrypted_secrets.secrets_getter($1::uuid, 'my-secret-name', 'default-value')`,
       [user_id]
     );
+
     expect(afterDelete.secrets_getter).toBe('default-value');
   });
 
@@ -171,6 +180,7 @@ describe('encrypted secrets', () => {
       )`,
       [user_id]
     );
+
     expect(encrypt_field_pgp_getter).toMatchSnapshot();
   });
 
@@ -188,6 +198,7 @@ describe('encrypted secrets', () => {
         })
       ]
     );
+
     expect(secrets_table_upsert).toMatchSnapshot();
   });
 });

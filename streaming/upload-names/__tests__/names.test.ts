@@ -6,10 +6,11 @@ import getName from '../src';
 
 jest.setTimeout(3000000);
 const files = []
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**'))
-  .concat(glob(__dirname + '/../../../__fixtures__/kitchen-sink/**/.*'))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**`))
+  .concat(glob(`${__dirname  }/../../../__fixtures__/kitchen-sink/**/.*`))
   .filter((file) => {
     const key = file.split('kitchen-sink')[1];
+
     return key != '';
   })
   .concat([
@@ -36,9 +37,11 @@ describe('uploads', () => {
   it('english', async () => {
     const res = {};
     const use = files;
+
     for (let i = 0; i < use.length; i++) {
       const file = use[i];
       const results = getName(file);
+
       res[basename(file)] = results;
     }
     expect(res).toMatchSnapshot();
@@ -46,9 +49,11 @@ describe('uploads', () => {
   it('upper', async () => {
     const res = {};
     const use = files;
+
     for (let i = 0; i < use.length; i++) {
       const file = use[i];
       const results = getName(file, { lower: false });
+
       res[basename(file)] = results;
     }
     expect(res).toMatchSnapshot();
@@ -56,8 +61,10 @@ describe('uploads', () => {
   it('any w english', async () => {
     const res = {};
     const use = allNonEnglish;
+
     for (let i = 0; i < use.length; i++) {
       const file = use[i];
+
       try {
         getName(file);
       } catch (e) {
@@ -68,9 +75,11 @@ describe('uploads', () => {
   it('any', async () => {
     const res = {};
     const use = allNonEnglish;
+
     for (let i = 0; i < use.length; i++) {
       const file = use[i];
       const results = await getName(file, { english: false });
+
       res[basename(file)] = results;
     }
     expect(res).toMatchSnapshot();
@@ -83,6 +92,7 @@ describe('uploads', () => {
       'some..file..name.txt'
     ];
     const res = {};
+
     for (const input of inputs) {
       res[input] = getName(input);
     }
@@ -97,6 +107,7 @@ describe('uploads', () => {
       'lev.р',
     ];
     const res = {};
+
     for (const input of inputs) {
       res[input] = getName(input);
     }
@@ -112,6 +123,7 @@ describe('uploads', () => {
       '😊😊😊.txt'
     ];
     const res = {};
+
     for (const input of inputs) {
       try {
         getName(input, { english: true });
@@ -130,6 +142,7 @@ describe('uploads', () => {
       '😊😊😊.txt'
     ];
     const res = {};
+
     for (const input of inputs) {
       res[input] = getName(input, { english: false });
     }

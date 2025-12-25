@@ -25,6 +25,7 @@ import { executeQuery, withTransaction } from './utils/transaction';
 // Helper function to get changes in order
 function getChangesInOrder(planPath: string, reverse: boolean = false): Change[] {
   const plan = parsePlanFileSimple(planPath);
+
   return reverse ? [...plan.changes].reverse() : plan.changes;
 }
 
@@ -51,6 +52,7 @@ export class PgpmMigrate {
   private toUnqualifiedLocal(pkg: string, nm: string) {
     if (!nm.includes(':')) return nm;
     const [p, local] = nm.split(':', 2);
+
     if (p === pkg) return local;
     throw new Error(`Cross-package change encountered in local tracking: ${nm} (current package: ${pkg})`);
   }
@@ -59,6 +61,7 @@ export class PgpmMigrate {
     this.pgConfig = config;
     // Use environment variable DEPLOYMENT_HASH_METHOD if available, otherwise use options or default to 'content'
     const envHashMethod = process.env.DEPLOYMENT_HASH_METHOD as HashMethod;
+
     this.hashMethod = options.hashMethod || envHashMethod || 'content';
     this.pool = getPgPool(this.pgConfig);
     this.eventLogger = new EventLogger(this.pgConfig);
@@ -70,9 +73,10 @@ export class PgpmMigrate {
   private async calculateScriptHash(filePath: string): Promise<string> {
     if (this.hashMethod === 'ast') {
       return await hashSqlFile(filePath);
-    } else {
-      return await hashFile(filePath);
     }
+ 
+      return await hashFile(filePath);
+    
   }
 
   /**
@@ -160,15 +164,18 @@ export class PgpmMigrate {
         }
         
         const isDeployed = await this.isDeployed(plan.package, change.name);
+
         if (isDeployed) {
           log.info(`Skipping already deployed change: ${change.name}`);
           const unqualified = this.toUnqualifiedLocal(plan.package, change.name);
+
           skipped.push(unqualified);
           continue;
         }
         
         // Read deploy script
         const deployScript = readScript(dirname(planPath), 'deploy', change.name);
+
         if (!deployScript) {
           log.error(`Deploy script not found for change: ${change.name}`);
           failed = change.name;
@@ -203,6 +210,7 @@ export class PgpmMigrate {
           );
           
           const unqualified = this.toUnqualifiedLocal(plan.package, change.name);
+
           deployed.push(unqualified);
           log.success(`Successfully ${logOnly ? 'logged' : 'deployed'}: ${change.name}`);
         } catch (error: any) {
@@ -217,6 +225,7 @@ export class PgpmMigrate {
 
           // Build comprehensive error message
           const errorLines = [];
+
           errorLines.push(`Failed to deploy ${change.name}:`);
           errorLines.push(`  Change: ${change.name}`);
           errorLines.push(`  Package: ${plan.package}`);
@@ -306,15 +315,18 @@ export class PgpmMigrate {
         
         // Check if deployed
         const isDeployed = await this.isDeployed(plan.package, change.name);
+
         if (!isDeployed) {
           log.info(`Skipping not deployed change: ${change.name}`);
           const unqualified = this.toUnqualifiedLocal(plan.package, change.name);
+
           skipped.push(unqualified);
           continue;
         }
         
         // Read revert script
         const revertScript = readScript(dirname(planPath), 'revert', change.name);
+
         if (!revertScript) {
           log.error(`Revert script not found for change: ${change.name}`);
           failed = change.name;
@@ -380,12 +392,14 @@ export class PgpmMigrate {
         
         // Check if deployed
         const isDeployed = await this.isDeployed(plan.package, change.name);
+
         if (!isDeployed) {
           continue;
         }
         
         // Read verify script
         const verifyScript = readScript(dirname(planPath), 'verify', change.name);
+
         if (!verifyScript) {
           log.warn(`Verify script not found for change: ${change.name}`);
           continue;
@@ -405,6 +419,7 @@ export class PgpmMigrate {
             log.success(`Successfully verified: ${change.name}`);
           } else {
             const verificationError = new Error(`Verification failed for ${change.name}`) as any;
+
             verificationError.code = 'VERIFICATION_FAILED';
             throw verificationError;
           }
@@ -474,6 +489,7 @@ export class PgpmMigrate {
         AND table_name IN ('projects', 'changes', 'tags', 'events')
       )
     `);
+
     return result.rows[0].exists;
   }
 
@@ -493,6 +509,7 @@ export class PgpmMigrate {
       
       if (!schemaResult.rows[0].exists) {
         log.info('No Sqitch schema found, nothing to import');
+
         return;
       }
       
@@ -596,6 +613,7 @@ export class PgpmMigrate {
       `, [plan.package]);
       
       const deployedSet = new Set(deployedResult.rows.map((r: any) => r.change_name));
+
       return allChanges.filter(c => !deployedSet.has(c.name)).map(c => c.name);
     } catch (error: any) {
       // If schema doesn't exist, all changes are pending
@@ -654,6 +672,7 @@ export class PgpmMigrate {
       return result.rows.map(row => row.requires);
     } catch (error) {
       log.error(`Failed to get dependencies for ${packageName}:${changeName}:`, error);
+
       return [];
     }
   }

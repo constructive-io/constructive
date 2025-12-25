@@ -117,6 +117,7 @@ it('newbie', async () => {
   const beforeInsert = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ beforeInsert })).toMatchSnapshot();
 
   await pg.any(
@@ -127,6 +128,7 @@ it('newbie', async () => {
   const afterFirstInsert = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterFirstInsert })).toMatchSnapshot();
 
   await pg.any(`UPDATE status_public.mytable SET toggle = 'yo'`);
@@ -134,6 +136,7 @@ it('newbie', async () => {
   const afterUpdateToggleToValue = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterUpdateToggleToValue })).toMatchSnapshot();
 
   await pg.any(`UPDATE status_public.mytable SET toggle = NULL`);
@@ -141,6 +144,7 @@ it('newbie', async () => {
   const afterUpdateToggleToNull = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterUpdateToggleToNull })).toMatchSnapshot();
 
   await pg.any(`UPDATE status_public.mytable SET is_verified = TRUE`);
@@ -148,6 +152,7 @@ it('newbie', async () => {
   const afterIsVerifiedIsTrue = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterIsVerifiedIsTrue })).toMatchSnapshot();
 
   await pg.any(`UPDATE status_public.mytable SET is_verified = FALSE`);
@@ -155,6 +160,7 @@ it('newbie', async () => {
   const afterIsVerifiedIsFalse = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterIsVerifiedIsFalse })).toMatchSnapshot();
 
   await pg.any(`UPDATE status_public.mytable SET is_approved = TRUE`);
@@ -162,5 +168,6 @@ it('newbie', async () => {
   const afterIsApprovedTrue = await pg.any(
     `SELECT * FROM status_public.user_achievements ORDER BY name`
   );
+
   expect(snapshot({ afterIsApprovedTrue })).toMatchSnapshot();
 });

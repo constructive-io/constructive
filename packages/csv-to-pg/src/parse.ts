@@ -1,12 +1,13 @@
+import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import csv from 'csv-parser';
 import { createReadStream, readFileSync } from 'fs';
 import { load as parseYAML } from 'js-yaml';
-import { ast, nodes } from '@pgsql/utils';
-import type { Node } from '@pgsql/types';
+
 import {
+  getRelatedField,
   makeBoundingBox,
   makeLocation,
-  getRelatedField,
   wrapValue
 } from './utils';
 
@@ -16,6 +17,7 @@ const NULL_TOKENS = new Set(['NULL', 'null', '\\N', 'NA', 'N/A', 'n/a', '#N/A', 
 function isNumeric(str: unknown): boolean {
   if (typeof str === 'number') return true;
   if (typeof str !== 'string') return false;
+
   return (
     !isNaN(str as unknown as number) &&
     !isNaN(parseFloat(str))
@@ -30,11 +32,13 @@ const isNullToken = (value: unknown): boolean => {
   if (typeof value === 'string') {
     return NULL_TOKENS.has(value.trim());
   }
+
   return false;
 };
 
 const parseJson = (value: unknown): string | undefined => {
   if (typeof value === 'string') return value;
+
   return value ? JSON.stringify(value) : undefined;
 };
 
@@ -49,10 +53,12 @@ const escapeArrayElement = (value: unknown): string => {
   const str = String(value);
   // Check if the value needs quoting
   const needsQuoting = /[,{}"\\]/.test(str) || str.trim() !== str || str === '' || NULL_TOKENS.has(str);
+
   if (needsQuoting) {
     // Escape backslashes and quotes, then wrap in quotes
-    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+    return `"${  str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')  }"`;
   }
+
   return str;
 };
 
@@ -63,12 +69,14 @@ const psqlArray = (value: unknown): string | undefined => {
   if (Array.isArray(value) && value.length) {
     return `{${value.map(escapeArrayElement).join(',')}}`;
   }
+
   return undefined;
 };
 
 export const parse = <T = Record<string, unknown>>(path: string, opts?: csv.Options): Promise<T[]> =>
   new Promise((resolve, reject) => {
     const results: T[] = [];
+
     createReadStream(path)
       .pipe(csv(opts))
       .on('data', (data: T) => results.push(data))
@@ -82,6 +90,7 @@ export const parse = <T = Record<string, unknown>>(path: string, opts?: csv.Opti
 
 export const readConfig = (config: string): unknown => {
   let configValue: unknown;
+
   if (config.endsWith('.js')) {
     configValue = require(config);
   } else if (config.endsWith('json')) {
@@ -91,11 +100,13 @@ export const readConfig = (config: string): unknown => {
   } else {
     throw new Error('unsupported config!');
   }
+
   return configValue;
 };
 
 const getFromValue = (from: string | string[]): string[] => {
   if (Array.isArray(from)) return from;
+
   return [from];
 };
 
@@ -104,27 +115,31 @@ const getFromValue = (from: string | string[]): string[] => {
  */
 const cleanseEmptyStrings = (str: unknown): unknown => {
   if (isNullToken(str)) return null;
+
   return str;
 };
 
 const parseBoolean = (str: unknown): boolean | null => {
   if (typeof str === 'boolean') {
     return str;
-  } else if (typeof str === 'string') {
+  } if (typeof str === 'string') {
     const s = str.toLowerCase();
+
     if (s === 'true') {
       return true;
-    } else if (s === 't') {
+    } if (s === 't') {
       return true;
-    } else if (s === 'f') {
+    } if (s === 'f') {
       return false;
-    } else if (s === 'false') {
+    } if (s === 'false') {
       return false;
     }
-    return null;
-  } else {
+
     return null;
   }
+ 
+    return null;
+  
 };
 
 const getValuesFromKeys = <T extends Record<string, unknown>>(object: T, keys: string[]): unknown[] => 
@@ -173,6 +188,7 @@ const makeNullOrThrow = (fieldName: string, rawValue: unknown, type: string, req
   if (required) {
     throw new ValidationError(fieldName, rawValue, type, reason);
   }
+
   return nodes.aConst({ isnull: true });
 };
 
@@ -187,6 +203,7 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(rawValue);
+
         if (isEmpty(value) || isNullToken(rawValue)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
@@ -196,12 +213,14 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         const val = nodes.aConst({
           ival: ast.integer({ ival: Number(value) })
         });
+
         return wrapValue(val, opts);
       };
     case 'float':
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(rawValue);
+
         if (isEmpty(value) || isNullToken(rawValue)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
@@ -212,6 +231,7 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         const val = nodes.aConst({
           fval: ast.float({ fval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
     case 'boolean':
@@ -228,17 +248,20 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         const val = nodes.aConst({
           boolval: ast.boolean({ boolval: Boolean(value) })
         });
+
         return wrapValue(val, opts);
       };
     case 'bbox':
       // do bbox magic with args from the fields
       return (record: Record<string, unknown>): Node => {
         const val = makeBoundingBox(String(parseFn(record[from[0]])));
+
         return wrapValue(val, opts);
       };
     case 'location':
       return (record: Record<string, unknown>): Node => {
         const [lon, lat] = getValuesFromKeys(record, from);
+
         if (lon === undefined || lon === null || isNullToken(lon)) {
           return makeNullOrThrow(fieldName, { lon, lat }, type, required, 'longitude is missing or null');
         }
@@ -251,6 +274,7 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
 
         // NO parse here...
         const val = makeLocation(lon as string | number, lat as string | number);
+
         return wrapValue(val, opts);
       };
     case 'related':
@@ -272,10 +296,12 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
     case 'uuid':
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
+
         if (isNullToken(rawValue)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const value = parseFn(rawValue);
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
         }
@@ -285,6 +311,7 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
     case 'timestamp':
@@ -292,10 +319,12 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
     case 'date':
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
+
         if (isNullToken(rawValue)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const value = parseFn(rawValue);
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty');
         }
@@ -308,14 +337,17 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         if (isNaN(dateObj.getTime())) {
           // Try parsing as epoch timestamp (seconds or milliseconds)
           const numValue = Number(strValue);
+
           if (!isNaN(numValue)) {
             // Assume milliseconds if > 10 billion, otherwise seconds
             const ms = numValue > 10000000000 ? numValue : numValue * 1000;
             const epochDate = new Date(ms);
+
             if (!isNaN(epochDate.getTime())) {
               const val = nodes.aConst({
                 sval: ast.string({ sval: epochDate.toISOString() })
               });
+
               return wrapValue(val, opts);
             }
           }
@@ -326,18 +358,21 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         const val = nodes.aConst({
           sval: ast.string({ sval: type === 'date' ? dateObj.toISOString().split('T')[0] : dateObj.toISOString() })
         });
+
         return wrapValue(val, opts);
       };
     case 'text':
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(cleanseEmptyStrings(rawValue));
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
 
@@ -345,12 +380,14 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(psqlArray(cleanseEmptyStrings(rawValue)));
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
     case 'image':
@@ -360,24 +397,28 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(parseJson(cleanseEmptyStrings(rawValue)));
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
     default:
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];
         const value = parseFn(cleanseEmptyStrings(rawValue));
+
         if (isEmpty(value)) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
         }
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })
         });
+
         return wrapValue(val, opts);
       };
   }
@@ -400,11 +441,12 @@ export const parseTypes = (config: Config): TypesMap => {
     let [key, value] = v;
     let type: string;
     let from: string[];
+
     if (typeof value === 'string') {
       type = value;
       from = [key];
       if (['related', 'location'].includes(type)) {
-        throw new Error('must use object for ' + type + ' type');
+        throw new Error(`must use object for ${  type  } type`);
       }
       value = {
         type,
@@ -415,6 +457,7 @@ export const parseTypes = (config: Config): TypesMap => {
       from = getFromValue(value.from || key);
     }
     m[key] = getCoercionFunc(type, from, value, key);
+
     return m;
   }, {});
 };

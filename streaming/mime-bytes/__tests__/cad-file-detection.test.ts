@@ -53,6 +53,7 @@ describe('CAD File Detection', () => {
 
     it('should use content type mapping for DWG files', () => {
       const contentType = getContentTypeForExtension('dwg', 'binary');
+
       expect(contentType).toBe('application/acad');
     });
 
@@ -83,6 +84,7 @@ describe('CAD File Detection', () => {
 
     it('should use content type mapping for EMF files', () => {
       const contentType = getContentTypeForExtension('emf', 'binary');
+
       expect(contentType).toBe('image/emf');
     });
   });
@@ -90,6 +92,7 @@ describe('CAD File Detection', () => {
   describe('DXF file detection', () => {
     it('should use content type mapping for DXF files', () => {
       const contentType = getContentTypeForExtension('dxf', 'ascii');
+
       expect(contentType).toBe('image/vnd.dxf');
     });
 

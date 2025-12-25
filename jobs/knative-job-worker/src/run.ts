@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import Worker from './index';
 import poolManager from '@constructive-io/job-pg';
 import {
-  getWorkerHostname,
-  getJobSupported
-} from '@constructive-io/job-utils';
+  getJobSupported,
+  getWorkerHostname} from '@constructive-io/job-utils';
+
+import Worker from './index';
 
 const pgPool = poolManager.getPool();
 

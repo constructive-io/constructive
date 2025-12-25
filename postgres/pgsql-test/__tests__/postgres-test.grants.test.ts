@@ -19,6 +19,7 @@ const sqlPath = (file: string) => resolve(__dirname, '../sql', file);
  */
 function setupBaseDatabase(config: PgConfig) {
   const admin = new DbAdmin(config);
+
   admin.loadSql(sqlPath('test.sql'), config.database);
 }
 
@@ -41,11 +42,13 @@ afterAll(async () => {
 describe('Database Setup', () => {
   it('has valid connection (pg)', async () => {
     const result = await pg.query('SELECT 1 AS ok');
+
     expect(result.rows[0].ok).toBe(1);
   });
 
   it('has valid connection (db)', async () => {
     const result = await db.query('SELECT 2 AS ok');
+
     expect(result.rows[0].ok).toBe(2);
   });
 });

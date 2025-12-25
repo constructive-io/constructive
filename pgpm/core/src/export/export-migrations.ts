@@ -46,7 +46,7 @@ const exportMigrationsToDisk = async ({
   extensionName,
   metaExtensionName
 }: ExportMigrationsToDiskOptions): Promise<void> => {
-  outdir = outdir + '/';
+  outdir = `${outdir  }/`;
 
   const pgPool = getPgPool({
     ...options.pg,
@@ -65,11 +65,13 @@ const exportMigrationsToDisk = async ({
 
   if (!db?.rows?.length) {
     console.log('NO DATABASES.');
+
     return;
   }
 
   if (!schemas?.rows?.length) {
     console.log('NO SCHEMAS.');
+
     return;
   }
 
@@ -201,6 +203,7 @@ export const exportMigrations = async ({
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
+
     await exportMigrationsToDisk({
       project,
       options,
@@ -251,10 +254,12 @@ const preparePackage = async ({
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
   const sqitchDir = path.resolve(path.join(outdir, name));
+
   mkdirSync(sqitchDir, { recursive: true });
   process.chdir(sqitchDir);
 
   const plan = glob(path.join(sqitchDir, 'pgpm.plan'));
+
   if (!plan.length) {
     await project.initModule({
       name,
@@ -290,6 +295,7 @@ const makeReplacer = ({ schemas, name }: MakeReplacerOptions): ReplacerResult =>
     if (replace[n] && replace[n].length === 2) {
       return replacer(str.replace(replace[n][0], replace[n][1]), n + 1);
     }
+
     return str;
   };
 

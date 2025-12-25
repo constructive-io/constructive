@@ -1,4 +1,4 @@
-import { getConnections, PgTestClient, snapshot } from 'pgsql-test';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown: () => Promise<void>;
@@ -34,6 +34,7 @@ describe('ext-verify utilities', () => {
           `SELECT get_entity_from_str($1) as entity`,
           [input]
         );
+
         expect(result.entity).toBe(expected);
       }
     });
@@ -51,6 +52,7 @@ describe('ext-verify utilities', () => {
           `SELECT get_schema_from_str($1) as schema_name`,
           [input]
         );
+
         expect(result.schema_name).toBe(expected);
       }
     });
@@ -61,6 +63,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_schema('public') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -87,6 +90,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_table('test_table') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -94,6 +98,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_table('public.test_table') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -131,6 +136,7 @@ describe('ext-verify utilities', () => {
           `SELECT verify_constraint('test_constraints', $1) as verified`,
           [constraint.conname]
         );
+
         expect(result.verified).toBe(true);
       }
     });
@@ -158,6 +164,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_function('test_function') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -165,6 +172,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_function('public.test_function') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -194,6 +202,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_view('test_view') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -201,6 +210,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_view('public.test_view') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -230,6 +240,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_index('test_index_table', 'test_custom_index') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -282,6 +293,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_trigger('test_update_trigger') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -310,6 +322,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_type('test_enum') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -317,6 +330,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_type('test_composite') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -338,6 +352,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_domain('test_domain') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -357,6 +372,7 @@ describe('ext-verify utilities', () => {
         `SELECT verify_role($1) as verified`,
         [currentUser.username]
       );
+
       expect(result.verified).toBe(true);
     });
 
@@ -377,6 +393,7 @@ describe('ext-verify utilities', () => {
       // Should at least include the user themselves
       expect(results.length).toBeGreaterThan(0);
       const usernames = results.map(r => r.rolname);
+
       expect(usernames).toContain(currentUser.username);
     });
   });
@@ -400,6 +417,7 @@ describe('ext-verify utilities', () => {
         `SELECT verify_table_grant('test_grants_table', 'INSERT', $1) as verified`,
         [currentUser.username]
       );
+
       expect(result.verified).toBe(true);
     });
   });
@@ -418,6 +436,7 @@ describe('ext-verify utilities', () => {
           `SELECT verify_extension($1) as verified`,
           [availableExtensions[0].name]
         );
+
         expect(result.verified).toBe(true);
       } else {
         // Skip this test if no common extensions are available
@@ -450,6 +469,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_security('test_security_table') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
   });
@@ -477,6 +497,7 @@ describe('ext-verify utilities', () => {
       const [result] = await pg.any(
         `SELECT verify_policy('test_policy', 'test_policy_table') as verified`
       );
+
       expect(result.verified).toBe(true);
     });
 

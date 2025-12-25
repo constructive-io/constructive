@@ -78,6 +78,7 @@ describe('db_meta_modules', () => {
 
     // Check that key columns exist
     const columnNames = columns.map(c => c.column_name);
+
     expect(columnNames).toContain('id');
     expect(columnNames).toContain('database_id');
     expect(columnNames).toContain('schema_id');
@@ -103,6 +104,7 @@ describe('db_meta_modules', () => {
 
     // Check that key columns exist
     const columnNames = columns.map(c => c.column_name);
+
     expect(columnNames).toContain('id');
     expect(columnNames).toContain('database_id');
     expect(columnNames).toContain('schema_id');
@@ -128,6 +130,7 @@ describe('db_meta_modules', () => {
 
     // Check that key columns exist
     const columnNames = columns.map(c => c.column_name);
+
     expect(columnNames).toContain('id');
     expect(columnNames).toContain('database_id');
     expect(columnNames).toContain('schema_id');
@@ -215,6 +218,7 @@ describe('db_meta_modules', () => {
 
     // Group by foreign table to see what they reference
     const foreignTables = [...new Set(fkConstraints.map(fk => fk.foreign_table_name))];
+
     expect(foreignTables).toContain('database');
     expect(foreignTables).toContain('schema');
     expect(foreignTables).toContain('table');

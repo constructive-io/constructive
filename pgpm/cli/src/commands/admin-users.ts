@@ -47,6 +47,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
         }))
       }
     ]);
+
     subcommand = answer.subcommand;
   }
 
@@ -72,5 +73,6 @@ function getSubcommandDescription(cmd: string): string {
     add: 'Add database users with roles',
     remove: 'Remove database users and revoke roles'
   };
+
   return descriptions[cmd] || '';
 }

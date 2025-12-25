@@ -1,5 +1,5 @@
-import { resolveExtensionDependencies, resolveDependencies } from '../../src/resolution/deps';
 import { PgpmPackage } from '../../src/core/class/pgpm';
+import { resolveDependencies,resolveExtensionDependencies } from '../../src/resolution/deps';
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;
@@ -17,6 +17,7 @@ it('sqitch package dependencies [utils]', async () => {
     fixture.getFixturePath('constructive', 'packages', 'utils'),
     'utils'
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -25,6 +26,7 @@ it('sqitch package dependencies [simple/1st]', async () => {
     fixture.getFixturePath('simple', 'packages', 'my-first'),
     'my-first'
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -33,6 +35,7 @@ it('sqitch package dependencies [simple/2nd]', async () => {
     fixture.getFixturePath('simple', 'packages', 'my-second'),
     'my-second'
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -41,6 +44,7 @@ it('sqitch package dependencies [simple/3rd]', async () => {
     fixture.getFixturePath('simple', 'packages', 'my-third'),
     'my-third'
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -49,6 +53,7 @@ it('constructive project extensions dependencies', async () => {
   const modules = pkg.listModules();
 
   const utils = await resolveExtensionDependencies('utils', modules);
+
   expect(utils).toEqual({
     external: ['plpgsql', 'uuid-ossp', 'pgcrypto'],
     resolved: [
@@ -63,6 +68,7 @@ it('constructive project extensions dependencies', async () => {
   });
 
   const secrets = await resolveExtensionDependencies('secrets', modules);
+
   expect(secrets).toEqual({
     external: ['plpgsql', 'uuid-ossp', 'pgcrypto'],
     resolved: [
@@ -77,6 +83,7 @@ it('constructive project extensions dependencies', async () => {
   });
 
   const totp = await resolveExtensionDependencies('totp', modules);
+
   expect(totp).toEqual({
     external: ['plpgsql', 'uuid-ossp', 'pgcrypto'],
     resolved: [

@@ -1,5 +1,6 @@
 import { print } from 'graphql'
-import { createOne, patchOne, deleteOne, createMutation, MutationSpec } from '../src'
+
+import { createMutation, createOne, deleteOne, MutationSpec,patchOne } from '../src'
 
 describe('gql mutation builders', () => {
   it('createMutation: builds non-null vars and selects scalar outputs', () => {
@@ -20,8 +21,10 @@ describe('gql mutation builders', () => {
     }
 
     const res = createMutation({ operationName: 'customMutation', mutation })
+
     expect(res).toBeDefined()
     const s = print(res!.ast)
+
     expect(s).toContain('mutation customMutationMutation')
     expect(s).toContain('$foo: String!')
     expect(s).toContain('$list: [Int!]!')
@@ -47,8 +50,10 @@ describe('gql mutation builders', () => {
     }
 
     const res = createOne({ operationName: 'createAction', mutation })
+
     expect(res).toBeDefined()
     const s = print(res!.ast)
+
     expect(s).toContain('mutation createActionMutation')
     expect(s).toContain('$name: String!')
     expect(s).not.toContain('$createdAt')
@@ -75,8 +80,10 @@ describe('gql mutation builders', () => {
     }
 
     const res = patchOne({ operationName: 'patchAction', mutation })
+
     expect(res).toBeDefined()
     const s = print(res!.ast)
+
     expect(s).toContain('mutation patchActionMutation')
     expect(s).toContain('$id: UUID!')
     expect(s).toContain('$name: String')
@@ -99,8 +106,10 @@ describe('gql mutation builders', () => {
     }
 
     const res = deleteOne({ operationName: 'deleteAction', mutation })
+
     expect(res).toBeDefined()
     const s = print(res!.ast)
+
     expect(s).toContain('mutation deleteActionMutation')
     expect(s).toContain('$id: UUID!')
     expect(s).toContain('$tags: [String]!')

@@ -1,3 +1,5 @@
+import './types'; // for Request type
+
 import { getNodeEnv } from '@constructive-io/graphql-env';
 import { svcCache } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -14,7 +16,6 @@ import errorPage404Message from '../errors/404-message';
  */
 import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
 import { ApiByNameQuery, ApiQuery, ListOfAllDomainsOfDb } from './gql';
-import './types'; // for Request type
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
@@ -24,6 +25,7 @@ const transformServiceToApi = (svc: Service): ApiStructure => {
     api.schemaNames?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
 
   let domains: string[] = [];
+
   if (api.database?.sites?.nodes) {
     domains = api.database.sites.nodes.reduce((acc: string[], site: Site) => {
       if (site.domains?.nodes && site.domains.nodes.length) {
@@ -33,10 +35,13 @@ const transformServiceToApi = (svc: Service): ApiStructure => {
             : domain.domain;
           const protocol =
             domain.domain === 'localhost' ? 'http://' : 'https://';
+
           return protocol + hostname;
         });
+
         return [...acc, ...siteUrls];
       }
+
       return acc;
     }, []);
   }
@@ -60,14 +65,17 @@ const transformServiceToApi = (svc: Service): ApiStructure => {
 
 const getPortFromRequest = (req: Request): string | null => {
   const host = req.headers.host;
+
   if (!host) return null;
 
   const parts = host.split(':');
+
   return parts.length === 2 ? `:${parts[1]}` : null;
 };
 
 export const getSubdomain = (reqDomains: string[]): string | null => {
   const names = reqDomains.filter((name) => !['www'].includes(name));
+
   return !names.length ? null : names.join('.');
 };
 
@@ -92,8 +100,10 @@ export const createApiMiddleware = (opts: any) => {
         databaseId,
         isPublic: false,
       };
+
       req.api = api;
       req.databaseId = databaseId;
+
       return next();
     }
     try {
@@ -103,8 +113,9 @@ export const createApiMiddleware = (opts: any) => {
         res
           .status(404)
           .send(errorPage404Message('API not found', svc.errorHtml));
+
         return;
-      } else if (!svc) {
+      } if (!svc) {
         res
           .status(404)
           .send(
@@ -112,9 +123,11 @@ export const createApiMiddleware = (opts: any) => {
               'API service not found for the given domain/subdomain.'
             )
           );
+
         return;
       }
       const api = transformServiceToApi(svc);
+
       req.api = api;
       req.databaseId = api.databaseId;
       next();
@@ -167,7 +180,9 @@ const getHardCodedSchemata = ({
       },
     },
   };
+
   svcCache.set(key, svc);
+
   return svc;
 };
 
@@ -198,7 +213,9 @@ const getMetaSchema = ({
       },
     },
   };
+
   svcCache.set(key, svc);
+
   return svc;
 };
 
@@ -223,16 +240,21 @@ const queryServiceByDomainAndSubdomain = async ({
 
   if (result.errors?.length) {
     console.error(result.errors);
+
     return null;
   }
 
   const nodes = result?.data?.domains?.nodes;
+
   if (nodes?.length) {
     const data = nodes[0];
     const apiPublic = (opts as any).api?.isPublic;
+
     if (!data.api || data.api.isPublic !== apiPublic) return null;
     const svc = { data };
+
     svcCache.set(key, svc);
+
     return svc;
   }
 
@@ -260,16 +282,21 @@ const queryServiceByApiName = async ({
 
   if (result.errors?.length) {
     console.error(result.errors);
+
     return null;
   }
 
   const data = result?.data;
   const apiPublic = (opts as any).api?.isPublic;
+
   if (data?.api && data.api.isPublic === apiPublic) {
     const svc = { data };
+
     svcCache.set(key, svc);
+
     return svc;
   }
+
   return null;
 };
 
@@ -281,19 +308,21 @@ const getSvcKey = (opts: PgpmOptions, req: Request): string => {
     .join('.');
 
   const apiPublic = (opts as any).api?.isPublic;
+
   if (apiPublic === false) {
     if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
+      return `api:${  req.get('X-Database-Id')  }:${  req.get('X-Api-Name')}`;
     }
     if (req.get('X-Schemata')) {
       return (
-        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
+        `schemata:${  req.get('X-Database-Id')  }:${  req.get('X-Schemata')}`
       );
     }
     if (req.get('X-Meta-Schema')) {
-      return 'metaschema:api:' + req.get('X-Database-Id');
+      return `metaschema:api:${  req.get('X-Database-Id')}`;
     }
   }
+
   return key;
 };
 
@@ -305,6 +334,7 @@ const validateSchemata = async (
     `SELECT schema_name FROM information_schema.schemata WHERE schema_name = ANY($1::text[])`,
     [schemata]
   );
+
   return result.rows.map((row: { schema_name: string }) => row.schema_name);
 };
 
@@ -318,9 +348,11 @@ export const getApiConfig = async (
   const domain: string = req.urlDomains.domain as string;
 
   const key = getSvcKey(opts, req);
+
   req.svc_key = key;
 
   let svc;
+
   if (svcCache.has(key)) {
     svc = svcCache.get(key);
   } else {
@@ -331,6 +363,7 @@ export const getApiConfig = async (
     if (validatedSchemata.length === 0) {
       const message = `No valid schemas found for domain: ${domain}, subdomain: ${subdomain}`;
       const error: any = new Error(message);
+
       error.code = 'NO_VALID_SCHEMAS';
       throw error;
     }
@@ -347,6 +380,7 @@ export const getApiConfig = async (
     const client = new GraphileQuery({ schema, pool: rootPgPool, settings });
 
     const apiPublic = (opts as any).api?.isPublic;
+
     if (apiPublic === false) {
       if (req.get('X-Schemata')) {
         svc = getHardCodedSchemata({
@@ -415,14 +449,14 @@ export const getApiConfig = async (
             );
 
             const linksHtml = allDomains.length
-              ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
+              ? `<ul class="mt-4 pl-5 list-disc space-y-1">${ 
                 allDomains
                   .map(
                     (d: any) =>
                       `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`
                   )
-                  .join('') +
-                `</ul>`
+                  .join('') 
+                }</ul>`
               : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
 
             const errorHtml = `
@@ -440,5 +474,6 @@ export const getApiConfig = async (
       }
     }
   }
+
   return svc;
 };

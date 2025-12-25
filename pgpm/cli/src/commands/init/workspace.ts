@@ -21,6 +21,7 @@ export default async function runWorkspaceSetup(
   const answers = await prompter.prompt(argv, workspaceQuestions);
   const { cwd = process.cwd() } = argv;
   const targetPath = path.join(cwd, sluggify(answers.name));
+
   // Prevent double-echoed keystrokes by closing our prompter before template prompts.
   prompter.close();
 
@@ -31,6 +32,7 @@ export default async function runWorkspaceSetup(
   // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
   // This provides the intended workspace directory name before the folder is created
   const dirName = path.basename(targetPath);
+
   registerDefaultResolver('workspace.dirname', () => dirName);
 
   const scaffoldResult = await scaffoldTemplate({
@@ -52,6 +54,7 @@ export default async function runWorkspaceSetup(
   const cacheMessage = scaffoldResult.cacheUsed
     ? `Using cached templates from ${scaffoldResult.templateDir}`
     : `Fetched templates into ${scaffoldResult.templateDir}`;
+
   log.success(cacheMessage);
   log.success('Workspace templates rendered.');
 

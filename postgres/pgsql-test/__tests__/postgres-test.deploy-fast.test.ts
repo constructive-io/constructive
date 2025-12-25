@@ -18,7 +18,8 @@ let totalStart: number;
 beforeAll(async () => {
   totalStart = Date.now();
 
-  const cwd = resolve(__dirname + '/../../../__fixtures__/sqitch/simple/packages/my-third');
+  const cwd = resolve(`${__dirname  }/../../../__fixtures__/sqitch/simple/packages/my-third`);
+
   ({ pg, teardown } = await getConnections({}, [
     seed.pgpm(cwd)
   ]));
@@ -34,6 +35,7 @@ beforeEach(async () => {
 afterEach(async () => {
   const elapsed = Date.now() - start;
   const name = expect.getState().currentTestName ?? 'unknown';
+
   testResults.push({ name, time: elapsed });
 
   await pg.afterEach();
@@ -56,24 +58,27 @@ afterAll(async () => {
     `🕒 Total Test Time: ${totalTime}ms`
   ];
 
-  console.log('\n' + summaryLines.join('\n') + '\n');
+  console.log(`\n${  summaryLines.join('\n')  }\n`);
 });
 
 describe('Constructive DeployFast DB Benchmark', () => {
   it('inserts Alice', async () => {
     await pg.query(`INSERT INTO myfirstapp.users (username, email) VALUES ('alice', 'alice@example.com')`);
     const res = await pg.query(`SELECT COUNT(*) FROM myfirstapp.users`);
+
     expect(res.rows[0].count).toBe('1');
   });
   
   it('starts clean without Alice', async () => {
     const res = await pg.query(`SELECT * FROM myfirstapp.users WHERE username = 'alice'`);
+
     expect(res.rows).toHaveLength(0);
   });
   
   it('inserts Bob with email', async () => {
     await pg.query(`INSERT INTO myfirstapp.users (username, email) VALUES ('bob', 'bob@example.com')`);
     const res = await pg.query(`SELECT * FROM myfirstapp.users WHERE username = 'bob'`);
+
     expect(res.rows[0].email).toBe('bob@example.com');
   });
 });

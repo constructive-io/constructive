@@ -1,6 +1,6 @@
+import { Logger } from '@pgpmjs/logger';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
-import { Logger } from '@pgpmjs/logger';
 
 import { pgCache } from './lru';
 
@@ -18,8 +18,10 @@ const getDbString = (
 export const getPgPool = (pgConfig: Partial<PgConfig>): pg.Pool => {
   const config = getPgEnvOptions(pgConfig);
   const { user, password, host, port, database, } = config;
+
   if (pgCache.has(database)) {
     const cached = pgCache.get(database);
+
     if (cached) return cached;
   }
   const connectionString = getDbString(user, password, host, port, database);
@@ -78,5 +80,6 @@ export const getPgPool = (pgConfig: Partial<PgConfig>): pg.Pool => {
   });
   
   pgCache.set(database, pgPool);
+
   return pgPool;
 };

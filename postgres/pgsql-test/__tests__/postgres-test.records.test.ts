@@ -47,18 +47,21 @@ describe('Postgres Test Framework', () => {
 
   it('should have 2 users initially', async () => {
     const { rows } = await pg.query('SELECT COUNT(*) FROM users');
+
     expect(rows[0].count).toBe('2');
   });
 
   it('inserts a user but rollback leaves baseline intact', async () => {
     await pg.query(`INSERT INTO users (name) VALUES ('Carol')`);
-    let res = await pg.query('SELECT COUNT(*) FROM users');
+    const res = await pg.query('SELECT COUNT(*) FROM users');
+
     expect(res.rows[0].count).toBe('3');   // inside this tx
     // after rollback... the next test, we’ll still see 2
   });
 
   it('still sees 2 users after previous insert test', async () => {
     const { rows } = await pg.query('SELECT COUNT(*) FROM users');
+
     expect(rows[0].count).toBe('2');
   });
 

@@ -51,6 +51,7 @@ const PgConnectionArgFilterForwardRelationsPlugin: Plugin = (builder) => {
         const foreignTable = constraint.foreignClassId
           ? introspectionResultsByKind.classById[constraint.foreignClassId]
           : null;
+
         if (!foreignTable) {
           throw new Error(
             `Could not find the foreign table (constraint: ${constraint.name})`
@@ -75,6 +76,7 @@ const PgConnectionArgFilterForwardRelationsPlugin: Plugin = (builder) => {
         const foreignKeyAttributes = constraint.foreignKeyAttributeNums.map(
           (num) => foreignAttributes.filter((attr) => attr.num === num)[0]
         );
+
         if (keyAttributes.some((attr) => omit(attr, 'read'))) {
           return memo;
         }
@@ -88,6 +90,7 @@ const PgConnectionArgFilterForwardRelationsPlugin: Plugin = (builder) => {
           foreignKeyAttributes,
           constraint,
         });
+
         return memo;
       }, []);
 
@@ -232,6 +235,7 @@ const PgConnectionArgFilterForwardRelationsPlugin: Plugin = (builder) => {
         foreignTable,
         foreignTableTypeName
       );
+
       if (!ForeignTableFilterType) continue;
 
       addField(
@@ -246,9 +250,11 @@ const PgConnectionArgFilterForwardRelationsPlugin: Plugin = (builder) => {
       );
 
       const keyIsNullable = !keyAttributes.every((attr) => attr.isNotNull);
+
       if (keyIsNullable) {
         const existsFieldName =
           inflection.filterForwardRelationExistsFieldName(fieldName);
+
         addField(
           existsFieldName,
           `A related \`${fieldName}\` exists.`,

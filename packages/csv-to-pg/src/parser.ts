@@ -1,7 +1,8 @@
 import { readFileSync } from 'fs';
-import { parse, parseTypes } from './index';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from './utils';
+
+import { parse, parseTypes } from './index';
+import { InsertMany,InsertOne } from './utils';
 
 interface ParserConfig {
   schema?: string;
@@ -33,10 +34,12 @@ export class Parser {
     const { schema, table, singleStmts, conflict, headers, delimeter } = config;
 
     const opts: CsvOptions = {};
+
     if (headers) opts.headers = headers;
     if (delimeter) opts.separator = delimeter;
 
     let records: Record<string, unknown>[];
+
     if (typeof data === 'undefined') {
       if (config.json || config.input.endsWith('.json')) {
         records = JSON.parse(readFileSync(config.input, 'utf-8'));
@@ -52,6 +55,7 @@ export class Parser {
 
     if (config.debug) {
       console.log(records);
+
       return;
     }
 
@@ -67,8 +71,9 @@ export class Parser {
           conflict
         })
       );
+
       return deparse(stmts);
-    } else {
+    } 
       const stmt = InsertMany({
         schema,
         table,
@@ -76,7 +81,8 @@ export class Parser {
         records,
         conflict
       });
+
       return deparse([stmt]);
-    }
+    
   }
 }

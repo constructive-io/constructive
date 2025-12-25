@@ -296,11 +296,13 @@ export const getOne = ({
         isArrayNotNull
       } = field;
       let type = t.namedType({ type: fieldType });
+
       if (isNotNull) type = t.nonNullType({ type });
       if (isArray) {
         type = t.listType({ type });
         if (isArrayNotNull) type = t.nonNullType({ type });
       }
+
       return t.variableDefinition({
         variable: t.variable({ name: fieldName }),
         type
@@ -338,6 +340,7 @@ export const getOne = ({
       })
     ]
   });
+
   return ast;
 };
 
@@ -348,7 +351,8 @@ export const createOne = ({
   selection
 }) => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
+    console.log(`no input field for mutation for${  mutationName}`);
+
     return;
   }
 
@@ -413,7 +417,8 @@ export const patchOne = ({
   selection
 }) => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
+    console.log(`no input field for mutation for${  mutationName}`);
+
     return;
   }
 
@@ -487,7 +492,8 @@ export const patchOne = ({
 
 export const deleteOne = ({ mutationName, operationName, mutation }) => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
+    console.log(`no input field for mutation for${  mutationName}`);
+
     return;
   }
 
@@ -506,12 +512,14 @@ export const deleteOne = ({ mutationName, operationName, mutation }) => {
       isArrayNotNull
     } = field;
     let type = t.namedType({ type: fieldType });
+
     if (isNotNull) type = t.nonNullType({ type });
     if (isArray) {
       type = t.listType({ type });
       // no need to check isArrayNotNull since we need this field for deletion
       type = t.nonNullType({ type });
     }
+
     return t.variableDefinition({
       variable: t.variable({ name: fieldName }),
       type
@@ -560,6 +568,7 @@ export function getSelections(selection = []) {
     .map((selectionDefn) => {
       if (selectionDefn.isObject) {
         const { name, selection, variables = {}, isBelongTo } = selectionDefn;
+
         return t.field({
           name,
           args: Object.entries(variables).reduce((args, variable) => {
@@ -568,7 +577,9 @@ export function getSelections(selection = []) {
               name: argName,
               value: getValueAst(argValue)
             });
+
             args = argAst ? [...args, argAst] : args;
+
             return args;
           }, []),
           selectionSet: isBelongTo
@@ -589,13 +600,14 @@ export function getSelections(selection = []) {
               ]
             })
         });
-      } else {
+      } 
         const { fieldDefn } = selectionDefn;
+
         // Field is not found in model meta, do nothing
         if (!fieldDefn) return null;
 
         return getCustomAst(fieldDefn);
-      }
+      
     })
     .filter(Boolean);
 }
@@ -630,6 +642,7 @@ function getValueAst(value) {
     return t.objectValue({
       fields: Object.entries(value).reduce((fields, entry) => {
         const [objKey, objValue] = entry;
+
         fields = [
           ...fields,
           t.objectField({
@@ -637,6 +650,7 @@ function getValueAst(value) {
             value: getValueAst(objValue)
           })
         ];
+
         return fields;
       }, [])
     });
@@ -676,6 +690,7 @@ function getCreateVariablesAst(attrs) {
       type = t.listType({ type });
       if (isArrayNotNull) type = t.nonNullType({ type });
     }
+
     return t.variableDefinition({
       variable: t.variable({ name: fieldName }),
       type
@@ -709,6 +724,7 @@ function getUpdateVariablesAst(attrs, patchers) {
     if (isNotNull) type = t.nonNullType({ type });
     if (isArray) type = t.listType({ type });
     if (patchers.includes(field.name)) type = t.nonNullType({ type });
+
     return t.variableDefinition({
       variable: t.variable({ name: fieldName }),
       type

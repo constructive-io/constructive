@@ -3,10 +3,11 @@ import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+
 import { 
   generateCreateBaseRolesSQL, 
-  generateCreateUserSQL, 
   generateCreateTestUsersSQL,
+  generateCreateUserSQL, 
   generateRemoveUserSQL
 } from '../roles';
 
@@ -31,6 +32,7 @@ export class PgpmInit {
       log.info('Bootstrapping PGPM roles...');
       
       const sql = generateCreateBaseRolesSQL(roles);
+
       await this.pool.query(sql);
       
       log.success('Successfully bootstrapped PGPM roles');
@@ -52,6 +54,7 @@ export class PgpmInit {
       log.info('Bootstrapping PGPM test roles...');
       
       const sql = generateCreateTestUsersSQL(roles, connections);
+
       await this.pool.query(sql);
       
       log.success('Successfully bootstrapped PGPM test roles');
@@ -79,6 +82,7 @@ export class PgpmInit {
       log.info(`Bootstrapping PGPM database roles for user: ${username}...`);
       
       const sql = generateCreateUserSQL(username, password, roles, useLocksForRoles);
+
       await this.pool.query(sql);
       
       log.success(`Successfully bootstrapped PGPM database roles for user: ${username}`);
@@ -104,6 +108,7 @@ export class PgpmInit {
       log.info(`Removing PGPM database roles for user: ${username}...`);
       
       const sql = generateRemoveUserSQL(username, roles, useLocksForRoles);
+
       await this.pool.query(sql);
       
       log.success(`Successfully removed PGPM database roles for user: ${username}`);

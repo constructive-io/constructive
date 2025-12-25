@@ -39,6 +39,7 @@ describe('mergeGraphQLCodegenOptions', () => {
     const base = { ...defaultGraphQLCodegenOptions }
     const overrides = { reactQuery: { fetcher: 'fetch', legacyMode: true, exposeDocument: true } } as any
     const merged = mergeGraphQLCodegenOptions(base, overrides)
+
     expect((merged as any).reactQuery).toBeUndefined()
     // base is not mutated
     expect(base.reactQuery?.fetcher).toBe('graphql-request')

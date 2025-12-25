@@ -16,6 +16,7 @@ const sql = (f: string) => join(__dirname, '/../sql', f);
 const TestPlugin = (builder: any) => {
   builder.hook('GraphQLObjectType:fields', (fields: any, build: any, context: any) => {
     const { scope } = context;
+
     if (scope.isRootQuery) {
       return build.extend(fields, {
         testPluginField: {
@@ -24,6 +25,7 @@ const TestPlugin = (builder: any) => {
         }
       });
     }
+
     return fields;
   });
 };
@@ -32,6 +34,7 @@ const TestPlugin = (builder: any) => {
 const AnotherTestPlugin = (builder: any) => {
   builder.hook('GraphQLObjectType:fields', (fields: any, build: any, context: any) => {
     const { scope } = context;
+
     if (scope.isRootQuery) {
       return build.extend(fields, {
         anotherTestField: {
@@ -40,6 +43,7 @@ const AnotherTestPlugin = (builder: any) => {
         }
       });
     }
+
     return fields;
   });
 };
@@ -82,22 +86,26 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
+
       expect(res.data?.testPluginField).toBe('test-plugin-value');
       expect(res.errors).toBeUndefined();
     });
 
     it('should include plugin field in introspection', async () => {
       const res = await query(IntrospectionQuery);
+
       expect(res.data).not.toBeNull();
       expect(res.data).not.toBeUndefined();
       expect(res.errors).toBeUndefined();
       
       const queryTypeName = res.data?.__schema?.queryType?.name;
+
       expect(queryTypeName).toBe('Query');
       
       // Find the Query type in the types array
       const types = res.data?.__schema?.types || [];
       const queryType = types.find((t: any) => t.name === queryTypeName);
+
       expect(queryType).not.toBeNull();
       expect(queryType).not.toBeUndefined();
       expect(queryType?.name).toBe('Query');
@@ -105,6 +113,7 @@ describe('graphile-test with plugins', () => {
       
       const fields = queryType?.fields || [];
       const testField = fields.find((f: any) => f.name === 'testPluginField');
+
       expect(testField).not.toBeNull();
       expect(testField).not.toBeUndefined();
       expect(testField?.name).toBe('testPluginField');
@@ -113,6 +122,7 @@ describe('graphile-test with plugins', () => {
       const typeName = testField.type?.name || 
                       testField.type?.ofType?.name || 
                       testField.type?.ofType?.ofType?.name;
+
       expect(typeName).toBe('String');
     });
   });
@@ -155,6 +165,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
+
       expect(res.data?.testPluginField).toBe('test-plugin-value');
       expect(res.data?.anotherTestField).toBe('another-test-value');
       expect(res.errors).toBeUndefined();
@@ -202,6 +213,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
+
       expect(res.data?.testPluginField).toBe('test-plugin-value');
       expect(res.errors).toBeUndefined();
     });
@@ -249,6 +261,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
+
       expect(res.data?.testPluginField).toBe('test-plugin-value');
       expect(res.errors).toBeUndefined();
     });
@@ -298,6 +311,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
+
       expect(res.data?.testPluginField).toBe('test-plugin-value');
       expect(res.data?.anotherTestField).toBe('another-test-value');
       expect(res.errors).toBeUndefined();

@@ -26,26 +26,31 @@ export class QueryBuilder {
 
   schema(schema: string): this {
     this.schemaName = schema;
+
     return this;
   }
 
   table(name: string): this {
     this.entityName = name;
+
     return this;
   }
 
   select(columns: string[] = ['*']): this {
     this.columns = columns;
+
     return this;
   }
 
   insert(values: Record<string, any>): this {
     this.values = values;
+
     return this;
   }
 
   update(values: Record<string, any>): this {
     this.values = values;
+
     return this;
   }
 
@@ -63,12 +68,14 @@ export class QueryBuilder {
     if (Array.isArray(args)) {
       // Handle array of arguments
       const formattedArgs = args.map((arg) => this.formatValue('', arg)).join(', ');
+
       argsClause = args.length > 0 ? `(${formattedArgs})` : '()';
     } else if (typeof args === 'object' && args !== null) {
       // Handle keyed object for named parameters
       const formattedArgs = Object.entries(args)
         .map(([key, value]) => `${this.escapeIdentifier(key)} := ${this.formatValue(key, value)}`)
         .join(', ');
+
       argsClause = Object.keys(args).length > 0 ? `(${formattedArgs})` : '()';
     }
   
@@ -81,31 +88,37 @@ export class QueryBuilder {
   where(column: string, operator: string, value: any): this {
     this.whereConditions.push({ column, operator, value });
     this.parameters.push(value);
+
     return this;
   }
 
   join(type: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL', table: string, on: string, schema: string | null = null): this {
     this.joins.push({ type, schema, table, on });
+
     return this;
   }
 
   groupBy(columns: string[]): this {
     this.groupByColumns.push(...columns);
+
     return this;
   }
 
   orderBy(column: string, direction: 'ASC' | 'DESC' = 'ASC'): this {
     this.orderByColumns.push({ column, direction });
+
     return this;
   }
 
   limit(limit: number): this {
     this.limitValue = limit;
+
     return this;
   }
 
   setTypes(types: Record<string, ValueType>): this {
     this.valueTypes = { ...this.valueTypes, ...types };
+
     return this;
   }
 
@@ -184,6 +197,7 @@ export class QueryBuilder {
   private buildDeleteQuery(): string {
     const fullyQualifiedTable = this.getFullyQualifiedTable();
     const whereClause = this.buildWhereClause();
+
     return `DELETE FROM ${fullyQualifiedTable}${whereClause};`;
   }
 
@@ -193,6 +207,7 @@ export class QueryBuilder {
         const fullyQualifiedJoinTable = schema
           ? `${this.escapeIdentifier(schema)}.${this.escapeIdentifier(table)}`
           : this.escapeIdentifier(table);
+
         return ` ${type} JOIN ${fullyQualifiedJoinTable} ON ${on}`;
       })
       .join('');
@@ -218,6 +233,7 @@ export class QueryBuilder {
       return '';
     }
     const groupBy = this.groupByColumns.map((col) => this.escapeIdentifier(col)).join(', ');
+
     return ` GROUP BY ${groupBy}`;
   }
   
@@ -228,6 +244,7 @@ export class QueryBuilder {
     const orderBy = this.orderByColumns
       .map(({ column, direction }) => `${this.escapeIdentifier(column)} ${direction}`)
       .join(', ');
+
     return ` ORDER BY ${orderBy}`;
   }  
 
@@ -235,6 +252,7 @@ export class QueryBuilder {
     if (this.needsQuoting(identifier)) {
       return `"${identifier.replace(/"/g, '""')}"`;
     }
+
     return identifier;
   }
 
@@ -266,13 +284,13 @@ export class QueryBuilder {
 
     if (typeof value === 'string') {
       return `'${value.replace(/'/g, "''")}'`;
-    } else if (typeof value === 'number' || typeof value === 'boolean') {
+    } if (typeof value === 'number' || typeof value === 'boolean') {
       return `${value}`;
-    } else if (value === null) {
+    } if (value === null) {
       return 'NULL';
-    } else {
+    } 
       throw new Error(`Unsupported value type: ${typeof value}`);
-    }
+    
   }
 
   private getFullyQualifiedTable(): string {
@@ -282,6 +300,7 @@ export class QueryBuilder {
     if (escapedSchema) {
       return `${escapedSchema}.${escapedTable}`;
     }
+
     return escapedTable;
   }
 }

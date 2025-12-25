@@ -23,6 +23,7 @@ export interface UploadResult {
 export const fileExists = async ({ client, bucket, key }: FileOperationArgs): Promise<boolean> => {
   try {
     await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+
     return true;
   } catch (e: any) {
     if (e.name === 'NotFound' || e.$metadata?.httpStatusCode === 404) return false;
@@ -87,7 +88,7 @@ export const upload = async ({
     ETag: result.ETag,
     Bucket: bucket,
     Key: key,
-    key: key, // v2 had both Key and key
+    key, // v2 had both Key and key
   };
 };
 
@@ -117,8 +118,9 @@ export const uploadThrough = ({
         ETag: data.ETag,
         Bucket: bucket,
         Key: key,
-        key: key, // v2 had both Key and key
+        key, // v2 had both Key and key
       };
+
       pass.emit('upload', result);
     })
     .catch((err) => {

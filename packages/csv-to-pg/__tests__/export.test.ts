@@ -1,12 +1,13 @@
 // @ts-nocheck
 
-import { parse, parseTypes } from '../src';
 import { resolve } from 'path';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from '../src/utils';
-import { Parser } from '../src/parser';
 
-const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
+import { parse, parseTypes } from '../src';
+import { Parser } from '../src/parser';
+import { InsertMany } from '../src/utils';
+
+const testCase = resolve(`${__dirname  }/../__fixtures__/test-case.csv`);
 
 const config = {
   schema: 'collections_public',

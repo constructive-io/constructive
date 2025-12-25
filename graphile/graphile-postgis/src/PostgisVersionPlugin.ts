@@ -23,6 +23,7 @@ const plugin: Plugin = (builder) => {
         );
       }
     };
+
     depends('graphile-build-pg', '^4.4.0');
 
     // Register this plugin

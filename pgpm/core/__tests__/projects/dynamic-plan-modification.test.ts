@@ -26,7 +26,8 @@ describe('Forked Deployment with deployModules', () => {
     const verifyDir = join(packagePath, 'verify');
     
     const originalPlan = readFileSync(planPath, 'utf8');
-    const modifiedPlan = originalPlan.trimEnd() + '\ntable_orders [table_products] 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add table_orders\n';
+    const modifiedPlan = `${originalPlan.trimEnd()  }\ntable_orders [table_products] 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add table_orders\n`;
+
     writeFileSync(planPath, modifiedPlan);
     
     writeFileSync(join(deployDir, 'table_orders.sql'), `-- Deploy my-first:table_orders to pg
@@ -68,10 +69,12 @@ SELECT 1/count(*) FROM information_schema.tables WHERE table_schema = 'myfirstap
     expect(await db.exists('table', 'myfirstapp.orders')).toBe(true);
     
     const schemas = await db.query('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \'myfirstapp\'');
+
     expect(schemas.rows).toHaveLength(1);
     expect(schemas.rows[0].schema_name).toBe('myfirstapp');
     
     const tables = await db.query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'myfirstapp\' ORDER BY table_name');
+
     expect(tables.rows).toHaveLength(3);
     expect(tables.rows.map((r: any) => r.table_name)).toEqual(['orders', 'products', 'users']);
     

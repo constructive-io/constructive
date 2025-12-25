@@ -40,17 +40,21 @@ describe('auth() method', () => {
 
   it('sets role and userId', async () => {
     const authRole = getRoleName('authenticated');
+
     db.auth({ role: authRole, userId: '12345' });
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(role.rows[0].role).toBe(authRole);
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('12345');
   });
 
   it('sets role with custom userIdKey', async () => {
     const authRole = getRoleName('authenticated');
+
     db.auth({ 
       role: authRole, 
       userId: 'custom-123',
@@ -58,25 +62,31 @@ describe('auth() method', () => {
     });
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(role.rows[0].role).toBe(authRole);
 
     const userId = await db.query('SELECT current_setting(\'app.user.id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('custom-123');
   });
 
   it('handles numeric userId', async () => {
     const authRole = getRoleName('authenticated');
+
     db.auth({ role: authRole, userId: 99999 });
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('99999');
   });
 
   it('sets role without userId', async () => {
     const authRole = getRoleName('authenticated');
+
     db.auth({ role: authRole });
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(role.rows[0].role).toBe(authRole);
   });
 });
@@ -95,20 +105,25 @@ describe('auth() with default role', () => {
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
     const expectedRole = getRoleName('authenticated');
+
     expect(role.rows[0].role).toBe(expectedRole);
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('test-user-456');
   });
 
   it('allows explicit role override', async () => {
     const anonRole = getRoleName('anonymous');
+
     db.auth({ userId: 'admin-user-789', role: anonRole });
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(role.rows[0].role).toBe(anonRole);
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('admin-user-789');
   });
 
@@ -116,6 +131,7 @@ describe('auth() with default role', () => {
     db.auth({ userId: 42 });
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('42');
   });
 });
@@ -131,6 +147,7 @@ describe('clearContext() method', () => {
 
   it('clears all session variables', async () => {
     const authRole = getRoleName('authenticated');
+
     db.setContext({
       role: authRole,
       'jwt.claims.user_id': 'test-123',
@@ -139,36 +156,43 @@ describe('clearContext() method', () => {
     });
 
     const roleBefore = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(roleBefore.rows[0].role).toBe(authRole);
 
     const userIdBefore = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userIdBefore.rows[0].user_id).toBe('test-123');
 
     db.clearContext();
 
     const defaultRole = getRoleName('anonymous');
     const roleAfter = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(roleAfter.rows[0].role).toBe(defaultRole);
 
     const userIdAfter = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userIdAfter.rows[0].user_id).toBe('');
 
   });
 
   it('allows setting new context after clearing', async () => {
     const authRole = getRoleName('authenticated');
+
     db.setContext({
       role: authRole,
       'jwt.claims.user_id': 'old-user'
     });
 
     const userIdBefore = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userIdBefore.rows[0].user_id).toBe('old-user');
 
     db.clearContext();
     db.auth({ userId: 'new-user' });
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('new-user');
   });
 });
@@ -188,11 +212,13 @@ describe('publish() method', () => {
     await pg.query(`INSERT INTO test_users (email, name) VALUES ('alice@test.com', 'Alice')`);
 
     const beforePublish = await db.any('SELECT * FROM test_users WHERE email = $1', ['alice@test.com']);
+
     expect(beforePublish.length).toBe(0);
 
     await pg.publish();
 
     const afterPublish = await db.any('SELECT * FROM test_users WHERE email = $1', ['alice@test.com']);
+
     expect(afterPublish.length).toBe(1);
     expect(afterPublish[0].email).toBe('alice@test.com');
     expect(afterPublish[0].name).toBe('Alice');
@@ -200,14 +226,17 @@ describe('publish() method', () => {
 
   it('preserves context after publish', async () => {
     const authRole = getRoleName('authenticated');
+
     db.auth({ role: authRole, userId: 'test-999' });
 
     await db.publish();
 
     const role = await db.query('SELECT current_setting(\'role\', true) AS role');
+
     expect(role.rows[0].role).toBe(authRole);
 
     const userId = await db.query('SELECT current_setting(\'jwt.claims.user_id\', true) AS user_id');
+
     expect(userId.rows[0].user_id).toBe('test-999');
   });
 
@@ -218,11 +247,13 @@ describe('publish() method', () => {
     await pg.query(`INSERT INTO test_users (email, name) VALUES ('charlie@test.com', 'Charlie')`);
 
     const beforeRollback = await pg.any('SELECT * FROM test_users WHERE email IN ($1, $2)', ['bob@test.com', 'charlie@test.com']);
+
     expect(beforeRollback.length).toBe(2);
 
     await pg.rollback();  // Rollback Charlie to the savepoint created by publish() (important-comment)
 
     const afterRollback = await pg.any('SELECT * FROM test_users WHERE email IN ($1, $2)', ['bob@test.com', 'charlie@test.com']);
+
     expect(afterRollback.length).toBe(1);  // Only Bob remains (was committed via publish) (important-comment)
     expect(afterRollback[0].email).toBe('bob@test.com');
     

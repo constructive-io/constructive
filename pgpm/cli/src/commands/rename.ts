@@ -8,6 +8,7 @@ import { cliExitWithError } from '../utils/cli-error';
 export default async (argv: Partial<ParsedArgs>, _prompter: Inquirerer) => {
   const cwd = (argv.cwd as string) || process.cwd();
   const to = (argv.to as string) || (argv._ && argv._[0] as string);
+
   if (!to) {
     await cliExitWithError('Missing new name. Use --to <name> or provide as positional argument.');
   }
@@ -15,6 +16,7 @@ export default async (argv: Partial<ParsedArgs>, _prompter: Inquirerer) => {
   const syncPkg = !!argv['sync-pkg-name'] || !!argv.syncPkgName;
   const proj = new PgpmPackage(path.resolve(cwd));
   const res = proj.renameModule(to, { dryRun, syncPackageJsonName: syncPkg });
+
   if (dryRun) {
     console.log('Dry run');
   }

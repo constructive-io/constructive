@@ -1,6 +1,7 @@
 // @ts-nocheck
-import { useState, useMemo, useContext } from 'react';
 import { GraphQLClient } from 'graphql-request';
+import { useContext,useMemo, useState } from 'react';
+
 import { getLqlContext } from './context';
 
 export const useGraphqlClient = () => {
@@ -8,6 +9,7 @@ export const useGraphqlClient = () => {
   const [headers, setHeaders] = useState({});
 
   const context = useContext(getLqlContext());
+
   if (!context || !context.endpointUrl) {
     throw new Error('Missing LqlProvider');
   }

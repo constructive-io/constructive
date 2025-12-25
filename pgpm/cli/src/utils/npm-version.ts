@@ -17,6 +17,7 @@ export async function fetchLatestVersion(pkgName: string, timeoutMs = 5000): Pro
       : (result as any)?.stdout ?? '';
 
     const parsed = parseVersionOutput(stdout);
+
     return parsed ?? null;
   } catch {
     return null;
@@ -25,10 +26,12 @@ export async function fetchLatestVersion(pkgName: string, timeoutMs = 5000): Pro
 
 const parseVersionOutput = (raw: string): string | null => {
   const trimmed = raw.trim();
+
   if (!trimmed.length) return null;
 
   try {
     const parsed = JSON.parse(trimmed);
+
     if (typeof parsed === 'string') return parsed;
     if (Array.isArray(parsed) && parsed.length) {
       return String(parsed[parsed.length - 1]);

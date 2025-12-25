@@ -21,6 +21,7 @@ export const makeIntrospectionQuery = (serverVersionNum: number, options: Intros
           where pg_auth_members.roleid = pg_roles.oid
             and pg_auth_members.member = accessible_roles._oid 
       `;
+
   return `\
     -- @see https://www.postgresql.org/docs/9.5/static/catalogs.html
     -- @see https://github.com/graphile/graphile-engine/blob/master/packages/graphile-build-pg/src/plugins/introspectionQuery.js

@@ -107,6 +107,7 @@ export interface PgSimpleInflectorOptions {
 const fixCapitalisedPlural = (fn: InflectionStringFn): InflectionStringFn =>
   function capitalisedPlural(this: PgInflection, str: string): string {
     const original = fn.call(this, str);
+
     return original.replace(/[0-9]S(?=[A-Z]|$)/g, (match) => match.toLowerCase());
   };
 
@@ -120,6 +121,7 @@ const fixChangePlural = (fn: InflectionStringFn): InflectionStringFn =>
     const prefix = str.slice(0, index);
     const word = str.slice(index, suffixIndex);
     const suffix = str.slice(suffixIndex);
+
     return `${prefix}${fn.call(this, word)}${suffix}`;
   };
 
@@ -147,7 +149,7 @@ export const PgSimpleInflector: Plugin = (
     pgOmitListSuffix !== true &&
     pgOmitListSuffix !== false
   ) {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       'You can simplify the inflector further by adding `{graphileBuildOptions: {pgOmitListSuffix: true}}` to the options passed to PostGraphile, however be aware that doing so will mean that later enabling relay connections will be a breaking change. To dismiss this message, set `pgOmitListSuffix` to false instead.'
     );
@@ -179,6 +181,7 @@ export const PgSimpleInflector: Plugin = (
       distinctPluralize(this: PgInflection, str: string) {
         const singular = this.singularize(str);
         const plural = this.pluralize(singular);
+
         if (singular !== plural) {
           return plural;
         }
@@ -190,11 +193,12 @@ export const PgSimpleInflector: Plugin = (
           plural.endsWith('z')
         ) {
           return `${plural}es`;
-        } else if (plural.endsWith('y')) {
+        } if (plural.endsWith('y')) {
           return `${plural.slice(0, -1)}ies`;
-        } else {
-          return `${plural}s`;
         }
+ 
+          return `${plural}s`;
+        
       },
 
       // Fix a naming bug
@@ -208,19 +212,23 @@ export const PgSimpleInflector: Plugin = (
         const matches = columnName.match(
           /^(.+?)(_row_id|_id|_uuid|_fk|_pk|RowId|Id|Uuid|UUID|Fk|Pk)$/
         );
+
         if (matches) {
           return matches[1];
         }
+
         return null;
       },
 
       baseNameMatches(this: PgInflection, baseName: string | null, otherName: string) {
         const singularizedName = this.singularize(otherName);
+
         return baseName === singularizedName;
       },
 
       baseNameMatchesAny(this: PgInflection, baseName: string | null, otherName: string) {
         if (!baseName) return false;
+
         return this.singularize(baseName) === this.singularize(otherName);
       },
 
@@ -254,16 +262,19 @@ export const PgSimpleInflector: Plugin = (
         if (detailedKeys.length === 1) {
           const key = detailedKeys[0];
           const columnName = this._columnName(key);
+
           return this.getBaseName?.(columnName) ?? null;
         }
         if (pgSimplifyMultikeyRelations) {
           const columnNames = detailedKeys.map((key) => this._columnName(key));
           const baseNames = columnNames.map((columnName) => this.getBaseName?.(columnName) ?? null);
+
           // Check none are null
           if (baseNames.every((n) => n)) {
             return baseNames.join('-');
           }
         }
+
         return null;
       },
 
@@ -318,6 +329,7 @@ export const PgSimpleInflector: Plugin = (
         }
 
         const baseName = this.getBaseNameFromKeys(detailedKeys);
+
         if (constraint.classId === constraint.foreignClassId) {
           if (baseName && this.baseNameMatchesAny?.(baseName, table.name)) {
             return oldInflection.singleRelationByKeys(
@@ -336,6 +348,7 @@ export const PgSimpleInflector: Plugin = (
         if (this.baseNameMatches?.(baseName, table.name)) {
           return this.camelCase(`${this._singularizedTableName(table)}`);
         }
+
         return oldInflection.singleRelationByKeys(
           detailedKeys,
           table,
@@ -369,6 +382,7 @@ export const PgSimpleInflector: Plugin = (
         if (baseName && this.baseNameMatches?.(baseName, foreignTable.name)) {
           return this.camelCase(`${this._singularizedTableName(table)}`);
         }
+
         return oldInflection.singleRelationByKeysBackwards(
           detailedKeys,
           table,
@@ -405,6 +419,7 @@ export const PgSimpleInflector: Plugin = (
             `${this.distinctPluralize(this._singularizedTableName(table))}`
           );
         }
+
         return null;
       },
 
@@ -418,9 +433,10 @@ export const PgSimpleInflector: Plugin = (
         if (constraint.tags.foreignFieldName) {
           if (constraint.tags.foreignSimpleFieldName) {
             return constraint.tags.foreignFieldName as string;
-          } else {
-            return `${constraint.tags.foreignFieldName}${ConnectionSuffix}`;
           }
+ 
+            return `${constraint.tags.foreignFieldName}${ConnectionSuffix}`;
+          
         }
         const base = this._manyRelationByKeysBase?.(
           detailedKeys,
@@ -428,9 +444,11 @@ export const PgSimpleInflector: Plugin = (
           foreignTable,
           constraint
         );
+
         if (base) {
           return base + ConnectionSuffix;
         }
+
         return (
           oldInflection.manyRelationByKeys(
             detailedKeys,
@@ -460,9 +478,11 @@ export const PgSimpleInflector: Plugin = (
           foreignTable,
           constraint
         );
+
         if (base) {
           return base + ListSuffix;
         }
+
         return (
           oldInflection.manyRelationByKeys(
             detailedKeys,
@@ -501,7 +521,8 @@ export const PgSimpleInflector: Plugin = (
               if (constraint.type === 'p') {
                 // Primary key, shorten!
                 return this.camelCase(this._singularizedTableName(table));
-              } else {
+              }
+ 
                 return this.camelCase(
                   `${this._singularizedTableName(
                     table
@@ -509,7 +530,7 @@ export const PgSimpleInflector: Plugin = (
                     .map((key) => this.column(key))
                     .join('-and-')}`
                 );
-              }
+              
             },
 
             updateByKeys(
@@ -526,7 +547,8 @@ export const PgSimpleInflector: Plugin = (
                 return this.camelCase(
                   `update-${this._singularizedTableName(table)}`
                 );
-              } else {
+              }
+ 
                 return this.camelCase(
                   `update-${this._singularizedTableName(
                     table
@@ -534,7 +556,7 @@ export const PgSimpleInflector: Plugin = (
                     .map((key) => this.column(key))
                     .join('-and-')}`
                 );
-              }
+              
             },
             deleteByKeys(
               this: PgInflection,
@@ -550,7 +572,8 @@ export const PgSimpleInflector: Plugin = (
                 return this.camelCase(
                   `delete-${this._singularizedTableName(table)}`
                 );
-              } else {
+              }
+ 
                 return this.camelCase(
                   `delete-${this._singularizedTableName(
                     table
@@ -558,7 +581,7 @@ export const PgSimpleInflector: Plugin = (
                     .map((key) => this.column(key))
                     .join('-and-')}`
                 );
-              }
+              
             },
             updateByKeysInputType(
               this: PgInflection,
@@ -576,7 +599,8 @@ export const PgSimpleInflector: Plugin = (
                 return this.upperCamelCase(
                   `update-${this._singularizedTableName(table)}-input`
                 );
-              } else {
+              }
+ 
                 return this.upperCamelCase(
                   `update-${this._singularizedTableName(
                     table
@@ -584,7 +608,7 @@ export const PgSimpleInflector: Plugin = (
                     .map((key) => this.column(key))
                     .join('-and-')}-input`
                 );
-              }
+              
             },
             deleteByKeysInputType(
               this: PgInflection,
@@ -602,7 +626,8 @@ export const PgSimpleInflector: Plugin = (
                 return this.upperCamelCase(
                   `delete-${this._singularizedTableName(table)}-input`
                 );
-              } else {
+              }
+ 
                 return this.upperCamelCase(
                   `delete-${this._singularizedTableName(
                     table
@@ -610,7 +635,7 @@ export const PgSimpleInflector: Plugin = (
                     .map((key) => this.column(key))
                     .join('-and-')}-input`
                 );
-              }
+              
             },
             updateNode(this: PgInflection, table: PgClass) {
               return this.camelCase(

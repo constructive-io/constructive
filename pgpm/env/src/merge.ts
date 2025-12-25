@@ -1,5 +1,6 @@
+import { DeploymentOptions,pgpmDefaults, PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
-import { pgpmDefaults, PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';
+
 import { loadConfigSync } from './config';
 import { getEnvVars } from './env';
 
@@ -52,5 +53,6 @@ export const getDeploymentEnvOptions = (overrides: Partial<DeploymentOptions> = 
   const opts = getEnvOptions({
     deployment: overrides
   }, cwd);
+
   return opts.deployment;
 };

@@ -12,11 +12,13 @@ export const walkUp = (startDir: string, filename: string): string => {
 
   while (currentDir) {
     const targetPath = resolve(currentDir, filename);
+
     if (existsSync(targetPath)) {
       return currentDir;
     }
 
     const parentDir = dirname(currentDir);
+
     if (parentDir === currentDir) {
       break;
     }

@@ -1,9 +1,10 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
 import { spawn } from 'child_process';
-import { fetchLatestVersion } from '../utils/npm-version';
+import { findAndRequirePackageJson } from 'find-and-require-package-json';
+import { CLIOptions, Inquirerer } from 'inquirerer';
+
 import { cliExitWithError } from '../utils/cli-error';
+import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('update');
 
@@ -24,6 +25,7 @@ Options:
 const runNpmInstall = (pkgName: string, registry?: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const args = ['install', '-g', pkgName];
+
     if (registry) {
       args.push('--registry', registry);
     }
@@ -60,6 +62,7 @@ export default async (
 
   if (dryRun) {
     log.info(`[dry-run] ${npmCommand}`);
+
     return argv;
   }
 
@@ -68,6 +71,7 @@ export default async (
   try {
     await runNpmInstall(pkgName, registry);
     const latest = await fetchLatestVersion(pkgName);
+
     if (latest) {
       log.success(`Successfully updated ${pkgName} to version ${latest}.`);
     } else {

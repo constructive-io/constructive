@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+
 import { writeSqitchPlan } from '../../../src/files/plan/writer';
 import { SqitchRow } from '../../../src/files/types';
 
@@ -49,9 +50,11 @@ describe('writeSqitchPlan', () => {
     writeSqitchPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
+
     expect(fs.existsSync(planPath)).toBe(true);
 
     const content = fs.readFileSync(planPath, 'utf-8');
+
     expect(content).toContain('%project=test-module');
     expect(content).toContain('John Doe <John Doe@5b0c196eeb62>');
     expect(content).toContain('schemas/test/schema 2017-08-11T08:11:51Z John Doe <John Doe@5b0c196eeb62>');
@@ -183,6 +186,7 @@ describe('writeSqitchPlan', () => {
 
     // Should only appear once
     const matches = content.match(/schemas\/test\/schema/g);
+
     expect(matches?.length).toBe(1); // Only in the header line, not duplicated
 
     expect(consoleSpy).toHaveBeenCalledWith('DUPLICATE schemas/test/schema');

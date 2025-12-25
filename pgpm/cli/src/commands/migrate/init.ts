@@ -33,6 +33,7 @@ export default async (
 
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 
@@ -54,6 +55,7 @@ export default async (
     
     // Check if there's an existing Sqitch deployment to import
     const hasSquitch = await client.hasSqitchTables();
+
     if (hasSquitch) {
       const { importSquitch } = await prompter.prompt(argv, [
         {

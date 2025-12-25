@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
-import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { GraphileCache, graphileCache } from 'graphile-cache';
 import graphqlUpload from 'graphql-upload';
@@ -53,6 +53,7 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
     };
 
     graphileCache.set(key, obj);
+
     return obj;
   };
 
@@ -67,6 +68,7 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
   app.use(async (req: Request, res: Response, next: NextFunction) => {
     if (req.urlDomains?.subdomains.length === 1) {
       const [dbName] = req.urlDomains.subdomains;
+
       try {
         const pgPool = getPgPool(
           getPgEnvOptions({
@@ -80,6 +82,7 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
           FROM pg_catalog.pg_namespace s
           WHERE s.nspname !~ '^pg_' AND s.nspname NOT IN ('information_schema');
         `);
+
         res.send(
           printSchemas({
             dbName,
@@ -89,23 +92,28 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
             port: server.port,
           })
         );
+
         return;
       } catch (e: any) {
         if (e.message?.match(/does not exist/)) {
           res.status(404).send('DB Not found');
+
           return;
         }
         console.error(e);
         res.status(500).send('Something happened...');
+
         return;
       }
     }
+
     return next();
   });
 
   app.use(async (req: Request, res: Response, next: NextFunction) => {
     if (req.urlDomains?.subdomains.length === 2) {
       const [, dbName] = req.urlDomains.subdomains;
+
       try {
         const pgPool = getPgPool(
           getPgEnvOptions({
@@ -118,28 +126,36 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
       } catch (e: any) {
         if (e.message?.match(/does not exist/)) {
           res.status(404).send('DB Not found');
+
           return;
         }
         console.error(e);
         res.status(500).send('Something happened...');
+
         return;
       }
     }
+
     return next();
   });
 
   app.use(async (req: Request, res: Response, next: NextFunction) => {
     if (req.urlDomains?.subdomains.length === 2) {
       const [schemaName, dbName] = req.urlDomains.subdomains;
+
       try {
         const { handler } = getGraphileInstanceObj(dbName, schemaName);
+
         handler(req, res, next);
+
         return;
       } catch (e: any) {
         res.status(500).send(e.message);
+
         return;
       }
     }
+
     return next();
   });
 
@@ -147,10 +163,13 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
     if (req.urlDomains?.subdomains.length === 2 && req.url === '/flush') {
       const [schemaName, dbName] = req.urlDomains.subdomains;
       const key = `${dbName}.${schemaName}`;
+
       graphileCache.delete(key);
       res.status(200).send('OK');
+
       return;
     }
+
     return next();
   });
 
@@ -168,20 +187,25 @@ export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
           SELECT * FROM pg_catalog.pg_database
           WHERE datistemplate = FALSE AND datname != 'postgres' AND datname !~ '^pg_'
         `);
+
         res.send(
           printDatabases({ databases: results.rows, req, port: server.port })
         );
+
         return;
       } catch (e: any) {
         if (e.message?.match(/does not exist/)) {
           res.status(404).send('DB Not found');
+
           return;
         }
         console.error(e);
         res.status(500).send('Something happened...');
+
         return;
       }
     }
+
     return next();
   });
 

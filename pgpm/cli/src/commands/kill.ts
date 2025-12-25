@@ -51,6 +51,7 @@ export default async (
 
     if (!databasesResult.rows.length) {
       log.info(`ℹ️  No databases found matching pattern "${argv.pattern}". Exiting.`);
+
       return;
     }
 
@@ -66,10 +67,12 @@ export default async (
 
     if (!databasesResult.rows.length) {
       log.info('ℹ️  No databases found to process. Exiting.');
+
       return;
     }
 
     let databases: OptionValue[];
+
     ({ databases } = await prompter.prompt(argv, [
       {
         type: 'checkbox',
@@ -97,6 +100,7 @@ export default async (
 
   if (!yes) {
     log.info('❌ Aborted. No actions were taken.');
+
     return;
   }
 

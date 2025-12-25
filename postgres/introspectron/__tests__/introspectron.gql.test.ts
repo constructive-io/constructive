@@ -37,12 +37,14 @@ beforeEach(async () => {
 
 it('includes basic root types', () => {
   const typeNames = introspection.__schema.types.map((t) => t.name);
+
   expect(typeNames).toContain('Query');
   expect(typeNames).toContain('String');
 });
 
 it('includes standard GraphQL directives', () => {
   const directiveNames = introspection.__schema.directives.map((d) => d.name);
+
   expect(directiveNames).toContain('skip');
   expect(directiveNames).toContain('include');
   expect(directiveNames).toContain('deprecated');
@@ -50,16 +52,19 @@ it('includes standard GraphQL directives', () => {
 
 it('includes fields with arguments', () => {
   const testType = introspection.__schema.types.find((t) => t.name === 'Query');
+
   expect(testType?.fields?.length).toBeGreaterThan(0);
 
   const fieldWithArgs = testType?.fields?.find(
     (f: IntrospectionField) => f.args && f.args.length > 0
   );
+
   expect(fieldWithArgs).toBeDefined();
 });
 
 it('has stable structure', () => {
   const schema = introspection.__schema;
+
   expect(schema.queryType?.name).toBe('Query');
   expect(Array.isArray(schema.types)).toBe(true);
   expect(schema.types.length).toBeGreaterThan(5);

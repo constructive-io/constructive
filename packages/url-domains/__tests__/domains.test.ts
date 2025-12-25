@@ -41,6 +41,7 @@ cases(
         return options.host;
       }
     };
+
     // @ts-ignore
     expect(parseReq(req)).toMatchSnapshot();
   },
@@ -58,6 +59,7 @@ cases(
         return options.host;
       }
     };
+
     // @ts-ignore
     await parseMiddleware()(req, null, () => {});
     expect(req).toMatchSnapshot();

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+
 import runGetGraphqlSchema from '../src/commands/get-graphql-schema';
 
 jest.mock('@constructive-io/graphql-server', () => ({
@@ -44,6 +45,7 @@ describe('cnc get-graphql-schema (mocked)', () => {
 
     expect(fs.existsSync(outDbFile)).toBe(true);
     const sdl = fs.readFileSync(outDbFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('hello');
   });
@@ -59,6 +61,7 @@ describe('cnc get-graphql-schema (mocked)', () => {
 
     expect(fs.existsSync(outEndpointFile)).toBe(true);
     const sdl = fs.readFileSync(outEndpointFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('greeting');
   });
@@ -76,13 +79,16 @@ describe('cnc get-graphql-schema (mocked)', () => {
     // Verify file written
     expect(fs.existsSync(outEndpointHeaderHostFile)).toBe(true);
     const sdl = fs.readFileSync(outEndpointHeaderHostFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the headerHost argument
     const server = jest.requireMock('@constructive-io/graphql-server') as any;
+
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
+
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
     expect(lastCall[1]).toEqual({ headerHost: 'meta8.localhost' });
   });
@@ -100,13 +106,16 @@ describe('cnc get-graphql-schema (mocked)', () => {
     // Verify file written
     expect(fs.existsSync(outEndpointAuthFile)).toBe(true);
     const sdl = fs.readFileSync(outEndpointAuthFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the auth argument
     const server = jest.requireMock('@constructive-io/graphql-server') as any;
+
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
+
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
     expect(lastCall[1]).toEqual({ auth: 'Bearer 123' });
   });
@@ -124,13 +133,16 @@ describe('cnc get-graphql-schema (mocked)', () => {
     // Verify file written
     expect(fs.existsSync(outEndpointHeadersFile)).toBe(true);
     const sdl = fs.readFileSync(outEndpointHeadersFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received the headers argument
     const server = jest.requireMock('@constructive-io/graphql-server') as any;
+
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
+
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
     expect(lastCall[1]).toEqual({ headers: { 'X-Mode': 'fast', Authorization: 'Bearer ABC' } });
   });
@@ -149,13 +161,16 @@ describe('cnc get-graphql-schema (mocked)', () => {
     // Verify file written
     expect(fs.existsSync(outEndpointAuthAndHeaderFile)).toBe(true);
     const sdl = fs.readFileSync(outEndpointAuthAndHeaderFile, 'utf8');
+
     expect(sdl).toContain('type Query');
     expect(sdl).toContain('greeting');
 
     // Verify the mocked function received both auth and headers
     const server = jest.requireMock('@constructive-io/graphql-server') as any;
+
     expect(server.fetchEndpointSchemaSDL).toHaveBeenCalled();
     const lastCall = server.fetchEndpointSchemaSDL.mock.calls[server.fetchEndpointSchemaSDL.mock.calls.length - 1];
+
     expect(lastCall[0]).toBe('http://localhost:5555/graphql');
     expect(lastCall[1]).toEqual({ auth: 'Bearer 123', headers: { Authorization: 'Bearer override', 'X-Mode': 'fast' } });
   });

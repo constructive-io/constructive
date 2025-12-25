@@ -81,6 +81,7 @@ module.exports = {
 
   it('should have no config when no config file exists', () => {
     const project = new PgpmPackage(tempDir);
+
     expect(project.config).toBeUndefined();
     expect(project.workspacePath).toBeUndefined();
   });

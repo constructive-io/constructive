@@ -9,6 +9,7 @@ import { cleanTree } from '../../packaging/package';
  */
 export async function hashFile(filePath: string): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
+
   return createHash('sha256').update(content).digest('hex');
 }
 
@@ -27,5 +28,6 @@ export async function hashSqlFile(filePath: string): Promise<string> {
   const parsed = await parse(content);
   const cleaned = cleanTree(parsed);
   const astString = JSON.stringify(cleaned);
+
   return hashString(astString);
 }

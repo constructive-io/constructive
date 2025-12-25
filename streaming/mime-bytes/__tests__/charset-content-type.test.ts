@@ -11,21 +11,25 @@ describe('Charset-aware Content Type Detection', () => {
   describe('getContentTypeForExtension', () => {
     it('should return text/x-typescript for .ts files with utf-8 charset', () => {
       const contentType = getContentTypeForExtension('ts', 'utf-8');
+
       expect(contentType).toBe('text/x-typescript');
     });
 
     it('should return video/mp2t for .ts files with binary charset', () => {
       const contentType = getContentTypeForExtension('ts', 'binary');
+
       expect(contentType).toBe('video/mp2t');
     });
 
     it('should return text/x-typescript for .tsx files with utf-8 charset', () => {
       const contentType = getContentTypeForExtension('tsx', 'utf-8');
+
       expect(contentType).toBe('text/x-typescript');
     });
 
     it('should return null for .tsx files with binary charset', () => {
       const contentType = getContentTypeForExtension('tsx', 'binary');
+
       expect(contentType).toBeNull();
     });
 
@@ -55,18 +59,21 @@ describe('Charset-aware Content Type Detection', () => {
       `);
 
       const result = await detector.detectFromBuffer(tsContent);
+
       expect(result).toBeDefined();
       expect(result?.charset).toBe('utf-8');
       
       // Since we don't have magic bytes for TS files, it will be detected as generic text
       // But the content type lookup should work with the charset
       const contentType = getContentTypeForExtension('ts', result?.charset);
+
       expect(contentType).toBe('text/x-typescript');
     });
 
     it('should detect binary MPEG-TS file as video/mp2t', async () => {
       // MPEG-TS sync byte pattern (0x47 every 188 bytes)
       const mpegTsContent = Buffer.alloc(376);
+
       mpegTsContent[0] = 0x47;
       mpegTsContent[188] = 0x47;
       // Add some binary data
@@ -75,9 +82,11 @@ describe('Charset-aware Content Type Detection', () => {
       }
 
       const result = await detector.detectFromBuffer(mpegTsContent);
+
       expect(result?.charset).toBe('binary');
       
       const contentType = getContentTypeForExtension('ts', result?.charset);
+
       expect(contentType).toBe('video/mp2t');
     });
   });
@@ -123,10 +132,12 @@ describe('Charset-aware Content Type Detection', () => {
       `);
 
       const result = await detector.detectFromBuffer(svgContent);
+
       expect(result).toBeDefined();
       
       // SVG files might be detected as XML or text
       const contentType = getContentTypeForExtension('svg');
+
       expect(contentType).toBe('image/svg+xml');
     });
   });

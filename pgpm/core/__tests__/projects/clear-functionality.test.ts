@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { PgpmPackage } from '../../src/core/class/pgpm';
-import { TestFixture } from '../../test-utils/TestFixture';
+
 import { parsePlanFile } from '../../src/files/plan/parser';
+import { TestFixture } from '../../test-utils/TestFixture';
 
 describe('Clear Functionality', () => {
   let fixture: TestFixture;
@@ -34,16 +34,20 @@ describe('Clear Functionality', () => {
     expect(fs.existsSync(path.join(deployDir, 'table_products.sql'))).toBe(true);
     
     const result = parsePlanFile(planPath);
+
     expect(result.errors.length).toBe(0);
     const plan = result.data!;
+
     expect(plan.changes.length).toBe(3);
     
     const firstChange = plan.changes[0].name;
+
     expect(firstChange).toBe('schema_myfirstapp');
     
     await pkg.removeFromPlan(firstChange);
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');
@@ -67,11 +71,14 @@ describe('Clear Functionality', () => {
     await pkg.removeFromPlan('schema_myfirstapp');
     
     const result = parsePlanFile(planPath);
+
     expect(result.errors.length).toBe(0);
     const plan = result.data!;
+
     expect(plan.changes.length).toBe(0);
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');
@@ -85,15 +92,19 @@ describe('Clear Functionality', () => {
     
     expect(result.errors.length).toBe(0);
     const plan = result.data!;
+
     expect(plan.changes.length).toBeGreaterThan(0);
     
     const firstChange = plan.changes[0].name;
+
     expect(firstChange).toBe('schema_myfirstapp');
     
     const secondChange = plan.changes[1].name;
+
     expect(secondChange).toBe('table_users');
     
     const thirdChange = plan.changes[2].name;
+
     expect(thirdChange).toBe('table_products');
   });
 
@@ -113,6 +124,7 @@ describe('Clear Functionality', () => {
     await pkg.removeFromPlan(firstChange);
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('@v1.0.0');
     expect(updatedPlan).not.toContain('@v1.1.0');
   });
@@ -136,6 +148,7 @@ describe('Clear Functionality', () => {
     await expect(pkg.removeFromPlan(firstChange)).resolves.not.toThrow();
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');

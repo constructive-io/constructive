@@ -18,6 +18,7 @@ it('sqitch package dependencies with resolved tags [simple-w-tags/1st]', async (
     'my-first',
     { tagResolution: 'resolve' }
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -27,6 +28,7 @@ it('sqitch package dependencies with resolved tags [simple-w-tags/2nd]', async (
     'my-second',
     { tagResolution: 'resolve' }
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -36,6 +38,7 @@ it('sqitch package dependencies with resolved tags [simple-w-tags/3rd]', async (
     'my-third',
     { tagResolution: 'resolve' }
   );
+
   expect(res).toMatchSnapshot();
 });
 describe('stage fixture dependency resolution - resolved tags', () => {
@@ -55,6 +58,7 @@ describe('stage fixture dependency resolution - resolved tags', () => {
       tagResolution: 'resolve',
       source: 'plan'
     });
+
     expect(res).toMatchSnapshot();
   });
 
@@ -64,6 +68,7 @@ describe('stage fixture dependency resolution - resolved tags', () => {
       tagResolution: 'resolve',
       source: 'sql'
     });
+
     expect(res).toMatchSnapshot();
   });
 });

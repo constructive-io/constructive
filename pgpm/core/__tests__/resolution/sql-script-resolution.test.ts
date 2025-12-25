@@ -90,15 +90,18 @@ describe('resolve tests', () => {
 
   it('resolves SQL in proper order', async () => {
     const sql = await resolve(baseFixture.getFixturePath('basic'));
+
     expect(sql).toBeTruthy();
     expect(sql.trim()).toBe(expectResult);
   });
 
   it('resolves SQL in proper order using cwd()', async () => {
     const originalDir = process.cwd();
+
     try {
       process.chdir(baseFixture.getFixturePath('basic'));
       const sql = await resolve();
+
       expect(sql).toBeTruthy();
       expect(sql.trim()).toBe(expectResult);
     } finally {
@@ -108,9 +111,11 @@ describe('resolve tests', () => {
 
   it('resolves SQL in plan order', async () => {
     const originalDir = process.cwd();
+
     try {
       process.chdir(baseFixture.getFixturePath('basic'));
       const sql = await resolveWithPlan();
+
       expect(sql).toBeTruthy();
       expect(sql.trim()).toBe(expectResult);
     } finally {

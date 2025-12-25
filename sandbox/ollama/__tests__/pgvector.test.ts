@@ -1,7 +1,8 @@
 process.env.LOG_SCOPE = 'ollama';
 jest.setTimeout(60000);
 
-import { PgTestClient, getConnections } from 'pgsql-test';
+import { getConnections,PgTestClient } from 'pgsql-test';
+
 import { OllamaClient } from '../src/utils/ollama';
 
 let pg: PgTestClient;
@@ -63,10 +64,12 @@ describe('Vector Search with Document Chunks', () => {
       `SELECT id, content FROM intelligence.chunks WHERE document_id = $1 ORDER BY chunk_index`,
       [docId]
     );
+
     console.log(`Generated ${chunks.rows.length} chunks`);
 
     for (const chunk of chunks.rows) {
       const chunkEmbedding = await ollama.generateEmbedding(chunk.content);
+
       await pg.client.query(
         'UPDATE intelligence.chunks SET embedding = $1::vector WHERE id = $2',
         [formatVector(chunkEmbedding), chunk.id]
@@ -77,6 +80,7 @@ describe('Vector Search with Document Chunks', () => {
     const chunksWithEmbeddings = await pg.client.query(
       'SELECT COUNT(*) FROM intelligence.chunks WHERE embedding IS NOT NULL'
     );
+
     expect(Number(chunksWithEmbeddings.rows[0].count)).toBeGreaterThan(0);
 
     // 6. Search for similar chunks using a query

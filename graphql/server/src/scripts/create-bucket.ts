@@ -2,8 +2,8 @@
 // Avoid strict type coupling between different @aws-sdk/client-s3 versions
 
 import { S3Client } from '@aws-sdk/client-s3';
-import { createS3Bucket } from '@constructive-io/s3-utils';
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { createS3Bucket } from '@constructive-io/s3-utils';
 
 (async () => {
   try {
@@ -27,6 +27,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
     process.env.IS_MINIO = 'true';
 
     const res = await createS3Bucket(client as any, bucket);
+
     console.log(`[create-bucket] ${bucket}:`, res);
 
     client.destroy();

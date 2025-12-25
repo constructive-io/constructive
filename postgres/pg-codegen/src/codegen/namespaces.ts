@@ -79,6 +79,7 @@ export const generateCode = (databaseObjects: DatabaseObject[], options: Codegen
       t.identifier(namespace),
       t.tsModuleBlock(namespaces[namespace])
     );
+
     namespaceDeclaration.declare = true;
     programBody.push(namespaceDeclaration);
   });

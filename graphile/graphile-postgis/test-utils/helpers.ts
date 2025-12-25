@@ -1,15 +1,14 @@
+import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections, seed } from 'graphile-test';
+import type { GraphQLSchema } from 'graphql';
 import {
   buildASTSchema,
   buildClientSchema,
   getIntrospectionQuery,
+  type IntrospectionQuery,
   parse,
-  printSchema,
-  type IntrospectionQuery
-} from 'graphql';
+  printSchema} from 'graphql';
 import { join } from 'path';
-import type { GraphQLSchema } from 'graphql';
-import type { GraphQLQueryFn } from 'graphile-test';
-import { getConnections, seed } from 'graphile-test';
 
 import PostgisPlugin from '../src';
 
@@ -20,6 +19,7 @@ export const printSchemaOrdered = (originalSchema: GraphQLSchema): string => {
   const schema = buildASTSchema(parse(printSchema(originalSchema)));
 
   const typeMap = schema.getTypeMap();
+
   Object.keys(typeMap).forEach((name) => {
     const gqlType = typeMap[name];
 
@@ -27,6 +27,7 @@ export const printSchemaOrdered = (originalSchema: GraphQLSchema): string => {
     if ('getFields' in gqlType && typeof gqlType.getFields === 'function') {
       const fields = gqlType.getFields();
       const keys = Object.keys(fields).sort();
+
       keys.forEach((key) => {
         const value = fields[key] as { args?: Array<{ name: string }> };
 
@@ -56,10 +57,12 @@ export const getSchemaSnapshot = async (
   query: GraphQLQueryFn
 ): Promise<string> => {
   const result = await query<IntrospectionQuery>(getIntrospectionQuery());
+
   if (!result.data) {
     throw new Error('No data returned from introspection query');
   }
   const schema = buildClientSchema(result.data);
+
   return printSchemaOrdered(schema);
 };
 

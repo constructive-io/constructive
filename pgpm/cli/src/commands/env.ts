@@ -57,8 +57,10 @@ function configToEnvVars(config: PgConfig): Record<string, string> {
 
 function printExports(config: PgConfig): void {
   const envVars = configToEnvVars(config);
+
   for (const [key, value] of Object.entries(envVars)) {
     const escapedValue = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
     console.log(`export ${key}="${escapedValue}"`);
   }
 }
@@ -102,6 +104,7 @@ export default async (
   const rawArgs = process.argv.slice(2);
   
   let envIndex = rawArgs.findIndex(arg => arg === 'env');
+
   if (envIndex === -1) {
     envIndex = 0;
   }
@@ -111,6 +114,7 @@ export default async (
   const supabaseIndex = argsAfterEnv.findIndex(arg => arg === '--supabase');
   
   let commandArgs: string[];
+
   if (supabaseIndex !== -1) {
     commandArgs = argsAfterEnv.slice(supabaseIndex + 1);
   } else {
@@ -120,12 +124,14 @@ export default async (
   commandArgs = commandArgs.filter(arg => arg !== '--cwd' && !arg.startsWith('--cwd='));
   
   const cwdIndex = commandArgs.findIndex(arg => arg === '--cwd');
+
   if (cwdIndex !== -1 && cwdIndex + 1 < commandArgs.length) {
     commandArgs.splice(cwdIndex, 2);
   }
 
   if (commandArgs.length === 0) {
     printExports(profile);
+
     return;
   }
 
@@ -133,6 +139,7 @@ export default async (
   
   try {
     const exitCode = await executeCommand(profile, command, args);
+
     process.exit(exitCode);
   } catch (error) {
     if (error instanceof Error) {

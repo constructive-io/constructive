@@ -11,6 +11,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
 ) => {
   const { connectionFilterSetofFunctions } =
     rawOptions as ConnectionFilterConfig;
+
   builder.hook('GraphQLInputObjectType:fields', (fields, build, context) => {
     const {
       extend,
@@ -42,6 +43,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
 
     // Must return a `RECORD` type
     const isRecordLike = proc.returnTypeId === '2249';
+
     if (!isRecordLike) return fields;
 
     // Must be marked @filterable OR enabled via plugin option
@@ -57,6 +59,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
       if (argModesWithOutput.includes(proc.argModes[idx])) {
         prev.push(proc.argNames[idx] || '');
       }
+
       return prev;
     }, []);
     const outputArgTypes = proc.argTypeIds.reduce(
@@ -64,6 +67,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
         if (argModesWithOutput.includes(proc.argModes[idx])) {
           prev.push(introspectionResultsByKind.typeById[typeId]);
         }
+
         return prev;
       },
       []
@@ -80,6 +84,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
           outputArgName,
           idx + 1
         );
+
         if (memo[fieldName]) {
           throw new Error(
             `Tried to register field name '${fieldName}' twice in '${describePgEntity(
@@ -91,6 +96,7 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
           name: outputArgName,
           type: outputArgTypes[idx],
         };
+
         return memo;
       },
       {}
@@ -103,9 +109,11 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
           outputArg.type.id,
           null
         );
+
         if (!OperatorsType) {
           return memo;
         }
+
         return extend(memo, {
           [fieldName]: fieldWithHooks(
             fieldName,
@@ -160,4 +168,5 @@ const PgConnectionArgFilterRecordFunctionsPlugin: Plugin = (
     return extend(fields, outputArgFields);
   });
 };
+
 export default PgConnectionArgFilterRecordFunctionsPlugin;

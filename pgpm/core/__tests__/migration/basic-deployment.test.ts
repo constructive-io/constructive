@@ -35,6 +35,7 @@ describe('Deploy Command', () => {
     
     // Verify it was recorded
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(1);
     expect(deployed[0]).toMatchObject({
       package: 'test-simple',
@@ -59,9 +60,11 @@ describe('Deploy Command', () => {
     
     // Verify dependencies were recorded
     const tableDeps = await db.getDependencies('test-simple', 'table');
+
     expect(tableDeps).toContain('test-simple:schema');
     
     const indexDeps = await db.getDependencies('test-simple', 'index');
+
     expect(indexDeps).toContain('test-simple:table');
   });
   
@@ -111,6 +114,7 @@ describe('Deploy Command', () => {
     
     // Verify nothing was deployed due to rollback
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(0);
     
     // Verify table doesn't exist
@@ -144,6 +148,7 @@ describe('Deploy Command', () => {
     
     // Verify first change was deployed
     const deployed = await db.getDeployedChanges();
+
     expect(deployed).toHaveLength(1);
     expect(deployed[0].change_name).toBe('good_change');
     

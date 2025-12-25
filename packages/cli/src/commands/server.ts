@@ -1,6 +1,6 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
-import { Logger } from '@pgpmjs/logger';
 import { GraphQLServer as server } from '@constructive-io/graphql-server';
+import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
@@ -130,6 +130,7 @@ export default async (
   // Warn when passing CORS override via CLI, especially in production
   if (origin && origin.trim().length) {
     const env = (process.env.NODE_ENV || 'development').toLowerCase();
+
     if (env === 'production') {
       if (origin.trim() === '*') {
         log.warn('CORS wildcard ("*") provided via --origin in production: this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.');
@@ -142,6 +143,7 @@ export default async (
   let selectedSchemas: string[] = [];
   let authRole: string | undefined;
   let roleName: string | undefined;
+
   if (!metaApi) {
     const db = await getPgPool({ database: selectedDb });
     const result = await db.query(`
@@ -183,6 +185,7 @@ export default async (
         required: true
       }
     ]);
+
     authRole = selectedAuthRole;
     roleName = selectedRoleName;
   }

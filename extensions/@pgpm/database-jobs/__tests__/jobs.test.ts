@@ -30,6 +30,7 @@ describe('scheduled jobs', () => {
         }
       ]
     );
+
     objs.scheduled1 = result;
   });
 
@@ -48,6 +49,7 @@ describe('scheduled jobs', () => {
         { start, end, rule: '*/1 * * * *' }
       ]
     );
+
     objs.scheduled2 = result;
   });
 
@@ -58,6 +60,7 @@ describe('scheduled jobs', () => {
     );
 
     const { queue_name, run_at, created_at, updated_at, ...obj } = result;
+
     expect(obj).toMatchSnapshot();
   });
 

@@ -1,9 +1,9 @@
 import { getEnvOptions, getNodeEnv, parseEnvBoolean } from '@pgpmjs/env';
-import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
-import { getPgPool } from 'pg-cache';
-import type { Pool } from 'pg';
 import type { PgpmOptions } from '@pgpmjs/types';
 import { jobsDefaults } from '@pgpmjs/types';
+import type { Pool } from 'pg';
+import { getPgPool } from 'pg-cache';
+import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 
 type Maybe<T> = T | null | undefined;
 
@@ -31,6 +31,7 @@ export const getJobConnectionString = (): string => {
   const auth = cfg.user
     ? `${cfg.user}${cfg.password ? `:${cfg.password}` : ''}@`
     : '';
+
   return `postgres://${auth}${cfg.host}:${cfg.port}/${cfg.database}`;
 };
 
@@ -38,6 +39,7 @@ export const getJobConnectionString = (): string => {
 export const getJobSchema = (): string => {
   const opts: PgpmOptions = getEnvOptions();
   const fromOpts: string | undefined = opts.jobs?.schema?.schema;
+
   return (
     fromOpts ||
     jobsDefaults.schema?.schema ||
@@ -49,6 +51,7 @@ export const getJobSchema = (): string => {
 export const getJobSupportAny = (): boolean => {
   const opts: PgpmOptions = getEnvOptions();
   const envVal = parseEnvBoolean(process.env.JOBS_SUPPORT_ANY);
+
   if (typeof envVal === 'boolean') return envVal;
 
   const worker: boolean | undefined = opts.jobs?.worker?.supportAny;
@@ -78,6 +81,7 @@ export const getJobSupported = (): string[] => {
 // ---- Hostnames ----
 export const getWorkerHostname = (): string => {
   const opts: PgpmOptions = getEnvOptions();
+
   return (
     process.env.HOSTNAME ||
     opts.jobs?.worker?.hostname ||
@@ -88,6 +92,7 @@ export const getWorkerHostname = (): string => {
 
 export const getSchedulerHostname = (): string => {
   const opts: PgpmOptions = getEnvOptions();
+
   return (
     process.env.HOSTNAME ||
     opts.jobs?.scheduler?.hostname ||
@@ -123,6 +128,7 @@ export const getJobGatewayDevMap = ():
   | Record<string, string>
   | null => {
   const map = process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP;
+
   if (!map) return null;
   try {
     return JSON.parse(map);
@@ -133,6 +139,7 @@ export const getJobGatewayDevMap = ():
       'Value:',
       map
     );
+
     return null;
   }
 };
@@ -142,6 +149,7 @@ export const getNodeEnvironment = getNodeEnv;
 // Neutral callback helpers (generic HTTP callback)
 export const getJobsCallbackPort = (): number => {
   const { callbackPort } = getJobGatewayConfig();
+
   return callbackPort;
 };
 
@@ -151,5 +159,6 @@ export const getCallbackBaseUrl = (): string => {
   }
   const host = process.env.JOBS_CALLBACK_HOST || 'jobs-callback';
   const port = getJobsCallbackPort();
+
   return `http://${host}:${port}/callback`;
 };

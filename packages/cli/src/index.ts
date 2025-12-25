@@ -6,6 +6,7 @@ import { commands } from './commands';
 
 if (process.argv.includes('--version') || process.argv.includes('-v')) {
   const pkg = findAndRequirePackageJson(__dirname);
+
   console.log(pkg.version);
   process.exit(0);
 }

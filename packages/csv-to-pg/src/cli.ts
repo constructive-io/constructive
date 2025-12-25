@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+import { writeFileSync } from 'fs';
 import { CLI, type CommandHandler } from 'inquirerer';
+import { dirname } from 'path';
+
 import { readConfig } from './parse';
 import { Parser } from './parser';
 import { normalizePath } from './utils';
-import { dirname } from 'path';
-import { writeFileSync } from 'fs';
 
 interface ConfigFile {
   input?: string;
@@ -22,6 +23,7 @@ interface PromptResult {
 const handler: CommandHandler = async (argv, prompter) => {
   // Get config from positional argument or --config flag
   let configPath = argv._[0] as string | undefined;
+
   if (!configPath && argv.config) {
     configPath = argv.config as string;
   }
@@ -36,6 +38,7 @@ const handler: CommandHandler = async (argv, prompter) => {
         required: true
       }
     ]);
+
     configPath = result.config;
   }
 
@@ -77,7 +80,8 @@ const handler: CommandHandler = async (argv, prompter) => {
   config.output = results.output;
 
   let outFile = results.output!;
-  if (!outFile.endsWith('.sql')) outFile = outFile + '.sql';
+
+  if (!outFile.endsWith('.sql')) outFile = `${outFile  }.sql`;
   config.output = outFile;
 
   if (argv.debug) {
@@ -97,4 +101,5 @@ const handler: CommandHandler = async (argv, prompter) => {
 };
 
 const cli = new CLI(handler, {});
+
 cli.run();

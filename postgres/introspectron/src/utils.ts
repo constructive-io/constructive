@@ -10,11 +10,13 @@ export const parseTags = (
         return { ...prev, text: `${prev.text}\n${curr}` };
       }
       const match = curr.match(/^@[a-zA-Z][a-zA-Z0-9_]*($|\s)/);
+
       if (!match) {
         return { ...prev, text: curr };
       }
       const key = match[0].substr(1).trim();
       const value = match[0] === curr ? true : curr.replace(match[0], '');
+
       return {
         ...prev,
         tags: {
@@ -37,12 +39,14 @@ export const parseTags = (
 export const deepClone = <T>(value: T): T => {
   if (Array.isArray(value)) {
     return value.map((val) => deepClone(val)) as unknown as T;
-  } else if (typeof value === 'object' && value !== null) {
+  } if (typeof value === 'object' && value !== null) {
     return Object.keys(value).reduce((memo, k) => {
       (memo as any)[k] = deepClone((value as any)[k]);
+
       return memo;
     }, {} as any) as T;
-  } else {
-    return value;
   }
+ 
+    return value;
+  
 };

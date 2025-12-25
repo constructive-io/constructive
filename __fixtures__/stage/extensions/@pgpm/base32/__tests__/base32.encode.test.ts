@@ -1,5 +1,5 @@
-import { getConnections, PgTestClient } from 'pgsql-test';
 import cases from 'jest-in-case';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown:  () => Promise<void>;
@@ -18,6 +18,7 @@ it('to_ascii', async () => {
     `SELECT base32.to_ascii($1::text) AS to_ascii`,
     ['Cat']
   );
+
   expect(to_ascii).toEqual([67, 97, 116]);
 });
 
@@ -30,6 +31,7 @@ it('to_binary', async () => {
     `SELECT base32.to_binary($1::int[]) AS to_binary`,
     [to_ascii]
   );
+
   expect(to_binary).toEqual(['01000011', '01100001', '01110100']);
 });
 
@@ -38,6 +40,7 @@ it('to_groups', async () => {
     `SELECT base32.to_groups($1::text[]) AS to_groups`,
     [['01000011', '01100001', '01110100']]
   );
+
   expect(to_groups).toEqual([
     '01000011',
     '01100001',
@@ -52,6 +55,7 @@ it('to_chunks', async () => {
     `SELECT base32.to_chunks($1::text[]) AS to_chunks`,
     [['01000011', '01100001', '01110100', 'xxxxxxxx', 'xxxxxxxx']]
   );
+
   expect(to_chunks).toEqual([
     '01000',
     '01101',
@@ -78,6 +82,7 @@ it('fill_chunks', async () => {
       'xxxxx'
     ]]
   );
+
   expect(fill_chunks).toEqual([
     '01000',
     '01101',
@@ -104,6 +109,7 @@ it('to_decimal', async () => {
       'xxxxx'
     ]]
   );
+
   expect(to_decimal).toEqual(['8', '13', '16', '23', '8', '=', '=', '=']);
 });
 
@@ -112,6 +118,7 @@ it('to_base32', async () => {
     `SELECT base32.to_base32($1::text[]) AS to_base32`,
     [['8', '13', '16', '23', '8', '=', '=', '=']]
   );
+
   expect(to_base32).toEqual('INQXI===');
 });
 
@@ -122,6 +129,7 @@ cases(
       `SELECT base32.encode($1::text) AS encode`,
       [opts.name]
     );
+
     expect(encode).toEqual(opts.result);
     expect(encode).toMatchSnapshot();
   },

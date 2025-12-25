@@ -1,6 +1,6 @@
-import { Tsquery } from 'pg-tsquery';
-import { omit } from 'graphile-build-pg';
 import type { Plugin } from 'graphile-build';
+import { omit } from 'graphile-build-pg';
+import { Tsquery } from 'pg-tsquery';
 
 const tsquery = new Tsquery();
 
@@ -26,7 +26,8 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
         const columnName =
           attr.kind === 'procedure'
             ? attr.name.substring(table.name.length + 1)
-            : this._columnName(attr, { skipRowId: true }); // eslint-disable-line no-underscore-dangle
+            : this._columnName(attr, { skipRowId: true });
+  
         return this.constantCase(
           `${columnName}_rank_${ascending ? 'asc' : 'desc'}`
         );
@@ -46,6 +47,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
     const tsvectorType = introspectionResultsByKind.type.find(
       (t: any) => t.name === 'tsvector'
     );
+
     if (!tsvectorType) {
       throw new Error('Unable to find tsvector type through introspection.');
     }
@@ -93,6 +95,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
     }
 
     const InputType = getGqlInputTypeByTypeIdAndModifier(pgTsvType.id, null);
+
     addConnectionFilterOperator(
       InputType.name,
       'matches',
@@ -106,8 +109,10 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
         queryBuilder: QueryBuilder
       ) => {
         const tsQueryString = `${tsquery.parse(input) || ''}`;
+
         queryBuilder.__fts_ranks = queryBuilder.__fts_ranks || {};
         queryBuilder.__fts_ranks[fieldName] = [identifier, tsQueryString];
+
         return sql.query`${identifier} @@ to_tsquery(${sql.value(tsQueryString)})`;
       },
       {
@@ -149,6 +154,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
         type.namespaceId === table.namespaceId &&
         type.classId === table.id
     );
+
     if (!tableType) {
       throw new Error('Could not determine the type of this table.');
     }
@@ -178,6 +184,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
           addDataGenerator(({ alias }: any) => ({
             pgQuery: (queryBuilder: QueryBuilder) => {
               const { parentQueryBuilder } = queryBuilder;
+
               if (
                 !parentQueryBuilder ||
                 !parentQueryBuilder.__fts_ranks ||
@@ -187,12 +194,14 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
               }
               const [identifier, tsQueryString] =
                 parentQueryBuilder.__fts_ranks[baseFieldName];
+
               queryBuilder.select?.(
                 sql.fragment`ts_rank(${identifier}, to_tsquery(${sql.value(tsQueryString)}))`,
                 alias
               );
             },
           }));
+
           return {
             description: `Full-text search ranking when filtered by \`${baseFieldName}\`.`,
             type: GraphQLFloat,
@@ -207,6 +216,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
     const tsvFields = tsvColumns.reduce((memo: any, attr: any) => {
       const fieldName = inflection.column(attr);
       const rankFieldName = inflection.pgTsvRank(fieldName);
+
       memo[rankFieldName] = newRankField(fieldName, rankFieldName);
 
       return memo;
@@ -216,6 +226,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
       const psuedoColumnName = proc.name.substring(table.name.length + 1);
       const fieldName = inflection.computedColumn(psuedoColumnName, proc, table);
       const rankFieldName = inflection.pgTsvRank(fieldName);
+
       memo[rankFieldName] = newRankField(fieldName, rankFieldName);
 
       return memo;
@@ -248,6 +259,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
         type.namespaceId === table.namespaceId &&
         type.classId === table.id
     );
+
     if (!tableType) {
       throw new Error('Could not determine the type of this table.');
     }
@@ -301,6 +313,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
             }
             const [identifier, tsQueryString] =
               queryBuilder.__fts_ranks[fieldName];
+
             return sql.fragment`ts_rank(${identifier}, to_tsquery(${sql.value(tsQueryString)}))`;
           };
 

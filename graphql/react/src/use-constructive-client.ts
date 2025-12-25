@@ -1,5 +1,6 @@
+import { MetaObject,QueryBuilder } from '@constructive-io/graphql-query';
 import { useMemo } from 'react';
-import { QueryBuilder, MetaObject } from '@constructive-io/graphql-query';
+
 import { useIntrospection } from './use-introspection';
 import { useSchemaMeta } from './use-schema-meta';
 
@@ -9,6 +10,7 @@ export function useConstructiveQuery() {
 
   return useMemo(() => {
     if (!meta.data || !introspection.data) return null;
+
     return new QueryBuilder({
       meta: MetaObject.convertFromMetaSchema({ _meta: meta.data }),
       introspection: introspection.data

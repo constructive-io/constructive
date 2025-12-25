@@ -82,6 +82,7 @@ export const getInstalledExtensions = (controlFilePath: string): string[] => {
     }
 
     const requiresValue = match[1];
+
     if (!requiresValue || requiresValue.trim() === '') {
       return [];
     }

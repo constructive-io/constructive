@@ -46,6 +46,7 @@ describe('UUID v5', () => {
       const str = strings[i];
       const s = new StringStream(str);
       const stream = new UuidStream();
+
       res[str] = await getUuid(s.pipe(stream));
     }
 

@@ -1,6 +1,6 @@
+import { errors } from '@pgpmjs/types';
 import { existsSync } from 'fs';
 import { dirname, resolve } from 'path';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Recursively walks up directories to find a specific file (sync version).
@@ -13,11 +13,13 @@ export const walkUp = (startDir: string, filename: string): string => {
 
   while (currentDir) {
     const targetPath = resolve(currentDir, filename);
+
     if (existsSync(targetPath)) {
       return currentDir;
     }
 
     const parentDir = dirname(currentDir);
+
     if (parentDir === currentDir) {
       break;
     }

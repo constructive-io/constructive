@@ -88,6 +88,7 @@ describe('Validators', () => {
   describe('parseReference', () => {
     it('should parse plain change names', () => {
       const ref = parseReference('users_table');
+
       expect(ref).toMatchObject({
         change: 'users_table'
       });
@@ -95,6 +96,7 @@ describe('Validators', () => {
 
     it('should parse tag references', () => {
       const ref = parseReference('@v1.0.0');
+
       expect(ref).toMatchObject({
         tag: 'v1.0.0'
       });
@@ -102,6 +104,7 @@ describe('Validators', () => {
 
     it('should parse change at tag', () => {
       const ref = parseReference('users_table@v1.0.0');
+
       expect(ref).toMatchObject({
         change: 'users_table',
         tag: 'v1.0.0'
@@ -111,13 +114,15 @@ describe('Validators', () => {
     it('should parse SHA1 references', () => {
       const sha1 = 'abc1234567890123456789012345678901234567';
       const ref = parseReference(sha1);
+
       expect(ref).toMatchObject({
-        sha1: sha1
+        sha1
       });
     });
 
     it('should parse project-qualified references', () => {
       const ref = parseReference('other_project:users_table');
+
       expect(ref).toMatchObject({
         package: 'other_project',
         change: 'users_table'
@@ -171,6 +176,7 @@ describe('Validators', () => {
 
     it('should parse conflict references', () => {
       const ref = parseReference('!users_table');
+
       expect(ref).toBeNull(); // Conflicts are not parsed by parseReference
     });
 

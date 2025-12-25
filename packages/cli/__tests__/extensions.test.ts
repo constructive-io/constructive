@@ -38,6 +38,7 @@ describe('cmds:extension', () => {
     });
 
     const isInit = Array.isArray(argv._) && argv._.includes('init');
+
     if (isInit) {
       argv = withInitDefaults(argv);
     }

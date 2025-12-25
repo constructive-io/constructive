@@ -16,6 +16,7 @@ export class Database {
    */
   async withTransaction(fn: (client: PoolClient) => Promise<void>): Promise<void> {
     const client = await this.pool.connect();
+
     try {
       await client.query('BEGIN');
       try {

@@ -1,9 +1,11 @@
 // @ts-nocheck
 import React from 'react';
+
 import { getLqlContext } from './context';
 
 export const LqlProvider = ({ endpointUrl, children }) => {
   const LqlContext = getLqlContext();
+
   return (
     <LqlContext.Consumer>
       {(context = {}) => {
@@ -12,7 +14,7 @@ export const LqlProvider = ({ endpointUrl, children }) => {
         }
         if (!context.endpointUrl) {
           throw new Error(
-            'LqlProvider was not passed endpointUrl: ' + JSON.stringify(context)
+            `LqlProvider was not passed endpointUrl: ${  JSON.stringify(context)}`
           );
         }
 

@@ -10,6 +10,7 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
 ) => {
   const { connectionFilterComputedColumns } =
     rawOptions as ConnectionFilterConfig;
+
   builder.hook('GraphQLInputObjectType:fields', (fields, build, context) => {
     const {
       extend,
@@ -52,6 +53,7 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
         table,
         proc
       );
+
       if (!computedColumnDetails) return memo;
       const { pseudoColumnName } = computedColumnDetails;
 
@@ -63,6 +65,7 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
           proc.argModes[idx] === 'b' // this arg is `inout`
       ).length;
       const nonOptionalArgumentsCount = inputArgsCount - proc.argDefaultsNum;
+
       if (nonOptionalArgumentsCount > 1) {
         return memo;
       }
@@ -72,10 +75,13 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
       const returnType = introspectionResultsByKind.typeById[proc.returnTypeId];
       const returnTypeTable =
         introspectionResultsByKind.classById[returnType.classId];
+
       if (returnTypeTable) return memo;
       const isRecordLike = returnType.id === '2249';
+
       if (isRecordLike) return memo;
       const isVoid = String(returnType.id) === '2278';
+
       if (isVoid) return memo;
 
       // Looks good
@@ -84,7 +90,9 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
         proc,
         table
       );
+
       memo = build.extend(memo, { [fieldName]: proc });
+
       return memo;
     }, {});
 
@@ -97,10 +105,12 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
           proc.returnTypeId,
           null
         );
+
         if (!OperatorsType) {
           return memo;
         }
         operatorsTypeNameByFieldName[fieldName] = OperatorsType.name;
+
         return extend(memo, {
           [fieldName]: fieldWithHooks(
             fieldName,
@@ -166,8 +176,10 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
       ) {
         prev.push(build.pgIntrospectionResultsByKind.typeById[typeId]);
       }
+
       return prev;
     }, []);
+
     if (
       argTypes
         .slice(1)
@@ -180,6 +192,7 @@ const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
     }
 
     const pseudoColumnName = proc.name.substr(table.name.length + 1);
+
     return { argTypes, pseudoColumnName };
   }
 };

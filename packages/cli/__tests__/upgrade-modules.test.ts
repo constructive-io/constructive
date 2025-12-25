@@ -17,6 +17,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
 
     const workspaceName = 'my-workspace';
     const moduleName = 'my-module';
+
     workspaceDir = path.join(fixture.tempDir, workspaceName);
     moduleDir = path.join(workspaceDir, 'packages', moduleName);
 
@@ -33,7 +34,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       _: ['init'],
       cwd: workspaceDir,
       name: moduleName,
-      moduleName: moduleName,
+      moduleName,
       extensions: ['uuid-ossp', 'plpgsql'],
     });
   });
@@ -52,6 +53,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       // Should complete without error
       const mod = new PgpmPackage(moduleDir);
       const result = mod.getInstalledModules();
+
       expect(result.installed).toEqual([]);
     });
   });
@@ -74,6 +76,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       const pkgJson = JSON.parse(
         fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
       );
+
       expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
     });
   });
@@ -96,6 +99,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       const pkgJson = JSON.parse(
         fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
       );
+
       expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
     });
 
@@ -103,6 +107,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       let pkgJson = JSON.parse(
         fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
       );
+
       expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
 
       await fixture.runCmd({
@@ -121,6 +126,7 @@ describe('cmds:upgrade-modules - with initialized workspace and module', () => {
       let pkgJson = JSON.parse(
         fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
       );
+
       expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
 
       await fixture.runCmd({

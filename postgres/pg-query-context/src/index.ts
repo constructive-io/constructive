@@ -3,12 +3,14 @@ import { ClientBase, Pool, PoolClient, QueryResult } from 'pg';
 function setContext(ctx: Record<string, string>): string[] {
   return Object.keys(ctx || {}).reduce<string[]>((m, el) => {
     m.push(`SELECT set_config('${el}', '${ctx[el]}', true);`);
+
     return m;
   }, []);
 }
 
 async function execContext(client: ClientBase, ctx: Record<string, string>): Promise<void> {
   const local = setContext(ctx);
+
   for (const query of local) {
     await client.query(query);
   }
@@ -32,6 +34,7 @@ export default async ({ client, context = {}, query = '', variables = [] }: Exec
     await pgClient.query('BEGIN');
     await execContext(pgClient, context);
     const result = await pgClient.query(query, variables);
+
     await pgClient.query('COMMIT');
 
     return result;

@@ -22,6 +22,7 @@ export const transformProps = (obj: any, props: TransformProps): any => {
   if (obj instanceof Date) {
     copy = new Date();
     copy.setTime(obj.getTime());
+
     return copy;
   }
 
@@ -31,6 +32,7 @@ export const transformProps = (obj: any, props: TransformProps): any => {
     for (let i = 0, len = obj.length; i < len; i++) {
       copy[i] = transformProps(obj[i], props);
     }
+
     return copy;
   }
 
@@ -41,6 +43,7 @@ export const transformProps = (obj: any, props: TransformProps): any => {
       if (Object.prototype.hasOwnProperty.call(obj, attr)) {
         if (props.hasOwnProperty(attr)) {
           const propRule = props[attr];
+
           if (typeof propRule === 'function') {
             // Apply function transformation
             copy[attr] = propRule(obj[attr]);
@@ -57,6 +60,7 @@ export const transformProps = (obj: any, props: TransformProps): any => {
         }
       }
     }
+
     return copy;
   }
 
@@ -72,6 +76,8 @@ export const transformProps = (obj: any, props: TransformProps): any => {
  */
 export const transform = async (statement: string, props: TransformProps): Promise<string> => {
   let tree = await parse(statement);
+
   tree = transformProps(tree, props);
+
   return await deparse(tree as any);
 };

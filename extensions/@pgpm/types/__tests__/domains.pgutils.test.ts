@@ -122,6 +122,7 @@ describe('types', () => {
   it('invalid attachment and image', async () => {
     for (const attachment of invalidAttachments) {
       let failed = false;
+
       try {
         await pg.any(`INSERT INTO customers (attachment) VALUES ($1);`, [attachment]);
       } catch (e) {
@@ -132,6 +133,7 @@ describe('types', () => {
 
     for (const image of invalidImages) {
       let failed = false;
+
       try {
         await pg.any(`INSERT INTO customers (image) VALUES ($1::json);`, [image]);
       } catch (e) {
@@ -150,6 +152,7 @@ describe('types', () => {
   it('invalid upload', async () => {
     for (const upload of invalidUploads) {
       let failed = false;
+
       try {
         await pg.any(`INSERT INTO customers (upload) VALUES ($1::json);`, [upload]);
       } catch (e) {
@@ -168,6 +171,7 @@ describe('types', () => {
   it('invalid url', async () => {
     for (const value of invalidUrls) {
       let failed = false;
+
       try {
         await pg.any(`INSERT INTO customers (url) VALUES ($1);`, [value]);
       } catch (e) {
@@ -190,6 +194,7 @@ describe('types', () => {
 
   it('not email', async () => {
     let failed = false;
+
     try {
       await pg.any(`
       INSERT INTO customers (email) VALUES
@@ -213,6 +218,7 @@ describe('types', () => {
 
   it('not hostname', async () => {
     let failed = false;
+
     try {
       await pg.any(`
       INSERT INTO customers (domain) VALUES
@@ -225,6 +231,7 @@ describe('types', () => {
 
   it('not hostname 2', async () => {
     let failed = false;
+
     try {
       await pg.any(`
       INSERT INTO customers (domain) VALUES

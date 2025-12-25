@@ -47,6 +47,7 @@ export default async (
 
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 

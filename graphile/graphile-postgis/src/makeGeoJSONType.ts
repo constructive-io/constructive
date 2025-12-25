@@ -44,9 +44,11 @@ export default function makeGeoJSONType(
         return parseFloat(ast.value);
       case Kind.OBJECT: {
         const value: Record<string, unknown> = Object.create(null);
+
         ast.fields.forEach((field) => {
           value[field.name.value] = parseLiteral(field.value, variables);
         });
+
         return value;
       }
       case Kind.LIST:
@@ -55,6 +57,7 @@ export default function makeGeoJSONType(
         return null;
       case Kind.VARIABLE: {
         const variableName = ast.name.value;
+
         return variables ? variables[variableName] : undefined;
       }
       default:

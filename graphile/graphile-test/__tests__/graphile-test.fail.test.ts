@@ -86,6 +86,7 @@ it('aborts transaction when inserting duplicate usernames', async () => {
     // Any query run before rollback/commit will throw:
     // "current transaction is aborted, commands ignored until end of transaction block"
     const res = await pg.client.query(`select * from app_public.users`);
+
     console.log('After failed tx:', res.rows); // Should not be reached!
   } catch (err) {
     const txErr = err as Error;

@@ -1,6 +1,7 @@
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
 import { CacheManager } from 'create-gen-app';
+import { CLIOptions, Inquirerer } from 'inquirerer';
+
 import { cliExitWithError } from '../utils/cli-error';
 
 const log = new Logger('cache');
@@ -26,6 +27,7 @@ export default async (
   }
 
   const action = (argv._?.[0] as string) || 'clean';
+
   if (action !== 'clean') {
     console.log(cacheUsageText);
     await cliExitWithError(`Unknown cache action: ${action}`);

@@ -35,6 +35,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
   // First add defaults
   for (const mapping of DEFAULT_MAPPINGS) {
     const key = `${mapping.namespaceName}.${mapping.name}`;
+
     if (!seen.has(key)) {
       allMappings.push(mapping);
       seen.add(key);
@@ -44,11 +45,13 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
   // Then add/override with custom mappings
   for (const mapping of customMappings) {
     const key = `${mapping.namespaceName}.${mapping.name}`;
+
     if (seen.has(key)) {
       // Override existing mapping
       const index = allMappings.findIndex(
         m => m.name === mapping.name && m.namespaceName === mapping.namespaceName
       );
+
       if (index !== -1) {
         allMappings[index] = mapping;
       }
@@ -74,6 +77,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
         // This allows the plugin to work even when optional dependencies are missing
         // (e.g., GeoJSON requires PostGIS plugin)
         const gqlType = build.getTypeByName(type);
+
         if (gqlType) {
           build.pgRegisterGqlTypeByTypeId(pgType.id, () => gqlType);
           // Store mapping for field resolver
@@ -99,6 +103,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
 
     // Check if this field's type is in our mappings
     const mapping = typeMappingsByTypeId.get(attr.type.id);
+
     if (!mapping) {
       return field;
     }
@@ -112,6 +117,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
     // Get the composite type's attributes
     // @ts-ignore
     const compositeType = attr.type.class;
+
     if (!compositeType || !compositeType.attributes) {
       return field;
     }
@@ -120,6 +126,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
     const { resolve: oldResolve, ...rest } = field;
     const defaultResolver = (obj: Record<string, any>) => {
       const value = oldResolve ? oldResolve(obj) : (fieldName ? obj[fieldName] : undefined);
+
       if (value == null) {
         return null;
       }
@@ -132,6 +139,7 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
       // For composite types mapped to scalars, extract the first field's value
       // This handles types like email(value text) -> extract value
       const attributes = compositeType.attributes;
+
       if (attributes && attributes.length > 0) {
         // Try to extract the first attribute's value
         // PostgreSQL composite types are returned as objects with attribute names as keys
@@ -146,12 +154,14 @@ const CustomPgTypeMappingsPlugin: Plugin = (builder, options) => {
         
         // Try camelCase version (PostGraphile might convert field names)
         const camelCaseName = attrFieldName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+
         if (value[camelCaseName] !== undefined) {
           return value[camelCaseName];
         }
         
         // Fallback: return the first property value
         const firstKey = Object.keys(value)[0];
+
         if (firstKey) {
           return value[firstKey];
         }

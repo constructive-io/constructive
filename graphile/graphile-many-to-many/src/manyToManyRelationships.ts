@@ -26,6 +26,7 @@ const manyToManyRelationships = (leftTable: PgClass, build: any): ManyToManyRela
       }
       const junctionTable =
         introspectionResultsByKind.classById[junctionLeftConstraint.classId];
+
       if (!junctionTable) {
         throw new Error(
           `Could not find the table that referenced us (constraint: ${junctionLeftConstraint.name})`
@@ -44,6 +45,7 @@ const manyToManyRelationships = (leftTable: PgClass, build: any): ManyToManyRela
         )
         .reduce<ManyToManyRelationship[]>((memoRightInner, junctionRightConstraint: PgConstraint) => {
           const rightTable = junctionRightConstraint.foreignClass;
+
           if (omit(rightTable, 'read') || omit(rightTable, 'manyToMany')) {
             return memoRightInner;
           }
@@ -86,6 +88,7 @@ const manyToManyRelationships = (leftTable: PgClass, build: any): ManyToManyRela
           const junctionRightConstraintIsUnique = !!junctionTable.constraints.find((c: PgConstraint) =>
             isUniqueConstraint(c as any, junctionRightKeyAttributes)
           );
+
           if (junctionLeftConstraintIsUnique || junctionRightConstraintIsUnique) {
             return memoRightInner;
           }
@@ -117,6 +120,7 @@ const manyToManyRelationships = (leftTable: PgClass, build: any): ManyToManyRela
             }
           ];
         }, []);
+
       return [...memoLeft, ...memoRight];
     }, []);
 };

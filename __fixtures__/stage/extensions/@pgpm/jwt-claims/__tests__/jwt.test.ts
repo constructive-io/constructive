@@ -55,6 +55,7 @@ it('get values', async () => {
   const { user_id } = await pg.one(
     `select jwt_public.current_user_id() as user_id`
   );
+
   await pg.any(`ROLLBACK`);
 
   expect({ user_agent }).toMatchSnapshot();

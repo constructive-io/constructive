@@ -16,6 +16,7 @@ export async function deployPgpm(
   cache: boolean = false
 ): Promise<void> {
   const proj = new PgpmPackage(cwd ?? process.cwd());
+
   if (!proj.isInModule()) return;
 
   await proj.deploy(

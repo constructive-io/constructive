@@ -2,11 +2,11 @@ import '../../test-utils/env';
 
 import { readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
 import type { Plugin } from 'graphile-build';
 import { PgConnectionArgCondition } from 'graphile-build-pg';
 import type { GraphQLQueryFnObj } from 'graphile-test';
 import { getConnectionsObject, seed, snapshot } from 'graphile-test';
+import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type { PostGraphileOptions } from 'postgraphile';
 
@@ -139,6 +139,7 @@ const contexts: Partial<Record<ConnectionVariant, ConnectionContext>> = {};
 beforeAll(async () => {
   for (const variant of Object.keys(variantConfigs) as ConnectionVariant[]) {
     const config = variantConfigs[variant];
+
     contexts[variant] = await createContext(
       config.overrideSettings,
       config.graphileBuildOptions
@@ -177,6 +178,7 @@ describe.each(queryFileNames)('%s', (queryFileName) => {
   it('matches snapshot', async () => {
     const query = await readFile(join(queriesDir, queryFileName), 'utf8');
     const result = await ctx.query({ query });
+
     expect(snapshot(result)).toMatchSnapshot();
   });
 });

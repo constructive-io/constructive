@@ -72,6 +72,7 @@ let { include: allowedScopes, exclude: blockedScopes } = parseScopeFilter(proces
 // Update scopes at runtime
 export const setLogScopes = (scopes: string[]) => {
   const parsed = parseScopeFilter(scopes.join(','));
+
   allowedScopes = parsed.include;
   blockedScopes = parsed.exclude;
 };
@@ -110,9 +111,9 @@ export class Logger {
     const outputParts = showTimestamp
       ? [yanse.dim(`[${new Date().toISOString()}]`), tag, prefix, ...formattedArgs]
       : [tag, prefix, ...formattedArgs];
-    const output = outputParts
+    const output = `${outputParts
       .map(arg => String(arg))
-      .join(' ') + '\n';
+      .join(' ')  }\n`;
 
     stream.write(output);
   }

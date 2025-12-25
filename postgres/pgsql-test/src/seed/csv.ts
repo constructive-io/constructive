@@ -81,10 +81,12 @@ async function parseCsvHeader(filePath: string): Promise<string[]> {
 
     parser.on('readable', () => {
       const row = parser.read() as string[] | null;
+
       if (!row) return;
       
       if (row.length === 0) {
         cleanup(new Error('CSV header has no columns'));
+
         return;
       }
       

@@ -18,6 +18,7 @@ describe('cmds:install - with initialized workspace and module', () => {
 
     const workspaceName = 'my-workspace';
     const moduleName = 'my-module';
+
     workspaceDir = path.join(fixture.tempDir, workspaceName);
     moduleDir = path.join(workspaceDir, 'packages', moduleName);
 
@@ -34,7 +35,7 @@ describe('cmds:install - with initialized workspace and module', () => {
       _: ['init'],
       cwd: workspaceDir,
       name: moduleName,
-      moduleName: moduleName,
+      moduleName,
       extensions: ['uuid-ossp', 'plpgsql'],
     });
   });
@@ -55,6 +56,7 @@ describe('cmds:install - with initialized workspace and module', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson).toMatchSnapshot();
 
     const installedFiles = glob.sync('**/*', {
@@ -73,6 +75,7 @@ describe('cmds:install - with initialized workspace and module', () => {
     // Snapshot control file
     const mod = new PgpmPackage(moduleDir);
     const controlFile = mod.getModuleControlFile();
+
     expect(controlFile).toMatchSnapshot();
   });
 
@@ -99,6 +102,7 @@ describe('cmds:install - with initialized workspace and module', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson).toMatchSnapshot();
 
     const extPath = path.join(workspaceDir, 'extensions');
@@ -119,6 +123,7 @@ describe('cmds:install - with initialized workspace and module', () => {
     // Snapshot control file after both installs
     const mod = new PgpmPackage(moduleDir);
     const controlFile = mod.getModuleControlFile();
+
     expect(controlFile).toMatchSnapshot();
   });
 });

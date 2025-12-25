@@ -11,6 +11,7 @@ export default function stream2etag(stream: Readable, partSizeInMb: number = 5):
       })
       .on('data', (chunk: Buffer | string) => {
         const buf = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : chunk;
+
         hash.update(buf);
       })      
       .on('end', () => {

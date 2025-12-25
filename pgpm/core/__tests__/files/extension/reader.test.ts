@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+
 import { getInstalledExtensions } from '../../../src/files/extension/reader';
 
 describe('getInstalledExtensions', () => {
@@ -24,9 +25,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual([]);
   });
 
@@ -34,6 +37,7 @@ superuser = false
     const nonExistentPath = path.join(tempDir, 'nonexistent.control');
     
     const result = getInstalledExtensions(nonExistentPath);
+
     expect(result).toEqual([]);
   });
 
@@ -46,9 +50,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual(['pgcrypto']);
   });
 
@@ -61,9 +67,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual(['pgcrypto', 'postgis', 'plpgsql']);
   });
 
@@ -76,9 +84,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual(['pgcrypto', 'postgis', 'plpgsql']);
   });
 
@@ -91,9 +101,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual(['pgcrypto', 'postgis']);
   });
 
@@ -106,9 +118,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual([]);
   });
 
@@ -121,9 +135,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual(['pgcrypto', 'postgis']);
   });
 
@@ -141,9 +157,11 @@ module_pathname = '$libdir/test'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(controlFilePath, content);
     
     const result = getInstalledExtensions(controlFilePath);
+
     expect(result).toEqual([]);
   });
 });

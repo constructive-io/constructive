@@ -1,8 +1,9 @@
 import poolManager from '@constructive-io/job-pg';
-import * as jobs from '@constructive-io/job-utils';
 import type { PgClientLike } from '@constructive-io/job-utils';
-import type { Pool, PoolClient } from 'pg';
+import * as jobs from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import type { Pool, PoolClient } from 'pg';
+
 import { request as req } from './req';
 
 export interface JobRow {
@@ -50,6 +51,7 @@ export default class Worker {
       await jobs.releaseJobs(pgPool, { workerId: this.workerId });
     });
   }
+
   async initialize(client: PgClientLike) {
     if (this._initialized === true) return;
 
@@ -59,6 +61,7 @@ export default class Worker {
     this._initialized = true;
     await this.doNext(client);
   }
+
   async handleFatalError(
     client: PgClientLike,
     {
@@ -68,11 +71,13 @@ export default class Worker {
     }: { err?: Error; fatalError: unknown; jobId: JobRow['id'] }
   ) {
     const when = err ? `after failure '${err.message}'` : 'after success';
+
     log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
     await poolManager.close();
     log.error(String(fatalError));
     process.exit(1);
   }
+
   async handleError(
     client: PgClientLike,
     { err, job, duration }: { err: Error; job: JobRow; duration: string }
@@ -89,6 +94,7 @@ export default class Worker {
       message: err.message
     });
   }
+
   async handleSuccess(
     client: PgClientLike,
     { job, duration }: { job: JobRow; duration: string }
@@ -97,8 +103,10 @@ export default class Worker {
       `Async task ${job.id} (${job.task_identifier}) to be processed`
     );
   }
+
   async doWork(job: JobRow) {
     const { payload, task_identifier } = job;
+
     log.debug('starting work on job', {
       id: job.id,
       task: task_identifier,
@@ -117,6 +125,7 @@ export default class Worker {
       jobId: job.id
     });
   }
+
   async doNext(client: PgClientLike): Promise<void> {
     if (!this._initialized) {
       return await this.initialize(client);
@@ -140,11 +149,13 @@ export default class Worker {
           () => this.doNext(client),
           this.idleDelay
         );
+
         return;
       }
       const start = process.hrtime();
 
       let err: Error | null = null;
+
       try {
         await this.doWork(job);
       } catch (error) {
@@ -155,6 +166,7 @@ export default class Worker {
         2
       );
       const jobId = job.id;
+
       try {
         if (err) {
           await this.handleError(client, { err, job, duration });
@@ -164,11 +176,13 @@ export default class Worker {
       } catch (fatalError: unknown) {
         await this.handleFatalError(client, { err, fatalError, jobId });
       }
+
       return this.doNext(client);
     } catch (err: unknown) {
       this.doNextTimer = setTimeout(() => this.doNext(client), this.idleDelay);
     }
   }
+
   listen() {
     const listenForChanges = (
       err: Error | null,
@@ -183,6 +197,7 @@ export default class Worker {
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
+
         return;
       }
       client.on('notification', () => {
@@ -203,6 +218,7 @@ export default class Worker {
       log.info(`${this.workerId} connected and looking for jobs...`);
       this.doNext(client);
     };
+
     this.pgPool.connect(listenForChanges);
   }
 }

@@ -90,6 +90,7 @@ describe('drizzle-orm-test', () => {
       ]);
       
       const result = await drizzleDb.select().from(users);
+
       // Should see 2 new records plus 1 seeded record for user 1
       expect(result).toHaveLength(3);
     });
@@ -107,6 +108,7 @@ describe('drizzle-orm-test', () => {
       
       const result = await drizzleDb.select().from(users);
       const updated = result.find(r => r.name === 'Alice Updated');
+
       expect(updated).toBeDefined();
       expect(updated!.name).toBe('Alice Updated');
     });
@@ -125,6 +127,7 @@ describe('drizzle-orm-test', () => {
       ]);
       
       let result = await drizzleDb.select().from(users);
+
       expect(result).toHaveLength(3);
       
       await drizzleDb.delete(users).where(eq(users.name, 'Alice'));
@@ -181,11 +184,13 @@ describe('drizzle-orm-test', () => {
       const result1 = await drizzleDb.execute<{ value: string }>(
         `SELECT current_setting('app.user_id', true) as value`
       );
+
       expect(result1.rows[0].value).toBe('123');
       
       const result2 = await drizzleDb.execute<{ value: string }>(
         `SELECT current_setting('app.user_id', true) as value`
       );
+
       expect(result2.rows[0].value).toBe('123');
     });
   });
@@ -202,6 +207,7 @@ describe('drizzle-orm-test', () => {
       await drizzleDb.insert(users).values({ name: 'Test User', userId: '999' });
       
       const result = await drizzleDb.select().from(users);
+
       expect(result.length).toBeGreaterThan(0);
     });
 
@@ -214,6 +220,7 @@ describe('drizzle-orm-test', () => {
       const drizzleDb = drizzle(db.client);
       
       const result = await drizzleDb.select().from(users);
+
       expect(result).toHaveLength(0);
     });
   });
@@ -273,6 +280,7 @@ describe('drizzle-orm-test', () => {
       await drizzleDb.insert(users).values({ name: 'New User 1 Record', userId: '1' });
 
       const rows = await drizzleDb.select().from(users);
+
       expect(rows).toHaveLength(2);
       expect(rows.every(r => r.userId === '1')).toBe(true);
     });
@@ -290,6 +298,7 @@ describe('drizzle-orm-test', () => {
         .where(eq(users.userId, '1'));
 
       const rows = await drizzleDb.select().from(users);
+
       expect(rows).toHaveLength(1);
       expect(rows[0].name).toBe('Updated User 1 Record');
     });
@@ -305,6 +314,7 @@ describe('drizzle-orm-test', () => {
       await drizzleDb.insert(users).values({ name: 'To Delete', userId: '1' });
       
       let rows = await drizzleDb.select().from(users);
+
       expect(rows).toHaveLength(2);
 
       await drizzleDb.delete(users).where(eq(users.name, 'To Delete'));
@@ -324,6 +334,7 @@ describe('drizzle-orm-test', () => {
       });
 
       let rows = await drizzleDb.select().from(users);
+
       expect(rows).toHaveLength(1);
       expect(rows[0].userId).toBe('1');
 

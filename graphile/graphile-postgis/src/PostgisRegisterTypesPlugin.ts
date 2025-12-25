@@ -3,16 +3,14 @@ import type { PgType } from 'graphile-build-pg';
 import type { SQL } from 'graphile-build-pg/node8plus/QueryBuilder';
 import type {
   GraphQLInterfaceType,
-  GraphQLOutputType,
-  GraphQLObjectType,
   GraphQLScalarType,
   GraphQLSchemaConfig
 } from 'graphql';
 
 import { GisSubtype } from './constants';
 import makeGeoJSONType from './makeGeoJSONType';
-import { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisTypeDetails, PostgisBuild } from './types';
+import { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';
 
 const SUBTYPES: GisSubtype[] = [
   GisSubtype.Point,
@@ -30,6 +28,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
   builder.hook('build', (build: Build): Build => {
     const rawBuild = build as PostgisBuild;
     const GeoJSON = makeGeoJSONType(rawBuild.graphql, rawBuild.inflection.builtin('GeoJSON'));
+
     rawBuild.addType(GeoJSON);
 
     return rawBuild.extend(rawBuild, {
@@ -42,6 +41,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         srid: number = 0
       ) {
         const typeModifier = getGISTypeModifier(subtype, hasZ, hasM, srid);
+
         return this.pgGetGqlTypeByTypeIdAndModifier(pgGISType.id, typeModifier);
       },
       pgGISIncludedTypes: [] as GisGraphQLType[],
@@ -74,12 +74,14 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         pgGISExtension: POSTGIS,
         pgGISIncludeType: includeType
       } = rawBuild;
+
       if (!GEOMETRY_TYPE || !GEOGRAPHY_TYPE) {
         return input;
       }
       // console.warn('PostGIS plugin enabled');
 
       const GeoJSON = getTypeByName(inflection.builtin('GeoJSON')) as GraphQLScalarType | undefined;
+
       if (!GeoJSON) {
         throw new Error('GeoJSON type was not registered on the build');
       }
@@ -93,6 +95,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
 
       const getGisInterface = (type: PgType): GraphQLInterfaceType => {
         const zmflag = -1; // no dimensional constraint; could be xy/xyz/xym/xyzm
+
         ensureInterfaceStore(type);
         if (!interfacesMap[type.id][zmflag]) {
           interfacesMap[type.id][zmflag] = newWithHooks(
@@ -111,6 +114,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
               },
               resolveType(value: GisFieldValue) {
                 const Type = constructedTypes[type.id]?.[value.__gisType];
+
                 return Type instanceof GraphQLObjectType ? Type : undefined;
               },
               description: `All ${type.name} types implement this interface`
@@ -126,16 +130,19 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
               for (const hasM of [false, true]) {
                 const typeModifier = getGISTypeModifier(subtype, hasZ, hasM, 0);
                 const Type = getGisType(type, typeModifier);
+
                 includeType(Type);
               }
             }
           }
         }
+
         return interfacesMap[type.id][zmflag];
       };
       const getGisDimensionInterface = (type: PgType, hasZ: boolean, hasM: boolean): GraphQLInterfaceType => {
         const zmflag = (hasZ ? 2 : 0) + (hasM ? 1 : 0); // Equivalent to ST_Zmflag: https://postgis.net/docs/ST_Zmflag.html
         const coords: Record<number, string> = { 0: 'XY', 1: 'XYM', 2: 'XYZ', 3: 'XYZM' };
+
         ensureInterfaceStore(type);
         if (!interfacesMap[type.id][zmflag]) {
           interfacesMap[type.id][zmflag] = newWithHooks(
@@ -154,6 +161,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
               },
               resolveType(value: GisFieldValue) {
                 const Type = constructedTypes[type.id]?.[value.__gisType];
+
                 return Type instanceof GraphQLObjectType ? Type : undefined;
               },
               description: `All ${type.name} ${coords[zmflag]} types implement this interface`
@@ -167,15 +175,18 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
           for (const subtype of SUBTYPES) {
             const typeModifier = getGISTypeModifier(subtype, hasZ, hasM, 0);
             const Type = getGisType(type, typeModifier);
+
             includeType(Type);
           }
         }
+
         return interfacesMap[type.id][zmflag];
       };
       const getGisType = (type: PgType, typeModifier: number): GisGraphQLType => {
         const typeId = type.id;
         const typeDetails: GisTypeDetails = getGISTypeDetails(typeModifier);
         const { subtype, hasZ, hasM, srid } = typeDetails;
+
         // console.warn(
         //   `Getting ${type.name} type ${type.id}|${typeModifier}|${subtype}|${hasZ}|${hasM}|${srid}`
         // );
@@ -183,6 +194,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
           constructedTypes[typeId] = {};
         }
         const typeModifierKey = typeModifier ?? -1;
+
         if (!pgTweaksByTypeIdAndModifer[typeId]) {
           pgTweaksByTypeIdAndModifer[typeId] = {};
         }
@@ -214,6 +226,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
                 'st_asgeojson' // MUST be lowercase!
               )}(${fragment})::JSON`
             ];
+
             return sql.fragment`(case when ${fragment} is null then null else json_build_object(
             ${sql.join(params, ', ')}
           ) end)`;
@@ -221,6 +234,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
         }
         const gisTypeKey: string | number =
           typeModifier != null ? getGISTypeName(subtype, hasZ, hasM) : -1;
+
         if (!constructedTypes[typeId][gisTypeKey]) {
           if (typeModifierKey === -1) {
             constructedTypes[typeId][gisTypeKey] = getGisInterface(type);
@@ -239,6 +253,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
               (introspectionType: PgType) =>
                 introspectionType.name === 'json' && introspectionType.namespaceName === 'pg_catalog'
             );
+
             if (!intType || !jsonType) {
               throw new Error('Unable to locate built-in int4/json types');
             }
@@ -274,6 +289,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
             );
           }
         }
+
         return constructedTypes[typeId][gisTypeKey];
       };
 
@@ -309,6 +325,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
       pgRegisterGqlTypeByTypeId(GEOMETRY_TYPE.id, (_set: Record<string, unknown>, typeModifier: number) => {
         return getGisType(GEOMETRY_TYPE, typeModifier);
       });
+
       return input;
     },
     ['PostgisTypes'],
@@ -319,6 +336,7 @@ const PostgisRegisterTypesPlugin: Plugin = (builder) => {
   builder.hook('GraphQLSchema', (schemaConfig, build: Build) => {
     const postgisBuild = build as PostgisBuild;
     const existingTypes = schemaConfig.types ?? [];
+
     return {
       ...schemaConfig,
       types: [...existingTypes, ...postgisBuild.pgGISIncludedTypes]

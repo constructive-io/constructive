@@ -15,6 +15,7 @@ export class TestFixture {
   
   constructor(...fixturePath: string[]) {
     const originalFixtureDir = getFixturePath(...fixturePath);
+
     this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'constructive-io-graphql-test-'));
     this.tempFixtureDir = path.join(this.tempDir, ...fixturePath);
   
@@ -27,7 +28,9 @@ export class TestFixture {
       const workspace = new PgpmPackage(this.getFixturePath(...workspacePath));
       const moduleMap = workspace.getModuleMap();
       const meta = moduleMap[moduleName];
+
       if (!meta) throw new Error(`Module ${moduleName} not found in workspace`);
+
       return new PgpmPackage(this.getFixturePath(...workspacePath, meta.path));
     };
   }

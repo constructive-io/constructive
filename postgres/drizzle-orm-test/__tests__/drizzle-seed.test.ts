@@ -1,11 +1,12 @@
 process.env.LOG_SCOPE = 'drizzle-orm-test';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { pgTable, pgSchema, uuid, text, serial, integer } from 'drizzle-orm/pg-core';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import {pgSchema, serial, text, uuid } from 'drizzle-orm/pg-core';
+import { mkdirSync,writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
+
 import { getConnections, PgTestClient } from '../src';
 
 let pg: PgTestClient;
@@ -163,6 +164,7 @@ describe('loadJson() method with Drizzle', () => {
     });
 
     const result = await drizzleDb.select().from(usersTable);
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Alice');
   });
@@ -171,7 +173,8 @@ describe('loadJson() method with Drizzle', () => {
 describe('loadCsv() method with Drizzle', () => {
   it('should load users from CSV with pg client and query via Drizzle', async () => {
     const csvPath = join(testDir, 'users.csv');
-    const csvContent = 'id,name\n' + [users[0], users[1]].map(u => `${u.id},${u.name}`).join('\n') + '\n';
+    const csvContent = `id,name\n${  [users[0], users[1]].map(u => `${u.id},${u.name}`).join('\n')  }\n`;
+
     writeFileSync(csvPath, csvContent);
 
     await pg.loadCsv({
@@ -192,10 +195,12 @@ describe('loadCsv() method with Drizzle', () => {
 
     const csvPath = join(testDir, 'users2.csv');
     const csvContent = 'id,name\n' + `${users[2].id},${users[2].name}\n`;
+
     writeFileSync(csvPath, csvContent);
 
     // Use savepoint to handle expected failure without aborting transaction
     const savepointName = 'csv_rls_test';
+
     await db.savepoint(savepointName);
     
     await expect(
@@ -213,7 +218,7 @@ describe('loadCsv() method with Drizzle', () => {
     const petsPath = join(testDir, 'pets.csv');
     
     writeFileSync(usersPath, `id,name\n${users[0].id},${users[0].name}\n`);
-    writeFileSync(petsPath, 'id,owner_id,name\n' + [pets[0], pets[1]].map(p => `${p.id},${p.owner_id},${p.name}`).join('\n') + '\n');
+    writeFileSync(petsPath, `id,owner_id,name\n${  [pets[0], pets[1]].map(p => `${p.id},${p.owner_id},${p.name}`).join('\n')  }\n`);
 
     await pg.loadCsv({
       'custom.users': usersPath,
@@ -240,6 +245,7 @@ describe('loadSql() method with Drizzle', () => {
     const sqlContent = [users[0], users[1]]
       .map(u => `INSERT INTO custom.users (id, name) VALUES ('${u.id}', '${u.name}');`)
       .join('\n');
+
     writeFileSync(sqlPath, sqlContent);
 
     await pg.loadSql([sqlPath]);
@@ -257,6 +263,7 @@ describe('loadSql() method with Drizzle', () => {
     await db.beforeEach();
 
     const sqlPath = join(testDir, 'seed2.sql');
+
     writeFileSync(sqlPath, `INSERT INTO custom.users (id, name) VALUES ('${users[2].id}', '${users[2].name}');`);
 
     await db.loadSql([sqlPath]);
@@ -276,6 +283,7 @@ describe('loadSql() method with Drizzle', () => {
     const petsSql = [pets[0], pets[1]]
       .map(p => `INSERT INTO custom.pets (id, owner_id, name) VALUES (${p.id}, '${p.owner_id}', '${p.name}');`)
       .join('\n');
+
     writeFileSync(petsPath, petsSql);
 
     await pg.loadSql([usersPath, petsPath]);
@@ -392,6 +400,7 @@ describe('Drizzle insert/update/delete with seed data', () => {
     });
 
     const result = await drizzleDb.select().from(usersTable);
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Bob');
   });
@@ -399,6 +408,7 @@ describe('Drizzle insert/update/delete with seed data', () => {
   it('should seed with loadCsv and then update via Drizzle', async () => {
     const csvPath = join(testDir, 'users-update.csv');
     const csvContent = `id,name\n${users[0].id},${users[0].name}\n`;
+
     writeFileSync(csvPath, csvContent);
 
     await pg.loadCsv({
@@ -412,12 +422,14 @@ describe('Drizzle insert/update/delete with seed data', () => {
       .where(eq(usersTable.id, users[0].id));
 
     const result = await drizzleDb.select().from(usersTable);
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Alice Updated');
   });
 
   it('should seed with loadSql and then delete via Drizzle', async () => {
     const sqlPath = join(testDir, 'seed-delete.sql');
+
     writeFileSync(sqlPath, `INSERT INTO custom.users (id, name) VALUES ('${users[0].id}', '${users[0].name}'), ('${users[1].id}', '${users[1].name}');`);
 
     await pg.loadSql([sqlPath]);
@@ -427,6 +439,7 @@ describe('Drizzle insert/update/delete with seed data', () => {
     await drizzleDb.delete(usersTable).where(eq(usersTable.id, users[0].id));
 
     const result = await drizzleDb.select().from(usersTable);
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Bob');
   });

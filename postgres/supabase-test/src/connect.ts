@@ -1,11 +1,10 @@
+import type { PgTestConnectionOptions } from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
 import { getPgEnvVars, PgConfig } from 'pg-env';
 import { 
-  getConnections as getPgConnections,
   type GetConnectionOpts,
-  type GetConnectionResult
-} from 'pgsql-test';
-import type { PgTestConnectionOptions } from '@pgpmjs/types';
+  type GetConnectionResult,
+  getConnections as getPgConnections} from 'pgsql-test';
 
 /**
  * Supabase default connection options

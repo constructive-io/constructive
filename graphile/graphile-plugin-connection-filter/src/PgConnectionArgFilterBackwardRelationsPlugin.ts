@@ -15,6 +15,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
   } = rawOptions as ConnectionFilterConfig;
   const hasConnections = pgSimpleCollections !== 'only';
   const simpleInflectorsAreShorter = pgOmitListSuffix === true;
+
   if (
     simpleInflectorsAreShorter &&
     connectionFilterUseListInflectors === undefined
@@ -92,6 +93,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         }
         const foreignTable =
           introspectionResultsByKind.classById[foreignConstraint.classId];
+
         if (!foreignTable) {
           throw new Error(
             `Could not find the foreign table (constraint: ${foreignConstraint.name})`
@@ -116,6 +118,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         const foreignKeyAttributes = foreignConstraint.keyAttributeNums.map(
           (num) => foreignAttributes.filter((attr) => attr.num === num)[0]
         );
+
         if (keyAttributes.some((attr) => omit(attr, 'read'))) {
           return memo;
         }
@@ -133,6 +136,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
               (n, i) => foreignKeyAttributes[i].num === n
             )
         );
+
         memo.push({
           table,
           keyAttributes,
@@ -141,6 +145,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
           foreignConstraint,
           isOneToMany: !isForeignKeyUnique,
         });
+
         return memo;
       }, []);
 
@@ -219,6 +224,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         foreignTableFilterTypeName,
         queryBuilder
       );
+
       return sqlFragment == null
         ? null
         : sql.query`exists(${sqlSelectWhereKeysMatch} and (${sqlFragment}))`;
@@ -282,8 +288,10 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
           null,
           { backwardRelationSpec }
         );
+
         return sqlFragment == null ? null : sqlFragment;
       };
+
       return resolveMany;
     };
 
@@ -303,6 +311,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         foreignTable,
         foreignTableTypeName
       );
+
       if (!ForeignTableFilterType) continue;
 
       if (isOneToMany) {
@@ -311,6 +320,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
             table,
             foreignTable
           );
+
           if (!connectionFilterTypesByTypeName[filterManyTypeName]) {
             connectionFilterTypesByTypeName[filterManyTypeName] = newWithHooks(
               GraphQLInputObjectType,
@@ -341,6 +351,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
               );
           const filterFieldName =
             inflection.filterManyRelationByKeysFieldName(fieldName);
+
           addField(
             filterFieldName,
             `Filter by the object’s \`${fieldName}\` relation.`,
@@ -354,6 +365,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
 
           const existsFieldName =
             inflection.filterBackwardManyRelationExistsFieldName(fieldName);
+
           addField(
             existsFieldName,
             `Some related \`${fieldName}\` exist.`,
@@ -374,6 +386,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         );
         const filterFieldName =
           inflection.filterSingleRelationByKeysBackwardsFieldName(fieldName);
+
         addField(
           filterFieldName,
           `Filter by the object’s \`${fieldName}\` relation.`,
@@ -387,6 +400,7 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
 
         const existsFieldName =
           inflection.filterBackwardSingleRelationExistsFieldName(fieldName);
+
         addField(
           existsFieldName,
           `A related \`${fieldName}\` exists.`,
@@ -502,13 +516,14 @@ const PgConnectionArgFilterBackwardRelationsPlugin: Plugin = (
         foreignTableFilterTypeName,
         queryBuilder
       );
+
       if (sqlFragment == null) {
         return null;
-      } else if (fieldName === 'every') {
+      } if (fieldName === 'every') {
         return sql.query`not exists(${sqlSelectWhereKeysMatch} and not (${sqlFragment}))`;
-      } else if (fieldName === 'some') {
+      } if (fieldName === 'some') {
         return sql.query`exists(${sqlSelectWhereKeysMatch} and (${sqlFragment}))`;
-      } else if (fieldName === 'none') {
+      } if (fieldName === 'none') {
         return sql.query`not exists(${sqlSelectWhereKeysMatch} and (${sqlFragment}))`;
       }
       throw new Error(`Unknown field name: ${fieldName}`);

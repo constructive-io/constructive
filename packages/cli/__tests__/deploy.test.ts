@@ -34,6 +34,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('schema', 'myfirstapp')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.find((change: any) => change.package === 'my-first' && change.change_name === 'schema_myfirstapp')).toBeTruthy();
     expect(deployedChanges.find((change: any) => change.package === 'my-second')).toBeFalsy();
     expect(deployedChanges.find((change: any) => change.package === 'my-third')).toBeFalsy();
@@ -51,6 +52,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('table', 'myfirstapp.products')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.some((change: any) => change.package === 'my-first')).toBe(true);
     expect(deployedChanges.find((change: any) => change.package === 'my-second')).toBeFalsy();
     expect(deployedChanges.find((change: any) => change.package === 'my-third')).toBeFalsy();
@@ -76,6 +78,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.some((change: any) => change.package === 'my-first')).toBe(true);
     expect(deployedChanges.some((change: any) => change.package === 'my-second')).toBe(true);
     expect(deployedChanges.some((change: any) => change.package === 'my-third')).toBe(true);
@@ -83,6 +86,7 @@ describe('CLI Deploy Command', () => {
 
   it('should revert changes via CLI', async () => {
     const deployCommands = `cnc deploy --database ${testDb.name} --package my-first --yes`;
+
     await fixture.runTerminalCommands(deployCommands, {
       database: testDb.name
     }, true);
@@ -92,6 +96,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('table', 'myfirstapp.products')).toBe(true);
     
     const revertCommands = `cnc revert --database $database  --package my-first --yes`;
+
     await fixture.runTerminalCommands(revertCommands, {
       database: testDb.name
     }, true);
@@ -114,6 +119,7 @@ describe('CLI Deploy Command', () => {
     expect(await testDb.exists('table', 'myfirstapp.products')).toBe(true);
     
     const deployedChanges = await testDb.getDeployedChanges();
+
     expect(deployedChanges.some((change: any) => change.package === 'my-first')).toBe(true);
     expect(deployedChanges.find((change: any) => change.package === 'my-second')).toBeFalsy();
     expect(deployedChanges.find((change: any) => change.package === 'my-third')).toBeFalsy();

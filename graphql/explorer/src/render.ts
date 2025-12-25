@@ -72,6 +72,7 @@ export const printDatabases = ({ databases, req, port }: PrintDatabasesParams): 
   const links = databases
     .map((d) => {
       const url = `${req.protocol}://${d.datname}.${req.hostname}:${port}`;
+
       return `<a href="${url}" class="text-brand hover:underline block">${d.datname}</a>`;
     })
     .join('');
@@ -91,6 +92,7 @@ export const printSchemas = ({ dbName, schemas, req, hostname, port }: PrintSche
   const links = schemas
     .map((d) => {
       const url = `${req.protocol}://${d.table_schema}.${req.hostname}:${port}/graphiql`;
+
       return `<a href="${url}" class="text-brand hover:underline block">${d.table_schema}</a>`;
     })
     .join('');

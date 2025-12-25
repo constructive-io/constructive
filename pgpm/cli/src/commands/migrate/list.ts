@@ -69,7 +69,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
       const deployed = deployedMap.get(change.name);
       const status = deployed ? '✅' : '⏳';
       const deps = change.dependencies.length > 0 ? change.dependencies.join(', ') : '-';
-      const depsDisplay = deps.length > 30 ? deps.substring(0, 27) + '...' : deps;
+      const depsDisplay = deps.length > 30 ? `${deps.substring(0, 27)  }...` : deps;
       
       console.log(`${status}      ${change.name.padEnd(30)} ${depsDisplay}`);
     });

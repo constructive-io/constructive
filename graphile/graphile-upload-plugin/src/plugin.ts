@@ -56,11 +56,13 @@ const UploadPostGraphilePlugin: Plugin = (
           attr.type?.namespaceName === namespaceName) ||
         (tag && attr.tags?.[tag])
     );
+
     if (types.length === 1) {
       return types[0];
-    } else if (types.length > 1) {
+    } if (types.length > 1) {
       throw new Error('Upload field definitions are ambiguous');
     }
+
     return undefined;
   };
 
@@ -76,6 +78,7 @@ const UploadPostGraphilePlugin: Plugin = (
       parseValue(value: unknown) {
         // The value should be an object with a `.promise` that resolves to the file upload
         const maybe = value as any;
+
         if (
           maybe &&
           maybe.promise &&
@@ -101,6 +104,7 @@ const UploadPostGraphilePlugin: Plugin = (
       const theType = build.pgIntrospectionResultsByKind.type.find(
         (typ: any) => typ.name === name && typ.namespaceName === namespaceName
       );
+
       if (theType) {
         build.pgRegisterGqlTypeByTypeId(theType.id, () =>
           build.getTypeByName(type)
@@ -115,7 +119,7 @@ const UploadPostGraphilePlugin: Plugin = (
     return build.extend(inflection, {
       // NO ARROW FUNCTIONS HERE (this)
       uploadColumn(this: any, attr: any) {
-        return this.column(attr) + 'Upload';
+        return `${this.column(attr)  }Upload`;
       },
     });
   });
@@ -141,6 +145,7 @@ const UploadPostGraphilePlugin: Plugin = (
             : context.scope.isPgPatch
               ? 'update'
               : 'create';
+
           if (build.pgOmit(attr, action)) return memo;
           if (attr.identity === 'a') return memo;
 
@@ -176,6 +181,7 @@ const UploadPostGraphilePlugin: Plugin = (
               }
             )}`
           );
+
           return memo;
         }, {}),
         `Adding columns to '${build.describePgEntity(table)}'`
@@ -216,14 +222,17 @@ const UploadPostGraphilePlugin: Plugin = (
             (memo: Record<string, UploadResolver>, attr: any) => {
               // first, try to directly match the types here
               const typeMatched = relevantUploadType(attr);
+
               if (typeMatched) {
                 const fieldName = inflection.column(attr);
                 const uploadFieldName = inflection.uploadColumn(attr);
+
                 memo[uploadFieldName] = typeMatched.resolve;
                 tags[uploadFieldName] = attr.tags;
                 types[uploadFieldName] = attr.type.name;
                 originals[uploadFieldName] = fieldName;
               }
+
               return memo;
             },
             {} as Record<string, UploadResolver>
@@ -248,7 +257,8 @@ const UploadPostGraphilePlugin: Plugin = (
               if (obj[key] instanceof Promise) {
                 if (uploadResolversByFieldName[key]) {
                   const upload = await obj[key];
-                  // eslint-disable-next-line require-atomic-updates
+
+                   
                   obj[originals[key]] = await uploadResolversByFieldName[key](
                     upload,
                     args,
@@ -272,6 +282,7 @@ const UploadPostGraphilePlugin: Plugin = (
             context,
             info
           );
+
           // Finally return the result.
           return oldResolveResult;
         },

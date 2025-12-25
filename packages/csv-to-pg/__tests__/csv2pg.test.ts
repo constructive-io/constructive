@@ -1,16 +1,17 @@
 // @ts-nocheck
-import { parse, parseTypes } from '../src';
+import { nodes } from '@pgsql/utils';
+import cases from 'jest-in-case';
 import { resolve } from 'path';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from '../src/utils';
-import cases from 'jest-in-case';
-import { nodes } from '@pgsql/utils';
 
-const zips = resolve(__dirname + '/../__fixtures__/zip.csv');
-const withHeaders = resolve(__dirname + '/../__fixtures__/headers.csv');
-const withDelimeter = resolve(__dirname + '/../__fixtures__/delimeter.csv');
-const forParse = resolve(__dirname + '/../__fixtures__/parse.csv');
-const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
+import { parse, parseTypes } from '../src';
+import { InsertMany,InsertOne } from '../src/utils';
+
+const zips = resolve(`${__dirname  }/../__fixtures__/zip.csv`);
+const withHeaders = resolve(`${__dirname  }/../__fixtures__/headers.csv`);
+const withDelimeter = resolve(`${__dirname  }/../__fixtures__/delimeter.csv`);
+const forParse = resolve(`${__dirname  }/../__fixtures__/parse.csv`);
+const testCase = resolve(`${__dirname  }/../__fixtures__/test-case.csv`);
 
 it('noop', () => {
   expect(true).toBe(true);
@@ -67,6 +68,7 @@ xdescribe('Insert Many', () => {
               url,
               mime: url.endsWith('png') ? 'image/png' : 'image/jpg'
             };
+
             return JSON.stringify(obj);
           }
         }
@@ -142,6 +144,7 @@ xdescribe('Insert Many', () => {
       types,
       records
     });
+
     expect(deparse([stmt])).toMatchSnapshot();
   });
 
@@ -171,6 +174,7 @@ xdescribe('Insert Many', () => {
       types,
       records
     });
+
     expect(deparse([stmt])).toMatchSnapshot();
   });
 

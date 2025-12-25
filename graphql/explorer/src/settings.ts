@@ -1,5 +1,5 @@
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getGraphileSettings as getSettings } from 'graphile-settings';
 import { PostGraphileOptions } from 'postgraphile';
 

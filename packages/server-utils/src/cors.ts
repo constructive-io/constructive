@@ -30,6 +30,7 @@ export const cors = (app: Express, origin?: string) => {
         credentials: true,
         optionsSuccessStatus: 200,
       };
+
       return corsPlugin(opts)(req, res, next);
     });
   }

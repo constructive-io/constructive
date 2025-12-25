@@ -1,5 +1,6 @@
 import type { Plugin } from 'graphile-build';
 import type { PgAttribute } from 'graphile-build-pg';
+
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';
 
 const PgConnectionArgFilterColumnsPlugin: Plugin = (builder) => {
@@ -35,7 +36,9 @@ const PgConnectionArgFilterColumnsPlugin: Plugin = (builder) => {
       .filter((attr) => !omit(attr, 'filter'))
       .reduce((memo: { [fieldName: string]: PgAttribute }, attr) => {
         const fieldName: string = inflection.column(attr);
+
         memo[fieldName] = attr;
+
         return memo;
       }, {});
 
@@ -48,10 +51,12 @@ const PgConnectionArgFilterColumnsPlugin: Plugin = (builder) => {
           attr.typeId,
           attr.typeModifier
         );
+
         if (!OperatorsType) {
           return memo;
         }
         operatorsTypeNameByFieldName[fieldName] = OperatorsType.name;
+
         return extend(memo, {
           [fieldName]: fieldWithHooks(
             fieldName,

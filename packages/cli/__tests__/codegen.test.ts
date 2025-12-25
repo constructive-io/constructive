@@ -1,5 +1,6 @@
-import path from 'path'
 import type { ParsedArgs } from 'minimist'
+import path from 'path'
+
 import codegenCommand from '../src/commands/codegen'
 
 jest.mock('@constructive-io/graphql-codegen', () => {
@@ -11,6 +12,7 @@ jest.mock('@constructive-io/graphql-codegen', () => {
     documents: { ...(a?.documents || {}), ...(b?.documents || {}) },
     features: { ...(a?.features || {}), ...(b?.features || {}) }
   })
+
   return {
     runCodegen: jest.fn(async () => ({ root: '/tmp/generated', typesFile: '', operationsDir: '', sdkFile: '' })),
     defaultGraphQLCodegenOptions: { input: {}, output: { root: 'graphql/codegen/dist' }, documents: {}, features: { emitTypes: true, emitOperations: true, emitSdk: true } },
@@ -37,13 +39,14 @@ describe('codegen command', () => {
 
   it('prints usage and exits with code 0 when --help is set', async () => {
     const spyLog = jest.spyOn(console, 'log').mockImplementation(() => {})
-    const spyExit = jest.spyOn(process, 'exit').mockImplementation(((code?: number) => { throw new Error('exit:' + code) }) as any)
+    const spyExit = jest.spyOn(process, 'exit').mockImplementation(((code?: number) => { throw new Error(`exit:${  code}`) }) as any)
 
     const argv: Partial<ParsedArgs> = { help: true }
 
     await expect(codegenCommand(argv, {} as any, {} as any)).rejects.toThrow('exit:0')
     expect(spyLog).toHaveBeenCalled()
     const first = (spyLog.mock.calls[0]?.[0] as string) || ''
+
     expect(first).toContain('Constructive GraphQL Codegen')
 
     spyLog.mockRestore()
@@ -106,6 +109,7 @@ describe('codegen command', () => {
       output: { root: 'custom-root' },
       features: { emitTypes: true, emitOperations: true, emitSdk: false }
     }
+
     ;(fs.readFile as jest.Mock).mockResolvedValueOnce(JSON.stringify(cfg))
 
     const argv: Partial<ParsedArgs> = {
@@ -119,6 +123,7 @@ describe('codegen command', () => {
     expect(runCodegen).toHaveBeenCalled()
     const call = (runCodegen as jest.Mock).mock.calls[0]
     const options = call[0]
+
     expect(options.input.schema).toBe('from-config.graphql')
     expect(options.output.root).toBe('graphql/codegen/dist')
     expect(options.documents.format).toBe('ts')

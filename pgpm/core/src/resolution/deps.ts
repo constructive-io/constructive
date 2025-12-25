@@ -1,3 +1,4 @@
+import { errors } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { join,relative } from 'path';
@@ -5,7 +6,6 @@ import { join,relative } from 'path';
 import { PgpmPackage } from '../core/class/pgpm';
 import { parsePlanFile } from '../files/plan/parser';
 import { ExtendedPlanFile } from '../files/types';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Represents a dependency graph where keys are module identifiers
@@ -103,6 +103,7 @@ function createDependencyResolver(
 
     if (transformModule) {
       const result = transformModule(sqlmodule, extname);
+
       moduleToResolve = result.module;
       edges = result.edges;
       returnEarly = result.returnEarly || false;
@@ -122,7 +123,9 @@ function createDependencyResolver(
 
     if (returnEarly) {
       const index = unresolved.indexOf(sqlmodule);
+
       unresolved.splice(index, 1);
+
       return;
     }
 
@@ -138,6 +141,7 @@ function createDependencyResolver(
 
     resolved.push(moduleToResolve);
     const index = unresolved.indexOf(sqlmodule);
+
     unresolved.splice(index, 1);
   };
 }
@@ -169,6 +173,7 @@ export const resolveExtensionDependencies = (
   const external: string[] = [];
   const deps: DependencyGraph = Object.keys(modules).reduce((memo, key) => {
     memo[key] = modules[key].requires;
+
     return memo;
   }, {} as DependencyGraph);
 
@@ -270,6 +275,7 @@ export const resolveDependencies = (
     
     try {
       let planPath: string;
+
       if (packageName === extname) {
         // For the current package
         planPath = join(packageDir, 'pgpm.plan');
@@ -284,6 +290,7 @@ export const resolveDependencies = (
         }
         
         const workspacePath = project.getWorkspacePath();
+
         if (!workspacePath) {
           throw new Error(`No workspace found for module ${packageName}`);
         }
@@ -292,8 +299,10 @@ export const resolveDependencies = (
       }
       
       const result = parsePlanFile(planPath);
+
       if (result.data) {
         planCache[packageName] = result.data;
+
         return result.data;
       }
     } catch (error) {
@@ -312,14 +321,18 @@ export const resolveDependencies = (
 // - Internal refs like "extname:change" are normalized to "change".
   const resolveTagToChange = (projectName: string, tagName: string): string | null => {
     const plan = loadPlanFile(projectName);
+
     if (!plan) return null;
     const tag = plan.tags.find(t => t.name === tagName);
+
     if (!tag) return null;
+
     return tag.change;
   };
   
   if (source === 'plan') {
     const plan = loadPlanFile(extname);
+
     if (!plan) {
       throw errors.PLAN_PARSE_ERROR({ planPath: `${extname}/pgpm.plan`, errors: 'Plan file not found or failed to parse while using plan-only resolution' });
     }
@@ -331,39 +344,49 @@ export const resolveDependencies = (
     const normalizeInternal = (dep: string): string => {
       if (/:/.test(dep)) {
         const [project, localKey] = dep.split(':', 2);
+
         if (project === extname) return localKey;
       }
+
       return dep;
     };
 
     const resolveTagDep = (projectName: string, tagName: string): string | null => {
       const change = resolveTagToChange(projectName, tagName);
+
       if (!change) return null;
+
       return `${projectName}:${change}`;
     };
 
     for (const ch of plan.changes) {
       const key = makeKey(ch.name);
+
       deps[key] = [];
       const changeDeps: string[] = (ch as any).dependencies || [];
+
       for (const rawDep of changeDeps) {
         let dep = rawDep.trim();
 
         if (dep.includes('@')) {
           const m = dep.match(/^([^:]+):@(.+)$/);
+
           if (m) {
             const projectName = m[1];
             const tagName = m[2];
             const resolved = resolveTagDep(projectName, tagName);
+
             if (resolved) {
               if (tagResolution === 'resolve') dep = resolved;
               else if (tagResolution === 'internal') tagMappings[dep] = resolved;
             }
           } else {
             const m2 = dep.match(/^@(.+)$/);
+
             if (m2) {
               const tagName = m2[1];
               const resolved = resolveTagDep(extname, tagName);
+
               if (resolved) {
                 if (tagResolution === 'resolve') dep = resolved;
                 else if (tagResolution === 'internal') tagMappings[dep] = resolved;
@@ -374,6 +397,7 @@ export const resolveDependencies = (
 
         if (/:/.test(dep)) {
           const [project] = dep.split(':', 2);
+
           if (project !== extname) {
             external.push(dep);
             if (!deps[dep]) deps[dep] = [];
@@ -394,8 +418,10 @@ export const resolveDependencies = (
       if (tagResolution === 'preserve') {
         let moduleToResolve = sqlmodule;
         let edges = deps[makeKey(sqlmodule)];
+
         if (/:/.test(sqlmodule)) {
           const [project, localKey] = sqlmodule.split(':', 2);
+
           if (project === extnameLocal) {
             moduleToResolve = localKey;
             edges = deps[makeKey(localKey)];
@@ -403,52 +429,58 @@ export const resolveDependencies = (
           } else {
             external.push(sqlmodule);
             deps[sqlmodule] = deps[sqlmodule] || [];
+
             return { module: sqlmodule, edges: [], returnEarly: true };
           }
-        } else {
-          if (!edges) throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
-        }
+        } else if (!edges) throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
+
         return { module: moduleToResolve, edges };
       }
 
       if (/:/.test(originalModule)) {
         const [project] = originalModule.split(':', 2);
+
         if (project !== extnameLocal) {
           external.push(originalModule);
           deps[originalModule] = deps[originalModule] || [];
+
           return { module: originalModule, edges: [], returnEarly: true };
         }
       }
 
       let moduleToResolve = sqlmodule;
+
       if (tagResolution === 'internal' && tagMappings[sqlmodule]) {
         moduleToResolve = tagMappings[sqlmodule];
       }
 
       let edges = deps[makeKey(moduleToResolve)];
+
       if (/:/.test(moduleToResolve)) {
         const [project, localKey] = moduleToResolve.split(':', 2);
+
         if (project === extnameLocal) {
           moduleToResolve = localKey;
           edges = deps[makeKey(localKey)];
           if (!edges) throw errors.MODULE_NOT_FOUND({ name: `${localKey} (from ${project}:${localKey})` });
         }
-      } else {
-        if (!edges) {
+      } else if (!edges) {
           edges = deps[makeKey(sqlmodule)];
           if (!edges) throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
         }
-      }
 
       if (tagResolution === 'internal' && edges) {
         const processedEdges = edges.map(dep => {
           if (/:/.test(dep)) {
             const [project] = dep.split(':', 2);
+
             if (project !== extnameLocal) return dep;
           }
           if (tagMappings[dep]) return tagMappings[dep];
+
           return dep;
         });
+
         return { module: moduleToResolve, edges: processedEdges };
       }
 
@@ -471,12 +503,14 @@ export const resolveDependencies = (
   for (const file of files) {
     const data = readFileSync(file, 'utf-8');
     const lines = data.split('\n');
-    const key = '/' + relative(packageDir, file);
+    const key = `/${  relative(packageDir, file)}`;
+
     deps[key] = [];
 
     for (const line of lines) {
       // Handle requires statements
       const requiresMatch = line.match(/^-- requires: (.*)/);
+
       if (requiresMatch) {
         const dep = requiresMatch[1].trim();
         
@@ -489,6 +523,7 @@ export const resolveDependencies = (
         // For other modes, handle tag resolution
         if (dep.includes('@')) {
           const match = dep.match(/^([^:]+):@(.+)$/);
+
           if (match) {
             const [, projectName, tagName] = match;
             const taggedChange = resolveTagToChange(projectName, tagName);
@@ -497,6 +532,7 @@ export const resolveDependencies = (
               if (tagResolution === 'resolve') {
                 // Full resolution: replace tag with actual change
                 const resolvedDep = `${projectName}:${taggedChange}`;
+
                 deps[key].push(resolvedDep);
               } else if (tagResolution === 'internal') {
                 // Internal resolution: keep tag in deps but track mapping
@@ -526,6 +562,7 @@ export const resolveDependencies = (
         m2 = line.match(/^-- Deploy ([^:]*):([\w\/]+)(?:\s+to\s+pg)?/);
         if (m2) {
           const actualProject = m2[1];
+
           keyToTest = m2[2];
         
           if (extname !== actualProject) {
@@ -538,6 +575,7 @@ export const resolveDependencies = (
           }
         
           const expectedKey = makeKey(keyToTest);
+
           if (key !== expectedKey) {
             throw new Error(
               `Deployment script path or internal name mismatch:
@@ -554,7 +592,7 @@ export const resolveDependencies = (
           keyToTest = m2[1].trim();
           if (key !== makeKey(keyToTest)) {
             throw new Error(
-              'deployment script in wrong place or is named wrong internally\n' + line
+              `deployment script in wrong place or is named wrong internally\n${  line}`
             );
           }
         }
@@ -573,6 +611,7 @@ export const resolveDependencies = (
       if (/:/.test(sqlmodule)) {
         // Has a prefix — could be internal or external
         const [project, localKey] = sqlmodule.split(':', 2);
+
         if (project === extname) {
           // Internal reference to current package
           moduleToResolve = localKey;
@@ -584,6 +623,7 @@ export const resolveDependencies = (
           // External reference — always OK, even if not in deps yet
           external.push(sqlmodule);
           deps[sqlmodule] = [];
+
           return { module: sqlmodule, edges: [], returnEarly: true };
         }
       } else {
@@ -599,16 +639,19 @@ export const resolveDependencies = (
     // Check if the ORIGINAL module (before tag resolution) is external
     if (/:/.test(originalModule)) {
       const [project, localKey] = originalModule.split(':', 2);
+
       if (project !== extname) {
         // External reference — always OK, even if not in deps yet
         external.push(originalModule);
         deps[originalModule] = deps[originalModule] || [];
+
         return { module: originalModule, edges: [], returnEarly: true };
       }
     }
     
     // For internal resolution mode, check if this module is a tag and resolve it
     let moduleToResolve = sqlmodule;
+
     if (tagResolution === 'internal' && tagMappings[sqlmodule]) {
       moduleToResolve = tagMappings[sqlmodule];
     }
@@ -618,6 +661,7 @@ export const resolveDependencies = (
     if (/:/.test(moduleToResolve)) {
       // Has a prefix — must be internal since we already handled external above
       const [project, localKey] = moduleToResolve.split(':', 2);
+
       if (project === extname) {
         // Internal reference to current package
         moduleToResolve = localKey;
@@ -643,6 +687,7 @@ export const resolveDependencies = (
         // Check if this dependency is external - if so, don't resolve tags
         if (/:/.test(dep)) {
           const [project, localKey] = dep.split(':', 2);
+
           if (project !== extname) {
             // External dependency - keep original tag name
             return dep;
@@ -653,8 +698,10 @@ export const resolveDependencies = (
         if (tagMappings[dep]) {
           return tagMappings[dep];
         }
+
         return dep;
       });
+
       return { module: moduleToResolve, edges: processedEdges };
     }
     
@@ -682,11 +729,13 @@ export const resolveDependencies = (
   dep_resolve('_virtual/app', resolved, unresolved);
 
   const index = resolved.indexOf('_virtual/app');
+
   resolved.splice(index, 1);
   delete deps[makeKey('_virtual/app')];
 
   const extensions = resolved.filter((module) => module.startsWith('extensions/'));
   const normalSql = resolved.filter((module) => !module.startsWith('extensions/'));
+
   resolved = [...extensions, ...normalSql];
 
   return { external, resolved, deps, resolvedTags: tagMappings };

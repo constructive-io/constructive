@@ -1,6 +1,5 @@
 // plugins/PgSearchPlugin.ts
 
-import type { Plugin } from 'graphile-build';
 
 export interface PgSearchPluginOptions {
   /** Prefix for tsvector fields, default is 'tsv' */
@@ -20,17 +19,20 @@ const PgSearchPlugin = (builder: any, options: PgSearchPluginOptions = {}) => {
     if (!isPgCondition || !table || table.kind !== 'class') return fields;
 
     const tsvs = table.attributes.filter((attr: any) => attr.type.name === 'tsvector');
+
     if (!tsvs.length) return fields;
 
     return build.extend(
       fields,
       tsvs.reduce((memo: any, attr: any) => {
         const fieldName = inflection.camelCase(`${pgSearchPrefix}_${attr.name}`);
+
         memo[fieldName] = fieldWithHooks(
           fieldName,
           { type: build.graphql.GraphQLString },
           {}
         );
+
         return memo;
       }, {})
     );
@@ -51,6 +53,7 @@ const PgSearchPlugin = (builder: any, options: PgSearchPluginOptions = {}) => {
       } = context;
 
       const table = tableIfProc || procOrTable;
+
       if (
         (!isPgFieldConnection && !isPgFieldSimpleCollection) ||
         !table ||
@@ -60,6 +63,7 @@ const PgSearchPlugin = (builder: any, options: PgSearchPluginOptions = {}) => {
       }
 
       const tsvs = table.attributes.filter((attr: any) => attr.type.name === 'tsvector');
+
       if (!tsvs.length) return args;
 
       tsvs.forEach((tsv: any) => {
@@ -69,6 +73,7 @@ const PgSearchPlugin = (builder: any, options: PgSearchPluginOptions = {}) => {
           if (!condition || !(conditionFieldName in condition)) return {};
 
           const value = condition[conditionFieldName];
+
           if (value == null) return {};
 
           return {

@@ -10,6 +10,7 @@ export function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, strin
     if (val?.ast) {
       acc[key] = print(val.ast);
     }
+
     return acc;
   }, {});
 }
@@ -17,5 +18,6 @@ export function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, strin
 export function generateKeyedObjFromIntrospection(introspection: IntrospectionQueryResult): Record<string, string> {
   const { queries, mutations } = parseGraphQuery(introspection);
   const gqlMap: GqlMap = { ...queries, ...mutations };
+
   return generateKeyedObjFromGqlMap(gqlMap);
 }

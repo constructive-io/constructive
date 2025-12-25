@@ -28,6 +28,7 @@ export const getRoleName = (
   options?: PgTestConnectionOptions
 ): string => {
   const mapping = getRoleMapping(options);
+
   return mapping[roleKey];
 };
 
@@ -36,5 +37,6 @@ export const getRoleName = (
  */
 export const getDefaultRole = (options?: PgTestConnectionOptions): string => {
   const mapping = getRoleMapping(options);
+
   return mapping.default;
 };

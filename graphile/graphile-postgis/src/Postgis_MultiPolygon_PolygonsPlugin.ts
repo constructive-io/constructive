@@ -1,10 +1,10 @@
+import type { MultiPolygon, Polygon } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { MultiPolygon, Polygon } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisMultiPolygonPolygonsPlugin: Plugin = (builder) => {
   builder.hook(
@@ -13,6 +13,7 @@ const PostgisMultiPolygonPolygonsPlugin: Plugin = (builder) => {
       const {
         scope: { isPgGISType, pgGISType, pgGISTypeDetails }
       } = context as typeof context & { scope: GisScope };
+
       if (
         !isPgGISType ||
         !pgGISType ||
@@ -44,6 +45,7 @@ const PostgisMultiPolygonPolygonsPlugin: Plugin = (builder) => {
           type: new GraphQLList(PolygonType),
           resolve(data: GisFieldValue) {
             const multiPolygon = data.__geojson as MultiPolygon;
+
             return multiPolygon.coordinates.map((coord) => ({
               __gisType: getGISTypeName(GisSubtype.Polygon, hasZ, hasM),
               __srid: data.__srid,
@@ -58,4 +60,5 @@ const PostgisMultiPolygonPolygonsPlugin: Plugin = (builder) => {
     }
   );
 };
+
 export default PostgisMultiPolygonPolygonsPlugin;

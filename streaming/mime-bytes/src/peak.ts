@@ -26,11 +26,13 @@ export class BufferPeekStream extends Transform {
       // After peeking, just pass through
       this.push(chunk);
       callback();
+
       return;
     }
 
     // Accumulate data until we have enough to peek
     const chunkBuffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding);
+
     this.buffer = Buffer.concat([this.buffer, chunkBuffer]);
     this.bufferLength += chunkBuffer.length;
 
@@ -40,6 +42,7 @@ export class BufferPeekStream extends Transform {
       
       // Emit the peek event with the requested bytes
       const peekBuffer = this.buffer.slice(0, this.peekBytes);
+
       this.emit('peek', peekBuffer);
       
       // Push all accumulated data

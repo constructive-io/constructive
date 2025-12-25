@@ -65,6 +65,7 @@ it('newbie', async () => {
     'accept_privacy',
     ...repeat('complete_action', 3)
   ];
+
   for (const name of steps) {
     await pg.any(
       `INSERT INTO status_public.user_steps (user_id, name) VALUES ($1, $2)`,
@@ -76,24 +77,28 @@ it('newbie', async () => {
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advancedRequirements })).toMatchSnapshot();
 
   const newbieRequirements = await pg.any(
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbieRequirements })).toMatchSnapshot();
 
   const [userAchievedNewbie] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbie: userAchievedNewbie })).toMatchSnapshot();
 
   const [userAchievedAdvanced] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advanced: userAchievedAdvanced })).toMatchSnapshot();
 });
 
@@ -106,6 +111,7 @@ it('advanced', async () => {
     ...repeat('invite_users', 3),
     ...repeat('complete_action', 21)
   ];
+
   for (const name of steps) {
     await pg.any(
       `INSERT INTO status_public.user_steps (user_id, name) VALUES ($1, $2)`,
@@ -117,24 +123,28 @@ it('advanced', async () => {
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advancedRequirements })).toMatchSnapshot();
 
   const newbieRequirements = await pg.any(
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbieRequirements })).toMatchSnapshot();
 
   const [userAchievedNewbie] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbie: userAchievedNewbie })).toMatchSnapshot();
 
   const [userAchievedAdvanced] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advanced: userAchievedAdvanced })).toMatchSnapshot();
 });
 
@@ -157,6 +167,7 @@ it('advanced part II', async () => {
     ...repeat('invite_users', 3),
     ...repeat('complete_action', 10)
   ];
+
   for (const name of steps) {
     await pg.any(
       `INSERT INTO status_public.user_steps (user_id, name) VALUES ($1, $2)`,
@@ -168,24 +179,28 @@ it('advanced part II', async () => {
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advancedRequirements })).toMatchSnapshot();
 
   const newbieRequirements = await pg.any(
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbieRequirements })).toMatchSnapshot();
 
   const [userAchievedNewbie] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbie: userAchievedNewbie })).toMatchSnapshot();
 
   const [userAchievedAdvanced] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advanced: userAchievedAdvanced })).toMatchSnapshot();
 });
 
@@ -227,23 +242,27 @@ it('advanced part III', async () => {
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advancedRequirements })).toMatchSnapshot();
 
   const newbieRequirements = await pg.any(
     `SELECT * FROM status_public.steps_required($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbieRequirements })).toMatchSnapshot();
 
   const [userAchievedNewbie] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['newbie', user_id]
   );
+
   expect(snapshot({ newbie: userAchievedNewbie })).toMatchSnapshot();
 
   const [userAchievedAdvanced] = await pg.any(
     `SELECT * FROM status_public.user_achieved($1, $2)`,
     ['advanced', user_id]
   );
+
   expect(snapshot({ advanced: userAchievedAdvanced })).toMatchSnapshot();
 });

@@ -1,9 +1,9 @@
-import * as jobs from '@constructive-io/job-utils';
-import type { PgClientLike } from '@constructive-io/job-utils';
-import schedule from 'node-schedule';
 import poolManager from '@constructive-io/job-pg';
-import type { Pool, PoolClient } from 'pg';
+import type { PgClientLike } from '@constructive-io/job-utils';
+import * as jobs from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import schedule from 'node-schedule';
+import type { Pool, PoolClient } from 'pg';
 
 export interface ScheduledJobRow {
   id: number | string;
@@ -58,6 +58,7 @@ export default class Scheduler {
       });
     });
   }
+
   async initialize(client: PgClientLike) {
     if (this._initialized === true) return;
     await jobs.releaseScheduledJobs(client, {
@@ -68,6 +69,7 @@ export default class Scheduler {
     this._initialized = true;
     await this.doNext(client);
   }
+
   async handleFatalError(
     client: PgClientLike,
     {
@@ -77,11 +79,13 @@ export default class Scheduler {
     }: { err?: Error; fatalError: unknown; jobId: ScheduledJobRow['id'] }
   ) {
     const when = err ? `after failure '${err.message}'` : 'after success';
+
     log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
     log.error(String(fatalError));
     await poolManager.close();
     process.exit(1);
   }
+
   async handleError(
     client: PgClientLike,
     {
@@ -94,12 +98,14 @@ export default class Scheduler {
       `Failed to initialize scheduler for ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`
     );
     const j = this.jobs[job.id];
+
     if (j) j.cancel();
     await jobs.releaseScheduledJobs(client, {
       workerId: this.workerId,
       ids: [job.id]
     });
   }
+
   async handleSuccess(
     client: PgClientLike,
     { job, duration }: { job: ScheduledJobRow; duration: string }
@@ -108,6 +114,7 @@ export default class Scheduler {
       `initialized ${job.id} (${job.task_identifier}) with success (${duration}ms)`
     );
   }
+
   async scheduleJob(client: PgClientLike, job: ScheduledJobRow) {
     const { id, task_identifier, schedule_info } = job;
     const j = schedule.scheduleJob(schedule_info as never, async () => {
@@ -124,6 +131,7 @@ export default class Scheduler {
             `attempted job[${job.task_identifier}] but it's probably non existent, unscheduling...`
           );
           const scheduledJob = this.jobs[job.id];
+
           if (scheduledJob) scheduledJob.cancel();
         }
       } else {
@@ -132,8 +140,10 @@ export default class Scheduler {
         );
       }
     });
+
     this.jobs[id] = j as SchedulerJobHandle;
   }
+
   async doNext(client: PgClientLike): Promise<void> {
     if (!this._initialized) {
       return await this.initialize(client);
@@ -150,16 +160,19 @@ export default class Scheduler {
           ? null
           : this.supportedTaskNames
       });
+
       if (!job || !job.id) {
         this.doNextTimer = setTimeout(
           () => this.doNext(client),
           this.idleDelay
         );
+
         return;
       }
       const start = process.hrtime();
 
       let err: Error | null = null;
+
       try {
         await this.scheduleJob(client, job);
       } catch (error) {
@@ -171,6 +184,7 @@ export default class Scheduler {
         2
       );
       const jobId = job.id;
+
       try {
         if (err) {
           await this.handleError(client, { err, job, duration });
@@ -180,11 +194,13 @@ export default class Scheduler {
       } catch (fatalError: unknown) {
         await this.handleFatalError(client, { err, fatalError, jobId });
       }
+
       return this.doNext(client);
     } catch (err: unknown) {
       this.doNextTimer = setTimeout(() => this.doNext(client), this.idleDelay);
     }
   }
+
   listen() {
     const listenForChanges = (
       err: Error | null,
@@ -199,6 +215,7 @@ export default class Scheduler {
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
+
         return;
       }
       client.on('notification', () => {
@@ -222,6 +239,7 @@ export default class Scheduler {
       );
       this.doNext(client);
     };
+
     this.pgPool.connect(listenForChanges);
   }
 }

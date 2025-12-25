@@ -56,6 +56,7 @@ export const revertProject = async (
     try {
       if (extensions.external.includes(extension)) {
         const msg = `DROP EXTENSION IF EXISTS "${extension}" RESTRICT;`;
+
         log.warn(`⚠️ Dropping external extension: ${extension}`);
         log.debug(`> ${msg}`);
         try {
@@ -69,6 +70,7 @@ export const revertProject = async (
         }
       } else {
         const modulePath = resolve(pkg.workspacePath!, modules[extension].path);
+
         log.info(`📂 Reverting local module: ${extension}`);
         log.debug(`→ Path: ${modulePath}`);
 
@@ -100,5 +102,6 @@ export const revertProject = async (
   }
 
   log.success(`✅ Revert complete for ${name}.`);
+
   return extensions;
 };

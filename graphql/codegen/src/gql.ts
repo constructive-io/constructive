@@ -576,7 +576,8 @@ export const createOne = ({
   );
 
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for ' + mutationName);
+    console.log(`no input field for mutation for ${  mutationName}`);
+
     return;
   }
 
@@ -691,7 +692,8 @@ export const patchOne = ({
   );
 
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for ' + mutationName);
+    console.log(`no input field for mutation for ${  mutationName}`);
+
     return;
   }
 
@@ -743,6 +745,7 @@ export const patchOne = ({
 
   const patchByVarDefs: VariableDefinitionNode[] = patchByAttrs.map(({ name, type, isNotNull, isArray, isArrayNotNull }) => {
     let gqlType: TypeNode = t.namedType({ type });
+
     if (isNotNull) {
       gqlType = t.nonNullType({ type: gqlType });
     }
@@ -752,6 +755,7 @@ export const patchOne = ({
         gqlType = t.nonNullType({ type: gqlType });
       }
     }
+
     return t.variableDefinition({ variable: t.variable({ name }), type: gqlType });
   });
 
@@ -823,7 +827,8 @@ export const deleteOne = ({
   );
 
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for ' + mutationName);
+    console.log(`no input field for mutation for ${  mutationName}`);
+
     return;
   }
 
@@ -907,7 +912,8 @@ export const createMutation = ({
   );
 
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for ' + mutationName);
+    console.log(`no input field for mutation for ${  mutationName}`);
+
     return;
   }
 
@@ -1040,6 +1046,7 @@ export const generate = (gql: GqlMap): AstMap => {
       ].forEach(fn => {
         // @ts-ignore
         const result = fn({ operationName, query: defn });
+
         if (result?.name && result?.ast) {
           m[result.name] = result;
         }
@@ -1048,7 +1055,7 @@ export const generate = (gql: GqlMap): AstMap => {
       // @ts-ignore
       ({ name, ast } = getOne({ operationName, query: defn }) ?? {});
     } else {
-      console.warn('Unknown qtype for key: ' + operationName);
+      console.warn(`Unknown qtype for key: ${  operationName}`);
     }
 
     if (name && ast) {
@@ -1073,6 +1080,7 @@ export const generateGranular = (
 
     if (defn.qtype === 'getMany') {
       const many = getMany({ operationName, query: defn, fields });
+
       if (many?.name && many?.ast && model === matchModel) {
         m[many.name] = many;
       }
@@ -1082,6 +1090,7 @@ export const generateGranular = (
         query: defn,
         fields,
       });
+
       if (paginatedEdges?.name && paginatedEdges?.ast && model === matchModel) {
         m[paginatedEdges.name] = paginatedEdges;
       }
@@ -1091,11 +1100,13 @@ export const generateGranular = (
         query: defn,
         fields,
       });
+
       if (paginatedNodes?.name && paginatedNodes?.ast && model === matchModel) {
         m[paginatedNodes.name] = paginatedNodes;
       }
     } else if (defn.qtype === 'getOne') {
       const one = getOne({ operationName, query: defn, fields });
+
       if (one?.name && one?.ast && model === matchModel) {
         m[one.name] = one;
       }
@@ -1115,6 +1126,7 @@ export function getSelections(
   const mapItem = (item: QueryField): FieldNode | null => {
     if (typeof item === 'string') {
       if (!useAll && !fields.includes(item)) return null;
+
       return t.field({ name: item });
     }
     if (
@@ -1126,6 +1138,7 @@ export function getSelections(
     ) {
       if (!useAll && !fields.includes(item.name)) return null;
       const isMany = (item as any).qtype === 'getMany';
+
       if (isMany) {
         return t.field({
           name: item.name,
@@ -1142,11 +1155,13 @@ export function getSelections(
           }),
         });
       }
+
       return t.field({
         name: item.name,
         selectionSet: t.selectionSet({ selections: item.selection.map((s) => mapItem(s)).filter(Boolean) as FieldNode[] }),
       });
     }
+
     return null;
   };
 

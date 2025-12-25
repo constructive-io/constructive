@@ -1,9 +1,9 @@
+import { PgpmPackage } from '../../src/core/class/pgpm';
 import {
   getExtensionsAndModules,
   getExtensionsAndModulesChanges,
   latestChange
 } from '../../src/modules/modules';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;
@@ -20,6 +20,7 @@ describe('sqitch modules', () => {
   it('should get modules', async () => {
     const pkg = new PgpmPackage(fixture.tempFixtureDir);
     const modules = pkg.listModules();
+
     expect(modules).toMatchSnapshot();
   });
 
@@ -27,6 +28,7 @@ describe('sqitch modules', () => {
     const pkg = new PgpmPackage(fixture.tempFixtureDir);
     const modules = pkg.listModules();
     const change = await latestChange('totp', modules, fixture.tempFixtureDir);
+
     expect(change).toBe('procedures/generate_secret');
   });
 
@@ -34,6 +36,7 @@ describe('sqitch modules', () => {
     const pkg = new PgpmPackage(fixture.tempFixtureDir);
     const modules = pkg.listModules();
     const deps = await getExtensionsAndModules('utils', modules);
+
     expect(deps).toEqual({
       native: ['plpgsql', 'uuid-ossp'],
       sqitch: ['totp', 'pg-verify'],
@@ -44,6 +47,7 @@ describe('sqitch modules', () => {
     const pkg = new PgpmPackage(fixture.tempFixtureDir);
     const modules = pkg.listModules();
     const deps = await getExtensionsAndModulesChanges('utils', modules, fixture.tempFixtureDir);
+
     expect(deps).toMatchSnapshot();
   });
 });

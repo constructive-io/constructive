@@ -1,5 +1,6 @@
 import { execSync } from 'child_process';
 import { PgConfig } from 'pg-env';
+
 import { JobsConfig } from './jobs';
 
 /**

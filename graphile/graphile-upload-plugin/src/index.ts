@@ -1,16 +1,16 @@
 import UploadPostGraphilePlugin, {
   type FileUpload,
+  type UploadFieldDefinition,
   type UploadPluginInfo,
   type UploadResolver,
-  type UploadFieldDefinition,
 } from './plugin';
 
 export {
-  UploadPostGraphilePlugin,
   type FileUpload,
-  type UploadPluginInfo,
-  type UploadResolver,
   type UploadFieldDefinition,
+  type UploadPluginInfo,
+  UploadPostGraphilePlugin,
+  type UploadResolver,
 };
 
 export { Uploader, type UploaderOptions } from './resolvers/upload';

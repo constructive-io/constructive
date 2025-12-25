@@ -85,6 +85,7 @@ export const introspect = async (
       object.comment = object.description;
       if (pgEnableTags && object.description) {
         const parsed = parseTags(object.description);
+
         object.tags = parsed.tags;
         object.description = parsed.text;
       } else {
@@ -96,6 +97,7 @@ export const introspect = async (
   const extensionConfigurationClassIds = (result.extension as any[]).flatMap(
     (e) => e.configurationClassIds || []
   );
+
   for (const klass of result.class as any[]) {
     klass.isExtensionConfigurationTable =
       extensionConfigurationClassIds.includes(klass.id);
@@ -116,10 +118,11 @@ export const introspect = async (
     )}'; however we couldn't find some of those! Missing schemas are: '${missingSchemas.join(
       "', '"
     )}'`;
+
     if (pgThrowOnMissingSchema) {
       throw new Error(errorMessage);
     } else {
-      console.warn('⚠️ WARNING⚠️  ' + errorMessage);
+      console.warn(`⚠️ WARNING⚠️  ${  errorMessage}`);
     }
   }
 

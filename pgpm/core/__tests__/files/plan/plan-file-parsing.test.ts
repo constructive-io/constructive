@@ -31,6 +31,7 @@ users_table 2024-01-01T00:00:00Z Developer <dev@example.com> # Create users tabl
 posts_table [users_table] 2024-01-02T00:00:00Z Developer <dev@example.com> # Create posts table
 `;
       const planPath = join(testDir, 'simple.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -54,6 +55,7 @@ users_table 2024-01-01T00:00:00Z Developer <dev@example.com> # Create users tabl
 posts_table [users_table] 2024-01-03T00:00:00Z Developer <dev@example.com> # Create posts table
 `;
       const planPath = join(testDir, 'with-tags.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -73,6 +75,7 @@ users_table 2024-01-01T00:00:00Z Developer <dev@example.com> # Create users tabl
 posts_table [users_table !old_posts] 2024-01-02T00:00:00Z Developer <dev@example.com> # Create posts table
 `;
       const planPath = join(testDir, 'with-conflicts.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -90,6 +93,7 @@ invalid line without timestamp
 users_table 2024-01-01T00:00:00Z Developer <dev@example.com>
 `;
       const planPath = join(testDir, 'invalid.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -106,6 +110,7 @@ users-table 2024-01-01T00:00:00Z Developer <dev@example.com> # Valid name
 users@table 2024-01-02T00:00:00Z Developer <dev@example.com> # Invalid name
 `;
       const planPath = join(testDir, 'invalid-names.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -122,6 +127,7 @@ users_table 2024-01-01T00:00:00Z Developer <dev@example.com>
 posts_table [@invalid@tag users_table] 2024-01-02T00:00:00Z Developer <dev@example.com>
 `;
       const planPath = join(testDir, 'invalid-deps.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFile(planPath);
@@ -141,6 +147,7 @@ users_table 2024-01-01T00:00:00Z Developer <dev@example.com>
 posts_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 `;
       const planPath = join(testDir, 'simple-parse.plan');
+
       writeFileSync(planPath, planContent);
 
       const result = parsePlanFileSimple(planPath);
@@ -165,6 +172,7 @@ posts_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 comments_table 2024-01-04T00:00:00Z Developer <dev@example.com>
 `;
       const planPath = join(testDir, 'get-changes.plan');
+
       writeFileSync(planPath, planContent);
 
       const changes = getChanges(planPath);
@@ -183,6 +191,7 @@ posts_table 2024-01-02T00:00:00Z Developer <dev@example.com>
 comments_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 `;
       const planPath = join(testDir, 'latest-change.plan');
+
       writeFileSync(planPath, planContent);
 
       const latest = getLatestChange(planPath);
@@ -195,6 +204,7 @@ comments_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 %project=test-project
 `;
       const planPath = join(testDir, 'no-changes.plan');
+
       writeFileSync(planPath, planContent);
 
       expect(getLatestChange(planPath)).toBe('');
@@ -218,6 +228,7 @@ comments_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 
     it('should resolve change references', () => {
       const result = resolveReference('posts_table', plan);
+
       expect(result.change).toBeDefined();
       expect(result.change).toBe('posts_table');
       expect(result.tag).toBeUndefined();
@@ -225,6 +236,7 @@ comments_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 
     it('should resolve tag references', () => {
       const result = resolveReference('@v1.0.0', plan);
+
       expect(result.tag).toBeDefined();
       expect(result.tag).toBe('v1.0.0');
       expect(result.change).toBe('users_table');
@@ -232,24 +244,28 @@ comments_table 2024-01-03T00:00:00Z Developer <dev@example.com>
 
     it('should resolve HEAD reference', () => {
       const result = resolveReference('HEAD', plan);
+
       expect(result.change).toBeDefined();
       expect(result.change).toBe('comments_table');
     });
 
     it('should resolve ROOT reference', () => {
       const result = resolveReference('ROOT', plan);
+
       expect(result.change).toBeDefined();
       expect(result.change).toBe('users_table');
     });
 
     it('should resolve relative references', () => {
       const result = resolveReference('HEAD^', plan);
+
       expect(result.change).toBeDefined();
       expect(result.change).toBe('posts_table');
     });
 
     it('should resolve tag-relative references', () => {
       const result = resolveReference('@v2.0.0~', plan);
+
       expect(result.change).toBeDefined();
       expect(result.change).toBe('comments_table');
     });

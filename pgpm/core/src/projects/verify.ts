@@ -48,11 +48,13 @@ export const verifyProject = async (
     try {
       if (extensions.external.includes(extension)) {
         const query = `SELECT 1/count(*) FROM pg_available_extensions WHERE name = $1`;
+
         log.info(`🔍 Verifying external extension: ${extension}`);
         log.debug(`> ${query}`);
         await pgPool.query(query, [extension]);
       } else {
         const modulePath = resolve(pkg.workspacePath!, modules[extension].path);
+
         log.info(`📂 Verifying local module: ${extension}`);
         log.debug(`→ Path: ${modulePath}`);
         log.debug(`→ Command: constructive migrate verify db:pg:${database}`);
@@ -80,5 +82,6 @@ export const verifyProject = async (
   }
 
   log.success(`✅ Verification complete for ${name}.`);
+
   return extensions;
 };

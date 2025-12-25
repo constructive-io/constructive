@@ -230,11 +230,13 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   const sql: Record<string, string> = {};
   const parsers: Record<string, Parser> = Object.entries(config).reduce((m, [name, config]) => {
     m[name] = new Parser(config);
+
     return m;
   }, {} as Record<string, Parser>);
 
   const queryAndParse = async (key: string, query: string) => {
     const result = await pool.query(query, [database_id]);
+
     if (result.rows.length) {
       sql[key] = await parsers[key].parse(result.rows);
     }
@@ -256,5 +258,5 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('rls_module', `SELECT * FROM meta_public.rls_module WHERE database_id = $1`);
   await queryAndParse('user_auth_module', `SELECT * FROM meta_public.user_auth_module WHERE database_id = $1`);
 
-  return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
+  return Object.entries(sql).reduce((m, [_, v]) => `${m  }\n\n${  v}`, '');
 };

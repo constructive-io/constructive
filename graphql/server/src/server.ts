@@ -1,8 +1,8 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
-import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, RequestHandler } from 'express';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
@@ -21,6 +21,7 @@ const log = new Logger('server');
 export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
   const envOptions = getEnvOptions(rawOpts);
   const app = new Server(envOptions);
+
   app.addEventListener();
   app.listen();
 };
@@ -40,6 +41,7 @@ class Server {
     trustProxy(app, opts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = opts.server?.origin?.trim();
+
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
         log.warn('CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.');
@@ -90,6 +92,7 @@ class Server {
 
   addEventListener(): void {
     const pgPool = this.getPool();
+
     pgPool.connect(this.listenForChanges.bind(this));
   }
 
@@ -101,6 +104,7 @@ class Server {
     if (err) {
       this.error('Error connecting with notify listener', err);
       setTimeout(() => this.addEventListener(), 5000);
+
       return;
     }
 

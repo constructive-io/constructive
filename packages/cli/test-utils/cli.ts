@@ -1,7 +1,7 @@
+import { cleanAnsi } from 'clean-ansi';
 import { CLIOptions } from 'inquirerer';
 import readline from 'readline';
 import { Readable, Transform, Writable } from 'stream';
-import { cleanAnsi } from 'clean-ansi';
 
 export const KEY_SEQUENCES = {
   ENTER: '\u000d',
@@ -43,6 +43,7 @@ function setupReadlineMock(inputQueue: InputResponse[], currentInputIndex: numbe
   readline.createInterface = jest.fn().mockReturnValue({
     question: (questionText: string, cb: (input: string) => void) => {
       const nextInput = inputQueue[currentInputIndex++];
+
       if (nextInput && nextInput.type === 'read') {
         setTimeout(() => cb(nextInput.value), 1); // simulate readline 1ms
       }
@@ -61,8 +62,8 @@ export function setupTests(): () => TestEnvironment {
   let writeResults: string[] = [];
   let transformResults: string[] = [];
 
-  let inputQueue: InputResponse[] = [];
-  let currentInputIndex = 0;
+  const inputQueue: InputResponse[] = [];
+  const currentInputIndex = 0;
   let lastScheduledTime = 0;
 
 
@@ -80,6 +81,7 @@ export function setupTests(): () => TestEnvironment {
         const str = chunk.toString();
         const humanizedStr = humanizeKeySequences(str);
         const cleanStr = cleanAnsi(humanizedStr);
+
         writeResults.push(cleanStr);
         mockWrite(str);
         callback();
@@ -103,6 +105,7 @@ export function setupTests(): () => TestEnvironment {
         const data = chunk.toString();
         const humanizedData = humanizeKeySequences(data);
         const cleanData = cleanAnsi(humanizedData);
+
         transformResults.push(cleanData);
         this.push(chunk);
         callback();

@@ -43,6 +43,7 @@ describe('db_meta functionality', () => {
         ...obj,
         dbname: 'test-database' // Replace dynamic dbname with static value
       };
+
       expect(snapshot(normalized)).toMatchSnapshot();
     };
 
@@ -53,8 +54,10 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [owner_id, 'my-meta-db']
     );
+
     objs.db = database;
     const database_id = database.id;
+
     expect(snapshot(database)).toMatchSnapshot();
 
     // Step 2: Create APIs first (since domains reference them)
@@ -64,6 +67,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, 'public', 'authenticated', 'anonymous']
     );
+
     objs.apis.public = publicApi;
     snapWithNormalizedDbname(publicApi);
 
@@ -73,6 +77,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, 'admin', 'administrator', 'administrator']
     );
+
     objs.apis.admin = adminApi;
     snapWithNormalizedDbname(adminApi);
 
@@ -83,6 +88,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, 'Website Title', 'Website Description']
     );
+
     objs.sites.app = appSite;
     snapWithNormalizedDbname(appSite);
 
@@ -93,6 +99,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, objs.apis.public.id, 'pgpm.io', 'api']
     );
+
     objs.domains.api = apiDomain;
     expect(snapshot(apiDomain)).toMatchSnapshot();
 
@@ -102,6 +109,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, objs.sites.app.id, 'pgpm.io', 'app']
     );
+
     objs.domains.app = appDomain;
     expect(snapshot(appDomain)).toMatchSnapshot();
 
@@ -111,6 +119,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, objs.apis.admin.id, 'pgpm.io', 'admin']
     );
+
     objs.domains.admin = adminDomain;
     expect(snapshot(adminDomain)).toMatchSnapshot();
 
@@ -120,6 +129,7 @@ describe('db_meta functionality', () => {
        RETURNING *`,
       [database_id, 'pgpm.io']
     );
+
     objs.domains.base = baseDomain;
 
     // Step 5: Register modules
@@ -131,6 +141,7 @@ describe('db_meta functionality', () => {
         supportEmail: 'support@interweb.co'
       })]
     );
+
     expect(snapshot(siteModule1)).toMatchSnapshot();
 
     const [apiModule] = await pg.any(
@@ -142,6 +153,7 @@ describe('db_meta functionality', () => {
         authenticate: 'authenticate'
       })]
     );
+
     expect(snapshot(apiModule)).toMatchSnapshot();
 
     const [siteModule2] = await pg.any(
@@ -159,6 +171,7 @@ describe('db_meta functionality', () => {
         verify_email: 'verify_email'
       })]
     );
+
     expect(snapshot(siteModule2)).toMatchSnapshot();
 
     // Step 6: Schema associations

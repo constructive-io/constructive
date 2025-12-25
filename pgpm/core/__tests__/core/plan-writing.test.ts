@@ -13,25 +13,31 @@ afterEach(() => {
 describe('PgpmPackage.writeModulePlan', () => {
   it('writes a clean plan to disk for a module (no projects)', async () => {
     const mod = fixture.getModuleProject(['.'], 'secrets');
+
     await mod.writeModulePlan({ includePackages: false });
 
     const plan = mod.getModulePlan();
+
     expect(plan).toMatchSnapshot();
   });
 
   it('writes a clean plan to disk for a module (with projects)', async () => {
     const mod = fixture.getModuleProject(['.'], 'secrets');
+
     await mod.writeModulePlan({ includePackages: true });
 
     const plan = mod.getModulePlan();
+
     expect(plan).toMatchSnapshot();
   });
 
   it('writes a plan for a dependency-heavy module (totp)', async () => {
     const mod = fixture.getModuleProject(['.'], 'totp');
+
     await mod.writeModulePlan({ includePackages: true });
 
     const plan = mod.getModulePlan();
+
     expect(plan).toContain('%project=totp');
     expect(plan).toMatchSnapshot();
   });

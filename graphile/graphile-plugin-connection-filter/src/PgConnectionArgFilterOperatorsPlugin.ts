@@ -12,6 +12,7 @@ import type { ConnectionFilterConfig } from './types';
 const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
   const { connectionFilterAllowedOperators, connectionFilterOperatorNames } =
     rawOptions as ConnectionFilterConfig;
+
   builder.hook('build', (build) => {
     const {
       graphql: {
@@ -290,16 +291,19 @@ const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
       const pgType = (introspectionResultsByKind.type as PgType[]).find(
         (t) => t.name === pgTypeName
       );
+
       if (!pgType) {
         return null;
       }
       const gqlTypeName = pgGetGqlTypeByTypeIdAndModifier(pgType.id, null).name;
+
       if (gqlTypeName === 'String') {
         // PostGraphile v4 handles all unknown types as Strings, so we can't trust
         // that the String operators are appropriate. Just return null so that the
         // fallback type name defined below is used.
         return null;
       }
+
       return gqlTypeName;
     };
 
@@ -465,6 +469,7 @@ const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
         resolveSqlValue: (input, pgType, pgTypeModifier) => {
           const rangeSubType =
             introspectionResultsByKind.typeById[(pgType as any).rangeSubTypeId];
+
           return sql.query`${gql2pg(
             input,
             (pgType as any).rangeSubTypeId,
@@ -615,6 +620,7 @@ const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
           | 'Scalar';
       };
     };
+
     if (
       !isPgConnectionFilterOperators ||
       !pgConnectionFilterOperatorsCategory ||
@@ -637,6 +643,7 @@ const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
     };
     const operatorSpecs =
       operatorSpecsByCategory[pgConnectionFilterOperatorsCategory];
+
     if (!operatorSpecs) {
       return fields;
     }
@@ -674,6 +681,7 @@ const PgConnectionArgFilterOperatorsPlugin: Plugin = (builder, rawOptions) => {
             isPgConnectionFilterOperator: true,
           }
         );
+
         return memo;
       },
       {}

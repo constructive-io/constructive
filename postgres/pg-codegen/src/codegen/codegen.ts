@@ -17,6 +17,7 @@ export const generateCodeTree = (
 
   // Common types
   const commonTypes: t.Statement[] = [];
+
   if (includeTimestamps) {
     commonTypes.push(
       t.exportNamedDeclaration(
@@ -48,6 +49,7 @@ export const generateCodeTree = (
         if (attr.kind === 'attribute' && attr.classId === obj.id) {
           const fieldType = mapPostgresTypeToTSType(attr.typeId, attr.isNotNull);
           const postgresType = mapPostgresTypeToIdentifier(attr.typeId);
+
           if (postgresType) usedTypes.add(postgresType);
 
           interfaceFields.push(
@@ -80,6 +82,7 @@ export const generateCodeTree = (
       );
 
       const data = t.identifier('data');
+
       data.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(pascalName)));
 
       const classImplements = t.tsExpressionWithTypeArguments(t.identifier(pascalName));
@@ -93,9 +96,11 @@ export const generateCodeTree = (
           ])
         )
       );
+
       (classDeclaration.declaration as t.ClassDeclaration).implements = [classImplements];
 
       const filePath = `schemas/${schemaName}.ts`;
+
       if (!schemaFiles[filePath]) schemaFiles[filePath] = [];
 
       if (usedTypes.size > 0) {
@@ -114,6 +119,7 @@ export const generateCodeTree = (
           );
         } else {
           const current = new Set(existingImports.specifiers.map((s) => (s.local as t.Identifier).name));
+
           Array.from(usedTypes).forEach((type) => {
             if (!current.has(type)) {
               existingImports.specifiers.push(
@@ -130,8 +136,10 @@ export const generateCodeTree = (
 
   // index.ts exports
   const indexFileStatements: t.Statement[] = [];
+
   Object.keys(schemaFiles).forEach((filePath) => {
     const schemaName = filePath.replace('schemas/', '').replace('.ts', '');
+
     if (schemaName === '_common') return;
 
     if (schemaName === 'public') {
@@ -152,6 +160,7 @@ export const generateCodeTree = (
   });
 
   const fileTree: Record<string, string> = {};
+
   Object.entries(schemaFiles).forEach(([filePath, statements]) => {
     // @ts-ignore
     fileTree[filePath] = generate(t.program(statements)).code;
@@ -159,6 +168,7 @@ export const generateCodeTree = (
   
   // @ts-ignore
   fileTree['index.ts'] = generate(t.program(indexFileStatements)).code;
+
   return fileTree;
 };
 
@@ -170,6 +180,7 @@ const toPascalCase = (str: string): string =>
 const mapPostgresTypeToTSType = (typeId: string, isNotNull: boolean): t.TSType => {
   const optionalType = (type: t.TSType): t.TSType =>
     isNotNull ? type : t.tsUnionType([type, t.tsNullKeyword()]);
+
   switch (typeId) {
   case '20': // BIGINT
   case '21': // SMALLINT

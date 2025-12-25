@@ -98,6 +98,7 @@ const PgConnectionArgFilterPostgisOperatorsPlugin: Plugin = (
     );
 
     const subtypes = [0, 1, 2, 3, 4, 5, 6, 7];
+
     for (const subtype of subtypes) {
       for (const hasZ of [false, true]) {
         for (const hasM of [false, true]) {
@@ -205,6 +206,7 @@ const PgConnectionArgFilterPostgisOperatorsPlugin: Plugin = (
           pgGISExtension.namespaceName === "public"
             ? sql.identifier(fn.toLowerCase())
             : sql.identifier(pgGISExtension.namespaceName, fn.toLowerCase());
+
         specs.push({
           typeNames:
             gqlTypeNamesByGisBaseTypeName[

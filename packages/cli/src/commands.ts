@@ -27,6 +27,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   // Run update check early so it shows on help/version paths too
   try {
     const pkg = findAndRequirePackageJson(__dirname);
+
     await checkForUpdates({
       command: command || 'help',
       pkgName: pkg.name,
@@ -41,6 +42,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
 
   if (argv.version || argv.v) {
     const pkg = findAndRequirePackageJson(__dirname);
+
     console.log(pkg.version);
     process.exit(0);
   }
@@ -75,6 +77,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
         options: Object.keys(commandMap)
       }
     ]);
+
     command = answer.command;
   }
 

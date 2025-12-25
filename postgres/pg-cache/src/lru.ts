@@ -63,6 +63,7 @@ export class PgPoolCacheManager {
   // Register a cleanup callback to be called when pools are disposed
   registerCleanupCallback(callback: PoolCleanupCallback): () => void {
     this.cleanupCallbacks.add(callback);
+
     // Return unregister function
     return () => {
       this.cleanupCallbacks.delete(callback);
@@ -85,6 +86,7 @@ export class PgPoolCacheManager {
   delete(key: PgPoolKey): void {
     const managedPool = this.pgCache.get(key);
     const existed = this.pgCache.delete(key);
+
     if (!existed && managedPool) {
       this.notifyCleanup(key);
       this.disposePool(managedPool);
@@ -93,6 +95,7 @@ export class PgPoolCacheManager {
 
   clear(): void {
     const entries = [...this.pgCache.entries()];
+
     this.pgCache.clear();
     for (const [key, managedPool] of entries) {
       this.notifyCleanup(key);
@@ -110,6 +113,7 @@ export class PgPoolCacheManager {
   async waitForDisposals(): Promise<void> {
     if (this.cleanupTasks.length === 0) return;
     const tasks = [...this.cleanupTasks];
+
     this.cleanupTasks = [];
     await Promise.allSettled(tasks);
   }
@@ -127,6 +131,7 @@ export class PgPoolCacheManager {
   private disposePool(managedPool: ManagedPgPool): void {
     if (managedPool.isDisposed) return;
     const task = managedPool.dispose();
+
     this.cleanupTasks.push(task);
   }
 }
