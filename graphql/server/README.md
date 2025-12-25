@@ -56,7 +56,7 @@ See [Configuration](#configuration) for the full list of supported env vars and 
 
 ## What it does
 
-With `api.enableMetaApi` enabled (default), the server resolves API settings from the meta schema, configures PostGraphile with the right schemata and roles, and serves GraphQL over `/graphql`.
+Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostGraphile into a single GraphQL endpoint. It serves `/graphql` and `/graphiql`, injects per-request `pgSettings`, and flushes cached schemas on demand or via database notifications. When meta API is enabled, it resolves API config (schemas, roles, modules) from the meta schema using the request host and enforces `api.isPublic`, with optional header overrides in private mode; when meta API is disabled, it serves the fixed schemas and roles from `api.exposedSchemas`, `api.anonRole`, `api.roleName`, and `api.defaultDatabaseId`.
 
 ## Key Features
 
@@ -86,15 +86,33 @@ When `API_ENABLE_META=true` (default):
   - `X-Schemata` + `X-Database-Id`
   - `X-Meta-Schema` + `X-Database-Id`
 
+When `API_ENABLE_META=false`:
+
+- The server skips meta lookups and serves the fixed schemas in `API_EXPOSED_SCHEMAS`.
+- Roles and database IDs come from `API_ANON_ROLE`, `API_ROLE_NAME`, and `API_DEFAULT_DATABASE_ID`.
+
 ## Configuration
 
-Configuration is merged from defaults, config files, and env vars via `@constructive-io/graphql-env`. See `graphql/env/README.md` for the full list.
+Configuration is merged from defaults, config files, and env vars via `@constructive-io/graphql-env`. See `graphql/env/README.md` for the full list and examples.
 
-Common env vars:
-
-- `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
-- `API_ENABLE_META`, `API_IS_PUBLIC`, `API_META_SCHEMAS`, `API_EXPOSED_SCHEMAS`
-- `API_ANON_ROLE`, `API_ROLE_NAME`, `API_DEFAULT_DATABASE_ID`
+| Env var | Purpose | Default |
+| --- | --- | --- |
+| `PGHOST` | Postgres host | `localhost` |
+| `PGPORT` | Postgres port | `5432` |
+| `PGUSER` | Postgres user | `postgres` |
+| `PGPASSWORD` | Postgres password | `password` |
+| `PGDATABASE` | Postgres database | `postgres` |
+| `GRAPHILE_SCHEMA` | Comma-separated schemas to expose | empty |
+| `FEATURES_SIMPLE_INFLECTION` | Enable simple inflection | `true` |
+| `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names | `true` |
+| `FEATURES_POSTGIS` | Enable PostGIS support | `true` |
+| `API_ENABLE_META` | Enable meta API routing | `true` |
+| `API_IS_PUBLIC` | Serve public APIs only | `true` |
+| `API_EXPOSED_SCHEMAS` | Schemas when meta routing is disabled | empty |
+| `API_META_SCHEMAS` | Meta schemas to query | `collections_public,meta_public` |
+| `API_ANON_ROLE` | Anonymous role name | `administrator` |
+| `API_ROLE_NAME` | Authenticated role name | `administrator` |
+| `API_DEFAULT_DATABASE_ID` | Default database ID | `hard-coded` |
 
 ## Testing
 
