@@ -112,20 +112,6 @@ export interface InitModuleOptions {
   answers?: Record<string, any>;
 }
 
-export interface InitWorkspaceOptions {
-  name: string;
-  outputDir: string;
-  branch?: string;
-  templateRepo?: string;
-  templatePath?: string;
-  cacheTtlMs?: number;
-  noTty?: boolean;
-  toolName?: string;
-  answers?: Record<string, any>;
-  cwd?: string;
-  prompter?: import('inquirerer').Inquirerer;
-}
-
 export class PgpmPackage {
   public cwd: string;
   public workspacePath?: string;
@@ -136,40 +122,6 @@ export class PgpmPackage {
 
   private _moduleMap?: ModuleMap;
   private _moduleInfo?: ExtensionInfo;
-
-  static async initWorkspace(options: InitWorkspaceOptions): Promise<void> {
-    const {
-      name,
-      outputDir,
-      branch,
-      templateRepo = DEFAULT_TEMPLATE_REPO,
-      templatePath,
-      cacheTtlMs = DEFAULT_TEMPLATE_TTL_MS,
-      noTty = false,
-      toolName = DEFAULT_TEMPLATE_TOOL_NAME,
-      answers = {},
-      cwd,
-      prompter,
-    } = options;
-
-    await scaffoldTemplate({
-      type: 'workspace',
-      outputDir,
-      templateRepo,
-      branch,
-      templatePath,
-      answers: {
-        ...answers,
-        name,
-        workspaceName: name,
-      },
-      noTty,
-      cacheTtlMs,
-      toolName,
-      cwd,
-      prompter,
-    });
-  }
 
   constructor(cwd: string = process.cwd()) {
     this.resetCwd(cwd);
