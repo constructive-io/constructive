@@ -1,6 +1,5 @@
-export { getEnvOptions, getConnEnvOptions, getDeploymentEnvOptions } from './merge';
-export { loadConfigSync, loadConfigSyncFromDir, loadConfigFileSync, resolvePgpmPath } from './config';
+export { loadConfigFileSync, loadConfigSync, loadConfigSyncFromDir, resolvePgpmPath } from './config';
 export { getEnvVars, getNodeEnv, parseEnvBoolean } from './env';
+export { getConnEnvOptions, getDeploymentEnvOptions,getEnvOptions } from './merge';
 export { walkUp } from './utils';
-
-export type { PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';
+export type { DeploymentOptions,PgpmOptions, PgTestConnectionOptions } from '@pgpmjs/types';

@@ -1,9 +1,9 @@
 import app from '@constructive-io/knative-job-fn';
-import { GraphQLClient } from 'graphql-request';
-import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send } from '@launchql/postmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
+import { GraphQLClient } from 'graphql-request';
+import gql from 'graphql-tag';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 
@@ -269,7 +269,7 @@ export const sendEmailLink = async (
   });
 
   if (isDryRun) {
-    // eslint-disable-next-line no-console
+     
     console.log('[send-email-link] DRY RUN email (skipping send)', {
       email_type: params.email_type,
       email: params.email,
@@ -326,7 +326,7 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
-    // eslint-disable-next-line no-console
+     
     console.log(`[send-email-link] listening on port ${port}`);
   });
 }

@@ -1,10 +1,10 @@
+import type { MultiPoint, Point as GeoPoint } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { MultiPoint, Point as GeoPoint } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisMultiPointPointsPlugin: Plugin = (builder) => {
   builder.hook(

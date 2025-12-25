@@ -1,8 +1,9 @@
-import { join } from 'path';
 import { getConnections, GraphQLQueryFn } from 'graphile-test';
+import gql from 'graphql-tag';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import gql from 'graphql-tag';
+
 import CustomPgTypeMappingsPlugin from '../src';
 
 const SCHEMA = 'public';

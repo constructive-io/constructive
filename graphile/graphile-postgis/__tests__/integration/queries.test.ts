@@ -1,7 +1,8 @@
 import '../../test-utils/env';
+
 import { readdirSync, readFileSync } from 'fs';
+import { getConnections, type GraphQLQueryFn,seed, snapshot } from 'graphile-test';
 import { join } from 'path';
-import { getConnections, seed, snapshot, type GraphQLQueryFn } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
 import PostgisPlugin from '../../src';

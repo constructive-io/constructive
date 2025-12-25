@@ -1,11 +1,12 @@
 process.env.LOG_SCOPE = 'drizzle-orm-test';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { pgTable, pgSchema, uuid, text, serial, integer } from 'drizzle-orm/pg-core';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { integer,pgSchema, pgTable, serial, text, uuid } from 'drizzle-orm/pg-core';
+import { mkdirSync,writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
+
 import { getConnections, PgTestClient } from '../src';
 
 let pg: PgTestClient;

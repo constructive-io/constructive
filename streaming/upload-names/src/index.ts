@@ -1,4 +1,5 @@
 import { basename, extname } from 'path';
+
 import slugify from './slugify';
 
 interface Options {

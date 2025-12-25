@@ -1,19 +1,20 @@
 import { promises as fs } from 'fs'
-import { join, dirname, isAbsolute, resolve } from 'path'
-import { buildSchema, buildClientSchema, graphql, getIntrospectionQuery, print } from 'graphql'
+import { buildClientSchema, buildSchema, getIntrospectionQuery, graphql, print } from 'graphql'
+import { dirname, isAbsolute, join, resolve } from 'path'
 const inflection: any = require('inflection')
-import { generate as generateGql, GqlMap } from './gql'
-import { parseGraphQuery } from 'introspectron'
-import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions, mergeGraphQLCodegenOptions } from './options'
+import generate from '@babel/generator'
+import { parse } from '@babel/parser'
+import * as t from '@babel/types'
 import { codegen as runCoreCodegen } from '@graphql-codegen/core'
 import * as typescriptPlugin from '@graphql-codegen/typescript'
-import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations'
 import * as typescriptGraphqlRequestPlugin from '@graphql-codegen/typescript-graphql-request'
+import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations'
 import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query'
 import { GraphQLClient } from 'graphql-request'
-import { parse } from '@babel/parser'
-import generate from '@babel/generator'
-import * as t from '@babel/types'
+import { parseGraphQuery } from 'introspectron'
+
+import { generate as generateGql, GqlMap } from './gql'
+import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions, mergeGraphQLCodegenOptions } from './options'
 
 function addDocumentNodeImport(code: string): string {
   const ast = parse(code, {

@@ -1,13 +1,13 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
 import {
-  UpdateCheckConfig,
   UPDATE_CHECK_APPSTASH_KEY,
   UPDATE_CHECK_TTL_MS,
-  UPDATE_PACKAGE_NAME
-} from '@pgpmjs/types';
+  UPDATE_PACKAGE_NAME,
+  UpdateCheckConfig} from '@pgpmjs/types';
+import { findAndRequirePackageJson } from 'find-and-require-package-json';
+
 import { compareVersions, fetchLatestVersion } from './npm-version';
-import { readUpdateConfig, shouldCheck, writeUpdateConfig, UpdateConfigOptions } from './update-config';
+import { readUpdateConfig, shouldCheck, UpdateConfigOptions,writeUpdateConfig } from './update-config';
 
 export interface CheckForUpdatesOptions extends UpdateConfigOptions {
   pkgName?: string;

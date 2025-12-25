@@ -1,10 +1,10 @@
+import type { GeometryCollection } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { GeometryCollection } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisGeometryCollectionGeometriesPlugin: Plugin = (builder) => {
   builder.hook(

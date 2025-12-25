@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+import { writeFileSync } from 'fs';
 import { CLI, type CommandHandler } from 'inquirerer';
+import { dirname } from 'path';
+
 import { readConfig } from './parse';
 import { Parser } from './parser';
 import { normalizePath } from './utils';
-import { dirname } from 'path';
-import { writeFileSync } from 'fs';
 
 interface ConfigFile {
   input?: string;

@@ -1,5 +1,6 @@
 import type { Plugin } from 'graphile-build';
 import type { PgAttribute } from 'graphile-build-pg';
+
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';
 
 const PgConnectionArgFilterColumnsPlugin: Plugin = (builder) => {

@@ -1,8 +1,8 @@
 import { deployFast, PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
-import { getPgPool } from 'pg-cache';
-import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { randomUUID } from 'crypto';
+import { getPgPool } from 'pg-cache';
 
 it('GraphQL query', async () => {
     const newDb = 'db-constructive-'+randomUUID();

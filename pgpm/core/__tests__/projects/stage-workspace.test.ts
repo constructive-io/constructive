@@ -1,7 +1,7 @@
-import { PgpmPackage, PackageContext } from '../../src/core/class/pgpm';
-import { TestFixture } from '../../test-utils/TestFixture';
-import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
+import { PackageContext,PgpmPackage } from '../../src/core/class/pgpm';
 import { TestDatabase } from '../../test-utils';
+import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
+import { TestFixture } from '../../test-utils/TestFixture';
 
 describe('Staging Fixture Tests', () => {
   let fixture: TestFixture;

@@ -1,7 +1,6 @@
 import { loadConfigSyncFromDir, resolvePgpmPath,walkUp } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { errors, PgpmOptions, PgpmWorkspaceConfig } from '@pgpmjs/types';
-import yanse from 'yanse';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import * as glob from 'glob';
@@ -10,15 +9,10 @@ import { parse } from 'parse-package-name';
 import path, { dirname, resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import yanse from 'yanse';
 
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TTL_MS, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate } from '../template-scaffold';
 import { getAvailableExtensions } from '../../extensions/extensions';
 import { generatePlan, writePlan, writePlanFile } from '../../files';
-import { Tag, ExtendedPlanFile, Change } from '../../files/types';
-import { parsePlanFile } from '../../files/plan/parser';
-import { isValidTagName, isValidChangeName, parseReference } from '../../files/plan/validators';
-import { getNow as getPlanTimestamp } from '../../files/plan/generator';
-import { resolveTagToChangeName } from '../../resolution/resolve';
 import {
   ExtensionInfo,
   getExtensionInfo,
@@ -28,6 +22,11 @@ import {
   writeExtensions,
 } from '../../files';
 import { generateControlFileContent, writeExtensionMakefile } from '../../files/extension/writer';
+import { getNow as getPlanTimestamp } from '../../files/plan/generator';
+import { parsePlanFile } from '../../files/plan/parser';
+import { isValidChangeName, isValidTagName, parseReference } from '../../files/plan/validators';
+import { Change,ExtendedPlanFile, Tag } from '../../files/types';
+import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
 import { PgpmMigrate } from '../../migrate/client';
 import {
   getExtensionsAndModules,
@@ -37,10 +36,10 @@ import {
   ModuleMap
 } from '../../modules/modules';
 import { packageModule } from '../../packaging/package';
-import { resolveExtensionDependencies, resolveDependencies } from '../../resolution/deps';
-import { PackageAnalysisIssue, PackageAnalysisResult, RenameOptions } from '../../files/types';
-
+import { resolveDependencies,resolveExtensionDependencies } from '../../resolution/deps';
+import { resolveTagToChangeName } from '../../resolution/resolve';
 import { parseTarget } from '../../utils/target-utils';
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, DEFAULT_TEMPLATE_TTL_MS, scaffoldTemplate } from '../template-scaffold';
 
 
 const logger = new Logger('pgpm');

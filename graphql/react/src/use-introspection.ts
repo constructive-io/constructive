@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
-import { useQuery } from 'react-query';
 // @ts-ignore
 import { IntrospectionQuery, parseGraphQuery } from 'introspectron';
+import { useEffect } from 'react';
+import { useQuery } from 'react-query';
+
 import { useGraphqlClient } from './use-graphql-client';
 
 const noop = () => {};

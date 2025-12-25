@@ -3,16 +3,16 @@ import type { PgType } from 'graphile-build-pg';
 import type { SQL } from 'graphile-build-pg/node8plus/QueryBuilder';
 import type {
   GraphQLInterfaceType,
-  GraphQLOutputType,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchemaConfig
 } from 'graphql';
 
 import { GisSubtype } from './constants';
 import makeGeoJSONType from './makeGeoJSONType';
-import { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisTypeDetails, PostgisBuild } from './types';
+import { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';
 
 const SUBTYPES: GisSubtype[] = [
   GisSubtype.Point,

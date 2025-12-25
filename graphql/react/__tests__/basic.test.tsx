@@ -1,16 +1,18 @@
 // @ts-nocheck
 jest.setTimeout(20000);
-import React from 'react';
-import { render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+
+import { cleanup,render } from '@testing-library/react';
+import React from 'react';
+import { QueryClient,QueryClientProvider } from 'react-query';
+import { useQuery } from 'react-query';
+
 import {
   LqlProvider,
-  useGraphqlClient,
   useConstructiveQuery,
+  useGraphqlClient,
   useTableRowsPaginated
 } from '../src';
-import { QueryClientProvider, QueryClient } from 'react-query';
-import { useQuery } from 'react-query';
 
 const TESTING_URL = process.env.TESTING_URL;
 if (!TESTING_URL) {

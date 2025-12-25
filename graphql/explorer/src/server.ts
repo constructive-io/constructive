@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
-import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { GraphileCache, graphileCache } from 'graphile-cache';
 import graphqlUpload from 'graphql-upload';

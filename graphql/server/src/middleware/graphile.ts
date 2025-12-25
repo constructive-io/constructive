@@ -1,3 +1,5 @@
+import './types'; // for Request type
+
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
@@ -5,7 +7,6 @@ import { getGraphileSettings as getSettings } from 'graphile-settings';
 import type { IncomingMessage } from 'http';
 import { getPgPool } from 'pg-cache';
 import { postgraphile, PostGraphileOptions } from 'postgraphile';
-import './types'; // for Request type
 
 import PublicKeySignature, {
   PublicKeyChallengeConfig,

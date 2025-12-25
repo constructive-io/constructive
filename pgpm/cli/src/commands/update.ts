@@ -1,9 +1,10 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
 import { spawn } from 'child_process';
-import { fetchLatestVersion } from '../utils/npm-version';
+import { findAndRequirePackageJson } from 'find-and-require-package-json';
+import { CLIOptions, Inquirerer } from 'inquirerer';
+
 import { cliExitWithError } from '../utils/cli-error';
+import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('update');
 

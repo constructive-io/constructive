@@ -1,15 +1,14 @@
+import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections, seed } from 'graphile-test';
+import type { GraphQLSchema } from 'graphql';
 import {
   buildASTSchema,
   buildClientSchema,
   getIntrospectionQuery,
+  type IntrospectionQuery,
   parse,
-  printSchema,
-  type IntrospectionQuery
-} from 'graphql';
+  printSchema} from 'graphql';
 import { join } from 'path';
-import type { GraphQLSchema } from 'graphql';
-import type { GraphQLQueryFn } from 'graphile-test';
-import { getConnections, seed } from 'graphile-test';
 
 import PostgisPlugin from '../src';
 

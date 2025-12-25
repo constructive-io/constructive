@@ -1,6 +1,6 @@
+import type { Point } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { Point } from 'geojson';
 
 import { GisSubtype } from './constants';
 import type { GisFieldValue, GisScope, PostgisBuild } from './types';

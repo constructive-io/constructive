@@ -1,5 +1,5 @@
-import { getConnections, PgTestClient } from 'pgsql-test';
 import cases from 'jest-in-case';
+import { getConnections, PgTestClient } from 'pgsql-test';
 
 let pg: PgTestClient;
 let teardown:  () => Promise<void>;

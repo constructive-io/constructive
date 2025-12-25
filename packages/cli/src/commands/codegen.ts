@@ -1,10 +1,10 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
-import { ParsedArgs } from 'minimist'
-import { promises as fs } from 'fs'
-import { join } from 'path'
-import yaml from 'js-yaml'
-import { runCodegen, defaultGraphQLCodegenOptions, mergeGraphQLCodegenOptions, GraphQLCodegenOptions } from '@constructive-io/graphql-codegen'
+import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions,mergeGraphQLCodegenOptions, runCodegen } from '@constructive-io/graphql-codegen'
 import { fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
+import { promises as fs } from 'fs'
+import { CLIOptions, Inquirerer } from 'inquirerer'
+import yaml from 'js-yaml'
+import { ParsedArgs } from 'minimist'
+import { join } from 'path'
 
 const usage = `
 Constructive GraphQL Codegen:

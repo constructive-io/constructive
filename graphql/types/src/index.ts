@@ -3,18 +3,16 @@ export * from '@pgpmjs/types';
 
 // Export GraphQL/Graphile specific types
 export {
-  GraphileOptions,
-  GraphileFeatureOptions,
+  apiDefaults,
   ApiOptions,
   graphileDefaults,
   graphileFeatureDefaults,
-  apiDefaults
-} from './graphile';
+  GraphileFeatureOptions,
+  GraphileOptions} from './graphile';
 
 // Export Constructive combined types
 export {
-  ConstructiveGraphQLOptions,
-  ConstructiveOptions,
+  constructiveDefaults,
   constructiveGraphqlDefaults,
-  constructiveDefaults
-} from './constructive';
+  ConstructiveGraphQLOptions,
+  ConstructiveOptions} from './constructive';

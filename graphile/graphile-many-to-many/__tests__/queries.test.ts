@@ -1,9 +1,9 @@
 import '../test-utils/env';
 
 import { existsSync, promises as fs, readdirSync } from 'fs';
-import { join } from 'path';
-import { getConnections } from 'graphile-test';
 import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections } from 'graphile-test';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
@@ -104,9 +104,9 @@ describe.each(fixtureSets.map(({ schema, fixtures }) => [schema, fixtures] as co
     const normalizedResult = JSON.parse(JSON.stringify(result));
     if (normalizedResult.errors) {
       // surface underlying errors in case snapshots hide details
-      /* eslint-disable no-console */
+       
       console.log(normalizedResult.errors.map((error: any) => error.originalError ?? error));
-      /* eslint-enable no-console */
+       
     }
     expect(normalizedResult).toMatchSnapshot();
   });

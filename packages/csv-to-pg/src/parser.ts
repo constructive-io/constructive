@@ -1,7 +1,8 @@
 import { readFileSync } from 'fs';
-import { parse, parseTypes } from './index';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from './utils';
+
+import { parse, parseTypes } from './index';
+import { InsertMany,InsertOne } from './utils';
 
 interface ParserConfig {
   schema?: string;

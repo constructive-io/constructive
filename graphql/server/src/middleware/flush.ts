@@ -1,10 +1,11 @@
+import './types'; // for Request type
+
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction,Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
-import './types'; // for Request type
 
 const log = new Logger('flush');
 

@@ -1,7 +1,7 @@
 import {
   generateCreateBaseRolesSQL,
-  generateCreateUserSQL,
   generateCreateTestUsersSQL,
+  generateCreateUserSQL,
   generateRemoveUserSQL
 } from '../../src/roles';
 

@@ -1,8 +1,10 @@
+import './types'; // for Request type
+
 import { parseUrl } from '@constructive-io/url-domains';
 import corsPlugin from 'cors';
 import type { Request, RequestHandler } from 'express';
+
 import { CorsModuleData } from '../types';
-import './types'; // for Request type
 
 /**
  * Unified CORS middleware for Constructive API

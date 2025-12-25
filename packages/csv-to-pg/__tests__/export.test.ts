@@ -1,10 +1,11 @@
 // @ts-nocheck
 
-import { parse, parseTypes } from '../src';
 import { resolve } from 'path';
 import { deparse } from 'pgsql-deparser';
-import { InsertOne, InsertMany } from '../src/utils';
+
+import { parse, parseTypes } from '../src';
 import { Parser } from '../src/parser';
+import { InsertMany,InsertOne } from '../src/utils';
 
 const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
 

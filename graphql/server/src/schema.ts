@@ -1,9 +1,10 @@
-import { printSchema, GraphQLSchema, getIntrospectionQuery, buildClientSchema } from 'graphql'
-import { getGraphileSettings } from 'graphile-settings'
-import { getPgPool } from 'pg-cache'
-import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile'
 import * as http from 'node:http'
 import * as https from 'node:https'
+
+import { getGraphileSettings } from 'graphile-settings'
+import { buildClientSchema,getIntrospectionQuery, GraphQLSchema, printSchema } from 'graphql'
+import { getPgPool } from 'pg-cache'
+import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile'
 
 export type BuildSchemaOptions = {
   database?: string;

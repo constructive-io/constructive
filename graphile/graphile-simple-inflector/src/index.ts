@@ -147,7 +147,7 @@ export const PgSimpleInflector: Plugin = (
     pgOmitListSuffix !== true &&
     pgOmitListSuffix !== false
   ) {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       'You can simplify the inflector further by adding `{graphileBuildOptions: {pgOmitListSuffix: true}}` to the options passed to PostGraphile, however be aware that doing so will mean that later enabling relay connections will be a breaking change. To dismiss this message, set `pgOmitListSuffix` to false instead.'
     );

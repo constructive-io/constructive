@@ -1,8 +1,9 @@
-import express from 'express';
-import bodyParser from 'body-parser';
 import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
+
+import bodyParser from 'body-parser';
+import express from 'express';
 
 type JobCallbackStatus = 'success' | 'error';
 
@@ -43,7 +44,7 @@ app.use((req: any, res: any, next: any) => {
       body = undefined;
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log('[knative-job-fn] Incoming job request', {
       method: req.method,
       path: req.originalUrl || req.url,
@@ -152,7 +153,7 @@ const sendJobCallback = async (
   }
 
   try {
-    // eslint-disable-next-line no-console
+     
     console.log('[knative-job-fn] Sending job callback', {
       status,
       target: normalizeCallbackUrl(callbackUrl),
@@ -162,7 +163,7 @@ const sendJobCallback = async (
     });
     await postJson(target, headers, body);
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('[knative-job-fn] Failed to POST job callback', {
       target,
       status,
@@ -190,7 +191,7 @@ app.use((req: any, res: any, next: any) => {
       // If an error handler already sent a callback, skip.
       if (res.locals.jobCallbackSent) return;
       res.locals.jobCallbackSent = true;
-      // eslint-disable-next-line no-console
+       
       console.log('[knative-job-fn] Function completed', {
         workerId: ctx.workerId,
         jobId: ctx.jobId,
@@ -212,7 +213,7 @@ export default {
     // NOTE Remember that Express middleware executes in order.
     // You should define error handlers last, after all other middleware.
     // Otherwise, your error handler won't get called
-    // eslint-disable-next-line no-unused-vars
+     
     app.use(async (error: any, req: any, res: any, next: any) => {
       res.set({
         'Content-Type': 'application/json',
@@ -227,7 +228,7 @@ export default {
           await sendJobCallback(ctx, 'error', error?.message);
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('[knative-job-fn] Failed to send error callback', err);
       }
 
@@ -251,7 +252,7 @@ export default {
           };
         }
 
-        // eslint-disable-next-line no-console
+         
         console.error('[knative-job-fn] Function error', {
           headers,
           path: req.originalUrl || req.url,

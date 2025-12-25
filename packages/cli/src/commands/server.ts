@@ -1,6 +1,6 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
-import { Logger } from '@pgpmjs/logger';
 import { GraphQLServer as server } from '@constructive-io/graphql-server';
+import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';

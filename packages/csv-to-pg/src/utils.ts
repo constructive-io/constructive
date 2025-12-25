@@ -1,5 +1,5 @@
-import { ast, nodes } from '@pgsql/utils';
 import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import { join, resolve } from 'path';
 
 export const normalizePath = (path: string, cwd?: string): string =>

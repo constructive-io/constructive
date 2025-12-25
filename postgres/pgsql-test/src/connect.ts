@@ -2,7 +2,6 @@ import { getConnEnvOptions } from '@pgpmjs/env';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { randomUUID } from 'crypto';
 import { teardownPgPools } from 'pg-cache';
-
 import {
   getPgEnvOptions,
   PgConfig,

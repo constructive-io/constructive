@@ -1,8 +1,8 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
-import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, RequestHandler } from 'express';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';

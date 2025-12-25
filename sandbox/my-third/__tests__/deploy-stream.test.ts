@@ -1,8 +1,8 @@
 import { deployStream, PgpmPackage } from '@pgpmjs/core';
-import { resolve } from 'path';
 import { getEnvOptions } from '@pgpmjs/env';
-import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { randomUUID } from 'crypto';
+import { resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 
 it('Constructive', async () => {

@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+
 import { OllamaClient } from '../utils/ollama';
 
 interface Document {

@@ -2,11 +2,11 @@ import '../../test-utils/env';
 
 import { readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
 import type { Plugin } from 'graphile-build';
 import { PgConnectionArgCondition } from 'graphile-build-pg';
 import type { GraphQLQueryFnObj } from 'graphile-test';
 import { getConnectionsObject, seed, snapshot } from 'graphile-test';
+import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type { PostGraphileOptions } from 'postgraphile';
 

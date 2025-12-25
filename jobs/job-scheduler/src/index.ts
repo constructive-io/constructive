@@ -1,9 +1,9 @@
-import * as jobs from '@constructive-io/job-utils';
-import type { PgClientLike } from '@constructive-io/job-utils';
-import schedule from 'node-schedule';
 import poolManager from '@constructive-io/job-pg';
-import type { Pool, PoolClient } from 'pg';
+import type { PgClientLike } from '@constructive-io/job-utils';
+import * as jobs from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import schedule from 'node-schedule';
+import type { Pool, PoolClient } from 'pg';
 
 export interface ScheduledJobRow {
   id: number | string;

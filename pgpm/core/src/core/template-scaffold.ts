@@ -1,14 +1,14 @@
+import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
 
-import { BoilerplateQuestion } from './boilerplate-types';
 import {
   readBoilerplateConfig,
   readBoilerplatesConfig,
   resolveBoilerplateBaseDir,
 } from './boilerplate-scanner';
+import { BoilerplateQuestion } from './boilerplate-types';
 
 export type TemplateKind = 'workspace' | 'module';
 

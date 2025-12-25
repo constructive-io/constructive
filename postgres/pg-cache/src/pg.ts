@@ -1,6 +1,6 @@
+import { Logger } from '@pgpmjs/logger';
 import pg from 'pg';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
-import { Logger } from '@pgpmjs/logger';
 
 import { pgCache } from './lru';
 

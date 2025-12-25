@@ -1,7 +1,8 @@
 process.env.LOG_SCOPE = 'ollama';
 jest.setTimeout(60000);
 
-import { PgTestClient, getConnections } from 'pgsql-test';
+import { getConnections,PgTestClient } from 'pgsql-test';
+
 import { OllamaClient } from '../src/utils/ollama';
 
 let pg: PgTestClient;

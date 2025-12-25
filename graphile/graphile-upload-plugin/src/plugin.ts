@@ -248,7 +248,7 @@ const UploadPostGraphilePlugin: Plugin = (
               if (obj[key] instanceof Promise) {
                 if (uploadResolversByFieldName[key]) {
                   const upload = await obj[key];
-                  // eslint-disable-next-line require-atomic-updates
+                   
                   obj[originals[key]] = await uploadResolversByFieldName[key](
                     upload,
                     args,

@@ -1,9 +1,9 @@
-import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput } from 'graphile-test';
 import { getGraphileSettings } from 'graphile-settings';
+import type { GetConnectionsInput,GraphQLQueryOptions, GraphQLTestContext } from 'graphile-test';
+import { runGraphQLInContext } from 'graphile-test/context';
 import type { GraphQLSchema } from 'graphql';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile';
-import { runGraphQLInContext } from 'graphile-test/context';
 
 export const GraphQLTest = (
   input: GetConnectionsInput & GetConnectionOpts,

@@ -2,10 +2,10 @@ import type { Build } from 'graphile-build';
 import type { PgClass } from 'graphile-build-pg';
 import type {
   GraphQLFieldConfigMap,
-  GraphQLObjectType,
-  GraphQLResolveInfo,
   GraphQLNamedType,
   GraphQLNullableType,
+  GraphQLObjectType,
+  GraphQLResolveInfo,
   GraphQLType
 } from 'graphql';
 
