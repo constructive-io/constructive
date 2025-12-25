@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/constructive-io/constructive/compare/pgpm@1.2.2...pgpm@1.3.0) (2025-12-25)
+
+### Features
+
+- **pgpm:** add --workspace flag to upgrade-modules command ([cbff1f6](https://github.com/constructive-io/constructive/commit/cbff1f6274b7e2b29c2682c41bf2572d9dd90ace))
+
 ## [1.2.2](https://github.com/constructive-io/constructive/compare/pgpm@1.2.1...pgpm@1.2.2) (2025-12-24)
 
 **Note:** Version bump only for package pgpm
