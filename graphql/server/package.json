@@ -74,13 +74,17 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
+    "@pgpmjs/core": "^3.2.1",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/graphql-upload": "^8.0.12",
     "@types/pg": "^8.16.0",
     "@types/request-ip": "^0.0.41",
+    "@types/supertest": "^6.0.3",
+    "graphile-test": "^2.11.15",
     "makage": "^0.1.9",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2"
   }
 }
