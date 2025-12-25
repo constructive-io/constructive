@@ -21,7 +21,8 @@ const aflt = (num: string | number): Node => nodes.aConst({ fval: ast.float({ fv
 const aint = (num: number): Node => nodes.aConst({ ival: ast.integer({ ival: num }) });
 
 export const makeLocation = (longitude: string | number | null | undefined, latitude: string | number | null | undefined): Node => {
-  if (!longitude || !latitude) {
+  // Use explicit null/undefined checks to allow valid 0 coordinates (e.g., Gulf of Guinea at 0,0)
+  if (longitude === null || longitude === undefined || latitude === null || latitude === undefined) {
     return nodes.aConst({ isnull: true });
   }
   return funcCall('st_setsrid', [
@@ -33,6 +34,32 @@ export const makeLocation = (longitude: string | number | null | undefined, lati
 // a string in the form of lon,lat,lon,lat
 // -118.587533,34.024999,-118.495177,34.13165
 export const makeBoundingBox = (bbox: string): Node => {
+  if (!bbox || typeof bbox !== 'string') {
+    return nodes.aConst({ isnull: true });
+  }
+  
+  const parts = bbox.split(',').map((a) => a.trim());
+  if (parts.length !== 4) {
+    throw new Error(`Invalid bounding box: expected 4 comma-separated values, got ${parts.length}. Value: "${bbox}"`);
+  }
+  
+  const numericParts = parts.map((p, i) => {
+    const num = parseFloat(p);
+    if (isNaN(num)) {
+      throw new Error(`Invalid bounding box: part ${i + 1} ("${p}") is not a valid number. Value: "${bbox}"`);
+    }
+    return num;
+  });
+  
+  // Validate coordinate ranges
+  const [lng1, lat1, lng2, lat2] = numericParts;
+  if (lng1 < -180 || lng1 > 180 || lng2 < -180 || lng2 > 180) {
+    throw new Error(`Invalid bounding box: longitude must be between -180 and 180. Value: "${bbox}"`);
+  }
+  if (lat1 < -90 || lat1 > 90 || lat2 < -90 || lat2 > 90) {
+    throw new Error(`Invalid bounding box: latitude must be between -90 and 90. Value: "${bbox}"`);
+  }
+  
   return funcCall('st_setsrid', [
     funcCall('st_makepolygon', [
       funcCall('st_geomfromtext', [
@@ -275,7 +302,8 @@ export const getRelatedField = ({
       break;
     case 'boolean':
     case 'bool':
-      val = nodes.string({ sval: value ? 'TRUE' : 'FALSE' });
+      // Use proper boolean constant for PG17 AST
+      val = nodes.aConst({ boolval: ast.boolean({ boolval: Boolean(value) }) });
       break;
     case 'text':
     default:
