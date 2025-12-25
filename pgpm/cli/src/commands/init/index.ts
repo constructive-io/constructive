@@ -6,7 +6,9 @@ import {
   DEFAULT_TEMPLATE_TOOL_NAME,
   inspectTemplate,
   PgpmPackage,
+  resolveBoilerplateBaseDir,
   scaffoldTemplate,
+  scanBoilerplates,
   sluggify,
 } from '@pgpmjs/core';
 import { errors } from '@pgpmjs/types';
@@ -36,12 +38,14 @@ Options:
   --repo <repo>           Template repo (default: https://github.com/constructive-io/pgpm-boilerplates.git)
   --from-branch <branch>  Branch/tag to use when cloning repo
   --dir <variant>         Template variant directory (e.g., supabase, drizzle)
+  --boilerplate           Prompt to select from available boilerplates
 
 Examples:
   ${binaryName} init                                   Initialize new module (default)
   ${binaryName} init workspace                         Initialize new workspace
   ${binaryName} init module                            Initialize new module explicitly
   ${binaryName} init workspace --dir <variant>         Use variant templates
+  ${binaryName} init --boilerplate                     Select from available boilerplates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
 `;
@@ -67,9 +71,50 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const branch = argv.fromBranch as string | undefined;
   const dir = argv.dir as string | undefined;
   const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
+  const useBoilerplatePrompt = Boolean(argv.boilerplate);
 
-  // Get fromPath from first positional arg, default to 'module'
-  const fromPath = (argv._?.[0] as string) || 'module';
+  // Get fromPath from first positional arg
+  let fromPath = argv._?.[0] as string | undefined;
+
+  // If --boilerplate flag is used and no fromPath provided, prompt user to select
+  if (useBoilerplatePrompt && !fromPath) {
+    // First, inspect with a dummy path to get the template directory
+    const initialInspection = inspectTemplate({
+      fromPath: 'module', // Use any valid path to trigger repo clone/cache
+      templateRepo,
+      branch,
+      dir,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd,
+    });
+
+    // Resolve the base directory and scan for available boilerplates
+    const baseDir = resolveBoilerplateBaseDir(initialInspection.templateDir);
+    const boilerplates = scanBoilerplates(baseDir);
+
+    if (boilerplates.length === 0) {
+      process.stderr.write('No boilerplates found in the template repository.\n');
+      fromPath = 'module'; // Fall back to default
+    } else {
+      const boilerplateQuestion: Question[] = [
+        {
+          name: 'selectedBoilerplate',
+          message: 'Select a boilerplate',
+          type: 'list',
+          options: boilerplates.map((bp) => bp.name),
+          required: true,
+        },
+      ];
+
+      const boilerplateAnswer = await prompter.prompt(argv, boilerplateQuestion);
+      fromPath = boilerplateAnswer.selectedBoilerplate;
+    }
+  }
+
+  // Default to 'module' if no fromPath provided
+  if (!fromPath) {
+    fromPath = 'module';
+  }
 
   // Inspect the template to get its type
   const inspection = inspectTemplate({
