@@ -40,12 +40,13 @@
     "schema",
     "sqitch"
   ],
-  "devDependencies": {
-    "@pgsql/types": "^17.6.2",
-    "@types/pg": "^8.16.0",
-    "copyfiles": "^2.4.1",
-    "makage": "^0.1.9"
-  },
+    "devDependencies": {
+      "@pgsql/types": "^17.6.2",
+      "@types/pg": "^8.16.0",
+      "copyfiles": "^2.4.1",
+      "inquirerer": "^2.3.2",
+      "makage": "^0.1.9"
+    },
     "dependencies": {
       "@pgpmjs/env": "workspace:^",
       "@pgpmjs/logger": "workspace:^",
@@ -54,7 +55,6 @@
       "create-gen-app": "^0.8.0",
       "csv-to-pg": "^2.0.10",
       "glob": "^13.0.0",
-      "inquirerer": "^2.3.2",
       "komoji": "^0.7.11",
       "parse-package-name": "^1.0.0",
       "pg": "^8.16.3",

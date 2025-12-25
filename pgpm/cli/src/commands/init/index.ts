@@ -41,7 +41,7 @@ Examples:
   ${binaryName} init                                   Initialize new module (default)
   ${binaryName} init workspace                         Initialize new workspace
   ${binaryName} init module                            Initialize new module explicitly
-  ${binaryName} init workspace --dir supabase          Use supabase variant templates
+  ${binaryName} init workspace --dir <variant>         Use variant templates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
 `;

@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
 import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
-import { Inquirerer, Question } from 'inquirerer';
+import type { Inquirerer, Question } from 'inquirerer';
 
 export interface InspectTemplateOptions {
   fromPath: string;
