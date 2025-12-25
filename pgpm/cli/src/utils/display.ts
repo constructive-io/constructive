@@ -1,12 +1,12 @@
 export const usageText = `
   Usage: pgpm <command> [options]
-  
+
   Core Database Operations:
     add                Add database changes to plans and create SQL files
     deploy             Deploy database changes and migrations
     verify             Verify database state and migrations
     revert             Revert database changes and migrations
-  
+
   Project Management:
     init               Initialize workspace or module
     extension          Manage module dependencies
@@ -15,7 +15,12 @@ export const usageText = `
     export             Export database migrations from existing databases
     update             Update pgpm to the latest version
     cache              Manage cached templates (clean)
-  
+    upgrade-modules    Upgrade installed pgpm modules to latest versions
+
+  Development Tools:
+    docker             Manage PostgreSQL Docker containers (start/stop)
+    env                Display environment configuration
+
   Database Administration:
     kill               Terminate database connections and optionally drop databases
     install            Install database modules
@@ -25,23 +30,26 @@ export const usageText = `
     analyze            Analyze database structure
     rename             Rename database changes
     admin-users        Manage admin users
-  
+
+  Testing:
+    test-packages      Run integration tests on all workspace packages
+
   Migration Tools:
     migrate            Migration management subcommands
       init             Initialize migration tracking
       status           Show migration status
       list             List all changes
       deps             Show change dependencies
-  
+
   Global Options:
     -h, --help         Display this help information
     -v, --version      Display version information
     --cwd <directory>  Working directory (default: current directory)
-  
+
   Individual Command Help:
     pgpm <command> --help    Display detailed help for specific command
     pgpm <command> -h        Display detailed help for specific command
-  
+
   Examples:
     pgpm deploy --help       Show deploy command options
     pgpm init workspace      Initialize new workspace
