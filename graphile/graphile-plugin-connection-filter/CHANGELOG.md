@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.23](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter@2.4.22...graphile-plugin-connection-filter@2.4.23) (2025-12-25)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter
+
 ## [2.4.22](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter@2.4.21...graphile-plugin-connection-filter@2.4.22) (2025-12-25)
 
 **Note:** Version bump only for package graphile-plugin-connection-filter
