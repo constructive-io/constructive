@@ -111,18 +111,13 @@ export function inspectTemplate(
   });
 
   // Compute effective fromPath:
-  // - If dir is provided, it OVERRIDES .boilerplates.json resolution
-  //   (join dir with fromPath if both provided, otherwise just use dir)
+  // - If dir is provided, join it with fromPath and bypass .boilerplates.json
   // - If dir is NOT provided, let create-gen-app use .boilerplates.json
-  // - If neither is provided, use undefined (repo root)
-  let effectiveFromPath: string | undefined;
-  let dirOverride = false;
-  if (dir) {
-    dirOverride = true;
-    effectiveFromPath = fromPath ? path.join(dir, fromPath) : dir;
-  } else {
-    effectiveFromPath = fromPath;
-  }
+  const effectiveFromPath = dir
+    ? fromPath
+      ? path.join(dir, fromPath)
+      : dir
+    : fromPath;
 
   const template =
     templateRepo.startsWith('.') ||
@@ -135,24 +130,9 @@ export function inspectTemplate(
     template,
     branch,
     fromPath: effectiveFromPath,
+    // When dir is specified, bypass .boilerplates.json resolution entirely
+    useBoilerplatesConfig: !dir,
   });
-
-  // When --dir is specified, we bypass .boilerplates.json resolution.
-  // Validate that create-gen-app didn't fall back to .boilerplates.json
-  // by checking that the resolved path matches what we expected.
-  if (dirOverride && effectiveFromPath) {
-    const expectedResolvedPath = result.resolvedFromPath;
-    // If create-gen-app fell back to .boilerplates.json, the resolvedFromPath
-    // would be different from our effectiveFromPath (e.g., "default/supabase/module"
-    // instead of "supabase/module")
-    if (expectedResolvedPath && expectedResolvedPath !== effectiveFromPath) {
-      throw new Error(
-        `Directory "${effectiveFromPath}" not found in template repository.\n` +
-          `The --dir option bypasses .boilerplates.json resolution.\n` +
-          `Available at: ${result.templateDir}`
-      );
-    }
-  }
 
   return {
     templateDir: result.templateDir,
@@ -188,9 +168,8 @@ export async function scaffoldTemplate(
     cacheBaseDir: resolveCacheBaseDir(cacheBaseDir),
   });
 
-  // If dir is provided, it OVERRIDES .boilerplates.json resolution
+  // If dir is provided, join it with fromPath and bypass .boilerplates.json
   // Otherwise, let create-gen-app resolve via .boilerplates.json
-  const dirOverride = Boolean(dir);
   const effectiveFromPath = dir ? path.join(dir, fromPath) : fromPath;
 
   const template =
@@ -208,18 +187,9 @@ export async function scaffoldTemplate(
     answers,
     noTty,
     prompter,
+    // When dir is specified, bypass .boilerplates.json resolution entirely
+    useBoilerplatesConfig: !dir,
   });
-
-  // When --dir is specified, we bypass .boilerplates.json resolution.
-  // Validate that create-gen-app didn't fall back to .boilerplates.json
-  // by checking that the resolved path matches what we expected.
-  if (dirOverride && result.fromPath !== effectiveFromPath) {
-    throw new Error(
-      `Directory "${effectiveFromPath}" not found in template repository.\n` +
-        `The --dir option bypasses .boilerplates.json resolution.\n` +
-        `Available at: ${result.templateDir}`
-    );
-  }
 
   return {
     cacheUsed: result.cacheUsed,
