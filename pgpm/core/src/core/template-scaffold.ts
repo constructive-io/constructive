@@ -4,7 +4,11 @@ import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
 import type { Inquirerer, Question } from 'inquirerer';
 
 export interface InspectTemplateOptions {
-  fromPath: string;
+  /**
+   * The boilerplate path to inspect. When omitted, inspects the template
+   * repository root and returns the templateDir for scanning available boilerplates.
+   */
+  fromPath?: string;
   templateRepo?: string;
   branch?: string;
   cacheTtlMs?: number;
@@ -106,9 +110,19 @@ export function inspectTemplate(
     cacheBaseDir: resolveCacheBaseDir(cacheBaseDir),
   });
 
-  // If dir is provided, prefix fromPath with it
-  // Otherwise, let create-gen-app resolve via .boilerplates.json
-  const effectiveFromPath = dir ? path.join(dir, fromPath) : fromPath;
+  // Compute effective fromPath:
+  // - If both dir and fromPath are provided, join them
+  // - If only dir is provided, use dir
+  // - If only fromPath is provided, use fromPath
+  // - If neither is provided, use undefined (repo root)
+  let effectiveFromPath: string | undefined;
+  if (dir && fromPath) {
+    effectiveFromPath = path.join(dir, fromPath);
+  } else if (dir) {
+    effectiveFromPath = dir;
+  } else {
+    effectiveFromPath = fromPath;
+  }
 
   const template =
     templateRepo.startsWith('.') ||

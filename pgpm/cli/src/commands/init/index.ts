@@ -74,47 +74,22 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
 
   // Get fromPath from first positional arg
-  let fromPath = argv._?.[0] as string | undefined;
+  const positionalFromPath = argv._?.[0] as string | undefined;
 
-  // If --boilerplate flag is used and no fromPath provided, prompt user to select
-  if (useBoilerplatePrompt && !fromPath) {
-    // First, inspect with a dummy path to get the template directory
-    const initialInspection = inspectTemplate({
-      fromPath: 'module', // Use any valid path to trigger repo clone/cache
+  // Handle --boilerplate flag: separate path from regular init
+  if (useBoilerplatePrompt) {
+    return handleBoilerplateInit(argv, prompter, {
+      positionalFromPath,
       templateRepo,
       branch,
       dir,
-      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      noTty,
       cwd,
     });
-
-    // Resolve the base directory and scan for available boilerplates
-    const baseDir = resolveBoilerplateBaseDir(initialInspection.templateDir);
-    const boilerplates = scanBoilerplates(baseDir);
-
-    if (boilerplates.length === 0) {
-      process.stderr.write('No boilerplates found in the template repository.\n');
-      fromPath = 'module'; // Fall back to default
-    } else {
-      const boilerplateQuestion: Question[] = [
-        {
-          name: 'selectedBoilerplate',
-          message: 'Select a boilerplate',
-          type: 'list',
-          options: boilerplates.map((bp) => bp.name),
-          required: true,
-        },
-      ];
-
-      const boilerplateAnswer = await prompter.prompt(argv, boilerplateQuestion);
-      fromPath = boilerplateAnswer.selectedBoilerplate;
-    }
   }
 
-  // Default to 'module' if no fromPath provided
-  if (!fromPath) {
-    fromPath = 'module';
-  }
+  // Regular init path: default to 'module' if no fromPath provided
+  const fromPath = positionalFromPath || 'module';
 
   // Inspect the template to get its type
   const inspection = inspectTemplate({
@@ -148,6 +123,104 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     dir,
     noTty,
     cwd,
+  });
+}
+
+interface BoilerplateInitContext {
+  positionalFromPath?: string;
+  templateRepo: string;
+  branch?: string;
+  dir?: string;
+  noTty: boolean;
+  cwd: string;
+}
+
+async function handleBoilerplateInit(
+  argv: Partial<Record<string, any>>,
+  prompter: Inquirerer,
+  ctx: BoilerplateInitContext
+) {
+  let fromPath: string;
+
+  if (ctx.positionalFromPath) {
+    // If a positional fromPath was provided with --boilerplate, use it directly
+    fromPath = ctx.positionalFromPath;
+  } else {
+    // No positional arg: prompt user to select from available boilerplates
+    if (ctx.noTty) {
+      throw new Error(
+        'Cannot use --boilerplate without a <fromPath> argument in non-interactive mode. ' +
+        'Please specify a boilerplate explicitly, e.g., `pgpm init workspace --boilerplate`'
+      );
+    }
+
+    // Inspect without fromPath to get the template directory for scanning
+    const initialInspection = inspectTemplate({
+      templateRepo: ctx.templateRepo,
+      branch: ctx.branch,
+      dir: ctx.dir,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd: ctx.cwd,
+    });
+
+    // Resolve the base directory and scan for available boilerplates
+    const baseDir = resolveBoilerplateBaseDir(initialInspection.templateDir);
+    const boilerplates = scanBoilerplates(baseDir);
+
+    if (boilerplates.length === 0) {
+      throw new Error(
+        `No boilerplates found in the template repository.\n` +
+        `Checked directory: ${baseDir}\n` +
+        `Make sure the repository contains boilerplate directories with .boilerplate.json files.`
+      );
+    }
+
+    const boilerplateQuestion: Question[] = [
+      {
+        name: 'selectedBoilerplate',
+        message: 'Select a boilerplate',
+        type: 'list',
+        options: boilerplates.map((bp) => bp.name),
+        required: true,
+      },
+    ];
+
+    const boilerplateAnswer = await prompter.prompt(argv, boilerplateQuestion);
+    fromPath = boilerplateAnswer.selectedBoilerplate;
+  }
+
+  // Inspect the selected template to get its type
+  const inspection = inspectTemplate({
+    fromPath,
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    cwd: ctx.cwd,
+  });
+
+  const templateType = inspection.config?.type;
+
+  // Branch based on template type
+  if (templateType === 'workspace') {
+    return handleWorkspaceInit(argv, prompter, {
+      fromPath,
+      templateRepo: ctx.templateRepo,
+      branch: ctx.branch,
+      dir: ctx.dir,
+      noTty: ctx.noTty,
+      cwd: ctx.cwd,
+    });
+  }
+
+  // Default to module init (for 'module' type or unknown types)
+  return handleModuleInit(argv, prompter, {
+    fromPath,
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    noTty: ctx.noTty,
+    cwd: ctx.cwd,
   });
 }
 
