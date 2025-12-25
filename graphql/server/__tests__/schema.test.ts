@@ -5,7 +5,7 @@ import express from 'express';
 import { postgraphile } from 'postgraphile';
 // @ts-ignore
 import { getGraphileSettings } from 'graphile-settings';
-import { getPgPool } from 'pg-cache';
+import { close as closePgPools, getPgPool } from 'pg-cache';
 
 import { buildSchemaSDL, fetchEndpointSchemaSDL } from '../src/schema';
 import { seed, getConnections } from 'graphile-test';
@@ -13,7 +13,7 @@ import { seed, getConnections } from 'graphile-test';
 jest.setTimeout(30000);
 
 const schemas = ['app_public'];
-const sql = (f: string) => join(__dirname, '../../@constructive-io/graphql-test/sql', f);
+const sql = (f: string) => join(__dirname, '../../test/sql', f);
 
 let db: any;
 let teardown: () => Promise<void>;
@@ -38,6 +38,7 @@ afterAll(async () => {
     server = null;
   }
   await teardown();
+  await closePgPools();
 });
 
 beforeEach(async () => {
