@@ -1,10 +1,10 @@
+import type { MultiPolygon, Polygon } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { MultiPolygon, Polygon } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisMultiPolygonPolygonsPlugin: Plugin = (builder) => {
   builder.hook(

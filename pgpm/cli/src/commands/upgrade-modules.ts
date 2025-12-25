@@ -2,6 +2,7 @@ import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
+
 import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('upgrade-modules');

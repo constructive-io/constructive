@@ -1,6 +1,6 @@
-import { Tsquery } from 'pg-tsquery';
-import { omit } from 'graphile-build-pg';
 import type { Plugin } from 'graphile-build';
+import { omit } from 'graphile-build-pg';
+import { Tsquery } from 'pg-tsquery';
 
 const tsquery = new Tsquery();
 
@@ -26,7 +26,7 @@ const PostGraphileFulltextFilterPlugin: Plugin = (builder) => {
         const columnName =
           attr.kind === 'procedure'
             ? attr.name.substring(table.name.length + 1)
-            : this._columnName(attr, { skipRowId: true }); // eslint-disable-line no-underscore-dangle
+            : this._columnName(attr, { skipRowId: true });  
         return this.constantCase(
           `${columnName}_rank_${ascending ? 'asc' : 'desc'}`
         );

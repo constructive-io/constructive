@@ -1,8 +1,9 @@
+import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'fs';
+import * as fs from 'fs';
+import { basename, join } from 'path';
+
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { basename, join } from 'path';
-import * as fs from 'fs';
 
 describe('Add functionality', () => {
   let fixture: TestFixture;

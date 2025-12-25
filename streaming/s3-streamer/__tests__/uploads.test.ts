@@ -1,6 +1,6 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import { getEnvOptions } from '@pgpmjs/env';
 import { createS3Bucket } from '@constructive-io/s3-utils';
+import { getEnvOptions } from '@pgpmjs/env';
 import { createReadStream } from 'fs';
 import { sync as glob } from 'glob';
 import { basename } from 'path';

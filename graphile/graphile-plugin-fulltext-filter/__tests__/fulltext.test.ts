@@ -1,9 +1,9 @@
+import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 import type { GraphQLQueryFnObj, GraphQLTestContext } from 'graphile-test';
 import { getConnectionsObject, seed } from 'graphile-test';
 import { buildClientSchema, getIntrospectionQuery } from 'graphql';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 
 import PostGraphileFulltextFilterPlugin from '../src';
 

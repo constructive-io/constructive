@@ -1,7 +1,7 @@
+import { cleanAnsi } from 'clean-ansi';
 import { CLIOptions } from 'inquirerer';
 import readline from 'readline';
 import { Readable, Transform, Writable } from 'stream';
-import { cleanAnsi } from 'clean-ansi';
 
 export const KEY_SEQUENCES = {
   ENTER: '\u000d',

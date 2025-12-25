@@ -1,3 +1,4 @@
+import { errors } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { join,relative } from 'path';
@@ -5,7 +6,6 @@ import { join,relative } from 'path';
 import { PgpmPackage } from '../core/class/pgpm';
 import { parsePlanFile } from '../files/plan/parser';
 import { ExtendedPlanFile } from '../files/types';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Represents a dependency graph where keys are module identifiers

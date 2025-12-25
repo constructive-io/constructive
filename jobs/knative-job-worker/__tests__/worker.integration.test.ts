@@ -21,10 +21,11 @@ jest.mock('@constructive-io/job-pg', () => ({
   }
 }));
 
+import * as jobUtils from '@constructive-io/job-utils';
 import path from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import * as jobUtils from '@constructive-io/job-utils';
+
 import Worker from '../src';
 
 let db: PgTestClient;

@@ -1,9 +1,9 @@
+import { PgpmPackage } from '../../src/core/class/pgpm';
 import {
   getExtensionsAndModules,
   getExtensionsAndModulesChanges,
   latestChange
 } from '../../src/modules/modules';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;

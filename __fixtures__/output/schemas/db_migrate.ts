@@ -1,4 +1,4 @@
-import { UUID, Timestamp } from "./_common";
+import { Timestamp,UUID } from "./_common";
 export interface migrate_files {
   id: UUID;
   database_id: UUID | null;

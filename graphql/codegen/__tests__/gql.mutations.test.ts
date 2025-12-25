@@ -1,5 +1,6 @@
 import { print } from 'graphql'
-import { createOne, patchOne, deleteOne, createMutation, MutationSpec } from '../src'
+
+import { createMutation, createOne, deleteOne, MutationSpec,patchOne } from '../src'
 
 describe('gql mutation builders', () => {
   it('createMutation: builds non-null vars and selects scalar outputs', () => {

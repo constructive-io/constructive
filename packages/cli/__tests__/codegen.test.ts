@@ -1,5 +1,6 @@
-import path from 'path'
 import type { ParsedArgs } from 'minimist'
+import path from 'path'
+
 import codegenCommand from '../src/commands/codegen'
 
 jest.mock('@constructive-io/graphql-codegen', () => {

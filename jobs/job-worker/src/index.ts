@@ -1,7 +1,7 @@
-import pg from 'pg';
-import type { Pool, PoolClient } from 'pg';
-import * as jobs from '@constructive-io/job-utils';
 import type { PgClientLike } from '@constructive-io/job-utils';
+import * as jobs from '@constructive-io/job-utils';
+import type { Pool, PoolClient } from 'pg';
+import pg from 'pg';
 
 const pgPoolConfig = {
   connectionString: jobs.getJobConnectionString()
@@ -37,7 +37,7 @@ export type TaskHandler = (
   job: JobRow
 ) => Promise<void> | void;
 
-/* eslint-disable no-console */
+ 
 
 export default class Worker {
   tasks: Record<string, TaskHandler>;

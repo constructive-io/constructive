@@ -1,5 +1,6 @@
 import type { Plugin } from 'graphile-build';
 import type { QueryBuilder, SQL } from 'graphile-build-pg';
+
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';
 
 const PgConnectionArgFilterLogicalOperatorsPlugin: Plugin = (builder) => {

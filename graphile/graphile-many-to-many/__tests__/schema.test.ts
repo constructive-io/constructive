@@ -1,15 +1,15 @@
 import '../test-utils/env';
 
 import { existsSync } from 'fs';
-import { join } from 'path';
-import { getIntrospectionQuery, buildClientSchema, printSchema } from 'graphql';
-import { lexicographicSortSchema } from 'graphql/utilities';
 import { PgConnectionArgCondition } from 'graphile-build-pg';
-import type { PostGraphileOptions } from 'postgraphile';
-import { getConnections } from 'graphile-test';
 import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections } from 'graphile-test';
+import { buildClientSchema, getIntrospectionQuery, printSchema } from 'graphql';
+import { lexicographicSortSchema } from 'graphql/utilities';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
+import type { PostGraphileOptions } from 'postgraphile';
 
 import PgManyToManyPlugin from '../src';
 

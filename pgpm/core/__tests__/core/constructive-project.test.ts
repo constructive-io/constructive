@@ -1,4 +1,4 @@
-import { PgpmPackage, PackageContext } from '../../src/core/class/pgpm';
+import { PackageContext,PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;

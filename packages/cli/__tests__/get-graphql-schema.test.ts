@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+
 import runGetGraphqlSchema from '../src/commands/get-graphql-schema';
 
 jest.mock('@constructive-io/graphql-server', () => ({

@@ -1,18 +1,20 @@
 import '../test-utils/env';
-import { getConnections, snapshot, seed, GraphQLQueryFn } from 'graphile-test';
-import { join } from 'path';
-import type { PgTestClient } from 'pgsql-test/test-client';
-import {
-  GoalsSearchViaCondition,
-  GoalsSearchViaFilter,
-  GoalsSearchViaCondition2,
-  GoalsSearchViaFilter2
-} from '../test-utils/queries';
-import { PgSearchPlugin } from '../src';
-import PgSimpleInflector from 'graphile-simple-inflector';
+
 import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 // @ts-ignore
 import FulltextFilterPlugin from 'graphile-plugin-fulltext-filter';
+import PgSimpleInflector from 'graphile-simple-inflector';
+import { getConnections, GraphQLQueryFn,seed, snapshot } from 'graphile-test';
+import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test/test-client';
+
+import { PgSearchPlugin } from '../src';
+import {
+  GoalsSearchViaCondition,
+  GoalsSearchViaCondition2,
+  GoalsSearchViaFilter,
+  GoalsSearchViaFilter2
+} from '../test-utils/queries';
 
 const SCHEMA = 'app_public';
 const sql = (f: string) => join(__dirname, '../sql', f);

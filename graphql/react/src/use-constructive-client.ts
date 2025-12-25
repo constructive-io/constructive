@@ -1,5 +1,6 @@
+import { MetaObject,QueryBuilder } from '@constructive-io/graphql-query';
 import { useMemo } from 'react';
-import { QueryBuilder, MetaObject } from '@constructive-io/graphql-query';
+
 import { useIntrospection } from './use-introspection';
 import { useSchemaMeta } from './use-schema-meta';
 

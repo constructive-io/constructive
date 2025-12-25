@@ -1,9 +1,9 @@
 import { getEnvOptions, getNodeEnv, parseEnvBoolean } from '@pgpmjs/env';
-import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
-import { getPgPool } from 'pg-cache';
-import type { Pool } from 'pg';
 import type { PgpmOptions } from '@pgpmjs/types';
 import { jobsDefaults } from '@pgpmjs/types';
+import type { Pool } from 'pg';
+import { getPgPool } from 'pg-cache';
+import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
 
 type Maybe<T> = T | null | undefined;
 

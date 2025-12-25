@@ -1,3 +1,5 @@
+import './types'; // for Request type
+
 import { getNodeEnv } from '@constructive-io/graphql-env';
 import { svcCache } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -14,7 +16,6 @@ import errorPage404Message from '../errors/404-message';
  */
 import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
 import { ApiByNameQuery, ApiQuery, ListOfAllDomainsOfDb } from './gql';
-import './types'; // for Request type
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;

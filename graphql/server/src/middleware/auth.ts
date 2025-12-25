@@ -1,8 +1,9 @@
+import './types'; // for Request type
+
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
-import './types'; // for Request type
 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions

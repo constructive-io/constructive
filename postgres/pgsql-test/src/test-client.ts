@@ -1,12 +1,13 @@
+import { AuthOptions, PgTestClientContext,PgTestConnectionOptions } from '@pgpmjs/types';
 import { Client, QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
-import { AuthOptions, PgTestConnectionOptions, PgTestClientContext } from '@pgpmjs/types';
-import { getRoleName } from './roles';
+
 import { generateContextStatements } from './context-utils';
+import { getRoleName } from './roles';
+import { type CsvSeedMap,loadCsvMap } from './seed/csv';
 import { insertJson, type JsonSeedMap } from './seed/json';
-import { loadCsvMap, type CsvSeedMap } from './seed/csv';
-import { loadSqlFiles } from './seed/sql';
 import { deployPgpm } from './seed/pgpm';
+import { loadSqlFiles } from './seed/sql';
 
 export type PgTestClientOpts = {
   deferConnect?: boolean;

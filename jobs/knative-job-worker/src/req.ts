@@ -1,4 +1,3 @@
-import requestLib from 'request';
 import {
   getCallbackBaseUrl,
   getJobGatewayConfig,
@@ -6,6 +5,7 @@ import {
   getNodeEnvironment
 } from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import requestLib from 'request';
 
 const log = new Logger('jobs:req');
 

@@ -1,6 +1,6 @@
 import app from '@constructive-io/knative-job-fn';
-import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
+import { parseEnvBoolean } from '@pgpmjs/env';
 
 type SimpleEmailPayload = {
   to: string;
@@ -62,7 +62,7 @@ app.post('*', async (req: any, res: any, next: any) => {
     };
 
     if (isDryRun) {
-      // eslint-disable-next-line no-console
+       
       console.log('[simple-email] DRY RUN email (no send)', logContext);
     } else {
       // Send via the Postmaster package (Mailgun or configured provider)
@@ -75,7 +75,7 @@ app.post('*', async (req: any, res: any, next: any) => {
         ...(replyTo && { replyTo })
       });
 
-      // eslint-disable-next-line no-console
+       
       console.log('[simple-email] Sent email', logContext);
     }
 
@@ -93,7 +93,7 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the underlying Express app
   (app as any).listen(port, () => {
-    // eslint-disable-next-line no-console
+     
     console.log(`[simple-email] listening on port ${port}`);
   });
 }

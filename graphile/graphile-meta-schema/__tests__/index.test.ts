@@ -1,9 +1,11 @@
 import '../test-utils/env';
+
 import PgManyToMany from '@graphile-contrib/pg-many-to-many';
+import { getConnections, type GraphQLQueryFn,seed, snapshot } from 'graphile-test';
 import { join } from 'path';
-import { getConnections, snapshot, seed, type GraphQLQueryFn } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
+import { PgMetaschemaPlugin } from '../src';
 import {
   GetBelongsToRelations,
   GetHasManyRelations,
@@ -13,7 +15,6 @@ import {
   GetMetaSchema,
   GetMetaSchemaUnion
 } from '../test-utils/queries';
-import { PgMetaschemaPlugin } from '../src';
 
 const SCHEMA = process.env.SCHEMA ?? 'app_meta';
 const sql = (file: string) => join(__dirname, '../sql', file);

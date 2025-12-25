@@ -1,12 +1,13 @@
+import type { Node } from '@pgsql/types';
+import { ast, nodes } from '@pgsql/utils';
 import csv from 'csv-parser';
 import { createReadStream, readFileSync } from 'fs';
 import { load as parseYAML } from 'js-yaml';
-import { ast, nodes } from '@pgsql/utils';
-import type { Node } from '@pgsql/types';
+
 import {
+  getRelatedField,
   makeBoundingBox,
   makeLocation,
-  getRelatedField,
   wrapValue
 } from './utils';
 

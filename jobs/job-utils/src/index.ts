@@ -1,30 +1,27 @@
+import { Logger } from '@pgpmjs/logger';
 import type {
-  FailJobParams,
   CompleteJobParams,
+  FailJobParams,
   GetJobParams,
   GetScheduledJobParams,
-  RunScheduledJobParams,
+  ReleaseJobsParams,
   ReleaseScheduledJobsParams,
-  ReleaseJobsParams
-} from '@pgpmjs/types';
+  RunScheduledJobParams} from '@pgpmjs/types';
 
 import {
-  getJobSchema,
-  getJobPgConfig,
-  getJobPool,
+  getCallbackBaseUrl,
   getJobConnectionString,
-  getJobSupportAny,
-  getJobSupported,
-  getWorkerHostname,
-  getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobPgConfig,
+  getJobPool,
   getJobsCallbackPort,
-  getCallbackBaseUrl,
-  getNodeEnvironment
-} from './runtime';
-
-import { Logger } from '@pgpmjs/logger';
+  getJobSchema,
+  getJobSupportAny,
+  getJobSupported,
+  getNodeEnvironment,
+  getSchedulerHostname,
+  getWorkerHostname} from './runtime';
 
 const log = new Logger('jobs:core');
 
@@ -33,20 +30,19 @@ export type PgClientLike = {
 };
 
 export {
-  getJobSchema,
-  getJobPgConfig,
-  getJobPool,
+  getCallbackBaseUrl,
   getJobConnectionString,
-  getJobSupportAny,
-  getJobSupported,
-  getWorkerHostname,
-  getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobPgConfig,
+  getJobPool,
   getJobsCallbackPort,
-  getCallbackBaseUrl,
-  getNodeEnvironment
-};
+  getJobSchema,
+  getJobSupportAny,
+  getJobSupported,
+  getNodeEnvironment,
+  getSchedulerHostname,
+  getWorkerHostname};
 
 const JOBS_SCHEMA = getJobSchema();
 

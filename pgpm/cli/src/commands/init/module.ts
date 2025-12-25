@@ -1,9 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, PgpmPackage, sluggify } from '@pgpmjs/core';
 import { errors } from '@pgpmjs/types';
+import fs from 'fs';
 import { Inquirerer, OptionValue, Question } from 'inquirerer';
+import path from 'path';
 
 const DEFAULT_MOTD = `
                  |              _   _

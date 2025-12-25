@@ -1,6 +1,7 @@
+import { PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PgpmOptions } from '@pgpmjs/types';
+
 import { walkUp } from './utils';
 
 /**

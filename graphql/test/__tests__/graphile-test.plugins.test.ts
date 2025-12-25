@@ -1,12 +1,12 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
+import type { GraphQLQueryFn } from 'graphile-test';
 import gql from 'graphql-tag';
 import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
 import { getConnections } from '../src/get-connections';
-import type { GraphQLQueryFn } from 'graphile-test';
 import { IntrospectionQuery } from '../test-utils/queries';
 
 const schemas = ['app_public'];

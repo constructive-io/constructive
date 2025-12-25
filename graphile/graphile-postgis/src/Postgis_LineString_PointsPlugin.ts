@@ -1,10 +1,10 @@
+import type { LineString, Point as GeoPoint } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { LineString, Point as GeoPoint } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisLineStringPointsPlugin: Plugin = (builder) => {
   builder.hook(

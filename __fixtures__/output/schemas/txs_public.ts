@@ -1,4 +1,4 @@
-import { UUID, Timestamp } from "./_common";
+import { Timestamp,UUID } from "./_common";
 export interface commit {
   id: UUID;
   message: string | null;

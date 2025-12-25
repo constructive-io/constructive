@@ -3,10 +3,11 @@ import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+
 import { 
   generateCreateBaseRolesSQL, 
-  generateCreateUserSQL, 
   generateCreateTestUsersSQL,
+  generateCreateUserSQL, 
   generateRemoveUserSQL
 } from '../roles';
 

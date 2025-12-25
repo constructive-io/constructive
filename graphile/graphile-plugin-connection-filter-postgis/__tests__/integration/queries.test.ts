@@ -1,11 +1,11 @@
 import { readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
+import PostgisPlugin from 'graphile-postgis';
 import type { GraphQLQueryFnObj } from 'graphile-test';
 import { getConnectionsObject, seed, snapshot } from 'graphile-test';
+import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import PostgisPlugin from 'graphile-postgis';
-import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 
 import PostgisConnectionFilterPlugin from '../../src';
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import Scheduler from './index';
 import poolManager from '@constructive-io/job-pg';
 import {
-  getSchedulerHostname,
-  getJobSupported
-} from '@constructive-io/job-utils';
+  getJobSupported,
+  getSchedulerHostname} from '@constructive-io/job-utils';
+
+import Scheduler from './index';
 
 const pgPool = poolManager.getPool();
 

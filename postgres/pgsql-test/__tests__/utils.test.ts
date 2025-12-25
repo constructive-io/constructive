@@ -1,13 +1,12 @@
 import {
-  snapshot,
+  IdHash,
   prune,
   pruneDates,
-  pruneIds,
-  pruneIdArrays,
-  pruneUUIDs,
   pruneHashes,
-  IdHash
-} from '../src/utils';
+  pruneIdArrays,
+  pruneIds,
+  pruneUUIDs,
+  snapshot} from '../src/utils';
 
 describe('snapshot utilities', () => {
   describe('pruneDates', () => {

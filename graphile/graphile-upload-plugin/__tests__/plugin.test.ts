@@ -1,13 +1,15 @@
 import '../test-utils/env';
-import { join } from 'path';
-import { createReadStream, writeFileSync, unlinkSync } from 'fs';
-import { tmpdir } from 'os';
+
 import { S3Client } from '@aws-sdk/client-s3';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Bucket } from '@constructive-io/s3-utils';
-import { getConnections, snapshot, seed } from 'graphile-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
+import { createReadStream, unlinkSync,writeFileSync } from 'fs';
 import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections, seed,snapshot } from 'graphile-test';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test/test-client';
+
 import UploadPostGraphilePlugin, { Uploader } from '../src';
 
 // Suppress PostgreSQL NOTICE messages (they're expected when roles don't exist yet)
@@ -15,21 +17,22 @@ import UploadPostGraphilePlugin, { Uploader } from '../src';
 if (typeof process !== 'undefined') {
   process.env.PGOPTIONS = '-c client_min_messages=warning';
 }
+import gql from 'graphql-tag';
+
 import {
-  IntrospectUploadScalar,
-  GetCreateUserInput,
-  GetCreateDocumentInput,
-  GetCreateProductInput,
-  GetCreateProfileInput,
-  CreateUserWithAvatar,
-  UpdateUserAvatar,
   CreateDocumentWithUpload,
-  UpdateDocumentWithUpload,
   CreateMediaWithUpload,
   CreateProductWithUpload,
   CreateProfileWithUpload,
+  CreateUserWithAvatar,
+  GetCreateDocumentInput,
+  GetCreateProductInput,
+  GetCreateProfileInput,
+  GetCreateUserInput,
+  IntrospectUploadScalar,
+  UpdateDocumentWithUpload,
+  UpdateUserAvatar,
 } from '../test-utils/queries';
-import gql from 'graphql-tag';
 
 const SCHEMA = process.env.SCHEMA ?? 'app_public';
 const sql = (f: string) => join(__dirname, '../sql', f);

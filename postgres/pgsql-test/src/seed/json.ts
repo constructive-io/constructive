@@ -1,4 +1,5 @@
 import type { Client } from 'pg';
+
 import { SeedAdapter, SeedContext } from './types';
 export interface JsonSeedMap {
   [table: string]: Record<string, any>[];

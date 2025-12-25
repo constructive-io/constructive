@@ -1,9 +1,3 @@
-import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { getConnections as getPgConnections } from 'pgsql-test';
-import type { SeedAdapter } from 'pgsql-test/seed/types';
-import type { PgTestClient } from 'pgsql-test/test-client';
-
-import { GraphQLTest } from './graphile-test';
 import type {
   GetConnectionsInput,
   GraphQLQueryFn,
@@ -13,6 +7,12 @@ import type {
   GraphQLQueryUnwrappedFnObj,
   GraphQLResponse
 } from 'graphile-test';
+import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
+import { getConnections as getPgConnections } from 'pgsql-test';
+import type { SeedAdapter } from 'pgsql-test/seed/types';
+import type { PgTestClient } from 'pgsql-test/test-client';
+
+import { GraphQLTest } from './graphile-test';
 
 // Core unwrapping utility
 const unwrap = <T>(res: GraphQLResponse<T>): T => {

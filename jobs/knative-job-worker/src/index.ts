@@ -1,8 +1,9 @@
 import poolManager from '@constructive-io/job-pg';
-import * as jobs from '@constructive-io/job-utils';
 import type { PgClientLike } from '@constructive-io/job-utils';
-import type { Pool, PoolClient } from 'pg';
+import * as jobs from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import type { Pool, PoolClient } from 'pg';
+
 import { request as req } from './req';
 
 export interface JobRow {

@@ -1,7 +1,7 @@
 import { deployFast, PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
-import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { randomUUID } from 'crypto';
 
 it('dashboard', async () => {
     const project = new PgpmPackage(process.env.CONSTRUCTIVE_DASHBOARD);

@@ -1,5 +1,6 @@
-import { CLIOptions, Inquirerer } from 'inquirerer';
 import { CacheManager } from 'create-gen-app';
+import { CLIOptions, Inquirerer } from 'inquirerer';
+
 import { cliExitWithError } from '../utils/cli-error';
 
 const cacheUsageText = `
