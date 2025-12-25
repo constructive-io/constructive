@@ -1,14 +1,7 @@
-import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
-
-import { BoilerplateQuestion } from './boilerplate-types';
-import {
-  readBoilerplateConfig,
-  readBoilerplatesConfig,
-  resolveBoilerplateBaseDir,
-} from './boilerplate-scanner';
+import { TemplateScaffolder } from 'create-gen-app';
+import { Inquirerer, Question } from 'inquirerer';
 
 export type TemplateKind = 'workspace' | 'module';
 
@@ -26,6 +19,12 @@ export interface ScaffoldTemplateOptions {
   cacheBaseDir?: string;
   /** Override the boilerplate directory (e.g., "default", "supabase") */
   dir?: string;
+  /**
+   * Optional Inquirerer instance to reuse for prompting.
+   * If provided, the caller retains ownership and is responsible for closing it.
+   * If not provided, a new instance will be created and closed automatically.
+   */
+  prompter?: Inquirerer;
 }
 
 export interface ScaffoldTemplateResult {
@@ -34,7 +33,7 @@ export interface ScaffoldTemplateResult {
   cachePath?: string;
   templateDir: string;
   /** Questions loaded from .boilerplate.json, if any */
-  questions?: BoilerplateQuestion[];
+  questions?: Question[];
 }
 
 export const DEFAULT_TEMPLATE_REPO =
@@ -42,82 +41,32 @@ export const DEFAULT_TEMPLATE_REPO =
 export const DEFAULT_TEMPLATE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 export const DEFAULT_TEMPLATE_TOOL_NAME = 'pgpm';
 
-const templatizer = new Templatizer();
+function resolveCacheBaseDir(cacheBaseDir?: string): string | undefined {
+  if (cacheBaseDir) {
+    return cacheBaseDir;
+  }
+  if (process.env.PGPM_CACHE_BASE_DIR) {
+    return process.env.PGPM_CACHE_BASE_DIR;
+  }
+  if (process.env.JEST_WORKER_ID) {
+    return path.join(os.tmpdir(), `pgpm-cache-${process.env.JEST_WORKER_ID}`);
+  }
+  return undefined;
+}
 
-const looksLikePath = (value: string): boolean => {
-  return (
-    value.startsWith('.') || value.startsWith('/') || value.startsWith('~')
-  );
-};
-
-/**
- * Resolve the template path using the new metadata-driven resolution.
- *
- * Resolution order:
- * 1. If explicit `templatePath` is provided, use it directly
- * 2. If `.boilerplates.json` exists, use its `dir` field to find the base directory
- * 3. Look for `{baseDir}/{type}` (e.g., "default/module")
- * 4. Fallback to legacy structure: `{type}` directly in root
- */
-const resolveFromPath = (
-  templateDir: string,
+function resolveFromPath(
   templatePath: string | undefined,
   type: TemplateKind,
-  dirOverride?: string
-): { fromPath: string; resolvedTemplatePath: string } => {
-  // If explicit templatePath is provided, use it directly
+  dir?: string
+): string | undefined {
   if (templatePath) {
-    const candidateDir = path.isAbsolute(templatePath)
-      ? templatePath
-      : path.join(templateDir, templatePath);
-    if (
-      fs.existsSync(candidateDir) &&
-      fs.statSync(candidateDir).isDirectory()
-    ) {
-      return {
-        fromPath: path.relative(templateDir, candidateDir) || '.',
-        resolvedTemplatePath: candidateDir,
-      };
-    }
-    return {
-      fromPath: templatePath,
-      resolvedTemplatePath: path.join(templateDir, templatePath),
-    };
+    return templatePath;
   }
-
-  // Try new metadata-driven resolution
-  const rootConfig = readBoilerplatesConfig(templateDir);
-  const baseDir = dirOverride ?? rootConfig?.dir;
-
-  if (baseDir) {
-    // New structure: {templateDir}/{baseDir}/{type}
-    const newStructurePath = path.join(templateDir, baseDir, type);
-    if (
-      fs.existsSync(newStructurePath) &&
-      fs.statSync(newStructurePath).isDirectory()
-    ) {
-      return {
-        fromPath: path.join(baseDir, type),
-        resolvedTemplatePath: newStructurePath,
-      };
-    }
+  if (dir) {
+    return path.join(dir, type);
   }
-
-  // Fallback to legacy structure: {templateDir}/{type}
-  const legacyPath = path.join(templateDir, type);
-  if (fs.existsSync(legacyPath) && fs.statSync(legacyPath).isDirectory()) {
-    return {
-      fromPath: type,
-      resolvedTemplatePath: legacyPath,
-    };
-  }
-
-  // Default fallback
-  return {
-    fromPath: type,
-    resolvedTemplatePath: path.join(templateDir, type),
-  };
-};
+  return type;
+}
 
 export async function scaffoldTemplate(
   options: ScaffoldTemplateOptions
@@ -135,101 +84,39 @@ export async function scaffoldTemplate(
     cwd,
     cacheBaseDir,
     dir,
+    prompter,
   } = options;
 
-  const resolvedRepo = looksLikePath(templateRepo)
-    ? path.resolve(cwd ?? process.cwd(), templateRepo)
-    : templateRepo;
-
-  // Handle local template directories without caching
-  if (
-    looksLikePath(templateRepo) &&
-    fs.existsSync(resolvedRepo) &&
-    fs.statSync(resolvedRepo).isDirectory()
-  ) {
-    const { fromPath, resolvedTemplatePath } = resolveFromPath(
-      resolvedRepo,
-      templatePath,
-      type,
-      dir
-    );
-
-    // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
-    const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
-
-    await templatizer.process(resolvedRepo, outputDir, {
-      argv: answers,
-      noTty,
-      fromPath,
-    } as any);
-
-    return {
-      cacheUsed: false,
-      cacheExpired: false,
-      templateDir: resolvedRepo,
-      questions: boilerplateConfig?.questions,
-    };
-  }
-
-  // Remote repo with caching
-  const cacheManager = new CacheManager({
+  const scaffolder = new TemplateScaffolder({
     toolName,
-    ttl: cacheTtlMs,
-    baseDir:
-      cacheBaseDir ??
-      process.env.PGPM_CACHE_BASE_DIR ??
-      (process.env.JEST_WORKER_ID
-        ? path.join(os.tmpdir(), `pgpm-cache-${process.env.JEST_WORKER_ID}`)
-        : undefined),
+    ttlMs: cacheTtlMs,
+    cacheBaseDir: resolveCacheBaseDir(cacheBaseDir),
   });
 
-  const gitCloner = new GitCloner();
-  const normalizedUrl = gitCloner.normalizeUrl(resolvedRepo);
-  const cacheKey = cacheManager.createKey(normalizedUrl, branch);
+  const fromPath = resolveFromPath(templatePath, type, dir);
 
-  const expiredMetadata = cacheManager.checkExpiration(cacheKey);
-  if (expiredMetadata) {
-    cacheManager.clear(cacheKey);
-  }
+  const template =
+    templateRepo.startsWith('.') ||
+    templateRepo.startsWith('/') ||
+    templateRepo.startsWith('~')
+      ? path.resolve(cwd ?? process.cwd(), templateRepo)
+      : templateRepo;
 
-  let templateDir: string;
-  let cacheUsed = false;
-  const cachedPath = cacheManager.get(cacheKey);
-  if (cachedPath && !expiredMetadata) {
-    templateDir = cachedPath;
-    cacheUsed = true;
-  } else {
-    const tempDest = path.join(cacheManager.getReposDir(), cacheKey);
-    gitCloner.clone(normalizedUrl, tempDest, {
-      branch,
-      depth: 1,
-      singleBranch: true,
-    });
-    cacheManager.set(cacheKey, tempDest);
-    templateDir = tempDest;
-  }
-
-  const { fromPath, resolvedTemplatePath } = resolveFromPath(
-    templateDir,
-    templatePath,
-    type,
-    dir
-  );
-
-  // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
-  const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
-
-  await templatizer.process(templateDir, outputDir, {
-    argv: answers,
-    noTty,
+  const result = await scaffolder.scaffold({
+    template,
+    outputDir,
+    branch,
     fromPath,
-  } as any);
+    answers,
+    noTty,
+    prompter,
+  });
 
   return {
-    cacheUsed,
-    cacheExpired: Boolean(expiredMetadata),
-    cachePath: templateDir,
-    templateDir,
-    questions: boilerplateConfig?.questions,
+    cacheUsed: result.cacheUsed,
+    cacheExpired: result.cacheExpired,
+    cachePath: result.templateDir,
+    templateDir: result.templateDir,
+    questions: result.questions,
   };
 }

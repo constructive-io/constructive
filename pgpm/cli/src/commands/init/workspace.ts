@@ -27,8 +27,6 @@ export default async function runWorkspaceSetup(
   const answers = await prompter.prompt(argv, workspaceQuestions);
   const { cwd = process.cwd() } = argv;
   const targetPath = path.join(cwd, sluggify(answers.name));
-  // Prevent double-echoed keystrokes by closing our prompter before template prompts.
-  prompter.close();
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
@@ -52,7 +50,8 @@ export default async function runWorkspaceSetup(
     },
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
-    cwd
+    cwd,
+    prompter
   });
 
   // Check for .motd file and print it, or use default ASCII art
