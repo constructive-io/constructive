@@ -1312,6 +1312,9 @@ importers:
 
   packages/csv-to-pg:
     dependencies:
+      '@pgsql/types':
+        specifier: ^17.6.2
+        version: 17.6.2
       '@pgsql/utils':
         specifier: ^17.8.3
         version: 17.8.3
