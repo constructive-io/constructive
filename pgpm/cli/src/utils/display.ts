@@ -15,6 +15,7 @@ export const usageText = `
     export             Export database migrations from existing databases
     update             Update pgpm to the latest version
     cache              Manage cached templates (clean)
+    upgrade-modules    Upgrade installed pgpm modules to latest versions
   
   Database Administration:
     kill               Terminate database connections and optionally drop databases
@@ -32,6 +33,11 @@ export const usageText = `
       status           Show migration status
       list             List all changes
       deps             Show change dependencies
+  
+  Development Tools:
+    docker             Manage PostgreSQL Docker containers (start/stop)
+    env                Manage PostgreSQL environment variables
+    test-packages      Run integration tests on workspace packages
   
   Global Options:
     -h, --help         Display this help information
