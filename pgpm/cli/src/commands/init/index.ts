@@ -179,7 +179,7 @@ async function handleBoilerplateInit(
       {
         name: 'selectedBoilerplate',
         message: 'Select a boilerplate',
-        type: 'list',
+        type: 'autocomplete',
         options: boilerplates.map((bp) => bp.name),
         required: true,
       },
