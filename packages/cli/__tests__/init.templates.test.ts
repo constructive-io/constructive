@@ -13,11 +13,10 @@ describe('Template scaffolding', () => {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-workspace-'));
 
     await scaffoldTemplate({
-      type: 'workspace',
+      fromPath: 'workspace',
       outputDir: outDir,
       templateRepo: TEMPLATE_REPO,
       branch: 'main',
-      templatePath: 'default/workspace',
       answers: { 
         name: 'demo-workspace',
         fullName: 'Tester',
@@ -38,11 +37,10 @@ describe('Template scaffolding', () => {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'constructive-module-'));
 
     await scaffoldTemplate({
-      type: 'module',
+      fromPath: 'module',
       outputDir: outDir,
       templateRepo: TEMPLATE_REPO,
       branch: 'main',
-      templatePath: 'default/module',
       answers: { 
         name: 'demo-module',
         description: 'demo module',

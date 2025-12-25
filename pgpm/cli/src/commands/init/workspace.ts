@@ -29,7 +29,6 @@ export default async function runWorkspaceSetup(
   const targetPath = path.join(cwd, sluggify(answers.name));
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
-  // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
   const templatePath = argv.templatePath as string | undefined;
 
   // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
@@ -38,11 +37,10 @@ export default async function runWorkspaceSetup(
   registerDefaultResolver('workspace.dirname', () => dirName);
 
   await scaffoldTemplate({
-    type: 'workspace',
+    fromPath: templatePath ?? 'workspace',
     outputDir: targetPath,
     templateRepo,
     branch: argv.fromBranch as string | undefined,
-    templatePath,
     answers: {
       ...argv,
       ...answers,

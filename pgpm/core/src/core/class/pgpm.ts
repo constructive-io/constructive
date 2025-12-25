@@ -433,12 +433,10 @@ export class PgpmPackage {
     };
 
     await scaffoldTemplate({
-      type: 'module',
+      fromPath: options.templatePath ?? 'module',
       outputDir: targetPath,
       templateRepo: options.templateRepo ?? DEFAULT_TEMPLATE_REPO,
       branch: options.branch,
-      // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
-      templatePath: options.templatePath,
       answers,
       noTty: options.noTty ?? false,
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
