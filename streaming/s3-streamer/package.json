@@ -35,8 +35,8 @@
     "makage": "^0.1.9"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.956.0",
-    "@aws-sdk/lib-storage": "^3.940.0",
+    "@aws-sdk/client-s3": "^3.958.0",
+    "@aws-sdk/lib-storage": "^3.958.0",
     "@constructive-io/content-type-stream": "workspace:^",
     "@pgpmjs/types": "workspace:^"
   },

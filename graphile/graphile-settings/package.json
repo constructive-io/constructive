@@ -34,7 +34,7 @@
     "@graphile-contrib/pg-many-to-many": "^1.0.2",
     "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "graphile-build": "^4.14.1",
     "graphile-i18n": "workspace:^",
     "graphile-meta-schema": "workspace:^",
