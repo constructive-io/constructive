@@ -19,12 +19,14 @@ Options:
   --all                   Upgrade all modules without prompting
   --dry-run               Show what would be upgraded without making changes
   --modules <names>       Comma-separated list of specific modules to upgrade
+  --workspace             Upgrade modules across all packages in the workspace
 
 Examples:
   pgpm upgrade-modules                     Interactive selection of modules to upgrade
   pgpm upgrade-modules --all               Upgrade all installed modules
   pgpm upgrade-modules --dry-run           Preview available upgrades
   pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker   Upgrade specific modules
+  pgpm upgrade-modules --workspace --all   Upgrade all modules across the entire workspace
 `;
 
 interface ModuleUpdateInfo {
@@ -55,55 +57,46 @@ async function fetchModuleVersions(
   return results;
 }
 
-export default async (
+async function upgradeModulesForProject(
+  project: PgpmPackage,
   argv: Partial<ParsedArgs>,
   prompter: Inquirerer,
-  _options: CLIOptions
-) => {
-  if (argv.help || argv.h) {
-    console.log(upgradeModulesUsageText);
-    process.exit(0);
-  }
-
-  const { cwd = process.cwd() } = argv;
-  const dryRun = Boolean(argv['dry-run']);
-  const upgradeAll = Boolean(argv.all);
-  const specificModules = argv.modules 
-    ? String(argv.modules).split(',').map(m => m.trim())
-    : undefined;
-
-  const project = new PgpmPackage(cwd);
-
-  if (!project.isInModule()) {
-    throw new Error('You must run this command inside a PGPM module.');
-  }
-
+  dryRun: boolean,
+  upgradeAll: boolean,
+  specificModules: string[] | undefined,
+  moduleName?: string
+): Promise<boolean> {
   const { installed, installedVersions } = project.getInstalledModules();
 
   if (installed.length === 0) {
-    log.info('No pgpm modules are installed in this module.');
-    return;
+    if (moduleName) {
+      log.info(`[${moduleName}] No pgpm modules are installed.`);
+    } else {
+      log.info('No pgpm modules are installed in this module.');
+    }
+    return false;
   }
 
-  log.info(`Found ${installed.length} installed module(s). Checking for updates...`);
+  const prefix = moduleName ? `[${moduleName}] ` : '';
+  log.info(`${prefix}Found ${installed.length} installed module(s). Checking for updates...`);
 
   const moduleVersions = await fetchModuleVersions(installedVersions);
   const modulesWithUpdates = moduleVersions.filter(m => m.hasUpdate);
 
   if (modulesWithUpdates.length === 0) {
-    log.success('All modules are already up to date.');
-    return;
+    log.success(`${prefix}All modules are already up to date.`);
+    return false;
   }
 
-  log.info(`\n${modulesWithUpdates.length} module(s) have updates available:\n`);
+  log.info(`\n${prefix}${modulesWithUpdates.length} module(s) have updates available:\n`);
   for (const mod of modulesWithUpdates) {
     log.info(`  ${mod.name}: ${mod.currentVersion} -> ${mod.latestVersion}`);
   }
   console.log('');
 
   if (dryRun) {
-    log.info('Dry run - no changes made.');
-    return;
+    log.info(`${prefix}Dry run - no changes made.`);
+    return true;
   }
 
   let modulesToUpgrade: string[];
@@ -116,8 +109,8 @@ export default async (
       .map(m => m.name);
     
     if (modulesToUpgrade.length === 0) {
-      log.warn('None of the specified modules have updates available.');
-      return;
+      log.warn(`${prefix}None of the specified modules have updates available.`);
+      return false;
     }
   } else {
     const options = modulesWithUpdates.map(mod => ({
@@ -129,7 +122,7 @@ export default async (
     const questions: Question[] = [
       {
         name: 'selectedModules',
-        message: 'Select modules to upgrade:',
+        message: `${prefix}Select modules to upgrade:`,
         type: 'checkbox',
         options: options.map(o => o.message),
         default: options.map(o => o.message)
@@ -146,14 +139,79 @@ export default async (
       .map(m => m.name);
 
     if (modulesToUpgrade.length === 0) {
-      log.info('No modules selected for upgrade.');
-      return;
+      log.info(`${prefix}No modules selected for upgrade.`);
+      return false;
     }
   }
 
-  log.info(`\nUpgrading ${modulesToUpgrade.length} module(s)...`);
+  log.info(`\n${prefix}Upgrading ${modulesToUpgrade.length} module(s)...`);
 
   await project.upgradeModules({ modules: modulesToUpgrade });
 
-  log.success('\nUpgrade complete!');
+  log.success(`${prefix}Upgrade complete!`);
+  return true;
+}
+
+export default async (
+  argv: Partial<ParsedArgs>,
+  prompter: Inquirerer,
+  _options: CLIOptions
+) => {
+  if (argv.help || argv.h) {
+    console.log(upgradeModulesUsageText);
+    process.exit(0);
+  }
+
+  const { cwd = process.cwd() } = argv;
+  const dryRun = Boolean(argv['dry-run']);
+  const upgradeAll = Boolean(argv.all);
+  const workspaceMode = Boolean(argv.workspace);
+  const specificModules = argv.modules 
+    ? String(argv.modules).split(',').map(m => m.trim())
+    : undefined;
+
+  const project = new PgpmPackage(cwd);
+
+  if (workspaceMode) {
+    if (!project.getWorkspacePath()) {
+      throw new Error('You must run this command inside a PGPM workspace when using --workspace.');
+    }
+
+    const modules = await project.getModules();
+
+    if (modules.length === 0) {
+      log.info('No modules found in the workspace.');
+      return;
+    }
+
+    log.info(`Found ${modules.length} module(s) in the workspace.\n`);
+
+    let anyUpgraded = false;
+    for (const moduleProject of modules) {
+      const moduleName = moduleProject.getModuleName();
+      const upgraded = await upgradeModulesForProject(
+        moduleProject,
+        argv,
+        prompter,
+        dryRun,
+        upgradeAll,
+        specificModules,
+        moduleName
+      );
+      if (upgraded) {
+        anyUpgraded = true;
+      }
+      console.log('');
+    }
+
+    if (!anyUpgraded && !dryRun) {
+      log.success('All modules across the workspace are already up to date.');
+    }
+  } else {
+    if (!project.isInModule()) {
+      throw new Error('You must run this command inside a PGPM module. Use --workspace to upgrade all modules in the workspace.');
+    }
+
+    await upgradeModulesForProject(project, argv, prompter, dryRun, upgradeAll, specificModules);
+  }
 };
