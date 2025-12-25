@@ -30,7 +30,7 @@ export default async function runWorkspaceSetup(
   const dirName = path.basename(targetPath);
   registerDefaultResolver('workspace.dirname', () => dirName);
 
-  const scaffoldResult = await scaffoldTemplate({
+  await scaffoldTemplate({
     type: 'workspace',
     outputDir: targetPath,
     templateRepo,
@@ -45,12 +45,6 @@ export default async function runWorkspaceSetup(
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
     cwd
   });
-
-  const cacheMessage = scaffoldResult.cacheUsed
-    ? `Using cached templates from ${scaffoldResult.templateDir}`
-    : `Fetched templates into ${scaffoldResult.templateDir}`;
-  process.stdout.write(`${cacheMessage}\n`);
-  process.stdout.write('Workspace templates rendered.\n');
 
   return { ...argv, ...answers, cwd: targetPath };
 }
