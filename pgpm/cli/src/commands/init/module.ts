@@ -60,6 +60,7 @@ export default async function runModuleSetup(
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   const templatePath = argv.templatePath as string | undefined;
+  const dir = argv.dir as string | undefined;
 
   const templateAnswers = {
     ...argv,
@@ -76,6 +77,7 @@ export default async function runModuleSetup(
     templateRepo,
     templatePath,
     branch: argv.fromBranch as string | undefined,
+    dir,
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
     answers: templateAnswers,
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true')
