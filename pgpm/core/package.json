@@ -51,7 +51,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "create-gen-app": "^0.6.1",
+    "create-gen-app": "^0.6.2",
     "csv-to-pg": "^2.0.10",
     "glob": "^13.0.0",
     "komoji": "^0.7.11",
