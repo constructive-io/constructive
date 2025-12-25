@@ -43,16 +43,19 @@ describe('introspect() SQL-based introspection', () => {
 
   it('includes the introspectron schema', () => {
     const schemaNames = result.namespace.map((n) => n.name);
+
     expect(schemaNames).toContain('introspectron');
   });
 
   it('freezes all introspected objects', () => {
     const anyClass = result.class[0];
+
     expect(Object.isFrozen(anyClass)).toBe(true);
   });
 
   it('detects primary key constraints', () => {
     const primaryKeys = result.constraint.filter((c) => c.type === 'p');
+
     expect(primaryKeys.length).toBeGreaterThan(0);
     expect(primaryKeys[0]?.keyAttributeNums.length).toBeGreaterThan(0);
   });
@@ -76,6 +79,7 @@ describe('introspect() SQL-based introspection', () => {
 
   it('warns but does not throw if `pgThrowOnMissingSchema` is false', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
     await introspect(pg.client, {
       schemas: ['nonexistent_schema'],
       pgThrowOnMissingSchema: false

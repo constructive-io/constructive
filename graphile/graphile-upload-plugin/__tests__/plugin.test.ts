@@ -1,13 +1,15 @@
 import '../test-utils/env';
-import { join } from 'path';
-import { createReadStream, writeFileSync, unlinkSync } from 'fs';
-import { tmpdir } from 'os';
+
 import { S3Client } from '@aws-sdk/client-s3';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Bucket } from '@constructive-io/s3-utils';
-import { getConnections, snapshot, seed } from 'graphile-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
+import { createReadStream, unlinkSync,writeFileSync } from 'fs';
 import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections, seed } from 'graphile-test';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test/test-client';
+
 import UploadPostGraphilePlugin, { Uploader } from '../src';
 
 // Suppress PostgreSQL NOTICE messages (they're expected when roles don't exist yet)
@@ -15,21 +17,20 @@ import UploadPostGraphilePlugin, { Uploader } from '../src';
 if (typeof process !== 'undefined') {
   process.env.PGOPTIONS = '-c client_min_messages=warning';
 }
+import gql from 'graphql-tag';
+
 import {
-  IntrospectUploadScalar,
-  GetCreateUserInput,
-  GetCreateDocumentInput,
-  GetCreateProductInput,
-  GetCreateProfileInput,
-  CreateUserWithAvatar,
-  UpdateUserAvatar,
   CreateDocumentWithUpload,
-  UpdateDocumentWithUpload,
   CreateMediaWithUpload,
   CreateProductWithUpload,
   CreateProfileWithUpload,
+  CreateUserWithAvatar,
+  GetCreateDocumentInput,
+  GetCreateProfileInput,
+  GetCreateUserInput,
+  IntrospectUploadScalar,
+  UpdateDocumentWithUpload,
 } from '../test-utils/queries';
-import gql from 'graphql-tag';
 
 const SCHEMA = process.env.SCHEMA ?? 'app_public';
 const sql = (f: string) => join(__dirname, '../sql', f);
@@ -66,8 +67,10 @@ jest.setTimeout(3000000);
 const testFiles: string[] = [];
 const createTestFile = (filename: string, content: string): string => {
   const filePath = join(tmpdir(), `upload-test-${Date.now()}-${filename}`);
+
   writeFileSync(filePath, content);
   testFiles.push(filePath);
+
   return filePath;
 };
 
@@ -83,6 +86,7 @@ let db: PgTestClient;
 beforeAll(async () => {
   process.env.IS_MINIO = 'true'; // Ensure MinIO behavior in createS3Bucket
   const result = await createS3Bucket(s3Client, BUCKET_NAME!);
+
   if (!result.success) throw new Error('Failed to create test S3 bucket');
 
   // Initialize uploader with real S3 configuration
@@ -198,6 +202,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
       const avatarField = inputFields.find(
         (f: any) => f.name === 'avatarUrlUpload'
       );
+
       expect(avatarField?.type?.name).toBe('Upload');
       expect(data.errors).toBeUndefined();
     });
@@ -226,6 +231,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
       
       pluginUploadFields.forEach((fieldName) => {
         const field = inputFields.find((f: any) => f.name === fieldName);
+
         expect(field).toBeDefined();
         expect(field?.type?.name).toBe('Upload');
       });
@@ -367,6 +373,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(data.errors).toBeUndefined();
       const document = data.data?.createDocument?.document;
+
       expect(document).toMatchObject({
         title: 'Test Document',
       });
@@ -390,6 +397,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       const document = createData.data?.createDocument?.document;
       const documentId = document?.id;
+
       expect(documentId).toBeDefined();
 
       // Get nodeId from the created document
@@ -403,6 +411,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
       `;
       const documentData = await query(getDocumentQuery, { id: documentId });
       const nodeId = documentData.data?.documentById?.nodeId;
+
       expect(nodeId).toBeDefined();
 
       // Create new file
@@ -418,7 +427,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       const updateData = await query(UpdateDocumentWithUpload, {
         input: {
-          nodeId: nodeId,
+          nodeId,
           documentPatch: {
             fileUploadUpload: { promise: uploadPromise },
           },
@@ -427,6 +436,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(updateData.errors).toBeUndefined();
       const updatedDocument = updateData.data?.updateDocument?.document;
+
       expect(updatedDocument).toMatchObject({
         id: documentId,
         title: 'Original Document',
@@ -440,6 +450,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
         const fileUploadData = typeof updatedDocument.fileUpload === 'string' 
           ? JSON.parse(updatedDocument.fileUpload) 
           : updatedDocument.fileUpload;
+
         expect(fileUploadData).toHaveProperty('url');
       }
 
@@ -469,6 +480,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(data.errors).toBeUndefined();
       const media = data.data?.createMedia?.media;
+
       expect(media).toMatchObject({
         name: 'Test Media',
       });
@@ -481,6 +493,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
         const uploadData = typeof media.uploadData === 'string' 
           ? JSON.parse(media.uploadData) 
           : media.uploadData;
+
         expect(uploadData).toHaveProperty('url');
       }
 
@@ -544,6 +557,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(data.errors).toBeUndefined();
       const product = data.data?.createProduct?.product;
+
       expect(product).toMatchObject({
         name: 'Test Product',
       });
@@ -591,6 +605,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
       // Verify all are Upload type
       ['avatarUpload', 'resumeUpload', 'portfolioUpload', 'customDataUpload'].forEach((fieldName) => {
         const field = inputFields.find((f: any) => f.name === fieldName);
+
         expect(field).toBeDefined();
         expect(field?.type?.name).toBe('Upload');
       });
@@ -637,6 +652,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(data.errors).toBeUndefined();
       const profile = data.data?.createProfile?.profile;
+
       expect(profile).toMatchObject({
         userId: 1,
       });
@@ -651,6 +667,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
         const avatarData = typeof profile.avatar === 'string' 
           ? JSON.parse(profile.avatar) 
           : profile.avatar;
+
         expect(avatarData).toHaveProperty('url');
       }
       if (profile?.resume) {
@@ -663,6 +680,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
         const portfolioData = typeof profile.portfolio === 'string' 
           ? JSON.parse(profile.portfolio) 
           : profile.portfolio;
+
         expect(portfolioData).toHaveProperty('url');
       }
     });
@@ -697,6 +715,7 @@ describe('UploadPostGraphilePlugin - Core Capabilities', () => {
 
       expect(data.errors).toBeUndefined();
       const document = data.data?.createDocument?.document;
+
       expect(document).toMatchObject({
         title: 'Document with Attachment',
       });

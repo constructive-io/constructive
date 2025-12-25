@@ -16,6 +16,7 @@ it('more', async () => {
     `SELECT utils.mask_pad($1, $2) AS mask_pad`,
     ['101', 20]
   );
+
   expect(mask_pad).toMatchSnapshot();
 });
 
@@ -24,6 +25,7 @@ it('less', async () => {
     `SELECT utils.mask_pad($1, $2) AS mask_pad`,
     ['101', 2]
   );
+
   expect(mask_pad).toMatchSnapshot();
 });
 
@@ -33,6 +35,7 @@ describe('bitmask', () => {
       `SELECT utils.bitmask_pad($1::varbit, $2) AS bitmask_pad`,
       ['101', 20]
     );
+
     expect(bitmask_pad).toMatchSnapshot();
   });
 
@@ -41,6 +44,7 @@ describe('bitmask', () => {
       `SELECT utils.bitmask_pad($1::varbit, $2) AS bitmask_pad`,
       ['101', 2]
     );
+
     expect(bitmask_pad).toMatchSnapshot();
   });
 });

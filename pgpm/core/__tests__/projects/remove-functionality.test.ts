@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { PgpmPackage } from '../../src/core/class/pgpm';
+
 import { TestFixture } from '../../test-utils/TestFixture';
 
 describe('Remove Functionality', () => {
@@ -41,6 +41,7 @@ describe('Remove Functionality', () => {
     await pkg.removeFromPlan('schema_myfirstapp');
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');
@@ -69,6 +70,7 @@ describe('Remove Functionality', () => {
     await pkg.removeFromPlan('table_users');
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');
@@ -103,6 +105,7 @@ describe('Remove Functionality', () => {
     
     const planPath = path.join(pkg.getModulePath()!, 'pgpm.plan');
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');
@@ -124,6 +127,7 @@ describe('Remove Functionality', () => {
     await pkg.removeFromPlan('table_users');
     
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('@v1.0.0');
     expect(updatedPlan).not.toContain('@v1.1.0');
   });
@@ -170,6 +174,7 @@ describe('Remove Functionality', () => {
     const pkg = fixture.getModuleProject([], 'my-first');
     const planPath = path.join(pkg.getModulePath()!, 'pgpm.plan');
     let planContent = fs.readFileSync(planPath, 'utf8');
+
     expect(planContent).toContain('@v1.0.0');
     await pkg.removeFromPlan('schema_myfirstapp');
     planContent = fs.readFileSync(planPath, 'utf8');
@@ -179,6 +184,7 @@ describe('Remove Functionality', () => {
     const pkg = fixture.getModuleProject([], 'my-first');
     const planPath = path.join(pkg.getModulePath()!, 'pgpm.plan');
     let planContent = fs.readFileSync(planPath, 'utf8');
+
     expect(planContent).toContain('@v1.0.0');
     expect(planContent).toContain('table_users');
     expect(planContent).toContain('table_products');
@@ -222,6 +228,7 @@ describe('Remove Functionality', () => {
     
     const planPath = path.join(pkg.getModulePath()!, 'pgpm.plan');
     const updatedPlan = fs.readFileSync(planPath, 'utf8');
+
     expect(updatedPlan).not.toContain('schema_myfirstapp');
     expect(updatedPlan).not.toContain('table_users');
     expect(updatedPlan).not.toContain('table_products');

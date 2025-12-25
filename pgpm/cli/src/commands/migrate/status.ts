@@ -60,6 +60,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
     
     if (statusResults.length > 0) {
       const status = statusResults[0];
+
       console.log(`Package: ${status.package}`);
       console.log(`Total Deployed: ${status.totalDeployed}`);
       
@@ -76,17 +77,20 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
 
     // Show recent changes
     const recentChanges = await targetClient.getRecentChanges(targetDatabase, 5);
+
     if (recentChanges.length > 0) {
       console.log('\n📋 Recent Changes:\n');
       recentChanges.forEach((change: any) => {
         const status = change.deployed_at ? '✅' : '⏳';
         const date = change.deployed_at ? new Date(change.deployed_at).toLocaleString() : 'Not deployed';
+
         console.log(`${status} ${change.change_name.padEnd(30)} ${date}`);
       });
     }
 
     // Show pending changes
     const pendingChanges = await targetClient.getPendingChanges(planPath, targetDatabase);
+
     if (pendingChanges.length > 0) {
       console.log(`\n⏳ Pending Changes: ${pendingChanges.length}\n`);
       pendingChanges.slice(0, 5).forEach((change: string) => {

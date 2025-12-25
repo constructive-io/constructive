@@ -96,6 +96,7 @@ export default async (
         if (value.includes('@')) {
           return false;
         }
+
         return true;
       }
     });
@@ -125,6 +126,7 @@ export default async (
     if (argv.package || !pkg.isInModule()) {
       const moduleMap = pkg.getModuleMap();
       const module = moduleMap[packageName];
+
       if (!module) {
         throw errors.MODULE_NOT_FOUND({ name: packageName });
       }
@@ -133,10 +135,12 @@ export default async (
       const absoluteModulePath = path.resolve(workspacePath, module.path);
       
       const originalCwd = process.cwd();
+
       process.chdir(absoluteModulePath);
       
       try {
         const modulePkg = new PgpmPackage(absoluteModulePath);
+
         modulePkg.addTag(finalTagName.trim(), changeName?.trim() || undefined, comment?.trim() || undefined);
         log.info(`Successfully added tag '${finalTagName}' to ${changeName || 'latest change'} in package '${packageName}'`);
       } finally {

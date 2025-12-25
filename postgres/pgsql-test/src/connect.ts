@@ -2,7 +2,6 @@ import { getConnEnvOptions } from '@pgpmjs/env';
 import { PgTestConnectionOptions } from '@pgpmjs/types';
 import { randomUUID } from 'crypto';
 import { teardownPgPools } from 'pg-cache';
-
 import {
   getPgEnvOptions,
   PgConfig,
@@ -26,6 +25,7 @@ export const getPgRootAdmin = (config: PgConfig, connOpts: PgTestConnectionOptio
     database: connOpts.rootDb
   });
   const admin = new DbAdmin(opts, false, connOpts);
+
   return admin;
 };
 
@@ -40,6 +40,7 @@ const getConnOopts = (cn: GetConnectionOpts = {}) => {
     database: `${connect.prefix}${randomUUID()}`,
     ...cn.pg
   });
+
   return {
     pg: config,
     db: connect
@@ -65,6 +66,7 @@ export const getConnections = async (
   const connOpts: PgTestConnectionOptions = cn.db;
 
   const root = getPgRootAdmin(config, connOpts);
+
   await root.createUserRole(
     connOpts.connections!.app!.user!,
     connOpts.connections!.app!.password!,
@@ -95,6 +97,7 @@ export const getConnections = async (
       await teardownPgPools();
       await manager.closeAll();
     })();
+
     return teardownPromise;
   };
 
@@ -103,12 +106,13 @@ export const getConnections = async (
       await seed.compose(seedAdapters).seed({
         connect: connOpts,
         admin,
-        config: config,
+        config,
         pg: manager.getClient(config)
       });
     } catch (error) {
       const err: any = error as any;
       const msg = err && (err.stack || err.message) ? (err.stack || err.message) : String(err);
+
       process.stderr.write(`[pgsql-test] Seed error (continuing): ${msg}\n`);
       // continue without teardown to allow caller-managed lifecycle
     }
@@ -124,6 +128,7 @@ export const getConnections = async (
     auth: connOpts.auth,
     roles: connOpts.roles
   });
+
   db.setContext({ role: getDefaultRole(connOpts) });
   
   return { pg, db, teardown, manager, admin };

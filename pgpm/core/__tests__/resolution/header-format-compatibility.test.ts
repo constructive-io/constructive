@@ -1,7 +1,8 @@
+import { mkdirSync,writeFileSync } from 'fs';
+import { join } from 'path';
+
 import { resolveDependencies } from '../../src/resolution/deps';
 import { TestFixture } from '../../test-utils';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
 
 describe('Header format compatibility', () => {
   let fixture: TestFixture;
@@ -24,6 +25,7 @@ describe('Header format compatibility', () => {
 schema 2024-01-01T00:00:00Z Test User <test@example.com> # Add schema
 tables/users [schema] 2024-01-02T00:00:00Z Test User <test@example.com> # Add users table
 `;
+
     writeFileSync(join(moduleDir, 'pgpm.plan'), planContent);
     
     if (headerFormat === 'old') {
@@ -36,6 +38,7 @@ CREATE SCHEMA app;
 
 CREATE TABLE app.users (id serial primary key);
 `;
+
       writeFileSync(join(moduleDir, 'deploy', 'schema.sql'), schemaContent);
       mkdirSync(join(moduleDir, 'deploy', 'tables'), { recursive: true });
       writeFileSync(join(moduleDir, 'deploy', 'tables', 'users.sql'), usersContent);
@@ -49,6 +52,7 @@ CREATE SCHEMA app;
 
 CREATE TABLE app.users (id serial primary key);
 `;
+
       writeFileSync(join(moduleDir, 'deploy', 'schema.sql'), schemaContent);
       mkdirSync(join(moduleDir, 'deploy', 'tables'), { recursive: true });
       writeFileSync(join(moduleDir, 'deploy', 'tables', 'users.sql'), usersContent);
@@ -62,6 +66,7 @@ CREATE SCHEMA app;
 
 CREATE TABLE app.users (id serial primary key);
 `;
+
       writeFileSync(join(moduleDir, 'deploy', 'schema.sql'), schemaContent);
       mkdirSync(join(moduleDir, 'deploy', 'tables'), { recursive: true });
       writeFileSync(join(moduleDir, 'deploy', 'tables', 'users.sql'), usersContent);
@@ -70,6 +75,7 @@ CREATE TABLE app.users (id serial primary key);
 
   test('parses old header format with "to pg"', () => {
     const moduleDir = join(fixture.tempDir, 'test-old-format');
+
     setupModule(moduleDir, 'old');
     
     const result = resolveDependencies(moduleDir, 'test-module', { source: 'sql' });
@@ -81,6 +87,7 @@ CREATE TABLE app.users (id serial primary key);
 
   test('parses new header format without "to pg"', () => {
     const moduleDir = join(fixture.tempDir, 'test-new-format');
+
     setupModule(moduleDir, 'new');
     
     const result = resolveDependencies(moduleDir, 'test-module', { source: 'sql' });
@@ -92,6 +99,7 @@ CREATE TABLE app.users (id serial primary key);
 
   test('parses mixed header formats (backwards compatibility)', () => {
     const moduleDir = join(fixture.tempDir, 'test-mixed-format');
+
     setupModule(moduleDir, 'mixed');
     
     const result = resolveDependencies(moduleDir, 'test-module', { source: 'sql' });
@@ -103,6 +111,7 @@ CREATE TABLE app.users (id serial primary key);
 
   test('validates simple header format without project prefix', () => {
     const moduleDir = join(fixture.tempDir, 'test-simple-format');
+
     mkdirSync(join(moduleDir, 'deploy'), { recursive: true });
     
     const planContent = `%syntax-version=1.0.0
@@ -111,12 +120,14 @@ CREATE TABLE app.users (id serial primary key);
 
 init 2024-01-01T00:00:00Z Test User <test@example.com> # Initialize
 `;
+
     writeFileSync(join(moduleDir, 'pgpm.plan'), planContent);
     
     const initContent = `-- Deploy init
 
 SELECT 1;
 `;
+
     writeFileSync(join(moduleDir, 'deploy', 'init.sql'), initContent);
     
     const result = resolveDependencies(moduleDir, 'test-module', { source: 'sql' });
@@ -126,6 +137,7 @@ SELECT 1;
 
   test('validates simple header format with old "to pg" suffix', () => {
     const moduleDir = join(fixture.tempDir, 'test-simple-old-format');
+
     mkdirSync(join(moduleDir, 'deploy'), { recursive: true });
     
     const planContent = `%syntax-version=1.0.0
@@ -134,12 +146,14 @@ SELECT 1;
 
 init 2024-01-01T00:00:00Z Test User <test@example.com> # Initialize
 `;
+
     writeFileSync(join(moduleDir, 'pgpm.plan'), planContent);
     
     const initContent = `-- Deploy init to pg
 
 SELECT 1;
 `;
+
     writeFileSync(join(moduleDir, 'deploy', 'init.sql'), initContent);
     
     const result = resolveDependencies(moduleDir, 'test-module', { source: 'sql' });

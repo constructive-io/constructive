@@ -2,6 +2,7 @@ process.env.CONSTRUCTIVE_DEBUG = 'true';
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+
 import { TestDatabase } from '../../test-utils';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 
@@ -51,6 +52,7 @@ describe('Forked Deployment with deployModules - my-third', () => {
       'updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()',
       'updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),\n  category TEXT DEFAULT \'general\''
     );
+
     writeFileSync(tableProductsPath, modifiedTableProducts);
 
     await fixture.deployModule('my-third', db.name, ['sqitch', 'simple-w-tags']);
@@ -60,6 +62,7 @@ describe('Forked Deployment with deployModules - my-third', () => {
     expect(await db.exists('table', 'myfirstapp.products')).toBe(true);
     
     const columns = await db.query('SELECT column_name FROM information_schema.columns WHERE table_schema = \'myfirstapp\' AND table_name = \'products\' AND column_name = \'category\'');
+
     expect(columns.rows).toHaveLength(1);
     expect(columns.rows[0].column_name).toBe('category');
 

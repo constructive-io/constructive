@@ -9,6 +9,7 @@ let queriesDbe, mutationsDbe;
 beforeAll(() => {
   // const { queries, mutations } = parseGraphQuery(introQuery);
   const { queries, mutations } = parseGraphQuery(introQueryDbe);
+
   queriesDbe = queries;
   mutationsDbe = mutations;
 });
@@ -24,6 +25,7 @@ it('mutationsDbe', () => {
 it('includes custom scalar types', () => {
   const actions = queriesDbe.actions;
   const names = actions.selection.map((sel) => (typeof sel === 'string' ? sel : sel.name));
+
   expect(names.includes('location')).toBeTruthy();
   expect(names.includes('timeRequired')).toBeTruthy();
 });

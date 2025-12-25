@@ -18,6 +18,7 @@ it('getClient', async () => {
   try {
     await client.withTransaction(async (client: PoolClient) => {
       const result = await client.query('SELECT 1');
+
       expect(result.rows[0]['?column?'] || result.rows[0].count).toBe(1);
     });
   } catch (e) {

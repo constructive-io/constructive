@@ -31,6 +31,7 @@ const writeGeneratedFiles = async (
 
       // Ensure the directory for the file exists
       const dirName = path.dirname(fullPath);
+
       await fs.mkdir(dirName, { recursive: true });
 
       // Write the file content
@@ -65,6 +66,7 @@ const writeGeneratedFiles = async (
 
     // Fetch introspection rows
     const rows: DatabaseObject[] = await getIntrospectionRows(options);
+
     log.info('Introspection Rows Fetched:', rows);
 
     // Generate TypeScript code

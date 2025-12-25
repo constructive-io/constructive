@@ -1,9 +1,9 @@
 import app from '@constructive-io/knative-job-fn';
-import { GraphQLClient } from 'graphql-request';
-import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send } from '@launchql/postmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
+import { GraphQLClient } from 'graphql-request';
+import gql from 'graphql-tag';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 
@@ -65,9 +65,11 @@ type GraphQLContext = {
 
 const getRequiredEnv = (name: string): string => {
   const value = process.env[name];
+
   if (!value) {
     throw new Error(`Missing required environment variable ${name}`);
   }
+
   return value;
 };
 
@@ -83,6 +85,7 @@ const createGraphQLClient = (
 
   const envName = hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
   const hostHeader = process.env[envName];
+
   if (hostHeader) {
     headers.host = hostHeader;
   }
@@ -102,16 +105,19 @@ export const sendEmailLink = async (
         if (!params.invite_token || !params.sender_id) {
           return { missing: 'invite_token_or_sender_id' };
         }
+
         return null;
       case 'forgot_password':
         if (!params.user_id || !params.reset_token) {
           return { missing: 'user_id_or_reset_token' };
         }
+
         return null;
       case 'email_verification':
         if (!params.email_id || !params.verification_token) {
           return { missing: 'email_id_or_verification_token' };
         }
+
         return null;
       default:
         return { missing: 'email_type' };
@@ -126,6 +132,7 @@ export const sendEmailLink = async (
   }
 
   const typeValidation = validateForType();
+
   if (typeValidation) {
     return typeValidation;
   }
@@ -135,6 +142,7 @@ export const sendEmailLink = async (
   });
 
   const site = databaseInfo?.database?.sites?.nodes?.[0];
+
   if (!site) {
     throw new Error('Site not found for database');
   }
@@ -198,6 +206,7 @@ export const sendEmailLink = async (
       const inviter = await client.request<any>(GetUser, {
         userId: params.sender_id
       });
+
       inviterName = inviter?.user?.displayName;
 
       if (inviterName) {
@@ -269,7 +278,7 @@ export const sendEmailLink = async (
   });
 
   if (isDryRun) {
-    // eslint-disable-next-line no-console
+     
     console.log('[send-email-link] DRY RUN email (skipping send)', {
       email_type: params.email_type,
       email: params.email,
@@ -297,6 +306,7 @@ app.post('*', async (req: any, res: any, next: any) => {
 
     const databaseId =
       req.get('X-Database-Id') || req.get('x-database-id') || process.env.DEFAULT_DATABASE_ID;
+
     if (!databaseId) {
       return res.status(400).json({ error: 'Missing X-Database-Id header or DEFAULT_DATABASE_ID' });
     }
@@ -324,9 +334,10 @@ export default app;
 // When executed directly (e.g. via `node dist/index.js`), start an HTTP server.
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
+
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
-    // eslint-disable-next-line no-console
+     
     console.log(`[send-email-link] listening on port ${port}`);
   });
 }

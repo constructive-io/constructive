@@ -24,6 +24,7 @@ commit;`;
 describe('resolve', () => {
   it('resolves sql in proper order', async () => {
     const sql = await resolve(fixture.tempFixtureDir, 'revert');
+
     expect(sql).toBeTruthy();
     expect(sql.trim()).toEqual(expectResult);
   });

@@ -30,10 +30,11 @@ export default async (
     }
   ];
 
-  let { yes, cwd } = await prompter.prompt(argv, questions);
+  const { yes, cwd } = await prompter.prompt(argv, questions);
 
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 
@@ -46,6 +47,7 @@ export default async (
   }
 
   const modulePath = pkg.getModulePath();
+
   if (!modulePath) {
     throw new Error('Could not resolve module path');
   }
@@ -61,10 +63,12 @@ export default async (
   
   if (plan.changes.length === 0) {
     log.info('Plan is already empty - nothing to clear.');
+
     return;
   }
   
   const firstChange = plan.changes[0].name;
+
   log.info(`Found ${plan.changes.length} changes in plan. Clearing from first change: ${firstChange}`);
   
   const opts = getEnvOptions({ 

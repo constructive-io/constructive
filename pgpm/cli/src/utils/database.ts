@@ -45,6 +45,7 @@ export async function getAvailableDatabases(options: DatabaseSelectionOptions = 
   query += ` ORDER BY datname`;
 
   const result = await db.query(query);
+
   return result.rows.map((row: any) => row.datname);
 }
 
@@ -111,6 +112,7 @@ export async function getTargetDatabase(
   } catch (error) {
     // Fall back to environment database
     const pgEnv = getPgEnvOptions();
+
     if (pgEnv.database) {
       return pgEnv.database;
     }

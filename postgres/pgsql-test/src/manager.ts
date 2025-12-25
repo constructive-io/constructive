@@ -13,6 +13,7 @@ const end = (pool: Pool) => {
   try {
     if ((pool as any).ended || (pool as any).ending) {
       log.warn('⚠️ pg pool already ended or ending');
+
       return;
     }
     pool.end();
@@ -49,6 +50,7 @@ export class PgTestConnector {
     if (!PgTestConnector.instance) {
       PgTestConnector.instance = new PgTestConnector(config, verbose);
     }
+
     return PgTestConnector.instance;
   }
 
@@ -71,6 +73,7 @@ export class PgTestConnector {
 
   private async awaitPendingConnects(): Promise<void> {
     const arr = Array.from(this.pendingConnects);
+
     if (arr.length) {
       await Promise.allSettled(arr);
     }
@@ -78,11 +81,14 @@ export class PgTestConnector {
 
   getPool(config: PgConfig): Pool {
     const key = this.poolKey(config);
+
     if (!this.pgPools.has(key)) {
       const pool = new Pool(config);
+
       this.pgPools.set(key, pool);
       log.info(`📘 Created new pg pool: ${key}`);
     }
+
     return this.pgPools.get(key)!;
   }
 
@@ -94,12 +100,15 @@ export class PgTestConnector {
       trackConnect: (p) => this.registerConnect(p),
       ...opts
     });
+
     this.clients.add(client);
 
     const key = this.dbKey(config);
+
     this.seenDbConfigs.set(key, config);
 
     log.info(`🔌 New PgTestClient connected to ${config.database}`);
+
     return client;
   }
 
@@ -136,6 +145,7 @@ export class PgTestConnector {
             { ...config, user: rootPg.user, password: rootPg.password },
             this.verbose
           );
+
           admin.drop();
           log.warn(`🧨 Dropped database: ${config.database}`);
         } catch (err) {
@@ -158,6 +168,7 @@ export class PgTestConnector {
   drop(config: PgConfig): void {
     const key = this.dbKey(config);
     const admin = new DbAdmin(config, this.verbose);
+
     admin.drop();
     log.warn(`🧨 Dropped database: ${config.database}`);
     this.seenDbConfigs.delete(key);

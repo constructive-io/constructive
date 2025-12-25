@@ -1,23 +1,22 @@
+import {
+  CDNOptions,
+  DeploymentOptions,
+  JobsConfig,
+  MigrationOptions,
+  pgpmDefaults,
+  PgpmOptions,
+  PgTestConnectionOptions,
+  ServerOptions} from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
 import { PgConfig } from 'pg-env';
+
 import {
-  PgpmOptions,
-  pgpmDefaults,
-  PgTestConnectionOptions,
-  DeploymentOptions,
-  ServerOptions,
-  CDNOptions,
-  MigrationOptions,
-  JobsConfig
-} from '@pgpmjs/types';
-import {
-  GraphileOptions,
-  GraphileFeatureOptions,
+  apiDefaults,
   ApiOptions,
   graphileDefaults,
   graphileFeatureDefaults,
-  apiDefaults
-} from './graphile';
+  GraphileFeatureOptions,
+  GraphileOptions} from './graphile';
 
 /**
  * GraphQL-specific options for Constructive

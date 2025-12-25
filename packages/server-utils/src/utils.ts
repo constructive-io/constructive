@@ -12,6 +12,7 @@ export const poweredBy = (name: string) => {
     res.set({
       'X-Powered-By': name,
     });
+
     return next();
   };
 };

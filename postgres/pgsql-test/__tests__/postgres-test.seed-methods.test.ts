@@ -1,7 +1,8 @@
 process.env.LOG_SCOPE = 'pgsql-test';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
+import { join } from 'path';
+
 import { seed } from '../src';
 import { getConnections } from '../src/connect';
 import { PgTestClient } from '../src/test-client';
@@ -93,6 +94,7 @@ describe('loadJson() method', () => {
     });
 
     const result = await pg.any('SELECT * FROM custom.users ORDER BY name');
+
     expect(result).toHaveLength(2);
     expect(result[0].name).toBe('Alice');
     expect(result[1].name).toBe('Bob');
@@ -107,6 +109,7 @@ describe('loadJson() method', () => {
     });
 
     const result = await db.any('SELECT * FROM custom.users');
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Charlie');
   });
@@ -133,7 +136,8 @@ describe('loadJson() method', () => {
 describe('loadCsv() method', () => {
   it('should load users from CSV with pg client', async () => {
     const csvPath = join(testDir, 'users.csv');
-    const csvContent = 'id,name\n' + [users[0], users[1]].map(u => `${u.id},${u.name}`).join('\n') + '\n';
+    const csvContent = `id,name\n${  [users[0], users[1]].map(u => `${u.id},${u.name}`).join('\n')  }\n`;
+
     writeFileSync(csvPath, csvContent);
 
     await pg.loadCsv({
@@ -141,6 +145,7 @@ describe('loadCsv() method', () => {
     });
 
     const result = await pg.any('SELECT * FROM custom.users ORDER BY name');
+
     expect(result).toHaveLength(2);
     expect(result[0].name).toBe('Alice');
     expect(result[1].name).toBe('Bob');
@@ -152,6 +157,7 @@ describe('loadCsv() method', () => {
 
     const csvPath = join(testDir, 'users2.csv');
     const csvContent = 'id,name\n' + `${users[2].id},${users[2].name}\n`;
+
     writeFileSync(csvPath, csvContent);
 
     // COPY FROM is not supported with row-level security
@@ -167,7 +173,7 @@ describe('loadCsv() method', () => {
     const petsPath = join(testDir, 'pets.csv');
     
     writeFileSync(usersPath, `id,name\n${users[0].id},${users[0].name}\n`);
-    writeFileSync(petsPath, 'id,owner_id,name\n' + [pets[0], pets[1]].map(p => `${p.id},${p.owner_id},${p.name}`).join('\n') + '\n');
+    writeFileSync(petsPath, `id,owner_id,name\n${  [pets[0], pets[1]].map(p => `${p.id},${p.owner_id},${p.name}`).join('\n')  }\n`);
 
     await pg.loadCsv({
       'custom.users': usersPath,
@@ -190,11 +196,13 @@ describe('loadSql() method', () => {
     const sqlContent = [users[0], users[1]]
       .map(u => `INSERT INTO custom.users (id, name) VALUES ('${u.id}', '${u.name}');`)
       .join('\n');
+
     writeFileSync(sqlPath, sqlContent);
 
     await pg.loadSql([sqlPath]);
 
     const result = await pg.any('SELECT * FROM custom.users ORDER BY name');
+
     expect(result).toHaveLength(2);
     expect(result[0].name).toBe('Alice');
     expect(result[1].name).toBe('Bob');
@@ -205,11 +213,13 @@ describe('loadSql() method', () => {
     await db.beforeEach();
 
     const sqlPath = join(testDir, 'seed2.sql');
+
     writeFileSync(sqlPath, `INSERT INTO custom.users (id, name) VALUES ('${users[2].id}', '${users[2].name}');`);
 
     await db.loadSql([sqlPath]);
 
     const result = await db.any('SELECT * FROM custom.users');
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Charlie');
   });
@@ -222,6 +232,7 @@ describe('loadSql() method', () => {
     const petsSql = [pets[0], pets[1]]
       .map(p => `INSERT INTO custom.pets (id, owner_id, name) VALUES (${p.id}, '${p.owner_id}', '${p.name}');`)
       .join('\n');
+
     writeFileSync(petsPath, petsSql);
 
     await pg.loadSql([usersPath, petsPath]);
@@ -264,6 +275,7 @@ describe('cross-connection visibility with publish()', () => {
     await db.beforeEach();
 
     const result = await db.any('SELECT * FROM custom.users');
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Alice');
   });
@@ -280,6 +292,7 @@ describe('cross-connection visibility with publish()', () => {
 
     // pg client (superuser) can see all data
     const result = await pg.any('SELECT * FROM custom.users');
+
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Bob');
   });

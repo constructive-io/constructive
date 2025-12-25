@@ -16,6 +16,7 @@ it('sqitch package dependencies [simple-w-tags/1st]', async () => {
     fixture.getFixturePath('simple-w-tags', 'packages', 'my-first'),
     'my-first'
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -24,6 +25,7 @@ it('sqitch package dependencies [simple-w-tags/2nd]', async () => {
     fixture.getFixturePath('simple-w-tags', 'packages', 'my-second'),
     'my-second'
   );
+
   expect(res).toMatchSnapshot();
 });
 

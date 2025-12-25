@@ -21,6 +21,7 @@ export class ETagHash {
       this.bytes += len;
     } else {
       const bytesNeeded = this.partSizeInBytes - this.bytes;
+
       this.sums[this.part].update(chunk.subarray(0, bytesNeeded));
       this.part++;
       this.sums.push(createCryptoHash('md5'));

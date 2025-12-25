@@ -1,7 +1,8 @@
 import '../../test-utils/env';
+
 import { readdirSync, readFileSync } from 'fs';
+import { getConnections, type GraphQLQueryFn,seed, snapshot } from 'graphile-test';
 import { join } from 'path';
-import { getConnections, seed, snapshot, type GraphQLQueryFn } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
 import PostgisPlugin from '../../src';
@@ -44,6 +45,7 @@ describe('integration queries', () => {
   it.each(queryFileNames)('%s', async (queryFileName) => {
     const queryText = readFileSync(join(queriesDir, queryFileName), 'utf8');
     const result = await query(queryText);
+
     expect(snapshot(result)).toMatchSnapshot();
   });
 });

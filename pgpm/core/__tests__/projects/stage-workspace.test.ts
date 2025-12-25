@@ -1,7 +1,7 @@
-import { PgpmPackage, PackageContext } from '../../src/core/class/pgpm';
-import { TestFixture } from '../../test-utils/TestFixture';
-import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
+import { PackageContext,PgpmPackage } from '../../src/core/class/pgpm';
 import { TestDatabase } from '../../test-utils';
+import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
+import { TestFixture } from '../../test-utils/TestFixture';
 
 describe('Staging Fixture Tests', () => {
   let fixture: TestFixture;
@@ -31,10 +31,12 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const modules = await project.getModules();
+
       expect(Array.isArray(modules)).toBe(true);
       expect(modules.length).toBeGreaterThan(0);
       
       const moduleNames = modules.map(m => m.getModuleName());
+
       expect(moduleNames).toContain('unique-names');
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
     });
@@ -46,6 +48,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
       
       const availableModules = project.getAvailableModules();
+
       expect(Array.isArray(availableModules)).toBe(true);
       expect(availableModules.length).toBeGreaterThan(0);
       expect(availableModules).toContain('unique-names');
@@ -56,6 +59,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const modules = await project.getModules();
+
       expect(Array.isArray(modules)).toBe(true);
       expect(modules.length).toBeGreaterThan(0);
 
@@ -89,6 +93,7 @@ describe('Staging Fixture Tests', () => {
       modules.forEach(mod => {
         const moduleName = mod.getModuleName();
         const moduleInfo = moduleMap[moduleName];
+
         expect(moduleInfo).toBeDefined();
         expect(moduleInfo.path).toBeTruthy();
       });
@@ -108,6 +113,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const name = project.getModuleName();
+
       expect(typeof name).toBe('string');
       expect(name).toBe('unique-names');
     });
@@ -122,6 +128,7 @@ describe('Staging Fixture Tests', () => {
       expect(project.isInModule()).toBe(true);
       
       const name = project.getModuleName();
+
       expect(name).toBe('pgpm-uuid');
     });
 
@@ -130,6 +137,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const info = project.getModuleInfo();
+
       expect(info.extname).toBeTruthy();
       expect(info.version).toMatch(/\d+\.\d+\.\d+/);
       expect(info.controlFile).toContain('.control');
@@ -142,6 +150,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const deps = project.getRequiredModules();
+
       expect(Array.isArray(deps)).toBe(true);
       expect(deps).toContain('plpgsql');
     });
@@ -151,6 +160,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const { native, modules: deps } = project.getModuleDependencies('unique-names');
+
       expect(native).toBeDefined();
       expect(deps).toBeDefined();
       expect(Array.isArray(deps)).toBe(true);
@@ -161,6 +171,7 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
       
       const result = await project.getModuleDependencyChanges('unique-names');
+
       expect(result).toHaveProperty('native');
       expect(result).toHaveProperty('modules');
       expect(Array.isArray(result.modules)).toBe(true);
@@ -184,10 +195,12 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const uuidDeps = project.getModuleDependencies('pgpm-uuid');
+
       expect(uuidDeps.modules).toBeDefined();
       expect(Array.isArray(uuidDeps.modules)).toBe(true);
       
       const result = await project.getModuleDependencyChanges('pgpm-uuid');
+
       expect(result.modules).toBeDefined();
       expect(Array.isArray(result.modules)).toBe(true);
     });
@@ -201,6 +214,7 @@ describe('Staging Fixture Tests', () => {
       expect(result.modules.length).toBeGreaterThan(0);
       
       const dependencyNames = result.modules.map(dep => dep.name);
+
       expect(dependencyNames.some(name => name.includes('pgpm-defaults'))).toBe(true);
       
       result.modules.forEach(dep => {
@@ -243,6 +257,7 @@ describe('Staging Fixture Tests', () => {
       
       for (const moduleName of moduleNames) {
         const deps = project.getModuleDependencies(moduleName);
+
         expect(deps).toHaveProperty('native');
         expect(deps).toHaveProperty('modules');
         expect(Array.isArray(deps.modules)).toBe(true);

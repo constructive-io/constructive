@@ -5,6 +5,7 @@ describe('convertFromMetaSchema()', () => {
   it('should convert from meta schema to meta object format', () => {
     const metaObj = convertFromMetaSchema(apiMetaSchema);
     const validate = validateMetaObject(metaObj);
+
     expect(validate).toBe(true);
   });
 

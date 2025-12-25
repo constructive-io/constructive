@@ -8,6 +8,7 @@ const idReplacement = (v: unknown, idHash?: IdHash): string | unknown => {
   if (!v) return v;
   if (!idHash) return '[ID]';
   const key = String(v);
+
   return idHash[key] !== undefined ? `[ID-${idHash[key]}]` : '[ID]';
 };
 
@@ -20,6 +21,7 @@ function mapValues<T extends AnyObject, R = any>(
 ): Record<keyof T, R> {
   return Object.entries(obj).reduce((acc, [key, value]) => {
     acc[key as keyof T] = fn(value, key as keyof T);
+
     return acc;
   }, {} as Record<keyof T, R>);
 }
@@ -31,13 +33,14 @@ export const pruneDates = (row: AnyObject): AnyObject =>
     }
     if (v instanceof Date) {
       return '[DATE]';
-    } else if (
+    } if (
       typeof v === 'string' &&
       /(_at|At)$/.test(k as string) &&
       /^20[0-9]{2}-[0-9]{2}-[0-9]{2}/.test(v)
     ) {
       return '[DATE]';
     }
+
     return v;
   });
 
@@ -67,6 +70,7 @@ export const pruneUUIDs = (row: AnyObject): AnyObject =>
     if (k === 'gravatar' && /^[0-9a-f]{32}$/i.test(v)) {
       return '[gUUID]';
     }
+
     return v;
   });
 
@@ -120,6 +124,7 @@ export const defaultPruners: Pruner[] = [
 // Compose pruners and apply pruneIds with IdHash support
 export const prune = (row: AnyObject, idHash?: IdHash): AnyObject => {
   const pruned = composePruners(...defaultPruners)(row);
+
   return pruneIds(pruned, idHash);
 };
 
@@ -129,13 +134,16 @@ export const createSnapshot = (pruners: Pruner[]) => {
   const snap = (obj: unknown, idHash?: IdHash): unknown => {
     if (Array.isArray(obj)) {
       return obj.map((el) => snap(el, idHash));
-    } else if (obj && typeof obj === 'object') {
+    } if (obj && typeof obj === 'object') {
       const pruned = pruneFn(obj as AnyObject);
       const prunedWithIds = pruneIds(pruned, idHash);
+
       return mapValues(prunedWithIds, (v) => snap(v, idHash));
     }
+
     return obj;
   };
+
   return snap;
 };
 

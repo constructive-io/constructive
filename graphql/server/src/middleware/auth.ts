@@ -1,8 +1,9 @@
+import './types'; // for Request type
+
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
-import './types'; // for Request type
 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
@@ -13,8 +14,10 @@ export const createAuthenticateMiddleware = (
     next: NextFunction
   ): Promise<void> => {
     const api = req.api;
+
     if (!api) {
       res.status(500).send('Missing API info');
+
       return;
     }
 
@@ -59,6 +62,7 @@ export const createAuthenticateMiddleware = (
             res.status(200).json({
               errors: [{ extensions: { code: 'UNAUTHENTICATED' } }],
             });
+
             return;
           }
 
@@ -74,6 +78,7 @@ export const createAuthenticateMiddleware = (
               },
             ],
           });
+
           return;
         }
       }

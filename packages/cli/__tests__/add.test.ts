@@ -52,6 +52,7 @@ describe('cmds:add', () => {
     const relativeFiles = absoluteFiles
       .map((file) => path.relative(argv.cwd, file))
       .sort();
+
     argv.cwd = '<CWD>';
 
     expect(argv).toMatchSnapshot(`${label} - argv`);
@@ -63,6 +64,7 @@ describe('cmds:add', () => {
 
   const setupModule = async (moduleDir: string) => {
     const moduleName = path.basename(moduleDir);
+
     fs.mkdirSync(moduleDir, { recursive: true });
     fs.mkdirSync(path.join(moduleDir, 'deploy'), { recursive: true });
     fs.mkdirSync(path.join(moduleDir, 'revert'), { recursive: true });
@@ -73,6 +75,7 @@ describe('cmds:add', () => {
 %uri=https://github.com/test/${moduleName}
 
 `;
+
     fs.writeFileSync(path.join(moduleDir, 'pgpm.plan'), planContent);
     
     const controlContent = `# ${moduleName} extension
@@ -81,11 +84,13 @@ default_version = '0.1.0'
 relocatable = false
 superuser = false
 `;
+
     fs.writeFileSync(path.join(moduleDir, `${moduleName}.control`), controlContent);
   };
 
   it('adds simple change', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module');
+
     await setupModule(moduleDir);
 
     await runAddTest(
@@ -101,11 +106,13 @@ superuser = false
     expect(fs.existsSync(path.join(moduleDir, 'verify', 'organizations.sql'))).toBe(true);
 
     const planContent = fs.readFileSync(path.join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('organizations');
   });
 
   it('adds change with note', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-with-note');
+
     await setupModule(moduleDir);
 
     await runAddTest(
@@ -118,12 +125,14 @@ superuser = false
     );
 
     const planContent = fs.readFileSync(path.join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('brands');
     expect(planContent).toContain('Adds the brands table');
   });
 
   it('adds change with dependencies', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-with-deps');
+
     await setupModule(moduleDir);
 
     await runAddTest(
@@ -145,15 +154,18 @@ superuser = false
     );
 
     const planContent = fs.readFileSync(path.join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('users');
     expect(planContent).toContain('contacts');
 
     const deployContent = fs.readFileSync(path.join(moduleDir, 'deploy', 'contacts.sql'), 'utf8');
+
     expect(deployContent).toContain('requires: users');
   });
 
   it('adds nested path change', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-nested');
+
     await setupModule(moduleDir);
 
     await runAddTest(
@@ -169,11 +181,13 @@ superuser = false
     expect(fs.existsSync(path.join(moduleDir, 'verify', 'api', 'v1', 'endpoints.sql'))).toBe(true);
 
     const planContent = fs.readFileSync(path.join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('api/v1/endpoints');
   });
 
   it('adds deeply nested path change', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-deep-nested');
+
     await setupModule(moduleDir);
 
     await runAddTest(
@@ -189,12 +203,14 @@ superuser = false
     expect(fs.existsSync(path.join(moduleDir, 'verify', 'schema', 'myschema', 'tables', 'mytable.sql'))).toBe(true);
 
     const planContent = fs.readFileSync(path.join(moduleDir, 'pgpm.plan'), 'utf8');
+
     expect(planContent).toContain('schema/myschema/tables/mytable');
   });
 
 
   it('shows help when requested', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-help');
+
     await setupModule(moduleDir);
 
     const { mockInput, mockOutput } = environment;
@@ -206,6 +222,7 @@ superuser = false
 
     const originalExit = process.exit;
     let exitCode: number | undefined;
+
     process.exit = jest.fn((code?: number) => {
       exitCode = code;
       throw new Error(`process.exit called with code ${code}`);
@@ -232,6 +249,7 @@ superuser = false
 
   it('verifies SQL files do not contain transaction statements', async () => {
     const moduleDir = path.join(fixture.tempDir, 'test-module-no-transactions');
+
     await setupModule(moduleDir);
 
     await runAddTest(

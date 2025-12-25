@@ -24,6 +24,7 @@ const getCacheKey = (
   database: string
 ): string => {
   const { host, port, user } = pg ?? {};
+
   return `${host}:${port}:${user}:${database}:${name}`;
 };
 
@@ -37,6 +38,7 @@ export const deployProject = async (
   toChange?: string
 ): Promise<Extensions> => {
   const mergedOpts = getEnvOptions(opts);
+
   log.info(`🔍 Gathering modules from ${pkg.workspacePath}...`);
   const modules = pkg.getModuleMap();
 
@@ -59,11 +61,13 @@ export const deployProject = async (
     try {
       if (extensions.external.includes(extension)) {
         const msg = `CREATE EXTENSION IF NOT EXISTS "${extension}" CASCADE;`;
+
         log.info(`📥 Installing external extension: ${extension}`);
         log.debug(`> ${msg}`);
         await pgPool.query(msg);
       } else {
         const modulePath = resolve(pkg.workspacePath!, modules[extension].path);
+
         log.info(`📂 Deploying local module: ${extension}`);
         log.debug(`→ Path: ${modulePath}`);
 
@@ -79,6 +83,7 @@ export const deployProject = async (
           }
 
           let modulePackage;
+
           try {
             modulePackage = await packageModule(localProject.modulePath, { 
               usePlan: mergedOpts.deployment.usePlan, 
@@ -87,6 +92,7 @@ export const deployProject = async (
           } catch (err: any) {
             // Build comprehensive error message
             const errorLines = [];
+
             errorLines.push(`❌ Failed to package module "${extension}" at path: ${modulePath}`);
             errorLines.push(`   Module Path: ${modulePath}`);
             errorLines.push(`   Workspace Path: ${pkg.workspacePath}`);
@@ -152,5 +158,6 @@ export const deployProject = async (
   }
 
   log.success(`✅ Deployment complete for ${name}.`);
+
   return extensions;
 };

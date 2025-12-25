@@ -1,4 +1,5 @@
 import type { Client } from 'pg';
+
 import { SeedAdapter, SeedContext } from './types';
 export interface JsonSeedMap {
   [table: string]: Record<string, any>[];
@@ -23,6 +24,7 @@ export async function insertJson(
 
     for (const row of rows) {
       const values = columns.map((c) => row[c]);
+
       await client.query(sql, values);
     }
   }
@@ -42,6 +44,7 @@ export function json(data: JsonSeedMap): SeedAdapter {
 
         for (const row of rows) {
           const values = columns.map((c) => row[c]);
+
           await pg.query(sql, values);
         }
       }

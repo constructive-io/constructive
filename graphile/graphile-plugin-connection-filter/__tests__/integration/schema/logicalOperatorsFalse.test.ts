@@ -1,13 +1,14 @@
 import '../../../test-utils/env';
+
+import { PgConnectionArgCondition } from 'graphile-build-pg';
 import { join } from 'path';
 import { Pool } from 'pg';
-import { PgConnectionArgCondition } from 'graphile-build-pg';
+import { getConnections, seed } from 'pgsql-test';
+import type { PgTestClient } from 'pgsql-test/test-client';
 import {
   createPostGraphileSchema,
   type PostGraphileOptions,
 } from 'postgraphile';
-import { getConnections, seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
 
 import ConnectionFilterPlugin from '../../../src/index';
 import { printSchemaOrdered } from '../../../test-utils/printSchema';
@@ -23,6 +24,7 @@ const createSchemaSnapshot = async (
   options: PostGraphileOptions
 ): Promise<string> => {
   const schema = await createPostGraphileSchema(pool, [SCHEMA], options);
+
   return printSchemaOrdered(schema);
 };
 
@@ -30,6 +32,7 @@ beforeAll(async () => {
   const connections = await getConnections({}, [
     seed.sqlfile([sql('schema.sql')]),
   ]);
+
   ({ pg: db, teardown } = connections);
   pool = new Pool(db.config);
 });

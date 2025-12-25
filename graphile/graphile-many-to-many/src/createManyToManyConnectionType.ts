@@ -2,10 +2,10 @@ import type { Build } from 'graphile-build';
 import type { PgClass } from 'graphile-build-pg';
 import type {
   GraphQLFieldConfigMap,
-  GraphQLObjectType,
-  GraphQLResolveInfo,
   GraphQLNamedType,
   GraphQLNullableType,
+  GraphQLObjectType,
+  GraphQLResolveInfo,
   GraphQLType
 } from 'graphql';
 
@@ -33,6 +33,7 @@ const hasNonNullKey = (row: Record<string, any>): boolean => {
       }
     }
   }
+
   return false;
 };
 
@@ -74,6 +75,7 @@ const createManyToManyConnectionType = (
         if ((identifiers && hasNonNullKey(identifiers)) || hasNonNullKey(row)) {
           return row;
         }
+
         return null;
       };
 
@@ -81,6 +83,7 @@ const createManyToManyConnectionType = (
     leftTable.type.id,
     null
   ) as GraphQLNamedType | null;
+
   if (!LeftTableType) {
     throw new Error(`Could not determine type for table with id ${leftTable.type.id}`);
   }
@@ -89,6 +92,7 @@ const createManyToManyConnectionType = (
     rightTable.type.id,
     null
   ) as GraphQLNamedType | null;
+
   if (!TableType) {
     throw new Error(`Could not determine type for table with id ${rightTable.type.id}`);
   }
@@ -127,6 +131,7 @@ const createManyToManyConnectionType = (
                   }
                 }
               }));
+
               return {
                 description: 'A cursor for use in pagination.',
                 type: Cursor,
@@ -149,6 +154,7 @@ const createManyToManyConnectionType = (
               resolve(data: any, _args: any, _context: any, resolveInfo: GraphQLResolveInfo) {
                 const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
                 const record = handleNullRow(data[safeAlias], data.__identifiers);
+
                 return record;
               }
             },
@@ -195,6 +201,7 @@ const createManyToManyConnectionType = (
         fieldWithHooks: any;
       }): GraphQLFieldConfigMap<any, any> => {
         recurseDataGeneratorsForField('pageInfo', true);
+
         return {
           nodes: pgField(
             build,
@@ -207,8 +214,10 @@ const createManyToManyConnectionType = (
               ),
               resolve(data: any, _args: any, _context: any, resolveInfo: GraphQLResolveInfo) {
                 const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+
                 return data.data.map((entry: any) => {
                   const record = handleNullRow(entry[safeAlias], entry[safeAlias].__identifiers);
+
                   return record;
                 });
               }
@@ -226,6 +235,7 @@ const createManyToManyConnectionType = (
               type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EdgeType))),
               resolve(data: any, _args: any, _context: any, resolveInfo: GraphQLResolveInfo) {
                 const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+
                 return data.data.map((entry: any) => ({
                   ...entry,
                   ...entry[safeAlias]

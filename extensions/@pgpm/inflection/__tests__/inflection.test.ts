@@ -20,6 +20,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.pg_slugify($1, $2)',
         [opts.name, opts.allowUnicode]
       );
+
       expect(pg_slugify).toEqual(opts.result);
     },
     [
@@ -43,6 +44,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.underscore($1)',
         [opts.name]
       );
+
       expect(underscore).toEqual(opts.result);
     },
     [
@@ -64,6 +66,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.no_single_underscores($1)',
         [opts.name]
       );
+
       expect(no_single_underscores).toEqual(opts.result);
     },
     [
@@ -78,6 +81,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.pascal($1)',
         [opts.name]
       );
+
       expect(pascal).toEqual(opts.result);
     },
     [
@@ -102,6 +106,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.camel($1)',
         [opts.name]
       );
+
       expect(camel).toEqual(opts.result);
     },
     [
@@ -127,6 +132,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.no_consecutive_caps($1)',
         [opts.name]
       );
+
       expect(no_consecutive_caps).toEqual(opts.result);
     },
     [
@@ -144,6 +150,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.plural($1)',
         [opts.name]
       );
+
       expect(plural).toEqual(opts.result);
     },
     [
@@ -165,6 +172,7 @@ describe('inflection', () => {
         'SELECT * FROM inflection.singular($1)',
         [opts.name]
       );
+
       expect(singular).toEqual(opts.result);
     },
     [

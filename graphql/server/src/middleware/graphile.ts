@@ -1,3 +1,5 @@
+import './types'; // for Request type
+
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
@@ -5,7 +7,6 @@ import { getGraphileSettings as getSettings } from 'graphile-settings';
 import type { IncomingMessage } from 'http';
 import { getPgPool } from 'pg-cache';
 import { postgraphile, PostGraphileOptions } from 'postgraphile';
-import './types'; // for Request type
 
 import PublicKeySignature, {
   PublicKeyChallengeConfig,
@@ -15,10 +16,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const api = req.api;
+
       if (!api) {
         return res.status(500).send('Missing API info');
       }
       const key = req.svc_key;
+
       if (!key) {
         return res.status(500).send('Missing service cache key');
       }
@@ -26,6 +29,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       if (graphileCache.has(key)) {
         const { handler } = graphileCache.get(key)!;
+
         return handler(req, res, next);
       }
 
@@ -33,7 +37,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         ...opts,
         graphile: {
           ...opts.graphile,
-          schema: schema,
+          schema,
         },
       });
 

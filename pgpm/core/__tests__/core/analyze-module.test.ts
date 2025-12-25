@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { TestFixture } from '../../test-utils';
+
 import { parsePlanFile } from '../../src/files/plan/parser';
 import { writePlanFile } from '../../src/files/plan/writer';
+import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;
 
@@ -22,6 +23,7 @@ describe('PgpmPackage.analyzeModule', () => {
     expect(result.name).toBe('my-first');
     expect(result.ok).toBe(false);
     const codes = result.issues.map(i => i.code);
+
     expect(codes).toContain('missing_sql');
     expect(result.issues.find(i => i.code === 'missing_sql')?.file).toContain(`sql/my-first--`);
   });
@@ -33,10 +35,12 @@ describe('PgpmPackage.analyzeModule', () => {
     const version = pkgJson.version;
     const sqlDir = path.join(modPath, 'sql');
     const combined = path.join(sqlDir, `my-first--${version}.sql`);
+
     fs.mkdirSync(sqlDir, { recursive: true });
     fs.writeFileSync(combined, '-- combined sql');
 
     const result = project.analyzeModule();
+
     expect(result.ok).toBe(true);
     expect(result.issues.length).toBe(0);
   });
@@ -51,6 +55,7 @@ describe('PgpmPackage.analyzeModule', () => {
     try {
       const result = project.analyzeModule();
       const codes = result.issues.map(i => i.code);
+
       expect(codes).toContain('missing_control');
     } finally {
       if (fs.existsSync(wrongControlPath)) {
@@ -64,11 +69,14 @@ describe('PgpmPackage.analyzeModule', () => {
     const modPath = project.getModulePath()!;
     const makefilePath = path.join(modPath, 'Makefile');
     const original = fs.readFileSync(makefilePath, 'utf8');
+
     try {
       const mutated = original.replace(/^EXTENSION\s*=.*$/m, 'EXTENSION = wrongname');
+
       fs.writeFileSync(makefilePath, mutated);
       const result = project.analyzeModule();
       const codes = result.issues.map(i => i.code);
+
       expect(codes).toContain('makefile_extension_mismatch');
     } finally {
       fs.writeFileSync(makefilePath, original);
@@ -80,11 +88,14 @@ describe('PgpmPackage.analyzeModule', () => {
     const modPath = project.getModulePath()!;
     const makefilePath = path.join(modPath, 'Makefile');
     const original = fs.readFileSync(makefilePath, 'utf8');
+
     try {
       const mutated = original.replace(/^DATA\s*=.*$/m, 'DATA = sql/wrong--0.0.0.sql');
+
       fs.writeFileSync(makefilePath, mutated);
       const result = project.analyzeModule();
       const codes = result.issues.map(i => i.code);
+
       expect(codes).toContain('makefile_data_mismatch');
     } finally {
       fs.writeFileSync(makefilePath, original);
@@ -96,13 +107,16 @@ describe('PgpmPackage.analyzeModule', () => {
     const modPath = project.getModulePath()!;
     const planPath = path.join(modPath, 'pgpm.plan');
     const original = fs.readFileSync(planPath, 'utf8');
+
     try {
       const parsed = parsePlanFile(planPath);
+
       if (!parsed.data) throw new Error('Failed to parse plan');
       parsed.data.uri = 'different-uri';
       writePlanFile(planPath, parsed.data);
       const result = project.analyzeModule();
       const codes = result.issues.map(i => i.code);
+
       expect(codes).toContain('plan_uri_mismatch');
     } finally {
       fs.writeFileSync(planPath, original);
@@ -128,6 +142,7 @@ describe('PgpmPackage.analyzeModule', () => {
     try {
       const result = project.analyzeModule();
       const codes = result.issues.map(i => i.code);
+
       expect(codes).toContain('missing_deploy_dir');
       expect(codes).toContain('missing_revert_dir');
       expect(codes).toContain('missing_verify_dir');

@@ -43,10 +43,12 @@ it('generates output', () => {
   const gen = generate(gqlMap);
   const output = Object.keys(gen).reduce<Record<string, string>>((acc, key) => {
     const entry = gen[key];
+
     if (entry?.ast) {
       // @ts-ignore
       acc[key] = print(entry.ast);
     }
+
     return acc;
   }, {});
 
@@ -57,5 +59,6 @@ it('generates output', () => {
 it('helper method', () => {
   expect(introspection).toBeDefined();
   const output = generateKeyedObjFromIntrospection(introspection);
+
   expect(output).toMatchSnapshot();
 });

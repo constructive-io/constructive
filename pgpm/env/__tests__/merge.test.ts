@@ -1,5 +1,6 @@
-import { getConnEnvOptions } from '../src/merge';
 import { pgpmDefaults } from '@pgpmjs/types';
+
+import { getConnEnvOptions } from '../src/merge';
 
 describe('getConnEnvOptions', () => {
   describe('roles resolution', () => {

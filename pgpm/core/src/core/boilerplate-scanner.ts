@@ -16,14 +16,17 @@ import {
  */
 export function readBoilerplatesConfig(templateDir: string): BoilerplatesRootConfig | null {
   const configPath = path.join(templateDir, '.boilerplates.json');
+
   if (fs.existsSync(configPath)) {
     try {
       const content = fs.readFileSync(configPath, 'utf-8');
+
       return JSON.parse(content) as BoilerplatesRootConfig;
     } catch {
       return null;
     }
   }
+
   return null;
 }
 
@@ -40,6 +43,7 @@ export function readBoilerplateConfig(boilerplatePath: string): BoilerplateConfi
   if (fs.existsSync(jsonPath)) {
     try {
       const content = fs.readFileSync(jsonPath, 'utf-8');
+
       return JSON.parse(content) as BoilerplateConfig;
     } catch {
       return null;
@@ -109,9 +113,11 @@ export function findBoilerplateByType(
  */
 export function resolveBoilerplateBaseDir(templateDir: string): string {
   const rootConfig = readBoilerplatesConfig(templateDir);
+
   if (rootConfig?.dir) {
     return path.join(templateDir, rootConfig.dir);
   }
+
   return templateDir;
 }
 

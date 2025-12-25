@@ -14,6 +14,7 @@ export const cleanText = (text: string): string =>
 
 export async function teardownAllPools(): Promise<void> {
   const { teardownPgPools } = await import('pg-cache');
+
   await teardownPgPools();
 }
 

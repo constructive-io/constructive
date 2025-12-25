@@ -1,18 +1,21 @@
 // @ts-nocheck
 jest.setTimeout(20000);
-import React from 'react';
-import { render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {
-  LqlProvider,
-  useGraphqlClient,
-  useConstructiveQuery,
-  useTableRowsPaginated
-} from '../src';
-import { QueryClientProvider, QueryClient } from 'react-query';
+
+import { cleanup,render } from '@testing-library/react';
+import React from 'react';
+import { QueryClient,QueryClientProvider } from 'react-query';
 import { useQuery } from 'react-query';
 
+import {
+  LqlProvider,
+  useConstructiveQuery,
+  useGraphqlClient,
+  useTableRowsPaginated
+} from '../src';
+
 const TESTING_URL = process.env.TESTING_URL;
+
 if (!TESTING_URL) {
   throw new Error(
     'process.env.TESTING_URL required. Please set a GraphQL Endpoint.'
@@ -24,6 +27,7 @@ afterEach(cleanup);
 
 it('works', async () => {
   const { container } = render(<h1>Hello, World!</h1>);
+
   expect(container.firstChild).toMatchInlineSnapshot(`
     <h1>
       Hello, World!
@@ -34,6 +38,7 @@ it('works', async () => {
 const Component = () => {
   const graphqlClient = useGraphqlClient();
   const queryBuilder = useConstructiveQuery();
+
   return <div>Yolo</div>;
 };
 
@@ -56,6 +61,7 @@ const FetchUsers = ({ onSuccess, onError }) => {
     onError
     // ...queryParams
   });
+
   if (isLoading || isFetching) {
     return <div>Loading</div>;
   }
@@ -64,6 +70,7 @@ const FetchUsers = ({ onSuccess, onError }) => {
     expect(error).toBeFalsy();
     expect(data.nodes).toBeTruthy();
   }
+
   return <div>Finished</div>;
 };
 
@@ -77,6 +84,7 @@ const BasicQuery = ({ onSuccess, onError }) => {
         currentUserAgent
       }
       `);
+
       return result;
     },
     {
@@ -85,6 +93,7 @@ const BasicQuery = ({ onSuccess, onError }) => {
       enabled: !!graphqlClient
     }
   );
+
   if (isLoading || isFetching) {
     return <div>Loading</div>;
   }
@@ -93,6 +102,7 @@ const BasicQuery = ({ onSuccess, onError }) => {
     expect(error).toBeFalsy();
     expect(data.nodes).toBeTruthy();
   }
+
   return <div>Finished</div>;
 };
 
@@ -124,6 +134,7 @@ it('useTableRowsPaginated', async (done) => {
     expect(true).toBe(false);
     done();
   };
+
   render(
     <QueryClientProvider client={queryClient}>
       <LqlProvider endpointUrl={TESTING_URL} headers={{}}>
@@ -143,6 +154,7 @@ it('useGraphqlClient', async (done) => {
     expect(true).toBe(false);
     done();
   };
+
   render(
     <QueryClientProvider client={queryClient}>
       <LqlProvider endpointUrl={TESTING_URL} headers={{}}>

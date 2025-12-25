@@ -74,11 +74,13 @@ export class UserController {
     // Test 1: TypeScript content
     const tsCode = Buffer.from('const x: number = 42;');
     const tsResult = await detector.detectWithFallback(tsCode, 'file.ts');
+
     expect(tsResult?.contentType).toBe('text/x-typescript');
     
     // Test 2: Binary content with .ts extension
     const binaryContent = Buffer.from([0x47, 0x00, 0x00, 0x00]);
     const binaryResult = await detector.detectWithFallback(binaryContent, 'video.ts');
+
     expect(binaryResult?.contentType).toBe('video/mp2t');
   });
 

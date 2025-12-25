@@ -27,6 +27,7 @@ describe('Staging Fixture Deployment Tests', () => {
     expect(await db.exists('table', 'unique_names.words')).toBe(true);
     
     const deployedChanges = await db.getDeployedChanges();
+
     expect(deployedChanges.some(change => change.package === 'unique-names')).toBe(true);
   });
 });

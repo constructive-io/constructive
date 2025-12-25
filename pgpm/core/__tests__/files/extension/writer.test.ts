@@ -1,8 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { writeExtensions, generateControlFileContent } from '../../../src/files/extension/writer';
+
 import { getInstalledExtensions } from '../../../src/files/extension/reader';
+import { generateControlFileContent,writeExtensions } from '../../../src/files/extension/writer';
 
 describe('extension writer', () => {
   let tempDir: string;
@@ -111,10 +112,12 @@ describe('extension writer', () => {
       expect(fs.existsSync(makefile)).toBe(true);
 
       const controlContent = fs.readFileSync(controlFile, 'utf-8');
+
       expect(controlContent).toContain("requires = 'pgcrypto'");
       expect(controlContent).toContain("default_version = '1.0.0'");
 
       const makefileContent = fs.readFileSync(makefile, 'utf-8');
+
       expect(makefileContent).toContain('EXTENSION = test-module');
       expect(makefileContent).toContain('DATA = sql/test-module--1.0.0.sql');
     });
@@ -128,6 +131,7 @@ describe('extension writer', () => {
       expect(controlContent).toContain("requires = 'pgcrypto,postgis,plpgsql'");
 
       const extensions = getInstalledExtensions(controlFile);
+
       expect(extensions).toEqual(['pgcrypto', 'postgis', 'plpgsql']);
     });
 
@@ -140,14 +144,16 @@ describe('extension writer', () => {
       expect(controlContent).not.toContain('requires =');
 
       const extensions = getInstalledExtensions(controlFile);
+
       expect(extensions).toEqual([]);
     });
 
     it('updates existing control file with new extensions', () => {
       writeExtensions(packageDir, ['pgcrypto']);
 
-      let controlFile = path.join(packageDir, 'test-module.control');
+      const controlFile = path.join(packageDir, 'test-module.control');
       let extensions = getInstalledExtensions(controlFile);
+
       expect(extensions).toEqual(['pgcrypto']);
 
       writeExtensions(packageDir, ['pgcrypto', 'postgis']);
@@ -165,6 +171,7 @@ describe('extension writer', () => {
       writeExtensions(packageDir, ['pgcrypto', 'postgis']);
 
       const secondContent = fs.readFileSync(controlFile, 'utf-8');
+
       expect(secondContent).toBe(firstContent);
     });
 
@@ -173,6 +180,7 @@ describe('extension writer', () => {
 
       const controlFile = path.join(packageDir, 'test-module.control');
       let extensions = getInstalledExtensions(controlFile);
+
       expect(extensions).toEqual(['pgcrypto']);
 
       writeExtensions(packageDir, ['postgis', 'plpgsql']);
@@ -190,6 +198,7 @@ describe('extension writer', () => {
       expect(controlContent).toContain("requires = 'plpgsql,pgcrypto,postgis'");
 
       const extensions = getInstalledExtensions(controlFile);
+
       expect(extensions).toEqual(['plpgsql', 'pgcrypto', 'postgis']);
     });
   });

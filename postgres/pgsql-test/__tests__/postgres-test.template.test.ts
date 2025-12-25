@@ -28,6 +28,7 @@ function setupTemplateDatabase(): void {
   });
 
   const admin = new DbAdmin(templateConfig);
+
   admin.cleanupTemplate(TEMPLATE_NAME);
   admin.createSeededTemplate(TEMPLATE_NAME, {
     seed: (ctx) => {
@@ -55,6 +56,7 @@ afterEach(async () => {
   await teardown();
   const elapsed = Date.now() - start;
   const name = expect.getState().currentTestName ?? 'unknown';
+
   testResults.push({ name, time: elapsed });
 });
 
@@ -74,24 +76,27 @@ afterAll(() => {
     `🕒 Total Test Time: ${totalTime}ms`
   ];
 
-  console.log('\n' + summaryLines.join('\n') + '\n');
+  console.log(`\n${  summaryLines.join('\n')  }\n`);
 });
 
 describe('Template DB Benchmark', () => {
   it('inserts Alice', async () => {
     await pg.query(`INSERT INTO app_public.users (username) VALUES ('alice')`);
     const res = await pg.query(`SELECT COUNT(*) FROM app_public.users`);
+
     expect(res.rows[0].count).toBe('1');
   });
 
   it('starts clean without Alice', async () => {
     const res = await pg.query(`SELECT * FROM app_public.users WHERE username = 'alice'`);
+
     expect(res.rows).toHaveLength(0);
   });
 
   it('inserts Bob, settings should be empty', async () => {
     await pg.query(`INSERT INTO app_public.users (username) VALUES ('bob')`);
     const settings = await pg.query(`SELECT * FROM app_public.user_settings`);
+
     expect(settings.rows).toHaveLength(0);
   });
 });

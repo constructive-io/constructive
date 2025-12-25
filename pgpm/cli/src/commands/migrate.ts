@@ -51,6 +51,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
         }))
       }
     ]);
+
     subcommand = answer.subcommand;
   }
 
@@ -72,5 +73,6 @@ function getSubcommandDescription(cmd: string): string {
     list: 'List all changes (deployed and pending)',
     deps: 'Show change dependencies'
   };
+
   return descriptions[cmd] || '';
 }

@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+
 import { OllamaClient } from '../utils/ollama';
 
 interface Document {
@@ -52,6 +53,7 @@ export class RAGService {
 
     for (const chunk of chunks.rows) {
       const chunkEmbedding = await this.ollama.generateEmbedding(chunk.content);
+
       await this.pool.query(
         'UPDATE intelligence.chunks SET embedding = $1 WHERE id = $2',
         [chunkEmbedding, chunk.id]

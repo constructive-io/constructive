@@ -26,6 +26,7 @@ describe('Partial Verification with toChange parameter', () => {
       "table_name = 'customers'",
       "table_name = 'nonexistent_table'"
     );
+
     fs.writeFileSync(verifyScriptPath, brokenContent);
     
     await fixture.verifyModule('my-third:create_schema', db.name, ['sqitch', 'simple-w-tags']);

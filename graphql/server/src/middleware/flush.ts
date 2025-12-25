@@ -1,10 +1,11 @@
+import './types'; // for Request type
+
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction,Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
-import './types'; // for Request type
 
 const log = new Logger('flush');
 
@@ -14,14 +15,17 @@ export const flush = async (req: Request, res: Response, next: NextFunction): Pr
     graphileCache.delete((req as any).svc_key);
     svcCache.delete((req as any).svc_key);
     res.status(200).send('OK');
+
     return;
   }
+
   return next();
 };
 
 export const flushService = async (opts: ConstructiveOptions, databaseId: string): Promise<void> => {
   const pgPool = getPgPool(opts.pg);
-  log.info('flushing db ' + databaseId);
+
+  log.info(`flushing db ${  databaseId}`);
 
   const api = new RegExp(`^api:${databaseId}:.*`);
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);
@@ -47,6 +51,7 @@ export const flushService = async (opts: ConstructiveOptions, databaseId: string
 
   for (const row of svc.rows) {
     let key: string | undefined;
+
     if (row.domain && !row.subdomain) {
       key = row.domain;
     } else if (row.domain && row.subdomain) {

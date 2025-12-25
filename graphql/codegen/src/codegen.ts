@@ -1,19 +1,21 @@
 import { promises as fs } from 'fs'
-import { join, dirname, isAbsolute, resolve } from 'path'
-import { buildSchema, buildClientSchema, graphql, getIntrospectionQuery, print } from 'graphql'
+import { buildClientSchema, buildSchema, getIntrospectionQuery, graphql, print } from 'graphql'
+import { dirname, isAbsolute, join, resolve } from 'path'
 const inflection: any = require('inflection')
-import { generate as generateGql, GqlMap } from './gql'
-import { parseGraphQuery } from 'introspectron'
-import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions, mergeGraphQLCodegenOptions } from './options'
+
+import generate from '@babel/generator'
+import { parse } from '@babel/parser'
+import * as t from '@babel/types'
 import { codegen as runCoreCodegen } from '@graphql-codegen/core'
 import * as typescriptPlugin from '@graphql-codegen/typescript'
-import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations'
 import * as typescriptGraphqlRequestPlugin from '@graphql-codegen/typescript-graphql-request'
+import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations'
 import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query'
 import { GraphQLClient } from 'graphql-request'
-import { parse } from '@babel/parser'
-import generate from '@babel/generator'
-import * as t from '@babel/types'
+import { parseGraphQuery } from 'introspectron'
+
+import { generate as generateGql, GqlMap } from './gql'
+import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions, mergeGraphQLCodegenOptions } from './options'
 
 function addDocumentNodeImport(code: string): string {
   const ast = parse(code, {
@@ -25,11 +27,13 @@ function addDocumentNodeImport(code: string): string {
     [t.importSpecifier(t.identifier('DocumentNode'), t.identifier('DocumentNode'))],
     t.stringLiteral('graphql')
   )
+
   importDecl.importKind = 'type'
 
   ast.program.body.unshift(importDecl)
 
   const output = generate(ast, {}, code)
+
   return output.code
 }
 
@@ -37,6 +41,7 @@ function getFilename(key: string, convention: GraphQLCodegenOptions['documents']
   if (convention === 'underscore') return inflection.underscore(key)
   if (convention === 'dashed') return inflection.underscore(key).replace(/_/g, '-')
   if (convention === 'camelUpper') return inflection.camelize(key, false)
+
   return key
 }
 
@@ -58,6 +63,7 @@ async function getIntrospectionFromSDL(schemaPath: string) {
   const schema = buildSchema(sdl)
   const q = getIntrospectionQuery()
   const res = await graphql({ schema, source: q })
+
   return res.data as any
 }
 
@@ -65,13 +71,16 @@ async function getIntrospectionFromEndpoint(endpoint: string, headers?: Record<s
   const client = new GraphQLClient(endpoint, { headers })
   const q = getIntrospectionQuery()
   const res = await client.request<any>(q)
+
   return res as any
 }
 
 function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, string> {
   const gen = generateGql(gqlMap)
+
   return Object.entries(gen).reduce<Record<string, string>>((acc, [key, val]) => {
     if (val?.ast) acc[key] = print(val.ast)
+
     return acc
   }, {})
 }
@@ -82,6 +91,7 @@ function applyQueryFilters(map: GqlMap, docs: GraphQLCodegenOptions['documents']
   const patterns = (docs.excludePatterns || []).filter(Boolean)
 
   let keys = Object.keys(map)
+
   if (allow.length > 0) keys = keys.filter((k) => allow.includes(k))
   if (exclude.length > 0) keys = keys.filter((k) => !exclude.includes(k))
   if (patterns.length > 0) {
@@ -92,11 +102,13 @@ function applyQueryFilters(map: GqlMap, docs: GraphQLCodegenOptions['documents']
         return null
       }
     }).filter((r): r is RegExp => !!r)
+
     keys = keys.filter((k) => !regs.some((r) => r.test(k)))
   }
 
   return keys.reduce<GqlMap>((acc, k) => {
     acc[k] = map[k]
+
     return acc
   }, {})
 }
@@ -104,10 +116,13 @@ function applyQueryFilters(map: GqlMap, docs: GraphQLCodegenOptions['documents']
 async function writeOperationsDocuments(docs: Record<string, string>, dir: string, format: 'gql' | 'ts', convention: GraphQLCodegenOptions['documents']['convention']) {
   await ensureDir(dir)
   const index: string[] = []
+
   for (const key of Object.keys(docs)) {
     const filename = getFilename(key, convention) + (format === 'ts' ? '.ts' : '.gql')
+
     if (format === 'ts') {
       const code = `import gql from 'graphql-tag'\nexport const ${key} = gql\`\n${docs[key]}\n\``
+
       await writeFileUTF8(join(dir, filename), code)
       index.push(`export * from './${filename}'`)
     } else {
@@ -162,14 +177,17 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       plugins: [{ typescript: {} }],
       pluginMap: { typescript: typescriptPlugin as any }
     })
+
     await writeFileUTF8(typesFile, typesContent)
   }
 
   if (options.features.emitSdk) {
     const documents: { location: string; document: any }[] = []
+
     for (const [name, content] of Object.entries(docs)) {
       try {
         const doc = require('graphql').parse(content)
+
         documents.push({ location: name, document: doc })
       } catch (e) {}
     }
@@ -191,14 +209,17 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
     })
     // Fix TS2742: Add missing DocumentNode import using Babel AST
     const sdkContentWithImport = addDocumentNodeImport(sdkContent)
+
     await writeFileUTF8(sdkFile, sdkContentWithImport)
   }
 
   if (options.features.emitReactQuery) {
     const documents: { location: string; document: any }[] = []
+
     for (const [name, content] of Object.entries(docs)) {
       try {
         const doc = require('graphql').parse(content)
+
         documents.push({ location: name, document: doc })
       } catch (e) {}
     }
@@ -224,6 +245,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
         'typescript-react-query': typescriptReactQueryPlugin as any
       }
     })
+
     await writeFileUTF8(reactQueryFile, rqContent)
   }
 
@@ -234,11 +256,13 @@ export async function runCodegenFromJSONConfig(configPath: string, cwd: string) 
   const path = isAbsolute(configPath) ? configPath : resolve(cwd, configPath)
   const content = await readFileUTF8(path)
   let overrides: any = {}
+
   try {
     overrides = JSON.parse(content)
   } catch (e) {
-    throw new Error('Invalid JSON config: ' + e)
+    throw new Error(`Invalid JSON config: ${  e}`)
   }
   const merged = mergeGraphQLCodegenOptions(defaultGraphQLCodegenOptions, overrides as any)
+
   return runCodegen(merged as GraphQLCodegenOptions, cwd)
 }

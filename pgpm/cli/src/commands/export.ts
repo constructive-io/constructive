@@ -53,6 +53,7 @@ export default async (
   `);
 
   let databases: OptionValue[];
+
   ({ databases } = await prompter.prompt(argv, [
     {
       type: 'checkbox',
@@ -73,6 +74,7 @@ export default async (
   `);
 
   let database_ids: OptionValue[];
+
   ({ database_ids } = await prompter.prompt({} as any, [
     {
       type: 'checkbox',

@@ -32,10 +32,11 @@ export default async (
     }
   ];
 
-  let { yes, cwd } = await prompter.prompt(argv, questions);
+  const { yes, cwd } = await prompter.prompt(argv, questions);
 
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 

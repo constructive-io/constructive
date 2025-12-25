@@ -1,9 +1,10 @@
-import { printSchema, GraphQLSchema, getIntrospectionQuery, buildClientSchema } from 'graphql'
-import { getGraphileSettings } from 'graphile-settings'
-import { getPgPool } from 'pg-cache'
-import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile'
 import * as http from 'node:http'
 import * as https from 'node:https'
+
+import { getGraphileSettings } from 'graphile-settings'
+import { buildClientSchema,getIntrospectionQuery, GraphQLSchema, printSchema } from 'graphql'
+import { getPgPool } from 'pg-cache'
+import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile'
 
 export type BuildSchemaOptions = {
   database?: string;
@@ -25,6 +26,7 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
 
   const pgPool = getPgPool({ database })
   const schema: GraphQLSchema = await createPostGraphileSchema(pgPool, schemas, settings)
+
   return printSchema(schema)
 }
 
@@ -45,6 +47,7 @@ export async function fetchEndpointSchemaSDL(endpoint: string, opts?: { headerHo
     'Content-Type': 'application/json',
     'Content-Length': String(Buffer.byteLength(postData)),
   }
+
   if (opts?.headerHost) {
     headers['Host'] = opts.headerHost
   }
@@ -69,21 +72,25 @@ export async function fetchEndpointSchemaSDL(endpoint: string, opts?: { headerHo
       headers,
     }, (res) => {
       let data = ''
+
       res.on('data', (chunk) => { data += chunk })
       res.on('end', () => {
         if (res.statusCode && res.statusCode >= 400) {
           reject(new Error(`HTTP ${res.statusCode} – ${data}`))
+
           return
         }
         resolve(data)
       })
     })
+
     req.on('error', (err) => reject(err))
     req.write(postData)
     req.end()
   })
 
   let json: any
+
   try {
     json = JSON.parse(responseData)
   } catch (e) {
@@ -98,5 +105,6 @@ export async function fetchEndpointSchemaSDL(endpoint: string, opts?: { headerHo
   }
 
   const schema = buildClientSchema(json.data as any)
+
   return printSchema(schema)
 }

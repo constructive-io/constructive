@@ -26,6 +26,7 @@ const PgManyToManyPlugin: Plugin = (builder: any, options: PgManyToManyOptions =
         );
       }
     };
+
     depends('graphile-build-pg', '^4.5.0');
 
     // Register this plugin

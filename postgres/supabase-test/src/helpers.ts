@@ -19,12 +19,13 @@ export async function insertUser(
          RETURNING id, email`,
         [id, email]
       );
-    } else {
+    }
+ 
       return await client.one(
         `INSERT INTO auth.users (id, email) 
          VALUES (gen_random_uuid(), $1) 
          RETURNING id, email`,
         [email]
       );
-    }
+    
   }

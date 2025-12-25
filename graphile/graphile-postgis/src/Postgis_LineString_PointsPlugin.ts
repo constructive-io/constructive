@@ -1,10 +1,10 @@
+import type { LineString, Point as GeoPoint } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { LineString, Point as GeoPoint } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisLineStringPointsPlugin: Plugin = (builder) => {
   builder.hook(
@@ -13,6 +13,7 @@ const PostgisLineStringPointsPlugin: Plugin = (builder) => {
       const {
         scope: { isPgGISType, pgGISType, pgGISTypeDetails }
       } = context as typeof context & { scope: GisScope };
+
       if (
         !isPgGISType ||
         !pgGISType ||
@@ -44,6 +45,7 @@ const PostgisLineStringPointsPlugin: Plugin = (builder) => {
           type: new GraphQLList(Point),
           resolve(data: GisFieldValue) {
             const lineString = data.__geojson as LineString;
+
             return lineString.coordinates.map((coord) => {
               return {
                 __gisType: getGISTypeName(GisSubtype.Point, hasZ, hasM),
@@ -60,4 +62,5 @@ const PostgisLineStringPointsPlugin: Plugin = (builder) => {
     }
   );
 };
+
 export default PostgisLineStringPointsPlugin;

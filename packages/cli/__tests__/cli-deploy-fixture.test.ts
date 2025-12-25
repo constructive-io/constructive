@@ -26,9 +26,11 @@ describe('CLIDeployTestFixture', () => {
     expect(testDb.config.database).toBe(testDb.name);
     
     const result = await testDb.query('SELECT 1 as test');
+
     expect(result.rows[0].test).toBe(1);
     
     const schemaExists = await testDb.exists('schema', 'pgpm_migrate');
+
     expect(schemaExists).toBe(true);
   });
 

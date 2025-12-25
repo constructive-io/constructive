@@ -21,6 +21,7 @@ it('totp.generate + totp.verify basic', async () => {
     `SELECT totp.verify($1::text, $2::text) AS verify`,
     ['secret', generate]
   );
+
   expect(typeof generate).toBe('string');
   expect(verify).toBe(true);
 });

@@ -106,6 +106,7 @@ describe('cmds:init', () => {
     );
 
     const cnc = new PgpmPackage(moduleDir);
+
     expect(cnc.getModuleControlFile()).toMatchSnapshot();
   });
 
@@ -135,6 +136,7 @@ describe('cmds:init', () => {
       });
 
       const workspaceDir = path.join(fixture.tempDir, 'test-workspace-template');
+
       expect(existsSync(workspaceDir)).toBe(true);
       expect(existsSync(path.join(workspaceDir, 'package.json'))).toBe(true);
       expect(existsSync(path.join(workspaceDir, 'pgpm.json'))).toBe(true);
@@ -181,6 +183,7 @@ describe('cmds:init', () => {
       });
 
       const moduleDir = path.join(workspaceDir, 'packages', 'test-module-template');
+
       expect(existsSync(moduleDir)).toBe(true);
       expect(existsSync(path.join(moduleDir, 'package.json'))).toBe(true);
       expect(existsSync(path.join(moduleDir, 'pgpm.plan'))).toBe(true);
@@ -215,6 +218,7 @@ describe('cmds:init', () => {
         });
 
         const workspaceDir = path.join(fixture.tempDir, 'test-workspace-repo');
+
         expect(existsSync(workspaceDir)).toBe(true);
         expect(existsSync(path.join(workspaceDir, 'package.json'))).toBe(true);
       },
@@ -248,6 +252,7 @@ describe('cmds:init', () => {
         });
 
         const workspaceDir = path.join(fixture.tempDir, 'test-workspace-branch');
+
         expect(existsSync(workspaceDir)).toBe(true);
         expect(existsSync(path.join(workspaceDir, 'package.json'))).toBe(true);
       },
@@ -298,6 +303,7 @@ describe('cmds:init', () => {
       });
 
       const modDir = path.join(packagesDir, modName);
+
       expect(existsSync(modDir)).toBe(true);
       expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
       expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);
@@ -328,6 +334,7 @@ describe('cmds:init', () => {
       });
 
       const firstMod = 'first-mod';
+
       await commands(withInitDefaults({
         _: ['init'],
         cwd: wsRoot,
@@ -360,6 +367,7 @@ describe('cmds:init', () => {
       });
 
       const secondModDir = path.join(packagesDir, secondMod);
+
       expect(existsSync(secondModDir)).toBe(true);
       expect(existsSync(path.join(secondModDir, 'pgpm.plan'))).toBe(true);
       expect(existsSync(path.join(secondModDir, 'package.json'))).toBe(true);
@@ -392,6 +400,7 @@ describe('cmds:init', () => {
       });
 
       const baseMod = 'base-mod';
+
       await commands(withInitDefaults({
         _: ['init'],
         cwd: wsRoot,
@@ -431,9 +440,11 @@ describe('cmds:init', () => {
       expect(errorSpy).toHaveBeenCalled();
       const errorCalls = errorSpy.mock.calls.map(call => call.join(' '));
       const hasNestedError = errorCalls.some(call => call.includes('Cannot create a module inside an existing module'));
+
       expect(hasNestedError).toBe(true);
 
       const nestedDir = path.join(insideDir, nestedName);
+
       expect(existsSync(nestedDir)).toBe(false);
 
       exitSpy.mockRestore();
@@ -467,6 +478,7 @@ describe('cmds:init', () => {
       });
 
       const modName = 'mod-from-root';
+
       await commands(withInitDefaults({
         _: ['init'],
         cwd: wsRoot,
@@ -482,6 +494,7 @@ describe('cmds:init', () => {
       });
 
       const modDir = path.join(wsRoot, 'packages', modName);
+
       expect(existsSync(modDir)).toBe(true);
       expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
       expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);

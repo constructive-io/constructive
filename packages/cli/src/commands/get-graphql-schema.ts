@@ -1,7 +1,7 @@
+import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
+import { promises as fs } from 'fs'
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
-import { promises as fs } from 'fs'
-import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
 
 const usage = `
 Constructive Get GraphQL Schema:
@@ -44,11 +44,14 @@ export default async (
   const headerArg = argv.header as string | string[] | undefined
   const headerList = Array.isArray(headerArg) ? headerArg : headerArg ? [headerArg] : []
   const headers: Record<string, string> = {}
+
   for (const h of headerList) {
     const idx = typeof h === 'string' ? h.indexOf(':') : -1
+
     if (idx <= 0) continue
     const name = h.slice(0, idx).trim()
     const value = h.slice(idx + 1).trim()
+
     if (!name) continue
     headers[name] = value
   }
@@ -56,8 +59,10 @@ export default async (
   const schemas = schemasArg.split(',').map(s => s.trim()).filter(Boolean)
 
   let sdl: string
+
   if (endpoint) {
     const opts: any = {}
+
     if (headerHost) opts.headerHost = headerHost
     if (auth) opts.auth = auth
     if (Object.keys(headers).length) opts.headers = headers
@@ -73,6 +78,6 @@ export default async (
     await fs.writeFile(out, sdl, 'utf8')
     console.log(`Wrote schema SDL to ${out}`)
   } else {
-    process.stdout.write(sdl + '\n')
+    process.stdout.write(`${sdl  }\n`)
   }
 }

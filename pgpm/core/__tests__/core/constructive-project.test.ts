@@ -1,4 +1,4 @@
-import { PgpmPackage, PackageContext } from '../../src/core/class/pgpm';
+import { PackageContext,PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;
@@ -44,6 +44,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
 
     const modules = await project.getModules();
+
     expect(Array.isArray(modules)).toBe(true);
     expect(modules.length).toBeGreaterThan(0);
     modules.forEach(mod => {
@@ -56,6 +57,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
 
     const name = project.getModuleName();
+
     expect(typeof name).toBe('string');
     expect(name.length).toBeGreaterThan(0);
   });
@@ -65,6 +67,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
 
     const info = project.getModuleInfo();
+
     expect(info.extname).toBeTruthy();
     expect(info.version).toMatch(/\d+\.\d+\.\d+/);
     expect(info.controlFile).toContain('.control');
@@ -76,6 +79,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
 
     const deps = project.getRequiredModules();
+
     expect(Array.isArray(deps)).toBe(true);
     expect(deps).toContain('plpgsql');
   });
@@ -101,6 +105,7 @@ describe('PgpmPackage', () => {
     const modName = Object.keys(modules)[0];
 
     const { native, modules: deps } = project.getModuleDependencies(modName);
+
     expect(native).toBeDefined();
     expect(deps).toBeDefined();
   });
@@ -110,6 +115,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
 
     const firstCall = project.getModuleInfo();
+
     project.clearCache();
     const secondCall = project.getModuleInfo();
 
@@ -129,6 +135,7 @@ describe('PgpmPackage', () => {
     const modules = project.getModuleMap();
     const name = Object.keys(modules)[0];
     const change = project.getLatestChange(name);
+
     expect(typeof change).toBe('string');
     expect(change.length).toBeGreaterThan(0);
   });
@@ -138,6 +145,7 @@ describe('PgpmPackage', () => {
     const project = new PgpmPackage(cwd);
     const name = Object.keys(project.getModuleMap())[0];
     const result = await project.getModuleDependencyChanges(name);
+
     expect(result).toHaveProperty('native');
     expect(result).toHaveProperty('modules');
     expect(Array.isArray(result.modules)).toBe(true);
@@ -147,6 +155,7 @@ describe('PgpmPackage', () => {
     const cwd = fixture.getFixturePath('constructive');
     const project = new PgpmPackage(cwd);
     const modules = project.getAvailableModules();
+
     expect(Array.isArray(modules)).toBe(true);
     expect(modules.length).toBeGreaterThan(0);
   });

@@ -25,6 +25,7 @@ export async function selectDeployedChange(
 
     if (packageStatuses.length === 0) {
       log.warn('No deployed packages found in database');
+
       return undefined;
     }
 
@@ -38,6 +39,7 @@ export async function selectDeployedChange(
         description: `${status.totalDeployed} changes, last: ${status.lastChange}`
       }))
     }]);
+
     selectedPackage = (packageAnswer as any).package;
   }
 
@@ -45,6 +47,7 @@ export async function selectDeployedChange(
 
   if (deployedChanges.length === 0) {
     log.warn(`No deployed changes found for package ${selectedPackage}`);
+
     return undefined;
   }
 
@@ -83,6 +86,7 @@ export async function selectDeployedPackage(
 
   if (packageStatuses.length === 0) {
     log.warn('No deployed packages found in database');
+
     return undefined;
   }
 

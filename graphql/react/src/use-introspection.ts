@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
-import { useQuery } from 'react-query';
 // @ts-ignore
 import { IntrospectionQuery, parseGraphQuery } from 'introspectron';
+import { useEffect } from 'react';
+import { useQuery } from 'react-query';
+
 import { useGraphqlClient } from './use-graphql-client';
 
 const noop = () => {};
@@ -23,8 +24,10 @@ export function useIntrospection(options = {}) {
       const introspectionResults = await graphqlClient.request(
         IntrospectionQuery
       );
+
       try {
         const { queries, mutations } = parseGraphQuery(introspectionResults);
+
         return { ...queries, ...mutations };
       } catch (err) {
         throw new Error('useIntrospection: failed to get introspection query');

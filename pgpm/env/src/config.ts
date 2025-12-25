@@ -1,6 +1,7 @@
+import { PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PgpmOptions } from '@pgpmjs/types';
+
 import { walkUp } from './utils';
 
 /**
@@ -17,6 +18,7 @@ export const loadConfigFileSync = (configPath: string): PgpmOptions => {
     case '.js':
       // delete require.cache[require.resolve(configPath)];
       const configModule = require(configPath);
+
       return configModule.default || configModule;
     
     default:
@@ -36,12 +38,13 @@ export const loadConfigSyncFromDir = (dir: string): PgpmOptions => {
   
   for (const filename of configFiles) {
     const configPath = path.join(dir, filename);
+
     if (fs.existsSync(configPath)) {
       return loadConfigFileSync(configPath);
     }
   }
   
-  throw new Error('No pgpm config file found. Expected one of: ' + configFiles.join(', '));
+  throw new Error(`No pgpm config file found. Expected one of: ${  configFiles.join(', ')}`);
 };
 
 /**
@@ -54,6 +57,7 @@ export const loadConfigSync = (cwd: string = process.cwd()): PgpmOptions => {
   for (const filename of configFiles) {
     try {
       const configDir = walkUp(cwd, filename);
+
       return loadConfigSyncFromDir(configDir);
     } catch {
     }

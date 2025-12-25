@@ -18,6 +18,7 @@ export class QueryBuilder {
     this.pickAllFields = pickAllFields.bind(this);
 
     const result = validateMetaObject(this._meta);
+
     if (typeof result === 'object' && result.errors) {
       throw new Error(`QueryBuilder: meta object is invalid:\n${result.message}`);
     }
@@ -29,6 +30,7 @@ export class QueryBuilder {
   initModelMap() {
     this._models = Object.keys(this._introspection).reduce((map, key) => {
       const defn = this._introspection[key];
+
       map = {
         ...map,
         [defn.model]: {
@@ -36,6 +38,7 @@ export class QueryBuilder {
           ...{ [key]: defn }
         }
       };
+
       return map;
     }, {});
   }
@@ -52,14 +55,16 @@ export class QueryBuilder {
   query(model) {
     this.clear();
     this._model = model;
+
     return this;
   }
 
   _findQuery() {
     // based on the op, finds the relevant GQL query
     const queries = this._models[this._model];
+
     if (!queries) {
-      throw new Error('No queries found for ' + this._model);
+      throw new Error(`No queries found for ${  this._model}`);
     }
 
     const matchQuery = Object.entries(queries).find(
@@ -67,10 +72,11 @@ export class QueryBuilder {
     );
 
     if (!matchQuery) {
-      throw new Error('No query found for ' + this._model + ':' + this._op);
+      throw new Error(`No query found for ${  this._model  }:${  this._op}`);
     }
 
     const queryKey = matchQuery[0];
+
     return queryKey;
   }
 
@@ -80,6 +86,7 @@ export class QueryBuilder {
     const matchingDefns = Object.keys(this._introspection).reduce(
       (arr, mutationKey) => {
         const defn = this._introspection[mutationKey];
+
         if (
           defn.model === this._model &&
           defn.qtype === this._op &&
@@ -88,6 +95,7 @@ export class QueryBuilder {
         ) {
           arr = [...arr, { defn, mutationKey }];
         }
+
         return arr;
       },
       []
@@ -95,7 +103,7 @@ export class QueryBuilder {
 
     if (!matchingDefns.length === 0) {
       throw new Error(
-        'no mutation found for ' + this._model + ':' + this._mutation
+        `no mutation found for ${  this._model  }:${  this._mutation}`
       );
     }
 
@@ -112,7 +120,7 @@ export class QueryBuilder {
         return `Update${inflection.camelize(this._model)}Input`;
       }
       default:
-        throw new Error('Unhandled mutation type' + mutationType);
+        throw new Error(`Unhandled mutation type${  mutationType}`);
       }
     };
 
@@ -122,7 +130,7 @@ export class QueryBuilder {
 
     if (!matchDefn) {
       throw new Error(
-        'no mutation found for ' + this._model + ':' + this._mutation
+        `no mutation found for ${  this._model  }:${  this._mutation}`
       );
     }
 
@@ -135,15 +143,18 @@ export class QueryBuilder {
     // If selection not given, pick only scalar fields
     if (selection == null) {
       this._select = this.pickScalarFields(null, defn);
+
       return this;
     }
 
     this._select = this.pickAllFields(selection, defn);
+
     return this;
   }
 
   edges(useEdges) {
     this._edges = useEdges;
+
     return this;
   }
 
@@ -209,6 +220,7 @@ export class QueryBuilder {
     );
 
     const defn = this._introspection[this._key];
+
     this.select(select);
     this._ast = getOne({
       builder: this,
@@ -234,6 +246,7 @@ export class QueryBuilder {
     );
 
     const defn = this._introspection[this._key];
+
     this.select(select);
     this._ast = createOne({
       builder: this,
@@ -300,11 +313,13 @@ export class QueryBuilder {
 
   queryName(name) {
     this._queryName = name;
+
     return this;
   }
 
   print() {
     this._hash = gqlPrint(this._ast);
+
     return this;
   }
 }
@@ -327,6 +342,7 @@ function pickScalarFields(selection, defn) {
       .filter((fieldName) => {
         // If not specified or not a valid selection list, allow all
         if (selection == null || !Array.isArray(selection)) return true;
+
         return selection.includes(fieldName);
       })
       .filter(
@@ -345,6 +361,7 @@ function pickScalarFields(selection, defn) {
     const relatedQuery = this._introspection[
       `${modelNameToGetMany(defn.model)}`
     ];
+
     return pickFrom(relatedQuery.selection);
   }
 
@@ -370,6 +387,7 @@ function pickAllFields(selection, defn) {
 
   for (const entry of selectionEntries) {
     const [fieldName, fieldOptions] = entry;
+
     // Case
     // {
     //   goalResults: // fieldName
@@ -412,6 +430,7 @@ function pickAllFields(selection, defn) {
           referencedForeignConstraint.refTable
         );
         const refDefn = this._introspection[getManyName];
+
         fieldSelection.selection = pickScalarFields.call(
           this,
           subFields,
@@ -457,6 +476,7 @@ function isFieldInDefinition(fieldName, defn, modelMeta) {
       if (isObject(selectionItem)) {
         return selectionItem.name === fieldName;
       }
+
       return false;
     })
   );

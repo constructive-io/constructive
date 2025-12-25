@@ -2,6 +2,7 @@ import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
+
 import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('upgrade-modules');
@@ -74,10 +75,12 @@ async function upgradeModulesForProject(
     } else {
       log.info('No pgpm modules are installed in this module.');
     }
+
     return false;
   }
 
   const prefix = moduleName ? `[${moduleName}] ` : '';
+
   log.info(`${prefix}Found ${installed.length} installed module(s). Checking for updates...`);
 
   const moduleVersions = await fetchModuleVersions(installedVersions);
@@ -85,6 +88,7 @@ async function upgradeModulesForProject(
 
   if (modulesWithUpdates.length === 0) {
     log.success(`${prefix}All modules are already up to date.`);
+
     return false;
   }
 
@@ -96,6 +100,7 @@ async function upgradeModulesForProject(
 
   if (dryRun) {
     log.info(`${prefix}Dry run - no changes made.`);
+
     return true;
   }
 
@@ -110,6 +115,7 @@ async function upgradeModulesForProject(
     
     if (modulesToUpgrade.length === 0) {
       log.warn(`${prefix}None of the specified modules have updates available.`);
+
       return false;
     }
   } else {
@@ -140,6 +146,7 @@ async function upgradeModulesForProject(
 
     if (modulesToUpgrade.length === 0) {
       log.info(`${prefix}No modules selected for upgrade.`);
+
       return false;
     }
   }
@@ -149,6 +156,7 @@ async function upgradeModulesForProject(
   await project.upgradeModules({ modules: modulesToUpgrade });
 
   log.success(`${prefix}Upgrade complete!`);
+
   return true;
 }
 
@@ -181,12 +189,14 @@ export default async (
 
     if (modules.length === 0) {
       log.info('No modules found in the workspace.');
+
       return;
     }
 
     log.info(`Found ${modules.length} module(s) in the workspace.\n`);
 
     let anyUpgraded = false;
+
     for (const moduleProject of modules) {
       const moduleName = moduleProject.getModuleName();
       const upgraded = await upgradeModulesForProject(
@@ -198,6 +208,7 @@ export default async (
         specificModules,
         moduleName
       );
+
       if (upgraded) {
         anyUpgraded = true;
       }

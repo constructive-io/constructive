@@ -112,10 +112,11 @@ export default async (
     }
   ];
 
-  let { yes, recursive, createdb, cwd, tx, fast, logOnly } = await prompter.prompt(argv, questions);
+  const { yes, recursive, createdb, cwd, tx, fast, logOnly } = await prompter.prompt(argv, questions);
 
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 
@@ -129,6 +130,7 @@ export default async (
   }
 
   let packageName: string | undefined;
+
   if (recursive) {
     packageName = await selectPackage(argv, prompter, cwd, 'deploy', log);
   }
@@ -149,12 +151,14 @@ export default async (
   const project = new PgpmPackage(cwd);
   
   let target: string | undefined;
+
   if (packageName && argv.to) {
     target = `${packageName}:${argv.to}`;
   } else if (packageName) {
     target = packageName;
   } else if (argv.package && argv.to) {
     const resolvedPackage = resolvePackageAlias(argv.package as string, cwd);
+
     target = `${resolvedPackage}:${argv.to}`;
   } else if (argv.package) {
     target = resolvePackageAlias(argv.package as string, cwd);

@@ -1,4 +1,4 @@
-import type { SchemaBuilder, Plugin } from 'graphile-build';
+import type { Plugin,SchemaBuilder } from 'graphile-build';
 import type { SQL } from 'graphile-build-pg';
 import type { GraphQLScalarType } from 'graphql';
 

@@ -44,6 +44,7 @@ export default async function runModuleSetup(
 
   const answers = await prompter.prompt(argv, moduleQuestions);
   const modName = sluggify(answers.moduleName);
+
   // Avoid overlapping readline listeners with create-gen-app's prompts.
   prompter.close();
 
@@ -75,5 +76,6 @@ export default async function runModuleSetup(
   });
 
   log.success(`Initialized module: ${modName}`);
+
   return { ...argv, ...answers };
 }

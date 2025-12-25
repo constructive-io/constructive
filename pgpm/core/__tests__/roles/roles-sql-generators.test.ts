@@ -1,7 +1,7 @@
 import {
   generateCreateBaseRolesSQL,
-  generateCreateUserSQL,
   generateCreateTestUsersSQL,
+  generateCreateUserSQL,
   generateRemoveUserSQL
 } from '../../src/roles';
 
@@ -52,6 +52,7 @@ describe('Role SQL Generators - Input Validation', () => {
         authenticated: 'auth',
         administrator: 'admin'
       });
+
       expect(sql).toContain('anon');
       expect(sql).toContain('auth');
       expect(sql).toContain('admin');
@@ -79,6 +80,7 @@ describe('Role SQL Generators - Input Validation', () => {
         anonymous: 'anon',
         authenticated: 'auth'
       });
+
       expect(sql).toContain('testuser');
       expect(sql).toContain('anon');
       expect(sql).toContain('auth');
@@ -127,6 +129,7 @@ describe('Role SQL Generators - Input Validation', () => {
 
     it('should generate valid SQL when all parameters are provided', () => {
       const sql = generateCreateTestUsersSQL(validRoles, validConnections);
+
       expect(sql).toContain('app_user');
       expect(sql).toContain('admin_user');
       expect(sql).toContain('anon');
@@ -155,6 +158,7 @@ describe('Role SQL Generators - Input Validation', () => {
         anonymous: 'anon',
         authenticated: 'auth'
       });
+
       expect(sql).toContain('testuser');
       expect(sql).toContain('anon');
       expect(sql).toContain('auth');

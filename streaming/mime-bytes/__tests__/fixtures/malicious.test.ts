@@ -101,6 +101,7 @@ describe('Malicious Fixtures', () => {
     // All files should be handled without throwing unhandled errors
     const totalFiles = Object.keys(errorHandlingResults).length;
     const handledFiles = Object.values(errorHandlingResults).filter(r => r.status === 'success').length;
+
     expect(handledFiles).toBe(totalFiles);
   });
 
@@ -165,6 +166,7 @@ describe('Malicious Fixtures', () => {
     ]);
     
     const gifarResult = await detector.detectFromBuffer(gifarData);
+
     expect(gifarResult).toBeDefined();
     expect(gifarResult?.name).toBe('gif89a'); // Should detect as GIF (first valid signature)
     
@@ -183,6 +185,7 @@ describe('Malicious Fixtures', () => {
     ]);
     
     const pdfzipResult = await detector.detectFromBuffer(pdfzipData);
+
     expect(pdfzipResult).toBeDefined();
     expect(pdfzipResult?.name).toBe('pdf'); // Should detect as PDF (first valid signature)
     

@@ -9,7 +9,6 @@ import type QueryBuilder from 'graphile-build-pg/node8plus/QueryBuilder';
 import type { GraphQLFieldConfigMap } from 'graphql';
 
 import {
-  additionalGraphQLContextFromRequest,
   makeLanguageDataLoaderForTable
 } from './middleware';
 
@@ -59,6 +58,7 @@ const hasI18nTag = (table: PgClass): boolean =>
 const getPrimaryKeyInfo = (table: PgClass): KeyInfo => {
   const identifier = table.primaryKeyConstraint?.keyAttributes?.[0]?.name;
   const idType = table.primaryKeyConstraint?.keyAttributes?.[0]?.type?.name;
+
   return { identifier, idType };
 };
 
@@ -79,9 +79,11 @@ export const LangPlugin: Plugin = (builder, options) => {
     const tablesWithLanguageTablesIdInfo = tablesWithLanguageTables.reduce<Record<string, KeyInfo>>(
       (memo: Record<string, KeyInfo>, table: PgClass) => {
         const keyInfo = getPrimaryKeyInfo(table);
+
         if (table.tags.i18n) {
           memo[table.tags.i18n as string] = keyInfo;
         }
+
         return memo;
       },
       {}
@@ -101,6 +103,7 @@ export const LangPlugin: Plugin = (builder, options) => {
 
     tablesWithLanguageTables.forEach((table: PgClass) => {
       const i18nTableName = table.tags.i18n as string;
+
       i18nTables[i18nTableName] = {
         table: table.name,
         key: null,
@@ -128,6 +131,7 @@ export const LangPlugin: Plugin = (builder, options) => {
 
       const foreignKeyConstraint: PgConstraint | undefined =
         foreignConstraintsThatMatter[0];
+
       if (!foreignKeyConstraint || foreignKeyConstraint.keyAttributes.length !== 1) {
         return;
       }
@@ -180,6 +184,7 @@ export const LangPlugin: Plugin = (builder, options) => {
       }
 
       const variationsTableName = tables[table.name];
+
       if (!variationsTableName) {
         return fields;
       }
@@ -204,6 +209,7 @@ export const LangPlugin: Plugin = (builder, options) => {
               : GraphQLString,
             description: `Locale for ${field}`
           };
+
           return memo;
         },
         {
@@ -226,6 +232,7 @@ export const LangPlugin: Plugin = (builder, options) => {
             const { addDataGenerator } = fieldContext as {
               addDataGenerator: (generator: () => { pgQuery: (queryBuilder: QueryBuilder) => void }) => void;
             };
+
             addDataGenerator(() => ({
               pgQuery: (queryBuilder: QueryBuilder) => {
                 queryBuilder.select(
@@ -241,6 +248,7 @@ export const LangPlugin: Plugin = (builder, options) => {
               const columnName = i18nFields[field].attr;
               const escColumnName = escapeIdentifier(columnName);
               const escFieldName = escapeIdentifier(field);
+
               return `coalesce(v.${escColumnName}, b.${escColumnName}) as ${escFieldName}`;
             });
 

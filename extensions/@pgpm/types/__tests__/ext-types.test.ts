@@ -16,6 +16,7 @@ describe('@pgql/types', () => {
     const { typname } = await pg.one(
       `SELECT typname FROM pg_type WHERE typname = 'url'`
     );
+
     expect(typname).toBe('url');
   });
 });

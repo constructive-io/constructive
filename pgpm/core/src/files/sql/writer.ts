@@ -26,6 +26,7 @@ export const writeSqitchFiles = (rows: SqitchRow[], opts: SqlWriteOptions): void
  */
 const ordered = (arr?: string[]): string[] => {
   if (!arr) return [];
+
   return arr.sort((a, b) => a.length - b.length || a.localeCompare(b));
 };
 
@@ -47,6 +48,7 @@ const writeDeploy = (row: SqitchRow, opts: SqlWriteOptions): void => {
   const prefix = path.join(opts.outdir, opts.name, 'deploy');
   const actualDir = path.resolve(prefix, dir);
   const actualFile = path.resolve(prefix, `${deploy}.sql`);
+
   fs.mkdirSync(actualDir, { recursive: true });
   
   const sqlContent = opts.replacer(row.content);
@@ -64,6 +66,7 @@ ${useTx ? 'BEGIN;' : ''}
 ${sqlContent}
 ${useTx ? 'COMMIT;' : ''}
 `;
+
   fs.writeFileSync(actualFile, content);
 };
 
@@ -85,6 +88,7 @@ const writeVerify = (row: SqitchRow, opts: SqlWriteOptions): void => {
   const prefix = path.join(opts.outdir, opts.name, 'verify');
   const actualDir = path.resolve(prefix, dir);
   const actualFile = path.resolve(prefix, `${deploy}.sql`);
+
   fs.mkdirSync(actualDir, { recursive: true });
   
   const sqlContent = opts.replacer(row.verify);
@@ -96,6 +100,7 @@ ${sqlContent}
 ${useTx ? 'COMMIT;' : ''}
 
 `);
+
   fs.writeFileSync(actualFile, content);
 };
 
@@ -117,6 +122,7 @@ const writeRevert = (row: SqitchRow, opts: SqlWriteOptions): void => {
   const prefix = path.join(opts.outdir, opts.name, 'revert');
   const actualDir = path.resolve(prefix, dir);
   const actualFile = path.resolve(prefix, `${deploy}.sql`);
+
   fs.mkdirSync(actualDir, { recursive: true });
   
   const sqlContent = opts.replacer(row.revert);
@@ -128,5 +134,6 @@ ${sqlContent}
 ${useTx ? 'COMMIT;' : ''}
 
 `;
+
   fs.writeFileSync(actualFile, content);
 };

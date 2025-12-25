@@ -2,16 +2,19 @@ import { PgpmOptions } from '@pgpmjs/types';
 
 const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
+
   return !isNaN(num) ? num : undefined;
 };
 
 export const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
+
   return ['true', '1', 'yes'].includes(val.toLowerCase());
 };
 
 const parseEnvStringArray = (val?: string): string[] | undefined => {
   if (!val) return undefined;
+
   return val
     .split(',')
     .map(s => s.trim())
@@ -188,6 +191,8 @@ type NodeEnv = 'development' | 'production' | 'test';
 
 export const getNodeEnv = (): NodeEnv => {
   const env = process.env.NODE_ENV?.toLowerCase();
+
   if (env === 'production' || env === 'test') return env;
+
   return 'development';
 };

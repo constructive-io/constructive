@@ -16,6 +16,7 @@ export async function loadSqlFiles(
     }
     
     const sql = readFileSync(file, 'utf-8');
+
     await client.query(sql);
   }
 }

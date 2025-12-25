@@ -1,4 +1,3 @@
-import requestLib from 'request';
 import {
   getCallbackBaseUrl,
   getJobGatewayConfig,
@@ -6,6 +5,7 @@ import {
   getNodeEnvironment
 } from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import requestLib from 'request';
 
 const log = new Logger('jobs:req');
 
@@ -23,6 +23,7 @@ const getFunctionUrl = (fn: string): string => {
 
   const { gatewayUrl } = getJobGatewayConfig();
   const base = gatewayUrl.replace(/\/$/, '');
+
   return `${base}/${fn}`;
 };
 
@@ -38,6 +39,7 @@ const request = (
   { body, databaseId, workerId, jobId }: RequestOptions
 ) => {
   const url = getFunctionUrl(fn);
+
   log.info(`dispatching job`, {
     fn,
     url,
@@ -46,6 +48,7 @@ const request = (
     jobId,
     databaseId
   });
+
   return new Promise<boolean>((resolve, reject) => {
     requestLib.post(
       {
@@ -64,15 +67,17 @@ const request = (
         json: true,
         body
       },
-      function (error: unknown) {
+      (error: unknown) => {
         if (error) {
           log.error(`request error for job[${jobId}] fn[${fn}]`, error);
           if (error instanceof Error && error.stack) {
             log.debug(error.stack);
           }
+
           return reject(error);
         }
         log.debug(`request success for job[${jobId}] fn[${fn}]`);
+
         return resolve(true);
       }
     );

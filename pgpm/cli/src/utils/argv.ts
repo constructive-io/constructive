@@ -6,5 +6,6 @@ export const extractFirst = (argv: Partial<ParsedArgs>) => {
     ...argv,
     _: argv._?.slice(1) ?? []
   };
+
   return { first, newArgv };
 };

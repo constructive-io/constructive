@@ -1,8 +1,9 @@
-import express from 'express';
-import bodyParser from 'body-parser';
 import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
+
+import bodyParser from 'body-parser';
+import express from 'express';
 
 type JobCallbackStatus = 'success' | 'error';
 
@@ -33,6 +34,7 @@ app.use((req: any, res: any, next: any) => {
     const headers = getHeaders(req);
 
     let body: any;
+
     if (req.body && typeof req.body === 'object') {
       // Only log top-level keys to avoid exposing sensitive body contents.
       body = { keys: Object.keys(req.body) };
@@ -43,7 +45,7 @@ app.use((req: any, res: any, next: any) => {
       body = undefined;
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log('[knative-job-fn] Incoming job request', {
       method: req.method,
       path: req.originalUrl || req.url,
@@ -71,9 +73,11 @@ app.use((req: any, res: any, next: any) => {
 const normalizeCallbackUrl = (rawUrl: string): string => {
   try {
     const url = new URL(rawUrl);
+
     if (!url.pathname || url.pathname === '/') {
       url.pathname = '/callback';
     }
+
     return url.toString();
   } catch {
     return rawUrl;
@@ -87,6 +91,7 @@ const postJson = (
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     let url: URL;
+
     try {
       url = new URL(urlStr);
     } catch (e) {
@@ -127,6 +132,7 @@ const sendJobCallback = async (
   errorMessage?: string
 ) => {
   const { callbackUrl, workerId, jobId, databaseId } = ctx;
+
   if (!callbackUrl || !workerId || !jobId) {
     return;
   }
@@ -152,7 +158,7 @@ const sendJobCallback = async (
   }
 
   try {
-    // eslint-disable-next-line no-console
+     
     console.log('[knative-job-fn] Sending job callback', {
       status,
       target: normalizeCallbackUrl(callbackUrl),
@@ -162,7 +168,7 @@ const sendJobCallback = async (
     });
     await postJson(target, headers, body);
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('[knative-job-fn] Failed to POST job callback', {
       target,
       status,
@@ -190,7 +196,7 @@ app.use((req: any, res: any, next: any) => {
       // If an error handler already sent a callback, skip.
       if (res.locals.jobCallbackSent) return;
       res.locals.jobCallbackSent = true;
-      // eslint-disable-next-line no-console
+       
       console.log('[knative-job-fn] Function completed', {
         workerId: ctx.workerId,
         jobId: ctx.jobId,
@@ -205,14 +211,14 @@ app.use((req: any, res: any, next: any) => {
 });
 
 export default {
-  post: function (...args: any[]) {
+  post (...args: any[]) {
     return app.post.apply(app, args as any);
   },
   listen: (port: any, cb: () => void = () => {}) => {
     // NOTE Remember that Express middleware executes in order.
     // You should define error handlers last, after all other middleware.
     // Otherwise, your error handler won't get called
-    // eslint-disable-next-line no-unused-vars
+     
     app.use(async (error: any, req: any, res: any, next: any) => {
       res.set({
         'Content-Type': 'application/json',
@@ -222,12 +228,13 @@ export default {
       // Mark job as having errored via callback, if available.
       try {
         const ctx: JobContext | undefined = res.locals?.jobContext;
+
         if (ctx && !res.locals.jobCallbackSent) {
           res.locals.jobCallbackSent = true;
           await sendJobCallback(ctx, 'error', error?.message);
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('[knative-job-fn] Failed to send error callback', err);
       }
 
@@ -251,7 +258,7 @@ export default {
           };
         }
 
-        // eslint-disable-next-line no-console
+         
         console.error('[knative-job-fn] Function error', {
           headers,
           path: req.originalUrl || req.url,

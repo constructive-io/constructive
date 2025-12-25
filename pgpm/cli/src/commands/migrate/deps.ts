@@ -47,6 +47,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
         }))
       }
     ]);
+
     changeName = answer.change;
   }
 
@@ -62,6 +63,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
       
       // Show changes with no dependencies first (roots)
       const roots = allChanges.filter(c => c.dependencies.length === 0);
+
       console.log('📌 Root Changes (no dependencies):\n');
       roots.forEach(change => {
         console.log(`  • ${change.name}`);
@@ -104,6 +106,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
 
       // All dependencies (recursive)
       const allDeps = getAllDependencies(change.name, allChanges);
+
       if (allDeps.size > 0) {
         console.log(`\n📦 All Dependencies (${allDeps.size} total):`);
         Array.from(allDeps).forEach(dep => {
@@ -113,6 +116,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
 
       // Dependents (what depends on this)
       const dependents = allChanges.filter(c => c.dependencies.includes(changeName));
+
       if (dependents.length > 0) {
         console.log(`\n📤 Depended on by (${dependents.length} changes):`);
         dependents.forEach(dep => {
@@ -144,10 +148,12 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
         
         // Check if this change is deployed
         const isDeployed = deployedMap.has(changeName);
+
         console.log(`  This change: ${isDeployed ? '✅ Deployed' : '⏳ Not deployed'}`);
 
         // Check dependencies
         const undeployedDeps = Array.from(allDeps).filter(dep => !deployedMap.has(dep));
+
         if (undeployedDeps.length > 0) {
           console.log(`  ⚠️  Undeployed dependencies: ${undeployedDeps.join(', ')}`);
         } else if (allDeps.size > 0) {
@@ -156,6 +162,7 @@ export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: 
 
         // Check dependents
         const deployedDependents = dependents.filter(d => deployedMap.has(d.name));
+
         if (deployedDependents.length > 0) {
           console.log(`  ⚠️  Deployed dependents: ${deployedDependents.map(d => d.name).join(', ')}`);
         }
@@ -188,9 +195,10 @@ function buildDependencyTree(changes: any[]): Map<string, string[]> {
 
 function showDependents(changeName: string, tree: Map<string, string[]>, indent: string) {
   const dependents = tree.get(changeName) || [];
+
   dependents.forEach(dep => {
     console.log(`${indent}└─ ${dep}`);
-    showDependents(dep, tree, indent + '   ');
+    showDependents(dep, tree, `${indent  }   `);
   });
 }
 
@@ -205,6 +213,7 @@ function getAllDependencies(changeName: string, changes: any[]): Set<string> {
       if (!deps.has(dep)) {
         deps.add(dep);
         const depChange = changes.find(c => c.name === dep);
+
         if (depChange) {
           addDeps(depChange);
         }
@@ -213,5 +222,6 @@ function getAllDependencies(changeName: string, changes: any[]): Set<string> {
   }
   
   addDeps(change);
+
   return deps;
 }

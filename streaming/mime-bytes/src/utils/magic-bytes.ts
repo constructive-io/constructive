@@ -3,8 +3,10 @@
 export function hexToBuffer(hexArray: string[]): Buffer {
   const bytes = hexArray.map(hex => {
     if (hex === '?') return 0; // Wildcard placeholder
+
     return parseInt(hex.replace(/0x/i, ''), 16);
   });
+
   return Buffer.from(bytes);
 }
 
@@ -39,10 +41,12 @@ export function compareBytes(buffer: Buffer, pattern: string[], offset: number =
 export function findMagicBytes(buffer: Buffer, patterns: Array<{pattern: string[], offset?: number}>): number {
   for (let i = 0; i < patterns.length; i++) {
     const { pattern, offset = 0 } = patterns[i];
+
     if (compareBytes(buffer, pattern, offset)) {
       return i;
     }
   }
+
   return -1;
 }
 
@@ -51,6 +55,7 @@ export function extractBytes(buffer: Buffer, offset: number, length: number): Bu
   if (offset + length > buffer.length) {
     return buffer.slice(offset);
   }
+
   return buffer.slice(offset, offset + length);
 }
 
@@ -61,6 +66,7 @@ export function isTextLike(buffer: Buffer): boolean {
   
   for (let i = 0; i < sampleSize; i++) {
     const byte = buffer[i];
+
     // Check for printable ASCII characters, tabs, newlines, carriage returns
     if ((byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13) {
       printableCount++;

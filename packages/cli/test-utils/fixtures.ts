@@ -1,9 +1,9 @@
+import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
 import fs from 'fs';
 import { Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import os from 'os';
 import path from 'path';
-import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
 
 import { commands } from '../src/commands';
 import { setupTests, TestEnvironment } from './cli';
@@ -27,6 +27,7 @@ export class TestFixture {
 
     if (fixturePath.length > 0) {
       const originalFixtureDir = getFixturePath(...fixturePath);
+
       this.tempFixtureDir = path.join(this.tempDir, ...fixturePath);
       cpSync(originalFixtureDir, this.tempFixtureDir, { recursive: true });
     } else {

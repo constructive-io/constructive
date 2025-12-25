@@ -51,15 +51,18 @@ export default async (
       message: 'Change name',
       required: true
     }]) as any;
+
     finalChange = answers.change;
   }
 
   let dependencies: string[] = [];
+
   if (argv.requires) {
     dependencies = Array.isArray(argv.requires) ? argv.requires : [argv.requires];
   }
 
   const pkg = new PgpmPackage(path.resolve(cwd));
+
   pkg.addChange(finalChange, dependencies.length > 0 ? dependencies : undefined, argv.note);
   
   return newArgv;

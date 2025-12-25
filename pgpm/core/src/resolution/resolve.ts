@@ -1,9 +1,9 @@
+import { errors } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 
 import { getChanges, getExtensionName } from '../files';
 import { parsePlanFile } from '../files/plan/parser';
 import { resolveDependencies } from './deps';
-import { errors } from '@pgpmjs/types';
 
 /**
  * Resolves SQL scripts for deployment or reversion.
@@ -26,6 +26,7 @@ export const resolve = (
     if (external.includes(script)) continue;
     const file = `${pkgDir}/${scriptType}/${script}.sql`;
     const dscript = readFileSync(file, 'utf-8');
+
     sqlfile.push(dscript);
   }
 
@@ -55,6 +56,7 @@ export const resolveWithPlan = (
   for (const script of resolved) {
     const file = `${pkgDir}/${scriptType}/${script}.sql`;
     const dscript = readFileSync(file, 'utf-8');
+
     sqlfile.push(dscript);
   }
 
@@ -95,6 +97,7 @@ export const resolveTagToChangeName = (
   if (tagReference.startsWith('@') && !tagReference.includes(':')) {
     if (!currentProject) {
       const plan = parsePlanFile(planPath);
+
       if (!plan.data) {
         throw errors.PLAN_PARSE_ERROR({ planPath, errors: 'Could not parse plan file' });
       }
@@ -105,6 +108,7 @@ export const resolveTagToChangeName = (
   
   // Parse package:@tagName format
   const match = tagReference.match(/^([^:]+):@(.+)$/);
+
   if (!match) {
     throw errors.INVALID_NAME({ name: tagReference, type: 'tag', rules: 'Expected format: package:@tagName or @tagName' });
   }
@@ -120,6 +124,7 @@ export const resolveTagToChangeName = (
   
   // Find the tag in the plan
   const tag = planResult.data.tags?.find((t: any) => t.name === tagName);
+
   if (!tag) {
     throw errors.TAG_NOT_FOUND({ tag: tagName, project: projectName });
   }

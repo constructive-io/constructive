@@ -43,6 +43,7 @@ export const options: Partial<CLIOptions> = {
 if (require.main === module) {
   if (process.argv.includes('--version') || process.argv.includes('-v')) {
     const pkg = findAndRequirePackageJson(__dirname);
+
     console.log(pkg.version);
     process.exit(0);
   }

@@ -9,6 +9,7 @@
 function isPunctuation(char: string): boolean {
   // Common punctuation marks, excluding underscore
   const punctuation = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^`{|}~]/;
+
   return punctuation.test(char);
 }
 
@@ -37,12 +38,14 @@ export function isValidChangeName(name: string): boolean {
 
   // Check first character - must not be punctuation except underscore
   const firstChar = name[0];
+
   if (firstChar !== '_' && isPunctuation(firstChar)) {
     return false;
   }
 
   // Check last character - must not be punctuation except underscore
   const lastChar = name[name.length - 1];
+
   if (lastChar !== '_' && isPunctuation(lastChar)) {
     return false;
   }
@@ -118,6 +121,7 @@ export function parseReference(ref: string): ParsedReference | null {
   // Check for package qualifier
   let workingRef = ref;
   const colonIndex = ref.indexOf(':');
+
   if (colonIndex > 0) {
     const projectPart = ref.substring(0, colonIndex);
     const remainingPart = ref.substring(colonIndex + 1);
@@ -139,71 +143,85 @@ export function parseReference(ref: string): ParsedReference | null {
   // Check for symbolic references
   if (workingRef === 'HEAD' || workingRef === '@HEAD') {
     result.symbolic = 'HEAD';
+
     return result;
   }
   if (workingRef === 'ROOT' || workingRef === '@ROOT') {
     result.symbolic = 'ROOT';
+
     return result;
   }
 
   // Check for relative references (e.g., HEAD^, @beta~2, HEAD^^)
   // Handle multiple ^ characters
   const multiCaretMatch = workingRef.match(/^(.+?)(\^+)$/);
+
   if (multiCaretMatch) {
     const [, base, carets] = multiCaretMatch;
+
     result.relative = {
-      base: base, // Keep the original base including @ prefix
+      base, // Keep the original base including @ prefix
       direction: '^',
       count: carets.length
     };
+
     return result;
   }
   
   // Handle ^N or ~N format
   const relativeMatch = workingRef.match(/^(.+?)([~^])(\d+)$/);
+
   if (relativeMatch) {
     const [, base, direction, countStr] = relativeMatch;
     const count = parseInt(countStr, 10);
     
     result.relative = {
-      base: base, // Keep the original base including @ prefix
+      base, // Keep the original base including @ prefix
       direction: direction as '^' | '~',
       count
     };
+
     return result;
   }
   
   // Handle single ^ or ~ without number
   const singleRelativeMatch = workingRef.match(/^(.+?)([~^])$/);
+
   if (singleRelativeMatch) {
     const [, base, direction] = singleRelativeMatch;
     
     result.relative = {
-      base: base, // Keep the original base including @ prefix
+      base, // Keep the original base including @ prefix
       direction: direction as '^' | '~',
       count: 1
     };
+
     return result;
   }
 
   // Check if it's a SHA1
   if (isSHA1(workingRef)) {
     result.sha1 = workingRef;
+
     return result;
   }
 
   // Check for tag reference (starts with @)
   if (workingRef.startsWith('@')) {
     const tagName = workingRef.substring(1);
+
     if (isValidTagName(tagName)) {
       result.tag = tagName;
+
       return result;
     }
+
     return null; // Invalid tag name
   }
 
   // Check for change@tag format
   const atIndex = workingRef.indexOf('@');
+
   if (atIndex > 0) {
     const changeName = workingRef.substring(0, atIndex);
     const tagName = workingRef.substring(atIndex + 1);
@@ -211,14 +229,17 @@ export function parseReference(ref: string): ParsedReference | null {
     if (isValidChangeName(changeName) && isValidTagName(tagName)) {
       result.change = changeName;
       result.tag = tagName;
+
       return result;
     }
+
     return null; // Invalid change or tag name
   }
 
   // Must be a plain change name
   if (isValidChangeName(workingRef)) {
     result.change = workingRef;
+
     return result;
   }
 

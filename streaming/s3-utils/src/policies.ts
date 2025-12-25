@@ -10,11 +10,13 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
   } catch (e: any) {
     if (e.name === 'BucketAlreadyOwnedByYou' || e.Code === 'BucketAlreadyOwnedByYou') {
       console.warn(`[createS3Bucket] Bucket "${Bucket}" already exists`);
+
       return { success: true };
-    } else {
+    } 
       console.error('[createS3Bucket error - createBucket]', e);
+
       return { success: false };
-    }
+    
   }
 
   // Check if it's MinIO by looking at the endpoint
@@ -86,6 +88,7 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
     return { success: true };
   } catch (e) {
     console.error('[createS3Bucket error - post-create]', e);
+
     return { success: false };
   }
 }

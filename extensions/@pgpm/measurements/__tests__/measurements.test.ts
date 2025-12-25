@@ -24,6 +24,7 @@ describe('measurements schema', () => {
     const schemas = await pg.any(
       `SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'measurements'`
     );
+
     expect(schemas).toHaveLength(1);
     expect(schemas[0].schema_name).toBe('measurements');
   });

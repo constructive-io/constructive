@@ -19,5 +19,6 @@ export function readScript(basePath: string, scriptType: string, changeName: str
  */
 export function scriptExists(basePath: string, scriptType: string, changeName: string): boolean {
   const scriptPath = join(basePath, scriptType, `${changeName}.sql`);
+
   return existsSync(scriptPath);
 }

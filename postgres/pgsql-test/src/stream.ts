@@ -8,9 +8,11 @@ function setArgs(config: PgConfig): string[] {
     '-h', config.host,
     '-d', config.database
   ];
+
   if (config.port) {
     args.push('-p', String(config.port));
   }
+
   return args;
 }
 
@@ -22,6 +24,7 @@ function stringToStream(text: string): Readable {
       this.push(null);
     }
   });
+
   return stream;
 }
 

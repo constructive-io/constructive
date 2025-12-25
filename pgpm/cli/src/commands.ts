@@ -19,13 +19,13 @@ import kill from './commands/kill';
 import migrate from './commands/migrate';
 import _package from './commands/package';
 import plan from './commands/plan';
-import updateCmd from './commands/update';
-import upgradeModules from './commands/upgrade-modules';
 import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
+import updateCmd from './commands/update';
+import upgradeModules from './commands/upgrade-modules';
 import verify from './commands/verify';
 import { extractFirst, usageText } from './utils';
 import { cliExitWithError } from './utils/cli-error';
@@ -43,6 +43,7 @@ const withPgTeardown = (fn: Function, skipTeardown: boolean = false) => async (.
 
 export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<string, Function> => {
   const pgt = (fn: Function) => withPgTeardown(fn, skipPgTeardown);
+
   return {
     add,
     'admin-users': pgt(adminUsers),
@@ -74,6 +75,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
 export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: CLIOptions & { skipPgTeardown?: boolean }) => {
   if (argv.version || argv.v) {
     const pkg = findAndRequirePackageJson(__dirname);
+
     console.log(pkg.version);
     process.exit(0);
   }
@@ -101,6 +103,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
         options: Object.keys(commandMap)
       }
     ]);
+
     command = answer.command;
   }
 

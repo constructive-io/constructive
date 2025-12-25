@@ -1,14 +1,13 @@
+import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
 
-import { BoilerplateQuestion } from './boilerplate-types';
 import {
   readBoilerplateConfig,
   readBoilerplatesConfig,
-  resolveBoilerplateBaseDir,
 } from './boilerplate-scanner';
+import { BoilerplateQuestion } from './boilerplate-types';
 
 export type TemplateKind = 'workspace' | 'module';
 
@@ -70,6 +69,7 @@ const resolveFromPath = (
     const candidateDir = path.isAbsolute(templatePath)
       ? templatePath
       : path.join(templateDir, templatePath);
+
     if (
       fs.existsSync(candidateDir) &&
       fs.statSync(candidateDir).isDirectory()
@@ -79,6 +79,7 @@ const resolveFromPath = (
         resolvedTemplatePath: candidateDir,
       };
     }
+
     return {
       fromPath: templatePath,
       resolvedTemplatePath: path.join(templateDir, templatePath),
@@ -92,6 +93,7 @@ const resolveFromPath = (
   if (baseDir) {
     // New structure: {templateDir}/{baseDir}/{type}
     const newStructurePath = path.join(templateDir, baseDir, type);
+
     if (
       fs.existsSync(newStructurePath) &&
       fs.statSync(newStructurePath).isDirectory()
@@ -105,6 +107,7 @@ const resolveFromPath = (
 
   // Fallback to legacy structure: {templateDir}/{type}
   const legacyPath = path.join(templateDir, type);
+
   if (fs.existsSync(legacyPath) && fs.statSync(legacyPath).isDirectory()) {
     return {
       fromPath: type,
@@ -188,6 +191,7 @@ export async function scaffoldTemplate(
   const cacheKey = cacheManager.createKey(normalizedUrl, branch);
 
   const expiredMetadata = cacheManager.checkExpiration(cacheKey);
+
   if (expiredMetadata) {
     cacheManager.clear(cacheKey);
   }
@@ -195,11 +199,13 @@ export async function scaffoldTemplate(
   let templateDir: string;
   let cacheUsed = false;
   const cachedPath = cacheManager.get(cacheKey);
+
   if (cachedPath && !expiredMetadata) {
     templateDir = cachedPath;
     cacheUsed = true;
   } else {
     const tempDest = path.join(cacheManager.getReposDir(), cacheKey);
+
     gitCloner.clone(normalizedUrl, tempDest, {
       branch,
       depth: 1,

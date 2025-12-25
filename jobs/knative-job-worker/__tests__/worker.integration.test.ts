@@ -21,10 +21,11 @@ jest.mock('@constructive-io/job-pg', () => ({
   }
 }));
 
+import * as jobUtils from '@constructive-io/job-utils';
 import path from 'path';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import * as jobUtils from '@constructive-io/job-utils';
+
 import Worker from '../src';
 
 let db: PgTestClient;
@@ -35,6 +36,7 @@ beforeAll(async () => {
     __dirname,
     '../../../extensions/@pgpm/database-jobs'
   );
+
   ({ db, teardown } = await getConnections({}, [seed.loadPgpm(modulePath)]));
   db.setContext({ role: 'administrator' });
 });
@@ -83,6 +85,7 @@ describe('knative worker integration with job queue', () => {
 
     expect(postMock).toHaveBeenCalledTimes(1);
     const [options] = postMock.mock.calls[0];
+
     expect(options.url).toBe('http://example-fn.knative.internal');
     expect(options.headers['X-Job-Id']).toBe(job.id);
     expect(options.headers['X-Database-Id']).toBe(databaseId);

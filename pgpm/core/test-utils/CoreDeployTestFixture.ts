@@ -22,7 +22,9 @@ export class CoreDeployTestFixture extends TestFixture {
     }
 
     const db = await this.migrateFixture.setupTestDatabase();
+
     this.databases.push(db);
+
     return db;
   }
 

@@ -1,4 +1,4 @@
-import Worker, { WorkerContext, JobRow } from './index';
+import Worker, { JobRow,WorkerContext } from './index';
 
 const worker = new Worker({
   tasks: {

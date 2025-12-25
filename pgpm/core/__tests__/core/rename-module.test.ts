@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+
 import { TestFixture } from '../../test-utils';
 
 let fixture: TestFixture;
@@ -31,15 +32,18 @@ describe('PgpmPackage.renameModule', () => {
     const modPath = project.getModulePath()!;
 
     const res = project.renameModule('renamed_mod', { dryRun: false, syncPackageJsonName: false });
+
     expect(res.changed.length).toBeGreaterThan(0);
 
     const newControl = path.join(modPath, 'renamed_mod.control');
+
     expect(fs.existsSync(newControl)).toBe(true);
 
     const analysis = project.analyzeModule();
     const mismatchCodes = analysis.issues.filter(i =>
       i.code === 'plan_project_mismatch' || i.code === 'plan_uri_mismatch' || i.code === 'control_filename_mismatch'
     );
+
     expect(mismatchCodes.length).toBe(0);
   });
 });

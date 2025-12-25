@@ -6,6 +6,7 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
  */
 const parseEnvBoolean = (val?: string): boolean | undefined => {
   if (val === undefined) return undefined;
+
   return ['true', '1', 'yes'].includes(val.toLowerCase());
 };
 

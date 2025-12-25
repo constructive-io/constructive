@@ -15,12 +15,14 @@ const getBuildHook = (): HookFn => {
   if (!hook) {
     throw new Error('Version plugin hook was not registered');
   }
+
   return hook;
 };
 
 describe('PostgisVersionPlugin', () => {
   it('throws when graphile-build is too old to provide versions', () => {
     const hook = getBuildHook();
+
     expect(() => hook({ graphileBuildVersion: '0.0.0' })).toThrow(
       /graphile-build@\^4\.1\.0/i
     );
@@ -28,6 +30,7 @@ describe('PostgisVersionPlugin', () => {
 
   it('throws when graphile-build-pg requirement is unmet', () => {
     const hook = getBuildHook();
+
     expect(() =>
       hook({
         versions: { 'graphile-build': '4.1.0' },
@@ -47,6 +50,7 @@ describe('PostgisVersionPlugin', () => {
       graphileBuildVersion: '4.14.1'
     };
     const result = hook(build);
+
     expect(result.versions['graphile-postgis']).toBeDefined();
   });
 });

@@ -24,29 +24,34 @@ export async function selectPackage(
   // Check if any modules exist
   if (!moduleNames.length) {
     const errorMsg = 'No modules found in the specified directory.';
+
     if (log) {
       log.error(errorMsg);
+
       return undefined;
-    } else {
+    } 
       prompter.close();
       throw errors.NOT_FOUND({}, errorMsg);
-    }
+    
   }
 
   // If a specific package was provided, validate it
   if (argv.package) {
     const inputPackage = argv.package as string;
     const packageName = resolvePackageAlias(inputPackage, cwd);
+
     if (log) log.info(`Using specified package: ${packageName}`);
     
     if (!moduleNames.includes(packageName)) {
       const errorMsg = `Package '${packageName}' not found. Available packages: ${moduleNames.join(', ')}`;
+
       if (log) {
         log.error(errorMsg);
+
         return undefined;
-      } else {
+      } 
         throw errors.NOT_FOUND({}, errorMsg);
-      }
+      
     }
     
     return packageName;
@@ -62,5 +67,6 @@ export async function selectPackage(
   }]);
 
   if (log) log.info(`Selected package: ${selectedPackage}`);
+
   return selectedPackage;
 }

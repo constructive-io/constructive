@@ -1,9 +1,9 @@
 import '../test-utils/env';
 
 import { existsSync, promises as fs, readdirSync } from 'fs';
-import { join } from 'path';
-import { getConnections } from 'graphile-test';
 import type { GraphQLQueryFn } from 'graphile-test';
+import { getConnections } from 'graphile-test';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
@@ -26,8 +26,10 @@ const getFixtureSets = (): FixtureSet[] => {
   return schemas
     .map((schema) => {
       const fixtureDir = join(SCHEMA_DIR, schema, 'fixtures/queries');
+
       try {
         const fixtures = readdirSync(fixtureDir).filter((file) => file.endsWith('.graphql'));
+
         return fixtures.length ? { schema, fixtures } : null;
       } catch {
         return null;
@@ -40,6 +42,7 @@ const fixtureSets = getFixtureSets();
 
 const grantAuthenticatedAccess = async (pg: PgTestClient, schemaName: string) => {
   const ident = `"${schemaName.replace(/"/g, '""')}"`;
+
   await pg.query(
     `
       grant usage on schema ${ident} to authenticated;
@@ -69,6 +72,7 @@ const getSchemaConnections = async (schemaName: string) => {
   );
 
   const { db, pg, query, teardown } = connections;
+
   return { db, pg, query, teardown };
 };
 
@@ -82,6 +86,7 @@ describe.each(fixtureSets.map(({ schema, fixtures }) => [schema, fixtures] as co
 
   beforeAll(async () => {
     const connections = await getSchemaConnections(schema);
+
     ({ db, pg, query, teardown } = connections);
     await grantAuthenticatedAccess(pg, schema);
   });
@@ -102,11 +107,12 @@ describe.each(fixtureSets.map(({ schema, fixtures }) => [schema, fixtures] as co
     const queryText = await fs.readFile(join(SCHEMA_DIR, schema, 'fixtures/queries', fixture), 'utf8');
     const result = await query(queryText);
     const normalizedResult = JSON.parse(JSON.stringify(result));
+
     if (normalizedResult.errors) {
       // surface underlying errors in case snapshots hide details
-      /* eslint-disable no-console */
+       
       console.log(normalizedResult.errors.map((error: any) => error.originalError ?? error));
-      /* eslint-enable no-console */
+       
     }
     expect(normalizedResult).toMatchSnapshot();
   });

@@ -73,6 +73,7 @@ it('csv in/out', async () => {
 
   // 6. Ensure output directory exists
   const outDir = path.resolve(__dirname, '../output');
+
   fs.mkdirSync(outDir, { recursive: true });
 
   // 7. Export updated tables to CSV

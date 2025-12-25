@@ -12,6 +12,7 @@ class ETagStream extends Transform {
 
   constructor(opts: ETagStreamOptions = {}) {
     const { partSizeInMb = 5, mode = 'through' } = opts;
+
     super();
     this.mode = mode;
     this.hash = createHash(partSizeInMb);
@@ -27,6 +28,7 @@ class ETagStream extends Transform {
 
   _flush(callback: TransformCallback): void {
     const digest = this.hash.digest();
+
     if (this.mode === 'through') {
       this.emit('etag', digest);
     } else {

@@ -62,6 +62,7 @@ describe('publishToDist()', () => {
 
   it('skips extraneous files and folders', () => {
     const junkDir = path.join(fixture.tempFixtureDir, 'junk');
+
     fs.mkdirSync(junkDir, { recursive: true });
     fs.writeFileSync(path.join(junkDir, 'ignore.txt'), 'junk');
 

@@ -72,6 +72,7 @@ export function proxyClientQuery(db: PgTestClient): void {
     
     // For normal queries (Drizzle ORM), apply context before executing
     const ctxStmts = (db as any).ctxStmts as string | undefined;
+
     if (!ctxStmts) {
       // No context to apply, just delegate
       return originalQuery(...args);
@@ -81,6 +82,7 @@ export function proxyClientQuery(db: PgTestClient): void {
     // Return a Promise for Drizzle's async query pattern
     const runWithContext = async () => {
       await originalQuery(ctxStmts);
+
       return originalQuery(...args);
     };
     

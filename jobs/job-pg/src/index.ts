@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
+ 
 
-import { Pool, PoolConfig } from 'pg';
 import { getJobPgConfig } from '@constructive-io/job-utils';
+import { Pool, PoolConfig } from 'pg';
 
 // k8s only does SIGINT
 // other events are bad for babel-watch
@@ -27,6 +27,7 @@ function once<T extends (...args: unknown[]) => unknown>(
       result = fn.apply((context ?? this) as never, args) as ReturnType<T>;
       called = true;
     }
+
     return result;
   };
 }
@@ -40,10 +41,12 @@ const end = (pool: Pool): void => {
       ended?: boolean;
       ending?: boolean;
     };
+
     if (state.ended || state.ending) {
       console.error(
         'DO NOT CLOSE pool, why are you trying to call end() when already ended?'
       );
+
       return;
     }
     void pool.end();

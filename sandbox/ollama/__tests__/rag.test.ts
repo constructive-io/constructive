@@ -1,9 +1,10 @@
 process.env.LOG_SCOPE = 'ollama';
 jest.setTimeout(60000);
 
-import { PgTestClient, getConnections } from 'pgsql-test';
-import { OllamaClient } from '../src/utils/ollama';
 import fetch from 'cross-fetch';
+import { getConnections,PgTestClient } from 'pgsql-test';
+
+import { OllamaClient } from '../src/utils/ollama';
 
 let pg: PgTestClient;
 let teardown: () => Promise<void>;
@@ -22,7 +23,9 @@ const measureTime = async <T>(service: 'ollama' | 'postgres' | 'other', action: 
   const start = performance.now();
   const result = await fn();
   const end = performance.now();
+
   addLog(service, action, end - start);
+
   return result;
 };
 
@@ -98,6 +101,7 @@ describe('Retrieval Augmented Generation (RAG)', () => {
 
     // Process chunks
     let totalChunkTime = 0;
+
     for (const [index, chunk] of chunks.rows.entries()) {
       const chunkStart = performance.now();
       
@@ -117,6 +121,7 @@ describe('Retrieval Augmented Generation (RAG)', () => {
       );
 
       const chunkEnd = performance.now();
+
       totalChunkTime += chunkEnd - chunkStart;
     }
 
@@ -179,6 +184,7 @@ Answer:`,
       } else if (log.startsWith('[POSTGRES]')) {
         acc.postgres += parseFloat(log.split(': ')[1]);
       }
+
       return acc;
     }, { ollama: 0, postgres: 0 });
 

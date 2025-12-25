@@ -39,6 +39,7 @@ describe('defaults security configurations', () => {
       // If datacl exists, check that PUBLIC doesn't appear or has no privileges
       if (privileges[0].datacl) {
         const aclString = privileges[0].datacl.toString();
+
         // PUBLIC should not appear in the ACL with any privileges
         // The ACL format is {user=privileges/grantor,...}
         // PUBLIC would appear as "=privileges/grantor" or "PUBLIC=privileges/grantor"
@@ -50,10 +51,12 @@ describe('defaults security configurations', () => {
     it('should verify database connection still works for current user', async () => {
       // Verify we can still connect and run queries
       const [result] = await pg.any(`SELECT 1 as test`);
+
       expect(result.test).toBe(1);
       
       // Verify we can see current user
       const [userResult] = await pg.any(`SELECT current_user as username`);
+
       expect(userResult.username).toBeDefined();
     });
   });
@@ -84,6 +87,7 @@ describe('defaults security configurations', () => {
     it('should allow current user to execute functions they create', async () => {
       // Current user should still be able to execute their own functions
       const [result] = await pg.any(`SELECT test_default_function() as result`);
+
       expect(result.result).toBe('test result');
     });
 
@@ -109,6 +113,7 @@ describe('defaults security configurations', () => {
         for (const priv of defaultPrivs) {
           if (priv.defaclacl) {
             const aclString = priv.defaclacl.toString();
+
             // Check that PUBLIC doesn't have execute (X) privileges
             // PUBLIC would appear as "=X/grantor" or "PUBLIC=X/grantor"
             expect(aclString).not.toMatch(/(?:^|,)(?:PUBLIC)?=[^,}]*X[^,}]*(?:,|$)/);
@@ -177,6 +182,7 @@ describe('defaults security configurations', () => {
       const [result] = await pg.any(`
         SELECT secret_data FROM test_security_table LIMIT 1
       `);
+
       expect(result.secret_data).toBe('confidential information');
 
       // Check table privileges for PUBLIC
@@ -287,6 +293,7 @@ describe('defaults security configurations', () => {
         FROM pg_default_acl 
         WHERE defaclobjtype = 'f'
       `);
+
       // Should have some default ACL configuration
       expect(parseInt(defaultFuncPrivs[0].count)).toBeGreaterThanOrEqual(0);
 
@@ -295,6 +302,7 @@ describe('defaults security configurations', () => {
         SELECT 
           has_schema_privilege('public', 'public', 'create') as public_can_create_in_public
       `);
+
       expect(schemaPrivs.public_can_create_in_public).toBe(false);
     });
 

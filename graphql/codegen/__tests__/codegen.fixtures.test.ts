@@ -30,6 +30,7 @@ describe('GraphQL Code Generation', () => {
   it('generate(): full AST map snapshot', () => {
     // @ts-ignore
     const output = generateKeyedObjFromGqlMap({ ...queries, ...mutations });
+
     expect(output).toMatchSnapshot('full generate() output');
   });
 

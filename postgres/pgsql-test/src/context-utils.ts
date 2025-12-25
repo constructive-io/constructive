@@ -14,6 +14,7 @@ export function generateContextStatements(context: PgTestClientContext): string 
           return 'SET LOCAL ROLE NONE;';
         }
         const escapedRole = val.replace(/"/g, '""');
+
         return `SET LOCAL ROLE "${escapedRole}";`;
       }
       // Use set_config for other context variables
@@ -21,6 +22,7 @@ export function generateContextStatements(context: PgTestClientContext): string 
         return `SELECT set_config('${key}', NULL, true);`;
       }
       const escapedVal = val.replace(/'/g, "''");
+
       return `SELECT set_config('${key}', '${escapedVal}', true);`;
     })
     .join('\n');

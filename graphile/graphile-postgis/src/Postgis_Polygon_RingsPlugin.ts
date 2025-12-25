@@ -1,10 +1,10 @@
+import type { LineString, Polygon } from 'geojson';
 import type { Build, Plugin } from 'graphile-build';
 import type { GraphQLFieldConfigMap } from 'graphql';
-import type { LineString, Polygon } from 'geojson';
 
 import { GisSubtype } from './constants';
-import { getGISTypeName } from './utils';
 import type { GisFieldValue, GisGraphQLType, GisScope, PostgisBuild } from './types';
+import { getGISTypeName } from './utils';
 
 const PostgisPolygonRingsPlugin: Plugin = (builder) => {
   builder.hook(
@@ -13,6 +13,7 @@ const PostgisPolygonRingsPlugin: Plugin = (builder) => {
       const {
         scope: { isPgGISType, pgGISType, pgGISTypeDetails }
       } = context as typeof context & { scope: GisScope };
+
       if (!isPgGISType || !pgGISType || !pgGISTypeDetails || pgGISTypeDetails.subtype !== GisSubtype.Polygon) {
         return fields;
       }
@@ -39,6 +40,7 @@ const PostgisPolygonRingsPlugin: Plugin = (builder) => {
           type: LineStringType,
           resolve(data: GisFieldValue) {
             const polygon = data.__geojson as Polygon;
+
             return {
               __gisType: getGISTypeName(GisSubtype.LineString, hasZ, hasM),
               __srid: data.__srid,
@@ -53,6 +55,7 @@ const PostgisPolygonRingsPlugin: Plugin = (builder) => {
           type: new GraphQLList(LineStringType),
           resolve(data: GisFieldValue) {
             const polygon = data.__geojson as Polygon;
+
             return polygon.coordinates.slice(1).map((coord) => ({
               __gisType: getGISTypeName(GisSubtype.LineString, hasZ, hasM),
               __srid: data.__srid,
@@ -67,4 +70,5 @@ const PostgisPolygonRingsPlugin: Plugin = (builder) => {
     }
   );
 };
+
 export default PostgisPolygonRingsPlugin;

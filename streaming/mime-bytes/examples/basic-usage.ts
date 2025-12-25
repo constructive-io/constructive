@@ -14,6 +14,7 @@ async function main() {
   ]);
   
   const pngResult = await detector.detectFromBuffer(pngBuffer);
+
   console.log('PNG Detection:', pngResult);
 
   // Example 2: Detect from a stream (memory efficient)
@@ -25,16 +26,19 @@ async function main() {
   
   const stream = Readable.from([jpegData]);
   const jpegResult = await detector.detectFromStream(stream);
+
   console.log('JPEG Detection:', jpegResult);
 
   // Example 3: Detect by extension
   console.log('\n=== Example 3: Detect by Extension ===');
   const extensionResults = detector.detectFromExtension('.pdf');
+
   console.log('PDF Extension Detection:', extensionResults);
 
   // Example 4: Get file types by category
   console.log('\n=== Example 4: Get by Category ===');
   const imageTypes = detector.getByCategory('image');
+
   console.log(`Found ${imageTypes.length} image types`);
   console.log('First 5 image types:', imageTypes.slice(0, 5).map(t => t.name));
 
@@ -43,18 +47,21 @@ async function main() {
   const unknownData = Buffer.from([0x00, 0x11, 0x22, 0x33]);
   const unknownStream = Readable.from([unknownData]);
   const fallbackResult = await detector.detectWithFallback(unknownStream, 'document.docx');
+
   console.log('Fallback Detection:', fallbackResult);
 
   // Example 6: Check specific file type
   console.log('\n=== Example 6: Check Specific Type ===');
   const isPng = detector.isFileType(pngBuffer, 'png');
   const isJpeg = detector.isFileType(pngBuffer, 'jpeg');
+
   console.log('Is PNG?', isPng);
   console.log('Is JPEG?', isJpeg);
 
   // Example 7: Get statistics
   console.log('\n=== Example 7: Statistics ===');
   const stats = detector.getStatistics();
+
   console.log('Total registered types:', stats.totalTypes);
   console.log('Types by category:', stats.byCategory);
   console.log('Types by MIME prefix:', stats.byMimePrefix);

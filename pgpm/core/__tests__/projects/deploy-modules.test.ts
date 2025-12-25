@@ -29,19 +29,24 @@ describe('Basic Deployment with deployModules', () => {
     expect(await db.exists('table', 'mythirdapp.customers')).toBe(true);
     
     const schemas = await db.query('SELECT schema_name FROM information_schema.schemata WHERE schema_name IN (\'myfirstapp\', \'mysecondapp\', \'mythirdapp\') ORDER BY schema_name');
+
     expect(schemas.rows).toHaveLength(3);
     expect(schemas.rows.map((r: any) => r.schema_name)).toEqual(['myfirstapp', 'mysecondapp', 'mythirdapp']);
     
     const tables = await db.query('SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema IN (\'myfirstapp\', \'mysecondapp\', \'mythirdapp\') ORDER BY table_schema, table_name');
+
     expect(tables.rows).toHaveLength(6);
     
     const myfirstappTables = tables.rows.filter((r: any) => r.table_schema === 'myfirstapp').map((r: any) => r.table_name);
+
     expect(myfirstappTables.sort()).toEqual(['products', 'users']);
     
     const mysecondappTables = tables.rows.filter((r: any) => r.table_schema === 'mysecondapp').map((r: any) => r.table_name);
+
     expect(mysecondappTables.sort()).toEqual(['consent_agreements', 'user_interactions', 'users']);
     
     const mythirdappTables = tables.rows.filter((r: any) => r.table_schema === 'mythirdapp').map((r: any) => r.table_name);
+
     expect(mythirdappTables).toEqual(['customers']);
   });
 });

@@ -39,9 +39,11 @@ interface ChatMessage {
 async function safeApiCall<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(url, options);
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     return await response.json();
   } catch (error) {
     console.error('API Error:', error);
@@ -68,8 +70,10 @@ async function pullModel(modelName: string) {
     for (const line of lines) {
       try {
         const data = JSON.parse(line) as PullResponse;
+
         if (data.status === 'pulling') {
           const progress = data.total ? Math.round((data.completed || 0) / data.total * 100) : 0;
+
           process.stdout.write(`\rPulling ${modelName}: ${progress}% complete`);
         } else if (data.status === 'success') {
           console.log('\nModel pulled successfully!');
@@ -87,7 +91,9 @@ async function pullModel(modelName: string) {
 async function listModels() {
   try {
     const data = await safeApiCall<OllamaModelsResponse>(`${OLLAMA_API}/api/tags`);
+
     console.log('Available models:', data.models);
+
     return data.models;
   } catch (error) {
     console.error('Failed to list models:', error);
@@ -123,6 +129,7 @@ async function testModel(modelName: string) {
     for (const line of lines) {
       try {
         const data = JSON.parse(line) as { message: ChatMessage };
+
         if (data.message?.content) {
           fullResponse += data.message.content;
           process.stdout.write(data.message.content);

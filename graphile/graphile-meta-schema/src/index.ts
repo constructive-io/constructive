@@ -221,17 +221,20 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
             if (type.isPgArray && type.arrayItemType?.name) {
               return type.arrayItemType.name;
             }
+
             return type.name;
           },
           pgAlias(type: PgType): string {
             if (type.isPgArray && type.arrayItemType?.name) {
               return aliasTypes(type.arrayItemType.name);
             }
+
             return aliasTypes(type.name);
           },
           gqlType(type: PgType): string {
             const gqlType = pgGetGqlTypeByTypeIdAndModifier(type.id, type.attrTypeModifier ?? null);
             const typeName = getTypeName(gqlType);
+
             switch (typeName) {
               case 'GeometryInterface':
               case 'GeometryPoint':
@@ -244,6 +247,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
           subtype(type: PgType): string | null {
             const gqlType = pgGetGqlTypeByTypeIdAndModifier(type.id, type.attrTypeModifier ?? null);
             const typeName = getTypeName(gqlType);
+
             switch (typeName) {
               case 'GeometryInterface':
               case 'GeometryPoint':
@@ -255,6 +259,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
           },
           typmod(type: PgType): Record<string, number | string | boolean> | null {
             const modifier = type.attrTypeModifier;
+
             if (!modifier) return null;
 
             if (type.name === 'geography' || type.name === 'geometry') {
@@ -262,6 +267,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
               const subtype = (modifier & 0x000000fc) >> 2;
               const hasZ = ((modifier & 0x00000002) >> 1) === 1;
               const hasM = (modifier & 0x00000001) === 1;
+
               if (subtype < GIS_TYPES.length) {
                 return {
                   srid,
@@ -272,6 +278,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
                 };
               }
             }
+
             return { modifier };
           },
           modifier(type: PgType): number | null | undefined {
@@ -292,12 +299,14 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
                 attrTypeModifier: attr.typeModifier
               };
             }
+
             return attr.type;
           }
         },
         MetaschemaTableInflection: {
           deleteByPrimaryKey(table: PgClass): string | null {
             if (!table.primaryKeyConstraint?.keyAttributes?.length) return null;
+
             return inflection.deleteByKeys(
               table.primaryKeyConstraint.keyAttributes,
               table,
@@ -306,6 +315,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
           },
           updateByPrimaryKey(table: PgClass): string | null {
             if (!table.primaryKeyConstraint?.keyAttributes?.length) return null;
+
             return inflection.updateByKeys(
               table.primaryKeyConstraint.keyAttributes,
               table,
@@ -337,6 +347,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
             if (typeof inflection.filterType === 'function') {
               return inflection.filterType(inflection.tableType(table)) ?? null;
             }
+
             return null;
           },
           inputType(table: PgClass): string {
@@ -379,6 +390,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
         MetaschemaTableQuery: {
           delete(table: PgClass): string | null {
             if (!table.primaryKeyConstraint?.keyAttributes?.length) return null;
+
             return inflection.deleteByKeys(
               table.primaryKeyConstraint.keyAttributes,
               table,
@@ -387,6 +399,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
           },
           update(table: PgClass): string | null {
             if (!table.primaryKeyConstraint?.keyAttributes?.length) return null;
+
             return inflection.updateByKeys(
               table.primaryKeyConstraint.keyAttributes,
               table,
@@ -468,6 +481,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
               junctionLeftConstraint,
               junctionRightConstraint
             } = relation;
+
             return inflection.manyToManyRelationByKeys(
               leftKeyAttributes,
               junctionLeftKeyAttributes,
@@ -538,6 +552,7 @@ const PgMetaschemaPlugin: Plugin = makeExtendSchemaPlugin(
             return introspection.class.filter((table) => {
               if (!schemas.includes(table.namespaceName)) return false;
               if (table.classKind !== 'r') return false;
+
               return true;
             });
           }

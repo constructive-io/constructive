@@ -60,6 +60,7 @@ export default async (
 
       if (!confirmTest) {
         log.info('Operation cancelled.');
+
         return;
       }
 
@@ -94,6 +95,7 @@ export default async (
 
       if (!yes) {
         log.info('Operation cancelled.');
+
         return;
       }
 

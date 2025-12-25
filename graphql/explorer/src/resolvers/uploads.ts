@@ -52,7 +52,7 @@ export class UploadHandler {
     const rand =
       Math.random().toString(36).substring(2, 7) +
       Math.random().toString(36).substring(2, 7);
-    const key = rand + '-' + uploadNames(filename);
+    const key = `${rand  }-${  uploadNames(filename)}`;
 
     const result = await this.streamer.upload({
       readStream,

@@ -8,9 +8,11 @@ export function normalizeExtension(extension: string): string {
 // Extract extension from filename
 export function getExtension(filename: string): string {
   const lastDot = filename.lastIndexOf('.');
+
   if (lastDot === -1 || lastDot === filename.length - 1) {
     return '';
   }
+
   return normalizeExtension(filename.substring(lastDot + 1));
 }
 
@@ -22,6 +24,7 @@ export function isCompressedExtension(extension: string): boolean {
     'iso', 'lha', 'lzh', 'pkg', 'deb', 'rpm', 'msi', 'jar', 'war',
     'ear', 'sar', 'aar', 'apk', 'ipa', 'xpi', 'egg', 'whl', 'gem'
   ];
+
   return compressed.includes(normalizeExtension(extension));
 }
 
@@ -32,6 +35,7 @@ export function isDocumentExtension(extension: string): boolean {
     'xls', 'xlsx', 'ods', 'csv', 'ppt', 'pptx', 'odp', 'epub', 'mobi',
     'azw', 'azw3', 'fb2', 'lit', 'pdb', 'ps', 'eps', 'indd', 'xps'
   ];
+
   return documents.includes(normalizeExtension(extension));
 }
 
@@ -47,6 +51,7 @@ export function isMediaExtension(extension: string): boolean {
     'ape', 'wv', 'amr', 'ac3', 'dts', 'spx', 'mid', 'midi', 'kar',
     'aiff', 'aif', 'aifc', 'au', 'snd', 'voc', 'ra', 'rm', 'ram'
   ];
+
   return media.includes(normalizeExtension(extension));
 }
 
@@ -62,6 +67,7 @@ export function isImageExtension(extension: string): boolean {
     'drf', 'k25', 'kdc', 'mdc', 'mef', 'mos', 'mrw', 'pef', 'ptx',
     'pxn', 'r3d', 'x3f', 'qoi'
   ];
+
   return images.includes(normalizeExtension(extension));
 }
 
@@ -74,6 +80,7 @@ export function isExecutableExtension(extension: string): boolean {
     'cpl', 'ocx', 'sys', 'drv', 'efi', 'mui', 'ax', 'ime', 'rs',
     'tsp', 'fon', 'wasm', 'ko', 'mod', 'prx', 'puff', 'axf', 'dex'
   ];
+
   return executables.includes(normalizeExtension(extension));
 }
 
@@ -116,7 +123,7 @@ export function getDoubleExtension(filename: string): string | null {
   const lower = filename.toLowerCase();
   
   for (const doubleExt of DOUBLE_EXTENSIONS) {
-    if (lower.endsWith('.' + doubleExt)) {
+    if (lower.endsWith(`.${  doubleExt}`)) {
       return doubleExt;
     }
   }

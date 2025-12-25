@@ -23,6 +23,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
     connectionFilterAllowNullInput,
     connectionFilterAllowEmptyObjectInput,
   } = rawOptions as ConnectionFilterConfig;
+
   // Add `filter` input argument to connection and simple collection types
   builder.hook(
     'GraphQLObjectType:fields:field:args',
@@ -54,6 +55,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       };
 
       const shouldAddFilter = isPgFieldConnection || isPgFieldSimpleCollection;
+
       if (!shouldAddFilter) return args;
 
       if (!source) return args;
@@ -73,6 +75,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
           : (build.pgIntrospectionResultsByKind.type as PgType[]).find(
               (t) => t.id === returnTypeId
             );
+
       if (!returnType) {
         return args;
       }
@@ -82,6 +85,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
         : pgGetGqlTypeByTypeIdAndModifier(returnTypeId, null).name;
       const filterTypeName = inflection.filterType(nodeTypeName);
       const nodeType = getTypeByName(nodeTypeName);
+
       if (!nodeType) {
         return args;
       }
@@ -96,6 +100,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
         nodeSource,
         nodeTypeName
       );
+
       if (!FilterType) {
         return args;
       }
@@ -113,6 +118,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
                 returnType,
                 null
               );
+
               if (sqlFragment != null) {
                 queryBuilder.where(sqlFragment);
               }
@@ -158,6 +164,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
           'Null literals are forbidden in filter argument input.'
         );
       }
+
       return null;
     };
 
@@ -167,6 +174,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
           'Empty objects are forbidden in filter argument input.'
         );
       }
+
       return null;
     };
 
@@ -182,6 +190,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       resolve: ConnectionFilterResolver
     ) => {
       const existingResolvers = connectionFilterResolvers[typeName] || {};
+
       if (existingResolvers[fieldName]) {
         return;
       }
@@ -209,6 +218,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
           if (isEmptyObject(value)) return handleEmptyObjectInput();
 
           const resolversByFieldName = connectionFilterResolvers[typeName];
+
           if (resolversByFieldName && resolversByFieldName[key]) {
             return resolversByFieldName[key]({
               sourceAlias,
@@ -239,6 +249,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       const pgType = introspectionResultsByKind.typeById[pgTypeId];
 
       const allowedPgTypeTypes = ['b', 'd', 'e', 'r'];
+
       if (!allowedPgTypeTypes.includes(pgType.type)) {
         // Not a base, domain, enum, or range type? Skip.
         return null;
@@ -260,6 +271,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       const pgGetSimpleType = (pgType: PgType) =>
         pgGetNonDomainType(pgGetNonRangeType(pgGetNonArrayType(pgType)));
       const pgSimpleType = pgGetSimpleType(pgType);
+
       if (!pgSimpleType) return null;
       if (
         !(
@@ -280,9 +292,11 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       // Establish field type and field input type
       const fieldType: GraphQLType | undefined =
         pgGetGqlTypeByTypeIdAndModifier(pgTypeId, pgTypeModifier);
+
       if (!fieldType) return null;
       const fieldInputType: GraphQLType | undefined =
         pgGetGqlInputTypeByTypeIdAndModifier(pgTypeId, pgTypeModifier);
+
       if (!fieldInputType) return null;
 
       // Avoid exposing filter operators on unrecognized types that PostGraphile handles as Strings
@@ -299,6 +313,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       const citextPgType = (introspectionResultsByKind.type as PgType[]).find(
         (t) => t.name === 'citext'
       );
+
       if (citextPgType) {
         actualStringPgTypeIds.push(citextPgType.id);
       }
@@ -358,9 +373,11 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
         : inflection.filterFieldType(namedType.name);
 
       const existingType = connectionFilterTypesByTypeName[operatorsTypeName];
+
       if (existingType) {
         return existingType;
       }
+
       return newWithHooks(
         GraphQLInputObjectType,
         {
@@ -388,6 +405,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
       nodeTypeName: string
     ) => {
       const existingType = connectionFilterTypesByTypeName[filterTypeName];
+
       if (existingType) {
         return existingType;
       }
@@ -395,6 +413,7 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
         name: filterTypeName,
         fields: {},
       });
+
       connectionFilterTypesByTypeName[filterTypeName] = placeholder;
       const FilterType = newWithHooks(
         GraphQLInputObjectType,
@@ -408,7 +427,9 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
         },
         true
       );
+
       connectionFilterTypesByTypeName[filterTypeName] = FilterType;
+
       return FilterType;
     };
 
@@ -430,30 +451,36 @@ const PgConnectionArgFilterPlugin: Plugin = (builder, rawOptions) => {
     ) => {
       if (!typeNames) {
         const msg = `Missing first argument 'typeNames' in call to 'addConnectionFilterOperator' for operator '${operatorName}'`;
+
         throw new Error(msg);
       }
       if (!operatorName) {
         const msg = `Missing second argument 'operatorName' in call to 'addConnectionFilterOperator' for operator '${operatorName}'`;
+
         throw new Error(msg);
       }
       if (!resolveType) {
         const msg = `Missing fourth argument 'resolveType' in call to 'addConnectionFilterOperator' for operator '${operatorName}'`;
+
         throw new Error(msg);
       }
       if (!resolve) {
         const msg = `Missing fifth argument 'resolve' in call to 'addConnectionFilterOperator' for operator '${operatorName}'`;
+
         throw new Error(msg);
       }
 
       const { connectionFilterScalarOperators } = build;
 
       const gqlTypeNames = Array.isArray(typeNames) ? typeNames : [typeNames];
+
       for (const gqlTypeName of gqlTypeNames) {
         if (!connectionFilterScalarOperators[gqlTypeName]) {
           connectionFilterScalarOperators[gqlTypeName] = {};
         }
         if (connectionFilterScalarOperators[gqlTypeName][operatorName]) {
           const msg = `Operator '${operatorName}' already exists for type '${gqlTypeName}'.`;
+
           throw new Error(msg);
         }
         connectionFilterScalarOperators[gqlTypeName][operatorName] = {

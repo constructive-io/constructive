@@ -4,6 +4,7 @@ import * as t from 'gql-ast';
 
 export function getCustomAst(fieldDefn) {
   const { pgType } = fieldDefn.type;
+
   if (pgType === 'geometry') {
     return geometryAst(fieldDefn.name);
   }

@@ -73,16 +73,18 @@ export default async (
     }
   ];
 
-  let { yes, recursive, cwd, tx } = await prompter.prompt(argv, questions);
+  const { yes, recursive, cwd, tx } = await prompter.prompt(argv, questions);
   
   if (!yes) {
     log.info('Operation cancelled.');
+
     return;
   }
 
   log.debug(`Using current directory: ${cwd}`);
 
   let packageName: string | undefined;
+
   if (recursive && argv.to !== true) {
     packageName = await selectDeployedPackage(database, argv, prompter, log, 'revert', cwd);
     if (!packageName) {
@@ -112,6 +114,7 @@ export default async (
     target = packageName;
   } else if (argv.package && argv.to) {
     const resolvedPackage = resolvePackageAlias(argv.package as string, cwd);
+
     target = `${resolvedPackage}:${argv.to}`;
   } else if (argv.package) {
     target = resolvePackageAlias(argv.package as string, cwd);

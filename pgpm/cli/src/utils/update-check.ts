@@ -1,13 +1,13 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
 import {
-  UpdateCheckConfig,
   UPDATE_CHECK_APPSTASH_KEY,
   UPDATE_CHECK_TTL_MS,
-  UPDATE_PACKAGE_NAME
-} from '@pgpmjs/types';
+  UPDATE_PACKAGE_NAME,
+  UpdateCheckConfig} from '@pgpmjs/types';
+import { findAndRequirePackageJson } from 'find-and-require-package-json';
+
 import { compareVersions, fetchLatestVersion } from './npm-version';
-import { readUpdateConfig, shouldCheck, writeUpdateConfig, UpdateConfigOptions } from './update-config';
+import { readUpdateConfig, shouldCheck, UpdateConfigOptions,writeUpdateConfig } from './update-config';
 
 export interface CheckForUpdatesOptions extends UpdateConfigOptions {
   pkgName?: string;
@@ -23,6 +23,7 @@ const shouldSkip = (command?: string): boolean => {
   if (process.env.PGPM_SKIP_UPDATE_CHECK) return true;
   if (process.env.CI === 'true') return true;
   if (command === 'update') return true;
+
   return false;
 };
 
@@ -49,6 +50,7 @@ export async function checkForUpdates(options: CheckForUpdatesOptions = {}): Pro
 
     if (needsCheck) {
       const fetched = await fetchLatestVersion(pkgName);
+
       if (fetched) {
         latestKnownVersion = fetched;
       }
@@ -91,6 +93,7 @@ export async function checkForUpdates(options: CheckForUpdatesOptions = {}): Pro
     };
   } catch (error) {
     log.debug('Update check skipped due to error:', error);
+
     return null;
   }
 }

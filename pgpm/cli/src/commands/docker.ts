@@ -80,6 +80,7 @@ function run(command: string, args: string[], options: { stdio?: 'inherit' | 'pi
 async function checkDockerAvailable(): Promise<boolean> {
   try {
     const result = await run('docker', ['--version']);
+
     return result.code === 0;
   } catch (error) {
     return false;
@@ -89,9 +90,11 @@ async function checkDockerAvailable(): Promise<boolean> {
 async function isContainerRunning(name: string): Promise<boolean | null> {
   try {
     const result = await run('docker', ['inspect', '-f', '{{.State.Running}}', name]);
+
     if (result.code === 0) {
       return result.stdout.trim() === 'true';
     }
+
     return null;
   } catch (error) {
     return null;
@@ -101,6 +104,7 @@ async function isContainerRunning(name: string): Promise<boolean | null> {
 async function containerExists(name: string): Promise<boolean> {
   try {
     const result = await run('docker', ['inspect', name]);
+
     return result.code === 0;
   } catch (error) {
     return false;
@@ -111,8 +115,10 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
   const { name, image, port, user, password, recreate } = options;
 
   const dockerAvailable = await checkDockerAvailable();
+
   if (!dockerAvailable) {
     await cliExitWithError('Docker is not installed or not available in PATH. Please install Docker first.');
+
     return;
   }
 
@@ -121,14 +127,17 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
 
   if (running === true) {
     console.log(`✅ Container "${name}" is already running`);
+
     return;
   }
 
   if (recreate && exists) {
     console.log(`🗑️  Removing existing container "${name}"...`);
     const removeResult = await run('docker', ['rm', '-f', name], { stdio: 'inherit' });
+
     if (removeResult.code !== 0) {
       await cliExitWithError(`Failed to remove container "${name}"`);
+
       return;
     }
   }
@@ -136,11 +145,13 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
   if (exists && running === false) {
     console.log(`🔄 Starting existing container "${name}"...`);
     const startResult = await run('docker', ['start', name], { stdio: 'inherit' });
+
     if (startResult.code === 0) {
       console.log(`✅ Container "${name}" started successfully`);
     } else {
       await cliExitWithError(`Failed to start container "${name}"`);
     }
+
     return;
   }
 
@@ -156,6 +167,7 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
   ];
 
   const runResult = await run('docker', runArgs, { stdio: 'inherit' });
+
   if (runResult.code === 0) {
     console.log(`✅ Container "${name}" created and started successfully`);
     console.log(`📌 PostgreSQL is available at localhost:${port}`);
@@ -168,25 +180,32 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
 
 async function stopContainer(name: string): Promise<void> {
   const dockerAvailable = await checkDockerAvailable();
+
   if (!dockerAvailable) {
     await cliExitWithError('Docker is not installed or not available in PATH. Please install Docker first.');
+
     return;
   }
 
   const exists = await containerExists(name);
+
   if (!exists) {
     console.log(`ℹ️  Container "${name}" not found`);
+
     return;
   }
 
   const running = await isContainerRunning(name);
+
   if (running === false) {
     console.log(`ℹ️  Container "${name}" is already stopped`);
+
     return;
   }
 
   console.log(`🛑 Stopping container "${name}"...`);
   const stopResult = await run('docker', ['stop', name], { stdio: 'inherit' });
+
   if (stopResult.code === 0) {
     console.log(`✅ Container "${name}" stopped successfully`);
   } else {
@@ -210,6 +229,7 @@ export default async (
   if (!subcommand) {
     console.log(dockerUsageText);
     await cliExitWithError('No subcommand provided. Use "start" or "stop".');
+
     return;
   }
 

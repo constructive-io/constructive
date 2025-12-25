@@ -16,6 +16,7 @@ describe('PgpmPackage Target API', () => {
   describe('parseTarget utility function', () => {
     test('parses project-only target format', () => {
       const result = parseTarget('secrets');
+
       expect(result).toEqual({
         packageName: 'secrets',
         toChange: undefined
@@ -24,6 +25,7 @@ describe('PgpmPackage Target API', () => {
 
     test('parses project:change target format', () => {
       const result = parseTarget('secrets:procedures/secretfunction');
+
       expect(result).toEqual({
         packageName: 'secrets',
         toChange: 'procedures/secretfunction'
@@ -32,6 +34,7 @@ describe('PgpmPackage Target API', () => {
 
     test('parses project:@tag target format', () => {
       const result = parseTarget('secrets:@v1.0.0');
+
       expect(result).toEqual({
         packageName: 'secrets',
         toChange: '@v1.0.0'
@@ -61,13 +64,16 @@ describe('PgpmPackage Target API', () => {
 
   describe('deploy method with target parameter', () => {
     let project: PgpmPackage;
+
     beforeEach(() => {
       const fixturePath = fixture.getFixturePath('constructive');
+
       project = new PgpmPackage(fixturePath);
     });
 
     test('deploys with project-only target', async () => {
       const mockDeploy = jest.spyOn(project as any, 'deploy');
+
       mockDeploy.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets');
         expect(recursive).toBe(true);
@@ -80,6 +86,7 @@ describe('PgpmPackage Target API', () => {
 
     test('deploys with project:change target', async () => {
       const mockDeploy = jest.spyOn(project as any, 'deploy');
+
       mockDeploy.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:procedures/secretfunction');
         expect(recursive).toBe(true);
@@ -92,6 +99,7 @@ describe('PgpmPackage Target API', () => {
 
     test('deploys with project:@tag target', async () => {
       const mockDeploy = jest.spyOn(project as any, 'deploy');
+
       mockDeploy.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:@v1.0.0');
         expect(recursive).toBe(true);
@@ -108,11 +116,13 @@ describe('PgpmPackage Target API', () => {
 
     beforeEach(() => {
       const fixturePath = fixture.getFixturePath('constructive');
+
       project = new PgpmPackage(fixturePath);
     });
 
     test('reverts with project-only target', async () => {
       const mockRevert = jest.spyOn(project as any, 'revert');
+
       mockRevert.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets');
         expect(recursive).toBe(true);
@@ -125,6 +135,7 @@ describe('PgpmPackage Target API', () => {
 
     test('reverts with project:change target', async () => {
       const mockRevert = jest.spyOn(project as any, 'revert');
+
       mockRevert.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:procedures/secretfunction');
         expect(recursive).toBe(true);
@@ -137,6 +148,7 @@ describe('PgpmPackage Target API', () => {
 
     test('reverts with project:@tag target', async () => {
       const mockRevert = jest.spyOn(project as any, 'revert');
+
       mockRevert.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:@v1.0.0');
         expect(recursive).toBe(true);
@@ -153,11 +165,13 @@ describe('PgpmPackage Target API', () => {
 
     beforeEach(() => {
       const fixturePath = fixture.getFixturePath('constructive');
+
       project = new PgpmPackage(fixturePath);
     });
 
     test('verifies with project-only target', async () => {
       const mockVerify = jest.spyOn(project as any, 'verify');
+
       mockVerify.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets');
         expect(recursive).toBe(true);
@@ -170,6 +184,7 @@ describe('PgpmPackage Target API', () => {
 
     test('verifies with project:change target', async () => {
       const mockVerify = jest.spyOn(project as any, 'verify');
+
       mockVerify.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:procedures/secretfunction');
         expect(recursive).toBe(true);
@@ -182,6 +197,7 @@ describe('PgpmPackage Target API', () => {
 
     test('verifies with project:@tag target', async () => {
       const mockVerify = jest.spyOn(project as any, 'verify');
+
       mockVerify.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBe('secrets:@v1.0.0');
         expect(recursive).toBe(true);
@@ -198,11 +214,13 @@ describe('PgpmPackage Target API', () => {
 
     beforeEach(() => {
       const fixturePath = fixture.getFixturePath('constructive');
+
       project = new PgpmPackage(fixturePath);
     });
 
     test('deploy works without target parameter (uses context)', async () => {
       const mockDeploy = jest.spyOn(project as any, 'deploy');
+
       mockDeploy.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBeUndefined();
         expect(recursive).toBe(true);
@@ -215,6 +233,7 @@ describe('PgpmPackage Target API', () => {
 
     test('revert works without target parameter (uses context)', async () => {
       const mockRevert = jest.spyOn(project as any, 'revert');
+
       mockRevert.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBeUndefined();
         expect(recursive).toBe(true);
@@ -227,6 +246,7 @@ describe('PgpmPackage Target API', () => {
 
     test('verify works without target parameter (uses context)', async () => {
       const mockVerify = jest.spyOn(project as any, 'verify');
+
       mockVerify.mockImplementation(async (opts, target, recursive) => {
         expect(target).toBeUndefined();
         expect(recursive).toBe(true);

@@ -65,6 +65,7 @@ export class FileTypeDetector {
       if (process.env.NODE_ENV !== 'test') {
         console.error('Error detecting file type from stream:', error);
       }
+
       return null;
     }
   }
@@ -86,6 +87,7 @@ export class FileTypeDetector {
 
     for (const offset of offsets) {
       const fileType = this.checkMagicBytesAtOffset(buffer, offset);
+
       if (fileType) {
         return this.enhanceDetectionResult(fileType, buffer);
       }
@@ -93,6 +95,7 @@ export class FileTypeDetector {
 
     // No magic bytes matched, but we can still detect charset for unknown files
     const charset = detectCharset(buffer);
+
     if (charset !== 'binary') {
       // Return a generic text file result
       return {
@@ -119,6 +122,7 @@ export class FileTypeDetector {
     // Check cache first
     if (this.extensionCache.has(cleanExt)) {
       const cachedTypes = this.extensionCache.get(cleanExt)!;
+
       return cachedTypes.map(fileType => ({
         name: fileType.name,
         mimeType: resolveMimeAlias(fileType.mimeType),
@@ -169,12 +173,15 @@ export class FileTypeDetector {
    */
   removeFileType(name: string): boolean {
     const index = this.fileTypes.findIndex(ft => ft.name === name);
+
     if (index !== -1) {
       this.fileTypes.splice(index, 1);
       // Clear caches when file types change
       this.clearCache();
+
       return true;
     }
+
     return false;
   }
 
@@ -222,9 +229,11 @@ export class FileTypeDetector {
    */
   private generateOffsets(bufferLength: number): number[] {
     const offsets: number[] = [];
+
     for (let i = 0; i <= this.options.maxOffset && i < bufferLength; i += 4) {
       offsets.push(i);
     }
+
     return offsets;
   }
 
@@ -249,6 +258,7 @@ export class FileTypeDetector {
       } else if (!fileType.contentType) {
         // Fall back to regular content type lookup if no charset-specific match
         const inferredContentType = getContentTypeByExtension(primaryExt);
+
         if (inferredContentType) {
           contentType = inferredContentType;
         }
@@ -281,6 +291,7 @@ export class FileTypeDetector {
         buffer = input;
       } else {
         const peekResult = await peek.promise(input, this.options.peekBytes);
+
         buffer = peekResult[0];
         peekStream = peekResult[1];
       }
@@ -292,12 +303,14 @@ export class FileTypeDetector {
         // If we have a filename, try to enhance with more specific content type
         if (filename) {
           const lastDot = filename.lastIndexOf('.');
+
           if (lastDot !== -1) {
             const extension = filename.substring(lastDot + 1);
             
             // Check for generic text files that might have specific content types
             if (magicResult.mimeType === 'text/plain' && magicResult.charset) {
               const contentType = getContentTypeForExtension(extension, magicResult.charset);
+
               if (contentType) {
                 // Enhance the result with charset-aware content type
                 const enhancedResult = {
@@ -305,6 +318,7 @@ export class FileTypeDetector {
                   contentType,
                   confidence: 0.8 // Higher confidence since we have both magic bytes and extension
                 };
+
                 return peekStream ? { ...enhancedResult, _stream: peekStream } : enhancedResult;
               }
             }
@@ -312,6 +326,7 @@ export class FileTypeDetector {
             // Check for ZIP files that might be Office Open XML or other specific formats
             if (magicResult.name === 'zip' || magicResult.mimeType === 'application/zip') {
               const contentType = getContentTypeForExtension(extension, magicResult.charset || 'binary');
+
               if (contentType && contentType !== 'application/zip') {
                 // Enhance the result with more specific content type
                 const enhancedResult = {
@@ -319,6 +334,7 @@ export class FileTypeDetector {
                   contentType,
                   confidence: 0.9 // High confidence for known ZIP-based formats
                 };
+
                 return peekStream ? { ...enhancedResult, _stream: peekStream } : enhancedResult;
               }
             }
@@ -332,6 +348,7 @@ export class FileTypeDetector {
       // Fallback to extension if filename provided
       if (filename) {
         const lastDot = filename.lastIndexOf('.');
+
         if (lastDot !== -1) {
           const extension = filename.substring(lastDot + 1);
           const charset = detectCharset(buffer);
@@ -355,6 +372,7 @@ export class FileTypeDetector {
           
           // Fall back to regular extension detection
           const extensionResults = this.detectFromExtension(extension);
+
           if (extensionResults.length > 0) {
             const result = {
               ...extensionResults[0],
@@ -364,6 +382,7 @@ export class FileTypeDetector {
             
             // Update content type if charset-specific mapping exists
             const charsetContentType = getContentTypeForExtension(extension, charset);
+
             if (charsetContentType) {
               result.contentType = charsetContentType;
             }
@@ -380,6 +399,7 @@ export class FileTypeDetector {
       if (process.env.NODE_ENV !== 'test') {
         console.error('Error in detectWithFallback:', error);
       }
+
       return null;
     }
   }
@@ -392,9 +412,11 @@ export class FileTypeDetector {
    */
   isFileType(buffer: Buffer, fileTypeName: string): boolean {
     const fileType = this.fileTypes.find(ft => ft.name === fileTypeName);
+
     if (!fileType) return false;
 
     const offset = fileType.offset || 0;
+
     return compareBytes(buffer, fileType.magicBytes, offset);
   }
 
@@ -416,10 +438,12 @@ export class FileTypeDetector {
     for (const fileType of this.fileTypes) {
       // Count by category
       const category = fileType.category || 'other';
+
       stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
 
       // Count by MIME prefix
       const mimePrefix = fileType.mimeType.split('/')[0];
+
       stats.byMimePrefix[mimePrefix] = (stats.byMimePrefix[mimePrefix] || 0) + 1;
     }
 

@@ -37,10 +37,12 @@ describe('installModule()', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(mod.getModulePath()!, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson.dependencies).toBeDefined();
     expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.2.0');
 
     const controlFileContent = mod.getModuleControlFile();
+
     expect(controlFileContent).toMatchSnapshot();
   });
 
@@ -56,6 +58,7 @@ describe('installModule()', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(mod.getModulePath()!, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson.dependencies['@pgpm-testing/totp']).toBe('1.2.0');
   });
 
@@ -147,6 +150,7 @@ describe('upgradeModules()', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(mod.getModulePath()!, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
   });
 
@@ -156,6 +160,7 @@ describe('upgradeModules()', () => {
     let pkgJson = JSON.parse(
       fs.readFileSync(path.join(mod.getModulePath()!, 'package.json'), 'utf-8')
     );
+
     expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.1.0');
     
     const result = await mod.upgradeModules();

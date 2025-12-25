@@ -1,5 +1,6 @@
 import '../test-utils/env';
-import { GraphQLQueryFn, getConnections, seed, snapshot } from 'graphile-test';
+
+import { getConnections, GraphQLQueryFn, seed, snapshot } from 'graphile-test';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
@@ -45,5 +46,6 @@ afterAll(async () => {
 
 it('applies simple inflection', async () => {
   const data = await query(IntrospectionQuery);
+
   expect(snapshot(data)).toMatchSnapshot();
 });

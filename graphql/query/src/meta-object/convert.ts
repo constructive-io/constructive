@@ -28,6 +28,7 @@ export function convertFromMetaSchema(metaSchema) {
 function pickArrayConstraint(constraints) {
   if (constraints.length === 0) return [];
   const c = constraints[0];
+
   return c.fields.map((field) => pickField(field));
 }
 
@@ -44,6 +45,7 @@ function pickForeignConstraint(constraints, relations) {
 
     const matchingBelongsTo = belongsTo.find((c) => {
       const field = pickField(c.keys[0]);
+
       return field.name === fromKey.name;
     });
 

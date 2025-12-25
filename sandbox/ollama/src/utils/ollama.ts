@@ -35,6 +35,7 @@ export class OllamaClient {
     }
 
     const data: OllamaEmbeddingResponse = await response.json();
+
     return data.embedding;
   }
 
@@ -60,6 +61,7 @@ export class OllamaClient {
     }
 
     const data: OllamaResponse = await response.json();
+
     return data.response;
   }
 
@@ -89,13 +91,16 @@ export class OllamaClient {
     }
 
     const reader = response.body?.getReader();
+
     if (!reader) {
       throw new Error('Failed to get response reader');
     }
 
     const decoder = new TextDecoder();
+
     while (true) {
       const { done, value } = await reader.read();
+
       if (done) break;
 
       const chunk = decoder.decode(value);
@@ -104,6 +109,7 @@ export class OllamaClient {
       for (const line of lines) {
         try {
           const data: OllamaResponse = JSON.parse(line);
+
           if (data.response) {
             onChunk(data.response);
           }

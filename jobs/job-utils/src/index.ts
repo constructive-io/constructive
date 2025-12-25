@@ -1,30 +1,27 @@
+import { Logger } from '@pgpmjs/logger';
 import type {
-  FailJobParams,
   CompleteJobParams,
+  FailJobParams,
   GetJobParams,
   GetScheduledJobParams,
-  RunScheduledJobParams,
+  ReleaseJobsParams,
   ReleaseScheduledJobsParams,
-  ReleaseJobsParams
-} from '@pgpmjs/types';
+  RunScheduledJobParams} from '@pgpmjs/types';
 
 import {
-  getJobSchema,
-  getJobPgConfig,
-  getJobPool,
+  getCallbackBaseUrl,
   getJobConnectionString,
-  getJobSupportAny,
-  getJobSupported,
-  getWorkerHostname,
-  getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobPgConfig,
+  getJobPool,
   getJobsCallbackPort,
-  getCallbackBaseUrl,
-  getNodeEnvironment
-} from './runtime';
-
-import { Logger } from '@pgpmjs/logger';
+  getJobSchema,
+  getJobSupportAny,
+  getJobSupported,
+  getNodeEnvironment,
+  getSchedulerHostname,
+  getWorkerHostname} from './runtime';
 
 const log = new Logger('jobs:core');
 
@@ -33,20 +30,19 @@ export type PgClientLike = {
 };
 
 export {
-  getJobSchema,
-  getJobPgConfig,
-  getJobPool,
+  getCallbackBaseUrl,
   getJobConnectionString,
-  getJobSupportAny,
-  getJobSupported,
-  getWorkerHostname,
-  getSchedulerHostname,
   getJobGatewayConfig,
   getJobGatewayDevMap,
+  getJobPgConfig,
+  getJobPool,
   getJobsCallbackPort,
-  getCallbackBaseUrl,
-  getNodeEnvironment
-};
+  getJobSchema,
+  getJobSupportAny,
+  getJobSupported,
+  getNodeEnvironment,
+  getSchedulerHostname,
+  getWorkerHostname};
 
 const JOBS_SCHEMA = getJobSchema();
 
@@ -83,6 +79,7 @@ export const getJob = async <T = any>(
     `SELECT * FROM "${JOBS_SCHEMA}".get_job($1, $2::text[]);`,
     [workerId, supportedTaskNames]
   );
+
   return (job as T) ?? null;
 };
 
@@ -97,6 +94,7 @@ export const getScheduledJob = async <T = any>(
     `SELECT * FROM "${JOBS_SCHEMA}".get_scheduled_job($1, $2::text[]);`,
     [workerId, supportedTaskNames]
   );
+
   return (job as T) ?? null;
 };
 
@@ -112,6 +110,7 @@ export const runScheduledJob = async (
       `SELECT * FROM "${JOBS_SCHEMA}".run_scheduled_job($1);`,
       [jobId]
     );
+
     return job ?? null;
   } catch (e: any) {
     if (e?.message === 'ALREADY_SCHEDULED') {
@@ -126,6 +125,7 @@ export const releaseScheduledJobs = async (
   { workerId, ids }: ReleaseScheduledJobsParams
 ) => {
   log.info(`releaseScheduledJobs worker[${workerId}]`);
+
   return client.query(
     `SELECT "${JOBS_SCHEMA}".release_scheduled_jobs($1, $2::bigint[]);`,
     [workerId, ids ?? null]
@@ -137,6 +137,7 @@ export const releaseJobs = async (
   { workerId }: ReleaseJobsParams
 ) => {
   log.info(`releaseJobs worker[${workerId}]`);
+
   return client.query(
     `SELECT "${JOBS_SCHEMA}".release_jobs($1);`,
     [workerId]

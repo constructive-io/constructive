@@ -29,6 +29,7 @@ export class CLIDeployTestFixture extends TestFixture {
     
     // Create database using admin pool
     const adminPool = getPgPool(baseConfig);
+
     try {
       await adminPool.query(`CREATE DATABASE "${dbName}"`);
     } catch (e) {
@@ -57,10 +58,12 @@ export class CLIDeployTestFixture extends TestFixture {
 
     // Initialize migrate schema
     const migrate = new PgpmMigrate(config);
+
     await migrate.initialize();
 
     // Get pool for test database operations
     const pool = getPgPool(pgConfig);
+
     this.pools.push(pool);
 
     const db: TestDatabase = {
@@ -80,8 +83,9 @@ export class CLIDeployTestFixture extends TestFixture {
             ) as exists`,
             [name]
           );
+
           return result.rows[0].exists;
-        } else {
+        } 
           const [schema, table] = name.includes('.') ? name.split('.') : ['public', name];
           const result = await pool.query(
             `SELECT EXISTS (
@@ -90,8 +94,9 @@ export class CLIDeployTestFixture extends TestFixture {
             ) as exists`,
             [schema, table]
           );
+
           return result.rows[0].exists;
-        }
+        
       },
 
       async getDeployedChanges() {
@@ -100,6 +105,7 @@ export class CLIDeployTestFixture extends TestFixture {
            FROM pgpm_migrate.changes 
            ORDER BY deployed_at`
         );
+
         return result.rows;
       },
 
@@ -138,6 +144,7 @@ export class CLIDeployTestFixture extends TestFixture {
            WHERE c.package = $1 AND c.change_name = $2`,
           [packageName, changeName]
         );
+
         return result.rows.map((row: any) => row.requires);
       },
 
@@ -148,6 +155,7 @@ export class CLIDeployTestFixture extends TestFixture {
     };
 
     this.databases.push(db);
+
     return db;
   }
 
@@ -167,6 +175,7 @@ export class CLIDeployTestFixture extends TestFixture {
     
     for (const command of commands) {
       let processedCommand = command;
+
       for (const [key, value] of Object.entries(variables)) {
         processedCommand = processedCommand.replace(new RegExp(`\\$${key}`, 'g'), value);
       }
@@ -175,6 +184,7 @@ export class CLIDeployTestFixture extends TestFixture {
       
       if (tokens[0] === 'cd') {
         const targetDir = tokens[1];
+
         if (targetDir.startsWith('/')) {
           currentDir = targetDir;
         } else {
@@ -184,8 +194,10 @@ export class CLIDeployTestFixture extends TestFixture {
       } else if (tokens[0] === 'cnc' || tokens[0] === 'constructive') {
         // Handle Constructive CLI commands
         const argv = this.parseCliCommand(tokens.slice(1), currentDir);
+
         if (executeCommands) {
           const result = await this.runCliCommand(argv);
+
           results.push({ command: processedCommand, type: 'cli', result });
         } else {
           results.push({ command: processedCommand, type: 'cli', result: { argv } });
@@ -202,6 +214,7 @@ export class CLIDeployTestFixture extends TestFixture {
     const re = /("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|--[a-zA-Z0-9_-]+|-[a-zA-Z0-9_]+|[^\s]+)|(\s+)/g;
     const matches = command.match(re);
     const tokens = matches ? matches.filter(t => t.trim()) : [];
+
     return tokens;
   }
 
@@ -212,6 +225,7 @@ export class CLIDeployTestFixture extends TestFixture {
     };
     
     let i = 0;
+
     while (i < tokens.length) {
       const token = tokens[i];
       
@@ -221,6 +235,7 @@ export class CLIDeployTestFixture extends TestFixture {
         // Handle --no-<thing> pattern by setting <thing>: false
         if (key.startsWith('no-')) {
           const baseKey = key.substring(3); // Remove 'no-' prefix
+
           argv[baseKey] = false;
           i += 1;
         } else if (i + 1 < tokens.length && !tokens[i + 1].startsWith('--')) {

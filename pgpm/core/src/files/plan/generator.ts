@@ -5,13 +5,13 @@ import fs from 'fs';
  */
 function getUTCTimestamp(d: Date = new Date()): string {
   return (
-    d.getUTCFullYear() +
-    '-' + String(d.getUTCMonth() + 1).padStart(2, '0') +
-    '-' + String(d.getUTCDate()).padStart(2, '0') +
-    'T' + String(d.getUTCHours()).padStart(2, '0') +
-    ':' + String(d.getUTCMinutes()).padStart(2, '0') +
-    ':' + String(d.getUTCSeconds()).padStart(2, '0') +
-    'Z'
+    `${d.getUTCFullYear() 
+    }-${  String(d.getUTCMonth() + 1).padStart(2, '0') 
+    }-${  String(d.getUTCDate()).padStart(2, '0') 
+    }T${  String(d.getUTCHours()).padStart(2, '0') 
+    }:${  String(d.getUTCMinutes()).padStart(2, '0') 
+    }:${  String(d.getUTCSeconds()).padStart(2, '0') 
+    }Z`
   );
 }
 

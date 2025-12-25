@@ -44,6 +44,7 @@ describe('cmds:package', () => {
   it('updates module with `extension` and `package` commands in copied fixture workspace', async () => {
     const fixtureWorkspace = fixture('constructive');
     const workspacePath = path.join(tempDir, 'constructive');
+
     fs.cpSync(fixtureWorkspace, workspacePath, { recursive: true });
 
     const modulePath = path.join(workspacePath, 'packages', 'secrets');
@@ -63,6 +64,7 @@ describe('cmds:package', () => {
 
     // Remove stale SQL to trigger regeneration
     const { sqlFile } = initialProject.getModuleInfo();
+
     fs.rmSync(path.join(modulePath, sqlFile));
 
     // Rebuild SQL package
@@ -73,6 +75,7 @@ describe('cmds:package', () => {
 
     // Snapshot generated SQL
     const sql = fs.readFileSync(path.join(modulePath, sqlFile), 'utf-8');
+
     expect(sql).toMatchSnapshot('extension-update - sql');
 
     // Snapshot resulting file structure

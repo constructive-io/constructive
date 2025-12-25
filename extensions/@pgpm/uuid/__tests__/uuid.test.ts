@@ -47,6 +47,7 @@ describe('uuids.pseudo_order_uuid()', () => {
     const { pseudo_order_uuid } = await pg.one(`
       SELECT uuids.pseudo_order_uuid() AS pseudo_order_uuid
     `);
+
     expect(pseudo_order_uuid).toMatch(
       /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/
     );
@@ -59,6 +60,7 @@ describe('uuids.pseudo_order_seed_uuid(seed)', () => {
       `SELECT uuids.pseudo_order_seed_uuid($1) AS pseudo_order_seed_uuid`,
       ['tenant123']
     );
+
     expect(pseudo_order_seed_uuid).toMatch(
       /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/
     );
@@ -71,6 +73,7 @@ describe('uuids.trigger_set_uuid_seed', () => {
       `INSERT INTO public.items (name, seed) VALUES ($1, $2) RETURNING custom_id`,
       ['Item A', 'my-seed']
     );
+
     expect(custom_id).toMatch(
       /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/
     );
@@ -83,6 +86,7 @@ describe('uuids.trigger_set_uuid_related_field', () => {
       `INSERT INTO public.items_seeded (tenant) VALUES ($1) RETURNING id`,
       ['tenant-42']
     );
+
     expect(id).toMatch(
       /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/
     );

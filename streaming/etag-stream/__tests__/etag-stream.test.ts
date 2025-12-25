@@ -7,6 +7,7 @@ import ETagStream from '../src';
 const getETag = (stream: NodeJS.ReadableStream): Promise<string | null> => {
   return new Promise((resolve, reject) => {
     let result: string | null = null;
+
     stream
       .on('error', (e) => reject(e))
       .on('data', (data: Buffer) => {
@@ -46,6 +47,7 @@ describe('etags', () => {
       const file = files[i];
       const key = file.split('__fixtures__')[1];
       const stream = new ETagStream({ mode: 'through' });
+
       res[key] = await getETagThrough(createReadStream(file).pipe(stream));
     }
 
@@ -60,6 +62,7 @@ describe('etags', () => {
       const file = files[i];
       const key = file.split('__fixtures__')[1];
       const stream = new ETagStream({ mode: 'buffer' }); // changed `false` to a valid type
+
       res[key] = await getETag(createReadStream(file).pipe(stream));
     }
 

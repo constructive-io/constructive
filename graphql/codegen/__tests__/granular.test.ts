@@ -17,7 +17,9 @@ it('generate', () => {
       // @ts-ignore
       m[key] = print(gen[key].ast);
     }
+
     return m;
   }, {});
+
   expect(output).toMatchSnapshot();
 });

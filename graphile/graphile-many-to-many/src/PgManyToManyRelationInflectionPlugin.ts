@@ -29,6 +29,7 @@ const PgManyToManyRelationInflectionPlugin: Plugin = (builder) => {
       if (junctionRightConstraint.tags.manyToManyFieldName) {
         return junctionRightConstraint.tags.manyToManyFieldName;
       }
+
       return this.camelCase(
         `${this.pluralize(this._singularizedTableName(rightTable))}-by-${this._singularizedTableName(
           junctionTable
@@ -52,6 +53,7 @@ const PgManyToManyRelationInflectionPlugin: Plugin = (builder) => {
       if (junctionRightConstraint.tags.manyToManySimpleFieldName) {
         return junctionRightConstraint.tags.manyToManySimpleFieldName;
       }
+
       return this.camelCase(
         `${this.pluralize(this._singularizedTableName(rightTable))}-by-${this._singularizedTableName(
           junctionTable
@@ -83,6 +85,7 @@ const PgManyToManyRelationInflectionPlugin: Plugin = (builder) => {
         junctionLeftConstraint,
         junctionRightConstraint
       );
+
       return this.upperCamelCase(`${leftTableTypeName}-${relationName}-many-to-many-edge`);
     };
 
@@ -109,6 +112,7 @@ const PgManyToManyRelationInflectionPlugin: Plugin = (builder) => {
         junctionRightConstraint,
         leftTableTypeName
       );
+
       return this.upperCamelCase(`${leftTableTypeName}-${relationName}-many-to-many-connection`);
     };
 

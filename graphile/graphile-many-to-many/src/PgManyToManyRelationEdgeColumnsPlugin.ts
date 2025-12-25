@@ -129,6 +129,7 @@ const PgManyToManyRelationEdgeColumnsPlugin: Plugin = (builder) => {
                   }
                 };
               });
+
               return {
                 description: attr.description,
                 type: nullableIf(

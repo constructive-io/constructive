@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync, mkdirSync } from 'fs';
+import { mkdirSync,mkdtempSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -26,6 +26,7 @@ jest.mock('pg-cache', () => ({
         if (typeof sql === 'string' && sql.includes('SELECT pgpm_migrate.is_deployed')) {
           return Promise.resolve({ rows: [{ is_deployed: false }] });
         }
+
         return Promise.resolve({ rows: [] });
       }),
   }),
@@ -61,6 +62,7 @@ describe('PgpmMigrate.deploy tag fallback bug reproduction', () => {
     } as any);
 
     const calls = (executeQuery as jest.Mock).mock.calls;
+
     expect(calls.length).toBeGreaterThan(0);
     const params = calls[0][2];
     const deps = params[3];

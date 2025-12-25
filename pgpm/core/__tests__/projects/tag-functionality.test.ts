@@ -1,10 +1,11 @@
 process.env.CONSTRUCTIVE_DEBUG = 'true';
 
-import { TestDatabase } from '../../test-utils';
-import { teardownPgPools } from 'pg-cache';
 import { readFileSync } from 'fs';
-import { PgpmPackage } from '../../src/core/class/pgpm';
 import { join } from 'path';
+import { teardownPgPools } from 'pg-cache';
+
+import { PgpmPackage } from '../../src/core/class/pgpm';
+import { TestDatabase } from '../../test-utils';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 
 describe('Tag functionality with CoreDeployTestFixture', () => {
@@ -40,6 +41,7 @@ describe('Tag functionality with CoreDeployTestFixture', () => {
     const packagePath = join(basePath, 'packages', 'my-first');
     
     const pkg = new PgpmPackage(packagePath);
+
     pkg.addTag('v1.3.0', 'schema_myfirstapp', 'Initial schema tag');
     
     await fixture.deployModule('my-first:@v1.3.0', db.name, ['sqitch', 'simple-w-tags']);
@@ -62,6 +64,7 @@ describe('Tag functionality with CoreDeployTestFixture', () => {
     const packagePath = join(basePath, 'packages', 'my-second');
     
     const pkg = new PgpmPackage(packagePath);
+
     pkg.addTag('v2.2.0', 'create_table', 'Table creation release');
     
     const updatedPlan = readFileSync(join(packagePath, 'pgpm.plan'), 'utf8');

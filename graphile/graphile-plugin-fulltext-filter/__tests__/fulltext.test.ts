@@ -1,9 +1,9 @@
+import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 import type { GraphQLQueryFnObj, GraphQLTestContext } from 'graphile-test';
 import { getConnectionsObject, seed } from 'graphile-test';
 import { buildClientSchema, getIntrospectionQuery } from 'graphql';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
 
 import PostGraphileFulltextFilterPlugin from '../src';
 
@@ -154,6 +154,7 @@ it('table with unfiltered full-text field works', async () => {
 
     expect(result.errors).toBeUndefined();
     const data = result.data?.allJobs.nodes;
+
     expect(data).toHaveLength(2);
     data?.forEach((n: any) => expect(n.fullTextRank).not.toBeNull());
 
@@ -179,6 +180,7 @@ it('table with unfiltered full-text field works', async () => {
 
     expect(bananaResult.errors).toBeUndefined();
     const bananaData = bananaResult.data?.allJobs.nodes;
+
     expect(bananaData).toHaveLength(1);
     bananaData?.forEach((n: any) => expect(n.fullTextRank).not.toBeNull());
   });
@@ -209,6 +211,7 @@ it('table with unfiltered full-text field works', async () => {
 
     expect(result.errors).toBeUndefined();
     const data = result.data?.allJobs.nodes;
+
     expect(data).toHaveLength(2);
     data?.forEach((n: any) => expect(n.fullTextRank).toBeNull());
   });
@@ -253,6 +256,7 @@ it('table with unfiltered full-text field works', async () => {
 
     expect(result.errors).toBeUndefined();
     const data = result.data?.allJobs.nodes;
+
     expect(data).toHaveLength(2);
     data?.forEach((n: any) => {
       expect(n.fullTextRank).not.toBeNull();
@@ -282,6 +286,7 @@ it('table with unfiltered full-text field works', async () => {
 
     expect(potatoResult.errors).toBeUndefined();
     const potatoData = potatoResult.data?.allJobs.nodes;
+
     expect(potatoData).toHaveLength(1);
     potatoData?.forEach((n: any) => {
       expect(n.fullTextRank).toBeNull();

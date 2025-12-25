@@ -1,5 +1,5 @@
-import { ParsedArgs } from 'minimist';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
+import { ParsedArgs } from 'minimist';
 
 export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {
   const baseName = (argv.moduleName as string) || (argv.name as string) || 'module';
@@ -21,6 +21,7 @@ export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {
 
 export const withInitDefaults = (argv: ParsedArgs, defaultRepo: string = DEFAULT_TEMPLATE_REPO): ParsedArgs => {
   const args = addInitDefaults(argv);
+
   if (!Array.isArray(args._) || !args._.includes('init')) return args;
 
   return {

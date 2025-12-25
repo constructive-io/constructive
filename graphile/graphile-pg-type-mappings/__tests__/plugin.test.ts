@@ -1,8 +1,9 @@
-import { join } from 'path';
 import { getConnections, GraphQLQueryFn } from 'graphile-test';
+import gql from 'graphql-tag';
+import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import gql from 'graphql-tag';
+
 import CustomPgTypeMappingsPlugin from '../src';
 
 const SCHEMA = 'public';
@@ -65,6 +66,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should map default types correctly', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -118,6 +120,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should handle custom type mappings', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -169,6 +172,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should map multiple custom types correctly', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -220,6 +224,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should override multiple default mappings', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -274,6 +279,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should handle both adding new types and overriding defaults', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -320,6 +326,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should use only default mappings when custom mappings is empty array', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });
@@ -372,6 +379,7 @@ describe('CustomPgTypeMappingsPlugin', () => {
 
     it('should handle plugin factory with options', async () => {
       const typeRes = await query(TYPE_INTROSPECTION_QUERY);
+
       expect(typeRes).toMatchSnapshot();
     });
   });

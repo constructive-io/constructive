@@ -1,15 +1,16 @@
 import { deployFast, PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
-import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { randomUUID } from 'crypto';
 
 it('dashboard', async () => {
     const project = new PgpmPackage(process.env.CONSTRUCTIVE_DASHBOARD);
     const opts = getEnvOptions({
         pg: {
-            database: 'db-dbe-'+randomUUID()
+            database: `db-dbe-${randomUUID()}`
         }
     })
+
     execSync(`createdb ${opts.pg.database}`);
     await deployFast({
         opts, 
@@ -25,9 +26,10 @@ it('Constructive', async () => {
     const project = new PgpmPackage(process.env.CONSTRUCTIVE_WORKSPACE);
     const opts = getEnvOptions({
         pg: {
-            database: 'db-constructive-'+randomUUID()
+            database: `db-constructive-${randomUUID()}`
         }
     })
+
     execSync(`createdb ${opts.pg.database}`);
     await deployFast({
         opts, 

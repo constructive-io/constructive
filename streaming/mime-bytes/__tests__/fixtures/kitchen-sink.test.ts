@@ -69,6 +69,7 @@ describe('Kitchen Sink Fixtures', () => {
     const largeExtensions = ['pdf', 'zip', 'mp4', 'avi', 'mov', 'mkv', 'tar', 'gz'];
     const largeFiles = files.filter(file => {
       const ext = path.extname(file).toLowerCase().replace('.', '');
+
       return largeExtensions.includes(ext);
     });
     

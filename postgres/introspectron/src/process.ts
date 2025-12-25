@@ -9,31 +9,37 @@ import { deepClone, parseTags } from './utils';
 
 const removeQuotes = (str: string): string => {
   const trimmed = str.trim();
+
   if (trimmed[0] === '"') {
     if (trimmed[trimmed.length - 1] !== '"') {
       throw new Error(
         `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`
       );
     }
+
     return trimmed.substring(1, trimmed.length - 1);
-  } else {
-    return trimmed.toLowerCase();
   }
+ 
+    return trimmed.toLowerCase();
+  
 };
 
 const parseSqlColumnArray = (str: string): string[] => {
   if (!str) throw new Error(`Cannot parse '${str}'`);
+
   return str.split(',').map(removeQuotes);
 };
 
 const parseSqlColumnString = (str: string): string => {
   if (!str) throw new Error(`Cannot parse '${str}'`);
+
   return removeQuotes(str);
 };
 
 function parseConstraintSpec(rawSpec: string): { spec: string; tags: Record<string, any>; description: string } {
   const [spec, ...tagComponents] = rawSpec.split(/\|/);
   const parsed = parseTags(tagComponents.join('\n'));
+
   return {
     spec,
     tags: parsed.tags,
@@ -50,27 +56,32 @@ function smartCommentConstraints(introspectionResults: PgIntrospectionResultByKi
     const attributes = introspectionResults.attribute
       .filter((a) => a.classId === tbl.id)
       .sort((a, b) => a.num - b.num);
+
     if (!cols) {
       const pk = introspectionResults.constraint.find(
         (c) => c.classId === tbl.id && c.type === 'p'
       );
+
       if (pk) {
         return pk.keyAttributeNums.map((n) =>
           attributes.find((a) => a.num === n)!
         );
-      } else {
+      } 
         throw new Error(
           `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${tbl.id}) and no PK found (${debugStr}).`
         );
-      }
+      
     }
+
     return cols.map((colName) => {
       const attr = attributes.find((a) => a.name === colName);
+
       if (!attr) {
         throw new Error(
           `Could not find attribute '${colName}' in '${tbl.namespaceName}.${tbl.name}'`
         );
       }
+
       return attr;
     });
   };
@@ -87,6 +98,7 @@ export const introspectionResultsFromRaw = (
   const xByY = <T extends Record<string, any>>(arrayOfX: T[], attrKey: keyof T): Record<string, T> =>
     arrayOfX.reduce((memo, x) => {
       memo[x[attrKey]] = x;
+
       return memo;
     }, {} as Record<string, T>);
 
@@ -94,8 +106,10 @@ export const introspectionResultsFromRaw = (
     arrayOfX.reduce((memo, x) => {
       const k1 = x[key1];
       const k2 = x[key2];
+
       if (!memo[k1]) memo[k1] = {};
       memo[k1][k2] = x;
+
       return memo;
     }, {} as Record<string, Record<string, T>>);
 
@@ -114,19 +128,23 @@ export const introspectionResultsFromRaw = (
   ) => {
     array.forEach((entry: any) => {
       const key = entry[lookupAttr];
+
       if (Array.isArray(key)) {
         entry[newAttr] = key
           .map((innerKey) => {
             const result = lookup[innerKey];
+
             if (innerKey && !result && !missingOk) {
               // @ts-ignore
               throw new Error(`Could not look up '${newAttr}' by '${lookupAttr}' ('${innerKey}') on '${JSON.stringify(entry)}'`);
             }
+
             return result;
           })
           .filter(Boolean);
       } else {
         const result = lookup[key];
+
         if (key && !result && !missingOk) {
           // @ts-ignore
           throw new Error(`Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(entry)}'`);
@@ -141,6 +159,7 @@ export const introspectionResultsFromRaw = (
       fn ? fn(introspectionResults) : null
     );
   };
+
   augment(introspectionResultsByKind);
 
   relate(introspectionResultsByKind.class, 'namespace', 'namespaceId', introspectionResultsByKind.namespaceById, true);
@@ -186,6 +205,7 @@ export const introspectionResultsFromRaw = (
 
   introspectionResultsByKind.index.forEach((index: PgIndex) => {
     const columns = index.attributeNums.map((nr) => index.class.attributes.find((attr) => attr.num === nr));
+
     if (columns[0]) {
       columns[0].isIndexed = true;
     }

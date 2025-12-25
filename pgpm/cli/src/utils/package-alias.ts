@@ -62,6 +62,7 @@ export function resolvePackageAlias(input: string, cwd: string): string {
   }
   
   const aliasMap = buildPackageAliasMap(cwd);
+
   return aliasMap[input] ?? input;
 }
 

@@ -9,6 +9,7 @@ it('deparses', async () => {
     lexpr: t.nodes.integer({ ival: 0 }),
     rexpr: t.nodes.integer({ ival: 0 })
   });
+
   expect(obj).toMatchSnapshot();
   expect(await deparse([obj])).toMatchSnapshot();
 });

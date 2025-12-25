@@ -20,6 +20,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
     });
 
@@ -28,6 +29,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
     });
 
@@ -36,6 +38,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
       
       expect(result).toHaveProperty('resolved');
@@ -49,6 +52,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
       
       expect(Array.isArray(result.resolved)).toBe(true);
@@ -60,6 +64,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
       
       expect(result).toHaveProperty('resolved');
@@ -76,6 +81,7 @@ describe('getWorkspaceExtensionsInDependencyOrder', () => {
       const project = new PgpmPackage(workspacePath);
       
       const result = await project.resolveWorkspaceExtensionDependencies();
+
       expect(result).toMatchSnapshot();
       
       expect(result.resolved.length).toBeGreaterThan(0);

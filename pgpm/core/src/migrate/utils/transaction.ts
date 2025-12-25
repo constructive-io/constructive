@@ -47,26 +47,31 @@ export async function withTransaction<T>(
   if (!options.useTransaction) {
     // No transaction - use pool directly
     log.debug('Executing without transaction');
+
     return fn({ client: pool, isTransaction: false, queryHistory, addQuery });
   }
 
   // Use transaction
   const client = await pool.connect();
   const transactionStartTime = Date.now();
+
   log.debug('Starting transaction');
 
   try {
     const beginTime = Date.now();
+
     await client.query('BEGIN');
     addQuery('BEGIN', [], beginTime);
     
     const result = await fn({ client, isTransaction: true, queryHistory, addQuery });
     
     const commitTime = Date.now();
+
     await client.query('COMMIT');
     addQuery('COMMIT', [], commitTime);
     
     const transactionDuration = Date.now() - transactionStartTime;
+
     log.debug(`Transaction committed successfully in ${transactionDuration}ms`);
     
     return result;
@@ -84,6 +89,7 @@ export async function withTransaction<T>(
     
     // Enhanced error logging with context
     const errorLines = [];
+
     errorLines.push(`Transaction rolled back due to error after ${transactionDuration}ms:`);
     errorLines.push(`Error Code: ${error.code || 'N/A'}`);
     errorLines.push(`Error Message: ${error.message || 'N/A'}`);
@@ -96,6 +102,7 @@ export async function withTransaction<T>(
         const params = entry.params && entry.params.length > 0 
           ? ` with params: ${JSON.stringify(entry.params.slice(0, 2))}${entry.params.length > 2 ? '...' : ''}`
           : '';
+
         errorLines.push(`  ${index + 1}. ${entry.query.split('\n')[0].trim()}${params}${duration}`);
       });
     }
@@ -147,6 +154,7 @@ export async function executeQuery(
     
     // Enhanced error logging
     const errorLines = [];
+
     errorLines.push(`Query failed after ${duration}ms:`);
     errorLines.push(`  Query: ${query.split('\n')[0].trim()}`);
     if (params && params.length > 0) {

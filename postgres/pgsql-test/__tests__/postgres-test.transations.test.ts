@@ -71,6 +71,7 @@ describe('Manual rollback using app_public.users', () => {
     const res = await pg.query(`
       SELECT * FROM app_public.users WHERE username = 'zara'
     `);
+
     expect(res.rows).toHaveLength(0); // proves rollback works
   });
 
@@ -105,6 +106,7 @@ describe('Manual rollback using app_public.users', () => {
     // Insert a user that we’ll intentionally roll back
     await pg.query(`INSERT INTO app_public.users (username) VALUES ('temp_user')`);
     const beforeRollback = await pg.query(`SELECT * FROM app_public.users WHERE username = 'temp_user'`);
+
     expect(beforeRollback.rows).toHaveLength(1);
 
     // Midway rollback (manual!)
@@ -117,6 +119,7 @@ describe('Manual rollback using app_public.users', () => {
     // Now insert another user instead
     await pg.query(`INSERT INTO app_public.users (username) VALUES ('persistent_user')`);
     const afterRollback = await pg.query(`SELECT * FROM app_public.users WHERE username = 'persistent_user'`);
+
     expect(afterRollback.rows).toHaveLength(1);
   });
 
@@ -132,6 +135,7 @@ describe('Manual rollback using app_public.users', () => {
 
   it('verifies crash_test user was cleaned up after failure', async () => {
     const res = await pg.query(`SELECT * FROM app_public.users WHERE username = 'crash_test'`);
+
     expect(res.rows).toHaveLength(0); // proves rollback on failed test worked
   });
 });

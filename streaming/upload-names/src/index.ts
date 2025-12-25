@@ -1,4 +1,5 @@
 import { basename, extname } from 'path';
+
 import slugify from './slugify';
 
 interface Options {
@@ -25,6 +26,7 @@ export default (
 
   // Step 3: Sluggify (ASCII-only if english = true)
   let slug = name;
+
   if (english) {
     slug = slugify(name);
     if (slug.length === 0 && name.length > 0) {
@@ -35,5 +37,6 @@ export default (
   }
 
   const result = english ? `${slug}${slugify(ext)}` : `${name}${ext}`;
+
   return lower ? result.toLowerCase() : result;
 };

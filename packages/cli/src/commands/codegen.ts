@@ -1,10 +1,10 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
-import { ParsedArgs } from 'minimist'
-import { promises as fs } from 'fs'
-import { join } from 'path'
-import yaml from 'js-yaml'
-import { runCodegen, defaultGraphQLCodegenOptions, mergeGraphQLCodegenOptions, GraphQLCodegenOptions } from '@constructive-io/graphql-codegen'
+import { defaultGraphQLCodegenOptions, GraphQLCodegenOptions,mergeGraphQLCodegenOptions, runCodegen } from '@constructive-io/graphql-codegen'
 import { fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
+import { promises as fs } from 'fs'
+import { CLIOptions, Inquirerer } from 'inquirerer'
+import yaml from 'js-yaml'
+import { ParsedArgs } from 'minimist'
+import { join } from 'path'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -34,15 +34,19 @@ function parseBool(v: any, d: boolean): boolean {
   if (v === undefined) return d
   if (typeof v === 'boolean') return v
   const s = String(v).toLowerCase()
+
   if (s === 'true') return true
   if (s === 'false') return false
+
   return d
 }
 
 async function loadConfig(path: string): Promise<Partial<GraphQLCodegenOptions>> {
   const content = await fs.readFile(path, 'utf8')
+
   if (/\.ya?ml$/i.test(path)) return yaml.load(content) as any
   if (/\.json$/i.test(path)) return JSON.parse(content)
+
   return {}
 }
 
@@ -60,9 +64,11 @@ export default async (
   const configPath = (argv.config as string) || ''
 
   let fileOpts: Partial<GraphQLCodegenOptions> = {}
+
   if (configPath) fileOpts = await loadConfig(configPath)
 
   const overrides: Partial<GraphQLCodegenOptions> = {}
+
   if (argv.schema) overrides.input = { ...(overrides.input || {}), schema: String(argv.schema) }
   if (argv.endpoint) overrides.input = { ...(overrides.input || {}), endpoint: String(argv.endpoint) } as any
   const headerHost = (argv.headerHost as string) ?? ''
@@ -70,12 +76,15 @@ export default async (
   const headerArg = argv.header as string | string[] | undefined
   const headerList = Array.isArray(headerArg) ? headerArg : headerArg ? [headerArg] : []
   const headers: Record<string, string> = {}
+
   if (auth) headers['Authorization'] = auth
   for (const h of headerList) {
     const idx = typeof h === 'string' ? h.indexOf(':') : -1
+
     if (idx <= 0) continue
     const name = h.slice(0, idx).trim()
     const value = h.slice(idx + 1).trim()
+
     if (!name) continue
     headers[name] = value
   }
@@ -89,12 +98,14 @@ export default async (
   const allowQueries = Array.isArray(allowQueryArg) ? allowQueryArg : allowQueryArg ? [String(allowQueryArg)] : []
   const excludeQueries = Array.isArray(excludeQueryArg) ? excludeQueryArg : excludeQueryArg ? [String(excludeQueryArg)] : []
   const excludePatterns = Array.isArray(excludePatternArg) ? excludePatternArg : excludePatternArg ? [String(excludePatternArg)] : []
+
   if (allowQueries.length || excludeQueries.length || excludePatterns.length) {
     overrides.documents = { ...(overrides.documents || {}), allowQueries, excludeQueries, excludePatterns } as any
   }
   const emitTypes = parseBool(argv.emitTypes, true)
   const emitOperations = parseBool(argv.emitOperations, true)
   const emitSdk = parseBool(argv.emitSdk, true)
+
   overrides.features = { emitTypes, emitOperations, emitSdk }
 
   const merged = mergeGraphQLCodegenOptions(defaultGraphQLCodegenOptions, fileOpts as any)
@@ -102,11 +113,13 @@ export default async (
 
   if (finalOptions.input.endpoint && headerHost) {
     const opts: any = {}
+
     if (headerHost) opts.headerHost = headerHost
     if (auth) opts.auth = auth
     if (Object.keys(headers).length) opts.headers = headers
     const sdl = await (fetchEndpointSchemaSDL as any)(String(finalOptions.input.endpoint), opts)
     const tmpSchemaPath = join(cwd, '.constructive-codegen-schema.graphql')
+
     await fs.writeFile(tmpSchemaPath, sdl, 'utf8')
     finalOptions.input.schema = tmpSchemaPath as any
     ;(finalOptions.input as any).endpoint = ''
@@ -114,11 +127,13 @@ export default async (
 
   const hasSchema = !!finalOptions.input.schema && String(finalOptions.input.schema).trim() !== ''
   const hasEndpoint = !!(finalOptions.input as any).endpoint && String((finalOptions.input as any).endpoint).trim() !== ''
+
   if (!hasSchema && !hasEndpoint) {
     console.error('Missing --schema or --endpoint or config.input')
     process.exit(1)
   }
 
   const result = await runCodegen(finalOptions, cwd)
+
   console.log(`Generated at ${join(result.root)}`)
 }

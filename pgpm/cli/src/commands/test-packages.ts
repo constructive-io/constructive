@@ -1,11 +1,11 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import path from 'path';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-import { getPgEnvOptions } from 'pg-env';
+import path from 'path';
 import { getPgPool } from 'pg-cache';
+import { getPgEnvOptions } from 'pg-env';
 
 const log = new Logger('test-packages');
 
@@ -58,14 +58,17 @@ async function createDatabase(dbname: string, adminDb: string = 'postgres'): Pro
     
     await pool.query(`CREATE DATABASE "${safeName}"`);
     log.debug(`Created database: ${safeName}`);
+
     return true;
   } catch (error: any) {
     if (error.code === '42P04') {
       // Database already exists, that's fine
       log.debug(`Database ${dbname} already exists`);
+
       return true;
     }
     log.error(`Failed to create database ${dbname}: ${error.message}`);
+
     return false;
   }
 }
@@ -97,7 +100,9 @@ async function checkPostgresConnection(): Promise<boolean> {
   try {
     const pgEnv = getPgEnvOptions({ database: 'postgres' });
     const pool = getPgPool(pgEnv);
+
     await pool.query('SELECT 1');
+
     return true;
   } catch {
     return false;
@@ -150,6 +155,7 @@ async function testModule(
       await workspacePkg.deploy(opts, moduleName, true);
     } catch (error: any) {
       await dropDatabase(dbname);
+
       return {
         moduleName,
         modulePath,
@@ -165,6 +171,7 @@ async function testModule(
         await workspacePkg.verify(opts, moduleName, true);
       } catch (error: any) {
         await dropDatabase(dbname);
+
         return {
           moduleName,
           modulePath,
@@ -179,6 +186,7 @@ async function testModule(
         await workspacePkg.revert(opts, moduleName, true);
       } catch (error: any) {
         await dropDatabase(dbname);
+
         return {
           moduleName,
           modulePath,
@@ -193,6 +201,7 @@ async function testModule(
         await workspacePkg.deploy(opts, moduleName, true);
       } catch (error: any) {
         await dropDatabase(dbname);
+
         return {
           moduleName,
           modulePath,
@@ -206,6 +215,7 @@ async function testModule(
     await dropDatabase(dbname);
 
     console.log(`${GREEN}SUCCESS: Module ${moduleName} passed all tests${NC}`);
+
     return {
       moduleName,
       modulePath,
@@ -214,6 +224,7 @@ async function testModule(
   } catch (error: any) {
     // Ensure cleanup on any unexpected error
     await dropDatabase(dbname);
+
     return {
       moduleName,
       modulePath,
@@ -241,6 +252,7 @@ export default async (
 
   // Parse excludes
   let excludes: string[] = [];
+
   if (argv.exclude) {
     excludes = (argv.exclude as string).split(',').map(e => e.trim());
   }
@@ -286,9 +298,11 @@ export default async (
 
   // Filter out excluded modules
   let filteredModules = modules;
+
   if (excludes.length > 0) {
     filteredModules = modules.filter(mod => {
       const moduleName = mod.getModuleName();
+
       return !excludes.includes(moduleName);
     });
     console.log(`Excluding: ${excludes.join(', ')}`);

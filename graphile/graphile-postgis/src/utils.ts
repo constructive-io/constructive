@@ -3,6 +3,7 @@ import type { GisTypeDetails } from './types';
 
 export const getGISTypeDetails = (modifier: number): GisTypeDetails => {
   const allZeroesHopefully = modifier >> 24;
+
   if (allZeroesHopefully !== 0) {
     throw new Error('Unsupported PostGIS modifier');
   }

@@ -1,7 +1,7 @@
+import langParser from 'accept-language-parser';
 import DataLoader from 'dataloader';
 import type { IncomingHttpHeaders } from 'http';
 import type { PoolClient } from 'pg';
-import langParser from 'accept-language-parser';
 
 import env from './env';
 
@@ -85,6 +85,7 @@ export const makeLanguageDataLoaderForTable = (
               `,
             [ids, languageCodes]
           );
+
           return ids.map((id) =>
             rows.find((row: LanguageRow) => row?.[identifier] === id)
           );

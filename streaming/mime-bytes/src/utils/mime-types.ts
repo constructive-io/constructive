@@ -15,9 +15,11 @@ export type MimeCategory = typeof MIME_CATEGORIES[keyof typeof MIME_CATEGORIES];
 // Extract category from MIME type
 export function getMimeCategory(mimeType: string): MimeCategory | null {
   const category = mimeType.split('/')[0];
+
   if (Object.values(MIME_CATEGORIES).includes(category as MimeCategory)) {
     return category as MimeCategory;
   }
+
   return null;
 }
 
@@ -97,5 +99,6 @@ const MIME_ALIASES: Record<string, string> = {
 // Resolve MIME type aliases
 export function resolveMimeAlias(mimeType: string): string {
   const normalized = normalizeMimeType(mimeType);
+
   return MIME_ALIASES[normalized] || normalized;
 }

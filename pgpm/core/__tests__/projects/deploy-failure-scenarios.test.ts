@@ -53,6 +53,7 @@ describe('Deploy Failure Scenarios', () => {
     const client = new PgpmMigrate(db.config);
     
     const initialState = await db.getMigrationState();
+
     expect(initialState.changeCount).toBe(0);
     expect(initialState.eventCount).toBe(0);
     
@@ -115,6 +116,7 @@ describe('Deploy Failure Scenarios', () => {
     const client = new PgpmMigrate(db.config);
     
     const initialState = await db.getMigrationState();
+
     expect(initialState.changeCount).toBe(0);
     
     await expect(client.deploy({
@@ -131,15 +133,19 @@ describe('Deploy Failure Scenarios', () => {
     
     expect(await db.exists('table', 'test_products')).toBe(true);
     const records = await db.query('SELECT * FROM test_products');
+
     expect(records.rows).toHaveLength(1);
     expect(records.rows[0].sku).toBe('PROD-001');
     
     const finalRecord = await db.query("SELECT * FROM test_products WHERE sku = 'PROD-002'");
+
     expect(finalRecord.rows).toHaveLength(0);
     
     const successEvents = finalState.events.filter((e: any) => e.event_type === 'deploy' && !e.error_message);
+
     expect(successEvents.length).toBe(2); // create_table, add_record
     const failEvents = finalState.events.filter((e: any) => e.event_type === 'deploy' && e.error_message);
+
     expect(failEvents.length).toBe(1); // violate_constraint failure logged
     expect(finalState.eventCount).toBe(3); // 2 successful deployments + 1 failure
   });
@@ -252,14 +258,17 @@ describe('Deploy Failure Scenarios', () => {
     expect(await db.exists('table', 'test_schema.orders')).toBe(true);
     
     const records = await db.query('SELECT * FROM test_schema.orders');
+
     expect(records.rows).toHaveLength(0);
     
     expect(finalState.changeCount).toBe(2);
     expect(finalState.changes.map((c: any) => c.change_name)).toEqual(['setup_schema', 'create_constraint_table']);
     
     const successEvents = finalState.events.filter((e: any) => e.event_type === 'deploy' && !e.error_message);
+
     expect(successEvents.length).toBe(2); // setup_schema, create_constraint_table
     const failEvents = finalState.events.filter((e: any) => e.event_type === 'deploy' && e.error_message);
+
     expect(failEvents.length).toBe(1); // fail_on_constraint failure logged
     expect(finalState.eventCount).toBe(3); // 2 successful deployments + 1 failure
     
@@ -310,6 +319,7 @@ describe('Deploy Failure Scenarios', () => {
     });
     
     const deployState = await db.getMigrationState();
+
     expect(deployState.changeCount).toBe(1);
     expect(await db.exists('table', 'users')).toBe(true);
     
@@ -323,6 +333,7 @@ describe('Deploy Failure Scenarios', () => {
     
     // Should have deploy success event + verify failure event
     const verifyEvents = finalState.events.filter((e: any) => e.event_type === 'verify');
+
     expect(verifyEvents.length).toBe(1);
     expect(verifyEvents[0].error_message).toBe('Verification failed for create_simple_table');
     expect(verifyEvents[0].error_code).toBe('VERIFICATION_FAILED');

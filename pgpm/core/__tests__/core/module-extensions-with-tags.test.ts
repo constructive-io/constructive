@@ -12,16 +12,19 @@ afterAll(() => {
 
 it('getModuleExtensions for my-first', () => {
   const project = fixture.getModuleProject(['simple-w-tags'], 'my-first');
+
   expect(project.getModuleExtensions()).toMatchSnapshot();
 });
 
 it('getModuleExtensions for my-second', () => {
   const project = fixture.getModuleProject(['simple-w-tags'], 'my-second');
+
   expect(project.getModuleExtensions()).toMatchSnapshot();
 });
 
 it('getModuleExtensions for my-third', () => {
   const project = fixture.getModuleProject(['simple-w-tags'], 'my-third');
+
   expect(project.getModuleExtensions()).toMatchSnapshot();
 });
 
@@ -47,12 +50,14 @@ describe('generateModulePlan with tags', () => {
   it('generates plan for my-second with cross-project dependencies', () => {
     const project = fixture.getModuleProject(['simple-w-tags'], 'my-second');
     const plan = project.generateModulePlan({ includePackages: true });
+
     expect(cleanText(plan)).toMatchSnapshot();
   });
 
   it('generates plan for my-third with multiple cross-project dependencies', () => {
     const project = fixture.getModuleProject(['simple-w-tags'], 'my-third');
     const plan = project.generateModulePlan({ includePackages: true });
+
     expect(cleanText(plan)).toMatchSnapshot();
   });
 

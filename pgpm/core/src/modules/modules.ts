@@ -1,5 +1,6 @@
-import { getLatestChange, Module } from '../files';
 import { errors } from '@pgpmjs/types';
+
+import { getLatestChange, Module } from '../files';
 
 export type ModuleMap = Record<string, Module>;
 
@@ -12,11 +13,13 @@ export const latestChange = (
   basePath: string
 ): string => {
   const module = modules[sqlmodule];
+
   if (!module) {
     throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
   }
 
   const planPath = `${basePath}/${module.path}/pgpm.plan`;
+
   return getLatestChange(planPath);
 };
 
@@ -29,6 +32,7 @@ export const latestChangeAndVersion = (
   basePath: string
 ): { change: string; version: string } => {
   const module = modules[sqlmodule];
+
   if (!module) {
     throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
   }
@@ -48,6 +52,7 @@ export const getExtensionsAndModules = (
   modules: ModuleMap
 ): { native: string[]; sqitch: string[] } => {
   const module = modules[sqlmodule];
+
   if (!module) {
     throw errors.MODULE_NOT_FOUND({ name: sqlmodule });
   }
@@ -78,6 +83,7 @@ export const getExtensionsAndModulesChanges = (
   const sqitchWithDetails = 
     sqitch.map( (mod) => {
       const { change, version } = latestChangeAndVersion(mod, modules, basePath);
+
       return { name: mod, latest: change, version };
     });
 

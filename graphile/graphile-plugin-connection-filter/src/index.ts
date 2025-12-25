@@ -4,8 +4,8 @@ import type { Plugin } from 'graphile-build';
 import ConnectionArgFilterPlugin from './ConnectionArgFilterPlugin';
 import PgConnectionArgFilterBackwardRelationsPlugin from './PgConnectionArgFilterBackwardRelationsPlugin';
 import PgConnectionArgFilterColumnsPlugin from './PgConnectionArgFilterColumnsPlugin';
-import PgConnectionArgFilterComputedColumnsPlugin from './PgConnectionArgFilterComputedColumnsPlugin';
 import PgConnectionArgFilterCompositeTypeColumnsPlugin from './PgConnectionArgFilterCompositeTypeColumnsPlugin';
+import PgConnectionArgFilterComputedColumnsPlugin from './PgConnectionArgFilterComputedColumnsPlugin';
 import PgConnectionArgFilterForwardRelationsPlugin from './PgConnectionArgFilterForwardRelationsPlugin';
 import PgConnectionArgFilterLogicalOperatorsPlugin from './PgConnectionArgFilterLogicalOperatorsPlugin';
 import PgConnectionArgFilterOperatorsPlugin from './PgConnectionArgFilterOperatorsPlugin';
@@ -46,6 +46,7 @@ const PostGraphileConnectionFilterPlugin: Plugin = (
         );
       }
     };
+
     depends('graphile-build-pg', '^4.5.0');
 
     build.versions = build.extend(build.versions, { [pkg.name]: pkg.version });

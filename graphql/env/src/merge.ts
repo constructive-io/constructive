@@ -1,6 +1,7 @@
-import deepmerge from 'deepmerge';
-import { ConstructiveOptions, constructiveGraphqlDefaults } from '@constructive-io/graphql-types';
+import { constructiveGraphqlDefaults,ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getEnvOptions as getPgpmEnvOptions, loadConfigSync } from '@pgpmjs/env';
+import deepmerge from 'deepmerge';
+
 import { getGraphQLEnvVars } from './env';
 
 /**

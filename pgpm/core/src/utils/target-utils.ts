@@ -24,6 +24,7 @@ export function parseTarget(target: string): ParsedTarget {
       if (!beforeAt) {
         throw errors.INVALID_NAME({ name: target, type: 'tag', rules: 'Expected format: package:@tagName' });
       }
+
       return { packageName: beforeAt, toChange: `@${afterAt}` };
     }
     

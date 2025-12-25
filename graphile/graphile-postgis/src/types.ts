@@ -1,3 +1,4 @@
+import type { Geometry } from 'geojson';
 import type { Build, Inflection } from 'graphile-build';
 import type { PgExtension, PgIntrospectionResultsByKind, PgType } from 'graphile-build-pg';
 import type { SQL } from 'graphile-build-pg/node8plus/QueryBuilder';
@@ -8,7 +9,6 @@ import type {
   GraphQLOutputType,
   GraphQLType
 } from 'graphql';
-import type { Geometry } from 'geojson';
 
 import type { GisSubtype } from './constants';
 

@@ -1,7 +1,7 @@
-import pg from 'pg';
-import type { Pool, PoolClient } from 'pg';
-import * as jobs from '@constructive-io/job-utils';
 import type { PgClientLike } from '@constructive-io/job-utils';
+import * as jobs from '@constructive-io/job-utils';
+import type { Pool, PoolClient } from 'pg';
+import pg from 'pg';
 
 const pgPoolConfig = {
   connectionString: jobs.getJobConnectionString()
@@ -12,11 +12,13 @@ function once<T extends (...args: unknown[]) => unknown>(
   context?: unknown
 ): (...args: Parameters<T>) => ReturnType<T> | undefined {
   let result: ReturnType<T> | undefined;
+
   return function (this: unknown, ...args: Parameters<T>) {
     if (fn) {
       result = fn.apply((context ?? this) as never, args) as ReturnType<T>;
       fn = null as unknown as T;
     }
+
     return result;
   };
 }
@@ -37,7 +39,7 @@ export type TaskHandler = (
   job: JobRow
 ) => Promise<void> | void;
 
-/* eslint-disable no-console */
+ 
 
 export default class Worker {
   tasks: Record<string, TaskHandler>;
@@ -78,15 +80,18 @@ export default class Worker {
       console.log('closing connection...');
       this.close();
     };
+
     process.once('SIGTERM', close);
     process.once('SIGINT', close);
   }
+
   close() {
     if (!this._ended) {
       this.pgPool.end();
     }
     this._ended = true;
   }
+
   handleFatalError({
     err,
     fatalError,
@@ -97,12 +102,14 @@ export default class Worker {
     jobId: JobRow['id'];
   }) {
     const when = err ? `after failure '${err.message}'` : 'after success';
+
     console.error(
       `Failed to release job '${jobId}' ${when}; committing seppuku`
     );
     console.error(fatalError);
     process.exit(1);
   }
+
   async handleError(
     client: PgClientLike,
     { err, job, duration }: { err: Error; job: JobRow; duration: string }
@@ -118,6 +125,7 @@ export default class Worker {
       message: err.message
     });
   }
+
   async handleSuccess(
     client: PgClientLike,
     { job, duration }: { job: JobRow; duration: string }
@@ -127,9 +135,11 @@ export default class Worker {
     );
     await jobs.completeJob(client, { workerId: this.workerId, jobId: job.id });
   }
+
   async doWork(job: JobRow) {
     const { task_identifier } = job;
     const worker = this.tasks[task_identifier];
+
     if (!worker) {
       throw new Error('Unsupported task');
     }
@@ -141,6 +151,7 @@ export default class Worker {
       job
     );
   }
+
   async doNext(client: PgClientLike): Promise<void> {
     if (this.doNextTimer) {
       clearTimeout(this.doNextTimer);
@@ -151,16 +162,19 @@ export default class Worker {
         workerId: this.workerId,
         supportedTaskNames: this.supportedTaskNames
       })) as JobRow | undefined;
+
       if (!job || !job.id) {
         this.doNextTimer = setTimeout(
           () => this.doNext(client),
           this.idleDelay
         );
+
         return;
       }
       const start = process.hrtime();
 
       let err: Error | null = null;
+
       try {
         await this.doWork(job);
       } catch (error) {
@@ -171,6 +185,7 @@ export default class Worker {
         2
       );
       const jobId = job.id;
+
       try {
         if (err) {
           await this.handleError(client, { err, job, duration });
@@ -180,11 +195,13 @@ export default class Worker {
       } catch (fatalError: unknown) {
         this.handleFatalError({ err, fatalError, jobId });
       }
+
       return this.doNext(client);
     } catch (err: unknown) {
       this.doNextTimer = setTimeout(() => this.doNext(client), this.idleDelay);
     }
   }
+
   listen() {
     const listenForChanges = (
       err: Error | null,
@@ -196,6 +213,7 @@ export default class Worker {
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
+
         return;
       }
       client.on('notification', () => {
@@ -213,6 +231,7 @@ export default class Worker {
       console.log(`${this.workerId} connected and looking for jobs...`);
       this.doNext(client);
     };
+
     this.pgPool.connect(listenForChanges);
   }
 }

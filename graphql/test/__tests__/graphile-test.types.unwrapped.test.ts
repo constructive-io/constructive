@@ -1,12 +1,12 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
+import type { GraphQLQueryUnwrappedFnObj } from 'graphile-test';
 import { join } from 'path';
 import { seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
-import { snapshot } from '../src/utils';
 import { getConnectionsObjectUnwrapped } from '../src/get-connections';
-import type { GraphQLQueryUnwrappedFnObj } from 'graphile-test';
+import { snapshot } from '../src/utils';
 
 const schemas = ['app_public'];
 const sql = (f: string) => join(__dirname, '/../sql', f);

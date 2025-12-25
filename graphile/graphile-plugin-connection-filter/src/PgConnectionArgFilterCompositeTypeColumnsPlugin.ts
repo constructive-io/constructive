@@ -10,6 +10,7 @@ const PgConnectionArgFilterCompositeTypeColumnsPlugin: Plugin = (
 ) => {
   const { connectionFilterAllowedFieldTypes } =
     rawOptions as ConnectionFilterConfig;
+
   builder.hook('GraphQLInputObjectType:fields', (fields, build, context) => {
     const {
       extend,
@@ -50,7 +51,9 @@ const PgConnectionArgFilterCompositeTypeColumnsPlugin: Plugin = (
       ) // keep only the composite type columns
       .reduce((memo: { [fieldName: string]: PgAttribute }, attr) => {
         const fieldName: string = inflection.column(attr);
+
         memo[fieldName] = attr;
+
         return memo;
       }, {});
 
@@ -62,10 +65,12 @@ const PgConnectionArgFilterCompositeTypeColumnsPlugin: Plugin = (
           attr.typeId,
           attr.typeModifier
         );
+
         if (!NodeType) {
           return memo;
         }
         const nodeTypeName = NodeType.name;
+
         // Respect `connectionFilterAllowedFieldTypes` config option
         if (
           connectionFilterAllowedFieldTypes &&
@@ -80,10 +85,12 @@ const PgConnectionArgFilterCompositeTypeColumnsPlugin: Plugin = (
           attr.type.class,
           nodeTypeName
         );
+
         if (!CompositeFilterType) {
           return memo;
         }
         filterTypeNameByFieldName[fieldName] = filterTypeName;
+
         return extend(memo, {
           [fieldName]: fieldWithHooks(
             fieldName,

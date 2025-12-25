@@ -18,6 +18,7 @@ it('sqitch package dependencies with internal tag resolution [simple-w-tags/1st]
     'my-first',
     { tagResolution: 'internal' }
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -27,6 +28,7 @@ it('sqitch package dependencies with internal tag resolution [simple-w-tags/2nd]
     'my-second',
     { tagResolution: 'internal' }
   );
+
   expect(res).toMatchSnapshot();
 });
 
@@ -36,6 +38,7 @@ it('sqitch package dependencies with internal tag resolution [simple-w-tags/3rd]
     'my-third',
     { tagResolution: 'internal' }
   );
+
   expect(res).toMatchSnapshot();
 });
 describe('stage fixture dependency resolution - internal tags', () => {
@@ -55,6 +58,7 @@ describe('stage fixture dependency resolution - internal tags', () => {
       tagResolution: 'internal',
       source: 'plan'
     });
+
     expect(res).toMatchSnapshot();
   });
 
@@ -64,6 +68,7 @@ describe('stage fixture dependency resolution - internal tags', () => {
       tagResolution: 'internal',
       source: 'sql'
     });
+
     expect(res).toMatchSnapshot();
   });
 });

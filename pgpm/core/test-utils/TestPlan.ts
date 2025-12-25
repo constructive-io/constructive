@@ -12,6 +12,7 @@ export class TestPlan {
     // Otherwise, resolve relative to root __fixtures__/sqitch-plans
     const rootDir = dirname(dirname(dirname(__dirname))); // Go up to workspace root
     const basePath = join(rootDir, '__fixtures__', 'sqitch-plans');
+
     this.fixturePath = join(basePath, fixturePath);
     
     if (!existsSync(this.fixturePath)) {

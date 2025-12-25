@@ -2,6 +2,7 @@ import { defaultPgConfig,PgConfig } from './pg-config';
 
 const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
+
   return !isNaN(num) ? num : undefined;
 };
 
@@ -26,11 +27,13 @@ export const getPgEnvVars = (): Partial<PgConfig> => {
 export const getPgEnvOptions = (overrides: Partial<PgConfig> = {}): PgConfig => {
   const envOpts = getPgEnvVars();
   const merged = { ...defaultPgConfig, ...envOpts, ...overrides };
+
   return merged;
 };
 
 export function toPgEnvVars(config: Partial<PgConfig>): Record<string, string> {
   const opts = { ...defaultPgConfig, ...config };
+
   return {
     ...(opts.host && { PGHOST: opts.host }),
     ...(opts.port && { PGPORT: String(opts.port) }),

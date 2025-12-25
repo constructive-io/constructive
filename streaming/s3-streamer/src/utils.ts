@@ -66,6 +66,7 @@ export const uploadFromStream = ({
         Bucket: bucket,
         Key: key
       };
+
       pass.emit('upload', result);
     })
     .catch((err) => {
@@ -110,7 +111,7 @@ export const asyncUpload = ({
     };
 
     contentStream
-      .on('contents', function (results: unknown) {
+      .on('contents', (results: unknown) => {
         contents = results;
         tryResolve();
       })

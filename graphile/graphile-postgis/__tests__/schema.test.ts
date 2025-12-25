@@ -1,4 +1,5 @@
 import '../test-utils/env';
+
 import type { GraphQLQueryFn } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
@@ -19,6 +20,7 @@ describe.each(SCHEMAS)('%s schema snapshot', (schemaName) => {
 
   beforeAll(async () => {
     const connections = await createConnectionsForSchema(schemaName);
+
     ({ query, teardown, db } = connections);
   });
 
@@ -33,6 +35,7 @@ describe.each(SCHEMAS)('%s schema snapshot', (schemaName) => {
 
   it('prints a schema with this plugin', async () => {
     const printedSchema = await getSchemaSnapshot(query);
+
     expect(printedSchema).toMatchSnapshot();
   });
 });

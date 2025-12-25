@@ -54,13 +54,16 @@ describe('Simple with Tags Migration', () => {
     expect(await db.exists('table', 'mythirdapp.customers')).toBe(true);
     
     const createSchemaDeps = await db.getDependencies('my-third', 'create_schema');
+
     expect(createSchemaDeps).toContain('my-first:table_products'); // resolved from my-first:@v1.1.0
     expect(createSchemaDeps).toContain('my-second:create_table'); // resolved from my-second:@v2.0.0
     
     const createTableDeps = await db.getDependencies('my-third', 'create_table');
+
     expect(createTableDeps).toContain('my-third:create_schema');
     
     const deployedChanges = await db.getDeployedChanges();
+
     expect(deployedChanges).toContainEqual(expect.objectContaining({
       package: 'my-first',
       change_name: 'schema_myfirstapp'
@@ -122,6 +125,7 @@ describe('Simple with Tags Migration', () => {
     expect(await db.exists('table', 'mythirdapp.customers')).toBe(true);
     
     const createSchemaDeps = await db.getDependencies('my-third', 'create_schema');
+
     expect(createSchemaDeps).toContain('my-first:table_products'); // resolved from my-first:@v1.1.0
     expect(createSchemaDeps).toContain('my-second:create_table'); // resolved from my-second:@v2.0.0
   });
@@ -229,6 +233,7 @@ describe('Simple with Tags Migration', () => {
     
     // Verify final state: my-third dependencies should still be resolved correctly after the complex sequence
     const createSchemaDeps = await db.getDependencies('my-third', 'create_schema');
+
     expect(createSchemaDeps).toContain('my-first:table_products'); // resolved from my-first:@v1.1.0
     expect(createSchemaDeps).toContain('my-second:create_table'); // resolved from my-second:@v2.0.0
     
@@ -265,6 +270,7 @@ describe('Simple with Tags Migration', () => {
     
     // Verify initial state: all projects fully deployed
     let deployedChanges = await db.getDeployedChanges();
+
     expect(deployedChanges.filter(c => c.package === 'my-first')).toHaveLength(3);
     expect(deployedChanges.filter(c => c.package === 'my-second')).toHaveLength(3);
     expect(deployedChanges.filter(c => c.package === 'my-third')).toHaveLength(2);
@@ -286,6 +292,7 @@ describe('Simple with Tags Migration', () => {
     // Verify state after revert to v1.0.0
     deployedChanges = await db.getDeployedChanges();
     const myFirstChanges = deployedChanges.filter(c => c.package === 'my-first');
+
     expect(myFirstChanges).toHaveLength(2); // schema_myfirstapp, table_users
     expect(myFirstChanges.map(c => c.change_name)).toEqual(['schema_myfirstapp', 'table_users']);
     
@@ -301,6 +308,7 @@ describe('Simple with Tags Migration', () => {
     // Verify state remains at my-second v2.0.0 level (all changes deployed)
     deployedChanges = await db.getDeployedChanges();
     const mySecondChanges = deployedChanges.filter(c => c.package === 'my-second');
+
     expect(mySecondChanges).toHaveLength(3); // create_schema, create_table, create_another_table
     expect(mySecondChanges.map(c => c.change_name)).toEqual(['create_schema', 'create_table', 'create_another_table']);
     
@@ -316,6 +324,7 @@ describe('Simple with Tags Migration', () => {
     // Verify state - my-second remains fully deployed due to fixture limitation
     deployedChanges = await db.getDeployedChanges();
     const mySecondChangesAfterRevert = deployedChanges.filter(c => c.package === 'my-second');
+
     expect(mySecondChangesAfterRevert).toHaveLength(3); // all changes remain due to fixture limitation
     expect(mySecondChangesAfterRevert.map(c => c.change_name)).toEqual(['create_schema', 'create_table', 'create_another_table']);
     
@@ -346,6 +355,7 @@ describe('Simple with Tags Migration', () => {
     
     // Verify final state: all dependencies correctly resolved
     const createSchemaDeps = await db.getDependencies('my-third', 'create_schema');
+
     expect(createSchemaDeps).toContain('my-first:table_products'); // resolved from my-first:@v1.1.0
     expect(createSchemaDeps).toContain('my-second:create_table'); // resolved from my-second:@v2.0.0
     
@@ -392,6 +402,7 @@ describe('Simple with Tags Migration', () => {
     // Verify both tag formats resolve to the same changes when appropriate
     const deployedChanges = await db.getDeployedChanges();
     const mySecondChanges = deployedChanges.filter(c => c.package === 'my-second');
+
     expect(mySecondChanges).toHaveLength(3); // create_schema, create_table, create_another_table
     expect(mySecondChanges.map(c => c.change_name)).toEqual(['create_schema', 'create_table', 'create_another_table']);
   });
