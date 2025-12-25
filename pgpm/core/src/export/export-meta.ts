@@ -23,7 +23,7 @@ const config: Record<string, TableConfig> = {
   },
   database_extension: {
     schema: 'collections_public',
-    table: 'database_extensions',
+    table: 'database_extension',
     fields: {
       name: 'text',
       database_id: 'uuid'
@@ -243,6 +243,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('database', `SELECT * FROM collections_public.database WHERE id = $1`);
   await queryAndParse('schema', `SELECT * FROM collections_public.schema WHERE database_id = $1`);
   await queryAndParse('table', `SELECT * FROM collections_public.table WHERE database_id = $1`);
+  await queryAndParse('field', `SELECT * FROM collections_public.field WHERE database_id = $1`);
   await queryAndParse('domains', `SELECT * FROM meta_public.domains WHERE database_id = $1`);
   await queryAndParse('apis', `SELECT * FROM meta_public.apis WHERE database_id = $1`);
   await queryAndParse('sites', `SELECT * FROM meta_public.sites WHERE database_id = $1`);
