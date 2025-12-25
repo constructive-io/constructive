@@ -1,0 +1,50 @@
+{
+  "name": "csv-to-pg",
+  "version": "3.0.0",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "csv to pg statements",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "bin": {
+    "csv2pg": "cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "makage": "^0.1.9"
+  },
+  "keywords": [
+    "csv",
+    "postgresql",
+    "pg",
+    "constructive"
+  ],
+  "dependencies": {
+    "@pgsql/utils": "^17.8.3",
+    "@pyramation/prompt": "^0.0.1",
+    "csv-parser": "^2.3.3",
+    "js-yaml": "^3.14.0",
+    "pgsql-deparser": "^17.12.2"
+  }
+}

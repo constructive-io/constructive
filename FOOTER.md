@@ -38,7 +38,6 @@ Common issues and solutions for pgpm, PostgreSQL, and testing.
 * [@pgsql/enums](https://www.npmjs.com/package/@pgsql/enums): **🏷️ TypeScript enums** for PostgreSQL AST for safe and ergonomic parsing logic.
 * [@pgsql/types](https://www.npmjs.com/package/@pgsql/types): **📝 Type definitions** for PostgreSQL AST nodes in TypeScript.
 * [@pgsql/utils](https://www.npmjs.com/package/@pgsql/utils): **🛠️ AST utilities** for constructing and transforming PostgreSQL syntax trees.
-* [pg-ast](https://www.npmjs.com/package/pg-ast): **🔍 Low-level AST tools** and transformations for Postgres query structures.
 
 ### 🚀 API & Dev Tools
 
