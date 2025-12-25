@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
-import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
+import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, PgpmPackage, sluggify } from '@pgpmjs/core';
 import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
 
 const DEFAULT_MOTD = `
                  |              _   _
-     ===         |.===.        '\\-//\`
-    (o o)        {}o o{}        (o o)
+    ===         |.===.        '\\-//\`
+   (o o)        {}o o{}        (o o)
 ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
 `;
 
@@ -29,7 +29,6 @@ export default async function runWorkspaceSetup(
   const targetPath = path.join(cwd, sluggify(answers.name));
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
-  // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
   const templatePath = argv.templatePath as string | undefined;
 
   // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
@@ -37,8 +36,8 @@ export default async function runWorkspaceSetup(
   const dirName = path.basename(targetPath);
   registerDefaultResolver('workspace.dirname', () => dirName);
 
-  await scaffoldTemplate({
-    type: 'workspace',
+  await PgpmPackage.initWorkspace({
+    name: answers.name,
     outputDir: targetPath,
     templateRepo,
     branch: argv.fromBranch as string | undefined,
@@ -46,12 +45,11 @@ export default async function runWorkspaceSetup(
     answers: {
       ...argv,
       ...answers,
-      workspaceName: answers.name
     },
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
     cwd,
-    prompter
+    prompter,
   });
 
   // Check for .motd file and print it, or use default ASCII art
