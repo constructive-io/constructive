@@ -1,1 +1,0 @@
--- Revert schemas/meta_public/tables/apis/table from pg
