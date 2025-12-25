@@ -2,14 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
-import { Inquirerer } from 'inquirerer';
-
-import { BoilerplateQuestion } from './boilerplate-types';
-import {
-  readBoilerplateConfig,
-  readBoilerplatesConfig,
-  resolveBoilerplateBaseDir,
-} from './boilerplate-scanner';
+import { Inquirerer, Question } from 'inquirerer';
 
 export type TemplateKind = 'workspace' | 'module';
 
@@ -41,7 +34,7 @@ export interface ScaffoldTemplateResult {
   cachePath?: string;
   templateDir: string;
   /** Questions loaded from .boilerplate.json, if any */
-  questions?: BoilerplateQuestion[];
+  questions?: Question[];
 }
 
 export const DEFAULT_TEMPLATE_REPO =
@@ -57,8 +50,43 @@ const looksLikePath = (value: string): boolean => {
   );
 };
 
+interface BoilerplatesConfig {
+  dir?: string;
+}
+
+interface BoilerplateConfig {
+  type?: string;
+  questions?: Question[];
+}
+
+function readBoilerplatesConfig(templateDir: string): BoilerplatesConfig | null {
+  const configPath = path.join(templateDir, '.boilerplates.json');
+  if (fs.existsSync(configPath)) {
+    try {
+      const content = fs.readFileSync(configPath, 'utf-8');
+      return JSON.parse(content) as BoilerplatesConfig;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function readBoilerplateConfig(boilerplatePath: string): BoilerplateConfig | null {
+  const jsonPath = path.join(boilerplatePath, '.boilerplate.json');
+  if (fs.existsSync(jsonPath)) {
+    try {
+      const content = fs.readFileSync(jsonPath, 'utf-8');
+      return JSON.parse(content) as BoilerplateConfig;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 /**
- * Resolve the template path using the new metadata-driven resolution.
+ * Resolve the template path using the metadata-driven resolution.
  *
  * Resolution order:
  * 1. If explicit `templatePath` is provided, use it directly
@@ -72,7 +100,6 @@ const resolveFromPath = (
   type: TemplateKind,
   dirOverride?: string
 ): { fromPath: string; resolvedTemplatePath: string } => {
-  // If explicit templatePath is provided, use it directly
   if (templatePath) {
     const candidateDir = path.isAbsolute(templatePath)
       ? templatePath
@@ -92,12 +119,10 @@ const resolveFromPath = (
     };
   }
 
-  // Try new metadata-driven resolution
   const rootConfig = readBoilerplatesConfig(templateDir);
   const baseDir = dirOverride ?? rootConfig?.dir;
 
   if (baseDir) {
-    // New structure: {templateDir}/{baseDir}/{type}
     const newStructurePath = path.join(templateDir, baseDir, type);
     if (
       fs.existsSync(newStructurePath) &&
@@ -110,7 +135,6 @@ const resolveFromPath = (
     }
   }
 
-  // Fallback to legacy structure: {templateDir}/{type}
   const legacyPath = path.join(templateDir, type);
   if (fs.existsSync(legacyPath) && fs.statSync(legacyPath).isDirectory()) {
     return {
@@ -119,13 +143,16 @@ const resolveFromPath = (
     };
   }
 
-  // Default fallback
   return {
     fromPath: type,
     resolvedTemplatePath: path.join(templateDir, type),
   };
 };
 
+/**
+ * Scaffold a template using create-gen-app components.
+ * This provides pgpm-specific defaults and path resolution.
+ */
 export async function scaffoldTemplate(
   options: ScaffoldTemplateOptions
 ): Promise<ScaffoldTemplateResult> {
@@ -149,7 +176,6 @@ export async function scaffoldTemplate(
     ? path.resolve(cwd ?? process.cwd(), templateRepo)
     : templateRepo;
 
-  // Handle local template directories without caching
   if (
     looksLikePath(templateRepo) &&
     fs.existsSync(resolvedRepo) &&
@@ -162,7 +188,6 @@ export async function scaffoldTemplate(
       dir
     );
 
-    // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
     const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
 
     await templatizer.process(resolvedRepo, outputDir, {
@@ -180,7 +205,6 @@ export async function scaffoldTemplate(
     };
   }
 
-  // Remote repo with caching
   const cacheManager = new CacheManager({
     toolName,
     ttl: cacheTtlMs,
@@ -225,7 +249,6 @@ export async function scaffoldTemplate(
     dir
   );
 
-  // Read boilerplate config for questions (create-gen-app now handles .boilerplate.json natively)
   const boilerplateConfig = readBoilerplateConfig(resolvedTemplatePath);
 
   await templatizer.process(templateDir, outputDir, {
