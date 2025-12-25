@@ -94,6 +94,7 @@ export const createApiMiddleware = (opts: any) => {
       };
       req.api = api;
       req.databaseId = databaseId;
+      req.svc_key = 'meta-api-off';
       return next();
     }
     try {
