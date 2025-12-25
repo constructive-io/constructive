@@ -1,9 +1,6 @@
-import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { CacheManager } from 'create-gen-app';
 import { cliExitWithError } from '../utils/cli-error';
-
-const log = new Logger('cache');
 
 const cacheUsageText = `
 Cache Command:
@@ -35,8 +32,7 @@ export default async (
   const cacheManager = new CacheManager({ toolName });
 
   cacheManager.clearAll();
-  log.success(`Cleared template cache for "${toolName}".`);
-  log.debug(`Cache location: ${cacheManager.getReposDir()}`);
+  process.stdout.write(`Cleared template cache for "${toolName}".\n`);
 
   return argv;
 };

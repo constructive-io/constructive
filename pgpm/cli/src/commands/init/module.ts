@@ -1,9 +1,6 @@
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, PgpmPackage, sluggify } from '@pgpmjs/core';
-import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
 import { Inquirerer, OptionValue, Question } from 'inquirerer';
-
-const log = new Logger('module-init');
 
 export default async function runModuleSetup(
   argv: Partial<Record<string, any>>,
@@ -14,12 +11,12 @@ export default async function runModuleSetup(
   const project = new PgpmPackage(cwd);
 
   if (!project.workspacePath) {
-    log.error('Not inside a PGPM workspace.');
+    process.stderr.write('Not inside a PGPM workspace.\n');
     throw errors.NOT_IN_WORKSPACE({});
   }
 
   if (!project.isInsideAllowedDirs(cwd) && !project.isInWorkspace() && !project.isParentOfAllowedDirs(cwd)) {
-    log.error('You must be inside the workspace root or a parent directory of modules (like packages/).');
+    process.stderr.write('You must be inside the workspace root or a parent directory of modules (like packages/).\n');
     throw errors.NOT_IN_WORKSPACE_MODULE({});
   }
 
@@ -74,6 +71,6 @@ export default async function runModuleSetup(
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true')
   });
 
-  log.success(`Initialized module: ${modName}`);
+  process.stdout.write(`Initialized module: ${modName}\n`);
   return { ...argv, ...answers };
 }

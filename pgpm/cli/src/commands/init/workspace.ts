@@ -1,9 +1,6 @@
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
-import { Logger } from '@pgpmjs/logger';
 import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
 import path from 'path';
-
-const log = new Logger('workspace-init');
 
 export default async function runWorkspaceSetup(
   argv: Partial<Record<string, any>>,
@@ -52,8 +49,8 @@ export default async function runWorkspaceSetup(
   const cacheMessage = scaffoldResult.cacheUsed
     ? `Using cached templates from ${scaffoldResult.templateDir}`
     : `Fetched templates into ${scaffoldResult.templateDir}`;
-  log.success(cacheMessage);
-  log.success('Workspace templates rendered.');
+  process.stdout.write(`${cacheMessage}\n`);
+  process.stdout.write('Workspace templates rendered.\n');
 
   return { ...argv, ...answers, cwd: targetPath };
 }
