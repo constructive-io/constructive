@@ -1,6 +1,15 @@
+import fs from 'fs';
+import path from 'path';
+
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
 import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
-import path from 'path';
+
+const DEFAULT_MOTD = `
+                 |              _   _
+     ===         |.===.        '\\-//\`
+    (o o)        {}o o{}        (o o)
+ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
+`;
 
 export default async function runWorkspaceSetup(
   argv: Partial<Record<string, any>>,
@@ -45,6 +54,24 @@ export default async function runWorkspaceSetup(
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
     cwd
   });
+
+  // Check for .motd file and print it, or use default ASCII art
+  const motdPath = path.join(targetPath, '.motd');
+  let motd = DEFAULT_MOTD;
+  if (fs.existsSync(motdPath)) {
+    try {
+      motd = fs.readFileSync(motdPath, 'utf8');
+      fs.unlinkSync(motdPath);
+    } catch {
+      // Ignore errors reading/deleting .motd
+    }
+  }
+  process.stdout.write(motd);
+  if (!motd.endsWith('\n')) {
+    process.stdout.write('\n');
+  }
+
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${dirName}\n`);
 
   return { ...argv, ...answers, cwd: targetPath };
 }
