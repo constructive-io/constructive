@@ -9,10 +9,6 @@ services:
       - "5432:5432"
     expose:
       - "5432"
-    volumes:
-      - ./bin:/sql-bin
-      - ./packages:/sql-packages
-      - ./extensions:/sql-extensions
     networks:
       - constructive-net
 
