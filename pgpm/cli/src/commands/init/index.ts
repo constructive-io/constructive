@@ -163,8 +163,12 @@ async function handleBoilerplateInit(
       cwd: ctx.cwd,
     });
 
-    // Resolve the base directory and scan for available boilerplates
-    const baseDir = resolveBoilerplateBaseDir(initialInspection.templateDir);
+    // Resolve the base directory for scanning boilerplates:
+    // - If --dir is specified, use the resolvedTemplatePath (bypasses .boilerplates.json)
+    // - Otherwise, use .boilerplates.json's dir (defaults to repo root if missing)
+    const baseDir = ctx.dir
+      ? initialInspection.resolvedTemplatePath
+      : resolveBoilerplateBaseDir(initialInspection.templateDir);
     const boilerplates = scanBoilerplates(baseDir);
 
     if (boilerplates.length === 0) {
