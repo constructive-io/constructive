@@ -54,6 +54,7 @@
     "create-gen-app": "^0.6.4",
     "csv-to-pg": "^2.0.10",
     "glob": "^13.0.0",
+    "inquirerer": "^2.3.2",
     "komoji": "^0.7.11",
     "parse-package-name": "^1.0.0",
     "pg": "^8.16.3",

@@ -2,6 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { CacheManager, GitCloner, Templatizer } from 'create-gen-app';
+import { Inquirerer } from 'inquirerer';
 
 import { BoilerplateQuestion } from './boilerplate-types';
 import {
@@ -26,6 +27,12 @@ export interface ScaffoldTemplateOptions {
   cacheBaseDir?: string;
   /** Override the boilerplate directory (e.g., "default", "supabase") */
   dir?: string;
+  /**
+   * Optional Inquirerer instance to reuse for prompting.
+   * If provided, the caller retains ownership and is responsible for closing it.
+   * If not provided, a new instance will be created and closed automatically by create-gen-app.
+   */
+  prompter?: Inquirerer;
 }
 
 export interface ScaffoldTemplateResult {
@@ -135,6 +142,7 @@ export async function scaffoldTemplate(
     cwd,
     cacheBaseDir,
     dir,
+    prompter,
   } = options;
 
   const resolvedRepo = looksLikePath(templateRepo)
@@ -161,6 +169,7 @@ export async function scaffoldTemplate(
       argv: answers,
       noTty,
       fromPath,
+      prompter,
     } as any);
 
     return {
@@ -223,6 +232,7 @@ export async function scaffoldTemplate(
     argv: answers,
     noTty,
     fromPath,
+    prompter,
   } as any);
 
   return {
