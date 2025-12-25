@@ -1,13 +1,3 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import yanse from 'yanse';
-
-// Function to display the version information
-export function displayVersion() {
-  const pkg = findAndRequirePackageJson(__dirname);
-  console.log(yanse.green(`Name: ${pkg.name}`));
-  console.log(yanse.blue(`Version: ${pkg.version}`));
-}
-
 export const usageText = `
   Usage: cnc <command> [options]
          constructive <command> [options]
@@ -58,7 +48,3 @@ export const usageText = `
     cnc server --port 8080  Start server on port 8080
     cnc init workspace      Initialize new workspace
   `;
-
-export function displayUsage() {
-  console.log(usageText);
-}

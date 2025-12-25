@@ -1,13 +1,3 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import yanse from 'yanse';
-
-// Function to display the version information
-export function displayVersion() {
-  const pkg = findAndRequirePackageJson(__dirname);
-  console.log(yanse.green(`Name: ${pkg.name}`));
-  console.log(yanse.blue(`Version: ${pkg.version}`));
-}
-
 export const usageText = `
   Usage: pgpm <command> [options]
   
@@ -57,7 +47,3 @@ export const usageText = `
     pgpm init workspace      Initialize new workspace
     pgpm install @pgpm/base32  Install a database module
   `;
-
-export function displayUsage() {
-  console.log(usageText);
-}
