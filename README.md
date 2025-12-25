@@ -41,7 +41,7 @@ cd my-app
 pgpm init
 cd packages/your-module
 
-# 3. Install a package 
+# 3. Install a package
 pgpm install @pgpm/faker
 
 # 4. Deploy everything
@@ -292,7 +292,7 @@ This architecture eliminates the traditional ORM layer and API boilerplate, lett
 
 ### 🚀 GraphQL API & Server
 
-- **[@constructive-io/graphql-server](https://github.com/constructive-io/constructive/tree/main/graphql/server)** - Express-based API server powered by PostGraphile with RLS integration and JWT authentication
+- **[@constructive-io/graphql-server](https://github.com/constructive-io/constructive/tree/main/graphql/server)** - Express-based API server powered by PostGraphile with RLS integration, JWT auth, and meta API routing
 - **[@constructive-io/graphql-explorer](https://github.com/constructive-io/constructive/tree/main/graphql/explorer)** - GraphiQL interface for exploring your auto-generated GraphQL API
 - **[graphile-settings](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-settings)** - Centralized PostGraphile plugin configuration with connection filters, PostGIS, and full-text search
 
