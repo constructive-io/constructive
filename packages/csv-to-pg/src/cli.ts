@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // @ts-nocheck
-import { prompt } from '@pyramation/prompt';
+import { Inquirerer } from 'inquirerer';
 import { readConfig } from './parse';
 import { Parser } from './parser';
 import { normalizePath } from './utils';
@@ -10,12 +10,16 @@ import { writeFileSync } from 'fs';
 const argv = process.argv.slice(2);
 
 (async () => {
-  let { config } = await prompt(
+  const prompter = new Inquirerer();
+
+  let { config } = await prompter.prompt(
+    {},
     [
       {
         _: true,
         name: 'config',
-        type: 'config',
+        type: 'text',
+        message: 'Config file path',
         required: true
       }
     ],
@@ -41,16 +45,19 @@ const argv = process.argv.slice(2);
     }
   }
 
-  const results = await prompt(
+  const results = await prompter.prompt(
+    {},
     [
       {
         name: 'input',
-        type: 'path',
+        type: 'text',
+        message: 'Input CSV file path',
         required: true
       },
       {
         name: 'output',
-        type: 'path',
+        type: 'text',
+        message: 'Output SQL file path',
         required: true
       }
     ],
