@@ -17,10 +17,6 @@ export const usageText = `
     cache              Manage cached templates (clean)
     upgrade-modules    Upgrade installed pgpm modules to latest versions
 
-  Development Tools:
-    docker             Manage PostgreSQL Docker containers (start/stop)
-    env                Display environment configuration
-
   Database Administration:
     kill               Terminate database connections and optionally drop databases
     install            Install database modules
@@ -40,7 +36,12 @@ export const usageText = `
       status           Show migration status
       list             List all changes
       deps             Show change dependencies
-
+  
+  Development Tools:
+    docker             Manage PostgreSQL Docker containers (start/stop)
+    env                Manage PostgreSQL environment variables
+    test-packages      Run integration tests on workspace packages
+  
   Global Options:
     -h, --help         Display this help information
     -v, --version      Display version information
