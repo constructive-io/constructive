@@ -1,44 +1,43 @@
-// @ts-nocheck
-
 import csv from 'csv-parser';
 import { createReadStream, readFileSync } from 'fs';
-import { safeLoad as parseYAML } from 'js-yaml';
-import { nodes } from '@pgsql/utils';
+import { load as parseYAML } from 'js-yaml';
+import { ast, nodes } from '@pgsql/utils';
+import type { Node } from '@pgsql/types';
 import {
   makeBoundingBox,
   makeLocation,
   getRelatedField,
   wrapValue
 } from './utils';
-function isNumeric(str) {
+
+function isNumeric(str: unknown): boolean {
   if (typeof str === 'number') return true;
-  if (typeof str !== 'string') return false; // we only process strings!
+  if (typeof str !== 'string') return false;
   return (
-    !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+    !isNaN(str as unknown as number) &&
     !isNaN(parseFloat(str))
-  ); // ...and ensure strings of whitespace fail
+  );
 }
 
-const parseJson = (value) => {
+const parseJson = (value: unknown): string | undefined => {
   if (typeof value === 'string') return value;
-  return value && JSON.stringify(value);
+  return value ? JSON.stringify(value) : undefined;
 };
 
-const psqlArray = (value) => {
-  if (value && value.length) {
+const psqlArray = (value: unknown): string | undefined => {
+  if (Array.isArray(value) && value.length) {
     return `{${value.map((v) => v)}}`;
   }
+  return undefined;
 };
 
-export const parse = (path, opts) =>
+export const parse = <T = Record<string, unknown>>(path: string, opts?: csv.Options): Promise<T[]> =>
   new Promise((resolve, reject) => {
-    const results = [];
+    const results: T[] = [];
     createReadStream(path)
       .pipe(csv(opts))
-      // TODO check if 'data' is guaranteed to have a full row,
-      // if so, make a hook to use the stream properly
-      .on('data', (data) => results.push(data))
-      .on('error', (er) => {
+      .on('data', (data: T) => results.push(data))
+      .on('error', (er: Error) => {
         reject(er);
       })
       .on('end', () => {
@@ -46,8 +45,8 @@ export const parse = (path, opts) =>
       });
   });
 
-export const readConfig = (config) => {
-  let configValue;
+export const readConfig = (config: string): unknown => {
+  let configValue: unknown;
   if (config.endsWith('.js')) {
     configValue = require(config);
   } else if (config.endsWith('json')) {
@@ -60,13 +59,12 @@ export const readConfig = (config) => {
   return configValue;
 };
 
-const getFromValue = (from) => {
+const getFromValue = (from: string | string[]): string[] => {
   if (Array.isArray(from)) return from;
   return [from];
 };
 
-// looks like the CSV library gives us empty strings?
-const cleanseEmptyStrings = (str) => {
+const cleanseEmptyStrings = (str: unknown): unknown => {
   if (typeof str === 'string') {
     if (str.trim() === '') return null;
     return str;
@@ -75,7 +73,7 @@ const cleanseEmptyStrings = (str) => {
   }
 };
 
-const parseBoolean = (str) => {
+const parseBoolean = (str: unknown): boolean | null => {
   if (typeof str === 'boolean') {
     return str;
   } else if (typeof str === 'string') {
@@ -95,21 +93,38 @@ const parseBoolean = (str) => {
   }
 };
 
-const getValuesFromKeys = (object, keys) => keys.map((key) => object[key]);
+const getValuesFromKeys = <T extends Record<string, unknown>>(object: T, keys: string[]): unknown[] => 
+  keys.map((key) => object[key]);
 
-const identity = (a) => a;
+const identity = <T>(a: T): T => a;
 
-const isEmpty = (value) => value === null || typeof value === 'undefined';
+const isEmpty = (value: unknown): boolean => value === null || typeof value === 'undefined';
+
+interface FieldOptions {
+  type?: string;
+  from?: string | string[];
+  parse?: <T>(value: T) => T;
+  wrap?: string[];
+  wrapAst?: (val: Node) => Node;
+  cast?: string;
+  schema?: string;
+  table?: string;
+  refType?: string;
+  refKey?: string;
+  refField?: string;
+}
+
+type CoercionFunc = (record: Record<string, unknown>) => Node;
 
 // type (int, text, etc)
 // from Array of keys that map to records found (e.g., ['lon', 'lat'])
-const getCoercionFunc = (type, from, opts) => {
-  const parse = (opts.parse = opts.parse || identity);
+const getCoercionFunc = (type: string, from: string[], opts: FieldOptions): CoercionFunc => {
+  const parseFn = opts.parse || identity;
 
   switch (type) {
     case 'int':
-      return (record) => {
-        const value = parse(record[from[0]]);
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(record[from[0]]);
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
@@ -117,13 +132,13 @@ const getCoercionFunc = (type, from, opts) => {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          ival: nodes.integer({ ival: value })
+          ival: ast.integer({ ival: Number(value) })
         });
         return wrapValue(val, opts);
       };
     case 'float':
-      return (record) => {
-        const value = parse(record[from[0]]);
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(record[from[0]]);
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
@@ -132,14 +147,14 @@ const getCoercionFunc = (type, from, opts) => {
         }
 
         const val = nodes.aConst({
-          fval: nodes.float({ fval: value })
+          fval: ast.float({ fval: String(value) })
         });
         return wrapValue(val, opts);
       };
     case 'boolean':
     case 'bool':
-      return (record) => {
-        const value = parse(parseBoolean(record[from[0]]));
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(parseBoolean(record[from[0]]));
 
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
@@ -152,12 +167,12 @@ const getCoercionFunc = (type, from, opts) => {
       };
     case 'bbox':
       // do bbox magic with args from the fields
-      return (record) => {
-        const val = makeBoundingBox(parse(record[from[0]]));
+      return (record: Record<string, unknown>): Node => {
+        const val = makeBoundingBox(String(parseFn(record[from[0]])));
         return wrapValue(val, opts);
       };
     case 'location':
-      return (record) => {
+      return (record: Record<string, unknown>): Node => {
         const [lon, lat] = getValuesFromKeys(record, from);
         if (typeof lon === 'undefined') {
           return nodes.aConst({ isnull: true });
@@ -170,53 +185,61 @@ const getCoercionFunc = (type, from, opts) => {
         }
 
         // NO parse here...
-        const val = makeLocation(lon, lat);
+        const val = makeLocation(lon as string | number, lat as string | number);
         return wrapValue(val, opts);
       };
     case 'related':
-      return (record) => {
+      return (record: Record<string, unknown>): Node => {
         return getRelatedField({
-          ...opts,
+          schema: opts.schema,
+          table: opts.table!,
+          refType: opts.refType!,
+          refKey: opts.refKey!,
+          refField: opts.refField!,
+          wrap: opts.wrap,
+          wrapAst: opts.wrapAst,
+          cast: opts.cast,
           record,
+          parse: parseFn,
           from
         });
       };
     case 'uuid':
-      return (record) => {
-        const value = parse(record[from[0]]);
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(record[from[0]]);
         if (
           isEmpty(value) ||
           !/^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i.test(
-            value
+            String(value)
           )
         ) {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          sval: nodes.string({ sval: value })
+          sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
       };
     case 'text':
-      return (record) => {
-        const value = parse(cleanseEmptyStrings(record[from[0]]));
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(cleanseEmptyStrings(record[from[0]]));
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          sval: nodes.string({ sval: value })
+          sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
       };
 
     case 'text[]':
-      return (record) => {
-        const value = parse(psqlArray(cleanseEmptyStrings(record[from[0]])));
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(psqlArray(cleanseEmptyStrings(record[from[0]])));
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          sval: nodes.string({ sval: value })
+          sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
       };
@@ -224,35 +247,47 @@ const getCoercionFunc = (type, from, opts) => {
     case 'attachment':
     case 'json':
     case 'jsonb':
-      return (record) => {
-        const value = parse(parseJson(cleanseEmptyStrings(record[from[0]])));
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(parseJson(cleanseEmptyStrings(record[from[0]])));
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          sval: nodes.string({ sval: value })
+          sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
       };
     default:
-      return (record) => {
-        const value = parse(cleanseEmptyStrings(record[from[0]]));
+      return (record: Record<string, unknown>): Node => {
+        const value = parseFn(cleanseEmptyStrings(record[from[0]]));
         if (isEmpty(value)) {
           return nodes.aConst({ isnull: true });
         }
         const val = nodes.aConst({
-          sval: nodes.string({ sval: value })
+          sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
       };
   }
 };
 
-export const parseTypes = (config) => {
-  return Object.entries(config.fields).reduce((m, v) => {
+interface ConfigFields {
+  [key: string]: string | FieldOptions;
+}
+
+interface Config {
+  fields: ConfigFields;
+}
+
+interface TypesMap {
+  [key: string]: CoercionFunc;
+}
+
+export const parseTypes = (config: Config): TypesMap => {
+  return Object.entries(config.fields).reduce<TypesMap>((m, v) => {
     let [key, value] = v;
-    let type;
-    let from;
+    let type: string;
+    let from: string[];
     if (typeof value === 'string') {
       type = value;
       from = [key];
@@ -264,7 +299,7 @@ export const parseTypes = (config) => {
         from
       };
     } else {
-      type = value.type;
+      type = value.type!;
       from = getFromValue(value.from || key);
     }
     m[key] = getCoercionFunc(type, from, value);

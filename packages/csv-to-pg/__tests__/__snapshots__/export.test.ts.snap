@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`test case arrays 1`] = `
-"INSERT INTO ONLY  (
+"INSERT INTO collections_public.field (
   id,
   schemas
 ) VALUES
@@ -9,7 +9,7 @@ exports[`test case arrays 1`] = `
 `;
 
 exports[`test case image/attachment 1`] = `
-"INSERT INTO ONLY  (
+"INSERT INTO collections_public.field (
   id,
   name,
   image,
@@ -19,7 +19,7 @@ exports[`test case image/attachment 1`] = `
 `;
 
 exports[`test case jsonb/json 1`] = `
-"INSERT INTO ONLY  (
+"INSERT INTO collections_public.field (
   id,
   name,
   data
@@ -30,7 +30,7 @@ exports[`test case jsonb/json 1`] = `
 exports[`test case test case 1`] = `Promise {}`;
 
 exports[`test case test case parser 1`] = `
-"INSERT INTO ONLY  (
+"INSERT INTO collections_public.field (
   id,
   database_id,
   table_id,

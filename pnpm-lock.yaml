@@ -1331,9 +1331,15 @@ importers:
         specifier: ^17.12.2
         version: 17.12.2
     devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       makage:
         specifier: ^0.1.9
         version: 0.1.9
+      pgsql-parser:
+        specifier: ^17.9.2
+        version: 17.9.2
     publishDirectory: dist
 
   packages/orm:

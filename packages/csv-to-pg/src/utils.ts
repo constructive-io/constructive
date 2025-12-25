@@ -1,26 +1,26 @@
-// @ts-nocheck
-import { nodes } from '@pgsql/utils';
+import { ast, nodes } from '@pgsql/utils';
+import type { Node } from '@pgsql/types';
 import { join, resolve } from 'path';
 
-export const normalizePath = (path, cwd) =>
+export const normalizePath = (path: string, cwd?: string): string =>
   path.startsWith('/') ? path : resolve(join(cwd ? cwd : process.cwd(), path));
 
-const lstr = (bbox) => {
+const lstr = (bbox: string): string => {
   const [lng1, lat1, lng2, lat2] = bbox.split(',').map((a) => a.trim());
   return `LINESTRING(${lng1} ${lat1}, ${lng1} ${lat2}, ${lng2} ${lat2}, ${lng2} ${lat1}, ${lng1} ${lat1})`;
 };
 
-const funcCall = (name, args) => {
+const funcCall = (name: string, args: Node[]): Node => {
   return nodes.funcCall({
     funcname: [nodes.string({ sval: name })],
     args
   });
 };
 
-const aflt = (num) => nodes.aConst({ fval: nodes.float({ fval: num }) });
-const aint = (num) => nodes.aConst({ ival: nodes.integer({ ival: num }) });
+const aflt = (num: string | number): Node => nodes.aConst({ fval: ast.float({ fval: String(num) }) });
+const aint = (num: number): Node => nodes.aConst({ ival: ast.integer({ ival: num }) });
 
-export const makeLocation = (longitude, latitude) => {
+export const makeLocation = (longitude: string | number | null | undefined, latitude: string | number | null | undefined): Node => {
   if (!longitude || !latitude) {
     return nodes.aConst({ isnull: true });
   }
@@ -32,44 +32,46 @@ export const makeLocation = (longitude, latitude) => {
 
 // a string in the form of lon,lat,lon,lat
 // -118.587533,34.024999,-118.495177,34.13165
-export const makeBoundingBox = (bbox) => {
+export const makeBoundingBox = (bbox: string): Node => {
   return funcCall('st_setsrid', [
     funcCall('st_makepolygon', [
       funcCall('st_geomfromtext', [
-        nodes.aConst({ sval: nodes.string({ sval: lstr(bbox) }) })
+        nodes.aConst({ sval: ast.string({ sval: lstr(bbox) }) })
       ])
     ]),
     aint(4326)
   ]);
 };
 
-const ValuesLists = ({ types, record }) =>
-  Object.entries(types).map(([field, type]) => {
+interface TypesMap {
+  [key: string]: (record: Record<string, unknown>) => Node;
+}
+
+const ValuesLists = ({ types, record }: { types: TypesMap; record: Record<string, unknown> }): Node[] =>
+  Object.entries(types).map(([_field, type]) => {
     if (typeof type === 'function') {
       return type(record);
     }
     throw new Error('coercion function missing');
   });
 
-const makeCast = (arg, type) => ({
+const makeCast = (arg: Node, type: string): Node => ({
   TypeCast: {
     arg,
     typeName: {
-      TypeName: {
-        names: [
-          {
-            String: {
-              str: type
-            }
+      names: [
+        {
+          String: {
+            sval: type
           }
-        ],
-        typemod: -1
-      }
+        }
+      ],
+      typemod: -1
     }
   }
 });
 
-const ref = (name) => ({
+const ref = (name: string): Node => ({
   ResTarget: {
     name,
     val: {
@@ -77,12 +79,12 @@ const ref = (name) => ({
         fields: [
           {
             String: {
-              str: 'excluded'
+              sval: 'excluded'
             }
           },
           {
             String: {
-              str: name
+              sval: name
             }
           }
         ]
@@ -91,42 +93,44 @@ const ref = (name) => ({
   }
 });
 
-const indexElem = (name) => ({
+const indexElem = (name: string): Node => ({
   IndexElem: {
     name,
-    ordering: 0,
-    nulls_ordering: 0
+    ordering: 'SORTBY_DEFAULT',
+    nulls_ordering: 'SORTBY_NULLS_DEFAULT'
   }
 });
 
-const makeConflictClause = (conflictElems, fields) => {
+import type { OnConflictClause } from '@pgsql/types';
+
+const makeConflictClause = (conflictElems: string[] | undefined, fields: string[]): OnConflictClause | undefined => {
   if (!conflictElems || !conflictElems.length) return undefined;
   const setElems = fields.filter((el) => !conflictElems.includes(el));
   if (setElems.length) {
     return {
-      OnConflictClause: {
-        action: 2,
-        infer: {
-          InferClause: {
-            indexElems: conflictElems.map((a) => indexElem(a))
-          }
-        },
-        targetList: setElems.map((a) => ref(a))
-      }
+      action: 'ONCONFLICT_UPDATE',
+      infer: {
+        indexElems: conflictElems.map((a) => indexElem(a))
+      },
+      targetList: setElems.map((a) => ref(a))
     };
   } else {
     return {
-      OnConflictClause: {
-        action: 1,
-        infer: {
-          InferClause: {
-            indexElems: conflictElems.map((a) => indexElem(a))
-          }
-        }
+      action: 'ONCONFLICT_NOTHING',
+      infer: {
+        indexElems: conflictElems.map((a) => indexElem(a))
       }
     };
   }
 };
+
+interface InsertOneParams {
+  schema?: string;
+  table: string;
+  types: TypesMap;
+  record: Record<string, unknown>;
+  conflict?: string[];
+}
 
 export const InsertOne = ({
   schema = 'public',
@@ -134,32 +138,45 @@ export const InsertOne = ({
   types,
   record,
   conflict
-}) => ({
+}: InsertOneParams): Node => ({
   RawStmt: {
     stmt: {
       InsertStmt: {
         relation: {
-          RangeVar: {
-            schemaname: schema,
-            relname: table,
-            inh: true,
-            relpersistence: 'p'
-          }
+          schemaname: schema,
+          relname: table,
+          inh: true,
+          relpersistence: 'p'
         },
         cols: Object.keys(types).map((field) => nodes.resTarget({ name: field })),
         selectStmt: {
           SelectStmt: {
-            valuesLists: [ValuesLists({ types, record })],
-            op: 0
+            valuesLists: [
+              {
+                List: {
+                  items: ValuesLists({ types, record })
+                }
+              }
+            ],
+            op: 'SETOP_NONE',
+            limitOption: 'LIMIT_OPTION_DEFAULT'
           }
         },
         onConflictClause: makeConflictClause(conflict, Object.keys(types)),
-        override: 0
+        override: 'OVERRIDING_NOT_SET'
       }
     },
     stmt_len: 1
   }
 });
+
+interface InsertManyParams {
+  schema?: string;
+  table: string;
+  types: TypesMap;
+  records: Record<string, unknown>[];
+  conflict?: string[];
+}
 
 export const InsertMany = ({
   schema = 'public',
@@ -167,36 +184,43 @@ export const InsertMany = ({
   types,
   records,
   conflict
-}) => ({
+}: InsertManyParams): Node => ({
   RawStmt: {
     stmt: {
       InsertStmt: {
         relation: {
-          RangeVar: {
-            schemaname: schema,
-            relname: table,
-            inh: true,
-            relpersistence: 'p'
-          }
+          schemaname: schema,
+          relname: table,
+          inh: true,
+          relpersistence: 'p'
         },
         cols: Object.keys(types).map((field) => nodes.resTarget({ name: field })),
         selectStmt: {
           SelectStmt: {
-            valuesLists: records.map((record) =>
-              ValuesLists({ types, record })
-            ),
-            op: 0
+            valuesLists: records.map((record) => ({
+              List: {
+                items: ValuesLists({ types, record })
+              }
+            })),
+            op: 'SETOP_NONE',
+            limitOption: 'LIMIT_OPTION_DEFAULT'
           }
         },
         onConflictClause: makeConflictClause(conflict, Object.keys(types)),
-        override: 0
+        override: 'OVERRIDING_NOT_SET'
       }
     },
     stmt_len: 1
   }
 });
 
-export const wrapValue = (val, { wrap, wrapAst, cast } = {}) => {
+interface WrapOptions {
+  wrap?: string[];
+  wrapAst?: (val: Node) => Node;
+  cast?: string;
+}
+
+export const wrapValue = (val: Node, { wrap, wrapAst, cast }: WrapOptions = {}): Node => {
   if (Array.isArray(wrap)) {
     val = nodes.funcCall({
       funcname: wrap.map((n) => nodes.string({ sval: n })),
@@ -207,6 +231,20 @@ export const wrapValue = (val, { wrap, wrapAst, cast } = {}) => {
   if (cast) return makeCast(val, cast);
   return val;
 };
+
+interface GetRelatedFieldParams {
+  schema?: string;
+  table: string;
+  refType: string;
+  refKey: string;
+  refField: string;
+  wrap?: string[];
+  wrapAst?: (val: Node) => Node;
+  cast?: string;
+  record: Record<string, unknown>;
+  parse: (value: unknown) => unknown;
+  from: string[];
+}
 
 export const getRelatedField = ({
   schema = 'public',
@@ -220,8 +258,8 @@ export const getRelatedField = ({
   record,
   parse,
   from
-}) => {
-  let val;
+}: GetRelatedFieldParams): Node => {
+  let val: Node;
 
   const value = parse(record[from[0]]);
   if (typeof value === 'undefined') {
@@ -230,10 +268,10 @@ export const getRelatedField = ({
 
   switch (refType) {
     case 'int':
-      val = nodes.aConst({ ival: nodes.integer({ ival: value }) });
+      val = nodes.aConst({ ival: ast.integer({ ival: value as number }) });
       break;
     case 'float':
-      val = nodes.aConst({ fval: nodes.float({ fval: value }) });
+      val = nodes.aConst({ fval: ast.float({ fval: String(value) }) });
       break;
     case 'boolean':
     case 'bool':
@@ -241,7 +279,7 @@ export const getRelatedField = ({
       break;
     case 'text':
     default:
-      val = nodes.aConst({ sval: nodes.string({ sval: value }) });
+      val = nodes.aConst({ sval: ast.string({ sval: String(value) }) });
   }
 
   val = wrapValue(val, { wrap, wrapAst });
@@ -249,7 +287,7 @@ export const getRelatedField = ({
   return wrapValue(
     {
       SubLink: {
-        subLinkType: 4,
+        subLinkType: 'EXPR_SUBLINK',
         subselect: {
           SelectStmt: {
             targetList: [
@@ -260,7 +298,7 @@ export const getRelatedField = ({
                       fields: [
                         {
                           String: {
-                            str: refKey
+                            sval: refKey
                           }
                         }
                       ]
@@ -281,11 +319,11 @@ export const getRelatedField = ({
             ],
             whereClause: {
               A_Expr: {
-                kind: 0,
+                kind: 'AEXPR_OP',
                 name: [
                   {
                     String: {
-                      str: '='
+                      sval: '='
                     }
                   }
                 ],
@@ -294,7 +332,7 @@ export const getRelatedField = ({
                     fields: [
                       {
                         String: {
-                          str: refField
+                          sval: refField
                         }
                       }
                     ]
@@ -303,7 +341,8 @@ export const getRelatedField = ({
                 rexpr: val
               }
             },
-            op: 0
+            op: 'SETOP_NONE',
+            limitOption: 'LIMIT_OPTION_DEFAULT'
           }
         }
       }

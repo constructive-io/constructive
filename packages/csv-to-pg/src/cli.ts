@@ -1,80 +1,100 @@
 #!/usr/bin/env node
-// @ts-nocheck
-import { Inquirerer } from 'inquirerer';
+import { CLI, type CommandHandler } from 'inquirerer';
 import { readConfig } from './parse';
 import { Parser } from './parser';
 import { normalizePath } from './utils';
 import { dirname } from 'path';
 import { writeFileSync } from 'fs';
 
-const argv = process.argv.slice(2);
+interface ConfigFile {
+  input?: string;
+  output?: string;
+  debug?: boolean;
+  [key: string]: unknown;
+}
 
-(async () => {
-  const prompter = new Inquirerer();
+interface PromptResult {
+  config?: string;
+  input?: string;
+  output?: string;
+}
 
-  let { config } = await prompter.prompt(
-    {},
-    [
+const handler: CommandHandler = async (argv, prompter) => {
+  // Get config from positional argument or --config flag
+  let configPath = argv._[0] as string | undefined;
+  if (!configPath && argv.config) {
+    configPath = argv.config as string;
+  }
+
+  // If no config provided, prompt for it
+  if (!configPath) {
+    const result = await prompter.prompt<PromptResult>({}, [
       {
-        _: true,
         name: 'config',
         type: 'text',
         message: 'Config file path',
         required: true
       }
-    ],
-    argv
-  );
-
-  config = normalizePath(config);
-  const dir = dirname(config);
-  config = readConfig(config);
-
-  if (config.input) {
-    if (!argv.includes('--input')) {
-      argv.push('--input');
-      config.input = normalizePath(config.input, dir);
-      argv.push(config.input);
-    }
-  }
-  if (config.output) {
-    if (!argv.includes('--output')) {
-      argv.push('--output');
-      config.output = normalizePath(config.output, dir);
-      argv.push(config.output);
-    }
+    ]);
+    configPath = result.config;
   }
 
-  const results = await prompter.prompt(
-    {},
-    [
-      {
-        name: 'input',
-        type: 'text',
-        message: 'Input CSV file path',
-        required: true
-      },
-      {
-        name: 'output',
-        type: 'text',
-        message: 'Output SQL file path',
-        required: true
-      }
-    ],
-    argv
-  );
+  const normalizedConfigPath = normalizePath(configPath!);
+  const dir = dirname(normalizedConfigPath);
+  const config = readConfig(normalizedConfigPath) as ConfigFile;
+
+  // Build initial values from parsed args and config
+  const initialValues: PromptResult = {};
+  
+  if (argv.input) {
+    initialValues.input = argv.input as string;
+  } else if (config.input) {
+    initialValues.input = normalizePath(config.input, dir);
+  }
+  
+  if (argv.output) {
+    initialValues.output = argv.output as string;
+  } else if (config.output) {
+    initialValues.output = normalizePath(config.output, dir);
+  }
+
+  const results = await prompter.prompt<PromptResult>(initialValues, [
+    {
+      name: 'input',
+      type: 'text',
+      message: 'Input CSV file path',
+      required: true
+    },
+    {
+      name: 'output',
+      type: 'text',
+      message: 'Output SQL file path',
+      required: true
+    }
+  ]);
 
   config.input = results.input;
+  config.output = results.output;
 
-  let outFile = results.output;
+  let outFile = results.output!;
   if (!outFile.endsWith('.sql')) outFile = outFile + '.sql';
+  config.output = outFile;
 
-  if (argv.includes('--debug')) {
+  if (argv.debug) {
     config.debug = true;
   }
 
-  const parser = new Parser(config);
+  // Cast config to the expected Parser config type
+  const parserConfig = config as ConfigFile & { input: string; table: string; fields: Record<string, unknown> };
+  const parser = new Parser(parserConfig);
   const sql = await parser.parse();
 
-  writeFileSync(config.output, sql);
-})();
+  if (sql) {
+    writeFileSync(config.output, sql);
+  }
+
+  prompter.close();
+};
+
+const cli = new CLI(handler, {});
+cli.run();
