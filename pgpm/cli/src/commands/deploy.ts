@@ -128,36 +128,50 @@ export default async (
     });
   }
 
+  const project = new PgpmPackage(cwd);
+
+  // Determine package name based on context (similar to tag.ts pattern)
   let packageName: string | undefined;
-  if (recursive) {
+  
+  if (argv.package) {
+    // User explicitly specified a package
+    packageName = resolvePackageAlias(argv.package as string, cwd);
+    log.info(`Using specified package: ${packageName}`);
+  } else if (project.isInModule()) {
+    // We're inside a module, use the current module
+    packageName = project.getModuleName();
+    log.info(`Using current module: ${packageName}`);
+  } else if (project.isInWorkspace() && recursive) {
+    // We're in a workspace and recursive is enabled, prompt for package selection
     packageName = await selectPackage(argv, prompter, cwd, 'deploy', log);
+    if (!packageName) {
+      log.error('No package selected. Cannot deploy without specifying a target package.');
+      return;
+    }
   }
+  // If not in module and not recursive, packageName stays undefined which means deploy all
 
   const cliOverrides = {
     pg: getPgEnvOptions({ database }),
     deployment: {
       useTx: tx !== false,
-      fast: fast !== false,
+      fast: fast === true,
       usePlan: argv.usePlan !== false,
       cache: argv.cache !== false,
-      logOnly: argv.logOnly !== false,
+      logOnly: logOnly === true,
     }
   };
   
   const opts = getEnvOptions(cliOverrides);
-
-  const project = new PgpmPackage(cwd);
   
   let target: string | undefined;
   if (packageName && argv.to) {
     target = `${packageName}:${argv.to}`;
   } else if (packageName) {
     target = packageName;
-  } else if (argv.package && argv.to) {
-    const resolvedPackage = resolvePackageAlias(argv.package as string, cwd);
-    target = `${resolvedPackage}:${argv.to}`;
-  } else if (argv.package) {
-    target = resolvePackageAlias(argv.package as string, cwd);
+  } else if (argv.to) {
+    // --to specified without --package, use just the target
+    target = argv.to as string;
   }
   
   await project.deploy(

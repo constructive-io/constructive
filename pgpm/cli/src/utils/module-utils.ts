@@ -9,6 +9,9 @@ import { resolvePackageAlias } from './package-alias';
 /**
  * Handle package selection for operations that need a specific package
  * Returns the selected package name, or undefined if validation fails or no packages exist
+ * 
+ * Uses getModuleMap() which discovers modules by scanning for .control files,
+ * ensuring consistency with how core deploy discovers modules.
  */
 export async function selectPackage(
   argv: Partial<ParsedArgs>,
@@ -18,8 +21,10 @@ export async function selectPackage(
   log?: Logger
 ): Promise<string | undefined> {
   const pkg = new PgpmPackage(cwd);
-  const modules = await pkg.getModules();
-  const moduleNames = modules.map(mod => mod.getModuleName());
+  // Use getModuleMap() instead of getModules() for consistency with core deploy
+  // getModuleMap() scans for .control files, while getModules() uses pgpm.json patterns
+  const modules = pkg.getModuleMap();
+  const moduleNames = Object.keys(modules);
 
   // Check if any modules exist
   if (!moduleNames.length) {
