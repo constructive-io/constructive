@@ -140,7 +140,8 @@ export default async (
     schema_names,
     outdir,
     extensionName,
-    metaExtensionName
+    metaExtensionName,
+    prompter
   });
 
   console.log(`
