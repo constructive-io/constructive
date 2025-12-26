@@ -4,7 +4,11 @@ import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
 import type { Inquirerer, Question } from 'inquirerer';
 
 export interface InspectTemplateOptions {
-  fromPath: string;
+  /**
+   * The boilerplate path to inspect. When omitted, inspects the template
+   * repository root and returns the templateDir for scanning available boilerplates.
+   */
+  fromPath?: string;
   templateRepo?: string;
   branch?: string;
   cacheTtlMs?: number;
@@ -106,9 +110,14 @@ export function inspectTemplate(
     cacheBaseDir: resolveCacheBaseDir(cacheBaseDir),
   });
 
-  // If dir is provided, prefix fromPath with it
-  // Otherwise, let create-gen-app resolve via .boilerplates.json
-  const effectiveFromPath = dir ? path.join(dir, fromPath) : fromPath;
+  // Compute effective fromPath:
+  // - If dir is provided, join it with fromPath and bypass .boilerplates.json
+  // - If dir is NOT provided, let create-gen-app use .boilerplates.json
+  const effectiveFromPath = dir
+    ? fromPath
+      ? path.join(dir, fromPath)
+      : dir
+    : fromPath;
 
   const template =
     templateRepo.startsWith('.') ||
@@ -121,6 +130,8 @@ export function inspectTemplate(
     template,
     branch,
     fromPath: effectiveFromPath,
+    // When dir is specified, bypass .boilerplates.json resolution entirely
+    useBoilerplatesConfig: !dir,
   });
 
   return {
@@ -157,7 +168,7 @@ export async function scaffoldTemplate(
     cacheBaseDir: resolveCacheBaseDir(cacheBaseDir),
   });
 
-  // If dir is provided, prefix fromPath with it
+  // If dir is provided, join it with fromPath and bypass .boilerplates.json
   // Otherwise, let create-gen-app resolve via .boilerplates.json
   const effectiveFromPath = dir ? path.join(dir, fromPath) : fromPath;
 
@@ -176,6 +187,8 @@ export async function scaffoldTemplate(
     answers,
     noTty,
     prompter,
+    // When dir is specified, bypass .boilerplates.json resolution entirely
+    useBoilerplatesConfig: !dir,
   });
 
   return {
