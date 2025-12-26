@@ -44,7 +44,7 @@
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
-    "genomic": "^3.0.0",
+    "genomic": "^4.0.0",
     "makage": "^0.1.9"
   },
   "dependencies": {
@@ -52,7 +52,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@genomic/scaffolds": "^1.0.0",
+    "@genomic/scaffolds": "^2.0.0",
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.0",
     "komoji": "^0.7.11",
