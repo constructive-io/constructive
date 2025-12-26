@@ -45,7 +45,7 @@ describe('Staging Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
       
-      const availableModules = project.getAvailableModules();
+      const availableModules = await project.getAvailableModules();
       expect(Array.isArray(availableModules)).toBe(true);
       expect(availableModules.length).toBeGreaterThan(0);
       expect(availableModules).toContain('unique-names');

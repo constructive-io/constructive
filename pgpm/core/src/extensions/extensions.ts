@@ -3,31 +3,37 @@ import { ModuleMap } from '../modules/modules';
 /**
  * Get the list of available extensions, including predefined core extensions.
  */
-export const getAvailableExtensions = (
+export const getAvailableExtensions = async (
   modules: ModuleMap
-): string[] => {
+): Promise<string[]> => {
+
   const coreExtensions = [
-    'address_standardizer',
-    'address_standardizer_data_us',
-    'bloom',
-    'btree_gin',
-    'btree_gist',
+    // Security & identity
+    'pgcrypto',
+    'uuid-ossp',
+  
+    // Developer ergonomics
     'citext',
     'hstore',
-    'intarray',
+  
+    // Search & relevance
     'pg_trgm',
-    'pgcrypto',
-    'plpgsql',
-    'plperl',
-    'plv8',
-    'postgis_tiger_geocoder',
-    'postgis_topology',
-    'postgis',
-    'postgres_fdw',
     'unaccent',
-    'uuid-ossp',
+  
+    // Indexing building blocks
+    'btree_gin',
+    'btree_gist',
+  
+    // Data interoperability
+    'postgres_fdw',
+  
+    // Geospatial (vertical showcase)
+    'postgis',
+  
+    // Procedural logic (baseline)
+    'plpgsql',
   ];
-
+  
   return Object.keys(modules).reduce<string[]>((acc, module) => {
     if (!acc.includes(module)) acc.push(module);
     return acc;
