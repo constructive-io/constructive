@@ -19,6 +19,7 @@ interface ExportMigrationsToDiskOptions {
   schema_names: string[];
   extensionName?: string;
   metaExtensionName: string;
+  scaffoldAnswers?: Record<string, any>;
 }
 
 interface ExportOptions {
@@ -33,6 +34,7 @@ interface ExportOptions {
   schema_names: string[];
   extensionName?: string;
   metaExtensionName: string;
+  scaffoldAnswers?: Record<string, any>;
 }
 
 const exportMigrationsToDisk = async ({
@@ -44,7 +46,8 @@ const exportMigrationsToDisk = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  metaExtensionName,
+  scaffoldAnswers
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -117,7 +120,8 @@ const exportMigrationsToDisk = async ({
         'pgpm-base32',
         'pgpm-totp',
         'pgpm-types'
-      ]
+      ],
+      scaffoldAnswers
     });
 
     writeSqitchPlan(results.rows, opts);
@@ -136,7 +140,8 @@ const exportMigrationsToDisk = async ({
       author,
       outdir,
       extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules'],
-      name: metaExtensionName
+      name: metaExtensionName,
+      scaffoldAnswers
     });
 
     const metaReplacer = makeReplacer({
@@ -197,7 +202,8 @@ export const exportMigrations = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  metaExtensionName,
+  scaffoldAnswers
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -210,7 +216,8 @@ export const exportMigrations = async ({
       databaseId,
       schema_names,
       author,
-      outdir
+      outdir,
+      scaffoldAnswers
     });
   }
 };
@@ -222,6 +229,7 @@ interface PreparePackageOptions {
   outdir: string;
   name: string;
   extensions: string[];
+  scaffoldAnswers?: Record<string, any>;
 }
 
 interface Schema {
@@ -247,7 +255,8 @@ const preparePackage = async ({
   author,
   outdir,
   name,
-  extensions
+  extensions,
+  scaffoldAnswers
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
   const sqitchDir = path.resolve(path.join(outdir, name));
@@ -256,11 +265,21 @@ const preparePackage = async ({
 
   const plan = glob(path.join(sqitchDir, 'pgpm.plan'));
   if (!plan.length) {
+    // Build module-specific answers for scaffolding
+    const moduleAnswers = {
+      ...scaffoldAnswers,
+      moduleName: name,
+      moduleDesc: name,
+      packageIdentifier: name
+    };
+
     await project.initModule({
       name,
       description: name,
       author,
       extensions,
+      answers: moduleAnswers,
+      noTty: true
     });
   } else {
     rmSync(path.resolve(sqitchDir, 'deploy'), { recursive: true, force: true });
