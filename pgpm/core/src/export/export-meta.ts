@@ -236,7 +236,10 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   const queryAndParse = async (key: string, query: string) => {
     const result = await pool.query(query, [database_id]);
     if (result.rows.length) {
-      sql[key] = await parsers[key].parse(result.rows);
+      const parsed = await parsers[key].parse(result.rows);
+      if (parsed) {
+        sql[key] = parsed;
+      }
     }
   };
 
