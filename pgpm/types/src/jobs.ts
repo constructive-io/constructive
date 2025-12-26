@@ -1,14 +1,3 @@
-import { PgConfig } from 'pg-env';
-
-/**
- * Job system PostgreSQL configuration
- * Extends the base PgConfig with job-specific database settings
- */
-export interface JobPgConfig extends PgConfig {
-  /** Database name for job system (defaults to 'jobs') */
-  database: string;
-}
-
 /**
  * Job schema configuration
  */
@@ -155,7 +144,7 @@ export interface Job {
 /**
  * Worker configuration options
  */
-export interface JobWorkerConfig extends JobPgConfig, JobSchemaConfig, JobHostnameConfig, JobTaskSupportConfig {
+export interface JobWorkerConfig extends JobSchemaConfig, JobHostnameConfig, JobTaskSupportConfig {
   /** Polling interval in milliseconds */
   pollInterval?: number;
   /** Whether to enable graceful shutdown */
@@ -165,7 +154,7 @@ export interface JobWorkerConfig extends JobPgConfig, JobSchemaConfig, JobHostna
 /**
  * Scheduler configuration options
  */
-export interface JobSchedulerConfig extends JobPgConfig, JobSchemaConfig, JobHostnameConfig, JobTaskSupportConfig {
+export interface JobSchedulerConfig extends JobSchemaConfig, JobHostnameConfig, JobTaskSupportConfig {
   /** Polling interval in milliseconds for checking scheduled jobs */
   pollInterval?: number;
   /** Whether to enable graceful shutdown */
@@ -176,8 +165,6 @@ export interface JobSchedulerConfig extends JobPgConfig, JobSchemaConfig, JobHos
  * Complete job system configuration
  */
 export interface JobsConfig {
-  /** PostgreSQL database configuration */
-  pg?: Partial<JobPgConfig>;
   /** Job schema configuration */
   schema?: Partial<JobSchemaConfig>;
   /** Worker configuration */
@@ -192,22 +179,10 @@ export interface JobsConfig {
  * Default configuration values for job system
  */
 export const jobsDefaults: JobsConfig = {
-  pg: {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: 'password',
-    database: 'jobs'
-  },
   schema: {
     schema: 'app_jobs'
   },
   worker: {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: 'password',
-    database: 'jobs',
     schema: 'app_jobs',
     hostname: 'worker-0',
     supportAny: true,
@@ -216,11 +191,6 @@ export const jobsDefaults: JobsConfig = {
     gracefulShutdown: true
   },
   scheduler: {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: 'password',
-    database: 'jobs',
     schema: 'app_jobs',
     hostname: 'scheduler-0',
     supportAny: true,
