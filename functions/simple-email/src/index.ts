@@ -27,7 +27,7 @@ const getRequiredField = (
 
 const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
 
-app.post('*', async (req: any, res: any, next: any) => {
+app.post('/:splat*', async (req: any, res: any, next: any) => {
   try {
     const payload = (req.body || {}) as SimpleEmailPayload;
 

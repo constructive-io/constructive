@@ -1,6 +1,6 @@
 import app from '@constructive-io/knative-job-fn';
 
-app.post('*', async (req: any, res: any, next: any) => {
+app.post('/:splat*', async (req: any, res: any, next: any) => {
   if (req.body.throw) {
     next(new Error('THROWN_ERROR'));
   } else {
