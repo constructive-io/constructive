@@ -289,7 +289,7 @@ const preparePackage = async ({
         moduleName: name,
         moduleDesc: description,
         packageIdentifier: name,
-        access: 'public'
+        access: 'restricted'
       }
     });
   } else {
