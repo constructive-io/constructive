@@ -1329,7 +1329,7 @@ importers:
         version: 3.14.2
       pgsql-deparser:
         specifier: ^17.14.0
-        version: 17.15.0
+        version: 17.14.0
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1339,7 +1339,7 @@ importers:
         version: 0.1.9
       pgsql-parser:
         specifier: ^17.9.4
-        version: 17.9.5
+        version: 17.9.4
     publishDirectory: dist
 
   packages/orm:
@@ -1529,10 +1529,10 @@ importers:
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
         specifier: ^17.14.0
-        version: 17.15.0
+        version: 17.14.0
       pgsql-parser:
         specifier: ^17.9.4
-        version: 17.9.5
+        version: 17.9.4
       yanse:
         specifier: ^0.1.8
         version: 0.1.8
@@ -1656,7 +1656,7 @@ importers:
         version: 1.30.2
       pgsql-deparser:
         specifier: ^17.14.0
-        version: 17.15.0
+        version: 17.14.0
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -4554,6 +4554,10 @@ packages:
     engines: {node: '>= 8.16.0'}
     hasBin: true
 
+  csv-to-pg@3.1.4:
+    resolution: {integrity: sha512-a7D40gKoEh6jnElninVe0Z9x5Vji6QuwnccAyLEw3DcecVo8ALRQeUlnAhgE1Yyq8xvHXecsfQ6RtSYxbNo1og==}
+    hasBin: true
+
   dargs@7.0.0:
     resolution: {integrity: sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==}
     engines: {node: '>=8'}
@@ -6647,10 +6651,7 @@ packages:
     engines: {node: '>= 0.6'}
 
   neo-async@2.6.2:
-    resolution:
-      {
-        integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==,
-      }
+    resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
   nested-obj@0.1.5:
     resolution: {integrity: sha512-04Y7qDMlI8RbYTn0cJAKaw/mLrO9UmLj3xbrjTZKDfOn9f3b/RXEQFIIpveJlwn8KfPwdVFWLZUaL5gNuQ7G0w==}
@@ -7024,6 +7025,9 @@ packages:
   performance-now@2.1.0:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
 
+  pg-cache@1.6.10:
+    resolution: {integrity: sha512-HXlm7YOpO2iNNOwX9TJ9F24LEsY6XFR2IR0RLjoJ9tUUOLPAejiBeOV2MlJfkLsMrr/18hDszIA6UcteUVIevg==}
+
   pg-cloudflare@1.2.7:
     resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
 
@@ -7078,16 +7082,13 @@ packages:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
   pgsql-deparser@17.14.0:
-    resolution:
-      {
-        integrity: sha512-K67wEMht8anQeHyR3wjHQI5PbzWz3uyBtPdlqmEvPvVKYTT1Wrb4byXEb+w0mRbeCDpDZROQKThtRRn/VQ8I3A==,
-      }
+    resolution: {integrity: sha512-K67wEMht8anQeHyR3wjHQI5PbzWz3uyBtPdlqmEvPvVKYTT1Wrb4byXEb+w0mRbeCDpDZROQKThtRRn/VQ8I3A==}
 
   pgsql-parser@17.9.4:
-    resolution:
-      {
-        integrity: sha512-ovnKoo5O/uBVHmVtXJCJ9TwJapprSbWRl66pLhal5K14vMx0nz1DLxvMtvbM6raPR+Fa83nvTO7KLT2pbX2IBg==,
-      }
+    resolution: {integrity: sha512-ovnKoo5O/uBVHmVtXJCJ9TwJapprSbWRl66pLhal5K14vMx0nz1DLxvMtvbM6raPR+Fa83nvTO7KLT2pbX2IBg==}
+
+  pgsql-test@2.18.12:
+    resolution: {integrity: sha512-ruQ0DndL85xNme4ZTI5lZuSLn/KySrYTWO3vdiHEWPP96l4/SW1q6vT4q9Wc+qfgBuYSxQ6V18LtNoTYTlwauQ==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -8067,6 +8068,9 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  uuid-hash@2.3.4:
+    resolution: {integrity: sha512-4jNwt8VEu5lG8K2nP8ULFZoHoEGISFcFt/EB+weoC6YseTr1+JzEkjDuJI/omGzxtG5dS5csX82nZGM98Ta6zQ==}
 
   uuid@10.0.0:
     resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
@@ -10230,8 +10234,8 @@ snapshots:
       pg: 8.16.3
       pg-cache: 1.6.10
       pg-env: 1.2.4
-      pgsql-deparser: 17.15.0
-      pgsql-parser: 17.9.5
+      pgsql-deparser: 17.14.0
+      pgsql-parser: 17.9.4
       yanse: 0.1.8
     transitivePeerDependencies:
       - pg-native
@@ -12012,6 +12016,15 @@ snapshots:
       minimist: 1.2.8
       through2: 3.0.2
 
+  csv-to-pg@3.1.4:
+    dependencies:
+      '@pgsql/types': 17.6.2
+      '@pgsql/utils': 17.8.5
+      csv-parser: 2.3.5
+      inquirerer: 2.4.0
+      js-yaml: 3.14.2
+      pgsql-deparser: 17.14.0
+
   dargs@7.0.0: {}
 
   dashdash@1.14.1:
@@ -13294,7 +13307,7 @@ snapshots:
     transitivePeerDependencies:
       - bluebird
 
-  inquirer@8.2.7(@types/node@20.19.25):
+  inquirer@8.2.7(@types/node@20.19.27):
     dependencies:
       '@inquirer/external-editor': 1.0.3(@types/node@20.19.27)
       ansi-escapes: 4.3.2
@@ -15169,6 +15182,16 @@ snapshots:
 
   performance-now@2.1.0: {}
 
+  pg-cache@1.6.10:
+    dependencies:
+      '@pgpmjs/logger': 1.3.5
+      '@pgpmjs/types': 2.12.7
+      lru-cache: 11.2.4
+      pg: 8.16.3
+      pg-env: 1.2.4
+    transitivePeerDependencies:
+      - pg-native
+
   pg-cloudflare@1.2.7:
     optional: true
 
@@ -15242,7 +15265,7 @@ snapshots:
     dependencies:
       '@pgsql/types': 17.6.2
       libpg-query: 17.7.3
-      pgsql-deparser: 17.15.0
+      pgsql-deparser: 17.14.0
 
   pgsql-test@2.18.12:
     dependencies:
@@ -16304,6 +16327,8 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  uuid-hash@2.3.4: {}
 
   uuid@10.0.0: {}
 
