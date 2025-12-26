@@ -25,3 +25,12 @@ export const walkUp = (startDir: string, filename: string): string => {
 
   throw new Error(`File "${filename}" not found in any parent directories.`);
 };
+
+export const mergeArraysUnique = <T>(
+  target: T[],
+  source: T[],
+  _options?: unknown
+): T[] => {
+  const merged = [...target, ...source];
+  return [...new Set(merged)];
+};

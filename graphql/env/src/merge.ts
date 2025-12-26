@@ -1,6 +1,6 @@
 import deepmerge from 'deepmerge';
 import { ConstructiveOptions, constructiveGraphqlDefaults } from '@constructive-io/graphql-types';
-import { getEnvOptions as getPgpmEnvOptions, loadConfigSync } from '@pgpmjs/env';
+import { getEnvOptions as getPgpmEnvOptions, loadConfigSync, mergeArraysUnique } from '@pgpmjs/env';
 import { getGraphQLEnvVars } from './env';
 
 /**
@@ -41,7 +41,9 @@ export const getEnvOptions = (
     },
     graphqlEnvOptions,
     overrides
-  ]) as ConstructiveOptions;
+  ], {
+    arrayMerge: mergeArraysUnique
+  }) as ConstructiveOptions;
 };
 
 /**
