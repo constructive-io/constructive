@@ -3,9 +3,9 @@ import { ModuleMap } from '../modules/modules';
 /**
  * Get the list of available extensions, including predefined core extensions.
  */
-export const getAvailableExtensions = (
+export const getAvailableExtensions = async (
   modules: ModuleMap
-): string[] => {
+): Promise<string[]> => {
 
   const coreExtensions = [
     // Security & identity

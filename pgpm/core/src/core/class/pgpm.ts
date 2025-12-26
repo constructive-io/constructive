@@ -324,9 +324,9 @@ export class PgpmPackage {
     return this._moduleMap;
   }
 
-  getAvailableModules(): string[] {
+  async getAvailableModules(): Promise<string[]> {
     const modules = this.getModuleMap();
-    return getAvailableExtensions(modules);
+    return await getAvailableExtensions(modules);
   }
 
   getModuleProject(name: string): PgpmPackage {
