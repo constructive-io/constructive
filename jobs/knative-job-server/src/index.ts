@@ -103,7 +103,7 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     res.status(200).json({ workerId, jobId: jobIdHeader });
   });
 
-  app.post('/:splat*', async (req: JobRequest, res: JobResponse, next: NextFn) => {
+  app.post('/callback', async (req: JobRequest, res: JobResponse, next: NextFn) => {
     const jobId = req.get('X-Job-Id');
 
     if (typeof jobId === 'undefined') {

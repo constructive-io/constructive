@@ -291,7 +291,7 @@ export const sendEmailLink = async (
 };
 
 // HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
-app.post('/:splat*', async (req: any, res: any, next: any) => {
+app.post('/', async (req: any, res: any, next: any) => {
   try {
     const params = (req.body || {}) as SendEmailParams;
 
