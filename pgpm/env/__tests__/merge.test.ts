@@ -3,54 +3,13 @@ import { pgpmDefaults, PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
-const PGPM_ENV_KEYS = [
-  'PGROOTDATABASE',
-  'PGTEMPLATE',
-  'DB_PREFIX',
-  'DB_EXTENSIONS',
-  'DB_CWD',
-  'DB_CONNECTION_USER',
-  'DB_CONNECTION_PASSWORD',
-  'DB_CONNECTION_ROLE',
-  'DB_CONNECTIONS_APP_USER',
-  'DB_CONNECTIONS_APP_PASSWORD',
-  'DB_CONNECTIONS_ADMIN_USER',
-  'DB_CONNECTIONS_ADMIN_PASSWORD',
-  'PORT',
-  'SERVER_HOST',
-  'SERVER_TRUST_PROXY',
-  'SERVER_ORIGIN',
-  'SERVER_STRICT_AUTH',
-  'PGHOST',
-  'PGPORT',
-  'PGUSER',
-  'PGPASSWORD',
-  'PGDATABASE',
-  'BUCKET_NAME',
-  'AWS_REGION',
-  'AWS_ACCESS_KEY',
-  'AWS_ACCESS_KEY_ID',
-  'AWS_SECRET_KEY',
-  'AWS_SECRET_ACCESS_KEY',
-  'MINIO_ENDPOINT',
-  'DEPLOYMENT_USE_TX',
-  'DEPLOYMENT_FAST',
-  'DEPLOYMENT_USE_PLAN',
-  'DEPLOYMENT_CACHE',
-  'DEPLOYMENT_TO_CHANGE',
-  'MIGRATIONS_CODEGEN_USE_TX',
-  'JOBS_SCHEMA',
-  'JOBS_SUPPORT_ANY',
-  'JOBS_SUPPORTED',
-  'INTERNAL_GATEWAY_URL',
-  'INTERNAL_JOBS_CALLBACK_URL',
-  'INTERNAL_JOBS_CALLBACK_PORT'
-];
+import { applyEnvFixture, loadEnvFixture, restoreEnv } from './test-utils';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
+
+const fixturesDir = path.join(__dirname, '..', '__fixtures__');
 
 describe('getConnEnvOptions', () => {
   describe('roles resolution', () => {
@@ -160,21 +119,10 @@ describe('getEnvOptions', () => {
 
   beforeEach(() => {
     envSnapshot = {};
-    for (const key of PGPM_ENV_KEYS) {
-      envSnapshot[key] = process.env[key];
-      delete process.env[key];
-    }
   });
 
   afterEach(() => {
-    for (const key of PGPM_ENV_KEYS) {
-      const value = envSnapshot[key];
-      if (value === undefined) {
-        delete process.env[key];
-      } else {
-        process.env[key] = value;
-      }
-    }
+    restoreEnv(envSnapshot);
     if (tempDir) {
       fs.rmSync(tempDir, { recursive: true, force: true });
       tempDir = '';
@@ -204,19 +152,8 @@ describe('getEnvOptions', () => {
       }
     });
 
-    Object.assign(process.env, {
-      PGHOST: 'env-host',
-      PGPORT: '6543',
-      PGUSER: 'env-user',
-      PGPASSWORD: 'env-pass',
-      DB_PREFIX: 'env-',
-      DB_CONNECTIONS_APP_PASSWORD: 'env-app-pass',
-      DB_CONNECTIONS_ADMIN_USER: 'env-admin-user',
-      PORT: '7777',
-      DEPLOYMENT_FAST: 'false',
-      JOBS_SUPPORT_ANY: 'false',
-      JOBS_SUPPORTED: 'alpha,beta'
-    });
+    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.base.json');
+    envSnapshot = { ...envSnapshot, ...applyEnvFixture(fixtureEnv) };
 
     const result = getEnvOptions(
       {
@@ -257,10 +194,8 @@ describe('getEnvOptions', () => {
       packages: ['testing/*', 'packages/*']
     });
 
-    Object.assign(process.env, {
-      DB_EXTENSIONS: 'postgis,pgcrypto',
-      JOBS_SUPPORTED: 'beta,gamma,delta'
-    });
+    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.dedupe.json');
+    envSnapshot = { ...envSnapshot, ...applyEnvFixture(fixtureEnv) };
 
     const overrides: PgpmOptionsWithPackages = {
       db: {
