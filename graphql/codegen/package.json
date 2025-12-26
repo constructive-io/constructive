@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.17.29",
+  "version": "2.17.30",
   "description": "Generate queries and mutations for use with Graphile",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -32,14 +32,13 @@
     "@constructive-io/graphql-test": "workspace:^",
     "@types/babel__generator": "^7.27.0",
     "@types/pluralize": "0.0.33",
-    "@types/babel__generator": "^7.27.0",
     "makage": "^0.1.9"
   },
   "dependencies": {
-    "@constructive-io/graphql-test": "^2.11.8",
     "@babel/generator": "^7.26.3",
     "@babel/parser": "^7.28.5",
     "@babel/types": "^7.26.3",
+    "@constructive-io/graphql-test": "^2.11.8",
     "@graphql-codegen/core": "5.0.0",
     "@graphql-codegen/typescript": "5.0.5",
     "@graphql-codegen/typescript-graphql-request": "6.0.1",
