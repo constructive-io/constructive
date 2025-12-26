@@ -7,7 +7,7 @@ import { Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
-import { commands } from '../src/commands';
+import { commands } from '../../../pgpm/cli/src/commands';
 import {
   setupTests,
   TestEnvironment,

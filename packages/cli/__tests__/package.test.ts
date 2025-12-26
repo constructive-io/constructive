@@ -6,7 +6,7 @@ import { ParsedArgs } from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 
-import { commands } from '../src/commands';
+import { commands } from '../../../pgpm/cli/src/commands';
 import { setupTests, TestEnvironment } from '../test-utils';
 
 const fixture = (name: string) =>
