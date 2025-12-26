@@ -30,27 +30,27 @@ describe('CLI Forked Deployment with Tag Syntax', () => {
   });
 
   it('handles forked deployment scenario with tag syntax via CLI', async () => {
-    await exec(`cnc deploy --database $database --package my-third --yes`);
+    await exec(`pgpm deploy --database $database --package my-third --yes`);
     
     expect(await testDb.exists('schema', 'mythirdapp')).toBe(true);
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(true);
     
-    await exec(`cnc revert --database $database --package my-first --to @v1.0.0 --yes`);
+    await exec(`pgpm revert --database $database --package my-first --to @v1.0.0 --yes`);
     
     expect(await testDb.exists('schema', 'mythirdapp')).toBe(false);
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(false);
     
-    await exec(`cnc deploy --database $database --package my-third --yes`);
+    await exec(`pgpm deploy --database $database --package my-third --yes`);
     
     expect(await testDb.exists('schema', 'mythirdapp')).toBe(true);
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(true);
     
-    await exec(`cnc revert --database $database --package my-first --to @v1.0.0 --yes`);
+    await exec(`pgpm revert --database $database --package my-first --to @v1.0.0 --yes`);
     
     expect(await testDb.exists('schema', 'mythirdapp')).toBe(false);
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(false);
     
-    await exec(`cnc deploy --database $database --package my-third --yes`);
+    await exec(`pgpm deploy --database $database --package my-third --yes`);
     
     expect(await testDb.exists('schema', 'mythirdapp')).toBe(true);
     expect(await testDb.exists('table', 'mythirdapp.customers')).toBe(true);

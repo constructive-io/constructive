@@ -1,3 +1,3 @@
-export { extractFirst } from 'pgpm';
-export { cliExitWithError } from 'pgpm';
+export { extractFirst } from './argv';
+export { cliExitWithError } from './cli-error';
 export { usageText } from './display';
