@@ -90,6 +90,8 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
 
   // Regular init path: default to 'module' if no fromPath provided
   const fromPath = positionalFromPath || 'module';
+  // Track if user explicitly requested module (e.g., `pgpm init module`)
+  const wasExplicitModuleRequest = positionalFromPath === 'module';
 
   // Inspect the template to get its type
   const inspection = inspectTemplate({
@@ -123,7 +125,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     dir,
     noTty,
     cwd,
-  });
+  }, wasExplicitModuleRequest);
 }
 
 interface BoilerplateInitContext {
@@ -218,6 +220,7 @@ async function handleBoilerplateInit(
   }
 
   // Default to module init (for 'module' type or unknown types)
+  // When using --boilerplate, user made an explicit choice, so treat as explicit request
   return handleModuleInit(argv, prompter, {
     fromPath,
     templateRepo: ctx.templateRepo,
@@ -225,7 +228,7 @@ async function handleBoilerplateInit(
     dir: ctx.dir,
     noTty: ctx.noTty,
     cwd: ctx.cwd,
-  });
+  }, true);
 }
 
 interface InitContext {
@@ -299,11 +302,45 @@ async function handleWorkspaceInit(
 async function handleModuleInit(
   argv: Partial<Record<string, any>>,
   prompter: Inquirerer,
-  ctx: InitContext
+  ctx: InitContext,
+  wasExplicitModuleRequest: boolean = false
 ) {
   const project = new PgpmPackage(ctx.cwd);
 
   if (!project.workspacePath) {
+    const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
+
+    // If user explicitly requested module init or we're in non-interactive mode,
+    // just show the error with helpful guidance
+    if (wasExplicitModuleRequest || noTty) {
+      process.stderr.write('Not inside a PGPM workspace.\n');
+      throw errors.NOT_IN_WORKSPACE({});
+    }
+
+    // Offer to create a workspace instead
+    const recoveryQuestion: Question[] = [
+      {
+        name: 'createWorkspace',
+        message: 'You are not inside a PGPM workspace. Would you like to create a new workspace instead?',
+        type: 'confirm',
+        required: true,
+      },
+    ];
+
+    const { createWorkspace } = await prompter.prompt(argv, recoveryQuestion);
+
+    if (createWorkspace) {
+      return handleWorkspaceInit(argv, prompter, {
+        fromPath: 'workspace',
+        templateRepo: ctx.templateRepo,
+        branch: ctx.branch,
+        dir: ctx.dir,
+        noTty: ctx.noTty,
+        cwd: ctx.cwd,
+      });
+    }
+
+    // User declined, show the error
     process.stderr.write('Not inside a PGPM workspace.\n');
     throw errors.NOT_IN_WORKSPACE({});
   }
