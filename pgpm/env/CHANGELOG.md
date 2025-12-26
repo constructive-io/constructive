@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.8.9...@pgpmjs/env@2.8.10) (2025-12-26)
+
+**Note:** Version bump only for package @pgpmjs/env
+
 ## [2.8.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.8.8...@pgpmjs/env@2.8.9) (2025-12-26)
 
 **Note:** Version bump only for package @pgpmjs/env

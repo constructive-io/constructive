@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.2](https://github.com/constructive-io/constructive/compare/pgpm@2.1.1...pgpm@2.1.2) (2025-12-26)
+
+### Bug Fixes
+
+- pass prompter through export flow to avoid double Inquirerer instances ([90c93e7](https://github.com/constructive-io/constructive/commit/90c93e786e6c0d1bc34a522a1ab2a8924973bc20))
+- **pgpm/cli:** use database name instead of UUID for default extension name ([87f1f72](https://github.com/constructive-io/constructive/commit/87f1f7208566ff0548d44f89040a8c90f32a4b01))
+
 ## [2.1.1](https://github.com/constructive-io/constructive/compare/pgpm@2.1.0...pgpm@2.1.1) (2025-12-26)
 
 **Note:** Version bump only for package pgpm
