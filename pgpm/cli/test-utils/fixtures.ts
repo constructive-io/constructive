@@ -3,9 +3,11 @@ import { Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import os from 'os';
 import path from 'path';
+import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
 
 import { commands } from '../src/commands';
 import { setupTests, TestEnvironment } from './cli';
+import { withInitDefaults } from './init-argv';
 
 const { mkdtempSync, rmSync, cpSync } = fs;
 
@@ -21,7 +23,7 @@ export class TestFixture {
   private environment: TestEnvironment;
 
   constructor(...fixturePath: string[]) {
-    this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'constructive-io-graphql-test-'));
+    this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'pgpm-test-'));
 
     if (fixturePath.length > 0) {
       const originalFixtureDir = getFixturePath(...fixturePath);
@@ -52,6 +54,10 @@ export class TestFixture {
       writeResults,
       transformResults
     } = this.environment;
+
+    // Default to remote templates and deterministic identity answers for init
+    // flows so tests are stable and do not rely on local machine config.
+    argv = withInitDefaults(argv, DEFAULT_TEMPLATE_REPO);
 
     const prompter = new Inquirerer({
       input: mockInput,

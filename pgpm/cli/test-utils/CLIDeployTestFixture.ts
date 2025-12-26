@@ -4,7 +4,6 @@ import { ParsedArgs } from 'minimist';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
-import { commands as pgpmCommands } from '../../../pgpm/cli/src/commands';
 
 import { commands } from '../src/commands';
 import { TestFixture } from './fixtures';
@@ -161,12 +160,12 @@ export class CLIDeployTestFixture extends TestFixture {
     const results: any[] = [];
     let currentDir = this.tempFixtureDir;
     
-    const commands = commandString
+    const cmds = commandString
       .split(/\n|;/)
       .map(cmd => cmd.trim())
       .filter(cmd => cmd.length > 0);
     
-    for (const command of commands) {
+    for (const command of cmds) {
       let processedCommand = command;
       for (const [key, value] of Object.entries(variables)) {
         processedCommand = processedCommand.replace(new RegExp(`\\$${key}`, 'g'), value);
@@ -182,15 +181,6 @@ export class CLIDeployTestFixture extends TestFixture {
           currentDir = require('path').resolve(currentDir, targetDir);
         }
         results.push({ command: processedCommand, type: 'cd', result: { cwd: currentDir } });
-      } else if (tokens[0] === 'cnc' || tokens[0] === 'constructive') {
-        // Handle Constructive CLI commands
-        const argv = this.parseCliCommand(tokens.slice(1), currentDir);
-        if (executeCommands) {
-          const result = await this.runCliCommand(argv);
-          results.push({ command: processedCommand, type: 'cli', result });
-        } else {
-          results.push({ command: processedCommand, type: 'cli', result: { argv } });
-        }
       } else if (tokens[0] === 'pgpm') {
         // Handle PGPM CLI commands
         const argv = this.parseCliCommand(tokens.slice(1), currentDir);
@@ -201,7 +191,7 @@ export class CLIDeployTestFixture extends TestFixture {
           results.push({ command: processedCommand, type: 'cli', result: { argv } });
         }
       } else {
-        throw new Error(`Unsupported command: ${tokens[0]}`);
+        throw new Error(`Unsupported command: ${tokens[0]}. Only 'pgpm' and 'cd' commands are supported.`);
       }
     }
     
@@ -249,32 +239,6 @@ export class CLIDeployTestFixture extends TestFixture {
     return argv;
   }
 
-  private async runCliCommand(argv: ParsedArgs): Promise<any> {
-    const prompter = new Inquirerer({
-      input: process.stdin,
-      output: process.stdout,
-      noTty: true
-    });
-
-    const options: CLIOptions & { skipPgTeardown?: boolean } = {
-      noTty: true,
-      input: process.stdin,
-      output: process.stdout,
-      version: '1.0.0',
-      skipPgTeardown: true,
-      minimistOpts: {
-        alias: {
-          v: 'version',
-          h: 'help'
-        }
-      }
-    };
-
-    await commands(argv, prompter, options);
-
-    return { argv };
-  }
-
   private async runPgpmCommand(argv: ParsedArgs): Promise<any> {
     const prompter = new Inquirerer({
       input: process.stdin,
@@ -296,7 +260,7 @@ export class CLIDeployTestFixture extends TestFixture {
       }
     };
 
-    await pgpmCommands(argv, prompter, options);
+    await commands(argv, prompter, options);
 
     return { argv };
   }

@@ -27,6 +27,5 @@ export const withInitDefaults = (argv: ParsedArgs, defaultRepo: string = DEFAULT
     ...args,
     repo: args.repo ?? defaultRepo,
     fromBranch: args.fromBranch ?? 'main'
-    // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution from .boilerplates.json
   };
 };
