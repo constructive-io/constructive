@@ -1,0 +1,52 @@
+{
+  "input": {
+    "endpoint": "http://localhost:3000/graphql",
+    "headers": {
+      "Host": "api.localhost"
+    }
+  },
+  "output": {
+    "root": "./dist/codegen",
+    "typesFile": "types/generated.ts",
+    "operationsDir": "operations",
+    "sdkFile": "sdk.ts",
+    "reactQueryFile": "react-query.ts"
+  },
+  "documents": {
+    "format": "ts",
+    "convention": "dashed",
+    "allowQueries": [],
+    "excludeQueries": [],
+    "excludePatterns": []
+  },
+  "features": {
+    "emitTypes": true,
+    "emitOperations": true,
+    "emitSdk": true,
+    "emitReactQuery": true
+  },
+  "scalars": {
+    "LaunchqlInternalTypeHostname": "string",
+    "PgpmInternalTypeHostname": "string"
+  },
+  "typeNameOverrides": {
+    "LaunchqlInternalTypeHostname": "String",
+    "PgpmInternalTypeHostname": "String"
+  },
+  "selection": {
+    "defaultMutationModelFields": [],
+    "modelFields": {
+      "extension": [],
+      "databaseExtension": [],
+      "table": ["id", "name", "schemaId"],
+      "field": ["id", "name", "tableId"],
+      "schema": ["id", "name", "databaseId"],
+      "api": ["id", "name", "databaseId"],
+      "domain": ["id", "domain", "subdomain", "databaseId"],
+      "site": ["id", "title", "databaseId"]
+    },
+    "mutationInputMode": "patchCollapsed",
+    "connectionStyle": "edges",
+    "forceModelOutput": true
+  }
+}

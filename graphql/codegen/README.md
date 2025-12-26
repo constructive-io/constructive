@@ -83,3 +83,100 @@ Documents options:
 Endpoint introspection:
 - Set `input.endpoint` and optional `input.headers`
 - If your dev server routes by hostname, add `headers: { Host: 'meta8.localhost' }`
+
+## Selection Options
+
+Configure result field selections, mutation input style, and connection pagination shape.
+
+```ts
+selection: {
+  defaultMutationModelFields?: string[]
+  modelFields?: Record<string, string[]>
+  mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'
+  connectionStyle?: 'nodes' | 'edges'
+  forceModelOutput?: boolean
+}
+```
+
+- `defaultMutationModelFields`
+  - Sets default fields selected from the object payload returned by mutations when the mutation exposes an OBJECT output.
+  - Example: `['id']` will select only the `id` from the returned model unless overridden per model.
+
+- `modelFields`
+  - Per‑model overrides for returned object payload fields.
+  - Example: `{ domain: ['id','domain','subdomain'] }` selects those fields from the `domain` object output.
+
+- `mutationInputMode`
+  - Controls how mutation variables and `input` are generated.
+  - `expanded`: one variable per input property; `input` is a flat object of those variables.
+  - `model`: one variable per property; variables are nested under the singular model key inside `input`.
+  - `raw`: a single `$input: <CreateXInput>!` variable passed directly as `input: $input`.
+  - `patchCollapsed`: a single `$patch: <ModelPatch>!` plus required locator(s) (e.g., `$id`), passed as `input: { id: $id, patch: $patch }`.
+
+- `connectionStyle`
+  - Standardizes connection queries and nested many selections.
+  - `nodes`: emits `totalCount` and `nodes { ... }`.
+  - `edges`: emits `totalCount`, `pageInfo { ... }`, and `edges { cursor node { ... } }`.
+
+- `forceModelOutput`
+  - When `true`, ensures the object payload is selected even if `defaultMutationModelFields` is empty, defaulting to `['id']`.
+  - Useful to avoid generating mutations that only return `clientMutationId`.
+
+### Examples
+
+Create mutation with raw input:
+
+```graphql
+mutation createDomain($input: CreateDomainInput!) {
+  createDomain(input: $input) {
+    domain { id, domain, subdomain }
+  }
+}
+```
+
+Patch mutation with collapsed patch:
+
+```graphql
+mutation updateDomain($id: UUID!, $patch: DomainPatch!) {
+  updateDomain(input: { id: $id, patch: $patch }) {
+    domain { id }
+    clientMutationId
+  }
+}
+```
+
+Edges‑style connection query:
+
+```graphql
+query getDomainsPaginated($first: Int, $after: Cursor) {
+  domains(first: $first, after: $after) {
+    totalCount
+    pageInfo { hasNextPage hasPreviousPage endCursor startCursor }
+    edges { cursor node { id domain subdomain } }
+  }
+}
+```
+
+## Custom Scalars and Type Overrides
+
+- When your schema exposes custom scalars that are not available in the printed SDL or differ across environments, you can configure both TypeScript scalar typings and GraphQL type names used in generated operations.
+
+- Add these to your config object:
+
+```json
+{
+  "scalars": {
+    "LaunchqlInternalTypeHostname": "string",
+    "PgpmInternalTypeHostname": "string"
+  },
+  "typeNameOverrides": {
+    "LaunchqlInternalTypeHostname": "String",
+    "PgpmInternalTypeHostname": "String"
+  }
+}
+```
+
+- `scalars`: maps GraphQL scalar names to TypeScript types for `typescript`/`typescript-operations`/`typescript-graphql-request`/`typescript-react-query` plugins.
+- `typeNameOverrides`: rewrites scalar names in generated GraphQL AST so variable definitions and input fields use compatible built‑in GraphQL types.
+
+- These options are also available programmatically through `LaunchQLGenOptions`.

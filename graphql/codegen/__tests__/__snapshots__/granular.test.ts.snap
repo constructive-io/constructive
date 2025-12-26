@@ -68,10 +68,19 @@ exports[`generate 1`] = `
   "getActionsQueryAll": "query getActionsQueryAll {
   actions {
     totalCount
-    nodes {
-      id
-      name
-      approved
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      endCursor
+      startCursor
+    }
+    edges {
+      cursor
+      node {
+        id
+        name
+        approved
+      }
     }
   }
 }

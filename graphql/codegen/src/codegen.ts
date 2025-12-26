@@ -68,8 +68,8 @@ async function getIntrospectionFromEndpoint(endpoint: string, headers?: Record<s
   return res as any
 }
 
-function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, string> {
-  const gen = generateGql(gqlMap)
+function generateKeyedObjFromGqlMap(gqlMap: GqlMap, selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]> }, typeNameOverrides?: Record<string, string>, typeIndex?: any): Record<string, string> {
+  const gen = generateGql(gqlMap, selection as any, typeNameOverrides, typeIndex)
   return Object.entries(gen).reduce<Record<string, string>>((acc, [key, val]) => {
     if (val?.ast) acc[key] = print(val.ast)
     return acc
@@ -105,11 +105,12 @@ async function writeOperationsDocuments(docs: Record<string, string>, dir: strin
   await ensureDir(dir)
   const index: string[] = []
   for (const key of Object.keys(docs)) {
-    const filename = getFilename(key, convention) + (format === 'ts' ? '.ts' : '.gql')
+    const base = getFilename(key, convention)
+    const filename = base + (format === 'ts' ? '.ts' : '.gql')
     if (format === 'ts') {
       const code = `import gql from 'graphql-tag'\nexport const ${key} = gql\`\n${docs[key]}\n\``
       await writeFileUTF8(join(dir, filename), code)
-      index.push(`export * from './${filename}'`)
+      index.push(`export * from './${base}'`)
     } else {
       await writeFileUTF8(join(dir, filename), docs[key])
     }
@@ -122,7 +123,10 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
     input: { ...(defaultGraphQLCodegenOptions.input), ...(opts.input || {}) },
     output: { ...(defaultGraphQLCodegenOptions.output), ...(opts.output || {}) },
     documents: { ...(defaultGraphQLCodegenOptions.documents), ...(opts.documents || {}) },
-    features: { ...(defaultGraphQLCodegenOptions.features), ...(opts.features || {}) }
+    features: { ...(defaultGraphQLCodegenOptions.features), ...(opts.features || {}) },
+    selection: { ...(defaultGraphQLCodegenOptions.selection), ...(opts.selection || {}) },
+    scalars: { ...(defaultGraphQLCodegenOptions.scalars || {}), ...(opts.scalars || {}) },
+    typeNameOverrides: { ...(defaultGraphQLCodegenOptions.typeNameOverrides || {}), ...(opts.typeNameOverrides || {}) }
   }
 
   const root = join(cwd, options.output.root)
@@ -145,8 +149,9 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
     ? buildClientSchema(introspection as any)
     : buildSchema(await readFileUTF8(schemaPath))
 
+  const typeIndex = buildTypeIndex(introspection)
   if (options.features.emitOperations || options.features.emitSdk || options.features.emitReactQuery) {
-    docs = generateKeyedObjFromGqlMap(gqlMap)
+    docs = generateKeyedObjFromGqlMap(gqlMap, options.selection, options.typeNameOverrides, typeIndex)
   }
 
   if (options.features.emitOperations) {
@@ -158,7 +163,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: typesFile,
       schema: schema as any,
       documents: [],
-      config: {},
+      config: { scalars: options.scalars || {} },
       plugins: [{ typescript: {} }],
       pluginMap: { typescript: typescriptPlugin as any }
     })
@@ -177,7 +182,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: sdkFile,
       schema: schema as any,
       documents,
-      config: {},
+      config: { scalars: options.scalars || {} },
       plugins: [
         { typescript: {} },
         { 'typescript-operations': {} },
@@ -206,7 +211,9 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       fetcher: options.reactQuery?.fetcher || 'graphql-request',
       legacyMode: options.reactQuery?.legacyMode || false,
       exposeDocument: options.reactQuery?.exposeDocument || false,
-      addInfiniteQuery: options.reactQuery?.addInfiniteQuery || false
+      addInfiniteQuery: options.reactQuery?.addInfiniteQuery || false,
+      reactQueryVersion: options.reactQuery?.reactQueryVersion || 5,
+      scalars: options.scalars || {}
     } as any
     const rqContent = await runCoreCodegen({
       filename: reactQueryFile,
@@ -241,4 +248,22 @@ export async function runCodegenFromJSONConfig(configPath: string, cwd: string) 
   }
   const merged = mergeGraphQLCodegenOptions(defaultGraphQLCodegenOptions, overrides as any)
   return runCodegen(merged as GraphQLCodegenOptions, cwd)
+}
+
+function buildTypeIndex(introspection: any) {
+  const byName: Record<string, any> = {}
+  const types = (introspection && introspection.__schema && introspection.__schema.types) || []
+  for (const t of types) {
+    if (t && typeof t.name === 'string' && t.name.length > 0) byName[t.name] = t
+  }
+  return {
+    byName,
+    getInputFieldType(typeName: string, fieldName: string) {
+      const typ = byName[typeName]
+      if (!typ || typ.kind !== 'INPUT_OBJECT') return null
+      const fields = typ.inputFields || []
+      const f = fields.find((x: any) => x && x.name === fieldName)
+      return f ? f.type : null
+    }
+  }
 }
