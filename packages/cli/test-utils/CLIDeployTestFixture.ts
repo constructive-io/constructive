@@ -4,7 +4,7 @@ import { ParsedArgs } from 'minimist';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
-import { commands as pgpmCommands } from 'pgpm';
+import { commands as pgpmCommands } from '../../../pgpm/cli/src/commands';
 
 import { commands } from '../src/commands';
 import { TestFixture } from './fixtures';
