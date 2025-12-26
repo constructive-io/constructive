@@ -83,6 +83,10 @@ export default async (
     }
   ]));
 
+  const selectedDatabaseNames = database_ids
+    .filter(did => did.selected)
+    .map(did => did.name);
+
   const dbInfo = {
     dbname,
     database_ids: database_ids.map(did =>
@@ -102,7 +106,7 @@ export default async (
       type: 'text',
       name: 'extensionName',
       message: 'Extension name',
-      default: dbInfo.database_ids[0],
+      default: selectedDatabaseNames[0] || dbname,
       required: true
     },
     {

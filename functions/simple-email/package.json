@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/simple-email-fn",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Simple Knative email function that sends emails directly from job payload",
   "author": "Constructive",
   "private": true,

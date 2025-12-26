@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.4](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.3...csv-to-pg@3.1.4) (2025-12-26)
+
+### Bug Fixes
+
+- **pgpm/core:** use workspace csv-to-pg to fix ast.ResTarget error ([b521725](https://github.com/constructive-io/constructive/commit/b521725cc5fb32cfaeb075525c75ac00b38d65a5))
+
+## [3.1.3](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.2...csv-to-pg@3.1.3) (2025-12-25)
+
+**Note:** Version bump only for package csv-to-pg
+
+## [3.1.2](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.1...csv-to-pg@3.1.2) (2025-12-25)
+
+**Note:** Version bump only for package csv-to-pg
+
 ## [3.1.1](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.0...csv-to-pg@3.1.1) (2025-12-25)
 
 **Note:** Version bump only for package csv-to-pg

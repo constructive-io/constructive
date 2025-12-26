@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.19...@constructive-io/cli@5.1.20) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.19](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.18...@constructive-io/cli@5.1.19) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.18](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.17...@constructive-io/cli@5.1.18) (2025-12-25)
+
+### Bug Fixes
+
+- **test:** update init.templates.test.ts to use fromPath instead of type ([3ec34dd](https://github.com/constructive-io/constructive/commit/3ec34dd20462db8213fdf71e0e5db5f08c60ae53))
+
+## [5.1.17](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.16...@constructive-io/cli@5.1.17) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.1.16](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.15...@constructive-io/cli@5.1.16) (2025-12-25)
 
 **Note:** Version bump only for package @constructive-io/cli
