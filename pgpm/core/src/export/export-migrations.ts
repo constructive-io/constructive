@@ -1,7 +1,6 @@
 import { PgpmOptions } from '@pgpmjs/types';
 import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
-import type { Inquirerer } from 'inquirerer';
 import { toSnakeCase } from 'komoji';
 import path from 'path';
 import { getPgPool } from 'pg-cache';
@@ -20,7 +19,6 @@ interface ExportMigrationsToDiskOptions {
   schema_names: string[];
   extensionName?: string;
   metaExtensionName: string;
-  prompter?: Inquirerer;
 }
 
 interface ExportOptions {
@@ -35,7 +33,6 @@ interface ExportOptions {
   schema_names: string[];
   extensionName?: string;
   metaExtensionName: string;
-  prompter?: Inquirerer;
 }
 
 const exportMigrationsToDisk = async ({
@@ -47,8 +44,7 @@ const exportMigrationsToDisk = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName,
-  prompter
+  metaExtensionName
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -121,8 +117,7 @@ const exportMigrationsToDisk = async ({
         'pgpm-base32',
         'pgpm-totp',
         'pgpm-types'
-      ],
-      prompter
+      ]
     });
 
     writeSqitchPlan(results.rows, opts);
@@ -141,8 +136,7 @@ const exportMigrationsToDisk = async ({
       author,
       outdir,
       extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules'],
-      name: metaExtensionName,
-      prompter
+      name: metaExtensionName
     });
 
     const metaReplacer = makeReplacer({
@@ -203,8 +197,7 @@ export const exportMigrations = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName,
-  prompter
+  metaExtensionName
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -217,8 +210,7 @@ export const exportMigrations = async ({
       databaseId,
       schema_names,
       author,
-      outdir,
-      prompter
+      outdir
     });
   }
 };
@@ -230,7 +222,6 @@ interface PreparePackageOptions {
   outdir: string;
   name: string;
   extensions: string[];
-  prompter?: Inquirerer;
 }
 
 interface Schema {
@@ -256,8 +247,7 @@ const preparePackage = async ({
   author,
   outdir,
   name,
-  extensions,
-  prompter
+  extensions
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
   const sqitchDir = path.resolve(path.join(outdir, name));
@@ -271,7 +261,6 @@ const preparePackage = async ({
       description: name,
       author,
       extensions,
-      prompter,
     });
   } else {
     rmSync(path.resolve(sqitchDir, 'deploy'), { recursive: true, force: true });

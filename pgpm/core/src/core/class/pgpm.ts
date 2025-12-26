@@ -112,8 +112,6 @@ export interface InitModuleOptions {
   noTty?: boolean;
   toolName?: string;
   answers?: Record<string, any>;
-  /** Optional Inquirerer instance to reuse for prompting. Avoids creating multiple instances on stdin. */
-  prompter?: import('inquirerer').Inquirerer;
 }
 
 export class PgpmPackage {
@@ -446,8 +444,7 @@ export class PgpmPackage {
       noTty: options.noTty ?? false,
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
       toolName: options.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
-      cwd: this.cwd,
-      prompter: options.prompter
+      cwd: this.cwd
     });
 
     this.initModuleSqitch(options.name, targetPath);
