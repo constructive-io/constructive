@@ -1,6 +1,6 @@
 import { PgpmMigrate } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Genomic, Question } from 'genomic';
+import { CLIOptions, Prompter, Question } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -10,7 +10,7 @@ const log = new Logger('migrate-init');
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Genomic,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   const pgEnv = getPgEnvOptions();

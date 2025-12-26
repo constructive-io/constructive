@@ -4,7 +4,7 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 import { PgpmPackage } from '@pgpmjs/core';
 import { existsSync } from 'fs';
 import { sync as glob } from 'glob';
-import { Genomic } from 'genomic';
+import { Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
@@ -37,7 +37,7 @@ describe('cmds:init', () => {
   const runInitTest = async (argv: ParsedArgs, label: string) => {
     const { mockInput, mockOutput, writeResults, transformResults } = environment;
 
-    const prompter = new Genomic({
+    const prompter = new Prompter({
       input: mockInput,
       output: mockOutput,
       noTty: true
@@ -112,7 +112,7 @@ describe('cmds:init', () => {
   describe('with custom templates', () => {
     it('initializes workspace with --template-path', async () => {
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true
@@ -144,7 +144,7 @@ describe('cmds:init', () => {
       // First create a workspace
       const workspaceDir = path.join(fixture.tempDir, 'test-workspace-for-module');
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true
@@ -193,7 +193,7 @@ describe('cmds:init', () => {
       'initializes workspace with --repo',
       async () => {
         const { mockInput, mockOutput } = environment;
-        const prompter = new Genomic({
+        const prompter = new Prompter({
           input: mockInput,
           output: mockOutput,
           noTty: true
@@ -225,7 +225,7 @@ describe('cmds:init', () => {
       'initializes workspace with --repo and --from-branch',
       async () => {
         const { mockInput, mockOutput } = environment;
-        const prompter = new Genomic({
+        const prompter = new Prompter({
           input: mockInput,
           output: mockOutput,
           noTty: true
@@ -258,7 +258,7 @@ describe('cmds:init', () => {
   describe('init from packages/ folder', () => {
     it('initializes module from packages/ folder (empty workspace)', async () => {
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true
@@ -305,7 +305,7 @@ describe('cmds:init', () => {
 
     it('initializes module from packages/ folder (with existing modules)', async () => {
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true
@@ -369,7 +369,7 @@ describe('cmds:init', () => {
   describe('prevent nested module creation', () => {
     it('prevents nested module creation inside existing module', async () => {
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true
@@ -444,7 +444,7 @@ describe('cmds:init', () => {
   describe('workspace root behavior', () => {
     it('initializes module from workspace root (existing behavior)', async () => {
       const { mockInput, mockOutput } = environment;
-      const prompter = new Genomic({
+      const prompter = new Prompter({
         input: mockInput,
         output: mockOutput,
         noTty: true

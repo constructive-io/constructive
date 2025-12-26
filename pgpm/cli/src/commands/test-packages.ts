@@ -2,7 +2,7 @@ import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import path from 'path';
-import { CLIOptions, Genomic } from 'genomic';
+import { CLIOptions, Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { getPgEnvOptions } from 'pg-env';
 import { getPgPool } from 'pg-cache';
@@ -225,7 +225,7 @@ async function testModule(
 
 export default async (
   argv: Partial<ParsedArgs>,
-  _prompter: Genomic,
+  _prompter: Prompter,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

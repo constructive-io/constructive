@@ -1,5 +1,5 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { CLIOptions, Genomic } from 'genomic';
+import { CLIOptions, Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 
 import codegen from './commands/codegen';
@@ -18,7 +18,7 @@ const createCommandMap = (): Record<string, Function> => {
   };
 };
 
-export const commands = async (argv: Partial<ParsedArgs>, prompter: Genomic, options: CLIOptions & { skipPgTeardown?: boolean }) => {
+export const commands = async (argv: Partial<ParsedArgs>, prompter: Prompter, options: CLIOptions & { skipPgTeardown?: boolean }) => {
   let { first: command, newArgv } = extractFirst(argv);
 
   // Run update check early so it shows on help/version paths too

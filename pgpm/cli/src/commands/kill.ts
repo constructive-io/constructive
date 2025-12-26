@@ -1,5 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Genomic, OptionValue } from 'genomic';
+import { CLIOptions, Prompter, OptionValue } from 'genomic';
 import { getPgPool } from 'pg-cache';
 
 const log = new Logger('db-kill');
@@ -27,7 +27,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Genomic,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

@@ -1,4 +1,4 @@
-import { Genomic } from 'genomic';
+import { Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
@@ -53,7 +53,7 @@ export async function getAvailableDatabases(options: DatabaseSelectionOptions = 
  */
 export async function selectDatabase(
   argv: Partial<ParsedArgs>,
-  prompter: Genomic,
+  prompter: Prompter,
   options: DatabaseSelectionOptions = {}
 ): Promise<string> {
   const {
@@ -97,7 +97,7 @@ export async function selectDatabase(
  */
 export async function getTargetDatabase(
   argv: Partial<ParsedArgs>,
-  prompter: Genomic,
+  prompter: Prompter,
   options: DatabaseSelectionOptions = {}
 ): Promise<string> {
   // If database is specified in args, use it

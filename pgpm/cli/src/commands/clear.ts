@@ -3,7 +3,7 @@ import { parsePlanFile } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
-import { CLIOptions, Genomic, Question } from 'genomic';
+import { CLIOptions, Prompter, Question } from 'genomic';
 import path from 'path';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -13,7 +13,7 @@ const log = new Logger('clear');
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Genomic,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   

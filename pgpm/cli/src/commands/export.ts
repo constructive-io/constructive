@@ -1,7 +1,7 @@
 import { exportMigrations,PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
-import { CLIOptions, Genomic, OptionValue } from 'genomic';
+import { CLIOptions, Prompter, OptionValue } from 'genomic';
 import { resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 
@@ -25,7 +25,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Genomic,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

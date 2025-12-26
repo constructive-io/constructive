@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Genomic } from 'genomic';
+import { Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import os from 'os';
 import path from 'path';
@@ -53,7 +53,7 @@ export class TestFixture {
       transformResults
     } = this.environment;
 
-    const prompter = new Genomic({
+    const prompter = new Prompter({
       input: mockInput,
       output: mockOutput,
       noTty: true

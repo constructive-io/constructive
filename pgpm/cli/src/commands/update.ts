@@ -1,6 +1,6 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Genomic } from 'genomic';
+import { CLIOptions, Prompter } from 'genomic';
 import { spawn } from 'child_process';
 import { fetchLatestVersion } from '../utils/npm-version';
 import { cliExitWithError } from '../utils/cli-error';
@@ -43,7 +43,7 @@ const runNpmInstall = (pkgName: string, registry?: string): Promise<void> => {
 
 export default async (
   argv: Partial<Record<string, any>>,
-  _prompter: Genomic,
+  _prompter: Prompter,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

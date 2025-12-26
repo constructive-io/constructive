@@ -1,5 +1,5 @@
 import { PgpmPackage, writePackage } from '@pgpmjs/core';
-import { CLIOptions, Genomic, Question } from 'genomic';
+import { CLIOptions, Prompter, Question } from 'genomic';
 
 const packageUsageText = `
 Package Command:
@@ -22,7 +22,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Genomic,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

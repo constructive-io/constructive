@@ -1,4 +1,4 @@
-import { CLIOptions, Genomic } from 'genomic';
+import { CLIOptions, Prompter } from 'genomic';
 import { CacheManager } from '@genomic/scaffolds';
 import { cliExitWithError } from '../utils/cli-error';
 
@@ -14,7 +14,7 @@ Options:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  _prompter: Genomic,
+  _prompter: Prompter,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

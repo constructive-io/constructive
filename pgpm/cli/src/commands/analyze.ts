@@ -1,9 +1,9 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { Genomic } from 'genomic';
+import { Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import path from 'path';
 
-export default async (argv: Partial<ParsedArgs>, _prompter: Genomic) => {
+export default async (argv: Partial<ParsedArgs>, _prompter: Prompter) => {
   const cwd = (argv.cwd as string) || process.cwd();
   const proj = new PgpmPackage(path.resolve(cwd));
   const result = proj.analyzeModule();

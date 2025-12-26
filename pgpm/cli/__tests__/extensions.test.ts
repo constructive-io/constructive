@@ -3,7 +3,7 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 
 import { PgpmPackage } from '@pgpmjs/core';
 import { sync as glob } from 'glob';
-import { Genomic } from 'genomic';
+import { Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
@@ -31,7 +31,7 @@ describe('cmds:extension', () => {
   });
 
   const runCommand = async (argv: ParsedArgs) => {
-    const prompter = new Genomic({
+    const prompter = new Prompter({
       input: environment.mockInput,
       output: environment.mockOutput,
       noTty: true

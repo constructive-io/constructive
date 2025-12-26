@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { CLIOptions, Genomic } from 'genomic';
+import { CLIOptions, Prompter } from 'genomic';
 
 import { cliExitWithError,extractFirst } from '../utils';
 
@@ -196,7 +196,7 @@ async function stopContainer(name: string): Promise<void> {
 
 export default async (
   argv: Partial<Record<string, any>>,
-  _prompter: Genomic,
+  _prompter: Prompter,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {
