@@ -135,21 +135,6 @@ export default async (
   ]);
 
   const outdir = resolve(project.workspacePath, 'packages/');
-
-  // Parse author string to extract fullName and email for scaffolding
-  // Expected format: "Name <email@example.com>" or just "Name"
-  const authorMatch = author.match(/^(.+?)\s*<(.+?)>$/);
-  const fullName = authorMatch ? authorMatch[1].trim() : author;
-  const authorEmail = authorMatch ? authorMatch[2].trim() : email;
-
-  // Build scaffold answers to pass to initModule to avoid redundant prompts
-  const scaffoldAnswers = {
-    fullName,
-    email: authorEmail,
-    author,
-    access: 'public',
-    license: 'MIT'
-  };
   
   await exportMigrations({
     project,
@@ -159,8 +144,7 @@ export default async (
     schema_names,
     outdir,
     extensionName,
-    metaExtensionName,
-    scaffoldAnswers
+    metaExtensionName
   });
 
   console.log(`
