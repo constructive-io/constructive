@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.0.1...@pgpmjs/core@4.0.2) (2025-12-26)
+
+### Bug Fixes
+
+- **pgpm/core:** use workspace csv-to-pg to fix ast.ResTarget error ([b521725](https://github.com/constructive-io/constructive/commit/b521725cc5fb32cfaeb075525c75ac00b38d65a5))
+
 ## [4.0.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.0.0...@pgpmjs/core@4.0.1) (2025-12-26)
 
 ### Bug Fixes
