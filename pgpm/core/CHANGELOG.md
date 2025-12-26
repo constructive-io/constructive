@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.0.0...@pgpmjs/core@4.0.1) (2025-12-26)
+
+### Bug Fixes
+
+- **pgpm:** --dir bypasses .boilerplates.json resolution ([47aa24e](https://github.com/constructive-io/constructive/commit/47aa24e5dc5fdc33ca765659f6dd286c488149cc))
+- **pgpm:** address feedback on --boilerplate implementation ([0b3493d](https://github.com/constructive-io/constructive/commit/0b3493dd708111164fa82f9320328ec291108fe7))
+
 # [4.0.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@3.2.3...@pgpmjs/core@4.0.0) (2025-12-25)
 
 ### Bug Fixes
