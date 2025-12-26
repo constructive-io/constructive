@@ -1,10 +1,10 @@
-import { Inquirerer, Question } from 'inquirerer';
+import { Prompter, Question } from 'genomic';
 
 import { KEY_SEQUENCES, setupTests, TestEnvironment } from '../test-utils';
 
 const beforeEachSetup = setupTests();
 
-describe('Inquirerer', () => {
+describe('Prompter', () => {
   let environment: TestEnvironment;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('Inquirerer', () => {
   it('prompts user and correctly processes delayed input', async () => {
     const { mockInput, mockOutput, writeResults, transformResults, enqueueInputResponse } = environment;
 
-    const prompter = new Inquirerer({
+    const prompter = new Prompter({
       input: mockInput,
       output: mockOutput,
       noTty: false

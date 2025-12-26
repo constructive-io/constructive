@@ -1,5 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Prompter } from 'genomic';
 import { ParsedArgs } from 'minimist';
 
 const installUsageText = `
@@ -23,7 +23,7 @@ Examples:
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Prompter,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

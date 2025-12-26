@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { CLI, CLIOptions } from 'inquirerer';
+import { CLI, CLIOptions } from 'genomic';
 
 import { commands, createPgpmCommandMap } from './commands';
 export { createInitUsageText } from './commands/init';

@@ -1,4 +1,4 @@
-import { CLIOptions } from 'inquirerer';
+import { CLIOptions } from 'genomic';
 import readline from 'readline';
 import { Readable, Transform, Writable } from 'stream';
 import { cleanAnsi } from 'clean-ansi';
