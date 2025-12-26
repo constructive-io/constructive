@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/constructive-io/constructive/compare/pgpm@2.1.2...pgpm@2.2.0) (2025-12-26)
+
+### Features
+
+- **pgpm:** make getAvailableModules and getAvailableExtensions async ([b6c8dbc](https://github.com/constructive-io/constructive/commit/b6c8dbcaeee751d6f120996cdc32dd9332f13298))
+- **pgpm:** update core extensions and add architecture comment ([e19ee03](https://github.com/constructive-io/constructive/commit/e19ee03f1d99ed867eff95f27abcaa4bc8bb9570))
+
 ## [2.1.2](https://github.com/constructive-io/constructive/compare/pgpm@2.1.1...pgpm@2.1.2) (2025-12-26)
 
 ### Bug Fixes
