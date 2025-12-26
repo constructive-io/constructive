@@ -315,6 +315,10 @@ async function handleModuleInit(
 
   const availExtensions = project.getAvailableModules();
 
+  // Note: moduleName is needed here before scaffolding because initModule creates
+  // the directory first, then scaffolds. The boilerplate's ____moduleName____ question
+  // gets skipped because the answer is already passed through. So users only see it
+  // once, but the definition exists in two places for this architectural reason.
   const moduleQuestions: Question[] = [
     {
       name: 'moduleName',
@@ -329,7 +333,7 @@ async function handleModuleInit(
       type: 'checkbox',
       allowCustomOptions: true,
       required: true,
-      default: ['plpgsql'],
+      default: ['plpgsql', 'uuid-ossp'],
     },
   ];
 
