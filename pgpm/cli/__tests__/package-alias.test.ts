@@ -32,7 +32,7 @@ describe('CLI Package Alias Resolution', () => {
 
   it('should deploy using npm package name alias instead of control file name', async () => {
     // Deploy using the scoped npm name (@test-scope/my-first) instead of control file name (my-first)
-    const commands = `cnc deploy --database ${testDb.name} --package @test-scope/my-first --yes`;
+    const commands = `pgpm deploy --database ${testDb.name} --package @test-scope/my-first --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name
@@ -48,7 +48,7 @@ describe('CLI Package Alias Resolution', () => {
 
   it('should still work with control file name directly (backward compatibility)', async () => {
     // Deploy using the control file name directly
-    const commands = `cnc deploy --database ${testDb.name} --package my-first --yes`;
+    const commands = `pgpm deploy --database ${testDb.name} --package my-first --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name
@@ -63,7 +63,7 @@ describe('CLI Package Alias Resolution', () => {
 
   it('should deploy to specific change using npm package name alias', async () => {
     // Deploy to a specific change using the aliased npm name
-    const commands = `cnc deploy --database ${testDb.name} --package @test-scope/my-first --to schema_myfirstapp --yes`;
+    const commands = `pgpm deploy --database ${testDb.name} --package @test-scope/my-first --to schema_myfirstapp --yes`;
     
     await fixture.runTerminalCommands(commands, {
       database: testDb.name
@@ -80,7 +80,7 @@ describe('CLI Package Alias Resolution', () => {
 
   it('should revert using npm package name alias', async () => {
     // First deploy
-    const deployCommands = `cnc deploy --database ${testDb.name} --package @test-scope/my-first --yes`;
+    const deployCommands = `pgpm deploy --database ${testDb.name} --package @test-scope/my-first --yes`;
     await fixture.runTerminalCommands(deployCommands, {
       database: testDb.name
     }, true);
@@ -88,7 +88,7 @@ describe('CLI Package Alias Resolution', () => {
     expect(await testDb.exists('schema', 'myfirstapp')).toBe(true);
     
     // Then revert using the aliased npm name
-    const revertCommands = `cnc revert --database ${testDb.name} --package @test-scope/my-first --yes`;
+    const revertCommands = `pgpm revert --database ${testDb.name} --package @test-scope/my-first --yes`;
     await fixture.runTerminalCommands(revertCommands, {
       database: testDb.name
     }, true);

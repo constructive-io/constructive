@@ -1,13 +1,11 @@
-# 🚀 Quickstart: Constructive CLI Basics
+# Quickstart: Constructive + PGPM
 
-Constructive is different from PGPM in that it ships with a GraphQL server and explorer. All PGPM commands are available under `constructive`, but `pgpm` does not include `server` or `explorer`.
+Constructive provides GraphQL server and code generation tools, while PGPM handles database migrations and packages. Install both for the complete workflow.
 
-### 1. Install the CLI
-
-Make sure you have the Constructive CLI available:
+### 1. Install the CLIs
 
 ```bash
-npm install -g @constructive-io/cli
+npm install -g @constructive-io/cli pgpm
 ```
 
 ### 2. Initialize a workspace
@@ -15,7 +13,7 @@ npm install -g @constructive-io/cli
 Generate a workspace along with its default services configuration:
 
 ```bash
-cnc init workspace # then enter workspace name
+pgpm init workspace # then enter workspace name
 cd myworkspace
 ```
 
@@ -32,14 +30,14 @@ If you already have Postgres installed locally, just ensure it is running and ac
 ### 4. Create a module & add changes
 
 ```bash
-cnc init
+pgpm init
 cd packages/mymodule
 
 # Add schema
-cnc add --change schemas/myschema
+pgpm add --change schemas/myschema
 
 # Add table (depends on schema)
-cnc add --change schemas/myschema/tables/mytable --requires schemas/myschema
+pgpm add --change schemas/myschema/tables/mytable --requires schemas/myschema
 ```
 
 ### 5. Example generated SQL
@@ -68,7 +66,7 @@ CREATE TABLE myschema.mytable (
 ### 6. Deploy to Postgres
 
 ```bash
-cnc deploy --database testdb --createdb --yes
+pgpm deploy --database testdb --createdb --yes
 ```
 
 **Sample output highlights:**
@@ -79,13 +77,13 @@ cnc deploy --database testdb --createdb --yes
 * Deploys schema + table successfully
 
 ```
-[deploy] SUCCESS: 🚀 Starting deployment to database testdb...
+[deploy] SUCCESS: Starting deployment to database testdb...
 [migrate] SUCCESS: Successfully deployed: schemas/myschema
 [migrate] SUCCESS: Successfully deployed: schemas/myschema/tables/mytable
-[deploy] SUCCESS: ✅ Deployment complete for mymodule.
+[deploy] SUCCESS: Deployment complete for mymodule.
 ```
 
-### 7. Explore
+### 7. Explore with GraphiQL
 
 ```bash
 cnc explorer
@@ -95,7 +93,7 @@ http://localhost:5555/graphiql (default)
 http://myschema.testdb.localhost:5555/graphiql (specific to a schema)
 
 
-### 8. Server
+### 8. Start GraphQL Server
 
 ```bash
 cnc server

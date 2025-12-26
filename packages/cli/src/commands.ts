@@ -1,19 +1,16 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-import { checkForUpdates, createInitUsageText, createPgpmCommandMap } from 'pgpm';
 
 import codegen from './commands/codegen';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
 import server from './commands/server';
 import { cliExitWithError, extractFirst, usageText } from './utils';
+import { checkForUpdates } from './utils/update-check';
 
-const createCommandMap = (skipPgTeardown: boolean = false): Record<string, Function> => {
-  const pgpmCommands = createPgpmCommandMap(skipPgTeardown);
-
+const createCommandMap = (): Record<string, Function> => {
   return {
-    ...pgpmCommands,
     server,
     explorer,
     'get-graphql-schema': getGraphqlSchema,
@@ -57,13 +54,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     process.exit(0);
   }
 
-  // Command-specific help for init
-  if (command === 'init' && (argv.help || argv.h)) {
-    console.log(createInitUsageText('constructive', 'Constructive'));
-    process.exit(0);
-  }
-
-  const commandMap = createCommandMap(options?.skipPgTeardown);
+  const commandMap = createCommandMap();
 
   // Prompt if no command provided
   if (!command) {
