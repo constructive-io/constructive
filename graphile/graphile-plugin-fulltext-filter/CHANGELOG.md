@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.24](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.1.23...graphile-plugin-fulltext-filter@2.1.24) (2025-12-25)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.1.23](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.1.22...graphile-plugin-fulltext-filter@2.1.23) (2025-12-25)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
 ## [2.1.22](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.1.21...graphile-plugin-fulltext-filter@2.1.22) (2025-12-25)
 
 **Note:** Version bump only for package graphile-plugin-fulltext-filter

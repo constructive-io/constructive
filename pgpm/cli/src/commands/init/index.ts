@@ -1,7 +1,23 @@
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import fs from 'fs';
+import path from 'path';
 
-import runModuleSetup from './module';
-import runWorkspaceSetup from './workspace';
+import {
+  DEFAULT_TEMPLATE_REPO,
+  DEFAULT_TEMPLATE_TOOL_NAME,
+  inspectTemplate,
+  PgpmPackage,
+  scaffoldTemplate,
+  sluggify,
+} from '@pgpmjs/core';
+import { errors } from '@pgpmjs/types';
+import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
+
+const DEFAULT_MOTD = `
+                 |              _   _
+     ===         |.===.        '\\-//\`
+    (o o)        {}o o{}        (o o)
+ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
+`;
 
 export const createInitUsageText = (binaryName: string, productLabel?: string): string => {
   const displayName = productLabel ?? binaryName;
@@ -9,22 +25,24 @@ export const createInitUsageText = (binaryName: string, productLabel?: string): 
   return `
 Init Command:
 
-  ${binaryName} init [OPTIONS] [workspace]
+  ${binaryName} init [OPTIONS] [<fromPath>]
 
-  Initialize ${displayName} workspace or module.
+  Initialize ${displayName} from a template. The template's type (workspace/module)
+  determines the behavior automatically.
 
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
   --repo <repo>           Template repo (default: https://github.com/constructive-io/pgpm-boilerplates.git)
-  --template-path <path>  Template sub-path (default: workspace/module) or local path override
   --from-branch <branch>  Branch/tag to use when cloning repo
+  --dir <variant>         Template variant directory (e.g., supabase, drizzle)
 
 Examples:
-  ${binaryName} init                                   Initialize new module in existing workspace
+  ${binaryName} init                                   Initialize new module (default)
   ${binaryName} init workspace                         Initialize new workspace
+  ${binaryName} init module                            Initialize new module explicitly
+  ${binaryName} init workspace --dir <variant>         Use variant templates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
-  ${binaryName} init --template-path ./custom-templates Use templates from local path
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
 `;
 };
@@ -40,19 +58,208 @@ export default async (
     process.exit(0);
   }
 
-  return handlePromptFlow(argv, prompter);
+  return handleInit(argv, prompter);
 };
 
-async function handlePromptFlow(argv: Partial<Record<string, any>>, prompter: Inquirerer) {
-  const firstArg = (argv._?.[0] as string) || undefined;
+async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirerer) {
+  const { cwd = process.cwd() } = argv;
+  const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
+  const branch = argv.fromBranch as string | undefined;
+  const dir = argv.dir as string | undefined;
+  const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
 
-  if (firstArg === 'workspace') {
-    const nextArgv = {
-      ...argv,
-      _: (argv._ ?? []).slice(1)
-    };
-    return runWorkspaceSetup(nextArgv, prompter);
+  // Get fromPath from first positional arg, default to 'module'
+  const fromPath = (argv._?.[0] as string) || 'module';
+
+  // Inspect the template to get its type
+  const inspection = inspectTemplate({
+    fromPath,
+    templateRepo,
+    branch,
+    dir,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    cwd,
+  });
+
+  const templateType = inspection.config?.type;
+
+  // Branch based on template type
+  if (templateType === 'workspace') {
+    return handleWorkspaceInit(argv, prompter, {
+      fromPath,
+      templateRepo,
+      branch,
+      dir,
+      noTty,
+      cwd,
+    });
   }
 
-  return runModuleSetup(argv, prompter);
+  // Default to module init (for 'module' type or unknown types)
+  return handleModuleInit(argv, prompter, {
+    fromPath,
+    templateRepo,
+    branch,
+    dir,
+    noTty,
+    cwd,
+  });
+}
+
+interface InitContext {
+  fromPath: string;
+  templateRepo: string;
+  branch?: string;
+  dir?: string;
+  noTty: boolean;
+  cwd: string;
+}
+
+async function handleWorkspaceInit(
+  argv: Partial<Record<string, any>>,
+  prompter: Inquirerer,
+  ctx: InitContext
+) {
+  const workspaceQuestions: Question[] = [
+    {
+      name: 'name',
+      message: 'Enter workspace name',
+      required: true,
+      type: 'text'
+    }
+  ];
+
+  const answers = await prompter.prompt(argv, workspaceQuestions);
+  const targetPath = path.join(ctx.cwd, sluggify(answers.name));
+
+  // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
+  const dirName = path.basename(targetPath);
+  registerDefaultResolver('workspace.dirname', () => dirName);
+
+  await scaffoldTemplate({
+    fromPath: ctx.fromPath,
+    outputDir: targetPath,
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    answers: {
+      ...argv,
+      ...answers,
+      workspaceName: answers.name
+    },
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    noTty: ctx.noTty,
+    cwd: ctx.cwd,
+    prompter
+  });
+
+  // Check for .motd file and print it, or use default ASCII art
+  const motdPath = path.join(targetPath, '.motd');
+  let motd = DEFAULT_MOTD;
+  if (fs.existsSync(motdPath)) {
+    try {
+      motd = fs.readFileSync(motdPath, 'utf8');
+      fs.unlinkSync(motdPath);
+    } catch {
+      // Ignore errors reading/deleting .motd
+    }
+  }
+  process.stdout.write(motd);
+  if (!motd.endsWith('\n')) {
+    process.stdout.write('\n');
+  }
+
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${dirName}\n`);
+
+  return { ...argv, ...answers, cwd: targetPath };
+}
+
+async function handleModuleInit(
+  argv: Partial<Record<string, any>>,
+  prompter: Inquirerer,
+  ctx: InitContext
+) {
+  const project = new PgpmPackage(ctx.cwd);
+
+  if (!project.workspacePath) {
+    process.stderr.write('Not inside a PGPM workspace.\n');
+    throw errors.NOT_IN_WORKSPACE({});
+  }
+
+  if (!project.isInsideAllowedDirs(ctx.cwd) && !project.isInWorkspace() && !project.isParentOfAllowedDirs(ctx.cwd)) {
+    process.stderr.write('You must be inside the workspace root or a parent directory of modules (like packages/).\n');
+    throw errors.NOT_IN_WORKSPACE_MODULE({});
+  }
+
+  const availExtensions = project.getAvailableModules();
+
+  const moduleQuestions: Question[] = [
+    {
+      name: 'moduleName',
+      message: 'Enter the module name',
+      required: true,
+      type: 'text',
+    },
+    {
+      name: 'extensions',
+      message: 'Which extensions?',
+      options: availExtensions,
+      type: 'checkbox',
+      allowCustomOptions: true,
+      required: true,
+    },
+  ];
+
+  const answers = await prompter.prompt(argv, moduleQuestions);
+  const modName = sluggify(answers.moduleName);
+
+  const extensions = answers.extensions
+    .filter((opt: OptionValue) => opt.selected)
+    .map((opt: OptionValue) => opt.name);
+
+  const templateAnswers = {
+    ...argv,
+    ...answers,
+    moduleName: modName,
+    packageIdentifier: (argv as any).packageIdentifier || modName
+  };
+
+  await project.initModule({
+    name: modName,
+    description: answers.description || modName,
+    author: answers.author || modName,
+    extensions,
+    templateRepo: ctx.templateRepo,
+    templatePath: ctx.fromPath,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    answers: templateAnswers,
+    noTty: ctx.noTty
+  });
+
+  const isRoot = path.resolve(project.getWorkspacePath()!) === path.resolve(ctx.cwd);
+  const modulePath = isRoot
+    ? path.join(ctx.cwd, 'packages', modName)
+    : path.join(ctx.cwd, modName);
+
+  const motdPath = path.join(modulePath, '.motd');
+  let motd = DEFAULT_MOTD;
+  if (fs.existsSync(motdPath)) {
+    try {
+      motd = fs.readFileSync(motdPath, 'utf8');
+      fs.unlinkSync(motdPath);
+    } catch {
+      // Ignore errors reading/deleting .motd
+    }
+  }
+  process.stdout.write(motd);
+  if (!motd.endsWith('\n')) {
+    process.stdout.write('\n');
+  }
+
+  const relPath = isRoot ? `packages/${modName}` : modName;
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
+
+  return { ...argv, ...answers };
 }

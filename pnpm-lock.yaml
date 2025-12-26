@@ -1239,8 +1239,8 @@ importers:
         specifier: ^0.8.2
         version: 0.8.2
       inquirerer:
-        specifier: ^2.3.1
-        version: 2.3.1
+        specifier: ^2.4.0
+        version: 2.4.0
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1321,8 +1321,8 @@ importers:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^2.3.1
-        version: 2.3.1
+        specifier: ^2.4.0
+        version: 2.4.0
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
@@ -1426,14 +1426,14 @@ importers:
         specifier: ^0.2.6
         version: 0.2.6
       create-gen-app:
-        specifier: ^0.6.3
-        version: 0.6.3
+        specifier: ^0.8.1
+        version: 0.8.1
       find-and-require-package-json:
         specifier: ^0.8.2
         version: 0.8.2
       inquirerer:
-        specifier: ^2.3.1
-        version: 2.3.1
+        specifier: ^2.4.0
+        version: 2.4.0
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1503,8 +1503,8 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       create-gen-app:
-        specifier: ^0.6.3
-        version: 0.6.3
+        specifier: ^0.8.1
+        version: 0.8.1
       csv-to-pg:
         specifier: ^2.0.10
         version: 2.0.10(@babel/core@7.28.5)
@@ -1545,6 +1545,9 @@ importers:
       copyfiles:
         specifier: ^2.4.1
         version: 2.4.1
+      inquirerer:
+        specifier: ^2.4.0
+        version: 2.4.0
       makage:
         specifier: ^0.1.9
         version: 0.1.9
@@ -6347,10 +6350,10 @@ packages:
       typescript:
         optional: true
 
-  create-gen-app@0.6.3:
+  create-gen-app@0.8.1:
     resolution:
       {
-        integrity: sha512-EMVW9LvMJeSmAS7tsqbH+yDGUZ/Xr4i6itk4rVhkDg+0QoB8cSRUCFxj79DFI/esyp89j7KHjjmVl5RkNAPzIg==,
+        integrity: sha512-jlThqSvLWlaqcSriraHjT3MlS5P98a51+b40WifgEhuyr1rBKS84QxRtqR5NoJ0h2bzCkn8hBedhzUt1wkIFFQ==,
       }
 
   create-require@1.1.1:
@@ -8413,10 +8416,10 @@ packages:
       }
     engines: { node: '>=12.0.0' }
 
-  inquirerer@2.3.1:
+  inquirerer@2.4.0:
     resolution:
       {
-        integrity: sha512-Fo4/PZXcvhJp5AuzxJmbvkxhgI3a8/QYQQh3CLwtIpQ8L4XwhaLC7equepdZUZDxahxDIq9QsduX0BlOHznncw==,
+        integrity: sha512-JV64rQPKD5U/sxWy43vvzvbHqOY4SdGwfxfyq4NfYUROC6C1kx+X9ghfGnbUv6dYa75VNyU6yfkai7bluGrm3A==,
       }
 
   invariant@2.2.4:
@@ -16664,10 +16667,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  create-gen-app@0.6.3:
+  create-gen-app@0.8.1:
     dependencies:
       appstash: 0.2.6
-      inquirerer: 2.3.1
+      inquirerer: 2.4.0
 
   create-require@1.1.1: {}
 
@@ -17945,7 +17948,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@2.3.1:
+  inquirerer@2.4.0:
     dependencies:
       deepmerge: 4.3.1
       find-and-require-package-json: 0.8.2

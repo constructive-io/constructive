@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/constructive-io/constructive/compare/pgpm@1.4.2...pgpm@2.0.0) (2025-12-25)
+
+### Bug Fixes
+
+- **pgpm:** update help text to use <variant> and move inquirerer to devDependencies ([b925480](https://github.com/constructive-io/constructive/commit/b92548012273ef831e649c5200bf86e1eb182131))
+
+### Features
+
+- **pgpm:** implement metadata-driven single entry point for init ([b57fe8f](https://github.com/constructive-io/constructive/commit/b57fe8f15970bcc0521625b84f0e4305391cbc65))
+
+### BREAKING CHANGES
+
+- **pgpm:** scaffoldTemplate() now uses fromPath instead of type parameter
+
+## [1.4.2](https://github.com/constructive-io/constructive/compare/pgpm@1.4.1...pgpm@1.4.2) (2025-12-25)
+
+**Note:** Version bump only for package pgpm
+
 ## [1.4.1](https://github.com/constructive-io/constructive/compare/pgpm@1.4.0...pgpm@1.4.1) (2025-12-25)
 
 **Note:** Version bump only for package pgpm
