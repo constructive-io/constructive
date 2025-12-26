@@ -4,6 +4,7 @@ import { ParsedArgs } from 'minimist';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
+import { commands as pgpmCommands } from 'pgpm';
 
 import { commands } from '../src/commands';
 import { TestFixture } from './fixtures';
@@ -190,6 +191,15 @@ export class CLIDeployTestFixture extends TestFixture {
         } else {
           results.push({ command: processedCommand, type: 'cli', result: { argv } });
         }
+      } else if (tokens[0] === 'pgpm') {
+        // Handle PGPM CLI commands
+        const argv = this.parseCliCommand(tokens.slice(1), currentDir);
+        if (executeCommands) {
+          const result = await this.runPgpmCommand(argv);
+          results.push({ command: processedCommand, type: 'cli', result });
+        } else {
+          results.push({ command: processedCommand, type: 'cli', result: { argv } });
+        }
       } else {
         throw new Error(`Unsupported command: ${tokens[0]}`);
       }
@@ -261,6 +271,32 @@ export class CLIDeployTestFixture extends TestFixture {
     };
 
     await commands(argv, prompter, options);
+
+    return { argv };
+  }
+
+  private async runPgpmCommand(argv: ParsedArgs): Promise<any> {
+    const prompter = new Inquirerer({
+      input: process.stdin,
+      output: process.stdout,
+      noTty: true
+    });
+
+    const options: CLIOptions & { skipPgTeardown?: boolean } = {
+      noTty: true,
+      input: process.stdin,
+      output: process.stdout,
+      version: '1.0.0',
+      skipPgTeardown: true,
+      minimistOpts: {
+        alias: {
+          v: 'version',
+          h: 'help'
+        }
+      }
+    };
+
+    await pgpmCommands(argv, prompter, options);
 
     return { argv };
   }
