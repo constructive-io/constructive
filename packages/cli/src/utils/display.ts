@@ -2,7 +2,7 @@ export const usageText = `
   Usage: cnc <command> [options]
          constructive <command> [options]
 
-  Constructive CLI - GraphQL Server and Development Tools
+  Constructive CLI - API Server and Development Tools
 
   GraphQL Server:
     server             Start a GraphQL server
@@ -30,5 +30,5 @@ export const usageText = `
 
   Database Operations:
     For database migrations, packages, and deployment, use pgpm:
-    https://github.com/constructive-io/constructive/tree/main/pgpm
+    https://pgpm.io
   `;

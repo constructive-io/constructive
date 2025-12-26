@@ -1,8 +1,8 @@
 # Constructive CLI
 
-> GraphQL Server and Development Tools for PostgreSQL
+> API Server and Development Tools for PostgreSQL
 
-Constructive CLI provides GraphQL server capabilities and code generation tools for PostgreSQL databases. For database migrations, packages, and deployment operations, use [pgpm](https://github.com/constructive-io/constructive/tree/main/pgpm).
+Constructive CLI provides GraphQL server capabilities and code generation tools for PostgreSQL databases. For database migrations, packages, and deployment operations, use [pgpm](https://pgpm.io).
 
 ## Installation
 
@@ -161,7 +161,7 @@ Common pgpm commands:
 - `pgpm verify` - Verify database state
 - `pgpm revert` - Revert database changes
 
-See the [pgpm documentation](https://github.com/constructive-io/constructive/tree/main/pgpm) for more details.
+See the [pgpm documentation](https://pgpm.io) for more details.
 
 ## Getting Help
 
