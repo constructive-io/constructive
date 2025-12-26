@@ -135,6 +135,8 @@ export default async (
   ]);
 
   const outdir = resolve(project.workspacePath, 'packages/');
+
+  prompter.close();
   
   await exportMigrations({
     project,
