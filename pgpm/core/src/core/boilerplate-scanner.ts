@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 
 import {
-  BoilerplateConfig,
   BoilerplatesRootConfig,
   ScannedBoilerplate
 } from './boilerplate-types';
+import { BoilerplateConfig } from './template-scaffold';
 
 /**
  * Read the root `.boilerplates.json` configuration from a template repository.

@@ -26,17 +26,6 @@ export interface BoilerplateQuestion {
 }
 
 /**
- * Configuration for a single boilerplate template.
- * Stored in `.boilerplate.json` within each template directory.
- */
-export interface BoilerplateConfig {
-  /** The type of boilerplate: workspace or module */
-  type: 'workspace' | 'module';
-  /** Questions to prompt the user during scaffolding */
-  questions?: BoilerplateQuestion[];
-}
-
-/**
  * Root configuration for a boilerplates repository.
  * Stored in `.boilerplates.json` at the repository root.
  */
@@ -54,7 +43,7 @@ export interface ScannedBoilerplate {
   /** The full path to the boilerplate directory */
   path: string;
   /** The type of boilerplate */
-  type: 'workspace' | 'module';
+  type: string;
   /** Questions from the boilerplate config */
-  questions?: BoilerplateQuestion[];
+  questions?: unknown[];
 }

@@ -1,7 +1,17 @@
 import os from 'os';
 import path from 'path';
-import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
+import { TemplateScaffolder, BoilerplateConfig as BaseBoilerplateConfig } from 'create-gen-app';
 import type { Inquirerer, Question } from 'inquirerer';
+
+/**
+ * Extended boilerplate configuration that includes pgpm-specific fields.
+ * This extends the base BoilerplateConfig from create-gen-app with additional
+ * properties that can be specified in .boilerplate.json files.
+ */
+export interface BoilerplateConfig extends BaseBoilerplateConfig {
+  /** Default extensions to pre-select when creating a module (only for type: module) */
+  defaultExtensions?: string[];
+}
 
 export interface InspectTemplateOptions {
   /**

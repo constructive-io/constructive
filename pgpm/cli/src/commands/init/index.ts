@@ -123,6 +123,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     dir,
     noTty,
     cwd,
+    defaultExtensions: inspection.config?.defaultExtensions,
   });
 }
 
@@ -225,6 +226,7 @@ async function handleBoilerplateInit(
     dir: ctx.dir,
     noTty: ctx.noTty,
     cwd: ctx.cwd,
+    defaultExtensions: inspection.config?.defaultExtensions,
   });
 }
 
@@ -235,6 +237,7 @@ interface InitContext {
   dir?: string;
   noTty: boolean;
   cwd: string;
+  defaultExtensions?: string[];
 }
 
 async function handleWorkspaceInit(
@@ -329,6 +332,7 @@ async function handleModuleInit(
       type: 'checkbox',
       allowCustomOptions: true,
       required: true,
+      default: ctx.defaultExtensions,
     },
   ];
 
