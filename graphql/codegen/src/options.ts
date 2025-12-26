@@ -32,7 +32,17 @@ export interface GraphQLCodegenOptions {
     legacyMode?: boolean
     exposeDocument?: boolean
     addInfiniteQuery?: boolean
+    reactQueryVersion?: number
   }
+  selection?: {
+    defaultMutationModelFields?: string[]
+    modelFields?: Record<string, string[]>
+    mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'
+    connectionStyle?: 'nodes' | 'edges'
+    forceModelOutput?: boolean
+  }
+  scalars?: Record<string, string>
+  typeNameOverrides?: Record<string, string>
 }
 
 export const defaultGraphQLCodegenOptions: GraphQLCodegenOptions = {
@@ -46,7 +56,10 @@ export const defaultGraphQLCodegenOptions: GraphQLCodegenOptions = {
   },
   documents: { format: 'gql', convention: 'dashed', allowQueries: [], excludeQueries: [], excludePatterns: [] },
   features: { emitTypes: true, emitOperations: true, emitSdk: true, emitReactQuery: true },
-  reactQuery: { fetcher: 'graphql-request', legacyMode: false, exposeDocument: false, addInfiniteQuery: false }
+  reactQuery: { fetcher: 'graphql-request', legacyMode: false, exposeDocument: false, addInfiniteQuery: false, reactQueryVersion: 5 },
+  selection: { defaultMutationModelFields: ['id'], modelFields: {}, mutationInputMode: 'patchCollapsed', connectionStyle: 'edges', forceModelOutput: true },
+  scalars: {},
+  typeNameOverrides: {}
 }
 
 export function mergeGraphQLCodegenOptions(base: GraphQLCodegenOptions, overrides: Partial<GraphQLCodegenOptions>): GraphQLCodegenOptions {
@@ -54,6 +67,9 @@ export function mergeGraphQLCodegenOptions(base: GraphQLCodegenOptions, override
     input: { ...(base.input || {}), ...(overrides.input || {}) },
     output: { ...(base.output || {}), ...(overrides.output || {}) },
     documents: { ...(base.documents || {}), ...(overrides.documents || {}) },
-    features: { ...(base.features || {}), ...(overrides.features || {}) }
+    features: { ...(base.features || {}), ...(overrides.features || {}) },
+    selection: { ...(base.selection || {}), ...(overrides.selection || {}) },
+    scalars: { ...(base.scalars || {}), ...(overrides.scalars || {}) },
+    typeNameOverrides: { ...(base.typeNameOverrides || {}), ...(overrides.typeNameOverrides || {}) }
   } as GraphQLCodegenOptions
 }
