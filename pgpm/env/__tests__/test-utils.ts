@@ -9,6 +9,22 @@ export const loadEnvFixture = (
   return JSON.parse(fs.readFileSync(filePath, 'utf8')) as Record<string, string>;
 };
 
+export const loadEnvKeys = (fixtureDir: string, name: string): string[] => {
+  const filePath = path.join(fixtureDir, name);
+  return JSON.parse(fs.readFileSync(filePath, 'utf8')) as string[];
+};
+
+export const snapshotAndClearEnv = (
+  keys: string[]
+): Record<string, string | undefined> => {
+  const snapshot: Record<string, string | undefined> = {};
+  for (const key of keys) {
+    snapshot[key] = process.env[key];
+    delete process.env[key];
+  }
+  return snapshot;
+};
+
 export const applyEnvFixture = (
   fixture: Record<string, string>
 ): Record<string, string | undefined> => {

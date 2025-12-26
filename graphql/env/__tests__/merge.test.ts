@@ -2,20 +2,27 @@ import { getEnvOptions } from '../src/merge';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { applyEnvFixture, loadEnvFixture, restoreEnv } from '../../../pgpm/env/__tests__/test-utils';
+import {
+  applyEnvFixture,
+  loadEnvFixture,
+  loadEnvKeys,
+  restoreEnv,
+  snapshotAndClearEnv
+} from '../../../pgpm/env/__tests__/test-utils';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
 
 const fixturesDir = path.join(__dirname, '..', '__fixtures__');
+const envKeys = loadEnvKeys(fixturesDir, 'env.keys.json');
 
 describe('getEnvOptions', () => {
   let envSnapshot: Record<string, string | undefined>;
   let tempDir = '';
 
   beforeEach(() => {
-    envSnapshot = {};
+    envSnapshot = snapshotAndClearEnv(envKeys);
   });
 
   afterEach(() => {
@@ -50,7 +57,7 @@ describe('getEnvOptions', () => {
     });
 
     const fixtureEnv = loadEnvFixture(fixturesDir, 'env.base.json');
-    envSnapshot = { ...envSnapshot, ...applyEnvFixture(fixtureEnv) };
+    applyEnvFixture(fixtureEnv);
 
     const result = getEnvOptions(
       {
@@ -93,7 +100,7 @@ describe('getEnvOptions', () => {
     });
 
     const fixtureEnv = loadEnvFixture(fixturesDir, 'env.dedupe.json');
-    envSnapshot = { ...envSnapshot, ...applyEnvFixture(fixtureEnv) };
+    applyEnvFixture(fixtureEnv);
 
     const result = getEnvOptions(
       {
