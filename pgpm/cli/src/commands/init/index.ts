@@ -329,6 +329,7 @@ async function handleModuleInit(
       type: 'checkbox',
       allowCustomOptions: true,
       required: true,
+      default: ['plpgsql'],
     },
   ];
 
