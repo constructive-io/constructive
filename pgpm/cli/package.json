@@ -50,7 +50,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.2.6",
-    "create-gen-app": "^0.8.1",
+    "create-gen-app": "^0.10.0",
     "find-and-require-package-json": "^0.8.2",
     "inquirerer": "^2.4.0",
     "js-yaml": "^4.1.0",
