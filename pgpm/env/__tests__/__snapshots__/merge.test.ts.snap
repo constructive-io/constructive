@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
+{
+  "cdn": {
+    "awsAccessKey": "minioadmin",
+    "awsRegion": "us-east-1",
+    "awsSecretKey": "minioadmin",
+    "bucketName": "test-bucket",
+    "minioEndpoint": "http://localhost:9000",
+  },
+  "db": {
+    "connections": {
+      "admin": {
+        "password": "admin_password",
+        "user": "env-admin-user",
+      },
+      "app": {
+        "password": "env-app-pass",
+        "user": "config_app",
+      },
+    },
+    "cwd": "<CWD>",
+    "extensions": [],
+    "prefix": "override-",
+    "roles": {
+      "administrator": "administrator",
+      "anonymous": "anonymous",
+      "authenticated": "authenticated",
+      "default": "anonymous",
+    },
+    "rootDb": "postgres",
+    "useLocksForRoles": false,
+  },
+  "deployment": {
+    "cache": true,
+    "fast": false,
+    "hashMethod": "content",
+    "logOnly": false,
+    "usePlan": true,
+    "useTx": true,
+  },
+  "jobs": {
+    "scheduler": {
+      "gracefulShutdown": true,
+      "hostname": "scheduler-0",
+      "pollInterval": 1000,
+      "schema": "app_jobs",
+      "supportAny": false,
+      "supported": [
+        "alpha",
+        "beta",
+      ],
+    },
+    "schema": {
+      "schema": "app_jobs",
+    },
+    "worker": {
+      "gracefulShutdown": true,
+      "hostname": "worker-0",
+      "pollInterval": 1000,
+      "schema": "app_jobs",
+      "supportAny": false,
+      "supported": [
+        "alpha",
+        "beta",
+      ],
+    },
+  },
+  "migrations": {
+    "codegen": {
+      "useTx": false,
+    },
+  },
+  "pg": {
+    "database": "config-db",
+    "host": "override-host",
+    "password": "env-pass",
+    "port": 6543,
+    "user": "env-user",
+  },
+  "server": {
+    "host": "localhost",
+    "port": 9999,
+    "strictAuth": false,
+    "trustProxy": false,
+  },
+}
+`;

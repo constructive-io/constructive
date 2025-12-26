@@ -2,6 +2,7 @@ import deepmerge from 'deepmerge';
 import { pgpmDefaults, PgpmOptions, PgTestConnectionOptions, DeploymentOptions } from '@pgpmjs/types';
 import { loadConfigSync } from './config';
 import { getEnvVars } from './env';
+import { mergeArraysUnique } from './utils';
 
 /**
  * Get core PGPM environment options by merging:
@@ -16,7 +17,9 @@ export const getEnvOptions = (overrides: PgpmOptions = {}, cwd: string = process
   const configOptions = loadConfigSync(cwd);
   const envOptions = getEnvVars();
   
-  return deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides]);
+  return deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides], {
+    arrayMerge: mergeArraysUnique
+  });
 };
 
 export const getConnEnvOptions = (overrides: Partial<PgTestConnectionOptions> = {}, cwd: string = process.cwd()): PgTestConnectionOptions => {
