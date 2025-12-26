@@ -1,4 +1,4 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
+import { CLIOptions, Genomic } from 'genomic'
 import { ParsedArgs } from 'minimist'
 import { promises as fs } from 'fs'
 import { join } from 'path'
@@ -48,7 +48,7 @@ async function loadConfig(path: string): Promise<Partial<GraphQLCodegenOptions>>
 
 export default async (
   argv: Partial<ParsedArgs>,
-  _prompter: Inquirerer,
+  _prompter: Genomic,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

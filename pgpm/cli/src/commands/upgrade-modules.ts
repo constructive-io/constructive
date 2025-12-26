@@ -1,6 +1,6 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
+import { CLIOptions, Genomic, OptionValue, Question } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { fetchLatestVersion } from '../utils/npm-version';
 
@@ -60,7 +60,7 @@ async function fetchModuleVersions(
 async function upgradeModulesForProject(
   project: PgpmPackage,
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   dryRun: boolean,
   upgradeAll: boolean,
   specificModules: string[] | undefined,
@@ -154,7 +154,7 @@ async function upgradeModulesForProject(
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

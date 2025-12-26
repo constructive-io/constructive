@@ -1,7 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 
 import { resolvePackageAlias } from './package-alias';
@@ -12,7 +12,7 @@ import { resolvePackageAlias } from './package-alias';
  */
 export async function selectPackage(
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   cwd: string,
   operationName: string,
   log?: Logger

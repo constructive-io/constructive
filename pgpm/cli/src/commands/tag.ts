@@ -1,7 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Genomic, Question } from 'genomic';
 import * as path from 'path';
 
 import { extractFirst } from '../utils/argv';
@@ -35,7 +35,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

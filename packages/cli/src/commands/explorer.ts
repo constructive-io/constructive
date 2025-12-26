@@ -2,7 +2,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import { GraphQLExplorer as explorer } from '@constructive-io/graphql-explorer';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Genomic, Question } from 'genomic';
 
 const log = new Logger('explorer');
 
@@ -72,7 +72,7 @@ const questions: Question[] = [
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

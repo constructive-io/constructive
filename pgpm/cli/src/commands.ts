@@ -1,5 +1,5 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { teardownPgPools } from 'pg-cache';
 
@@ -71,7 +71,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
   };
 };
 
-export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: CLIOptions & { skipPgTeardown?: boolean }) => {
+export const commands = async (argv: Partial<ParsedArgs>, prompter: Genomic, options: CLIOptions & { skipPgTeardown?: boolean }) => {
   if (argv.version || argv.v) {
     const pkg = findAndRequirePackageJson(__dirname);
     console.log(pkg.version);

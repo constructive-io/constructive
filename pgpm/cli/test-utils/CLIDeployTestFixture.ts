@@ -1,5 +1,5 @@
 import { PgpmMigrate } from '@pgpmjs/core';
-import { CLIOptions,Inquirerer } from 'inquirerer';
+import { CLIOptions,Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
@@ -240,7 +240,7 @@ export class CLIDeployTestFixture extends TestFixture {
   }
 
   private async runPgpmCommand(argv: ParsedArgs): Promise<any> {
-    const prompter = new Inquirerer({
+    const prompter = new Genomic({
       input: process.stdin,
       output: process.stdout,
       noTty: true

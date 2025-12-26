@@ -1,5 +1,5 @@
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { CacheManager } from 'create-gen-app';
+import { CLIOptions, Genomic } from 'genomic';
+import { CacheManager } from '@genomic/scaffolds';
 import { cliExitWithError } from '../utils/cli-error';
 
 const cacheUsageText = `
@@ -14,7 +14,7 @@ Options:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  _prompter: Inquirerer,
+  _prompter: Genomic,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

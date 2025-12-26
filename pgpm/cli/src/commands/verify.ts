@@ -1,7 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Genomic, Question } from 'genomic';
 import { getPgEnvOptions } from 'pg-env';
 
 import { getTargetDatabase, resolvePackageAlias } from '../utils';
@@ -33,7 +33,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

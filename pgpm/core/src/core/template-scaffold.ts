@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
-import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
-import type { Inquirerer, Question } from 'inquirerer';
+import { TemplateScaffolder, BoilerplateConfig } from '@genomic/scaffolds';
+import type { Genomic, Question } from 'genomic';
 
 export interface InspectTemplateOptions {
   /**
@@ -56,11 +56,11 @@ export interface ScaffoldTemplateOptions {
    */
   dir?: string;
   /**
-   * Optional Inquirerer instance to reuse for prompting.
+   * Optional Genomic instance to reuse for prompting.
    * If provided, the caller retains ownership and is responsible for closing it.
    * If not provided, a new instance will be created and closed automatically.
    */
-  prompter?: Inquirerer;
+  prompter?: Genomic;
 }
 
 export interface ScaffoldTemplateResult {

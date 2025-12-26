@@ -1,7 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import * as fs from 'fs';
 import { sync as glob } from 'glob';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
@@ -31,7 +31,7 @@ describe('cmds:package', () => {
   });
 
   const runCommand = async (argv: ParsedArgs) => {
-    const prompter = new Inquirerer({
+    const prompter = new Genomic({
       input: environment.mockInput,
       output: environment.mockOutput,
       noTty: true

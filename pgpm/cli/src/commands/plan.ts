@@ -1,6 +1,6 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Genomic, Question } from 'genomic';
 
 const log = new Logger('plan');
 
@@ -25,7 +25,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

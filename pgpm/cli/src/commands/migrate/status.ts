@@ -2,7 +2,7 @@ import { PgpmMigrate } from '@pgpmjs/core';
 import { parsePlanFile } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { existsSync } from 'fs';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { join } from 'path';
 import { getPgEnvOptions } from 'pg-env';
@@ -10,7 +10,7 @@ import { getPgEnvOptions } from 'pg-env';
 import { getTargetDatabase } from '../../utils/database';
 const log = new Logger('migrate-status');
 
-export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: CLIOptions) => {
+export default async (argv: Partial<ParsedArgs>, prompter: Genomic, options: CLIOptions) => {
   const cwd = argv.cwd || process.cwd();
   const planPath = join(cwd, 'pgpm.plan');
   

@@ -1,6 +1,6 @@
 import { PgpmMigrate } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { getPgEnvOptions } from 'pg-env';
 
 import { resolvePackageAlias } from './package-alias';
@@ -8,7 +8,7 @@ import { resolvePackageAlias } from './package-alias';
 export async function selectDeployedChange(
   database: string,
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   log: Logger,
   action: 'revert' | 'verify' = 'revert',
   cwd: string = process.cwd()
@@ -67,7 +67,7 @@ export async function selectDeployedChange(
 export async function selectDeployedPackage(
   database: string,
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   log: Logger,
   action: 'revert' | 'verify' = 'revert',
   cwd: string = process.cwd()

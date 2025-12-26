@@ -1,4 +1,4 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
+import { CLIOptions, Genomic } from 'genomic'
 import { ParsedArgs } from 'minimist'
 import { promises as fs } from 'fs'
 import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
@@ -26,7 +26,7 @@ const defaultSchemas = [
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {

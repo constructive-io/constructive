@@ -1,5 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
+import { CLIOptions, Genomic, OptionValue, Question } from 'genomic';
 import { ParsedArgs } from 'minimist';
 
 const extensionUsageText = `
@@ -19,7 +19,7 @@ Examples:
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

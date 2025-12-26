@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { CLI, type CommandHandler } from 'inquirerer';
+import { CLI, type CommandHandler } from 'genomic';
 import { readConfig } from './parse';
 import { Parser } from './parser';
 import { normalizePath } from './utils';

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { sync as glob } from 'glob';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
@@ -28,7 +28,7 @@ describe('cmds:add', () => {
   const runAddTest = async (argv: ParsedArgs, label: string) => {
     const { mockInput, mockOutput, writeResults, transformResults } = environment;
 
-    const prompter = new Inquirerer({
+    const prompter = new Genomic({
       input: mockInput,
       output: mockOutput,
       noTty: true
@@ -198,7 +198,7 @@ superuser = false
     await setupModule(moduleDir);
 
     const { mockInput, mockOutput } = environment;
-    const prompter = new Inquirerer({
+    const prompter = new Genomic({
       input: mockInput,
       output: mockOutput,
       noTty: true

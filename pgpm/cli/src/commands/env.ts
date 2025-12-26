@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { defaultPgConfig, PgConfig } from 'pg-env';
 
@@ -89,7 +89,7 @@ function executeCommand(config: PgConfig, command: string, args: string[]): Prom
 
 export default async (
   argv: Partial<ParsedArgs>,
-  _prompter: Inquirerer
+  _prompter: Genomic
 ) => {
   if (argv.help || argv.h) {
     console.log(envUsageText);

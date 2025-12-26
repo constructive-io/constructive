@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { DEFAULT_TEMPLATE_REPO, DEFAULT_TEMPLATE_TOOL_NAME, scaffoldTemplate, sluggify } from '@pgpmjs/core';
-import { Inquirerer, Question, registerDefaultResolver } from 'inquirerer';
+import { Genomic, Question, registerDefaultResolver } from 'genomic';
 
 const DEFAULT_MOTD = `
                  |              _   _
@@ -13,7 +13,7 @@ ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
 
 export default async function runWorkspaceSetup(
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer
+  prompter: Genomic
 ) {
   const workspaceQuestions: Question[] = [
     {

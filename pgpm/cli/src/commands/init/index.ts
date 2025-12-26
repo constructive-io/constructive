@@ -12,7 +12,7 @@ import {
   sluggify,
 } from '@pgpmjs/core';
 import { errors } from '@pgpmjs/types';
-import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
+import { CLIOptions, Genomic, OptionValue, Question, registerDefaultResolver } from 'genomic';
 
 const DEFAULT_MOTD = `
                  |              _   _
@@ -53,7 +53,7 @@ Examples:
 
 export default async (
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested
@@ -65,7 +65,7 @@ export default async (
   return handleInit(argv, prompter);
 };
 
-async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirerer) {
+async function handleInit(argv: Partial<Record<string, any>>, prompter: Genomic) {
   const { cwd = process.cwd() } = argv;
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   const branch = argv.fromBranch as string | undefined;
@@ -139,7 +139,7 @@ interface BoilerplateInitContext {
 
 async function handleBoilerplateInit(
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   ctx: BoilerplateInitContext
 ) {
   let fromPath: string;
@@ -242,7 +242,7 @@ interface InitContext {
 
 async function handleWorkspaceInit(
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   ctx: InitContext
 ) {
   const workspaceQuestions: Question[] = [
@@ -301,7 +301,7 @@ async function handleWorkspaceInit(
 
 async function handleModuleInit(
   argv: Partial<Record<string, any>>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   ctx: InitContext,
   wasExplicitModuleRequest: boolean = false
 ) {

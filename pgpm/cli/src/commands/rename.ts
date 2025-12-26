@@ -1,11 +1,11 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { Inquirerer } from 'inquirerer';
+import { Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import path from 'path';
 
 import { cliExitWithError } from '../utils/cli-error';
 
-export default async (argv: Partial<ParsedArgs>, _prompter: Inquirerer) => {
+export default async (argv: Partial<ParsedArgs>, _prompter: Genomic) => {
   const cwd = (argv.cwd as string) || process.cwd();
   const to = (argv.to as string) || (argv._ && argv._[0] as string);
   if (!to) {

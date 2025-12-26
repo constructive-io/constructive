@@ -1,7 +1,7 @@
 import { PgpmInit } from '@pgpmjs/core';
 import { getConnEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Genomic, Question } from 'genomic';
 import { ParsedArgs } from 'minimist';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -28,7 +28,7 @@ Examples:
 
 export default async (
   argv: Partial<ParsedArgs>,
-  prompter: Inquirerer,
+  prompter: Genomic,
   _options: CLIOptions
 ) => {
   // Show usage if explicitly requested

@@ -1,4 +1,4 @@
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Genomic } from 'genomic';
 import { ParsedArgs } from 'minimist';
 
 import { extractFirst } from '../utils';
@@ -24,7 +24,7 @@ Options:
   --cwd          Working directory (default: current directory)
 `;
 
-export default async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: CLIOptions) => {
+export default async (argv: Partial<ParsedArgs>, prompter: Genomic, options: CLIOptions) => {
   let { first: subcommand, newArgv } = extractFirst(argv);
 
   // Prompt if no subcommand provided
