@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.14](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@0.2.13...@constructive-io/send-email-link-fn@0.2.14) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
 ## [0.2.13](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@0.2.12...@constructive-io/send-email-link-fn@0.2.13) (2025-12-26)
 
 **Note:** Version bump only for package @constructive-io/send-email-link-fn
