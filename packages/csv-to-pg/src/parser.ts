@@ -11,7 +11,7 @@ interface ParserConfig {
   headers?: string[];
   delimeter?: string;
   json?: boolean;
-  input: string;
+  input?: string;
   debug?: boolean;
   fields: Record<string, unknown>;
 }
@@ -38,6 +38,9 @@ export class Parser {
 
     let records: Record<string, unknown>[];
     if (typeof data === 'undefined') {
+      if (!config.input) {
+        throw new Error('input is required when data is not provided');
+      }
       if (config.json || config.input.endsWith('.json')) {
         records = JSON.parse(readFileSync(config.input, 'utf-8'));
       } else {
