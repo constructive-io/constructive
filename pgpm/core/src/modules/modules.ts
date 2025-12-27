@@ -4,6 +4,60 @@ import { errors } from '@pgpmjs/types';
 export type ModuleMap = Record<string, Module>;
 
 /**
+ * Mapping from control file names (used in extensions list) to npm package names.
+ * Only includes modules that can be installed via pgpm install from @pgpm/* packages.
+ * Native PostgreSQL extensions (plpgsql, uuid-ossp, etc.) are not included.
+ */
+export const PGPM_MODULE_MAP: Record<string, string> = {
+  'pgpm-base32': '@pgpm/base32',
+  'pgpm-database-jobs': '@pgpm/database-jobs',
+  'db-meta-modules': '@pgpm/db-meta-modules',
+  'db-meta-schema': '@pgpm/db-meta-schema',
+  'pgpm-inflection': '@pgpm/inflection',
+  'pgpm-jwt-claims': '@pgpm/jwt-claims',
+  'pgpm-stamps': '@pgpm/stamps',
+  'pgpm-totp': '@pgpm/totp',
+  'pgpm-types': '@pgpm/types',
+  'pgpm-utils': '@pgpm/utils',
+  'pgpm-uuid': '@pgpm/uuid'
+};
+
+/**
+ * Result of checking for missing installable modules.
+ */
+export interface MissingModule {
+  controlName: string;
+  npmName: string;
+}
+
+/**
+ * Determines which pgpm modules from an extensions list are missing from the installed modules.
+ * Only checks modules that are in PGPM_MODULE_MAP (installable via pgpm install).
+ * 
+ * @param extensions - List of extension/control file names to check
+ * @param installedModules - List of installed npm package names (e.g., '@pgpm/base32')
+ * @returns Array of missing modules with their control names and npm package names
+ */
+export const getMissingInstallableModules = (
+  extensions: string[],
+  installedModules: string[]
+): MissingModule[] => {
+  const missingModules: MissingModule[] = [];
+  
+  for (const ext of extensions) {
+    const npmName = PGPM_MODULE_MAP[ext];
+    if (npmName && !installedModules.includes(npmName)) {
+      missingModules.push({
+        controlName: ext,
+        npmName
+      });
+    }
+  }
+  
+  return missingModules;
+};
+
+/**
  * Get the latest change from the pgpm.plan file for a specific module.
  */
 export const latestChange = (
