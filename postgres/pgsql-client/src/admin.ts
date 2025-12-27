@@ -69,7 +69,7 @@ export class DbAdmin {
   }
 
   dropTemplate(dbName: string): void {
-    this.run(`psql -c "UPDATE pg_database SET datistemplate='false' WHERE datname='${dbName};"`);
+    this.run(`psql -c "UPDATE pg_database SET datistemplate='false' WHERE datname='${dbName}'"`);
     this.drop(dbName);
   }
 

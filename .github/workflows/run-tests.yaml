@@ -37,6 +37,8 @@ jobs:
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@pg_db:5432/postgres
+          - package: postgres/pgsql-client
+            env: {}
           - package: postgres/pgsql-test
             env: {}
           - package: packages/orm
