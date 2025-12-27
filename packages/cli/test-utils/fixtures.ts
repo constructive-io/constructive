@@ -1,5 +1,5 @@
 import path from 'path';
-import { createTestFixture, TestFixture as BaseTestFixture } from '@inquirerer/test';
+import { createTestFixture, TestFixture as BaseTestFixture, TestFixtureOptions } from '@inquirerer/test';
 
 import { commands } from '../src/commands';
 
@@ -11,7 +11,7 @@ export const getFixturePath = (...paths: string[]) =>
 const createFixture = (...fixturePath: string[]) =>
   createTestFixture(
     {
-      commands,
+      commands: commands as TestFixtureOptions['commands'],
       fixtureRoot: FIXTURES_PATH,
       tmpPrefix: 'constructive-io-graphql-test-',
       cliOptions: { version: '1.0.0' }
