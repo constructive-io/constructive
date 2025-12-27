@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.4.0...@pgpmjs/core@4.5.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** use new upgradePrompt UI for interactive mode ([237f6e0](https://github.com/constructive-io/constructive/commit/237f6e01a849910a84adb69bb1df7396aeeaa0ce))
+
 # [4.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.3.0...@pgpmjs/core@4.4.0) (2025-12-27)
 
 ### Bug Fixes

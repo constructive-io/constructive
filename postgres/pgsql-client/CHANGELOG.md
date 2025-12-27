@@ -1,0 +1,14 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2025-12-27)
+
+### Bug Fixes
+
+- address review feedback for pgsql-client ([7bc8186](https://github.com/constructive-io/constructive/commit/7bc8186022482017cd1e3bcc30c6276dabffd302))
+
+### Features
+
+- create pgsql-client package with DbAdmin and PgClient utilities ([248c7de](https://github.com/constructive-io/constructive/commit/248c7de423264ff5627f26564ea9dd0b7bbd2081))

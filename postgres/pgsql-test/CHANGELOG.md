@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.20.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.19.1...pgsql-test@2.20.0) (2025-12-27)
+
+### Bug Fixes
+
+- address review feedback for pgsql-client ([7bc8186](https://github.com/constructive-io/constructive/commit/7bc8186022482017cd1e3bcc30c6276dabffd302))
+- update test imports to use pgsql-client for getRoleName ([6f4b4ff](https://github.com/constructive-io/constructive/commit/6f4b4ff15d891aed8f0d389ecc16205e2648b997))
+
+### Features
+
+- create pgsql-client package with DbAdmin and PgClient utilities ([248c7de](https://github.com/constructive-io/constructive/commit/248c7de423264ff5627f26564ea9dd0b7bbd2081))
+- **pgsql-test:** add keepDb option to teardown() for database preservation ([a007c41](https://github.com/constructive-io/constructive/commit/a007c410c8ac57358a1e4b04ce1a7c25801d2a18))
+
 ## [2.19.1](https://github.com/constructive-io/constructive/compare/pgsql-test@2.19.0...pgsql-test@2.19.1) (2025-12-27)
 
 **Note:** Version bump only for package pgsql-test

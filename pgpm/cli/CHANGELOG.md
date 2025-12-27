@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/constructive/compare/pgpm@2.5.1...pgpm@2.6.0) (2025-12-27)
+
+### Bug Fixes
+
+- cast argv to ParsedArgs in argvTransform for type compatibility ([1629181](https://github.com/constructive-io/constructive/commit/1629181265b2d5e3372b821df53daf8aa933c3b3))
+- use unknown intermediate cast for pgpm/cli commands type compatibility ([3d4b4f2](https://github.com/constructive-io/constructive/commit/3d4b4f2401ab326c45562d7693de599041713cf5))
+
+### Features
+
+- **pgpm:** support install without arguments like pnpm ([872836c](https://github.com/constructive-io/constructive/commit/872836cc7cf3581e9d36ccb7ce6becd4e4ffd723))
+- **pgpm:** use new upgradePrompt UI for interactive mode ([237f6e0](https://github.com/constructive-io/constructive/commit/237f6e01a849910a84adb69bb1df7396aeeaa0ce))
+
 ## [2.5.1](https://github.com/constructive-io/constructive/compare/pgpm@2.5.0...pgpm@2.5.1) (2025-12-27)
 
 **Note:** Version bump only for package pgpm

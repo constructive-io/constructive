@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.3.1...@constructive-io/cli@5.4.0) (2025-12-27)
+
+### Bug Fixes
+
+- cast commands to TestFixtureOptions type for compatibility ([60383ab](https://github.com/constructive-io/constructive/commit/60383ab5fa6120f0ef021fe589f9c8d80719b2e4))
+- use unknown intermediate cast for commands type compatibility ([77c262c](https://github.com/constructive-io/constructive/commit/77c262cfd9f1556a7d8db3fb69a59aeb1189a09c))
+
+### Features
+
+- **pgpm:** use new upgradePrompt UI for interactive mode ([237f6e0](https://github.com/constructive-io/constructive/commit/237f6e01a849910a84adb69bb1df7396aeeaa0ce))
+
 ## [5.3.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.3.0...@constructive-io/cli@5.3.1) (2025-12-27)
 
 **Note:** Version bump only for package @constructive-io/cli
