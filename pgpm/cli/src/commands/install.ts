@@ -1,24 +1,31 @@
-import { PgpmPackage } from '@pgpmjs/core';
+import { getMissingInstallableModules, PgpmPackage } from '@pgpmjs/core';
+import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
+
+const logger = new Logger('pgpm');
 
 const installUsageText = `
 Install Command:
 
-  pgpm install <package>...
+  pgpm install [package]...
 
   Install pgpm modules into current module.
 
+  When called without arguments, installs any missing modules that are
+  listed in the module's .control file but not yet installed in the workspace.
+
 Arguments:
-  package                 One or more package names to install
+  package                 One or more package names to install (optional)
 
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
+  pgpm install                                 Install missing modules from .control file
   pgpm install @pgpm/base32                    Install single package
-  pgpm install @pgpm/base32 @pgpm/utils   Install multiple packages
+  pgpm install @pgpm/base32 @pgpm/utils        Install multiple packages
 `;
 
 export default async (
@@ -39,8 +46,21 @@ export default async (
     throw new Error('You must run this command inside a PGPM module.');
   }
 
+  // If no packages specified, install missing modules from .control file
   if (argv._.length === 0) {
-    throw new Error('You must provide a package name to install, e.g. `@pgpm/base32`');
+    const requiredExtensions = project.getRequiredModules();
+    const installedModules = project.getWorkspaceInstalledModules();
+    const missingModules = getMissingInstallableModules(requiredExtensions, installedModules);
+
+    if (missingModules.length === 0) {
+      logger.success('All modules are already installed.');
+      return;
+    }
+
+    const missingNames = missingModules.map(m => m.npmName);
+    logger.info(`Installing missing modules: ${missingNames.join(', ')}`);
+    await project.installModules(...missingNames);
+    return;
   }
 
   await project.installModules(...argv._);

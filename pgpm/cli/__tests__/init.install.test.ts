@@ -129,4 +129,54 @@ describe('cmds:install - with initialized workspace and module', () => {
     const controlFile = mod.getModuleControlFile();
     expect(controlFile).toMatchSnapshot();
   });
+
+  it('installs missing modules when called without arguments', async () => {
+    // First, update the module's control file to require pgpm-base32
+    // This simulates a module that has dependencies listed but not installed
+    const mod = new PgpmPackage(moduleDir);
+    const currentDeps = mod.getRequiredModules();
+    mod.setModuleDependencies([...currentDeps, 'pgpm-base32']);
+
+    // Verify the control file now includes pgpm-base32
+    const controlBefore = mod.getModuleControlFile();
+    expect(controlBefore).toContain('pgpm-base32');
+
+    // Run install without arguments - should install missing modules
+    await fixture.runCmd({
+      _: ['install'],
+      cwd: moduleDir,
+    });
+
+    // Verify the module was installed
+    const pkgJson = JSON.parse(
+      fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
+    );
+    expect(pkgJson.dependencies).toBeDefined();
+    expect(pkgJson.dependencies['@pgpm/base32']).toBeDefined();
+
+    // Verify extension files were installed
+    const extPath = path.join(workspaceDir, 'extensions', '@pgpm', 'base32');
+    expect(fs.existsSync(extPath)).toBe(true);
+  });
+
+  it('reports success when all modules are already installed', async () => {
+    // Install a module first
+    await fixture.runCmd({
+      _: ['install', '@pgpm-testing/base32@1.0.0'],
+      cwd: moduleDir,
+    });
+
+    // Running install without arguments should succeed (no missing modules)
+    // This test verifies the command doesn't throw when nothing needs to be installed
+    await fixture.runCmd({
+      _: ['install'],
+      cwd: moduleDir,
+    });
+
+    // Verify the module is still installed
+    const pkgJson = JSON.parse(
+      fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
+    );
+    expect(pkgJson.dependencies['@pgpm-testing/base32']).toBe('1.0.0');
+  });
 });
