@@ -625,10 +625,10 @@ importers:
     dependencies:
       '@constructive-io/s3-streamer':
         specifier: workspace:^
-        version: link:../../streaming/s3-streamer/dist
+        version: link:../../uploads/s3-streamer/dist
       '@constructive-io/upload-names':
         specifier: workspace:^
-        version: link:../../streaming/upload-names/dist
+        version: link:../../uploads/upload-names/dist
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -644,7 +644,7 @@ importers:
         version: link:../../graphql/env/dist
       '@constructive-io/s3-utils':
         specifier: workspace:^
-        version: link:../../streaming/s3-utils/dist
+        version: link:../../uploads/s3-utils/dist
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
@@ -754,10 +754,10 @@ importers:
         version: link:../types/dist
       '@constructive-io/s3-streamer':
         specifier: workspace:^
-        version: link:../../streaming/s3-streamer/dist
+        version: link:../../uploads/s3-streamer/dist
       '@constructive-io/upload-names':
         specifier: workspace:^
-        version: link:../../streaming/upload-names/dist
+        version: link:../../uploads/upload-names/dist
       '@constructive-io/url-domains':
         specifier: workspace:^
         version: link:../../packages/url-domains/dist
@@ -891,10 +891,10 @@ importers:
         version: link:../types/dist
       '@constructive-io/s3-utils':
         specifier: workspace:^
-        version: link:../../streaming/s3-utils/dist
+        version: link:../../uploads/s3-utils/dist
       '@constructive-io/upload-names':
         specifier: workspace:^
-        version: link:../../streaming/upload-names/dist
+        version: link:../../uploads/upload-names/dist
       '@constructive-io/url-domains':
         specifier: workspace:^
         version: link:../../packages/url-domains/dist
@@ -1863,7 +1863,7 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
 
-  streaming/content-type-stream:
+  uploads/content-type-stream:
     dependencies:
       etag-hash:
         specifier: workspace:^
@@ -1880,14 +1880,14 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/etag-hash:
+  uploads/etag-hash:
     devDependencies:
       makage:
         specifier: ^0.1.9
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/etag-stream:
+  uploads/etag-stream:
     dependencies:
       etag-hash:
         specifier: workspace:^
@@ -1901,7 +1901,7 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/mime-bytes:
+  uploads/mime-bytes:
     devDependencies:
       glob:
         specifier: ^13.0.0
@@ -1911,7 +1911,7 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/s3-streamer:
+  uploads/s3-streamer:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.958.0
@@ -1940,7 +1940,7 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/s3-utils:
+  uploads/s3-utils:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.958.0
@@ -1957,7 +1957,7 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/stream-to-etag:
+  uploads/stream-to-etag:
     dependencies:
       etag-hash:
         specifier: workspace:^
@@ -1971,7 +1971,7 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/upload-names:
+  uploads/upload-names:
     devDependencies:
       glob:
         specifier: ^13.0.0
@@ -1981,14 +1981,14 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/uuid-hash:
+  uploads/uuid-hash:
     devDependencies:
       makage:
         specifier: ^0.1.9
         version: 0.1.9
     publishDirectory: dist
 
-  streaming/uuid-stream:
+  uploads/uuid-stream:
     dependencies:
       uuid-hash:
         specifier: workspace:^
@@ -9338,24 +9338,24 @@ snapshots:
     dependencies:
       '@graphql-tools/utils': 10.11.0(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/optimize@1.4.0(graphql@15.10.1)':
     dependencies:
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/optimize@2.0.0(graphql@15.10.1)':
     dependencies:
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/relay-operation-optimizer@6.5.18(encoding@0.1.13)(graphql@15.10.1)':
     dependencies:
       '@ardatan/relay-compiler': 12.0.0(encoding@0.1.13)(graphql@15.10.1)
       '@graphql-tools/utils': 9.2.1(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -9365,7 +9365,7 @@ snapshots:
       '@ardatan/relay-compiler': 12.0.3(encoding@0.1.13)(graphql@15.10.1)
       '@graphql-tools/utils': 10.11.0(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
     transitivePeerDependencies:
       - encoding
 
@@ -9374,7 +9374,7 @@ snapshots:
       '@graphql-tools/merge': 9.1.6(graphql@15.10.1)
       '@graphql-tools/utils': 10.11.0(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.11.0(graphql@15.10.1)':
     dependencies:
@@ -9382,18 +9382,18 @@ snapshots:
       '@whatwg-node/promise-helpers': 1.3.2
       cross-inspect: 1.0.1
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@8.13.1(graphql@15.10.1)':
     dependencies:
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@9.2.1(graphql@15.10.1)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-typed-document-node/core@3.2.0(graphql@15.10.1)':
     dependencies:
@@ -10936,7 +10936,7 @@ snapshots:
 
   '@whatwg-node/promise-helpers@1.3.2':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@yarnpkg/lockfile@1.1.0': {}
 
@@ -11750,7 +11750,7 @@ snapshots:
 
   cross-inspect@1.0.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   cross-spawn@7.0.6:
     dependencies:
