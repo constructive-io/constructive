@@ -37,8 +37,8 @@ afterAll(async () => {
     await new Promise<void>((resolve) => server!.close(() => resolve()));
     server = null;
   }
-  await teardown();
   await closePgPools();
+  await teardown();
 });
 
 beforeEach(async () => {

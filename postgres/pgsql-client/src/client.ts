@@ -46,7 +46,7 @@ export class PgClient {
     if (!this._ended) {
       this._ended = true;
       await this.ensureConnected();
-      this.client.end();
+      await this.client.end();
     }
   }
 
