@@ -44,7 +44,7 @@
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
-    "inquirerer": "^2.4.0",
+    "inquirerer": "^4.0.0",
     "makage": "^0.1.9"
   },
   "dependencies": {
@@ -52,8 +52,8 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "create-gen-app": "^0.10.0",
     "csv-to-pg": "workspace:^",
+    "genomic": "^5.0.0",
     "glob": "^13.0.0",
     "komoji": "^0.7.11",
     "parse-package-name": "^1.0.0",

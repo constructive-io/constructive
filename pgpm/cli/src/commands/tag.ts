@@ -4,7 +4,7 @@ import { errors } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import * as path from 'path';
 
-import { extractFirst } from '../utils/argv';
+import { extractFirst } from '../utils';
 import { selectPackage } from '../utils/module-utils';
 import { resolvePackageAlias } from '../utils/package-alias';
 

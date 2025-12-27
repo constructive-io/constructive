@@ -1,4 +1,4 @@
-export * from './argv';
+export { extractFirst } from '@inquirerer/utils';
 export * from './database';
 export * from './display';
 export * from './cli-error';

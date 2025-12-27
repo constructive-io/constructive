@@ -46,14 +46,15 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@inquirerer/utils": "^3.0.0",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.2.6",
-    "create-gen-app": "^0.10.0",
     "find-and-require-package-json": "^0.8.2",
-    "inquirerer": "^2.4.0",
+    "genomic": "^5.0.0",
+    "inquirerer": "^4.0.0",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",

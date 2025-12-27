@@ -1,6 +1,6 @@
 import os from 'os';
 import path from 'path';
-import { TemplateScaffolder, BoilerplateConfig } from 'create-gen-app';
+import { TemplateScaffolder, BoilerplateConfig } from 'genomic';
 import type { Inquirerer, Question } from 'inquirerer';
 
 export interface InspectTemplateOptions {

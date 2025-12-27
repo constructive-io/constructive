@@ -1,3 +1,3 @@
-export { extractFirst } from './argv';
+export { extractFirst } from '@inquirerer/utils';
 export { cliExitWithError } from './cli-error';
 export { usageText } from './display';
