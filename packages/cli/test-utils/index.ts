@@ -1,2 +1,16 @@
-export * from './cli';
 export * from './fixtures';
+
+// Re-export test utilities from @inquirerer/test for backwards compatibility
+export {
+  KEY_SEQUENCES,
+  setupTests,
+  createTestEnvironment,
+  normalizePackageJsonForSnapshot,
+  cleanAnsi
+} from '@inquirerer/test';
+
+export type {
+  TestEnvironment,
+  InputResponse,
+  NormalizeOptions
+} from '@inquirerer/test';
