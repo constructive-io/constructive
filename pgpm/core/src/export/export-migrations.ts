@@ -53,24 +53,36 @@ interface Prompter {
 }
 
 /**
+ * Result of checking for missing modules at workspace level.
+ */
+interface MissingModulesResult {
+  missingModules: { controlName: string; npmName: string }[];
+  shouldInstall: boolean;
+}
+
+/**
  * Checks which pgpm modules from the extensions list are missing from the workspace
- * and prompts the user to install them if a prompter is provided.
+ * and prompts the user if they want to install them.
  * 
- * @param project - The PgpmPackage instance
+ * This function only does detection and prompting - it does NOT install.
+ * Use installMissingModules() after the module is created to do the actual installation.
+ * 
+ * @param project - The PgpmPackage instance (only needs workspace context)
  * @param extensions - List of extension names (control file names)
  * @param prompter - Optional prompter for interactive confirmation
- * @returns List of extensions that were successfully installed
+ * @returns Object with missing modules and whether user wants to install them
  */
-const promptAndInstallMissingModules = async (
+const detectMissingModules = async (
   project: PgpmPackage,
   extensions: string[],
   prompter?: Prompter
-): Promise<string[]> => {
-  const { installed } = project.getInstalledModules();
+): Promise<MissingModulesResult> => {
+  // Use workspace-level check - doesn't require being inside a module
+  const installed = project.getWorkspaceInstalledModules();
   const missingModules = getMissingInstallableModules(extensions, installed);
   
   if (missingModules.length === 0) {
-    return [];
+    return { missingModules: [], shouldInstall: false };
   }
   
   const missingNames = missingModules.map(m => m.npmName);
@@ -86,15 +98,35 @@ const promptAndInstallMissingModules = async (
       }
     ]);
     
-    if (install) {
-      console.log('Installing missing modules...');
-      await project.installModules(...missingNames);
-      console.log('Modules installed successfully.');
-      return missingModules.map(m => m.controlName);
-    }
+    return { missingModules, shouldInstall: install };
   }
   
-  return [];
+  return { missingModules, shouldInstall: false };
+};
+
+/**
+ * Installs missing modules into a specific module directory.
+ * Must be called after the module has been created.
+ * 
+ * @param moduleDir - The directory of the module to install into
+ * @param missingModules - Array of missing modules to install
+ */
+const installMissingModules = async (
+  moduleDir: string,
+  missingModules: { controlName: string; npmName: string }[]
+): Promise<void> => {
+  if (missingModules.length === 0) {
+    return;
+  }
+  
+  const missingNames = missingModules.map(m => m.npmName);
+  console.log('Installing missing modules...');
+  
+  // Create a new PgpmPackage instance pointing to the module directory
+  const moduleProject = new PgpmPackage(moduleDir);
+  await moduleProject.installModules(...missingNames);
+  
+  console.log('Modules installed successfully.');
 };
 
 interface ExportMigrationsToDiskOptions {
@@ -197,9 +229,11 @@ const exportMigrationsToDisk = async ({
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
   if (results?.rows?.length > 0) {
-    await promptAndInstallMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter);
+    // Detect missing modules at workspace level and prompt user
+    const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter);
 
-    await preparePackage({
+    // Create/prepare the module directory
+    const dbModuleDir = await preparePackage({
       project,
       author,
       outdir,
@@ -208,6 +242,11 @@ const exportMigrationsToDisk = async ({
       extensions: [...DB_REQUIRED_EXTENSIONS],
       prompter
     });
+
+    // Install missing modules if user confirmed (now that module exists)
+    if (dbMissingResult.shouldInstall) {
+      await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
+    }
 
     writePgpmPlan(results.rows, opts);
     writePgpmFiles(results.rows, opts);
@@ -223,9 +262,11 @@ const exportMigrationsToDisk = async ({
     // Build description for the meta/service extension package
     const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
 
-    await promptAndInstallMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
+    // Detect missing modules at workspace level and prompt user
+    const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
 
-    await preparePackage({
+    // Create/prepare the module directory
+    const svcModuleDir = await preparePackage({
       project,
       author,
       outdir,
@@ -234,6 +275,11 @@ const exportMigrationsToDisk = async ({
       extensions: [...SERVICE_REQUIRED_EXTENSIONS],
       prompter
     });
+
+    // Install missing modules if user confirmed (now that module exists)
+    if (svcMissingResult.shouldInstall) {
+      await installMissingModules(svcModuleDir, svcMissingResult.missingModules);
+    }
 
     const metaReplacer = makeReplacer({
       schemas: schemas.rows.filter((schema: any) =>
@@ -351,6 +397,8 @@ interface ReplacerResult {
 /**
  * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
  * If the module already exists and a prompter is provided, prompts the user for confirmation.
+ * 
+ * @returns The absolute path to the created/prepared module directory
  */
 const preparePackage = async ({
   project,
@@ -360,7 +408,7 @@ const preparePackage = async ({
   description,
   extensions,
   prompter
-}: PreparePackageOptions): Promise<void> => {
+}: PreparePackageOptions): Promise<string> => {
   const curDir = process.cwd();
   const pgpmDir = path.resolve(path.join(outdir, name));
   mkdirSync(pgpmDir, { recursive: true });
@@ -401,6 +449,7 @@ const preparePackage = async ({
   }
 
   process.chdir(curDir);
+  return pgpmDir;
 };
 
 /**
