@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/constructive-io/constructive/compare/pgpm@2.2.1...pgpm@2.3.0) (2025-12-27)
+
+### Bug Fixes
+
+- **tests:** normalize package.json dependency versions in snapshot tests ([66792d3](https://github.com/constructive-io/constructive/commit/66792d3555bdba536544e7e29e52bd735958a333))
+
+### Features
+
+- **pgpm:** prompt to create workspace when running pgpm init outside workspace ([cc292ed](https://github.com/constructive-io/constructive/commit/cc292eda1a5c38fdea87c1588f46c8f6c25b4123))
+
 ## [2.2.1](https://github.com/constructive-io/constructive/compare/pgpm@2.2.0...pgpm@2.2.1) (2025-12-26)
 
 **Note:** Version bump only for package pgpm

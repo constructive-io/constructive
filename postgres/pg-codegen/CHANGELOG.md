@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.26](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.25...pg-codegen@2.15.26) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
 ## [2.15.25](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.24...pg-codegen@2.15.25) (2025-12-26)
 
 **Note:** Version bump only for package pg-codegen

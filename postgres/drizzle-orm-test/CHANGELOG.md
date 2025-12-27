@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.30](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.29...drizzle-orm-test@0.3.30) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
 ## [0.3.29](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.28...drizzle-orm-test@0.3.29) (2025-12-26)
 
 **Note:** Version bump only for package drizzle-orm-test

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.24...@constructive-io/cli@5.2.0) (2025-12-27)
+
+### Bug Fixes
+
+- **cli:** correct import path for pgpm commands in test fixture ([3f0a764](https://github.com/constructive-io/constructive/commit/3f0a7644d0ee7814672c9f73081d30ec431363ef))
+- **cli:** update test fixture to support pgpm commands ([713e778](https://github.com/constructive-io/constructive/commit/713e7786de89ef523714ace6a4aab984cf21994b))
+- **cli:** update tests to use pgpm commands instead of cnc ([4b8a9c7](https://github.com/constructive-io/constructive/commit/4b8a9c762165f38daefdb5c56d642bd7241b2a53))
+
+### Features
+
+- **cli:** separate cnc and pgpm CLIs - hard separation ([d5a50ea](https://github.com/constructive-io/constructive/commit/d5a50ea19192bdfd66e9f7cfe7f6cf48d4b6e49a))
+
 ## [5.1.24](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.23...@constructive-io/cli@5.1.24) (2025-12-26)
 
 **Note:** Version bump only for package @constructive-io/cli
