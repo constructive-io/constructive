@@ -19,7 +19,7 @@ Options:
   --cwd <directory>       Working directory (default: current directory)
   -i, --interactive       Show outdated modules and select which ones to upgrade
   --dry-run               Show what would be upgraded without making changes
-  --workspace             Upgrade modules across all packages in the workspace
+  -w, --workspace         Upgrade modules across all packages in the workspace
 
 Examples:
   pgpm upgrade                          Upgrade all installed modules
@@ -161,7 +161,7 @@ export default async (
   const { cwd = process.cwd() } = argv;
   const dryRun = Boolean(argv['dry-run']);
   const interactive = Boolean(argv.i || argv.interactive);
-  const workspaceMode = Boolean(argv.workspace);
+  const workspaceMode = Boolean(argv.w || argv.workspace);
   
   // Get specific modules from positional arguments (argv._)
   const specificModules = argv._ && argv._.length > 0 
