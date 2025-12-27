@@ -46,11 +46,16 @@ const getConnOopts = (cn: GetConnectionOpts = {}) => {
   };
 };
 
+export interface TeardownOptions {
+  /** If true, keeps the database after closing connections (default: false) */
+  keepDb?: boolean;
+}
+
 export interface GetConnectionResult {
   pg: PgTestClient;
   db: PgTestClient;
   admin: DbAdmin;
-  teardown: () => Promise<void>
+  teardown: (opts?: TeardownOptions) => Promise<void>
   manager: PgTestConnector
 }
 
@@ -88,12 +93,14 @@ export const getConnections = async (
   const pg = manager.getClient(config);
 
   let teardownPromise: Promise<void> | null = null;
-  const teardown = async () => {
+  let teardownOpts: TeardownOptions = {};
+  const teardown = async (opts: TeardownOptions = {}) => {
+    teardownOpts = opts;
     if (teardownPromise) return teardownPromise;
     teardownPromise = (async () => {
       manager.beginTeardown();
       await teardownPgPools();
-      await manager.closeAll();
+      await manager.closeAll({ keepDb: teardownOpts.keepDb });
     })();
     return teardownPromise;
   };
