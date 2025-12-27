@@ -45,6 +45,12 @@ import { parseTarget } from '../../utils/target-utils';
 
 const logger = new Logger('pgpm');
 
+/**
+ * Directory name for workspace extensions.
+ * Extensions are installed globally in the workspace's extensions/ directory.
+ */
+const EXTENSIONS_DIR = 'extensions';
+
 function getUTCTimestamp(d: Date = new Date()): string {
   return (
     d.getUTCFullYear() +
@@ -954,7 +960,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     this.ensureModule();
   
     const originalDir = process.cwd();
-    const skitchExtDir = path.join(this.workspacePath!, 'extensions');
+    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
     const pkgJsonPath = path.join(this.modulePath!, 'package.json');
   
     if (!fs.existsSync(pkgJsonPath)) {
@@ -1089,7 +1095,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
     const dependencies = pkgData.dependencies || {};
-    const skitchExtDir = path.join(this.workspacePath!, 'extensions');
+    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
 
     const installed: string[] = [];
     const installedVersions: Record<string, string> = {};
@@ -1117,7 +1123,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
   getWorkspaceInstalledModules(): string[] {
     this.ensureWorkspace();
 
-    const extensionsDir = path.join(this.workspacePath!, 'extensions');
+    const extensionsDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
     
     if (!fs.existsSync(extensionsDir)) {
       return [];
