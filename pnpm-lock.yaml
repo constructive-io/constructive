@@ -187,7 +187,7 @@ importers:
     dependencies:
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -271,7 +271,7 @@ importers:
     dependencies:
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -309,7 +309,7 @@ importers:
     dependencies:
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -382,7 +382,7 @@ importers:
     dependencies:
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -1225,8 +1225,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/server/dist
       '@inquirerer/utils':
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.1.1
+        version: 3.1.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1241,10 +1241,10 @@ importers:
         version: link:../../pgpm/types/dist
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       inquirerer:
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: ^4.1.1
+        version: 4.1.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1265,7 +1265,7 @@ importers:
         version: 0.10.0
       yanse:
         specifier: ^0.1.8
-        version: 0.1.8
+        version: 0.1.9
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1325,8 +1325,8 @@ importers:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^2.4.0
-        version: 2.4.0
+        specifier: ^4.1.0
+        version: 4.1.0
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
@@ -1415,8 +1415,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.1.1
+        version: 3.1.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1434,13 +1434,13 @@ importers:
         version: 0.2.6
       find-and-require-package-json:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.3
       genomic:
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.0.2
+        version: 5.0.2
       inquirerer:
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: ^4.1.1
+        version: 4.1.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1461,7 +1461,7 @@ importers:
         version: 0.10.0
       yanse:
         specifier: ^0.1.8
-        version: 0.1.8
+        version: 0.1.9
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1516,8 +1516,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.0.2
+        version: 5.0.2
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1544,7 +1544,7 @@ importers:
         version: 17.9.5
       yanse:
         specifier: ^0.1.8
-        version: 0.1.8
+        version: 0.1.9
     devDependencies:
       '@pgsql/types':
         specifier: ^17.6.2
@@ -1556,8 +1556,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: ^4.1.1
+        version: 4.1.1
       makage:
         specifier: ^0.1.9
         version: 0.1.9
@@ -1581,7 +1581,7 @@ importers:
     dependencies:
       yanse:
         specifier: ^0.1.8
-        version: 0.1.8
+        version: 0.1.9
     devDependencies:
       makage:
         specifier: ^0.1.9
@@ -2763,8 +2763,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/utils@3.0.0':
-    resolution: {integrity: sha512-Aa6sKbMy6R8zGyBVhhnSoldbhlmTuF/buRSmLaKMebrcKnHU8QfMMOQoyICqj3pf4brKXwLOzIm8EZinASJKQQ==}
+  '@inquirerer/utils@3.1.1':
+    resolution: {integrity: sha512-8slhzP+uuBv1Wr67bxUm6zG5IwFRpeeR+i34vvIMVeyW2pvBzXjYMjMYjcfBCS6HHqb2x9Dhq5Px0bwhcO44MQ==}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -3922,6 +3922,9 @@ packages:
 
   appstash@0.2.6:
     resolution: {integrity: sha512-93YKWpKwIaGDZeLB1dVLX63V92EINorNgGIUUm6+U3zib+QYwis7NqwqNcqt4948Nz4aLmFkme820kxMO3grtw==}
+
+  appstash@0.2.7:
+    resolution: {integrity: sha512-EdJDs164q4OuKOBo/mdN6srwJdCy5e2NxmPKUyTBI8Z6aEAkX3ViSRFoAA78A4P0azysSMk8wqafsuM0R6weww==}
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -5162,11 +5165,11 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  find-and-require-package-json@0.8.2:
-    resolution: {integrity: sha512-uhGbdUEsz/qgbOBzFAuqZy7i4xKdN8pnzEY3mF2jTdv3TkYow5NGWdsosdETJTVLoiJFAZ72zVlL4KcsvVb6SA==}
-
   find-and-require-package-json@0.8.3:
     resolution: {integrity: sha512-8FVl3RyEnn8FEdfrm24abOjSQRSRqVEgDsIuveRG+YHFka3jUaKzRbKDw7M4Ox/z7ImcxaFmRxDeeXnqNheeLg==}
+
+  find-and-require-package-json@0.8.4:
+    resolution: {integrity: sha512-08+BvFbBNU1pvxSMzZnZ01bRGxRyOUAbQG/ttfFrt6G5cFyitmZbtPVKPPz75L/3etyccRq/xxQ1GXUdYB+BkQ==}
 
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
@@ -5268,8 +5271,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.0.0:
-    resolution: {integrity: sha512-SB3B1Wz9hQcaMMEPUZPO+8N3ywOzZVrLYqjdEdUtwFAMp/YZoNW1TFEbAYqysu1cpmSRKQzKZhmkIP1WFH7VsA==}
+  genomic@5.0.2:
+    resolution: {integrity: sha512-/cW9JC/akIXGB7Y1qTZWpiFfFINaRZMApZh3eMXhjuLu4VLVkdUO5+TIZWLx+slvHzFXRkwB+dPkIp8QgOnGfA==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5648,11 +5651,11 @@ packages:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
 
-  inquirerer@2.4.0:
-    resolution: {integrity: sha512-JV64rQPKD5U/sxWy43vvzvbHqOY4SdGwfxfyq4NfYUROC6C1kx+X9ghfGnbUv6dYa75VNyU6yfkai7bluGrm3A==}
+  inquirerer@4.1.0:
+    resolution: {integrity: sha512-XCrUg5A/nagVyBpkpMb5OowbBDmq7rKTwPV0xEw5Zsauu9rsFUOHFLAST+vpOss8ST1uH3gZK2uqAcX5wm6QcA==}
 
-  inquirerer@4.0.0:
-    resolution: {integrity: sha512-vfJ0M62CJB4MwUZi758vV/VSh3a75cpcgRs4vcYnDfjaIhe9xmyjvnOKT3UmkndqqTkt4O5pP0dPIE0ybe3Gbw==}
+  inquirerer@4.1.1:
+    resolution: {integrity: sha512-OC8UJ7GRxVEFvrT7G5IDIBttjMrqREuax2J2/1ZdmbpJJIaxgydjHYsSmjoyg21XMv+0IU9DEsvBOyJqV1e9dQ==}
 
   invariant@2.2.4:
     resolution: {integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==}
@@ -8153,8 +8156,8 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
-  yanse@0.1.8:
-    resolution: {integrity: sha512-kPJpgJ+Cazht6h2kzsd5/ATS6r77f0nMS8U5iQQw7xdlb0lvHVvCOASq7d8/VqgHDYjMBU3TZU75VSjVgK/8qg==}
+  yanse@0.1.10:
+    resolution: {integrity: sha512-sSfkypRMWbsBzUcP3oe9xIhyTBqQRv7XvjICzSkciEPP4xmw/8i0slDqlvhVBz9WsSB40aaJvkJunaddl9viZA==}
 
   yanse@0.1.9:
     resolution: {integrity: sha512-AKKZLY+TWENQOYEuQei07b4QFW4hCS6yyAbUiWBCjHOpkhzWUD8EehNAeI/8kwm5pvJQcmX2ojujPywF+DCheA==}
@@ -9437,10 +9440,10 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  '@inquirerer/utils@3.0.0':
+  '@inquirerer/utils@3.1.1':
     dependencies:
-      appstash: 0.2.6
-      find-and-require-package-json: 0.8.3
+      appstash: 0.2.7
+      find-and-require-package-json: 0.8.4
       minimist: 1.2.8
 
   '@isaacs/balanced-match@4.0.1': {}
@@ -11057,6 +11060,8 @@ snapshots:
 
   appstash@0.2.6: {}
 
+  appstash@0.2.7: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -11743,7 +11748,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 5.9.3
@@ -11966,7 +11971,7 @@ snapshots:
 
   domutils@1.5.1:
     dependencies:
-      dom-serializer: 0.1.1
+      dom-serializer: 0.2.2
       domelementtype: 1.3.1
 
   domutils@1.7.0:
@@ -12234,9 +12239,9 @@ snapshots:
   execa@5.0.0:
     dependencies:
       cross-spawn: 7.0.6
-      get-stream: 6.0.0
+      get-stream: 6.0.1
       human-signals: 2.1.0
-      is-stream: 2.0.0
+      is-stream: 2.0.1
       merge-stream: 2.0.0
       npm-run-path: 4.0.1
       onetime: 5.1.2
@@ -12390,9 +12395,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-and-require-package-json@0.8.2: {}
-
   find-and-require-package-json@0.8.3: {}
+
+  find-and-require-package-json@0.8.4: {}
 
   find-up@2.1.0:
     dependencies:
@@ -12489,10 +12494,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.0.0:
+  genomic@5.0.2:
     dependencies:
-      appstash: 0.2.6
-      inquirerer: 4.0.0
+      appstash: 0.2.7
+      inquirerer: 4.1.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -12961,21 +12966,21 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@2.4.0:
-    dependencies:
-      deepmerge: 4.3.1
-      find-and-require-package-json: 0.8.2
-      js-yaml: 4.1.1
-      minimist: 1.2.8
-      yanse: 0.1.8
-
-  inquirerer@4.0.0:
+  inquirerer@4.1.0:
     dependencies:
       deepmerge: 4.3.1
       find-and-require-package-json: 0.8.3
       js-yaml: 4.1.1
       minimist: 1.2.8
       yanse: 0.1.9
+
+  inquirerer@4.1.1:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.8.4
+      js-yaml: 4.1.1
+      minimist: 1.2.8
+      yanse: 0.1.10
 
   invariant@2.2.4:
     dependencies:
@@ -13228,7 +13233,7 @@ snapshots:
 
   jest-diff@29.7.0:
     dependencies:
-      chalk: 4.1.0
+      chalk: 4.1.2
       diff-sequences: 29.6.3
       jest-get-type: 29.6.3
       pretty-format: 29.7.0
@@ -14311,7 +14316,7 @@ snapshots:
       array-differ: 3.0.0
       array-union: 2.1.0
       arrify: 2.0.1
-      minimatch: 3.0.5
+      minimatch: 3.1.2
 
   mute-stream@0.0.8: {}
 
@@ -14491,7 +14496,7 @@ snapshots:
       '@yarnpkg/parsers': 3.0.2
       '@zkochan/js-yaml': 0.0.7
       axios: 1.13.2
-      chalk: 4.1.0
+      chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
       cliui: 8.0.1
@@ -14589,9 +14594,9 @@ snapshots:
   ora@5.3.0:
     dependencies:
       bl: 4.1.0
-      chalk: 4.1.0
+      chalk: 4.1.2
       cli-cursor: 3.1.0
-      cli-spinners: 2.6.1
+      cli-spinners: 2.9.2
       is-interactive: 1.0.0
       log-symbols: 4.1.0
       strip-ansi: 6.0.1
@@ -16093,7 +16098,7 @@ snapshots:
 
   yaml@2.8.2: {}
 
-  yanse@0.1.8: {}
+  yanse@0.1.10: {}
 
   yanse@0.1.9: {}
 

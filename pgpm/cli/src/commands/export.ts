@@ -128,8 +128,6 @@ export default async (
   ]);
 
   const outdir = resolve(project.workspacePath, 'packages/');
-
-  prompter.close();
   
   await exportMigrations({
     project,
@@ -139,8 +137,11 @@ export default async (
     schema_names,
     outdir,
     extensionName,
-    metaExtensionName
+    metaExtensionName,
+    prompter
   });
+
+  prompter.close();
 
   console.log(`
 

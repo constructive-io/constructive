@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.2.0...@pgpmjs/core@4.2.1) (2025-12-27)
+
+### Bug Fixes
+
+- **pgpm:** use workspace-level module detection for export flow ([2b02711](https://github.com/constructive-io/constructive/commit/2b0271160944c28bb08058474d4436da5b49c563))
+
+# [4.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.1.2...@pgpmjs/core@4.2.0) (2025-12-27)
+
+### Bug Fixes
+
+- **pgpm:** change default access from 'public' to 'restricted' ([3a0ba34](https://github.com/constructive-io/constructive/commit/3a0ba347a092869b718c120c4888a9fe5474a287))
+- **pgpm:** remove packageIdentifier from answers (no longer required) ([ad96963](https://github.com/constructive-io/constructive/commit/ad96963d265a3e4385b65289bbe910c99375c9c3))
+
+### Features
+
+- **pgpm:** add CLOSED license, comment out security-related dbname updates, rename sqitchDir to pgpmDir ([89d9156](https://github.com/constructive-io/constructive/commit/89d9156b741ac6bc4ff5c696b28fd7bf45b99043))
+- **pgpm:** add interactive prompts for export flow ([68d69a3](https://github.com/constructive-io/constructive/commit/68d69a3e68c343db76beca8539a4238f1f657f74))
+- **pgpm:** improve export command UX with smart defaults ([da34db0](https://github.com/constructive-io/constructive/commit/da34db00b021d0b6806d5e4c7c079ebf99bd5a02))
+
 ## [4.1.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.1.1...@pgpmjs/core@4.1.2) (2025-12-27)
 
 ### Bug Fixes

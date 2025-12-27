@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.1](https://github.com/constructive-io/constructive/compare/pgpm@2.4.0...pgpm@2.4.1) (2025-12-27)
+
+**Note:** Version bump only for package pgpm
+
+# [2.4.0](https://github.com/constructive-io/constructive/compare/pgpm@2.3.0...pgpm@2.4.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** add interactive prompts for export flow ([68d69a3](https://github.com/constructive-io/constructive/commit/68d69a3e68c343db76beca8539a4238f1f657f74))
+- **pgpm:** improve export command UX with smart defaults ([da34db0](https://github.com/constructive-io/constructive/commit/da34db00b021d0b6806d5e4c7c079ebf99bd5a02))
+
 # [2.3.0](https://github.com/constructive-io/constructive/compare/pgpm@2.2.1...pgpm@2.3.0) (2025-12-27)
 
 ### Bug Fixes

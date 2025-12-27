@@ -1,6 +1,6 @@
 {
   "name": "pgpm",
-  "version": "2.3.0",
+  "version": "2.4.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Package Manager - Database migration and package management CLI",
   "main": "index.js",
@@ -46,15 +46,15 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@inquirerer/utils": "^3.0.0",
+    "@inquirerer/utils": "^3.1.1",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.2.6",
     "find-and-require-package-json": "^0.8.2",
-    "genomic": "^5.0.0",
-    "inquirerer": "^4.0.0",
+    "genomic": "^5.0.2",
+    "inquirerer": "^4.1.1",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",

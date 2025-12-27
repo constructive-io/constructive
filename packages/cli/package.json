@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/cli",
-  "version": "5.2.0",
+  "version": "5.2.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI",
   "main": "index.js",
@@ -55,8 +55,8 @@
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "find-and-require-package-json": "^0.8.2",
-    "@inquirerer/utils": "^3.0.0",
-    "inquirerer": "^4.0.0",
+    "@inquirerer/utils": "^3.1.1",
+    "inquirerer": "^4.1.1",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
