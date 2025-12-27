@@ -14,7 +14,7 @@
  *   in the workspace's extensions/ directory or installable via pgpm install
  */
 
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync } from 'fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Pool } from 'pg';
@@ -23,6 +23,7 @@ import { getPgEnvOptions, PgConfig } from 'pg-env';
 
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import { PgpmMigrate } from '../../src/migrate/client';
+import { exportMigrations } from '../../src/export/export-migrations';
 
 // Increase timeout for this test as it involves workspace setup and deployment
 jest.setTimeout(120000);
@@ -31,6 +32,7 @@ describe('Export Flow E2E', () => {
   let tempDir: string;
   let workspaceDir: string;
   let testModuleDir: string;
+  let exportWorkspaceDir: string;
   let db: {
     name: string;
     config: PgConfig;
@@ -54,6 +56,24 @@ describe('Export Flow E2E', () => {
 
     // Deploy the workspace to the test database
     await deployWorkspace();
+
+    // Setup export workspace directory
+    exportWorkspaceDir = join(tempDir, 'export-workspace');
+    mkdirSync(exportWorkspaceDir, { recursive: true });
+    mkdirSync(join(exportWorkspaceDir, 'packages'), { recursive: true });
+    mkdirSync(join(exportWorkspaceDir, 'extensions'), { recursive: true });
+    
+    // Create pgpm.json for export workspace
+    writeFileSync(join(exportWorkspaceDir, 'pgpm.json'), JSON.stringify({
+      packages: ['packages/*', 'extensions/*']
+    }, null, 2));
+    
+    // Create package.json for export workspace
+    writeFileSync(join(exportWorkspaceDir, 'package.json'), JSON.stringify({
+      name: 'export-test-workspace',
+      version: '1.0.0',
+      private: true
+    }, null, 2));
   });
 
   afterAll(async () => {
@@ -259,6 +279,94 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         schema_id uuid,
         api_id uuid
       );
+
+      -- Additional meta_public tables required by exportMeta
+      CREATE TABLE IF NOT EXISTS meta_public.apps (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        site_id uuid,
+        name text,
+        app_image text,
+        app_store_link text,
+        app_store_id text,
+        app_id_prefix text,
+        play_store_link text
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.site_modules (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        site_id uuid,
+        name text,
+        data jsonb
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.site_themes (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        site_id uuid,
+        theme jsonb
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.api_modules (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        api_id uuid,
+        name text,
+        data jsonb
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.api_extensions (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        api_id uuid,
+        schema_name text
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.rls_module (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        api_id uuid,
+        schema_id uuid,
+        private_schema_id uuid,
+        tokens_table_id uuid,
+        users_table_id uuid,
+        authenticate text,
+        authenticate_strict text,
+        "current_role" text,
+        current_role_id text
+      );
+
+      CREATE TABLE IF NOT EXISTS meta_public.user_auth_module (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        schema_id uuid,
+        emails_table_id uuid,
+        users_table_id uuid,
+        secrets_table_id uuid,
+        encrypted_table_id uuid,
+        tokens_table_id uuid,
+        sign_in_function text,
+        sign_up_function text,
+        sign_out_function text,
+        sign_in_one_time_token_function text,
+        one_time_token_function text,
+        extend_token_expires text,
+        send_account_deletion_email_function text,
+        delete_account_function text,
+        set_password_function text,
+        reset_password_function text,
+        forgot_password_function text,
+        send_verification_email_function text,
+        verify_email_function text
+      );
+
+      -- Additional collections_public table required by exportMeta
+      CREATE TABLE IF NOT EXISTS collections_public.database_extension (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        database_id uuid,
+        name text
+      );
     `);
 
     return { name: dbName, config, pool };
@@ -460,5 +568,178 @@ INSERT INTO meta_public.api_schemata (id, database_id, schema_id, api_id) VALUES
       expect(row).toHaveProperty('revert');
       expect(row).toHaveProperty('verify');
     }
+  });
+
+  describe('Export to second workspace', () => {
+    const DATABASE_ID = 'a1b2c3d4-e5f6-4708-b250-000000000001';
+    const EXTENSION_NAME = 'pets-export';
+    const META_EXTENSION_NAME = 'pets-export-svc';
+    let exportError: Error | null = null;
+
+    beforeAll(async () => {
+      // Get schema names from the seeded data
+      const schemaResult = await db.pool.query(
+        'SELECT schema_name FROM collections_public.schema WHERE database_id = $1',
+        [DATABASE_ID]
+      );
+      const schemaNames = schemaResult.rows.map((r: any) => r.schema_name);
+
+      // Pre-create the module directories to avoid initModule prompting for input
+      // This simulates what initModule would do but without the TTY prompts
+      const dbModuleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
+      const svcModuleDir = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME);
+      
+      // Create db module structure
+      mkdirSync(dbModuleDir, { recursive: true });
+      writeFileSync(join(dbModuleDir, 'package.json'), JSON.stringify({
+        name: EXTENSION_NAME,
+        version: '1.0.0',
+        description: 'Exported pets database schema'
+      }, null, 2));
+      writeFileSync(join(dbModuleDir, `${EXTENSION_NAME}.control`), `# ${EXTENSION_NAME} extension
+comment = 'Exported pets database schema'
+default_version = '1.0.0'
+relocatable = false
+`);
+      // Create empty pgpm.plan so preparePackage thinks module exists and skips initModule
+      writeFileSync(join(dbModuleDir, 'pgpm.plan'), `%syntax-version=1.0.0
+%project=${EXTENSION_NAME}
+%uri=https://github.com/test/${EXTENSION_NAME}
+`);
+      
+      // Create svc module structure
+      mkdirSync(svcModuleDir, { recursive: true });
+      writeFileSync(join(svcModuleDir, 'package.json'), JSON.stringify({
+        name: META_EXTENSION_NAME,
+        version: '1.0.0',
+        description: 'Exported pets service metadata'
+      }, null, 2));
+      writeFileSync(join(svcModuleDir, `${META_EXTENSION_NAME}.control`), `# ${META_EXTENSION_NAME} extension
+comment = 'Exported pets service metadata'
+default_version = '1.0.0'
+relocatable = false
+`);
+      // Create empty pgpm.plan so preparePackage thinks module exists and skips initModule
+      writeFileSync(join(svcModuleDir, 'pgpm.plan'), `%syntax-version=1.0.0
+%project=${META_EXTENSION_NAME}
+%uri=https://github.com/test/${META_EXTENSION_NAME}
+`);
+
+      // Create a PgpmPackage instance for the export workspace
+      const project = new PgpmPackage(exportWorkspaceDir);
+
+      try {
+        // Run the export - since pgpm.plan exists, preparePackage will skip initModule
+        // and just delete/recreate deploy/revert/verify directories
+        await exportMigrations({
+          project,
+          options: {
+            pg: db.config
+          },
+          dbInfo: {
+            dbname: db.name,
+            databaseName: 'pets',
+            database_ids: [DATABASE_ID]
+          },
+          author: 'test <test@test.local>',
+          outdir: join(exportWorkspaceDir, 'packages'),
+          schema_names: schemaNames,
+          extensionName: EXTENSION_NAME,
+          extensionDesc: 'Exported pets database schema',
+          metaExtensionName: META_EXTENSION_NAME,
+          metaExtensionDesc: 'Exported pets service metadata'
+          // No prompter - non-interactive mode (will auto-overwrite since no prompter)
+        });
+      } catch (err) {
+        exportError = err as Error;
+      }
+    }, 180000); // Increase timeout for export operation
+
+    it('should have completed export without errors', () => {
+      if (exportError) {
+        console.error('Export error:', exportError);
+      }
+      expect(exportError).toBeNull();
+    });
+
+    it('should have created the database export module directory', () => {
+      const dbModuleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
+      expect(existsSync(dbModuleDir)).toBe(true);
+    });
+
+    it('should have created pgpm.plan for database export', () => {
+      const planPath = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'pgpm.plan');
+      expect(existsSync(planPath)).toBe(true);
+      
+      const planContent = readFileSync(planPath, 'utf-8');
+      expect(planContent).toContain('%project=' + EXTENSION_NAME);
+      // Should contain migration entries from sql_actions
+      expect(planContent).toContain('schemas/');
+    });
+
+    it('should have created deploy directory with SQL files', () => {
+      const deployDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'deploy');
+      expect(existsSync(deployDir)).toBe(true);
+      
+      // Check that deploy directory has SQL files
+      const files = readdirSync(deployDir, { recursive: true });
+      expect(files.length).toBeGreaterThan(0);
+    });
+
+    it('should have created revert directory with SQL files', () => {
+      const revertDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'revert');
+      expect(existsSync(revertDir)).toBe(true);
+    });
+
+    it('should have created verify directory with SQL files', () => {
+      const verifyDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'verify');
+      expect(existsSync(verifyDir)).toBe(true);
+    });
+
+    it('should have created the service/meta export module directory', () => {
+      const svcModuleDir = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME);
+      expect(existsSync(svcModuleDir)).toBe(true);
+    });
+
+    it('should have created pgpm.plan for service export', () => {
+      const planPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'pgpm.plan');
+      expect(existsSync(planPath)).toBe(true);
+      
+      const planContent = readFileSync(planPath, 'utf-8');
+      expect(planContent).toContain('%project=' + META_EXTENSION_NAME);
+      expect(planContent).toContain('migrate/meta');
+    });
+
+    it('should have created deploy/migrate/meta.sql with collections data', () => {
+      const metaSqlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate', 'meta.sql');
+      expect(existsSync(metaSqlPath)).toBe(true);
+      
+      const metaContent = readFileSync(metaSqlPath, 'utf-8');
+      // Should contain INSERT statements for meta tables
+      expect(metaContent).toContain('INSERT INTO');
+      expect(metaContent).toContain('session_replication_role');
+    });
+
+    it('should have created control files for both modules', () => {
+      const dbControlPath = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, EXTENSION_NAME + '.control');
+      const svcControlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, META_EXTENSION_NAME + '.control');
+      
+      expect(existsSync(dbControlPath)).toBe(true);
+      expect(existsSync(svcControlPath)).toBe(true);
+    });
+
+    it('should have created package.json for both modules', () => {
+      const dbPkgPath = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'package.json');
+      const svcPkgPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'package.json');
+      
+      expect(existsSync(dbPkgPath)).toBe(true);
+      expect(existsSync(svcPkgPath)).toBe(true);
+      
+      const dbPkg = JSON.parse(readFileSync(dbPkgPath, 'utf-8'));
+      expect(dbPkg.name).toBe(EXTENSION_NAME);
+      
+      const svcPkg = JSON.parse(readFileSync(svcPkgPath, 'utf-8'));
+      expect(svcPkg.name).toBe(META_EXTENSION_NAME);
+    });
   });
 });
