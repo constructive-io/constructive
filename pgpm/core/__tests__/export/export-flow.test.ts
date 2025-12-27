@@ -14,9 +14,9 @@
  *   in the workspace's extensions/ directory or installable via pgpm install
  */
 
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { Pool } from 'pg';
 import { getPgPool, teardownPgPools } from 'pg-cache';
 import { getPgEnvOptions, PgConfig } from 'pg-env';
@@ -27,6 +27,35 @@ import { exportMigrations } from '../../src/export/export-migrations';
 
 // Increase timeout for this test as it involves workspace setup and deployment
 jest.setTimeout(120000);
+
+/**
+ * Recursively get all files in a directory as a sorted array of relative paths.
+ * Used for snapshot testing directory structures.
+ */
+function getDirectoryStructure(dir: string, baseDir?: string): string[] {
+  const base = baseDir || dir;
+  const results: string[] = [];
+  
+  if (!existsSync(dir)) {
+    return results;
+  }
+  
+  const entries = readdirSync(dir);
+  for (const entry of entries) {
+    const fullPath = join(dir, entry);
+    const relativePath = relative(base, fullPath);
+    const stat = statSync(fullPath);
+    
+    if (stat.isDirectory()) {
+      results.push(relativePath + '/');
+      results.push(...getDirectoryStructure(fullPath, base));
+    } else {
+      results.push(relativePath);
+    }
+  }
+  
+  return results.sort();
+}
 
 describe('Export Flow E2E', () => {
   let tempDir: string;
@@ -740,6 +769,18 @@ relocatable = false
       
       const svcPkg = JSON.parse(readFileSync(svcPkgPath, 'utf-8'));
       expect(svcPkg.name).toBe(META_EXTENSION_NAME);
+    });
+
+    it('should match snapshot for database export deploy/ folder structure', () => {
+      const dbDeployDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME, 'deploy');
+      const structure = getDirectoryStructure(dbDeployDir);
+      expect(structure).toMatchSnapshot('pets-export deploy folder');
+    });
+
+    it('should match snapshot for service export deploy/ folder structure', () => {
+      const svcDeployDir = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy');
+      const structure = getDirectoryStructure(svcDeployDir);
+      expect(structure).toMatchSnapshot('pets-export-svc deploy folder');
     });
   });
 });
