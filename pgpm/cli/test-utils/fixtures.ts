@@ -18,7 +18,7 @@ const createFixture = (...fixturePath: string[]) =>
       fixtureRoot: FIXTURES_PATH,
       tmpPrefix: 'pgpm-test-',
       cliOptions: { version: '1.0.0' },
-      argvTransform: (argv: Partial<ParsedArgs>) => withInitDefaults(argv, DEFAULT_TEMPLATE_REPO)
+      argvTransform: (argv) => withInitDefaults(argv as ParsedArgs, DEFAULT_TEMPLATE_REPO)
     },
     ...fixturePath
   );
