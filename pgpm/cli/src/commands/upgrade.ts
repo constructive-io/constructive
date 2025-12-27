@@ -1,6 +1,6 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
+import { CLIOptions, Inquirerer, upgradePrompt, PackageInfo, createSpinner } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import { fetchLatestVersion } from '../utils/npm-version';
 
@@ -80,10 +80,15 @@ async function upgradeModulesForProject(
   }
 
   const prefix = moduleName ? `[${moduleName}] ` : '';
-  log.info(`${prefix}Found ${installed.length} installed module(s). Checking for updates...`);
-
+  
+  // Use spinner while checking for updates
+  const spinner = createSpinner(`${prefix}Checking ${installed.length} installed module(s) for updates...`);
+  spinner.start();
+  
   const moduleVersions = await fetchModuleVersions(installedVersions);
   const modulesWithUpdates = moduleVersions.filter(m => m.hasUpdate);
+  
+  spinner.succeed(`${prefix}Found ${modulesWithUpdates.length} module(s) with updates available`);
 
   if (modulesWithUpdates.length === 0) {
     log.success(`${prefix}All modules are already up to date.`);
@@ -114,36 +119,22 @@ async function upgradeModulesForProject(
       return false;
     }
   } else if (interactive) {
-    // Interactive mode: prompt user to select modules
-    const options = modulesWithUpdates.map(mod => ({
+    // Interactive mode: use pnpm-style upgrade UI
+    const packages: PackageInfo[] = modulesWithUpdates.map(mod => ({
       name: mod.name,
-      value: mod.name,
-      message: `${mod.name} (${mod.currentVersion} -> ${mod.latestVersion})`
+      current: mod.currentVersion,
+      latest: mod.latestVersion!,
+      type: 'dependencies' as const
     }));
 
-    const questions: Question[] = [
-      {
-        name: 'selectedModules',
-        message: `${prefix}Select modules to upgrade:`,
-        type: 'checkbox',
-        options: options.map(o => o.message),
-        default: options.map(o => o.message)
-      }
-    ];
+    const result = await upgradePrompt(packages, 10);
 
-    const answers = await prompter.prompt(argv, questions);
-    const selectedOptions = (answers.selectedModules as OptionValue[])
-      .filter(opt => opt.selected)
-      .map(opt => opt.name);
-
-    modulesToUpgrade = modulesWithUpdates
-      .filter(mod => selectedOptions.includes(`${mod.name} (${mod.currentVersion} -> ${mod.latestVersion})`))
-      .map(m => m.name);
-
-    if (modulesToUpgrade.length === 0) {
+    if (result.updates.length === 0) {
       log.info(`${prefix}No modules selected for upgrade.`);
       return false;
     }
+
+    modulesToUpgrade = result.updates.map(u => u.name);
   } else {
     // Default behavior: upgrade all modules with updates (like pnpm upgrade)
     modulesToUpgrade = modulesWithUpdates.map(m => m.name);
