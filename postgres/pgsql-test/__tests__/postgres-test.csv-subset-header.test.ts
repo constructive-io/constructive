@@ -1,9 +1,6 @@
 process.env.LOG_SCOPE = 'pgsql-test';
 
-import fs from 'fs';
 import path from 'path';
-
-import { exportCsv } from 'pgsql-seed';
 
 import { seed } from '../src';
 import { getConnections } from '../src/connect';
@@ -71,14 +68,4 @@ it('csv in/out', async () => {
     { name: 'Bob', content: 'Graphile is cool!' },
     { name: 'Carol', content: "Carol's first post" }
   ]);
-
-  // 6. Ensure output directory exists
-  const outDir = path.resolve(__dirname, '../output');
-  fs.mkdirSync(outDir, { recursive: true });
-
-  // 7. Export updated tables to CSV
-  await exportCsv(pg, 'custom.users', path.join(outDir, 'users.csv'));
-  await exportCsv(pg, 'custom.posts', path.join(outDir, 'posts.csv'));
-
-  console.log(`📤 Exported users and posts to ${outDir}`);
 });
