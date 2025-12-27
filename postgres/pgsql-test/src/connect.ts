@@ -8,9 +8,10 @@ import {
   PgConfig,
 } from 'pg-env';
 
+import { getDefaultRole } from 'pgsql-client';
+
 import { DbAdmin } from './admin';
 import { PgTestConnector } from './manager';
-import { getDefaultRole } from './roles';
 import { seed } from './seed';
 import { SeedAdapter } from './seed/types';
 import { PgTestClient } from './test-client';
