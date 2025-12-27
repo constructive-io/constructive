@@ -18,7 +18,6 @@ export const getJobPgConfig = (): PgConfig => {
   return {
     ...defaultPgConfig,
     ...(opts.pg ?? {}),
-    ...(opts.jobs?.pg ?? {}),
     ...envOnly
   };
 };

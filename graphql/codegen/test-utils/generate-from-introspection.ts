@@ -3,8 +3,8 @@ import { IntrospectionQueryResult, parseGraphQuery } from 'introspectron';
 
 import { generate, GqlMap } from '../src/gql';
 
-export function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, string> {
-  const gen = generate(gqlMap);
+export function generateKeyedObjFromGqlMap(gqlMap: GqlMap, selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]> }): Record<string, string> {
+  const gen = generate(gqlMap, selection as any);
 
   return Object.entries(gen).reduce<Record<string, string>>((acc, [key, val]) => {
     if (val?.ast) {
@@ -14,8 +14,8 @@ export function generateKeyedObjFromGqlMap(gqlMap: GqlMap): Record<string, strin
   }, {});
 }
 
-export function generateKeyedObjFromIntrospection(introspection: IntrospectionQueryResult): Record<string, string> {
+export function generateKeyedObjFromIntrospection(introspection: IntrospectionQueryResult, selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]> }): Record<string, string> {
   const { queries, mutations } = parseGraphQuery(introspection);
   const gqlMap: GqlMap = { ...queries, ...mutations };
-  return generateKeyedObjFromGqlMap(gqlMap);
+  return generateKeyedObjFromGqlMap(gqlMap, selection);
 }

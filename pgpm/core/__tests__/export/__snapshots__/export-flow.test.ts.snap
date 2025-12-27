@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Export Flow E2E Export to second workspace should match snapshot for database export deploy/ folder structure: pets-export deploy folder 1`] = `
+[
+  "schemas/",
+  "schemas/pets_export_private/",
+  "schemas/pets_export_private/schema.sql",
+  "schemas/pets_export_public/",
+  "schemas/pets_export_public/schema.sql",
+  "schemas/pets_export_public/tables/",
+  "schemas/pets_export_public/tables/owners/",
+  "schemas/pets_export_public/tables/owners/table.sql",
+  "schemas/pets_export_public/tables/pets/",
+  "schemas/pets_export_public/tables/pets/table.sql",
+  "schemas/pets_export_public/tables/species/",
+  "schemas/pets_export_public/tables/species/table.sql",
+]
+`;
+
+exports[`Export Flow E2E Export to second workspace should match snapshot for service export deploy/ folder structure: pets-export-svc deploy folder 1`] = `
+[
+  "migrate/",
+  "migrate/meta.sql",
+]
+`;

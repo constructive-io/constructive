@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "3.2.1",
+  "version": "4.5.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -44,6 +44,7 @@
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
+    "inquirerer": "^4.2.0",
     "makage": "^0.1.9"
   },
   "dependencies": {
@@ -51,16 +52,16 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "create-gen-app": "^0.6.2",
-    "csv-to-pg": "^2.0.10",
+    "csv-to-pg": "workspace:^",
+    "genomic": "^5.2.0",
     "glob": "^13.0.0",
     "komoji": "^0.7.11",
     "parse-package-name": "^1.0.0",
     "pg": "^8.16.3",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.13.0",
-    "pgsql-parser": "^17.9.3",
+    "pgsql-deparser": "^17.15.0",
+    "pgsql-parser": "^17.9.5",
     "yanse": "^0.1.8"
   }
 }

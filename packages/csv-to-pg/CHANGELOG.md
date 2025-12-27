@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.2.1...csv-to-pg@3.3.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** use new upgradePrompt UI for interactive mode ([237f6e0](https://github.com/constructive-io/constructive/commit/237f6e01a849910a84adb69bb1df7396aeeaa0ce))
+
+## [3.2.1](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.2.0...csv-to-pg@3.2.1) (2025-12-27)
+
+**Note:** Version bump only for package csv-to-pg
+
+# [3.2.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.5...csv-to-pg@3.2.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** add -w alias for --workspace flag and migrate to genomic ([d402038](https://github.com/constructive-io/constructive/commit/d402038f5791dcc3ec17003f956aae8057119294))
+
+## [3.1.5](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.4...csv-to-pg@3.1.5) (2025-12-26)
+
+**Note:** Version bump only for package csv-to-pg
+
+## [3.1.4](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.3...csv-to-pg@3.1.4) (2025-12-26)
+
+### Bug Fixes
+
+- **pgpm/core:** use workspace csv-to-pg to fix ast.ResTarget error ([b521725](https://github.com/constructive-io/constructive/commit/b521725cc5fb32cfaeb075525c75ac00b38d65a5))
+
+## [3.1.3](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.2...csv-to-pg@3.1.3) (2025-12-25)
+
+**Note:** Version bump only for package csv-to-pg
+
+## [3.1.2](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.1...csv-to-pg@3.1.2) (2025-12-25)
+
+**Note:** Version bump only for package csv-to-pg
+
+## [3.1.1](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.1.0...csv-to-pg@3.1.1) (2025-12-25)
+
+**Note:** Version bump only for package csv-to-pg
+
 # [3.1.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@2.0.10...csv-to-pg@3.1.0) (2025-12-25)
 
 ### Bug Fixes

@@ -1,24 +1,31 @@
-import { PgpmPackage } from '@pgpmjs/core';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { getMissingInstallableModules, PgpmPackage } from '@pgpmjs/core';
+import { Logger } from '@pgpmjs/logger';
+import { CLIOptions, Inquirerer, createSpinner } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
+
+const logger = new Logger('pgpm');
 
 const installUsageText = `
 Install Command:
 
-  pgpm install <package>...
+  pgpm install [package]...
 
   Install pgpm modules into current module.
 
+  When called without arguments, installs any missing modules that are
+  listed in the module's .control file but not yet installed in the workspace.
+
 Arguments:
-  package                 One or more package names to install
+  package                 One or more package names to install (optional)
 
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
+  pgpm install                                 Install missing modules from .control file
   pgpm install @pgpm/base32                    Install single package
-  pgpm install @pgpm/base32 @pgpm/utils   Install multiple packages
+  pgpm install @pgpm/base32 @pgpm/utils        Install multiple packages
 `;
 
 export default async (
@@ -39,10 +46,33 @@ export default async (
     throw new Error('You must run this command inside a PGPM module.');
   }
 
+  // If no packages specified, install missing modules from .control file
   if (argv._.length === 0) {
-    throw new Error('You must provide a package name to install, e.g. `@pgpm/base32`');
+    const checkSpinner = createSpinner('Checking for missing modules...');
+    checkSpinner.start();
+    
+    const requiredExtensions = project.getRequiredModules();
+    const installedModules = project.getWorkspaceInstalledModules();
+    const missingModules = getMissingInstallableModules(requiredExtensions, installedModules);
+
+    if (missingModules.length === 0) {
+      checkSpinner.succeed('All modules are already installed.');
+      return;
+    }
+
+    const missingNames = missingModules.map(m => m.npmName);
+    checkSpinner.succeed(`Found ${missingModules.length} missing module(s): ${missingNames.join(', ')}`);
+    
+    const installSpinner = createSpinner(`Installing ${missingModules.length} module(s)...`);
+    installSpinner.start();
+    await project.installModules(...missingNames);
+    installSpinner.succeed(`Installed ${missingModules.length} module(s) successfully.`);
+    return;
   }
 
+  const installSpinner = createSpinner(`Installing ${argv._.length} module(s)...`);
+  installSpinner.start();
   await project.installModules(...argv._);
+  installSpinner.succeed(`Installed ${argv._.length} module(s) successfully.`);
 
 };

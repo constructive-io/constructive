@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.38](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.37...@constructive-io/graphql-codegen@2.17.38) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.37](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.36...@constructive-io/graphql-codegen@2.17.37) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.36](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.35...@constructive-io/graphql-codegen@2.17.36) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.35](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.34...@constructive-io/graphql-codegen@2.17.35) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.34](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.33...@constructive-io/graphql-codegen@2.17.34) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.33](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.32...@constructive-io/graphql-codegen@2.17.33) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.32](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.31...@constructive-io/graphql-codegen@2.17.32) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.31](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.30...@constructive-io/graphql-codegen@2.17.31) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.30](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.29...@constructive-io/graphql-codegen@2.17.30) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.29](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.28...@constructive-io/graphql-codegen@2.17.29) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.28](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.27...@constructive-io/graphql-codegen@2.17.28) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.27](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.26...@constructive-io/graphql-codegen@2.17.27) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.26](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.25...@constructive-io/graphql-codegen@2.17.26) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.25](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.24...@constructive-io/graphql-codegen@2.17.25) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.17.24](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.23...@constructive-io/graphql-codegen@2.17.24) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [2.17.23](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.22...@constructive-io/graphql-codegen@2.17.23) (2025-12-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

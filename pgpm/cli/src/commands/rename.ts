@@ -1,9 +1,8 @@
+import { cliExitWithError } from '@inquirerer/utils';
 import { PgpmPackage } from '@pgpmjs/core';
 import { Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import path from 'path';
-
-import { cliExitWithError } from '../utils/cli-error';
 
 export default async (argv: Partial<ParsedArgs>, _prompter: Inquirerer) => {
   const cwd = (argv.cwd as string) || process.cwd();

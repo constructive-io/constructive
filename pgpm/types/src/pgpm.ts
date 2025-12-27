@@ -261,22 +261,10 @@ export const pgpmDefaults: PgpmOptions = {
     }
   },
   jobs: {
-    pg: {
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'password',
-      database: 'jobs'
-    },
     schema: {
       schema: 'app_jobs'
     },
     worker: {
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'password',
-      database: 'jobs',
       schema: 'app_jobs',
       hostname: 'worker-0',
       supportAny: true,
@@ -285,11 +273,6 @@ export const pgpmDefaults: PgpmOptions = {
       gracefulShutdown: true
     },
     scheduler: {
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'password',
-      database: 'jobs',
       schema: 'app_jobs',
       hostname: 'scheduler-0',
       supportAny: true,

@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.36](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.35...graphile-many-to-many@1.0.36) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.35](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.34...graphile-many-to-many@1.0.35) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.34](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.33...graphile-many-to-many@1.0.34) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.33](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.32...graphile-many-to-many@1.0.33) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.32](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.31...graphile-many-to-many@1.0.32) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.31](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.30...graphile-many-to-many@1.0.31) (2025-12-27)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.30](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.29...graphile-many-to-many@1.0.30) (2025-12-26)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.29](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.28...graphile-many-to-many@1.0.29) (2025-12-26)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.28](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.27...graphile-many-to-many@1.0.28) (2025-12-26)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.27](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.26...graphile-many-to-many@1.0.27) (2025-12-26)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.26](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.25...graphile-many-to-many@1.0.26) (2025-12-26)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.25](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.24...graphile-many-to-many@1.0.25) (2025-12-25)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.24](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.23...graphile-many-to-many@1.0.24) (2025-12-25)
+
+**Note:** Version bump only for package graphile-many-to-many
+
+## [1.0.23](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.22...graphile-many-to-many@1.0.23) (2025-12-25)
+
+**Note:** Version bump only for package graphile-many-to-many
+
 ## [1.0.22](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.21...graphile-many-to-many@1.0.22) (2025-12-25)
 
 **Note:** Version bump only for package graphile-many-to-many

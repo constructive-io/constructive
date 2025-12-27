@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.31](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.30...pg-codegen@2.15.31) (2025-12-27)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.30](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.29...pg-codegen@2.15.30) (2025-12-27)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.29](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.28...pg-codegen@2.15.29) (2025-12-27)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.28](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.27...pg-codegen@2.15.28) (2025-12-27)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.27](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.26...pg-codegen@2.15.27) (2025-12-27)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.26](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.25...pg-codegen@2.15.26) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
+## [2.15.25](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.24...pg-codegen@2.15.25) (2025-12-26)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.24](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.23...pg-codegen@2.15.24) (2025-12-26)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.23](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.22...pg-codegen@2.15.23) (2025-12-26)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.22](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.21...pg-codegen@2.15.22) (2025-12-26)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.21](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.20...pg-codegen@2.15.21) (2025-12-26)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.20](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.19...pg-codegen@2.15.20) (2025-12-25)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.19](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.18...pg-codegen@2.15.19) (2025-12-25)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.18](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.17...pg-codegen@2.15.18) (2025-12-25)
+
+**Note:** Version bump only for package pg-codegen
+
 ## [2.15.17](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.16...pg-codegen@2.15.17) (2025-12-25)
 
 **Note:** Version bump only for package pg-codegen

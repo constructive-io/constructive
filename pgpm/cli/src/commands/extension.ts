@@ -37,7 +37,7 @@ export default async (
 
   const info = project.getModuleInfo();
   const installed = project.getRequiredModules();
-  const available = project.getAvailableModules();
+  const available = await project.getAvailableModules();
   const filtered = available.filter(name => name !== info.extname);
 
   const questions: Question[] = [

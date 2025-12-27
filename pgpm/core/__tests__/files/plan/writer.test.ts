@@ -1,10 +1,10 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { writeSqitchPlan } from '../../../src/files/plan/writer';
-import { SqitchRow } from '../../../src/files/types';
+import { writePgpmPlan } from '../../../src/files/plan/writer';
+import { PgpmRow } from '../../../src/files/types';
 
-describe('writeSqitchPlan', () => {
+describe('writePgpmPlan', () => {
   let tempDir: string;
   let outputDir: string;
 
@@ -18,7 +18,7 @@ describe('writeSqitchPlan', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  const createTestRows = (): SqitchRow[] => [
+  const createTestRows = (): PgpmRow[] => [
     {
       deploy: 'schemas/test/schema',
       revert: 'schemas/test/schema',
@@ -46,7 +46,7 @@ describe('writeSqitchPlan', () => {
       replacer: (str: string) => str.replace('constructive-extension-name', 'test-module')
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     expect(fs.existsSync(planPath)).toBe(true);
@@ -67,7 +67,7 @@ describe('writeSqitchPlan', () => {
       replacer: (str: string) => str.replace('constructive-extension-name', 'test-module')
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');
@@ -90,7 +90,7 @@ describe('writeSqitchPlan', () => {
       replacer: (str: string) => str.replace('constructive-extension-name', 'test-module')
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');
@@ -108,7 +108,7 @@ describe('writeSqitchPlan', () => {
       replacer: (str: string) => str.replace('constructive-extension-name', 'test-module')
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');
@@ -117,7 +117,7 @@ describe('writeSqitchPlan', () => {
   });
 
   it('should handle rows with dependencies correctly', () => {
-    const rows: SqitchRow[] = [
+    const rows: PgpmRow[] = [
       {
         deploy: 'schemas/test/schema',
         content: 'CREATE SCHEMA test;',
@@ -139,7 +139,7 @@ describe('writeSqitchPlan', () => {
       replacer: (str: string) => str.replace('constructive-extension-name', 'test-module')
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');
@@ -152,7 +152,7 @@ describe('writeSqitchPlan', () => {
   });
 
   it('should skip duplicate deploy paths', () => {
-    const rows: SqitchRow[] = [
+    const rows: PgpmRow[] = [
       {
         deploy: 'schemas/test/schema',
         content: 'CREATE SCHEMA test;',
@@ -176,7 +176,7 @@ describe('writeSqitchPlan', () => {
 
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');
@@ -203,7 +203,7 @@ describe('writeSqitchPlan', () => {
       }
     };
 
-    writeSqitchPlan(rows, opts);
+    writePgpmPlan(rows, opts);
 
     const planPath = path.join(outputDir, 'test-module', 'pgpm.plan');
     const content = fs.readFileSync(planPath, 'utf-8');

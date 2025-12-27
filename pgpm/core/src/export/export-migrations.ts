@@ -6,19 +6,143 @@ import path from 'path';
 import { getPgPool } from 'pg-cache';
 
 import { PgpmPackage } from '../core/class/pgpm';
-import { SqitchRow, SqlWriteOptions,writeSqitchFiles, writeSqitchPlan } from '../files';
+import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
+import { getMissingInstallableModules } from '../modules/modules';
 import { exportMeta } from './export-meta';
+
+/**
+ * Required extensions for database schema exports.
+ * Includes native PostgreSQL extensions and pgpm modules.
+ */
+const DB_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'uuid-ossp',
+  'citext',
+  'pgcrypto',
+  'btree_gist',
+  'postgis',
+  'hstore',
+  'db-meta-schema',
+  'pgpm-inflection',
+  'pgpm-uuid',
+  'pgpm-utils',
+  'pgpm-database-jobs',
+  'pgpm-jwt-claims',
+  'pgpm-stamps',
+  'pgpm-base32',
+  'pgpm-totp',
+  'pgpm-types'
+] as const;
+
+/**
+ * Required extensions for service/meta exports.
+ * Includes native PostgreSQL extensions and pgpm modules for metadata management.
+ */
+const SERVICE_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'db-meta-schema',
+  'db-meta-modules'
+] as const;
+
+/**
+ * Prompter interface for interactive prompts.
+ * Compatible with Inquirerer from the CLI.
+ */
+interface Prompter {
+  prompt: (argv: any, questions: any[]) => Promise<Record<string, any>>;
+}
+
+/**
+ * Result of checking for missing modules at workspace level.
+ */
+interface MissingModulesResult {
+  missingModules: { controlName: string; npmName: string }[];
+  shouldInstall: boolean;
+}
+
+/**
+ * Checks which pgpm modules from the extensions list are missing from the workspace
+ * and prompts the user if they want to install them.
+ * 
+ * This function only does detection and prompting - it does NOT install.
+ * Use installMissingModules() after the module is created to do the actual installation.
+ * 
+ * @param project - The PgpmPackage instance (only needs workspace context)
+ * @param extensions - List of extension names (control file names)
+ * @param prompter - Optional prompter for interactive confirmation
+ * @returns Object with missing modules and whether user wants to install them
+ */
+const detectMissingModules = async (
+  project: PgpmPackage,
+  extensions: string[],
+  prompter?: Prompter
+): Promise<MissingModulesResult> => {
+  // Use workspace-level check - doesn't require being inside a module
+  const installed = project.getWorkspaceInstalledModules();
+  const missingModules = getMissingInstallableModules(extensions, installed);
+  
+  if (missingModules.length === 0) {
+    return { missingModules: [], shouldInstall: false };
+  }
+  
+  const missingNames = missingModules.map(m => m.npmName);
+  console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
+  
+  if (prompter) {
+    const { install } = await prompter.prompt({}, [
+      {
+        type: 'confirm',
+        name: 'install',
+        message: `Install missing modules (${missingNames.join(', ')})?`,
+        default: true
+      }
+    ]);
+    
+    return { missingModules, shouldInstall: install };
+  }
+  
+  return { missingModules, shouldInstall: false };
+};
+
+/**
+ * Installs missing modules into a specific module directory.
+ * Must be called after the module has been created.
+ * 
+ * @param moduleDir - The directory of the module to install into
+ * @param missingModules - Array of missing modules to install
+ */
+const installMissingModules = async (
+  moduleDir: string,
+  missingModules: { controlName: string; npmName: string }[]
+): Promise<void> => {
+  if (missingModules.length === 0) {
+    return;
+  }
+  
+  const missingNames = missingModules.map(m => m.npmName);
+  console.log('Installing missing modules...');
+  
+  // Create a new PgpmPackage instance pointing to the module directory
+  const moduleProject = new PgpmPackage(moduleDir);
+  await moduleProject.installModules(...missingNames);
+  
+  console.log('Modules installed successfully.');
+};
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
   options: PgpmOptions;
   database: string;
   databaseId: string;
+  databaseName: string;
   author: string;
   outdir: string;
   schema_names: string[];
   extensionName?: string;
+  extensionDesc?: string;
   metaExtensionName: string;
+  metaExtensionDesc?: string;
+  prompter?: Prompter;
 }
 
 interface ExportOptions {
@@ -26,13 +150,17 @@ interface ExportOptions {
   options: PgpmOptions;
   dbInfo: {
     dbname: string;
+    databaseName: string;
     database_ids: string[];
   };
   author: string;
   outdir: string;
   schema_names: string[];
   extensionName?: string;
+  extensionDesc?: string;
   metaExtensionName: string;
+  metaExtensionDesc?: string;
+  prompter?: Prompter;
 }
 
 const exportMigrationsToDisk = async ({
@@ -40,11 +168,15 @@ const exportMigrationsToDisk = async ({
   options,
   database,
   databaseId,
+  databaseName,
   author,
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  extensionDesc,
+  metaExtensionName,
+  metaExtensionDesc,
+  prompter
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -93,35 +225,31 @@ const exportMigrationsToDisk = async ({
     author
   };
 
+  // Build description for the database extension package
+  const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
+
   if (results?.rows?.length > 0) {
-    await preparePackage({
+    // Detect missing modules at workspace level and prompt user
+    const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter);
+
+    // Create/prepare the module directory
+    const dbModuleDir = await preparePackage({
       project,
       author,
       outdir,
       name,
-      extensions: [
-        'plpgsql',
-        'uuid-ossp',
-        'citext',
-        'pgcrypto',
-        'btree_gist',
-        'postgis',
-        'hstore',
-        'db-meta-schema',
-        'pgpm-inflection',
-        'pgpm-uuid',
-        'pgpm-utils',
-        'pgpm-database-jobs',
-        'pgpm-jwt-claims',
-        'pgpm-stamps',
-        'pgpm-base32',
-        'pgpm-totp',
-        'pgpm-types'
-      ]
+      description: dbExtensionDesc,
+      extensions: [...DB_REQUIRED_EXTENSIONS],
+      prompter
     });
 
-    writeSqitchPlan(results.rows, opts);
-    writeSqitchFiles(results.rows, opts);
+    // Install missing modules if user confirmed (now that module exists)
+    if (dbMissingResult.shouldInstall) {
+      await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
+    }
+
+    writePgpmPlan(results.rows, opts);
+    writePgpmFiles(results.rows, opts);
 
     let meta = await exportMeta({
       opts: options,
@@ -131,13 +259,27 @@ const exportMigrationsToDisk = async ({
 
     meta = replacer(meta);
 
-    await preparePackage({
+    // Build description for the meta/service extension package
+    const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
+
+    // Detect missing modules at workspace level and prompt user
+    const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
+
+    // Create/prepare the module directory
+    const svcModuleDir = await preparePackage({
       project,
       author,
       outdir,
-      extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules'],
-      name: metaExtensionName
+      name: metaExtensionName,
+      description: metaDesc,
+      extensions: [...SERVICE_REQUIRED_EXTENSIONS],
+      prompter
     });
+
+    // Install missing modules if user confirmed (now that module exists)
+    if (svcMissingResult.shouldInstall) {
+      await installMissingModules(svcModuleDir, svcMissingResult.missingModules);
+    }
 
     const metaReplacer = makeReplacer({
       schemas: schemas.rows.filter((schema: any) =>
@@ -146,7 +288,7 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName
     });
 
-    const metaPackage: SqitchRow[] = [
+    const metaPackage: PgpmRow[] = [
       {
         deps: [],
         deploy: 'migrate/meta',
@@ -168,11 +310,15 @@ $LQLMIGRATION$;
 
 ${meta}
 
-UPDATE meta_public.apis
-      SET dbname = current_database() WHERE TRUE;
+-- TODO: Research needed - These UPDATE statements may be a security leak.
+-- They appear to rebind exported metadata to the target database after import,
+-- but exposing dbname in meta_public tables could leak internal database names.
+-- Consider removing entirely or gating behind an explicit flag.
+-- UPDATE meta_public.apis
+--       SET dbname = current_database() WHERE TRUE;
 
-UPDATE meta_public.sites
-      SET dbname = current_database() WHERE TRUE;
+-- UPDATE meta_public.sites
+--       SET dbname = current_database() WHERE TRUE;
 
 SET session_replication_role TO DEFAULT;
 `
@@ -182,8 +328,8 @@ SET session_replication_role TO DEFAULT;
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;
 
-    writeSqitchPlan(metaPackage, opts);
-    writeSqitchFiles(metaPackage, opts);
+    writePgpmPlan(metaPackage, opts);
+    writePgpmFiles(metaPackage, opts);
   }
 
   pgPool.end();
@@ -197,7 +343,10 @@ export const exportMigrations = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  extensionDesc,
+  metaExtensionName,
+  metaExtensionDesc,
+  prompter
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -205,12 +354,16 @@ export const exportMigrations = async ({
       project,
       options,
       extensionName,
+      extensionDesc,
       metaExtensionName,
+      metaExtensionDesc,
       database: dbInfo.dbname,
+      databaseName: dbInfo.databaseName,
       databaseId,
       schema_names,
       author,
-      outdir
+      outdir,
+      prompter
     });
   }
 };
@@ -221,7 +374,9 @@ interface PreparePackageOptions {
   author: string;
   outdir: string;
   name: string;
+  description: string;
   extensions: string[];
+  prompter?: Prompter;
 }
 
 interface Schema {
@@ -240,35 +395,61 @@ interface ReplacerResult {
 }
 
 /**
- * Creates a Sqitch package directory or resets the deploy/revert/verify directories if it exists.
+ * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
+ * If the module already exists and a prompter is provided, prompts the user for confirmation.
+ * 
+ * @returns The absolute path to the created/prepared module directory
  */
 const preparePackage = async ({
   project,
   author,
   outdir,
   name,
-  extensions
-}: PreparePackageOptions): Promise<void> => {
+  description,
+  extensions,
+  prompter
+}: PreparePackageOptions): Promise<string> => {
   const curDir = process.cwd();
-  const sqitchDir = path.resolve(path.join(outdir, name));
-  mkdirSync(sqitchDir, { recursive: true });
-  process.chdir(sqitchDir);
+  const pgpmDir = path.resolve(path.join(outdir, name));
+  mkdirSync(pgpmDir, { recursive: true });
+  process.chdir(pgpmDir);
 
-  const plan = glob(path.join(sqitchDir, 'pgpm.plan'));
+  const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
     await project.initModule({
       name,
-      description: name,
+      description,
       author,
       extensions,
+      answers: {
+        moduleName: name,
+        moduleDesc: description,
+        access: 'restricted',
+        license: 'CLOSED'
+      }
     });
   } else {
-    rmSync(path.resolve(sqitchDir, 'deploy'), { recursive: true, force: true });
-    rmSync(path.resolve(sqitchDir, 'revert'), { recursive: true, force: true });
-    rmSync(path.resolve(sqitchDir, 'verify'), { recursive: true, force: true });
+    if (prompter) {
+      const { overwrite } = await prompter.prompt({}, [
+        {
+          type: 'confirm',
+          name: 'overwrite',
+          message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
+          default: false
+        }
+      ]);
+      if (!overwrite) {
+        process.chdir(curDir);
+        throw new Error(`Export cancelled: Module "${name}" already exists.`);
+      }
+    }
+    rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
+    rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
+    rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
   }
 
   process.chdir(curDir);
+  return pgpmDir;
 };
 
 /**

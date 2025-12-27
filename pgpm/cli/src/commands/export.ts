@@ -1,7 +1,7 @@
 import { exportMigrations,PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
-import { CLIOptions, Inquirerer, OptionValue } from 'inquirerer';
+import { CLIOptions, Inquirerer } from 'inquirerer';
 import { resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 
@@ -52,18 +52,15 @@ export default async (
       AND datname !~ '^pg_';
   `);
 
-  let databases: OptionValue[];
-  ({ databases } = await prompter.prompt(argv, [
+  const { databases: dbname } = await prompter.prompt(argv, [
     {
-      type: 'checkbox',
+      type: 'list',
       name: 'databases',
       message: 'Select a database',
       options: databasesResult.rows.map(row => row.datname),
       required: true
     }
-  ]));
-
-  const dbname = databases.filter(d=>d.selected).map(d=>d.value)[0];
+  ]);
   const selectedDb = await getPgPool({
     database: dbname
   });
@@ -72,22 +69,22 @@ export default async (
     SELECT id, name FROM collections_public.database;
   `);
 
-  let database_ids: OptionValue[];
-  ({ database_ids } = await prompter.prompt({} as any, [
+  const { database_ids: selectedDatabaseName } = await prompter.prompt({} as any, [
     {
-      type: 'checkbox',
+      type: 'list',
       name: 'database_ids',
-      message: 'Select database_id(s)',
+      message: 'Select database_id',
       options: dbsResult.rows.map(db => db.name),
       required: true
     }
-  ]));
+  ]);
+
+  const selectedDatabase = dbsResult.rows.find(db => db.name === selectedDatabaseName);
 
   const dbInfo = {
     dbname,
-    database_ids: database_ids.map(did =>
-      dbsResult.rows.find(db => db.name === did.name)!.id
-    )
+    databaseName: selectedDatabaseName,
+    database_ids: [selectedDatabase!.id]
   };
 
   const { author, extensionName, metaExtensionName } = await prompter.prompt(argv, [
@@ -102,14 +99,14 @@ export default async (
       type: 'text',
       name: 'extensionName',
       message: 'Extension name',
-      default: dbInfo.database_ids[0],
+      default: selectedDatabaseName || dbname,
       required: true
     },
     {
       type: 'text',
       name: 'metaExtensionName',
       message: 'Meta extension name',
-      default: 'svc',
+      default: `${selectedDatabaseName || dbname}-service`,
       required: true
     }
   ]);
@@ -140,8 +137,11 @@ export default async (
     schema_names,
     outdir,
     extensionName,
-    metaExtensionName
+    metaExtensionName,
+    prompter
   });
+
+  prompter.close();
 
   console.log(`
 

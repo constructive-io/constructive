@@ -1,0 +1,54 @@
+{
+  "name": "pgsql-client",
+  "version": "1.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PostgreSQL client utilities with query helpers, RLS context management, and database administration",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "client",
+    "pg",
+    "rls",
+    "row-level-security",
+    "database",
+    "admin",
+    "query-helpers",
+    "constructive"
+  ],
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "makage": "^0.1.9"
+  },
+  "dependencies": {
+    "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "pg": "^8.16.3",
+    "pg-env": "workspace:^"
+  }
+}

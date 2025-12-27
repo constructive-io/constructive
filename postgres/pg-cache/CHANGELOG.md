@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.11](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.10...pg-cache@1.6.11) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
+## [1.6.10](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.9...pg-cache@1.6.10) (2025-12-26)
+
+**Note:** Version bump only for package pg-cache
+
 ## [1.6.9](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.8...pg-cache@1.6.9) (2025-12-24)
 
 ### Bug Fixes

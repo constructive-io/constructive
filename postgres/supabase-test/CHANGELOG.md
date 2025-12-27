@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.31](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.30...supabase-test@0.4.31) (2025-12-27)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.30](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.29...supabase-test@0.4.30) (2025-12-27)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.29](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.28...supabase-test@0.4.29) (2025-12-27)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.28](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.27...supabase-test@0.4.28) (2025-12-27)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.27](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.26...supabase-test@0.4.27) (2025-12-27)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.26](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.25...supabase-test@0.4.26) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
+## [0.4.25](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.24...supabase-test@0.4.25) (2025-12-26)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.24](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.23...supabase-test@0.4.24) (2025-12-26)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.23](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.22...supabase-test@0.4.23) (2025-12-26)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.22](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.21...supabase-test@0.4.22) (2025-12-26)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.21](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.20...supabase-test@0.4.21) (2025-12-26)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.20](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.19...supabase-test@0.4.20) (2025-12-25)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.19](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.18...supabase-test@0.4.19) (2025-12-25)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.18](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.17...supabase-test@0.4.18) (2025-12-25)
+
+**Note:** Version bump only for package supabase-test
+
 ## [0.4.17](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.16...supabase-test@0.4.17) (2025-12-25)
 
 **Note:** Version bump only for package supabase-test

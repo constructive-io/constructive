@@ -1,19 +1,16 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
+import { cliExitWithError, checkForUpdates, extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-import { checkForUpdates, createInitUsageText, createPgpmCommandMap } from 'pgpm';
 
 import codegen from './commands/codegen';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
 import server from './commands/server';
-import { cliExitWithError, extractFirst, usageText } from './utils';
+import { usageText } from './utils';
 
-const createCommandMap = (skipPgTeardown: boolean = false): Record<string, Function> => {
-  const pgpmCommands = createPgpmCommandMap(skipPgTeardown);
-
+const createCommandMap = (): Record<string, Function> => {
   return {
-    ...pgpmCommands,
     server,
     explorer,
     'get-graphql-schema': getGraphqlSchema,
@@ -25,16 +22,18 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   let { first: command, newArgv } = extractFirst(argv);
 
   // Run update check early so it shows on help/version paths too
+  // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / CONSTRUCTIVE_SKIP_UPDATE_CHECK is set)
   try {
     const pkg = findAndRequirePackageJson(__dirname);
-    await checkForUpdates({
-      command: command || 'help',
+    const updateResult = await checkForUpdates({
       pkgName: pkg.name,
       pkgVersion: pkg.version,
       toolName: 'constructive',
-      key: pkg.name,
-      updateCommand: `Run npm i -g ${pkg.name}@latest to upgrade.`
     });
+    if (updateResult.hasUpdate && updateResult.message) {
+      console.warn(updateResult.message);
+      console.warn(`Run npm i -g ${pkg.name}@latest to upgrade.`);
+    }
   } catch {
     // ignore update check failures
   }
@@ -57,13 +56,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     process.exit(0);
   }
 
-  // Command-specific help for init
-  if (command === 'init' && (argv.help || argv.h)) {
-    console.log(createInitUsageText('constructive', 'Constructive'));
-    process.exit(0);
-  }
-
-  const commandMap = createCommandMap(options?.skipPgTeardown);
+  const commandMap = createCommandMap();
 
   // Prompt if no command provided
   if (!command) {

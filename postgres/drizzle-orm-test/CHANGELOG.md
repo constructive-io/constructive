@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.35](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.34...drizzle-orm-test@0.3.35) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.34](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.33...drizzle-orm-test@0.3.34) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.33](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.32...drizzle-orm-test@0.3.33) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.32](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.31...drizzle-orm-test@0.3.32) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.31](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.30...drizzle-orm-test@0.3.31) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.30](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.29...drizzle-orm-test@0.3.30) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
+## [0.3.29](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.28...drizzle-orm-test@0.3.29) (2025-12-26)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.28](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.27...drizzle-orm-test@0.3.28) (2025-12-26)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.27](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.26...drizzle-orm-test@0.3.27) (2025-12-26)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.26](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.25...drizzle-orm-test@0.3.26) (2025-12-26)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.25](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.24...drizzle-orm-test@0.3.25) (2025-12-26)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.24](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.23...drizzle-orm-test@0.3.24) (2025-12-25)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.23](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.22...drizzle-orm-test@0.3.23) (2025-12-25)
+
+**Note:** Version bump only for package drizzle-orm-test
+
+## [0.3.22](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.21...drizzle-orm-test@0.3.22) (2025-12-25)
+
+**Note:** Version bump only for package drizzle-orm-test
+
 ## [0.3.21](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.20...drizzle-orm-test@0.3.21) (2025-12-25)
 
 **Note:** Version bump only for package drizzle-orm-test

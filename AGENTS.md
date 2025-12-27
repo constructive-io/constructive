@@ -50,11 +50,17 @@ This guide helps AI agents quickly navigate the Constructive monorepo. Construct
 
 ## Common Workflows (via CLI)
 
-- Initialize workspace/module: `pgpm init workspace`, `pgpm init` (also available via `cnc init`)
+**Database Operations (pgpm):**
+- Initialize workspace/module: `pgpm init workspace`, `pgpm init`
 - Create a change: `pgpm add <change>`
 - Deploy/verify/revert: `pgpm deploy`, `pgpm verify`, `pgpm revert`
 - Install PGPM modules: `pgpm install <pkg@version>`
-- Start GraphQL server/explorer: `cnc server`, `cnc explorer`
+
+**GraphQL Operations (cnc/constructive):**
+- Start GraphQL server: `cnc server`
+- Launch GraphiQL explorer: `cnc explorer`
+- Generate types/SDK: `cnc codegen`
+- Export schema SDL: `cnc get-graphql-schema`
 
 ## Tips
 

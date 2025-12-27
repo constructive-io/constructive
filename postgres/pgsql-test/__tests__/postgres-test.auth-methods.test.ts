@@ -1,7 +1,8 @@
 process.env.LOG_SCOPE = 'pgsql-test';
 
+import { getRoleName } from 'pgsql-client';
+
 import { getConnections } from '../src/connect';
-import { getRoleName } from '../src/roles';
 import { PgTestClient } from '../src/test-client';
 
 let db: PgTestClient;

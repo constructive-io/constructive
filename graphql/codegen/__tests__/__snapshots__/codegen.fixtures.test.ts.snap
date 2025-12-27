@@ -88,6 +88,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createApiToken(
     input: {apiToken: {userId: $userId, accessToken: $accessToken, accessTokenExpiresAt: $accessTokenExpiresAt}}
   ) {
+    apiToken {
+      id
+    }
     clientMutationId
   }
 }
@@ -96,6 +99,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createArticle(
     input: {article: {header: $header, url: $url, image: $image, datePublished: $datePublished, ownerId: $ownerId}}
   ) {
+    article {
+      id
+    }
     clientMutationId
   }
 }
@@ -104,6 +110,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createCampaignAction(
     input: {campaignAction: {name: $name, description: $description, rewardUnit: $rewardUnit, rewardAmount: $rewardAmount, totalBitcoinLimit: $totalBitcoinLimit, actionWeeklyLimit: $actionWeeklyLimit, actionDailyLimit: $actionDailyLimit, userTotalLimit: $userTotalLimit, userWeeklyLimit: $userWeeklyLimit, userDailyLimit: $userDailyLimit, startDate: $startDate, endDate: $endDate, campaignId: $campaignId, partnerId: $partnerId, thumbnailId: $thumbnailId}}
   ) {
+    campaignAction {
+      id
+    }
     clientMutationId
   }
 }
@@ -112,6 +121,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createCampaign(
     input: {campaign: {name: $name, description: $description, startDate: $startDate, endDate: $endDate, partnerId: $partnerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    campaign {
+      id
+    }
     clientMutationId
   }
 }
@@ -120,6 +132,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createCompletedAction(
     input: {completedAction: {dateCompleted: $dateCompleted, txid: $txid, userId: $userId, actionId: $actionId}}
   ) {
+    completedAction {
+      id
+    }
     clientMutationId
   }
 }
@@ -128,6 +143,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createImage(
     input: {image: {name: $name, url: $url, versions: $versions, versions2: $versions2, versions3: $versions3}}
   ) {
+    image {
+      id
+    }
     clientMutationId
   }
 }
@@ -136,6 +154,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createInitiativesPyraRecord(
     input: {initiativesPyraRecord: {name: $name, email: $email, bitcoinAddress: $bitcoinAddress, date: $date, actionsCompleted: $actionsCompleted, actionId: $actionId}}
   ) {
+    initiativesPyraRecord {
+      id
+    }
     clientMutationId
   }
 }
@@ -144,6 +165,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createMerchant(
     input: {merchant: {name: $name, bitcoinAddress: $bitcoinAddress, description: $description, ownerId: $ownerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    merchant {
+      id
+    }
     clientMutationId
   }
 }
@@ -152,12 +176,18 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createPartner(
     input: {partner: {name: $name, description: $description, bitcoinAddress: $bitcoinAddress, ownerId: $ownerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    partner {
+      id
+    }
     clientMutationId
   }
 }
 ",
   "createPermissionMutation": "mutation createPermissionMutation($name: String, $userId: UUID!) {
   createPermission(input: {permission: {name: $name, userId: $userId}}) {
+    permission {
+      id
+    }
     clientMutationId
   }
 }
@@ -166,6 +196,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createProduct(
     input: {product: {name: $name, url: $url, merchantId: $merchantId, iconId: $iconId}}
   ) {
+    product {
+      id
+    }
     clientMutationId
   }
 }
@@ -174,6 +207,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createService(
     input: {service: {name: $name, description: $description, type: $type, data: $data, campaignActionId: $campaignActionId, iconId: $iconId}}
   ) {
+    service {
+      id
+    }
     clientMutationId
   }
 }
@@ -182,6 +218,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createShopifyAccount(
     input: {shopifyAccount: {name: $name, shopLink: $shopLink, partnerId: $partnerId, iconId: $iconId}}
   ) {
+    shopifyAccount {
+      id
+    }
     clientMutationId
   }
 }
@@ -190,6 +229,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createShopifyOrder(
     input: {shopifyOrder: {orderId: $orderId, email: $email, orderStatus: $orderStatus, financialStatus: $financialStatus, subtotalPrice: $subtotalPrice, orderCreatedAt: $orderCreatedAt, orderClosedAt: $orderClosedAt, bitcoinUpdatedAt: $bitcoinUpdatedAt, bitcoinRebate: $bitcoinRebate, bitcoinAddress: $bitcoinAddress, paidDate: $paidDate, transactionId: $transactionId, partnerId: $partnerId, shopifyAccountId: $shopifyAccountId}}
   ) {
+    shopifyOrder {
+      id
+    }
     clientMutationId
   }
 }
@@ -198,6 +240,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createShopifySecret(
     input: {shopifySecret: {shopifyAccountId: $shopifyAccountId, name: $name, value: $value, enc: $enc}}
   ) {
+    shopifySecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -206,6 +251,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createUserEncryptedSecret(
     input: {userEncryptedSecret: {userId: $userId, name: $name, value: $value, enc: $enc}}
   ) {
+    userEncryptedSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -214,6 +262,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createUser(
     input: {user: {username: $username, bitcoinAddress: $bitcoinAddress}}
   ) {
+    user {
+      id
+    }
     clientMutationId
   }
 }
@@ -222,6 +273,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   createUserSecret(
     input: {userSecret: {userId: $userId, name: $name, value: $value}}
   ) {
+    userSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -442,17 +496,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getApiTokensQuery": "query getApiTokensQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ApiTokenCondition, $filter: ApiTokenFilter, $orderBy: [ApiTokensOrderBy!]) {
-  apiTokens(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getApiTokensQueryAll": "query getApiTokensQueryAll {
+  apiTokens {
     totalCount
     pageInfo {
       hasNextPage
@@ -460,23 +505,14 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      userId
-      accessToken
-      accessTokenExpiresAt
-    }
-  }
-}
-",
-  "getApiTokensQueryAll": "query getApiTokensQueryAll {
-  apiTokens {
-    totalCount
-    nodes {
-      id
-      userId
-      accessToken
-      accessTokenExpiresAt
+    edges {
+      cursor
+      node {
+        id
+        userId
+        accessToken
+        accessTokenExpiresAt
+      }
     }
   }
 }
@@ -540,17 +576,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getArticlesQuery": "query getArticlesQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ArticleCondition, $filter: ArticleFilter, $orderBy: [ArticlesOrderBy!]) {
-  articles(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getArticlesQueryAll": "query getArticlesQueryAll {
+  articles {
     totalCount
     pageInfo {
       hasNextPage
@@ -558,35 +585,20 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      header
-      url
-      image
-      datePublished
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-    }
-  }
-}
-",
-  "getArticlesQueryAll": "query getArticlesQueryAll {
-  articles {
-    totalCount
-    nodes {
-      id
-      header
-      url
-      image
-      datePublished
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
+    edges {
+      cursor
+      node {
+        id
+        header
+        url
+        image
+        datePublished
+        ownerId
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+      }
     }
   }
 }
@@ -713,17 +725,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getCampaignActionsQuery": "query getCampaignActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: CampaignActionCondition, $filter: CampaignActionFilter, $orderBy: [CampaignActionsOrderBy!]) {
-  campaignActions(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getCampaignActionsQueryAll": "query getCampaignActionsQueryAll {
+  campaignActions {
     totalCount
     pageInfo {
       hasNextPage
@@ -731,67 +734,36 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      description
-      rewardUnit
-      rewardAmount
-      totalBitcoinLimit
-      actionWeeklyLimit
-      actionDailyLimit
-      userTotalLimit
-      userWeeklyLimit
-      userDailyLimit
-      startDate
-      endDate
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      campaignId
-      partnerId
-      thumbnailId
-      campaign
-      partner
-      thumbnail
-      completedActionsByActionId
-      services
-      initiativesPyraRecordsByActionId
-    }
-  }
-}
-",
-  "getCampaignActionsQueryAll": "query getCampaignActionsQueryAll {
-  campaignActions {
-    totalCount
-    nodes {
-      id
-      name
-      description
-      rewardUnit
-      rewardAmount
-      totalBitcoinLimit
-      actionWeeklyLimit
-      actionDailyLimit
-      userTotalLimit
-      userWeeklyLimit
-      userDailyLimit
-      startDate
-      endDate
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      campaignId
-      partnerId
-      thumbnailId
-      campaign
-      partner
-      thumbnail
-      completedActionsByActionId
-      services
-      initiativesPyraRecordsByActionId
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        rewardUnit
+        rewardAmount
+        totalBitcoinLimit
+        actionWeeklyLimit
+        actionDailyLimit
+        userTotalLimit
+        userWeeklyLimit
+        userDailyLimit
+        startDate
+        endDate
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        campaignId
+        partnerId
+        thumbnailId
+        campaign
+        partner
+        thumbnail
+        completedActionsByActionId
+        services
+        initiativesPyraRecordsByActionId
+      }
     }
   }
 }
@@ -867,17 +839,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getCampaignsQuery": "query getCampaignsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: CampaignCondition, $filter: CampaignFilter, $orderBy: [CampaignsOrderBy!]) {
-  campaigns(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getCampaignsQueryAll": "query getCampaignsQueryAll {
+  campaigns {
     totalCount
     pageInfo {
       hasNextPage
@@ -885,47 +848,26 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      description
-      startDate
-      endDate
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      logoId
-      backgroundImageId
-      partner
-      logo
-      backgroundImage
-      campaignActions
-    }
-  }
-}
-",
-  "getCampaignsQueryAll": "query getCampaignsQueryAll {
-  campaigns {
-    totalCount
-    nodes {
-      id
-      name
-      description
-      startDate
-      endDate
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      logoId
-      backgroundImageId
-      partner
-      logo
-      backgroundImage
-      campaignActions
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        startDate
+        endDate
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        partnerId
+        logoId
+        backgroundImageId
+        partner
+        logo
+        backgroundImage
+        campaignActions
+      }
     }
   }
 }
@@ -991,17 +933,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getCompletedActionsQuery": "query getCompletedActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: CompletedActionCondition, $filter: CompletedActionFilter, $orderBy: [CompletedActionsOrderBy!]) {
-  completedActions(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getCompletedActionsQueryAll": "query getCompletedActionsQueryAll {
+  completedActions {
     totalCount
     pageInfo {
       hasNextPage
@@ -1009,37 +942,21 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      dateCompleted
-      txid
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      userId
-      actionId
-      user
-      action
-    }
-  }
-}
-",
-  "getCompletedActionsQueryAll": "query getCompletedActionsQueryAll {
-  completedActions {
-    totalCount
-    nodes {
-      id
-      dateCompleted
-      txid
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      userId
-      actionId
-      user
-      action
+    edges {
+      cursor
+      node {
+        id
+        dateCompleted
+        txid
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        userId
+        actionId
+        user
+        action
+      }
     }
   }
 }
@@ -1129,17 +1046,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getImagesQuery": "query getImagesQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ImageCondition, $filter: ImageFilter, $orderBy: [ImagesOrderBy!]) {
-  images(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getImagesQueryAll": "query getImagesQueryAll {
+  images {
     totalCount
     pageInfo {
       hasNextPage
@@ -1147,51 +1055,28 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      url
-      versions
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnersByLogoId
-      partnersByBackgroundImageId
-      campaignsByLogoId
-      campaignsByBackgroundImageId
-      campaignActionsByThumbnailId
-      servicesByIconId
-      merchantsByLogoId
-      merchantsByBackgroundImageId
-      productsByIconId
-      shopifyAccountsByIconId
-    }
-  }
-}
-",
-  "getImagesQueryAll": "query getImagesQueryAll {
-  images {
-    totalCount
-    nodes {
-      id
-      name
-      url
-      versions
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnersByLogoId
-      partnersByBackgroundImageId
-      campaignsByLogoId
-      campaignsByBackgroundImageId
-      campaignActionsByThumbnailId
-      servicesByIconId
-      merchantsByLogoId
-      merchantsByBackgroundImageId
-      productsByIconId
-      shopifyAccountsByIconId
+    edges {
+      cursor
+      node {
+        id
+        name
+        url
+        versions
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        partnersByLogoId
+        partnersByBackgroundImageId
+        campaignsByLogoId
+        campaignsByBackgroundImageId
+        campaignActionsByThumbnailId
+        servicesByIconId
+        merchantsByLogoId
+        merchantsByBackgroundImageId
+        productsByIconId
+        shopifyAccountsByIconId
+      }
     }
   }
 }
@@ -1259,17 +1144,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getInitiativesPyraRecordsQuery": "query getInitiativesPyraRecordsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: InitiativesPyraRecordCondition, $filter: InitiativesPyraRecordFilter, $orderBy: [InitiativesPyraRecordsOrderBy!]) {
-  initiativesPyraRecords(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getInitiativesPyraRecordsQueryAll": "query getInitiativesPyraRecordsQueryAll {
+  initiativesPyraRecords {
     totalCount
     pageInfo {
       hasNextPage
@@ -1277,39 +1153,22 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      email
-      bitcoinAddress
-      date
-      actionsCompleted
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      actionId
-      action
-    }
-  }
-}
-",
-  "getInitiativesPyraRecordsQueryAll": "query getInitiativesPyraRecordsQueryAll {
-  initiativesPyraRecords {
-    totalCount
-    nodes {
-      id
-      name
-      email
-      bitcoinAddress
-      date
-      actionsCompleted
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      actionId
-      action
+    edges {
+      cursor
+      node {
+        id
+        name
+        email
+        bitcoinAddress
+        date
+        actionsCompleted
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        actionId
+        action
+      }
     }
   }
 }
@@ -1381,17 +1240,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getMerchantsQuery": "query getMerchantsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: MerchantCondition, $filter: MerchantFilter, $orderBy: [MerchantsOrderBy!]) {
-  merchants(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getMerchantsQueryAll": "query getMerchantsQueryAll {
+  merchants {
     totalCount
     pageInfo {
       hasNextPage
@@ -1399,43 +1249,24 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      bitcoinAddress
-      description
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      logoId
-      backgroundImageId
-      logo
-      backgroundImage
-      products
-    }
-  }
-}
-",
-  "getMerchantsQueryAll": "query getMerchantsQueryAll {
-  merchants {
-    totalCount
-    nodes {
-      id
-      name
-      bitcoinAddress
-      description
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      logoId
-      backgroundImageId
-      logo
-      backgroundImage
-      products
+    edges {
+      cursor
+      node {
+        id
+        name
+        bitcoinAddress
+        description
+        ownerId
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        logoId
+        backgroundImageId
+        logo
+        backgroundImage
+        products
+      }
     }
   }
 }
@@ -1513,17 +1344,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getPartnersQuery": "query getPartnersQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: PartnerCondition, $filter: PartnerFilter, $orderBy: [PartnersOrderBy!]) {
-  partners(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getPartnersQueryAll": "query getPartnersQueryAll {
+  partners {
     totalCount
     pageInfo {
       hasNextPage
@@ -1531,49 +1353,27 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      description
-      bitcoinAddress
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      logoId
-      backgroundImageId
-      logo
-      backgroundImage
-      campaigns
-      campaignActions
-      shopifyAccounts
-      shopifyOrders
-    }
-  }
-}
-",
-  "getPartnersQueryAll": "query getPartnersQueryAll {
-  partners {
-    totalCount
-    nodes {
-      id
-      name
-      description
-      bitcoinAddress
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      logoId
-      backgroundImageId
-      logo
-      backgroundImage
-      campaigns
-      campaignActions
-      shopifyAccounts
-      shopifyOrders
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        bitcoinAddress
+        ownerId
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        logoId
+        backgroundImageId
+        logo
+        backgroundImage
+        campaigns
+        campaignActions
+        shopifyAccounts
+        shopifyOrders
+      }
     }
   }
 }
@@ -1633,17 +1433,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getPermissionsQuery": "query getPermissionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: PermissionCondition, $filter: PermissionFilter, $orderBy: [PermissionsOrderBy!]) {
-  permissions(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getPermissionsQueryAll": "query getPermissionsQueryAll {
+  permissions {
     totalCount
     pageInfo {
       hasNextPage
@@ -1651,31 +1442,18 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      userId
-      user
-    }
-  }
-}
-",
-  "getPermissionsQueryAll": "query getPermissionsQueryAll {
-  permissions {
-    totalCount
-    nodes {
-      id
-      name
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      userId
-      user
+    edges {
+      cursor
+      node {
+        id
+        name
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        userId
+        user
+      }
     }
   }
 }
@@ -1741,17 +1519,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getProductsQuery": "query getProductsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ProductCondition, $filter: ProductFilter, $orderBy: [ProductsOrderBy!]) {
-  products(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getProductsQueryAll": "query getProductsQueryAll {
+  products {
     totalCount
     pageInfo {
       hasNextPage
@@ -1759,37 +1528,21 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      url
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      merchantId
-      iconId
-      merchant
-      icon
-    }
-  }
-}
-",
-  "getProductsQueryAll": "query getProductsQueryAll {
-  products {
-    totalCount
-    nodes {
-      id
-      name
-      url
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      merchantId
-      iconId
-      merchant
-      icon
+    edges {
+      cursor
+      node {
+        id
+        name
+        url
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        merchantId
+        iconId
+        merchant
+        icon
+      }
     }
   }
 }
@@ -1859,17 +1612,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getServicesQuery": "query getServicesQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ServiceCondition, $filter: ServiceFilter, $orderBy: [ServicesOrderBy!]) {
-  services(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getServicesQueryAll": "query getServicesQueryAll {
+  services {
     totalCount
     pageInfo {
       hasNextPage
@@ -1877,41 +1621,23 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      description
-      type
-      data
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      campaignActionId
-      iconId
-      campaignAction
-      icon
-    }
-  }
-}
-",
-  "getServicesQueryAll": "query getServicesQueryAll {
-  services {
-    totalCount
-    nodes {
-      id
-      name
-      description
-      type
-      data
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      campaignActionId
-      iconId
-      campaignAction
-      icon
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        type
+        data
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        campaignActionId
+        iconId
+        campaignAction
+        icon
+      }
     }
   }
 }
@@ -1979,17 +1705,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getShopifyAccountsQuery": "query getShopifyAccountsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ShopifyAccountCondition, $filter: ShopifyAccountFilter, $orderBy: [ShopifyAccountsOrderBy!]) {
-  shopifyAccounts(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getShopifyAccountsQueryAll": "query getShopifyAccountsQueryAll {
+  shopifyAccounts {
     totalCount
     pageInfo {
       hasNextPage
@@ -1997,39 +1714,22 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      name
-      shopLink
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      iconId
-      partner
-      icon
-      shopifyOrders
-    }
-  }
-}
-",
-  "getShopifyAccountsQueryAll": "query getShopifyAccountsQueryAll {
-  shopifyAccounts {
-    totalCount
-    nodes {
-      id
-      name
-      shopLink
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      iconId
-      partner
-      icon
-      shopifyOrders
+    edges {
+      cursor
+      node {
+        id
+        name
+        shopLink
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        partnerId
+        iconId
+        partner
+        icon
+        shopifyOrders
+      }
     }
   }
 }
@@ -2145,17 +1845,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getShopifyOrdersQuery": "query getShopifyOrdersQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ShopifyOrderCondition, $filter: ShopifyOrderFilter, $orderBy: [ShopifyOrdersOrderBy!]) {
-  shopifyOrders(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getShopifyOrdersQueryAll": "query getShopifyOrdersQueryAll {
+  shopifyOrders {
     totalCount
     pageInfo {
       hasNextPage
@@ -2163,57 +1854,31 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      orderId
-      email
-      orderStatus
-      financialStatus
-      subtotalPrice
-      orderCreatedAt
-      orderClosedAt
-      bitcoinUpdatedAt
-      bitcoinRebate
-      bitcoinAddress
-      paidDate
-      transactionId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      shopifyAccountId
-      partner
-      shopifyAccount
-    }
-  }
-}
-",
-  "getShopifyOrdersQueryAll": "query getShopifyOrdersQueryAll {
-  shopifyOrders {
-    totalCount
-    nodes {
-      id
-      orderId
-      email
-      orderStatus
-      financialStatus
-      subtotalPrice
-      orderCreatedAt
-      orderClosedAt
-      bitcoinUpdatedAt
-      bitcoinRebate
-      bitcoinAddress
-      paidDate
-      transactionId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      partnerId
-      shopifyAccountId
-      partner
-      shopifyAccount
+    edges {
+      cursor
+      node {
+        id
+        orderId
+        email
+        orderStatus
+        financialStatus
+        subtotalPrice
+        orderCreatedAt
+        orderClosedAt
+        bitcoinUpdatedAt
+        bitcoinRebate
+        bitcoinAddress
+        paidDate
+        transactionId
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        partnerId
+        shopifyAccountId
+        partner
+        shopifyAccount
+      }
     }
   }
 }
@@ -2280,17 +1945,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getShopifySecretsQuery": "query getShopifySecretsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ShopifySecretCondition, $filter: ShopifySecretFilter, $orderBy: [ShopifySecretsOrderBy!]) {
-  shopifySecrets(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getShopifySecretsQueryAll": "query getShopifySecretsQueryAll {
+  shopifySecrets {
     totalCount
     pageInfo {
       hasNextPage
@@ -2298,25 +1954,15 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      shopifyAccountId
-      name
-      value
-      enc
-    }
-  }
-}
-",
-  "getShopifySecretsQueryAll": "query getShopifySecretsQueryAll {
-  shopifySecrets {
-    totalCount
-    nodes {
-      id
-      shopifyAccountId
-      name
-      value
-      enc
+    edges {
+      cursor
+      node {
+        id
+        shopifyAccountId
+        name
+        value
+        enc
+      }
     }
   }
 }
@@ -2400,17 +2046,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getUserEncryptedSecretsQuery": "query getUserEncryptedSecretsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: UserEncryptedSecretCondition, $filter: UserEncryptedSecretFilter, $orderBy: [UserEncryptedSecretsOrderBy!]) {
-  userEncryptedSecrets(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getUserEncryptedSecretsQueryAll": "query getUserEncryptedSecretsQueryAll {
+  userEncryptedSecrets {
     totalCount
     pageInfo {
       hasNextPage
@@ -2418,25 +2055,15 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      userId
-      name
-      value
-      enc
-    }
-  }
-}
-",
-  "getUserEncryptedSecretsQueryAll": "query getUserEncryptedSecretsQueryAll {
-  userEncryptedSecrets {
-    totalCount
-    nodes {
-      id
-      userId
-      name
-      value
-      enc
+    edges {
+      cursor
+      node {
+        id
+        userId
+        name
+        value
+        enc
+      }
     }
   }
 }
@@ -2507,17 +2134,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getUserSecretsQuery": "query getUserSecretsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: UserSecretCondition, $filter: UserSecretFilter, $orderBy: [UserSecretsOrderBy!]) {
-  userSecrets(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getUserSecretsQueryAll": "query getUserSecretsQueryAll {
+  userSecrets {
     totalCount
     pageInfo {
       hasNextPage
@@ -2525,23 +2143,14 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      userId
-      name
-      value
-    }
-  }
-}
-",
-  "getUserSecretsQueryAll": "query getUserSecretsQueryAll {
-  userSecrets {
-    totalCount
-    nodes {
-      id
-      userId
-      name
-      value
+    edges {
+      cursor
+      node {
+        id
+        userId
+        name
+        value
+      }
     }
   }
 }
@@ -2585,17 +2194,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "getUsersQuery": "query getUsersQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: UserCondition, $filter: UserFilter, $orderBy: [UsersOrderBy!]) {
-  users(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+  "getUsersQueryAll": "query getUsersQueryAll {
+  users {
     totalCount
     pageInfo {
       hasNextPage
@@ -2603,25 +2203,15 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
       endCursor
       startCursor
     }
-    nodes {
-      id
-      username
-      bitcoinAddress
-      permissions
-      completedActions
-    }
-  }
-}
-",
-  "getUsersQueryAll": "query getUsersQueryAll {
-  users {
-    totalCount
-    nodes {
-      id
-      username
-      bitcoinAddress
-      permissions
-      completedActions
+    edges {
+      cursor
+      node {
+        id
+        username
+        bitcoinAddress
+        permissions
+        completedActions
+      }
     }
   }
 }
@@ -2825,6 +2415,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateApiTokenByAccessToken(
     input: {accessToken: $accessToken, patch: {userId: $userId, accessTokenExpiresAt: $accessTokenExpiresAt}}
   ) {
+    apiToken {
+      id
+    }
     clientMutationId
   }
 }
@@ -2833,6 +2426,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateApiToken(
     input: {id: $id, patch: {userId: $userId, accessToken: $accessToken, accessTokenExpiresAt: $accessTokenExpiresAt}}
   ) {
+    apiToken {
+      id
+    }
     clientMutationId
   }
 }
@@ -2841,6 +2437,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateArticle(
     input: {id: $id, patch: {header: $header, url: $url, image: $image, datePublished: $datePublished, ownerId: $ownerId}}
   ) {
+    article {
+      id
+    }
     clientMutationId
   }
 }
@@ -2849,6 +2448,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateCampaignActionByName(
     input: {name: $name, patch: {description: $description, rewardUnit: $rewardUnit, rewardAmount: $rewardAmount, totalBitcoinLimit: $totalBitcoinLimit, actionWeeklyLimit: $actionWeeklyLimit, actionDailyLimit: $actionDailyLimit, userTotalLimit: $userTotalLimit, userWeeklyLimit: $userWeeklyLimit, userDailyLimit: $userDailyLimit, startDate: $startDate, endDate: $endDate, campaignId: $campaignId, partnerId: $partnerId, thumbnailId: $thumbnailId}}
   ) {
+    campaignAction {
+      id
+    }
     clientMutationId
   }
 }
@@ -2857,6 +2459,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateCampaignAction(
     input: {id: $id, patch: {name: $name, description: $description, rewardUnit: $rewardUnit, rewardAmount: $rewardAmount, totalBitcoinLimit: $totalBitcoinLimit, actionWeeklyLimit: $actionWeeklyLimit, actionDailyLimit: $actionDailyLimit, userTotalLimit: $userTotalLimit, userWeeklyLimit: $userWeeklyLimit, userDailyLimit: $userDailyLimit, startDate: $startDate, endDate: $endDate, campaignId: $campaignId, partnerId: $partnerId, thumbnailId: $thumbnailId}}
   ) {
+    campaignAction {
+      id
+    }
     clientMutationId
   }
 }
@@ -2865,6 +2470,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateCampaign(
     input: {id: $id, patch: {name: $name, description: $description, startDate: $startDate, endDate: $endDate, partnerId: $partnerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    campaign {
+      id
+    }
     clientMutationId
   }
 }
@@ -2873,6 +2481,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateCompletedAction(
     input: {id: $id, patch: {dateCompleted: $dateCompleted, txid: $txid, userId: $userId, actionId: $actionId}}
   ) {
+    completedAction {
+      id
+    }
     clientMutationId
   }
 }
@@ -2881,6 +2492,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateImage(
     input: {id: $id, patch: {name: $name, url: $url, versions: $versions}}
   ) {
+    image {
+      id
+    }
     clientMutationId
   }
 }
@@ -2889,6 +2503,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateInitiativesPyraRecord(
     input: {id: $id, patch: {name: $name, email: $email, bitcoinAddress: $bitcoinAddress, date: $date, actionsCompleted: $actionsCompleted, actionId: $actionId}}
   ) {
+    initiativesPyraRecord {
+      id
+    }
     clientMutationId
   }
 }
@@ -2897,6 +2514,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateMerchant(
     input: {id: $id, patch: {name: $name, bitcoinAddress: $bitcoinAddress, description: $description, ownerId: $ownerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    merchant {
+      id
+    }
     clientMutationId
   }
 }
@@ -2905,12 +2525,18 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updatePartner(
     input: {id: $id, patch: {name: $name, description: $description, bitcoinAddress: $bitcoinAddress, ownerId: $ownerId, logoId: $logoId, backgroundImageId: $backgroundImageId}}
   ) {
+    partner {
+      id
+    }
     clientMutationId
   }
 }
 ",
   "updatePermissionMutation": "mutation updatePermissionMutation($id: UUID!, $name: String, $userId: UUID) {
   updatePermission(input: {id: $id, patch: {name: $name, userId: $userId}}) {
+    permission {
+      id
+    }
     clientMutationId
   }
 }
@@ -2919,6 +2545,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateProduct(
     input: {id: $id, patch: {name: $name, url: $url, merchantId: $merchantId, iconId: $iconId}}
   ) {
+    product {
+      id
+    }
     clientMutationId
   }
 }
@@ -2927,6 +2556,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateService(
     input: {id: $id, patch: {name: $name, description: $description, type: $type, data: $data, campaignActionId: $campaignActionId, iconId: $iconId}}
   ) {
+    service {
+      id
+    }
     clientMutationId
   }
 }
@@ -2935,6 +2567,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateShopifyAccount(
     input: {id: $id, patch: {name: $name, shopLink: $shopLink, partnerId: $partnerId, iconId: $iconId}}
   ) {
+    shopifyAccount {
+      id
+    }
     clientMutationId
   }
 }
@@ -2943,6 +2578,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateShopifyOrderByOrderIdAndEmailAndShopifyAccountId(
     input: {orderId: $orderId, email: $email, shopifyAccountId: $shopifyAccountId, patch: {orderStatus: $orderStatus, financialStatus: $financialStatus, subtotalPrice: $subtotalPrice, orderCreatedAt: $orderCreatedAt, orderClosedAt: $orderClosedAt, bitcoinUpdatedAt: $bitcoinUpdatedAt, bitcoinRebate: $bitcoinRebate, bitcoinAddress: $bitcoinAddress, paidDate: $paidDate, transactionId: $transactionId, partnerId: $partnerId}}
   ) {
+    shopifyOrder {
+      id
+    }
     clientMutationId
   }
 }
@@ -2951,6 +2589,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateShopifyOrder(
     input: {id: $id, patch: {orderId: $orderId, email: $email, orderStatus: $orderStatus, financialStatus: $financialStatus, subtotalPrice: $subtotalPrice, orderCreatedAt: $orderCreatedAt, orderClosedAt: $orderClosedAt, bitcoinUpdatedAt: $bitcoinUpdatedAt, bitcoinRebate: $bitcoinRebate, bitcoinAddress: $bitcoinAddress, paidDate: $paidDate, transactionId: $transactionId, partnerId: $partnerId, shopifyAccountId: $shopifyAccountId}}
   ) {
+    shopifyOrder {
+      id
+    }
     clientMutationId
   }
 }
@@ -2959,6 +2600,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateShopifySecretByShopifyAccountIdAndName(
     input: {shopifyAccountId: $shopifyAccountId, name: $name, patch: {value: $value, enc: $enc}}
   ) {
+    shopifySecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -2967,6 +2611,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateShopifySecret(
     input: {id: $id, patch: {shopifyAccountId: $shopifyAccountId, name: $name, value: $value, enc: $enc}}
   ) {
+    shopifySecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -2975,6 +2622,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserByBitcoinAddress(
     input: {bitcoinAddress: $bitcoinAddress, patch: {username: $username}}
   ) {
+    user {
+      id
+    }
     clientMutationId
   }
 }
@@ -2983,6 +2633,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserByUsername(
     input: {username: $username, patch: {bitcoinAddress: $bitcoinAddress}}
   ) {
+    user {
+      id
+    }
     clientMutationId
   }
 }
@@ -2991,6 +2644,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserEncryptedSecretByUserIdAndName(
     input: {userId: $userId, name: $name, patch: {value: $value, enc: $enc}}
   ) {
+    userEncryptedSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -2999,6 +2655,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserEncryptedSecret(
     input: {id: $id, patch: {userId: $userId, name: $name, value: $value, enc: $enc}}
   ) {
+    userEncryptedSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -3007,6 +2666,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUser(
     input: {id: $id, patch: {username: $username, bitcoinAddress: $bitcoinAddress}}
   ) {
+    user {
+      id
+    }
     clientMutationId
   }
 }
@@ -3015,6 +2677,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserSecretByUserIdAndName(
     input: {userId: $userId, name: $name, patch: {value: $value}}
   ) {
+    userSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -3023,6 +2688,9 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   updateUserSecret(
     input: {id: $id, patch: {userId: $userId, name: $name, value: $value}}
   ) {
+    userSecret {
+      id
+    }
     clientMutationId
   }
 }
@@ -3064,8 +2732,8 @@ exports[`GraphQL Code Generation generate(): full AST map snapshot: full generat
   }
 }
 ",
-  "uuidGenerateV4Mutation": "mutation uuidGenerateV4Mutation {
-  uuidGenerateV4 {
+  "uuidGenerateV4Mutation": "mutation uuidGenerateV4Mutation($input: UuidGenerateV4Input!) {
+  uuidGenerateV4(input: $input) {
     uuid
   }
 }
@@ -3077,36 +2745,48 @@ exports[`GraphQL Code Generation getMany(): works with nested selection: getMany
 "query getActionItemsQueryAll {
   actionItems {
     totalCount
-    nodes {
-      id
-      name
-      description
-      type
-      itemOrder
-      isRequired
-      notificationText
-      embedCode
-      url
-      media
-      ownerId
-      createdBy
-      updatedBy
-      createdAt
-      updatedAt
-      actionId
-      userActionItems(first: 3) {
-        nodes {
-          id
-          value
-          status
-          createdBy
-          updatedBy
-          createdAt
-          updatedAt
-          userId
-          actionId
-          userActionId
-          actionItemId
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      endCursor
+      startCursor
+    }
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        type
+        itemOrder
+        isRequired
+        notificationText
+        embedCode
+        url
+        media
+        ownerId
+        createdBy
+        updatedBy
+        createdAt
+        updatedAt
+        actionId
+        userActionItems(first: 3) {
+          edges {
+            cursor
+            node {
+              id
+              value
+              status
+              createdBy
+              updatedBy
+              createdAt
+              updatedAt
+              userId
+              actionId
+              userActionId
+              actionItemId
+            }
+          }
         }
       }
     }
@@ -3152,18 +2832,21 @@ exports[`GraphQL Code Generation getManyPaginatedNodes(): works with nested sele
       updatedAt
       actionId
       userActionItems(first: 3) {
-        nodes {
-          id
-          value
-          status
-          createdBy
-          updatedBy
-          createdAt
-          updatedAt
-          userId
-          actionId
-          userActionId
-          actionItemId
+        edges {
+          cursor
+          node {
+            id
+            value
+            status
+            createdBy
+            updatedBy
+            createdAt
+            updatedAt
+            userId
+            actionId
+            userActionId
+            actionItemId
+          }
         }
       }
     }
@@ -3201,157 +2884,190 @@ exports[`GraphQL Code Generation getOne(): works with nested selection: getOne -
     updatedAt
     ownerId
     actionGoals(first: 3) {
-      nodes {
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        actionId
-        goalId
-        ownerId
+      edges {
+        cursor
+        node {
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          actionId
+          goalId
+          ownerId
+        }
       }
     }
     actionResults(first: 3) {
-      nodes {
-        id
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        actionId
-        ownerId
+      edges {
+        cursor
+        node {
+          id
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          actionId
+          ownerId
+        }
       }
     }
     actionItems(first: 3) {
-      nodes {
-        id
-        name
-        description
-        type
-        itemOrder
-        isRequired
-        notificationText
-        embedCode
-        url
-        media
-        ownerId
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          name
+          description
+          type
+          itemOrder
+          isRequired
+          notificationText
+          embedCode
+          url
+          media
+          ownerId
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          actionId
+        }
       }
     }
     userActions(first: 3) {
-      nodes {
-        id
-        actionStarted
-        complete
-        verified
-        verifiedDate
-        userRating
-        rejected
-        rejectedReason
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        verifierId
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          actionStarted
+          complete
+          verified
+          verifiedDate
+          userRating
+          rejected
+          rejectedReason
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          verifierId
+          actionId
+        }
       }
     }
     userActionResults(first: 3) {
-      nodes {
-        id
-        value
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        actionId
-        userActionId
-        actionResultId
+      edges {
+        cursor
+        node {
+          id
+          value
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          actionId
+          userActionId
+          actionResultId
+        }
       }
     }
     userActionItems(first: 3) {
-      nodes {
-        id
-        value
-        status
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        actionId
-        userActionId
-        actionItemId
+      edges {
+        cursor
+        node {
+          id
+          value
+          status
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          actionId
+          userActionId
+          actionItemId
+        }
       }
     }
     userPassActions(first: 3) {
-      nodes {
-        id
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          actionId
+        }
       }
     }
     userSavedActions(first: 3) {
-      nodes {
-        id
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          actionId
+        }
       }
     }
     userViewedActions(first: 3) {
-      nodes {
-        id
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userId
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userId
+          actionId
+        }
       }
     }
     userActionReactions(first: 3) {
-      nodes {
-        id
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        userActionId
-        userId
-        reacterId
-        actionId
+      edges {
+        cursor
+        node {
+          id
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          userActionId
+          userId
+          reacterId
+          actionId
+        }
       }
     }
     searchRank
     goals(first: 3) {
-      nodes {
-        id
-        name
-        slug
-        shortName
-        icon
-        subHead
-        tags
-        search
-        createdBy
-        updatedBy
-        createdAt
-        updatedAt
-        searchRank
+      edges {
+        cursor
+        node {
+          id
+          name
+          slug
+          shortName
+          icon
+          subHead
+          tags
+          search
+          createdBy
+          updatedBy
+          createdAt
+          updatedAt
+          searchRank
+        }
       }
     }
   }

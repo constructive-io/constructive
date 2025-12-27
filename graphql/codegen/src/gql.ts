@@ -23,6 +23,53 @@ const NON_MUTABLE_PROPS = [
 const objectToArray = (obj: Record<string, any>): { name: string; [key: string]: any }[] =>
   Object.keys(obj).map((k) => ({ name: k, ...obj[k] }));
 
+type TypeIndex = { byName: Record<string, any>; getInputFieldType: (typeName: string, fieldName: string) => any };
+
+function refToTypeNode(ref: any, overrides?: Record<string, string>): TypeNode | null {
+  if (!ref) return null as any;
+  if (ref.kind === 'NON_NULL') {
+    const inner = refToTypeNode(ref.ofType, overrides) as any;
+    return t.nonNullType({ type: inner });
+  }
+  if (ref.kind === 'LIST') {
+    const inner = refToTypeNode(ref.ofType, overrides) as any;
+    return t.listType({ type: inner });
+  }
+  const name = (overrides && overrides[ref.name]) || ref.name;
+  return t.namedType({ type: name });
+}
+
+function resolveTypeName(name: string, type: any, overrides?: Record<string, string>): string {
+  if (typeof type === 'string') {
+    const base = type;
+    const mapped = overrides && overrides[base];
+    return mapped || base;
+  }
+  if (type && typeof type === 'object') {
+    if (typeof (type as any).name === 'string' && (type as any).name.length > 0) return (type as any).name;
+    let t: any = type;
+    while (t && typeof t === 'object' && t.ofType) t = t.ofType;
+    if (t && typeof t.name === 'string' && t.name.length > 0) {
+      const base = t.name as string;
+      const mapped = overrides && overrides[base];
+      return mapped || base;
+    }
+  }
+  return 'JSON';
+}
+
+function refToNamedTypeName(ref: any): string | null {
+  let r = ref;
+  while (r && (r.kind === 'NON_NULL' || r.kind === 'LIST')) r = r.ofType;
+  return r && r.name ? r.name : null;
+}
+
+function extractNamedTypeName(node: any): string | null {
+  let n = node;
+  while (n && !n.name && n.type) n = n.type;
+  return n && n.name ? n.name : null;
+}
+
 interface CreateGqlMutationArgs {
   operationName: string;
   mutationName: string;
@@ -110,8 +157,27 @@ export const getMany = ({
         selections: [
           t.field({ name: 'totalCount' }),
           t.field({
-            name: 'nodes',
-            selectionSet: t.selectionSet({ selections }),
+            name: 'pageInfo',
+            selectionSet: t.selectionSet({
+              selections: [
+                t.field({ name: 'hasNextPage' }),
+                t.field({ name: 'hasPreviousPage' }),
+                t.field({ name: 'endCursor' }),
+                t.field({ name: 'startCursor' }),
+              ],
+            }),
+          }),
+          t.field({
+            name: 'edges',
+            selectionSet: t.selectionSet({
+              selections: [
+                t.field({ name: 'cursor' }),
+                t.field({
+                  name: 'node',
+                  selectionSet: t.selectionSet({ selections }),
+                }),
+              ],
+            }),
           }),
         ],
       }),
@@ -495,7 +561,7 @@ export const getOne = ({
   operationName,
   query,
   fields,
-}: GetOneArgs): GetOneResult => {
+}: GetOneArgs, typeNameOverrides?: Record<string, string>): GetOneResult => {
   const queryName = inflection.camelize(
     ['get', inflection.underscore(operationName), 'query'].join('_'),
     true
@@ -504,7 +570,8 @@ export const getOne = ({
   const variableDefinitions: VariableDefinitionNode[] = objectToArray(query.properties)
     .filter((field) => field.isNotNull)
     .map(({ name, type, isNotNull, isArray, isArrayNotNull }) => {
-      let gqlType = t.namedType({ type }) as any;
+      const typeName = resolveTypeName(name, type, typeNameOverrides);
+      let gqlType = t.namedType({ type: typeName }) as any;
 
       if (isNotNull) {
         gqlType = t.nonNullType({ type: gqlType });
@@ -559,6 +626,7 @@ export const getOne = ({
 export interface CreateOneArgs {
   operationName: string;
   mutation: MutationSpec;
+  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface CreateOneResult {
@@ -569,7 +637,8 @@ export interface CreateOneResult {
 export const createOne = ({
   operationName,
   mutation,
-}: CreateOneArgs): CreateOneResult | undefined => {
+  selection,
+}: CreateOneArgs, typeNameOverrides?: Record<string, string>, typeIndex?: TypeIndex): CreateOneResult | undefined => {
   const mutationName = inflection.camelize(
     [inflection.underscore(operationName), 'mutation'].join('_'),
     true
@@ -590,63 +659,84 @@ export const createOne = ({
   );
 
   const attrs = allAttrs.filter(
-    (field) => !NON_MUTABLE_PROPS.includes(field.name)
+    (field) => field.name === 'id' ? Boolean(field.isNotNull) : !NON_MUTABLE_PROPS.includes(field.name)
   );
 
+  const useRaw = selection?.mutationInputMode === 'raw';
+  const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
+  let unresolved = 0;
+  let modelInputName: string | null = null;
+  if (typeIndex && inputTypeName) {
+    const modelRef = typeIndex.getInputFieldType(inputTypeName, modelName);
+    modelInputName = refToNamedTypeName(modelRef);
+  }
   const variableDefinitions: VariableDefinitionNode[] = attrs.map(
     ({ name, type, isNotNull, isArray, isArrayNotNull }) => {
-      let gqlType: TypeNode = t.namedType({ type });
-
-      if (isNotNull) {
-        gqlType = t.nonNullType({ type: gqlType });
+      let gqlType: TypeNode | null = null as any;
+      if (typeIndex && modelInputName) {
+        const fieldTypeRef = typeIndex.getInputFieldType(modelInputName, name);
+        const tn = refToTypeNode(fieldTypeRef, typeNameOverrides) as any;
+        if (tn) gqlType = tn;
       }
-
-      if (isArray) {
-        gqlType = t.listType({ type: gqlType });
-        if (isArrayNotNull) {
+      if (!gqlType) {
+        const typeName = resolveTypeName(name, type, typeNameOverrides);
+        gqlType = t.namedType({ type: typeName });
+        if (isNotNull) {
           gqlType = t.nonNullType({ type: gqlType });
         }
+        if (isArray) {
+          gqlType = t.listType({ type: gqlType });
+          if (isArrayNotNull) {
+            gqlType = t.nonNullType({ type: gqlType });
+          }
+        }
       }
-
-      return t.variableDefinition({
-        variable: t.variable({ name }),
-        type: gqlType,
-      });
+      const nn = extractNamedTypeName(gqlType);
+      if (nn === 'JSON') unresolved++;
+      return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
     }
   );
 
-  const selectArgs: ArgumentNode[] = [
-    t.argument({
-      name: 'input',
-      value: t.objectValue({
-        fields: [
-          t.objectField({
-            name: modelName,
-            value: t.objectValue({
-              fields: attrs.map((field) =>
-                t.objectField({
-                  name: field.name,
-                  value: t.variable({ name: field.name }),
-                })
-              ),
+  const mustUseRaw = useRaw || unresolved > 0;
+  const selectArgs: ArgumentNode[] = mustUseRaw
+    ? [t.argument({ name: 'input', value: t.variable({ name: 'input' }) as any })]
+    : [
+      t.argument({
+        name: 'input',
+        value: t.objectValue({
+          fields: [
+            t.objectField({
+              name: modelName,
+              value: t.objectValue({
+                fields: attrs.map((field) => t.objectField({ name: field.name, value: t.variable({ name: field.name }) })),
+              }),
             }),
-          }),
-        ],
+          ],
+        }),
       }),
-    }),
-  ];
+    ];
 
   const selections: FieldNode[] = allAttrs.map((field) =>
     t.field({ name: 'id' })
   );
 
+  const modelFields = selection?.modelFields?.[modelName] || selection?.defaultMutationModelFields || ['id'];
+
+  const nested: FieldNode[] = (modelFields.length > 0)
+    ? [t.field({
+        name: modelName,
+        selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
+      })]
+    : [];
+
   const ast: DocumentNode = createGqlMutation({
     operationName,
     mutationName,
     selectArgs,
-    selections: [t.field({ name: 'clientMutationId' })],
-    variableDefinitions,
-    modelName,
+    selections: [...nested, t.field({ name: 'clientMutationId' })],
+    variableDefinitions: mustUseRaw
+      ? [t.variableDefinition({ variable: t.variable({ name: 'input' }), type: t.nonNullType({ type: t.namedType({ type: inputTypeName }) }) as any })]
+      : variableDefinitions,
     useModel: false,
   });
 
@@ -674,6 +764,7 @@ export interface MutationSpec {
 export interface PatchOneArgs {
   operationName: string;
   mutation: MutationSpec;
+  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface PatchOneResult {
@@ -684,7 +775,8 @@ export interface PatchOneResult {
 export const patchOne = ({
   operationName,
   mutation,
-}: PatchOneArgs): PatchOneResult | undefined => {
+  selection,
+}: PatchOneArgs, typeNameOverrides?: Record<string, string>, typeIndex?: TypeIndex): PatchOneResult | undefined => {
   const mutationName = inflection.camelize(
     [inflection.underscore(operationName), 'mutation'].join('_'),
     true
@@ -701,7 +793,7 @@ export const patchOne = ({
   );
 
   // @ts-ignore
-  const allAttrs: FieldNode[] = objectToArray(
+  const allAttrs: FieldProperty[] = objectToArray(
     mutation.properties.input.properties['patch']?.properties || {}
   );
 
@@ -716,86 +808,106 @@ export const patchOne = ({
 
   const patchers = patchByAttrs.map((p) => p.name);
 
-  const patchAttrVarDefs: VariableDefinitionNode[] = patchAttrs
-    // @ts-ignore
-    .filter((field) => !patchers.includes(field.name))
-    .map(
-    // @ts-ignore
-    ({ name, type, isArray }) => {
-      let gqlType: TypeNode = t.namedType({ type });
-
-      if (isArray) {
-        gqlType = t.listType({ type: gqlType });
-      }
-
-      // @ts-ignore
-      if (patchers.includes(name)) {
-        gqlType = t.nonNullType({ type: gqlType });
-      }
-
-      return t.variableDefinition({
-        // @ts-ignore
-        variable: t.variable({ name }),
-        type: gqlType,
+  const useCollapsedOpt = selection?.mutationInputMode === 'patchCollapsed';
+  const ModelPascal = inflection.camelize(plz.singular(mutation.model), false);
+  const patchTypeName = `${ModelPascal}Patch`;
+  const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
+  let unresolved = 0;
+  const patchAttrVarDefs: VariableDefinitionNode[] = useCollapsedOpt
+    ? [
+      t.variableDefinition({
+        variable: t.variable({ name: 'patch' }),
+        type: t.nonNullType({ type: t.namedType({ type: patchTypeName }) }) as any,
+      }),
+    ]
+    : patchAttrs
+      .filter((field) => !patchers.includes((field as any).name))
+      .map(({ name, type, isArray }: any) => {
+        let gqlType: TypeNode | null = null as any;
+        if (typeIndex) {
+          const pType = typeIndex.byName[patchTypeName];
+          const f = pType && pType.inputFields && pType.inputFields.find((x: any) => x.name === name);
+          if (f && f.type) gqlType = refToTypeNode(f.type, typeNameOverrides) as any;
+        }
+        if (!gqlType) {
+          const typeName = resolveTypeName(name, type, typeNameOverrides);
+          gqlType = t.namedType({ type: typeName });
+          if (isArray) {
+            gqlType = t.listType({ type: gqlType });
+          }
+          if ((patchers as any).includes(name)) {
+            gqlType = t.nonNullType({ type: gqlType });
+          }
+        }
+        const nn = extractNamedTypeName(gqlType);
+        if (nn === 'JSON') unresolved++;
+        return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
       });
-    }
-  );
 
   const patchByVarDefs: VariableDefinitionNode[] = patchByAttrs.map(({ name, type, isNotNull, isArray, isArrayNotNull }) => {
-    let gqlType: TypeNode = t.namedType({ type });
-    if (isNotNull) {
-      gqlType = t.nonNullType({ type: gqlType });
+    let gqlType: TypeNode | null = null as any;
+    if (typeIndex && inputTypeName) {
+      const ref = typeIndex.getInputFieldType(inputTypeName, name);
+      const tn = refToTypeNode(ref, typeNameOverrides) as any;
+      if (tn) gqlType = tn;
     }
-    if (isArray) {
-      gqlType = t.listType({ type: gqlType });
-      if (isArrayNotNull) {
+    if (!gqlType) {
+      const typeName = resolveTypeName(name, type, typeNameOverrides);
+      gqlType = t.namedType({ type: typeName });
+      if (isNotNull) {
         gqlType = t.nonNullType({ type: gqlType });
       }
+      if (isArray) {
+        gqlType = t.listType({ type: gqlType });
+        if (isArrayNotNull) {
+          gqlType = t.nonNullType({ type: gqlType });
+        }
+      }
     }
-    return t.variableDefinition({ variable: t.variable({ name }), type: gqlType });
+    const nn = extractNamedTypeName(gqlType);
+    if (nn === 'JSON') unresolved++;
+    return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
   });
 
-  const selectArgs: ArgumentNode[] = [
-    t.argument({
-      name: 'input',
-      value: t.objectValue({
-        fields: [
-          ...patchByAttrs.map((field) =>
+  const mustUseRaw = useCollapsedOpt || unresolved > 0;
+  const selectArgs: ArgumentNode[] = mustUseRaw
+    ? [t.argument({ name: 'input', value: t.variable({ name: 'input' }) as any })]
+    : [
+      t.argument({
+        name: 'input',
+        value: t.objectValue({
+          fields: [
+            ...patchByAttrs.map((field) => t.objectField({ name: field.name, value: t.variable({ name: field.name }) })),
             t.objectField({
-              name: field.name,
-              value: t.variable({ name: field.name }),
-            })
-          ),
-          t.objectField({
-            name: 'patch',
-            value: t.objectValue({
-              fields: patchAttrs
-              // @ts-ignore
-                .filter((field) => !patchers.includes(field.name))
-                .map((field) =>
-                  t.objectField({
-                    // @ts-ignore
-                    name: field.name,
-                    // @ts-ignore
-                    value: t.variable({ name: field.name }),
-                  })
-                ),
+              name: 'patch',
+              value: useCollapsedOpt ? (t.variable({ name: 'patch' }) as any) : t.objectValue({
+                fields: patchAttrs
+                  .filter((field) => !patchers.includes((field as any).name))
+                  .map((field: any) => t.objectField({ name: field.name, value: t.variable({ name: field.name }) })),
+              }),
             }),
-          }),
-        ],
+          ],
+        }),
       }),
-    }),
-  ];
+    ];
 
-  const selections: FieldNode[] = [t.field({ name: 'clientMutationId' })];
+  const modelFields = selection?.modelFields?.[modelName] || selection?.defaultMutationModelFields || ['id'];
+
+  const nestedPatch: FieldNode[] = (modelFields.length > 0)
+    ? [t.field({
+        name: modelName,
+        selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
+      })]
+    : [];
 
   const ast: DocumentNode = createGqlMutation({
     operationName,
     mutationName,
     selectArgs,
-    selections,
-    variableDefinitions: [...patchByVarDefs, ...patchAttrVarDefs],
-    modelName,
+    selections: [...nestedPatch, t.field({ name: 'clientMutationId' })],
+    variableDefinitions: mustUseRaw
+      ? [t.variableDefinition({ variable: t.variable({ name: 'input' }), type: t.nonNullType({ type: t.namedType({ type: inputTypeName }) }) as any })]
+      : [...patchByVarDefs, ...patchAttrVarDefs],
     useModel: false,
   });
 
@@ -816,7 +928,7 @@ export interface DeleteOneResult {
 export const deleteOne = ({
   operationName,
   mutation,
-}: DeleteOneArgs): DeleteOneResult | undefined => {
+}: DeleteOneArgs, typeNameOverrides?: Record<string, string>, typeIndex?: TypeIndex): DeleteOneResult | undefined => {
   const mutationName = inflection.camelize(
     [inflection.underscore(operationName), 'mutation'].join('_'),
     true
@@ -837,40 +949,44 @@ export const deleteOne = ({
     mutation.properties.input.properties
   );
 
+  const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
+  let unresolved = 0;
   const variableDefinitions: VariableDefinitionNode[] = deleteAttrs.map(
     ({ name, type, isNotNull, isArray }) => {
-      let gqlType: TypeNode = t.namedType({ type });
-
-      if (isNotNull) {
-        gqlType = t.nonNullType({ type: gqlType });
+      let gqlType: TypeNode | null = null as any;
+      if (typeIndex && inputTypeName) {
+        const ref = typeIndex.getInputFieldType(inputTypeName, name);
+        const tn = refToTypeNode(ref, typeNameOverrides) as any;
+        if (tn) gqlType = tn;
       }
-
-      if (isArray) {
-        gqlType = t.listType({ type: gqlType });
-        // Always non-null list for deletion fields
-        gqlType = t.nonNullType({ type: gqlType });
+      if (!gqlType) {
+        const typeName = resolveTypeName(name, type, typeNameOverrides);
+        gqlType = t.namedType({ type: typeName });
+        if (isNotNull) {
+          gqlType = t.nonNullType({ type: gqlType });
+        }
+        if (isArray) {
+          gqlType = t.listType({ type: gqlType });
+          gqlType = t.nonNullType({ type: gqlType });
+        }
       }
-
-      return t.variableDefinition({
-        variable: t.variable({ name }),
-        type: gqlType,
-      });
+      const nn = extractNamedTypeName(gqlType);
+      if (nn === 'JSON') unresolved++;
+      return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
     }
   );
 
-  const selectArgs: ArgumentNode[] = [
-    t.argument({
-      name: 'input',
-      value: t.objectValue({
-        fields: deleteAttrs.map((f) =>
-          t.objectField({
-            name: f.name,
-            value: t.variable({ name: f.name }),
-          })
-        ),
+  const mustUseRaw = unresolved > 0;
+  const selectArgs: ArgumentNode[] = mustUseRaw
+    ? [t.argument({ name: 'input', value: t.variable({ name: 'input' }) as any })]
+    : [
+      t.argument({
+        name: 'input',
+        value: t.objectValue({
+          fields: deleteAttrs.map((f) => t.objectField({ name: f.name, value: t.variable({ name: f.name }) })),
+        }),
       }),
-    }),
-  ];
+    ];
 
   const selections: FieldNode[] = [t.field({ name: 'clientMutationId' })];
 
@@ -879,7 +995,9 @@ export const deleteOne = ({
     mutationName,
     selectArgs,
     selections,
-    variableDefinitions,
+    variableDefinitions: mustUseRaw
+      ? [t.variableDefinition({ variable: t.variable({ name: 'input' }), type: t.nonNullType({ type: t.namedType({ type: inputTypeName }) }) as any })]
+      : variableDefinitions,
     modelName,
     useModel: false,
   });
@@ -890,6 +1008,7 @@ export const deleteOne = ({
 export interface CreateMutationArgs {
   operationName: string;
   mutation: MutationSpec;
+  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface CreateMutationResult {
@@ -900,7 +1019,8 @@ export interface CreateMutationResult {
 export const createMutation = ({
   operationName,
   mutation,
-}: CreateMutationArgs): CreateMutationResult | undefined => {
+  selection,
+}: CreateMutationArgs, typeNameOverrides?: Record<string, string>, typeIndex?: TypeIndex): CreateMutationResult | undefined => {
   const mutationName = inflection.camelize(
     [inflection.underscore(operationName), 'mutation'].join('_'),
     true
@@ -916,54 +1036,74 @@ export const createMutation = ({
     mutation.properties.input.properties
   );
 
-  const variableDefinitions: VariableDefinitionNode[] = otherAttrs.map(
-    ({ name, type, isArray, isArrayNotNull }) => {
-      let gqlType: TypeNode = t.namedType({ type });
-
-      // Force as non-nullable for mutation reliability (as per your comment)
+  const useRaw = selection?.mutationInputMode === 'raw';
+  const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
+  let unresolved = 0;
+  const builtVarDefs: VariableDefinitionNode[] = otherAttrs.map(({ name, type, isArray, isArrayNotNull }) => {
+    let gqlType: TypeNode | null = null as any;
+    if (typeIndex && inputTypeName) {
+      const ref = typeIndex.getInputFieldType(inputTypeName, name);
+      const tn = refToTypeNode(ref, typeNameOverrides) as any;
+      if (tn) gqlType = tn;
+    }
+    if (!gqlType) {
+      const typeName = resolveTypeName(name, type, typeNameOverrides);
+      gqlType = t.namedType({ type: typeName });
       gqlType = t.nonNullType({ type: gqlType });
-
       if (isArray) {
         gqlType = t.listType({ type: gqlType });
         if (isArrayNotNull) {
           gqlType = t.nonNullType({ type: gqlType });
         }
       }
-
-      return t.variableDefinition({
-        variable: t.variable({ name }),
-        type: gqlType,
-      });
+      if ((gqlType as any).type && (gqlType as any).type.type && (gqlType as any).type.type.name === 'JSON') {
+        unresolved++;
+      }
     }
-  );
+    return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
+  });
+  const mustUseRaw = useRaw || otherAttrs.length === 0 || unresolved > 0;
+  const variableDefinitions: VariableDefinitionNode[] = mustUseRaw
+    ? [t.variableDefinition({ variable: t.variable({ name: 'input' }), type: t.nonNullType({ type: t.namedType({ type: inputTypeName }) }) as any })]
+    : builtVarDefs;
 
-  const selectArgs: ArgumentNode[] =
-    otherAttrs.length > 0
-      ? [
-        t.argument({
-          name: 'input',
-          value: t.objectValue({
-            fields: otherAttrs.map((f) =>
-              t.objectField({
-                name: f.name,
-                value: t.variable({ name: f.name }),
-              })
-            ),
+  const selectArgs: ArgumentNode[] = [
+    t.argument({
+      name: 'input',
+      value: mustUseRaw
+        ? (t.variable({ name: 'input' }) as any)
+        : t.objectValue({
+            fields: otherAttrs.map((f) => t.objectField({ name: f.name, value: t.variable({ name: f.name }) })),
           }),
-        }),
-      ]
-      : [];
+    }),
+  ];
 
-  const outputFields: string[] =
-    mutation.outputs
-      ?.filter((field) => field.type.kind === 'SCALAR')
-      .map((f) => f.name) || [];
+  const scalarOutputs = (mutation.outputs || [])
+    .filter((field) => field.type.kind === 'SCALAR')
+    .map((f) => f.name);
 
-  if (outputFields.length === 0) {
-    outputFields.push('clientMutationId');
+  const objectOutput = (mutation.outputs || []).find((field) => field.type.kind === 'OBJECT');
+
+  const selections: FieldNode[] = [];
+  if (objectOutput?.name) {
+    const modelFieldsRaw = selection?.modelFields?.[objectOutput.name] || selection?.defaultMutationModelFields || [];
+    const shouldDropId = /Extension$/i.test(objectOutput.name);
+    const fallbackFields = shouldDropId ? [] : ['id'];
+    const modelFields = (selection?.forceModelOutput && modelFieldsRaw.length === 0) ? fallbackFields : (modelFieldsRaw.length > 0 ? modelFieldsRaw : []);
+    if (modelFields.length > 0) {
+      selections.push(
+        t.field({
+          name: objectOutput.name,
+          selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
+        })
+      );
+    }
   }
-
-  const selections: FieldNode[] = outputFields.map((o) => t.field({ name: o }));
+  if (scalarOutputs.length > 0) {
+    selections.push(...scalarOutputs.map((o) => t.field({ name: o })));
+  } else {
+    selections.push(t.field({ name: 'clientMutationId' }));
+  }
 
   const ast: DocumentNode = createGqlMutation({
     operationName,
@@ -1013,7 +1153,7 @@ interface AstMap {
   [key: string]: AstMapEntry;
 }
 
-export const generate = (gql: GqlMap): AstMap => {
+export const generate = (gql: GqlMap, selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean }, typeNameOverrides?: Record<string, string>, typeIndex?: TypeIndex): AstMap => {
   return Object.keys(gql).reduce<AstMap>((m, operationName) => {
     const defn = gql[operationName];
     let name: string | undefined;
@@ -1021,32 +1161,29 @@ export const generate = (gql: GqlMap): AstMap => {
 
     if (defn.qtype === 'mutation') {
       if (defn.mutationType === 'create') {
-        ({ name, ast } = createOne({ operationName, mutation: defn as MutationSpec }) ?? {});
+        ({ name, ast } = createOne({ operationName, mutation: defn as MutationSpec, selection }, typeNameOverrides, typeIndex) ?? {});
       } else if (defn.mutationType === 'patch') {
-        ({ name, ast } = patchOne({ operationName, mutation: defn as MutationSpec }) ?? {});
+        ({ name, ast } = patchOne({ operationName, mutation: defn as MutationSpec, selection }, typeNameOverrides, typeIndex) ?? {});
       } else if (defn.mutationType === 'delete') {
-        ({ name, ast } = deleteOne({ operationName, mutation: defn as MutationSpec }) ?? {});
+        ({ name, ast } = deleteOne({ operationName, mutation: defn as MutationSpec }, typeNameOverrides, typeIndex) ?? {});
       } else {
-        ({ name, ast } = createMutation({ operationName, mutation: defn as MutationSpec }) ?? {});
+        ({ name, ast } = createMutation({ operationName, mutation: defn as MutationSpec, selection }, typeNameOverrides, typeIndex) ?? {});
       }
     } else if (defn.qtype === 'getMany') {
-      // getMany + related
       [
         getMany,
         getManyPaginatedEdges,
-        getManyPaginatedNodes,
         getOrderByEnums,
         getFragment
       ].forEach(fn => {
-        // @ts-ignore
-        const result = fn({ operationName, query: defn });
+        const result = (fn as any)({ operationName, query: defn });
         if (result?.name && result?.ast) {
           m[result.name] = result;
         }
       });
     } else if (defn.qtype === 'getOne') {
       // @ts-ignore
-      ({ name, ast } = getOne({ operationName, query: defn }) ?? {});
+      ({ name, ast } = getOne({ operationName, query: defn }, typeNameOverrides) ?? {});
     } else {
       console.warn('Unknown qtype for key: ' + operationName);
     }
@@ -1112,8 +1249,11 @@ export function getSelections(
 ): FieldNode[] {
   const useAll = fields.length === 0;
 
+  const shouldDropId = typeof query.model === 'string' && /Extension$/i.test(query.model);
+
   const mapItem = (item: QueryField): FieldNode | null => {
     if (typeof item === 'string') {
+      if (shouldDropId && item === 'id') return null;
       if (!useAll && !fields.includes(item)) return null;
       return t.field({ name: item });
     }
@@ -1129,14 +1269,20 @@ export function getSelections(
       if (isMany) {
         return t.field({
           name: item.name,
-          args: [
-            t.argument({ name: 'first', value: t.intValue({ value: '3' as any }) }),
-          ],
+          args: [t.argument({ name: 'first', value: t.intValue({ value: '3' as any }) })],
           selectionSet: t.selectionSet({
             selections: [
               t.field({
-                name: 'nodes',
-                selectionSet: t.selectionSet({ selections: item.selection.map((s) => mapItem(s)).filter(Boolean) as FieldNode[] }),
+                name: 'edges',
+                selectionSet: t.selectionSet({
+                  selections: [
+                    t.field({ name: 'cursor' }),
+                    t.field({
+                      name: 'node',
+                      selectionSet: t.selectionSet({ selections: item.selection.map((s) => mapItem(s)).filter(Boolean) as FieldNode[] }),
+                    }),
+                  ],
+                }),
               }),
             ],
           }),
@@ -1150,5 +1296,8 @@ export function getSelections(
     return null;
   };
 
-  return query.selection.map((field) => mapItem(field)).filter((i): i is FieldNode => Boolean(i));
+  return query.selection
+    .filter((s: any) => !(shouldDropId && s === 'id'))
+    .map((field) => mapItem(field))
+    .filter((i): i is FieldNode => Boolean(i));
 }

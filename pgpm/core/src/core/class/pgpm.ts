@@ -45,6 +45,12 @@ import { parseTarget } from '../../utils/target-utils';
 
 const logger = new Logger('pgpm');
 
+/**
+ * Directory name for workspace extensions.
+ * Extensions are installed globally in the workspace's extensions/ directory.
+ */
+const EXTENSIONS_DIR = 'extensions';
+
 function getUTCTimestamp(d: Date = new Date()): string {
   return (
     d.getUTCFullYear() +
@@ -106,6 +112,8 @@ export interface InitModuleOptions {
   branch?: string;
   templateRepo?: string;
   templatePath?: string;
+  /** Override the base directory for template resolution (e.g., 'supabase', 'drizzle') */
+  dir?: string;
   cacheTtlMs?: number;
   noTty?: boolean;
   toolName?: string;
@@ -322,9 +330,9 @@ export class PgpmPackage {
     return this._moduleMap;
   }
 
-  getAvailableModules(): string[] {
+  async getAvailableModules(): Promise<string[]> {
     const modules = this.getModuleMap();
-    return getAvailableExtensions(modules);
+    return await getAvailableExtensions(modules);
   }
 
   getModuleProject(name: string): PgpmPackage {
@@ -433,12 +441,11 @@ export class PgpmPackage {
     };
 
     await scaffoldTemplate({
-      type: 'module',
+      fromPath: options.templatePath ?? 'module',
       outputDir: targetPath,
       templateRepo: options.templateRepo ?? DEFAULT_TEMPLATE_REPO,
       branch: options.branch,
-      // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
-      templatePath: options.templatePath,
+      dir: options.dir,
       answers,
       noTty: options.noTty ?? false,
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
@@ -953,7 +960,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     this.ensureModule();
   
     const originalDir = process.cwd();
-    const skitchExtDir = path.join(this.workspacePath!, 'extensions');
+    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
     const pkgJsonPath = path.join(this.modulePath!, 'package.json');
   
     if (!fs.existsSync(pkgJsonPath)) {
@@ -1088,7 +1095,7 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const pkgData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
     const dependencies = pkgData.dependencies || {};
-    const skitchExtDir = path.join(this.workspacePath!, 'extensions');
+    const skitchExtDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
 
     const installed: string[] = [];
     const installedVersions: Record<string, string> = {};
@@ -1102,6 +1109,48 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
     }
 
     return { installed, installedVersions };
+  }
+
+  /**
+   * Returns all pgpm modules installed in the workspace extensions directory.
+   * Unlike getInstalledModules(), this does NOT require being inside a module.
+   * It scans the workspace/extensions/ directory directly to find installed packages.
+   * 
+   * This is useful for checking what's available at workspace level before a module exists.
+   * 
+   * @returns Array of installed npm package names (e.g., '@pgpm/base32', '@pgpm/totp')
+   */
+  getWorkspaceInstalledModules(): string[] {
+    this.ensureWorkspace();
+
+    const extensionsDir = path.join(this.workspacePath!, EXTENSIONS_DIR);
+    
+    if (!fs.existsSync(extensionsDir)) {
+      return [];
+    }
+
+    const installed: string[] = [];
+    const entries = fs.readdirSync(extensionsDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+
+      if (entry.name.startsWith('@')) {
+        // Handle scoped packages like @pgpm/base32
+        const scopeDir = path.join(extensionsDir, entry.name);
+        const scopedEntries = fs.readdirSync(scopeDir, { withFileTypes: true });
+        for (const scopedEntry of scopedEntries) {
+          if (scopedEntry.isDirectory()) {
+            installed.push(`${entry.name}/${scopedEntry.name}`);
+          }
+        }
+      } else {
+        // Handle non-scoped packages
+        installed.push(entry.name);
+      }
+    }
+
+    return installed;
   }
 
   /**

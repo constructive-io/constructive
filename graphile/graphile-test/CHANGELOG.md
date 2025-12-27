@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.11.30](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.29...graphile-test@2.11.30) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.29](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.28...graphile-test@2.11.29) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.28](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.27...graphile-test@2.11.28) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.27](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.26...graphile-test@2.11.27) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.26](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.25...graphile-test@2.11.26) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.25](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.24...graphile-test@2.11.25) (2025-12-27)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.24](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.23...graphile-test@2.11.24) (2025-12-26)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.23](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.22...graphile-test@2.11.23) (2025-12-26)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.22](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.21...graphile-test@2.11.22) (2025-12-26)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.21](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.20...graphile-test@2.11.21) (2025-12-26)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.20](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.19...graphile-test@2.11.20) (2025-12-26)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.19](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.18...graphile-test@2.11.19) (2025-12-25)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.18](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.17...graphile-test@2.11.18) (2025-12-25)
+
+**Note:** Version bump only for package graphile-test
+
+## [2.11.17](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.16...graphile-test@2.11.17) (2025-12-25)
+
+**Note:** Version bump only for package graphile-test
+
 ## [2.11.16](https://github.com/constructive-io/constructive/compare/graphile-test@2.11.15...graphile-test@2.11.16) (2025-12-25)
 
 **Note:** Version bump only for package graphile-test

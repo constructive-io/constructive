@@ -1,6 +1,6 @@
+import { cliExitWithError } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
-import { CacheManager } from 'create-gen-app';
-import { cliExitWithError } from '../utils/cli-error';
+import { CacheManager } from 'genomic';
 
 const cacheUsageText = `
 Cache Command:

@@ -1,5 +1,22 @@
-import { getConnEnvOptions } from '../src/merge';
-import { pgpmDefaults } from '@pgpmjs/types';
+import { getConnEnvOptions, getEnvOptions } from '../src/merge';
+import { pgpmDefaults, PgpmOptions } from '@pgpmjs/types';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import {
+  applyEnvFixture,
+  loadEnvFixture,
+  loadEnvKeys,
+  restoreEnv,
+  snapshotAndClearEnv
+} from './test-utils';
+
+const writeConfig = (dir: string, config: Record<string, unknown>): void => {
+  fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
+};
+
+const fixturesDir = path.join(__dirname, '..', '__fixtures__');
+const envKeys = loadEnvKeys(fixturesDir, 'env.keys.json');
 
 describe('getConnEnvOptions', () => {
   describe('roles resolution', () => {
@@ -99,5 +116,130 @@ describe('getConnEnvOptions', () => {
       expect(result.rootDb).toBe('custom_root');
       expect(result.prefix).toBe('custom-');
     });
+  });
+});
+
+describe('getEnvOptions', () => {
+  let envSnapshot: Record<string, string | undefined>;
+  let tempDir = '';
+  type PgpmOptionsWithPackages = PgpmOptions & { packages?: string[] };
+
+  beforeEach(() => {
+    envSnapshot = snapshotAndClearEnv(envKeys);
+  });
+
+  afterEach(() => {
+    restoreEnv(envSnapshot);
+    if (tempDir) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      tempDir = '';
+    }
+  });
+
+  it('merges defaults, config, env, and overrides', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-'));
+    writeConfig(tempDir, {
+      pg: {
+        host: 'config-host',
+        database: 'config-db'
+      },
+      server: {
+        port: 4000
+      },
+      db: {
+        prefix: 'config-',
+        connections: {
+          app: {
+            user: 'config_app'
+          }
+        }
+      },
+      deployment: {
+        fast: true
+      }
+    });
+
+    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.base.json');
+    applyEnvFixture(fixtureEnv);
+
+    const result = getEnvOptions(
+      {
+        db: {
+          prefix: 'override-',
+          cwd: '<CWD>'
+        },
+        pg: {
+          host: 'override-host'
+        },
+        server: {
+          port: 9999
+        },
+        deployment: {
+          cache: true
+        }
+      },
+      tempDir
+    );
+
+    expect(result).toMatchSnapshot();
+  });
+
+  it('dedupes array fields across config, env, and overrides', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-dedupe-'));
+    writeConfig(tempDir, {
+      db: {
+        extensions: ['uuid', 'postgis']
+      },
+      jobs: {
+        worker: {
+          supported: ['alpha', 'beta']
+        },
+        scheduler: {
+          supported: ['beta', 'gamma']
+        }
+      },
+      packages: ['testing/*', 'packages/*']
+    });
+
+    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.dedupe.json');
+    applyEnvFixture(fixtureEnv);
+
+    const overrides: PgpmOptionsWithPackages = {
+      db: {
+        extensions: ['uuid', 'hstore']
+      },
+      jobs: {
+        worker: {
+          supported: ['delta', 'epsilon']
+        },
+        scheduler: {
+          supported: ['gamma', 'zeta']
+        }
+      },
+      packages: ['testing/*', 'extensions/*']
+    };
+
+    const result = getEnvOptions(overrides, tempDir) as PgpmOptionsWithPackages;
+
+    expect(result.db?.extensions).toEqual([
+      'uuid',
+      'postgis',
+      'pgcrypto',
+      'hstore'
+    ]);
+    expect(result.jobs?.worker?.supported).toEqual([
+      'alpha',
+      'beta',
+      'gamma',
+      'delta',
+      'epsilon'
+    ]);
+    expect(result.jobs?.scheduler?.supported).toEqual([
+      'beta',
+      'gamma',
+      'delta',
+      'zeta'
+    ]);
+    expect(result.packages).toEqual(['testing/*', 'packages/*', 'extensions/*']);
   });
 });

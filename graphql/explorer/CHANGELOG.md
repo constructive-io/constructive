@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.31](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.30...@constructive-io/graphql-explorer@2.10.31) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.30](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.29...@constructive-io/graphql-explorer@2.10.30) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.29](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.28...@constructive-io/graphql-explorer@2.10.29) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.28](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.27...@constructive-io/graphql-explorer@2.10.28) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.27](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.26...@constructive-io/graphql-explorer@2.10.27) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.26](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.25...@constructive-io/graphql-explorer@2.10.26) (2025-12-27)
+
+### Bug Fixes
+
+- update README badge paths and rename streaming/ to uploads/ ([63ff1b6](https://github.com/constructive-io/constructive/commit/63ff1b622f63289a41ff0e0dd80a01e6e7241be1))
+
+## [2.10.25](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.24...@constructive-io/graphql-explorer@2.10.25) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.24](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.23...@constructive-io/graphql-explorer@2.10.24) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.23](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.22...@constructive-io/graphql-explorer@2.10.23) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.22](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.21...@constructive-io/graphql-explorer@2.10.22) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.21](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.20...@constructive-io/graphql-explorer@2.10.21) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.20](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.19...@constructive-io/graphql-explorer@2.10.20) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.19](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.18...@constructive-io/graphql-explorer@2.10.19) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
+## [2.10.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.17...@constructive-io/graphql-explorer@2.10.18) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
 ## [2.10.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@2.10.16...@constructive-io/graphql-explorer@2.10.17) (2025-12-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-explorer

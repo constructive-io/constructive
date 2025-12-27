@@ -49,6 +49,7 @@ const GetDatabaseInfo = gql`
 type SendEmailParams = {
   email_type: 'invite_email' | 'forgot_password' | 'email_verification';
   email: string;
+  invite_type?: number | string;
   invite_token?: string;
   sender_id?: string;
   user_id?: string;
@@ -195,6 +196,9 @@ export const sendEmailLink = async (
       url.searchParams.append('invite_token', params.invite_token);
       url.searchParams.append('email', params.email);
 
+      const scope = Number(params.invite_type) === 2 ? 'org' : 'app';
+      url.searchParams.append('type', scope);
+
       const inviter = await client.request<any>(GetUser, {
         userId: params.sender_id
       });
@@ -291,7 +295,7 @@ export const sendEmailLink = async (
 };
 
 // HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
-app.post('*', async (req: any, res: any, next: any) => {
+app.post('/', async (req: any, res: any, next: any) => {
   try {
     const params = (req.body || {}) as SendEmailParams;
 

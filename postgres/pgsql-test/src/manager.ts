@@ -9,13 +9,13 @@ const log = new Logger('test-connector');
 
 const SYS_EVENTS = ['SIGTERM'];
 
-const end = (pool: Pool) => {
+const end = async (pool: Pool): Promise<void> => {
   try {
     if ((pool as any).ended || (pool as any).ending) {
       log.warn('⚠️ pg pool already ended or ending');
       return;
     }
-    pool.end();
+    await pool.end();
   } catch (err) {
     log.error('❌ pg pool termination error:', err);
   }
@@ -103,7 +103,9 @@ export class PgTestConnector {
     return client;
   }
 
-  async closeAll(): Promise<void> {
+  async closeAll(opts: { keepDb?: boolean } = {}): Promise<void> {
+    const { keepDb = false } = opts;
+    
     this.beginTeardown();
     await this.awaitPendingConnects();
 
@@ -121,31 +123,40 @@ export class PgTestConnector {
     this.clients.clear();
 
     log.info('🧯 Disposing pg pools...');
+    const poolTasks: Promise<void>[] = [];
     for (const [key, pool] of this.pgPools.entries()) {
       log.debug(`🧯 Disposing pg pool [${key}]`);
-      end(pool);
+      poolTasks.push(end(pool));
     }
     this.pgPools.clear();
+    await Promise.allSettled(poolTasks);
 
-    log.info('🗑️ Dropping seen databases...');
-    await Promise.all(
-      Array.from(this.seenDbConfigs.values()).map(async (config) => {
-        try {
-          const rootPg = getPgEnvOptions(this.config);
-          const admin = new DbAdmin(
-            { ...config, user: rootPg.user, password: rootPg.password },
-            this.verbose
-          );
-          admin.drop();
-          log.warn(`🧨 Dropped database: ${config.database}`);
-        } catch (err) {
-          log.error(`❌ Failed to drop database ${config.database}:`, err);
-        }
-      })
-    );
+    if (keepDb) {
+      log.info('📦 Keeping databases (keepDb=true)...');
+      const dbNames = Array.from(this.seenDbConfigs.values()).map(c => c.database);
+      log.info(`📦 Preserved databases: ${dbNames.join(', ')}`);
+    } else {
+      log.info('🗑️ Dropping seen databases...');
+      await Promise.all(
+        Array.from(this.seenDbConfigs.values()).map(async (config) => {
+          try {
+            const rootPg = getPgEnvOptions(this.config);
+            const admin = new DbAdmin(
+              { ...config, user: rootPg.user, password: rootPg.password },
+              this.verbose
+            );
+            admin.drop();
+            log.warn(`🧨 Dropped database: ${config.database}`);
+          } catch (err) {
+            log.error(`❌ Failed to drop database ${config.database}:`, err);
+          }
+        })
+      );
+    }
     this.seenDbConfigs.clear();
 
-    log.success('✅ All PgTestClients closed, pools disposed, databases dropped.');
+    const action = keepDb ? 'preserved' : 'dropped';
+    log.success(`✅ All PgTestClients closed, pools disposed, databases ${action}.`);
     this.pendingConnects.clear();
     this.shuttingDown = false;
 

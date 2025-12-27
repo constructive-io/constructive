@@ -146,7 +146,7 @@ describe('PgpmPackage', () => {
   it('returns a list of available modules in workspace', async () => {
     const cwd = fixture.getFixturePath('constructive');
     const project = new PgpmPackage(cwd);
-    const modules = project.getAvailableModules();
+    const modules = await project.getAvailableModules();
     expect(Array.isArray(modules)).toBe(true);
     expect(modules.length).toBeGreaterThan(0);
   });

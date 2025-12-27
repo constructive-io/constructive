@@ -1,0 +1,117 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and overrides 1`] = `
+{
+  "api": {
+    "anonRole": "env_anon",
+    "defaultDatabaseId": "override_db",
+    "enableMetaApi": false,
+    "exposedSchemas": [
+      "public",
+      "app",
+    ],
+    "isPublic": true,
+    "metaSchemas": [
+      "config_meta",
+      "collections_public",
+      "meta_public",
+      "env_meta1",
+      "env_meta2",
+    ],
+    "roleName": "env_role",
+  },
+  "cdn": {
+    "awsAccessKey": "minioadmin",
+    "awsRegion": "us-east-1",
+    "awsSecretKey": "minioadmin",
+    "bucketName": "test-bucket",
+    "minioEndpoint": "http://localhost:9000",
+  },
+  "db": {
+    "connections": {
+      "admin": {
+        "password": "admin_password",
+        "user": "app_admin",
+      },
+      "app": {
+        "password": "app_password",
+        "user": "app_user",
+      },
+    },
+    "cwd": "<CWD>",
+    "extensions": [],
+    "prefix": "db-",
+    "roles": {
+      "administrator": "administrator",
+      "anonymous": "anonymous",
+      "authenticated": "authenticated",
+      "default": "anonymous",
+    },
+    "rootDb": "postgres",
+    "useLocksForRoles": false,
+  },
+  "deployment": {
+    "cache": false,
+    "fast": false,
+    "hashMethod": "content",
+    "logOnly": false,
+    "usePlan": true,
+    "useTx": true,
+  },
+  "features": {
+    "oppositeBaseNames": false,
+    "postgis": false,
+    "simpleInflection": true,
+  },
+  "graphile": {
+    "appendPlugins": [],
+    "graphileBuildOptions": {},
+    "overrideSettings": {},
+    "schema": [
+      "config_schema",
+      "env_schema_a",
+      "env_schema_b",
+      "override_schema",
+    ],
+  },
+  "jobs": {
+    "scheduler": {
+      "gracefulShutdown": true,
+      "hostname": "scheduler-0",
+      "pollInterval": 1000,
+      "schema": "app_jobs",
+      "supportAny": true,
+      "supported": [],
+    },
+    "schema": {
+      "schema": "app_jobs",
+    },
+    "worker": {
+      "gracefulShutdown": true,
+      "hostname": "worker-0",
+      "pollInterval": 1000,
+      "schema": "app_jobs",
+      "supportAny": true,
+      "supported": [],
+    },
+  },
+  "migrations": {
+    "codegen": {
+      "useTx": false,
+    },
+  },
+  "pg": {
+    "database": "config-db",
+    "host": "override-host",
+    "password": "password",
+    "port": 5432,
+    "user": "env-user",
+  },
+  "server": {
+    "host": "localhost",
+    "port": 5000,
+    "strictAuth": false,
+    "trustProxy": false,
+  },
+}
+`;

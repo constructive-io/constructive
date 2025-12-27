@@ -3,6 +3,89 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.0...@constructive-io/cli@5.4.1) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.3.1...@constructive-io/cli@5.4.0) (2025-12-27)
+
+### Bug Fixes
+
+- cast commands to TestFixtureOptions type for compatibility ([60383ab](https://github.com/constructive-io/constructive/commit/60383ab5fa6120f0ef021fe589f9c8d80719b2e4))
+- use unknown intermediate cast for commands type compatibility ([77c262c](https://github.com/constructive-io/constructive/commit/77c262cfd9f1556a7d8db3fb69a59aeb1189a09c))
+
+### Features
+
+- **pgpm:** use new upgradePrompt UI for interactive mode ([237f6e0](https://github.com/constructive-io/constructive/commit/237f6e01a849910a84adb69bb1df7396aeeaa0ce))
+
+## [5.3.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.3.0...@constructive-io/cli@5.3.1) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.2.2...@constructive-io/cli@5.3.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** add -w alias for --workspace flag and migrate to genomic ([d402038](https://github.com/constructive-io/constructive/commit/d402038f5791dcc3ec17003f956aae8057119294))
+
+## [5.2.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.2.1...@constructive-io/cli@5.2.2) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.2.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.2.0...@constructive-io/cli@5.2.1) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.24...@constructive-io/cli@5.2.0) (2025-12-27)
+
+### Bug Fixes
+
+- **cli:** correct import path for pgpm commands in test fixture ([3f0a764](https://github.com/constructive-io/constructive/commit/3f0a7644d0ee7814672c9f73081d30ec431363ef))
+- **cli:** update test fixture to support pgpm commands ([713e778](https://github.com/constructive-io/constructive/commit/713e7786de89ef523714ace6a4aab984cf21994b))
+- **cli:** update tests to use pgpm commands instead of cnc ([4b8a9c7](https://github.com/constructive-io/constructive/commit/4b8a9c762165f38daefdb5c56d642bd7241b2a53))
+
+### Features
+
+- **cli:** separate cnc and pgpm CLIs - hard separation ([d5a50ea](https://github.com/constructive-io/constructive/commit/d5a50ea19192bdfd66e9f7cfe7f6cf48d4b6e49a))
+
+## [5.1.24](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.23...@constructive-io/cli@5.1.24) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.23](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.22...@constructive-io/cli@5.1.23) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.22](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.21...@constructive-io/cli@5.1.22) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.21](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.20...@constructive-io/cli@5.1.21) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.19...@constructive-io/cli@5.1.20) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.19](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.18...@constructive-io/cli@5.1.19) (2025-12-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.18](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.17...@constructive-io/cli@5.1.18) (2025-12-25)
+
+### Bug Fixes
+
+- **test:** update init.templates.test.ts to use fromPath instead of type ([3ec34dd](https://github.com/constructive-io/constructive/commit/3ec34dd20462db8213fdf71e0e5db5f08c60ae53))
+
+## [5.1.17](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.16...@constructive-io/cli@5.1.17) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.1.16](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.15...@constructive-io/cli@5.1.16) (2025-12-25)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.1.15](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.1.14...@constructive-io/cli@5.1.15) (2025-12-25)
 
 **Note:** Version bump only for package @constructive-io/cli

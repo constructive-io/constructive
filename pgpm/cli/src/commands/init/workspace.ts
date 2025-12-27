@@ -39,12 +39,14 @@ export default async function runWorkspaceSetup(
   const dirName = path.basename(targetPath);
   registerDefaultResolver('workspace.dirname', () => dirName);
 
+  const dir = argv.dir as string | undefined;
+
   await scaffoldTemplate({
-    type: 'workspace',
+    fromPath: templatePath ?? 'workspace',
     outputDir: targetPath,
     templateRepo,
     branch: argv.fromBranch as string | undefined,
-    templatePath,
+    dir,
     answers: {
       ...argv,
       ...answers,
@@ -52,7 +54,8 @@ export default async function runWorkspaceSetup(
     },
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
     noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
-    cwd
+    cwd,
+    prompter
   });
 
   // Check for .motd file and print it, or use default ASCII art
