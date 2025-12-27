@@ -103,8 +103,9 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     command = answer.command;
   }
 
-  // Run update check (skip on CI, update command, or if explicitly disabled)
-  if (!process.env.CI && !process.env.PGPM_SKIP_UPDATE_CHECK && command !== 'update') {
+  // Run update check (skip on 'update' command to avoid redundant check)
+  // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / PGPM_SKIP_UPDATE_CHECK is set)
+  if (command !== 'update') {
     try {
       const pkg = findAndRequirePackageJson(__dirname);
       const updateResult = await checkForUpdates({

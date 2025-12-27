@@ -22,21 +22,20 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   let { first: command, newArgv } = extractFirst(argv);
 
   // Run update check early so it shows on help/version paths too
-  if (!process.env.CI && !process.env.PGPM_SKIP_UPDATE_CHECK) {
-    try {
-      const pkg = findAndRequirePackageJson(__dirname);
-      const updateResult = await checkForUpdates({
-        pkgName: pkg.name,
-        pkgVersion: pkg.version,
-        toolName: 'constructive',
-      });
-      if (updateResult.hasUpdate && updateResult.message) {
-        console.warn(updateResult.message);
-        console.warn(`Run npm i -g ${pkg.name}@latest to upgrade.`);
-      }
-    } catch {
-      // ignore update check failures
+  // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / CONSTRUCTIVE_SKIP_UPDATE_CHECK is set)
+  try {
+    const pkg = findAndRequirePackageJson(__dirname);
+    const updateResult = await checkForUpdates({
+      pkgName: pkg.name,
+      pkgVersion: pkg.version,
+      toolName: 'constructive',
+    });
+    if (updateResult.hasUpdate && updateResult.message) {
+      console.warn(updateResult.message);
+      console.warn(`Run npm i -g ${pkg.name}@latest to upgrade.`);
     }
+  } catch {
+    // ignore update check failures
   }
 
   if (argv.version || argv.v) {
