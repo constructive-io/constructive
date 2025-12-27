@@ -1,5 +1,5 @@
 import { PgpmOptions } from '@pgpmjs/types';
-import { existsSync, mkdirSync, rmSync } from 'fs';
+import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
 import { toSnakeCase } from 'komoji';
 import path from 'path';
@@ -7,26 +7,42 @@ import { getPgPool } from 'pg-cache';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
+import { getMissingInstallableModules } from '../modules/modules';
 import { exportMeta } from './export-meta';
 
 /**
- * Mapping from control file names (used in extensions list) to npm package names.
- * Only includes modules that can be installed via pgpm install from @pgpm/* packages.
- * Native PostgreSQL extensions (plpgsql, uuid-ossp, etc.) are not included.
+ * Required extensions for database schema exports.
+ * Includes native PostgreSQL extensions and pgpm modules.
  */
-const PGPM_MODULE_MAP: Record<string, string> = {
-  'pgpm-base32': '@pgpm/base32',
-  'pgpm-database-jobs': '@pgpm/database-jobs',
-  'db-meta-modules': '@pgpm/db-meta-modules',
-  'db-meta-schema': '@pgpm/db-meta-schema',
-  'pgpm-inflection': '@pgpm/inflection',
-  'pgpm-jwt-claims': '@pgpm/jwt-claims',
-  'pgpm-stamps': '@pgpm/stamps',
-  'pgpm-totp': '@pgpm/totp',
-  'pgpm-types': '@pgpm/types',
-  'pgpm-utils': '@pgpm/utils',
-  'pgpm-uuid': '@pgpm/uuid'
-};
+const DB_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'uuid-ossp',
+  'citext',
+  'pgcrypto',
+  'btree_gist',
+  'postgis',
+  'hstore',
+  'db-meta-schema',
+  'pgpm-inflection',
+  'pgpm-uuid',
+  'pgpm-utils',
+  'pgpm-database-jobs',
+  'pgpm-jwt-claims',
+  'pgpm-stamps',
+  'pgpm-base32',
+  'pgpm-totp',
+  'pgpm-types'
+] as const;
+
+/**
+ * Required extensions for service/meta exports.
+ * Includes native PostgreSQL extensions and pgpm modules for metadata management.
+ */
+const SERVICE_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'db-meta-schema',
+  'db-meta-modules'
+] as const;
 
 /**
  * Prompter interface for interactive prompts.
@@ -45,30 +61,19 @@ interface Prompter {
  * @param prompter - Optional prompter for interactive confirmation
  * @returns List of extensions that were successfully installed
  */
-const checkAndInstallMissingModules = async (
+const promptAndInstallMissingModules = async (
   project: PgpmPackage,
   extensions: string[],
   prompter?: Prompter
 ): Promise<string[]> => {
-  const moduleMap = project.getModuleMap();
-  const availableModules = Object.keys(moduleMap);
+  const { installed } = project.getInstalledModules();
+  const missingModules = getMissingInstallableModules(extensions, installed);
   
-  const missingPgpmModules: { controlName: string; npmName: string }[] = [];
-  
-  for (const ext of extensions) {
-    if (PGPM_MODULE_MAP[ext] && !availableModules.includes(ext)) {
-      missingPgpmModules.push({
-        controlName: ext,
-        npmName: PGPM_MODULE_MAP[ext]
-      });
-    }
-  }
-  
-  if (missingPgpmModules.length === 0) {
+  if (missingModules.length === 0) {
     return [];
   }
   
-  const missingNames = missingPgpmModules.map(m => m.npmName);
+  const missingNames = missingModules.map(m => m.npmName);
   console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
   
   if (prompter) {
@@ -85,7 +90,7 @@ const checkAndInstallMissingModules = async (
       console.log('Installing missing modules...');
       await project.installModules(...missingNames);
       console.log('Modules installed successfully.');
-      return missingPgpmModules.map(m => m.controlName);
+      return missingModules.map(m => m.controlName);
     }
   }
   
@@ -192,27 +197,7 @@ const exportMigrationsToDisk = async ({
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
   if (results?.rows?.length > 0) {
-    const dbExtensions = [
-      'plpgsql',
-      'uuid-ossp',
-      'citext',
-      'pgcrypto',
-      'btree_gist',
-      'postgis',
-      'hstore',
-      'db-meta-schema',
-      'pgpm-inflection',
-      'pgpm-uuid',
-      'pgpm-utils',
-      'pgpm-database-jobs',
-      'pgpm-jwt-claims',
-      'pgpm-stamps',
-      'pgpm-base32',
-      'pgpm-totp',
-      'pgpm-types'
-    ];
-
-    await checkAndInstallMissingModules(project, dbExtensions, prompter);
+    await promptAndInstallMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter);
 
     await preparePackage({
       project,
@@ -220,7 +205,7 @@ const exportMigrationsToDisk = async ({
       outdir,
       name,
       description: dbExtensionDesc,
-      extensions: dbExtensions,
+      extensions: [...DB_REQUIRED_EXTENSIONS],
       prompter
     });
 
@@ -238,8 +223,7 @@ const exportMigrationsToDisk = async ({
     // Build description for the meta/service extension package
     const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
 
-    const metaExtensions = ['plpgsql', 'db-meta-schema', 'db-meta-modules'];
-    await checkAndInstallMissingModules(project, metaExtensions, prompter);
+    await promptAndInstallMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
 
     await preparePackage({
       project,
@@ -247,7 +231,7 @@ const exportMigrationsToDisk = async ({
       outdir,
       name: metaExtensionName,
       description: metaDesc,
-      extensions: metaExtensions,
+      extensions: [...SERVICE_REQUIRED_EXTENSIONS],
       prompter
     });
 
