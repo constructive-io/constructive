@@ -2,6 +2,8 @@
 
 PostgreSQL seeding utilities for CSV, JSON, and SQL data loading.
 
+> **Looking for pgpm integration?** Use [`pgsql-seed`](../pgsql-seed) instead - it re-exports everything from this package plus adds `deployPgpm`/`loadPgpm` for deploying pgpm packages.
+
 ## Installation
 
 ```bash

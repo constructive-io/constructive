@@ -3,10 +3,10 @@ import { PgConfig } from 'pg-env';
 import { AuthOptions, PgTestConnectionOptions, PgTestClientContext } from '@pgpmjs/types';
 import { getRoleName } from './roles';
 import { generateContextStatements } from './context-utils';
-import { insertJsonMap, type JsonSeedMap } from 'pg-seed';
-import { loadCsvMap, type CsvSeedMap } from 'pg-seed';
-import { loadSqlFiles } from 'pg-seed';
-import { deployPgpm } from './seed/pgpm';
+import { insertJsonMap, type JsonSeedMap } from 'pgsql-seed';
+import { loadCsvMap, type CsvSeedMap } from 'pgsql-seed';
+import { loadSqlFiles } from 'pgsql-seed';
+import { deployPgpm } from 'pgsql-seed';
 
 export type PgTestClientOpts = {
   deferConnect?: boolean;

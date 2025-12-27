@@ -1,12 +1,12 @@
-// Re-export from pg-seed for backwards compatibility
+// Re-export from pgsql-seed for backwards compatibility
 export {
   exportCsv as exportTableToCsv,
   loadCsv as copyCsvIntoTable,
   loadCsvMap,
   type CsvSeedMap
-} from 'pg-seed';
+} from 'pgsql-seed';
 
-import { loadCsv, type CsvSeedMap } from 'pg-seed';
+import { loadCsv, type CsvSeedMap } from 'pgsql-seed';
 
 import { SeedAdapter, SeedContext } from './types';
 

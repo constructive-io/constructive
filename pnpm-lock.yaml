@@ -1773,6 +1773,32 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
+  postgres/pgsql-seed:
+    dependencies:
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../../pgpm/env/dist
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+      pg-env:
+        specifier: workspace:^
+        version: link:../pg-env/dist
+      pg-seed:
+        specifier: workspace:^
+        version: link:../pg-seed/dist
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      makage:
+        specifier: ^0.1.9
+        version: 0.1.9
+    publishDirectory: dist
+
   postgres/pgsql-test:
     dependencies:
       '@pgpmjs/core':
@@ -1799,9 +1825,9 @@ importers:
       pg-env:
         specifier: workspace:^
         version: link:../pg-env/dist
-      pg-seed:
+      pgsql-seed:
         specifier: workspace:^
-        version: link:../pg-seed/dist
+        version: link:../pgsql-seed/dist
     devDependencies:
       '@types/pg':
         specifier: ^8.16.0
