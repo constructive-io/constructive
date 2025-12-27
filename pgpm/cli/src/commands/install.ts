@@ -1,6 +1,6 @@
 import { getMissingInstallableModules, PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Inquirerer, createSpinner } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 
 const logger = new Logger('pgpm');
@@ -48,21 +48,31 @@ export default async (
 
   // If no packages specified, install missing modules from .control file
   if (argv._.length === 0) {
+    const checkSpinner = createSpinner('Checking for missing modules...');
+    checkSpinner.start();
+    
     const requiredExtensions = project.getRequiredModules();
     const installedModules = project.getWorkspaceInstalledModules();
     const missingModules = getMissingInstallableModules(requiredExtensions, installedModules);
 
     if (missingModules.length === 0) {
-      logger.success('All modules are already installed.');
+      checkSpinner.succeed('All modules are already installed.');
       return;
     }
 
     const missingNames = missingModules.map(m => m.npmName);
-    logger.info(`Installing missing modules: ${missingNames.join(', ')}`);
+    checkSpinner.succeed(`Found ${missingModules.length} missing module(s): ${missingNames.join(', ')}`);
+    
+    const installSpinner = createSpinner(`Installing ${missingModules.length} module(s)...`);
+    installSpinner.start();
     await project.installModules(...missingNames);
+    installSpinner.succeed(`Installed ${missingModules.length} module(s) successfully.`);
     return;
   }
 
+  const installSpinner = createSpinner(`Installing ${argv._.length} module(s)...`);
+  installSpinner.start();
   await project.installModules(...argv._);
+  installSpinner.succeed(`Installed ${argv._.length} module(s) successfully.`);
 
 };
