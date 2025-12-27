@@ -1,77 +1,54 @@
-import fs from 'fs';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
-import os from 'os';
 import path from 'path';
+import { createTestFixture, TestFixture as BaseTestFixture, TestFixtureOptions } from '@inquirerer/test';
 
 import { commands } from '../src/commands';
-import { setupTests, TestEnvironment } from './cli';
-
-const { mkdtempSync, rmSync, cpSync } = fs;
 
 export const FIXTURES_PATH = path.resolve(__dirname, '../../../__fixtures__');
 
 export const getFixturePath = (...paths: string[]) =>
   path.join(FIXTURES_PATH, ...paths);
 
+const createFixture = (...fixturePath: string[]) =>
+  createTestFixture(
+    {
+      commands: commands as unknown as TestFixtureOptions['commands'],
+      fixtureRoot: FIXTURES_PATH,
+      tmpPrefix: 'constructive-io-graphql-test-',
+      cliOptions: { version: '1.0.0' }
+    },
+    ...fixturePath
+  );
+
+export { createFixture as createTestFixture };
+
 export class TestFixture {
-  readonly tempDir: string;
-  readonly tempFixtureDir: string;
-  readonly getFixturePath: (...paths: string[]) => string;
-  private environment: TestEnvironment;
+  private fixture: BaseTestFixture;
 
   constructor(...fixturePath: string[]) {
-    this.tempDir = mkdtempSync(path.join(os.tmpdir(), 'constructive-io-graphql-test-'));
+    this.fixture = createFixture(...fixturePath);
+  }
 
-    if (fixturePath.length > 0) {
-      const originalFixtureDir = getFixturePath(...fixturePath);
-      this.tempFixtureDir = path.join(this.tempDir, ...fixturePath);
-      cpSync(originalFixtureDir, this.tempFixtureDir, { recursive: true });
-    } else {
-      this.tempFixtureDir = this.tempDir;
-    }
+  get tempDir() {
+    return this.fixture.tempDir;
+  }
 
-    this.getFixturePath = (...paths: string[]) =>
-      path.join(this.tempFixtureDir, ...paths);
+  get tempFixtureDir() {
+    return this.fixture.tempFixtureDir;
+  }
 
-    this.environment = setupTests()();
+  getFixturePath(...paths: string[]) {
+    return this.fixture.getFixturePath(...paths);
   }
 
   fixturePath(...paths: string[]) {
-    return path.join(this.tempFixtureDir, ...paths);
+    return this.fixture.fixturePath(...paths);
   }
 
   cleanup() {
-    rmSync(this.tempDir, { recursive: true, force: true });
+    this.fixture.cleanup();
   }
 
-  async runCmd(argv: ParsedArgs) {
-    const {
-      mockInput,
-      mockOutput,
-      writeResults,
-      transformResults
-    } = this.environment;
-
-    const prompter = new Inquirerer({
-      input: mockInput,
-      output: mockOutput,
-      noTty: true
-    });
-
-    const result = await commands(argv, prompter, {
-      noTty: true,
-      input: mockInput,
-      output: mockOutput,
-      version: '1.0.0',
-      minimistOpts: {}
-    });
-
-    return {
-      result,
-      argv,
-      writeResults,
-      transformResults
-    };
+  async runCmd(argv: Parameters<BaseTestFixture['runCmd']>[0]) {
+    return this.fixture.runCmd(argv);
   }
 }

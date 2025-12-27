@@ -33,13 +33,13 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@inquirerer/test": "^1.2.0",
     "@types/js-yaml": "^4.0.9",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20.12.7",
     "@types/pg": "^8.16.0",
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.16",
-    "clean-ansi": "0.1.5",
     "glob": "^13.0.0",
     "makage": "^0.1.9",
     "pg": "^8.16.3",
