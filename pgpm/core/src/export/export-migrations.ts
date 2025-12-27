@@ -22,6 +22,7 @@ interface ExportMigrationsToDiskOptions {
   extensionDesc?: string;
   metaExtensionName: string;
   metaExtensionDesc?: string;
+  clobber?: boolean;
 }
 
 interface ExportOptions {
@@ -39,6 +40,7 @@ interface ExportOptions {
   extensionDesc?: string;
   metaExtensionName: string;
   metaExtensionDesc?: string;
+  clobber?: boolean;
 }
 
 const exportMigrationsToDisk = async ({
@@ -53,7 +55,8 @@ const exportMigrationsToDisk = async ({
   extensionName,
   extensionDesc,
   metaExtensionName,
-  metaExtensionDesc
+  metaExtensionDesc,
+  clobber = false
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -130,7 +133,8 @@ const exportMigrationsToDisk = async ({
         'pgpm-base32',
         'pgpm-totp',
         'pgpm-types'
-      ]
+      ],
+      clobber
     });
 
     writePgpmPlan(results.rows, opts);
@@ -153,7 +157,8 @@ const exportMigrationsToDisk = async ({
       outdir,
       name: metaExtensionName,
       description: metaDesc,
-      extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules']
+      extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules'],
+      clobber
     });
 
     const metaReplacer = makeReplacer({
@@ -220,7 +225,8 @@ export const exportMigrations = async ({
   extensionName,
   extensionDesc,
   metaExtensionName,
-  metaExtensionDesc
+  metaExtensionDesc,
+  clobber = false
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -236,7 +242,8 @@ export const exportMigrations = async ({
       databaseId,
       schema_names,
       author,
-      outdir
+      outdir,
+      clobber
     });
   }
 };
@@ -249,6 +256,7 @@ interface PreparePackageOptions {
   name: string;
   description: string;
   extensions: string[];
+  clobber?: boolean;
 }
 
 interface Schema {
@@ -268,6 +276,9 @@ interface ReplacerResult {
 
 /**
  * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
+ * 
+ * @param clobber - If true, allows overwriting existing deploy/revert/verify directories.
+ *                  If false (default), throws an error if the module already exists.
  */
 const preparePackage = async ({
   project,
@@ -275,7 +286,8 @@ const preparePackage = async ({
   outdir,
   name,
   description,
-  extensions
+  extensions,
+  clobber = false
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
   const pgpmDir = path.resolve(path.join(outdir, name));
@@ -297,6 +309,13 @@ const preparePackage = async ({
       }
     });
   } else {
+    if (!clobber) {
+      process.chdir(curDir);
+      throw new Error(
+        `Module "${name}" already exists at ${pgpmDir}. ` +
+        `Use --clobber flag to overwrite existing deploy/revert/verify directories.`
+      );
+    }
     rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
     rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
     rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });

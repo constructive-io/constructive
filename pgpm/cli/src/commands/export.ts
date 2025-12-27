@@ -18,9 +18,11 @@ Options:
   --extensionName <name>  Extension name
   --metaExtensionName <name>  Meta extension name (default: svc)
   --cwd <directory>       Working directory (default: current directory)
+  --clobber               Overwrite existing deploy/revert/verify directories if module exists
 
 Examples:
   pgpm export              Export migrations from selected database
+  pgpm export --clobber    Export and overwrite existing module directories
 `;
 
 export default async (
@@ -139,7 +141,8 @@ export default async (
     schema_names,
     outdir,
     extensionName,
-    metaExtensionName
+    metaExtensionName,
+    clobber: argv.clobber ?? false
   });
 
   console.log(`
