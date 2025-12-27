@@ -3,4 +3,3 @@ export * from './CLIDeployTestFixture';
 export * from './fixtures';
 export * from './init-argv';
 export * from './TestDatabase';
-export { normalizePackageJsonForSnapshot } from './cli';

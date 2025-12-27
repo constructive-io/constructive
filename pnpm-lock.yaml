@@ -1267,6 +1267,9 @@ importers:
         specifier: ^0.1.8
         version: 0.1.9
     devDependencies:
+      '@inquirerer/test':
+        specifier: ^1.1.2
+        version: 1.1.2(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1282,9 +1285,6 @@ importers:
       '@types/shelljs':
         specifier: ^0.8.16
         version: 0.8.17
-      clean-ansi:
-        specifier: 0.1.5
-        version: 0.1.5
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1463,6 +1463,9 @@ importers:
         specifier: ^0.1.8
         version: 0.1.9
     devDependencies:
+      '@inquirerer/test':
+        specifier: ^1.1.2
+        version: 1.1.2(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1481,9 +1484,6 @@ importers:
       '@types/shelljs':
         specifier: ^0.8.16
         version: 0.8.17
-      clean-ansi:
-        specifier: 0.1.5
-        version: 0.1.5
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -2761,6 +2761,14 @@ packages:
       '@types/node': '>=18'
     peerDependenciesMeta:
       '@types/node':
+        optional: true
+
+  '@inquirerer/test@1.1.2':
+    resolution: {integrity: sha512-0ZKRhasGscf/58OlaG+ttFV6fR8LXl0GA3VcugYEKg7Zk1rgI08aLMnioM6+9+PPlLL7LGKsrqv6BXE6rdLvRg==}
+    peerDependencies:
+      jest: '>=29.0.0'
+    peerDependenciesMeta:
+      jest:
         optional: true
 
   '@inquirerer/utils@3.1.1':
@@ -4263,8 +4271,8 @@ packages:
   cjs-module-lexer@2.1.1:
     resolution: {integrity: sha512-+CmxIZ/L2vNcEfvNtLdU0ZQ6mbq3FZnwAP2PPTiKP+1QOoKwlKlPgb8UKV0Dds7QVaMnHm+FwSft2VB0s/SLjQ==}
 
-  clean-ansi@0.1.5:
-    resolution: {integrity: sha512-16NGZfpEQJFwTIyPtoFwO4xlrEYfO2qD/d5vBP130U84JlaFQLC71dZxKt1tcfxHJ0LWXNbB0qWlOQ36J7IvZQ==}
+  clean-ansi@0.1.7:
+    resolution: {integrity: sha512-ZSwYoCaCJCzv7yuOS0KinkpsBLTn0Mi+pEY1EiJr1ZWxLpJUtWKUrdV7ni4F+xeY96looeZz2vFKKpcrM+pn+A==}
 
   clean-css@4.2.4:
     resolution: {integrity: sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==}
@@ -9440,6 +9448,13 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
+  '@inquirerer/test@1.1.2(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
+    dependencies:
+      clean-ansi: 0.1.7
+      inquirerer: 4.1.1
+    optionalDependencies:
+      jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
+
   '@inquirerer/utils@3.1.1':
     dependencies:
       appstash: 0.2.7
@@ -11545,7 +11560,7 @@ snapshots:
 
   cjs-module-lexer@2.1.1: {}
 
-  clean-ansi@0.1.5: {}
+  clean-ansi@0.1.7: {}
 
   clean-css@4.2.4:
     dependencies:

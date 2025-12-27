@@ -49,8 +49,8 @@ exports[`Inquirerer prompts user and correctly processes delayed input 3`] = `
 
 exports[`Inquirerer prompts user and correctly processes delayed input 4`] = `
 [
-  "",
-  "",
+  "<DOWN_ARROW>",
+  "<DOWN_ARROW>",
   "<ENTER>",
 ]
 `;
