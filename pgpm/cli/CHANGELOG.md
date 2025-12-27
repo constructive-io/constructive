@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/constructive-io/constructive/compare/pgpm@2.6.0...pgpm@2.7.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** add -w alias for --workspace flag on upgrade command ([7387ac4](https://github.com/constructive-io/constructive/commit/7387ac4b4e3ef49c6b5da262feeec2cdd96770ce))
+- **pgpm:** add spinner to install command ([db3b097](https://github.com/constructive-io/constructive/commit/db3b0976abe524b784e6f36e069b71e9cb74193e))
+
 # [2.6.0](https://github.com/constructive-io/constructive/compare/pgpm@2.5.1...pgpm@2.6.0) (2025-12-27)
 
 ### Bug Fixes
