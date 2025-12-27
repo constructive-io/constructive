@@ -18,7 +18,7 @@
 
 PostgreSQL seeding utilities with pgpm integration - batteries included.
 
-This package re-exports everything from [`pg-seed`](../pg-seed) and adds pgpm deployment functionality.
+This package re-exports everything from [`pg-seed`](https://www.npmjs.com/package/pg-seed) and adds pgpm deployment functionality.
 
 ## Installation
 
@@ -40,7 +40,7 @@ import {
 } from 'pgsql-seed';
 ```
 
-See the [pg-seed documentation](../pg-seed/README.md) for details on these utilities.
+See the [pg-seed documentation](https://www.npmjs.com/package/pg-seed) for details on these utilities.
 
 ### pgpm Integration
 
