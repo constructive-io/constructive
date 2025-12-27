@@ -30,6 +30,9 @@ export const getAvailableExtensions = async (
     // Geospatial (vertical showcase)
     'postgis',
   
+    // AI & embeddings
+    'vector',
+  
     // Procedural logic (baseline)
     'plpgsql',
   ];
