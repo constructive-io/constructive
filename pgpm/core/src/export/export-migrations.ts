@@ -288,7 +288,6 @@ const preparePackage = async ({
       answers: {
         moduleName: name,
         moduleDesc: description,
-        packageIdentifier: name,
         access: 'restricted'
       }
     });
