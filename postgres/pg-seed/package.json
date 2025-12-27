@@ -1,8 +1,8 @@
 {
-  "name": "pgsql-test",
-  "version": "2.18.17",
+  "name": "pg-seed",
+  "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "pgsql-test offers isolated, role-aware, and rollback-friendly PostgreSQL environments for integration tests — giving developers realistic test coverage without external state pollution",
+  "description": "PostgreSQL seeding utilities for CSV, JSON, and SQL data loading",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -22,28 +22,15 @@
   "keywords": [
     "postgres",
     "postgresql",
-    "testing",
-    "integration-tests",
-    "database-testing",
-    "pg",
-    "rls",
-    "role-based-access",
-    "test-database",
-    "test-runner",
-    "jest",
-    "mocha",
-    "sqitch",
-    "constructive",
-    "graphile",
-    "typeorm",
-    "knex",
     "seed",
-    "fixtures",
-    "transactions",
-    "rollback",
-    "node-postgres",
-    "pg-pool",
-    "pg-client"
+    "seeding",
+    "csv",
+    "json",
+    "sql",
+    "data-loading",
+    "copy",
+    "pg-copy-streams",
+    "constructive"
   ],
   "scripts": {
     "clean": "makage clean",
@@ -60,14 +47,8 @@
     "makage": "^0.1.9"
   },
   "dependencies": {
-    "@pgpmjs/core": "workspace:^",
-    "@pgpmjs/env": "workspace:^",
-    "@pgpmjs/logger": "workspace:^",
-    "@pgpmjs/server-utils": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
+    "csv-parse": "^6.1.0",
     "pg": "^8.16.3",
-    "pg-cache": "workspace:^",
-    "pg-env": "workspace:^",
-    "pg-seed": "workspace:^"
+    "pg-copy-streams": "^7.0.0"
   }
 }

@@ -3,9 +3,9 @@ import { PgConfig } from 'pg-env';
 import { AuthOptions, PgTestConnectionOptions, PgTestClientContext } from '@pgpmjs/types';
 import { getRoleName } from './roles';
 import { generateContextStatements } from './context-utils';
-import { insertJson, type JsonSeedMap } from './seed/json';
-import { loadCsvMap, type CsvSeedMap } from './seed/csv';
-import { loadSqlFiles } from './seed/sql';
+import { insertJsonMap, type JsonSeedMap } from 'pg-seed';
+import { loadCsvMap, type CsvSeedMap } from 'pg-seed';
+import { loadSqlFiles } from 'pg-seed';
 import { deployPgpm } from './seed/pgpm';
 
 export type PgTestClientOpts = {
@@ -183,7 +183,7 @@ export class PgTestClient {
 
   async loadJson(data: JsonSeedMap): Promise<void> {
     await this.ctxQuery();
-    await insertJson(this.client, data);
+    await insertJsonMap(this.client, data);
   }
 
   async loadSql(files: string[]): Promise<void> {
