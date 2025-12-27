@@ -13,11 +13,13 @@ Options:
   --plan                          Include deployment plan (default: true)
   --pretty                        Pretty-print output (default: true)
   --functionDelimiter <delimiter> Function delimiter (default: $EOFCODE$)
+  --outputDiff                    Export AST diff files when round-trip mismatch detected (default: false)
   --cwd <directory>               Working directory (default: current directory)
 
 Examples:
   pgpm package                     Package with defaults
   pgpm package --no-plan           Package without plan
+  pgpm package --outputDiff        Package and export AST diff files if mismatch detected
 `;
 
 export default async (
@@ -51,10 +53,17 @@ export default async (
       default: '$EOFCODE$',
       useDefault: true,
       required: false
+    },
+    {
+      type: 'confirm',
+      name: 'outputDiff',
+      default: false,
+      useDefault: true,
+      required: false
     }
   ];
 
-  let { cwd, plan, pretty, functionDelimiter } = await prompter.prompt(argv, questions);
+  let { cwd, plan, pretty, functionDelimiter, outputDiff } = await prompter.prompt(argv, questions);
 
   const project = new PgpmPackage(cwd);
 
@@ -69,7 +78,8 @@ export default async (
     usePlan: plan,
     packageDir: project.modulePath,
     pretty,
-    functionDelimiter
+    functionDelimiter,
+    outputDiff
   });
 
   return argv;
