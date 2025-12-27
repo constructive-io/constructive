@@ -26,6 +26,7 @@ interface PackageModuleOptions {
   extension?: boolean;
   pretty?: boolean;
   functionDelimiter?: string;
+  outputDiff?: boolean;
 }
 
 interface WritePackageOptions extends PackageModuleOptions {
@@ -44,7 +45,7 @@ const filterStatements = (stmts: RawStmt[], extension: boolean): RawStmt[] => {
 
 export const packageModule = async (
   packageDir: string,
-  { usePlan = true, extension = true, pretty = true, functionDelimiter = '$EOFCODE$' }: PackageModuleOptions = {}
+  { usePlan = true, extension = true, pretty = true, functionDelimiter = '$EOFCODE$', outputDiff = false }: PackageModuleOptions = {}
 ): Promise<{ sql: string; diff?: boolean; tree1?: string; tree2?: string }> => {
   const resolveFn = usePlan ? resolveWithPlan : resolve;
   const sql = resolveFn(packageDir);
@@ -70,7 +71,8 @@ export const packageModule = async (
     });
 
     const tree1 = parsed.stmts;
-    const tree2 = await parse(finalSql);
+    const reparsed = await parse(finalSql);
+    const tree2 = filterStatements(reparsed.stmts as any, extension);
 
     const results: {
       sql: string;
@@ -102,6 +104,7 @@ export const writePackage = async ({
   extension = true,
   usePlan = true,
   packageDir,
+  outputDiff = false,
 }: WritePackageOptions): Promise<void> => {
   const pkgPath = `${packageDir}/package.json`;
   const pkg = require(pkgPath);
@@ -116,6 +119,7 @@ export const writePackage = async ({
   const { sql, diff, tree1, tree2 } = await packageModule(packageDir, {
     extension,
     usePlan,
+    outputDiff,
   });
 
   const outPath = extension ? `${packageDir}/sql` : `${packageDir}/out`;
@@ -140,10 +144,13 @@ export const writePackage = async ({
   }
 
   if (diff) {
-    log.warn(`⚠️ SQL diff exists! Review the ${relative(packageDir, outPath)}/ folder.`);
-    // Uncomment if needed:
-    // writeFileSync(`${outPath}/orig.${sqlFileName}.tree.json`, tree1);
-    // writeFileSync(`${outPath}/parsed.${sqlFileName}.tree.json`, tree2);
+    if (outputDiff) {
+      writeFileSync(`${outPath}/orig.${sqlFileName}.tree.json`, tree1!);
+      writeFileSync(`${outPath}/parsed.${sqlFileName}.tree.json`, tree2!);
+      log.warn(`⚠️ AST round-trip diff detected! Diff files written to ${relative(packageDir, outPath)}/`);
+    } else {
+      log.warn(`⚠️ AST round-trip diff detected! Run with --outputDiff to export the AST diff files.`);
+    }
   }
 
   const writePath = `${outPath}/${sqlFileName}`;
