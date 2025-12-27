@@ -134,46 +134,6 @@ Express-based server powered by PostGraphile that automatically exposes your Pos
 
 **Learn more:** [@constructive-io/graphql-server documentation](https://github.com/constructive-io/constructive/tree/main/graphql/server)
 
-### 🧪 Testing Infrastructure
-
-Comprehensive testing tools for PostgreSQL applications with isolated test databases, transaction-based rollbacks, and RLS simulation.
-
-**Packages:**
-- **[pgsql-test](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-test)** - Isolated PostgreSQL test environments with per-test transaction rollbacks
-- **[graphile-test](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-test)** - GraphQL testing utilities for PostGraphile projects
-- **[supabase-test](https://github.com/constructive-io/constructive/tree/main/postgres/supabase-test)** - Supabase-optimized test harness with JWT helpers
-
-### 🧠 Code Generation
-
-Automatically generate TypeScript types, GraphQL queries, and SQL builders from your database schema.
-
-**Packages:**
-- **[introspectron](https://github.com/constructive-io/constructive/tree/main/postgres/introspectron)** - PostgreSQL schema introspection
-- **[@constructive-io/graphql-codegen](https://github.com/constructive-io/constructive/tree/main/graphql/codegen)** - GraphQL code generation (types, operations, SDK)
-- **[pg-codegen](https://github.com/constructive-io/constructive/tree/main/postgres/pg-codegen)** - TypeScript interfaces and classes from database tables
-- **[@constructive-io/graphql-query](https://github.com/constructive-io/constructive/tree/main/graphql/query)** - Fluent GraphQL query builder for PostGraphile
-- **[@constructive-io/query-builder](https://github.com/constructive-io/constructive/tree/main/packages/query-builder)** - TypeScript SQL query builder
-
-### 🔁 File Streaming & Uploads
-
-Stream files directly to S3-compatible storage with automatic content-type detection, ETag generation, and metadata extraction.
-
-**Packages:**
-- **[@constructive-io/s3-streamer](https://github.com/constructive-io/constructive/tree/main/streaming/s3-streamer)** - Direct S3 streaming with metadata injection
-- **[etag-hash](https://github.com/constructive-io/constructive/tree/main/streaming/etag-hash)** - S3-compatible ETag computation
-- **[uuid-hash](https://github.com/constructive-io/constructive/tree/main/streaming/uuid-hash)** - Deterministic UUIDs from content hashing
-
-### 🧠 SQL Parsing & AST
-
-Low-level tools for parsing, transforming, and generating PostgreSQL SQL.
-
-**Packages:**
-- **[pgsql-parser](https://github.com/constructive-io/pgpm-modulessql-parser)** - SQL parsing and deparsing engine
-- **[libpg-query-node](https://github.com/constructive-iolibpg-query-node)** - Node.js bindings for libpg_query
-- **[pg-ast](https://github.com/constructive-io/constructive/tree/main/postgres/pg-ast)** - AST construction and transformation utilities
-- **[@pgsql/types](https://github.com/constructive-io/pgpm-modulessql-parser/tree/main/packages/types)** - TypeScript type definitions for PostgreSQL AST
-- **[@pgsql/utils](https://github.com/constructive-io/pgpm-modulessql-parser/tree/main/packages/utils)** - AST manipulation utilities
-
 ## Common Workflows
 
 ### Development
@@ -299,6 +259,8 @@ This architecture eliminates the traditional ORM layer and API boilerplate, lett
 ### 🧪 Testing & Quality Assurance
 
 - **[pgsql-test](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-test)** - Isolated PostgreSQL test environments with per-test transaction rollbacks and RLS simulation
+- **[pgsql-seed](https://github.com/constructive-io/constructive/tree/main/postgres/pgsql-seed)** - PostgreSQL seeding utilities for CSV, JSON, SQL data loading, and pgpm deployment
+- **[drizzle-orm-test](https://github.com/constructive-io/constructive/tree/main/postgres/drizzle-orm-test)** - Drop-in pgsql-test replacement for Drizzle ORM with context management and RLS testing
 - **[graphile-test](https://github.com/constructive-io/constructive/tree/main/graphile/graphile-test)** - GraphQL testing utilities for PostGraphile projects with snapshot support
 - **[supabase-test](https://github.com/constructive-io/constructive/tree/main/postgres/supabase-test)** - Supabase-optimized test harness with JWT helpers and local stack integration
 - **[pg-query-context](https://github.com/constructive-io/constructive/tree/main/postgres/pg-query-context)** - Session context injection for setting role, JWT claims, and session variables

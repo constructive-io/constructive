@@ -16,33 +16,83 @@
   </a>
 </p>
 
-PostgreSQL seeding utilities with pgpm integration - batteries included.
-
-This package re-exports everything from [`pg-seed`](https://www.npmjs.com/package/pg-seed) and adds pgpm deployment functionality.
+PostgreSQL seeding utilities for CSV, JSON, SQL data loading, and pgpm deployment.
 
 ## Installation
 
 ```bash
 npm install pgsql-seed
-# or
-pnpm add pgsql-seed
 ```
 
 ## Usage
 
-### All pg-seed utilities are available
+### CSV Loading (COPY protocol)
 
 ```typescript
-import { 
-  loadCsv, loadCsvMap, exportCsv,  // CSV utilities
-  insertJson, insertJsonMap,        // JSON utilities
-  loadSql, loadSqlFiles, execSql    // SQL utilities
-} from 'pgsql-seed';
+import { Client } from 'pg';
+import { loadCsv, loadCsvMap, exportCsv } from 'pgsql-seed';
+
+const client = new Client();
+await client.connect();
+
+// Load a single CSV file
+await loadCsv(client, 'users', './data/users.csv');
+
+// Load multiple CSV files
+await loadCsvMap(client, {
+  'users': './data/users.csv',
+  'orders': './data/orders.csv'
+});
+
+// Export a table to CSV
+await exportCsv(client, 'users', './backup/users.csv');
 ```
 
-See the [pg-seed documentation](https://www.npmjs.com/package/pg-seed) for details on these utilities.
+### JSON Insertion
 
-### pgpm Integration
+```typescript
+import { Client } from 'pg';
+import { insertJson, insertJsonMap } from 'pgsql-seed';
+
+const client = new Client();
+await client.connect();
+
+// Insert rows into a single table
+await insertJson(client, 'users', [
+  { name: 'Alice', email: 'alice@example.com' },
+  { name: 'Bob', email: 'bob@example.com' }
+]);
+
+// Insert rows into multiple tables
+await insertJsonMap(client, {
+  'users': [{ name: 'Alice', email: 'alice@example.com' }],
+  'orders': [{ user_id: 1, total: 99.99 }]
+});
+```
+
+### SQL File Execution
+
+```typescript
+import { Client } from 'pg';
+import { loadSql, loadSqlFiles, execSql } from 'pgsql-seed';
+
+const client = new Client();
+await client.connect();
+
+// Execute a single SQL file
+await loadSql(client, './migrations/001-schema.sql');
+
+// Execute multiple SQL files
+await loadSqlFiles(client, [
+  './migrations/001-schema.sql',
+  './migrations/002-data.sql'
+]);
+
+// Execute a SQL string with parameters
+await execSql(client, 'INSERT INTO users (name) VALUES ($1)', ['Alice']);
+```
+
+### pgpm Deployment
 
 Deploy pgpm packages directly from your code:
 
@@ -67,7 +117,16 @@ await deployPgpm(config, '/path/to/package');
 await deployPgpm(config, undefined, true);
 ```
 
-## When to use pg-seed vs pgsql-seed
+## Client Compatibility
 
-- Use **`pg-seed`** if you only need CSV/JSON/SQL seeding and want a lightweight package with no pgpm dependency
-- Use **`pgsql-seed`** if you need pgpm deployment functionality or want a single package with all seeding utilities
+All functions accept either a raw `pg.Client`/`pg.PoolClient` or any wrapper object that exposes a `.client` property containing the underlying pg client. This makes it compatible with testing utilities like `PgTestClient`.
+
+```typescript
+// Works with raw pg.Client
+const client = new Client();
+await loadCsv(client, 'users', './data/users.csv');
+
+// Works with wrappers that have a .client property
+const testClient = new PgTestClient(config);
+await loadCsv(testClient, 'users', './data/users.csv');
+```
