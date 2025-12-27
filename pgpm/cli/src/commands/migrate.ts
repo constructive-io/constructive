@@ -1,7 +1,6 @@
+import { extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-
-import { extractFirst } from '../utils';
 import deps from './migrate/deps';
 // Migrate subcommands
 import init from './migrate/init';

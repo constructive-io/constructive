@@ -1,3 +1,4 @@
+import { cliExitWithError } from '@inquirerer/utils';
 import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
@@ -5,7 +6,6 @@ import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import { getPgEnvOptions } from 'pg-env';
 
 import { getTargetDatabase, resolvePackageAlias } from '../utils';
-import { cliExitWithError } from '../utils/cli-error';
 import { selectDeployedChange, selectDeployedPackage } from '../utils/deployed-changes';
 
 const log = new Logger('revert');

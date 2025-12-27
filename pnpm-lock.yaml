@@ -1224,6 +1224,9 @@ importers:
       '@constructive-io/graphql-server':
         specifier: workspace:^
         version: link:../../graphql/server/dist
+      '@inquirerer/utils':
+        specifier: ^3.1.1
+        version: 3.1.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1240,8 +1243,8 @@ importers:
         specifier: ^0.8.2
         version: 0.8.3
       inquirerer:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1411,6 +1414,9 @@ importers:
 
   pgpm/cli:
     dependencies:
+      '@inquirerer/utils':
+        specifier: ^3.1.1
+        version: 3.1.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1430,11 +1436,11 @@ importers:
         specifier: ^0.8.2
         version: 0.8.3
       genomic:
-        specifier: ^5.0.1
-        version: 5.0.1
+        specifier: ^5.0.2
+        version: 5.0.2
       inquirerer:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1510,8 +1516,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.0.1
-        version: 5.0.1
+        specifier: ^5.0.2
+        version: 5.0.2
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1550,8 +1556,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       makage:
         specifier: ^0.1.9
         version: 0.1.9
@@ -2757,6 +2763,9 @@ packages:
       '@types/node':
         optional: true
 
+  '@inquirerer/utils@3.1.1':
+    resolution: {integrity: sha512-8slhzP+uuBv1Wr67bxUm6zG5IwFRpeeR+i34vvIMVeyW2pvBzXjYMjMYjcfBCS6HHqb2x9Dhq5Px0bwhcO44MQ==}
+
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
     engines: {node: 20 || >=22}
@@ -3913,6 +3922,9 @@ packages:
 
   appstash@0.2.6:
     resolution: {integrity: sha512-93YKWpKwIaGDZeLB1dVLX63V92EINorNgGIUUm6+U3zib+QYwis7NqwqNcqt4948Nz4aLmFkme820kxMO3grtw==}
+
+  appstash@0.2.7:
+    resolution: {integrity: sha512-EdJDs164q4OuKOBo/mdN6srwJdCy5e2NxmPKUyTBI8Z6aEAkX3ViSRFoAA78A4P0azysSMk8wqafsuM0R6weww==}
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -5156,6 +5168,9 @@ packages:
   find-and-require-package-json@0.8.3:
     resolution: {integrity: sha512-8FVl3RyEnn8FEdfrm24abOjSQRSRqVEgDsIuveRG+YHFka3jUaKzRbKDw7M4Ox/z7ImcxaFmRxDeeXnqNheeLg==}
 
+  find-and-require-package-json@0.8.4:
+    resolution: {integrity: sha512-08+BvFbBNU1pvxSMzZnZ01bRGxRyOUAbQG/ttfFrt6G5cFyitmZbtPVKPPz75L/3etyccRq/xxQ1GXUdYB+BkQ==}
+
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
     engines: {node: '>=4'}
@@ -5256,8 +5271,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.0.1:
-    resolution: {integrity: sha512-4XwbYz5NRsdm79MsAcp7ikw2r22jq2pp8Gp1RmnHj61pcRl6D4QI6WxoLfn56kzbxp349/2+DmR0Bf7q9Wxy3A==}
+  genomic@5.0.2:
+    resolution: {integrity: sha512-/cW9JC/akIXGB7Y1qTZWpiFfFINaRZMApZh3eMXhjuLu4VLVkdUO5+TIZWLx+slvHzFXRkwB+dPkIp8QgOnGfA==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5638,6 +5653,9 @@ packages:
 
   inquirerer@4.1.0:
     resolution: {integrity: sha512-XCrUg5A/nagVyBpkpMb5OowbBDmq7rKTwPV0xEw5Zsauu9rsFUOHFLAST+vpOss8ST1uH3gZK2uqAcX5wm6QcA==}
+
+  inquirerer@4.1.1:
+    resolution: {integrity: sha512-OC8UJ7GRxVEFvrT7G5IDIBttjMrqREuax2J2/1ZdmbpJJIaxgydjHYsSmjoyg21XMv+0IU9DEsvBOyJqV1e9dQ==}
 
   invariant@2.2.4:
     resolution: {integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==}
@@ -8138,6 +8156,9 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  yanse@0.1.10:
+    resolution: {integrity: sha512-sSfkypRMWbsBzUcP3oe9xIhyTBqQRv7XvjICzSkciEPP4xmw/8i0slDqlvhVBz9WsSB40aaJvkJunaddl9viZA==}
+
   yanse@0.1.9:
     resolution: {integrity: sha512-AKKZLY+TWENQOYEuQei07b4QFW4hCS6yyAbUiWBCjHOpkhzWUD8EehNAeI/8kwm5pvJQcmX2ojujPywF+DCheA==}
 
@@ -9418,6 +9439,12 @@ snapshots:
       iconv-lite: 0.7.1
     optionalDependencies:
       '@types/node': 20.19.27
+
+  '@inquirerer/utils@3.1.1':
+    dependencies:
+      appstash: 0.2.7
+      find-and-require-package-json: 0.8.4
+      minimist: 1.2.8
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -11033,6 +11060,8 @@ snapshots:
 
   appstash@0.2.6: {}
 
+  appstash@0.2.7: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -12368,6 +12397,8 @@ snapshots:
 
   find-and-require-package-json@0.8.3: {}
 
+  find-and-require-package-json@0.8.4: {}
+
   find-up@2.1.0:
     dependencies:
       locate-path: 2.0.0
@@ -12463,10 +12494,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.0.1:
+  genomic@5.0.2:
     dependencies:
-      appstash: 0.2.6
-      inquirerer: 4.1.0
+      appstash: 0.2.7
+      inquirerer: 4.1.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -12942,6 +12973,14 @@ snapshots:
       js-yaml: 4.1.1
       minimist: 1.2.8
       yanse: 0.1.9
+
+  inquirerer@4.1.1:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.8.4
+      js-yaml: 4.1.1
+      minimist: 1.2.8
+      yanse: 0.1.10
 
   invariant@2.2.4:
     dependencies:
@@ -16058,6 +16097,8 @@ snapshots:
   yallist@4.0.0: {}
 
   yaml@2.8.2: {}
+
+  yanse@0.1.10: {}
 
   yanse@0.1.9: {}
 

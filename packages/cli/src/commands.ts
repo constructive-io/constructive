@@ -1,4 +1,5 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
+import { cliExitWithError, checkForUpdates, extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 
@@ -6,8 +7,7 @@ import codegen from './commands/codegen';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
 import server from './commands/server';
-import { cliExitWithError, extractFirst, usageText } from './utils';
-import { checkForUpdates } from './utils/update-check';
+import { usageText } from './utils';
 
 const createCommandMap = (): Record<string, Function> => {
   return {
@@ -22,16 +22,18 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   let { first: command, newArgv } = extractFirst(argv);
 
   // Run update check early so it shows on help/version paths too
+  // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / CONSTRUCTIVE_SKIP_UPDATE_CHECK is set)
   try {
     const pkg = findAndRequirePackageJson(__dirname);
-    await checkForUpdates({
-      command: command || 'help',
+    const updateResult = await checkForUpdates({
       pkgName: pkg.name,
       pkgVersion: pkg.version,
       toolName: 'constructive',
-      key: pkg.name,
-      updateCommand: `Run npm i -g ${pkg.name}@latest to upgrade.`
     });
+    if (updateResult.hasUpdate && updateResult.message) {
+      console.warn(updateResult.message);
+      console.warn(`Run npm i -g ${pkg.name}@latest to upgrade.`);
+    }
   } catch {
     // ignore update check failures
   }

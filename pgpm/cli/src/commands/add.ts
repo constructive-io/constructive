@@ -1,9 +1,8 @@
+import { extractFirst } from '@inquirerer/utils';
 import { PgpmPackage } from '@pgpmjs/core';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
-
-import { extractFirst } from '../utils/argv';
 
 const addUsageText = `
 Add Command:
