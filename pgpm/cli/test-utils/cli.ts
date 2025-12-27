@@ -3,6 +3,46 @@ import readline from 'readline';
 import { Readable, Transform, Writable } from 'stream';
 import { cleanAnsi } from 'clean-ansi';
 
+/**
+ * Normalizes a package.json object for snapshot testing by replacing
+ * dependency versions with a placeholder. This prevents snapshot failures
+ * when boilerplate/tooling dependency versions change.
+ * 
+ * @param pkgJson - The parsed package.json object
+ * @param options - Configuration options
+ * @param options.preserveVersionsFor - Array of package names whose versions should be preserved (not normalized)
+ * @returns A new object with normalized dependency versions
+ */
+export function normalizePackageJsonForSnapshot(
+  pkgJson: Record<string, unknown>,
+  options: { preserveVersionsFor?: string[] } = {}
+): Record<string, unknown> {
+  const { preserveVersionsFor = [] } = options;
+  const result = { ...pkgJson };
+
+  const depFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'] as const;
+
+  for (const field of depFields) {
+    const deps = result[field];
+    if (deps && typeof deps === 'object' && !Array.isArray(deps)) {
+      const normalizedDeps: Record<string, string> = {};
+      const sortedKeys = Object.keys(deps as Record<string, string>).sort();
+      
+      for (const key of sortedKeys) {
+        if (preserveVersionsFor.includes(key)) {
+          normalizedDeps[key] = (deps as Record<string, string>)[key];
+        } else {
+          normalizedDeps[key] = '<VERSION>';
+        }
+      }
+      
+      result[field] = normalizedDeps;
+    }
+  }
+
+  return result;
+}
+
 export const KEY_SEQUENCES = {
   ENTER: '\u000d',
   UP_ARROW: '\u001b[A',

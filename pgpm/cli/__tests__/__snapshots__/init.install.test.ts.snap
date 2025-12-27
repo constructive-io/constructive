@@ -11,8 +11,8 @@ exports[`cmds:install - with initialized workspace and module installs a module 
   },
   "description": "my-module",
   "devDependencies": {
-    "makage": "0.1.8",
-    "pgsql-test": "^2.16.2",
+    "makage": "<VERSION>",
+    "pgsql-test": "<VERSION>",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
@@ -150,8 +150,8 @@ exports[`cmds:install - with initialized workspace and module installs two modul
   },
   "description": "my-module",
   "devDependencies": {
-    "makage": "0.1.8",
-    "pgsql-test": "^2.16.2",
+    "makage": "<VERSION>",
+    "pgsql-test": "<VERSION>",
   },
   "homepage": "https://github.com/tester/my-module",
   "keywords": [],
