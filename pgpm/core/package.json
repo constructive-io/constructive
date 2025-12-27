@@ -44,7 +44,7 @@
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
-    "inquirerer": "^4.1.1",
+    "inquirerer": "^4.1.2",
     "makage": "^0.1.9"
   },
   "dependencies": {

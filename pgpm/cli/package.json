@@ -54,7 +54,7 @@
     "appstash": "^0.2.6",
     "find-and-require-package-json": "^0.8.2",
     "genomic": "^5.0.2",
-    "inquirerer": "^4.1.1",
+    "inquirerer": "^4.1.2",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
