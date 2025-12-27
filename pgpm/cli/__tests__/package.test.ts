@@ -2,12 +2,12 @@ import { PgpmPackage } from '@pgpmjs/core';
 import * as fs from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer } from 'inquirerer';
+import { setupTests, TestEnvironment } from '@inquirerer/test';
 import { ParsedArgs } from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 
 import { commands } from '../src/commands';
-import { setupTests, TestEnvironment } from '../test-utils';
 
 const fixture = (name: string) =>
   path.resolve(__dirname, '../../..', '__fixtures__', 'sqitch', name);

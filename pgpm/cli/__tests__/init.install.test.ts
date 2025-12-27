@@ -4,9 +4,10 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 import { PgpmPackage } from '@pgpmjs/core';
 import * as fs from 'fs';
 import * as glob from 'glob';
+import { normalizePackageJsonForSnapshot } from '@inquirerer/test';
 import * as path from 'path';
 
-import { TestFixture, normalizePackageJsonForSnapshot } from '../test-utils';
+import { TestFixture } from '../test-utils';
 
 describe('cmds:install - with initialized workspace and module', () => {
   let fixture: TestFixture;

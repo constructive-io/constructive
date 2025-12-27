@@ -4,9 +4,9 @@ import { ParsedArgs } from 'minimist';
 import os from 'os';
 import path from 'path';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
+import { setupTests, TestEnvironment } from '@inquirerer/test';
 
 import { commands } from '../src/commands';
-import { setupTests, TestEnvironment } from './cli';
 import { withInitDefaults } from './init-argv';
 
 const { mkdtempSync, rmSync, cpSync } = fs;

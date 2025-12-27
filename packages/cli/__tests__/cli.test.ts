@@ -1,6 +1,5 @@
 import { Inquirerer, Question } from 'inquirerer';
-
-import { KEY_SEQUENCES, setupTests, TestEnvironment } from '../test-utils';
+import { KEY_SEQUENCES, setupTests, TestEnvironment } from '@inquirerer/test';
 
 const beforeEachSetup = setupTests();
 

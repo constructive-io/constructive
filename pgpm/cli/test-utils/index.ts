@@ -1,4 +1,3 @@
-export * from './cli';
 export * from './CLIDeployTestFixture';
 export * from './fixtures';
 export * from './init-argv';

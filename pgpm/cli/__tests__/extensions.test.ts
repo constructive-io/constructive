@@ -4,16 +4,12 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 import { PgpmPackage } from '@pgpmjs/core';
 import { sync as glob } from 'glob';
 import { Inquirerer } from 'inquirerer';
+import { setupTests, TestEnvironment } from '@inquirerer/test';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
 import { commands } from '../src/commands';
-import {
-  setupTests,
-  TestEnvironment,
-  TestFixture,
-  withInitDefaults
-} from '../test-utils';
+import { TestFixture, withInitDefaults } from '../test-utils';
 
 const beforeEachSetup = setupTests();
 

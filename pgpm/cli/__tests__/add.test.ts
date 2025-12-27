@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer } from 'inquirerer';
+import { setupTests, TestEnvironment } from '@inquirerer/test';
 import { ParsedArgs } from 'minimist';
 import * as path from 'path';
 
 import { commands } from '../src/commands';
-import { setupTests, TestEnvironment, TestFixture } from '../test-utils';
+import { TestFixture } from '../test-utils';
 
 const beforeEachSetup = setupTests();
 
