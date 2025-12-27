@@ -185,11 +185,15 @@ $LQLMIGRATION$;
 
 ${meta}
 
-UPDATE meta_public.apis
-      SET dbname = current_database() WHERE TRUE;
+-- TODO: Research needed - These UPDATE statements may be a security leak.
+-- They appear to rebind exported metadata to the target database after import,
+-- but exposing dbname in meta_public tables could leak internal database names.
+-- Consider removing entirely or gating behind an explicit flag.
+-- UPDATE meta_public.apis
+--       SET dbname = current_database() WHERE TRUE;
 
-UPDATE meta_public.sites
-      SET dbname = current_database() WHERE TRUE;
+-- UPDATE meta_public.sites
+--       SET dbname = current_database() WHERE TRUE;
 
 SET session_replication_role TO DEFAULT;
 `
@@ -263,7 +267,7 @@ interface ReplacerResult {
 }
 
 /**
- * Creates a Sqitch package directory or resets the deploy/revert/verify directories if it exists.
+ * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
  */
 const preparePackage = async ({
   project,
@@ -274,11 +278,11 @@ const preparePackage = async ({
   extensions
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
-  const sqitchDir = path.resolve(path.join(outdir, name));
-  mkdirSync(sqitchDir, { recursive: true });
-  process.chdir(sqitchDir);
+  const pgpmDir = path.resolve(path.join(outdir, name));
+  mkdirSync(pgpmDir, { recursive: true });
+  process.chdir(pgpmDir);
 
-  const plan = glob(path.join(sqitchDir, 'pgpm.plan'));
+  const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
     await project.initModule({
       name,
@@ -288,13 +292,14 @@ const preparePackage = async ({
       answers: {
         moduleName: name,
         moduleDesc: description,
-        access: 'restricted'
+        access: 'restricted',
+        license: 'CLOSED'
       }
     });
   } else {
-    rmSync(path.resolve(sqitchDir, 'deploy'), { recursive: true, force: true });
-    rmSync(path.resolve(sqitchDir, 'revert'), { recursive: true, force: true });
-    rmSync(path.resolve(sqitchDir, 'verify'), { recursive: true, force: true });
+    rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
+    rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
+    rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
   }
 
   process.chdir(curDir);
