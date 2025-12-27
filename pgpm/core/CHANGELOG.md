@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.2.0...@pgpmjs/core@4.2.1) (2025-12-27)
+
+### Bug Fixes
+
+- **pgpm:** use workspace-level module detection for export flow ([2b02711](https://github.com/constructive-io/constructive/commit/2b0271160944c28bb08058474d4436da5b49c563))
+
 # [4.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.1.2...@pgpmjs/core@4.2.0) (2025-12-27)
 
 ### Bug Fixes

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.32](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.31...drizzle-orm-test@0.3.32) (2025-12-27)
+
+**Note:** Version bump only for package drizzle-orm-test
+
 ## [0.3.31](https://github.com/constructive-io/constructive/compare/drizzle-orm-test@0.3.30...drizzle-orm-test@0.3.31) (2025-12-27)
 
 **Note:** Version bump only for package drizzle-orm-test
