@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
 
-import { TestFixture } from '../test-utils';
+import { TestFixture, normalizePackageJsonForSnapshot } from '../test-utils';
 
 describe('cmds:install - with initialized workspace and module', () => {
   let fixture: TestFixture;
@@ -55,7 +55,11 @@ describe('cmds:install - with initialized workspace and module', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
     );
-    expect(pkgJson).toMatchSnapshot();
+    // Normalize package.json for snapshot, preserving versions for explicitly installed packages
+    const normalizedPkgJson = normalizePackageJsonForSnapshot(pkgJson, {
+      preserveVersionsFor: ['@pgpm-testing/base32']
+    });
+    expect(normalizedPkgJson).toMatchSnapshot();
 
     const installedFiles = glob.sync('**/*', {
       cwd: path.join(workspaceDir, 'extensions'),
@@ -99,7 +103,11 @@ describe('cmds:install - with initialized workspace and module', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.join(moduleDir, 'package.json'), 'utf-8')
     );
-    expect(pkgJson).toMatchSnapshot();
+    // Normalize package.json for snapshot, preserving versions for explicitly installed packages
+    const normalizedPkgJson = normalizePackageJsonForSnapshot(pkgJson, {
+      preserveVersionsFor: ['@pgpm-testing/base32', '@pgpm-testing/utils']
+    });
+    expect(normalizedPkgJson).toMatchSnapshot();
 
     const extPath = path.join(workspaceDir, 'extensions');
     const installedFiles = glob.sync('**/*', {
