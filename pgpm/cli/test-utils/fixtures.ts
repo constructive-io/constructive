@@ -1,6 +1,6 @@
 import path from 'path';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
-import { createTestFixture, TestFixture as BaseTestFixture } from '@inquirerer/test';
+import { createTestFixture, TestFixture as BaseTestFixture, TestFixtureOptions } from '@inquirerer/test';
 import { ParsedArgs } from 'minimist';
 
 import { commands } from '../src/commands';
@@ -14,7 +14,7 @@ export const getFixturePath = (...paths: string[]) =>
 const createFixture = (...fixturePath: string[]) =>
   createTestFixture(
     {
-      commands,
+      commands: commands as unknown as TestFixtureOptions['commands'],
       fixtureRoot: FIXTURES_PATH,
       tmpPrefix: 'pgpm-test-',
       cliOptions: { version: '1.0.0' },
