@@ -1,7 +1,6 @@
+import { extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
-
-import { extractFirst } from '../utils';
 import add from './admin-users/add';
 import bootstrap from './admin-users/bootstrap';
 import remove from './admin-users/remove';

@@ -1,10 +1,9 @@
+import { extractFirst } from '@inquirerer/utils';
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import * as path from 'path';
-
-import { extractFirst } from '../utils';
 import { selectPackage } from '../utils/module-utils';
 import { resolvePackageAlias } from '../utils/package-alias';
 

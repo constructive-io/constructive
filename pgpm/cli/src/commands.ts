@@ -1,4 +1,5 @@
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
+import { cliExitWithError, checkForUpdates, extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import { teardownPgPools } from 'pg-cache';
@@ -27,9 +28,7 @@ import revert from './commands/revert';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
 import verify from './commands/verify';
-import { extractFirst, usageText } from './utils';
-import { cliExitWithError } from './utils/cli-error';
-import { checkForUpdates } from './utils/update-check';
+import { usageText } from './utils';
 
 const withPgTeardown = (fn: Function, skipTeardown: boolean = false) => async (...args: any[]) => {
   try {
@@ -104,13 +103,22 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     command = answer.command;
   }
 
-  try {
-    await checkForUpdates({
-      command,
-      pkgVersion: findAndRequirePackageJson(__dirname).version
-    });
-  } catch {
-    // ignore update check failures
+  // Run update check (skip on CI, update command, or if explicitly disabled)
+  if (!process.env.CI && !process.env.PGPM_SKIP_UPDATE_CHECK && command !== 'update') {
+    try {
+      const pkg = findAndRequirePackageJson(__dirname);
+      const updateResult = await checkForUpdates({
+        pkgName: pkg.name,
+        pkgVersion: pkg.version,
+        toolName: 'pgpm',
+      });
+      if (updateResult.hasUpdate && updateResult.message) {
+        console.warn(updateResult.message);
+        console.warn('Run pgpm update to upgrade.');
+      }
+    } catch {
+      // ignore update check failures
+    }
   }
 
   newArgv = await prompter.prompt(newArgv, [
@@ -128,7 +136,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
 
   if (!commandFn) {
     console.log(usageText);
-    await cliExitWithError(`Unknown command: ${command}`);
+    await cliExitWithError(`Unknown command: ${command}`, { beforeExit: teardownPgPools });
   }
 
   await commandFn(newArgv, prompter, options);

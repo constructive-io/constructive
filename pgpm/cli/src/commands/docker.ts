@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
+import { cliExitWithError, extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer } from 'inquirerer';
-
-import { cliExitWithError,extractFirst } from '../utils';
 
 const dockerUsageText = `
 Docker Command:

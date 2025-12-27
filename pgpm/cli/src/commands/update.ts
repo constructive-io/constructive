@@ -1,9 +1,9 @@
+import { cliExitWithError } from '@inquirerer/utils';
 import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { spawn } from 'child_process';
 import { fetchLatestVersion } from '../utils/npm-version';
-import { cliExitWithError } from '../utils/cli-error';
 
 const log = new Logger('update');
 
@@ -76,7 +76,7 @@ export default async (
   } catch (error: any) {
     await cliExitWithError(
       error instanceof Error ? error.message : String(error),
-      { package: pkgName, registry }
+      { context: { package: pkgName, registry } }
     );
   }
 
