@@ -1,10 +1,3 @@
-// Re-export from pgsql-seed for backwards compatibility
-export {
-  insertJson,
-  insertJsonMap,
-  type JsonSeedMap
-} from 'pgsql-seed';
-
 import { insertJsonMap, type JsonSeedMap } from 'pgsql-seed';
 
 import { SeedAdapter, SeedContext } from './types';

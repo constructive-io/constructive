@@ -1,6 +1,3 @@
-// Re-export from pgsql-seed for backwards compatibility
-export { deployPgpm, loadPgpm } from 'pgsql-seed';
-
 import { deployPgpm } from 'pgsql-seed';
 
 import { SeedAdapter, SeedContext } from './types';
