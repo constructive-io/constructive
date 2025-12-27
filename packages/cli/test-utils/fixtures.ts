@@ -11,7 +11,7 @@ export const getFixturePath = (...paths: string[]) =>
 const createFixture = (...fixturePath: string[]) =>
   createTestFixture(
     {
-      commands: commands as TestFixtureOptions['commands'],
+      commands: commands as unknown as TestFixtureOptions['commands'],
       fixtureRoot: FIXTURES_PATH,
       tmpPrefix: 'constructive-io-graphql-test-',
       cliOptions: { version: '1.0.0' }
