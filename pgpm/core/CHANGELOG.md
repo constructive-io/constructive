@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.3.0...@pgpmjs/core@4.4.0) (2025-12-27)
+
+### Bug Fixes
+
+- **pgpm:** remove schema shims from pets fixture - use pgpm modules instead ([fa6ba66](https://github.com/constructive-io/constructive/commit/fa6ba66e35c1dcd49b32aa574913cc37ab897737))
+
+### Features
+
+- **extensions:** add vector (pgvector) to available extensions list ([e7136e0](https://github.com/constructive-io/constructive/commit/e7136e0440fbdaea91bad122679a406493211a00))
+
 # [4.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.2.1...@pgpmjs/core@4.3.0) (2025-12-27)
 
 ### Features

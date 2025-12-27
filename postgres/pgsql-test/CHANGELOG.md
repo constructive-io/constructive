@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.1](https://github.com/constructive-io/constructive/compare/pgsql-test@2.19.0...pgsql-test@2.19.1) (2025-12-27)
+
+**Note:** Version bump only for package pgsql-test
+
 # [2.19.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.18.18...pgsql-test@2.19.0) (2025-12-27)
 
 ### Features
