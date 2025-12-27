@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.2.2...@constructive-io/cli@5.3.0) (2025-12-27)
+
+### Features
+
+- **pgpm:** add -w alias for --workspace flag and migrate to genomic ([d402038](https://github.com/constructive-io/constructive/commit/d402038f5791dcc3ec17003f956aae8057119294))
+
 ## [5.2.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.2.1...@constructive-io/cli@5.2.2) (2025-12-27)
 
 **Note:** Version bump only for package @constructive-io/cli

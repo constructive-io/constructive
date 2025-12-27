@@ -1,6 +1,6 @@
 {
   "name": "pg-seed",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL seeding utilities for CSV, JSON, and SQL data loading",
   "main": "index.js",

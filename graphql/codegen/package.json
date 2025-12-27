@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.17.35",
+  "version": "2.17.36",
   "description": "Generate queries and mutations for use with Graphile",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
