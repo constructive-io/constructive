@@ -1436,8 +1436,8 @@ importers:
         specifier: ^0.8.2
         version: 0.8.3
       genomic:
-        specifier: ^5.0.3
-        version: 5.0.3
+        specifier: ^5.1.0
+        version: 5.1.0
       inquirerer:
         specifier: ^4.1.2
         version: 4.1.2
@@ -1516,8 +1516,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.0.3
-        version: 5.0.3
+        specifier: ^5.1.0
+        version: 5.1.0
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -5289,8 +5289,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.0.3:
-    resolution: {integrity: sha512-VR+Y82NA1SLFzX5XR/r0vzcKZQHPMWszVwOuqhhTQ9TWnz2cP1R18IAIP0J61Akxl0QhErw0ENaVQKX8WlBWOQ==}
+  genomic@5.1.0:
+    resolution: {integrity: sha512-MRg8bh6iz628qKdQ1TwfO4o1P5khDA+qnqQzYSArvYz5JwcgHUm+/7b6e/8beMr93SD9ZgASHJ1mTIsOttCNkw==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -12503,7 +12503,7 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.0.3:
+  genomic@5.1.0:
     dependencies:
       appstash: 0.2.7
       inquirerer: 4.1.2
