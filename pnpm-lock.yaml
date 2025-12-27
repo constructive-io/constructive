@@ -1756,6 +1756,55 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
+  postgres/pg-seed:
+    dependencies:
+      csv-parse:
+        specifier: ^6.1.0
+        version: 6.1.0
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+      pg-copy-streams:
+        specifier: ^7.0.0
+        version: 7.0.0
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      '@types/pg-copy-streams':
+        specifier: ^1.2.5
+        version: 1.2.5
+      makage:
+        specifier: ^0.1.9
+        version: 0.1.9
+    publishDirectory: dist
+
+  postgres/pgsql-seed:
+    dependencies:
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../../pgpm/env/dist
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+      pg-env:
+        specifier: workspace:^
+        version: link:../pg-env/dist
+      pg-seed:
+        specifier: workspace:^
+        version: link:../pg-seed/dist
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      makage:
+        specifier: ^0.1.9
+        version: 0.1.9
+    publishDirectory: dist
+
   postgres/pgsql-test:
     dependencies:
       '@pgpmjs/core':
@@ -1773,21 +1822,18 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
-      csv-parse:
-        specifier: ^6.1.0
-        version: 6.1.0
       pg:
         specifier: ^8.16.3
         version: 8.16.3
       pg-cache:
         specifier: workspace:^
         version: link:../pg-cache/dist
-      pg-copy-streams:
-        specifier: ^7.0.0
-        version: 7.0.0
       pg-env:
         specifier: workspace:^
         version: link:../pg-env/dist
+      pgsql-seed:
+        specifier: workspace:^
+        version: link:../pgsql-seed/dist
     devDependencies:
       '@types/pg':
         specifier: ^8.16.0
