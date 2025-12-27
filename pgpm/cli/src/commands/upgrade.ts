@@ -1,32 +1,34 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
+import { CLIOptions, Inquirerer, upgradePrompt, PackageInfo, createSpinner } from 'inquirerer';
 import { ParsedArgs } from 'minimist';
 import { fetchLatestVersion } from '../utils/npm-version';
 
-const log = new Logger('upgrade-modules');
+const log = new Logger('upgrade');
 
-const upgradeModulesUsageText = `
-Upgrade Modules Command:
+const upgradeUsageText = `
+Upgrade Command:
 
-  pgpm upgrade-modules [OPTIONS]
+  pgpm upgrade [PACKAGE...] [OPTIONS]
 
   Upgrade installed pgpm modules to their latest versions from npm.
+  When used without arguments, upgrades all modules.
 
 Options:
   --help, -h              Show this help message
   --cwd <directory>       Working directory (default: current directory)
-  --all                   Upgrade all modules without prompting
+  -i, --interactive       Show outdated modules and select which ones to upgrade
   --dry-run               Show what would be upgraded without making changes
-  --modules <names>       Comma-separated list of specific modules to upgrade
   --workspace             Upgrade modules across all packages in the workspace
 
 Examples:
-  pgpm upgrade-modules                     Interactive selection of modules to upgrade
-  pgpm upgrade-modules --all               Upgrade all installed modules
-  pgpm upgrade-modules --dry-run           Preview available upgrades
-  pgpm upgrade-modules --modules @pgpm/base32,@pgpm/faker   Upgrade specific modules
-  pgpm upgrade-modules --workspace --all   Upgrade all modules across the entire workspace
+  pgpm upgrade                          Upgrade all installed modules
+  pgpm upgrade -i                       Interactive selection of modules to upgrade
+  pgpm upgrade @pgpm/base32             Upgrade specific module
+  pgpm upgrade @pgpm/base32 @pgpm/uuid  Upgrade multiple specific modules
+  pgpm upgrade --dry-run                Preview available upgrades
+  pgpm upgrade --workspace              Upgrade all modules across the entire workspace
+  pgpm up                               Alias for upgrade
 `;
 
 interface ModuleUpdateInfo {
@@ -62,7 +64,7 @@ async function upgradeModulesForProject(
   argv: Partial<ParsedArgs>,
   prompter: Inquirerer,
   dryRun: boolean,
-  upgradeAll: boolean,
+  interactive: boolean,
   specificModules: string[] | undefined,
   moduleName?: string
 ): Promise<boolean> {
@@ -78,10 +80,15 @@ async function upgradeModulesForProject(
   }
 
   const prefix = moduleName ? `[${moduleName}] ` : '';
-  log.info(`${prefix}Found ${installed.length} installed module(s). Checking for updates...`);
-
+  
+  // Use spinner while checking for updates
+  const spinner = createSpinner(`${prefix}Checking ${installed.length} installed module(s) for updates...`);
+  spinner.start();
+  
   const moduleVersions = await fetchModuleVersions(installedVersions);
   const modulesWithUpdates = moduleVersions.filter(m => m.hasUpdate);
+  
+  spinner.succeed(`${prefix}Found ${modulesWithUpdates.length} module(s) with updates available`);
 
   if (modulesWithUpdates.length === 0) {
     log.success(`${prefix}All modules are already up to date.`);
@@ -101,9 +108,8 @@ async function upgradeModulesForProject(
 
   let modulesToUpgrade: string[];
 
-  if (upgradeAll) {
-    modulesToUpgrade = modulesWithUpdates.map(m => m.name);
-  } else if (specificModules) {
+  if (specificModules && specificModules.length > 0) {
+    // Specific modules provided as positional arguments
     modulesToUpgrade = modulesWithUpdates
       .filter(m => specificModules.includes(m.name))
       .map(m => m.name);
@@ -112,36 +118,26 @@ async function upgradeModulesForProject(
       log.warn(`${prefix}None of the specified modules have updates available.`);
       return false;
     }
-  } else {
-    const options = modulesWithUpdates.map(mod => ({
+  } else if (interactive) {
+    // Interactive mode: use pnpm-style upgrade UI
+    const packages: PackageInfo[] = modulesWithUpdates.map(mod => ({
       name: mod.name,
-      value: mod.name,
-      message: `${mod.name} (${mod.currentVersion} -> ${mod.latestVersion})`
+      current: mod.currentVersion,
+      latest: mod.latestVersion!,
+      type: 'dependencies' as const
     }));
 
-    const questions: Question[] = [
-      {
-        name: 'selectedModules',
-        message: `${prefix}Select modules to upgrade:`,
-        type: 'checkbox',
-        options: options.map(o => o.message),
-        default: options.map(o => o.message)
-      }
-    ];
+    const result = await upgradePrompt(packages, 10);
 
-    const answers = await prompter.prompt(argv, questions);
-    const selectedOptions = (answers.selectedModules as OptionValue[])
-      .filter(opt => opt.selected)
-      .map(opt => opt.name);
-
-    modulesToUpgrade = modulesWithUpdates
-      .filter(mod => selectedOptions.includes(`${mod.name} (${mod.currentVersion} -> ${mod.latestVersion})`))
-      .map(m => m.name);
-
-    if (modulesToUpgrade.length === 0) {
+    if (result.updates.length === 0) {
       log.info(`${prefix}No modules selected for upgrade.`);
       return false;
     }
+
+    modulesToUpgrade = result.updates.map(u => u.name);
+  } else {
+    // Default behavior: upgrade all modules with updates (like pnpm upgrade)
+    modulesToUpgrade = modulesWithUpdates.map(m => m.name);
   }
 
   log.info(`\n${prefix}Upgrading ${modulesToUpgrade.length} module(s)...`);
@@ -158,16 +154,18 @@ export default async (
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {
-    console.log(upgradeModulesUsageText);
+    console.log(upgradeUsageText);
     process.exit(0);
   }
 
   const { cwd = process.cwd() } = argv;
   const dryRun = Boolean(argv['dry-run']);
-  const upgradeAll = Boolean(argv.all);
+  const interactive = Boolean(argv.i || argv.interactive);
   const workspaceMode = Boolean(argv.workspace);
-  const specificModules = argv.modules 
-    ? String(argv.modules).split(',').map(m => m.trim())
+  
+  // Get specific modules from positional arguments (argv._)
+  const specificModules = argv._ && argv._.length > 0 
+    ? argv._.map((m: string) => String(m).trim())
     : undefined;
 
   const project = new PgpmPackage(cwd);
@@ -194,7 +192,7 @@ export default async (
         argv,
         prompter,
         dryRun,
-        upgradeAll,
+        interactive,
         specificModules,
         moduleName
       );
@@ -212,6 +210,6 @@ export default async (
       throw new Error('You must run this command inside a PGPM module. Use --workspace to upgrade all modules in the workspace.');
     }
 
-    await upgradeModulesForProject(project, argv, prompter, dryRun, upgradeAll, specificModules);
+    await upgradeModulesForProject(project, argv, prompter, dryRun, interactive, specificModules);
   }
 };

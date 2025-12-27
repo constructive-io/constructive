@@ -15,7 +15,7 @@ export const usageText = `
     export             Export database migrations from existing databases
     update             Update pgpm to the latest version
     cache              Manage cached templates (clean)
-    upgrade-modules    Upgrade installed pgpm modules to latest versions
+    upgrade            Upgrade installed pgpm modules to latest versions (alias: up)
 
   Database Administration:
     kill               Terminate database connections and optionally drop databases

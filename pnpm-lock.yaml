@@ -1243,8 +1243,8 @@ importers:
         specifier: ^0.8.2
         version: 0.8.3
       inquirerer:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^4.2.0
+        version: 4.2.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1325,8 +1325,8 @@ importers:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^4.2.0
+        version: 4.2.1
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
@@ -1436,11 +1436,11 @@ importers:
         specifier: ^0.8.2
         version: 0.8.3
       genomic:
-        specifier: ^5.1.0
-        version: 5.1.0
+        specifier: ^5.2.0
+        version: 5.2.1
       inquirerer:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^4.2.0
+        version: 4.2.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1516,8 +1516,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.1.0
-        version: 5.1.0
+        specifier: ^5.2.0
+        version: 5.2.1
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1556,8 +1556,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^4.2.0
+        version: 4.2.1
       makage:
         specifier: ^0.1.9
         version: 0.1.9
@@ -5223,6 +5223,9 @@ packages:
   find-and-require-package-json@0.8.4:
     resolution: {integrity: sha512-08+BvFbBNU1pvxSMzZnZ01bRGxRyOUAbQG/ttfFrt6G5cFyitmZbtPVKPPz75L/3etyccRq/xxQ1GXUdYB+BkQ==}
 
+  find-and-require-package-json@0.8.5:
+    resolution: {integrity: sha512-I15lQmpt0rxbmDpIgdn1IEWJU/smOLuKrPZFQMnktnz6kn25XgjGNn1ouKLFGsXuDW1Ssd47YPdSPwhSIGuvnA==}
+
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
     engines: {node: '>=4'}
@@ -5323,8 +5326,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.1.0:
-    resolution: {integrity: sha512-MRg8bh6iz628qKdQ1TwfO4o1P5khDA+qnqQzYSArvYz5JwcgHUm+/7b6e/8beMr93SD9ZgASHJ1mTIsOttCNkw==}
+  genomic@5.2.1:
+    resolution: {integrity: sha512-7+6g0ib9katy7OFUeaPXKiBPFZZSmeDdc3BNUvBvgCASCrseLU9r7a4sBo6319zbX81IBniM1EdIRsWzYKz9Qg==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5706,8 +5709,8 @@ packages:
   inquirerer@4.1.1:
     resolution: {integrity: sha512-OC8UJ7GRxVEFvrT7G5IDIBttjMrqREuax2J2/1ZdmbpJJIaxgydjHYsSmjoyg21XMv+0IU9DEsvBOyJqV1e9dQ==}
 
-  inquirerer@4.1.2:
-    resolution: {integrity: sha512-77alDagsj6hPYadiDalAJDWeR8UqgqjlS7t0IERpDVWx9pmhCPEBAPV59VE1rAlgg4adS1AJoQhNeJP0OVtugg==}
+  inquirerer@4.2.1:
+    resolution: {integrity: sha512-DlJzCWrs/GjuUUifhH1Bu+gjOY7DAWlODqESNBb8a9CE1qeiUDqdPrf9qQGy82clMOXDDqQlB3CLbYSKw3z/lA==}
 
   invariant@2.2.4:
     resolution: {integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==}
@@ -8210,6 +8213,9 @@ packages:
 
   yanse@0.1.10:
     resolution: {integrity: sha512-sSfkypRMWbsBzUcP3oe9xIhyTBqQRv7XvjICzSkciEPP4xmw/8i0slDqlvhVBz9WsSB40aaJvkJunaddl9viZA==}
+
+  yanse@0.1.11:
+    resolution: {integrity: sha512-70QlVdqwpLdQH1ZqFk5HSAFk6puptS7Q6y79umsucED+uvmbSSVvKMJVDmc4Yt+89JMkf7n4gaR/Ftz6wUZKeA==}
 
   yanse@0.1.9:
     resolution: {integrity: sha512-AKKZLY+TWENQOYEuQei07b4QFW4hCS6yyAbUiWBCjHOpkhzWUD8EehNAeI/8kwm5pvJQcmX2ojujPywF+DCheA==}
@@ -12452,6 +12458,8 @@ snapshots:
 
   find-and-require-package-json@0.8.4: {}
 
+  find-and-require-package-json@0.8.5: {}
+
   find-up@2.1.0:
     dependencies:
       locate-path: 2.0.0
@@ -12547,10 +12555,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.1.0:
+  genomic@5.2.1:
     dependencies:
       appstash: 0.2.7
-      inquirerer: 4.1.2
+      inquirerer: 4.2.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -13027,13 +13035,13 @@ snapshots:
       minimist: 1.2.8
       yanse: 0.1.10
 
-  inquirerer@4.1.2:
+  inquirerer@4.2.1:
     dependencies:
       deepmerge: 4.3.1
-      find-and-require-package-json: 0.8.4
+      find-and-require-package-json: 0.8.5
       js-yaml: 4.1.1
       minimist: 1.2.8
-      yanse: 0.1.10
+      yanse: 0.1.11
 
   invariant@2.2.4:
     dependencies:
@@ -16152,6 +16160,8 @@ snapshots:
   yaml@2.8.2: {}
 
   yanse@0.1.10: {}
+
+  yanse@0.1.11: {}
 
   yanse@0.1.9: {}
 
