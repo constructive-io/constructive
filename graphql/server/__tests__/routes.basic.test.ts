@@ -6,6 +6,7 @@ import request, { type Test } from 'supertest';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { PgpmInit } from '@pgpmjs/core';
+import { closeAllCaches } from 'graphile-cache';
 import { seed, getConnections } from 'graphile-test';
 import { Server as GraphQLServer } from '../src/server';
 
@@ -199,6 +200,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await closeAllCaches();
   await Promise.all([metaDb?.teardown(), appDb?.teardown()]);
 });
 

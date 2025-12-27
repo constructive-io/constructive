@@ -6,7 +6,7 @@ import { buildSchema, GraphQLInputObjectType, GraphQLObjectType } from 'graphql'
 import { postgraphile } from 'postgraphile';
 // @ts-ignore
 import { getGraphileSettings } from 'graphile-settings';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, teardownPgPools } from 'pg-cache';
 
 import { buildSchemaSDL, fetchEndpointSchemaSDL } from '../src/schema';
 import { seed, getConnections } from 'graphile-test';
@@ -66,6 +66,7 @@ afterAll(async () => {
     await new Promise<void>((resolve) => server!.close(() => resolve()));
     server = null;
   }
+  await teardownPgPools();
   await teardown();
 });
 
