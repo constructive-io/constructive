@@ -14,11 +14,14 @@ interface ExportMigrationsToDiskOptions {
   options: PgpmOptions;
   database: string;
   databaseId: string;
+  databaseName: string;
   author: string;
   outdir: string;
   schema_names: string[];
   extensionName?: string;
+  extensionDesc?: string;
   metaExtensionName: string;
+  metaExtensionDesc?: string;
 }
 
 interface ExportOptions {
@@ -26,13 +29,16 @@ interface ExportOptions {
   options: PgpmOptions;
   dbInfo: {
     dbname: string;
+    databaseName: string;
     database_ids: string[];
   };
   author: string;
   outdir: string;
   schema_names: string[];
   extensionName?: string;
+  extensionDesc?: string;
   metaExtensionName: string;
+  metaExtensionDesc?: string;
 }
 
 const exportMigrationsToDisk = async ({
@@ -40,11 +46,14 @@ const exportMigrationsToDisk = async ({
   options,
   database,
   databaseId,
+  databaseName,
   author,
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  extensionDesc,
+  metaExtensionName,
+  metaExtensionDesc
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -93,12 +102,16 @@ const exportMigrationsToDisk = async ({
     author
   };
 
+  // Build description for the database extension package
+  const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
+
   if (results?.rows?.length > 0) {
     await preparePackage({
       project,
       author,
       outdir,
       name,
+      description: dbExtensionDesc,
       extensions: [
         'plpgsql',
         'uuid-ossp',
@@ -131,12 +144,16 @@ const exportMigrationsToDisk = async ({
 
     meta = replacer(meta);
 
+    // Build description for the meta/service extension package
+    const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
+
     await preparePackage({
       project,
       author,
       outdir,
-      extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules'],
-      name: metaExtensionName
+      name: metaExtensionName,
+      description: metaDesc,
+      extensions: ['plpgsql', 'db-meta-schema', 'db-meta-modules']
     });
 
     const metaReplacer = makeReplacer({
@@ -197,7 +214,9 @@ export const exportMigrations = async ({
   outdir,
   schema_names,
   extensionName,
-  metaExtensionName
+  extensionDesc,
+  metaExtensionName,
+  metaExtensionDesc
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -205,8 +224,11 @@ export const exportMigrations = async ({
       project,
       options,
       extensionName,
+      extensionDesc,
       metaExtensionName,
+      metaExtensionDesc,
       database: dbInfo.dbname,
+      databaseName: dbInfo.databaseName,
       databaseId,
       schema_names,
       author,
@@ -221,6 +243,7 @@ interface PreparePackageOptions {
   author: string;
   outdir: string;
   name: string;
+  description: string;
   extensions: string[];
 }
 
@@ -247,6 +270,7 @@ const preparePackage = async ({
   author,
   outdir,
   name,
+  description,
   extensions
 }: PreparePackageOptions): Promise<void> => {
   const curDir = process.cwd();
@@ -258,9 +282,14 @@ const preparePackage = async ({
   if (!plan.length) {
     await project.initModule({
       name,
-      description: name,
+      description,
       author,
       extensions,
+      answers: {
+        moduleName: name,
+        moduleDesc: description,
+        access: 'restricted'
+      }
     });
   } else {
     rmSync(path.resolve(sqitchDir, 'deploy'), { recursive: true, force: true });
