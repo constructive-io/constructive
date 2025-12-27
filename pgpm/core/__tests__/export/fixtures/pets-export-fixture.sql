@@ -2,10 +2,18 @@
 -- A simplified meta-schema for a "pets" application
 -- Used for testing the pgpm export flow
 --
--- This fixture includes:
--- 1. Schema shims for collections_public, meta_public, and db_migrate
--- 2. Sample data for a pets application
--- 3. Sample migration records in db_migrate.sql_actions
+-- PREREQUISITES:
+-- This fixture assumes the following pgpm modules are already deployed:
+--   - db-meta-schema (provides collections_public.* tables)
+--   - db-meta-modules (provides meta_public.* tables)
+--   - db-migrate (provides db_migrate.sql_actions table)
+--
+-- USAGE:
+--   1. Set up a pgpm workspace
+--   2. Install required modules: pgpm install @pgpm/db-meta-schema @pgpm/db-meta-modules @pgpm/db-migrate
+--   3. Deploy to a test database: pgpm deploy --createdb
+--   4. Run this fixture: psql -d <dbname> -f pets-export-fixture.sql
+--   5. Test export: pgpm export
 
 SET session_replication_role TO replica;
 
@@ -18,110 +26,6 @@ DO $LQLMIGRATION$
     EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
   END;
 $LQLMIGRATION$;
-
--- ============================================================================
--- SCHEMA SHIMS (create if not exists)
--- ============================================================================
-
-CREATE SCHEMA IF NOT EXISTS collections_public;
-CREATE SCHEMA IF NOT EXISTS meta_public;
-CREATE SCHEMA IF NOT EXISTS db_migrate;
-
--- ============================================================================
--- COLLECTIONS_PUBLIC TABLES (shim)
--- ============================================================================
-
-CREATE TABLE IF NOT EXISTS collections_public.database (
-  id uuid PRIMARY KEY,
-  owner_id uuid,
-  name text,
-  hash uuid
-);
-
-CREATE TABLE IF NOT EXISTS collections_public.schema (
-  id uuid PRIMARY KEY,
-  database_id uuid REFERENCES collections_public.database(id),
-  name text,
-  schema_name text,
-  description text
-);
-
-CREATE TABLE IF NOT EXISTS collections_public.table (
-  id uuid PRIMARY KEY,
-  database_id uuid REFERENCES collections_public.database(id),
-  schema_id uuid REFERENCES collections_public.schema(id),
-  name text,
-  description text
-);
-
-CREATE TABLE IF NOT EXISTS collections_public.field (
-  id uuid PRIMARY KEY,
-  database_id uuid REFERENCES collections_public.database(id),
-  table_id uuid REFERENCES collections_public.table(id),
-  name text,
-  type text,
-  description text
-);
-
--- ============================================================================
--- META_PUBLIC TABLES (shim)
--- ============================================================================
-
-CREATE TABLE IF NOT EXISTS meta_public.domains (
-  id uuid PRIMARY KEY,
-  database_id uuid,
-  site_id uuid,
-  api_id uuid,
-  domain text,
-  subdomain text
-);
-
-CREATE TABLE IF NOT EXISTS meta_public.apis (
-  id uuid PRIMARY KEY,
-  database_id uuid,
-  name text,
-  dbname text,
-  is_public boolean,
-  role_name text,
-  anon_role text
-);
-
-CREATE TABLE IF NOT EXISTS meta_public.sites (
-  id uuid PRIMARY KEY,
-  database_id uuid,
-  title text,
-  description text,
-  og_image text,
-  favicon text,
-  apple_touch_icon text,
-  logo text,
-  dbname text
-);
-
-CREATE TABLE IF NOT EXISTS meta_public.api_schemata (
-  id uuid PRIMARY KEY,
-  database_id uuid,
-  schema_id uuid,
-  api_id uuid
-);
-
--- ============================================================================
--- DB_MIGRATE TABLES (shim)
--- ============================================================================
-
-CREATE TABLE IF NOT EXISTS db_migrate.sql_actions (
-    id SERIAL PRIMARY KEY,
-    name text,
-    database_id uuid,
-    deploy text,
-    deps text[],
-    payload json,
-    content text,
-    revert text,
-    verify text,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    unique(database_id, deploy)
-);
 
 -- ============================================================================
 -- DATABASE
