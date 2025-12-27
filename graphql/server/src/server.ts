@@ -4,6 +4,7 @@ import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, RequestHandler } from 'express';
+import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
@@ -28,6 +29,8 @@ export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
 class Server {
   private app: Express;
   private opts: PgpmOptions;
+  private listenClient: PoolClient | null = null;
+  private listenRelease: (() => void) | null = null;
 
   constructor(opts: PgpmOptions) {
     this.opts = getEnvOptions(opts);
@@ -61,7 +64,7 @@ class Server {
     this.app = app;
   }
 
-  listen(): void {
+  listen(): HttpServer {
     const { server } = this.opts;
     const httpServer = this.app.listen(server?.port, server?.host, () =>
       log.info(`listening at http://${server?.host}:${server?.port}`)
@@ -78,6 +81,8 @@ class Server {
       }
       throw err;
     });
+
+    return httpServer;
   }
 
   async flush(databaseId: string): Promise<void> {
@@ -104,6 +109,9 @@ class Server {
       return;
     }
 
+    this.listenClient = client;
+    this.listenRelease = release;
+
     client.on('notification', ({ channel, payload }) => {
       if (channel === 'schema:update' && payload) {
         log.info('schema:update', payload);
@@ -120,6 +128,28 @@ class Server {
     });
 
     this.log('connected and listening for changes...');
+  }
+
+  async removeEventListener(): Promise<void> {
+    if (!this.listenClient || !this.listenRelease) {
+      return;
+    }
+
+    const client = this.listenClient;
+    const release = this.listenRelease;
+    this.listenClient = null;
+    this.listenRelease = null;
+
+    client.removeAllListeners('notification');
+    client.removeAllListeners('error');
+
+    try {
+      await client.query('UNLISTEN "schema:update"');
+    } catch {
+      // Ignore listener cleanup errors during shutdown.
+    }
+
+    release();
   }
 
   log(text: string): void {
