@@ -50,7 +50,7 @@ export interface ResolvedReference {
 }
 
 // SQL file types
-export interface SqitchRow {
+export interface PgpmRow {
   deploy: string;
   revert?: string;
   verify?: string;
@@ -58,3 +58,8 @@ export interface SqitchRow {
   deps?: string[];
   name?: string;
 }
+
+/**
+ * @deprecated Use PgpmRow instead. This alias is kept for backwards compatibility.
+ */
+export type SqitchRow = PgpmRow;
