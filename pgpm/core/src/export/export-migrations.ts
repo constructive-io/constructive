@@ -6,7 +6,7 @@ import path from 'path';
 import { getPgPool } from 'pg-cache';
 
 import { PgpmPackage } from '../core/class/pgpm';
-import { SqitchRow, SqlWriteOptions,writeSqitchFiles, writeSqitchPlan } from '../files';
+import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
 import { exportMeta } from './export-meta';
 
 interface ExportMigrationsToDiskOptions {
@@ -133,8 +133,8 @@ const exportMigrationsToDisk = async ({
       ]
     });
 
-    writeSqitchPlan(results.rows, opts);
-    writeSqitchFiles(results.rows, opts);
+    writePgpmPlan(results.rows, opts);
+    writePgpmFiles(results.rows, opts);
 
     let meta = await exportMeta({
       opts: options,
@@ -163,7 +163,7 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName
     });
 
-    const metaPackage: SqitchRow[] = [
+    const metaPackage: PgpmRow[] = [
       {
         deps: [],
         deploy: 'migrate/meta',
@@ -199,8 +199,8 @@ SET session_replication_role TO DEFAULT;
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;
 
-    writeSqitchPlan(metaPackage, opts);
-    writeSqitchFiles(metaPackage, opts);
+    writePgpmPlan(metaPackage, opts);
+    writePgpmFiles(metaPackage, opts);
   }
 
   pgPool.end();

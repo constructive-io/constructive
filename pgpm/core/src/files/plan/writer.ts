@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Change, PlanFile, SqitchRow, Tag, ExtendedPlanFile } from '../types';
+import { Change, PlanFile, PgpmRow, Tag, ExtendedPlanFile } from '../types';
 
 export interface PlanWriteOptions {
   outdir: string;
@@ -11,9 +11,9 @@ export interface PlanWriteOptions {
 }
 
 /**
- * Write a Sqitch plan file based on the provided rows
+ * Write a PGPM plan file based on the provided rows
  */
-export function writeSqitchPlan(rows: SqitchRow[], opts: PlanWriteOptions): void {
+export function writePgpmPlan(rows: PgpmRow[], opts: PlanWriteOptions): void {
   const dir = path.resolve(path.join(opts.outdir, opts.name));
   fs.mkdirSync(dir, { recursive: true });
 
@@ -165,3 +165,8 @@ export function generateTagLineContent(tag: Tag): string {
   
   return line;
 }
+
+/**
+ * @deprecated Use writePgpmPlan instead. This alias is kept for backwards compatibility.
+ */
+export const writeSqitchPlan = writePgpmPlan;

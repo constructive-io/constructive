@@ -2,7 +2,7 @@ import { getEnvOptions } from '@pgpmjs/env';
 import fs from 'fs';
 import path from 'path';
 
-import { SqitchRow } from '../types';
+import { PgpmRow } from '../types';
 
 export interface SqlWriteOptions {
   outdir: string;
@@ -13,9 +13,9 @@ export interface SqlWriteOptions {
 }
 
 /**
- * Write SQL files for Sqitch migrations (deploy, revert, verify)
+ * Write SQL files for PGPM migrations (deploy, revert, verify)
  */
-export const writeSqitchFiles = (rows: SqitchRow[], opts: SqlWriteOptions): void => {
+export const writePgpmFiles = (rows: PgpmRow[], opts: SqlWriteOptions): void => {
   rows.forEach((row) => writeVerify(row, opts));
   rows.forEach((row) => writeRevert(row, opts));
   rows.forEach((row) => writeDeploy(row, opts));
@@ -30,9 +30,9 @@ const ordered = (arr?: string[]): string[] => {
 };
 
 /**
- * Write a deploy SQL file for a Sqitch change
+ * Write a deploy SQL file for a PGPM change
  */
-const writeDeploy = (row: SqitchRow, opts: SqlWriteOptions): void => {
+const writeDeploy = (row: PgpmRow, opts: SqlWriteOptions): void => {
   const globalOpts = getEnvOptions({
     migrations: {
       codegen: {
@@ -68,9 +68,9 @@ ${useTx ? 'COMMIT;' : ''}
 };
 
 /**
- * Write a verify SQL file for a Sqitch change
+ * Write a verify SQL file for a PGPM change
  */
-const writeVerify = (row: SqitchRow, opts: SqlWriteOptions): void => {
+const writeVerify = (row: PgpmRow, opts: SqlWriteOptions): void => {
   const globalOpts = getEnvOptions({
     migrations: {
       codegen: {
@@ -100,9 +100,9 @@ ${useTx ? 'COMMIT;' : ''}
 };
 
 /**
- * Write a revert SQL file for a Sqitch change
+ * Write a revert SQL file for a PGPM change
  */
-const writeRevert = (row: SqitchRow, opts: SqlWriteOptions): void => {
+const writeRevert = (row: PgpmRow, opts: SqlWriteOptions): void => {
   const globalOpts = getEnvOptions({
     migrations: {
       codegen: {
@@ -130,3 +130,8 @@ ${useTx ? 'COMMIT;' : ''}
 `;
   fs.writeFileSync(actualFile, content);
 };
+
+/**
+ * @deprecated Use writePgpmFiles instead. This alias is kept for backwards compatibility.
+ */
+export const writeSqitchFiles = writePgpmFiles;
