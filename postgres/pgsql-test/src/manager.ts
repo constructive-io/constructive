@@ -9,13 +9,13 @@ const log = new Logger('test-connector');
 
 const SYS_EVENTS = ['SIGTERM'];
 
-const end = (pool: Pool) => {
+const end = async (pool: Pool): Promise<void> => {
   try {
     if ((pool as any).ended || (pool as any).ending) {
       log.warn('⚠️ pg pool already ended or ending');
       return;
     }
-    pool.end();
+    await pool.end();
   } catch (err) {
     log.error('❌ pg pool termination error:', err);
   }
@@ -123,11 +123,13 @@ export class PgTestConnector {
     this.clients.clear();
 
     log.info('🧯 Disposing pg pools...');
+    const poolTasks: Promise<void>[] = [];
     for (const [key, pool] of this.pgPools.entries()) {
       log.debug(`🧯 Disposing pg pool [${key}]`);
-      end(pool);
+      poolTasks.push(end(pool));
     }
     this.pgPools.clear();
+    await Promise.allSettled(poolTasks);
 
     if (keepDb) {
       log.info('📦 Keeping databases (keepDb=true)...');
