@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.32](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.31...@constructive-io/knative-job-service@0.4.32) (2025-12-27)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
 ## [0.4.31](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.30...@constructive-io/knative-job-service@0.4.31) (2025-12-27)
 
 **Note:** Version bump only for package @constructive-io/knative-job-service

@@ -320,16 +320,17 @@ async function handleModuleInit(
     // Offer to create a workspace instead
     const recoveryQuestion: Question[] = [
       {
-        name: 'createWorkspace',
+        name: 'workspace',
+        alias: 'w',
         message: 'You are not inside a PGPM workspace. Would you like to create a new workspace instead?',
         type: 'confirm',
         required: true,
       },
     ];
 
-    const { createWorkspace } = await prompter.prompt(argv, recoveryQuestion);
+    const { workspace } = await prompter.prompt(argv, recoveryQuestion);
 
-    if (createWorkspace) {
+    if (workspace) {
       return handleWorkspaceInit(argv, prompter, {
         fromPath: 'workspace',
         templateRepo: ctx.templateRepo,
