@@ -6,8 +6,7 @@ import request, { type Test } from 'supertest';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { PgpmInit } from '@pgpmjs/core';
-import { closeAllCaches } from 'graphile-cache';
-import { seed, getConnections } from 'graphile-test';
+import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
 
 jest.setTimeout(30000);
@@ -18,9 +17,9 @@ const sql = (f: string) => join(__dirname, '../../test/sql', f);
 const metaSeedPath = join(__dirname, '../../../../constructive-db/services/svc');
 const testDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 
-type GraphileConnections = Awaited<ReturnType<typeof getConnections>>;
-type PgTestClient = GraphileConnections['db'];
-type SeededConnections = Pick<GraphileConnections, 'db' | 'pg' | 'teardown'>;
+type PgsqlConnections = Awaited<ReturnType<typeof getConnections>>;
+type PgTestClient = PgsqlConnections['db'];
+type SeededConnections = Pick<PgsqlConnections, 'db' | 'pg' | 'teardown'>;
 
 type RouteCase = {
   name: string;
@@ -113,7 +112,7 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
 
 const createAppDb = async (): Promise<SeededConnections> => {
   const { db, pg, teardown } = await getConnections(
-    { schemas: appSchemas },
+    {},
     [
       bootstrapAdminUsers,
       seed.sqlfile([
@@ -128,7 +127,7 @@ const createAppDb = async (): Promise<SeededConnections> => {
 
 const createMetaDb = async (): Promise<SeededConnections> => {
   const { db, pg, teardown } = await getConnections(
-    { schemas: metaSchemas },
+    {},
     [
       bootstrapAdminUsers,
       seed.pgpm(metaSeedPath),
@@ -200,7 +199,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await closeAllCaches();
   await Promise.all([metaDb?.teardown(), appDb?.teardown()]);
 });
 

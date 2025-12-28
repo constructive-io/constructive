@@ -84,6 +84,7 @@
     "graphile-test": "^2.11.15",
     "makage": "^0.1.9",
     "nodemon": "^3.1.10",
+    "pgsql-test": "workspace:^",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2"
   }
