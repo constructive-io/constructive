@@ -1,11 +1,11 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
-import { join } from 'path';
+import { dirname, join } from 'path';
 import type { Server as HttpServer } from 'http';
 import request, { type Test } from 'supertest';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { PgpmInit } from '@pgpmjs/core';
+import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
 
@@ -14,8 +14,23 @@ jest.setTimeout(30000);
 const appSchemas = ['app_public'];
 const metaSchemas = ['collections_public', 'meta_public'];
 const sql = (f: string) => join(__dirname, '../../test/sql', f);
-const metaSeedPath = join(__dirname, '../../../../constructive-db/services/svc');
-const testDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
+const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
+// Stable seeded UUID used for JWT claims and meta fixtures; dbname is set dynamically per test DB.
+const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
+
+const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
+
+const getPgpmModulePath = (pkgName: string): string =>
+  dirname(require.resolve(`${pkgName}/pgpm.plan`));
+
+const metaSeedModules = [
+  getPgpmModulePath('@pgpm/verify'),
+  getPgpmModulePath('@pgpm/types'),
+  getPgpmModulePath('@pgpm/inflection'),
+  getPgpmModulePath('@pgpm/database-jobs'),
+  getPgpmModulePath('@pgpm/db-meta-schema'),
+  getPgpmModulePath('@pgpm/db-meta-modules'),
+];
 
 type PgsqlConnections = Awaited<ReturnType<typeof getConnections>>;
 type PgTestClient = PgsqlConnections['db'];
@@ -53,6 +68,16 @@ const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
   const appUser = connections.app?.user;
   if (appUser) {
     await admin.grantRole(roles.administrator, appUser, config.database);
+  }
+});
+
+const deployMetaModules = seed.fn(async ({ config }) => {
+  const migrator = new PgpmMigrate(config);
+  for (const modulePath of metaSeedModules) {
+    const result = await migrator.deploy({ modulePath, usePlan: false });
+    if (result.failed) {
+      throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
+    }
   }
 });
 
@@ -127,17 +152,18 @@ const createAppDb = async (): Promise<SeededConnections> => {
 
 const createMetaDb = async (): Promise<SeededConnections> => {
   const { db, pg, teardown } = await getConnections(
-    {},
+    { db: { extensions: metaDbExtensions } },
     [
       bootstrapAdminUsers,
-      seed.pgpm(metaSeedPath),
+      deployMetaModules,
+      seed.sqlfile([metaSql('meta.seed.sql')]),
     ]
   );
 
   await db.begin();
   db.setContext({
     role: 'administrator',
-    'jwt.claims.database_id': testDatabaseId,
+    'jwt.claims.database_id': seededDatabaseId,
   });
   try {
     await db.query('UPDATE meta_public.apis SET dbname = current_database()');
@@ -171,7 +197,7 @@ const buildOptions = ({
         enableMetaApi: false,
         isPublic,
         exposedSchemas: appSchemas,
-        defaultDatabaseId: testDatabaseId,
+        defaultDatabaseId: seededDatabaseId,
       };
 
   return getEnvOptions({
@@ -260,7 +286,7 @@ describe.each(cases)(
     beforeEach(async () => {
       db.setContext({
         role: enableMetaApi && isPublic ? 'anonymous' : 'administrator',
-        'jwt.claims.database_id': testDatabaseId,
+        'jwt.claims.database_id': seededDatabaseId,
       });
       await db.beforeEach();
     });

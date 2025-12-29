@@ -983,6 +983,24 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.958.0
         version: 3.958.0
+      '@pgpm/database-jobs':
+        specifier: ^0.15.5
+        version: 0.15.5
+      '@pgpm/db-meta-modules':
+        specifier: ^0.15.5
+        version: 0.15.5
+      '@pgpm/db-meta-schema':
+        specifier: ^0.15.5
+        version: 0.15.5
+      '@pgpm/inflection':
+        specifier: ^0.15.5
+        version: 0.15.5
+      '@pgpm/types':
+        specifier: ^0.15.5
+        version: 0.15.5
+      '@pgpm/verify':
+        specifier: ^0.15.5
+        version: 0.15.5
       '@pgpmjs/core':
         specifier: ^3.2.1
         version: 3.2.1(@babel/core@7.28.5)
@@ -3202,6 +3220,24 @@ packages:
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
+
+  '@pgpm/database-jobs@0.15.5':
+    resolution: {integrity: sha512-1aA4aOcxEGJNLsdsjqcKR1X6vzwrE8tONIq7wgV2Bqic3gmqeDHtbMJw6JevA8h5adXE76xLvDD049Ou22cFsQ==}
+
+  '@pgpm/db-meta-modules@0.15.5':
+    resolution: {integrity: sha512-FbaUkk2FRtpPunRT6JzDRA6T5xS4zKgItVi7XgvnrkCfj1mns+8FGbWLrFlmfkY2ZslYAKCqNkZ9F3m0X7tOTg==}
+
+  '@pgpm/db-meta-schema@0.15.5':
+    resolution: {integrity: sha512-2Ltk/DAWIWBdm0MYXPB6mMbh9Bg8FXZdF8IZRZHjIQYlShHej+H0eIL8ZlsMnyg8DZzcDUo0dS6nPjUdSDsZhw==}
+
+  '@pgpm/inflection@0.15.5':
+    resolution: {integrity: sha512-ILxqfp/1yLaWNidBJcudeDnb5hZnh1tgd9K4u3MY4hpNqTY1b64ytg+w9jXROWf1tyJuvD4Xyzi0FBKZpzpl1w==}
+
+  '@pgpm/types@0.15.5':
+    resolution: {integrity: sha512-8kdjKAuLd2/sfR5AakMdVxwuhx8YOwoTm2bGRw/5v8o1JPi6SrRCPS0TvCN2RaD5GjPMasRNNURW8wHMv8FtCw==}
+
+  '@pgpm/verify@0.15.5':
+    resolution: {integrity: sha512-8+e1uYn9FYUKRFyewVRq0YHRZkZoUSJ/QbOczCZc7P9n1J4LJFLUSZNGvMz/nA1OKlanEAnjINnjzF0+krFT/g==}
 
   '@pgpmjs/core@3.2.1':
     resolution: {integrity: sha512-xoWo17Bwae/HxC/emNZo/ik4c4j4U7I6gSUiYM42pY/j6zfMeIYdf64ZzSxG7ooES9HIRFWu0B1S4W0cqkS1DA==}
@@ -10444,6 +10480,32 @@ snapshots:
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@pgpm/database-jobs@0.15.5':
+    dependencies:
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/db-meta-modules@0.15.5':
+    dependencies:
+      '@pgpm/db-meta-schema': 0.15.5
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/db-meta-schema@0.15.5':
+    dependencies:
+      '@pgpm/database-jobs': 0.15.5
+      '@pgpm/inflection': 0.15.5
+      '@pgpm/types': 0.15.5
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/inflection@0.15.5':
+    dependencies:
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/types@0.15.5':
+    dependencies:
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/verify@0.15.5': {}
 
   '@pgpmjs/core@3.2.1(@babel/core@7.28.5)':
     dependencies:
