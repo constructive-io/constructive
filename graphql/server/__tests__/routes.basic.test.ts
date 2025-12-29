@@ -2,7 +2,7 @@ process.env.LOG_SCOPE = 'graphile-test';
 
 import { dirname, join } from 'path';
 import type { Server as HttpServer } from 'http';
-import request, { type Test } from 'supertest';
+import request from 'supertest';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
@@ -91,7 +91,10 @@ const requireConnections = (
   return connections;
 };
 
-const setHeaders = (req: Test, headers?: Record<string, string>): Test => {
+const setHeaders = <T extends { set: (field: string, value: string) => T }>(
+  req: T,
+  headers?: Record<string, string>
+): T => {
   if (!headers) return req;
   for (const [key, value] of Object.entries(headers)) {
     req.set(key, value);
@@ -304,10 +307,9 @@ describe.each(cases)(
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const res = await setHeaders(
-        request(started.httpServer).get('/healthz'),
-        headers
-      );
+      const req = request.agent(started.httpServer);
+      setHeaders(req, headers);
+      const res = await req.get('/healthz');
 
       expect(res.status).toBe(200);
       expect(res.text).toBe('ok');
@@ -317,10 +319,9 @@ describe.each(cases)(
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const res = await setHeaders(
-        request(started.httpServer).get('/graphiql'),
-        headers
-      );
+      const req = request.agent(started.httpServer);
+      setHeaders(req, headers);
+      const res = await req.get('/graphiql');
 
       expect(res.status).toBe(200);
       expect(res.text).toContain('GraphiQL');
@@ -330,12 +331,11 @@ describe.each(cases)(
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const res = await setHeaders(
-        request(started.httpServer)
-          .get('/graphql')
-          .query({ query: '{ __typename }' }),
-        headers
-      );
+      const req = request.agent(started.httpServer);
+      setHeaders(req, headers);
+      const res = await req
+        .get('/graphql')
+        .query({ query: '{ __typename }' });
 
       if (res.status === 200) {
         expect(res.body?.data?.__typename).toBe('Query');
@@ -348,12 +348,11 @@ describe.each(cases)(
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const res = await setHeaders(
-        request(started.httpServer)
-          .post('/graphql')
-          .send({ query: '{ __typename }' }),
-        headers
-      );
+      const req = request.agent(started.httpServer);
+      setHeaders(req, headers);
+      const res = await req
+        .post('/graphql')
+        .send({ query: '{ __typename }' });
 
       expect(res.status).toBe(200);
       expect(res.body?.data?.__typename).toBe('Query');
