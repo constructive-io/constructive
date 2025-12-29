@@ -98,7 +98,7 @@ const startServer = async (
 const stopServer = async (started: StartedServer | null): Promise<void> => {
   if (!started) return;
 
-  await started.server.removeEventListener();
+  await started.server.close();
   await new Promise<void>((resolve, reject) => {
     started.httpServer.close((error) => {
       if (error) {
@@ -199,7 +199,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await Promise.all([metaDb?.teardown(), appDb?.teardown()]);
+  await GraphQLServer.closeCaches();
+  if (metaDb) {
+    await metaDb.teardown();
+  }
+  if (appDb) {
+    await appDb.teardown();
+  }
 });
 
 const cases: RouteCase[] = [

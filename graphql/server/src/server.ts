@@ -3,6 +3,7 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { closeAllCaches } from 'graphile-cache';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
@@ -31,6 +32,8 @@ class Server {
   private opts: PgpmOptions;
   private listenClient: PoolClient | null = null;
   private listenRelease: (() => void) | null = null;
+  private shuttingDown = false;
+  private closed = false;
 
   constructor(opts: PgpmOptions) {
     this.opts = getEnvOptions(opts);
@@ -94,6 +97,7 @@ class Server {
   }
 
   addEventListener(): void {
+    if (this.shuttingDown) return;
     const pgPool = this.getPool();
     pgPool.connect(this.listenForChanges.bind(this));
   }
@@ -105,7 +109,14 @@ class Server {
   ): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
-      setTimeout(() => this.addEventListener(), 5000);
+      if (!this.shuttingDown) {
+        setTimeout(() => this.addEventListener(), 5000);
+      }
+      return;
+    }
+
+    if (this.shuttingDown) {
+      release();
       return;
     }
 
@@ -122,6 +133,10 @@ class Server {
     client.query('LISTEN "schema:update"');
 
     client.on('error', (e) => {
+      if (this.shuttingDown) {
+        release();
+        return;
+      }
       this.error('Error with database notify listener', e);
       release();
       this.addEventListener();
@@ -150,6 +165,26 @@ class Server {
     }
 
     release();
+  }
+
+  async close(opts: { closeCaches?: boolean } = {}): Promise<void> {
+    const { closeCaches = false } = opts;
+    if (this.closed) {
+      if (closeCaches) {
+        await Server.closeCaches();
+      }
+      return;
+    }
+    this.closed = true;
+    this.shuttingDown = true;
+    await this.removeEventListener();
+    if (closeCaches) {
+      await Server.closeCaches();
+    }
+  }
+
+  static async closeCaches(): Promise<void> {
+    await closeAllCaches();
   }
 
   log(text: string): void {
