@@ -100,8 +100,8 @@ export const getConnections = async (
     if (teardownPromise) return teardownPromise;
     teardownPromise = (async () => {
       manager.beginTeardown();
-      await teardownPgPools();
       await manager.closeAll({ keepDb: teardownOpts.keepDb });
+      await teardownPgPools();
     })();
     return teardownPromise;
   };

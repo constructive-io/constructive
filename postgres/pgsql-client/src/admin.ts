@@ -54,12 +54,42 @@ export class DbAdmin {
     }
   }
 
+  private terminateConnections(dbName: string): void {
+    const maintenanceDb = this.roleConfig?.rootDb ?? this.config.database;
+    const escapedDbName = dbName.replace(/'/g, "''");
+    const sql =
+      "SELECT pg_terminate_backend(pid) " +
+      `FROM pg_stat_activity WHERE datname='${escapedDbName}' ` +
+      "AND pid <> pg_backend_pid();";
+    const escapedSql = sql.replace(/"/g, '\\"');
+    this.run(`psql -v ON_ERROR_STOP=1 -d "${maintenanceDb}" -c "${escapedSql}"`);
+  }
+
+  private dropWithPsql(dbName: string): void {
+    const escapedDbName = dbName.replace(/"/g, '""');
+    this.run(
+      `psql -v ON_ERROR_STOP=1 -c "DROP DATABASE IF EXISTS \\"${escapedDbName}\\";"`
+    );
+  }
+
   private safeDropDb(name: string): void {
     try {
       this.run(`dropdb "${name}"`);
     } catch (err: any) {
-      if (!err.message.includes('does not exist')) {
-        log.warn(`Could not drop database ${name}: ${err.message}`);
+      if (err.message.includes('does not exist')) return;
+      try {
+        this.terminateConnections(name);
+      } catch (terminateError: any) {
+        log.warn(
+          `Could not terminate connections for ${name}: ${terminateError.message}`
+        );
+      }
+      try {
+        this.dropWithPsql(name);
+      } catch (dropError: any) {
+        if (!dropError.message.includes('does not exist')) {
+          log.warn(`Could not drop database ${name}: ${dropError.message}`);
+        }
       }
     }
   }
