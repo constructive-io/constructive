@@ -716,16 +716,32 @@ export const createOne = ({
       }),
     ];
 
-  const selections: FieldNode[] = allAttrs.map((field) =>
-    t.field({ name: 'id' })
-  );
+  let idExists = true;
+  let availableFieldNames: string[] = [];
+  if (typeIndex) {
+    const typ = (typeIndex as any).byName?.[mutation.model];
+    const fields = (typ && Array.isArray(typ.fields)) ? typ.fields : [];
+    idExists = fields.some((f: any) => f && f.name === 'id');
+    availableFieldNames = fields
+      .filter((f: any) => {
+        let r = f.type;
+        while (r && (r.kind === 'NON_NULL' || r.kind === 'LIST')) r = r.ofType;
+        const kind = r?.kind;
+        return kind === 'SCALAR' || kind === 'ENUM';
+      })
+      .map((f: any) => f.name);
+  }
 
-  const modelFields = selection?.modelFields?.[modelName] || selection?.defaultMutationModelFields || ['id'];
+  const configured = (selection?.modelFields && selection?.modelFields[modelName])
+    ? selection!.modelFields![modelName]!
+    : (selection?.defaultMutationModelFields || []);
+  const configuredFiltered = configured.filter((n) => n === 'id' ? idExists : availableFieldNames.includes(n));
+  const finalFields = Array.from(new Set([...(idExists ? ['id'] : []), ...((configuredFiltered.length > 0) ? configuredFiltered : availableFieldNames)]));
 
-  const nested: FieldNode[] = (modelFields.length > 0)
+  const nested: FieldNode[] = (finalFields.length > 0)
     ? [t.field({
         name: modelName,
-        selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
+        selectionSet: t.selectionSet({ selections: finalFields.map((f) => t.field({ name: f })) }),
       })]
     : [];
 
@@ -869,7 +885,7 @@ export const patchOne = ({
     return t.variableDefinition({ variable: t.variable({ name }), type: gqlType as any });
   });
 
-  const mustUseRaw = useCollapsedOpt || unresolved > 0;
+  const mustUseRaw = unresolved > 0;
   const selectArgs: ArgumentNode[] = mustUseRaw
     ? [t.argument({ name: 'input', value: t.variable({ name: 'input' }) as any })]
     : [
@@ -891,7 +907,14 @@ export const patchOne = ({
       }),
     ];
 
-  const modelFields = selection?.modelFields?.[modelName] || selection?.defaultMutationModelFields || ['id'];
+  let idExistsPatch = true;
+  if (typeIndex) {
+    const typ = (typeIndex as any).byName?.[mutation.model];
+    const fields = (typ && Array.isArray(typ.fields)) ? typ.fields : [];
+    idExistsPatch = fields.some((f: any) => f && f.name === 'id');
+  }
+  const shouldDropIdPatch = /Extension$/i.test(modelName) || !idExistsPatch;
+  const modelFields = shouldDropIdPatch ? [] : ['id'];
 
   const nestedPatch: FieldNode[] = (modelFields.length > 0)
     ? [t.field({
@@ -1082,22 +1105,42 @@ export const createMutation = ({
     .filter((field) => field.type.kind === 'SCALAR')
     .map((f) => f.name);
 
-  const objectOutput = (mutation.outputs || []).find((field) => field.type.kind === 'OBJECT');
+  let objectOutputName: string | undefined = (mutation.outputs || [])
+    .find((field) => field.type.kind === 'OBJECT')?.name;
+
+  if (!objectOutputName) {
+    const payloadTypeName = (mutation as any)?.output?.name;
+    if (typeIndex && payloadTypeName) {
+      const payloadType = (typeIndex as any).byName?.[payloadTypeName];
+      const fields = (payloadType && Array.isArray(payloadType.fields)) ? payloadType.fields : [];
+      const match = fields
+        .filter((f: any) => f && f.name !== 'clientMutationId')
+        .filter((f: any) => (refToNamedTypeName(f.type) || f.type?.name) !== 'Query')
+        .find((f: any) => (refToNamedTypeName(f.type) || f.type?.name) === (mutation as any)?.model);
+      if (match) objectOutputName = match.name;
+    }
+  }
 
   const selections: FieldNode[] = [];
-  if (objectOutput?.name) {
-    const modelFieldsRaw = selection?.modelFields?.[objectOutput.name] || selection?.defaultMutationModelFields || [];
-    const shouldDropId = /Extension$/i.test(objectOutput.name);
-    const fallbackFields = shouldDropId ? [] : ['id'];
-    const modelFields = (selection?.forceModelOutput && modelFieldsRaw.length === 0) ? fallbackFields : (modelFieldsRaw.length > 0 ? modelFieldsRaw : []);
-    if (modelFields.length > 0) {
-      selections.push(
-        t.field({
-          name: objectOutput.name,
-          selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
-        })
-      );
-    }
+  if (objectOutputName) {
+    const modelTypeName = (mutation as any)?.model;
+    const modelType = typeIndex && modelTypeName ? (typeIndex as any).byName?.[modelTypeName] : null;
+    const fieldNames: string[] = (modelType && Array.isArray(modelType.fields))
+      ? modelType.fields
+          .filter((f: any) => {
+            let r = f.type;
+            while (r && (r.kind === 'NON_NULL' || r.kind === 'LIST')) r = r.ofType;
+            const kind = r?.kind;
+            return kind === 'SCALAR' || kind === 'ENUM';
+          })
+          .map((f: any) => f.name)
+      : [];
+    selections.push(
+      t.field({
+        name: objectOutputName,
+        selectionSet: t.selectionSet({ selections: fieldNames.map((n) => t.field({ name: n })) }),
+      })
+    );
   }
   if (scalarOutputs.length > 0) {
     selections.push(...scalarOutputs.map((o) => t.field({ name: o })));

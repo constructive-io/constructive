@@ -86,25 +86,15 @@ Endpoint introspection:
 
 ## Selection Options
 
-Configure result field selections, mutation input style, and connection pagination shape.
+Configure mutation input style and connection pagination shape.
 
 ```ts
 selection: {
-  defaultMutationModelFields?: string[]
-  modelFields?: Record<string, string[]>
   mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'
   connectionStyle?: 'nodes' | 'edges'
   forceModelOutput?: boolean
 }
 ```
-
-- `defaultMutationModelFields`
-  - Sets default fields selected from the object payload returned by mutations when the mutation exposes an OBJECT output.
-  - Example: `['id']` will select only the `id` from the returned model unless overridden per model.
-
-- `modelFields`
-  - Per‑model overrides for returned object payload fields.
-  - Example: `{ domain: ['id','domain','subdomain'] }` selects those fields from the `domain` object output.
 
 - `mutationInputMode`
   - Controls how mutation variables and `input` are generated.
@@ -119,8 +109,7 @@ selection: {
   - `edges`: emits `totalCount`, `pageInfo { ... }`, and `edges { cursor node { ... } }`.
 
 - `forceModelOutput`
-  - When `true`, ensures the object payload is selected even if `defaultMutationModelFields` is empty, defaulting to `['id']`.
-  - Useful to avoid generating mutations that only return `clientMutationId`.
+  - When `true`, ensures the object payload selection is emitted to avoid a payload with only `clientMutationId`.
 
 ### Examples
 

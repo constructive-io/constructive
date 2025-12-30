@@ -35,8 +35,6 @@ export interface GraphQLCodegenOptions {
     reactQueryVersion?: number
   }
   selection?: {
-    defaultMutationModelFields?: string[]
-    modelFields?: Record<string, string[]>
     mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'
     connectionStyle?: 'nodes' | 'edges'
     forceModelOutput?: boolean
@@ -57,7 +55,7 @@ export const defaultGraphQLCodegenOptions: GraphQLCodegenOptions = {
   documents: { format: 'gql', convention: 'dashed', allowQueries: [], excludeQueries: [], excludePatterns: [] },
   features: { emitTypes: true, emitOperations: true, emitSdk: true, emitReactQuery: true },
   reactQuery: { fetcher: 'graphql-request', legacyMode: false, exposeDocument: false, addInfiniteQuery: false, reactQueryVersion: 5 },
-  selection: { defaultMutationModelFields: ['id'], modelFields: {}, mutationInputMode: 'patchCollapsed', connectionStyle: 'edges', forceModelOutput: true },
+  selection: { mutationInputMode: 'patchCollapsed', connectionStyle: 'edges', forceModelOutput: true },
   scalars: {},
   typeNameOverrides: {}
 }
