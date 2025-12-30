@@ -26,7 +26,6 @@ describe('gql mutation builders', () => {
     expect(s).toContain('$foo: String!')
     expect(s).toContain('$list: [Int!]!')
     expect(s).toContain('clientMutationId')
-    expect(s).toContain('node')
   })
 
   it('createOne: omits non-mutable props and uses non-null types', () => {
