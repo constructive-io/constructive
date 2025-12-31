@@ -70,9 +70,7 @@ function extractNamedTypeName(node: any): string | null {
 }
 
 function singularModel(name: string): string {
-  const s = inflection.singularize(name);
-  if (/^regiman$/i.test(s)) return /[A-Z]/.test(s.charAt(0)) ? 'Regimen' : 'regimen';
-  return s;
+  return inflection.singularize(name);
 }
 
 interface CreateGqlMutationArgs {
