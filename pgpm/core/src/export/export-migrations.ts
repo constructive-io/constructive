@@ -389,6 +389,26 @@ interface MakeReplacerOptions {
   name: string;
 }
 
+/**
+ * Parses an author string in the format "Full Name <email@example.com>" 
+ * and returns the fullName and email components.
+ * 
+ * @param author - Author string like "Constructive <developers@constructive.io>"
+ * @returns Object with fullName and email, or just fullName if no email found
+ */
+const parseAuthorString = (author: string): { fullName: string; email?: string } => {
+  // Match "Full Name <email@example.com>" format
+  const match = author.match(/^(.+?)\s*<([^>]+)>$/);
+  if (match) {
+    return {
+      fullName: match[1].trim(),
+      email: match[2].trim()
+    };
+  }
+  // If no email found, treat the whole string as fullName
+  return { fullName: author.trim() };
+};
+
 interface ReplacerResult {
   replacer: (str: string, n?: number) => string;
   replace: [RegExp, string][];
@@ -416,16 +436,22 @@ const preparePackage = async ({
 
   const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
+    // Parse author string to extract fullName and email for non-interactive scaffolding
+    const { fullName, email } = parseAuthorString(author);
+    
     await project.initModule({
       name,
       description,
       author,
       extensions,
+      noTty: true, // Disable interactive prompts for programmatic use
       answers: {
         moduleName: name,
         moduleDesc: description,
         access: 'restricted',
-        license: 'CLOSED'
+        license: 'CLOSED',
+        fullName,
+        ...(email && { email })
       }
     });
   } else {
