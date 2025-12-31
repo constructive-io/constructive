@@ -81,7 +81,7 @@ let db: PgTestClient;
 
 // Create bucket before tests
 beforeAll(async () => {
-  process.env.IS_MINIO = 'true'; // Ensure MinIO behavior in createS3Bucket
+  process.env.BUCKET_PROVIDER = 'minio'; // Ensure MinIO behavior in createS3Bucket
   const result = await createS3Bucket(s3Client, BUCKET_NAME!);
   if (!result.success) throw new Error('Failed to create test S3 bucket');
 

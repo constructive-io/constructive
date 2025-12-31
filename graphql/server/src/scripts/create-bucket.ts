@@ -30,8 +30,6 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 
     // Set BUCKET_PROVIDER for downstream policy detection
     process.env.BUCKET_PROVIDER = provider;
-    // Legacy hint for backwards compatibility
-    process.env.IS_MINIO = isMinio ? 'true' : 'false';
 
     const res = await createS3Bucket(client as any, bucket);
     console.log(`[create-bucket] ${bucket} (provider: ${provider}):`, res);
