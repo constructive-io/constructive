@@ -8,6 +8,7 @@ import { getPgPool } from 'pg-cache';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
 import { getMissingInstallableModules } from '../modules/modules';
+import { parseAuthor } from '../utils/author';
 import { exportMeta } from './export-meta';
 
 /**
@@ -416,6 +417,8 @@ const preparePackage = async ({
 
   const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
+    const { fullName, email } = parseAuthor(author);
+    
     await project.initModule({
       name,
       description,
@@ -425,7 +428,9 @@ const preparePackage = async ({
         moduleName: name,
         moduleDesc: description,
         access: 'restricted',
-        license: 'CLOSED'
+        license: 'CLOSED',
+        fullName,
+        ...(email && { email })
       }
     });
   } else {
