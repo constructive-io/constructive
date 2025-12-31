@@ -349,6 +349,7 @@ SET session_replication_role TO DEFAULT;
 
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;
+    opts.outdir = svcOutdir;
 
     writePgpmPlan(metaPackage, opts);
     writePgpmFiles(metaPackage, opts);
