@@ -185,7 +185,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       config: { scalars: options.scalars || {} },
       plugins: [
         { typescript: {} },
-        { 'typescript-operations': {} },
+        { 'typescript-operations': { dedupeOperationSuffix: true } },
         { 'typescript-graphql-request': {} }
       ],
       pluginMap: {
@@ -222,7 +222,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       config: rqConfig,
       plugins: [
         { typescript: {} },
-        { 'typescript-operations': {} },
+        { 'typescript-operations': { dedupeOperationSuffix: true } },
         { 'typescript-react-query': rqConfig }
       ],
       pluginMap: {
