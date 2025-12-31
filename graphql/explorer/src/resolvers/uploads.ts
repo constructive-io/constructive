@@ -9,6 +9,7 @@ interface UploaderOptions {
   awsSecretKey: string;
   awsAccessKey: string;
   minioEndpoint?: string;
+  provider?: 's3' | 'minio' | string;
 }
 
 interface Upload {
@@ -32,7 +33,8 @@ export class UploadHandler {
       awsRegion: options.awsRegion,
       awsSecretKey: options.awsSecretKey,
       awsAccessKey: options.awsAccessKey,
-      minioEndpoint: options.minioEndpoint
+      minioEndpoint: options.minioEndpoint,
+      provider: options.provider
     });
   }
 

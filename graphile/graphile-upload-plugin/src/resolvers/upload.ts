@@ -7,6 +7,7 @@ export interface UploaderOptions {
   awsSecretKey: string;
   awsAccessKey: string;
   minioEndpoint?: string;
+  provider?: 's3' | 'minio' | string;
 }
 
 export class Uploader {
@@ -18,7 +19,8 @@ export class Uploader {
       awsRegion,
       awsSecretKey,
       awsAccessKey,
-      minioEndpoint
+      minioEndpoint,
+      provider
     } = this.opts;
 
     this.streamerInstance = new streamer({
@@ -27,6 +29,7 @@ export class Uploader {
       awsSecretKey,
       awsAccessKey,
       minioEndpoint,
+      provider
     });
   }
 

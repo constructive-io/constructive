@@ -110,6 +110,13 @@ export interface ServerOptions {
  * CDN and file storage configuration
  */
 export interface CDNOptions {
+    /**
+     * CDN / object storage provider.
+     * - 's3'    → AWS S3 (default)
+     * - 'minio' → MinIO / S3‑compatible endpoint
+     * - string  → reserved for future providers
+     */
+    provider?: 's3' | 'minio' | string;
     /** S3 bucket name for file storage */
     bucketName?: string;
     /** AWS region for S3 bucket */
@@ -241,6 +248,9 @@ export const pgpmDefaults: PgpmOptions = {
     strictAuth: false,
   },
   cdn: {
+    // Defaults are MinIO‑style for local/dev;
+    // production should override via BUCKET_PROVIDER=s3.
+    provider: 'minio',
     bucketName: 'test-bucket',
     awsRegion: 'us-east-1',
     awsAccessKey: 'minioadmin',

@@ -9,6 +9,8 @@ import { getClient, Streamer, upload } from '../src';
 import type { AsyncUploadResult } from '../src/utils';
 
 // Use Constructive defaults with optional overrides
+// Defaults are MinIO‑style (provider: 'minio', localhost endpoint),
+// which is suitable for local/CI test environments.
 const config = getEnvOptions({
   cdn: {
     bucketName: 'test-bucket'

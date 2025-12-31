@@ -34,7 +34,9 @@ import gql from 'graphql-tag';
 const SCHEMA = process.env.SCHEMA ?? 'app_public';
 const sql = (f: string) => join(__dirname, '../sql', f);
 
-// Use defaults with optional overrides
+// Use defaults with optional overrides.
+// Defaults are MinIO‑style (provider: 'minio', localhost endpoint),
+// which is suitable for local/CI test environments.
 const config = getEnvOptions({
   cdn: {
     bucketName: 'test-upload-bucket'

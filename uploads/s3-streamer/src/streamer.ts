@@ -9,6 +9,7 @@ interface StreamerOptions {
   awsSecretKey: string;
   awsAccessKey: string;
   minioEndpoint?: string;
+  provider?: 's3' | 'minio' | string;
   defaultBucket: string;
 }
 
@@ -28,13 +29,15 @@ export class Streamer {
     awsSecretKey,
     awsAccessKey,
     minioEndpoint,
+    provider,
     defaultBucket
   }: StreamerOptions) {
     this.s3 = getS3({
       awsRegion,
       awsSecretKey,
       awsAccessKey,
-      minioEndpoint
+      minioEndpoint,
+      provider
     });
     this.defaultBucket = defaultBucket;
   }
