@@ -4,6 +4,9 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import { Logger } from '@pgpmjs/logger';
+
+const log = new Logger('create-bucket');
 
 (async () => {
   try {
@@ -29,11 +32,15 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
     });
 
     const res = await createS3Bucket(client as any, bucket, { provider });
-    console.log(`[create-bucket] ${bucket} (provider: ${provider}):`, res);
+    if (res.success) {
+      log.success(`${bucket} (provider: ${provider})`);
+    } else {
+      log.error(`Failed to create bucket ${bucket}`);
+    }
 
     client.destroy();
   } catch (e) {
-    console.error('[create-bucket] error', e);
+    log.error('error', e);
     process.exitCode = 1;
   }
 })();
