@@ -9,7 +9,10 @@ const parseEnvBoolean = (val?: string): boolean | undefined => {
   return ['true', '1', 'yes'].includes(val.toLowerCase());
 };
 
-export const getGraphQLEnvVars = (): Partial<ConstructiveOptions> => {
+/**
+ * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
+ */
+export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
   const {
     GRAPHILE_SCHEMA,
 
@@ -24,7 +27,7 @@ export const getGraphQLEnvVars = (): Partial<ConstructiveOptions> => {
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
-  } = process.env;
+  } = env;
 
   return {
     graphile: {

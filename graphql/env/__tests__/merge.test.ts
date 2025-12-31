@@ -2,31 +2,15 @@ import { getEnvOptions } from '../src/merge';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import {
-  applyEnvFixture,
-  loadEnvFixture,
-  loadEnvKeys,
-  restoreEnv,
-  snapshotAndClearEnv
-} from '../../../pgpm/env/__tests__/test-utils';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
 
-const fixturesDir = path.join(__dirname, '..', '__fixtures__');
-const envKeys = loadEnvKeys(fixturesDir, 'env.keys.json');
-
 describe('getEnvOptions', () => {
-  let envSnapshot: Record<string, string | undefined>;
   let tempDir = '';
 
-  beforeEach(() => {
-    envSnapshot = snapshotAndClearEnv(envKeys);
-  });
-
   afterEach(() => {
-    restoreEnv(envSnapshot);
     if (tempDir) {
       fs.rmSync(tempDir, { recursive: true, force: true });
       tempDir = '';
@@ -56,8 +40,20 @@ describe('getEnvOptions', () => {
       }
     });
 
-    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.base.json');
-    applyEnvFixture(fixtureEnv);
+    const testEnv: NodeJS.ProcessEnv = {
+      PGHOST: 'env-host',
+      PGUSER: 'env-user',
+      GRAPHILE_SCHEMA: 'env_schema_a,env_schema_b',
+      FEATURES_SIMPLE_INFLECTION: 'true',
+      FEATURES_POSTGIS: 'false',
+      API_ENABLE_META: 'true',
+      API_IS_PUBLIC: 'true',
+      API_EXPOSED_SCHEMAS: 'public,app',
+      API_META_SCHEMAS: 'env_meta1,env_meta2',
+      API_ANON_ROLE: 'env_anon',
+      API_ROLE_NAME: 'env_role',
+      API_DEFAULT_DATABASE_ID: 'env_db'
+    };
 
     const result = getEnvOptions(
       {
@@ -81,7 +77,8 @@ describe('getEnvOptions', () => {
           defaultDatabaseId: 'override_db'
         }
       },
-      tempDir
+      tempDir,
+      testEnv
     );
 
     expect(result).toMatchSnapshot();
@@ -99,8 +96,11 @@ describe('getEnvOptions', () => {
       }
     });
 
-    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.dedupe.json');
-    applyEnvFixture(fixtureEnv);
+    const testEnv: NodeJS.ProcessEnv = {
+      GRAPHILE_SCHEMA: 'shared_schema,env_schema',
+      API_EXPOSED_SCHEMAS: 'shared,env_schema',
+      API_META_SCHEMAS: 'meta_public,env_meta'
+    };
 
     const result = getEnvOptions(
       {
@@ -112,7 +112,8 @@ describe('getEnvOptions', () => {
           metaSchemas: ['env_meta', 'override_meta']
         }
       },
-      tempDir
+      tempDir,
+      testEnv
     );
 
     expect(result.graphile?.schema).toEqual([
