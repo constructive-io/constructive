@@ -148,6 +148,8 @@ interface ExportMigrationsToDiskOptions {
   repoName?: string;
   /** GitHub username/org for module scaffolding. Required for non-interactive use. */
   username?: string;
+  /** Output directory for service/meta module. Defaults to outdir if not provided. */
+  serviceOutdir?: string;
 }
 
 interface ExportOptions {
@@ -170,6 +172,8 @@ interface ExportOptions {
   repoName?: string;
   /** GitHub username/org for module scaffolding. Required for non-interactive use. */
   username?: string;
+  /** Output directory for service/meta module. Defaults to outdir if not provided. */
+  serviceOutdir?: string;
 }
 
 const exportMigrationsToDisk = async ({
@@ -187,9 +191,12 @@ const exportMigrationsToDisk = async ({
   metaExtensionDesc,
   prompter,
   repoName,
-  username
+  username,
+  serviceOutdir
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
+  // Use serviceOutdir for service module, defaulting to outdir if not provided
+  const svcOutdir = (serviceOutdir || outdir.slice(0, -1)) + '/';
 
   const pgPool = getPgPool({
     ...options.pg,
@@ -278,11 +285,11 @@ const exportMigrationsToDisk = async ({
     // Detect missing modules at workspace level and prompt user
     const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
 
-    // Create/prepare the module directory
+    // Create/prepare the module directory (use serviceOutdir if provided)
     const svcModuleDir = await preparePackage({
       project,
       author,
-      outdir,
+      outdir: svcOutdir,
       name: metaExtensionName,
       description: metaDesc,
       extensions: [...SERVICE_REQUIRED_EXTENSIONS],
@@ -342,6 +349,7 @@ SET session_replication_role TO DEFAULT;
 
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;
+    opts.outdir = svcOutdir;
 
     writePgpmPlan(metaPackage, opts);
     writePgpmFiles(metaPackage, opts);
@@ -363,7 +371,8 @@ export const exportMigrations = async ({
   metaExtensionDesc,
   prompter,
   repoName,
-  username
+  username,
+  serviceOutdir
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -382,7 +391,8 @@ export const exportMigrations = async ({
       outdir,
       prompter,
       repoName,
-      username
+      username,
+      serviceOutdir
     });
   }
 };
