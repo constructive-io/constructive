@@ -430,7 +430,9 @@ const preparePackage = async ({
         access: 'restricted',
         license: 'CLOSED',
         fullName,
-        ...(email && { email })
+        ...(email && { email }),
+        repoName: name,
+        username: 'constructive-io'
       }
     });
   } else {
