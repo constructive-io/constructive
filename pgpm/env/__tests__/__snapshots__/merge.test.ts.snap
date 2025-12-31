@@ -8,6 +8,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "awsSecretKey": "minioadmin",
     "bucketName": "test-bucket",
     "minioEndpoint": "http://localhost:9000",
+    "provider": "minio",
   },
   "db": {
     "connections": {
