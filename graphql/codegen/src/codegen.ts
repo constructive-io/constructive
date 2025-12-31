@@ -182,11 +182,11 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: sdkFile,
       schema: schema as any,
       documents,
-      config: { scalars: options.scalars || {} },
+      config: { scalars: options.scalars || {}, dedupeOperationSuffix: true },
       plugins: [
         { typescript: {} },
-        { 'typescript-operations': { dedupeOperationSuffix: true } },
-        { 'typescript-graphql-request': {} }
+        { 'typescript-operations': {} },
+        { 'typescript-graphql-request': { dedupeOperationSuffix: true } }
       ],
       pluginMap: {
         typescript: typescriptPlugin as any,
@@ -219,10 +219,10 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: reactQueryFile,
       schema: schema as any,
       documents,
-      config: rqConfig,
+      config: { ...rqConfig, dedupeOperationSuffix: true },
       plugins: [
         { typescript: {} },
-        { 'typescript-operations': { dedupeOperationSuffix: true } },
+        { 'typescript-operations': {} },
         { 'typescript-react-query': rqConfig }
       ],
       pluginMap: {
