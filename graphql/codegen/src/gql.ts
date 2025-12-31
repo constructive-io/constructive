@@ -626,7 +626,7 @@ export const getOne = ({
 export interface CreateOneArgs {
   operationName: string;
   mutation: MutationSpec;
-  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
+  selection?: { mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface CreateOneResult {
@@ -732,11 +732,7 @@ export const createOne = ({
       .map((f: any) => f.name);
   }
 
-  const configured = (selection?.modelFields && selection?.modelFields[modelName])
-    ? selection!.modelFields![modelName]!
-    : (selection?.defaultMutationModelFields || []);
-  const configuredFiltered = configured.filter((n) => n === 'id' ? idExists : availableFieldNames.includes(n));
-  const finalFields = Array.from(new Set([...(idExists ? ['id'] : []), ...((configuredFiltered.length > 0) ? configuredFiltered : availableFieldNames)]));
+  const finalFields = Array.from(new Set([...(idExists ? ['id'] : []), ...availableFieldNames]));
 
   const nested: FieldNode[] = (finalFields.length > 0)
     ? [t.field({
@@ -780,7 +776,7 @@ export interface MutationSpec {
 export interface PatchOneArgs {
   operationName: string;
   mutation: MutationSpec;
-  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
+  selection?: { mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface PatchOneResult {
@@ -914,12 +910,12 @@ export const patchOne = ({
     idExistsPatch = fields.some((f: any) => f && f.name === 'id');
   }
   const shouldDropIdPatch = /Extension$/i.test(modelName) || !idExistsPatch;
-  const modelFields = shouldDropIdPatch ? [] : ['id'];
+  const idSelection = shouldDropIdPatch ? [] : ['id'];
 
-  const nestedPatch: FieldNode[] = (modelFields.length > 0)
+  const nestedPatch: FieldNode[] = (idSelection.length > 0)
     ? [t.field({
         name: modelName,
-        selectionSet: t.selectionSet({ selections: modelFields.map((f) => t.field({ name: f })) }),
+        selectionSet: t.selectionSet({ selections: idSelection.map((f) => t.field({ name: f })) }),
       })]
     : [];
 
@@ -1031,7 +1027,7 @@ export const deleteOne = ({
 export interface CreateMutationArgs {
   operationName: string;
   mutation: MutationSpec;
-  selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]>; mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
+  selection?: { mutationInputMode?: 'expanded' | 'model' | 'raw' | 'patchCollapsed'; connectionStyle?: 'nodes' | 'edges'; forceModelOutput?: boolean };
 }
 
 export interface CreateMutationResult {
