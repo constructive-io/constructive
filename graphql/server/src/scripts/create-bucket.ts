@@ -28,10 +28,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
       } : {}),
     });
 
-    // Set BUCKET_PROVIDER for downstream policy detection
-    process.env.BUCKET_PROVIDER = provider;
-
-    const res = await createS3Bucket(client as any, bucket);
+    const res = await createS3Bucket(client as any, bucket, { provider });
     console.log(`[create-bucket] ${bucket} (provider: ${provider}):`, res);
 
     client.destroy();

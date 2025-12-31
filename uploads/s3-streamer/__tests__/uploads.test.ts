@@ -38,8 +38,7 @@ jest.setTimeout(3000000);
 
 // Create bucket before tests
 beforeAll(async () => {
-  process.env.BUCKET_PROVIDER = 'minio'; // Ensure MinIO behavior in createS3Bucket
-  const result = await createS3Bucket(s3Client, BUCKET_NAME);
+  const result = await createS3Bucket(s3Client, BUCKET_NAME, { provider: 'minio' });
   if (!result.success) throw new Error('Failed to create test S3 bucket');
 });
 

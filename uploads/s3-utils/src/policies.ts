@@ -4,18 +4,18 @@ import {
   PutBucketPolicyCommand, 
   S3Client} from '@aws-sdk/client-s3';
 
-/**
- * Determines if MinIO-specific bucket policies should be used.
- * 
- * Uses BUCKET_PROVIDER env var: 'minio' | 's3' | 'gcs'
- * Defaults to 'minio' if not set (for local dev).
- */
-function shouldUseMinioPolicy(): boolean {
-  const provider = process.env.BUCKET_PROVIDER?.toLowerCase() || 'minio';
-  return provider === 'minio';
+export interface CreateS3BucketOptions {
+  provider: 'minio' | 's3' | 'gcs';
 }
 
-export async function createS3Bucket(client: S3Client, Bucket: string): Promise<{ success: boolean }> {
+export async function createS3Bucket(
+  client: S3Client, 
+  Bucket: string,
+  options: CreateS3BucketOptions
+): Promise<{ success: boolean }> {
+  const { provider } = options;
+  const useMinioPolicy = provider === 'minio';
+
   try {
     await client.send(new CreateBucketCommand({ Bucket }));
   } catch (e: any) {
@@ -27,8 +27,6 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
       return { success: false };
     }
   }
-
-  const useMinioPolicy = shouldUseMinioPolicy();
 
   const policy = useMinioPolicy
     ? {
