@@ -144,6 +144,10 @@ interface ExportMigrationsToDiskOptions {
   metaExtensionName: string;
   metaExtensionDesc?: string;
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
 }
 
 interface ExportOptions {
@@ -162,6 +166,10 @@ interface ExportOptions {
   metaExtensionName: string;
   metaExtensionDesc?: string;
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
 }
 
 const exportMigrationsToDisk = async ({
@@ -177,7 +185,9 @@ const exportMigrationsToDisk = async ({
   extensionDesc,
   metaExtensionName,
   metaExtensionDesc,
-  prompter
+  prompter,
+  repoName,
+  username
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
 
@@ -241,7 +251,9 @@ const exportMigrationsToDisk = async ({
       name,
       description: dbExtensionDesc,
       extensions: [...DB_REQUIRED_EXTENSIONS],
-      prompter
+      prompter,
+      repoName,
+      username
     });
 
     // Install missing modules if user confirmed (now that module exists)
@@ -274,7 +286,9 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName,
       description: metaDesc,
       extensions: [...SERVICE_REQUIRED_EXTENSIONS],
-      prompter
+      prompter,
+      repoName,
+      username
     });
 
     // Install missing modules if user confirmed (now that module exists)
@@ -347,7 +361,9 @@ export const exportMigrations = async ({
   extensionDesc,
   metaExtensionName,
   metaExtensionDesc,
-  prompter
+  prompter,
+  repoName,
+  username
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -364,7 +380,9 @@ export const exportMigrations = async ({
       schema_names,
       author,
       outdir,
-      prompter
+      prompter,
+      repoName,
+      username
     });
   }
 };
@@ -378,6 +396,10 @@ interface PreparePackageOptions {
   description: string;
   extensions: string[];
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
 }
 
 interface Schema {
@@ -408,7 +430,9 @@ const preparePackage = async ({
   name,
   description,
   extensions,
-  prompter
+  prompter,
+  repoName,
+  username
 }: PreparePackageOptions): Promise<string> => {
   const curDir = process.cwd();
   const pgpmDir = path.resolve(path.join(outdir, name));
@@ -430,7 +454,10 @@ const preparePackage = async ({
         access: 'restricted',
         license: 'CLOSED',
         fullName,
-        ...(email && { email })
+        ...(email && { email }),
+        // Use provided values or sensible defaults
+        repoName: repoName || name,
+        ...(username && { username })
       }
     });
   } else {
