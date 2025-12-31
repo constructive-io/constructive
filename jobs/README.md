@@ -156,7 +156,7 @@ http://simple-email.interweb.svc.cluster.local
 and the worker will call:
 
 ```text
-POST http://simple-email.interweb.svc.cluster.local/simple-email
+POST http://simple-email.interweb.svc.cluster.local/
 ```
 
 ---
