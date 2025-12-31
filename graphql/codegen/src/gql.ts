@@ -8,8 +8,7 @@ import {
   TypeNode,
   VariableDefinitionNode,
 } from 'graphql';
-// @ts-ignore
-const inflection: any = require('inflection');
+import inflection from 'inflection'
 
 const NON_MUTABLE_PROPS = [
   'id',
@@ -19,7 +18,7 @@ const NON_MUTABLE_PROPS = [
   'updatedBy',
 ];
 
-const objectToArray = (obj: Record<string, any>): { name: string; [key: string]: any }[] =>
+const objectToArray = (obj: Record<string, any>): { name: string;[key: string]: any }[] =>
   Object.keys(obj).map((k) => ({ name: k, ...obj[k] }));
 
 type TypeIndex = { byName: Record<string, any>; getInputFieldType: (typeName: string, fieldName: string) => any };
@@ -739,9 +738,9 @@ export const createOne = ({
 
   const nested: FieldNode[] = (finalFields.length > 0)
     ? [t.field({
-        name: modelName,
-        selectionSet: t.selectionSet({ selections: finalFields.map((f) => t.field({ name: f })) }),
-      })]
+      name: modelName,
+      selectionSet: t.selectionSet({ selections: finalFields.map((f) => t.field({ name: f })) }),
+    })]
     : [];
 
   const ast: DocumentNode = createGqlMutation({
@@ -917,9 +916,9 @@ export const patchOne = ({
 
   const nestedPatch: FieldNode[] = (idSelection.length > 0)
     ? [t.field({
-        name: modelName,
-        selectionSet: t.selectionSet({ selections: idSelection.map((f) => t.field({ name: f })) }),
-      })]
+      name: modelName,
+      selectionSet: t.selectionSet({ selections: idSelection.map((f) => t.field({ name: f })) }),
+    })]
     : [];
 
   const ast: DocumentNode = createGqlMutation({
@@ -1095,8 +1094,8 @@ export const createMutation = ({
       value: mustUseRaw
         ? (t.variable({ name: 'input' }) as any)
         : t.objectValue({
-            fields: otherAttrs.map((f) => t.objectField({ name: f.name, value: t.variable({ name: f.name }) })),
-          }),
+          fields: otherAttrs.map((f) => t.objectField({ name: f.name, value: t.variable({ name: f.name }) })),
+        }),
     }),
   ];
 
@@ -1126,13 +1125,13 @@ export const createMutation = ({
     const modelType = typeIndex && modelTypeName ? (typeIndex as any).byName?.[modelTypeName] : null;
     const fieldNames: string[] = (modelType && Array.isArray(modelType.fields))
       ? modelType.fields
-          .filter((f: any) => {
-            let r = f.type;
-            while (r && (r.kind === 'NON_NULL' || r.kind === 'LIST')) r = r.ofType;
-            const kind = r?.kind;
-            return kind === 'SCALAR' || kind === 'ENUM';
-          })
-          .map((f: any) => f.name)
+        .filter((f: any) => {
+          let r = f.type;
+          while (r && (r.kind === 'NON_NULL' || r.kind === 'LIST')) r = r.ofType;
+          const kind = r?.kind;
+          return kind === 'SCALAR' || kind === 'ENUM';
+        })
+        .map((f: any) => f.name)
       : [];
     selections.push(
       t.field({
