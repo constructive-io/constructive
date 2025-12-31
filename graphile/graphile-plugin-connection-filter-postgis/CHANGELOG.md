@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.43](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.42...graphile-plugin-connection-filter-postgis@1.1.43) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
 ## [1.1.42](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.41...graphile-plugin-connection-filter-postgis@1.1.42) (2025-12-31)
 
 **Note:** Version bump only for package graphile-plugin-connection-filter-postgis
