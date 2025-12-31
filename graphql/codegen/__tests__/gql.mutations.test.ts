@@ -2,7 +2,7 @@ import { print } from 'graphql'
 import { createOne, patchOne, deleteOne, createMutation, MutationSpec } from '../src'
 
 describe('gql mutation builders', () => {
-  it('createMutation: builds non-null vars and selects scalar outputs', () => {
+  it('createMutation: builds non-null vars and includes object outputs', () => {
     const mutation: MutationSpec = {
       model: 'Actions',
       properties: {
@@ -26,7 +26,7 @@ describe('gql mutation builders', () => {
     expect(s).toContain('$foo: String!')
     expect(s).toContain('$list: [Int!]!')
     expect(s).toContain('clientMutationId')
-    expect(s).not.toContain('node')
+    expect(s).toContain('node')
   })
 
   it('createOne: omits non-mutable props and uses non-null types', () => {

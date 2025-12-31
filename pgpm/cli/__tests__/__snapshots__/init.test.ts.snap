@@ -56,7 +56,7 @@ exports[`cmds:init initializes module: module-only - files 1`] = `
   "packages/my-module/Makefile",
   "packages/my-module/LICENSE",
   "packages/my-module/__tests__/basic.test.ts",
-  ".github/ci.yaml",
+  ".github/workflows/ci.yml",
 ]
 `;
 
@@ -124,7 +124,7 @@ exports[`cmds:init initializes workspace: workspace - files 1`] = `
   "my-workspace/.prettierrc.json",
   "my-workspace/.gitignore",
   "my-workspace/.eslintrc.json",
-  "my-workspace/.github/ci.yaml",
+  "my-workspace/.github/workflows/ci.yml",
 ]
 `;
 

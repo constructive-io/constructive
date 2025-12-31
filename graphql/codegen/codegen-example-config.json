@@ -1,6 +1,6 @@
 {
   "input": {
-    "endpoint": "http://localhost:3000/graphql",
+    "endpoint": "http://localhost:5555/graphql",
     "headers": {
       "Host": "api.localhost"
     }
@@ -34,17 +34,6 @@
     "PgpmInternalTypeHostname": "String"
   },
   "selection": {
-    "defaultMutationModelFields": [],
-    "modelFields": {
-      "extension": [],
-      "databaseExtension": [],
-      "table": ["id", "name", "schemaId"],
-      "field": ["id", "name", "tableId"],
-      "schema": ["id", "name", "databaseId"],
-      "api": ["id", "name", "databaseId"],
-      "domain": ["id", "domain", "subdomain", "databaseId"],
-      "site": ["id", "title", "databaseId"]
-    },
     "mutationInputMode": "patchCollapsed",
     "connectionStyle": "edges",
     "forceModelOutput": true
