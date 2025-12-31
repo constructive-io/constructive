@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "2.9.31",
+  "version": "2.9.32",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.0...@pgpmjs/core@4.5.1) (2025-12-31)
+
+### Bug Fixes
+
+- **pgpm:** fix AST round-trip diff comparison bug and add --outputDiff flag ([02ed48e](https://github.com/constructive-io/constructive/commit/02ed48e7649458fc1ade9397c5aba9d7a4eea722))
+
 # [4.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.4.0...@pgpmjs/core@4.5.0) (2025-12-27)
 
 ### Features
