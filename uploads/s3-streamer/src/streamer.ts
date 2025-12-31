@@ -1,5 +1,6 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { ReadStream } from 'fs';
+import type { BucketProvider } from '@pgpmjs/types';
 
 import getS3 from './s3';
 import { type AsyncUploadResult,upload as streamUpload } from './utils';
@@ -9,6 +10,7 @@ interface StreamerOptions {
   awsSecretKey: string;
   awsAccessKey: string;
   minioEndpoint?: string;
+  provider?: BucketProvider;
   defaultBucket: string;
 }
 
@@ -28,13 +30,15 @@ export class Streamer {
     awsSecretKey,
     awsAccessKey,
     minioEndpoint,
+    provider,
     defaultBucket
   }: StreamerOptions) {
     this.s3 = getS3({
       awsRegion,
       awsSecretKey,
       awsAccessKey,
-      minioEndpoint
+      minioEndpoint,
+      provider
     });
     this.defaultBucket = defaultBucket;
   }

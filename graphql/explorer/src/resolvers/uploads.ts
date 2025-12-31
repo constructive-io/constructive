@@ -2,6 +2,7 @@ import Streamer from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
 import { ReadStream } from 'fs';
 import type { GraphQLResolveInfo } from 'graphql';
+import type { BucketProvider } from '@pgpmjs/types';
 
 interface UploaderOptions {
   bucketName: string;
@@ -9,6 +10,7 @@ interface UploaderOptions {
   awsSecretKey: string;
   awsAccessKey: string;
   minioEndpoint?: string;
+  provider?: BucketProvider;
 }
 
 interface Upload {
@@ -32,7 +34,8 @@ export class UploadHandler {
       awsRegion: options.awsRegion,
       awsSecretKey: options.awsSecretKey,
       awsAccessKey: options.awsAccessKey,
-      minioEndpoint: options.minioEndpoint
+      minioEndpoint: options.minioEndpoint,
+      provider: options.provider
     });
   }
 

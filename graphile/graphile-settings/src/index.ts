@@ -32,6 +32,7 @@ export const getGraphileSettings = (
     awsAccessKey: cdn.awsAccessKey!,
     awsSecretKey: cdn.awsSecretKey!,
     minioEndpoint: cdn.minioEndpoint,
+    provider: cdn.provider,
   });
 
   const resolveUpload = uploader.resolveUpload.bind(uploader);

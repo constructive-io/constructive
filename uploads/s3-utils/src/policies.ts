@@ -17,15 +17,24 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
     }
   }
 
-  // Check if it's MinIO by looking at the endpoint
-  const endpoint = (client as any).config?.endpoint;
-  const endpointUrl = typeof endpoint === 'function' ? await endpoint() : endpoint;
-  const hostname = endpointUrl?.hostname || endpointUrl?.host || '';
+  // Check if it's MinIO by looking at BUCKET_PROVIDER env var first, then fall back to heuristics
+  const bucketProvider = process.env.BUCKET_PROVIDER?.toLowerCase();
+  let isMinio: boolean;
   
-  const isMinio =
-    process.env.IS_MINIO === 'true' ||
-    ['localhost', '127.0.0.1'].includes(hostname) ||
-    hostname.includes('minio');
+  if (bucketProvider) {
+    // Explicit provider takes precedence
+    isMinio = bucketProvider === 'minio';
+  } else {
+    // Fall back to legacy detection for backwards compatibility
+    const endpoint = (client as any).config?.endpoint;
+    const endpointUrl = typeof endpoint === 'function' ? await endpoint() : endpoint;
+    const hostname = endpointUrl?.hostname || endpointUrl?.host || '';
+    
+    isMinio =
+      process.env.IS_MINIO === 'true' ||
+      ['localhost', '127.0.0.1'].includes(hostname) ||
+      hostname.includes('minio');
+  }
 
   const policy = isMinio
     ? {

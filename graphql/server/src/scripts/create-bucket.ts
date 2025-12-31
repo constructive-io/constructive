@@ -1,4 +1,4 @@
-// Minimal script to create a bucket in MinIO using @constructive-io/s3-utils
+// Minimal script to create a bucket in MinIO/S3 using @constructive-io/s3-utils
 // Avoid strict type coupling between different @aws-sdk/client-s3 versions
 
 import { S3Client } from '@aws-sdk/client-s3';
@@ -10,6 +10,9 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
     const opts = getEnvOptions();
     const { cdn } = opts;
 
+    const provider = cdn?.provider || 'minio';
+    const isMinio = provider === 'minio';
+    
     const bucket = cdn?.bucketName || 'test-bucket';
     const region = cdn?.awsRegion || 'us-east-1';
     const accessKey = cdn?.awsAccessKey || 'minioadmin';
@@ -19,15 +22,19 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
     const client: any = new S3Client({
       region,
       credentials: { accessKeyId: accessKey, secretAccessKey: secretKey },
-      endpoint,
-      forcePathStyle: true,
+      ...(isMinio ? {
+        endpoint,
+        forcePathStyle: true,
+      } : {}),
     });
 
-    // Hint downstream to apply MinIO policies
-    process.env.IS_MINIO = 'true';
+    // Set BUCKET_PROVIDER for downstream policy detection
+    process.env.BUCKET_PROVIDER = provider;
+    // Legacy hint for backwards compatibility
+    process.env.IS_MINIO = isMinio ? 'true' : 'false';
 
     const res = await createS3Bucket(client as any, bucket);
-    console.log(`[create-bucket] ${bucket}:`, res);
+    console.log(`[create-bucket] ${bucket} (provider: ${provider}):`, res);
 
     client.destroy();
   } catch (e) {
