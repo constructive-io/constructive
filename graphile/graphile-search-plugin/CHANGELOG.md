@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.41](https://github.com/constructive-io/constructive/compare/graphile-search-plugin@0.2.40...graphile-search-plugin@0.2.41) (2025-12-31)
+
+**Note:** Version bump only for package graphile-search-plugin
+
 ## [0.2.40](https://github.com/constructive-io/constructive/compare/graphile-search-plugin@0.2.39...graphile-search-plugin@0.2.40) (2025-12-31)
 
 **Note:** Version bump only for package graphile-search-plugin

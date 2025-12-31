@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.5.35...graphile-upload-plugin@0.6.0) (2025-12-31)
+
+### Features
+
+- **cdn:** add BUCKET_PROVIDER env var for explicit storage provider selection ([e305ba0](https://github.com/constructive-io/constructive/commit/e305ba06ef62406e60b83f5b5eb784ec9c20316a))
+
 ## [0.5.35](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.5.34...graphile-upload-plugin@0.5.35) (2025-12-31)
 
 **Note:** Version bump only for package graphile-upload-plugin

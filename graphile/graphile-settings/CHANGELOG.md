@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.10.0](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.36...graphile-settings@2.10.0) (2025-12-31)
+
+### Features
+
+- **cdn:** add BUCKET_PROVIDER env var for explicit storage provider selection ([e305ba0](https://github.com/constructive-io/constructive/commit/e305ba06ef62406e60b83f5b5eb784ec9c20316a))
+
 ## [2.9.36](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.35...graphile-settings@2.9.36) (2025-12-31)
 
 **Note:** Version bump only for package graphile-settings
