@@ -458,6 +458,8 @@ const preparePackage = async ({
       description,
       author,
       extensions,
+      // Use outputDir to create module directly in the specified location
+      outputDir: outdir,
       answers: {
         moduleName: name,
         moduleDesc: description,
