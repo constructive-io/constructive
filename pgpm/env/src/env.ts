@@ -21,8 +21,10 @@ const parseEnvStringArray = (val?: string): string[] | undefined => {
 /**
  * Parse core PGPM environment variables.
  * GraphQL-related env vars (GRAPHILE_*, FEATURES_*, API_*) are handled by @constructive-io/graphql-env.
+ * 
+ * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getEnvVars = (): PgpmOptions => {
+export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions => {
     const {
       PGROOTDATABASE,
       PGTEMPLATE,
@@ -74,7 +76,7 @@ export const getEnvVars = (): PgpmOptions => {
     INTERNAL_GATEWAY_URL,
     INTERNAL_JOBS_CALLBACK_URL,
     INTERNAL_JOBS_CALLBACK_PORT
-  } = process.env;
+  } = env;
 
   return {
     db: {

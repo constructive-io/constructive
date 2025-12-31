@@ -12,10 +12,18 @@ import { mergeArraysUnique } from './utils';
  * 4. Runtime overrides
  * 
  * For Constructive applications that need GraphQL options, use @constructive-io/graphql-env instead.
+ * 
+ * @param overrides - Runtime overrides to apply last
+ * @param cwd - Working directory for config file resolution
+ * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getEnvOptions = (overrides: PgpmOptions = {}, cwd: string = process.cwd()): PgpmOptions => {
+export const getEnvOptions = (
+  overrides: PgpmOptions = {}, 
+  cwd: string = process.cwd(),
+  env: NodeJS.ProcessEnv = process.env
+): PgpmOptions => {
   const configOptions = loadConfigSync(cwd);
-  const envOptions = getEnvVars();
+  const envOptions = getEnvVars(env);
   
   return deepmerge.all([pgpmDefaults, configOptions, envOptions, overrides], {
     arrayMerge: mergeArraysUnique
