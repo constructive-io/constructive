@@ -9,7 +9,7 @@ import {
   VariableDefinitionNode,
 } from 'graphql';
 // @ts-ignore
-import inflection from 'inflection';
+const inflection: any = require('inflection');
 
 const NON_MUTABLE_PROPS = [
   'id',
@@ -67,6 +67,12 @@ function extractNamedTypeName(node: any): string | null {
   let n = node;
   while (n && !n.name && n.type) n = n.type;
   return n && n.name ? n.name : null;
+}
+
+function singularModel(name: string): string {
+  const s = inflection.singularize(name);
+  if (/^regiman$/i.test(s)) return /[A-Z]/.test(s.charAt(0)) ? 'Regimen' : 'regimen';
+  return s;
 }
 
 interface CreateGqlMutationArgs {
@@ -649,7 +655,7 @@ export const createOne = ({
   }
 
   const modelName = inflection.camelize(
-    [mutation.model].join('_'),
+    [singularModel(mutation.model)].join('_'),
     true
   );
 
@@ -799,7 +805,7 @@ export const patchOne = ({
   }
 
   const modelName = inflection.camelize(
-    [mutation.model].join('_'),
+    [singularModel(mutation.model)].join('_'),
     true
   );
 
@@ -820,7 +826,7 @@ export const patchOne = ({
   const patchers = patchByAttrs.map((p) => p.name);
 
   const useCollapsedOpt = selection?.mutationInputMode === 'patchCollapsed';
-  const ModelPascal = inflection.camelize(mutation.model, false);
+  const ModelPascal = inflection.camelize(singularModel(mutation.model), false);
   const patchTypeName = `${ModelPascal}Patch`;
   const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
   let unresolved = 0;
@@ -958,7 +964,7 @@ export const deleteOne = ({
   }
 
   const modelName = inflection.camelize(
-    [mutation.model].join('_'),
+    [singularModel(mutation.model)].join('_'),
     true
   );
 
