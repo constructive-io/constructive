@@ -1,4 +1,5 @@
 import app from '@constructive-io/knative-job-fn';
+import type { Request, Response, NextFunction } from 'express';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 
@@ -27,7 +28,11 @@ const getRequiredField = (
 
 const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
 
-app.post('/', async (req: any, res: any, next: any) => {
+type SimpleEmailResponseBody = { complete: true };
+type SimpleEmailRequest = Request<{}, SimpleEmailResponseBody, Partial<SimpleEmailPayload>>;
+type SimpleEmailResponse = Response<SimpleEmailResponseBody>;
+
+app.post('/', async (req: SimpleEmailRequest, res: SimpleEmailResponse, next: NextFunction) => {
   try {
     const payload = (req.body || {}) as SimpleEmailPayload;
 
@@ -92,7 +97,7 @@ export default app;
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the underlying Express app
-  (app as any).listen(port, () => {
+  app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`[simple-email] listening on port ${port}`);
   });

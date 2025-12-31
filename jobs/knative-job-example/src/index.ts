@@ -1,6 +1,7 @@
 import app from '@constructive-io/knative-job-fn';
+import type { Request, Response, NextFunction } from 'express';
 
-app.post('/', async (req: any, res: any, next: any) => {
+app.post('/', async (req: Request, res: Response, next: NextFunction) => {
   if (req.body.throw) {
     next(new Error('THROWN_ERROR'));
   } else {

@@ -55,11 +55,11 @@ const end = (pool: Pool): void => {
 
 // Callbacks registered for pool close events can accept arbitrary arguments
 // (we forward whatever was passed to `onClose`).
-type PoolCloseCallback = (...args: any[]) => Promise<void> | void;
+type PoolCloseCallback = (...args: unknown[]) => Promise<void> | void;
 
 class PoolManager {
   private pgPool: Pool;
-  private callbacks: Array<[PoolCloseCallback, any, any[]]>;
+  private callbacks: Array<[PoolCloseCallback, unknown, unknown[]]>;
   private _closed: boolean;
 
   constructor({ pgPool = new Pool(pgPoolConfig) }: { pgPool?: Pool } = {}) {
@@ -77,7 +77,11 @@ class PoolManager {
     });
   }
 
-  onClose(fn: PoolCloseCallback, context?: any, args: any[] = []): void {
+  onClose(
+    fn: PoolCloseCallback,
+    context?: unknown,
+    args: unknown[] = []
+  ): void {
     this.callbacks.push([fn, context, args]);
   }
 

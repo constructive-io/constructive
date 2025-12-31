@@ -28,8 +28,13 @@ import { Logger } from '@pgpmjs/logger';
 
 const log = new Logger('jobs:core');
 
+export type QueryParams = readonly unknown[] | undefined;
+
 export type PgClientLike = {
-  query<T = any>(text: string, params?: any[]): Promise<{ rows: T[] }>;
+  query<T = unknown>(
+    text: string,
+    params?: QueryParams
+  ): Promise<{ rows: T[] }>;
 };
 
 export {
@@ -72,7 +77,7 @@ export const completeJob = async (
   );
 };
 
-export const getJob = async <T = any>(
+export const getJob = async <T = unknown>(
   client: PgClientLike,
   { workerId, supportedTaskNames }: GetJobParams
 ): Promise<T | null> => {
@@ -86,7 +91,7 @@ export const getJob = async <T = any>(
   return (job as T) ?? null;
 };
 
-export const getScheduledJob = async <T = any>(
+export const getScheduledJob = async <T = unknown>(
   client: PgClientLike,
   { workerId, supportedTaskNames }: GetScheduledJobParams
 ): Promise<T | null> => {
@@ -100,10 +105,10 @@ export const getScheduledJob = async <T = any>(
   return (job as T) ?? null;
 };
 
-export const runScheduledJob = async (
+export const runScheduledJob = async <T = unknown>(
   client: PgClientLike,
   { jobId }: RunScheduledJobParams
-): Promise<any | null> => {
+): Promise<T | null> => {
   log.info(`runScheduledJob job[${jobId}]`);
   try {
     const {
@@ -112,9 +117,14 @@ export const runScheduledJob = async (
       `SELECT * FROM "${JOBS_SCHEMA}".run_scheduled_job($1);`,
       [jobId]
     );
-    return job ?? null;
-  } catch (e: any) {
-    if (e?.message === 'ALREADY_SCHEDULED') {
+    return (job as T) ?? null;
+  } catch (e: unknown) {
+    if (
+      e &&
+      typeof e === 'object' &&
+      'message' in e &&
+      (e as { message?: unknown }).message === 'ALREADY_SCHEDULED'
+    ) {
       return null;
     }
     throw e;

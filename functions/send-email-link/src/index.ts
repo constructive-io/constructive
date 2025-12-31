@@ -1,4 +1,5 @@
 import app from '@constructive-io/knative-job-fn';
+import type { Request, Response, NextFunction } from 'express';
 import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
@@ -46,6 +47,60 @@ const GetDatabaseInfo = gql`
   }
 `;
 
+type GetUserResult = {
+  user: {
+    username: string | null;
+    displayName: string | null;
+    profilePicture: string | null;
+  } | null;
+};
+
+type LegalTermsCompany = {
+  website: string;
+  nick: string;
+  name: string;
+};
+
+type LegalTermsEmails = {
+  support: string;
+};
+
+type LegalTermsData = {
+  emails: LegalTermsEmails;
+  company: LegalTermsCompany;
+};
+
+type SiteTheme = {
+  theme: {
+    primary: string;
+  };
+};
+
+type SiteDomain = {
+  subdomain: string | null;
+  domain: string;
+};
+
+type SiteLogo = {
+  url?: string | null;
+} | null;
+
+type DatabaseInfoResult = {
+  database?:
+    | {
+        sites?: {
+          nodes?: Array<{
+            domains?: { nodes?: SiteDomain[] };
+            logo?: SiteLogo;
+            title?: string;
+            siteThemes?: { nodes?: SiteTheme[] };
+            siteModules?: { nodes?: Array<{ data: LegalTermsData }> };
+          }>;
+        };
+      }
+    | null;
+};
+
 type SendEmailParams = {
   email_type: 'invite_email' | 'forgot_password' | 'email_verification';
   email: string;
@@ -63,6 +118,10 @@ type GraphQLContext = {
   meta: GraphQLClient;
   databaseId: string;
 };
+
+type SendEmailLinkMissing = { missing: string };
+type SendEmailLinkSuccess = { complete: true; dryRun?: true };
+export type SendEmailLinkResult = SendEmailLinkMissing | SendEmailLinkSuccess;
 
 const getRequiredEnv = (name: string): string => {
   const value = process.env[name];
@@ -94,10 +153,10 @@ const createGraphQLClient = (
 export const sendEmailLink = async (
   params: SendEmailParams,
   context: GraphQLContext
-) => {
+): Promise<SendEmailLinkResult> => {
   const { client, meta, databaseId } = context;
 
-  const validateForType = (): { missing?: string } | null => {
+  const validateForType = (): SendEmailLinkMissing | null => {
     switch (params.email_type) {
       case 'invite_email':
         if (!params.invite_token || !params.sender_id) {
@@ -131,7 +190,7 @@ export const sendEmailLink = async (
     return typeValidation;
   }
 
-  const databaseInfo = await meta.request<any>(GetDatabaseInfo, {
+  const databaseInfo = await meta.request<DatabaseInfoResult>(GetDatabaseInfo, {
     databaseId
   });
 
@@ -199,7 +258,7 @@ export const sendEmailLink = async (
       const scope = Number(params.invite_type) === 2 ? 'org' : 'app';
       url.searchParams.append('type', scope);
 
-      const inviter = await client.request<any>(GetUser, {
+      const inviter = await client.request<GetUserResult>(GetUser, {
         userId: params.sender_id
       });
       inviterName = inviter?.user?.displayName;
@@ -239,7 +298,7 @@ export const sendEmailLink = async (
       break;
     }
     default:
-      return false;
+      return { missing: 'email_type' };
   }
 
   const link = url.href;
@@ -295,7 +354,11 @@ export const sendEmailLink = async (
 };
 
 // HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
-app.post('/', async (req: any, res: any, next: any) => {
+type SendEmailLinkRequestBody = Partial<SendEmailParams>;
+type SendEmailLinkRequest = Request<{}, SendEmailLinkResult, SendEmailLinkRequestBody>;
+type SendEmailLinkResponse = Response<SendEmailLinkResult>;
+
+app.post('/', async (req: SendEmailLinkRequest, res: SendEmailLinkResponse, next: NextFunction) => {
   try {
     const params = (req.body || {}) as SendEmailParams;
 
@@ -329,7 +392,7 @@ export default app;
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
-  (app as any).listen(port, () => {
+  app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`[send-email-link] listening on port ${port}`);
   });
