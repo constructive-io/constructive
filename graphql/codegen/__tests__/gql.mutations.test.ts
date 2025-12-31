@@ -106,4 +106,28 @@ describe('gql mutation builders', () => {
     expect(s).toContain('$tags: [String]!')
     expect(s).toContain('clientMutationId')
   })
+
+  it('createOne: handles Regimen singularization and input key', () => {
+    const mutation: MutationSpec = {
+      model: 'Regimens',
+      properties: {
+        input: {
+          properties: {
+            regimen: {
+              properties: {
+                name: { type: 'String', isNotNull: true }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const res = createOne({ operationName: 'createRegimen', mutation })
+    expect(res).toBeDefined()
+    const s = print(res!.ast)
+    expect(s).toContain('mutation createRegimenMutation')
+    expect(s).toContain('$name: String!')
+    expect(s).toContain('regimen')
+  })
 })

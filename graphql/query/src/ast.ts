@@ -2,7 +2,6 @@
 
 import * as t from 'gql-ast';
 import inflection from 'inflection';
-import plz from 'pluralize';
 
 import { getCustomAst, isIntervalType } from './custom-ast';
 
@@ -353,7 +352,7 @@ export const createOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 
@@ -418,7 +417,7 @@ export const patchOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 
@@ -492,7 +491,7 @@ export const deleteOne = ({ mutationName, operationName, mutation }) => {
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 

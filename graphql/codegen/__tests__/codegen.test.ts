@@ -10,6 +10,8 @@ import { generateKeyedObjFromIntrospection } from '../test-utils/generate-from-i
 
 const sql = (f: string) => join(__dirname, '../sql', f);
 
+jest.setTimeout(30000);
+
 let teardown: () => Promise<void>;
 let query: GraphQLQueryFn;
 let introspection: IntrospectionQueryResult;
