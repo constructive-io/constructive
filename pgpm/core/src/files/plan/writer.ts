@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { Change, PlanFile, PgpmRow, Tag, ExtendedPlanFile } from '../types';
+import { parseAuthor } from '../../utils/author';
 
 export interface PlanWriteOptions {
   outdir: string;
@@ -19,22 +20,9 @@ export function writePgpmPlan(rows: PgpmRow[], opts: PlanWriteOptions): void {
 
   const date = (): string => '2017-08-11T08:11:51Z'; // stubbed timestamp
   
-  // Parse author string - it might contain email in format "Name <email>"
-  const authorInput = (opts.author || 'constructive').trim();
-  let authorName = authorInput;
-  let authorEmail = '';
-  
-  // Check if author already contains email in <...> format
-  const emailMatch = authorInput.match(/^(.+?)\s*<([^>]+)>\s*$/);
-  if (emailMatch) {
-    // Author already has email format: "Name <email>"
-    authorName = emailMatch[1].trim();
-    authorEmail = emailMatch[2].trim();
-  } else {
-    // No email in author, use default format
-    authorName = authorInput;
-    authorEmail = `${authorName}@5b0c196eeb62`;
-  }
+  const { fullName, email } = parseAuthor(opts.author || 'constructive');
+  const authorName = fullName;
+  const authorEmail = email || `${fullName}@5b0c196eeb62`;
 
   const duplicates: Record<string, boolean> = {};
 
