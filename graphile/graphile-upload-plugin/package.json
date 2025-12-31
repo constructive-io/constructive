@@ -52,6 +52,7 @@
   "dependencies": {
     "@constructive-io/s3-streamer": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "graphile-build": "^4.14.1",
     "graphql": "15.10.1"
   }

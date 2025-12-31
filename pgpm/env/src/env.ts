@@ -1,4 +1,4 @@
-import { PgpmOptions } from '@pgpmjs/types';
+import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
 const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
@@ -50,6 +50,7 @@ export const getEnvVars = (): PgpmOptions => {
     PGPASSWORD,
     PGDATABASE,
 
+    BUCKET_PROVIDER,
     BUCKET_NAME,
     AWS_REGION,
     AWS_ACCESS_KEY,
@@ -121,6 +122,7 @@ export const getEnvVars = (): PgpmOptions => {
       ...(PGDATABASE && { database: PGDATABASE }),
     },
     cdn: {
+      ...(BUCKET_PROVIDER && { provider: BUCKET_PROVIDER as BucketProvider }),
       ...(BUCKET_NAME && { bucketName: BUCKET_NAME }),
       ...(AWS_REGION && { awsRegion: AWS_REGION }),
       ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && { awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID }),

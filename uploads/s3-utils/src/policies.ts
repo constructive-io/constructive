@@ -4,7 +4,18 @@ import {
   PutBucketPolicyCommand, 
   S3Client} from '@aws-sdk/client-s3';
 
-export async function createS3Bucket(client: S3Client, Bucket: string): Promise<{ success: boolean }> {
+export interface CreateS3BucketOptions {
+  provider: 'minio' | 's3' | 'gcs';
+}
+
+export async function createS3Bucket(
+  client: S3Client, 
+  Bucket: string,
+  options: CreateS3BucketOptions
+): Promise<{ success: boolean }> {
+  const { provider } = options;
+  const useMinioPolicy = provider === 'minio';
+
   try {
     await client.send(new CreateBucketCommand({ Bucket }));
   } catch (e: any) {
@@ -17,17 +28,7 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
     }
   }
 
-  // Check if it's MinIO by looking at the endpoint
-  const endpoint = (client as any).config?.endpoint;
-  const endpointUrl = typeof endpoint === 'function' ? await endpoint() : endpoint;
-  const hostname = endpointUrl?.hostname || endpointUrl?.host || '';
-  
-  const isMinio =
-    process.env.IS_MINIO === 'true' ||
-    ['localhost', '127.0.0.1'].includes(hostname) ||
-    hostname.includes('minio');
-
-  const policy = isMinio
+  const policy = useMinioPolicy
     ? {
       Version: '2012-10-17',
       Statement: [
@@ -61,7 +62,7 @@ export async function createS3Bucket(client: S3Client, Bucket: string): Promise<
     };
 
   try {
-    if (!isMinio) {
+    if (!useMinioPolicy) {
       await client.send(new PutBucketCorsCommand({
         Bucket,
         CORSConfiguration: {
