@@ -10,7 +10,6 @@ import {
 } from 'graphql';
 // @ts-ignore
 import inflection from 'inflection';
-import plz from 'pluralize';
 
 const NON_MUTABLE_PROPS = [
   'id',
@@ -650,7 +649,7 @@ export const createOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [mutation.model].join('_'),
     true
   );
 
@@ -800,7 +799,7 @@ export const patchOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [mutation.model].join('_'),
     true
   );
 
@@ -821,7 +820,7 @@ export const patchOne = ({
   const patchers = patchByAttrs.map((p) => p.name);
 
   const useCollapsedOpt = selection?.mutationInputMode === 'patchCollapsed';
-  const ModelPascal = inflection.camelize(plz.singular(mutation.model), false);
+  const ModelPascal = inflection.camelize(mutation.model, false);
   const patchTypeName = `${ModelPascal}Patch`;
   const inputTypeName = resolveTypeName('input', (mutation.properties as any)?.input?.type || (mutation.properties as any)?.input, typeNameOverrides);
   let unresolved = 0;
@@ -959,7 +958,7 @@ export const deleteOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [mutation.model].join('_'),
     true
   );
 
