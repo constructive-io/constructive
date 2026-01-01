@@ -595,11 +595,11 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pgsql-deparser:
-        specifier: ^13.18.0
-        version: 13.19.1
+        specifier: ^17.15.0
+        version: 17.15.0
       pgsql-parser:
-        specifier: ^13.18.0
-        version: 13.19.1
+        specifier: ^17.9.5
+        version: 17.9.5
     devDependencies:
       makage:
         specifier: ^0.1.9
@@ -3197,12 +3197,6 @@ packages:
 
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
-
-  '@pgsql/types@13.11.1':
-    resolution: {integrity: sha512-5JeN7DZYCVbxPPFI47Z370Jzr3eHZpqgwCdutYWV8e8XtuhxF7UuvWvOsx2oPJe9KnQen0vzJWnVq/61bRvxmw==}
-
-  '@pgsql/types@13.11.2':
-    resolution: {integrity: sha512-ZZ5K2qJCMhpmkCsxJajDe9qYx8lvz1NTPIcfFb/L4XOdHwew1K0+9NgpKJzwoadO4tF/IduqOxoA4a9jAjG95A==}
 
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
@@ -6213,9 +6207,6 @@ packages:
     resolution: {integrity: sha512-26zzwoBNAvX9AWOPiqqF6FG4HrSCPsHFkQm7nT+xU1ggAujL/eae81RnCv4CJ2In9q9fh10B88sYSzKCUh/Ghg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  libpg-query@13.6.0:
-    resolution: {integrity: sha512-zaCGweMgNiPRGRfNVR8wO+XNCl2jZOx8eOXTbaIPgkePI6UJ2FKbHrRSHO5qJSvLxGm5j/5ry7uAdFw3lCn7gw==}
-
   libpg-query@17.7.3:
     resolution: {integrity: sha512-lHKBvoWRsXt/9bJxpAeFxkLu0CA6tELusqy3o1z6/DwGXSETxhKJDaNlNdrNV8msvXDLBhpg/4RE/fKKs5rYFA==}
 
@@ -7093,14 +7084,8 @@ packages:
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
-  pgsql-deparser@13.19.1:
-    resolution: {integrity: sha512-iCkE5h6wrXtRjT8ygdj7YktDVE3TwTYOLDmpEGT+8WWY47722584Zcr8kN/mk+2nA8mMVqH1Wwzwuu+aAdvjpQ==}
-
   pgsql-deparser@17.15.0:
     resolution: {integrity: sha512-CuNjFaUOYM/ct8R46/RO/hePT4CPfriicBbBIU8Q9JvWfHIENP1sMqXEDtQv63YGr1fZXEuWbYICEy72yTEBGQ==}
-
-  pgsql-parser@13.19.1:
-    resolution: {integrity: sha512-px+T9MY97vMzJWupiKSBXONJuQXtP6ix63RDH0xkZWG+Nv0qw45CnfMZrySmNp21YEOXVvlZTNTYN1MxulC6iQ==}
 
   pgsql-parser@17.9.5:
     resolution: {integrity: sha512-68T7wCHHeNFhggsW/QOqron0Kf4vx6eUSz9eEKj/7zEs2dqUqC1d170z8tbfVuhRwTH9EYkdr3kNx4fGi8K/ZQ==}
@@ -10184,10 +10169,6 @@ snapshots:
       '@octokit/openapi-types': 24.2.0
 
   '@one-ini/wasm@0.1.1': {}
-
-  '@pgsql/types@13.11.1': {}
-
-  '@pgsql/types@13.11.2': {}
 
   '@pgsql/types@17.6.2': {}
 
@@ -13812,10 +13793,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  libpg-query@13.6.0:
-    dependencies:
-      '@pgsql/types': 13.11.1
-
   libpg-query@17.7.3:
     dependencies:
       '@pgsql/types': 17.6.2
@@ -14997,19 +14974,9 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pgsql-deparser@13.19.1:
-    dependencies:
-      '@pgsql/types': 13.11.2
-
   pgsql-deparser@17.15.0:
     dependencies:
       '@pgsql/types': 17.6.2
-
-  pgsql-parser@13.19.1:
-    dependencies:
-      '@pgsql/types': 13.11.1
-      libpg-query: 13.6.0
-      pgsql-deparser: 13.19.1
 
   pgsql-parser@17.9.5:
     dependencies:
