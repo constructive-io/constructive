@@ -1,5 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { errors } from '@pgpmjs/types';
+import { errors, extractPgErrorFields, formatPgErrorFields } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 import { dirname,join } from 'path';
 import { Pool } from 'pg';
@@ -224,6 +224,15 @@ export class PgpmMigrate {
           errorLines.push(`  Dependencies: ${qualifiedDeps && qualifiedDeps.length > 0 ? qualifiedDeps.join(', ') : 'none'}`);
           errorLines.push(`  Error Code: ${error.code || 'N/A'}`);
           errorLines.push(`  Error Message: ${error.message || 'N/A'}`);
+          
+          // Add extended PostgreSQL error fields
+          const pgFields = extractPgErrorFields(error);
+          if (pgFields) {
+            const fieldLines = formatPgErrorFields(pgFields);
+            if (fieldLines.length > 0) {
+              fieldLines.forEach(line => errorLines.push(`  ${line}`));
+            }
+          }
           
           // Show SQL script preview for debugging
           if (cleanDeploySql) {
