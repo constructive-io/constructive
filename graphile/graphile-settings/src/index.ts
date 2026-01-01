@@ -17,7 +17,6 @@ import PgPostgisFilter from 'graphile-plugin-connection-filter-postgis';
 
 import CustomPgTypeMappingsPlugin from 'graphile-pg-type-mappings';
 import UploadPostGraphilePlugin, { Uploader } from 'graphile-upload-plugin';
-import SqlExpressionValidatorPlugin from 'graphile-sql-expression-validator';
 
 export const getGraphileSettings = (
   rawOpts: ConstructiveOptions
@@ -38,16 +37,15 @@ export const getGraphileSettings = (
 
   const resolveUpload = uploader.resolveUpload.bind(uploader);
 
-    const plugins: Plugin[] = [
-      ConnectionFilterPlugin,
-      FulltextFilterPlugin,
-      CustomPgTypeMappingsPlugin,
-      UploadPostGraphilePlugin,
-      SqlExpressionValidatorPlugin,
-      PgMetaschema,
-      PgManyToMany,
-      PgSearch,
-    ];
+  const plugins: Plugin[] = [
+    ConnectionFilterPlugin,
+    FulltextFilterPlugin,
+    CustomPgTypeMappingsPlugin,
+    UploadPostGraphilePlugin,
+    PgMetaschema,
+    PgManyToMany,
+    PgSearch,
+  ];
 
   if (features?.postgis) {
     plugins.push(PgPostgis, PgPostgisFilter);
