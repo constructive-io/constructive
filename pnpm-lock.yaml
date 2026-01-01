@@ -515,9 +515,6 @@ importers:
       graphile-simple-inflector:
         specifier: workspace:^
         version: link:../graphile-simple-inflector/dist
-      graphile-sql-expression-validator:
-        specifier: workspace:^
-        version: link:../graphile-sql-expression-validator/dist
       graphile-upload-plugin:
         specifier: workspace:^
         version: link:../graphile-upload-plugin/dist
