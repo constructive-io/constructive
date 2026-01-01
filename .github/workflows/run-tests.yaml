@@ -93,6 +93,8 @@ jobs:
             env: {}
           - package: graphile/graphile-pg-type-mappings
             env: {}
+          - package: graphile/graphile-sql-expression-validator
+            env: {}
 
     env:
       PGHOST: pg_db
