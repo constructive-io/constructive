@@ -10,7 +10,7 @@ npm install graphile-sql-expression-validator
 
 ## Usage
 
-### Smart Comment
+### Smart Comments
 
 Tag columns that contain SQL expressions with `@sqlExpression`:
 
@@ -19,6 +19,17 @@ COMMENT ON COLUMN collections_public.field.default_value IS E'@sqlExpression';
 ```
 
 The plugin will automatically look for a companion `*_ast` column (e.g., `default_value_ast`) to store the parsed AST.
+
+#### Custom AST Field Name
+
+By default, the plugin looks for a companion column named `<column>_ast`. You can override this with `@rawSqlAstField`:
+
+```sql
+-- Use a custom AST column name
+COMMENT ON COLUMN collections_public.field.default_value IS E'@sqlExpression\n@rawSqlAstField my_custom_ast_column';
+```
+
+If `@rawSqlAstField` points to a non-existent column, the plugin will throw an error. If not specified, it falls back to the `<column>_ast` convention (and silently skips AST storage if that column doesn't exist).
 
 ### Plugin Configuration
 
@@ -35,6 +46,15 @@ const postgraphileOptions = {
       allowedSchemas: ['my_schema'],
       // Optional: Maximum expression length (default: 10000)
       maxExpressionLength: 5000,
+      // Optional: Auto-allow schemas owned by the current database
+      // Queries: SELECT schema_name FROM collections_public.schema 
+      //          WHERE database_id = jwt_private.current_database_id()
+      allowOwnedSchemas: true,
+      // Optional: Custom hook for dynamic schema resolution
+      getAdditionalAllowedSchemas: async (context) => {
+        // Return additional allowed schemas based on request context
+        return ['dynamic_schema'];
+      },
     },
   },
 };

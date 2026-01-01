@@ -6,6 +6,8 @@ export interface SqlExpressionValidatorOptions {
   allowedFunctions?: string[];
   allowedSchemas?: string[];
   maxExpressionLength?: number;
+  allowOwnedSchemas?: boolean;
+  getAdditionalAllowedSchemas?: (context: any) => Promise<string[]>;
 }
 
 const DEFAULT_ALLOWED_FUNCTIONS = [
@@ -252,6 +254,55 @@ export async function validateAst(
   }
 }
 
+const OWNED_SCHEMAS_CACHE_KEY = Symbol('sqlExpressionValidator.ownedSchemas');
+
+async function resolveEffectiveOptions(
+  baseOptions: SqlExpressionValidatorOptions,
+  gqlContext: any
+): Promise<SqlExpressionValidatorOptions> {
+  const {
+    allowedSchemas = [],
+    allowOwnedSchemas = false,
+    getAdditionalAllowedSchemas,
+    ...rest
+  } = baseOptions;
+
+  const effectiveSchemas = [...allowedSchemas];
+
+  if (allowOwnedSchemas && gqlContext?.pgClient) {
+    let ownedSchemas: string[] | undefined = gqlContext[OWNED_SCHEMAS_CACHE_KEY];
+
+    if (!ownedSchemas) {
+      try {
+        const result = await gqlContext.pgClient.query(
+          `SELECT schema_name FROM collections_public.schema WHERE database_id = jwt_private.current_database_id()`
+        );
+        ownedSchemas = result.rows.map((row: { schema_name: string }) => row.schema_name);
+        gqlContext[OWNED_SCHEMAS_CACHE_KEY] = ownedSchemas;
+      } catch (err) {
+        ownedSchemas = [];
+      }
+    }
+
+    effectiveSchemas.push(...ownedSchemas);
+  }
+
+  if (getAdditionalAllowedSchemas) {
+    try {
+      const additionalSchemas = await getAdditionalAllowedSchemas(gqlContext);
+      effectiveSchemas.push(...additionalSchemas);
+    } catch (err) {
+    }
+  }
+
+  const uniqueSchemas = [...new Set(effectiveSchemas)];
+
+  return {
+    ...rest,
+    allowedSchemas: uniqueSchemas,
+  };
+}
+
 const SqlExpressionValidatorPlugin: Plugin = (
   builder,
   options: { sqlExpressionValidator?: SqlExpressionValidatorOptions } = {}
@@ -285,59 +336,82 @@ const SqlExpressionValidatorPlugin: Plugin = (
         async resolve(
           source: any,
           args: any,
-          context: any,
+          gqlContext: any,
           info: any
         ) {
-          for (const attr of sqlExpressionColumns) {
-            const columnName = build.inflection.column(attr);
-            const astColumnName = columnName + 'Ast';
+          const effectiveOptions = await resolveEffectiveOptions(
+            validatorOptions,
+            gqlContext
+          );
 
-            const inputPath = findInputPath(args, columnName);
-            const astInputPath = findInputPath(args, astColumnName);
+          for (const attr of sqlExpressionColumns) {
+            const textGqlName = build.inflection.column(attr);
+
+            const rawSqlAstFieldTag = attr.tags?.rawSqlAstField;
+            const astDbName =
+              typeof rawSqlAstFieldTag === 'string' && rawSqlAstFieldTag.trim()
+                ? rawSqlAstFieldTag.trim()
+                : `${attr.name}_ast`;
+
+            const astAttr = build.pgIntrospectionResultsByKind.attribute.find(
+              (a: any) => a.classId === table.id && a.name === astDbName
+            );
+
+            let astGqlName: string | null = null;
+            if (astAttr) {
+              astGqlName = build.inflection.column(astAttr);
+            } else if (typeof rawSqlAstFieldTag === 'string' && rawSqlAstFieldTag.trim()) {
+              throw new Error(
+                `@rawSqlAstField points to missing column "${astDbName}" on ${table.namespaceName}.${table.name}`
+              );
+            }
+
+            const inputPath = findInputPath(args, textGqlName);
+            const astInputPath = astGqlName ? findInputPath(args, astGqlName) : null;
 
             if (inputPath) {
               const textValue = getNestedValue(args, inputPath);
               if (textValue !== undefined && textValue !== null) {
                 const result = await parseAndValidateSqlExpression(
                   textValue,
-                  validatorOptions
+                  effectiveOptions
                 );
 
                 if (!result.valid) {
                   throw new Error(
-                    `Invalid SQL expression in ${columnName}: ${result.error}`
+                    `Invalid SQL expression in ${textGqlName}: ${result.error}`
                   );
                 }
 
                 setNestedValue(args, inputPath, result.canonicalText);
 
-                if (astInputPath || canSetAstColumn(args, inputPath, astColumnName)) {
-                  const astPath = astInputPath || replaceLastSegment(inputPath, astColumnName);
+                if (astGqlName && (astInputPath || canSetAstColumn(args, inputPath, astGqlName))) {
+                  const astPath = astInputPath || replaceLastSegment(inputPath, astGqlName);
                   setNestedValue(args, astPath, result.ast);
                 }
               }
             }
 
-            if (astInputPath && !inputPath) {
+            if (astInputPath && !inputPath && astGqlName) {
               const astValue = getNestedValue(args, astInputPath);
               if (astValue !== undefined && astValue !== null) {
-                const result = await validateAst(astValue, validatorOptions);
+                const result = await validateAst(astValue, effectiveOptions);
 
                 if (!result.valid) {
                   throw new Error(
-                    `Invalid SQL expression AST in ${astColumnName}: ${result.error}`
+                    `Invalid SQL expression AST in ${astGqlName}: ${result.error}`
                   );
                 }
 
-                const textPath = replaceLastSegment(astInputPath, columnName);
-                if (canSetColumn(args, astInputPath, columnName)) {
+                const textPath = replaceLastSegment(astInputPath, textGqlName);
+                if (canSetColumn(args, astInputPath, textGqlName)) {
                   setNestedValue(args, textPath, result.canonicalText);
                 }
               }
             }
           }
 
-          return oldResolve(source, args, context, info);
+          return oldResolve(source, args, gqlContext, info);
         },
       };
     }
