@@ -1,3 +1,20 @@
+import { 
+  extractPgErrorFields, 
+  formatPgErrorFields, 
+  formatPgError,
+  type PgErrorFields,
+  type PgErrorContext
+} from '@pgpmjs/types';
+
+// Re-export PostgreSQL error formatting utilities
+export { 
+  extractPgErrorFields, 
+  formatPgErrorFields, 
+  formatPgError,
+  type PgErrorFields,
+  type PgErrorContext
+};
+
 const uuidRegexp = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // ID hash map for tracking ID relationships in snapshots

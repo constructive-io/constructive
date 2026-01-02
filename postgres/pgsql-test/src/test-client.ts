@@ -4,12 +4,49 @@ import { insertJsonMap, type JsonSeedMap } from 'pgsql-seed';
 import { loadCsvMap, type CsvSeedMap } from 'pgsql-seed';
 import { loadSqlFiles } from 'pgsql-seed';
 import { deployPgpm } from 'pgsql-seed';
+import { QueryResult } from 'pg';
+import { formatPgError } from './utils';
 
-export type PgTestClientOpts = PgClientOpts;
+export type PgTestClientOpts = PgClientOpts & {
+  /**
+   * Enable enhanced PostgreSQL error messages with extended fields.
+   * Defaults to true. Errors will include detail, hint, where, position, etc.
+   * Can be disabled by setting enhancedErrors: false.
+   */
+  enhancedErrors?: boolean;
+};
 
 export class PgTestClient extends PgClient {
+  protected testOpts: PgTestClientOpts;
+
   constructor(config: PgConfig, opts: PgTestClientOpts = {}) {
     super(config, opts);
+    this.testOpts = opts;
+  }
+
+  /**
+   * Check if enhanced errors are enabled. Defaults to true.
+   * Can be disabled by setting enhancedErrors: false in options.
+   */
+  private shouldEnhanceErrors(): boolean {
+    // Default to true unless explicitly disabled via option
+    return this.testOpts.enhancedErrors !== false;
+  }
+
+  /**
+   * Override query to enhance PostgreSQL errors with extended fields.
+   * When enhancedErrors is enabled, errors will include detail, hint, where, position, etc.
+   */
+  async query<T = any>(query: string, values?: any[]): Promise<QueryResult<T>> {
+    try {
+      return await super.query<T>(query, values);
+    } catch (err: any) {
+      if (this.shouldEnhanceErrors()) {
+        // Enhance the error message with PostgreSQL extended fields
+        err.message = formatPgError(err, { query, values });
+      }
+      throw err;
+    }
   }
 
   async beforeEach(): Promise<void> {

@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Enhanced PostgreSQL Error Messages JSON/JSONB Type Mismatch Errors snapshot: JSON/JSONB type mismatch error 1`] = `
+"invalid input syntax for type json
+Detail: Token "not_valid_json" is invalid.
+Where: JSON data, line 1: not_valid_json
+Query: INSERT INTO test_json_errors (name, config) VALUES ($1, $2)
+Values: ["test_name","not_valid_json"]"
+`;
+
+exports[`Enhanced PostgreSQL Error Messages Unique Constraint Violation Errors snapshot: unique constraint violation error 1`] = `
+"duplicate key value violates unique constraint "test_unique_errors_email_key"
+Detail: Key (email)=(admin@example.com) already exists.
+Schema: public
+Table: test_unique_errors
+Constraint: test_unique_errors_email_key
+Query: INSERT INTO test_unique_errors (email) VALUES ($1)
+Values: ["admin@example.com"]"
+`;
+
+exports[`Enhanced PostgreSQL Error Messages Foreign Key Violation Errors snapshot: foreign key violation error 1`] = `
+"insert or update on table "test_child" violates foreign key constraint "test_child_parent_id_fkey"
+Detail: Key (parent_id)=(999) is not present in table "test_parent".
+Schema: public
+Table: test_child
+Constraint: test_child_parent_id_fkey
+Query: INSERT INTO test_child (parent_id) VALUES ($1)
+Values: [999]"
+`;
+
+exports[`Enhanced PostgreSQL Error Messages Undefined Table Errors snapshot: undefined table error 1`] = `
+"relation "nonexistent_table_xyz" does not exist
+Position: 15
+Query: SELECT * FROM nonexistent_table_xyz"
+`;
+
+exports[`Enhanced PostgreSQL Error Messages Nested PL/pgSQL Errors (Migration-style) snapshot: nested EXECUTE error with PL/pgSQL call stack 1`] = `
+"relation "nonexistent_migration_table" does not exist
+Where: PL/pgSQL function test_migration_error() line 3 at EXECUTE
+Internal Query: INSERT INTO nonexistent_migration_table (col) VALUES (1)
+Internal Position: 13
+Query: SELECT test_migration_error()"
+`;
+
+exports[`Enhanced PostgreSQL Error Messages Nested PL/pgSQL Errors (Migration-style) snapshot: constraint violation inside nested EXECUTE 1`] = `
+"duplicate key value violates unique constraint "test_nested_unique_code_key"
+Detail: Key (code)=(ABC123) already exists.
+Where: SQL statement "INSERT INTO test_nested_unique (code) VALUES ('ABC123')"
+PL/pgSQL function test_nested_unique_error() line 4 at EXECUTE
+Schema: public
+Table: test_nested_unique
+Constraint: test_nested_unique_code_key
+Query: SELECT test_nested_unique_error()"
+`;
