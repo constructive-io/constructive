@@ -1915,30 +1915,6 @@ importers:
         version: 0.1.9
     publishDirectory: dist
 
-  sandbox/my-first:
-    devDependencies:
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
-
-  sandbox/my-second:
-    devDependencies:
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
-
-  sandbox/my-third:
-    devDependencies:
-      '@pgpmjs/core':
-        specifier: workspace:^
-        version: link:../../pgpm/core/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
-
   uploads/content-type-stream:
     dependencies:
       etag-hash:

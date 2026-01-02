@@ -7,4 +7,3 @@ packages:
   - 'graphile/*'
   - 'jobs/*'
   - 'functions/*'
-  - 'sandbox/*'
