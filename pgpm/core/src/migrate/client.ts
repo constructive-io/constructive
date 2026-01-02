@@ -1,5 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { errors, extractPgErrorFields, formatPgErrorFields } from '@pgpmjs/types';
+import { errors, extractPgErrorFields, formatPgError, formatPgErrorFields } from '@pgpmjs/types';
 import { readFileSync } from 'fs';
 import { dirname,join } from 'path';
 import { Pool } from 'pg';
@@ -273,6 +273,14 @@ export class PgpmMigrate {
           log.error(errorLines.join('\n'));
           
           failed = change.name;
+          
+          // Enhance the thrown error message with PostgreSQL extended fields
+          // This ensures callers get the same enhanced error format as PgTestClient
+          if (!(error as any).__pgpmEnhanced) {
+            error.message = formatPgError(error);
+            (error as any).__pgpmEnhanced = true;
+          }
+          
           throw error; // Re-throw to trigger rollback if in transaction
         }
         
@@ -354,6 +362,13 @@ export class PgpmMigrate {
 
           log.error(`Failed to revert ${change.name}:`, error);
           failed = change.name;
+          
+          // Enhance the thrown error message with PostgreSQL extended fields
+          if (!(error as any).__pgpmEnhanced) {
+            error.message = formatPgError(error);
+            (error as any).__pgpmEnhanced = true;
+          }
+          
           throw error; // Re-throw to trigger rollback if in transaction
         }
       }
