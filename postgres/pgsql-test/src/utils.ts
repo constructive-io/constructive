@@ -15,7 +15,26 @@ export {
   type PgErrorContext
 };
 
-const uuidRegexp = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/**
+ * Extract the error code from an error message.
+ * 
+ * Enhanced error messages from PgTestClient include additional context on subsequent lines
+ * (Where, Query, Values, etc.). This function returns only the first line, which contains
+ * the actual error code raised by PostgreSQL.
+ * 
+ * @param message - The error message (may contain multiple lines with debug context)
+ * @returns The first line of the error message (the error code)
+ * 
+ * @example
+ * // Error message with enhanced context:
+ * // "NONEXISTENT_TYPE\nWhere: PL/pgSQL function...\nQuery: INSERT INTO..."
+ * getErrorCode(err.message) // => "NONEXISTENT_TYPE"
+ */
+export function getErrorCode(message: string): string {
+  return message.split('\n')[0];
+}
+
+const uuidRegexp= /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // ID hash map for tracking ID relationships in snapshots
 // Values can be numbers (e.g., 1 -> [ID-1]) or strings (e.g., 'user2' -> [ID-user2])
