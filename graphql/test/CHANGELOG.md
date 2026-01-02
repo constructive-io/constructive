@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.11.39](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@2.11.38...@constructive-io/graphql-test@2.11.39) (2026-01-02)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
 ## [2.11.38](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@2.11.37...@constructive-io/graphql-test@2.11.38) (2025-12-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

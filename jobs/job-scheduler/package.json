@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/job-scheduler",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "description": "job scheduler",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/job-scheduler#readme",
