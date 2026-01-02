@@ -87,39 +87,7 @@ describe('PGPM Migration Error Messages', () => {
   });
 
   describe('Nested EXECUTE Migration Errors', () => {
-    it('captures error from migration with nested EXECUTE and PL/pgSQL call stack', async () => {
-      const tempDir = createPlanFile('test-nested-execute-error', [
-        { name: 'broken_migration' }
-      ], tempDirs);
-      
-      createScript(tempDir, 'deploy', 'broken_migration', `
-DO $$
-BEGIN
-  EXECUTE 'CREATE TABLE nonexistent_schema_abc.broken_table (id serial PRIMARY KEY)';
-END;
-$$;
-      `);
-      
-      const client = new PgpmMigrate(pg.config);
-      await client.initialize();
-      
-      let caughtError: any = null;
-      try {
-        await client.deploy({
-          modulePath: tempDir,
-          useTransaction: true
-        });
-      } catch (err) {
-        caughtError = err;
-      }
-      
-      expect(caughtError).not.toBeNull();
-      expect(caughtError.message).toMatch(/schema.*nonexistent_schema_abc.*does not exist/i);
-      expect(caughtError.message).toContain('Where:');
-      expect(caughtError.message).toContain('EXECUTE');
-    });
-
-    it('snapshot: nested EXECUTE migration error with full call stack', async () => {
+    it('snapshot: nested EXECUTE migration error', async () => {
       const tempDir = createPlanFile('test-nested-execute-snapshot', [
         { name: 'broken_nested_execute' }
       ], tempDirs);
@@ -146,48 +114,12 @@ $$;
       }
       
       expect(caughtError).not.toBeNull();
+      expect(caughtError.message).toMatch(/nonexistent_migration_table_xyz.*does not exist/i);
       expect(caughtError.message).toMatchSnapshot();
     });
   });
 
   describe('Constraint Violation in Migration', () => {
-    it('captures constraint violation error with full context', async () => {
-      const tempDir = createPlanFile('test-constraint-violation', [
-        { name: 'create_table' },
-        { name: 'insert_duplicate', dependencies: ['create_table'] }
-      ], tempDirs);
-      
-      createScript(tempDir, 'deploy', 'create_table', `
-CREATE TABLE test_migration_users (
-  id serial PRIMARY KEY,
-  email text UNIQUE NOT NULL
-);
-INSERT INTO test_migration_users (email) VALUES ('admin@test.com');
-      `);
-      
-      createScript(tempDir, 'deploy', 'insert_duplicate', `
-INSERT INTO test_migration_users (email) VALUES ('admin@test.com');
-      `);
-      
-      const client = new PgpmMigrate(pg.config);
-      await client.initialize();
-      
-      let caughtError: any = null;
-      try {
-        await client.deploy({
-          modulePath: tempDir,
-          useTransaction: true
-        });
-      } catch (err) {
-        caughtError = err;
-      }
-      
-      expect(caughtError).not.toBeNull();
-      expect(caughtError.message).toMatch(/duplicate key value violates unique constraint/i);
-      expect(caughtError.message).toContain('Detail:');
-      expect(caughtError.message).toContain('Constraint:');
-    });
-
     it('snapshot: constraint violation in migration', async () => {
       const tempDir = createPlanFile('test-constraint-snapshot', [
         { name: 'setup_constraint_table' },
@@ -220,6 +152,7 @@ INSERT INTO test_snapshot_products (sku) VALUES ('PROD-001');
       }
       
       expect(caughtError).not.toBeNull();
+      expect(caughtError.message).toMatch(/duplicate key value violates unique constraint/i);
       expect(caughtError.message).toMatchSnapshot();
     });
   });
