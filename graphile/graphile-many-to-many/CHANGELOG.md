@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.45](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.44...graphile-many-to-many@1.0.45) (2026-01-02)
+
+**Note:** Version bump only for package graphile-many-to-many
+
 ## [1.0.44](https://github.com/constructive-io/constructive/compare/graphile-many-to-many@1.0.43...graphile-many-to-many@1.0.44) (2026-01-02)
 
 **Note:** Version bump only for package graphile-many-to-many

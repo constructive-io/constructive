@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.20.8...pgsql-test@2.21.0) (2026-01-02)
+
+### Bug Fixes
+
+- correct JSON type mismatch snapshot where field format ([efb43ec](https://github.com/constructive-io/constructive/commit/efb43ec37c8ff246b96e9c2bf86eaf845686be9c))
+- simplify pgpm migration error tests to capture raw error messages ([e1c9502](https://github.com/constructive-io/constructive/commit/e1c9502ec849ab03906c5b7f4887d2de4aff9b42))
+- update snapshot file header to use correct Jest URL ([7972b5f](https://github.com/constructive-io/constructive/commit/7972b5f8a9fb4fd67ec193114592593cd552b10b))
+
+### Features
+
+- add pgpm migration error tests using pgsql-test framework ([77f2edf](https://github.com/constructive-io/constructive/commit/77f2edfdea182f023e50a66915fd23ceade5731e))
+- add snapshot file for pgpm migration error tests ([327b1e6](https://github.com/constructive-io/constructive/commit/327b1e689c280fdd951cf072945774ed763d673a))
+- add snapshot file with real PostgreSQL error output ([1b7ab0c](https://github.com/constructive-io/constructive/commit/1b7ab0cbd51df6b4cae23c0d7775e4b520ee80b6))
+- add snapshot tests for error message formatting ([a523999](https://github.com/constructive-io/constructive/commit/a523999cbad627934ae1ce75375005d639865235))
+- improve PostgreSQL error messages with extended fields ([6d2ef31](https://github.com/constructive-io/constructive/commit/6d2ef3174daae4db36e2ed1c54eb070f0d143ffd))
+- make enhanced errors default to true in PgTestClient ([6f20eb3](https://github.com/constructive-io/constructive/commit/6f20eb3396c03fdb422d64a193d716fcec7e2597))
+- remove process.env usage and add migration error tests ([a9de303](https://github.com/constructive-io/constructive/commit/a9de303e0efbe1adb81d959ce1d45c3d322380b4))
+
 ## [2.20.8](https://github.com/constructive-io/constructive/compare/pgsql-test@2.20.7...pgsql-test@2.20.8) (2026-01-02)
 
 **Note:** Version bump only for package pgsql-test

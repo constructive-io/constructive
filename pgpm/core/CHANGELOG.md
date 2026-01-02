@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.3...@pgpmjs/core@4.7.0) (2026-01-02)
+
+### Bug Fixes
+
+- preserve PostgreSQL error diagnostics in pgpm_migrate stored procedures ([b54d144](https://github.com/constructive-io/constructive/commit/b54d14448ad83af614fea098e2971896d5a558f8))
+
+### Features
+
+- enhance PgpmMigrate thrown errors with extended PostgreSQL fields ([c3c2c33](https://github.com/constructive-io/constructive/commit/c3c2c333b7ad8737d0798e9e31c1f3ceed4c1af5))
+- improve PostgreSQL error messages with extended fields ([6d2ef31](https://github.com/constructive-io/constructive/commit/6d2ef3174daae4db36e2ed1c54eb070f0d143ffd))
+
 ## [4.6.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.2...@pgpmjs/core@4.6.3) (2026-01-02)
 
 **Note:** Version bump only for package @pgpmjs/core

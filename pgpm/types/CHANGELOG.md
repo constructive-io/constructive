@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.13.0...@pgpmjs/types@2.14.0) (2026-01-02)
+
+### Features
+
+- improve PostgreSQL error messages with extended fields ([6d2ef31](https://github.com/constructive-io/constructive/commit/6d2ef3174daae4db36e2ed1c54eb070f0d143ffd))
+
 # [2.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.12.8...@pgpmjs/types@2.13.0) (2025-12-31)
 
 ### Features
