@@ -17,7 +17,17 @@ PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 4
 }
 `;
 
-exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration: error message 1`] = `"duplicate key value violates unique constraint "test_snapshot_products_sku_key""`;
+exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration: error message 1`] = `
+"duplicate key value violates unique constraint "test_snapshot_products_sku_key"
+Detail: Key (sku)=(PROD-001) already exists.
+Where: SQL statement "
+INSERT INTO test_snapshot_products (sku) VALUES ('PROD-001');
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE
+Schema: public
+Table: test_snapshot_products
+Constraint: test_snapshot_products_sku_key"
+`;
 
 exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error fields 1`] = `
 {
@@ -36,7 +46,16 @@ PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 4
 }
 `;
 
-exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error message 1`] = `"invalid input syntax for type json"`;
+exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error message 1`] = `
+"invalid input syntax for type json
+Detail: Token "not_valid_json" is invalid.
+Where: JSON data, line 1: not_valid_json
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE
+Internal Query: 
+INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_json');
+      
+Internal Position: 69"
+`;
 
 exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error fields 1`] = `
 {
@@ -60,4 +79,17 @@ PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 4
 }
 `;
 
-exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error message 1`] = `"relation "nonexistent_migration_table_xyz" does not exist"`;
+exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error message 1`] = `
+"relation "nonexistent_migration_table_xyz" does not exist
+Where: PL/pgSQL function inline_code_block line 3 at EXECUTE
+SQL statement "
+DO $$
+BEGIN
+  EXECUTE 'INSERT INTO nonexistent_migration_table_xyz (col) VALUES (1)';
+END;
+$$;
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE
+Internal Query: INSERT INTO nonexistent_migration_table_xyz (col) VALUES (1)
+Internal Position: 13"
+`;
