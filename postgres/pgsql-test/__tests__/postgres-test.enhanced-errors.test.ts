@@ -196,5 +196,102 @@ describe('PostgreSQL Error Formatting Utilities', () => {
       expect(formatted).toContain('Position: 15');
       expect(formatted).toContain('Query: SELECT * FROM nonexistent_table');
     });
+
+    it('formats nested EXECUTE migration error with full call stack context', () => {
+      // This simulates what PostgreSQL returns when an error occurs inside
+      // a nested EXECUTE call in the pgpm migration deploy flow:
+      // 1. Client calls: CALL pgpm_migrate.deploy(...)
+      // 2. pgpm_migrate.deploy does: EXECUTE p_deploy_sql
+      // 3. The deploy SQL contains a PL/pgSQL block that fails
+      //
+      // The 'where' field contains the full PL/pgSQL call stack
+      const mockError = {
+        message: 'relation "nonexistent_schema.some_table" does not exist',
+        code: '42P01',
+        where: `PL/pgSQL function inline_code_block line 5 at SQL statement
+SQL statement "CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY)"
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 15 at EXECUTE`,
+        internalQuery: 'CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY)',
+        position: '14'
+      };
+
+      const formatted = formatPgError(mockError, {
+        query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
+        values: ['my_package', 'create_tables', 'abc123', null, 'DO $$ BEGIN CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY); END $$;', false]
+      });
+      
+      // Verify the error message is included
+      expect(formatted).toContain('relation "nonexistent_schema.some_table" does not exist');
+      
+      // Verify the nested call stack is captured in the 'where' field
+      expect(formatted).toContain('Where:');
+      expect(formatted).toContain('inline_code_block');
+      expect(formatted).toContain('pgpm_migrate.deploy');
+      expect(formatted).toContain('EXECUTE');
+      
+      // Verify the internal query (the actual failing SQL) is captured
+      expect(formatted).toContain('Internal Query:');
+      expect(formatted).toContain('CREATE TABLE nonexistent_schema.some_table');
+      
+      // Verify the outer query context is included
+      expect(formatted).toContain('Query: CALL pgpm_migrate.deploy');
+      expect(formatted).toContain('Values:');
+      expect(formatted).toContain('my_package');
+      expect(formatted).toContain('create_tables');
+    });
+
+    it('formats migration error with constraint violation in nested EXECUTE', () => {
+      // Simulates a constraint violation that occurs inside a migration script
+      // executed via pgpm_migrate.deploy -> EXECUTE
+      const mockError = {
+        message: 'duplicate key value violates unique constraint "users_email_key"',
+        code: '23505',
+        detail: 'Key (email)=(admin@example.com) already exists.',
+        schema: 'public',
+        table: 'users',
+        constraint: 'users_email_key',
+        where: `SQL statement "INSERT INTO users (email, name) VALUES ('admin@example.com', 'Admin')"
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 15 at EXECUTE`
+      };
+
+      const formatted = formatPgError(mockError, {
+        query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
+        values: ['my_package', 'seed_users', 'def456', null, "INSERT INTO users (email, name) VALUES ('admin@example.com', 'Admin');", false]
+      });
+      
+      // Verify constraint violation details are captured
+      expect(formatted).toContain('duplicate key value violates unique constraint');
+      expect(formatted).toContain('Detail: Key (email)=(admin@example.com) already exists.');
+      expect(formatted).toContain('Schema: public');
+      expect(formatted).toContain('Table: users');
+      expect(formatted).toContain('Constraint: users_email_key');
+      
+      // Verify the nested call stack shows where the error occurred
+      expect(formatted).toContain('Where:');
+      expect(formatted).toContain('pgpm_migrate.deploy');
+      expect(formatted).toContain('EXECUTE');
+    });
+
+    it('formats transaction aborted error with context from previous failure', () => {
+      // When a previous command in a transaction fails, subsequent commands
+      // get error code 25P02 (transaction aborted). This test verifies we
+      // capture enough context to help debug the original failure.
+      const mockError = {
+        message: 'current transaction is aborted, commands ignored until end of transaction block',
+        code: '25P02'
+      };
+
+      const formatted = formatPgError(mockError, {
+        query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
+        values: ['my_package', 'second_change', 'ghi789', ['first_change'], 'CREATE INDEX ...', false]
+      });
+      
+      // Verify the transaction aborted error is captured
+      expect(formatted).toContain('current transaction is aborted');
+      
+      // Verify query context is included to help identify which command triggered this
+      expect(formatted).toContain('Query: CALL pgpm_migrate.deploy');
+      expect(formatted).toContain('second_change');
+    });
   });
 });

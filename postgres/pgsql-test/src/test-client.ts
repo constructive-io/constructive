@@ -11,7 +11,7 @@ export type PgTestClientOpts = PgClientOpts & {
   /**
    * Enable enhanced PostgreSQL error messages with extended fields.
    * Defaults to true. Errors will include detail, hint, where, position, etc.
-   * Can be disabled via enhancedErrors: false or PGSQL_TEST_ENHANCED_ERRORS=0 environment variable.
+   * Can be disabled by setting enhancedErrors: false.
    */
   enhancedErrors?: boolean;
 };
@@ -26,20 +26,11 @@ export class PgTestClient extends PgClient {
 
   /**
    * Check if enhanced errors are enabled. Defaults to true.
-   * Can be disabled via enhancedErrors: false or PGSQL_TEST_ENHANCED_ERRORS=0 environment variable.
+   * Can be disabled by setting enhancedErrors: false in options.
    */
   private shouldEnhanceErrors(): boolean {
-    // Check if explicitly disabled via option
-    if (this.testOpts.enhancedErrors === false) {
-      return false;
-    }
-    // Check if explicitly disabled via environment variable
-    if (process.env.PGSQL_TEST_ENHANCED_ERRORS === '0' || 
-        process.env.PGSQL_TEST_ENHANCED_ERRORS === 'false') {
-      return false;
-    }
-    // Default to true
-    return true;
+    // Default to true unless explicitly disabled via option
+    return this.testOpts.enhancedErrors !== false;
   }
 
   /**
