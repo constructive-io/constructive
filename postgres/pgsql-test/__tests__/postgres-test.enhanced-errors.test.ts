@@ -294,4 +294,44 @@ PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 1
       expect(formatted).toContain('second_change');
     });
   });
+
+  describe('Error Message Snapshots', () => {
+    it('snapshot: JSON/JSONB type mismatch error', () => {
+      // Simple case: inserting plain text into a jsonb column
+      const mockError = {
+        message: 'invalid input syntax for type json',
+        code: '22P02',
+        detail: 'Token "not_valid_json" is invalid.',
+        position: '52'
+      };
+
+      const formatted = formatPgError(mockError, {
+        query: 'INSERT INTO test_constraints (name, config) VALUES ($1, $2)',
+        values: ['test_name', 'not_valid_json']
+      });
+      
+      expect(formatted).toMatchSnapshot();
+    });
+
+    it('snapshot: nested EXECUTE migration error with full call stack', () => {
+      // Complex case: error inside pgpm_migrate.deploy -> EXECUTE p_deploy_sql
+      // This shows the full PL/pgSQL call stack in the 'where' field
+      const mockError = {
+        message: 'relation "nonexistent_schema.some_table" does not exist',
+        code: '42P01',
+        where: `PL/pgSQL function inline_code_block line 5 at SQL statement
+SQL statement "CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY)"
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 15 at EXECUTE`,
+        internalQuery: 'CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY)',
+        position: '14'
+      };
+
+      const formatted = formatPgError(mockError, {
+        query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
+        values: ['my_package', 'create_tables', 'abc123hash', null, 'DO $$ BEGIN CREATE TABLE nonexistent_schema.some_table (id serial PRIMARY KEY); END $$;', false]
+      });
+      
+      expect(formatted).toMatchSnapshot();
+    });
+  });
 });
