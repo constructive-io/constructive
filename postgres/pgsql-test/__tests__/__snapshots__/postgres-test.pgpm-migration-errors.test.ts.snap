@@ -5,12 +5,15 @@ exports[`PGPM Migration Error Messages Constraint Violation in Migration snapsho
   "code": "23505",
   "constraint": "test_snapshot_products_sku_key",
   "detail": "Key (sku)=(PROD-001) already exists.",
-  "hint": "",
+  "hint": undefined,
   "internalQuery": undefined,
   "position": undefined,
   "schema": "public",
   "table": "test_snapshot_products",
-  "where": "PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 73 at RAISE",
+  "where": "SQL statement "
+INSERT INTO test_snapshot_products (sku) VALUES ('PROD-001');
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
 
@@ -19,22 +22,21 @@ exports[`PGPM Migration Error Messages Constraint Violation in Migration snapsho
 exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error fields 1`] = `
 {
   "code": "22P02",
-  "constraint": "",
+  "constraint": undefined,
   "detail": "Token "not_valid_json" is invalid.",
-  "hint": "",
-  "internalQuery": undefined,
+  "hint": undefined,
+  "internalQuery": "
+INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_json');
+      ",
   "position": undefined,
-  "schema": "",
-  "table": "",
-  "where": "PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 73 at RAISE",
+  "schema": undefined,
+  "table": undefined,
+  "where": "JSON data, line 1: not_valid_json
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
 
-exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error message 1`] = `
-"invalid input syntax for type json
-Detail: Token "not_valid_json" is invalid.
-Where: PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 73 at RAISE"
-`;
+exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error message 1`] = `"invalid input syntax for type json"`;
 
 exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error fields 1`] = `
 {
