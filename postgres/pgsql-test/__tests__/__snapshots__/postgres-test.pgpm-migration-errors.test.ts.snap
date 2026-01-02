@@ -32,9 +32,6 @@ INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_js
   "schema": undefined,
   "table": undefined,
   "where": "JSON data, line 1: not_valid_json
-SQL statement "
-INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_json');
-      "
 PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
