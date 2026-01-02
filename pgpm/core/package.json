@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "4.6.2",
+  "version": "4.6.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -55,13 +55,13 @@
     "csv-to-pg": "workspace:^",
     "genomic": "^5.2.0",
     "glob": "^13.0.0",
-    "komoji": "^0.7.11",
+    "komoji": "^0.7.14",
     "parse-package-name": "^1.0.0",
     "pg": "^8.16.3",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.15.0",
-    "pgsql-parser": "^17.9.5",
-    "yanse": "^0.1.8"
+    "pgsql-deparser": "^17.17.0",
+    "pgsql-parser": "^17.9.9",
+    "yanse": "^0.1.11"
   }
 }
