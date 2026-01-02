@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration 1`] = `"duplicate key value violates unique constraint "test_snapshot_products_sku_key""`;
 
