@@ -200,30 +200,30 @@ export default `
         <article>
             <div class="vcntr">
                 <div class="logo">
-                <svg viewBox="-115 -130 440 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="-115 -900 440 1450" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
     @keyframes cube0 {
-      0%, 0% { transform: translate(0.0px, -600.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 0% { transform: translate(0.0px, -600.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       35.7%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     @keyframes cube1 {
-      0%, 8.6% { transform: translate(0.0px, -680.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 8.6% { transform: translate(0.0px, -680.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       44.3%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     @keyframes cube2 {
-      0%, 17.1% { transform: translate(0.0px, -760.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 17.1% { transform: translate(0.0px, -760.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       52.9%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     @keyframes cube3 {
-      0%, 25.7% { transform: translate(0.0px, -840.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 25.7% { transform: translate(0.0px, -840.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       61.4%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     @keyframes cube4 {
-      0%, 34.3% { transform: translate(0.0px, -920.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 34.3% { transform: translate(0.0px, -920.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       70%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     @keyframes cube5 {
-      0%, 42.9% { transform: translate(0.0px, -1000.0px) rotate(0.0deg) scale(1.00); opacity: 0.3; }
+      0%, 42.9% { transform: translate(0.0px, -1000.0px) rotate(0.0deg) scale(1.00); opacity: 0; }
       78.6%, 100% { transform: translate(0.0px, 0.0px) rotate(0.0deg) scale(1.00); opacity: 1; }
     }
     .cube-0 { animation: cube0 1.40s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate; transform-origin: center; }
