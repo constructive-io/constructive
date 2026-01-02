@@ -2,15 +2,18 @@
 
 exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration: error fields 1`] = `
 {
-  "code": undefined,
-  "constraint": undefined,
-  "detail": undefined,
+  "code": "23505",
+  "constraint": "test_snapshot_products_sku_key",
+  "detail": "Key (sku)=(PROD-001) already exists.",
   "hint": undefined,
   "internalQuery": undefined,
   "position": undefined,
-  "schema": undefined,
-  "table": undefined,
-  "where": undefined,
+  "schema": "public",
+  "table": "test_snapshot_products",
+  "where": "SQL statement "
+INSERT INTO test_snapshot_products (sku) VALUES ('PROD-001');
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
 
@@ -18,15 +21,21 @@ exports[`PGPM Migration Error Messages Constraint Violation in Migration snapsho
 
 exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error fields 1`] = `
 {
-  "code": undefined,
+  "code": "22P02",
   "constraint": undefined,
-  "detail": undefined,
+  "detail": "Token "not_valid_json" is invalid.",
   "hint": undefined,
-  "internalQuery": undefined,
+  "internalQuery": "
+INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_json');
+      ",
   "position": undefined,
   "schema": undefined,
   "table": undefined,
-  "where": undefined,
+  "where": "JSON data, line 1: not_valid_json
+SQL statement "
+INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_json');
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
 
@@ -34,15 +43,23 @@ exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot:
 
 exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error fields 1`] = `
 {
-  "code": undefined,
+  "code": "42P01",
   "constraint": undefined,
   "detail": undefined,
   "hint": undefined,
-  "internalQuery": undefined,
+  "internalQuery": "INSERT INTO nonexistent_migration_table_xyz (col) VALUES (1)",
   "position": undefined,
   "schema": undefined,
   "table": undefined,
-  "where": undefined,
+  "where": "PL/pgSQL function inline_code_block line 3 at EXECUTE
+SQL statement "
+DO $$
+BEGIN
+  EXECUTE 'INSERT INTO nonexistent_migration_table_xyz (col) VALUES (1)';
+END;
+$$;
+      "
+PL/pgSQL function pgpm_migrate.deploy(text,text,text,text[],text,boolean) line 46 at EXECUTE",
 }
 `;
 
