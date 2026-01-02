@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.40](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.39...pg-codegen@2.15.40) (2026-01-02)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.39](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.38...pg-codegen@2.15.39) (2026-01-02)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.38](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.37...pg-codegen@2.15.38) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.37](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.36...pg-codegen@2.15.37) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.36](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.35...pg-codegen@2.15.36) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.35](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.34...pg-codegen@2.15.35) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.34](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.33...pg-codegen@2.15.34) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.33](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.32...pg-codegen@2.15.33) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.15.32](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.31...pg-codegen@2.15.32) (2025-12-31)
+
+**Note:** Version bump only for package pg-codegen
+
 ## [2.15.31](https://github.com/constructive-io/constructive/compare/pg-codegen@2.15.30...pg-codegen@2.15.31) (2025-12-27)
 
 **Note:** Version bump only for package pg-codegen

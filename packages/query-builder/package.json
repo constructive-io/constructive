@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/query-builder",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Query Builder",
   "main": "index.js",
@@ -36,6 +36,6 @@
     "database"
   ],
   "devDependencies": {
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "pg-ast",
-  "version": "2.4.11",
+  "version": "2.4.13",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ASTs in JS",
   "main": "index.js",
@@ -37,12 +37,12 @@
     "parse"
   ],
   "devDependencies": {
-    "makage": "^0.1.9",
-    "pg-proto-parser": "^1.30.2",
-    "pgsql-deparser": "^17.15.0"
+    "makage": "^0.1.10",
+    "pg-proto-parser": "^1.30.4",
+    "pgsql-deparser": "^17.17.0"
   },
   "dependencies": {
     "@pgsql/types": "^17.6.2",
-    "nested-obj": "0.1.7"
+    "nested-obj": "0.1.10"
   }
 }

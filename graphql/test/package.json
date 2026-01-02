@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-test",
-  "version": "2.11.31",
+  "version": "2.11.40",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Testing with all plugins loaded",
   "main": "index.js",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/pg": "^8.16.0",
     "graphql-tag": "2.12.6",
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",

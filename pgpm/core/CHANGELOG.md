@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.3...@pgpmjs/core@4.7.0) (2026-01-02)
+
+### Bug Fixes
+
+- preserve PostgreSQL error diagnostics in pgpm_migrate stored procedures ([b54d144](https://github.com/constructive-io/constructive/commit/b54d14448ad83af614fea098e2971896d5a558f8))
+
+### Features
+
+- enhance PgpmMigrate thrown errors with extended PostgreSQL fields ([c3c2c33](https://github.com/constructive-io/constructive/commit/c3c2c333b7ad8737d0798e9e31c1f3ceed4c1af5))
+- improve PostgreSQL error messages with extended fields ([6d2ef31](https://github.com/constructive-io/constructive/commit/6d2ef3174daae4db36e2ed1c54eb070f0d143ffd))
+
+## [4.6.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.2...@pgpmjs/core@4.6.3) (2026-01-02)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.6.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.1...@pgpmjs/core@4.6.2) (2025-12-31)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.6.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.0...@pgpmjs/core@4.6.1) (2025-12-31)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.4...@pgpmjs/core@4.6.0) (2025-12-31)
+
+### Features
+
+- **pgpm:** add outputDir option to initModule for explicit module directory control ([a37bb91](https://github.com/constructive-io/constructive/commit/a37bb910554a89dcd11e1baf1f0b539e0a95bd8a))
+
+## [4.5.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.3...@pgpmjs/core@4.5.4) (2025-12-31)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.5.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.2...@pgpmjs/core@4.5.3) (2025-12-31)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.5.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.1...@pgpmjs/core@4.5.2) (2025-12-31)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.5.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.5.0...@pgpmjs/core@4.5.1) (2025-12-31)
+
+### Bug Fixes
+
+- **pgpm:** fix AST round-trip diff comparison bug and add --outputDiff flag ([02ed48e](https://github.com/constructive-io/constructive/commit/02ed48e7649458fc1ade9397c5aba9d7a4eea722))
+
 # [4.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.4.0...@pgpmjs/core@4.5.0) (2025-12-27)
 
 ### Features

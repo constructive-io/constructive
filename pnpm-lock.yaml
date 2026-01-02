@@ -53,8 +53,8 @@ importers:
         specifier: ^8.2.3
         version: 8.2.4(@types/node@20.19.25)(encoding@0.1.13)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
@@ -126,8 +126,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       nodemon:
         specifier: ^3.1.10
         version: 3.1.11
@@ -176,8 +176,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -186,8 +186,8 @@ importers:
   graphile/graphile-many-to-many:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -202,8 +202,8 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -237,8 +237,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -260,8 +260,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -270,8 +270,8 @@ importers:
   graphile/graphile-plugin-connection-filter:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -295,8 +295,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -308,8 +308,8 @@ importers:
   graphile/graphile-plugin-connection-filter-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -333,8 +333,8 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -371,8 +371,8 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -381,8 +381,8 @@ importers:
   graphile/graphile-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -406,8 +406,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -429,8 +429,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphile/graphile-search-plugin:
@@ -455,8 +455,8 @@ importers:
         specifier: workspace:^
         version: link:../graphile-test/dist
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -553,8 +553,8 @@ importers:
         specifier: ^0.0.41
         version: 0.0.41
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       nodemon:
         specifier: ^3.1.10
         version: 3.1.11
@@ -576,11 +576,34 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
+  graphile/graphile-sql-expression-validator:
+    dependencies:
+      graphile-build:
+        specifier: ^4.14.1
+        version: 4.14.1(graphql@15.10.1)
+      graphql:
+        specifier: 15.10.1
+        version: 15.10.1
+      pgsql-deparser:
+        specifier: ^17.17.0
+        version: 17.17.0
+      pgsql-parser:
+        specifier: ^17.9.9
+        version: 17.9.9
+    devDependencies:
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+      ts-jest:
+        specifier: ^29.4.6
+        version: 29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-test:
@@ -617,8 +640,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphile/graphile-upload-plugin:
@@ -629,6 +652,9 @@ importers:
       '@constructive-io/upload-names':
         specifier: workspace:^
         version: link:../../uploads/upload-names/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../../pgpm/types/dist
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -655,8 +681,8 @@ importers:
         specifier: ^2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -709,9 +735,6 @@ importers:
       introspectron:
         specifier: workspace:^
         version: link:../../postgres/introspectron/dist
-      pluralize:
-        specifier: ^8.0.0
-        version: 8.0.0
     devDependencies:
       '@constructive-io/graphql-test':
         specifier: workspace:^
@@ -719,12 +742,12 @@ importers:
       '@types/babel__generator':
         specifier: ^7.27.0
         version: 7.27.0
-      '@types/pluralize':
-        specifier: 0.0.33
-        version: 0.0.33
+      '@types/inflection':
+        specifier: ^2.0.0
+        version: 2.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/env:
@@ -740,8 +763,8 @@ importers:
         version: 4.3.1
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/explorer:
@@ -802,8 +825,8 @@ importers:
         specifier: ^8.0.12
         version: 8.0.12
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       nodemon:
         specifier: ^3.1.10
         version: 3.1.11
@@ -819,8 +842,8 @@ importers:
         version: 15.10.1
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/query:
@@ -837,13 +860,10 @@ importers:
       inflection:
         specifier: 1.12.0
         version: 1.12.0
-      pluralize:
-        specifier: 8.0.0
-        version: 8.0.0
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/react:
@@ -877,8 +897,8 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/server:
@@ -1026,8 +1046,8 @@ importers:
         specifier: ^2.11.15
         version: 2.11.16(@babel/core@7.28.5)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       nodemon:
         specifier: ^3.1.10
         version: 3.1.11
@@ -1082,8 +1102,8 @@ importers:
         specifier: 2.12.6
         version: 2.12.6(graphql@15.10.1)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   graphql/types:
@@ -1105,8 +1125,8 @@ importers:
         version: 4.14.1
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   jobs/job-pg:
@@ -1258,7 +1278,7 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/server/dist
       '@inquirerer/utils':
-        specifier: ^3.1.1
+        specifier: ^3.1.2
         version: 3.1.2
       '@pgpmjs/core':
         specifier: workspace:^
@@ -1273,8 +1293,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       inquirerer:
         specifier: ^4.2.0
         version: 4.2.1
@@ -1297,11 +1317,11 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       yanse:
-        specifier: ^0.1.8
-        version: 0.1.8
+        specifier: ^0.1.11
+        version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.0
+        specifier: ^1.2.3
         version: 1.2.3(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1322,8 +1342,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -1342,8 +1362,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   packages/csv-to-pg:
@@ -1352,8 +1372,8 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
       '@pgsql/utils':
-        specifier: ^17.8.4
-        version: 17.8.7
+        specifier: ^17.8.9
+        version: 17.8.9
       csv-parser:
         specifier: ^2.3.3
         version: 2.3.5
@@ -1364,18 +1384,18 @@ importers:
         specifier: ^3.14.0
         version: 3.14.2
       pgsql-deparser:
-        specifier: ^17.15.0
-        version: 17.15.2
+        specifier: ^17.17.0
+        version: 17.17.0
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-parser:
-        specifier: ^17.9.5
-        version: 17.9.7
+        specifier: ^17.9.9
+        version: 17.9.9
     publishDirectory: dist
 
   packages/orm:
@@ -1388,15 +1408,15 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   packages/query-builder:
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   packages/server-utils:
@@ -1424,8 +1444,8 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.19.25)(typescript@5.9.3)
@@ -1441,14 +1461,14 @@ importers:
         specifier: ^5.0.6
         version: 5.0.6
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.1.1
+        specifier: ^3.1.2
         version: 3.1.2
       '@pgpmjs/core':
         specifier: workspace:^
@@ -1463,11 +1483,11 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       appstash:
-        specifier: ^0.2.6
-        version: 0.2.6
+        specifier: ^0.2.7
+        version: 0.2.7
       find-and-require-package-json:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.5
+        version: 0.8.5
       genomic:
         specifier: ^5.2.0
         version: 5.2.1
@@ -1493,11 +1513,11 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       yanse:
-        specifier: ^0.1.8
-        version: 0.1.8
+        specifier: ^0.1.11
+        version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.0
+        specifier: ^1.2.3
         version: 1.2.3(jest@30.2.0(@types/node@20.19.25)(ts-node@10.9.2(@types/node@20.19.25)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1521,8 +1541,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -1555,8 +1575,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       komoji:
-        specifier: ^0.7.11
-        version: 0.7.11
+        specifier: ^0.7.14
+        version: 0.7.14
       parse-package-name:
         specifier: ^1.0.0
         version: 1.0.0
@@ -1570,14 +1590,14 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^17.15.0
-        version: 17.15.2
+        specifier: ^17.17.0
+        version: 17.17.0
       pgsql-parser:
-        specifier: ^17.9.5
-        version: 17.9.7
+        specifier: ^17.9.9
+        version: 17.9.9
       yanse:
-        specifier: ^0.1.8
-        version: 0.1.8
+        specifier: ^0.1.11
+        version: 0.1.11
     devDependencies:
       '@pgsql/types':
         specifier: ^17.6.2
@@ -1592,8 +1612,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.1
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   pgpm/env:
@@ -1606,19 +1626,19 @@ importers:
         version: 4.3.1
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   pgpm/logger:
     dependencies:
       yanse:
-        specifier: ^0.1.8
-        version: 0.1.8
+        specifier: ^0.1.11
+        version: 0.1.11
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   pgpm/types:
@@ -1628,8 +1648,8 @@ importers:
         version: link:../../postgres/pg-env/dist
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/drizzle-orm-test:
@@ -1648,8 +1668,8 @@ importers:
         specifier: ^0.45.1
         version: 0.45.1(@types/pg@8.16.0)(pg@8.16.3)
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/introspectron:
@@ -1674,8 +1694,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pgsql-test:
         specifier: workspace:^
         version: link:../pgsql-test/dist
@@ -1687,18 +1707,18 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
       nested-obj:
-        specifier: 0.1.7
-        version: 0.1.7
+        specifier: 0.1.10
+        version: 0.1.10
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       pg-proto-parser:
-        specifier: ^1.30.2
-        version: 1.30.2
+        specifier: ^1.30.4
+        version: 1.30.4
       pgsql-deparser:
-        specifier: ^17.15.0
-        version: 17.15.2
+        specifier: ^17.17.0
+        version: 17.17.0
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -1723,8 +1743,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pg-codegen:
@@ -1764,15 +1784,15 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pg-env:
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pg-query-context:
@@ -1785,8 +1805,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pg-seed:
@@ -1808,8 +1828,8 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pgsql-client:
@@ -1834,8 +1854,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pgsql-seed:
@@ -1860,8 +1880,8 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/pgsql-test:
@@ -1894,6 +1914,9 @@ importers:
         specifier: workspace:^
         version: link:../pgsql-seed/dist
     devDependencies:
+      '@pgpmjs/core':
+        specifier: workspace:*
+        version: link:../../pgpm/core/dist
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
@@ -1901,8 +1924,8 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   postgres/supabase-test:
@@ -1921,33 +1944,9 @@ importers:
         version: link:../pgsql-test/dist
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
-
-  sandbox/my-first:
-    devDependencies:
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
-
-  sandbox/my-second:
-    devDependencies:
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
-
-  sandbox/my-third:
-    devDependencies:
-      '@pgpmjs/core':
-        specifier: workspace:^
-        version: link:../../pgpm/core/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
-      makage:
-        specifier: ^0.1.9
-        version: 0.1.9
 
   uploads/content-type-stream:
     dependencies:
@@ -1962,15 +1961,15 @@ importers:
         version: link:../uuid-hash/dist
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/etag-hash:
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/etag-stream:
@@ -1983,8 +1982,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/mime-bytes:
@@ -1993,8 +1992,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/s3-streamer:
@@ -2022,8 +2021,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/s3-utils:
@@ -2039,8 +2038,8 @@ importers:
         specifier: ^18.19.69
         version: 18.19.130
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/stream-to-etag:
@@ -2053,8 +2052,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/upload-names:
@@ -2063,15 +2062,15 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/uuid-hash:
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
   uploads/uuid-stream:
@@ -2081,8 +2080,8 @@ importers:
         version: link:../uuid-hash/dist
     devDependencies:
       makage:
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
     publishDirectory: dist
 
 packages:
@@ -3257,8 +3256,8 @@ packages:
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
 
-  '@pgsql/utils@17.8.7':
-    resolution: {integrity: sha512-g6e/3+4uLhTIeQ85sKUqfzxCsnz94p7FuLxQvA0ntUBGzUestdMx8vEQMo1Ktv9dIKG7+P29BLRmOrLVRAwTgg==}
+  '@pgsql/utils@17.8.9':
+    resolution: {integrity: sha512-CfSMMJygrUDBo/6Kj9Dp03IbZuGHM8M4RcMNHDpSquJZvGMH/DEr3fLFlLp05ikYInzgzbPn4ysOdajO0HckiQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3700,6 +3699,10 @@ packages:
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
+  '@types/inflection@2.0.0':
+    resolution: {integrity: sha512-wvtAa0dRWFxn/Dw7w7+LySUmN6Yvndvbc87djXaSc0KwhcG2g33LwXdaHg6p2KOddj/1+172GPSeazgandPO2Q==}
+    deprecated: This is a stub types definition. inflection provides its own type definitions, so you do not need this installed.
+
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
 
@@ -3762,9 +3765,6 @@ packages:
 
   '@types/pg@8.16.0':
     resolution: {integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==}
-
-  '@types/pluralize@0.0.33':
-    resolution: {integrity: sha512-JOqsl+ZoCpP4e8TDke9W79FDcSgPAR0l6pixx2JHkhnRjvShyYiAYw2LVsnA7K08Y6DeOnaU6ujmENO4os/cYg==}
 
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
@@ -6360,6 +6360,9 @@ packages:
   komoji@0.7.11:
     resolution: {integrity: sha512-AsyVaw7i/C9WmQsC5+RN+kMXzmMMI8EkY2TSE9jDlJiV9GQDWBAEJuHkmU9A8RElXDPLDFjKXSWsIMc8ejX4LA==}
 
+  komoji@0.7.14:
+    resolution: {integrity: sha512-iJlRccr/DTKcSumEHiTbvyt3V6GYmA762FmjhBAFlIKhoO87BPo7V0eHxSUgsILH8eYHHguk9KCmZ8xMIDPbHw==}
+
   lerna@8.2.4:
     resolution: {integrity: sha512-0gaVWDIVT7fLfprfwpYcQajb7dBJv3EGavjG7zvJ+TmGx3/wovl5GklnSwM2/WeE0Z2wrIz7ndWhBcDUHVjOcQ==}
     engines: {node: '>=18.0.0'}
@@ -6500,8 +6503,8 @@ packages:
     engines: {node: '>=6.0.0'}
     deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
-  makage@0.1.9:
-    resolution: {integrity: sha512-69vpRE3xhIl0QX3iYsj4RYXk0KRMfglzV6qs9IbI1Z2KZlQWzp33YFkBJ2SJhCGLsuzqiXGXcGCAywWwqyT01g==}
+  makage@0.1.10:
+    resolution: {integrity: sha512-IQKuRbHOrDgVNlydle+XRO5iMyaozBq4Bb9vhEzwxtvzyk08JkQo5qpfFRep0dSum53gECdX2gBoTmkWDHIfJA==}
     hasBin: true
 
   make-dir@2.1.0:
@@ -6857,11 +6860,11 @@ packages:
   nested-obj@0.0.1:
     resolution: {integrity: sha512-kB1WKTng+IePQhZVs1UXtFaHBx4QEM5a0XKGAzYfCKvdx5DhNjCytNDWMUGpNNpHLotln+tiwcA52kWCIgGq1Q==}
 
+  nested-obj@0.1.10:
+    resolution: {integrity: sha512-5V2kUPrBee/tmoS2p0IJ35BcaJuW1p1yXF5GP8JpXIkDoPbaYeYypAHizUeZkAUxcC7Rago7izWmEq7qa8+Mhw==}
+
   nested-obj@0.1.5:
     resolution: {integrity: sha512-04Y7qDMlI8RbYTn0cJAKaw/mLrO9UmLj3xbrjTZKDfOn9f3b/RXEQFIIpveJlwn8KfPwdVFWLZUaL5gNuQ7G0w==}
-
-  nested-obj@0.1.7:
-    resolution: {integrity: sha512-Be4D0jTttOEgVfXaA49X4woyBI0F9ubkBfGiBYtE90j5onZtJLkEt4xTf4b4g7+vlcxw1kN/FZ0NEPIFecYj4g==}
 
   netmask@1.0.6:
     resolution: {integrity: sha512-3DWDqAtIiPSkBXZyYEjwebfK56nrlQfRGt642fu8RPaL+ePu750+HCMHxjJCG3iEHq/0aeMvX6KIzlv7nuhfrA==}
@@ -7264,8 +7267,8 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-proto-parser@1.30.2:
-    resolution: {integrity: sha512-yeOA93aZx0AUtuduaW1uZfm2etQVR1JCMmXTaEQLTIE8blwqHGgOuGkxZpZOtCYi1jMCnLFF/LEqiQJPgEnXgA==}
+  pg-proto-parser@1.30.4:
+    resolution: {integrity: sha512-+9/n8zfYQVNRc8KGhxxNXO8NA5OKni01IPtit6+C3sLMtcRVVFCj4W0XtrEGFivNjz2qwUtFmRhG8OGMTxs6hg==}
 
   pg-protocol@1.10.3:
     resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
@@ -7299,20 +7302,14 @@ packages:
   pgsql-deparser@1.3.1:
     resolution: {integrity: sha512-TQ+cGdpvjoVlPoWjrEUcIvHI32+IGPevJQopAFtfKUIOV8dIQ6HxWCgLriwc6LCGkMnorp2n1jX0k7HVnlzgIg==}
 
-  pgsql-deparser@17.13.0:
-    resolution: {integrity: sha512-VyXNHqxd+MUVggJf/CfcONeOPAa80PRtTmDyfRxlYMPQS1VbDVYi91J4y7MSVdQwo1vV86jqploZF6zmNLzBdg==}
-
-  pgsql-deparser@17.15.2:
-    resolution: {integrity: sha512-GVOZ7us3Oc/l5+FqPtWb/dL9QxFfsD96aXw9qDoaTUeomb3IYZEQw0vsdO/pmfvfmDovYDmO1RccMe02BZA51Q==}
+  pgsql-deparser@17.17.0:
+    resolution: {integrity: sha512-mnEzQGEEWF52KfN8dn8gzK+8zbkYt0K+t+4Ka1sklrAczzIqWyWoFO1HWdBdnkociQxMJtkEbKg7wYNGcwVi4Q==}
 
   pgsql-enums@1.1.1:
     resolution: {integrity: sha512-Qfqw/tnSG4+ceC311Gzuf45QYavCbKbXOiXdVyie0n0ukR797sWhJvEUYPCx9MtO/OKEKtkoSQfzW1mq4kKTrg==}
 
-  pgsql-parser@17.9.3:
-    resolution: {integrity: sha512-V5jBV7gHp9Bakd1u0FbZi+sYCneUkuWHqgLunsMkVD8ModmJnH76LmIL+1RxDz6NAZOECwMfhxVOJzZLQDLN1A==}
-
-  pgsql-parser@17.9.7:
-    resolution: {integrity: sha512-fw0dSuBLRp7EZsFoj8Nw4WM//t0LEFpg3YxU+h5E+FNCV6ZbT8HaJFeKfRsE3Iiq77amkJ5aRPvxM7Kx3lK1Hg==}
+  pgsql-parser@17.9.9:
+    resolution: {integrity: sha512-GhX+VaQYCgi+PSzCNoxbm3dssJYSMkkceDhpgVCyeIuniBC2a5T4igjdz8qOKkZi+P4wocyfjE1/KINnrQZTrw==}
 
   pgsql-test@2.18.7:
     resolution: {integrity: sha512-I9auOiSACJ4bZVXa9YQWIVaAC87P5mP6J/czp1cDISc5XXY0/Ip6xhLVoCEQa3X6ziH9ZJ6n/HhMe5nqlkensg==}
@@ -7354,10 +7351,6 @@ packages:
 
   pluralize@7.0.0:
     resolution: {integrity: sha512-ARhBOdzS3e41FbkW/XWrTEtukqqLoK5+Z/4UeDaLuSW+39JPeFgs4gCGqsrJHVZX0fUrx//4OF0K1CUGwlIFow==}
-    engines: {node: '>=4'}
-
-  pluralize@8.0.0:
-    resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
   postcss-selector-parser@6.1.2:
@@ -10521,8 +10514,8 @@ snapshots:
       pg: 8.16.3
       pg-cache: 1.6.9
       pg-env: 1.2.4
-      pgsql-deparser: 17.13.0
-      pgsql-parser: 17.9.3
+      pgsql-deparser: 17.17.0
+      pgsql-parser: 17.9.9
       yanse: 0.1.8
     transitivePeerDependencies:
       - '@babel/core'
@@ -10536,7 +10529,7 @@ snapshots:
 
   '@pgpmjs/logger@1.3.5':
     dependencies:
-      yanse: 0.1.8
+      yanse: 0.1.11
 
   '@pgpmjs/server-utils@2.8.9':
     dependencies:
@@ -10554,7 +10547,7 @@ snapshots:
 
   '@pgsql/types@17.6.2': {}
 
-  '@pgsql/utils@17.8.7':
+  '@pgsql/utils@17.8.9':
     dependencies:
       '@pgsql/types': 17.6.2
       nested-obj: 0.1.5
@@ -11168,6 +11161,10 @@ snapshots:
 
   '@types/http-errors@2.0.5': {}
 
+  '@types/inflection@2.0.0':
+    dependencies:
+      inflection: 1.12.0
+
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -11244,8 +11241,6 @@ snapshots:
       '@types/node': 20.19.25
       pg-protocol: 1.10.3
       pg-types: 2.2.0
-
-  '@types/pluralize@0.0.33': {}
 
   '@types/qs@6.14.0': {}
 
@@ -14221,6 +14216,8 @@ snapshots:
 
   komoji@0.7.11: {}
 
+  komoji@0.7.14: {}
+
   lerna@8.2.4(@types/node@20.19.25)(encoding@0.1.13):
     dependencies:
       '@lerna/create': 8.2.4(@types/node@20.19.25)(encoding@0.1.13)(typescript@5.9.3)
@@ -14459,7 +14456,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  makage@0.1.9: {}
+  makage@0.1.10:
+    dependencies:
+      glob: 11.1.0
+      yaml: 2.8.1
 
   make-dir@2.1.0:
     dependencies:
@@ -14981,9 +14981,9 @@ snapshots:
 
   nested-obj@0.0.1: {}
 
-  nested-obj@0.1.5: {}
+  nested-obj@0.1.10: {}
 
-  nested-obj@0.1.7: {}
+  nested-obj@0.1.5: {}
 
   netmask@1.0.6: {}
 
@@ -15508,7 +15508,7 @@ snapshots:
     dependencies:
       pg: 8.16.3
 
-  pg-proto-parser@1.30.2:
+  pg-proto-parser@1.30.4:
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
@@ -15517,7 +15517,7 @@ snapshots:
       '@launchql/protobufjs': 7.2.6
       case: 1.6.3
       deepmerge: 4.3.1
-      nested-obj: 0.1.7
+      nested-obj: 0.1.10
       strfy-js: 3.1.5
     transitivePeerDependencies:
       - supports-color
@@ -15565,11 +15565,7 @@ snapshots:
       lodash: 4.17.20
       pgsql-enums: 1.1.1
 
-  pgsql-deparser@17.13.0:
-    dependencies:
-      '@pgsql/types': 17.6.2
-
-  pgsql-deparser@17.15.2:
+  pgsql-deparser@17.17.0:
     dependencies:
       '@pgsql/types': 17.6.2
 
@@ -15577,17 +15573,11 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  pgsql-parser@17.9.3:
+  pgsql-parser@17.9.9:
     dependencies:
       '@pgsql/types': 17.6.2
       libpg-query: 17.7.3
-      pgsql-deparser: 17.13.0
-
-  pgsql-parser@17.9.7:
-    dependencies:
-      '@pgsql/types': 17.6.2
-      libpg-query: 17.7.3
-      pgsql-deparser: 17.15.2
+      pgsql-deparser: 17.17.0
 
   pgsql-test@2.18.7(@babel/core@7.28.5):
     dependencies:
@@ -15627,8 +15617,6 @@ snapshots:
       find-up: 4.1.0
 
   pluralize@7.0.0: {}
-
-  pluralize@8.0.0: {}
 
   postcss-selector-parser@6.1.2:
     dependencies:

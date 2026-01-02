@@ -97,6 +97,7 @@ BEGIN
         BEGIN
             EXECUTE p_deploy_sql;
         EXCEPTION WHEN OTHERS THEN
+            -- Re-raise the original exception to preserve full context including SQL statement
             RAISE;
         END;
     END IF;
@@ -166,7 +167,12 @@ BEGIN
     END IF;
     
     -- Execute revert
-    EXECUTE p_revert_sql;
+    BEGIN
+        EXECUTE p_revert_sql;
+    EXCEPTION WHEN OTHERS THEN
+        -- Re-raise the original exception to preserve full context including SQL statement
+        RAISE;
+    END;
     
     -- Remove from deployed
     DELETE FROM pgpm_migrate.changes 

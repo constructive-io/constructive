@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.44](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.43...graphile-i18n@0.2.44) (2026-01-02)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.43](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.42...graphile-i18n@0.2.43) (2026-01-02)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.42](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.41...graphile-i18n@0.2.42) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.41](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.40...graphile-i18n@0.2.41) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.40](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.39...graphile-i18n@0.2.40) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.39](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.38...graphile-i18n@0.2.39) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.38](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.37...graphile-i18n@0.2.38) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.37](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.36...graphile-i18n@0.2.37) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
+## [0.2.36](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.35...graphile-i18n@0.2.36) (2025-12-31)
+
+**Note:** Version bump only for package graphile-i18n
+
 ## [0.2.35](https://github.com/constructive-io/constructive/compare/graphile-i18n@0.2.34...graphile-i18n@0.2.35) (2025-12-27)
 
 **Note:** Version bump only for package graphile-i18n

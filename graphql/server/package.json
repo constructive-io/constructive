@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "2.10.31",
+  "version": "2.11.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -88,7 +88,7 @@
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
     "graphile-test": "^2.11.15",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "nodemon": "^3.1.10",
     "pgsql-test": "workspace:^",
     "supertest": "^7.1.4",

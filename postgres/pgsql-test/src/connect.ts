@@ -15,6 +15,7 @@ import { PgTestConnector } from './manager';
 import { seed } from './seed';
 import { SeedAdapter } from './seed/types';
 import { PgTestClient } from './test-client';
+import { formatPgError } from './utils';
 
 let manager: PgTestConnector;
 
@@ -115,9 +116,9 @@ export const getConnections = async (
         pg: manager.getClient(config)
       });
     } catch (error) {
-      const err: any = error as any;
-      const msg = err && (err.stack || err.message) ? (err.stack || err.message) : String(err);
-      process.stderr.write(`[pgsql-test] Seed error (continuing): ${msg}\n`);
+      // Format the error with PostgreSQL extended fields for better debugging
+      const formatted = formatPgError(error);
+      process.stderr.write(`[pgsql-test] Seed error (continuing):\n${formatted}\n`);
       // continue without teardown to allow caller-managed lifecycle
     }
   }

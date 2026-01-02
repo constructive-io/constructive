@@ -13,16 +13,21 @@ import { getGraphQLEnvVars } from './env';
  * 
  * This is the main entry point for Constructive packages that need
  * both core PGPM options and GraphQL/Graphile options.
+ * 
+ * @param overrides - Runtime overrides to apply last
+ * @param cwd - Working directory for config file resolution
+ * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
 export const getEnvOptions = (
   overrides: Partial<ConstructiveOptions> = {}, 
-  cwd: string = process.cwd()
+  cwd: string = process.cwd(),
+  env: NodeJS.ProcessEnv = process.env
 ): ConstructiveOptions => {
   // Get core PGPM options (includes pgpmDefaults + config + core env vars)
-  const coreOptions = getPgpmEnvOptions({}, cwd);
+  const coreOptions = getPgpmEnvOptions({}, cwd, env);
   
   // Get GraphQL-specific env vars
-  const graphqlEnvOptions = getGraphQLEnvVars();
+  const graphqlEnvOptions = getGraphQLEnvVars(env);
   
   // Load config again to get any GraphQL-specific config
   // Config files can contain Constructive options (graphile, features, api)

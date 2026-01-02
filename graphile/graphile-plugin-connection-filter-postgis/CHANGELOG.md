@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.45](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.44...graphile-plugin-connection-filter-postgis@1.1.45) (2026-01-02)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.44](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.43...graphile-plugin-connection-filter-postgis@1.1.44) (2026-01-02)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.43](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.42...graphile-plugin-connection-filter-postgis@1.1.43) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.42](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.41...graphile-plugin-connection-filter-postgis@1.1.42) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.41](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.40...graphile-plugin-connection-filter-postgis@1.1.41) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.40](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.39...graphile-plugin-connection-filter-postgis@1.1.40) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.39](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.38...graphile-plugin-connection-filter-postgis@1.1.39) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.38](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.37...graphile-plugin-connection-filter-postgis@1.1.38) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.1.37](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.36...graphile-plugin-connection-filter-postgis@1.1.37) (2025-12-31)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
 ## [1.1.36](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.1.35...graphile-plugin-connection-filter-postgis@1.1.36) (2025-12-27)
 
 **Note:** Version bump only for package graphile-plugin-connection-filter-postgis

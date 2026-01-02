@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.10](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.9...@constructive-io/cli@5.4.10) (2026-01-02)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.9](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.8...@constructive-io/cli@5.4.9) (2026-01-02)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.8](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.7...@constructive-io/cli@5.4.8) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.7](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.6...@constructive-io/cli@5.4.7) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.6](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.5...@constructive-io/cli@5.4.6) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.5](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.4...@constructive-io/cli@5.4.5) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.3...@constructive-io/cli@5.4.4) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.2...@constructive-io/cli@5.4.3) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.4.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.1...@constructive-io/cli@5.4.2) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.4.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.0...@constructive-io/cli@5.4.1) (2025-12-27)
 
 **Note:** Version bump only for package @constructive-io/cli

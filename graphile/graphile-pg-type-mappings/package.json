@@ -1,6 +1,6 @@
 {
   "name": "graphile-pg-type-mappings",
-  "version": "0.3.36",
+  "version": "0.3.45",
   "description": "Custom PostgreSQL type mappings plugin for Graphile/PostGraphile",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -43,7 +43,7 @@
     "graphile-postgis": "workspace:^",
     "graphile-test": "workspace:^",
     "graphql-tag": "2.12.6",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {

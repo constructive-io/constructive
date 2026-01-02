@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.44](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.43...graphile-meta-schema@0.3.44) (2026-01-02)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.43](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.42...graphile-meta-schema@0.3.43) (2026-01-02)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.42](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.41...graphile-meta-schema@0.3.42) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.41](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.40...graphile-meta-schema@0.3.41) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.40](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.39...graphile-meta-schema@0.3.40) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.39](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.38...graphile-meta-schema@0.3.39) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.38](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.37...graphile-meta-schema@0.3.38) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.37](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.36...graphile-meta-schema@0.3.37) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
+## [0.3.36](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.35...graphile-meta-schema@0.3.36) (2025-12-31)
+
+**Note:** Version bump only for package graphile-meta-schema
+
 ## [0.3.35](https://github.com/constructive-io/constructive/compare/graphile-meta-schema@0.3.34...graphile-meta-schema@0.3.35) (2025-12-27)
 
 **Note:** Version bump only for package graphile-meta-schema

@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.3](https://github.com/constructive-io/constructive/compare/graphile-settings@2.10.2...graphile-settings@2.10.3) (2026-01-02)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.10.2](https://github.com/constructive-io/constructive/compare/graphile-settings@2.10.1...graphile-settings@2.10.2) (2026-01-02)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.10.1](https://github.com/constructive-io/constructive/compare/graphile-settings@2.10.0...graphile-settings@2.10.1) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
+# [2.10.0](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.36...graphile-settings@2.10.0) (2025-12-31)
+
+### Features
+
+- **cdn:** add BUCKET_PROVIDER env var for explicit storage provider selection ([e305ba0](https://github.com/constructive-io/constructive/commit/e305ba06ef62406e60b83f5b5eb784ec9c20316a))
+
+## [2.9.36](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.35...graphile-settings@2.9.36) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.9.35](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.34...graphile-settings@2.9.35) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.9.34](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.33...graphile-settings@2.9.34) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.9.33](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.32...graphile-settings@2.9.33) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.9.32](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.31...graphile-settings@2.9.32) (2025-12-31)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [2.9.31](https://github.com/constructive-io/constructive/compare/graphile-settings@2.9.30...graphile-settings@2.9.31) (2025-12-27)
 
 **Note:** Version bump only for package graphile-settings

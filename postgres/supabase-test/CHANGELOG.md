@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.40](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.39...supabase-test@0.4.40) (2026-01-02)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.39](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.38...supabase-test@0.4.39) (2026-01-02)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.38](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.37...supabase-test@0.4.38) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.37](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.36...supabase-test@0.4.37) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.36](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.35...supabase-test@0.4.36) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.35](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.34...supabase-test@0.4.35) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.34](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.33...supabase-test@0.4.34) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.33](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.32...supabase-test@0.4.33) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.4.32](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.31...supabase-test@0.4.32) (2025-12-31)
+
+**Note:** Version bump only for package supabase-test
+
 ## [0.4.31](https://github.com/constructive-io/constructive/compare/supabase-test@0.4.30...supabase-test@0.4.31) (2025-12-27)
 
 **Note:** Version bump only for package supabase-test

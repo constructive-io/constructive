@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/types",
-  "version": "2.12.8",
+  "version": "2.14.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM types",
   "main": "index.js",
@@ -40,6 +40,6 @@
     "migrations"
   ],
   "devDependencies": {
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   }
 }

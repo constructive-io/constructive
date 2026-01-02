@@ -26,7 +26,7 @@ This guide helps AI agents quickly navigate the Constructive monorepo. Construct
 - **`streaming/*`** – S3 helpers and stream hashing utilities
 - **`extensions/*`** – PGPM extension modules (Postgres extensions packaged as PGPM modules)
 - **`graphile/*`** – Graphile/PostGraphile plugins (kept under their own namespace)
-- **`jobs/*`**, **`functions/*`**, **`sandbox/*`** – supporting systems and examples
+- **`jobs/*`**, **`functions/*`** – supporting systems and examples
 
 ## Entry Points
 

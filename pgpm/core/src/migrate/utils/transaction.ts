@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { extractPgErrorFields, formatPgErrorFields } from '@pgpmjs/types';
 import { Pool, PoolClient } from 'pg';
 
 const log = new Logger('migrate:transaction');
@@ -88,6 +89,15 @@ export async function withTransaction<T>(
     errorLines.push(`Error Code: ${error.code || 'N/A'}`);
     errorLines.push(`Error Message: ${error.message || 'N/A'}`);
     
+    // Add extended PostgreSQL error fields
+    const pgFields = extractPgErrorFields(error);
+    if (pgFields) {
+      const fieldLines = formatPgErrorFields(pgFields);
+      if (fieldLines.length > 0) {
+        errorLines.push(...fieldLines);
+      }
+    }
+    
     // Log query history for debugging
     if (queryHistory.length > 0) {
       errorLines.push('Query history for this transaction:');
@@ -150,10 +160,19 @@ export async function executeQuery(
     errorLines.push(`Query failed after ${duration}ms:`);
     errorLines.push(`  Query: ${query.split('\n')[0].trim()}`);
     if (params && params.length > 0) {
-      errorLines.push(`  Params: ${JSON.stringify(params.slice(0, 3))}${params.length > 3 ? '...' : ''}`);
+      errorLines.push(`  Params: ${JSON.stringify(params)}`);
     }
     errorLines.push(`  Error Code: ${error.code || 'N/A'}`);
     errorLines.push(`  Error Message: ${error.message || 'N/A'}`);
+    
+    // Add extended PostgreSQL error fields
+    const pgFields = extractPgErrorFields(error);
+    if (pgFields) {
+      const fieldLines = formatPgErrorFields(pgFields);
+      if (fieldLines.length > 0) {
+        fieldLines.forEach(line => errorLines.push(`  ${line}`));
+      }
+    }
     
     // Provide debugging hints for common errors
     if (error.code === '42P01') {

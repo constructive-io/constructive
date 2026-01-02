@@ -1,6 +1,6 @@
 {
   "name": "pg-codegen",
-  "version": "2.15.31",
+  "version": "2.15.40",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Codegen",
   "main": "index.js",
@@ -52,6 +52,6 @@
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   }
 }

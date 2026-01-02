@@ -3,20 +3,10 @@ import { pgpmDefaults, PgpmOptions } from '@pgpmjs/types';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import {
-  applyEnvFixture,
-  loadEnvFixture,
-  loadEnvKeys,
-  restoreEnv,
-  snapshotAndClearEnv
-} from './test-utils';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
 };
-
-const fixturesDir = path.join(__dirname, '..', '__fixtures__');
-const envKeys = loadEnvKeys(fixturesDir, 'env.keys.json');
 
 describe('getConnEnvOptions', () => {
   describe('roles resolution', () => {
@@ -120,16 +110,10 @@ describe('getConnEnvOptions', () => {
 });
 
 describe('getEnvOptions', () => {
-  let envSnapshot: Record<string, string | undefined>;
   let tempDir = '';
   type PgpmOptionsWithPackages = PgpmOptions & { packages?: string[] };
 
-  beforeEach(() => {
-    envSnapshot = snapshotAndClearEnv(envKeys);
-  });
-
   afterEach(() => {
-    restoreEnv(envSnapshot);
     if (tempDir) {
       fs.rmSync(tempDir, { recursive: true, force: true });
       tempDir = '';
@@ -159,8 +143,19 @@ describe('getEnvOptions', () => {
       }
     });
 
-    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.base.json');
-    applyEnvFixture(fixtureEnv);
+    const testEnv: NodeJS.ProcessEnv = {
+      PGHOST: 'env-host',
+      PGPORT: '6543',
+      PGUSER: 'env-user',
+      PGPASSWORD: 'env-pass',
+      DB_PREFIX: 'env-',
+      DB_CONNECTIONS_APP_PASSWORD: 'env-app-pass',
+      DB_CONNECTIONS_ADMIN_USER: 'env-admin-user',
+      PORT: '7777',
+      DEPLOYMENT_FAST: 'false',
+      JOBS_SUPPORT_ANY: 'false',
+      JOBS_SUPPORTED: 'alpha,beta'
+    };
 
     const result = getEnvOptions(
       {
@@ -178,7 +173,8 @@ describe('getEnvOptions', () => {
           cache: true
         }
       },
-      tempDir
+      tempDir,
+      testEnv
     );
 
     expect(result).toMatchSnapshot();
@@ -201,8 +197,10 @@ describe('getEnvOptions', () => {
       packages: ['testing/*', 'packages/*']
     });
 
-    const fixtureEnv = loadEnvFixture(fixturesDir, 'env.dedupe.json');
-    applyEnvFixture(fixtureEnv);
+    const testEnv: NodeJS.ProcessEnv = {
+      DB_EXTENSIONS: 'postgis,pgcrypto',
+      JOBS_SUPPORTED: 'beta,gamma,delta'
+    };
 
     const overrides: PgpmOptionsWithPackages = {
       db: {
@@ -219,7 +217,7 @@ describe('getEnvOptions', () => {
       packages: ['testing/*', 'extensions/*']
     };
 
-    const result = getEnvOptions(overrides, tempDir) as PgpmOptionsWithPackages;
+    const result = getEnvOptions(overrides, tempDir, testEnv) as PgpmOptionsWithPackages;
 
     expect(result.db?.extensions).toEqual([
       'uuid',

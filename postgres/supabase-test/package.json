@@ -1,6 +1,6 @@
 {
   "name": "supabase-test",
-  "version": "0.4.31",
+  "version": "0.4.40",
   "author": "Interweb <developers@interweb.io>",
   "description": "supabase-test offers isolated, role-aware, and rollback-friendly PostgreSQL environments for integration tests with Supabase defaults baked in",
   "main": "index.js",
@@ -58,6 +58,6 @@
     "pgsql-test": "workspace:^"
   },
   "devDependencies": {
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   }
 }

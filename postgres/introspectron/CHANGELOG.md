@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.45](https://github.com/constructive-io/constructive/compare/introspectron@2.14.44...introspectron@2.14.45) (2026-01-02)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.44](https://github.com/constructive-io/constructive/compare/introspectron@2.14.43...introspectron@2.14.44) (2026-01-02)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.43](https://github.com/constructive-io/constructive/compare/introspectron@2.14.42...introspectron@2.14.43) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.42](https://github.com/constructive-io/constructive/compare/introspectron@2.14.41...introspectron@2.14.42) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.41](https://github.com/constructive-io/constructive/compare/introspectron@2.14.40...introspectron@2.14.41) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.40](https://github.com/constructive-io/constructive/compare/introspectron@2.14.39...introspectron@2.14.40) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.39](https://github.com/constructive-io/constructive/compare/introspectron@2.14.38...introspectron@2.14.39) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.38](https://github.com/constructive-io/constructive/compare/introspectron@2.14.37...introspectron@2.14.38) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
+## [2.14.37](https://github.com/constructive-io/constructive/compare/introspectron@2.14.36...introspectron@2.14.37) (2025-12-31)
+
+**Note:** Version bump only for package introspectron
+
 ## [2.14.36](https://github.com/constructive-io/constructive/compare/introspectron@2.14.35...introspectron@2.14.36) (2025-12-27)
 
 **Note:** Version bump only for package introspectron

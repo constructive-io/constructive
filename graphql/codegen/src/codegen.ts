@@ -68,7 +68,7 @@ async function getIntrospectionFromEndpoint(endpoint: string, headers?: Record<s
   return res as any
 }
 
-function generateKeyedObjFromGqlMap(gqlMap: GqlMap, selection?: { defaultMutationModelFields?: string[]; modelFields?: Record<string, string[]> }, typeNameOverrides?: Record<string, string>, typeIndex?: any): Record<string, string> {
+function generateKeyedObjFromGqlMap(gqlMap: GqlMap, selection?: GraphQLCodegenOptions['selection'], typeNameOverrides?: Record<string, string>, typeIndex?: any): Record<string, string> {
   const gen = generateGql(gqlMap, selection as any, typeNameOverrides, typeIndex)
   return Object.entries(gen).reduce<Record<string, string>>((acc, [key, val]) => {
     if (val?.ast) acc[key] = print(val.ast)
@@ -182,11 +182,11 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: sdkFile,
       schema: schema as any,
       documents,
-      config: { scalars: options.scalars || {} },
+      config: { scalars: options.scalars || {}, dedupeOperationSuffix: true },
       plugins: [
         { typescript: {} },
         { 'typescript-operations': {} },
-        { 'typescript-graphql-request': {} }
+        { 'typescript-graphql-request': { dedupeOperationSuffix: true } }
       ],
       pluginMap: {
         typescript: typescriptPlugin as any,
@@ -219,7 +219,7 @@ export async function runCodegen(opts: GraphQLCodegenOptions, cwd: string) {
       filename: reactQueryFile,
       schema: schema as any,
       documents,
-      config: rqConfig,
+      config: { ...rqConfig, dedupeOperationSuffix: true },
       plugins: [
         { typescript: {} },
         { 'typescript-operations': {} },

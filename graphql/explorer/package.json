@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-explorer",
-  "version": "2.10.31",
+  "version": "2.11.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Explorer",
   "main": "index.js",
@@ -54,7 +54,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/graphql-upload": "^8.0.12",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2"
   },

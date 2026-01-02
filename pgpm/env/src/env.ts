@@ -1,4 +1,4 @@
-import { PgpmOptions } from '@pgpmjs/types';
+import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
 const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
@@ -21,8 +21,10 @@ const parseEnvStringArray = (val?: string): string[] | undefined => {
 /**
  * Parse core PGPM environment variables.
  * GraphQL-related env vars (GRAPHILE_*, FEATURES_*, API_*) are handled by @constructive-io/graphql-env.
+ * 
+ * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
-export const getEnvVars = (): PgpmOptions => {
+export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions => {
     const {
       PGROOTDATABASE,
       PGTEMPLATE,
@@ -50,6 +52,7 @@ export const getEnvVars = (): PgpmOptions => {
     PGPASSWORD,
     PGDATABASE,
 
+    BUCKET_PROVIDER,
     BUCKET_NAME,
     AWS_REGION,
     AWS_ACCESS_KEY,
@@ -73,7 +76,7 @@ export const getEnvVars = (): PgpmOptions => {
     INTERNAL_GATEWAY_URL,
     INTERNAL_JOBS_CALLBACK_URL,
     INTERNAL_JOBS_CALLBACK_PORT
-  } = process.env;
+  } = env;
 
   return {
     db: {
@@ -121,6 +124,7 @@ export const getEnvVars = (): PgpmOptions => {
       ...(PGDATABASE && { database: PGDATABASE }),
     },
     cdn: {
+      ...(BUCKET_PROVIDER && { provider: BUCKET_PROVIDER as BucketProvider }),
       ...(BUCKET_NAME && { bucketName: BUCKET_NAME }),
       ...(AWS_REGION && { awsRegion: AWS_REGION }),
       ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && { awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID }),

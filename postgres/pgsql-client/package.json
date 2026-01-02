@@ -1,6 +1,6 @@
 {
   "name": "pgsql-client",
-  "version": "1.1.0",
+  "version": "1.1.9",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL client utilities with query helpers, RLS context management, and database administration",
   "main": "index.js",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   },
   "dependencies": {
     "@pgpmjs/core": "workspace:^",

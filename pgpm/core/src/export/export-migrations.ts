@@ -8,6 +8,7 @@ import { getPgPool } from 'pg-cache';
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
 import { getMissingInstallableModules } from '../modules/modules';
+import { parseAuthor } from '../utils/author';
 import { exportMeta } from './export-meta';
 
 /**
@@ -143,6 +144,12 @@ interface ExportMigrationsToDiskOptions {
   metaExtensionName: string;
   metaExtensionDesc?: string;
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
+  /** Output directory for service/meta module. Defaults to outdir if not provided. */
+  serviceOutdir?: string;
 }
 
 interface ExportOptions {
@@ -161,6 +168,12 @@ interface ExportOptions {
   metaExtensionName: string;
   metaExtensionDesc?: string;
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
+  /** Output directory for service/meta module. Defaults to outdir if not provided. */
+  serviceOutdir?: string;
 }
 
 const exportMigrationsToDisk = async ({
@@ -176,9 +189,14 @@ const exportMigrationsToDisk = async ({
   extensionDesc,
   metaExtensionName,
   metaExtensionDesc,
-  prompter
+  prompter,
+  repoName,
+  username,
+  serviceOutdir
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
+  // Use serviceOutdir for service module, defaulting to outdir if not provided
+  const svcOutdir = (serviceOutdir || outdir.slice(0, -1)) + '/';
 
   const pgPool = getPgPool({
     ...options.pg,
@@ -240,7 +258,9 @@ const exportMigrationsToDisk = async ({
       name,
       description: dbExtensionDesc,
       extensions: [...DB_REQUIRED_EXTENSIONS],
-      prompter
+      prompter,
+      repoName,
+      username
     });
 
     // Install missing modules if user confirmed (now that module exists)
@@ -265,15 +285,17 @@ const exportMigrationsToDisk = async ({
     // Detect missing modules at workspace level and prompt user
     const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter);
 
-    // Create/prepare the module directory
+    // Create/prepare the module directory (use serviceOutdir if provided)
     const svcModuleDir = await preparePackage({
       project,
       author,
-      outdir,
+      outdir: svcOutdir,
       name: metaExtensionName,
       description: metaDesc,
       extensions: [...SERVICE_REQUIRED_EXTENSIONS],
-      prompter
+      prompter,
+      repoName,
+      username
     });
 
     // Install missing modules if user confirmed (now that module exists)
@@ -327,6 +349,7 @@ SET session_replication_role TO DEFAULT;
 
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;
+    opts.outdir = svcOutdir;
 
     writePgpmPlan(metaPackage, opts);
     writePgpmFiles(metaPackage, opts);
@@ -346,7 +369,10 @@ export const exportMigrations = async ({
   extensionDesc,
   metaExtensionName,
   metaExtensionDesc,
-  prompter
+  prompter,
+  repoName,
+  username,
+  serviceOutdir
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -363,7 +389,10 @@ export const exportMigrations = async ({
       schema_names,
       author,
       outdir,
-      prompter
+      prompter,
+      repoName,
+      username,
+      serviceOutdir
     });
   }
 };
@@ -377,6 +406,10 @@ interface PreparePackageOptions {
   description: string;
   extensions: string[];
   prompter?: Prompter;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
 }
 
 interface Schema {
@@ -407,7 +440,9 @@ const preparePackage = async ({
   name,
   description,
   extensions,
-  prompter
+  prompter,
+  repoName,
+  username
 }: PreparePackageOptions): Promise<string> => {
   const curDir = process.cwd();
   const pgpmDir = path.resolve(path.join(outdir, name));
@@ -416,16 +451,25 @@ const preparePackage = async ({
 
   const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
+    const { fullName, email } = parseAuthor(author);
+    
     await project.initModule({
       name,
       description,
       author,
       extensions,
+      // Use outputDir to create module directly in the specified location
+      outputDir: outdir,
       answers: {
         moduleName: name,
         moduleDesc: description,
         access: 'restricted',
-        license: 'CLOSED'
+        license: 'CLOSED',
+        fullName,
+        ...(email && { email }),
+        // Use provided values or sensible defaults
+        repoName: repoName || name,
+        ...(username && { username })
       }
     });
   } else {

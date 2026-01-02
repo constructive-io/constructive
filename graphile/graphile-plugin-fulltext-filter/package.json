@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-fulltext-filter",
-  "version": "2.1.35",
+  "version": "2.1.44",
   "description": "Full text searching on tsvector fields for use with graphile-plugin-connection-filter",
   "main": "index.js",
   "module": "esm/index.js",
@@ -52,7 +52,7 @@
   "devDependencies": {
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   }
 }

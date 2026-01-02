@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-types",
-  "version": "2.12.8",
+  "version": "2.12.10",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL/Graphile types for PostGraphile integration",
   "main": "index.js",
@@ -44,6 +44,6 @@
     "graphile"
   ],
   "devDependencies": {
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   }
 }

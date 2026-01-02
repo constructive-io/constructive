@@ -1,6 +1,6 @@
 {
   "name": "pg-query-context",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "author": "Constructive <developers@constructive.io>",
   "description": "pg query context",
   "main": "index.js",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.9"
+    "makage": "^0.1.10"
   },
   "keywords": [
     "postgresql",

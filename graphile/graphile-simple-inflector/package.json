@@ -1,6 +1,6 @@
 {
   "name": "graphile-simple-inflector",
-  "version": "0.2.35",
+  "version": "0.2.44",
   "description": "Simple inflector plugin for Graphile/PostGraphile",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -42,7 +42,7 @@
   "devDependencies": {
     "graphile-test": "workspace:^",
     "graphql-tag": "2.12.6",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {

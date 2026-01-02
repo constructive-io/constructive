@@ -1,6 +1,6 @@
 {
   "name": "graphile-postgis",
-  "version": "0.2.36",
+  "version": "0.2.45",
   "description": "Graphile/PostGraphile PostGIS integration plugin",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -41,11 +41,11 @@
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
     "graphile-test": "workspace:^",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {
-    "find-and-require-package-json": "^0.8.2",
+    "find-and-require-package-json": "^0.8.5",
     "graphile-build": "^4.14.1",
     "graphile-build-pg": "^4.14.1",
     "graphile-utils": "^4.14.1",

@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.44](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.43...@constructive-io/knative-job-service@0.4.44) (2026-01-02)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.43](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.42...@constructive-io/knative-job-service@0.4.43) (2026-01-02)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.42](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.41...@constructive-io/knative-job-service@0.4.42) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.41](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.40...@constructive-io/knative-job-service@0.4.41) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.40](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.39...@constructive-io/knative-job-service@0.4.40) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.39](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.38...@constructive-io/knative-job-service@0.4.39) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.38](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.37...@constructive-io/knative-job-service@0.4.38) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.37](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.36...@constructive-io/knative-job-service@0.4.37) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [0.4.36](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.35...@constructive-io/knative-job-service@0.4.36) (2025-12-31)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
 ## [0.4.35](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.4.34...@constructive-io/knative-job-service@0.4.35) (2025-12-27)
 
 **Note:** Version bump only for package @constructive-io/knative-job-service

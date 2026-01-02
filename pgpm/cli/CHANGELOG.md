@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.9](https://github.com/constructive-io/constructive/compare/pgpm@2.7.8...pgpm@2.7.9) (2026-01-02)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.8](https://github.com/constructive-io/constructive/compare/pgpm@2.7.7...pgpm@2.7.8) (2026-01-02)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.7](https://github.com/constructive-io/constructive/compare/pgpm@2.7.6...pgpm@2.7.7) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.6](https://github.com/constructive-io/constructive/compare/pgpm@2.7.5...pgpm@2.7.6) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.5](https://github.com/constructive-io/constructive/compare/pgpm@2.7.4...pgpm@2.7.5) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.4](https://github.com/constructive-io/constructive/compare/pgpm@2.7.3...pgpm@2.7.4) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.3](https://github.com/constructive-io/constructive/compare/pgpm@2.7.2...pgpm@2.7.3) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.2](https://github.com/constructive-io/constructive/compare/pgpm@2.7.1...pgpm@2.7.2) (2025-12-31)
+
+**Note:** Version bump only for package pgpm
+
+## [2.7.1](https://github.com/constructive-io/constructive/compare/pgpm@2.7.0...pgpm@2.7.1) (2025-12-31)
+
+### Bug Fixes
+
+- **pgpm:** fix AST round-trip diff comparison bug and add --outputDiff flag ([02ed48e](https://github.com/constructive-io/constructive/commit/02ed48e7649458fc1ade9397c5aba9d7a4eea722))
+
 # [2.7.0](https://github.com/constructive-io/constructive/compare/pgpm@2.6.0...pgpm@2.7.0) (2025-12-27)
 
 ### Features

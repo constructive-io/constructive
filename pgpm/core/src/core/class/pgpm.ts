@@ -118,6 +118,12 @@ export interface InitModuleOptions {
   noTty?: boolean;
   toolName?: string;
   answers?: Record<string, any>;
+  /** 
+   * Parent directory where the module should be created. 
+   * When provided, bypasses createModuleDirectory() and creates the module at outputDir/name.
+   * Must be an absolute path or relative to workspace root.
+   */
+  outputDir?: string;
 }
 
 export class PgpmPackage {
@@ -429,7 +435,19 @@ export class PgpmPackage {
 
   async initModule(options: InitModuleOptions): Promise<void> {
     this.ensureWorkspace();
-    const targetPath = this.createModuleDirectory(options.name);
+    
+    // If outputDir is provided, use it directly instead of createModuleDirectory
+    let targetPath: string;
+    if (options.outputDir) {
+      // Resolve outputDir relative to workspace if not absolute
+      const resolvedOutputDir = path.isAbsolute(options.outputDir) 
+        ? options.outputDir 
+        : path.resolve(this.workspacePath!, options.outputDir);
+      targetPath = path.join(resolvedOutputDir, options.name);
+      fs.mkdirSync(targetPath, { recursive: true });
+    } else {
+      targetPath = this.createModuleDirectory(options.name);
+    }
     
     const answers = {
       ...options.answers,

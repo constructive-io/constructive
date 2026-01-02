@@ -1,6 +1,6 @@
 {
   "name": "graphile-upload-plugin",
-  "version": "0.5.30",
+  "version": "0.6.3",
   "description": "Graphile upload plugin for PostGraphile",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -45,13 +45,14 @@
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
     "graphql-tag": "^2.12.6",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^",
     "ts-jest": "^29.4.6"
   },
   "dependencies": {
     "@constructive-io/s3-streamer": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
     "graphile-build": "^4.14.1",
     "graphql": "15.10.1"
   }
