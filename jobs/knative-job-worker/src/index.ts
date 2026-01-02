@@ -4,6 +4,7 @@ import type { PgClientLike } from '@constructive-io/job-utils';
 import type { Pool, PoolClient } from 'pg';
 import { Logger } from '@pgpmjs/logger';
 import { request as req } from './req';
+import { resolveSecretsForJob } from './secrets';
 
 export interface JobRow {
   id: number | string;
@@ -97,7 +98,7 @@ export default class Worker {
       `Async task ${job.id} (${job.task_identifier}) to be processed`
     );
   }
-  async doWork(job: JobRow) {
+  async doWork(job: JobRow, client: PgClientLike) {
     const { payload, task_identifier } = job;
     log.debug('starting work on job', {
       id: job.id,
@@ -110,8 +111,16 @@ export default class Worker {
     ) {
       throw new Error('Unsupported task');
     }
+
+    const secrets = await resolveSecretsForJob(client, job.id);
+
+    const body =
+      payload && typeof payload === 'object'
+        ? { ...(payload as any), secrets }
+        : { payload, secrets };
+
     await req(task_identifier, {
-      body: payload,
+      body,
       databaseId: job.database_id,
       workerId: this.workerId,
       jobId: job.id
@@ -146,7 +155,7 @@ export default class Worker {
 
       let err: Error | null = null;
       try {
-        await this.doWork(job);
+        await this.doWork(job, client);
       } catch (error) {
         err = error as Error;
       }

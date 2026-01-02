@@ -23,6 +23,19 @@ services:
       PGUSER: postgres
       PGPASSWORD: password
       PGDATABASE: launchql
+
+      # Local secrets provider (Vault/OpenBao-compatible) for dev.
+      # When combined with docker-compose.secrets.yml, an OpenBao/Vault
+      # style dev instance runs at http://openbao:8200 with a root
+      # token "root". This is for local development only.
+      VAULT_ADDR: "http://openbao:8200"
+      OPENBAO_ADDR: "http://openbao:8200"
+      # For the dev Vault image, the default KV v2 engine is mounted at
+      # the path "secret". Use that here for local testing; in
+      # production you can override this via meta_public.secret_providers.config.
+      OPENBAO_MOUNT_PATH: "secret"
+      OPENBAO_MANAGEMENT_TOKEN: "root"
+
       # API meta configuration (static mode for dev)
       API_ENABLE_META: "true"
       API_EXPOSED_SCHEMAS: "collections_public,meta_public"

@@ -46,9 +46,27 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           PublicKeySignature(pubkey_challenge.data as PublicKeyChallengeConfig)
         );
       }
-
+ 
       options.appendPlugins = options.appendPlugins ?? [];
       options.appendPlugins.push(...opts.graphile.appendPlugins);
+
+      // Always include the internal SecretsManagement plugin so that
+      // GraphQL can manage secret metadata and delegate values to
+      // external providers such as OpenBao. The plugin code is
+      // responsible for enforcing that values are never exposed via
+      // public queries.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const SecretsManagement = require('../plugins/SecretsManagement').default;
+        if (SecretsManagement) {
+          options.appendPlugins.push(SecretsManagement);
+        }
+      } catch {
+        // If the plugin cannot be loaded for some reason, continue
+        // without it; this preserves server startup in environments
+        // that do not yet include the plugin.
+      }
+
 
       options.pgSettings = async function pgSettings(request: IncomingMessage) {
         const gqlReq = request as Request;
