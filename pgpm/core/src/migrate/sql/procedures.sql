@@ -53,6 +53,17 @@ CREATE PROCEDURE pgpm_migrate.deploy(
 LANGUAGE plpgsql AS $$
 DECLARE
     v_change_id TEXT;
+    -- Error diagnostic variables
+    v_sqlstate TEXT;
+    v_message TEXT;
+    v_detail TEXT;
+    v_hint TEXT;
+    v_context TEXT;
+    v_schema_name TEXT;
+    v_table_name TEXT;
+    v_column_name TEXT;
+    v_constraint_name TEXT;
+    v_datatype_name TEXT;
 BEGIN
     -- Ensure package exists
     CALL pgpm_migrate.register_package(p_package);
@@ -97,7 +108,30 @@ BEGIN
         BEGIN
             EXECUTE p_deploy_sql;
         EXCEPTION WHEN OTHERS THEN
-            RAISE;
+            -- Capture all error diagnostics to preserve them in the re-raised exception
+            GET STACKED DIAGNOSTICS
+                v_sqlstate = RETURNED_SQLSTATE,
+                v_message = MESSAGE_TEXT,
+                v_detail = PG_EXCEPTION_DETAIL,
+                v_hint = PG_EXCEPTION_HINT,
+                v_context = PG_EXCEPTION_CONTEXT,
+                v_schema_name = SCHEMA_NAME,
+                v_table_name = TABLE_NAME,
+                v_column_name = COLUMN_NAME,
+                v_constraint_name = CONSTRAINT_NAME,
+                v_datatype_name = PG_DATATYPE_NAME;
+            
+            -- Re-raise with all captured diagnostics preserved
+            RAISE EXCEPTION USING
+                ERRCODE = v_sqlstate,
+                MESSAGE = v_message,
+                DETAIL = v_detail,
+                HINT = v_hint,
+                SCHEMA = v_schema_name,
+                TABLE = v_table_name,
+                COLUMN = v_column_name,
+                CONSTRAINT = v_constraint_name,
+                DATATYPE = v_datatype_name;
         END;
     END IF;
     
@@ -124,6 +158,18 @@ CREATE PROCEDURE pgpm_migrate.revert(
     p_revert_sql TEXT
 )
 LANGUAGE plpgsql AS $$
+DECLARE
+    -- Error diagnostic variables
+    v_sqlstate TEXT;
+    v_message TEXT;
+    v_detail TEXT;
+    v_hint TEXT;
+    v_context TEXT;
+    v_schema_name TEXT;
+    v_table_name TEXT;
+    v_column_name TEXT;
+    v_constraint_name TEXT;
+    v_datatype_name TEXT;
 BEGIN
     -- Check if deployed
     IF NOT pgpm_migrate.is_deployed(p_package, p_change_name) THEN
@@ -165,8 +211,35 @@ BEGIN
         END;
     END IF;
     
-    -- Execute revert
-    EXECUTE p_revert_sql;
+    -- Execute revert with error diagnostics preservation
+    BEGIN
+        EXECUTE p_revert_sql;
+    EXCEPTION WHEN OTHERS THEN
+        -- Capture all error diagnostics to preserve them in the re-raised exception
+        GET STACKED DIAGNOSTICS
+            v_sqlstate = RETURNED_SQLSTATE,
+            v_message = MESSAGE_TEXT,
+            v_detail = PG_EXCEPTION_DETAIL,
+            v_hint = PG_EXCEPTION_HINT,
+            v_context = PG_EXCEPTION_CONTEXT,
+            v_schema_name = SCHEMA_NAME,
+            v_table_name = TABLE_NAME,
+            v_column_name = COLUMN_NAME,
+            v_constraint_name = CONSTRAINT_NAME,
+            v_datatype_name = PG_DATATYPE_NAME;
+        
+        -- Re-raise with all captured diagnostics preserved
+        RAISE EXCEPTION USING
+            ERRCODE = v_sqlstate,
+            MESSAGE = v_message,
+            DETAIL = v_detail,
+            HINT = v_hint,
+            SCHEMA = v_schema_name,
+            TABLE = v_table_name,
+            COLUMN = v_column_name,
+            CONSTRAINT = v_constraint_name,
+            DATATYPE = v_datatype_name;
+    END;
     
     -- Remove from deployed
     DELETE FROM pgpm_migrate.changes 
