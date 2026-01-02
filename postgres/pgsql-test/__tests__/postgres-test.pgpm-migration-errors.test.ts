@@ -115,7 +115,20 @@ $$;
       
       expect(caughtError).not.toBeNull();
       expect(caughtError.message).toMatch(/nonexistent_migration_table_xyz.*does not exist/i);
-      expect(caughtError.message).toMatchSnapshot();
+      // Snapshot the full error message (should include enhanced fields if available)
+      expect(caughtError.message).toMatchSnapshot('error message');
+      // Also snapshot the raw error properties to see what PostgreSQL fields are available
+      expect({
+        code: caughtError.code,
+        detail: caughtError.detail,
+        hint: caughtError.hint,
+        where: caughtError.where,
+        schema: caughtError.schema,
+        table: caughtError.table,
+        constraint: caughtError.constraint,
+        position: caughtError.position,
+        internalQuery: caughtError.internalQuery
+      }).toMatchSnapshot('error fields');
     });
   });
 
@@ -153,7 +166,20 @@ INSERT INTO test_snapshot_products (sku) VALUES ('PROD-001');
       
       expect(caughtError).not.toBeNull();
       expect(caughtError.message).toMatch(/duplicate key value violates unique constraint/i);
-      expect(caughtError.message).toMatchSnapshot();
+      // Snapshot the full error message (should include enhanced fields if available)
+      expect(caughtError.message).toMatchSnapshot('error message');
+      // Also snapshot the raw error properties to see what PostgreSQL fields are available
+      expect({
+        code: caughtError.code,
+        detail: caughtError.detail,
+        hint: caughtError.hint,
+        where: caughtError.where,
+        schema: caughtError.schema,
+        table: caughtError.table,
+        constraint: caughtError.constraint,
+        position: caughtError.position,
+        internalQuery: caughtError.internalQuery
+      }).toMatchSnapshot('error fields');
     });
   });
 
@@ -191,7 +217,20 @@ INSERT INTO test_migration_config (name, settings) VALUES ('test', 'not_valid_js
       
       expect(caughtError).not.toBeNull();
       expect(caughtError.message).toMatch(/invalid input syntax for type json/i);
-      expect(caughtError.message).toMatchSnapshot();
+      // Snapshot the full error message (should include enhanced fields if available)
+      expect(caughtError.message).toMatchSnapshot('error message');
+      // Also snapshot the raw error properties to see what PostgreSQL fields are available
+      expect({
+        code: caughtError.code,
+        detail: caughtError.detail,
+        hint: caughtError.hint,
+        where: caughtError.where,
+        schema: caughtError.schema,
+        table: caughtError.table,
+        constraint: caughtError.constraint,
+        position: caughtError.position,
+        internalQuery: caughtError.internalQuery
+      }).toMatchSnapshot('error fields');
     });
   });
 });

@@ -1,7 +1,49 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration 1`] = `"duplicate key value violates unique constraint "test_snapshot_products_sku_key""`;
+exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration: error fields 1`] = `
+{
+  "code": undefined,
+  "constraint": undefined,
+  "detail": undefined,
+  "hint": undefined,
+  "internalQuery": undefined,
+  "position": undefined,
+  "schema": undefined,
+  "table": undefined,
+  "where": undefined,
+}
+`;
 
-exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration 1`] = `"invalid input syntax for type json"`;
+exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration: error message 1`] = `"duplicate key value violates unique constraint "test_snapshot_products_sku_key""`;
 
-exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error 1`] = `"relation "nonexistent_migration_table_xyz" does not exist"`;
+exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error fields 1`] = `
+{
+  "code": undefined,
+  "constraint": undefined,
+  "detail": undefined,
+  "hint": undefined,
+  "internalQuery": undefined,
+  "position": undefined,
+  "schema": undefined,
+  "table": undefined,
+  "where": undefined,
+}
+`;
+
+exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration: error message 1`] = `"invalid input syntax for type json"`;
+
+exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error fields 1`] = `
+{
+  "code": undefined,
+  "constraint": undefined,
+  "detail": undefined,
+  "hint": undefined,
+  "internalQuery": undefined,
+  "position": undefined,
+  "schema": undefined,
+  "table": undefined,
+  "where": undefined,
+}
+`;
+
+exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error: error message 1`] = `"relation "nonexistent_migration_table_xyz" does not exist"`;
