@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "makage": "^0.1.9",
+    "makage": "^0.1.10",
     "pgsql-parser": "^17.9.9"
   },
   "keywords": [
