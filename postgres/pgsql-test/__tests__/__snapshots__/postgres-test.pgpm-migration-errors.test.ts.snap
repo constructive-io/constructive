@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PGPM Migration Error Messages Constraint Violation in Migration snapshot: constraint violation in migration 1`] = `"duplicate key value violates unique constraint "test_snapshot_products_sku_key""`;
+
+exports[`PGPM Migration Error Messages JSON Type Mismatch in Migration snapshot: JSON type mismatch error in migration 1`] = `"invalid input syntax for type json"`;
+
+exports[`PGPM Migration Error Messages Nested EXECUTE Migration Errors snapshot: nested EXECUTE migration error 1`] = `"relation "nonexistent_migration_table_xyz" does not exist"`;
