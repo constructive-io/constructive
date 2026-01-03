@@ -204,12 +204,12 @@ const exportMigrationsToDisk = async ({
   });
 
   const db = await pgPool.query(
-    `select * from collections_public.database where id=$1`,
+    `select * from metaschema_public.database where id=$1`,
     [databaseId]
   );
 
   const schemas = await pgPool.query(
-    `select * from collections_public.schema where database_id=$1`,
+    `select * from metaschema_public.schema where database_id=$1`,
     [databaseId]
   );
 
@@ -315,7 +315,7 @@ const exportMigrationsToDisk = async ({
         deps: [],
         deploy: 'migrate/meta',
         content: `SET session_replication_role TO replica;
--- using replica in case we are deploying triggers to collections_public
+-- using replica in case we are deploying triggers to metaschema_public
 
 -- unaccent, postgis affected and require grants
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
@@ -334,12 +334,12 @@ ${meta}
 
 -- TODO: Research needed - These UPDATE statements may be a security leak.
 -- They appear to rebind exported metadata to the target database after import,
--- but exposing dbname in meta_public tables could leak internal database names.
+-- but exposing dbname in services_public tables could leak internal database names.
 -- Consider removing entirely or gating behind an explicit flag.
--- UPDATE meta_public.apis
+-- UPDATE services_public.apis
 --       SET dbname = current_database() WHERE TRUE;
 
--- UPDATE meta_public.sites
+-- UPDATE services_public.sites
 --       SET dbname = current_database() WHERE TRUE;
 
 SET session_replication_role TO DEFAULT;
