@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.0...@pgpmjs/core@4.7.1) (2026-01-03)
+
+### Bug Fixes
+
+- **pgpm:** preserve original exception context in deploy/revert procedures ([07f17eb](https://github.com/constructive-io/constructive/commit/07f17eb415455896d21ff7440ee81e5927c1c63f))
+
 # [4.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.6.3...@pgpmjs/core@4.7.0) (2026-01-02)
 
 ### Bug Fixes
