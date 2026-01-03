@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.22.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.21.0...pgsql-test@2.22.0) (2026-01-03)
+
+### Bug Fixes
+
+- **pgpm:** preserve original exception context in deploy/revert procedures ([07f17eb](https://github.com/constructive-io/constructive/commit/07f17eb415455896d21ff7440ee81e5927c1c63f))
+- **pgsql-test:** update error message snapshots to include enhanced context ([75b5087](https://github.com/constructive-io/constructive/commit/75b5087a37a43066ca0d1e44aa33748e0c04ef80))
+- **pgsql-test:** update snapshots for enhanced error message format ([1fb2dda](https://github.com/constructive-io/constructive/commit/1fb2ddaaf2d78d794035b7c9571458bedc272eaf))
+
+### Features
+
+- **pgsql-test:** add getErrorCode helper for enhanced error messages ([43b3c7e](https://github.com/constructive-io/constructive/commit/43b3c7e8035ddba8d1a127078617db2a83e20695))
+
 # [2.21.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.20.8...pgsql-test@2.21.0) (2026-01-02)
 
 ### Bug Fixes
