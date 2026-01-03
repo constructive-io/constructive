@@ -12,7 +12,7 @@ interface TableConfig {
 
 const config: Record<string, TableConfig> = {
   database: {
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     table: 'database',
     fields: {
       id: 'uuid',
@@ -22,7 +22,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   database_extension: {
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     table: 'database_extension',
     fields: {
       name: 'text',
@@ -30,7 +30,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   schema: {
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     table: 'schema',
     fields: {
       id: 'uuid',
@@ -41,7 +41,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   table: {
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     table: 'table',
     fields: {
       id: 'uuid',
@@ -52,7 +52,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   field: {
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     table: 'field',
     fields: {
       id: 'uuid',
@@ -64,7 +64,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   domains: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'domains',
     fields: {
       id: 'uuid',
@@ -76,7 +76,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   sites: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'sites',
     fields: {
       id: 'uuid',
@@ -91,7 +91,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   apis: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'apis',
     fields: {
       id: 'uuid',
@@ -104,7 +104,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   apps: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'apps',
     fields: {
       id: 'uuid',
@@ -119,7 +119,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   site_modules: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'site_modules',
     fields: {
       id: 'uuid',
@@ -130,7 +130,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   site_themes: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'site_themes',
     fields: {
       id: 'uuid',
@@ -140,7 +140,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   api_modules: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'api_modules',
     fields: {
       id: 'uuid',
@@ -151,7 +151,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   api_extensions: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'api_extensions',
     fields: {
       id: 'uuid',
@@ -161,7 +161,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   api_schemata: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'api_schemata',
     fields: {
       id: 'uuid',
@@ -171,7 +171,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   rls_module: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'rls_module',
     fields: {
       id: 'uuid',
@@ -188,7 +188,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   user_auth_module: {
-    schema: 'meta_public',
+    schema: 'services_public',
     table: 'user_auth_module',
     fields: {
       id: 'uuid',
@@ -243,22 +243,22 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
     }
   };
 
-  await queryAndParse('database', `SELECT * FROM collections_public.database WHERE id = $1`);
-  await queryAndParse('schema', `SELECT * FROM collections_public.schema WHERE database_id = $1`);
-  await queryAndParse('table', `SELECT * FROM collections_public.table WHERE database_id = $1`);
-  await queryAndParse('field', `SELECT * FROM collections_public.field WHERE database_id = $1`);
-  await queryAndParse('domains', `SELECT * FROM meta_public.domains WHERE database_id = $1`);
-  await queryAndParse('apis', `SELECT * FROM meta_public.apis WHERE database_id = $1`);
-  await queryAndParse('sites', `SELECT * FROM meta_public.sites WHERE database_id = $1`);
-  await queryAndParse('api_modules', `SELECT * FROM meta_public.api_modules WHERE database_id = $1`);
-  await queryAndParse('site_modules', `SELECT * FROM meta_public.site_modules WHERE database_id = $1`);
-  await queryAndParse('site_themes', `SELECT * FROM meta_public.site_themes WHERE database_id = $1`);
-  await queryAndParse('apps', `SELECT * FROM meta_public.apps WHERE database_id = $1`);
-  await queryAndParse('database_extension', `SELECT * FROM collections_public.database_extension WHERE database_id = $1`);
-  await queryAndParse('api_extensions', `SELECT * FROM meta_public.api_extensions WHERE database_id = $1`);
-  await queryAndParse('api_schemata', `SELECT * FROM meta_public.api_schemata WHERE database_id = $1`);
-  await queryAndParse('rls_module', `SELECT * FROM meta_public.rls_module WHERE database_id = $1`);
-  await queryAndParse('user_auth_module', `SELECT * FROM meta_public.user_auth_module WHERE database_id = $1`);
+  await queryAndParse('database', `SELECT * FROM metaschema_public.database WHERE id = $1`);
+  await queryAndParse('schema', `SELECT * FROM metaschema_public.schema WHERE database_id = $1`);
+  await queryAndParse('table', `SELECT * FROM metaschema_public.table WHERE database_id = $1`);
+  await queryAndParse('field', `SELECT * FROM metaschema_public.field WHERE database_id = $1`);
+  await queryAndParse('domains', `SELECT * FROM services_public.domains WHERE database_id = $1`);
+  await queryAndParse('apis', `SELECT * FROM services_public.apis WHERE database_id = $1`);
+  await queryAndParse('sites', `SELECT * FROM services_public.sites WHERE database_id = $1`);
+  await queryAndParse('api_modules', `SELECT * FROM services_public.api_modules WHERE database_id = $1`);
+  await queryAndParse('site_modules', `SELECT * FROM services_public.site_modules WHERE database_id = $1`);
+  await queryAndParse('site_themes', `SELECT * FROM services_public.site_themes WHERE database_id = $1`);
+  await queryAndParse('apps', `SELECT * FROM services_public.apps WHERE database_id = $1`);
+  await queryAndParse('database_extension', `SELECT * FROM metaschema_public.database_extension WHERE database_id = $1`);
+  await queryAndParse('api_extensions', `SELECT * FROM services_public.api_extensions WHERE database_id = $1`);
+  await queryAndParse('api_schemata', `SELECT * FROM services_public.api_schemata WHERE database_id = $1`);
+  await queryAndParse('rls_module', `SELECT * FROM services_public.rls_module WHERE database_id = $1`);
+  await queryAndParse('user_auth_module', `SELECT * FROM services_public.user_auth_module WHERE database_id = $1`);
 
   return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
 };
