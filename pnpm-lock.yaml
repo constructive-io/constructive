@@ -757,6 +757,7 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+    publishDirectory: dist
 
   graphql/env:
     dependencies:
@@ -1248,7 +1249,7 @@ importers:
     dependencies:
       '@constructive-io/graphql-codegen':
         specifier: workspace:^
-        version: link:../../graphql/codegen
+        version: link:../../graphql/codegen/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../../graphql/env/dist
