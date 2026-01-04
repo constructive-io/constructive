@@ -36,7 +36,8 @@ export default async (
   const dryRun = !!(argv['dry-run'] || argv.dryRun)
   const verbose = !!(argv.verbose || argv.v)
 
-  const bin = require.resolve('@constructive-io/graphql-codegen/bin/graphql-codegen.js')
+  const envBin = process.env.CONSTRUCTIVE_CODEGEN_BIN
+  const bin = envBin || require.resolve('@constructive-io/graphql-codegen/bin/graphql-codegen.js')
   const args: string[] = ['generate']
   if (configPath) args.push('-c', configPath)
   if (endpoint) args.push('-e', endpoint)
