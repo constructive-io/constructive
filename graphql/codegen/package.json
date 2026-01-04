@@ -49,11 +49,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "graphql-codegen": "./bin/graphql-codegen.js"
+    "graphql-codegen": "./dist/cli/index.js"
   },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
