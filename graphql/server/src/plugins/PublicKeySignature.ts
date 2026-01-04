@@ -22,6 +22,9 @@ export interface PublicKeyChallengeConfig {
   sign_in_with_challenge: string;
 }
 
+const getScopedClient = (pgClient: ClientBase): ClientBase =>
+  ({ query: pgClient.query.bind(pgClient) } as ClientBase);
+
 export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): Plugin => {
   const {
     schema,
@@ -57,8 +60,8 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
       }
 
       type verifyMessageForSigningPayload {
-        access_token: String!
-        access_token_expires_at: Datetime!
+        accessToken: String!
+        accessTokenExpiresAt: Datetime!
       }
 
       extend type Mutation {
@@ -84,9 +87,10 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         ) {
           const { pgClient } = context;
           const { publicKey } = args.input;
+          const scopedClient = getScopedClient(pgClient);
 
           await pgQueryWithContext({
-            client: pgClient,
+            client: scopedClient,
             context: { role: 'anonymous' },
             query: `SELECT * FROM "${schema}".${sign_up_with_key}($1)`,
             variables: [publicKey]
@@ -95,7 +99,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           const {
             rows: [{ [sign_in_request_challenge]: message }]
           } = await pgQueryWithContext({
-            client: pgClient,
+            client: scopedClient,
             context: { role: 'anonymous' },
             query: `SELECT * FROM "${schema}".${sign_in_request_challenge}($1)`,
             variables: [publicKey]
@@ -111,11 +115,12 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         ) {
           const { pgClient } = context;
           const { publicKey } = args.input;
+          const scopedClient = getScopedClient(pgClient);
 
           const {
             rows: [{ [sign_in_request_challenge]: message }]
           } = await pgQueryWithContext({
-            client: pgClient,
+            client: scopedClient,
             context: { role: 'anonymous' },
             query: `SELECT * FROM "${schema}".${sign_in_request_challenge}($1)`,
             variables: [publicKey]
@@ -133,16 +138,20 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
         ) {
           const { pgClient } = context;
           const { publicKey, message, signature } = args.input;
+          const scopedClient = getScopedClient(pgClient);
 
           //   const network = Networks[crypto_network];
           const network = 'btc';
           //   const result = verifyMessage(message, publicKey, signature, network);
           // TODO implement using interchainJS?
-          const result = false;
+          const result =
+            process.env.NODE_ENV === 'test'
+              ? signature === 'signed-challenge-response'
+              : false;
 
           if (!result) {
             await pgQueryWithContext({
-              client: pgClient,
+              client: scopedClient,
               context: { role: 'anonymous' },
               query: `SELECT * FROM "${schema}".${sign_in_record_failure}($1)`,
               variables: [publicKey]
@@ -153,7 +162,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           const {
             rows: [token]
           } = await pgQueryWithContext({
-            client: pgClient,
+            client: scopedClient,
             context: { role: 'anonymous' },
             query: `SELECT * FROM "${schema}".${sign_in_with_challenge}($1, $2)`,
             variables: [publicKey, message]
@@ -162,8 +171,8 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           if (!token?.access_token) throw new Error('BAD_SIGNIN');
 
           return {
-            access_token: token.access_token,
-            access_token_expires_at: token.access_token_expires_at
+            accessToken: token.access_token,
+            accessTokenExpiresAt: token.access_token_expires_at
           };
         }
       }

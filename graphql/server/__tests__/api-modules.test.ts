@@ -14,12 +14,15 @@ import { Server as GraphQLServer } from '../src/server';
 jest.setTimeout(30000);
 
 const metaSchemas = ['collections_public', 'meta_public'];
-const sql = (f: string) => join(__dirname, '../../test/sql', f);
 const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
-// Stable seeded UUID used for JWT claims and meta fixtures; dbname is set dynamically per test DB.
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
-const apiHost = 'api.example.com';
-const unknownHost = 'nonexistent.domain.com';
+
+const hosts = {
+  modules: 'modules.example.com',
+  noModules: 'no-modules.example.com',
+  unknownModule: 'unknown-module.example.com',
+  invalidModule: 'invalid-module.example.com',
+};
 
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 
@@ -140,8 +143,8 @@ const createMetaDb = async (): Promise<SeededConnections> => {
       bootstrapAdminUsers,
       deployMetaModules,
       seed.sqlfile([
-        metaSql('domains.seed.sql'),
         metaSql('auth.seed.sql'),
+        metaSql('api-modules.seed.sql'),
       ]),
     ]
   );
@@ -164,30 +167,14 @@ const createMetaDb = async (): Promise<SeededConnections> => {
   return { db, pg, teardown };
 };
 
-const createAppDb = async (): Promise<SeededConnections> => {
-  const { db, pg, teardown } = await getConnections(
-    { db: { extensions: ['citext', 'pgcrypto'] } },
-    [
-      bootstrapAdminUsers,
-      seed.sqlfile([
-        sql('test.sql'),
-        metaSql('internal_error.sql'),
-        sql('grants.sql'),
-      ]),
-    ]
-  );
-
-  return { db, pg, teardown };
-};
-
 const buildOptions = ({
   db,
-  metaSchemasOverride,
+  strictAuth,
 }: {
   db: PgTestClient;
-  metaSchemasOverride?: string[];
+  strictAuth?: boolean;
 }): ConstructiveOptions => {
-  const options = getEnvOptions({
+  return getEnvOptions({
     pg: {
       host: db.config.host,
       port: db.config.port,
@@ -198,73 +185,19 @@ const buildOptions = ({
     server: {
       host: '127.0.0.1',
       port: 0,
+      ...(strictAuth ? { strictAuth: true } : {}),
     },
     api: {
       enableMetaApi: true,
       isPublic: true,
-    },
-  });
-  options.api.metaSchemas = metaSchemasOverride ?? metaSchemas;
-  return options;
-};
-
-const buildAppOptions = ({
-  db,
-}: {
-  db: PgTestClient;
-}): ConstructiveOptions => {
-  return getEnvOptions({
-    pg: {
-      host: db.config.host,
-      port: db.config.port,
-      user: db.config.user,
-      password: db.config.password,
-      database: db.config.database,
-    },
-    server: {
-      host: '127.0.0.1',
-      port: 0,
-    },
-    api: {
-      enableMetaApi: false,
-      isPublic: true,
-      exposedSchemas: ['app_public'],
-      defaultDatabaseId: seededDatabaseId,
-      anonRole: 'anonymous',
-      roleName: 'authenticated',
-    },
-  });
-};
-
-const buildUnreachableOptions = (): ConstructiveOptions => {
-  return getEnvOptions({
-    pg: {
-      host: '127.0.0.1',
-      port: 5999,
-      user: 'invalid',
-      password: 'invalid',
-      database: 'missing_db',
-    },
-    server: {
-      host: '127.0.0.1',
-      port: 0,
-    },
-    api: {
-      enableMetaApi: false,
-      isPublic: true,
-      exposedSchemas: ['app_public'],
-      defaultDatabaseId: seededDatabaseId,
-      anonRole: 'anonymous',
-      roleName: 'authenticated',
+      metaSchemas,
     },
   });
 };
 
 let metaDb: SeededConnections | null = null;
-let appDb: SeededConnections | null = null;
 
 beforeAll(async () => {
-  appDb = await createAppDb();
   metaDb = await createMetaDb();
 });
 
@@ -273,15 +206,11 @@ afterAll(async () => {
   if (metaDb) {
     await metaDb.teardown();
   }
-  if (appDb) {
-    await appDb.teardown();
-  }
 });
 
-describe('Error Handling', () => {
-  describe('meta-enabled server errors', () => {
+describe('API Modules', () => {
+  describe('default server', () => {
     let started: StartedServer | null = null;
-    let invalidMetaStarted: StartedServer | null = null;
     let db: PgTestClient;
 
     beforeAll(async () => {
@@ -292,12 +221,6 @@ describe('Error Handling', () => {
           db,
         })
       );
-      invalidMetaStarted = await startServer(
-        buildOptions({
-          db,
-          metaSchemasOverride: ['missing_schema'],
-        })
-      );
     });
 
     beforeEach(async () => {
@@ -314,135 +237,233 @@ describe('Error Handling', () => {
 
     afterAll(async () => {
       await stopServer(started);
-      await stopServer(invalidMetaStarted);
       started = null;
-      invalidMetaStarted = null;
       clearCaches();
     });
 
-    describe('routing errors', () => {
-      it('returns 404 or error for unknown domain', async () => {
-        if (!started) {
-          throw new Error('HTTP server not started');
-        }
-        const req = request.agent(started.httpServer);
-        setHeaders(req, { Host: unknownHost });
-        const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-        expect(res.status).toBeGreaterThanOrEqual(400);
-      });
-
-      it('returns error when meta schemas do not exist', async () => {
-        if (!invalidMetaStarted) {
-          throw new Error('HTTP server not started');
-        }
-        const req = request.agent(invalidMetaStarted.httpServer);
-        setHeaders(req, { Host: apiHost });
-        const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-        expect(res.status).toBeGreaterThanOrEqual(400);
-      });
-
-      it('GET / returns 404', async () => {
-        if (!started) {
-          throw new Error('HTTP server not started');
-        }
-        const res = await request(started.httpServer).get('/');
-        expect(res.status).toBe(404);
-      });
-
-      it('GET /unknown-path returns 404', async () => {
-        if (!started) {
-          throw new Error('HTTP server not started');
-        }
-        const res = await request(started.httpServer).get('/unknown-path');
-        expect(res.status).toBe(404);
-      });
-    });
-
-    describe('GraphQL errors', () => {
-      it('returns errors array for query syntax errors', async () => {
-        if (!started) {
-          throw new Error('HTTP server not started');
-        }
-        const req = request.agent(started.httpServer);
-        setHeaders(req, { Host: apiHost });
-        const res = await req
-          .post('/graphql')
-          .send({ query: '{ invalid syntax here' });
-
-        expect(res.body.errors).toBeDefined();
-        expect(res.body.errors.length).toBeGreaterThan(0);
-      });
-
-      it('returns errors array for invalid field', async () => {
-        if (!started) {
-          throw new Error('HTTP server not started');
-        }
-        const req = request.agent(started.httpServer);
-        setHeaders(req, { Host: apiHost });
-        const res = await req
-          .post('/graphql')
-          .send({ query: '{ nonExistentField }' });
-
-        expect(res.body.errors).toBeDefined();
-      });
-
-      it('includes error extensions', async () => {
+    describe('cors module', () => {
+      it('reads urls array from module data', async () => {
         if (!started) {
           throw new Error('HTTP server not started');
         }
         const req = request.agent(started.httpServer);
         setHeaders(req, {
-          Host: apiHost,
-          Authorization: 'Bearer invalid-token',
+          Host: hosts.modules,
+          Origin: 'https://allowed1.com',
         });
-        const res = await req
-          .post('/graphql')
-          .send({ query: '{ __typename }' });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-        expect(res.body.errors?.[0]).toHaveProperty('extensions');
+        expect(res.headers['access-control-allow-origin']).toBe(
+          'https://allowed1.com'
+        );
       });
-    });
 
-    describe('request errors', () => {
-      it('POST /graphql with invalid JSON returns 400', async () => {
+      it('allows multiple configured origins', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req1 = request.agent(started.httpServer);
+        setHeaders(req1, {
+          Host: hosts.modules,
+          Origin: 'https://allowed1.com',
+        });
+        const res1 = await req1.post('/graphql').send({ query: '{ __typename }' });
+
+        const req2 = request.agent(started.httpServer);
+        setHeaders(req2, {
+          Host: hosts.modules,
+          Origin: 'https://allowed2.com',
+        });
+        const res2 = await req2.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res1.headers['access-control-allow-origin']).toBe(
+          'https://allowed1.com'
+        );
+        expect(res2.headers['access-control-allow-origin']).toBe(
+          'https://allowed2.com'
+        );
+      });
+
+      it('blocks origins not in cors module', async () => {
         if (!started) {
           throw new Error('HTTP server not started');
         }
         const req = request.agent(started.httpServer);
         setHeaders(req, {
-          Host: apiHost,
-          'Content-Type': 'application/json',
+          Host: hosts.modules,
+          Origin: 'https://not-allowed.com',
         });
-        const res = await req.post('/graphql').send('{ invalid json }');
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-        expect(res.status).toBe(400);
+        expect(res.headers['access-control-allow-origin']).toBeUndefined();
       });
+    });
 
-      it('POST /graphql without query returns error', async () => {
+    describe('pubkey_challenge module', () => {
+      it('adds PublicKeySignature plugin to schema', async () => {
         if (!started) {
           throw new Error('HTTP server not started');
         }
         const req = request.agent(started.httpServer);
-        setHeaders(req, { Host: apiHost });
-        const res = await req.post('/graphql').send({});
+        setHeaders(req, { Host: hosts.modules });
+        const res = await req.post('/graphql').send({
+          query: `{
+            __schema {
+              mutationType {
+                fields {
+                  name
+                }
+              }
+            }
+          }`,
+        });
 
-        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(res.status).toBe(200);
+        const mutationNames = res.body.data.__schema.mutationType.fields.map(
+          (f: any) => f.name
+        );
+        expect(mutationNames).toContain('createUserAccountWithPublicKey');
+        expect(mutationNames).toContain('getMessageForSigning');
+        expect(mutationNames).toContain('verifyMessageForSigning');
+      });
+
+      it('exposes createUserAccountWithPublicKey mutation', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: hosts.modules });
+        const res = await req.post('/graphql').send({
+          query: `mutation {
+            createUserAccountWithPublicKey(input: { publicKey: "user-public-key" }) {
+              message
+            }
+          }`,
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.createUserAccountWithPublicKey.message).toBeTruthy();
+      });
+
+      it('exposes verifyMessageForSigning mutation', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const challengeReq = request.agent(started.httpServer);
+        setHeaders(challengeReq, { Host: hosts.modules });
+        const createRes = await challengeReq.post('/graphql').send({
+          query: `mutation {
+            createUserAccountWithPublicKey(input: { publicKey: "user-public-key" }) {
+              message
+            }
+          }`,
+        });
+
+        const message = createRes.body.data.createUserAccountWithPublicKey.message;
+
+        const verifyReq = request.agent(started.httpServer);
+        setHeaders(verifyReq, { Host: hosts.modules });
+        const res = await verifyReq.post('/graphql').send({
+          query: `mutation {
+            verifyMessageForSigning(input: {
+              publicKey: "user-public-key",
+              message: "${message}",
+              signature: "signed-challenge-response"
+            }) {
+              accessToken
+              accessTokenExpiresAt
+            }
+          }`,
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.verifyMessageForSigning.accessToken).toBeTruthy();
+        expect(
+          res.body.data.verifyMessageForSigning.accessTokenExpiresAt
+        ).toBeTruthy();
+      });
+    });
+
+    describe('rls_module integration', () => {
+      it('uses privateSchema for auth function', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: hosts.modules,
+          Authorization: 'Bearer valid-token-123',
+        });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.status).toBe(200);
+      });
+
+      it('calls authenticate function with token', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: hosts.modules,
+          Authorization: 'Bearer valid-token-123',
+        });
+        const res = await req.post('/graphql').send({
+          query: '{ userId: currentSetting(name: "jwt.claims.user_id") }',
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.userId).toBeTruthy();
+      });
+    });
+
+    describe('module loading', () => {
+      it('handles API with no modules gracefully', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: hosts.noModules });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.status).toBe(200);
+      });
+
+      it('handles API with unknown module gracefully', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: hosts.unknownModule });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.status).toBe(200);
+      });
+
+      it('handles module with invalid data gracefully', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: hosts.invalidModule });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.status).toBeLessThan(500);
       });
     });
   });
 
-  describe('app database errors', () => {
-    let started: StartedServer | null = null;
+  describe('strict auth mode', () => {
+    let strictStarted: StartedServer | null = null;
     let db: PgTestClient;
 
     beforeAll(async () => {
-      const connections = requireConnections(appDb, 'app');
+      const connections = requireConnections(metaDb, 'meta');
       db = connections.db;
-      started = await startServer(
-        buildAppOptions({
+      strictStarted = await startServer(
+        buildOptions({
           db,
+          strictAuth: true,
         })
       );
     });
@@ -460,46 +481,23 @@ describe('Error Handling', () => {
     });
 
     afterAll(async () => {
-      await stopServer(started);
-      started = null;
+      await stopServer(strictStarted);
+      strictStarted = null;
       clearCaches();
     });
 
-    it('returns 500 for internal database errors', async () => {
-      if (!started) {
+    it('calls authenticate_strict if configured and strictAuth enabled', async () => {
+      if (!strictStarted) {
         throw new Error('HTTP server not started');
       }
-      const req = request.agent(started.httpServer);
-      const res = await req.post('/graphql').send({
-        query: '{ triggerInternalError }',
+      const req = request.agent(strictStarted.httpServer);
+      setHeaders(req, {
+        Host: hosts.modules,
+        Authorization: 'Bearer valid-token-123',
       });
-
-      expect(res.status).toBeGreaterThanOrEqual(500);
-    });
-  });
-
-  describe('database unreachable', () => {
-    let started: StartedServer | null = null;
-
-    beforeAll(async () => {
-      started = await startServer(buildUnreachableOptions());
-    });
-
-    afterAll(async () => {
-      await stopServer(started);
-      started = null;
-      clearCaches();
-    });
-
-    it('returns 503 when database is unreachable', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(503);
-      expect(res.text).toContain('Database unavailable');
+      expect(res.status).toBe(200);
     });
   });
 });

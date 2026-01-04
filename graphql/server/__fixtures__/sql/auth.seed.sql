@@ -3,6 +3,11 @@ BEGIN;
 -- Auth schema
 CREATE SCHEMA IF NOT EXISTS auth_private;
 
+-- Ensure base database record exists for foreign keys
+INSERT INTO collections_public.database (id, name)
+VALUES ('0b22e268-16d6-582b-950a-24e108688849', 'test-db')
+ON CONFLICT (id) DO NOTHING;
+
 -- Tokens table
 CREATE TABLE IF NOT EXISTS auth_private.tokens (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -85,7 +90,8 @@ INSERT INTO meta_public.rls_module (
   users_table_id,
   authenticate,
   authenticate_strict
-) VALUES (
+)
+SELECT
   'dddddddd-4444-4444-4444-444444444444',
   '0b22e268-16d6-582b-950a-24e108688849',
   '11111111-1111-1111-1111-111111111111',
@@ -95,6 +101,8 @@ INSERT INTO meta_public.rls_module (
   '99999999-7777-7777-7777-777777777777',
   'authenticate',
   'authenticate_strict'
+WHERE EXISTS (
+  SELECT 1 FROM meta_public.apis WHERE id = '11111111-1111-1111-1111-111111111111'
 )
 ON CONFLICT (api_id) DO NOTHING;
 
