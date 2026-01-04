@@ -2,7 +2,7 @@
  * Tests for export-meta.ts configuration validation
  * 
  * These tests validate that the export-meta config uses correct table names
- * and includes all required fields for exporting meta_public and collections_public data.
+ * and includes all required fields for exporting services_public and metaschema_public data.
  */
 
 import { readFileSync } from 'fs';
@@ -19,7 +19,7 @@ describe('Export Meta Config Validation', () => {
 
   describe('table name validation', () => {
     it('should use singular table name "database_extension" (not plural "database_extensions")', () => {
-      // The actual table in collections_public is database_extension (singular)
+      // The actual table in metaschema_public is database_extension (singular)
       // This test ensures the config uses the correct table name
       
       // Check that the config defines the table correctly
@@ -31,20 +31,20 @@ describe('Export Meta Config Validation', () => {
       expect(configSection).not.toContain("table: 'database_extensions'");
     });
 
-    it('should query the correct table name in collections_public.database_extension', () => {
+    it('should query the correct table name in metaschema_public.database_extension', () => {
       // The query should use the correct singular table name
-      expect(exportMetaSource).toContain('FROM collections_public.database_extension');
+      expect(exportMetaSource).toContain('FROM metaschema_public.database_extension');
     });
 
     it('should include field table in queries', () => {
       // The field table should be queried (it was missing before)
       expect(exportMetaSource).toContain("queryAndParse('field'");
-      expect(exportMetaSource).toContain('FROM collections_public.field');
+      expect(exportMetaSource).toContain('FROM metaschema_public.field');
     });
   });
 
-  describe('collections_public tables', () => {
-    it('should include all required collections_public tables in config', () => {
+  describe('metaschema_public tables', () => {
+    it('should include all required metaschema_public tables in config', () => {
       const requiredTables = [
         'database',
         'database_extension',
@@ -59,8 +59,8 @@ describe('Export Meta Config Validation', () => {
     });
   });
 
-  describe('meta_public tables', () => {
-    it('should include all required meta_public tables in config', () => {
+  describe('services_public tables', () => {
+    it('should include all required services_public tables in config', () => {
       const requiredTables = [
         'domains',
         'sites',
@@ -95,10 +95,10 @@ describe('Export Meta Config Validation', () => {
 });
 
 describe('Export Meta Config Drift Detection', () => {
-  it('should document the expected table names in collections_public', () => {
+  it('should document the expected table names in metaschema_public', () => {
     // This test documents the expected table names that export-meta.ts should use
     // If these change, the export-meta.ts config needs to be updated
-    const expectedCollectionsPublicTables = [
+    const expectedMetaschemaPublicTables = [
       'database',
       'database_extension', // NOT 'database_extensions' (plural)
       'schema',
@@ -107,13 +107,13 @@ describe('Export Meta Config Drift Detection', () => {
     ];
 
     // Document the expected tables
-    expect(expectedCollectionsPublicTables).toContain('database_extension');
-    expect(expectedCollectionsPublicTables).not.toContain('database_extensions');
+    expect(expectedMetaschemaPublicTables).toContain('database_extension');
+    expect(expectedMetaschemaPublicTables).not.toContain('database_extensions');
   });
 
-  it('should document the expected table names in meta_public', () => {
+  it('should document the expected table names in services_public', () => {
     // This test documents the expected table names that export-meta.ts should use
-    const expectedMetaPublicTables = [
+    const expectedServicesPublicTables = [
       'apis',
       'api_extensions',
       'api_modules',
@@ -128,7 +128,7 @@ describe('Export Meta Config Drift Detection', () => {
     ];
 
     // Document the expected tables
-    expect(expectedMetaPublicTables.length).toBe(11);
+    expect(expectedServicesPublicTables.length).toBe(11);
   });
 
   it('should document the bug: config uses database_extensions but table is database_extension', () => {
@@ -136,7 +136,7 @@ describe('Export Meta Config Drift Detection', () => {
     // In export-meta.ts, line 26, the config defines:
     //   table: 'database_extensions' (plural)
     // But the actual table in db-meta-schema is:
-    //   collections_public.database_extension (singular)
+    //   metaschema_public.database_extension (singular)
     // 
     // This causes the Parser to generate INSERT statements with the wrong table name,
     // which will fail when the exported SQL is replayed.
