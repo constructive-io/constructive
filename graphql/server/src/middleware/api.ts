@@ -349,6 +349,13 @@ export const getApiConfig = async (
 
     const apiPublic = (opts as any).api?.isPublic;
     if (apiPublic === false) {
+      const databaseId = req.get('X-Database-Id');
+      const hasApiName = req.get('X-Api-Name');
+      const hasSchemata = req.get('X-Schemata');
+      const hasMetaSchema = req.get('X-Meta-Schema');
+      if ((hasApiName || hasSchemata || hasMetaSchema) && !databaseId) {
+        return null;
+      }
       if (req.get('X-Schemata')) {
         svc = getHardCodedSchemata({
           opts,
