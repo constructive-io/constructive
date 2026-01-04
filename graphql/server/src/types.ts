@@ -67,6 +67,7 @@ export interface OldApiStructure {
   schemaNames: SchemaNodes;
   schemaNamesFromExt: SchemaNodes;
   apiModules: ApiModuleNodes;
+  domains?: DomainNodes;
   rlsModule?: RlsModule;
   database?: Database;
   databaseId?: string;

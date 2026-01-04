@@ -23,23 +23,34 @@ const transformServiceToApi = (svc: Service): ApiStructure => {
   const additionalSchemas =
     api.schemaNames?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
 
-  let domains: string[] = [];
-  if (api.database?.sites?.nodes) {
-    domains = api.database.sites.nodes.reduce((acc: string[], site: Site) => {
-      if (site.domains?.nodes && site.domains.nodes.length) {
-        const siteUrls = site.domains.nodes.map((domain: Domain) => {
-          const hostname = domain.subdomain
-            ? `${domain.subdomain}.${domain.domain}`
-            : domain.domain;
-          const protocol =
-            domain.domain === 'localhost' ? 'http://' : 'https://';
-          return protocol + hostname;
-        });
-        return [...acc, ...siteUrls];
+  const toUrl = (domain: Domain): string => {
+    const hostname = domain.subdomain
+      ? `${domain.subdomain}.${domain.domain}`
+      : domain.domain;
+    const protocol = domain.domain === 'localhost' ? 'http://' : 'https://';
+    return protocol + hostname;
+  };
+
+  const domainUrls = new Set<string>();
+  if (api.domains?.nodes?.length) {
+    api.domains.nodes.forEach((domain: Domain) => {
+      if (domain?.domain) {
+        domainUrls.add(toUrl(domain));
       }
-      return acc;
-    }, []);
+    });
   }
+
+  if (api.database?.sites?.nodes) {
+    api.database.sites.nodes.forEach((site: Site) => {
+      site.domains?.nodes?.forEach((domain: Domain) => {
+        if (domain?.domain) {
+          domainUrls.add(toUrl(domain));
+        }
+      });
+    });
+  }
+
+  const domains = [...domainUrls];
 
   return {
     dbname: api.dbname,

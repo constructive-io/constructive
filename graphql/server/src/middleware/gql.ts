@@ -25,6 +25,12 @@ export const ApiQuery: GraphQLDocument = gql`
               schemaName
             }
           }
+          domains {
+            nodes {
+              subdomain
+              domain
+            }
+          }
           rlsModule {
             privateSchema {
               schemaName
@@ -74,6 +80,12 @@ export const ApiByNameQuery: GraphQLDocument = gql`
       schemaNames: schemataByApiSchemaApiIdAndSchemaId {
         nodes {
           schemaName
+        }
+      }
+      domains {
+        nodes {
+          subdomain
+          domain
         }
       }
       rlsModule {

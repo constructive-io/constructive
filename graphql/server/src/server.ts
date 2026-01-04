@@ -1,15 +1,15 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
+import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import { closeAllCaches } from 'graphile-cache';
+import { graphileCache } from 'graphile-cache';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, pgCache } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createApiMiddleware } from './middleware/api';
@@ -55,11 +55,11 @@ class Server {
     }
     
     app.use(poweredBy('constructive'));
-    app.use(cors(fallbackOrigin));
     app.use(graphqlUpload.graphqlUploadExpress());
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(api);
+    app.use(cors(fallbackOrigin));
     app.use(authenticate);
     app.use(graphile(opts));
     app.use(flush);
@@ -171,7 +171,7 @@ class Server {
     const { closeCaches = false } = opts;
     if (this.closed) {
       if (closeCaches) {
-        await Server.closeCaches();
+        await Server.closeCaches({ closePools: true });
       }
       return;
     }
@@ -179,12 +179,19 @@ class Server {
     this.shuttingDown = true;
     await this.removeEventListener();
     if (closeCaches) {
-      await Server.closeCaches();
+      await Server.closeCaches({ closePools: true });
     }
   }
 
-  static async closeCaches(): Promise<void> {
-    await closeAllCaches();
+  static async closeCaches(
+    opts: { closePools?: boolean } = {}
+  ): Promise<void> {
+    const { closePools = false } = opts;
+    svcCache.clear();
+    graphileCache.clear();
+    if (closePools) {
+      await pgCache.close();
+    }
   }
 
   log(text: string): void {

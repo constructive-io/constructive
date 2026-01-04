@@ -13,21 +13,11 @@ import { Server as GraphQLServer } from '../src/server';
 
 jest.setTimeout(30000);
 
-const appSchemas = ['app_public'];
 const metaSchemas = ['collections_public', 'meta_public'];
-const sql = (f: string) => join(__dirname, '../../test/sql', f);
 const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
 // Stable seeded UUID used for JWT claims and meta fixtures; dbname is set dynamically per test DB.
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
-
-const domains = {
-  publicApi: 'api.example.com',
-  publicApp: 'app.example.com',
-  privateAdmin: 'admin.example.com',
-  unknown: 'unknown.example.com',
-  withWww: 'www.example.com',
-  withPort: 'api.example.com:3000',
-};
+const apiHost = 'api.example.com';
 
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 
@@ -141,28 +131,16 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
   });
 };
 
-const createAppDb = async (): Promise<SeededConnections> => {
-  const { db, pg, teardown } = await getConnections(
-    {},
-    [
-      bootstrapAdminUsers,
-      seed.sqlfile([
-        sql('test.sql'),
-        sql('grants.sql'),
-      ]),
-    ]
-  );
-
-  return { db, pg, teardown };
-};
-
 const createMetaDb = async (): Promise<SeededConnections> => {
   const { db, pg, teardown } = await getConnections(
     { db: { extensions: metaDbExtensions } },
     [
       bootstrapAdminUsers,
       deployMetaModules,
-      seed.sqlfile([metaSql('domains.seed.sql')]),
+      seed.sqlfile([
+        metaSql('domains.seed.sql'),
+        metaSql('cors.seed.sql'),
+      ]),
     ]
   );
 
@@ -186,26 +164,11 @@ const createMetaDb = async (): Promise<SeededConnections> => {
 
 const buildOptions = ({
   db,
-  enableMetaApi,
-  isPublic,
+  origin,
 }: {
   db: PgTestClient;
-  enableMetaApi: boolean;
-  isPublic: boolean;
+  origin?: string;
 }): ConstructiveOptions => {
-  const api = enableMetaApi
-    ? {
-        enableMetaApi: true,
-        isPublic,
-        metaSchemas,
-      }
-    : {
-        enableMetaApi: false,
-        isPublic,
-        exposedSchemas: appSchemas,
-        defaultDatabaseId: seededDatabaseId,
-      };
-
   return getEnvOptions({
     pg: {
       host: db.config.host,
@@ -217,16 +180,19 @@ const buildOptions = ({
     server: {
       host: '127.0.0.1',
       port: 0,
+      ...(origin ? { origin } : {}),
     },
-    api,
+    api: {
+      enableMetaApi: true,
+      isPublic: true,
+      metaSchemas,
+    },
   });
 };
 
 let metaDb: SeededConnections | null = null;
-let appDb: SeededConnections | null = null;
 
 beforeAll(async () => {
-  appDb = await createAppDb();
   metaDb = await createMetaDb();
 });
 
@@ -235,13 +201,10 @@ afterAll(async () => {
   if (metaDb) {
     await metaDb.teardown();
   }
-  if (appDb) {
-    await appDb.teardown();
-  }
 });
 
-describe('Domain Routing', () => {
-  describe('meta enabled, isPublic=true', () => {
+describe('CORS', () => {
+  describe('default config', () => {
     let started: StartedServer | null = null;
     let db: PgTestClient;
 
@@ -251,8 +214,6 @@ describe('Domain Routing', () => {
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: true,
-          isPublic: true,
         })
       );
     });
@@ -275,78 +236,136 @@ describe('Domain Routing', () => {
       clearCaches();
     });
 
-    it('routes api.example.com to public API', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.publicApi });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+    describe('preflight requests', () => {
+      it('responds to OPTIONS with correct headers', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://allowed.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: apiHost,
+          Origin: origin,
+          'Access-Control-Request-Method': 'POST',
+        });
+        const res = await req.options('/graphql');
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
+        expect(res.status).toBe(200);
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
+
+      it('includes Access-Control-Allow-Methods', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://allowed.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: apiHost,
+          Origin: origin,
+          'Access-Control-Request-Method': 'POST',
+        });
+        const res = await req.options('/graphql');
+
+        expect(res.headers['access-control-allow-methods']).toContain('POST');
+      });
+
+      it('includes Access-Control-Allow-Headers', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://allowed.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: apiHost,
+          Origin: origin,
+          'Access-Control-Request-Method': 'POST',
+          'Access-Control-Request-Headers': 'Content-Type, Authorization',
+        });
+        const res = await req.options('/graphql');
+
+        expect(res.headers['access-control-allow-headers']).toBeTruthy();
+      });
     });
 
-    it('routes app.example.com to different public API', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.publicApp });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+    describe('per-API cors module', () => {
+      it('allows origins in cors module urls array', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://allowed.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
+
+      it('allows origins from api.domains', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://api.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
+
+      it('blocks origins not in allowlist', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://blocked.example.com';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+        expect(res.headers['access-control-allow-origin']).toBeUndefined();
+      });
     });
 
-    it('rejects requests to domains with is_public=false APIs', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.privateAdmin });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+    describe('localhost exception', () => {
+      it('always allows localhost origins', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'http://localhost:3000';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBeGreaterThanOrEqual(400);
-    });
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
 
-    it('returns error for unknown domains', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.unknown });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+      it('allows localhost with any port', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'http://localhost:8080';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBeGreaterThanOrEqual(400);
-    });
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
 
-    it('handles www subdomain (maps to same API as configured)', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.withWww });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+      it('allows localhost over https', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const origin = 'https://localhost:3000';
+        const req = request.agent(started.httpServer);
+        setHeaders(req, { Host: apiHost, Origin: origin });
+        const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
-    });
-
-    it('handles port in Host header', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.withPort });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
+        expect(res.headers['access-control-allow-origin']).toBe(origin);
+      });
     });
   });
 
-  describe('meta enabled, isPublic=false', () => {
+  describe('global fallback (SERVER_ORIGIN="*")', () => {
     let started: StartedServer | null = null;
     let db: PgTestClient;
 
@@ -356,15 +375,14 @@ describe('Domain Routing', () => {
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: true,
-          isPublic: false,
+          origin: '*',
         })
       );
     });
 
     beforeEach(async () => {
       db.setContext({
-        role: 'administrator',
+        role: 'anonymous',
         'jwt.claims.database_id': seededDatabaseId,
       });
       await db.beforeEach();
@@ -380,49 +398,37 @@ describe('Domain Routing', () => {
       clearCaches();
     });
 
-    it('routes admin.example.com to private API', async () => {
+    it('allows any origin when SERVER_ORIGIN="*"', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
+      const origin = 'https://random.domain.com';
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.privateAdmin });
+      setHeaders(req, { Host: apiHost, Origin: origin });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
-    });
-
-    it('rejects requests to domains with is_public=true APIs', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: domains.publicApi });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(res.headers['access-control-allow-origin']).toBe(origin);
     });
   });
 
-  describe('meta disabled', () => {
+  describe('global fallback (SERVER_ORIGIN specific)', () => {
     let started: StartedServer | null = null;
     let db: PgTestClient;
 
     beforeAll(async () => {
-      const connections = requireConnections(appDb, 'app');
+      const connections = requireConnections(metaDb, 'meta');
       db = connections.db;
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: false,
-          isPublic: true,
+          origin: 'https://specific.com',
         })
       );
     });
 
     beforeEach(async () => {
       db.setContext({
-        role: 'administrator',
+        role: 'anonymous',
         'jwt.claims.database_id': seededDatabaseId,
       });
       await db.beforeEach();
@@ -438,34 +444,28 @@ describe('Domain Routing', () => {
       clearCaches();
     });
 
-    it('ignores Host header, uses static config', async () => {
+    it('allows specific origin when SERVER_ORIGIN set', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
+      const origin = 'https://specific.com';
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: 'any.domain.com' });
+      setHeaders(req, { Host: apiHost, Origin: origin });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.__typename).toBe('Query');
+      expect(res.headers['access-control-allow-origin']).toBe(origin);
     });
 
-    it('serves exposedSchemas regardless of domain', async () => {
+    it('blocks non-matching origin when SERVER_ORIGIN set', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const req1 = request.agent(started.httpServer);
-      setHeaders(req1, { Host: 'foo.com' });
-      const res1 = await req1.post('/graphql').send({ query: '{ __typename }' });
+      const origin = 'https://other.com';
+      const req = request.agent(started.httpServer);
+      setHeaders(req, { Host: apiHost, Origin: origin });
+      const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      const req2 = request.agent(started.httpServer);
-      setHeaders(req2, { Host: 'bar.com' });
-      const res2 = await req2.post('/graphql').send({ query: '{ __typename }' });
-
-      expect(res1.status).toBe(200);
-      expect(res2.status).toBe(200);
-      expect(res1.body.data.__typename).toBe('Query');
-      expect(res2.body.data.__typename).toBe('Query');
+      expect(res.headers['access-control-allow-origin']).toBeUndefined();
     });
   });
 });

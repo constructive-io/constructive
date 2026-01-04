@@ -17,6 +17,8 @@ const metaSchemas = ['collections_public', 'meta_public'];
 const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
 // Stable seeded UUID used for JWT claims and meta fixtures; dbname is set dynamically per test DB.
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
+const apiHost = 'api.example.com';
+const unknownHost = 'nonexistent.domain.com';
 
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 
@@ -94,6 +96,11 @@ type StartedServer = {
   httpServer: HttpServer;
 };
 
+const clearCaches = (): void => {
+  svcCache.clear();
+  graphileCache.clear();
+};
+
 const startServer = async (
   opts: ConstructiveOptions
 ): Promise<StartedServer> => {
@@ -123,11 +130,6 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
       resolve();
     });
   });
-};
-
-const clearCaches = (): void => {
-  svcCache.clear();
-  graphileCache.clear();
 };
 
 const createMetaDb = async (): Promise<SeededConnections> => {
@@ -163,12 +165,12 @@ const createMetaDb = async (): Promise<SeededConnections> => {
 
 const buildOptions = ({
   db,
-  strictAuth,
+  metaSchemasOverride,
 }: {
   db: PgTestClient;
-  strictAuth?: boolean;
+  metaSchemasOverride?: string[];
 }): ConstructiveOptions => {
-  return getEnvOptions({
+  const options = getEnvOptions({
     pg: {
       host: db.config.host,
       port: db.config.port,
@@ -179,14 +181,14 @@ const buildOptions = ({
     server: {
       host: '127.0.0.1',
       port: 0,
-      ...(strictAuth ? { strictAuth: true } : {}),
     },
     api: {
       enableMetaApi: true,
       isPublic: true,
-      metaSchemas,
     },
   });
+  options.api.metaSchemas = metaSchemasOverride ?? metaSchemas;
+  return options;
 };
 
 let metaDb: SeededConnections | null = null;
@@ -202,8 +204,9 @@ afterAll(async () => {
   }
 });
 
-describe('Authentication', () => {
+describe('Error Handling', () => {
   let started: StartedServer | null = null;
+  let invalidMetaStarted: StartedServer | null = null;
   let db: PgTestClient;
 
   beforeAll(async () => {
@@ -212,6 +215,12 @@ describe('Authentication', () => {
     started = await startServer(
       buildOptions({
         db,
+      })
+    );
+    invalidMetaStarted = await startServer(
+      buildOptions({
+        db,
+        metaSchemasOverride: ['missing_schema'],
       })
     );
   });
@@ -230,217 +239,103 @@ describe('Authentication', () => {
 
   afterAll(async () => {
     await stopServer(started);
+    await stopServer(invalidMetaStarted);
     started = null;
+    invalidMetaStarted = null;
     clearCaches();
   });
 
-  describe('Bearer token auth', () => {
-    it('sets jwt.claims.user_id on valid token', async () => {
+  describe('routing errors', () => {
+    it('returns 404 or error for unknown domain', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer valid-token-123',
-      });
-      const res = await req.post('/graphql').send({
-        query: '{ userId: currentSetting(name: "jwt.claims.user_id") }',
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.userId).toBe('11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
-    });
-
-    it('sets jwt.claims.token_id on valid token', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer valid-token-123',
-      });
-      const res = await req.post('/graphql').send({
-        query: '{ tokenId: currentSetting(name: "jwt.claims.token_id") }',
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.tokenId).toBe('aaaaaaaa-1111-1111-1111-111111111111');
-    });
-
-    it('sets jwt.claims.database_id', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer valid-token-123',
-      });
-      const res = await req.post('/graphql').send({
-        query: '{ dbId: currentSetting(name: "jwt.claims.database_id") }',
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.dbId).toBe(seededDatabaseId);
-    });
-
-    it('sets jwt.claims.ip_address', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer valid-token-123',
-      });
-      const res = await req.post('/graphql').send({
-        query: '{ ip: currentSetting(name: "jwt.claims.ip_address") }',
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.ip).toBeTruthy();
-    });
-
-    it('returns UNAUTHENTICATED for invalid token', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer invalid-token-xyz',
-      });
+      setHeaders(req, { Host: unknownHost });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBeGreaterThanOrEqual(400);
+    });
+
+    it('returns error when meta schemas do not exist', async () => {
+      if (!invalidMetaStarted) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(invalidMetaStarted.httpServer);
+      setHeaders(req, { Host: apiHost });
+      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+
+      expect(res.status).toBeGreaterThanOrEqual(400);
+    });
+  });
+
+  describe('GraphQL errors', () => {
+    it('returns errors array for query syntax errors', async () => {
+      if (!started) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(started.httpServer);
+      setHeaders(req, { Host: apiHost });
+      const res = await req
+        .post('/graphql')
+        .send({ query: '{ invalid syntax here' });
+
       expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+      expect(res.body.errors.length).toBeGreaterThan(0);
     });
 
-    it('returns UNAUTHENTICATED for expired token', async () => {
+    it('returns errors array for invalid field', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'Bearer expired-token',
-      });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
+      setHeaders(req, { Host: apiHost });
+      const res = await req
+        .post('/graphql')
+        .send({ query: '{ nonExistentField }' });
 
-      expect(res.status).toBe(200);
       expect(res.body.errors).toBeDefined();
-      expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
     });
 
-    it('handles malformed Authorization header', async () => {
+    it('includes error extensions', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
       setHeaders(req, {
-        Host: 'api.example.com',
-        Authorization: 'NotBearer token',
+        Host: apiHost,
+        Authorization: 'Bearer invalid-token',
       });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
-      expect(res.status).toBe(200);
+      expect(res.body.errors?.[0]).toHaveProperty('extensions');
     });
   });
 
-  describe('Anonymous access', () => {
-    it('uses anonRole from API config', async () => {
+  describe('request errors', () => {
+    it('POST /graphql with invalid JSON returns 400', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: 'api.example.com' });
-      const res = await req.post('/graphql').send({
-        query: '{ role: currentSetting(name: "role") }',
+      setHeaders(req, {
+        Host: apiHost,
+        'Content-Type': 'application/json',
       });
+      const res = await req.post('/graphql').send('{ invalid json }');
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.role).toBe('anonymous');
+      expect(res.status).toBe(400);
     });
 
-    it('sets jwt.claims.database_id even without auth', async () => {
+    it('POST /graphql without query returns error', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: 'api.example.com' });
-      const res = await req.post('/graphql').send({
-        query: '{ dbId: currentSetting(name: "jwt.claims.database_id") }',
-      });
+      setHeaders(req, { Host: apiHost });
+      const res = await req.post('/graphql').send({});
 
-      expect(res.status).toBe(200);
-      expect(res.body.data.dbId).toBe(seededDatabaseId);
+      expect(res.status).toBeGreaterThanOrEqual(400);
     });
-
-    it('sets jwt.claims.ip_address even without auth', async () => {
-      if (!started) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: 'api.example.com' });
-      const res = await req.post('/graphql').send({
-        query: '{ ip: currentSetting(name: "jwt.claims.ip_address") }',
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.data.ip).toBeTruthy();
-    });
-  });
-});
-
-describe('Authentication (Strict Mode)', () => {
-  let strictStarted: StartedServer | null = null;
-  let db: PgTestClient;
-
-  beforeAll(async () => {
-    const connections = requireConnections(metaDb, 'meta');
-    db = connections.db;
-    strictStarted = await startServer(
-      buildOptions({
-        db: connections.db,
-        strictAuth: true,
-      })
-    );
-  });
-
-  beforeEach(async () => {
-    db.setContext({
-      role: 'anonymous',
-      'jwt.claims.database_id': seededDatabaseId,
-    });
-    await db.beforeEach();
-  });
-
-  afterEach(async () => {
-    await db.afterEach();
-  });
-
-  afterAll(async () => {
-    await stopServer(strictStarted);
-    strictStarted = null;
-    clearCaches();
-  });
-
-  it('uses authenticateStrict function when enabled', async () => {
-    if (!strictStarted) {
-      throw new Error('HTTP server not started');
-    }
-    const req = request.agent(strictStarted.httpServer);
-    setHeaders(req, {
-      Host: 'api.example.com',
-      Authorization: 'Bearer valid-token-123',
-    });
-    const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-    expect(res.status).toBe(200);
-    expect(res.body.errors).toBeDefined();
-    expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
   });
 });

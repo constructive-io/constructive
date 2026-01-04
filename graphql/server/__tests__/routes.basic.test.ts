@@ -228,7 +228,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await GraphQLServer.closeCaches();
+  await GraphQLServer.closeCaches({ closePools: true });
   if (metaDb) {
     await metaDb.teardown();
   }
