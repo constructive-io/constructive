@@ -3,7 +3,9 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { closeAllCaches } from 'graphile-cache';
 import express, { Express, RequestHandler } from 'express';
+import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
@@ -28,6 +30,10 @@ export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
 class Server {
   private app: Express;
   private opts: PgpmOptions;
+  private listenClient: PoolClient | null = null;
+  private listenRelease: (() => void) | null = null;
+  private shuttingDown = false;
+  private closed = false;
 
   constructor(opts: PgpmOptions) {
     this.opts = getEnvOptions(opts);
@@ -61,7 +67,7 @@ class Server {
     this.app = app;
   }
 
-  listen(): void {
+  listen(): HttpServer {
     const { server } = this.opts;
     const httpServer = this.app.listen(server?.port, server?.host, () =>
       log.info(`listening at http://${server?.host}:${server?.port}`)
@@ -78,6 +84,8 @@ class Server {
       }
       throw err;
     });
+
+    return httpServer;
   }
 
   async flush(databaseId: string): Promise<void> {
@@ -89,6 +97,7 @@ class Server {
   }
 
   addEventListener(): void {
+    if (this.shuttingDown) return;
     const pgPool = this.getPool();
     pgPool.connect(this.listenForChanges.bind(this));
   }
@@ -100,9 +109,19 @@ class Server {
   ): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
-      setTimeout(() => this.addEventListener(), 5000);
+      if (!this.shuttingDown) {
+        setTimeout(() => this.addEventListener(), 5000);
+      }
       return;
     }
+
+    if (this.shuttingDown) {
+      release();
+      return;
+    }
+
+    this.listenClient = client;
+    this.listenRelease = release;
 
     client.on('notification', ({ channel, payload }) => {
       if (channel === 'schema:update' && payload) {
@@ -114,12 +133,58 @@ class Server {
     client.query('LISTEN "schema:update"');
 
     client.on('error', (e) => {
+      if (this.shuttingDown) {
+        release();
+        return;
+      }
       this.error('Error with database notify listener', e);
       release();
       this.addEventListener();
     });
 
     this.log('connected and listening for changes...');
+  }
+
+  async removeEventListener(): Promise<void> {
+    if (!this.listenClient || !this.listenRelease) {
+      return;
+    }
+
+    const client = this.listenClient;
+    const release = this.listenRelease;
+    this.listenClient = null;
+    this.listenRelease = null;
+
+    client.removeAllListeners('notification');
+    client.removeAllListeners('error');
+
+    try {
+      await client.query('UNLISTEN "schema:update"');
+    } catch {
+      // Ignore listener cleanup errors during shutdown.
+    }
+
+    release();
+  }
+
+  async close(opts: { closeCaches?: boolean } = {}): Promise<void> {
+    const { closeCaches = false } = opts;
+    if (this.closed) {
+      if (closeCaches) {
+        await Server.closeCaches();
+      }
+      return;
+    }
+    this.closed = true;
+    this.shuttingDown = true;
+    await this.removeEventListener();
+    if (closeCaches) {
+      await Server.closeCaches();
+    }
+  }
+
+  static async closeCaches(): Promise<void> {
+    await closeAllCaches();
   }
 
   log(text: string): void {
