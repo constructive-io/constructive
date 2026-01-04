@@ -1,13 +1,15 @@
-// @ts-nocheck
 import introspection from '../__fixtures__/api/introspection.json';
 import metaObject from '../__fixtures__/api/meta-obj.json';
-import { QueryBuilder } from '../src';
+import { QueryBuilder } from '../src/query-builder';
+
+const typedIntrospection = introspection as any;
+const typedMetaObject = metaObject as any;
 
 describe('getMany', () => {
   it('should select only scalar fields by default', () => {
     const builder = new QueryBuilder({
-      meta: metaObject,
-      introspection
+      meta: typedMetaObject,
+      introspection: typedIntrospection,
     });
 
     const result = builder.query('Action').getMany().print();
@@ -23,8 +25,8 @@ describe('getMany', () => {
 
   it('should whitelist selected fields', () => {
     const builder = new QueryBuilder({
-      meta: metaObject,
-      introspection
+      meta: typedMetaObject,
+      introspection: typedIntrospection,
     });
 
     const result = builder
@@ -38,19 +40,19 @@ describe('getMany', () => {
           actionResults: {
             select: {
               id: true,
-              actionId: true
+              actionId: true,
             },
             variables: {
               first: 10,
               filter: {
                 name: {
-                  in: ['abc', 'def']
+                  in: ['abc', 'def'],
                 },
-                actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' }
-              }
-            }
-          }
-        }
+                actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' },
+              },
+            },
+          },
+        },
       })
       .print();
 
@@ -61,8 +63,8 @@ describe('getMany', () => {
 
 it('should select totalCount in subfields by default', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -76,19 +78,19 @@ it('should select totalCount in subfields by default', () => {
         actionResults: {
           select: {
             id: true,
-            actionId: true
+            actionId: true,
           },
           variables: {
             first: 10,
             filter: {
               name: {
-                in: ['abc', 'def']
+                in: ['abc', 'def'],
               },
-              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' }
-            }
-          }
-        }
-      }
+              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' },
+            },
+          },
+        },
+      },
     })
     .print();
 
@@ -99,8 +101,8 @@ it('should select totalCount in subfields by default', () => {
 
 it('selects relation field', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -125,13 +127,13 @@ it('selects relation field', () => {
             createdBy: true,
             updatedBy: true,
             createdAt: true,
-            updatedAt: true
+            updatedAt: true,
           },
           variables: {
-            first: 3
-          }
-        }
-      }
+            first: 3,
+          },
+        },
+      },
     })
     .print();
 
@@ -141,8 +143,8 @@ it('selects relation field', () => {
 
 it('selects all scalar fields of junction table by default', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder.query('ActionGoal').getMany().print();
@@ -153,8 +155,8 @@ it('selects all scalar fields of junction table by default', () => {
 
 it('selects belongsTo relation field', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -164,10 +166,10 @@ it('selects belongsTo relation field', () => {
         owner: {
           select: {
             id: true,
-            type: true
-          }
-        }
-      }
+            type: true,
+          },
+        },
+      },
     })
     .print();
 
@@ -178,8 +180,8 @@ it('selects belongsTo relation field', () => {
 
 it('selects non-scalar custom types', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -189,8 +191,8 @@ it('selects non-scalar custom types', () => {
         id: true,
         name: true,
         location: true, // non-scalar custom type
-        timeRequired: true // non-scalar custom type
-      }
+        timeRequired: true, // non-scalar custom type
+      },
     })
     .print();
 
@@ -200,8 +202,8 @@ it('selects non-scalar custom types', () => {
 
 it('getMany edges', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder
     .query('Action')
@@ -215,20 +217,20 @@ it('getMany edges', () => {
         actionResults: {
           select: {
             id: true,
-            actionId: true
+            actionId: true,
           },
           variables: {
             first: 10,
             before: null,
             filter: {
               name: {
-                in: ['abc', 'def']
+                in: ['abc', 'def'],
               },
-              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' }
-            }
-          }
-        }
-      }
+              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' },
+            },
+          },
+        },
+      },
     })
     .print();
   expect(result._hash).toMatchSnapshot();
@@ -237,8 +239,8 @@ it('getMany edges', () => {
 
 it('getOne', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder
     .query('Action')
@@ -251,20 +253,20 @@ it('getOne', () => {
         actionResults: {
           select: {
             id: true,
-            actionId: true
+            actionId: true,
           },
           variables: {
             first: 10,
             before: null,
             filter: {
               name: {
-                in: ['abc', 'def']
+                in: ['abc', 'def'],
               },
-              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' }
-            }
-          }
-        }
-      }
+              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' },
+            },
+          },
+        },
+      },
     })
     .print();
   expect(result._hash).toMatchSnapshot();
@@ -273,8 +275,8 @@ it('getOne', () => {
 
 it('getAll', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -288,20 +290,20 @@ it('getAll', () => {
         actionResults: {
           select: {
             id: true,
-            actionId: true
+            actionId: true,
           },
           variables: {
             first: 10,
             before: null,
             filter: {
               name: {
-                in: ['abc', 'def']
+                in: ['abc', 'def'],
               },
-              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' }
-            }
-          }
-        }
-      }
+              actionId: { equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e' },
+            },
+          },
+        },
+      },
     })
     .print();
   expect(result._hash).toMatchSnapshot();
@@ -310,8 +312,8 @@ it('getAll', () => {
 
 it('create with default scalar selection', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder.query('Action').create().print();
 
@@ -321,8 +323,8 @@ it('create with default scalar selection', () => {
 
 it('create with custom selection', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder
     .query('Action')
@@ -331,8 +333,8 @@ it('create with custom selection', () => {
         id: true,
         name: true,
         photo: true,
-        title: true
-      }
+        title: true,
+      },
     })
     .print();
 
@@ -343,8 +345,8 @@ it('create with custom selection', () => {
 
 it('update with default scalar selection', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder.query('Action').update().print();
   expect(result._hash).toMatchSnapshot();
@@ -353,8 +355,8 @@ it('update with default scalar selection', () => {
 
 it('update with custom selection', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder
     .query('Action')
@@ -363,8 +365,8 @@ it('update with custom selection', () => {
         id: true,
         name: true,
         photo: true,
-        title: true
-      }
+        title: true,
+      },
     })
     .print();
   expect(/(id)|(name)|(photo)|(title)/gm.test(result._hash)).toBe(true);
@@ -374,8 +376,8 @@ it('update with custom selection', () => {
 
 it('delete', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
   const result = builder.query('Action').delete().print();
   expect(result._hash).toMatchSnapshot();
@@ -384,8 +386,8 @@ it('delete', () => {
 
 it('expands further selections of custom ast fields in nested selection', () => {
   const builder = new QueryBuilder({
-    meta: metaObject,
-    introspection
+    meta: typedMetaObject,
+    introspection: typedIntrospection,
   });
 
   const result = builder
@@ -396,10 +398,10 @@ it('expands further selections of custom ast fields in nested selection', () => 
           select: {
             id: true,
             location: true, // custom ast
-            timeRequired: true // custom ast
-          }
-        }
-      }
+            timeRequired: true, // custom ast
+          },
+        },
+      },
     })
     .print();
 

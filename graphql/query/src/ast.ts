@@ -1,15 +1,47 @@
-// @ts-nocheck
-
 import * as t from 'gql-ast';
+import type {
+  ArgumentNode,
+  DocumentNode,
+  FieldNode,
+  TypeNode,
+  ValueNode,
+  VariableDefinitionNode,
+} from 'graphql';
 import inflection from 'inflection';
+import plz from 'pluralize';
 
-import { getCustomAst, isIntervalType } from './custom-ast';
-
-const isObject = val => val !== null && typeof val === 'object';
+import { getCustomAst } from './custom-ast';
+import type {
+  ASTFunctionParams,
+  FieldSelection,
+  MutationASTParams,
+  NestedProperties,
+  ObjectArrayItem,
+  QueryProperty,
+} from './types';
 
 const NON_MUTABLE_PROPS = ['createdAt', 'createdBy', 'updatedAt', 'updatedBy'];
-const objectToArray = (obj) =>
-  Object.keys(obj).map((k) => ({ name: k, ...obj[k] }));
+
+const objectToArray = (obj: Record<string, QueryProperty>): ObjectArrayItem[] =>
+  Object.keys(obj).map((k) => ({
+    key: k,
+    name: obj[k].name || k,
+    type: obj[k].type,
+    isNotNull: obj[k].isNotNull,
+    isArray: obj[k].isArray,
+    isArrayNotNull: obj[k].isArrayNotNull,
+    properties: obj[k].properties,
+  }));
+
+interface CreateGqlMutationParams {
+  operationName: string;
+  mutationName: string;
+  selectArgs: ArgumentNode[];
+  selections: FieldNode[];
+  variableDefinitions: VariableDefinitionNode[];
+  modelName: string;
+  useModel?: boolean;
+}
 
 const createGqlMutation = ({
   operationName,
@@ -18,32 +50,32 @@ const createGqlMutation = ({
   selections,
   variableDefinitions,
   modelName,
-  useModel = true
-}) => {
-  const opSel = !modelName
+  useModel = true,
+}: CreateGqlMutationParams): DocumentNode => {
+  const opSel: FieldNode[] = !modelName
     ? [
-      t.field({
-        name: operationName,
-        args: selectArgs,
-        selectionSet: t.selectionSet({ selections })
-      })
-    ]
+        t.field({
+          name: operationName,
+          args: selectArgs,
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ]
     : [
-      t.field({
-        name: operationName,
-        args: selectArgs,
-        selectionSet: t.selectionSet({
-          selections: useModel
-            ? [
-              t.field({
-                name: modelName,
-                selectionSet: t.selectionSet({ selections })
-              })
-            ]
-            : selections
-        })
-      })
-    ];
+        t.field({
+          name: operationName,
+          args: selectArgs,
+          selectionSet: t.selectionSet({
+            selections: useModel
+              ? [
+                  t.field({
+                    name: modelName,
+                    selectionSet: t.selectionSet({ selections }),
+                  }),
+                ]
+              : selections,
+          }),
+        }),
+      ];
 
   return t.document({
     definitions: [
@@ -51,30 +83,35 @@ const createGqlMutation = ({
         operation: 'mutation',
         name: mutationName,
         variableDefinitions,
-        selectionSet: t.selectionSet({ selections: opSel })
-      })
-    ]
+        selectionSet: t.selectionSet({ selections: opSel }),
+      }),
+    ],
   });
 };
 
-export const getAll = ({ queryName, operationName, query, selection }) => {
+export const getAll = ({
+  queryName,
+  operationName,
+  query: _query,
+  selection,
+}: ASTFunctionParams): DocumentNode => {
   const selections = getSelections(selection);
 
-  const opSel = [
+  const opSel: FieldNode[] = [
     t.field({
       name: operationName,
-      selectionSet: t.objectValue({
-        fields: [
+      selectionSet: t.selectionSet({
+        selections: [
           t.field({
-            name: 'totalCount'
+            name: 'totalCount',
           }),
           t.field({
             name: 'nodes',
-            selectionSet: t.selectionSet({ selections })
-          })
-        ]
-      })
-    })
+            selectionSet: t.selectionSet({ selections }),
+          }),
+        ],
+      }),
+    }),
   ];
 
   const ast = t.document({
@@ -82,249 +119,52 @@ export const getAll = ({ queryName, operationName, query, selection }) => {
       t.operationDefinition({
         operation: 'query',
         name: queryName,
-        selectionSet: t.selectionSet({ selections: opSel })
-      })
-    ]
+        selectionSet: t.selectionSet({ selections: opSel }),
+      }),
+    ],
   });
 
   return ast;
 };
 
-export const getMany = ({
-  builder, // we can use props here to enable pagination, etc
+export const getCount = ({
   queryName,
   operationName,
   query,
-  selection
-}) => {
+}: Omit<ASTFunctionParams, 'selection'>): DocumentNode => {
   const Singular = query.model;
-  const Plural = operationName.charAt(0).toUpperCase() + operationName.slice(1);
-  const Condition = `${Singular}Condition`;
   const Filter = `${Singular}Filter`;
-  const OrderBy = `${Plural}OrderBy`;
-  const selections = getSelections(selection);
+  const Condition = `${Singular}Condition`;
 
-  const ast = t.document({
-    definitions: [
-      t.operationDefinition({
-        operation: 'query',
-        name: queryName,
-        variableDefinitions: [
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'first'
-            }),
-            type: t.namedType({
-              type: 'Int'
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'last'
-            }),
-            type: t.namedType({
-              type: 'Int'
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'after'
-            }),
-            type: t.namedType({
-              type: 'Cursor'
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'before'
-            }),
-            type: t.namedType({
-              type: 'Cursor'
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'offset'
-            }),
-            type: t.namedType({
-              type: 'Int'
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'condition'
-            }),
-            type: t.namedType({
-              type: Condition
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'filter'
-            }),
-            type: t.namedType({
-              type: Filter
-            })
-          }),
-          t.variableDefinition({
-            variable: t.variable({
-              name: 'orderBy'
-            }),
-            type: t.listType({
-              type: t.nonNullType({ type: t.namedType({ type: OrderBy }) })
-            })
-          })
-        ],
-        selectionSet: t.selectionSet({
-          selections: [
-            t.field({
-              name: operationName,
-              args: [
-                t.argument({
-                  name: 'first',
-                  value: t.variable({
-                    name: 'first'
-                  })
-                }),
-                t.argument({
-                  name: 'last',
-                  value: t.variable({
-                    name: 'last'
-                  })
-                }),
-                t.argument({
-                  name: 'offset',
-                  value: t.variable({
-                    name: 'offset'
-                  })
-                }),
-                t.argument({
-                  name: 'after',
-                  value: t.variable({
-                    name: 'after'
-                  })
-                }),
-                t.argument({
-                  name: 'before',
-                  value: t.variable({
-                    name: 'before'
-                  })
-                }),
-                t.argument({
-                  name: 'condition',
-                  value: t.variable({
-                    name: 'condition'
-                  })
-                }),
-                t.argument({
-                  name: 'filter',
-                  value: t.variable({
-                    name: 'filter'
-                  })
-                }),
-                t.argument({
-                  name: 'orderBy',
-                  value: t.variable({
-                    name: 'orderBy'
-                  })
-                })
-              ],
-              selectionSet: t.objectValue({
-                fields: [
-                  t.field({
-                    name: 'totalCount'
-                  }),
-                  t.field({
-                    name: 'pageInfo',
-                    selectionSet: t.selectionSet({
-                      selections: [
-                        t.field({ name: 'hasNextPage' }),
-                        t.field({ name: 'hasPreviousPage' }),
-                        t.field({ name: 'endCursor' }),
-                        t.field({ name: 'startCursor' })
-                      ]
-                    })
-                  }),
-                  builder._edges
-                    ? t.field({
-                      name: 'edges',
-                      selectionSet: t.selectionSet({
-                        selections: [
-                          t.field({ name: 'cursor' }),
-                          t.field({
-                            name: 'node',
-                            selectionSet: t.selectionSet({ selections })
-                          })
-                        ]
-                      })
-                    })
-                    : t.field({
-                      name: 'nodes',
-                      selectionSet: t.selectionSet({
-                        selections
-                      })
-                    })
-                ]
-              })
-            })
-          ]
-        })
-      })
-    ]
-  });
+  const variableDefinitions: VariableDefinitionNode[] = [
+    t.variableDefinition({
+      variable: t.variable({ name: 'condition' }),
+      type: t.namedType({ type: Condition }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'filter' }),
+      type: t.namedType({ type: Filter }),
+    }),
+  ];
 
-  return ast;
-};
+  const args: ArgumentNode[] = [
+    t.argument({ name: 'condition', value: t.variable({ name: 'condition' }) }),
+    t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
+  ];
 
-export const getOne = ({
-  builder, // we can use props here to enable pagination, etc
-  queryName,
-  operationName,
-  query,
-  selection
-}) => {
-  const variableDefinitions = Object.keys(query.properties)
-    .map((key) => ({ name: key, ...query.properties[key] }))
-    .filter((field) => field.isNotNull)
-    .map((field) => {
-      const {
-        name: fieldName,
-        type: fieldType,
-        isNotNull,
-        isArray,
-        isArrayNotNull
-      } = field;
-      let type = t.namedType({ type: fieldType });
-      if (isNotNull) type = t.nonNullType({ type });
-      if (isArray) {
-        type = t.listType({ type });
-        if (isArrayNotNull) type = t.nonNullType({ type });
-      }
-      return t.variableDefinition({
-        variable: t.variable({ name: fieldName }),
-        type
-      });
-    });
-
-  const props = objectToArray(query.properties);
-
-  const selectArgs = props
-    .filter((field) => field.isNotNull)
-    .map((field) => {
-      return t.argument({
-        name: field.name,
-        value: t.variable({ name: field.name })
-      });
-    });
-
-  const selections = getSelections(selection);
-
-  const opSel = [
+  // PostGraphile supports totalCount through connections
+  const opSel: FieldNode[] = [
     t.field({
       name: operationName,
-      args: selectArgs,
-      selectionSet: t.selectionSet({ selections })
-    })
+      args,
+      selectionSet: t.selectionSet({
+        selections: [
+          t.field({
+            name: 'totalCount',
+          }),
+        ],
+      }),
+    }),
   ];
 
   const ast = t.document({
@@ -333,9 +173,193 @@ export const getOne = ({
         operation: 'query',
         name: queryName,
         variableDefinitions,
-        selectionSet: t.selectionSet({ selections: opSel })
+        selectionSet: t.selectionSet({ selections: opSel }),
+      }),
+    ],
+  });
+
+  return ast;
+};
+
+export const getMany = ({
+  builder,
+  queryName,
+  operationName,
+  query,
+  selection,
+}: ASTFunctionParams): DocumentNode => {
+  const Singular = query.model;
+  const Plural = operationName.charAt(0).toUpperCase() + operationName.slice(1);
+  const Condition = `${Singular}Condition`;
+  const Filter = `${Singular}Filter`;
+  const OrderBy = `${Plural}OrderBy`;
+  const selections = getSelections(selection);
+
+  const variableDefinitions: VariableDefinitionNode[] = [
+    t.variableDefinition({
+      variable: t.variable({ name: 'first' }),
+      type: t.namedType({ type: 'Int' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'last' }),
+      type: t.namedType({ type: 'Int' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'after' }),
+      type: t.namedType({ type: 'Cursor' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'before' }),
+      type: t.namedType({ type: 'Cursor' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'offset' }),
+      type: t.namedType({ type: 'Int' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'condition' }),
+      type: t.namedType({ type: Condition }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'filter' }),
+      type: t.namedType({ type: Filter }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'orderBy' }),
+      type: t.listType({
+        type: t.nonNullType({ type: t.namedType({ type: OrderBy }) }),
+      }),
+    }),
+  ];
+
+  const args: ArgumentNode[] = [
+    t.argument({ name: 'first', value: t.variable({ name: 'first' }) }),
+    t.argument({ name: 'last', value: t.variable({ name: 'last' }) }),
+    t.argument({ name: 'offset', value: t.variable({ name: 'offset' }) }),
+    t.argument({ name: 'after', value: t.variable({ name: 'after' }) }),
+    t.argument({ name: 'before', value: t.variable({ name: 'before' }) }),
+    t.argument({ name: 'condition', value: t.variable({ name: 'condition' }) }),
+    t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
+    t.argument({ name: 'orderBy', value: t.variable({ name: 'orderBy' }) }),
+  ];
+
+  const pageInfoFields: FieldNode[] = [
+    t.field({ name: 'hasNextPage' }),
+    t.field({ name: 'hasPreviousPage' }),
+    t.field({ name: 'endCursor' }),
+    t.field({ name: 'startCursor' }),
+  ];
+
+  const dataField: FieldNode = builder?._edges
+    ? t.field({
+        name: 'edges',
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({ name: 'cursor' }),
+            t.field({
+              name: 'node',
+              selectionSet: t.selectionSet({ selections }),
+            }),
+          ],
+        }),
       })
-    ]
+    : t.field({
+        name: 'nodes',
+        selectionSet: t.selectionSet({ selections }),
+      });
+
+  const connectionFields: FieldNode[] = [
+    t.field({ name: 'totalCount' }),
+    t.field({
+      name: 'pageInfo',
+      selectionSet: t.selectionSet({ selections: pageInfoFields }),
+    }),
+    dataField,
+  ];
+
+  const ast = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'query',
+        name: queryName,
+        variableDefinitions,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: operationName,
+              args,
+              selectionSet: t.selectionSet({ selections: connectionFields }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return ast;
+};
+
+export const getOne = ({
+  queryName,
+  operationName,
+  query,
+  selection,
+}: ASTFunctionParams): DocumentNode => {
+  const variableDefinitions: VariableDefinitionNode[] = Object.keys(
+    query.properties
+  )
+    .map((key) => ({ key, ...query.properties[key] }))
+    .filter((field) => field.isNotNull)
+    .map((field) => {
+      const {
+        key: fieldName,
+        type: fieldType,
+        isNotNull,
+        isArray,
+        isArrayNotNull,
+      } = field;
+      let type: TypeNode = t.namedType({ type: fieldType });
+      if (isNotNull) type = t.nonNullType({ type });
+      if (isArray) {
+        type = t.listType({ type });
+        if (isArrayNotNull) type = t.nonNullType({ type });
+      }
+      return t.variableDefinition({
+        variable: t.variable({ name: fieldName }),
+        type,
+      });
+    });
+
+  const props = objectToArray(query.properties);
+
+  const selectArgs: ArgumentNode[] = props
+    .filter((field) => field.isNotNull)
+    .map((field) => {
+      return t.argument({
+        name: field.name,
+        value: t.variable({ name: field.name }),
+      });
+    });
+
+  const selections = getSelections(selection);
+
+  const opSel: FieldNode[] = [
+    t.field({
+      name: operationName,
+      args: selectArgs,
+      selectionSet: t.selectionSet({ selections }),
+    }),
+  ];
+
+  const ast = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'query',
+        name: queryName,
+        variableDefinitions,
+        selectionSet: t.selectionSet({ selections: opSel }),
+      }),
+    ],
   });
   return ast;
 };
@@ -344,29 +368,35 @@ export const createOne = ({
   mutationName,
   operationName,
   mutation,
-  selection
-}) => {
+  selection,
+}: MutationASTParams): DocumentNode => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
-    return;
+    throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
   const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+    [plz.singular(mutation.model)].join('_'),
     true
   );
 
-  const allAttrs = objectToArray(
-    mutation.properties.input.properties[modelName].properties
-  );
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const modelProperties = inputProperties[modelName] as QueryProperty;
 
+  if (!modelProperties.properties) {
+    throw new Error(`No properties found for model: ${modelName}`);
+  }
+
+  const allAttrs = objectToArray(
+    modelProperties.properties as Record<string, QueryProperty>
+  );
   const attrs = allAttrs.filter(
     (field) => !NON_MUTABLE_PROPS.includes(field.name)
   );
 
   const variableDefinitions = getCreateVariablesAst(attrs);
 
-  const selectArgs = [
+  const selectArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
       value: t.objectValue({
@@ -377,16 +407,14 @@ export const createOne = ({
               fields: attrs.map((field) =>
                 t.objectField({
                   name: field.name,
-                  value: t.variable({
-                    name: field.name
-                  })
+                  value: t.variable({ name: field.name }),
                 })
-              )
-            })
-          })
-        ]
-      })
-    })
+              ),
+            }),
+          }),
+        ],
+      }),
+    }),
   ];
 
   const selections = selection
@@ -399,7 +427,7 @@ export const createOne = ({
     selectArgs,
     selections,
     variableDefinitions,
-    modelName
+    modelName,
   });
 
   return ast;
@@ -409,35 +437,36 @@ export const patchOne = ({
   mutationName,
   operationName,
   mutation,
-  selection
-}) => {
+  selection,
+}: MutationASTParams): DocumentNode => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
-    return;
+    throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
   const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+    [plz.singular(mutation.model)].join('_'),
     true
   );
 
-  const allAttrs = objectToArray(
-    mutation.properties.input.properties['patch']?.properties || {}
-  );
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const patchProperties = inputProperties['patch'] as QueryProperty;
+
+  const allAttrs = patchProperties?.properties
+    ? objectToArray(patchProperties.properties as Record<string, QueryProperty>)
+    : [];
 
   const patchAttrs = allAttrs.filter(
     (prop) => !NON_MUTABLE_PROPS.includes(prop.name)
   );
-
   const patchByAttrs = objectToArray(
-    mutation.properties.input.properties
+    inputProperties as Record<string, QueryProperty>
   ).filter((n) => n.name !== 'patch');
-
   const patchers = patchByAttrs.map((p) => p.name);
 
   const variableDefinitions = getUpdateVariablesAst(patchAttrs, patchers);
 
-  const selectArgs = [
+  const selectArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
       value: t.objectValue({
@@ -445,7 +474,7 @@ export const patchOne = ({
           ...patchByAttrs.map((field) =>
             t.objectField({
               name: field.name,
-              value: t.variable({ name: field.name })
+              value: t.variable({ name: field.name }),
             })
           ),
           t.objectField({
@@ -456,16 +485,14 @@ export const patchOne = ({
                 .map((field) =>
                   t.objectField({
                     name: field.name,
-                    value: t.variable({
-                      name: field.name
-                    })
+                    value: t.variable({ name: field.name }),
                   })
-                )
-            })
-          })
-        ]
-      })
-    })
+                ),
+            }),
+          }),
+        ],
+      }),
+    }),
   ];
 
   const selections = selection
@@ -478,61 +505,65 @@ export const patchOne = ({
     selectArgs,
     selections,
     variableDefinitions,
-    modelName
+    modelName,
   });
 
   return ast;
 };
 
-export const deleteOne = ({ mutationName, operationName, mutation }) => {
+export const deleteOne = ({
+  mutationName,
+  operationName,
+  mutation,
+}: Omit<MutationASTParams, 'selection'>): DocumentNode => {
   if (!mutation.properties?.input?.properties) {
-    console.log('no input field for mutation for' + mutationName);
-    return;
+    throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
   const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+    [plz.singular(mutation.model)].join('_'),
     true
   );
 
-  const deleteAttrs = objectToArray(mutation.properties.input.properties);
-  const variableDefinitions = deleteAttrs.map((field) => {
-    const {
-      name: fieldName,
-      type: fieldType,
-      isNotNull,
-      isArray,
-      isArrayNotNull
-    } = field;
-    let type = t.namedType({ type: fieldType });
-    if (isNotNull) type = t.nonNullType({ type });
-    if (isArray) {
-      type = t.listType({ type });
-      // no need to check isArrayNotNull since we need this field for deletion
-      type = t.nonNullType({ type });
-    }
-    return t.variableDefinition({
-      variable: t.variable({ name: fieldName }),
-      type
-    });
-  });
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const deleteAttrs = objectToArray(
+    inputProperties as Record<string, QueryProperty>
+  );
 
-  const selectArgs = [
+  const variableDefinitions: VariableDefinitionNode[] = deleteAttrs.map(
+    (field) => {
+      const { name: fieldName, type: fieldType, isNotNull, isArray } = field;
+      let type: TypeNode = t.namedType({ type: fieldType });
+      if (isNotNull) type = t.nonNullType({ type });
+      if (isArray) {
+        type = t.listType({ type });
+        // no need to check isArrayNotNull since we need this field for deletion
+        type = t.nonNullType({ type });
+      }
+      return t.variableDefinition({
+        variable: t.variable({ name: fieldName }),
+        type,
+      });
+    }
+  );
+
+  const selectArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
       value: t.objectValue({
         fields: deleteAttrs.map((f) =>
           t.objectField({
             name: f.name,
-            value: t.variable({ name: f.name })
+            value: t.variable({ name: f.name }),
           })
-        )
-      })
-    })
+        ),
+      }),
+    }),
   ];
 
   // so we can support column select grants plugin
-  const selections = [t.field({ name: 'clientMutationId' })];
+  const selections: FieldNode[] = [t.field({ name: 'clientMutationId' })];
   const ast = createGqlMutation({
     operationName,
     mutationName,
@@ -540,118 +571,108 @@ export const deleteOne = ({ mutationName, operationName, mutation }) => {
     selections,
     useModel: false,
     variableDefinitions,
-    modelName
+    modelName,
   });
 
   return ast;
 };
 
-export function getSelections(selection = []) {
-  const selectionAst = (field) => {
+export function getSelections(selection: FieldSelection[] = []): FieldNode[] {
+  const selectionAst = (field: string | FieldSelection): FieldNode => {
     return typeof field === 'string'
-      ? t.field({
-        name: field
-      })
-      : getCustomAst(field.fieldDefn);
+      ? t.field({ name: field })
+      : getCustomAst(field.fieldDefn) || t.field({ name: field.name });
   };
 
   return selection
-    .map((selectionDefn) => {
+    .map((selectionDefn): FieldNode | null => {
       if (selectionDefn.isObject) {
         const { name, selection, variables = {}, isBelongTo } = selectionDefn;
-        return t.field({
-          name,
-          args: Object.entries(variables).reduce((args, variable) => {
+
+        const args: ArgumentNode[] = Object.entries(variables).reduce(
+          (acc: ArgumentNode[], variable) => {
             const [argName, argValue] = variable;
             const argAst = t.argument({
               name: argName,
-              value: getValueAst(argValue)
+              value: getComplexValueAst(argValue),
             });
-            args = argAst ? [...args, argAst] : args;
-            return args;
-          }, []),
-          selectionSet: isBelongTo
-            ? t.selectionSet({
-              selections: selection.map((field) => selectionAst(field))
-            })
-            : t.objectValue({
-              fields: [
-                t.field({
-                  name: 'totalCount'
-                }),
+            return argAst ? [...acc, argAst] : acc;
+          },
+          []
+        );
+
+        const subSelections =
+          selection?.map((field) => selectionAst(field)) || [];
+
+        const selectionSet = isBelongTo
+          ? t.selectionSet({ selections: subSelections })
+          : t.selectionSet({
+              selections: [
+                t.field({ name: 'totalCount' }),
                 t.field({
                   name: 'nodes',
-                  selectionSet: t.selectionSet({
-                    selections: selection.map((field) => selectionAst(field))
-                  })
-                })
-              ]
-            })
+                  selectionSet: t.selectionSet({ selections: subSelections }),
+                }),
+              ],
+            });
+
+        return t.field({
+          name,
+          args,
+          selectionSet,
         });
       } else {
-        const { fieldDefn } = selectionDefn;
-        // Field is not found in model meta, do nothing
-        if (!fieldDefn) return null;
-
-        return getCustomAst(fieldDefn);
+        return selectionAst(selectionDefn);
       }
     })
-    .filter(Boolean);
+    .filter((node): node is FieldNode => node !== null);
 }
 
-/**
- * Get argument AST from a value
- * @param {*} value
- * @returns {Object} AST for the argument
- */
-function getValueAst(value) {
-  if (value == null) {
+function getComplexValueAst(value: unknown): ValueNode {
+  // Handle null
+  if (value === null) {
     return t.nullValue();
   }
 
+  // Handle primitives
+  if (typeof value === 'boolean') {
+    return t.booleanValue({ value });
+  }
+
   if (typeof value === 'number') {
-    return t.intValue({ value });
+    return t.intValue({ value: value.toString() });
   }
 
   if (typeof value === 'string') {
     return t.stringValue({ value });
   }
 
-  if (typeof value === 'boolean') {
-    return t.booleanValue({ value });
-  }
-
+  // Handle arrays
   if (Array.isArray(value)) {
-    return t.listValue({ values: value.map((v) => getValueAst(v)) });
-  }
-
-  if (isObject(value)) {
-    return t.objectValue({
-      fields: Object.entries(value).reduce((fields, entry) => {
-        const [objKey, objValue] = entry;
-        fields = [
-          ...fields,
-          t.objectField({
-            name: objKey,
-            value: getValueAst(objValue)
-          })
-        ];
-        return fields;
-      }, [])
+    return t.listValue({
+      values: value.map((item) => getComplexValueAst(item)),
     });
   }
+
+  // Handle objects
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    return t.objectValue({
+      fields: Object.entries(obj).map(([key, val]) =>
+        t.objectField({
+          name: key,
+          value: getComplexValueAst(val),
+        })
+      ),
+    });
+  }
+
+  throw new Error(`Unsupported value type: ${typeof value}`);
 }
 
-const CustomInputTypes = {
-  interval: 'IntervalInput'
-};
-
-/**
- * Get mutation variables AST from attributes array
- * @param {Array} attrs
- * @returns {Object} AST for the variables
- */
-function getCreateVariablesAst(attrs) {
+function getCreateVariablesAst(
+  attrs: ObjectArrayItem[]
+): VariableDefinitionNode[] {
   return attrs.map((field) => {
     const {
       name: fieldName,
@@ -659,17 +680,8 @@ function getCreateVariablesAst(attrs) {
       isNotNull,
       isArray,
       isArrayNotNull,
-      properties
     } = field;
-
-    let type;
-
-    if (properties == null) {
-      type = t.namedType({ type: fieldType });
-    } else if (isIntervalType(properties)) {
-      type = t.namedType({ type: CustomInputTypes.interval });
-    }
-
+    let type: TypeNode = t.namedType({ type: fieldType });
     if (isNotNull) type = t.nonNullType({ type });
     if (isArray) {
       type = t.listType({ type });
@@ -677,40 +689,41 @@ function getCreateVariablesAst(attrs) {
     }
     return t.variableDefinition({
       variable: t.variable({ name: fieldName }),
-      type
+      type,
     });
   });
 }
 
-/**
- * Get mutation variables AST from attributes array
- * @param {Array} attrs
- * @returns {Object} AST for the variables
- */
-function getUpdateVariablesAst(attrs, patchers) {
-  return attrs.map((field) => {
-    const {
-      name: fieldName,
-      type: fieldType,
-      isNotNull,
-      isArray,
-      properties
-    } = field;
+function getUpdateVariablesAst(
+  attrs: ObjectArrayItem[],
+  patchers: string[]
+): VariableDefinitionNode[] {
+  const patchVariables: VariableDefinitionNode[] = attrs
+    .filter((field) => !patchers.includes(field.name))
+    .map((field) => {
+      const {
+        name: fieldName,
+        type: fieldType,
+        isArray,
+        isArrayNotNull,
+      } = field;
+      let type: TypeNode = t.namedType({ type: fieldType });
+      if (isArray) {
+        type = t.listType({ type });
+        if (isArrayNotNull) type = t.nonNullType({ type });
+      }
+      return t.variableDefinition({
+        variable: t.variable({ name: fieldName }),
+        type,
+      });
+    });
 
-    let type;
-
-    if (properties == null) {
-      type = t.namedType({ type: fieldType });
-    } else if (isIntervalType(properties)) {
-      type = t.namedType({ type: CustomInputTypes.interval });
-    }
-
-    if (isNotNull) type = t.nonNullType({ type });
-    if (isArray) type = t.listType({ type });
-    if (patchers.includes(field.name)) type = t.nonNullType({ type });
+  const patcherVariables: VariableDefinitionNode[] = patchers.map((patcher) => {
     return t.variableDefinition({
-      variable: t.variable({ name: fieldName }),
-      type
+      variable: t.variable({ name: patcher }),
+      type: t.nonNullType({ type: t.namedType({ type: 'String' }) }),
     });
   });
+
+  return [...patchVariables, ...patcherVariables];
 }

@@ -10,6 +10,6 @@ export function validateMetaObject(obj: any) {
 
   return {
     errors: ajv.errors,
-    message: ajv.errorsText(ajv.errors, { separator: '\n' })
+    message: ajv.errorsText(ajv.errors, { separator: '\n' }),
   };
 }
