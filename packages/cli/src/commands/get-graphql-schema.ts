@@ -20,8 +20,9 @@ Options:
 `
 
 const defaultSchemas = [
-  'collections_public',
-  'dashboard_public'
+  'metaschema_public',
+  'metaschema_modules_public',
+  'services_public'
 ]
 
 export default async (
