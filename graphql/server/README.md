@@ -33,13 +33,13 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 GraphQLServer(
   getEnvOptions({
     pg: { database: 'constructive_db' },
-    server: { host: '0.0.0.0', port: 3000 }
+    server: { host: '0.0.0.0', port: 3000 },
   })
 );
 ```
 
 > **Tip:** Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` to control DB connectivity.
-See [Configuration](#configuration) for the full list of supported env vars and defaults.
+> See [Configuration](#configuration) for the full list of supported env vars and defaults.
 
 ### Local Development (this repo)
 
@@ -50,9 +50,9 @@ pnpm dev
 ```
 
 This starts the server with env defaults from `@constructive-io/graphql-env`.
-> **Tip:** Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` to control DB connectivity.
-See [Configuration](#configuration) for the full list of supported env vars and defaults.
 
+> **Tip:** Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` to control DB connectivity.
+> See [Configuration](#configuration) for the full list of supported env vars and defaults.
 
 ## What it does
 
@@ -79,7 +79,7 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 
 When `API_ENABLE_META=true` (default):
 
-- The server resolves APIs from `meta_public.domains` using the request host.
+- The server resolves APIs from `services_public.domains` using the request host.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
 - In private mode (`API_IS_PUBLIC=false`), you can override with headers:
   - `X-Api-Name` + `X-Database-Id`
@@ -95,24 +95,24 @@ When `API_ENABLE_META=false`:
 
 Configuration is merged from defaults, config files, and env vars via `@constructive-io/graphql-env`. See `graphql/env/README.md` for the full list and examples.
 
-| Env var | Purpose | Default |
-| --- | --- | --- |
-| `PGHOST` | Postgres host | `localhost` |
-| `PGPORT` | Postgres port | `5432` |
-| `PGUSER` | Postgres user | `postgres` |
-| `PGPASSWORD` | Postgres password | `password` |
-| `PGDATABASE` | Postgres database | `postgres` |
-| `GRAPHILE_SCHEMA` | Comma-separated schemas to expose | empty |
-| `FEATURES_SIMPLE_INFLECTION` | Enable simple inflection | `true` |
-| `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names | `true` |
-| `FEATURES_POSTGIS` | Enable PostGIS support | `true` |
-| `API_ENABLE_META` | Enable meta API routing | `true` |
-| `API_IS_PUBLIC` | Serve public APIs only | `true` |
-| `API_EXPOSED_SCHEMAS` | Schemas when meta routing is disabled | empty |
-| `API_META_SCHEMAS` | Meta schemas to query | `collections_public,meta_public` |
-| `API_ANON_ROLE` | Anonymous role name | `administrator` |
-| `API_ROLE_NAME` | Authenticated role name | `administrator` |
-| `API_DEFAULT_DATABASE_ID` | Default database ID | `hard-coded` |
+| Env var                        | Purpose                               | Default                                                       |
+| ------------------------------ | ------------------------------------- | ------------------------------------------------------------- |
+| `PGHOST`                       | Postgres host                         | `localhost`                                                   |
+| `PGPORT`                       | Postgres port                         | `5432`                                                        |
+| `PGUSER`                       | Postgres user                         | `postgres`                                                    |
+| `PGPASSWORD`                   | Postgres password                     | `password`                                                    |
+| `PGDATABASE`                   | Postgres database                     | `postgres`                                                    |
+| `GRAPHILE_SCHEMA`              | Comma-separated schemas to expose     | empty                                                         |
+| `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
+| `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
+| `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |
+| `API_ENABLE_META`              | Enable meta API routing               | `true`                                                        |
+| `API_IS_PUBLIC`                | Serve public APIs only                | `true`                                                        |
+| `API_EXPOSED_SCHEMAS`          | Schemas when meta routing is disabled | empty                                                         |
+| `API_META_SCHEMAS`             | Meta schemas to query                 | `services_public,metaschema_public,metaschema_modules_public` |
+| `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
+| `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
+| `API_DEFAULT_DATABASE_ID`      | Default database ID                   | `hard-coded`                                                  |
 
 ## Testing
 

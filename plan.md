@@ -58,7 +58,7 @@ The `pgpm export` command's `meta_public` schema export is broken. The export fu
    - Transaction-isolated tests with automatic rollback
 
 3. **Test approach**:
-   - Install `@pgpm/db-meta-schema` and `@pgpm/db-meta-modules`
+   - Install `@pgpm/metaschema-schema` and `@pgpm/metaschema-modules`
    - Seed representative data into all relevant tables
    - Call `exportMeta()` to generate SQL
    - Execute generated SQL in a fresh transaction
@@ -94,8 +94,8 @@ extensions/@pgpm/export-meta-test/
 
 ## Dependencies
 
-- `@pgpm/db-meta-schema` - Core schema definitions
-- `@pgpm/db-meta-modules` - Module table definitions
+- `@pgpm/metaschema-schema` - Core schema definitions
+- `@pgpm/metaschema-modules` - Module table definitions
 - `pgsql-test` - Test infrastructure
 - `@pgpmjs/core` - Export functionality to test
 

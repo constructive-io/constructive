@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/constructive-io/constructive/compare/introspectron@2.14.48...introspectron@2.15.0) (2026-01-05)
+
+**Note:** Version bump only for package introspectron
+
 ## [2.14.48](https://github.com/constructive-io/constructive/compare/introspectron@2.14.47...introspectron@2.14.48) (2026-01-05)
 
 **Note:** Version bump only for package introspectron

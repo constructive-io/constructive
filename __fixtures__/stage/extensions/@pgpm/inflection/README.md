@@ -297,7 +297,7 @@ SELECT slug FROM blog_posts;
 
 ## Integration Examples
 
-### With @pgpm/db-meta-schema
+### With @pgpm/metaschema-schema
 
 Use inflection for schema introspection and code generation:
 

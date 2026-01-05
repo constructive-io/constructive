@@ -1,14 +1,18 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
-import { NextFunction,Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
 
 const log = new Logger('flush');
 
-export const flush = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const flush = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   if (req.url === '/flush') {
     // TODO: check bearer for a flush / special key
     graphileCache.delete((req as any).svc_key);
@@ -19,7 +23,10 @@ export const flush = async (req: Request, res: Response, next: NextFunction): Pr
   return next();
 };
 
-export const flushService = async (opts: ConstructiveOptions, databaseId: string): Promise<void> => {
+export const flushService = async (
+  opts: ConstructiveOptions,
+  databaseId: string
+): Promise<void> => {
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
 
@@ -38,7 +45,7 @@ export const flushService = async (opts: ConstructiveOptions, databaseId: string
 
   const svc = await pgPool.query(
     `SELECT *
-     FROM meta_public.domains
+     FROM services_public.domains
      WHERE database_id = $1`,
     [databaseId]
   );
