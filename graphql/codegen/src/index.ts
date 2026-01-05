@@ -1,3 +1,22 @@
-export * from './gql'
-export * from './codegen'
-export * from './options'
+/**
+ * @constructive-io/graphql-codegen
+ *
+ * CLI-based GraphQL SDK generator for PostGraphile endpoints.
+ * Introspects via _meta query and generates typed queries, mutations,
+ * and React Query v5 hooks.
+ */
+
+// Core types
+export * from './types';
+
+// Core query building
+export * from './core';
+
+// Generators
+export * from './generators';
+
+// Client utilities
+export * from './client';
+
+// Config definition helper
+export { defineConfig } from './types/config';

@@ -13,11 +13,30 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [2.17.50](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.49...@constructive-io/graphql-codegen@2.17.50) (2026-01-05)
 
+### BREAKING CHANGES
+
+- **Complete package migration**: This package has been completely replaced with the code from `@constructive-io/graphql-sdk` (dashboard/packages/graphql-sdk)
+- New CLI-based GraphQL SDK generator for PostGraphile endpoints with React Query hooks and Prisma-like ORM support
+- Build system changed from `makage` to `tsup`
+- Test framework changed from `jest` to `jest` (with ESM support)
+- New CLI binary: `graphql-codegen`
+- Added peer dependencies: `@tanstack/react-query`, `react`
+- Uses workspace dependency for `gql-ast`
+
+### Features
+
+- CLI commands: `init`, `generate`, `generate-orm`
+- React Query hooks generation
+- Prisma-like ORM client generation
+- Watch mode with schema change detection
+- Full TypeScript support with type inference
+
+---
+
+## [2.17.49](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.49...@constructive-io/graphql-codegen@2.17.50) (2026-01-04)
+
 **Note:** Version bump only for package @constructive-io/graphql-codegen
 
-## [2.17.49](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.48...@constructive-io/graphql-codegen@2.17.49) (2026-01-05)
-
-**Note:** Version bump only for package @constructive-io/graphql-codegen
 
 ## [2.17.48](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.47...@constructive-io/graphql-codegen@2.17.48) (2026-01-03)
 

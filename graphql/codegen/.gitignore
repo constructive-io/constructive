@@ -1,0 +1,19 @@
+# Build output
+dist/
+
+# Generated SDK output (for testing)
+output-rq
+output-orm/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Logs
+*.log

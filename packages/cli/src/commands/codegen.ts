@@ -1,10 +1,7 @@
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
-import { promises as fs } from 'fs'
+import { spawnSync } from 'child_process'
 import { join } from 'path'
-import yaml from 'js-yaml'
-import { runCodegen, defaultGraphQLCodegenOptions, mergeGraphQLCodegenOptions, GraphQLCodegenOptions } from '@constructive-io/graphql-codegen'
-import { fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -13,38 +10,13 @@ Constructive GraphQL Codegen:
 
 Options:
   --help, -h                 Show this help message
-  --config <path>            Config file (json|yaml)
-  --schema <path>            Schema SDL file path
-  --endpoint <url>           GraphQL endpoint to fetch schema via introspection
-  --headerHost <host>        Optional Host header to send with endpoint requests
-  --auth <token>             Optional Authorization header value (e.g., "Bearer 123")
-  --header "Name: Value"    Optional HTTP header; repeat to add multiple headers
-  --out <dir>                Output root directory (default: graphql/codegen/dist)
-  --format <gql|ts>          Document format (default: gql)
-  --convention <style>       Filename convention (dashed|underscore|camelcase|camelUpper)
-  --emitTypes <bool>         Emit types (default: true)
-  --emitOperations <bool>    Emit operations (default: true)
-  --emitSdk <bool>           Emit sdk (default: true)
-  --allowQuery <name>        Only generate for this root field (repeatable)
-  --excludeQuery <name>      Exclude this root field (repeatable)
-  --excludePattern <regex>   Exclude fields matching regex (repeatable)
+  --config <path>            Path to graphql-codegen config file
+  --endpoint <url>           GraphQL endpoint URL
+  --auth <token>             Authorization header value (e.g., "Bearer 123")
+  --out <dir>                Output directory (default: graphql/codegen/dist)
+  --dry-run                  Preview without writing files
+  -v, --verbose              Verbose output
 `
-
-function parseBool(v: any, d: boolean): boolean {
-  if (v === undefined) return d
-  if (typeof v === 'boolean') return v
-  const s = String(v).toLowerCase()
-  if (s === 'true') return true
-  if (s === 'false') return false
-  return d
-}
-
-async function loadConfig(path: string): Promise<Partial<GraphQLCodegenOptions>> {
-  const content = await fs.readFile(path, 'utf8')
-  if (/\.ya?ml$/i.test(path)) return yaml.load(content) as any
-  if (/\.json$/i.test(path)) return JSON.parse(content)
-  return {}
-}
 
 export default async (
   argv: Partial<ParsedArgs>,
@@ -57,68 +29,23 @@ export default async (
   }
 
   const cwd = (argv.cwd as string) || process.cwd()
+  const endpoint = (argv.endpoint as string) || ''
+  const outDir = (argv.out as string) || 'graphql/codegen/dist'
+  const auth = (argv.auth as string) || ''
   const configPath = (argv.config as string) || ''
+  const dryRun = !!(argv['dry-run'] || argv.dryRun)
+  const verbose = !!(argv.verbose || argv.v)
 
-  let fileOpts: Partial<GraphQLCodegenOptions> = {}
-  if (configPath) fileOpts = await loadConfig(configPath)
+  const envBin = process.env.CONSTRUCTIVE_CODEGEN_BIN
+  const bin = envBin || require.resolve('@constructive-io/graphql-codegen/bin/graphql-codegen.js')
+  const args: string[] = ['generate']
+  if (configPath) args.push('-c', configPath)
+  if (endpoint) args.push('-e', endpoint)
+  if (outDir) args.push('-o', outDir)
+  if (auth) args.push('-a', auth)
+  if (dryRun) args.push('--dry-run')
+  if (verbose) args.push('-v')
 
-  const overrides: Partial<GraphQLCodegenOptions> = {}
-  if (argv.schema) overrides.input = { ...(overrides.input || {}), schema: String(argv.schema) }
-  if (argv.endpoint) overrides.input = { ...(overrides.input || {}), endpoint: String(argv.endpoint) } as any
-  const headerHost = (argv.headerHost as string) ?? ''
-  const auth = (argv.auth as string) ?? ''
-  const headerArg = argv.header as string | string[] | undefined
-  const headerList = Array.isArray(headerArg) ? headerArg : headerArg ? [headerArg] : []
-  const headers: Record<string, string> = {}
-  if (auth) headers['Authorization'] = auth
-  for (const h of headerList) {
-    const idx = typeof h === 'string' ? h.indexOf(':') : -1
-    if (idx <= 0) continue
-    const name = h.slice(0, idx).trim()
-    const value = h.slice(idx + 1).trim()
-    if (!name) continue
-    headers[name] = value
-  }
-  if (Object.keys(headers).length) overrides.input = { ...(overrides.input || {}), headers } as any
-  if (argv.out) overrides.output = { ...(overrides.output || {}), root: String(argv.out) } as any
-  if (argv.format) overrides.documents = { ...(overrides.documents || {}), format: String(argv.format) as any } as any
-  if (argv.convention) overrides.documents = { ...(overrides.documents || {}), convention: String(argv.convention) as any } as any
-  const allowQueryArg = argv.allowQuery as string | string[] | undefined
-  const excludeQueryArg = argv.excludeQuery as string | string[] | undefined
-  const excludePatternArg = argv.excludePattern as string | string[] | undefined
-  const allowQueries = Array.isArray(allowQueryArg) ? allowQueryArg : allowQueryArg ? [String(allowQueryArg)] : []
-  const excludeQueries = Array.isArray(excludeQueryArg) ? excludeQueryArg : excludeQueryArg ? [String(excludeQueryArg)] : []
-  const excludePatterns = Array.isArray(excludePatternArg) ? excludePatternArg : excludePatternArg ? [String(excludePatternArg)] : []
-  if (allowQueries.length || excludeQueries.length || excludePatterns.length) {
-    overrides.documents = { ...(overrides.documents || {}), allowQueries, excludeQueries, excludePatterns } as any
-  }
-  const emitTypes = parseBool(argv.emitTypes, true)
-  const emitOperations = parseBool(argv.emitOperations, true)
-  const emitSdk = parseBool(argv.emitSdk, true)
-  overrides.features = { emitTypes, emitOperations, emitSdk }
-
-  const merged = mergeGraphQLCodegenOptions(defaultGraphQLCodegenOptions, fileOpts as any)
-  const finalOptions = mergeGraphQLCodegenOptions(merged, overrides)
-
-  if (finalOptions.input.endpoint && headerHost) {
-    const opts: any = {}
-    if (headerHost) opts.headerHost = headerHost
-    if (auth) opts.auth = auth
-    if (Object.keys(headers).length) opts.headers = headers
-    const sdl = await (fetchEndpointSchemaSDL as any)(String(finalOptions.input.endpoint), opts)
-    const tmpSchemaPath = join(cwd, '.constructive-codegen-schema.graphql')
-    await fs.writeFile(tmpSchemaPath, sdl, 'utf8')
-    finalOptions.input.schema = tmpSchemaPath as any
-    ;(finalOptions.input as any).endpoint = ''
-  }
-
-  const hasSchema = !!finalOptions.input.schema && String(finalOptions.input.schema).trim() !== ''
-  const hasEndpoint = !!(finalOptions.input as any).endpoint && String((finalOptions.input as any).endpoint).trim() !== ''
-  if (!hasSchema && !hasEndpoint) {
-    console.error('Missing --schema or --endpoint or config.input')
-    process.exit(1)
-  }
-
-  const result = await runCodegen(finalOptions, cwd)
-  console.log(`Generated at ${join(result.root)}`)
+  const res = spawnSync(process.execPath, [bin, ...args], { cwd, stdio: 'inherit' })
+  if ((res.status ?? 0) !== 0) process.exit(res.status ?? 1)
 }
