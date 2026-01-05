@@ -1,0 +1,7 @@
+# metaschema-modules extension
+comment = 'metaschema-modules extension'
+default_version = '0.14.0'
+module_pathname = '$libdir/metaschema-modules'
+requires = 'plpgsql,metaschema-schema,pgpm-verify'
+relocatable = false
+superuser = false

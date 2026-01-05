@@ -1,8 +1,0 @@
-# db-meta-modules extension
-comment = 'db-meta-modules extension'
-default_version = '0.14.0'
-module_pathname = '$libdir/db-meta-modules'
-requires = 'plpgsql,db-meta-schema,pgpm-verify'
-relocatable = false
-superuser = false
-
