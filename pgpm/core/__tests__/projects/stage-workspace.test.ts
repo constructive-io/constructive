@@ -33,7 +33,7 @@ describe('Staging Fixture Tests', () => {
       const modules = await project.getModules();
       expect(Array.isArray(modules)).toBe(true);
       expect(modules.length).toBeGreaterThan(0);
-      
+
       const moduleNames = modules.map(m => m.getModuleName());
       expect(moduleNames).toContain('unique-names');
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
@@ -44,7 +44,7 @@ describe('Staging Fixture Tests', () => {
     it('returns available modules from both extensions and packages', async () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
-      
+
       const availableModules = await project.getAvailableModules();
       expect(Array.isArray(availableModules)).toBe(true);
       expect(availableModules.length).toBeGreaterThan(0);
@@ -66,7 +66,7 @@ describe('Staging Fixture Tests', () => {
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
       expect(moduleNames.some(name => name.includes('pgpm-base32'))).toBe(true);
 
-      expect(moduleNames.some(name => name.includes('db-meta'))).toBe(true);
+            expect(moduleNames.some(name => name.includes('metaschema'))).toBe(true);
 
       modules.forEach(mod => {
         expect(mod.isInModule()).toBe(true);
@@ -80,12 +80,12 @@ describe('Staging Fixture Tests', () => {
 
       const modules = await project.getModules();
       const moduleMap = project.getModuleMap();
-      
+
       expect(Object.keys(moduleMap).length).toBeGreaterThan(0);
-      
+
       expect(moduleMap['unique-names']).toBeDefined();
       expect(moduleMap['unique-names'].path).toContain('packages/unique-names');
-      
+
       modules.forEach(mod => {
         const moduleName = mod.getModuleName();
         const moduleInfo = moduleMap[moduleName];
@@ -120,7 +120,7 @@ describe('Staging Fixture Tests', () => {
 
       expect(project.getContext()).toBe(PackageContext.ModuleInsideWorkspace);
       expect(project.isInModule()).toBe(true);
-      
+
       const name = project.getModuleName();
       expect(name).toBe('pgpm-uuid');
     });
@@ -159,7 +159,7 @@ describe('Staging Fixture Tests', () => {
     it('gets dependency changes with versions for internal modules', async () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
-      
+
       const result = await project.getModuleDependencyChanges('unique-names');
       expect(result).toHaveProperty('native');
       expect(result).toHaveProperty('modules');
@@ -186,7 +186,7 @@ describe('Staging Fixture Tests', () => {
       const uuidDeps = project.getModuleDependencies('pgpm-uuid');
       expect(uuidDeps.modules).toBeDefined();
       expect(Array.isArray(uuidDeps.modules)).toBe(true);
-      
+
       const result = await project.getModuleDependencyChanges('pgpm-uuid');
       expect(result.modules).toBeDefined();
       expect(Array.isArray(result.modules)).toBe(true);
@@ -197,12 +197,12 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const result = await project.getModuleDependencyChanges('unique-names');
-      
+
       expect(result.modules.length).toBeGreaterThan(0);
-      
+
       const dependencyNames = result.modules.map(dep => dep.name);
       expect(dependencyNames.some(name => name.includes('pgpm-defaults'))).toBe(true);
-      
+
       result.modules.forEach(dep => {
         expect(dep).toHaveProperty('name');
         expect(dep).toHaveProperty('latest');
@@ -218,13 +218,13 @@ describe('Staging Fixture Tests', () => {
       const project = new PgpmPackage(cwd);
 
       const { native, modules: deps } = project.getModuleDependencies('unique-names');
-      
+
       const dependencyChanges = await project.getModuleDependencyChanges('unique-names');
 
       const defaultsDep = dependencyChanges.modules.find(dep =>
         dep.name.includes('pgpm-defaults')
       );
-      
+
       if (defaultsDep) {
         expect(defaultsDep.name).toBeTruthy();
         expect(defaultsDep.latest).toBeTruthy();
@@ -238,9 +238,9 @@ describe('Staging Fixture Tests', () => {
 
       const moduleMap = project.getModuleMap();
       const moduleNames = Object.keys(moduleMap);
-      
+
       expect(moduleNames.length).toBeGreaterThan(1);
-      
+
       for (const moduleName of moduleNames) {
         const deps = project.getModuleDependencies(moduleName);
         expect(deps).toHaveProperty('native');

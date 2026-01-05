@@ -57,7 +57,7 @@ const settings = getGraphileSettings({
   },
   graphile: {
     schema: ['app_public'],
-    metaSchemas: ['meta_public'],
+    metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public'],
   },
   features: {
     postgis: true,

@@ -76,7 +76,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
 
    ```sh
    pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
-   pgpm deploy --yes --database "$PGDATABASE" --package db-meta
+   pgpm deploy --yes --database "$PGDATABASE" --package metaschema
    pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
    ```
 
@@ -126,7 +126,7 @@ In dry-run mode:
 
 ## 5. Ensure GraphQL host routing works for `send-email-link`
 
-Constructive selects the API by the HTTP `Host` header using rows in `meta_public.domains`.
+Constructive selects the API by the HTTP `Host` header using rows in `services_public.domains`.
 
 For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
 
@@ -152,7 +152,7 @@ With the jobs stack running, you can enqueue a test job from your host into the 
 First, grab a real `database_id` (required by `send-email-link`, optional for `simple-email`):
 
 ```sh
-DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM collections_public.database ORDER BY created_at LIMIT 1;')"
+DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
 echo "$DBID"
 ```
 
@@ -179,7 +179,7 @@ You should then see the job picked up by `knative-job-service` and the email pay
 
 `send-email-link` queries GraphQL for site/database metadata, so it requires:
 
-- The app/meta packages deployed in step 3 (`app-svc-local`, `db-meta`)
+- The app/meta packages deployed in step 3 (`app-svc-local`, `metaschema-schema`, `services`, `metaschema-modules`)
 - A real `database_id` (use `$DBID` above)
 - A GraphQL hostname that matches a seeded domain route (step 5)
 - For localhost development, the site/domain metadata usually resolves to `localhost`.

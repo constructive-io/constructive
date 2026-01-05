@@ -92,14 +92,14 @@ describe('getEnvOptions', () => {
       },
       api: {
         exposedSchemas: ['public', 'shared'],
-        metaSchemas: ['collections_public', 'meta_public', 'config_meta']
+        metaSchemas: ['metaschema_public', 'services_public', 'config_meta']
       }
     });
 
     const testEnv: NodeJS.ProcessEnv = {
       GRAPHILE_SCHEMA: 'shared_schema,env_schema',
       API_EXPOSED_SCHEMAS: 'shared,env_schema',
-      API_META_SCHEMAS: 'meta_public,env_meta'
+      API_META_SCHEMAS: 'services_public,env_meta'
     };
 
     const result = getEnvOptions(
@@ -129,9 +129,10 @@ describe('getEnvOptions', () => {
       'override_schema'
     ]);
     expect(result.api?.metaSchemas).toEqual([
-      'collections_public',
-      'meta_public',
+      'metaschema_public',
+      'services_public',
       'config_meta',
+      'metaschema_modules_public',
       'env_meta',
       'override_meta'
     ]);

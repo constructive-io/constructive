@@ -605,7 +605,7 @@ export interface memberships_module {
   default_limits_table_id: UUID;
   permissions_table_id: UUID;
   default_permissions_table_id: UUID;
-  acl_table_id: UUID;
+  sprt_table_id: UUID;
   admin_grants_table_id: UUID;
   admin_grants_table_name: string;
   owner_grants_table_id: UUID;
@@ -638,7 +638,7 @@ export class memberships_module implements memberships_module {
   default_limits_table_id: UUID;
   permissions_table_id: UUID;
   default_permissions_table_id: UUID;
-  acl_table_id: UUID;
+  sprt_table_id: UUID;
   admin_grants_table_id: UUID;
   admin_grants_table_name: string;
   owner_grants_table_id: UUID;
@@ -670,7 +670,7 @@ export class memberships_module implements memberships_module {
     this.default_limits_table_id = data.default_limits_table_id;
     this.permissions_table_id = data.permissions_table_id;
     this.default_permissions_table_id = data.default_permissions_table_id;
-    this.acl_table_id = data.acl_table_id;
+    this.sprt_table_id = data.sprt_table_id;
     this.admin_grants_table_id = data.admin_grants_table_id;
     this.admin_grants_table_name = data.admin_grants_table_name;
     this.owner_grants_table_id = data.owner_grants_table_id;
