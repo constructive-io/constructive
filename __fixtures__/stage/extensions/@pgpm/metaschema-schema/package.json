@@ -1,7 +1,7 @@
 {
-  "name": "@pgpm/db-meta-modules",
+  "name": "@pgpm/metaschema-schema",
   "version": "0.15.2",
-  "description": "Module metadata handling and dependency tracking",
+  "description": "Database metadata utilities and introspection functions",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "contributors": [
     "Constructive <developers@constructive.io>"
@@ -10,7 +10,7 @@
     "postgresql",
     "pgpm",
     "metadata",
-    "modules"
+    "introspection"
   ],
   "publishConfig": {
     "access": "public"
@@ -21,7 +21,9 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpm/db-meta-schema": "0.15.2",
+    "@pgpm/database-jobs": "0.15.2",
+    "@pgpm/inflection": "0.15.2",
+    "@pgpm/types": "0.15.2",
     "@pgpm/verify": "0.15.2"
   },
   "devDependencies": {
