@@ -23,7 +23,7 @@ const DB_REQUIRED_EXTENSIONS = [
   'btree_gist',
   'postgis',
   'hstore',
-  'db-meta-schema',
+  'metaschema-schema',
   'pgpm-inflection',
   'pgpm-uuid',
   'pgpm-utils',
@@ -41,8 +41,8 @@ const DB_REQUIRED_EXTENSIONS = [
  */
 const SERVICE_REQUIRED_EXTENSIONS = [
   'plpgsql',
-  'db-meta-schema',
-  'db-meta-modules'
+  'metaschema-schema',
+  'metaschema-modules'
 ] as const;
 
 /**
