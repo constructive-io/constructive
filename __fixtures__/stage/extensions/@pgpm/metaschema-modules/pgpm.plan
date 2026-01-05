@@ -2,7 +2,7 @@
 %project=metaschema-modules
 %uri=metaschema-modules
   
-schemas/meta_private/schema [db-meta-schema:schemas/meta_public/tables/site_themes/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/meta_private/schema
+schemas/meta_private/schema [metaschema-schema:schemas/meta_public/tables/site_themes/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/meta_private/schema
 schemas/meta_public/schema 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/meta_public/schema
 schemas/meta_public/tables/apis/table [schemas/meta_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/meta_public/tables/apis/table
 schemas/meta_public/tables/connected_accounts_module/table [schemas/meta_public/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/meta_public/tables/connected_accounts_module/table
