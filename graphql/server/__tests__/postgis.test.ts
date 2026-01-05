@@ -14,7 +14,7 @@ import { Server as GraphQLServer } from '../src/server';
 
 jest.setTimeout(30000);
 
-const metaSchemas = ['collections_public', 'meta_public'];
+const metaSchemas = ['metaschema_public', 'services_public', 'metaschema_modules_public'];
 const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 
@@ -39,8 +39,9 @@ const metaSeedModules = [
   getPgpmModulePath('@pgpm/types'),
   getPgpmModulePath('@pgpm/inflection'),
   getPgpmModulePath('@pgpm/database-jobs'),
-  getPgpmModulePath('@pgpm/db-meta-schema'),
-  getPgpmModulePath('@pgpm/db-meta-modules'),
+  getPgpmModulePath('@pgpm/metaschema-schema'),
+  getPgpmModulePath('@pgpm/services'),
+  getPgpmModulePath('@pgpm/metaschema-modules'),
 ];
 
 type PgsqlConnections = Awaited<ReturnType<typeof getConnections>>;
@@ -72,7 +73,7 @@ const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
 const deployMetaModules = seed.fn(async ({ config }) => {
   const migrator = new PgpmMigrate(config);
   for (const modulePath of metaSeedModules) {
-    const result = await migrator.deploy({ modulePath, usePlan: false });
+    const result = await migrator.deploy({ modulePath, usePlan: true });
     if (result.failed) {
       throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
     }
@@ -90,7 +91,7 @@ const deployGeoTypesModule = seed.fn(async ({ config, pg }) => {
   const modulePath = getPgpmModulePath('@pgpm/geotypes');
 
   const migrator = new PgpmMigrate(config);
-  const result = await migrator.deploy({ modulePath, usePlan: false });
+  const result = await migrator.deploy({ modulePath, usePlan: true });
   if (result.failed) {
     throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
   }
@@ -181,7 +182,7 @@ const createMetaDb = async (): Promise<SeededConnections> => {
     'jwt.claims.database_id': seededDatabaseId,
   });
   try {
-    await db.query('UPDATE meta_public.apis SET dbname = current_database()');
+    await db.query('UPDATE services_public.apis SET dbname = current_database()');
     await db.commit();
   } catch (error) {
     await db.client.query('ROLLBACK;');

@@ -38,7 +38,7 @@ export const flushService = async (opts: ConstructiveOptions, databaseId: string
 
   const svc = await pgPool.query(
     `SELECT *
-     FROM meta_public.domains
+     FROM services_public.domains
      WHERE database_id = $1`,
     [databaseId]
   );

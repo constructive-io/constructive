@@ -4,7 +4,7 @@ BEGIN;
 CREATE SCHEMA IF NOT EXISTS auth_private;
 
 -- Ensure base database record exists for foreign keys
-INSERT INTO collections_public.database (id, name)
+INSERT INTO metaschema_public.database (id, name)
 VALUES ('0b22e268-16d6-582b-950a-24e108688849', 'test-db')
 ON CONFLICT (id) DO NOTHING;
 
@@ -54,15 +54,15 @@ GRANT EXECUTE ON FUNCTION auth_private.authenticate(text) TO PUBLIC;
 GRANT EXECUTE ON FUNCTION auth_private.authenticate_strict(text) TO PUBLIC;
 
 -- Helper for testing settings in GraphQL
-CREATE OR REPLACE FUNCTION meta_public.current_setting(name text)
+CREATE OR REPLACE FUNCTION services_public.current_setting(name text)
 RETURNS text LANGUAGE sql STABLE AS $$
   SELECT current_setting(name, true);
 $$;
 
-GRANT EXECUTE ON FUNCTION meta_public.current_setting(text) TO PUBLIC;
+GRANT EXECUTE ON FUNCTION services_public.current_setting(text) TO PUBLIC;
 
 -- Metadata for auth schema and tables
-INSERT INTO collections_public.schema (id, database_id, name, schema_name, label, description)
+INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, label, description)
 VALUES (
   'eeeeeeee-5555-5555-5555-555555555555',
   '0b22e268-16d6-582b-950a-24e108688849',
@@ -73,14 +73,14 @@ VALUES (
 )
 ON CONFLICT (schema_name) DO NOTHING;
 
-INSERT INTO collections_public.table (id, database_id, schema_id, name, label)
+INSERT INTO metaschema_public.table (id, database_id, schema_id, name, label)
 VALUES
   ('ffffffff-6666-6666-6666-666666666666', '0b22e268-16d6-582b-950a-24e108688849', 'eeeeeeee-5555-5555-5555-555555555555', 'tokens', 'Tokens'),
   ('99999999-7777-7777-7777-777777777777', '0b22e268-16d6-582b-950a-24e108688849', 'eeeeeeee-5555-5555-5555-555555555555', 'users', 'Users')
 ON CONFLICT (database_id, name) DO NOTHING;
 
 -- RLS module entry
-INSERT INTO meta_public.rls_module (
+INSERT INTO metaschema_modules_public.rls_module (
   id,
   database_id,
   api_id,
@@ -102,7 +102,7 @@ SELECT
   'authenticate',
   'authenticate_strict'
 WHERE EXISTS (
-  SELECT 1 FROM meta_public.apis WHERE id = '11111111-1111-1111-1111-111111111111'
+  SELECT 1 FROM services_public.apis WHERE id = '11111111-1111-1111-1111-111111111111'
 )
 ON CONFLICT (api_id) DO NOTHING;
 

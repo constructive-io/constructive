@@ -1004,26 +1004,29 @@ importers:
         specifier: ^3.958.0
         version: 3.958.0
       '@pgpm/database-jobs':
-        specifier: ^0.15.5
-        version: 0.15.5
-      '@pgpm/db-meta-modules':
-        specifier: ^0.15.5
-        version: 0.15.5
-      '@pgpm/db-meta-schema':
-        specifier: ^0.15.5
-        version: 0.15.5
+        specifier: ^0.16.0
+        version: 0.16.0
       '@pgpm/geotypes':
-        specifier: ^0.15.5
-        version: 0.15.5
+        specifier: ^0.16.0
+        version: 0.16.0
       '@pgpm/inflection':
         specifier: ^0.15.5
         version: 0.15.5
+      '@pgpm/metaschema-modules':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/metaschema-schema':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/services':
+        specifier: ^0.16.0
+        version: 0.16.0
       '@pgpm/types':
-        specifier: ^0.15.5
-        version: 0.15.5
+        specifier: ^0.16.0
+        version: 0.16.0
       '@pgpm/verify':
-        specifier: ^0.15.5
-        version: 0.15.5
+        specifier: ^0.16.0
+        version: 0.16.0
       '@pgpmjs/core':
         specifier: ^3.2.1
         version: 3.2.1(@babel/core@7.28.5)
@@ -3223,26 +3226,35 @@ packages:
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
 
-  '@pgpm/database-jobs@0.15.5':
-    resolution: {integrity: sha512-1aA4aOcxEGJNLsdsjqcKR1X6vzwrE8tONIq7wgV2Bqic3gmqeDHtbMJw6JevA8h5adXE76xLvDD049Ou22cFsQ==}
+  '@pgpm/database-jobs@0.16.0':
+    resolution: {integrity: sha512-s8I7958PlhfYXZKhYoU76R03yk6dlevjGk/Uy9uktveJkZ8C3JVsIhP6Lv4lo0SFEZCjFmXRCYpOY5xINIcX4w==}
 
-  '@pgpm/db-meta-modules@0.15.5':
-    resolution: {integrity: sha512-FbaUkk2FRtpPunRT6JzDRA6T5xS4zKgItVi7XgvnrkCfj1mns+8FGbWLrFlmfkY2ZslYAKCqNkZ9F3m0X7tOTg==}
-
-  '@pgpm/db-meta-schema@0.15.5':
-    resolution: {integrity: sha512-2Ltk/DAWIWBdm0MYXPB6mMbh9Bg8FXZdF8IZRZHjIQYlShHej+H0eIL8ZlsMnyg8DZzcDUo0dS6nPjUdSDsZhw==}
-
-  '@pgpm/geotypes@0.15.5':
-    resolution: {integrity: sha512-4WmvKeD3gNb94+QUcbtFl41w53qH75GU7YjvGgJT8QNn1gDOJy4GqUD5Gj8m6pHp2I6AbmmQOmyWO68Bd+FyqQ==}
+  '@pgpm/geotypes@0.16.0':
+    resolution: {integrity: sha512-jpEpRApaiubIfTtuQ/chspfBwZJKy9bcTIpZMZ/HI2fS36i7AaRp5a0hifV31GFKnpsJa+zY3/fS5Y8uGyIkOA==}
 
   '@pgpm/inflection@0.15.5':
     resolution: {integrity: sha512-ILxqfp/1yLaWNidBJcudeDnb5hZnh1tgd9K4u3MY4hpNqTY1b64ytg+w9jXROWf1tyJuvD4Xyzi0FBKZpzpl1w==}
 
-  '@pgpm/types@0.15.5':
-    resolution: {integrity: sha512-8kdjKAuLd2/sfR5AakMdVxwuhx8YOwoTm2bGRw/5v8o1JPi6SrRCPS0TvCN2RaD5GjPMasRNNURW8wHMv8FtCw==}
+  '@pgpm/inflection@0.16.0':
+    resolution: {integrity: sha512-otjWGx+KkB113Wc5I9nsvoqPhBK6zD1ON2OcXw9PQRgqU43Y9f0yZjb559dDzZwDn5XUeiZMf6il5SIvJE5NPg==}
+
+  '@pgpm/metaschema-modules@0.16.0':
+    resolution: {integrity: sha512-xqCpf2NTfyijjCcbo9MN8rMDItNEX0wqO/eJOIGHKJbU8zj3FGxVU0aIAX4IX9Gm9+JPr9qvGALNnqh57j3w/w==}
+
+  '@pgpm/metaschema-schema@0.16.0':
+    resolution: {integrity: sha512-vHY4ePiq6h3BvPpgRO7vt89hIgt8QAEZggsXpu6vusg9mWHKG8JRGZqo2RhgnTw2MTxDhnHg7nYPk0Z5kPu97g==}
+
+  '@pgpm/services@0.16.0':
+    resolution: {integrity: sha512-leVZHmwnFnkz+W3fp+g+ukPdEjvX9s3qFzz2y06OwTthtKd8b8f5CUtFEoT0FLh9ldWK21n/7sC/zc06pRv0TQ==}
+
+  '@pgpm/types@0.16.0':
+    resolution: {integrity: sha512-CioHCxZGQUnpLANw4aMOOq7Z6zi2SXCxJIRZ8CSBPJfJkWU1OgxX+EpSjnm4Td4bznJhOViXniLltibaaGkMPA==}
 
   '@pgpm/verify@0.15.5':
     resolution: {integrity: sha512-8+e1uYn9FYUKRFyewVRq0YHRZkZoUSJ/QbOczCZc7P9n1J4LJFLUSZNGvMz/nA1OKlanEAnjINnjzF0+krFT/g==}
+
+  '@pgpm/verify@0.16.0':
+    resolution: {integrity: sha512-uG0zTXAWGLV8wTUiLdBn+2b4AO+gtiw7sZf+TFFU8h/mVGMBTHUb9Gbsl/GL/5/0zZKOxak7cRJ5deec79KB/A==}
 
   '@pgpmjs/core@3.2.1':
     resolution: {integrity: sha512-xoWo17Bwae/HxC/emNZo/ik4c4j4U7I6gSUiYM42pY/j6zfMeIYdf64ZzSxG7ooES9HIRFWu0B1S4W0cqkS1DA==}
@@ -10480,36 +10492,48 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
-  '@pgpm/database-jobs@0.15.5':
+  '@pgpm/database-jobs@0.16.0':
     dependencies:
-      '@pgpm/verify': 0.15.5
+      '@pgpm/verify': 0.16.0
 
-  '@pgpm/db-meta-modules@0.15.5':
+  '@pgpm/geotypes@0.16.0':
     dependencies:
-      '@pgpm/db-meta-schema': 0.15.5
-      '@pgpm/verify': 0.15.5
-
-  '@pgpm/db-meta-schema@0.15.5':
-    dependencies:
-      '@pgpm/database-jobs': 0.15.5
-      '@pgpm/inflection': 0.15.5
-      '@pgpm/types': 0.15.5
-      '@pgpm/verify': 0.15.5
-
-  '@pgpm/geotypes@0.15.5':
-    dependencies:
-      '@pgpm/types': 0.15.5
-      '@pgpm/verify': 0.15.5
+      '@pgpm/types': 0.16.0
+      '@pgpm/verify': 0.16.0
 
   '@pgpm/inflection@0.15.5':
     dependencies:
       '@pgpm/verify': 0.15.5
 
-  '@pgpm/types@0.15.5':
+  '@pgpm/inflection@0.16.0':
     dependencies:
-      '@pgpm/verify': 0.15.5
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/metaschema-modules@0.16.0':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.16.0
+      '@pgpm/services': 0.16.0
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/metaschema-schema@0.16.0':
+    dependencies:
+      '@pgpm/database-jobs': 0.16.0
+      '@pgpm/inflection': 0.16.0
+      '@pgpm/types': 0.16.0
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/services@0.16.0':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.16.0
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/types@0.16.0':
+    dependencies:
+      '@pgpm/verify': 0.16.0
 
   '@pgpm/verify@0.15.5': {}
+
+  '@pgpm/verify@0.16.0': {}
 
   '@pgpmjs/core@3.2.1(@babel/core@7.28.5)':
     dependencies:

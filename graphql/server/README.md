@@ -97,7 +97,7 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 
 When `API_ENABLE_META=true` (default):
 
-- The server resolves APIs from `meta_public.domains` using the request host.
+- The server resolves APIs from `services_public.domains` using the request host.
 - Only APIs where `api.is_public` matches `API_IS_PUBLIC` are served.
 - In private mode (`API_IS_PUBLIC=false`), you can override with headers:
   - `X-Api-Name` + `X-Database-Id` - Route by API name
@@ -178,10 +178,10 @@ CORS is handled at three levels with the following priority:
 
 ### CORS Module Configuration
 
-Configure allowed origins per-API via the `cors` module in `meta_public.api_modules`:
+Configure allowed origins per-API via the `cors` module in `services_public.api_modules`:
 
 ```sql
-INSERT INTO meta_public.api_modules (database_id, api_id, name, data)
+INSERT INTO services_public.api_modules (database_id, api_id, name, data)
 VALUES (
   'db-uuid',
   'api-uuid',
@@ -192,7 +192,7 @@ VALUES (
 
 ## API Modules
 
-API modules extend functionality per-API. Configure via `meta_public.api_modules`.
+API modules extend functionality per-API. Configure via `services_public.api_modules`.
 
 ### Available Modules
 
@@ -215,7 +215,7 @@ When the `pubkey_challenge` module is configured, the following GraphQL mutation
 
 **Configuration:**
 ```sql
-INSERT INTO meta_public.api_modules (database_id, api_id, name, data)
+INSERT INTO services_public.api_modules (database_id, api_id, name, data)
 VALUES (
   'db-uuid',
   'api-uuid',
@@ -226,10 +226,10 @@ VALUES (
 
 ### RLS Module
 
-Configure RLS authentication via `meta_public.rls_module`:
+Configure RLS authentication via `metaschema_modules_public.rls_module`:
 
 ```sql
-INSERT INTO meta_public.rls_module (database_id, api_id, private_schema, authenticate, authenticate_strict)
+INSERT INTO metaschema_modules_public.rls_module (database_id, api_id, private_schema, authenticate, authenticate_strict)
 VALUES (
   'db-uuid',
   'api-uuid',
@@ -297,7 +297,7 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `API_ENABLE_META` | Enable meta API routing | `true` |
 | `API_IS_PUBLIC` | Serve public APIs only | `true` |
 | `API_EXPOSED_SCHEMAS` | Schemas when meta routing is disabled | empty |
-| `API_META_SCHEMAS` | Meta schemas to query | `collections_public,meta_public` |
+| `API_META_SCHEMAS` | Meta schemas to query | `metaschema_public,services_public,metaschema_modules_public` |
 | `API_ANON_ROLE` | Anonymous role name | `administrator` |
 | `API_ROLE_NAME` | Authenticated role name | `administrator` |
 | `API_DEFAULT_DATABASE_ID` | Default database ID | `hard-coded` |

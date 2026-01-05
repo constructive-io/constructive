@@ -76,5 +76,5 @@ export const apiDefaults: ApiOptions = {
   roleName: 'administrator',
   defaultDatabaseId: 'hard-coded',
   isPublic: true,
-  metaSchemas: ['collections_public', 'meta_public']
+  metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public']
 };

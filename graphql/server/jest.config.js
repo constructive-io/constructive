@@ -2,6 +2,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  // Avoid concurrent role bootstrapping across Jest workers.
+  maxWorkers: 1,
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',

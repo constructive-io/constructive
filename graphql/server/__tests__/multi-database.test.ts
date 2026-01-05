@@ -13,7 +13,7 @@ import { Server as GraphQLServer } from '../src/server';
 
 jest.setTimeout(30000);
 
-const metaSchemas = ['collections_public', 'meta_public'];
+const metaSchemas = ['metaschema_public', 'services_public', 'metaschema_modules_public'];
 const sql = (f: string) => join(__dirname, '../../test/sql', f);
 const metaSql = (f: string) => join(__dirname, '../__fixtures__/sql', f);
 
@@ -50,8 +50,9 @@ const metaSeedModules = [
   getPgpmModulePath('@pgpm/types'),
   getPgpmModulePath('@pgpm/inflection'),
   getPgpmModulePath('@pgpm/database-jobs'),
-  getPgpmModulePath('@pgpm/db-meta-schema'),
-  getPgpmModulePath('@pgpm/db-meta-modules'),
+  getPgpmModulePath('@pgpm/metaschema-schema'),
+  getPgpmModulePath('@pgpm/services'),
+  getPgpmModulePath('@pgpm/metaschema-modules'),
 ];
 
 type PgsqlConnections = Awaited<ReturnType<typeof getConnections>>;
@@ -83,7 +84,7 @@ const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
 const deployMetaModules = seed.fn(async ({ config }) => {
   const migrator = new PgpmMigrate(config);
   for (const modulePath of metaSeedModules) {
-    const result = await migrator.deploy({ modulePath, usePlan: false });
+    const result = await migrator.deploy({ modulePath, usePlan: true });
     if (result.failed) {
       throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
     }
@@ -202,15 +203,15 @@ const createMetaDb = async ({
   });
   try {
     await db.query(
-      'UPDATE meta_public.apis SET dbname = $1 WHERE id = $2',
+      'UPDATE services_public.apis SET dbname = $1 WHERE id = $2',
       [primary.db.config.database, apiIds.primary]
     );
     await db.query(
-      'UPDATE meta_public.apis SET dbname = $1 WHERE id = $2',
+      'UPDATE services_public.apis SET dbname = $1 WHERE id = $2',
       [secondary.db.config.database, apiIds.secondary]
     );
     await db.query(
-      'UPDATE meta_public.apis SET dbname = $1 WHERE id = $2',
+      'UPDATE services_public.apis SET dbname = $1 WHERE id = $2',
       [tertiary.db.config.database, apiIds.tertiary]
     );
     await db.commit();
