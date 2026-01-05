@@ -25,11 +25,11 @@ export default defineConfig([
   },
   // CLI entry point (separate build, no React deps)
   {
-    entry: ['src/cli/index.ts'],
-    format: ['esm'],
+    entry: { 'bin/graphql-codegen': 'src/cli/index.ts' },
+    format: ['cjs'],
     dts: false,
     sourcemap: true,
-    outDir: 'dist/cli',
+    outDir: 'dist',
     external: ['react', '@tanstack/react-query'],
     banner: {
       js: '#!/usr/bin/env node',
