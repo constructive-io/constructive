@@ -42,7 +42,7 @@ describe('stage fixture dependency resolution - resolved tags', () => {
   let stageFixture: TestFixture;
 
   beforeAll(() => {
-    stageFixture = new TestFixture('stage');
+    stageFixture = new TestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(() => {

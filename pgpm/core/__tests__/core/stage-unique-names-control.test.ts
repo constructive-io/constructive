@@ -10,7 +10,7 @@ describe('stage fixture control/metadata generation (unique-names)', () => {
   let project: PgpmPackage;
 
   beforeAll(() => {
-    fixture = new TestFixture('stage');
+    fixture = new TestFixture('sqitch', 'simple-w-exts');
     dst = fixture.tempFixtureDir;
     project = new PgpmPackage(dst);
   });

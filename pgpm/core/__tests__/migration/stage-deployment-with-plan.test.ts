@@ -6,7 +6,7 @@ describe('Staging Fixture Deployment With Pre-Generated Plan', () => {
   let db: TestDatabase;
 
   beforeAll(async () => {
-    fixture = new CoreDeployTestFixture('stage');
+    fixture = new CoreDeployTestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(async () => {
@@ -24,7 +24,7 @@ describe('Staging Fixture Deployment With Pre-Generated Plan', () => {
     const mod = fixture.getModuleProject([], 'unique-names');
     mod.writeModulePlan({ includePackages: true, includeTags: true });
 
-    await fixture.deployModule('unique-names', db.name, ['stage']);
+    await fixture.deployModule('unique-names', db.name, ['sqitch', 'simple-w-exts']);
 
     expect(await db.exists('schema', 'unique_names')).toBe(true);
     expect(await db.exists('table', 'unique_names.words')).toBe(true);
@@ -37,7 +37,7 @@ describe('Staging Fixture Deployment With Pre-Generated Plan', () => {
     const mod = fixture.getModuleProject([], 'unique-names');
     mod.writeModulePlan({ includePackages: true, includeTags: false });
 
-    await fixture.deployModule('unique-names', db.name, ['stage']);
+    await fixture.deployModule('unique-names', db.name, ['sqitch', 'simple-w-exts']);
 
     expect(await db.exists('schema', 'unique_names')).toBe(true);
     expect(await db.exists('table', 'unique_names.words')).toBe(true);
@@ -48,7 +48,7 @@ describe('Staging Fixture Deployment With Pre-Generated Plan', () => {
   test('deploys unique-names after generating plan (includePackages=false, includeTags=false)', async () => {
     const mod = fixture.getModuleProject([], 'unique-names');
     mod.writeModulePlan({ includePackages: false, includeTags: false });
-    await fixture.deployModule('unique-names', db.name, ['stage']);
+    await fixture.deployModule('unique-names', db.name, ['sqitch', 'simple-w-exts']);
     expect(await db.exists('schema', 'unique_names')).toBe(true);
     expect(await db.exists('table', 'unique_names.words')).toBe(true);
     const deployedChanges = await db.getDeployedChanges();

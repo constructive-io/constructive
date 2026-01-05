@@ -6,7 +6,7 @@ describe('Staging Fixture Deployment Tests', () => {
   let db: TestDatabase;
   
   beforeAll(async () => {
-    fixture = new CoreDeployTestFixture('stage');
+    fixture = new CoreDeployTestFixture('sqitch', 'simple-w-exts');
   });
   
   afterAll(async () => {
@@ -21,7 +21,7 @@ describe('Staging Fixture Deployment Tests', () => {
   });
 
   test('deploys unique-names package successfully', async () => {
-    await fixture.deployModule('unique-names', db.name, ['stage']);
+    await fixture.deployModule('unique-names', db.name, ['sqitch', 'simple-w-exts']);
     
     expect(await db.exists('schema', 'unique_names')).toBe(true);
     expect(await db.exists('table', 'unique_names.words')).toBe(true);

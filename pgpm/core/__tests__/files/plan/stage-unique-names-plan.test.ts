@@ -4,7 +4,7 @@ describe('stage fixture plan generation (unique-names)', () => {
   let fixture: TestFixture;
 
   beforeAll(() => {
-    fixture = new TestFixture('stage');
+    fixture = new TestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(() => {

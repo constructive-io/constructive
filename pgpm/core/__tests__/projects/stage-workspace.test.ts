@@ -9,7 +9,7 @@ describe('Staging Fixture Tests', () => {
   let db: TestDatabase;
 
   beforeAll(() => {
-    fixture = new TestFixture('stage');
+    fixture = new TestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(() => {
@@ -66,7 +66,7 @@ describe('Staging Fixture Tests', () => {
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
       expect(moduleNames.some(name => name.includes('pgpm-base32'))).toBe(true);
 
-            expect(moduleNames.some(name => name.includes('metaschema'))).toBe(true);
+      expect(moduleNames.some(name => name.includes('pgpm-types'))).toBe(true);
 
       modules.forEach(mod => {
         expect(mod.isInModule()).toBe(true);

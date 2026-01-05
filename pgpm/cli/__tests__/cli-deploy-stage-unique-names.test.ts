@@ -13,7 +13,7 @@ describe('CLIDeployTestFixture Migrate', () => {
   let testDb: any;
 
   beforeAll(async () => {
-    fixture = new CLIDeployTestFixture('stage');
+    fixture = new CLIDeployTestFixture('sqitch', 'simple-w-exts');
     testDb = await fixture.setupTestDatabase();
   });
 
