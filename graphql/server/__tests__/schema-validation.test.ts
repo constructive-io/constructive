@@ -74,35 +74,6 @@ const deployMetaModules = seed.fn(async ({ config }) => {
   }
 });
 
-const seedSchemaValidationApis = seed.fn(async ({ pg }) => {
-  await pg.query(
-    `INSERT INTO meta_public.apis (id, database_id, name, is_public, role_name, anon_role)
-     VALUES
-       ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', $1, 'partial-invalid', true, 'authenticated', 'anonymous'),
-       ('99999999-bbbb-bbbb-bbbb-bbbbbbbbbbbb', $1, 'no-valid', true, 'authenticated', 'anonymous'),
-       ('99999999-cccc-cccc-cccc-cccccccccccc', $1, 'empty-schemas', true, 'authenticated', 'anonymous')`,
-    [seededDatabaseId]
-  );
-
-  await pg.query(
-    `INSERT INTO meta_public.domains (id, database_id, api_id, domain, subdomain)
-     VALUES
-       ('dddddddd-1111-1111-1111-111111111111', $1, '99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'example.com', 'partial'),
-       ('dddddddd-2222-2222-2222-222222222222', $1, '99999999-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'example.com', 'novalid'),
-       ('dddddddd-3333-3333-3333-333333333333', $1, '99999999-cccc-cccc-cccc-cccccccccccc', 'example.com', 'empty')`,
-    [seededDatabaseId]
-  );
-
-  await pg.query(
-    `INSERT INTO meta_public.api_extensions (id, database_id, api_id, schema_name)
-     VALUES
-       ('eeeeeeee-1111-1111-1111-111111111111', $1, '99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'app_public'),
-       ('eeeeeeee-2222-2222-2222-222222222222', $1, '99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'missing_schema'),
-       ('eeeeeeee-3333-3333-3333-333333333333', $1, '99999999-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'missing_schema')`,
-    [seededDatabaseId]
-  );
-});
-
 const requireConnections = (
   connections: SeededConnections | null,
   label: string
@@ -174,8 +145,8 @@ const createMetaDb = async (): Promise<SeededConnections> => {
       seed.sqlfile([
         metaSql('auth.seed.sql'),
         metaSql('meta-schema.seed.sql'),
+        metaSql('schema-validation.seed.sql'),
       ]),
-      seedSchemaValidationApis,
     ]
   );
 
