@@ -1,1 +1,0 @@
--- Verify schemas/meta_public/tables/apis/table  on pg

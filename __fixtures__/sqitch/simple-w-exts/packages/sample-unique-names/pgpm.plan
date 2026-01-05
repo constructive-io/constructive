@@ -1,0 +1,9 @@
+%syntax-version=1.0.0
+%project=sample-unique-names
+%uri=sample-unique-names
+  
+schemas/unique_names/schema [pgpm-base32:schemas/base32/schema pgpm-verify:@0.1.0] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/unique_names/schema
+schemas/unique_names/tables/words/table [schemas/unique_names/schema] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/unique_names/tables/words/table
+schemas/unique_names/procedures/generate_name [schemas/unique_names/schema schemas/unique_names/tables/words/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/unique_names/procedures/generate_name
+schemas/unique_names/tables/words/fixtures/1589271124916_fixture [schemas/unique_names/schema schemas/unique_names/tables/words/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/unique_names/tables/words/fixtures/1589271124916_fixture
+schemas/unique_names/tables/words/indexes/words_type_idx [schemas/unique_names/schema schemas/unique_names/tables/words/table] 2017-08-11T08:11:51Z skitch <skitch@5b0c196eeb62> # add schemas/unique_names/tables/words/indexes/words_type_idx
