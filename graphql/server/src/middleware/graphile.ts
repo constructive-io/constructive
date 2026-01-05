@@ -10,24 +10,41 @@ import './types'; // for Request type
 import PublicKeySignature, {
   PublicKeyChallengeConfig,
 } from '../plugins/PublicKeySignature';
+import { createRequestScopedLogger } from './request-logger';
+
+const log = createRequestScopedLogger('graphile');
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    log.debug(req, `Graphile middleware started for ${req.path}`);
+
     try {
       const api = req.api;
       if (!api) {
+        log.error(req, 'Missing API info in graphile middleware');
         return res.status(500).send('Missing API info');
       }
       const key = req.svc_key;
       if (!key) {
+        log.error(req, 'Missing service cache key');
         return res.status(500).send('Missing service cache key');
       }
       const { dbname, anonRole, roleName, schema } = api;
 
       if (graphileCache.has(key)) {
+        log.debug(req, `Graphile handler cache HIT for key=${key}`);
         const { handler } = graphileCache.get(key)!;
         return handler(req, res, next);
       }
+
+      log.debug(
+        req,
+        `Graphile handler cache MISS for key=${key}, creating new handler...`
+      );
+      log.debug(
+        req,
+        `Creating PostGraphile handler: db=${dbname}, schemas=[${schema?.join(', ')}], anonRole=${anonRole}, roleName=${roleName}`
+      );
 
       const options = getSettings({
         ...opts,
@@ -42,6 +59,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       );
 
       if (pubkey_challenge && pubkey_challenge.data) {
+        log.debug(req, 'PublicKeySignature plugin enabled for this API');
         options.appendPlugins.push(
           PublicKeySignature(pubkey_challenge.data as PublicKeyChallengeConfig)
         );
@@ -49,6 +67,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       options.appendPlugins = options.appendPlugins ?? [];
       options.appendPlugins.push(...opts.graphile.appendPlugins);
+
+      log.debug(
+        req,
+        `PostGraphile plugins: ${options.appendPlugins?.length || 0} plugins configured`
+      );
 
       options.pgSettings = async function pgSettings(request: IncomingMessage) {
         const gqlReq = request as Request;
@@ -65,6 +88,10 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         }
 
         if (gqlReq?.token?.user_id) {
+          log.debug(
+            gqlReq,
+            `pgSettings: authenticated user=${gqlReq.token.user_id}, role=${roleName}`
+          );
           return {
             role: roleName,
             [`jwt.claims.token_id`]: gqlReq.token.id,
@@ -73,6 +100,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           };
         }
 
+        log.debug(gqlReq, `pgSettings: anonymous user, role=${anonRole}`);
         return { role: anonRole, ...context };
       };
 
@@ -93,6 +121,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         ...opts.pg,
         database: dbname,
       });
+
+      log.debug(req, `Creating PostGraphile instance for database: ${dbname}`);
       const handler = postgraphile(pgPool, schema, graphileOpts);
 
       graphileCache.set(key, {
@@ -101,8 +131,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         handler,
       });
 
+      log.debug(req, `PostGraphile handler created and cached with key=${key}`);
+
       return handler(req, res, next);
     } catch (e: any) {
+      log.error(req, `Graphile middleware error: ${e.message}`, e);
       return res.status(500).send(e.message);
     }
   };

@@ -1,4 +1,5 @@
 import { getNodeEnv } from '@constructive-io/graphql-env';
+import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, Response } from 'express';
@@ -9,45 +10,103 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
-/**
- * Transforms the old service structure to the new api structure
- */
 import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
 import { ApiByNameQuery, ApiQuery, ListOfAllDomainsOfDb } from './gql';
-import './types'; // for Request type
+import { createRequestScopedLogger, getRequestId } from './request-logger';
+import './types';
+
+// ============================================================================
+// Logger Setup
+// ============================================================================
+
+const log = createRequestScopedLogger('api');
+const queryLog = new Logger('api');
+const isDev = () => getNodeEnv() === 'development';
+
+const debugLog = (prefix: string, message: string): void => {
+  if (isDev()) queryLog.debug(`${prefix} ${message}`);
+};
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface ApiOptions {
+  metaSchemas?: string[];
+  isPublic?: boolean;
+  exposedSchemas?: string[];
+  anonRole?: string;
+  roleName?: string;
+  defaultDatabaseId?: string;
+  enableMetaApi?: boolean;
+}
+
+interface ServiceData {
+  data: { api: any };
+  errorHtml?: string;
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+const getApiOptions = (opts: PgpmOptions): ApiOptions =>
+  (opts as any).api || {};
+
+export const getSubdomain = (subdomains: string[]): string | null => {
+  const filtered = subdomains.filter((name) => name !== 'www');
+  return filtered.length ? filtered.join('.') : null;
+};
+
+const getPortFromRequest = (req: Request): string => {
+  const host = req.headers.host;
+  if (!host) return '';
+  const parts = host.split(':');
+  return parts.length === 2 ? `:${parts[1]}` : '';
+};
+
+const validateSchemata = async (
+  pool: Pool,
+  schemata: string[]
+): Promise<string[]> => {
+  if (!schemata.length) return [];
+  const result = await pool.query(
+    `SELECT schema_name FROM information_schema.schemata WHERE schema_name = ANY($1::text[])`,
+    [schemata]
+  );
+  return result.rows.map((row: { schema_name: string }) => row.schema_name);
+};
+
+// ============================================================================
+// Transform Functions
+// ============================================================================
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
-  const schemaNames =
+  const extSchemas =
     api.schemaNamesFromExt?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
   const additionalSchemas =
     api.schemaNames?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
 
-  let domains: string[] = [];
-  if (api.database?.sites?.nodes) {
-    domains = api.database.sites.nodes.reduce((acc: string[], site: Site) => {
-      if (site.domains?.nodes && site.domains.nodes.length) {
-        const siteUrls = site.domains.nodes.map((domain: Domain) => {
-          const hostname = domain.subdomain
-            ? `${domain.subdomain}.${domain.domain}`
-            : domain.domain;
-          const protocol =
-            domain.domain === 'localhost' ? 'http://' : 'https://';
+  const domains =
+    api.database?.sites?.nodes?.flatMap(
+      (site: Site) =>
+        site.domains?.nodes?.map((d: Domain) => {
+          const hostname = d.subdomain
+            ? `${d.subdomain}.${d.domain}`
+            : d.domain;
+          const protocol = d.domain === 'localhost' ? 'http://' : 'https://';
           return protocol + hostname;
-        });
-        return [...acc, ...siteUrls];
-      }
-      return acc;
-    }, []);
-  }
+        }) || []
+    ) || [];
 
   return {
     dbname: api.dbname,
     anonRole: api.anonRole,
     roleName: api.roleName,
-    schema: [...schemaNames, ...additionalSchemas],
+    schema: [...extSchemas, ...additionalSchemas],
     apiModules:
-      api.apiModules?.nodes?.map((node) => ({
+      api.apiModules?.nodes?.map((node: any) => ({
         name: node.name,
         data: node.data,
       })) || [],
@@ -58,54 +117,302 @@ const transformServiceToApi = (svc: Service): ApiStructure => {
   };
 };
 
-const getPortFromRequest = (req: Request): string | null => {
-  const host = req.headers.host;
-  if (!host) return null;
+// ============================================================================
+// Cache Key Generation
+// ============================================================================
 
-  const parts = host.split(':');
-  return parts.length === 2 ? `:${parts[1]}` : null;
+const getSvcKey = (opts: PgpmOptions, req: Request): string => {
+  const apiOpts = getApiOptions(opts);
+  const domain = req.urlDomains.domain as string;
+  const subdomains = (req.urlDomains.subdomains as string[]).filter(
+    (name) => name !== 'www'
+  );
+
+  if (apiOpts.isPublic === false) {
+    const dbId = req.get('X-Database-Id');
+    if (req.get('X-Api-Name')) return `api:${dbId}:${req.get('X-Api-Name')}`;
+    if (req.get('X-Schemata'))
+      return `schemata:${dbId}:${req.get('X-Schemata')}`;
+    if (req.get('X-Meta-Schema')) return `metaschema:api:${dbId}`;
+  }
+
+  return [...subdomains, domain].join('.');
 };
 
-export const getSubdomain = (reqDomains: string[]): string | null => {
-  const names = reqDomains.filter((name) => !['www'].includes(name));
-  return !names.length ? null : names.join('.');
+// ============================================================================
+// Service Builders (Header-based Config)
+// ============================================================================
+
+const buildServiceFromSchemas = (
+  opts: PgpmOptions,
+  schemas: string[],
+  databaseId: string,
+  key: string
+): ServiceData => {
+  const svc: ServiceData = {
+    data: {
+      api: {
+        databaseId,
+        isPublic: false,
+        dbname: opts.pg?.database,
+        anonRole: 'administrator',
+        roleName: 'administrator',
+        schemaNamesFromExt: {
+          nodes: schemas.map((schemaName) => ({ schemaName })),
+        },
+        schemaNames: { nodes: [] },
+        apiModules: [],
+      },
+    },
+  };
+  svcCache.set(key, svc);
+  return svc;
 };
 
-export const createApiMiddleware = (opts: any) => {
+// ============================================================================
+// GraphQL Query Functions
+// ============================================================================
+
+const queryByDomain = async (
+  client: GraphileQuery,
+  opts: PgpmOptions,
+  domain: string,
+  subdomain: string | null,
+  key: string,
+  requestId?: string
+): Promise<ServiceData | null> => {
+  const prefix = requestId ? `[${requestId}]` : '';
+  const apiOpts = getApiOptions(opts);
+
+  debugLog(prefix, `Querying API by domain=${domain}, subdomain=${subdomain}`);
+
+  const result = await client.query({
+    role: 'administrator',
+    query: ApiQuery as any,
+    variables: { domain, subdomain },
+  });
+
+  if (result.errors?.length) {
+    queryLog.error(`${prefix} GraphQL errors:`, result.errors);
+    return null;
+  }
+
+  const node = (result?.data as any)?.domains?.nodes?.[0];
+  if (!node?.api || node.api.isPublic !== apiOpts.isPublic) {
+    debugLog(prefix, `No matching API for domain=${domain}`);
+    return null;
+  }
+
+  const svc: ServiceData = { data: node };
+  svcCache.set(key, svc);
+  debugLog(prefix, `API cached with key=${key}`);
+  return svc;
+};
+
+const queryByName = async (
+  client: GraphileQuery,
+  opts: PgpmOptions,
+  name: string,
+  databaseId: string,
+  key: string,
+  requestId?: string
+): Promise<ServiceData | null> => {
+  const prefix = requestId ? `[${requestId}]` : '';
+  const apiOpts = getApiOptions(opts);
+
+  debugLog(prefix, `Querying API by name=${name}`);
+
+  const result = await client.query({
+    role: 'administrator',
+    query: ApiByNameQuery as any,
+    variables: { databaseId, name },
+  });
+
+  if (result.errors?.length) {
+    queryLog.error(`${prefix} GraphQL errors:`, result.errors);
+    return null;
+  }
+
+  const data = result?.data as any;
+  if (!data?.api || data.api.isPublic !== apiOpts.isPublic) {
+    debugLog(prefix, `No matching API with name=${name}`);
+    return null;
+  }
+
+  const svc: ServiceData = { data };
+  svcCache.set(key, svc);
+  debugLog(prefix, `API cached with key=${key}`);
+  return svc;
+};
+
+const buildDevErrorHtml = async (
+  client: GraphileQuery,
+  req: Request
+): Promise<ServiceData | null> => {
+  if (!isDev()) return null;
+
+  const result = await client.query({
+    role: 'administrator',
+    query: ListOfAllDomainsOfDb as any,
+  });
+
+  const apis = (result.data as any)?.apis?.nodes;
+  if (result.errors?.length || !apis?.length) return null;
+
+  const port = getPortFromRequest(req);
+  const links = apis.flatMap((api: any) =>
+    api.domains.nodes.map((d: any) => {
+      const href = d.subdomain
+        ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
+        : `http://${d.domain}${port}/graphiql`;
+      return `<li><a href="${href}" class="text-brand hover:underline">${href}</a></li>`;
+    })
+  );
+
+  const linksHtml = links.length
+    ? `<ul class="mt-4 pl-5 list-disc space-y-1">${links.join('')}</ul>`
+    : `<p class="text-gray-600">No APIs registered for this database.</p>`;
+
+  return {
+    data: { api: null },
+    errorHtml: `<p class="text-sm text-gray-700">Try some of these:</p><div class="mt-4">${linksHtml}</div>`,
+  };
+};
+
+// ============================================================================
+// Main API Config Resolver
+// ============================================================================
+
+export const getApiConfig = async (
+  opts: PgpmOptions,
+  req: Request
+): Promise<ServiceData | null> => {
+  const requestId = getRequestId(req);
+  const apiOpts = getApiOptions(opts);
+  const key = getSvcKey(opts, req);
+  req.svc_key = key;
+
+  // Check cache
+  if (svcCache.has(key)) {
+    log.debug(req, `Cache HIT for key=${key}`);
+    return svcCache.get(key) as ServiceData;
+  }
+
+  log.debug(req, `Cache MISS for key=${key}`);
+
+  // Validate meta schemas
+  const rootPool = getPgPool(opts.pg);
+  const metaSchemas = apiOpts.metaSchemas || [];
+  const validSchemas = await validateSchemata(rootPool, metaSchemas);
+
+  if (!validSchemas.length) {
+    const domain = req.urlDomains.domain;
+    const subdomain = getSubdomain(req.urlDomains.subdomains as string[]);
+    const error: any = new Error(
+      `No valid schemas found for domain: ${domain}, subdomain: ${subdomain}`
+    );
+    error.code = 'NO_VALID_SCHEMAS';
+    throw error;
+  }
+
+  // Build GraphQL client
+  const settings = getGraphileSettings({ graphile: { schema: validSchemas } });
+  // @ts-expect-error - settings type mismatch between packages
+  const schema = await getSchema(rootPool, settings);
+  // @ts-expect-error - settings type mismatch between packages
+  const client = new GraphileQuery({ schema, pool: rootPool, settings });
+
+  const domain = req.urlDomains.domain as string;
+  const subdomain = getSubdomain(req.urlDomains.subdomains as string[]);
+
+  // Handle private API header-based lookups
+  if (apiOpts.isPublic === false) {
+    const dbId = req.get('X-Database-Id') || '';
+
+    if (req.get('X-Schemata')) {
+      log.debug(req, `Using X-Schemata header`);
+      const schemas = req
+        .get('X-Schemata')!
+        .split(',')
+        .map((s) => s.trim());
+      return buildServiceFromSchemas(opts, schemas, dbId, key);
+    }
+
+    if (req.get('X-Api-Name')) {
+      log.debug(req, `Using X-Api-Name header`);
+      return queryByName(
+        client,
+        opts,
+        req.get('X-Api-Name')!,
+        dbId,
+        key,
+        requestId
+      );
+    }
+
+    if (req.get('X-Meta-Schema')) {
+      log.debug(req, `Using X-Meta-Schema header`);
+      return buildServiceFromSchemas(opts, metaSchemas, dbId, key);
+    }
+  }
+
+  // Standard domain lookup
+  const svc = await queryByDomain(
+    client,
+    opts,
+    domain,
+    subdomain,
+    key,
+    requestId
+  );
+  return svc || buildDevErrorHtml(client, req);
+};
+
+// ============================================================================
+// Express Middleware
+// ============================================================================
+
+export const createApiMiddleware = (opts: PgpmOptions) => {
+  const apiOpts = getApiOptions(opts);
+
   return async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (opts.api?.enableMetaApi === false) {
-      const schemas = opts.api.exposedSchemas;
-      const anonRole = opts.api.anonRole;
-      const roleName = opts.api.roleName;
-      const databaseId = opts.api.defaultDatabaseId;
-      const api: ApiStructure = {
+    log.debug(req, `Started for ${req.method} ${req.originalUrl}`);
+
+    // Fast path: Meta API disabled
+    if (apiOpts.enableMetaApi === false) {
+      req.api = {
         dbname: opts.pg?.database ?? '',
-        anonRole,
-        roleName,
-        schema: schemas,
+        anonRole: apiOpts.anonRole || 'anonymous',
+        roleName: apiOpts.roleName || 'authenticated',
+        schema: apiOpts.exposedSchemas || [],
         apiModules: [],
         domains: [],
-        databaseId,
+        databaseId: apiOpts.defaultDatabaseId,
         isPublic: false,
       };
-      req.api = api;
-      req.databaseId = databaseId;
+      req.databaseId = apiOpts.defaultDatabaseId;
       req.svc_key = 'meta-api-off';
+      log.debug(req, `Meta API disabled, using static config`);
       return next();
     }
+
     try {
       const svc = await getApiConfig(opts, req);
 
       if (svc?.errorHtml) {
+        log.warn(req, `API not found, showing suggestions`);
         res
           .status(404)
           .send(errorPage404Message('API not found', svc.errorHtml));
         return;
-      } else if (!svc) {
+      }
+
+      if (!svc) {
+        log.warn(req, `No API service found`);
         res
           .status(404)
           .send(
@@ -115,14 +422,21 @@ export const createApiMiddleware = (opts: any) => {
           );
         return;
       }
-      const api = transformServiceToApi(svc);
+
+      const api = transformServiceToApi(svc as Service);
       req.api = api;
       req.databaseId = api.databaseId;
+      log.debug(
+        req,
+        `Resolved: db=${api.dbname}, schemas=[${api.schema?.join(', ')}]`
+      );
       next();
     } catch (e: any) {
       if (e.code === 'NO_VALID_SCHEMAS') {
+        log.warn(req, e.message);
         res.status(404).send(errorPage404Message(e.message));
-      } else if (e.message.match(/does not exist/)) {
+      } else if (e.message?.includes('does not exist')) {
+        log.warn(req, `Resource not found: ${e.message}`);
         res
           .status(404)
           .send(
@@ -131,315 +445,9 @@ export const createApiMiddleware = (opts: any) => {
             )
           );
       } else {
-        console.error(e);
+        log.error(req, `Error: ${e.message}`, e);
         res.status(500).send(errorPage50x);
       }
     }
   };
-};
-
-const getHardCodedSchemata = ({
-  opts,
-  schemata,
-  databaseId,
-  key,
-}: {
-  opts: PgpmOptions;
-  schemata: string;
-  databaseId: string;
-  key: string;
-}): any => {
-  const svc = {
-    data: {
-      api: {
-        databaseId,
-        isPublic: false,
-        dbname: opts.pg.database,
-        anonRole: 'administrator',
-        roleName: 'administrator',
-        schemaNamesFromExt: {
-          nodes: schemata
-            .split(',')
-            .map((schema) => schema.trim())
-            .map((schemaName) => ({ schemaName })),
-        },
-        schemaNames: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: [] as Array<any>,
-      },
-    },
-  };
-  svcCache.set(key, svc);
-  return svc;
-};
-
-const getMetaSchema = ({
-  opts,
-  key,
-  databaseId,
-}: {
-  opts: PgpmOptions;
-  key: string;
-  databaseId: string;
-}): any => {
-  const apiOpts = (opts as any).api || {};
-  const schemata = apiOpts.metaSchemas || [];
-  const svc = {
-    data: {
-      api: {
-        databaseId,
-        isPublic: false,
-        dbname: opts.pg.database,
-        anonRole: 'administrator',
-        roleName: 'administrator',
-        schemaNamesFromExt: {
-          nodes: schemata.map((schemaName: string) => ({ schemaName })),
-        },
-        schemaNames: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: [] as Array<any>,
-      },
-    },
-  };
-  svcCache.set(key, svc);
-  return svc;
-};
-
-const queryServiceByDomainAndSubdomain = async ({
-  opts,
-  key,
-  client,
-  domain,
-  subdomain,
-}: {
-  opts: PgpmOptions;
-  key: string;
-  client: any;
-  domain: string;
-  subdomain: string;
-}): Promise<any> => {
-  const result = await client.query({
-    role: 'administrator',
-    query: ApiQuery,
-    variables: { domain, subdomain },
-  });
-
-  if (result.errors?.length) {
-    console.error(result.errors);
-    return null;
-  }
-
-  const nodes = result?.data?.domains?.nodes;
-  if (nodes?.length) {
-    const data = nodes[0];
-    const apiPublic = (opts as any).api?.isPublic;
-    if (!data.api || data.api.isPublic !== apiPublic) return null;
-    const svc = { data };
-    svcCache.set(key, svc);
-    return svc;
-  }
-
-  return null;
-};
-
-const queryServiceByApiName = async ({
-  opts,
-  key,
-  client,
-  databaseId,
-  name,
-}: {
-  opts: PgpmOptions;
-  key: string;
-  client: any;
-  databaseId: string;
-  name: string;
-}): Promise<any> => {
-  const result = await client.query({
-    role: 'administrator',
-    query: ApiByNameQuery,
-    variables: { databaseId, name },
-  });
-
-  if (result.errors?.length) {
-    console.error(result.errors);
-    return null;
-  }
-
-  const data = result?.data;
-  const apiPublic = (opts as any).api?.isPublic;
-  if (data?.api && data.api.isPublic === apiPublic) {
-    const svc = { data };
-    svcCache.set(key, svc);
-    return svc;
-  }
-  return null;
-};
-
-const getSvcKey = (opts: PgpmOptions, req: Request): string => {
-  const domain = req.urlDomains.domain;
-  const key = (req.urlDomains.subdomains as string[])
-    .filter((name: string) => !['www'].includes(name))
-    .concat(domain)
-    .join('.');
-
-  const apiPublic = (opts as any).api?.isPublic;
-  if (apiPublic === false) {
-    if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
-    }
-    if (req.get('X-Schemata')) {
-      return (
-        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
-      );
-    }
-    if (req.get('X-Meta-Schema')) {
-      return 'metaschema:api:' + req.get('X-Database-Id');
-    }
-  }
-  return key;
-};
-
-const validateSchemata = async (
-  pool: Pool,
-  schemata: string[]
-): Promise<string[]> => {
-  const result = await pool.query(
-    `SELECT schema_name FROM information_schema.schemata WHERE schema_name = ANY($1::text[])`,
-    [schemata]
-  );
-  return result.rows.map((row: { schema_name: string }) => row.schema_name);
-};
-
-export const getApiConfig = async (
-  opts: PgpmOptions,
-  req: Request
-): Promise<any> => {
-  const rootPgPool = getPgPool(opts.pg);
-  // @ts-ignore
-  const subdomain = getSubdomain(req.urlDomains.subdomains);
-  const domain: string = req.urlDomains.domain as string;
-
-  const key = getSvcKey(opts, req);
-  req.svc_key = key;
-
-  let svc;
-  if (svcCache.has(key)) {
-    svc = svcCache.get(key);
-  } else {
-    const apiOpts = (opts as any).api || {};
-    const allSchemata = apiOpts.metaSchemas || [];
-    const validatedSchemata = await validateSchemata(rootPgPool, allSchemata);
-
-    if (validatedSchemata.length === 0) {
-      const message = `No valid schemas found for domain: ${domain}, subdomain: ${subdomain}`;
-      const error: any = new Error(message);
-      error.code = 'NO_VALID_SCHEMAS';
-      throw error;
-    }
-
-    const settings = getGraphileSettings({
-      graphile: {
-        schema: validatedSchemata,
-      },
-    });
-
-    // @ts-ignore
-    const schema = await getSchema(rootPgPool, settings);
-    // @ts-ignore
-    const client = new GraphileQuery({ schema, pool: rootPgPool, settings });
-
-    const apiPublic = (opts as any).api?.isPublic;
-    if (apiPublic === false) {
-      if (req.get('X-Schemata')) {
-        svc = getHardCodedSchemata({
-          opts,
-          key,
-          schemata: req.get('X-Schemata'),
-          databaseId: req.get('X-Database-Id'),
-        });
-      } else if (req.get('X-Api-Name')) {
-        svc = await queryServiceByApiName({
-          opts,
-          key,
-          client,
-          name: req.get('X-Api-Name'),
-          databaseId: req.get('X-Database-Id'),
-        });
-      } else if (req.get('X-Meta-Schema')) {
-        svc = getMetaSchema({
-          opts,
-          key,
-          databaseId: req.get('X-Database-Id'),
-        });
-      } else {
-        svc = await queryServiceByDomainAndSubdomain({
-          opts,
-          key,
-          client,
-          domain,
-          subdomain,
-        });
-      }
-    } else {
-      svc = await queryServiceByDomainAndSubdomain({
-        opts,
-        key,
-        client,
-        domain,
-        subdomain,
-      });
-
-      if (!svc) {
-        if (getNodeEnv() === 'development') {
-          // TODO ONLY DO THIS IN DEV MODE
-          const fallbackResult = await client.query({
-            role: 'administrator',
-            // @ts-ignore
-            query: ListOfAllDomainsOfDb,
-            // variables: { databaseId }
-          });
-
-          if (
-            !fallbackResult.errors?.length &&
-            fallbackResult.data?.apis?.nodes?.length
-          ) {
-            const port = getPortFromRequest(req);
-
-            const allDomains = fallbackResult.data.apis.nodes.flatMap(
-              (api: any) =>
-                api.domains.nodes.map((d: any) => ({
-                  domain: d.domain,
-                  subdomain: d.subdomain,
-                  href: d.subdomain
-                    ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
-                    : `http://${d.domain}${port}/graphiql`,
-                }))
-            );
-
-            const linksHtml = allDomains.length
-              ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
-                allDomains
-                  .map(
-                    (d: any) =>
-                      `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`
-                  )
-                  .join('') +
-                `</ul>`
-              : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
-
-            const errorHtml = `
-          <p class="text-sm text-gray-700">Try some of these:</p>
-          <div class="mt-4">
-            ${linksHtml}
-          </div>
-        `.trim();
-
-            return {
-              errorHtml,
-            };
-          }
-        }
-      }
-    }
-  }
-  return svc;
 };

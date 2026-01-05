@@ -3,6 +3,9 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 import './types'; // for Request type
+import { createRequestScopedLogger } from './request-logger';
+
+const log = createRequestScopedLogger('auth');
 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
@@ -12,8 +15,11 @@ export const createAuthenticateMiddleware = (
     res: Response,
     next: NextFunction
   ): Promise<void> => {
+    log.debug(req, 'Auth middleware started');
+
     const api = req.api;
     if (!api) {
+      log.error(req, 'Missing API info in auth middleware');
       res.status(500).send('Missing API info');
       return;
     }
@@ -24,18 +30,32 @@ export const createAuthenticateMiddleware = (
     });
     const rlsModule = api.rlsModule;
 
-    if (!rlsModule) return next();
+    if (!rlsModule) {
+      log.debug(req, 'No RLS module configured, skipping authentication');
+      return next();
+    }
 
     const authFn = opts.server.strictAuth
       ? rlsModule.authenticateStrict
       : rlsModule.authenticate;
+
+    log.debug(
+      req,
+      `Using auth function: ${authFn} (strictAuth=${opts.server.strictAuth})`
+    );
 
     if (authFn && rlsModule.privateSchema.schemaName) {
       const { authorization = '' } = req.headers;
       const [authType, authToken] = authorization.split(' ');
       let token: any = {};
 
-      if (authType?.toLowerCase() === 'bearer' && authToken) {
+      const hasToken = authType?.toLowerCase() === 'bearer' && authToken;
+      log.debug(
+        req,
+        `Authorization header: type=${authType || 'none'}, hasToken=${!!hasToken}, tokenLength=${authToken?.length || 0}`
+      );
+
+      if (hasToken) {
         const context: Record<string, any> = {
           'jwt.claims.ip_address': req.clientIp,
         };
@@ -47,6 +67,11 @@ export const createAuthenticateMiddleware = (
           context['jwt.claims.user_agent'] = req.get('User-Agent');
         }
 
+        log.debug(
+          req,
+          `Validating token via ${rlsModule.privateSchema.schemaName}.${authFn}()`
+        );
+
         try {
           const result = await pgQueryContext({
             client: pool,
@@ -56,6 +81,10 @@ export const createAuthenticateMiddleware = (
           });
 
           if (result?.rowCount === 0) {
+            log.warn(
+              req,
+              'Token validation returned no rows - UNAUTHENTICATED'
+            );
             res.status(200).json({
               errors: [{ extensions: { code: 'UNAUTHENTICATED' } }],
             });
@@ -63,7 +92,12 @@ export const createAuthenticateMiddleware = (
           }
 
           token = result.rows[0];
+          log.debug(
+            req,
+            `Token validated successfully: user_id=${token.user_id}, token_id=${token.id}`
+          );
         } catch (e: any) {
+          log.error(req, `Token validation error: ${e.message}`, e);
           res.status(200).json({
             errors: [
               {
@@ -76,9 +110,15 @@ export const createAuthenticateMiddleware = (
           });
           return;
         }
+      } else {
+        log.debug(req, 'No bearer token provided, proceeding as anonymous');
       }
 
       req.token = token;
+
+      if (token.user_id) {
+        log.debug(req, `Request authenticated: user_id=${token.user_id}`);
+      }
     }
 
     next();

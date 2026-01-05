@@ -3,7 +3,7 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import express, { Express, RequestHandler } from 'express';
+import express, { Express, json, RequestHandler } from 'express';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
@@ -15,6 +15,10 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import {
+  createRequestLoggerMiddleware,
+  createGraphQLLoggerMiddleware,
+} from './middleware/request-logger';
 
 const log = new Logger('server');
 
@@ -36,21 +40,50 @@ class Server {
     const api = createApiMiddleware(opts);
     const authenticate = createAuthenticateMiddleware(opts);
 
+    // Log startup configuration
+    log.info(`Starting server with config:`);
+    log.info(
+      `  Database: ${opts.pg?.database}@${opts.pg?.host}:${opts.pg?.port}`
+    );
+    log.info(
+      `  Meta schemas: ${(opts as any).api?.metaSchemas?.join(', ') || 'default'}`
+    );
+    log.info(
+      `  Meta API enabled: ${(opts as any).api?.enableMetaApi !== false}`
+    );
+    log.info(`  Public APIs only: ${(opts as any).api?.isPublic !== false}`);
+
     healthz(app);
     trustProxy(app, opts.server.trustProxy);
+
     // Warn if a global CORS override is set in production
     const fallbackOrigin = opts.server?.origin?.trim();
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
-        log.warn('CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.');
+        log.warn(
+          'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
+        );
       } else {
-        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`);
+        log.warn(
+          `CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`
+        );
       }
     }
-    
+
     app.use(poweredBy('constructive'));
+
+    // Request logging middleware (early in chain for request ID and timing)
+    app.use(createRequestLoggerMiddleware());
+
     app.use(cors(fallbackOrigin));
     app.use(graphqlUpload.graphqlUploadExpress());
+
+    // JSON body parser (needed before GraphQL logger to read request body)
+    app.use(json());
+
+    // GraphQL-specific logging (after body parser)
+    app.use(createGraphQLLoggerMiddleware());
+
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(api);
@@ -69,10 +102,7 @@ class Server {
 
     httpServer.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
-        this.error(
-          `Port ${server?.port ?? 'unknown'} is already in use`,
-          err
-        );
+        this.error(`Port ${server?.port ?? 'unknown'} is already in use`, err);
       } else {
         this.error('Server failed to start', err);
       }
