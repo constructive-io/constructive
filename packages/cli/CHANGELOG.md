@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.4.12](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.11...@constructive-io/cli@5.4.12) (2026-01-05)
+
+### Bug Fixes
+
+- remove dashboard_public from default schemas ([9310e0b](https://github.com/constructive-io/constructive/commit/9310e0b290992e574423273e499d6f7fa1a9267e))
+- update module tables to metaschema_modules_public schema ([9a9d58a](https://github.com/constructive-io/constructive/commit/9a9d58a6ee308e71efbf2a189df04c2cf123a524))
+
 ## [5.4.11](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.4.10...@constructive-io/cli@5.4.11) (2026-01-03)
 
 **Note:** Version bump only for package @constructive-io/cli

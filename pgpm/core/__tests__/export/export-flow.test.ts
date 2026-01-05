@@ -5,7 +5,7 @@
  * 1. Sets up a temporary workspace with required pgpm modules (db-meta-schema, db-meta-modules, db-migrate)
  * 2. Creates a custom module with migrations to seed test data:
  *    - insert_sql_actions: Creates db_migrate.sql_actions table and inserts sample migration records
- *    - insert_meta_schema: Inserts collections_public data representing a pets application
+ *    - insert_meta_schema: Inserts metaschema_public data representing a pets application
  * 3. Deploys everything to a test database
  * 4. Runs the export flow and verifies the output
  * 
@@ -177,7 +177,7 @@ requires = ''
 
 create_sql_actions 2017-08-11T08:11:51Z constructive <constructive@test.local> # Create sql_actions table
 insert_sql_actions [create_sql_actions] 2017-08-11T08:11:52Z constructive <constructive@test.local> # Insert migration records
-insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <constructive@test.local> # Insert collections_public data
+insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <constructive@test.local> # Insert metaschema_public data
 `;
     writeFileSync(join(testModuleDir, 'pgpm.plan'), planContent);
 
@@ -194,12 +194,12 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
     // Create revert scripts (minimal)
     writeFileSync(join(testModuleDir, 'revert', 'create_sql_actions.sql'), '-- Revert create_sql_actions\nDROP TABLE IF EXISTS db_migrate.sql_actions;\nDROP SCHEMA IF EXISTS db_migrate;');
     writeFileSync(join(testModuleDir, 'revert', 'insert_sql_actions.sql'), '-- Revert insert_sql_actions\nDELETE FROM db_migrate.sql_actions;');
-    writeFileSync(join(testModuleDir, 'revert', 'insert_meta_schema.sql'), '-- Revert insert_meta_schema\nDELETE FROM collections_public.field;\nDELETE FROM collections_public.table;\nDELETE FROM collections_public.schema;\nDELETE FROM collections_public.database;');
+    writeFileSync(join(testModuleDir, 'revert', 'insert_meta_schema.sql'), '-- Revert insert_meta_schema\nDELETE FROM metaschema_public.field;\nDELETE FROM metaschema_public.table;\nDELETE FROM metaschema_public.schema;\nDELETE FROM metaschema_public.database;');
 
     // Create verify scripts (minimal)
     writeFileSync(join(testModuleDir, 'verify', 'create_sql_actions.sql'), 'SELECT 1 FROM db_migrate.sql_actions LIMIT 0;');
     writeFileSync(join(testModuleDir, 'verify', 'insert_sql_actions.sql'), 'SELECT 1 FROM db_migrate.sql_actions WHERE database_id IS NOT NULL LIMIT 1;');
-    writeFileSync(join(testModuleDir, 'verify', 'insert_meta_schema.sql'), 'SELECT 1 FROM collections_public.database WHERE name = \'pets\' LIMIT 1;');
+    writeFileSync(join(testModuleDir, 'verify', 'insert_meta_schema.sql'), 'SELECT 1 FROM metaschema_public.database WHERE name = \'pets\' LIMIT 1;');
   }
 
   async function setupTestDatabase(): Promise<{ name: string; config: PgConfig; pool: Pool }> {
@@ -233,45 +233,46 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
     // Create the required schemas that would normally come from pgpm modules
     // For this test, we create minimal shims since we're testing the export flow, not the modules
     await pool.query(`
-      CREATE SCHEMA IF NOT EXISTS collections_public;
-      CREATE SCHEMA IF NOT EXISTS meta_public;
+      CREATE SCHEMA IF NOT EXISTS metaschema_public;
+      CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
+      CREATE SCHEMA IF NOT EXISTS services_public;
       CREATE SCHEMA IF NOT EXISTS db_migrate;
 
-      -- collections_public tables
-      CREATE TABLE IF NOT EXISTS collections_public.database (
+      -- metaschema_public tables
+      CREATE TABLE IF NOT EXISTS metaschema_public.database (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         owner_id uuid,
         name text,
         hash uuid
       );
 
-      CREATE TABLE IF NOT EXISTS collections_public.schema (
+      CREATE TABLE IF NOT EXISTS metaschema_public.schema (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES collections_public.database(id),
+        database_id uuid REFERENCES metaschema_public.database(id),
         name text,
         schema_name text,
         description text
       );
 
-      CREATE TABLE IF NOT EXISTS collections_public.table (
+      CREATE TABLE IF NOT EXISTS metaschema_public.table (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES collections_public.database(id),
-        schema_id uuid REFERENCES collections_public.schema(id),
+        database_id uuid REFERENCES metaschema_public.database(id),
+        schema_id uuid REFERENCES metaschema_public.schema(id),
         name text,
         description text
       );
 
-      CREATE TABLE IF NOT EXISTS collections_public.field (
+      CREATE TABLE IF NOT EXISTS metaschema_public.field (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES collections_public.database(id),
-        table_id uuid REFERENCES collections_public.table(id),
+        database_id uuid REFERENCES metaschema_public.database(id),
+        table_id uuid REFERENCES metaschema_public.table(id),
         name text,
         type text,
         description text
       );
 
-      -- meta_public tables
-      CREATE TABLE IF NOT EXISTS meta_public.domains (
+      -- services_public tables
+      CREATE TABLE IF NOT EXISTS services_public.domains (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         site_id uuid,
@@ -280,7 +281,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         subdomain text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.apis (
+      CREATE TABLE IF NOT EXISTS services_public.apis (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         name text,
@@ -290,7 +291,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         anon_role text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.sites (
+      CREATE TABLE IF NOT EXISTS services_public.sites (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         title text,
@@ -302,15 +303,15 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         dbname text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.api_schemata (
+      CREATE TABLE IF NOT EXISTS services_public.api_schemata (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         schema_id uuid,
         api_id uuid
       );
 
-      -- Additional meta_public tables required by exportMeta
-      CREATE TABLE IF NOT EXISTS meta_public.apps (
+      -- Additional services_public tables required by exportMeta
+      CREATE TABLE IF NOT EXISTS services_public.apps (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         site_id uuid,
@@ -322,7 +323,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         play_store_link text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.site_modules (
+      CREATE TABLE IF NOT EXISTS services_public.site_modules (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         site_id uuid,
@@ -330,14 +331,14 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         data jsonb
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.site_themes (
+      CREATE TABLE IF NOT EXISTS services_public.site_themes (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         site_id uuid,
         theme jsonb
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.api_modules (
+      CREATE TABLE IF NOT EXISTS services_public.api_modules (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         api_id uuid,
@@ -345,14 +346,15 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         data jsonb
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.api_extensions (
+      CREATE TABLE IF NOT EXISTS services_public.api_extensions (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         api_id uuid,
         schema_name text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.rls_module (
+      -- metaschema_modules_public tables (module configuration)
+      CREATE TABLE IF NOT EXISTS metaschema_modules_public.rls_module (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         api_id uuid,
@@ -366,7 +368,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         current_role_id text
       );
 
-      CREATE TABLE IF NOT EXISTS meta_public.user_auth_module (
+      CREATE TABLE IF NOT EXISTS metaschema_modules_public.user_auth_module (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         schema_id uuid,
@@ -390,8 +392,8 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         verify_email_function text
       );
 
-      -- Additional collections_public table required by exportMeta
-      CREATE TABLE IF NOT EXISTS collections_public.database_extension (
+      -- Additional metaschema_public table required by exportMeta
+      CREATE TABLE IF NOT EXISTS metaschema_public.database_extension (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         name text
@@ -490,25 +492,25 @@ INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, re
 
   function getInsertMetaSchemaScript(): string {
     return `-- Deploy: insert_meta_schema
--- Insert collections_public data representing the pets application
+-- Insert metaschema_public data representing the pets application
 
 -- Database
-INSERT INTO collections_public.database (id, owner_id, name, hash) VALUES
+INSERT INTO metaschema_public.database (id, owner_id, name, hash) VALUES
   ('a1b2c3d4-e5f6-4708-b250-000000000001', '00000000-0000-0000-0000-000000000001', 'pets', 'f1e2d3c4-b5a6-5c2e-9a07-000000000001');
 
 -- Schemas
-INSERT INTO collections_public.schema (id, database_id, name, schema_name, description) VALUES
+INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description) VALUES
   ('aaaa0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'public', 'pets_public', 'Public-facing tables'),
   ('aaaa0002-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'private', 'pets_private', 'Internal tables');
 
 -- Tables
-INSERT INTO collections_public.table (id, database_id, schema_id, name, description) VALUES
+INSERT INTO metaschema_public.table (id, database_id, schema_id, name, description) VALUES
   ('bbbb0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'owners', 'Pet owners'),
   ('bbbb0002-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'pets', 'Pets'),
   ('bbbb0003-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'species', 'Pet species');
 
 -- Fields
-INSERT INTO collections_public.field (id, database_id, table_id, name, type, description) VALUES
+INSERT INTO metaschema_public.field (id, database_id, table_id, name, type, description) VALUES
   ('cccc0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0001-0000-0000-0000-000000000001', 'id', 'uuid', 'Primary key'),
   ('cccc0002-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0001-0000-0000-0000-000000000001', 'name', 'text', 'Owner name'),
   ('cccc0003-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0001-0000-0000-0000-000000000001', 'email', 'text', 'Contact email'),
@@ -519,16 +521,16 @@ INSERT INTO collections_public.field (id, database_id, table_id, name, type, des
   ('cccc0021-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'bbbb0003-0000-0000-0000-000000000001', 'name', 'citext', 'Species name');
 
 -- Meta public data
-INSERT INTO meta_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role) VALUES
+INSERT INTO services_public.apis (id, database_id, name, dbname, is_public, role_name, anon_role) VALUES
   ('eeee0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'public', 'pets-db', true, 'authenticated', 'anonymous');
 
-INSERT INTO meta_public.sites (id, database_id, title, description, dbname) VALUES
+INSERT INTO services_public.sites (id, database_id, title, description, dbname) VALUES
   ('ffff0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'Pet Clinic', 'A pet management application', 'pets');
 
-INSERT INTO meta_public.domains (id, database_id, domain, subdomain) VALUES
+INSERT INTO services_public.domains (id, database_id, domain, subdomain) VALUES
   ('dddd0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'localhost', 'pets');
 
-INSERT INTO meta_public.api_schemata (id, database_id, schema_id, api_id) VALUES
+INSERT INTO services_public.api_schemata (id, database_id, schema_id, api_id) VALUES
   ('1111aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
 `;
   }
@@ -539,29 +541,29 @@ INSERT INTO meta_public.api_schemata (id, database_id, schema_id, api_id) VALUES
     expect(parseInt(result.rows[0].count)).toBeGreaterThan(0);
   });
 
-  it('should have seeded the database with collections_public data', async () => {
-    const dbResult = await db.pool.query('SELECT * FROM collections_public.database WHERE name = $1', ['pets']);
+  it('should have seeded the database with metaschema_public data', async () => {
+    const dbResult = await db.pool.query('SELECT * FROM metaschema_public.database WHERE name = $1', ['pets']);
     expect(dbResult.rows).toHaveLength(1);
     expect(dbResult.rows[0].name).toBe('pets');
 
-    const schemaResult = await db.pool.query('SELECT COUNT(*) as count FROM collections_public.schema');
+    const schemaResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.schema');
     expect(parseInt(schemaResult.rows[0].count)).toBeGreaterThan(0);
 
-    const tableResult = await db.pool.query('SELECT COUNT(*) as count FROM collections_public.table');
+    const tableResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.table');
     expect(parseInt(tableResult.rows[0].count)).toBeGreaterThan(0);
 
-    const fieldResult = await db.pool.query('SELECT COUNT(*) as count FROM collections_public.field');
+    const fieldResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.field');
     expect(parseInt(fieldResult.rows[0].count)).toBeGreaterThan(0);
   });
 
-  it('should have seeded the database with meta_public data', async () => {
-    const apiResult = await db.pool.query('SELECT COUNT(*) as count FROM meta_public.apis');
+  it('should have seeded the database with services_public data', async () => {
+    const apiResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.apis');
     expect(parseInt(apiResult.rows[0].count)).toBeGreaterThan(0);
 
-    const siteResult = await db.pool.query('SELECT COUNT(*) as count FROM meta_public.sites');
+    const siteResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.sites');
     expect(parseInt(siteResult.rows[0].count)).toBeGreaterThan(0);
 
-    const domainResult = await db.pool.query('SELECT COUNT(*) as count FROM meta_public.domains');
+    const domainResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.domains');
     expect(parseInt(domainResult.rows[0].count)).toBeGreaterThan(0);
   });
 
@@ -608,7 +610,7 @@ INSERT INTO meta_public.api_schemata (id, database_id, schema_id, api_id) VALUES
     beforeAll(async () => {
       // Get schema names from the seeded data
       const schemaResult = await db.pool.query(
-        'SELECT schema_name FROM collections_public.schema WHERE database_id = $1',
+        'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
         [DATABASE_ID]
       );
       const schemaNames = schemaResult.rows.map((r: any) => r.schema_name);
