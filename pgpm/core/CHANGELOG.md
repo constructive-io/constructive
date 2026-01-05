@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.1...@pgpmjs/core@4.7.2) (2026-01-05)
+
+### Bug Fixes
+
+- rename collections_public -> metaschema_public, meta_public -> services_public in @pgpmjs/core ([85ed480](https://github.com/constructive-io/constructive/commit/85ed48016e0774f526e6f2fb10ab78fdc10736d0))
+- update export-flow.test.ts to create metaschema_modules_public schema and tables ([757194c](https://github.com/constructive-io/constructive/commit/757194ce95a46a437a49040c39acdf8d865ca748))
+- update export-meta.test.ts to use new schema names (metaschema_public, services_public) ([4b1ac0d](https://github.com/constructive-io/constructive/commit/4b1ac0da234e8e7255891e3b04d979c6354cf02a))
+- update module tables to metaschema_modules_public schema ([9a9d58a](https://github.com/constructive-io/constructive/commit/9a9d58a6ee308e71efbf2a189df04c2cf123a524))
+- update test fixtures to use new schema names (metaschema_public, services_public) ([4f0b7d8](https://github.com/constructive-io/constructive/commit/4f0b7d838e6b277352b55ceb430f16dabbffa441))
+
 ## [4.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.0...@pgpmjs/core@4.7.1) (2026-01-03)
 
 ### Bug Fixes

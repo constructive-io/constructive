@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.11](https://github.com/constructive-io/constructive/compare/pgpm@2.7.10...pgpm@2.7.11) (2026-01-05)
+
+### Bug Fixes
+
+- rename collections_public -> metaschema_public, meta_public -> services_public in @pgpmjs/core ([85ed480](https://github.com/constructive-io/constructive/commit/85ed48016e0774f526e6f2fb10ab78fdc10736d0))
+
 ## [2.7.10](https://github.com/constructive-io/constructive/compare/pgpm@2.7.9...pgpm@2.7.10) (2026-01-03)
 
 **Note:** Version bump only for package pgpm
