@@ -140,7 +140,7 @@ export async function loadConfigFile(configPath: string): Promise<{
   try {
     // Use jiti to load TypeScript/ESM config files seamlessly
     // jiti handles .ts, .js, .mjs, .cjs and ESM/CJS interop
-    const jiti = createJiti(import.meta.url, {
+    const jiti = createJiti(__filename, {
       interopDefault: true,
       debug: process.env.JITI_DEBUG === '1',
     });

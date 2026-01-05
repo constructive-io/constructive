@@ -15,6 +15,8 @@ import {
 import { QueryBuilder } from '../core/query-builder';
 import type {
   IntrospectionSchema,
+  MetaConstraint,
+  MetaFieldType,
   MetaObject,
   MutationDefinition,
   QueryDefinition,
@@ -68,8 +70,8 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
           typmod: field.type.typmod,
         },
       })),
-      primaryConstraints: [], // Would need to be derived from schema
-      uniqueConstraints: [], // Would need to be derived from schema
+      primaryConstraints: [] as MetaConstraint[], // Would need to be derived from schema
+      uniqueConstraints: [] as MetaConstraint[], // Would need to be derived from schema
       foreignConstraints: table.relations.belongsTo.map((rel) => ({
         refTable: rel.referencesTable,
         fromKey: {
@@ -82,7 +84,7 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
             pgType: null,
             subtype: null,
             typmod: null,
-          },
+          } as MetaFieldType,
           alias: rel.fieldName || '',
         },
         toKey: {
@@ -95,7 +97,7 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
             pgType: null,
             subtype: null,
             typmod: null,
-          },
+          } as MetaFieldType,
         },
       })),
     })),
