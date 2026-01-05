@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.12.0...@constructive-io/graphql-server@2.13.0) (2026-01-05)
+
+### Bug Fixes
+
+- **graphql-server:** use services_public.domains in flush service ([acc75b2](https://github.com/constructive-io/constructive/commit/acc75b265a2642cea56e72b91d11e709f114fbe8))
+
 # [2.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.11.5...@constructive-io/graphql-server@2.12.0) (2026-01-05)
 
 ### Features

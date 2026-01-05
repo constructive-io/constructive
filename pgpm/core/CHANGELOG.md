@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.2...@pgpmjs/core@4.8.0) (2026-01-05)
+
+### Bug Fixes
+
+- **pgpm:** add database_id filter to sql_actions export query and skipSchemaRenaming option ([ef1860f](https://github.com/constructive-io/constructive/commit/ef1860f3946e8ba2f91ae90edaa6263a5666776d))
+
 ## [4.7.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.1...@pgpmjs/core@4.7.2) (2026-01-05)
 
 ### Bug Fixes
