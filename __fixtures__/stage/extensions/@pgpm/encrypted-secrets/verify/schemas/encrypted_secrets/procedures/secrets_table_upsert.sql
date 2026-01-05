@@ -1,7 +1,0 @@
--- Verify schemas/encrypted_secrets/procedures/secrets_table_upsert  on pg
-
-BEGIN;
-
-SELECT verify_function ('encrypted_secrets.secrets_table_upsert');
-
-ROLLBACK;

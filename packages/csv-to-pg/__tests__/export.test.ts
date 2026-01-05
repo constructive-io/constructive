@@ -9,7 +9,7 @@ import { Parser } from '../src/parser';
 const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
 
 const config = {
-  schema: 'collections_public',
+  schema: 'metaschema_public',
   singleStmts: true,
   table: 'field',
   headers: [
@@ -76,7 +76,7 @@ it('test case parser', async () => {
 
 it('jsonb/json', async () => {
   const parser = new Parser({
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     singleStmts: true,
     table: 'field',
     fields: {
@@ -101,7 +101,7 @@ it('jsonb/json', async () => {
 
 it('image/attachment', async () => {
   const parser = new Parser({
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     singleStmts: true,
     table: 'field',
     fields: {
@@ -130,7 +130,7 @@ it('image/attachment', async () => {
 
 it('arrays', async () => {
   const parser = new Parser({
-    schema: 'collections_public',
+    schema: 'metaschema_public',
     singleStmts: true,
     table: 'field',
     fields: {

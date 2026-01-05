@@ -275,7 +275,7 @@ async function resolveEffectiveOptions(
     if (!ownedSchemas) {
       try {
         const result = await gqlContext.pgClient.query(
-          `SELECT schema_name FROM collections_public.schema WHERE database_id = jwt_private.current_database_id()`
+          `SELECT schema_name FROM metaschema_public.schema WHERE database_id = jwt_private.current_database_id()`
         );
         ownedSchemas = result.rows.map((row: { schema_name: string }) => row.schema_name);
         gqlContext[OWNED_SCHEMAS_CACHE_KEY] = ownedSchemas;

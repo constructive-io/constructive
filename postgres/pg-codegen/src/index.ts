@@ -52,7 +52,7 @@ const writeGeneratedFiles = async (
       pgLegacyFunctionsOnly: false,
       pgIgnoreRBAC: true,
     },
-    namespacesToIntrospect: ['collections_public'],
+    namespacesToIntrospect: ['metaschema_public'],
     includeExtensions: false,
   };
 

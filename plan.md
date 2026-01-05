@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-The `pgpm export` command's `meta_public` schema export is broken. The export functionality in `pgpm/core/src/export/export-meta.ts` has several issues that cause the generated SQL to fail when replayed.
+The `pgpm export` command's `services_public` schema export is broken. The export functionality in `pgpm/core/src/export/export-meta.ts` has several issues that cause the generated SQL to fail when replayed.
 
 ## Issues Identified
 
@@ -11,7 +11,7 @@ The `pgpm export` command's `meta_public` schema export is broken. The export fu
 1. **Table name mismatch (`database_extension`)**
    - Location: `pgpm/core/src/export/export-meta.ts` line 26-27
    - Config defines: `table: 'database_extensions'` (plural)
-   - Actual table: `collections_public.database_extension` (singular)
+   - Actual table: `metaschema_public.database_extension` (singular)
    - Impact: Generated INSERT statements target non-existent table
 
 2. **Missing columns in `user_auth_module` config**
@@ -28,7 +28,7 @@ The `pgpm export` command's `meta_public` schema export is broken. The export fu
    - Impact: Field data is never exported
 
 4. **Missing `site_metadata` table**
-   - Table exists in `meta_public` schema but not in export config
+   - Table exists in `services_public` schema but not in export config
    - Impact: Site metadata is never exported
 
 ### Secondary Issues
@@ -40,16 +40,16 @@ The `pgpm export` command's `meta_public` schema export is broken. The export fu
    - Impact: May fail in non-superuser environments
 
 6. **Type mismatches** (may or may not cause issues depending on csv-to-pg handling)
-   - `meta_public.sites.favicon`: actual `attachment`, config says `upload`
-   - `meta_public.domains.subdomain/domain`: actual `hostname`, config says `text`
-   - `meta_public.api_modules.data`: actual `pg_catalog.json`, config says `jsonb`
-   - `meta_public.site_modules.data`: actual `pg_catalog.json`, config says `jsonb`
+   - `services_public.sites.favicon`: actual `attachment`, config says `upload`
+   - `services_public.domains.subdomain/domain`: actual `hostname`, config says `text`
+   - `services_public.api_modules.data`: actual `pg_catalog.json`, config says `jsonb`
+   - `services_public.site_modules.data`: actual `pg_catalog.json`, config says `jsonb`
 
 ## Proposed Solution
 
 ### Phase 1: Create Test Infrastructure
 
-1. **Create a new test module** in `extensions/` directory
+1. **Create a new test module** in `pgpm-modules/` directory
    - Name: `@pgpm/export-meta-test` or similar
    - Purpose: Test the export functionality with seed data
 
@@ -102,13 +102,13 @@ extensions/@pgpm/export-meta-test/
 ## Success Criteria
 
 1. Export generates valid SQL that can be replayed
-2. All tables in `meta_public` and `collections_public` are properly exported
+2. All tables in `services_public` and `metaschema_public` are properly exported
 3. FK constraints are respected (either via proper ordering or explicit handling)
 4. Tests catch schema drift automatically
 5. CI passes with new tests
 
 ## Questions to Resolve
 
-1. Should this be a separate module or part of existing `db-meta-schema` tests?
+1. Should this be a separate module or part of existing `metaschema-schema` tests?
 2. Do we need to support non-superuser deployments (affects `session_replication_role` approach)?
 3. Should we add the tests to `launchql-extensions` repo as well for parity?

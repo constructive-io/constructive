@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.8.0...@pgpmjs/core@4.9.0) (2026-01-05)
+
+### Bug Fixes
+
+- update outdated extension names from db-meta-_ to metaschema-_ ([a4961fd](https://github.com/constructive-io/constructive/commit/a4961fd09f3e92748c4c539d204c6df8cb21b436))
+
 # [4.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.7.2...@pgpmjs/core@4.8.0) (2026-01-05)
 
 ### Bug Fixes

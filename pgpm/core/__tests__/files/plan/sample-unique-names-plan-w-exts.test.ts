@@ -1,0 +1,31 @@
+import { cleanText, TestFixture } from '../../../test-utils';
+
+describe('w-exts fixture plan generation (sample-unique-names)', () => {
+  let fixture: TestFixture;
+
+  beforeAll(() => {
+    fixture = new TestFixture('sqitch', 'simple-w-exts');
+  });
+
+  afterAll(() => {
+    fixture.cleanup();
+  });
+
+  it('generates a plan for sample-unique-names (no packages)', async () => {
+    const mod = fixture.getModuleProject([], 'sample-unique-names');
+    const plan = mod.generateModulePlan({ includePackages: false });
+    expect(cleanText(plan)).toMatchSnapshot();
+  });
+
+  it('generates a plan for sample-unique-names (with packages)', async () => {
+    const mod = fixture.getModuleProject([], 'sample-unique-names');
+    const plan = mod.generateModulePlan({ includePackages: true });
+    expect(cleanText(plan)).toMatchSnapshot();
+  });
+  it('generates a plan for sample-unique-names (with packages and includeTags)', async () => {
+    const mod = fixture.getModuleProject([], 'sample-unique-names');
+    const plan = mod.generateModulePlan({ includePackages: true, includeTags: true });
+    expect(cleanText(plan)).toMatchSnapshot();
+  });
+
+});
