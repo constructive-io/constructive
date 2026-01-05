@@ -2,7 +2,7 @@
  * End-to-end test for the pgpm export flow.
  * 
  * This test:
- * 1. Sets up a temporary workspace with required pgpm modules (db-meta-schema, db-meta-modules, db-migrate)
+ * 1. Sets up a temporary workspace with required pgpm modules (metaschema-schema, metaschema-modules, db-migrate)
  * 2. Creates a custom module with migrations to seed test data:
  *    - insert_sql_actions: Creates db_migrate.sql_actions table and inserts sample migration records
  *    - insert_meta_schema: Inserts metaschema_public data representing a pets application
@@ -10,7 +10,7 @@
  * 4. Runs the export flow and verifies the output
  * 
  * PREREQUISITES:
- * - The @pgpm/db-meta-schema, @pgpm/db-meta-modules, and @pgpm/db-migrate modules must be available
+ * - The @pgpm/metaschema-schema, @pgpm/metaschema-modules, and @pgpm/db-migrate modules must be available
  *   in the workspace's extensions/ directory or installable via pgpm install
  */
 

@@ -11,8 +11,8 @@ export type ModuleMap = Record<string, Module>;
 export const PGPM_MODULE_MAP: Record<string, string> = {
   'pgpm-base32': '@pgpm/base32',
   'pgpm-database-jobs': '@pgpm/database-jobs',
-  'db-meta-modules': '@pgpm/db-meta-modules',
-  'db-meta-schema': '@pgpm/db-meta-schema',
+  'metaschema-modules': '@pgpm/metaschema-modules',
+  'metaschema-schema': '@pgpm/metaschema-schema',
   'pgpm-inflection': '@pgpm/inflection',
   'pgpm-jwt-claims': '@pgpm/jwt-claims',
   'pgpm-stamps': '@pgpm/stamps',
