@@ -50,13 +50,13 @@ import { GraphQLServer } from '@constructive-io/graphql-server';
 GraphQLServer(
   getEnvOptions({
     pg: { database: 'constructive_db' },
-    server: { host: '0.0.0.0', port: 3000 }
+    server: { host: '0.0.0.0', port: 3000 },
   })
 );
 ```
 
 > **Tip:** Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` to control DB connectivity.
-See [Configuration](#configuration) for the full list of supported env vars and defaults.
+> See [Configuration](#configuration) for the full list of supported env vars and defaults.
 
 ### Local Development (this repo)
 
@@ -67,6 +67,9 @@ pnpm dev
 ```
 
 This starts the server with env defaults from `@constructive-io/graphql-env`.
+
+> **Tip:** Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` to control DB connectivity.
+> See [Configuration](#configuration) for the full list of supported env vars and defaults.
 
 ## What it does
 

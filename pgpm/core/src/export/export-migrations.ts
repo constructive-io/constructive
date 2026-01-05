@@ -150,6 +150,12 @@ interface ExportMigrationsToDiskOptions {
   username?: string;
   /** Output directory for service/meta module. Defaults to outdir if not provided. */
   serviceOutdir?: string;
+  /** 
+   * Skip schema name replacement for infrastructure schemas.
+   * When true, schema names like metaschema_public, services_public will not be renamed.
+   * Useful for self-referential introspection where you want to apply policies to real schemas.
+   */
+  skipSchemaRenaming?: boolean;
 }
 
 interface ExportOptions {
@@ -174,6 +180,12 @@ interface ExportOptions {
   username?: string;
   /** Output directory for service/meta module. Defaults to outdir if not provided. */
   serviceOutdir?: string;
+  /** 
+   * Skip schema name replacement for infrastructure schemas.
+   * When true, schema names like metaschema_public, services_public will not be renamed.
+   * Useful for self-referential introspection where you want to apply policies to real schemas.
+   */
+  skipSchemaRenaming?: boolean;
 }
 
 const exportMigrationsToDisk = async ({
@@ -192,7 +204,8 @@ const exportMigrationsToDisk = async ({
   prompter,
   repoName,
   username,
-  serviceOutdir
+  serviceOutdir,
+  skipSchemaRenaming = false
 }: ExportMigrationsToDiskOptions): Promise<void> => {
   outdir = outdir + '/';
   // Use serviceOutdir for service module, defaulting to outdir if not provided
@@ -204,12 +217,12 @@ const exportMigrationsToDisk = async ({
   });
 
   const db = await pgPool.query(
-    `select * from collections_public.database where id=$1`,
+    `select * from metaschema_public.database where id=$1`,
     [databaseId]
   );
 
   const schemas = await pgPool.query(
-    `select * from collections_public.schema where database_id=$1`,
+    `select * from metaschema_public.schema where database_id=$1`,
     [databaseId]
   );
 
@@ -225,15 +238,24 @@ const exportMigrationsToDisk = async ({
 
   const name = extensionName || db.rows[0].name;
 
+  // When skipSchemaRenaming is true, pass empty schemas array to avoid renaming
+  // This is useful for self-referential introspection where you want to apply
+  // policies to real infrastructure schemas (metaschema_public, services_public, etc.)
+  const schemasForReplacement = skipSchemaRenaming
+    ? []
+    : schemas.rows.filter((schema: any) => schema_names.includes(schema.schema_name));
+
   const { replace, replacer } = makeReplacer({
-    schemas: schemas.rows.filter((schema: any) =>
-      schema_names.includes(schema.schema_name)
-    ),
+    schemas: schemasForReplacement,
     name
   });
 
+  // Filter sql_actions by database_id to avoid cross-database pollution
+  // Previously this query had no WHERE clause, which could export actions
+  // from unrelated databases in a persistent database environment
   const results = await pgPool.query(
-    `select * from db_migrate.sql_actions order by id`
+    `select * from db_migrate.sql_actions where database_id = $1 order by id`,
+    [databaseId]
   );
 
   const opts: SqlWriteOptions = {
@@ -303,10 +325,13 @@ const exportMigrationsToDisk = async ({
       await installMissingModules(svcModuleDir, svcMissingResult.missingModules);
     }
 
+    // Use same skipSchemaRenaming logic for meta replacer
+    const metaSchemasForReplacement = skipSchemaRenaming
+      ? []
+      : schemas.rows.filter((schema: any) => schema_names.includes(schema.schema_name));
+
     const metaReplacer = makeReplacer({
-      schemas: schemas.rows.filter((schema: any) =>
-        schema_names.includes(schema.schema_name)
-      ),
+      schemas: metaSchemasForReplacement,
       name: metaExtensionName
     });
 
@@ -315,7 +340,7 @@ const exportMigrationsToDisk = async ({
         deps: [],
         deploy: 'migrate/meta',
         content: `SET session_replication_role TO replica;
--- using replica in case we are deploying triggers to collections_public
+-- using replica in case we are deploying triggers to metaschema_public
 
 -- unaccent, postgis affected and require grants
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
@@ -334,12 +359,12 @@ ${meta}
 
 -- TODO: Research needed - These UPDATE statements may be a security leak.
 -- They appear to rebind exported metadata to the target database after import,
--- but exposing dbname in meta_public tables could leak internal database names.
+-- but exposing dbname in services_public tables could leak internal database names.
 -- Consider removing entirely or gating behind an explicit flag.
--- UPDATE meta_public.apis
+-- UPDATE services_public.apis
 --       SET dbname = current_database() WHERE TRUE;
 
--- UPDATE meta_public.sites
+-- UPDATE services_public.sites
 --       SET dbname = current_database() WHERE TRUE;
 
 SET session_replication_role TO DEFAULT;
@@ -372,7 +397,8 @@ export const exportMigrations = async ({
   prompter,
   repoName,
   username,
-  serviceOutdir
+  serviceOutdir,
+  skipSchemaRenaming
 }: ExportOptions): Promise<void> => {
   for (let v = 0; v < dbInfo.database_ids.length; v++) {
     const databaseId = dbInfo.database_ids[v];
@@ -392,7 +418,8 @@ export const exportMigrations = async ({
       prompter,
       repoName,
       username,
-      serviceOutdir
+      serviceOutdir,
+      skipSchemaRenaming
     });
   }
 };

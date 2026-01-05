@@ -1,8 +1,13 @@
+import { getNodeEnv } from '@constructive-io/graphql-env';
+import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 import './types'; // for Request type
+
+const log = new Logger('auth');
+const isDev = () => getNodeEnv() === 'development';
 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
@@ -24,7 +29,10 @@ export const createAuthenticateMiddleware = (
     });
     const rlsModule = api.rlsModule;
 
-    if (!rlsModule) return next();
+    if (!rlsModule) {
+      if (isDev()) log.debug('No RLS module configured, skipping auth');
+      return next();
+    }
 
     const authFn = opts.server.strictAuth
       ? rlsModule.authenticateStrict
@@ -63,7 +71,9 @@ export const createAuthenticateMiddleware = (
           }
 
           token = result.rows[0];
+          if (isDev()) log.debug(`Auth success: role=${token.role}`);
         } catch (e: any) {
+          log.error('Auth error:', e.message);
           res.status(200).json({
             errors: [
               {

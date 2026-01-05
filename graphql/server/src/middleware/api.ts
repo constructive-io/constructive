@@ -1,4 +1,5 @@
 import { getNodeEnv } from '@constructive-io/graphql-env';
+import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, Response } from 'express';
@@ -15,6 +16,9 @@ import errorPage404Message from '../errors/404-message';
 import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
 import { ApiByNameQuery, ApiQuery, ListOfAllDomainsOfDb } from './gql';
 import './types'; // for Request type
+
+const log = new Logger('api');
+const isDev = () => getNodeEnv() === 'development';
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
@@ -129,6 +133,10 @@ export const createApiMiddleware = (opts: any) => {
       const api = transformServiceToApi(svc);
       req.api = api;
       req.databaseId = api.databaseId;
+      if (isDev())
+        log.debug(
+          `Resolved API: db=${api.dbname}, schemas=[${api.schema?.join(', ')}]`
+        );
       next();
     } catch (e: any) {
       if (e.code === 'NO_VALID_SCHEMAS') {
@@ -142,7 +150,7 @@ export const createApiMiddleware = (opts: any) => {
             )
           );
       } else {
-        console.error(e);
+        log.error('API middleware error:', e);
         res.status(500).send(errorPage50x);
       }
     }
@@ -234,7 +242,7 @@ const queryServiceByDomainAndSubdomain = async ({
   });
 
   if (result.errors?.length) {
-    console.error(result.errors);
+    log.error('GraphQL query errors:', result.errors);
     return null;
   }
 
@@ -271,7 +279,7 @@ const queryServiceByApiName = async ({
   });
 
   if (result.errors?.length) {
-    console.error(result.errors);
+    log.error('GraphQL query errors:', result.errors);
     return null;
   }
 
@@ -334,14 +342,18 @@ export const getApiConfig = async (
 
   let svc;
   if (svcCache.has(key)) {
+    if (isDev()) log.debug(`Cache HIT for key=${key}`);
     svc = svcCache.get(key);
   } else {
+    if (isDev()) log.debug(`Cache MISS for key=${key}, looking up API`);
     const apiOpts = (opts as any).api || {};
     const allSchemata = apiOpts.metaSchemas || [];
     const validatedSchemata = await validateSchemata(rootPgPool, allSchemata);
 
     if (validatedSchemata.length === 0) {
-      const message = `No valid schemas found for domain: ${domain}, subdomain: ${subdomain}`;
+      const apiOpts2 = (opts as any).api || {};
+      const message = `No valid schemas found. Configured metaSchemas: [${(apiOpts2.metaSchemas || []).join(', ')}]`;
+      if (isDev()) log.debug(message);
       const error: any = new Error(message);
       error.code = 'NO_VALID_SCHEMAS';
       throw error;

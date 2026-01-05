@@ -66,7 +66,7 @@ export default async (
   });
 
   const dbsResult = await selectedDb.query(`
-    SELECT id, name FROM collections_public.database;
+    SELECT id, name FROM metaschema_public.database;
   `);
 
   const { database_ids: selectedDatabaseName } = await prompter.prompt({} as any, [
@@ -112,7 +112,7 @@ export default async (
   ]);
 
   const schemasResult = await selectedDb.query(
-    `SELECT * FROM collections_public.schema WHERE database_id = $1`,
+    `SELECT * FROM metaschema_public.schema WHERE database_id = $1`,
     [dbInfo.database_ids[0]]
   );
 
