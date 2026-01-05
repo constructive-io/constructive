@@ -38,19 +38,19 @@ it('sqitch package dependencies with resolved tags [simple-w-tags/3rd]', async (
   );
   expect(res).toMatchSnapshot();
 });
-describe('stage fixture dependency resolution - resolved tags', () => {
-  let stageFixture: TestFixture;
+describe('w-exts fixture dependency resolution - resolved tags', () => {
+  let wExtsFixture: TestFixture;
 
   beforeAll(() => {
-    stageFixture = new TestFixture('sqitch', 'simple-w-exts');
+    wExtsFixture = new TestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(() => {
-    stageFixture.cleanup();
+    wExtsFixture.cleanup();
   });
 
   it('resolves tags to changes from plan only for unique-names', async () => {
-    const pkgDir = stageFixture.getFixturePath('packages', 'unique-names');
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
     const res = await resolveDependencies(pkgDir, 'unique-names', {
       tagResolution: 'resolve',
       source: 'plan'
@@ -59,7 +59,7 @@ describe('stage fixture dependency resolution - resolved tags', () => {
   });
 
   it('resolves tags to changes from sql headers for unique-names', async () => {
-    const pkgDir = stageFixture.getFixturePath('packages', 'unique-names');
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
     const res = await resolveDependencies(pkgDir, 'unique-names', {
       tagResolution: 'resolve',
       source: 'sql'

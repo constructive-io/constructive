@@ -3,7 +3,7 @@ import { TestFixture } from '../../test-utils/TestFixture';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 import { TestDatabase } from '../../test-utils';
 
-describe('Staging Fixture Tests', () => {
+describe('w-exts Fixture Tests', () => {
   let fixture: TestFixture;
   let deployFixture: CoreDeployTestFixture;
   let db: TestDatabase;

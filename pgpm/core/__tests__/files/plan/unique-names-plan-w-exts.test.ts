@@ -1,6 +1,6 @@
 import { cleanText, TestFixture } from '../../../test-utils';
 
-describe('stage fixture plan generation (unique-names)', () => {
+describe('w-exts fixture plan generation (unique-names)', () => {
   let fixture: TestFixture;
 
   beforeAll(() => {

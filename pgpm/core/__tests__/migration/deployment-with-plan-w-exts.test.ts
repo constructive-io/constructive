@@ -1,7 +1,7 @@
 import { TestDatabase } from '../../test-utils';
 import { CoreDeployTestFixture } from '../../test-utils/CoreDeployTestFixture';
 
-describe('Staging Fixture Deployment With Pre-Generated Plan', () => {
+describe('w-exts Fixture Deployment With Pre-Generated Plan', () => {
   let fixture: CoreDeployTestFixture;
   let db: TestDatabase;
 

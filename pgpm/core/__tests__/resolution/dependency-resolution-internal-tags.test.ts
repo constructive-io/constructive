@@ -38,19 +38,19 @@ it('sqitch package dependencies with internal tag resolution [simple-w-tags/3rd]
   );
   expect(res).toMatchSnapshot();
 });
-describe('stage fixture dependency resolution - internal tags', () => {
-  let stageFixture: TestFixture;
+describe('w-exts fixture dependency resolution - internal tags', () => {
+  let wExtsFixture: TestFixture;
 
   beforeAll(() => {
-    stageFixture = new TestFixture('sqitch', 'simple-w-exts');
+    wExtsFixture = new TestFixture('sqitch', 'simple-w-exts');
   });
 
   afterAll(() => {
-    stageFixture.cleanup();
+    wExtsFixture.cleanup();
   });
 
   it('resolves internal tags from plan only for unique-names', async () => {
-    const pkgDir = stageFixture.getFixturePath('packages', 'unique-names');
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
     const res = await resolveDependencies(pkgDir, 'unique-names', {
       tagResolution: 'internal',
       source: 'plan'
@@ -59,7 +59,7 @@ describe('stage fixture dependency resolution - internal tags', () => {
   });
 
   it('resolves internal tags from sql headers for unique-names', async () => {
-    const pkgDir = stageFixture.getFixturePath('packages', 'unique-names');
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
     const res = await resolveDependencies(pkgDir, 'unique-names', {
       tagResolution: 'internal',
       source: 'sql'

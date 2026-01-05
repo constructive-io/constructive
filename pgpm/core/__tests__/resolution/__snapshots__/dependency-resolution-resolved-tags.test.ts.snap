@@ -82,7 +82,7 @@ exports[`sqitch package dependencies with resolved tags [simple-w-tags/3rd] 1`] 
 }
 `;
 
-exports[`stage fixture dependency resolution - resolved tags resolves tags to changes from plan only for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - resolved tags resolves tags to changes from plan only for unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [
@@ -122,7 +122,7 @@ exports[`stage fixture dependency resolution - resolved tags resolves tags to ch
 }
 `;
 
-exports[`stage fixture dependency resolution - resolved tags resolves tags to changes from sql headers for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - resolved tags resolves tags to changes from sql headers for unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [

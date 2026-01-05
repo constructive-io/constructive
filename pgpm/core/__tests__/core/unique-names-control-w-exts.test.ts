@@ -4,7 +4,7 @@ import path from 'path';
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
-describe('stage fixture control/metadata generation (unique-names)', () => {
+describe('w-exts fixture control/metadata generation (unique-names)', () => {
   let fixture: TestFixture;
   let dst: string;
   let project: PgpmPackage;

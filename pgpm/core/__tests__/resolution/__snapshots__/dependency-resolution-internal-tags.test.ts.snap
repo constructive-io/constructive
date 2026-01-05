@@ -89,7 +89,7 @@ exports[`sqitch package dependencies with internal tag resolution [simple-w-tags
 }
 `;
 
-exports[`stage fixture dependency resolution - internal tags resolves internal tags from plan only for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - internal tags resolves internal tags from plan only for unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [
@@ -131,7 +131,7 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
 }
 `;
 
-exports[`stage fixture dependency resolution - internal tags resolves internal tags from sql headers for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - internal tags resolves internal tags from sql headers for unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [
