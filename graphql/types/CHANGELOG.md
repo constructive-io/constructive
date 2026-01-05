@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@2.12.10...@constructive-io/graphql-types@2.12.11) (2026-01-05)
+
+### Bug Fixes
+
+- **graphql-types:** update default metaSchemas for API metadata lookup ([b8290a4](https://github.com/constructive-io/constructive/commit/b8290a4e64971945d082946611477b421363c0a1))
+
 ## [2.12.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@2.12.9...@constructive-io/graphql-types@2.12.10) (2026-01-02)
 
 **Note:** Version bump only for package @constructive-io/graphql-types
