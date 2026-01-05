@@ -234,6 +234,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
     // For this test, we create minimal shims since we're testing the export flow, not the modules
     await pool.query(`
       CREATE SCHEMA IF NOT EXISTS metaschema_public;
+      CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
       CREATE SCHEMA IF NOT EXISTS services_public;
       CREATE SCHEMA IF NOT EXISTS db_migrate;
 
@@ -352,7 +353,8 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         schema_name text
       );
 
-      CREATE TABLE IF NOT EXISTS services_public.rls_module (
+      -- metaschema_modules_public tables (module configuration)
+      CREATE TABLE IF NOT EXISTS metaschema_modules_public.rls_module (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         api_id uuid,
@@ -366,7 +368,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         current_role_id text
       );
 
-      CREATE TABLE IF NOT EXISTS services_public.user_auth_module (
+      CREATE TABLE IF NOT EXISTS metaschema_modules_public.user_auth_module (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         schema_id uuid,
