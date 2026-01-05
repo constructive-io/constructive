@@ -711,9 +711,6 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
-      pluralize:
-        specifier: ^8.0.0
-        version: 8.0.0
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
@@ -733,9 +730,6 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.27
-      '@types/pluralize':
-        specifier: ^0.0.33
-        version: 0.0.33
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
@@ -869,13 +863,7 @@ importers:
       inflection:
         specifier: 1.12.0
         version: 1.12.0
-      pluralize:
-        specifier: ^8.0.0
-        version: 8.0.0
     devDependencies:
-      '@types/pluralize':
-        specifier: ^0.0.33
-        version: 0.0.33
       makage:
         specifier: ^0.1.10
         version: 0.1.10
@@ -3735,9 +3723,6 @@ packages:
 
   '@types/pg@8.16.0':
     resolution: {integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==}
-
-  '@types/pluralize@0.0.33':
-    resolution: {integrity: sha512-JOqsl+ZoCpP4e8TDke9W79FDcSgPAR0l6pixx2JHkhnRjvShyYiAYw2LVsnA7K08Y6DeOnaU6ujmENO4os/cYg==}
 
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
@@ -7270,10 +7255,6 @@ packages:
 
   pluralize@7.0.0:
     resolution: {integrity: sha512-ARhBOdzS3e41FbkW/XWrTEtukqqLoK5+Z/4UeDaLuSW+39JPeFgs4gCGqsrJHVZX0fUrx//4OF0K1CUGwlIFow==}
-    engines: {node: '>=4'}
-
-  pluralize@8.0.0:
-    resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
   postcss-load-config@6.0.1:
@@ -10936,8 +10917,6 @@ snapshots:
       '@types/node': 20.19.27
       pg-protocol: 1.10.3
       pg-types: 2.2.0
-
-  '@types/pluralize@0.0.33': {}
 
   '@types/qs@6.14.0': {}
 
@@ -15355,8 +15334,6 @@ snapshots:
       pathe: 2.0.3
 
   pluralize@7.0.0: {}
-
-  pluralize@8.0.0: {}
 
   postcss-load-config@6.0.1(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:

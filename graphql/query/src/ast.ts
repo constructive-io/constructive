@@ -8,7 +8,6 @@ import type {
   VariableDefinitionNode,
 } from 'graphql';
 import inflection from 'inflection';
-import plz from 'pluralize';
 
 import { getCustomAst } from './custom-ast';
 import type {
@@ -375,7 +374,7 @@ export const createOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 
@@ -444,7 +443,7 @@ export const patchOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 
@@ -521,7 +520,7 @@ export const deleteOne = ({
   }
 
   const modelName = inflection.camelize(
-    [plz.singular(mutation.model)].join('_'),
+    [inflection.singularize(mutation.model)].join('_'),
     true
   );
 
