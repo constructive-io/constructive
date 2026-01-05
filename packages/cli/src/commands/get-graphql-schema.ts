@@ -22,8 +22,7 @@ Options:
 const defaultSchemas = [
   'metaschema_public',
   'metaschema_modules_public',
-  'services_public',
-  'dashboard_public'
+  'services_public'
 ]
 
 export default async (
