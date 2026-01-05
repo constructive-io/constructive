@@ -1,4 +1,4 @@
-import { getEnvOptions } from '@constructive-io/graphql-env';
+import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -17,6 +17,7 @@ import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 
 const log = new Logger('server');
+const isDev = () => getNodeEnv() === 'development';
 
 export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
   const envOptions = getEnvOptions(rawOpts);
@@ -36,18 +37,32 @@ class Server {
     const api = createApiMiddleware(opts);
     const authenticate = createAuthenticateMiddleware(opts);
 
+    // Log startup config in dev mode
+    if (isDev()) {
+      log.debug(
+        `Database: ${opts.pg?.database}@${opts.pg?.host}:${opts.pg?.port}`
+      );
+      log.debug(
+        `Meta schemas: ${(opts as any).api?.metaSchemas?.join(', ') || 'default'}`
+      );
+    }
+
     healthz(app);
     trustProxy(app, opts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = opts.server?.origin?.trim();
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
-        log.warn('CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.');
+        log.warn(
+          'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
+        );
       } else {
-        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`);
+        log.warn(
+          `CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`
+        );
       }
     }
-    
+
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
     app.use(graphqlUpload.graphqlUploadExpress());
@@ -69,10 +84,7 @@ class Server {
 
     httpServer.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
-        this.error(
-          `Port ${server?.port ?? 'unknown'} is already in use`,
-          err
-        );
+        this.error(`Port ${server?.port ?? 'unknown'} is already in use`, err);
       } else {
         this.error('Server failed to start', err);
       }

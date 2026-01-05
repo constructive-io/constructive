@@ -63,7 +63,7 @@ export const graphileDefaults: GraphileOptions = {
 export const graphileFeatureDefaults: GraphileFeatureOptions = {
   simpleInflection: true,
   oppositeBaseNames: true,
-  postgis: true
+  postgis: true,
 };
 
 /**
@@ -76,5 +76,9 @@ export const apiDefaults: ApiOptions = {
   roleName: 'administrator',
   defaultDatabaseId: 'hard-coded',
   isPublic: true,
-  metaSchemas: ['collections_public', 'meta_public']
+  metaSchemas: [
+    'services_public',
+    'metaschema_public',
+    'metaschema_modules_public',
+  ],
 };
