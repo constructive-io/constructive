@@ -20,7 +20,9 @@ Options:
 `
 
 const defaultSchemas = [
-  'collections_public',
+  'metaschema_public',
+  'metaschema_modules_public',
+  'services_public',
   'dashboard_public'
 ]
 

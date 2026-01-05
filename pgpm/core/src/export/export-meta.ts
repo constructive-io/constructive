@@ -171,7 +171,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   rls_module: {
-    schema: 'services_public',
+    schema: 'metaschema_modules_public',
     table: 'rls_module',
     fields: {
       id: 'uuid',
@@ -188,7 +188,7 @@ const config: Record<string, TableConfig> = {
     }
   },
   user_auth_module: {
-    schema: 'services_public',
+    schema: 'metaschema_modules_public',
     table: 'user_auth_module',
     fields: {
       id: 'uuid',
@@ -257,8 +257,8 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('database_extension', `SELECT * FROM metaschema_public.database_extension WHERE database_id = $1`);
   await queryAndParse('api_extensions', `SELECT * FROM services_public.api_extensions WHERE database_id = $1`);
   await queryAndParse('api_schemata', `SELECT * FROM services_public.api_schemata WHERE database_id = $1`);
-  await queryAndParse('rls_module', `SELECT * FROM services_public.rls_module WHERE database_id = $1`);
-  await queryAndParse('user_auth_module', `SELECT * FROM services_public.user_auth_module WHERE database_id = $1`);
+  await queryAndParse('rls_module', `SELECT * FROM metaschema_modules_public.rls_module WHERE database_id = $1`);
+  await queryAndParse('user_auth_module', `SELECT * FROM metaschema_modules_public.user_auth_module WHERE database_id = $1`);
 
   return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
 };

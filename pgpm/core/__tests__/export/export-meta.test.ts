@@ -70,7 +70,18 @@ describe('Export Meta Config Validation', () => {
         'site_themes',
         'api_modules',
         'api_extensions',
-        'api_schemata',
+        'api_schemata'
+      ];
+
+      for (const table of requiredTables) {
+        expect(exportMetaSource).toContain(`queryAndParse('${table}'`);
+      }
+    });
+  });
+
+  describe('metaschema_modules_public tables', () => {
+    it('should include all required metaschema_modules_public tables in config', () => {
+      const requiredTables = [
         'rls_module',
         'user_auth_module'
       ];
@@ -122,13 +133,22 @@ describe('Export Meta Config Drift Detection', () => {
       'domains',
       'site_modules',
       'site_themes',
-      'sites',
+      'sites'
+    ];
+
+    // Document the expected tables
+    expect(expectedServicesPublicTables.length).toBe(9);
+  });
+
+  it('should document the expected table names in metaschema_modules_public', () => {
+    // This test documents the expected table names that export-meta.ts should use
+    const expectedMetaschemaModulesPublicTables = [
       'rls_module',
       'user_auth_module'
     ];
 
     // Document the expected tables
-    expect(expectedServicesPublicTables.length).toBe(11);
+    expect(expectedMetaschemaModulesPublicTables.length).toBe(2);
   });
 
   it('should document the bug: config uses database_extensions but table is database_extension', () => {
