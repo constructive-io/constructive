@@ -17,7 +17,7 @@ describe('w-exts Fixture Tests', () => {
   });
 
   describe('Workspace Detection', () => {
-    it('detects staging fixture as workspace correctly', async () => {
+    it('detects w-exts fixture as workspace correctly', async () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
@@ -35,7 +35,7 @@ describe('w-exts Fixture Tests', () => {
       expect(modules.length).toBeGreaterThan(0);
 
       const moduleNames = modules.map(m => m.getModuleName());
-      expect(moduleNames).toContain('unique-names');
+      expect(moduleNames).toContain('sample-unique-names');
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
     });
   });
@@ -48,7 +48,7 @@ describe('w-exts Fixture Tests', () => {
       const availableModules = await project.getAvailableModules();
       expect(Array.isArray(availableModules)).toBe(true);
       expect(availableModules.length).toBeGreaterThan(0);
-      expect(availableModules).toContain('unique-names');
+      expect(availableModules).toContain('sample-unique-names');
     });
 
     it('getModules() returns all modules from extensions/@pgpm and packages', async () => {
@@ -61,7 +61,7 @@ describe('w-exts Fixture Tests', () => {
 
       const moduleNames = modules.map(m => m.getModuleName());
 
-      expect(moduleNames).toContain('unique-names');
+      expect(moduleNames).toContain('sample-unique-names');
 
       expect(moduleNames.some(name => name.includes('pgpm-uuid'))).toBe(true);
       expect(moduleNames.some(name => name.includes('pgpm-base32'))).toBe(true);
@@ -83,8 +83,8 @@ describe('w-exts Fixture Tests', () => {
 
       expect(Object.keys(moduleMap).length).toBeGreaterThan(0);
 
-      expect(moduleMap['unique-names']).toBeDefined();
-      expect(moduleMap['unique-names'].path).toContain('packages/unique-names');
+      expect(moduleMap['sample-unique-names']).toBeDefined();
+      expect(moduleMap['sample-unique-names'].path).toContain('packages/sample-unique-names');
 
       modules.forEach(mod => {
         const moduleName = mod.getModuleName();
@@ -95,7 +95,7 @@ describe('w-exts Fixture Tests', () => {
     });
 
     it('detects module inside workspace correctly', async () => {
-      const cwd = fixture.getFixturePath('packages', 'unique-names');
+      const cwd = fixture.getFixturePath('packages', 'sample-unique-names');
       const project = new PgpmPackage(cwd);
 
       expect(project.getContext()).toBe(PackageContext.ModuleInsideWorkspace);
@@ -104,12 +104,12 @@ describe('w-exts Fixture Tests', () => {
     });
 
     it('resolves module name from pgpm plan', async () => {
-      const cwd = fixture.getFixturePath('packages', 'unique-names');
+      const cwd = fixture.getFixturePath('packages', 'sample-unique-names');
       const project = new PgpmPackage(cwd);
 
       const name = project.getModuleName();
       expect(typeof name).toBe('string');
-      expect(name).toBe('unique-names');
+      expect(name).toBe('sample-unique-names');
     });
   });
 
@@ -138,7 +138,7 @@ describe('w-exts Fixture Tests', () => {
 
   describe('Module Dependencies', () => {
     it('gets required modules from control file', async () => {
-      const cwd = fixture.getFixturePath('packages', 'unique-names');
+      const cwd = fixture.getFixturePath('packages', 'sample-unique-names');
       const project = new PgpmPackage(cwd);
 
       const deps = project.getRequiredModules();
@@ -150,7 +150,7 @@ describe('w-exts Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const { native, modules: deps } = project.getModuleDependencies('unique-names');
+      const { native, modules: deps } = project.getModuleDependencies('sample-unique-names');
       expect(native).toBeDefined();
       expect(deps).toBeDefined();
       expect(Array.isArray(deps)).toBe(true);
@@ -160,7 +160,7 @@ describe('w-exts Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const result = await project.getModuleDependencyChanges('unique-names');
+      const result = await project.getModuleDependencyChanges('sample-unique-names');
       expect(result).toHaveProperty('native');
       expect(result).toHaveProperty('modules');
       expect(Array.isArray(result.modules)).toBe(true);
@@ -172,10 +172,10 @@ describe('w-exts Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const { native, modules: deps } = project.getModuleDependencies('unique-names');
+      const { native, modules: deps } = project.getModuleDependencies('sample-unique-names');
 
       expect(Array.isArray(deps)).toBe(true);
-      expect(deps.some(dep => dep.includes('pgpm-defaults'))).toBe(true);
+      expect(deps.some(dep => dep.includes('pgpm-base32'))).toBe(true);
       expect(deps.some(dep => dep.includes('pgpm-verify'))).toBe(true);
     });
 
@@ -196,12 +196,12 @@ describe('w-exts Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const result = await project.getModuleDependencyChanges('unique-names');
+      const result = await project.getModuleDependencyChanges('sample-unique-names');
 
       expect(result.modules.length).toBeGreaterThan(0);
 
       const dependencyNames = result.modules.map(dep => dep.name);
-      expect(dependencyNames.some(name => name.includes('pgpm-defaults'))).toBe(true);
+      expect(dependencyNames.some(name => name.includes('pgpm-base32'))).toBe(true);
 
       result.modules.forEach(dep => {
         expect(dep).toHaveProperty('name');
@@ -217,18 +217,18 @@ describe('w-exts Fixture Tests', () => {
       const cwd = fixture.getFixturePath();
       const project = new PgpmPackage(cwd);
 
-      const { native, modules: deps } = project.getModuleDependencies('unique-names');
+      const { native, modules: deps } = project.getModuleDependencies('sample-unique-names');
 
-      const dependencyChanges = await project.getModuleDependencyChanges('unique-names');
+      const dependencyChanges = await project.getModuleDependencyChanges('sample-unique-names');
 
-      const defaultsDep = dependencyChanges.modules.find(dep =>
-        dep.name.includes('pgpm-defaults')
+      const base32Dep = dependencyChanges.modules.find(dep =>
+        dep.name.includes('pgpm-base32')
       );
 
-      if (defaultsDep) {
-        expect(defaultsDep.name).toBeTruthy();
-        expect(defaultsDep.latest).toBeTruthy();
-        expect(defaultsDep.version).toBeTruthy();
+      if (base32Dep) {
+        expect(base32Dep.name).toBeTruthy();
+        expect(base32Dep.latest).toBeTruthy();
+        expect(base32Dep.version).toBeTruthy();
       }
     });
 

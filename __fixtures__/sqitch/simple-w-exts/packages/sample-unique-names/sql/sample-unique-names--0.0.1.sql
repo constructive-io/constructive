@@ -1,4 +1,4 @@
-\echo Use "CREATE EXTENSION unique-names" to load this file. \quit
+\echo Use "CREATE EXTENSION sample-unique-names" to load this file. \quit
 CREATE SCHEMA unique_names;
 
 CREATE TABLE unique_names.words (

@@ -20,13 +20,13 @@ describe('w-exts Fixture Deployment Tests', () => {
   afterEach(async () => {
   });
 
-  test('deploys unique-names package successfully', async () => {
-    await fixture.deployModule('unique-names', db.name, ['sqitch', 'simple-w-exts']);
+  test('deploys sample-unique-names package successfully', async () => {
+    await fixture.deployModule('sample-unique-names', db.name, ['sqitch', 'simple-w-exts']);
     
     expect(await db.exists('schema', 'unique_names')).toBe(true);
     expect(await db.exists('table', 'unique_names.words')).toBe(true);
     
     const deployedChanges = await db.getDeployedChanges();
-    expect(deployedChanges.some(change => change.package === 'unique-names')).toBe(true);
+    expect(deployedChanges.some(change => change.package === 'sample-unique-names')).toBe(true);
   });
 });

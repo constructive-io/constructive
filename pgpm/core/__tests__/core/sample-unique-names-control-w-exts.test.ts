@@ -4,7 +4,7 @@ import path from 'path';
 import { PgpmPackage } from '../../src/core/class/pgpm';
 import { TestFixture } from '../../test-utils';
 
-describe('w-exts fixture control/metadata generation (unique-names)', () => {
+describe('w-exts fixture control/metadata generation (sample-unique-names)', () => {
   let fixture: TestFixture;
   let dst: string;
   let project: PgpmPackage;
@@ -19,14 +19,14 @@ describe('w-exts fixture control/metadata generation (unique-names)', () => {
     fixture.cleanup();
   });
 
-  it('writes control file and Makefile for unique-names without modifying source fixture', async () => {
-    const moduleProject = fixture.getModuleProject([], 'unique-names');
+  it('writes control file and Makefile for sample-unique-names without modifying source fixture', async () => {
+    const moduleProject = fixture.getModuleProject([], 'sample-unique-names');
 
     expect(() =>
       moduleProject.setModuleDependencies(['plpgsql'])
     ).not.toThrow();
 
-    const moduleDir = path.join(fixture.tempFixtureDir, 'packages', 'unique-names');
+    const moduleDir = path.join(fixture.tempFixtureDir, 'packages', 'sample-unique-names');
     const controlFilePath = path.join(
       moduleDir,
       `${moduleProject.getModuleName()}.control`

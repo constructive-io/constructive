@@ -49,18 +49,18 @@ describe('w-exts fixture dependency resolution - internal tags', () => {
     wExtsFixture.cleanup();
   });
 
-  it('resolves internal tags from plan only for unique-names', async () => {
-    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
-    const res = await resolveDependencies(pkgDir, 'unique-names', {
+  it('resolves internal tags from plan only for sample-unique-names', async () => {
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'sample-unique-names');
+    const res = await resolveDependencies(pkgDir, 'sample-unique-names', {
       tagResolution: 'internal',
       source: 'plan'
     });
     expect(res).toMatchSnapshot();
   });
 
-  it('resolves internal tags from sql headers for unique-names', async () => {
-    const pkgDir = wExtsFixture.getFixturePath('packages', 'unique-names');
-    const res = await resolveDependencies(pkgDir, 'unique-names', {
+  it('resolves internal tags from sql headers for sample-unique-names', async () => {
+    const pkgDir = wExtsFixture.getFixturePath('packages', 'sample-unique-names');
+    const res = await resolveDependencies(pkgDir, 'sample-unique-names', {
       tagResolution: 'internal',
       source: 'sql'
     });
