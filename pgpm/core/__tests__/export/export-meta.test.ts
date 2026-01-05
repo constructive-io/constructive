@@ -155,7 +155,7 @@ describe('Export Meta Config Drift Detection', () => {
     // BUG DOCUMENTATION:
     // In export-meta.ts, line 26, the config defines:
     //   table: 'database_extensions' (plural)
-    // But the actual table in db-meta-schema is:
+    // But the actual table in metaschema-schema is:
     //   metaschema_public.database_extension (singular)
     // 
     // This causes the Parser to generate INSERT statements with the wrong table name,

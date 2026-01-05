@@ -42,7 +42,8 @@ const DB_REQUIRED_EXTENSIONS = [
 const SERVICE_REQUIRED_EXTENSIONS = [
   'plpgsql',
   'metaschema-schema',
-  'metaschema-modules'
+  'metaschema-modules',
+  'services'
 ] as const;
 
 /**
@@ -64,10 +65,10 @@ interface MissingModulesResult {
 /**
  * Checks which pgpm modules from the extensions list are missing from the workspace
  * and prompts the user if they want to install them.
- * 
+ *
  * This function only does detection and prompting - it does NOT install.
  * Use installMissingModules() after the module is created to do the actual installation.
- * 
+ *
  * @param project - The PgpmPackage instance (only needs workspace context)
  * @param extensions - List of extension names (control file names)
  * @param prompter - Optional prompter for interactive confirmation
@@ -81,14 +82,14 @@ const detectMissingModules = async (
   // Use workspace-level check - doesn't require being inside a module
   const installed = project.getWorkspaceInstalledModules();
   const missingModules = getMissingInstallableModules(extensions, installed);
-  
+
   if (missingModules.length === 0) {
     return { missingModules: [], shouldInstall: false };
   }
-  
+
   const missingNames = missingModules.map(m => m.npmName);
   console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
-  
+
   if (prompter) {
     const { install } = await prompter.prompt({}, [
       {
@@ -98,17 +99,17 @@ const detectMissingModules = async (
         default: true
       }
     ]);
-    
+
     return { missingModules, shouldInstall: install };
   }
-  
+
   return { missingModules, shouldInstall: false };
 };
 
 /**
  * Installs missing modules into a specific module directory.
  * Must be called after the module has been created.
- * 
+ *
  * @param moduleDir - The directory of the module to install into
  * @param missingModules - Array of missing modules to install
  */
@@ -119,14 +120,14 @@ const installMissingModules = async (
   if (missingModules.length === 0) {
     return;
   }
-  
+
   const missingNames = missingModules.map(m => m.npmName);
   console.log('Installing missing modules...');
-  
+
   // Create a new PgpmPackage instance pointing to the module directory
   const moduleProject = new PgpmPackage(moduleDir);
   await moduleProject.installModules(...missingNames);
-  
+
   console.log('Modules installed successfully.');
 };
 
@@ -150,7 +151,7 @@ interface ExportMigrationsToDiskOptions {
   username?: string;
   /** Output directory for service/meta module. Defaults to outdir if not provided. */
   serviceOutdir?: string;
-  /** 
+  /**
    * Skip schema name replacement for infrastructure schemas.
    * When true, schema names like metaschema_public, services_public will not be renamed.
    * Useful for self-referential introspection where you want to apply policies to real schemas.
@@ -180,7 +181,7 @@ interface ExportOptions {
   username?: string;
   /** Output directory for service/meta module. Defaults to outdir if not provided. */
   serviceOutdir?: string;
-  /** 
+  /**
    * Skip schema name replacement for infrastructure schemas.
    * When true, schema names like metaschema_public, services_public will not be renamed.
    * Useful for self-referential introspection where you want to apply policies to real schemas.
@@ -348,7 +349,7 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
 DO $LQLMIGRATION$
   DECLARE
   BEGIN
-  
+
     EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_user');
     EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
 
@@ -457,7 +458,7 @@ interface ReplacerResult {
 /**
  * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
  * If the module already exists and a prompter is provided, prompts the user for confirmation.
- * 
+ *
  * @returns The absolute path to the created/prepared module directory
  */
 const preparePackage = async ({
@@ -479,7 +480,7 @@ const preparePackage = async ({
   const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
   if (!plan.length) {
     const { fullName, email } = parseAuthor(author);
-    
+
     await project.initModule({
       name,
       description,

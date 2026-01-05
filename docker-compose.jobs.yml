@@ -25,7 +25,7 @@ services:
       PGDATABASE: launchql
       # API meta configuration (static mode for dev)
       API_ENABLE_META: "true"
-      API_EXPOSED_SCHEMAS: "collections_public,meta_public"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public"
       API_ANON_ROLE: "administrator"
       API_ROLE_NAME: "administrator"
       API_DEFAULT_DATABASE_ID: "dbe"
