@@ -1012,6 +1012,9 @@ importers:
       '@pgpm/db-meta-schema':
         specifier: ^0.15.5
         version: 0.15.5
+      '@pgpm/geotypes':
+        specifier: ^0.15.5
+        version: 0.15.5
       '@pgpm/inflection':
         specifier: ^0.15.5
         version: 0.15.5
@@ -3228,6 +3231,9 @@ packages:
 
   '@pgpm/db-meta-schema@0.15.5':
     resolution: {integrity: sha512-2Ltk/DAWIWBdm0MYXPB6mMbh9Bg8FXZdF8IZRZHjIQYlShHej+H0eIL8ZlsMnyg8DZzcDUo0dS6nPjUdSDsZhw==}
+
+  '@pgpm/geotypes@0.15.5':
+    resolution: {integrity: sha512-4WmvKeD3gNb94+QUcbtFl41w53qH75GU7YjvGgJT8QNn1gDOJy4GqUD5Gj8m6pHp2I6AbmmQOmyWO68Bd+FyqQ==}
 
   '@pgpm/inflection@0.15.5':
     resolution: {integrity: sha512-ILxqfp/1yLaWNidBJcudeDnb5hZnh1tgd9K4u3MY4hpNqTY1b64ytg+w9jXROWf1tyJuvD4Xyzi0FBKZpzpl1w==}
@@ -10487,6 +10493,11 @@ snapshots:
     dependencies:
       '@pgpm/database-jobs': 0.15.5
       '@pgpm/inflection': 0.15.5
+      '@pgpm/types': 0.15.5
+      '@pgpm/verify': 0.15.5
+
+  '@pgpm/geotypes@0.15.5':
+    dependencies:
       '@pgpm/types': 0.15.5
       '@pgpm/verify': 0.15.5
 
