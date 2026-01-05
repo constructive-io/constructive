@@ -133,6 +133,7 @@ describe('getEnvOptions', () => {
       'services_public',
       'metaschema_modules_public',
       'config_meta',
+      'metaschema_modules_public',
       'env_meta',
       'override_meta'
     ]);
