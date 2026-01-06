@@ -4,6 +4,7 @@
  */
 import {
   configure,
+  setHeader,
   execute,
   executeWithErrors,
   GraphQLClientError,
@@ -77,13 +78,8 @@ async function main() {
     });
     const token = loginResult.login?.apiToken?.accessToken;
     if (token) {
-      configure({
-        endpoint: ENDPOINT,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Use setHeader() to update auth without re-configuring
+      setHeader('Authorization', `Bearer ${token}`);
       console.log('✓ Logged in, token:', token.slice(0, 30) + '...');
     }
   } catch (e) {
