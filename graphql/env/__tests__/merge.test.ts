@@ -35,8 +35,7 @@ describe('getEnvOptions', () => {
       },
       api: {
         enableMetaApi: false,
-        isPublic: false,
-        metaSchemas: ['config_meta']
+        isPublic: false
       }
     });
 
@@ -92,7 +91,7 @@ describe('getEnvOptions', () => {
       },
       api: {
         exposedSchemas: ['public', 'shared'],
-        metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public', 'config_meta']
+        metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public', 'metaschema_public']
       }
     });
 
@@ -131,8 +130,6 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual([
       'metaschema_public',
       'services_public',
-      'metaschema_modules_public',
-      'config_meta',
       'metaschema_modules_public',
       'env_meta',
       'override_meta'
