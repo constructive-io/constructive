@@ -173,10 +173,69 @@ export const PgSimpleInflector: Plugin = (
        * Pluralize/singularize only supports single words, so only run
        * on the final segment of a name.
        */
-      pluralize: fixChangePlural(oldInflection.pluralize),
-      singularize: fixChangePlural(oldInflection.singularize),
+      pluralize: fixChangePlural(function pluralize(this: PgInflection, str: string): string {
+        // Special cases for words that pluralize library handles incorrectly
+        // Check BEFORE calling the original pluralize to ensure correct handling
+        const specialPlurals: Record<string, string> = {
+          regimen: 'regimens',
+          regimens: 'regimens', // Already plural, return as-is
+        };
+        
+        const lowerStr = str.toLowerCase();
+        
+        // Only apply special rule if it's an exact match (case-insensitive)
+        if (lowerStr in specialPlurals) {
+          // Preserve original case pattern: if input was capitalized, capitalize result
+          if (str.charAt(0) === str.charAt(0).toUpperCase()) {
+            return specialPlurals[lowerStr].charAt(0).toUpperCase() + specialPlurals[lowerStr].slice(1);
+          }
+          return specialPlurals[lowerStr];
+        }
+        
+        return oldInflection.pluralize.call(this, str);
+      }),
+      singularize: fixChangePlural(function singularize(this: PgInflection, str: string): string {
+        // Special cases for words that pluralize library handles incorrectly
+        // Check BEFORE calling the original singularize to ensure correct handling
+        const specialSingulars: Record<string, string> = {
+          regimens: 'regimen', // Plural -> singular
+          regimen: 'regimen', // Already singular, return as-is
+        };
+        
+        const lowerStr = str.toLowerCase();
+        
+        // Only apply special rule if it's an exact match (case-insensitive)
+        if (lowerStr in specialSingulars) {
+          // Preserve original case pattern: if input was capitalized, capitalize result
+          if (str.charAt(0) === str.charAt(0).toUpperCase()) {
+            return specialSingulars[lowerStr].charAt(0).toUpperCase() + specialSingulars[lowerStr].slice(1);
+          }
+          return specialSingulars[lowerStr];
+        }
+        
+        return oldInflection.singularize.call(this, str);
+      }),
 
       distinctPluralize(this: PgInflection, str: string) {
+        // Special cases for words that pluralize library handles incorrectly
+        // These are checked FIRST with exact match (case-insensitive) to ensure
+        // they don't affect any other words
+        const specialPlurals: Record<string, string> = {
+          regimen: 'regimens',
+          regimens: 'regimens', // Already plural, return as-is
+        };
+
+        const lowerStr = str.toLowerCase();
+        
+        // Only apply special rule if it's an exact match (case-insensitive)
+        if (lowerStr in specialPlurals) {
+          // Return the plural form for special cases
+          // This ensures "regimen" -> "regimens" and "regimens" -> "regimens"
+          return specialPlurals[lowerStr];
+        }
+
+        // For all other words, use the original logic
+        // This ensures backward compatibility
         const singular = this.singularize(str);
         const plural = this.pluralize(singular);
         if (singular !== plural) {
