@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.19.0...@constructive-io/graphql-codegen@2.20.0) (2026-01-06)
+
+### Bug Fixes
+
+- **graphql-codegen:** remove bin wrapper that imports from dist ([98061b5](https://github.com/constructive-io/constructive/commit/98061b58c508b98f326426448365660a2b5680d7))
+- **graphql-codegen:** use publishConfig.directory pattern like pgpm/cnc ([2821ad9](https://github.com/constructive-io/constructive/commit/2821ad9901364ae0cbd94cc3f3b9fbcc5c7d5db4))
+
+### Features
+
+- upstream new codegen cli ([e30a7f9](https://github.com/constructive-io/constructive/commit/e30a7f9274db2b432d77111f07eede7318c1deed))
+
 # [2.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.18.0...@constructive-io/graphql-codegen@2.19.0) (2026-01-05)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
@@ -36,7 +47,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ## [2.17.49](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.49...@constructive-io/graphql-codegen@2.17.50) (2026-01-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
-
 
 ## [2.17.48](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.17.47...@constructive-io/graphql-codegen@2.17.48) (2026-01-03)
 
