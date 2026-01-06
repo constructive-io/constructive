@@ -1,4 +1,5 @@
 import type { Plugin } from 'graphile-build';
+import * as inflection from 'inflection';
 
 type InflectionStringFn = (this: PgInflection, str: string) => string;
 
@@ -123,6 +124,10 @@ const fixChangePlural = (fn: InflectionStringFn): InflectionStringFn =>
     return `${prefix}${fn.call(this, word)}${suffix}`;
   };
 
+// Helper functions that use inflection library directly (no 'this' dependency)
+const inflectionPluralize = (str: string): string => inflection.pluralize(str);
+const inflectionSingularize = (str: string): string => inflection.singularize(str);
+
 const DEFAULT_NODE_ID = 'nodeId';
 
 export const PgSimpleInflector: Plugin = (
@@ -172,9 +177,14 @@ export const PgSimpleInflector: Plugin = (
       /*
        * Pluralize/singularize only supports single words, so only run
        * on the final segment of a name.
+       * Use inflection library instead of the default pluralize library.
        */
-      pluralize: fixChangePlural(oldInflection.pluralize),
-      singularize: fixChangePlural(oldInflection.singularize),
+      pluralize: fixChangePlural(function pluralize(this: PgInflection, str: string): string {
+        return inflectionPluralize(str);
+      }),
+      singularize: fixChangePlural(function singularize(this: PgInflection, str: string): string {
+        return inflectionSingularize(str);
+      }),
 
       distinctPluralize(this: PgInflection, str: string) {
         const singular = this.singularize(str);
