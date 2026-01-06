@@ -1,0 +1,29 @@
+{
+    "name": "@constructive-io/hello-world-fn",
+    "version": "0.0.1",
+    "description": "Hello World Knative function",
+    "author": "Constructive",
+    "private": true,
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "build:watch": "tsc -p tsconfig.json -w",
+        "clean": "rm -rf dist tsconfig.tsbuildinfo",
+        "test": "jest __tests__/k8s_runner.test.ts",
+        "test:inner": "jest __tests__/index.test.ts",
+        "build:test-image": "docker build -t constructive/hello-world-test:v15 -f Dockerfile.test ../../"
+    },
+    "dependencies": {
+        "@constructive-io/knative-job-fn": "workspace:^",
+        "kubernetesjs": "^0.7.6"
+    },
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^20.0.0",
+        "@types/pg": "^8.11.0",
+        "pg": "^8.11.3",
+        "pgsql-test": "workspace:^",
+        "ts-jest": "^29.4.6",
+        "typescript": "^5.9.3"
+    }
+}

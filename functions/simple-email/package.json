@@ -11,11 +11,21 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w"
+    "build:watch": "tsc -p tsconfig.json -w",
+    "test": "jest __tests__/k8s_runner.test.ts",
+    "test:inner": "jest __tests__/index.test.ts",
+    "build:test-image": "docker build -t constructive/simple-email-test:v4 -f Dockerfile.test ../../"
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
     "@launchql/postmaster": "0.1.4",
-    "@pgpmjs/env": "workspace:^"
+    "@pgpmjs/env": "workspace:^",
+    "kubernetesjs": "^0.7.6"
+  },
+  "devDependencies": {
+    "pgsql-test": "workspace:^",
+    "@types/jest": "^30.0.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
   }
 }

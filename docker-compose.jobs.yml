@@ -59,6 +59,19 @@ services:
       - "8081:8080"
     networks:
       - constructive-net
+    
+  # Hello World function
+  hello-world:
+    container_name: hello-world
+    image: constructive:dev
+    entrypoint: ["node", "functions/hello-world/dist/index.js"]
+    environment:
+      NODE_ENV: development
+      PORT: "8080"
+    ports:
+      - "8083:8080"
+    networks:
+      - constructive-net
 
   # Send email link function (invite, password reset, verification)
   send-email-link:
@@ -100,6 +113,7 @@ services:
     depends_on:
       - simple-email
       - send-email-link
+      - hello-world
     environment:
       NODE_ENV: development
 
@@ -113,7 +127,7 @@ services:
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "simple-email,send-email-link"
+      JOBS_SUPPORTED: "simple-email,send-email-link,hello-world"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -128,7 +142,10 @@ services:
       # Development-only map from task identifier -> function URL
       # Used by @constructive-io/knative-job-worker when NODE_ENV !== 'production'.
       # This lets the worker call the function containers directly in docker-compose.
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"simple-email":"http://simple-email:8080","send-email-link":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"simple-email":"http://simple-email:8080","send-email-link":"http://send-email-link:8080","hello-world":"http://hello-world:8080"}'
+
+
+
 
     ports:
       - "8080:8080"

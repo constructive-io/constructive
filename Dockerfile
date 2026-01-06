@@ -24,6 +24,7 @@ COPY . .
 # Install and build all workspaces
 RUN set -eux; \
     CI=true pnpm install --frozen-lockfile; \
+    pnpm run clean; \
     pnpm run build
 
 ################################################################################

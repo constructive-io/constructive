@@ -110,7 +110,7 @@ const postJson = (
       (res) => {
         // Drain response data but ignore contents; callback server
         // only uses status for debugging.
-        res.on('data', () => {});
+        res.on('data', () => { });
         res.on('end', () => resolve());
       }
     );
@@ -208,7 +208,7 @@ export default {
   post: function (...args: any[]) {
     return app.post.apply(app, args as any);
   },
-  listen: (port: any, cb: () => void = () => {}) => {
+  listen: (port: any, cb: () => void = () => { }) => {
     // NOTE Remember that Express middleware executes in order.
     // You should define error handlers last, after all other middleware.
     // Otherwise, your error handler won't get called
@@ -263,6 +263,6 @@ export default {
 
       res.status(200).json({ message: error.message });
     });
-    app.listen(port, cb);
+    return app.listen(port, cb);
   }
 };

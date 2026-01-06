@@ -33,9 +33,9 @@ let teardown: () => Promise<void>;
 beforeAll(async () => {
   const modulePath = path.resolve(
     __dirname,
-    '../../../extensions/@pgpm/database-jobs'
+    '../../../../constructive-db/pgpm-modules/database-jobs'
   );
-  ({ db, teardown } = await getConnections({}, [seed.loadPgpm(modulePath)]));
+  ({ db, teardown } = await getConnections({}, [seed.pgpm(modulePath)]));
   db.setContext({ role: 'administrator' });
 });
 
@@ -83,7 +83,7 @@ describe('knative worker integration with job queue', () => {
 
     expect(postMock).toHaveBeenCalledTimes(1);
     const [options] = postMock.mock.calls[0];
-    expect(options.url).toBe('http://example-fn.knative.internal');
+    expect(options.url).toBe('http://knative.internal/example-fn');
     expect(options.headers['X-Job-Id']).toBe(job.id);
     expect(options.headers['X-Database-Id']).toBe(databaseId);
   });

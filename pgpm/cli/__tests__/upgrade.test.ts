@@ -1,6 +1,11 @@
 jest.setTimeout(60000);
 process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 
+jest.mock('../src/utils/npm-version', () => ({
+  fetchLatestVersion: async (pkgName: string) =>
+    pkgName === '@pgpm-testing/base32' ? '1.2.0' : null
+}));
+
 import { PgpmPackage } from '@pgpmjs/core';
 import * as fs from 'fs';
 import * as path from 'path';
