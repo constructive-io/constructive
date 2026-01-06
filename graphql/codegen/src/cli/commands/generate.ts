@@ -193,18 +193,18 @@ export async function generateCommand(
   }
 
   // 7. Generate code
-  log('Generating code...');
+  console.log('Generating code...');
   const { files: generatedFiles, stats } = generate({
     tables,
     customOperations: customOperationsData,
     config,
   });
+  console.log(`Generated ${stats.totalFiles} files`);
 
-  log(`  Generated ${stats.queryHooks} table query hooks`);
-  log(`  Generated ${stats.mutationHooks} table mutation hooks`);
-  log(`  Generated ${stats.customQueryHooks} custom query hooks`);
-  log(`  Generated ${stats.customMutationHooks} custom mutation hooks`);
-  log(`  Total files: ${stats.totalFiles}`);
+  log(`  ${stats.queryHooks} table query hooks`);
+  log(`  ${stats.mutationHooks} table mutation hooks`);
+  log(`  ${stats.customQueryHooks} custom query hooks`);
+  log(`  ${stats.customMutationHooks} custom mutation hooks`);
 
   if (options.dryRun) {
     return {
@@ -308,13 +308,21 @@ export interface WriteResult {
   errors?: string[];
 }
 
+export interface WriteOptions {
+  showProgress?: boolean;
+}
+
 export async function writeGeneratedFiles(
   files: GeneratedFile[],
   outputDir: string,
-  subdirs: string[]
+  subdirs: string[],
+  options: WriteOptions = {}
 ): Promise<WriteResult> {
+  const { showProgress = true } = options;
   const errors: string[] = [];
   const written: string[] = [];
+  const total = files.length;
+  const isTTY = process.stdout.isTTY;
 
   // Ensure output directory exists
   try {
@@ -342,8 +350,20 @@ export async function writeGeneratedFiles(
     return { success: false, errors };
   }
 
-  for (const file of files) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const filePath = path.join(outputDir, file.path);
+
+    // Show progress
+    if (showProgress) {
+      const progress = Math.round(((i + 1) / total) * 100);
+      if (isTTY) {
+        process.stdout.write(`\rWriting files: ${i + 1}/${total} (${progress}%)`);
+      } else if (i % 100 === 0 || i === total - 1) {
+        // Non-TTY: periodic updates for CI/CD
+        console.log(`Writing files: ${i + 1}/${total}`);
+      }
+    }
 
     // Ensure parent directory exists
     const parentDir = path.dirname(filePath);
@@ -362,6 +382,11 @@ export async function writeGeneratedFiles(
       const message = err instanceof Error ? err.message : 'Unknown error';
       errors.push(`Failed to write ${filePath}: ${message}`);
     }
+  }
+
+  // Clear progress line
+  if (showProgress && isTTY) {
+    process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
   return {

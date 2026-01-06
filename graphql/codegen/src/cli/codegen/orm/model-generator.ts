@@ -23,7 +23,7 @@ import {
   createFileHeader,
   createImport,
 } from '../ts-ast';
-import { getTableNames, lcFirst } from '../utils';
+import { getTableNames, getOrderByTypeName, getFilterTypeName, lcFirst } from '../utils';
 
 export interface GeneratedModelFile {
   fileName: string;
@@ -42,14 +42,16 @@ export function generateModelFile(
   const project = createProject();
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
-  const fileName = `${lcFirst(typeName)}.ts`;
+  // Avoid "index.ts" which clashes with barrel file
+  const baseFileName = lcFirst(typeName);
+  const fileName = baseFileName === 'index' ? `${baseFileName}Model.ts` : `${baseFileName}.ts`;
   const entityLower = singularName;
 
-  // Type names for this entity
+  // Type names for this entity - use inflection from table metadata
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
-  const whereTypeName = `${typeName}Filter`;
-  const orderByTypeName = `${typeName}sOrderBy`; // PostGraphile uses plural
+  const whereTypeName = getFilterTypeName(table);
+  const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
   const deleteInputTypeName = `Delete${typeName}Input`;
