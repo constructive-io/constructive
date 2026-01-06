@@ -1,0 +1,7 @@
+# sample-unique-names extension
+comment = 'sample-unique-names extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/sample-unique-names'
+requires = 'plpgsql,uuid-ossp,pgpm-base32,pgpm-verify'
+relocatable = false
+superuser = false

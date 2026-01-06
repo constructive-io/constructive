@@ -1,7 +1,0 @@
-# metaschema-schema extension
-comment = 'metaschema-schema extension'
-default_version = '0.14.0'
-module_pathname = '$libdir/metaschema-schema'
-requires = 'citext,hstore,pgpm-inflection,pgpm-database-jobs,pgpm-types,pgcrypto,plpgsql,postgis,uuid-ossp,pgpm-verify'
-relocatable = false
-superuser = false

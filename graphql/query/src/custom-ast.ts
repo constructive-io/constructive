@@ -1,8 +1,13 @@
-// @ts-nocheck
-
 import * as t from 'gql-ast';
+import type { InlineFragmentNode } from 'graphql';
 
-export function getCustomAst(fieldDefn) {
+import type { CleanField, MetaField } from './types';
+
+export function getCustomAst(fieldDefn?: MetaField): any {
+  if (!fieldDefn) {
+    return null;
+  }
+
   const { pgType } = fieldDefn.type;
   if (pgType === 'geometry') {
     return geometryAst(fieldDefn.name);
@@ -13,20 +18,134 @@ export function getCustomAst(fieldDefn) {
   }
 
   return t.field({
-    name: fieldDefn.name
+    name: fieldDefn.name,
   });
 }
 
-export function geometryAst(name) {
+/**
+ * Generate custom AST for CleanField type - handles GraphQL types that need subfield selections
+ */
+export function getCustomAstForCleanField(field: CleanField): any {
+  const { name, type } = field;
+  const { gqlType, pgType } = type;
+
+  // Handle by GraphQL type first (this is what the error messages reference)
+  if (gqlType === 'GeometryPoint') {
+    return geometryPointAst(name);
+  }
+
+  if (gqlType === 'Interval') {
+    return intervalAst(name);
+  }
+
+  if (gqlType === 'GeometryGeometryCollection') {
+    return geometryCollectionAst(name);
+  }
+
+  // Handle by pgType as fallback
+  if (pgType === 'geometry') {
+    return geometryAst(name);
+  }
+
+  if (pgType === 'interval') {
+    return intervalAst(name);
+  }
+
+  // Return simple field for scalar types
+  return t.field({
+    name,
+  });
+}
+
+/**
+ * Check if a CleanField requires subfield selection based on its GraphQL type
+ */
+export function requiresSubfieldSelection(field: CleanField): boolean {
+  const { gqlType } = field.type;
+
+  // Complex GraphQL types that require subfield selection
+  const complexTypes = [
+    'GeometryPoint',
+    'Interval',
+    'GeometryGeometryCollection',
+    'GeoJSON',
+  ];
+
+  return complexTypes.includes(gqlType);
+}
+
+/**
+ * Generate AST for GeometryPoint type
+ */
+export function geometryPointAst(name: string): any {
   return t.field({
     name,
     selectionSet: t.selectionSet({
-      selections: toFieldArray(['geojson'])
-    })
+      selections: toFieldArray(['x', 'y']),
+    }),
   });
 }
 
-export function intervalAst(name) {
+/**
+ * Generate AST for GeometryGeometryCollection type
+ */
+export function geometryCollectionAst(name: string): any {
+  // Manually create inline fragment since gql-ast doesn't support it
+  const inlineFragment: InlineFragmentNode = {
+    kind: 'InlineFragment',
+    typeCondition: {
+      kind: 'NamedType',
+      name: {
+        kind: 'Name',
+        value: 'GeometryPoint',
+      },
+    },
+    selectionSet: {
+      kind: 'SelectionSet',
+      selections: [
+        {
+          kind: 'Field',
+          name: {
+            kind: 'Name',
+            value: 'x',
+          },
+        },
+        {
+          kind: 'Field',
+          name: {
+            kind: 'Name',
+            value: 'y',
+          },
+        },
+      ],
+    },
+  };
+
+  return t.field({
+    name,
+    selectionSet: t.selectionSet({
+      selections: [
+        t.field({
+          name: 'geometries',
+          selectionSet: t.selectionSet({
+            selections: [inlineFragment as any], // gql-ast limitation with inline fragments
+          }),
+        }),
+      ],
+    }),
+  });
+}
+
+export function geometryAst(name: string): any {
+  return t.field({
+    name,
+    selectionSet: t.selectionSet({
+      selections: toFieldArray(['geojson']),
+    }),
+  });
+}
+
+export function intervalAst(name: string): any {
   return t.field({
     name,
     selectionSet: t.selectionSet({
@@ -36,23 +155,18 @@ export function intervalAst(name) {
         'minutes',
         'months',
         'seconds',
-        'years'
-      ])
-    })
+        'years',
+      ]),
+    }),
   });
 }
 
-function toFieldArray(strArr) {
+function toFieldArray(strArr: string[]): any[] {
   return strArr.map((fieldName) => t.field({ name: fieldName }));
 }
 
-export function isIntervalType(obj) {
-  return [
-    'days',
-    'hours',
-    'minutes',
-    'months',
-    'seconds',
-    'years'
-  ].every((key) => obj.hasOwnProperty(key));
+export function isIntervalType(obj: any): boolean {
+  return ['days', 'hours', 'minutes', 'months', 'seconds', 'years'].every(
+    (key) => obj.hasOwnProperty(key)
+  );
 }

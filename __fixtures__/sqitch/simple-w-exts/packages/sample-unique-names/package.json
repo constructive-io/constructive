@@ -1,0 +1,37 @@
+{
+  "name": "@constructive-io/sample-unique-names",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "undefined",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/pgpm-modules",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "restricted",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/pgpm-modules"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/pgpm-modules/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepare": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "graphile-test": "^2.3.0",
+    "graphql-tag": "2.12.6",
+    "pgsql-test": "^2.6.0"
+  }
+}
