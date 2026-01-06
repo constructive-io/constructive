@@ -10,6 +10,7 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
+import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -298,7 +299,7 @@ describe('Meta Schema Integration', () => {
     });
 
     describe('api_extensions merging', () => {
-      it('includes all schema_name entries in exposed schemas', async () => {
+      it('includes exposed schema types', async () => {
         if (!started) {
           throw new Error('HTTP server not started');
         }
@@ -316,7 +317,9 @@ describe('Meta Schema Integration', () => {
 
         expect(res.status).toBe(200);
         const typeNames = res.body.data.__schema.types.map((t: any) => t.name);
-        expect(typeNames).toEqual(expect.arrayContaining(['Item', 'Profile', 'Invoice']));
+        expect(typeNames).toEqual(
+          expect.arrayContaining(['Item', 'Profile', 'Invoice', 'PublicItem'])
+        );
       });
 
       it('merges schemas in correct order', async () => {
@@ -406,6 +409,86 @@ describe('Meta Schema Integration', () => {
     });
   });
 
+  describe('role-based schema exposure', () => {
+    describe('authenticated role', () => {
+      let started: StartedServer | null = null;
+      let db: PgTestClient;
+
+      beforeAll(async () => {
+        const connections = requireConnections(metaDb, 'meta');
+        db = connections.db;
+        clearCaches();
+        started = await startServer(
+          buildOptions({
+            db,
+            isPublic: true,
+          })
+        );
+      });
+
+      beforeEach(async () => {
+        db.setContext({
+          role: 'anonymous',
+          'jwt.claims.database_id': seededDatabaseId,
+        });
+        await db.beforeEach();
+      });
+
+      afterEach(async () => {
+        await db.afterEach();
+      });
+
+      afterAll(async () => {
+        await stopServer(started);
+        started = null;
+        clearCaches();
+      });
+
+      it('includes user tables in schema', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: hosts.api,
+          ...roleHeaders('authenticated'),
+        });
+        const res = await req.post('/graphql').send({
+          query: `{
+            __schema {
+              types { name }
+            }
+          }`,
+        });
+
+        expect(res.status).toBe(200);
+        const typeNames = res.body.data.__schema.types.map((t: any) => t.name);
+        expect(typeNames).toEqual(
+          expect.arrayContaining(['Item', 'Profile', 'Invoice'])
+        );
+      });
+
+      it('filters items by user under RLS', async () => {
+        if (!started) {
+          throw new Error('HTTP server not started');
+        }
+        const req = request.agent(started.httpServer);
+        setHeaders(req, {
+          Host: hosts.api,
+          ...roleHeaders('authenticated'),
+        });
+        const res = await req.post('/graphql').send({
+          query: '{ items { nodes { name } } }',
+        });
+
+        expect(res.status).toBe(200);
+        const names = res.body.data.items.nodes.map((n: any) => n.name);
+        expect(names).toContain('User Item A');
+        expect(names).not.toContain('User Item B');
+      });
+    });
+  });
+
   describe('apis table filtering', () => {
     let publicStarted: StartedServer | null = null;
     let privateStarted: StartedServer | null = null;
@@ -468,6 +551,31 @@ describe('Meta Schema Integration', () => {
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
       expect(res.status).toBe(200);
+    });
+
+    it('exposes admin-only tables and bypasses RLS for admin role', async () => {
+      if (!privateStarted) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(privateStarted.httpServer);
+      setHeaders(req, {
+        Host: hosts.admin,
+        'X-Database-Id': seededDatabaseId,
+        'X-Schemata': 'app_public,users_public,billing_public,extra_public',
+      });
+      const res = await req.post('/graphql').send({
+        query: `{
+          adminNote: __type(name: "AdminNote") { name }
+          items { nodes { name } }
+        }`,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.adminNote?.name).toBe('AdminNote');
+      const names = res.body.data.items.nodes.map((n: any) => n.name);
+      expect(names).toEqual(
+        expect.arrayContaining(['User Item A', 'User Item B'])
+      );
     });
   });
 

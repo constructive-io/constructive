@@ -10,6 +10,7 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
+import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -381,7 +382,10 @@ describe('Schema Validation', () => {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: hosts.valid });
+      setHeaders(req, {
+        Host: hosts.valid,
+        ...roleHeaders('authenticated'),
+      });
       const res = await req.post('/graphql').send({
         query: `{
           __schema {
@@ -400,7 +404,10 @@ describe('Schema Validation', () => {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: hosts.valid });
+      setHeaders(req, {
+        Host: hosts.valid,
+        ...roleHeaders('authenticated'),
+      });
       const res = await req.post('/graphql').send({
         query: `{
           __schema {
@@ -419,7 +426,10 @@ describe('Schema Validation', () => {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: hosts.valid });
+      setHeaders(req, {
+        Host: hosts.valid,
+        ...roleHeaders('authenticated'),
+      });
       const res = await req.post('/graphql').send({
         query: `{
           __type(name: "ItemFilter") {
@@ -438,7 +448,10 @@ describe('Schema Validation', () => {
         throw new Error('HTTP server not started');
       }
       const req = request.agent(started.httpServer);
-      setHeaders(req, { Host: hosts.valid });
+      setHeaders(req, {
+        Host: hosts.valid,
+        ...roleHeaders('authenticated'),
+      });
       const res = await req.post('/graphql').send({
         query: `{
           filterType: __type(name: "ItemFilter") {

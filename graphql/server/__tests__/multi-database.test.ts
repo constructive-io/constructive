@@ -168,7 +168,7 @@ const createAppDb = async (
       ]),
       seed.fn(async ({ pg }) => {
         await pg.query(
-          'INSERT INTO app_public.items (name, source_db) VALUES ($1, $2)',
+          'INSERT INTO app_public.items (name, source_db, is_public) VALUES ($1, $2, true)',
           [itemName, sourceDb]
         );
       }),
@@ -320,10 +320,13 @@ describe('Multi-Database', () => {
       setHeaders(req, { Host: hosts.primary });
       const res = await req
         .post('/graphql')
-        .send({ query: '{ items { nodes { sourceDb } } }' });
+        .send({ query: '{ items { nodes { name sourceDb } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.items.nodes[0].sourceDb).toBe(databases.primary.name);
+      const node = res.body.data.items.nodes.find(
+        (n: any) => n.name === 'Primary Item'
+      );
+      expect(node?.sourceDb).toBe(databases.primary.name);
     });
 
     it('routes secondary.example.com to secondary database', async () => {
@@ -334,12 +337,13 @@ describe('Multi-Database', () => {
       setHeaders(req, { Host: hosts.secondary });
       const res = await req
         .post('/graphql')
-        .send({ query: '{ items { nodes { sourceDb } } }' });
+        .send({ query: '{ items { nodes { name sourceDb } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.items.nodes[0].sourceDb).toBe(
-        databases.secondary.name
+      const node = res.body.data.items.nodes.find(
+        (n: any) => n.name === 'Secondary Item'
       );
+      expect(node?.sourceDb).toBe(databases.secondary.name);
     });
 
     it('routes tertiary.example.com to tertiary database', async () => {
@@ -350,12 +354,13 @@ describe('Multi-Database', () => {
       setHeaders(req, { Host: hosts.tertiary });
       const res = await req
         .post('/graphql')
-        .send({ query: '{ items { nodes { sourceDb } } }' });
+        .send({ query: '{ items { nodes { name sourceDb } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.items.nodes[0].sourceDb).toBe(
-        databases.tertiary.name
+      const node = res.body.data.items.nodes.find(
+        (n: any) => n.name === 'Tertiary Item'
       );
+      expect(node?.sourceDb).toBe(databases.tertiary.name);
     });
   });
 
@@ -390,16 +395,15 @@ describe('Multi-Database', () => {
       expect(names).not.toContain('Primary Item');
     });
 
-    it('mutations in one database do not affect another', async () => {
+    it('writes in one database do not affect another', async () => {
       if (!started) {
         throw new Error('HTTP server not started');
       }
-      const createReq = request.agent(started.httpServer);
-      setHeaders(createReq, { Host: hosts.primary });
-      await createReq.post('/graphql').send({
-        query:
-          'mutation { createItem(input: { item: { name: "New Primary Item" } }) { item { id } } }',
-      });
+      const primaryConnections = requireConnections(primaryDb, 'primary');
+      await primaryConnections.pg.query(
+        'INSERT INTO app_public.items (name, source_db, is_public) VALUES ($1, $2, true)',
+        ['New Primary Item', databases.primary.name]
+      );
 
       const readReq = request.agent(started.httpServer);
       setHeaders(readReq, { Host: hosts.secondary });

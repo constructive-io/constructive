@@ -4,6 +4,12 @@ CREATE SCHEMA IF NOT EXISTS app_public;
 
 CREATE TABLE IF NOT EXISTS app_public.items (
   id serial PRIMARY KEY,
+  name text NOT NULL,
+  owner_id uuid DEFAULT nullif(current_setting('jwt.claims.user_id', true), '')::uuid
+);
+
+CREATE TABLE IF NOT EXISTS app_public.public_items (
+  id serial PRIMARY KEY,
   name text NOT NULL
 );
 
@@ -42,15 +48,53 @@ AS $$
   SELECT 'token-' || public_key, now() + interval '1 day';
 $$;
 
+ALTER TABLE app_public.items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY items_select_own ON app_public.items
+  FOR SELECT TO authenticated
+  USING (owner_id = current_setting('jwt.claims.user_id', true)::uuid);
+
+CREATE POLICY items_insert_own ON app_public.items
+  FOR INSERT TO authenticated
+  WITH CHECK (owner_id = current_setting('jwt.claims.user_id', true)::uuid);
+
+CREATE POLICY items_update_own ON app_public.items
+  FOR UPDATE TO authenticated
+  USING (owner_id = current_setting('jwt.claims.user_id', true)::uuid)
+  WITH CHECK (owner_id = current_setting('jwt.claims.user_id', true)::uuid);
+
+CREATE POLICY items_delete_own ON app_public.items
+  FOR DELETE TO authenticated
+  USING (owner_id = current_setting('jwt.claims.user_id', true)::uuid);
+
+INSERT INTO app_public.public_items (id, name) VALUES
+  (1, 'Public Item')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO app_public.items (id, name, owner_id) VALUES
+  (1, 'User Item A', '11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+  (2, 'User Item B', '22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb')
+ON CONFLICT (id) DO NOTHING;
+
 GRANT USAGE ON SCHEMA app_public TO anonymous;
 GRANT USAGE ON SCHEMA app_public TO authenticated;
 GRANT USAGE ON SCHEMA app_public TO administrator;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA app_public TO anonymous;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA app_public TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA app_public TO administrator;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA app_public TO anonymous;
+
+GRANT SELECT ON app_public.public_items TO anonymous;
+GRANT SELECT ON app_public.public_items TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.public_items TO administrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.items TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.items TO administrator;
+
+GRANT EXECUTE ON FUNCTION app_public.current_setting(text) TO anonymous;
+GRANT EXECUTE ON FUNCTION app_public.sign_up_with_key(text) TO anonymous;
+GRANT EXECUTE ON FUNCTION app_public.sign_in_request_challenge(text) TO anonymous;
+GRANT EXECUTE ON FUNCTION app_public.sign_in_record_failure(text) TO anonymous;
+GRANT EXECUTE ON FUNCTION app_public.sign_in_with_challenge(text, text) TO anonymous;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA app_public TO authenticated;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA app_public TO administrator;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA app_public TO authenticated;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA app_public TO administrator;
 
 -- Database
 INSERT INTO metaschema_public.database (id, name) VALUES

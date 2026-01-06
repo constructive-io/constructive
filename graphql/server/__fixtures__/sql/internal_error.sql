@@ -13,7 +13,10 @@ END;
 $$;
 
 GRANT USAGE ON SCHEMA app_public TO anonymous;
-GRANT EXECUTE ON FUNCTION app_public.trigger_internal_error() TO authenticated;
+GRANT USAGE ON SCHEMA app_public TO authenticated;
+GRANT USAGE ON SCHEMA app_public TO administrator;
 GRANT EXECUTE ON FUNCTION app_public.trigger_internal_error() TO anonymous;
+GRANT EXECUTE ON FUNCTION app_public.trigger_internal_error() TO authenticated;
+GRANT EXECUTE ON FUNCTION app_public.trigger_internal_error() TO administrator;
 
 COMMIT;

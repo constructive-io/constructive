@@ -11,6 +11,7 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
+import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -232,13 +233,14 @@ afterAll(async () => {
   }
 });
 
-describe('PostGIS', () => {
+describe('PostGIS (anonymous)', () => {
   let started: StartedServer | null = null;
   let db: PgTestClient;
 
   beforeAll(async () => {
     const connections = requireConnections(metaDb, 'meta');
     db = connections.db;
+    clearCaches();
     started = await startServer(
       buildOptions({
         db,
@@ -307,5 +309,60 @@ describe('PostGIS', () => {
 
     const geomTypeName = getNamedType(geomField.type);
     expect(['GeometryPoint', 'GeoJSON']).toContain(geomTypeName);
+  });
+});
+
+describe('PostGIS (authenticated)', () => {
+  let started: StartedServer | null = null;
+  let db: PgTestClient;
+
+  beforeAll(async () => {
+    const connections = requireConnections(metaDb, 'meta');
+    db = connections.db;
+    clearCaches();
+    started = await startServer(
+      buildOptions({
+        db,
+      })
+    );
+  });
+
+  beforeEach(async () => {
+    db.setContext({
+      role: 'anonymous',
+      'jwt.claims.database_id': seededDatabaseId,
+    });
+    await db.beforeEach();
+  });
+
+  afterEach(async () => {
+    await db.afterEach();
+  });
+
+  afterAll(async () => {
+    await stopServer(started);
+    started = null;
+    clearCaches();
+  });
+
+  it('allows authenticated insert mutations', async () => {
+    if (!started) {
+      throw new Error('HTTP server not started');
+    }
+    const req = request.agent(started.httpServer);
+    setHeaders(req, {
+      Host: hosts.api,
+      ...roleHeaders('authenticated'),
+    });
+    const res = await req.post('/graphql').send({
+      query: `mutation {
+        createGeoPoint(input: { geoPoint: { name: "Auth Insert" } }) {
+          geoPoint { id name }
+        }
+      }`,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.createGeoPoint.geoPoint.name).toBe('Auth Insert');
   });
 });

@@ -19,8 +19,10 @@ VALUES (
   )
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.geo_points TO anonymous;
+GRANT SELECT ON app_public.geo_points TO anonymous;
 GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.geo_points TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON app_public.geo_points TO administrator;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA app_public TO authenticated;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA app_public TO administrator;
 
 COMMIT;

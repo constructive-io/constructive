@@ -10,6 +10,7 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
+import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -451,6 +452,122 @@ describe('API Modules', () => {
 
         expect(res.status).toBeLessThan(500);
       });
+    });
+  });
+
+  describe('role behavior (anonymous)', () => {
+    let started: StartedServer | null = null;
+    let db: PgTestClient;
+
+    beforeAll(async () => {
+      const connections = requireConnections(metaDb, 'meta');
+      db = connections.db;
+      clearCaches();
+      started = await startServer(
+        buildOptions({
+          db,
+        })
+      );
+    });
+
+    beforeEach(async () => {
+      db.setContext({
+        role: 'anonymous',
+        'jwt.claims.database_id': seededDatabaseId,
+      });
+      await db.beforeEach();
+    });
+
+    afterEach(async () => {
+      await db.afterEach();
+    });
+
+    afterAll(async () => {
+      await stopServer(started);
+      started = null;
+      clearCaches();
+    });
+
+    it('exposes public items to anonymous', async () => {
+      if (!started) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(started.httpServer);
+      setHeaders(req, { Host: hosts.modules });
+      const res = await req.post('/graphql').send({
+        query: '{ publicItems { nodes { name } } }',
+      });
+
+      expect(res.status).toBe(200);
+      const names = res.body.data.publicItems.nodes.map((n: any) => n.name);
+      expect(names).toContain('Public Item');
+    });
+
+    it('omits authenticated-only items from anonymous schema', async () => {
+      if (!started) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(started.httpServer);
+      setHeaders(req, { Host: hosts.modules });
+      const res = await req.post('/graphql').send({
+        query: '{ items { nodes { name } } }',
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.errors).toBeDefined();
+    });
+  });
+
+  describe('role behavior (authenticated)', () => {
+    let started: StartedServer | null = null;
+    let db: PgTestClient;
+
+    beforeAll(async () => {
+      const connections = requireConnections(metaDb, 'meta');
+      db = connections.db;
+      clearCaches();
+      started = await startServer(
+        buildOptions({
+          db,
+        })
+      );
+    });
+
+    beforeEach(async () => {
+      db.setContext({
+        role: 'anonymous',
+        'jwt.claims.database_id': seededDatabaseId,
+      });
+      await db.beforeEach();
+    });
+
+    afterEach(async () => {
+      await db.afterEach();
+    });
+
+    afterAll(async () => {
+      await stopServer(started);
+      started = null;
+      clearCaches();
+    });
+
+    it('filters items by user for authenticated role', async () => {
+      if (!started) {
+        throw new Error('HTTP server not started');
+      }
+      const req = request.agent(started.httpServer);
+      setHeaders(req, {
+        Host: hosts.modules,
+        ...roleHeaders('authenticated'),
+      });
+      const res = await req.post('/graphql').send({
+        query: '{ items { nodes { name } } }',
+      });
+
+      expect(res.status).toBe(200);
+      const names = res.body.data.items.nodes.map((n: any) => n.name);
+      expect(names).toContain('User Item A');
+      expect(names).not.toContain('User Item B');
     });
   });
 
