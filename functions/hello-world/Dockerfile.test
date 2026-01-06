@@ -1,0 +1,48 @@
+FROM node:18-alpine
+
+# Install Postgres and Bash
+RUN apk add --no-cache postgresql postgresql-client postgresql-contrib bash
+
+# Setup Postgres Directories
+ENV PGDATA=/var/lib/postgresql/data
+RUN mkdir -p /var/lib/postgresql/data && \
+    mkdir -p /run/postgresql && \
+    chown -R postgres:postgres /var/lib/postgresql && \
+    chown -R postgres:postgres /run/postgresql
+
+WORKDIR /app
+
+# Copy Monorepo Context (Required for dependencies)
+# We assume build context is the Repo Root
+COPY . .
+
+# Install Dependencies
+RUN npm install -g pnpm@9 && pnpm install
+
+# Install Dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build PGPM
+RUN pnpm --filter pgpm build
+
+# Fix: Copy assets not handled by build
+RUN mkdir -p /app/pgpm/core/dist/migrate && \
+    cp -r /app/pgpm/core/src/migrate/sql /app/pgpm/core/dist/migrate/sql
+
+# Install PGPM CLI Globally (from dist)
+RUN npm install -g ./pgpm/cli/dist
+
+# Setup Entrypoint
+COPY functions/hello-world/test-entrypoint.sh /test-entrypoint.sh
+RUN chmod +x /test-entrypoint.sh
+
+# Environment Defaults
+ENV PGHOST=localhost
+ENV PGPORT=5432
+ENV PGUSER=postgres
+ENV PGDATABASE=launchql
+ENV NODE_ENV=test
+
+WORKDIR /app/functions/hello-world
+
+ENTRYPOINT ["/test-entrypoint.sh"]

@@ -1,0 +1,29 @@
+{
+    "name": "@constructive-io/runtime-script-fn",
+    "version": "0.0.1",
+    "description": "Runtime Script Runner using pgsql-test",
+    "author": "Constructive",
+    "private": true,
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "build:watch": "tsc -p tsconfig.json -w",
+        "clean": "rm -rf dist tsconfig.tsbuildinfo",
+        "test": "jest __tests__/k8s_runner.test.ts",
+        "test:inner": "jest __tests__/index.test.ts",
+        "build:test-image": "docker build -t constructive/runtime-script-test:v9 -f Dockerfile.test ../../"
+    },
+    "dependencies": {
+        "@constructive-io/knative-job-fn": "workspace:^",
+        "express": "^5.2.1",
+        "kubernetesjs": "^0.7.6",
+        "pg": "^8.11.3",
+        "pgsql-test": "workspace:^"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "@types/node": "^20.0.0",
+        "@types/pg": "^8.11.0",
+        "typescript": "^5.0.0"
+    }
+}

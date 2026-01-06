@@ -2,6 +2,7 @@ import app from '@constructive-io/knative-job-fn';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 
+// graphql-sdk
 type SimpleEmailPayload = {
   to: string;
   subject: string;

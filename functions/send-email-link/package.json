@@ -11,7 +11,10 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w"
+    "build:watch": "tsc -p tsconfig.json -w",
+    "test": "jest __tests__/k8s_runner.test.ts",
+    "test:inner": "jest __tests__/index.test.ts",
+    "build:test-image": "docker build -t constructive/send-email-link-test:v4 -f Dockerfile.test ../../"
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
@@ -20,6 +23,13 @@
     "@launchql/styled-email": "0.1.0",
     "@pgpmjs/env": "workspace:^",
     "graphql-request": "^7.1.2",
-    "graphql-tag": "^2.12.6"
+    "graphql-tag": "^2.12.6",
+    "kubernetesjs": "^0.7.6"
+  },
+  "devDependencies": {
+    "pgsql-test": "workspace:^",
+    "@types/jest": "^30.0.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
   }
 }

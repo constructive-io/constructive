@@ -10,6 +10,7 @@ import analyze from './commands/analyze';
 import cache from './commands/cache';
 import clear from './commands/clear';
 import deploy from './commands/deploy';
+import dump from './commands/dump';
 import docker from './commands/docker';
 import env from './commands/env';
 import _export from './commands/export';
@@ -47,6 +48,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     'admin-users': pgt(adminUsers),
     clear: pgt(clear),
     deploy: pgt(deploy),
+    dump: pgt(dump),
     docker,
     env,
     verify: pgt(verify),
@@ -84,7 +86,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     console.log(usageText);
     process.exit(0);
   }
-  
+
   if (command === 'help') {
     console.log(usageText);
     process.exit(0);

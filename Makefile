@@ -20,6 +20,9 @@ roles:
 install:
 	docker exec postgres /sql-bin/install.sh
 
+clean:
+	pnpm run clean
+
 openhands:
 	@echo "Starting OpenHands with current directory: $(PWD)"
 	export SANDBOX_VOLUMES=$(PWD):/workspace:rw; \

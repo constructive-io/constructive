@@ -1,27 +1,17 @@
 import requestLib from 'request';
 import {
-  getCallbackBaseUrl,
-  getJobGatewayConfig,
   getJobGatewayDevMap,
   getNodeEnvironment
 } from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
+import { completeUrl, devMap, gatewayUrl } from './env';
 
 const log = new Logger('jobs:req');
 
-// callback URL for job completion
-const completeUrl = getCallbackBaseUrl();
-
-// Development override map (e.g. point a function name at localhost)
-const nodeEnv = getNodeEnvironment();
-const DEV_MAP = nodeEnv !== 'production' ? getJobGatewayDevMap() : null;
-
 const getFunctionUrl = (fn: string): string => {
-  if (DEV_MAP && DEV_MAP[fn]) {
-    return DEV_MAP[fn] || completeUrl;
+  if (devMap && devMap[fn]) {
+    return devMap[fn] || completeUrl;
   }
-
-  const { gatewayUrl } = getJobGatewayConfig();
   const base = gatewayUrl.replace(/\/$/, '');
   return `${base}/${fn}`;
 };
