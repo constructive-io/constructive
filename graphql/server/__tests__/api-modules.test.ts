@@ -10,7 +10,6 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
-import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -23,6 +22,10 @@ const hosts = {
   noModules: 'no-modules.example.com',
   unknownModule: 'unknown-module.example.com',
   invalidModule: 'invalid-module.example.com',
+};
+
+const authHeaders = {
+  Authorization: 'Bearer valid-token-123',
 };
 
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
@@ -558,7 +561,7 @@ describe('API Modules', () => {
       const req = request.agent(started.httpServer);
       setHeaders(req, {
         Host: hosts.modules,
-        ...roleHeaders('authenticated'),
+        ...authHeaders,
       });
       const res = await req.post('/graphql').send({
         query: '{ items { nodes { name } } }',
@@ -611,7 +614,7 @@ describe('API Modules', () => {
       const req = request.agent(strictStarted.httpServer);
       setHeaders(req, {
         Host: hosts.modules,
-        Authorization: 'Bearer valid-token-123',
+        ...authHeaders,
       });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 

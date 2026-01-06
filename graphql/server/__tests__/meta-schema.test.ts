@@ -10,7 +10,6 @@ import { svcCache } from '@pgpmjs/server-utils';
 import { graphileCache } from 'graphile-cache';
 import { seed, getConnections } from 'pgsql-test';
 import { Server as GraphQLServer } from '../src/server';
-import { roleHeaders } from '../test-utils/role-helpers';
 
 jest.setTimeout(30000);
 
@@ -24,6 +23,10 @@ const hosts = {
   rootIo: 'example.io',
   admin: 'admin.example.com',
   noAuth: 'no-auth.example.com',
+};
+
+const authHeaders = {
+  Authorization: 'Bearer valid-token-123',
 };
 
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
@@ -451,7 +454,7 @@ describe('Meta Schema Integration', () => {
         const req = request.agent(started.httpServer);
         setHeaders(req, {
           Host: hosts.api,
-          ...roleHeaders('authenticated'),
+          ...authHeaders,
         });
         const res = await req.post('/graphql').send({
           query: `{
@@ -475,7 +478,7 @@ describe('Meta Schema Integration', () => {
         const req = request.agent(started.httpServer);
         setHeaders(req, {
           Host: hosts.api,
-          ...roleHeaders('authenticated'),
+          ...authHeaders,
         });
         const res = await req.post('/graphql').send({
           query: '{ items { nodes { name } } }',
@@ -620,7 +623,7 @@ describe('Meta Schema Integration', () => {
       const req = request.agent(strictStarted.httpServer);
       setHeaders(req, {
         Host: hosts.api,
-        Authorization: 'Bearer valid-token-123',
+        ...authHeaders,
       });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
