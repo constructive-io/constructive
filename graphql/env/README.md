@@ -65,7 +65,7 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     roleName: 'administrator',
     defaultDatabaseId: 'hard-coded',
     isPublic: true,
-    metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public']
+    metaSchemas: ['services_public', 'metaschema_public', 'metaschema_modules_public']
   }
 }
 ```
