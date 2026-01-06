@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.0...@constructive-io/graphql-codegen@2.20.1) (2026-01-06)
+
+### Bug Fixes
+
+- wrong bin entry ([f80ae2c](https://github.com/constructive-io/constructive/commit/f80ae2c0a4f096d382c28a2d0917acd2a1f563cf))
+
 # [2.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.19.0...@constructive-io/graphql-codegen@2.20.0) (2026-01-06)
 
 ### Bug Fixes
