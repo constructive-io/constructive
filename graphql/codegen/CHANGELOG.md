@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.0...@constructive-io/graphql-codegen@2.22.1) (2026-01-07)
+
+### Bug Fixes
+
+- upgrade inflection to v3.0.2 and update imports to use named exports ([4e6bf94](https://github.com/constructive-io/constructive/commit/4e6bf94749437bb0594e83dfe30bd34a2d69bb97)), closes [#571](https://github.com/constructive-io/constructive/issues/571)
+
 # [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.21.0...@constructive-io/graphql-codegen@2.22.0) (2026-01-07)
 
 ### Bug Fixes
