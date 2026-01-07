@@ -333,13 +333,20 @@ pgpm package --no-plan
 Dump a postgres database to a sql file.
 
 ```bash
-# Dump to default timestamped file
+# dump to default timestamped file
 pgpm dump --database mydb
 
-# Dump to specific file
+# interactive mode (prompts for database)
+pgpm dump
+
+# dump to specific file
 pgpm dump --database mydb --out ./backup.sql
 
-# Dump with pruning (keep only one tenant)
+# dump from a specific working directory
+pgpm dump --database mydb --cwd ./packages/my-module
+
+# dump with pruning 
+# useful for creating test fixtures or development snapshots
 pgpm dump --database mydb --database-id <uuid>
 ```
 
