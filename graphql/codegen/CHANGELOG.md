@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.1...@constructive-io/graphql-codegen@2.21.0) (2026-01-07)
+
+### Features
+
+- **graphql-codegen:** make React Query optional with config flag ([07c5ccc](https://github.com/constructive-io/constructive/commit/07c5ccc404aec3c66fe5e6680d465a9fcbc26f68))
+
 ## [2.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.0...@constructive-io/graphql-codegen@2.20.1) (2026-01-06)
 
 ### Bug Fixes
