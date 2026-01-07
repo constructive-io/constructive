@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import inflection from 'inflection';
+import { camelize, pluralize, underscore } from 'inflection';
 
 import {
   createOne,
@@ -150,13 +150,13 @@ export class QueryBuilder {
     const getInputName = (mutationType: string): string => {
       switch (mutationType) {
         case 'delete': {
-          return `Delete${inflection.camelize(this._model)}Input`;
+          return `Delete${camelize(this._model)}Input`;
         }
         case 'create': {
-          return `Create${inflection.camelize(this._model)}Input`;
+          return `Create${camelize(this._model)}Input`;
         }
         case 'patch': {
-          return `Update${inflection.camelize(this._model)}Input`;
+          return `Update${camelize(this._model)}Input`;
         }
         default:
           throw new Error('Unhandled mutation type' + mutationType);
@@ -198,17 +198,17 @@ export class QueryBuilder {
     this._op = 'getMany';
     this._key = this._findQuery();
 
-    this.queryName(
-      inflection.camelize(
-        ['get', inflection.underscore(this._key), 'query'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            ['get', underscore(this._key), 'query'].join('_'),
+            true
+          )
+        );
 
-    const defn = this._introspection[this._key];
+        const defn = this._introspection[this._key];
 
-    this.select(select);
-    this._ast = getMany({
+        this.select(select);
+        this._ast = getMany({
       builder: this,
       queryName: this._queryName,
       operationName: this._key,
@@ -223,12 +223,12 @@ export class QueryBuilder {
     this._op = 'getMany';
     this._key = this._findQuery();
 
-    this.queryName(
-      inflection.camelize(
-        ['get', inflection.underscore(this._key), 'query', 'all'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            ['get', underscore(this._key), 'query', 'all'].join('_'),
+            true
+          )
+        );
 
     const defn = this._introspection[this._key];
 
@@ -247,12 +247,12 @@ export class QueryBuilder {
     this._op = 'getMany';
     this._key = this._findQuery();
 
-    this.queryName(
-      inflection.camelize(
-        ['get', inflection.underscore(this._key), 'count', 'query'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            ['get', underscore(this._key), 'count', 'query'].join('_'),
+            true
+          )
+        );
 
     const defn = this._introspection[this._key];
 
@@ -269,16 +269,16 @@ export class QueryBuilder {
     this._op = 'getOne';
     this._key = this._findQuery();
 
-    this.queryName(
-      inflection.camelize(
-        ['get', inflection.underscore(this._key), 'query'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            ['get', underscore(this._key), 'query'].join('_'),
+            true
+          )
+        );
 
-    const defn = this._introspection[this._key];
-    this.select(select);
-    this._ast = getOne({
+        const defn = this._introspection[this._key];
+        this.select(select);
+        this._ast = getOne({
       builder: this,
       queryName: this._queryName,
       operationName: this._key,
@@ -294,16 +294,16 @@ export class QueryBuilder {
     this._mutation = 'create';
     this._key = this._findMutation();
 
-    this.queryName(
-      inflection.camelize(
-        [inflection.underscore(this._key), 'mutation'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            [underscore(this._key), 'mutation'].join('_'),
+            true
+          )
+        );
 
-    const defn = this._introspection[this._key] as MutationDefinition;
-    this.select(select);
-    this._ast = createOne({
+        const defn = this._introspection[this._key] as MutationDefinition;
+        this.select(select);
+        this._ast = createOne({
       operationName: this._key,
       mutationName: this._queryName,
       mutation: defn,
@@ -318,17 +318,17 @@ export class QueryBuilder {
     this._mutation = 'delete';
     this._key = this._findMutation();
 
-    this.queryName(
-      inflection.camelize(
-        [inflection.underscore(this._key), 'mutation'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            [underscore(this._key), 'mutation'].join('_'),
+            true
+          )
+        );
 
-    const defn = this._introspection[this._key] as MutationDefinition;
+        const defn = this._introspection[this._key] as MutationDefinition;
 
-    this.select(select);
-    this._ast = deleteOne({
+        this.select(select);
+        this._ast = deleteOne({
       operationName: this._key,
       mutationName: this._queryName,
       mutation: defn,
@@ -342,17 +342,17 @@ export class QueryBuilder {
     this._mutation = 'patch';
     this._key = this._findMutation();
 
-    this.queryName(
-      inflection.camelize(
-        [inflection.underscore(this._key), 'mutation'].join('_'),
-        true
-      )
-    );
+        this.queryName(
+          camelize(
+            [underscore(this._key), 'mutation'].join('_'),
+            true
+          )
+        );
 
-    const defn = this._introspection[this._key] as MutationDefinition;
+        const defn = this._introspection[this._key] as MutationDefinition;
 
-    this.select(select);
-    this._ast = patchOne({
+        this.select(select);
+        this._ast = patchOne({
       operationName: this._key,
       mutationName: this._queryName,
       mutation: defn,
@@ -577,8 +577,8 @@ function isRelationalField(fieldName: string, modelMeta: MetaTable): boolean {
 // Get getMany op name from model
 // ie. UserSetting => userSettings
 function modelNameToGetMany(model: string): string {
-  return inflection.camelize(
-    inflection.pluralize(inflection.underscore(model)),
+  return camelize(
+    pluralize(underscore(model)),
     true
   );
 }
