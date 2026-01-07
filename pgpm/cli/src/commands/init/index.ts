@@ -16,7 +16,7 @@ import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver 
 
 const DEFAULT_MOTD = `
                  |              _   _
-    ===         |.===.        '\\-//\`
+     ===         |.===.        '\\-//\`
     (o o)        {}o o{}        (o o)
 ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
 `;
