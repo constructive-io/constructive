@@ -53,6 +53,8 @@ export interface GenerateCustomQueryHookOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
 }
 
 /**
@@ -61,7 +63,7 @@ export interface GenerateCustomQueryHookOptions {
 export function generateCustomQueryHook(
   options: GenerateCustomQueryHookOptions
 ): GeneratedCustomQueryFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true } = options;
 
   const project = createProject();
   const hookName = getOperationHookName(operation.name, 'query');
@@ -82,24 +84,30 @@ export function generateCustomQueryHook(
   const sourceFile = createSourceFile(project, fileName);
 
   // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader(`Custom query hook for ${operation.name}`) + '\n\n'
-  );
+  const headerText = reactQueryEnabled
+    ? `Custom query hook for ${operation.name}`
+    : `Custom query functions for ${operation.name}`;
+  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
 
-  // Add imports
-  sourceFile.addImportDeclarations([
-    createImport({
-      moduleSpecifier: '@tanstack/react-query',
-      namedImports: ['useQuery'],
-      typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-    }),
+  // Add imports - conditionally include React Query imports
+  const imports = [];
+  if (reactQueryEnabled) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '@tanstack/react-query',
+        namedImports: ['useQuery'],
+        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
+      })
+    );
+  }
+  imports.push(
     createImport({
       moduleSpecifier: '../client',
       namedImports: ['execute'],
       typeOnlyNamedImports: ['ExecuteOptions'],
-    }),
-  ]);
+    })
+  );
+  sourceFile.addImportDeclarations(imports);
 
   // Add query document constant
   sourceFile.addVariableStatement(
@@ -139,18 +147,20 @@ export function generateCustomQueryHook(
     );
   }
 
-  // Generate hook function
-  const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
-  const hookBody = generateHookBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-  const hookDoc = generateHookDoc(operation, hookName);
+  // Generate hook function (only if React Query is enabled)
+  if (reactQueryEnabled) {
+    const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
+    const hookBody = generateHookBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
+    const hookDoc = generateHookDoc(operation, hookName);
 
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: hookParams,
-    statements: hookBody,
-    docs: [{ description: hookDoc }],
-  });
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: hookParams,
+      statements: hookBody,
+      docs: [{ description: hookDoc }],
+    });
+  }
 
   // Add standalone functions section
   sourceFile.addStatements('\n// ============================================================================');
@@ -173,21 +183,23 @@ export function generateCustomQueryHook(
     docs: [{ description: fetchDoc }],
   });
 
-  // Generate prefetch function
-  const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
-  const prefetchParams = generatePrefetchParameters(operation, variablesTypeName);
-  const prefetchBody = generatePrefetchBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-  const prefetchDoc = generatePrefetchDoc(operation, prefetchFnName);
+  // Generate prefetch function (only if React Query is enabled)
+  if (reactQueryEnabled) {
+    const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
+    const prefetchParams = generatePrefetchParameters(operation, variablesTypeName);
+    const prefetchBody = generatePrefetchBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
+    const prefetchDoc = generatePrefetchDoc(operation, prefetchFnName);
 
-  sourceFile.addFunction({
-    name: prefetchFnName,
-    isExported: true,
-    isAsync: true,
-    parameters: prefetchParams,
-    returnType: 'Promise<void>',
-    statements: prefetchBody,
-    docs: [{ description: prefetchDoc }],
-  });
+    sourceFile.addFunction({
+      name: prefetchFnName,
+      isExported: true,
+      isAsync: true,
+      parameters: prefetchParams,
+      returnType: 'Promise<void>',
+      statements: prefetchBody,
+      docs: [{ description: prefetchDoc }],
+    });
+  }
 
   return {
     fileName,
@@ -482,6 +494,8 @@ export interface GenerateAllCustomQueryHooksOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
 }
 
 /**
@@ -490,7 +504,7 @@ export interface GenerateAllCustomQueryHooksOptions {
 export function generateAllCustomQueryHooks(
   options: GenerateAllCustomQueryHooksOptions
 ): GeneratedCustomQueryFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true } = options;
 
   return operations
     .filter((op) => op.kind === 'query')
@@ -500,6 +514,7 @@ export function generateAllCustomQueryHooks(
         typeRegistry,
         maxDepth,
         skipQueryField,
+        reactQueryEnabled,
       })
     );
 }

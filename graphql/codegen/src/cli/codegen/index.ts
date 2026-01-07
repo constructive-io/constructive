@@ -100,6 +100,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   // Extract codegen options
   const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
+  const reactQueryEnabled = config.reactQuery.enabled;
 
   // 1. Generate client.ts
   files.push({
@@ -114,7 +115,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   });
 
   // 3. Generate table-based query hooks (queries/*.ts)
-  const queryHooks = generateAllQueryHooks(tables);
+  const queryHooks = generateAllQueryHooks(tables, { reactQueryEnabled });
   for (const hook of queryHooks) {
     files.push({
       path: `queries/${hook.fileName}`,
@@ -130,6 +131,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       typeRegistry: customOperations.typeRegistry,
       maxDepth,
       skipQueryField,
+      reactQueryEnabled,
     });
 
     for (const hook of customQueryHooks) {
@@ -149,7 +151,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   });
 
   // 6. Generate table-based mutation hooks (mutations/*.ts)
-  const mutationHooks = generateAllMutationHooks(tables);
+  const mutationHooks = generateAllMutationHooks(tables, { reactQueryEnabled });
   for (const hook of mutationHooks) {
     files.push({
       path: `mutations/${hook.fileName}`,
@@ -165,6 +167,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       typeRegistry: customOperations.typeRegistry,
       maxDepth,
       skipQueryField,
+      reactQueryEnabled,
     });
 
     for (const hook of customMutationHooks) {

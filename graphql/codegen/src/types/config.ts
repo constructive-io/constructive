@@ -108,6 +108,19 @@ export interface GraphQLSDKConfig {
   };
 
   /**
+   * React Query integration options
+   * Controls whether React Query hooks are generated
+   */
+  reactQuery?: {
+    /**
+     * Whether to generate React Query hooks (useQuery, useMutation)
+     * When false, only standalone fetch functions are generated (no React dependency)
+     * @default false
+     */
+    enabled?: boolean;
+  };
+
+  /**
    * Watch mode configuration (dev-only feature)
    * When enabled via CLI --watch flag, the CLI will poll the endpoint for schema changes
    */
@@ -160,7 +173,7 @@ export interface ResolvedWatchConfig {
 /**
  * Resolved configuration with defaults applied
  */
-export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers' | 'tables' | 'queries' | 'mutations' | 'hooks' | 'postgraphile' | 'codegen' | 'orm' | 'watch'>> {
+export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers' | 'tables' | 'queries' | 'mutations' | 'hooks' | 'postgraphile' | 'codegen' | 'orm' | 'reactQuery' | 'watch'>> {
   headers: Record<string, string>;
   tables: {
     include: string[];
@@ -190,6 +203,9 @@ export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers
     output: string;
     useSharedTypes: boolean;
   } | null;
+  reactQuery: {
+    enabled: boolean;
+  };
   watch: ResolvedWatchConfig;
 }
 
@@ -235,6 +251,9 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint'> = {
     skipQueryField: true,
   },
   orm: null, // ORM generation disabled by default
+  reactQuery: {
+    enabled: false, // React Query hooks disabled by default
+  },
   watch: DEFAULT_WATCH_CONFIG,
 };
 
@@ -292,6 +311,9 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
           useSharedTypes: config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
         }
       : null,
+    reactQuery: {
+      enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
+    },
     watch: {
       pollInterval: config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
       debounce: config.watch?.debounce ?? DEFAULT_WATCH_CONFIG.debounce,
