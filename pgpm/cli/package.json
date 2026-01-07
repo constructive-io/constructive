@@ -59,6 +59,7 @@
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
+    "pgsql-deparser": "^17.17.0",
     "semver": "^7.6.2",
     "shelljs": "^0.10.0",
     "yanse": "^0.1.11"
