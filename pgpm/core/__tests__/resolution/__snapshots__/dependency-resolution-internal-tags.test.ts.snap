@@ -89,7 +89,7 @@ exports[`sqitch package dependencies with internal tag resolution [simple-w-tags
 }
 `;
 
-exports[`stage fixture dependency resolution - internal tags resolves internal tags from plan only for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - internal tags resolves internal tags from plan only for sample-unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [
@@ -97,7 +97,7 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
       "schemas/unique_names/tables/words/table",
     ],
     "/deploy/schemas/unique_names/schema.sql": [
-      "pgpm-defaults:defaults/public",
+      "pgpm-base32:schemas/base32/schema",
       "pgpm-verify:@0.1.0",
     ],
     "/deploy/schemas/unique_names/tables/words/fixtures/1589271124916_fixture.sql": [
@@ -111,11 +111,11 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
     "/deploy/schemas/unique_names/tables/words/table.sql": [
       "schemas/unique_names/schema",
     ],
-    "pgpm-defaults:defaults/public": [],
+    "pgpm-base32:schemas/base32/schema": [],
     "pgpm-verify:@0.1.0": [],
   },
   "external": [
-    "pgpm-defaults:defaults/public",
+    "pgpm-base32:schemas/base32/schema",
     "pgpm-verify:@0.1.0",
   ],
   "resolved": [
@@ -131,7 +131,7 @@ exports[`stage fixture dependency resolution - internal tags resolves internal t
 }
 `;
 
-exports[`stage fixture dependency resolution - internal tags resolves internal tags from sql headers for unique-names 1`] = `
+exports[`w-exts fixture dependency resolution - internal tags resolves internal tags from sql headers for sample-unique-names 1`] = `
 {
   "deps": {
     "/deploy/schemas/unique_names/procedures/generate_name.sql": [

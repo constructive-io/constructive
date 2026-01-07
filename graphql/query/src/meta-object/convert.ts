@@ -1,12 +1,85 @@
-// @ts-nocheck
+import type { MetaFieldType } from '../types';
 
-export function convertFromMetaSchema(metaSchema) {
+// Input schema types
+interface MetaSchemaField {
+  name: string;
+  type: MetaFieldType;
+}
+
+interface MetaSchemaConstraint {
+  fields: MetaSchemaField[];
+}
+
+interface MetaSchemaForeignConstraint {
+  fields: MetaSchemaField[];
+  refFields: MetaSchemaField[];
+  refTable: { name: string };
+}
+
+interface MetaSchemaBelongsTo {
+  keys: MetaSchemaField[];
+  fieldName: string;
+}
+
+interface MetaSchemaRelations {
+  belongsTo: MetaSchemaBelongsTo[];
+}
+
+interface MetaSchemaTable {
+  name: string;
+  fields: MetaSchemaField[];
+  primaryKeyConstraints: MetaSchemaConstraint[];
+  uniqueConstraints: MetaSchemaConstraint[];
+  foreignKeyConstraints: MetaSchemaForeignConstraint[];
+  relations: MetaSchemaRelations;
+}
+
+interface MetaSchemaInput {
+  _meta: {
+    tables: MetaSchemaTable[];
+  };
+}
+
+// Output types
+interface ConvertedField {
+  name: string;
+  type: MetaFieldType;
+  alias?: string;
+}
+
+interface ConvertedConstraint {
+  name: string;
+  type: MetaFieldType;
+  alias?: string;
+}
+
+interface ConvertedForeignConstraint {
+  refTable: string;
+  fromKey: ConvertedField;
+  toKey: ConvertedField;
+}
+
+interface ConvertedTable {
+  name: string;
+  fields: ConvertedField[];
+  primaryConstraints: ConvertedConstraint[];
+  uniqueConstraints: ConvertedConstraint[];
+  foreignConstraints: ConvertedForeignConstraint[];
+}
+
+interface ConvertedMetaObject {
+  tables: ConvertedTable[];
+}
+
+export function convertFromMetaSchema(
+  metaSchema: MetaSchemaInput
+): ConvertedMetaObject {
   const {
-    _meta: { tables }
+    _meta: { tables },
   } = metaSchema;
 
-  const result = {
-    tables: []
+  const result: ConvertedMetaObject = {
+    tables: [],
   };
 
   for (const table of tables) {
@@ -18,20 +91,25 @@ export function convertFromMetaSchema(metaSchema) {
       foreignConstraints: pickForeignConstraint(
         table.foreignKeyConstraints,
         table.relations
-      )
+      ),
     });
   }
 
   return result;
 }
 
-function pickArrayConstraint(constraints) {
+function pickArrayConstraint(
+  constraints: MetaSchemaConstraint[]
+): ConvertedConstraint[] {
   if (constraints.length === 0) return [];
   const c = constraints[0];
-  return c.fields.map((field) => pickField(field));
+  return c.fields.map((field) => pickConstraintField(field));
 }
 
-function pickForeignConstraint(constraints, relations) {
+function pickForeignConstraint(
+  constraints: MetaSchemaForeignConstraint[],
+  relations: MetaSchemaRelations
+): ConvertedForeignConstraint[] {
   if (constraints.length === 0) return [];
 
   const { belongsTo } = relations;
@@ -42,8 +120,8 @@ function pickForeignConstraint(constraints, relations) {
     const fromKey = pickField(fields[0]);
     const toKey = pickField(refFields[0]);
 
-    const matchingBelongsTo = belongsTo.find((c) => {
-      const field = pickField(c.keys[0]);
+    const matchingBelongsTo = belongsTo.find((belongsToItem) => {
+      const field = pickField(belongsToItem.keys[0]);
       return field.name === fromKey.name;
     });
 
@@ -55,14 +133,21 @@ function pickForeignConstraint(constraints, relations) {
     return {
       refTable: refTable.name,
       fromKey,
-      toKey
+      toKey,
     };
   });
 }
 
-function pickField(field) {
+function pickField(field: MetaSchemaField): ConvertedField {
   return {
     name: field.name,
-    type: field.type
+    type: field.type,
+  };
+}
+
+function pickConstraintField(field: MetaSchemaField): ConvertedConstraint {
+  return {
+    name: field.name,
+    type: field.type,
   };
 }

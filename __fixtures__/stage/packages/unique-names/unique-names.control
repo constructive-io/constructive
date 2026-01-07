@@ -1,8 +1,0 @@
-# unique-names extension
-comment = 'unique-names extension'
-default_version = '0.0.1'
-module_pathname = '$libdir/unique-names'
-requires = 'plpgsql,uuid-ossp,pgpm-defaults,pgpm-verify'
-relocatable = false
-superuser = false
-  
