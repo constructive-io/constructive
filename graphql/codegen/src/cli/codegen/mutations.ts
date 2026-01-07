@@ -46,14 +46,29 @@ export interface GeneratedMutationFile {
   content: string;
 }
 
+export interface MutationGeneratorOptions {
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+}
+
 // ============================================================================
 // Create mutation hook generator
 // ============================================================================
 
 /**
  * Generate create mutation hook file content using AST
+ * When reactQueryEnabled is false, returns null since mutations require React Query
  */
-export function generateCreateMutationHook(table: CleanTable): GeneratedMutationFile {
+export function generateCreateMutationHook(
+  table: CleanTable,
+  options: MutationGeneratorOptions = {}
+): GeneratedMutationFile | null {
+  const { reactQueryEnabled = true } = options;
+
+  // Mutations require React Query - skip generation when disabled
+  if (!reactQueryEnabled) {
+    return null;
+  }
   const project = createProject();
   const { typeName, singularName } = getTableNames(table);
   const hookName = getCreateMutationHookName(table);
@@ -208,8 +223,19 @@ mutate({
 
 /**
  * Generate update mutation hook file content using AST
+ * When reactQueryEnabled is false, returns null since mutations require React Query
  */
-export function generateUpdateMutationHook(table: CleanTable): GeneratedMutationFile | null {
+export function generateUpdateMutationHook(
+  table: CleanTable,
+  options: MutationGeneratorOptions = {}
+): GeneratedMutationFile | null {
+  const { reactQueryEnabled = true } = options;
+
+  // Mutations require React Query - skip generation when disabled
+  if (!reactQueryEnabled) {
+    return null;
+  }
+
   // Check if update mutation exists
   if (table.query?.update === null) {
     return null;
@@ -369,8 +395,19 @@ mutate({
 
 /**
  * Generate delete mutation hook file content using AST
+ * When reactQueryEnabled is false, returns null since mutations require React Query
  */
-export function generateDeleteMutationHook(table: CleanTable): GeneratedMutationFile | null {
+export function generateDeleteMutationHook(
+  table: CleanTable,
+  options: MutationGeneratorOptions = {}
+): GeneratedMutationFile | null {
+  const { reactQueryEnabled = true } = options;
+
+  // Mutations require React Query - skip generation when disabled
+  if (!reactQueryEnabled) {
+    return null;
+  }
+
   // Check if delete mutation exists
   if (table.query?.delete === null) {
     return null;
@@ -504,19 +541,26 @@ mutate({
 
 /**
  * Generate all mutation hook files for all tables
+ * When reactQueryEnabled is false, returns empty array since mutations require React Query
  */
-export function generateAllMutationHooks(tables: CleanTable[]): GeneratedMutationFile[] {
+export function generateAllMutationHooks(
+  tables: CleanTable[],
+  options: MutationGeneratorOptions = {}
+): GeneratedMutationFile[] {
   const files: GeneratedMutationFile[] = [];
 
   for (const table of tables) {
-    files.push(generateCreateMutationHook(table));
+    const createHook = generateCreateMutationHook(table, options);
+    if (createHook) {
+      files.push(createHook);
+    }
 
-    const updateHook = generateUpdateMutationHook(table);
+    const updateHook = generateUpdateMutationHook(table, options);
     if (updateHook) {
       files.push(updateHook);
     }
 
-    const deleteHook = generateDeleteMutationHook(table);
+    const deleteHook = generateDeleteMutationHook(table, options);
     if (deleteHook) {
       files.push(deleteHook);
     }

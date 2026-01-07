@@ -51,15 +51,23 @@ export interface GenerateCustomMutationHookOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
 }
 
 /**
  * Generate a custom mutation hook file
+ * When reactQueryEnabled is false, returns null since mutations require React Query
  */
 export function generateCustomMutationHook(
   options: GenerateCustomMutationHookOptions
-): GeneratedCustomMutationFile {
-  const { operation } = options;
+): GeneratedCustomMutationFile | null {
+  const { operation, reactQueryEnabled = true } = options;
+
+  // Mutations require React Query - skip generation when disabled
+  if (!reactQueryEnabled) {
+    return null;
+  }
 
   try {
     return generateCustomMutationHookInternal(options);
@@ -229,15 +237,18 @@ export interface GenerateAllCustomMutationHooksOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
 }
 
 /**
  * Generate all custom mutation hook files
+ * When reactQueryEnabled is false, returns empty array since mutations require React Query
  */
 export function generateAllCustomMutationHooks(
   options: GenerateAllCustomMutationHooksOptions
 ): GeneratedCustomMutationFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true } = options;
 
   return operations
     .filter((op) => op.kind === 'mutation')
@@ -247,6 +258,8 @@ export function generateAllCustomMutationHooks(
         typeRegistry,
         maxDepth,
         skipQueryField,
+        reactQueryEnabled,
       })
-    );
+    )
+    .filter((result): result is GeneratedCustomMutationFile => result !== null);
 }

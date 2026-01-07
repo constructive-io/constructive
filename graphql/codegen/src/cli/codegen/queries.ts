@@ -46,6 +46,11 @@ export interface GeneratedQueryFile {
   content: string;
 }
 
+export interface QueryGeneratorOptions {
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+}
+
 // ============================================================================
 // List query hook generator
 // ============================================================================
@@ -53,7 +58,11 @@ export interface GeneratedQueryFile {
 /**
  * Generate list query hook file content using AST
  */
-export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
+export function generateListQueryHook(
+  table: CleanTable,
+  options: QueryGeneratorOptions = {}
+): GeneratedQueryFile {
+  const { reactQueryEnabled = true } = options;
   const project = createProject();
   const { typeName, pluralName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
@@ -69,7 +78,10 @@ export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
   const sourceFile = createSourceFile(project, getListQueryFileName(table));
 
   // Add file header as leading comment
-  sourceFile.insertText(0, createFileHeader(`List query hook for ${typeName}`) + '\n\n');
+  const headerText = reactQueryEnabled
+    ? `List query hook for ${typeName}`
+    : `List query functions for ${typeName}`;
+  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
 
   // Collect all filter types used by this table's fields
   const filterTypesUsed = new Set<string>();
@@ -80,13 +92,18 @@ export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
     }
   }
 
-  // Add imports
-  sourceFile.addImportDeclarations([
-    createImport({
-      moduleSpecifier: '@tanstack/react-query',
-      namedImports: ['useQuery'],
-      typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-    }),
+  // Add imports - conditionally include React Query imports
+  const imports = [];
+  if (reactQueryEnabled) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '@tanstack/react-query',
+        namedImports: ['useQuery'],
+        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
+      })
+    );
+  }
+  imports.push(
     createImport({
       moduleSpecifier: '../client',
       namedImports: ['execute'],
@@ -95,8 +112,9 @@ export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
     createImport({
       moduleSpecifier: '../types',
       typeOnlyNamedImports: [typeName, ...Array.from(filterTypesUsed)],
-    }),
-  ]);
+    })
+  );
+  sourceFile.addImportDeclarations(imports);
 
   // Re-export entity type
   sourceFile.addStatements(`\n// Re-export entity type for convenience\nexport type { ${typeName} };\n`);
@@ -185,28 +203,29 @@ export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
     )
   );
 
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Hook');
-  sourceFile.addStatements('// ============================================================================\n');
+  // Add React Query hook section (only if enabled)
+  if (reactQueryEnabled) {
+    sourceFile.addStatements('\n// ============================================================================');
+    sourceFile.addStatements('// Hook');
+    sourceFile.addStatements('// ============================================================================\n');
 
-  // Hook function
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: [
-      {
-        name: 'variables',
-        type: `${ucFirst(pluralName)}QueryVariables`,
-        hasQuestionToken: true,
-      },
-      {
-        name: 'options',
-        type: `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-        hasQuestionToken: true,
-      },
-    ],
-    statements: `return useQuery({
+    // Hook function
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: [
+        {
+          name: 'variables',
+          type: `${ucFirst(pluralName)}QueryVariables`,
+          hasQuestionToken: true,
+        },
+        {
+          name: 'options',
+          type: `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
+          hasQuestionToken: true,
+        },
+      ],
+      statements: `return useQuery({
     queryKey: ${queryName}QueryKey(variables),
     queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
       ${queryName}QueryDocument,
@@ -214,9 +233,9 @@ export function generateListQueryHook(table: CleanTable): GeneratedQueryFile {
     ),
     ...options,
   });`,
-    docs: [
-      {
-        description: `Query hook for fetching ${typeName} list
+      docs: [
+        {
+          description: `Query hook for fetching ${typeName} list
 
 @example
 \`\`\`tsx
@@ -226,9 +245,10 @@ const { data, isLoading } = ${hookName}({
   orderBy: ['CREATED_AT_DESC'],
 });
 \`\`\``,
-      },
-    ],
-  });
+        },
+      ],
+    });
+  }
 
   // Add section comment for standalone functions
   sourceFile.addStatements('\n// ============================================================================');
@@ -277,29 +297,30 @@ const data = await queryClient.fetchQuery({
     ],
   });
 
-  // Prefetch function (for SSR/QueryClient)
-  sourceFile.addFunction({
-    name: `prefetch${ucFirst(pluralName)}Query`,
-    isExported: true,
-    isAsync: true,
-    parameters: [
-      {
-        name: 'queryClient',
-        type: 'QueryClient',
-      },
-      {
-        name: 'variables',
-        type: `${ucFirst(pluralName)}QueryVariables`,
-        hasQuestionToken: true,
-      },
-      {
-        name: 'options',
-        type: 'ExecuteOptions',
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: 'Promise<void>',
-    statements: `await queryClient.prefetchQuery({
+  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled
+  if (reactQueryEnabled) {
+    sourceFile.addFunction({
+      name: `prefetch${ucFirst(pluralName)}Query`,
+      isExported: true,
+      isAsync: true,
+      parameters: [
+        {
+          name: 'queryClient',
+          type: 'QueryClient',
+        },
+        {
+          name: 'variables',
+          type: `${ucFirst(pluralName)}QueryVariables`,
+          hasQuestionToken: true,
+        },
+        {
+          name: 'options',
+          type: 'ExecuteOptions',
+          hasQuestionToken: true,
+        },
+      ],
+      returnType: 'Promise<void>',
+      statements: `await queryClient.prefetchQuery({
     queryKey: ${queryName}QueryKey(variables),
     queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
       ${queryName}QueryDocument,
@@ -307,17 +328,18 @@ const data = await queryClient.fetchQuery({
       options
     ),
   });`,
-    docs: [
-      {
-        description: `Prefetch ${typeName} list for SSR or cache warming
+      docs: [
+        {
+          description: `Prefetch ${typeName} list for SSR or cache warming
 
 @example
 \`\`\`ts
 await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });
 \`\`\``,
-      },
-    ],
-  });
+        },
+      ],
+    });
+  }
 
   return {
     fileName: getListQueryFileName(table),
@@ -332,7 +354,11 @@ await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });
 /**
  * Generate single item query hook file content using AST
  */
-export function generateSingleQueryHook(table: CleanTable): GeneratedQueryFile {
+export function generateSingleQueryHook(
+  table: CleanTable,
+  options: QueryGeneratorOptions = {}
+): GeneratedQueryFile {
+  const { reactQueryEnabled = true } = options;
   const project = createProject();
   const { typeName, singularName } = getTableNames(table);
   const hookName = getSingleQueryHookName(table);
@@ -345,15 +371,23 @@ export function generateSingleQueryHook(table: CleanTable): GeneratedQueryFile {
   const sourceFile = createSourceFile(project, getSingleQueryFileName(table));
 
   // Add file header
-  sourceFile.insertText(0, createFileHeader(`Single item query hook for ${typeName}`) + '\n\n');
+  const headerText = reactQueryEnabled
+    ? `Single item query hook for ${typeName}`
+    : `Single item query functions for ${typeName}`;
+  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
 
-  // Add imports
-  sourceFile.addImportDeclarations([
-    createImport({
-      moduleSpecifier: '@tanstack/react-query',
-      namedImports: ['useQuery'],
-      typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-    }),
+  // Add imports - conditionally include React Query imports
+  const imports = [];
+  if (reactQueryEnabled) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '@tanstack/react-query',
+        namedImports: ['useQuery'],
+        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
+      })
+    );
+  }
+  imports.push(
     createImport({
       moduleSpecifier: '../client',
       namedImports: ['execute'],
@@ -362,8 +396,9 @@ export function generateSingleQueryHook(table: CleanTable): GeneratedQueryFile {
     createImport({
       moduleSpecifier: '../types',
       typeOnlyNamedImports: [typeName],
-    }),
-  ]);
+    })
+  );
+  sourceFile.addImportDeclarations(imports);
 
   // Re-export entity type
   sourceFile.addStatements(`\n// Re-export entity type for convenience\nexport type { ${typeName} };\n`);
@@ -411,24 +446,25 @@ export function generateSingleQueryHook(table: CleanTable): GeneratedQueryFile {
     )
   );
 
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Hook');
-  sourceFile.addStatements('// ============================================================================\n');
+  // Add React Query hook section (only if enabled)
+  if (reactQueryEnabled) {
+    sourceFile.addStatements('\n// ============================================================================');
+    sourceFile.addStatements('// Hook');
+    sourceFile.addStatements('// ============================================================================\n');
 
-  // Hook function
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: [
-      { name: 'id', type: 'string' },
-      {
-        name: 'options',
-        type: `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-        hasQuestionToken: true,
-      },
-    ],
-    statements: `return useQuery({
+    // Hook function
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: [
+        { name: 'id', type: 'string' },
+        {
+          name: 'options',
+          type: `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
+          hasQuestionToken: true,
+        },
+      ],
+      statements: `return useQuery({
     queryKey: ${queryName}QueryKey(id),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
@@ -437,9 +473,9 @@ export function generateSingleQueryHook(table: CleanTable): GeneratedQueryFile {
     enabled: !!id && (options?.enabled !== false),
     ...options,
   });`,
-    docs: [
-      {
-        description: `Query hook for fetching a single ${typeName} by ID
+      docs: [
+        {
+          description: `Query hook for fetching a single ${typeName} by ID
 
 @example
 \`\`\`tsx
@@ -449,9 +485,10 @@ if (data?.${queryName}) {
   console.log(data.${queryName}.id);
 }
 \`\`\``,
-      },
-    ],
-  });
+        },
+      ],
+    });
+  }
 
   // Add section comment for standalone functions
   sourceFile.addStatements('\n// ============================================================================');
@@ -489,22 +526,23 @@ const data = await fetch${ucFirst(singularName)}Query('uuid-here');
     ],
   });
 
-  // Prefetch function (for SSR/QueryClient)
-  sourceFile.addFunction({
-    name: `prefetch${ucFirst(singularName)}Query`,
-    isExported: true,
-    isAsync: true,
-    parameters: [
-      { name: 'queryClient', type: 'QueryClient' },
-      { name: 'id', type: 'string' },
-      {
-        name: 'options',
-        type: 'ExecuteOptions',
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: 'Promise<void>',
-    statements: `await queryClient.prefetchQuery({
+  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled
+  if (reactQueryEnabled) {
+    sourceFile.addFunction({
+      name: `prefetch${ucFirst(singularName)}Query`,
+      isExported: true,
+      isAsync: true,
+      parameters: [
+        { name: 'queryClient', type: 'QueryClient' },
+        { name: 'id', type: 'string' },
+        {
+          name: 'options',
+          type: 'ExecuteOptions',
+          hasQuestionToken: true,
+        },
+      ],
+      returnType: 'Promise<void>',
+      statements: `await queryClient.prefetchQuery({
     queryKey: ${queryName}QueryKey(id),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
@@ -512,17 +550,18 @@ const data = await fetch${ucFirst(singularName)}Query('uuid-here');
       options
     ),
   });`,
-    docs: [
-      {
-        description: `Prefetch a single ${typeName} for SSR or cache warming
+      docs: [
+        {
+          description: `Prefetch a single ${typeName} for SSR or cache warming
 
 @example
 \`\`\`ts
 await prefetch${ucFirst(singularName)}Query(queryClient, 'uuid-here');
 \`\`\``,
-      },
-    ],
-  });
+        },
+      ],
+    });
+  }
 
   return {
     fileName: getSingleQueryFileName(table),
@@ -537,12 +576,15 @@ await prefetch${ucFirst(singularName)}Query(queryClient, 'uuid-here');
 /**
  * Generate all query hook files for all tables
  */
-export function generateAllQueryHooks(tables: CleanTable[]): GeneratedQueryFile[] {
+export function generateAllQueryHooks(
+  tables: CleanTable[],
+  options: QueryGeneratorOptions = {}
+): GeneratedQueryFile[] {
   const files: GeneratedQueryFile[] = [];
 
   for (const table of tables) {
-    files.push(generateListQueryHook(table));
-    files.push(generateSingleQueryHook(table));
+    files.push(generateListQueryHook(table, options));
+    files.push(generateSingleQueryHook(table, options));
   }
 
   return files;
