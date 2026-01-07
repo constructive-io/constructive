@@ -125,6 +125,17 @@ async function buildPruneSql(dbname: string, databaseId: string): Promise<string
   return lines.join('\n');
 }
 
+// Helper to retrieve argument from parsed argv or positional _ array
+function getArg(argv: Partial<ParsedArgs>, key: string): string | undefined {
+  if (argv[key]) return argv[key] as string;
+  const args = (argv._ as string[]) || [];
+  const idx = args.indexOf(`--${key}`);
+  if (idx > -1 && args.length > idx + 1) {
+    return args[idx + 1];
+  }
+  return undefined;
+}
+
 export default async (
   argv: Partial<ParsedArgs>,
   prompter: Inquirerer,
@@ -142,7 +153,7 @@ export default async (
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
 
   let databaseIdInfo: { id: string; name: string } | null = null;
-  const databaseIdRaw = argv['database-id'] as string | undefined;
+  const databaseIdRaw = getArg(argv, 'database-id');
   if (databaseIdRaw) {
     databaseIdInfo = await resolveDatabaseId(dbname, databaseIdRaw);
     if (!databaseIdInfo) {
