@@ -124,6 +124,11 @@ export interface InitModuleOptions {
    * Must be an absolute path or relative to workspace root.
    */
   outputDir?: string;
+  /**
+   * Whether this is a pgpm-managed module that should create pgpm.plan and .control files.
+   * Defaults to true for backward compatibility.
+   */
+  pgpm?: boolean;
 }
 
 export class PgpmPackage {
@@ -436,6 +441,9 @@ export class PgpmPackage {
   async initModule(options: InitModuleOptions): Promise<void> {
     this.ensureWorkspace();
     
+    // Determine if this is a pgpm-managed module (defaults to true for backward compatibility)
+    const isPgpmModule = options.pgpm ?? true;
+    
     // If outputDir is provided, use it directly instead of createModuleDirectory
     let targetPath: string;
     if (options.outputDir) {
@@ -471,8 +479,11 @@ export class PgpmPackage {
       cwd: this.cwd
     });
 
-    this.initModuleSqitch(options.name, targetPath);
-    writeExtensions(targetPath, options.extensions);
+    // Only create pgpm files (pgpm.plan, .control, deploy/revert/verify dirs) for pgpm-managed modules
+    if (isPgpmModule) {
+      this.initModuleSqitch(options.name, targetPath);
+      writeExtensions(targetPath, options.extensions);
+    }
   }
 
   // ──────────────── Dependency Analysis ────────────────
