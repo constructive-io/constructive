@@ -47,6 +47,6 @@
   },
   "dependencies": {
     "graphile-build": "^4.14.1",
-    "inflekt": "^0.1.0"
+    "inflekt": "^0.1.2"
   }
 }
