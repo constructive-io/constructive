@@ -43,6 +43,8 @@
     "test:watch": "jest --watch",
     "example:codegen:sdk": "node dist/cli/index.js generate --endpoint http://api.localhost:3000/graphql --output examples/output/generated-sdk",
     "example:codegen:orm": "node dist/cli/index.js generate-orm --endpoint http://api.localhost:3000/graphql --output examples/output/generated-orm",
+    "example:codegen:sdk:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-sdk-schema",
+    "example:codegen:orm:schema": "node dist/cli/index.js generate-orm --schema examples/example.schema.graphql --output examples/output/generated-orm-schema",
     "example:sdk": "tsx examples/react-query-sdk.ts",
     "example:orm": "tsx examples/orm-sdk.ts"
   },

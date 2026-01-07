@@ -23,7 +23,11 @@
  *     useRegisterMutation.ts
  *     ...
  */
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../types/schema';
+import type {
+  CleanTable,
+  CleanOperation,
+  TypeRegistry,
+} from '../../types/schema';
 import type { ResolvedConfig } from '../../types/config';
 
 import { generateClientFile } from './client';
@@ -137,7 +141,9 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 3. Generate types.ts (can now import enums from schema-types)
   files.push({
     path: 'types.ts',
-    content: generateTypesFile(tables, { enumsFromSchemaTypes: generatedEnumNames }),
+    content: generateTypesFile(tables, {
+      enumsFromSchemaTypes: generatedEnumNames,
+    }),
   });
 
   // 4. Generate table-based query hooks (queries/*.ts)
@@ -150,7 +156,11 @@ export function generate(options: GenerateOptions): GenerateResult {
   }
 
   // 5. Generate custom query hooks if available
-  let customQueryHooks: Array<{ fileName: string; content: string; operationName: string }> = [];
+  let customQueryHooks: Array<{
+    fileName: string;
+    content: string;
+    operationName: string;
+  }> = [];
   if (customOperations && customOperations.queries.length > 0) {
     customQueryHooks = generateAllCustomQueryHooks({
       operations: customOperations.queries,
@@ -172,9 +182,13 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 5. Generate queries/index.ts barrel (includes both table and custom queries)
   files.push({
     path: 'queries/index.ts',
-    content: customQueryHooks.length > 0
-      ? generateCustomQueriesBarrel(tables, customQueryHooks.map((h) => h.operationName))
-      : generateQueriesBarrel(tables),
+    content:
+      customQueryHooks.length > 0
+        ? generateCustomQueriesBarrel(
+            tables,
+            customQueryHooks.map((h) => h.operationName)
+          )
+        : generateQueriesBarrel(tables),
   });
 
   // 6. Generate table-based mutation hooks (mutations/*.ts)
@@ -190,7 +204,11 @@ export function generate(options: GenerateOptions): GenerateResult {
   }
 
   // 7. Generate custom mutation hooks if available
-  let customMutationHooks: Array<{ fileName: string; content: string; operationName: string }> = [];
+  let customMutationHooks: Array<{
+    fileName: string;
+    content: string;
+    operationName: string;
+  }> = [];
   if (customOperations && customOperations.mutations.length > 0) {
     customMutationHooks = generateAllCustomMutationHooks({
       operations: customOperations.mutations,
@@ -209,18 +227,27 @@ export function generate(options: GenerateOptions): GenerateResult {
     }
   }
 
-  // 8. Generate mutations/index.ts barrel (includes both table and custom mutations)
-  files.push({
-    path: 'mutations/index.ts',
-    content: customMutationHooks.length > 0
-      ? generateCustomMutationsBarrel(tables, customMutationHooks.map((h) => h.operationName))
-      : generateMutationsBarrel(tables),
-  });
+  // 8. Generate mutations/index.ts barrel (only if React Query is enabled)
+  // When reactQuery is disabled, no mutation hooks are generated, so skip the barrel
+  const hasMutations =
+    mutationHooks.length > 0 || customMutationHooks.length > 0;
+  if (hasMutations) {
+    files.push({
+      path: 'mutations/index.ts',
+      content:
+        customMutationHooks.length > 0
+          ? generateCustomMutationsBarrel(
+              tables,
+              customMutationHooks.map((h) => h.operationName)
+            )
+          : generateMutationsBarrel(tables),
+    });
+  }
 
   // 9. Generate main index.ts barrel (with schema-types if present)
   files.push({
     path: 'index.ts',
-    content: generateMainBarrel(tables, hasSchemaTypes),
+    content: generateMainBarrel(tables, { hasSchemaTypes, hasMutations }),
   });
 
   return {
@@ -242,15 +269,25 @@ export function generate(options: GenerateOptions): GenerateResult {
 
 export { generateClientFile } from './client';
 export { generateTypesFile } from './types';
-export { generateAllQueryHooks, generateListQueryHook, generateSingleQueryHook } from './queries';
+export {
+  generateAllQueryHooks,
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from './queries';
 export {
   generateAllMutationHooks,
   generateCreateMutationHook,
   generateUpdateMutationHook,
   generateDeleteMutationHook,
 } from './mutations';
-export { generateAllCustomQueryHooks, generateCustomQueryHook } from './custom-queries';
-export { generateAllCustomMutationHooks, generateCustomMutationHook } from './custom-mutations';
+export {
+  generateAllCustomQueryHooks,
+  generateCustomQueryHook,
+} from './custom-queries';
+export {
+  generateAllCustomMutationHooks,
+  generateCustomMutationHook,
+} from './custom-mutations';
 export {
   generateQueriesBarrel,
   generateMutationsBarrel,

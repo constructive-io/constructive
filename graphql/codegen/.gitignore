@@ -7,6 +7,8 @@ output-orm/
 
 examples/output/generated-sdk/
 examples/output/generated-orm/
+examples/output/generated-sdk-schema/
+examples/output/generated-orm-schema/
 
 # Dependencies
 node_modules/
