@@ -81,12 +81,24 @@ export function scanBoilerplates(baseDir: string): ScannedBoilerplate[] {
         ? (configType as 'workspace' | 'module' | 'generic')
         : 'module';
 
+      // Validate and normalize requiresWorkspace field
+      const validWorkspaceTypes = ['pgpm', 'pnpm', 'lerna', 'npm'] as const;
+      let requiresWorkspace: ScannedBoilerplate['requiresWorkspace'];
+      if (config.requiresWorkspace === false) {
+        requiresWorkspace = false;
+      } else if (typeof config.requiresWorkspace === 'string' && 
+                 validWorkspaceTypes.includes(config.requiresWorkspace as any)) {
+        requiresWorkspace = config.requiresWorkspace as 'pgpm' | 'pnpm' | 'lerna' | 'npm';
+      } else {
+        // Default: 'pgpm' for module type (backward compatibility), undefined for others
+        requiresWorkspace = type === 'module' ? 'pgpm' : undefined;
+      }
+
       boilerplates.push({
         name: entry.name,
         path: boilerplatePath,
         type,
-        pgpm: config.pgpm,
-        requiresWorkspace: config.requiresWorkspace,
+        requiresWorkspace,
         questions: config.questions as ScannedBoilerplate['questions']
       });
     }

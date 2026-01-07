@@ -4,20 +4,31 @@ import { TemplateScaffolder, BoilerplateConfig as GenomicBoilerplateConfig } fro
 import type { Inquirerer, Question } from 'inquirerer';
 
 /**
- * Extended BoilerplateConfig that adds pgpm-specific fields.
- * These fields control whether pgpm-specific files are created and workspace requirements.
+ * Supported workspace types for template requirements.
+ * - 'pgpm': Requires pgpm workspace (pgpm.json/pgpm.config.js) and creates pgpm.plan/.control files
+ * - 'pnpm': Requires pnpm workspace (pnpm-workspace.yaml)
+ * - 'lerna': Requires lerna workspace (lerna.json)
+ * - 'npm': Requires npm workspace (package.json with workspaces field)
+ * - false: No workspace required, can be scaffolded anywhere
+ */
+export type WorkspaceType = 'pgpm' | 'pnpm' | 'lerna' | 'npm' | false;
+
+/**
+ * Extended BoilerplateConfig that adds workspace requirement field.
+ * This field controls both workspace detection and whether pgpm-specific files are created.
  */
 export interface BoilerplateConfig extends GenomicBoilerplateConfig {
-  /** 
-   * Whether this is a pgpm-managed template that creates pgpm.plan and .control files.
-   * Defaults to true for 'workspace' and 'module' types, false for 'generic'.
-   */
-  pgpm?: boolean;
   /**
-   * Whether this template requires being inside a pgpm workspace.
-   * Defaults to true for 'module' type, false for 'workspace' and 'generic'.
+   * Specifies what type of workspace this template requires.
+   * - 'pgpm': Requires pgpm workspace AND creates pgpm.plan/.control files
+   * - 'pnpm': Requires pnpm workspace (pnpm-workspace.yaml), no pgpm files
+   * - 'lerna': Requires lerna workspace (lerna.json), no pgpm files
+   * - 'npm': Requires npm workspace (package.json with workspaces), no pgpm files
+   * - false: No workspace required, no pgpm files
+   * 
+   * Defaults to 'pgpm' for 'module' type (backward compatibility), false for others.
    */
-  requiresWorkspace?: boolean;
+  requiresWorkspace?: WorkspaceType;
 }
 
 export interface InspectTemplateOptions {

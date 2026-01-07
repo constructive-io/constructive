@@ -125,7 +125,6 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     dir,
     noTty,
     cwd,
-    pgpm: inspection.config?.pgpm,
     requiresWorkspace: inspection.config?.requiresWorkspace,
   }, wasExplicitModuleRequest);
 }
@@ -230,7 +229,6 @@ async function handleBoilerplateInit(
     dir: ctx.dir,
     noTty: ctx.noTty,
     cwd: ctx.cwd,
-    pgpm: inspection.config?.pgpm,
     requiresWorkspace: inspection.config?.requiresWorkspace,
   }, true);
 }
@@ -242,10 +240,11 @@ interface InitContext {
   dir?: string;
   noTty: boolean;
   cwd: string;
-  /** Whether this is a pgpm-managed template (creates pgpm.plan, .control files) */
-  pgpm?: boolean;
-  /** Whether this template requires being inside a workspace */
-  requiresWorkspace?: boolean;
+  /** 
+   * What type of workspace this template requires.
+   * 'pgpm' also indicates pgpm files should be created.
+   */
+  requiresWorkspace?: 'pgpm' | 'pnpm' | 'lerna' | 'npm' | false;
 }
 
 async function handleWorkspaceInit(
@@ -313,15 +312,18 @@ async function handleModuleInit(
   ctx: InitContext,
   wasExplicitModuleRequest: boolean = false
 ) {
-  // Determine if this template requires a workspace (defaults to true for backward compatibility)
-  const requiresWorkspace = ctx.requiresWorkspace ?? true;
-  // Determine if this is a pgpm-managed template (defaults to true for backward compatibility)
-  const isPgpmTemplate = ctx.pgpm ?? true;
+  // Determine workspace requirement (defaults to 'pgpm' for backward compatibility)
+  const workspaceType = ctx.requiresWorkspace ?? 'pgpm';
+  // Whether this is a pgpm-managed template (creates pgpm.plan, .control files)
+  const isPgpmTemplate = workspaceType === 'pgpm';
+  // Whether any workspace is required
+  const requiresWorkspace = workspaceType !== false;
 
   const project = new PgpmPackage(ctx.cwd);
 
-  // Only enforce workspace requirement if the template requires it
-  if (requiresWorkspace && !project.workspacePath) {
+  // Only enforce pgpm workspace requirement if the template requires 'pgpm' workspace
+  // TODO: Add detection for pnpm, lerna, npm workspaces when those types are used
+  if (requiresWorkspace && workspaceType === 'pgpm' && !project.workspacePath) {
     const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
 
     // If user explicitly requested module init or we're in non-interactive mode,

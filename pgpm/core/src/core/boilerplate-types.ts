@@ -3,9 +3,9 @@
  * These types support the `.boilerplate.json` and `.boilerplates.json` configuration files.
  */
 
-// Re-export BoilerplateConfig from template-scaffold to avoid duplication
-// The extended type in template-scaffold adds pgpm-specific fields to the genomic base type
-export type { BoilerplateConfig } from './template-scaffold';
+// Re-export BoilerplateConfig and WorkspaceType from template-scaffold to avoid duplication
+// The extended type in template-scaffold adds workspace requirement field to the genomic base type
+export type { BoilerplateConfig, WorkspaceType } from './template-scaffold';
 
 /**
  * A question to prompt the user during template scaffolding.
@@ -48,10 +48,11 @@ export interface ScannedBoilerplate {
   path: string;
   /** The type of boilerplate */
   type: 'workspace' | 'module' | 'generic';
-  /** Whether this is a pgpm-managed template */
-  pgpm?: boolean;
-  /** Whether this template requires being inside a workspace */
-  requiresWorkspace?: boolean;
+  /** 
+   * What type of workspace this template requires.
+   * 'pgpm' also indicates pgpm files should be created.
+   */
+  requiresWorkspace?: 'pgpm' | 'pnpm' | 'lerna' | 'npm' | false;
   /** Questions from the boilerplate config */
   questions?: BoilerplateQuestion[];
 }
