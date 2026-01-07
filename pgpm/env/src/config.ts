@@ -78,3 +78,72 @@ export const resolvePgpmPath = (cwd: string = process.cwd()): string | undefined
   
   return undefined;
 };
+
+/**
+ * Resolve the path to a pnpm workspace by finding pnpm-workspace.yaml
+ */
+export const resolvePnpmWorkspace = (cwd: string = process.cwd()): string | undefined => {
+  try {
+    return walkUp(cwd, 'pnpm-workspace.yaml');
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * Resolve the path to a lerna workspace by finding lerna.json
+ */
+export const resolveLernaWorkspace = (cwd: string = process.cwd()): string | undefined => {
+  try {
+    return walkUp(cwd, 'lerna.json');
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * Resolve the path to an npm workspace by finding package.json with workspaces field
+ */
+export const resolveNpmWorkspace = (cwd: string = process.cwd()): string | undefined => {
+  let currentDir = path.resolve(cwd);
+  const root = path.parse(currentDir).root;
+
+  while (currentDir !== root) {
+    const packageJsonPath = path.join(currentDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        if (packageJson.workspaces) {
+          return currentDir;
+        }
+      } catch {
+        // Ignore JSON parse errors
+      }
+    }
+    currentDir = path.dirname(currentDir);
+  }
+  return undefined;
+};
+
+export type WorkspaceType = 'pgpm' | 'pnpm' | 'lerna' | 'npm';
+
+/**
+ * Resolve workspace path based on workspace type
+ */
+export const resolveWorkspaceByType = (
+  cwd: string,
+  workspaceType: WorkspaceType
+): string | undefined => {
+  switch (workspaceType) {
+    case 'pgpm':
+      return resolvePgpmPath(cwd);
+    case 'pnpm':
+      return resolvePnpmWorkspace(cwd);
+    case 'lerna':
+      return resolveLernaWorkspace(cwd);
+    case 'npm':
+      return resolveNpmWorkspace(cwd);
+    default:
+      return undefined;
+  }
+};

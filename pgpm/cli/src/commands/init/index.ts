@@ -11,6 +11,7 @@ import {
   scanBoilerplates,
   sluggify,
 } from '@pgpmjs/core';
+import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue, Question, registerDefaultResolver } from 'inquirerer';
 
@@ -20,83 +21,6 @@ const DEFAULT_MOTD = `
     (o o)        {}o o{}        (o o)
 ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-
 `;
-
-/**
- * Detect if we're inside a pnpm workspace by looking for pnpm-workspace.yaml
- */
-function findPnpmWorkspace(startDir: string): string | null {
-  let currentDir = path.resolve(startDir);
-  const root = path.parse(currentDir).root;
-
-  while (currentDir !== root) {
-    const workspaceFile = path.join(currentDir, 'pnpm-workspace.yaml');
-    if (fs.existsSync(workspaceFile)) {
-      return currentDir;
-    }
-    currentDir = path.dirname(currentDir);
-  }
-  return null;
-}
-
-/**
- * Detect if we're inside a lerna workspace by looking for lerna.json
- */
-function findLernaWorkspace(startDir: string): string | null {
-  let currentDir = path.resolve(startDir);
-  const root = path.parse(currentDir).root;
-
-  while (currentDir !== root) {
-    const lernaFile = path.join(currentDir, 'lerna.json');
-    if (fs.existsSync(lernaFile)) {
-      return currentDir;
-    }
-    currentDir = path.dirname(currentDir);
-  }
-  return null;
-}
-
-/**
- * Detect if we're inside an npm workspace by looking for package.json with workspaces field
- */
-function findNpmWorkspace(startDir: string): string | null {
-  let currentDir = path.resolve(startDir);
-  const root = path.parse(currentDir).root;
-
-  while (currentDir !== root) {
-    const packageJsonPath = path.join(currentDir, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-        if (packageJson.workspaces) {
-          return currentDir;
-        }
-      } catch {
-        // Ignore JSON parse errors
-      }
-    }
-    currentDir = path.dirname(currentDir);
-  }
-  return null;
-}
-
-/**
- * Find workspace path based on workspace type
- */
-function findWorkspaceByType(startDir: string, workspaceType: 'pgpm' | 'pnpm' | 'lerna' | 'npm'): string | null {
-  switch (workspaceType) {
-    case 'pnpm':
-      return findPnpmWorkspace(startDir);
-    case 'lerna':
-      return findLernaWorkspace(startDir);
-    case 'npm':
-      return findNpmWorkspace(startDir);
-    case 'pgpm':
-      // pgpm workspace detection is handled by PgpmPackage.workspacePath
-      return null;
-    default:
-      return null;
-  }
-}
 
 export const createInitUsageText = (binaryName: string, productLabel?: string): string => {
   const displayName = productLabel ?? binaryName;
@@ -398,14 +322,14 @@ async function handleModuleInit(
 
   // Check workspace requirement based on type (skip if workspaceType is false)
   if (workspaceType !== false) {
-    let workspacePath: string | null = null;
+    let workspacePath: string | undefined;
     let workspaceTypeName = '';
 
     if (workspaceType === 'pgpm') {
-      workspacePath = project.workspacePath ?? null;
+      workspacePath = project.workspacePath;
       workspaceTypeName = 'PGPM';
     } else {
-      workspacePath = findWorkspaceByType(ctx.cwd, workspaceType);
+      workspacePath = resolveWorkspaceByType(ctx.cwd, workspaceType);
       workspaceTypeName = workspaceType.toUpperCase();
     }
 
