@@ -68,16 +68,35 @@ export function generateMutationsBarrel(tables: CleanTable[]): string {
  * @param tables - The tables to include in the SDK
  * @param hasSchemaTypes - Whether schema-types.ts was generated
  */
+export interface MainBarrelOptions {
+  hasSchemaTypes?: boolean;
+  hasMutations?: boolean;
+}
+
 export function generateMainBarrel(
   tables: CleanTable[],
-  hasSchemaTypes: boolean = false
+  options: MainBarrelOptions | boolean = {}
 ): string {
+  // Support legacy signature where second arg was just hasSchemaTypes boolean
+  const opts: MainBarrelOptions =
+    typeof options === 'boolean'
+      ? { hasSchemaTypes: options, hasMutations: true }
+      : options;
+
+  const { hasSchemaTypes = false, hasMutations = true } = opts;
   const tableNames = tables.map((t) => t.name).join(', ');
 
   const schemaTypesExport = hasSchemaTypes
     ? `
 // Schema types (input, payload, enum types)
 export * from './schema-types';
+`
+    : '';
+
+  const mutationsExport = hasMutations
+    ? `
+// Mutation hooks
+export * from './mutations';
 `
     : '';
 
@@ -119,10 +138,7 @@ export * from './types';
 ${schemaTypesExport}
 // Query hooks
 export * from './queries';
-
-// Mutation hooks
-export * from './mutations';
-`;
+${mutationsExport}`;
 }
 
 // ============================================================================

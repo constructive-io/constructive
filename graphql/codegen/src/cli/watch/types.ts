@@ -2,7 +2,6 @@
  * Watch mode types
  */
 
-import type { MetaQueryResponse } from '../introspect/meta-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 
 /**
@@ -16,8 +15,6 @@ export interface PollResult {
   error?: string;
   /** The new hash if successful */
   hash?: string;
-  /** Meta response if successful */
-  meta?: MetaQueryResponse;
   /** Schema response if successful */
   schema?: IntrospectionQueryResponse;
 }
@@ -47,7 +44,7 @@ export interface WatchOptions {
 /**
  * Events emitted by the SchemaPoller
  */
-export type PollEventType = 
+export type PollEventType =
   | 'poll-start'
   | 'poll-success'
   | 'poll-error'

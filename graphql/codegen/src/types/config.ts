@@ -7,9 +7,16 @@
  */
 export interface GraphQLSDKConfig {
   /**
-   * GraphQL endpoint URL (must expose _meta query)
+   * GraphQL endpoint URL for live introspection
+   * Either endpoint or schema must be provided
    */
-  endpoint: string;
+  endpoint?: string;
+
+  /**
+   * Path to GraphQL schema file (.graphql) for file-based generation
+   * Either endpoint or schema must be provided
+   */
+  schema?: string;
 
   /**
    * Headers to include in introspection requests
@@ -23,7 +30,7 @@ export interface GraphQLSDKConfig {
   output?: string;
 
   /**
-   * Table filtering options (for table-based CRUD operations from _meta)
+   * Table filtering options (for table-based CRUD operations)
    */
   tables?: {
     /** Tables to include (glob patterns supported) */
@@ -129,7 +136,7 @@ export interface GraphQLSDKConfig {
 
 /**
  * Watch mode configuration options
- * 
+ *
  * Watch mode uses in-memory caching for efficiency - no file I/O during polling.
  */
 export interface WatchConfig {
@@ -173,8 +180,17 @@ export interface ResolvedWatchConfig {
 /**
  * Resolved configuration with defaults applied
  */
-export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers' | 'tables' | 'queries' | 'mutations' | 'hooks' | 'postgraphile' | 'codegen' | 'orm' | 'reactQuery' | 'watch'>> {
+export interface ResolvedConfig {
+  /**
+   * GraphQL endpoint URL (empty string if using schema file)
+   */
+  endpoint: string;
+  /**
+   * Path to GraphQL schema file (null if using endpoint)
+   */
+  schema: string | null;
   headers: Record<string, string>;
+  output: string;
   tables: {
     include: string[];
     exclude: string[];
@@ -187,6 +203,7 @@ export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers
     include: string[];
     exclude: string[];
   };
+  excludeFields: string[];
   hooks: {
     queries: boolean;
     mutations: boolean;
@@ -222,7 +239,7 @@ export const DEFAULT_WATCH_CONFIG: ResolvedWatchConfig = {
 /**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint'> = {
+export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
   headers: {},
   output: './generated/graphql',
   tables: {
@@ -277,7 +294,8 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
   return {
-    endpoint: config.endpoint,
+    endpoint: config.endpoint ?? '',
+    schema: config.schema ?? null,
     headers: config.headers ?? DEFAULT_CONFIG.headers,
     output: config.output ?? DEFAULT_CONFIG.output,
     tables: {
@@ -296,29 +314,35 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     hooks: {
       queries: config.hooks?.queries ?? DEFAULT_CONFIG.hooks.queries,
       mutations: config.hooks?.mutations ?? DEFAULT_CONFIG.hooks.mutations,
-      queryKeyPrefix: config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
+      queryKeyPrefix:
+        config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
     },
     postgraphile: {
       schema: config.postgraphile?.schema ?? DEFAULT_CONFIG.postgraphile.schema,
     },
     codegen: {
-      maxFieldDepth: config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
-      skipQueryField: config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
+      maxFieldDepth:
+        config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
+      skipQueryField:
+        config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
     },
     orm: config.orm
       ? {
           output: config.orm.output ?? DEFAULT_ORM_CONFIG.output,
-          useSharedTypes: config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
+          useSharedTypes:
+            config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
         }
       : null,
     reactQuery: {
       enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
     },
     watch: {
-      pollInterval: config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
+      pollInterval:
+        config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
       debounce: config.watch?.debounce ?? DEFAULT_WATCH_CONFIG.debounce,
       touchFile: config.watch?.touchFile ?? DEFAULT_WATCH_CONFIG.touchFile,
-      clearScreen: config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
+      clearScreen:
+        config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
     },
   };
 }

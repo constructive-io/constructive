@@ -23,7 +23,12 @@ import {
   createFileHeader,
   createImport,
 } from '../ts-ast';
-import { getTableNames, getOrderByTypeName, getFilterTypeName, lcFirst } from '../utils';
+import {
+  getTableNames,
+  getOrderByTypeName,
+  getFilterTypeName,
+  lcFirst,
+} from '../utils';
 
 export interface GeneratedModelFile {
   fileName: string;
@@ -44,7 +49,8 @@ export function generateModelFile(
   const modelName = `${typeName}Model`;
   // Avoid "index.ts" which clashes with barrel file
   const baseFileName = lcFirst(typeName);
-  const fileName = baseFileName === 'index' ? `${baseFileName}Model.ts` : `${baseFileName}.ts`;
+  const fileName =
+    baseFileName === 'index' ? `${baseFileName}Model.ts` : `${baseFileName}.ts`;
   const entityLower = singularName;
 
   // Type names for this entity - use inflection from table metadata
@@ -125,9 +131,13 @@ export function generateModelFile(
   );
 
   // Add Model class
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Model Class');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   // Generate the model class
   const classDeclaration = sourceFile.addClass({
@@ -171,7 +181,8 @@ export function generateModelFile(
         before: args?.before,
         offset: args?.offset,
       },
-      '${whereTypeName}'
+      '${whereTypeName}',
+      '${orderByTypeName}'
     );
     return new QueryBuilder({
       client: this.client,

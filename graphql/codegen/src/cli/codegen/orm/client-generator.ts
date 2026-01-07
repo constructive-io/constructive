@@ -314,7 +314,8 @@ export function buildFindManyDocument<TSelect, TWhere>(
     before?: string;
     offset?: number;
   },
-  filterTypeName: string
+  filterTypeName: string,
+  orderByTypeName: string
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select ? buildSelections(select) : 'id';
 
@@ -328,7 +329,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
     variables.where = args.where;
   }
   if (args.orderBy?.length) {
-    varDefs.push(\`$orderBy: [\${operationName}sOrderBy!]\`);
+    varDefs.push(\`$orderBy: [\${orderByTypeName}!]\`);
     queryArgs.push('orderBy: $orderBy');
     variables.orderBy = args.orderBy;
   }
@@ -639,15 +640,21 @@ export function generateCreateClientFile(
 
   // Re-export types and classes
   sourceFile.addStatements('\n// Re-export types and classes');
-  sourceFile.addStatements("export type { OrmClientConfig, QueryResult, GraphQLError } from './client';");
+  sourceFile.addStatements(
+    "export type { OrmClientConfig, QueryResult, GraphQLError } from './client';"
+  );
   sourceFile.addStatements("export { GraphQLRequestError } from './client';");
   sourceFile.addStatements("export { QueryBuilder } from './query-builder';");
   sourceFile.addStatements("export * from './select-types';");
 
   // Generate createClient function
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Client Factory');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   // Build the return object
   const modelEntries = tables.map((table) => {
