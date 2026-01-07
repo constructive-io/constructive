@@ -7,7 +7,7 @@ import type {
   CleanFieldType,
 } from '../../types/schema';
 import { scalarToTsType, scalarToFilterType } from './scalars';
-import { pluralize } from '../introspect/pluralize';
+import { pluralize } from 'inflekt';
 
 // ============================================================================
 // String manipulation

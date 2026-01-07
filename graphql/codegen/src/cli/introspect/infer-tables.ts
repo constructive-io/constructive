@@ -32,7 +32,7 @@ import type {
   TableConstraints,
   ConstraintInfo,
 } from '../../types/schema';
-import { singularize, pluralize, lcFirst, ucFirst } from './pluralize';
+import { singularize, pluralize, lcFirst, ucFirst } from 'inflekt';
 
 // ============================================================================
 // Pattern Matching Constants

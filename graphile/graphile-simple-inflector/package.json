@@ -46,6 +46,7 @@
     "pgsql-test": "workspace:^"
   },
   "dependencies": {
-    "graphile-build": "^4.14.1"
+    "graphile-build": "^4.14.1",
+    "inflekt": "^0.1.2"
   }
 }

@@ -7,7 +7,7 @@ import type {
   ValueNode,
   VariableDefinitionNode,
 } from 'graphql';
-import * as inflection from 'inflection';
+import { camelize, singularize } from 'inflekt';
 
 
 import { getCustomAst } from './custom-ast';
@@ -379,8 +379,8 @@ export const createOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+  const modelName = camelize(
+    [singularize(mutation.model)].join('_'),
     true
   );
 
@@ -448,8 +448,8 @@ export const patchOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+  const modelName = camelize(
+    [singularize(mutation.model)].join('_'),
     true
   );
 
@@ -525,8 +525,8 @@ export const deleteOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
+  const modelName = camelize(
+    [singularize(mutation.model)].join('_'),
     true
   );
 
