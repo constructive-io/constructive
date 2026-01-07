@@ -117,7 +117,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     });
   }
 
-  // Default to module init (for 'module' type or unknown types)
+  // Default to module init (for 'module' type, 'generic' type, or unknown types)
   return handleModuleInit(argv, prompter, {
     fromPath,
     templateRepo,
@@ -125,6 +125,8 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     dir,
     noTty,
     cwd,
+    pgpm: inspection.config?.pgpm,
+    requiresWorkspace: inspection.config?.requiresWorkspace,
   }, wasExplicitModuleRequest);
 }
 
@@ -219,7 +221,7 @@ async function handleBoilerplateInit(
     });
   }
 
-  // Default to module init (for 'module' type or unknown types)
+  // Default to module init (for 'module' type, 'generic' type, or unknown types)
   // When using --boilerplate, user made an explicit choice, so treat as explicit request
   return handleModuleInit(argv, prompter, {
     fromPath,
@@ -228,6 +230,8 @@ async function handleBoilerplateInit(
     dir: ctx.dir,
     noTty: ctx.noTty,
     cwd: ctx.cwd,
+    pgpm: inspection.config?.pgpm,
+    requiresWorkspace: inspection.config?.requiresWorkspace,
   }, true);
 }
 
@@ -238,6 +242,10 @@ interface InitContext {
   dir?: string;
   noTty: boolean;
   cwd: string;
+  /** Whether this is a pgpm-managed template (creates pgpm.plan, .control files) */
+  pgpm?: boolean;
+  /** Whether this template requires being inside a workspace */
+  requiresWorkspace?: boolean;
 }
 
 async function handleWorkspaceInit(
@@ -305,9 +313,15 @@ async function handleModuleInit(
   ctx: InitContext,
   wasExplicitModuleRequest: boolean = false
 ) {
+  // Determine if this template requires a workspace (defaults to true for backward compatibility)
+  const requiresWorkspace = ctx.requiresWorkspace ?? true;
+  // Determine if this is a pgpm-managed template (defaults to true for backward compatibility)
+  const isPgpmTemplate = ctx.pgpm ?? true;
+
   const project = new PgpmPackage(ctx.cwd);
 
-  if (!project.workspacePath) {
+  // Only enforce workspace requirement if the template requires it
+  if (requiresWorkspace && !project.workspacePath) {
     const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
 
     // If user explicitly requested module init or we're in non-interactive mode,
@@ -346,17 +360,15 @@ async function handleModuleInit(
     throw errors.NOT_IN_WORKSPACE({});
   }
 
-  if (!project.isInsideAllowedDirs(ctx.cwd) && !project.isInWorkspace() && !project.isParentOfAllowedDirs(ctx.cwd)) {
-    process.stderr.write('You must be inside the workspace root or a parent directory of modules (like packages/).\n');
-    throw errors.NOT_IN_WORKSPACE_MODULE({});
+  // Only check workspace directory constraints if we're in a workspace
+  if (project.workspacePath) {
+    if (!project.isInsideAllowedDirs(ctx.cwd) && !project.isInWorkspace() && !project.isParentOfAllowedDirs(ctx.cwd)) {
+      process.stderr.write('You must be inside the workspace root or a parent directory of modules (like packages/).\n');
+      throw errors.NOT_IN_WORKSPACE_MODULE({});
+    }
   }
 
-  const availExtensions = await project.getAvailableModules();
-
-  // Note: moduleName is needed here before scaffolding because initModule creates
-  // the directory first, then scaffolds. The boilerplate's ____moduleName____ question
-  // gets skipped because the answer is already passed through. So users only see it
-  // once, but the definition exists in two places for this architectural reason.
+  // Build questions based on whether this is a pgpm template
   const moduleQuestions: Question[] = [
     {
       name: 'moduleName',
@@ -364,7 +376,12 @@ async function handleModuleInit(
       required: true,
       type: 'text',
     },
-    {
+  ];
+
+  // Only ask for extensions if this is a pgpm template
+  if (isPgpmTemplate && project.workspacePath) {
+    const availExtensions = await project.getAvailableModules();
+    moduleQuestions.push({
       name: 'extensions',
       message: 'Which extensions?',
       options: availExtensions,
@@ -372,15 +389,17 @@ async function handleModuleInit(
       allowCustomOptions: true,
       required: true,
       default: ['plpgsql', 'uuid-ossp'],
-    },
-  ];
+    });
+  }
 
   const answers = await prompter.prompt(argv, moduleQuestions);
   const modName = sluggify(answers.moduleName);
 
-  const extensions = answers.extensions
-    .filter((opt: OptionValue) => opt.selected)
-    .map((opt: OptionValue) => opt.name);
+  const extensions = isPgpmTemplate && answers.extensions
+    ? answers.extensions
+        .filter((opt: OptionValue) => opt.selected)
+        .map((opt: OptionValue) => opt.name)
+    : [];
 
   const templateAnswers = {
     ...argv,
@@ -389,24 +408,47 @@ async function handleModuleInit(
     packageIdentifier: (argv as any).packageIdentifier || modName
   };
 
-  await project.initModule({
-    name: modName,
-    description: answers.description || modName,
-    author: answers.author || modName,
-    extensions,
-    templateRepo: ctx.templateRepo,
-    templatePath: ctx.fromPath,
-    branch: ctx.branch,
-    dir: ctx.dir,
-    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
-    answers: templateAnswers,
-    noTty: ctx.noTty
-  });
+  // Determine output path based on whether we're in a workspace
+  let modulePath: string;
+  if (project.workspacePath) {
+    // Use workspace-aware initModule
+    await project.initModule({
+      name: modName,
+      description: answers.description || modName,
+      author: answers.author || modName,
+      extensions,
+      templateRepo: ctx.templateRepo,
+      templatePath: ctx.fromPath,
+      branch: ctx.branch,
+      dir: ctx.dir,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      answers: templateAnswers,
+      noTty: ctx.noTty,
+      pgpm: isPgpmTemplate,
+    });
 
-  const isRoot = path.resolve(project.getWorkspacePath()!) === path.resolve(ctx.cwd);
-  const modulePath = isRoot
-    ? path.join(ctx.cwd, 'packages', modName)
-    : path.join(ctx.cwd, modName);
+    const isRoot = path.resolve(project.workspacePath) === path.resolve(ctx.cwd);
+    modulePath = isRoot
+      ? path.join(ctx.cwd, 'packages', modName)
+      : path.join(ctx.cwd, modName);
+  } else {
+    // Not in a workspace - scaffold directly to current directory
+    modulePath = path.join(ctx.cwd, modName);
+    fs.mkdirSync(modulePath, { recursive: true });
+
+    await scaffoldTemplate({
+      fromPath: ctx.fromPath,
+      outputDir: modulePath,
+      templateRepo: ctx.templateRepo,
+      branch: ctx.branch,
+      dir: ctx.dir,
+      answers: templateAnswers,
+      noTty: ctx.noTty,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd: ctx.cwd,
+      prompter
+    });
+  }
 
   const motdPath = path.join(modulePath, '.motd');
   let motd = DEFAULT_MOTD;
@@ -423,8 +465,7 @@ async function handleModuleInit(
     process.stdout.write('\n');
   }
 
-  const relPath = isRoot ? `packages/${modName}` : modName;
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${modName}\n`);
 
   return { ...argv, ...answers };
 }

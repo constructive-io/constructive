@@ -74,11 +74,20 @@ export function scanBoilerplates(baseDir: string): ScannedBoilerplate[] {
     const config = readBoilerplateConfig(boilerplatePath);
 
     if (config) {
+      // Validate and normalize the type field
+      const validTypes = ['workspace', 'module', 'generic'] as const;
+      const configType = config.type as string;
+      const type: 'workspace' | 'module' | 'generic' = validTypes.includes(configType as any) 
+        ? (configType as 'workspace' | 'module' | 'generic')
+        : 'module';
+
       boilerplates.push({
         name: entry.name,
         path: boilerplatePath,
-        type: config.type ?? 'module',
-        questions: config.questions
+        type,
+        pgpm: config.pgpm,
+        requiresWorkspace: config.requiresWorkspace,
+        questions: config.questions as ScannedBoilerplate['questions']
       });
     }
   }

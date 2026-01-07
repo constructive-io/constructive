@@ -1,7 +1,24 @@
 import os from 'os';
 import path from 'path';
-import { TemplateScaffolder, BoilerplateConfig } from 'genomic';
+import { TemplateScaffolder, BoilerplateConfig as GenomicBoilerplateConfig } from 'genomic';
 import type { Inquirerer, Question } from 'inquirerer';
+
+/**
+ * Extended BoilerplateConfig that adds pgpm-specific fields.
+ * These fields control whether pgpm-specific files are created and workspace requirements.
+ */
+export interface BoilerplateConfig extends GenomicBoilerplateConfig {
+  /** 
+   * Whether this is a pgpm-managed template that creates pgpm.plan and .control files.
+   * Defaults to true for 'workspace' and 'module' types, false for 'generic'.
+   */
+  pgpm?: boolean;
+  /**
+   * Whether this template requires being inside a pgpm workspace.
+   * Defaults to true for 'module' type, false for 'workspace' and 'generic'.
+   */
+  requiresWorkspace?: boolean;
+}
 
 export interface InspectTemplateOptions {
   /**
