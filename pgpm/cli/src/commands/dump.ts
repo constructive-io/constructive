@@ -6,6 +6,7 @@ import { getPgPool } from 'pg-cache';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { QuoteUtils } from 'pgsql-deparser/utils/quote-utils';
 
 import { getTargetDatabase } from '../utils';
 
@@ -38,22 +39,21 @@ function nowStamp(): string {
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 }
 
-function quoteIdent(s: string): string {
-  return `"${String(s).replace(/"/g, '""')}"`;
-}
-
-async function runPgDump(args: string[], env: Record<string, string>): Promise<void> {
+async function runPgDump(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const child = spawn('pg_dump', args, {
-      env: {
-        ...process.env,
-        ...env
-      },
+      env,
       stdio: 'inherit',
       shell: false
     });
 
-    child.on('error', reject);
+    child.on('error', (err: any) => {
+      if (err.code === 'ENOENT') {
+        log.error('pg_dump not found; ensure PostgreSQL client tools are installed and in PATH');
+      }
+      reject(err);
+    });
+
     child.on('close', (code) => {
       if (code === 0) {
         resolve();
@@ -85,7 +85,7 @@ async function buildPruneSql(dbname: string, databaseId: string): Promise<string
     from information_schema.columns c
     join information_schema.tables t
       on t.table_schema = c.table_schema
-     and t.table_name = c.table_name
+      and t.table_name = c.table_name
     where c.column_name = 'database_id'
       and t.table_type = 'BASE TABLE'
       and c.table_schema not in ('pg_catalog', 'information_schema')
@@ -104,10 +104,18 @@ async function buildPruneSql(dbname: string, databaseId: string): Promise<string
   for (const row of tables.rows) {
     const schema = String(row.table_schema);
     const table = String(row.table_name);
-    lines.push(`delete from ${quoteIdent(schema)}.${quoteIdent(table)} where database_id <> '${databaseId}';`);
+    // Use QuoteUtils for robust identifier quoting
+    const qualified = QuoteUtils.quoteQualifiedIdentifier(schema, table);
+    // Use formatEString to safely escape the UUID/string literal
+    const dbIdLiteral = QuoteUtils.formatEString(databaseId);
+    lines.push(`delete from ${qualified} where database_id <> ${dbIdLiteral};`);
   }
 
-  lines.push(`delete from metaschema_public.database where id <> '${databaseId}';`);
+  // Handle metaschema_public.database deletion
+  const metaschemaDb = QuoteUtils.quoteQualifiedIdentifier('metaschema_public', 'database');
+  const dbIdLiteral = QuoteUtils.formatEString(databaseId);
+  lines.push(`delete from ${metaschemaDb} where id <> ${dbIdLiteral};`);
+
   lines.push('set session_replication_role = origin;');
   lines.push('do $$ begin');
   lines.push(`  raise notice 'prune done';`);
@@ -160,11 +168,12 @@ export default async (
     dbname
   ];
 
-  await runPgDump(args, spawnEnv as any);
+  await runPgDump(args, spawnEnv);
 
   if (databaseIdInfo) {
     const pruneSql = await buildPruneSql(dbname, databaseIdInfo.id);
-    fs.appendFileSync(outPath, pruneSql, 'utf8');
+    // Use writeFileSync with 'a' flag for explicit append as requested
+    fs.writeFileSync(outPath, pruneSql, { encoding: 'utf8', flag: 'a' });
     log.info('added prune section to dump file');
   }
 
