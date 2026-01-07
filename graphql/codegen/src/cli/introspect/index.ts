@@ -6,8 +6,8 @@
 export { inferTablesFromIntrospection } from './infer-tables';
 export type { InferTablesOptions } from './infer-tables';
 
-// Pluralization utilities
-export { singularize, pluralize } from './pluralize';
+// Pluralization utilities (from inflekt)
+export { singularize, pluralize } from 'inflekt';
 
 // Schema sources
 export {

@@ -33,7 +33,7 @@ import {
   getOrderByTypeName,
   isRelationField,
 } from '../utils';
-import { pluralize } from '../../introspect/pluralize';
+import { pluralize } from 'inflekt';
 import { getTypeBaseName } from '../type-resolver';
 import { scalarToTsType, scalarToFilterType } from '../scalars';
 
