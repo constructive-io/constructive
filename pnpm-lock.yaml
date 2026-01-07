@@ -569,8 +569,8 @@ importers:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
       inflekt:
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       graphile-test:
         specifier: workspace:^
@@ -709,8 +709,8 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       inflekt:
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.2.0
+        version: 0.2.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -5589,8 +5589,8 @@ packages:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
 
-  inflekt@0.1.2:
-    resolution: {integrity: sha512-lHNWa0YVLVoUmWKuZVhrwliGmmh+OOd2C0teFEC+uP37wA3/b/bzNq9X8k4zkbstNk6RJuvUi1N0l9OQp9T/+Q==}
+  inflekt@0.2.0:
+    resolution: {integrity: sha512-eznjYm6FOl6sX2fgDGe48WiCPO0db+BQhirptPBS1BhIAwqnbCgWHHCgmuzk1ldwQTKx8ot/v1ecJrFjVAe3xg==}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -12703,7 +12703,7 @@ snapshots:
 
   inflection@3.0.2: {}
 
-  inflekt@0.1.2:
+  inflekt@0.2.0:
     dependencies:
       inflection: 3.0.2
 
