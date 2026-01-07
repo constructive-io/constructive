@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.10.0](https://github.com/constructive-io/constructive/compare/pgpm@2.9.1...pgpm@2.10.0) (2026-01-07)
+
+### Bug Fixes
+
+- restore original MOTD spacing ([bb0cd97](https://github.com/constructive-io/constructive/commit/bb0cd97a30397c9601680986992372e33f40d2dc))
+
+### Features
+
+- **pgpm:** add workspace detection for pnpm, lerna, npm workspaces ([545aba1](https://github.com/constructive-io/constructive/commit/545aba1aedb2103e0f0d40df7eb120fb2e0adcd7))
+- **pgpm:** support non-pgpm templates in init command ([1c8f8c6](https://github.com/constructive-io/constructive/commit/1c8f8c6b75db89687e3976aad00da1ddeded3ecc))
+
 ## [2.9.1](https://github.com/constructive-io/constructive/compare/pgpm@2.9.0...pgpm@2.9.1) (2026-01-06)
 
 **Note:** Version bump only for package pgpm

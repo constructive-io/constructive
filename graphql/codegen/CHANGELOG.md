@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.1...@constructive-io/graphql-codegen@2.23.0) (2026-01-07)
+
+### Features
+
+- codegen source modes ([922f943](https://github.com/constructive-io/constructive/commit/922f943d6bd45c5a6e0ea8192101b310241a7b36))
+
 ## [2.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.0...@constructive-io/graphql-codegen@2.22.1) (2026-01-07)
 
 ### Bug Fixes
