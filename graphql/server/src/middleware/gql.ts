@@ -20,7 +20,7 @@ export const ApiQuery: GraphQLDocument = gql`
               schemaName
             }
           }
-          schemaNames: schemataByApiSchemaApiIdAndSchemaId {
+          schemaNames: schemasByApiSchemaApiIdAndSchemaId {
             nodes {
               schemaName
             }
