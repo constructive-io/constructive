@@ -1,5 +1,5 @@
 import type { Plugin } from 'graphile-build';
-import * as inflection from 'inflection';
+import { pluralize, singularize, fixCapitalisedPlural } from 'inflekt';
 
 type InflectionStringFn = (this: PgInflection, str: string) => string;
 
@@ -105,10 +105,10 @@ export interface PgSimpleInflectorOptions {
   nodeIdFieldName?: string;
 }
 
-const fixCapitalisedPlural = (fn: InflectionStringFn): InflectionStringFn =>
+const fixCapitalisedPluralWrapper = (fn: InflectionStringFn): InflectionStringFn =>
   function capitalisedPlural(this: PgInflection, str: string): string {
     const original = fn.call(this, str);
-    return original.replace(/[0-9]S(?=[A-Z]|$)/g, (match) => match.toLowerCase());
+    return fixCapitalisedPlural(original);
   };
 
 const fixChangePlural = (fn: InflectionStringFn): InflectionStringFn =>
@@ -124,9 +124,9 @@ const fixChangePlural = (fn: InflectionStringFn): InflectionStringFn =>
     return `${prefix}${fn.call(this, word)}${suffix}`;
   };
 
-// Helper functions that use inflection library directly (no 'this' dependency)
-const inflectionPluralize = (str: string): string => inflection.pluralize(str);
-const inflectionSingularize = (str: string): string => inflection.singularize(str);
+// Helper functions that use inflekt library directly (no 'this' dependency)
+const inflektPluralize = (str: string): string => pluralize(str);
+const inflektSingularize = (str: string): string => singularize(str);
 
 const DEFAULT_NODE_ID = 'nodeId';
 
@@ -171,19 +171,19 @@ export const PgSimpleInflector: Plugin = (
        * This solves the issue with `blah-table1s` becoming `blahTable1S`
        * (i.e. the capital S at the end) or `table1-connection becoming `Table1SConnection`
        */
-      camelCase: fixCapitalisedPlural(oldInflection.camelCase),
-      upperCamelCase: fixCapitalisedPlural(oldInflection.upperCamelCase),
+      camelCase: fixCapitalisedPluralWrapper(oldInflection.camelCase),
+      upperCamelCase: fixCapitalisedPluralWrapper(oldInflection.upperCamelCase),
 
       /*
        * Pluralize/singularize only supports single words, so only run
        * on the final segment of a name.
-       * Use inflection library instead of the default pluralize library.
+       * Use inflekt library instead of the default pluralize library.
        */
       pluralize: fixChangePlural(function pluralize(this: PgInflection, str: string): string {
-        return inflectionPluralize(str);
+        return inflektPluralize(str);
       }),
       singularize: fixChangePlural(function singularize(this: PgInflection, str: string): string {
-        return inflectionSingularize(str);
+        return inflektSingularize(str);
       }),
 
       distinctPluralize(this: PgInflection, str: string) {

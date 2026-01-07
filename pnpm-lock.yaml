@@ -568,9 +568,9 @@ importers:
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
-      inflection:
-        specifier: ^3.0.2
-        version: 3.0.2
+      inflekt:
+        specifier: ^0.1.0
+        version: 0.1.0
     devDependencies:
       graphile-test:
         specifier: workspace:^
@@ -708,9 +708,9 @@ importers:
       graphql:
         specifier: 15.10.1
         version: 15.10.1
-      inflection:
-        specifier: ^3.0.2
-        version: 3.0.2
+      inflekt:
+        specifier: ^0.1.0
+        version: 0.1.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -5588,6 +5588,9 @@ packages:
   inflection@3.0.2:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
+
+  inflekt@0.1.0:
+    resolution: {integrity: sha512-dHNmRdXabKEI0eVsN3x0PMXz3Esi7t3L5e15FENhk63la0DFLCNyXT7I3tLxhUtorEzG3GoFU/zA66C8Uz9xJg==}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -12699,6 +12702,11 @@ snapshots:
   inflection@1.3.8: {}
 
   inflection@3.0.2: {}
+
+  inflekt@0.1.0:
+    dependencies:
+      inflection: 3.0.2
+      komoji: 0.7.14
 
   inflight@1.0.6:
     dependencies:
