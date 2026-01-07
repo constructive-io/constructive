@@ -204,17 +204,17 @@ export async function generateOrmCommand(
   }
 
   // 7. Generate ORM code
-  log('Generating ORM client...');
+  console.log('Generating code...');
   const { files: generatedFiles, stats } = generateOrm({
     tables,
     customOperations: customOperationsData,
     config,
   });
+  console.log(`Generated ${stats.totalFiles} files`);
 
-  log(`  Generated ${stats.tables} table models`);
-  log(`  Generated ${stats.customQueries} custom query operations`);
-  log(`  Generated ${stats.customMutations} custom mutation operations`);
-  log(`  Total files: ${stats.totalFiles}`);
+  log(`  ${stats.tables} table models`);
+  log(`  ${stats.customQueries} custom query operations`);
+  log(`  ${stats.customMutations} custom mutation operations`);
 
   if (options.dryRun) {
     return {

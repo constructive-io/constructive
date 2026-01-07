@@ -5,6 +5,9 @@ dist/
 output-rq
 output-orm/
 
+examples/output/generated-sdk/
+examples/output/generated-orm/
+
 # Dependencies
 node_modules/
 

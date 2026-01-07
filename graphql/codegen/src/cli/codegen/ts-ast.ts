@@ -215,7 +215,8 @@ export function createInterface(
  */
 export function createFilterInterface(
   name: string,
-  fieldFilters: Array<{ fieldName: string; filterType: string }>
+  fieldFilters: Array<{ fieldName: string; filterType: string }>,
+  options?: { isExported?: boolean }
 ): InterfaceDeclarationStructure {
   const properties: InterfaceProperty[] = [
     ...fieldFilters.map((f) => ({
@@ -228,7 +229,7 @@ export function createFilterInterface(
     { name: 'not', type: name, optional: true, docs: ['Logical NOT'] },
   ];
 
-  return createInterface(name, properties);
+  return createInterface(name, properties, { isExported: options?.isExported ?? true });
 }
 
 // ============================================================================

@@ -1,6 +1,6 @@
 /**
  * Type Resolver - Convert GraphQL types to TypeScript
- * 
+ *
  * Utilities for converting CleanTypeRef and other GraphQL types
  * into TypeScript type strings and interface definitions.
  */
@@ -10,7 +10,88 @@ import type {
   CleanObjectField,
 } from '../../types/schema';
 import type { InterfaceProperty } from './ts-ast';
-import { scalarToTsType as resolveScalarToTs } from './scalars';
+import { scalarToTsType as resolveScalarToTs, SCALAR_NAMES } from './scalars';
+
+// ============================================================================
+// Type Tracker for Collecting Referenced Types
+// ============================================================================
+
+/**
+ * Types that should not be tracked (scalars, built-ins, internal types)
+ */
+const SKIP_TYPE_TRACKING = new Set([
+  ...SCALAR_NAMES,
+  // GraphQL built-ins
+  'Query',
+  'Mutation',
+  'Subscription',
+  '__Schema',
+  '__Type',
+  '__Field',
+  '__InputValue',
+  '__EnumValue',
+  '__Directive',
+  // Connection types (handled separately)
+  'PageInfo',
+]);
+
+/**
+ * Interface for tracking referenced types during code generation
+ */
+export interface TypeTracker {
+  /** Set of type names that have been referenced */
+  referencedTypes: Set<string>;
+  /** Track a type reference */
+  track(typeName: string): void;
+  /** Get importable types from schema-types.ts (Input/Payload/Enum types) */
+  getImportableTypes(): string[];
+  /** Get importable types from types.ts (table entity types) */
+  getTableTypes(): string[];
+  /** Reset the tracker */
+  reset(): void;
+}
+
+/**
+ * Options for creating a TypeTracker
+ */
+export interface TypeTrackerOptions {
+  /** Table entity type names that should be imported from types.ts */
+  tableTypeNames?: Set<string>;
+}
+
+/**
+ * Create a new TypeTracker instance
+ *
+ * @param options - Optional configuration for the tracker
+ */
+export function createTypeTracker(options?: TypeTrackerOptions): TypeTracker {
+  const referencedTypes = new Set<string>();
+  const tableTypeNames = options?.tableTypeNames ?? new Set<string>();
+
+  return {
+    referencedTypes,
+    track(typeName: string) {
+      if (typeName && !SKIP_TYPE_TRACKING.has(typeName)) {
+        referencedTypes.add(typeName);
+      }
+    },
+    getImportableTypes() {
+      // Return schema types (not table entity types)
+      return Array.from(referencedTypes)
+        .filter((name) => !tableTypeNames.has(name))
+        .sort();
+    },
+    getTableTypes() {
+      // Return table entity types only
+      return Array.from(referencedTypes)
+        .filter((name) => tableTypeNames.has(name))
+        .sort();
+    },
+    reset() {
+      referencedTypes.clear();
+    },
+  };
+}
 
 // ============================================================================
 // GraphQL to TypeScript Type Mapping
@@ -30,20 +111,23 @@ export function scalarToTsType(scalarName: string): string {
 /**
  * Convert a CleanTypeRef to a TypeScript type string
  * Handles nested LIST and NON_NULL wrappers
+ *
+ * @param typeRef - The GraphQL type reference
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function typeRefToTsType(typeRef: CleanTypeRef): string {
+export function typeRefToTsType(typeRef: CleanTypeRef, tracker?: TypeTracker): string {
   switch (typeRef.kind) {
     case 'NON_NULL':
       // Non-null wrapper - unwrap and return the inner type
       if (typeRef.ofType) {
-        return typeRefToTsType(typeRef.ofType);
+        return typeRefToTsType(typeRef.ofType, tracker);
       }
       return 'unknown';
 
     case 'LIST':
       // List wrapper - wrap inner type in array
       if (typeRef.ofType) {
-        const innerType = typeRefToTsType(typeRef.ofType);
+        const innerType = typeRefToTsType(typeRef.ofType, tracker);
         return `${innerType}[]`;
       }
       return 'unknown[]';
@@ -52,14 +136,20 @@ export function typeRefToTsType(typeRef: CleanTypeRef): string {
       // Scalar type - map to TS type
       return scalarToTsType(typeRef.name ?? 'unknown');
 
-    case 'ENUM':
-      // Enum type - use the GraphQL enum name
-      return typeRef.name ?? 'string';
+    case 'ENUM': {
+      // Enum type - use the GraphQL enum name and track it
+      const typeName = typeRef.name ?? 'string';
+      tracker?.track(typeName);
+      return typeName;
+    }
 
     case 'OBJECT':
-    case 'INPUT_OBJECT':
-      // Object types - use the GraphQL type name
-      return typeRef.name ?? 'unknown';
+    case 'INPUT_OBJECT': {
+      // Object types - use the GraphQL type name and track it
+      const typeName = typeRef.name ?? 'unknown';
+      tracker?.track(typeName);
+      return typeName;
+    }
 
     default:
       return 'unknown';
@@ -69,9 +159,12 @@ export function typeRefToTsType(typeRef: CleanTypeRef): string {
 /**
  * Convert a CleanTypeRef to a nullable TypeScript type string
  * (for optional fields that can be null)
+ *
+ * @param typeRef - The GraphQL type reference
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function typeRefToNullableTsType(typeRef: CleanTypeRef): string {
-  const baseType = typeRefToTsType(typeRef);
+export function typeRefToNullableTsType(typeRef: CleanTypeRef, tracker?: TypeTracker): string {
+  const baseType = typeRefToTsType(typeRef, tracker);
 
   // If the outer type is NON_NULL, it's required
   if (typeRef.kind === 'NON_NULL') {
@@ -127,11 +220,14 @@ export function getBaseTypeKind(typeRef: CleanTypeRef): CleanTypeRef['kind'] {
 
 /**
  * Convert CleanArgument to InterfaceProperty for ts-morph
+ *
+ * @param arg - The GraphQL argument
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function argumentToInterfaceProperty(arg: CleanArgument): InterfaceProperty {
+export function argumentToInterfaceProperty(arg: CleanArgument, tracker?: TypeTracker): InterfaceProperty {
   return {
     name: arg.name,
-    type: typeRefToTsType(arg.type),
+    type: typeRefToTsType(arg.type, tracker),
     optional: !isTypeRequired(arg.type),
     docs: arg.description ? [arg.description] : undefined,
   };
@@ -139,11 +235,14 @@ export function argumentToInterfaceProperty(arg: CleanArgument): InterfaceProper
 
 /**
  * Convert CleanObjectField to InterfaceProperty for ts-morph
+ *
+ * @param field - The GraphQL object field
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function fieldToInterfaceProperty(field: CleanObjectField): InterfaceProperty {
+export function fieldToInterfaceProperty(field: CleanObjectField, tracker?: TypeTracker): InterfaceProperty {
   return {
     name: field.name,
-    type: typeRefToNullableTsType(field.type),
+    type: typeRefToNullableTsType(field.type, tracker),
     optional: false, // Fields are always present, just potentially null
     docs: field.description ? [field.description] : undefined,
   };
@@ -151,16 +250,22 @@ export function fieldToInterfaceProperty(field: CleanObjectField): InterfaceProp
 
 /**
  * Convert an array of CleanArguments to InterfaceProperty array
+ *
+ * @param args - The GraphQL arguments
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function argumentsToInterfaceProperties(args: CleanArgument[]): InterfaceProperty[] {
-  return args.map(argumentToInterfaceProperty);
+export function argumentsToInterfaceProperties(args: CleanArgument[], tracker?: TypeTracker): InterfaceProperty[] {
+  return args.map((arg) => argumentToInterfaceProperty(arg, tracker));
 }
 
 /**
  * Convert an array of CleanObjectFields to InterfaceProperty array
+ *
+ * @param fields - The GraphQL object fields
+ * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function fieldsToInterfaceProperties(fields: CleanObjectField[]): InterfaceProperty[] {
-  return fields.map(fieldToInterfaceProperty);
+export function fieldsToInterfaceProperties(fields: CleanObjectField[], tracker?: TypeTracker): InterfaceProperty[] {
+  return fields.map((field) => fieldToInterfaceProperty(field, tracker));
 }
 
 // ============================================================================

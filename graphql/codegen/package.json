@@ -41,9 +41,10 @@
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "example:orm": "tsx examples/test-orm.ts",
-    "example:rq": "tsx examples/test-rq.ts",
-    "example:schema": "tsx examples/download-schema.ts"
+    "example:codegen:sdk": "node dist/cli/index.js generate --endpoint http://api.localhost:3000/graphql --output examples/output/generated-sdk",
+    "example:codegen:orm": "node dist/cli/index.js generate-orm --endpoint http://api.localhost:3000/graphql --output examples/output/generated-orm",
+    "example:sdk": "tsx examples/react-query-sdk.ts",
+    "example:orm": "tsx examples/orm-sdk.ts"
   },
   "dependencies": {
     "ajv": "^8.17.1",
@@ -76,6 +77,7 @@
     "jest": "^29.7.0",
     "react": "^19.2.3",
     "ts-jest": "^29.2.5",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

@@ -54,6 +54,39 @@ export function getConfig(): GraphQLClientConfig {
   return globalConfig;
 }
 
+/**
+ * Set a single header value
+ * Useful for updating Authorization after login
+ *
+ * @example
+ * \`\`\`ts
+ * setHeader('Authorization', 'Bearer <new-token>');
+ * \`\`\`
+ */
+export function setHeader(key: string, value: string): void {
+  const config = getConfig();
+  globalConfig = {
+    ...config,
+    headers: { ...config.headers, [key]: value },
+  };
+}
+
+/**
+ * Merge multiple headers into the current configuration
+ *
+ * @example
+ * \`\`\`ts
+ * setHeaders({ Authorization: 'Bearer <token>', 'X-Custom': 'value' });
+ * \`\`\`
+ */
+export function setHeaders(headers: Record<string, string>): void {
+  const config = getConfig();
+  globalConfig = {
+    ...config,
+    headers: { ...config.headers, ...headers },
+  };
+}
+
 // ============================================================================
 // Error handling
 // ============================================================================

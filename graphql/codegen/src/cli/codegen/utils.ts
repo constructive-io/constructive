@@ -277,10 +277,12 @@ export function fieldTypeToTs(fieldType: CleanFieldType): string {
 
 /**
  * Get the PostGraphile filter type for a GraphQL scalar
+ * @param gqlType - The GraphQL type string (e.g., "String", "UUID")
+ * @param isArray - Whether this is an array type
  */
-export function getScalarFilterType(gqlType: string): string | null {
+export function getScalarFilterType(gqlType: string, isArray = false): string | null {
   const cleanType = gqlType.replace(/!/g, '');
-  return scalarToFilterType(cleanType);
+  return scalarToFilterType(cleanType, isArray);
 }
 
 // ============================================================================
@@ -308,12 +310,48 @@ export function getScalarFields(table: CleanTable): CleanField[] {
 }
 
 /**
- * Get primary key field names
+ * Primary key field information
+ */
+export interface PrimaryKeyField {
+  /** Field name */
+  name: string;
+  /** GraphQL type (e.g., "UUID", "Int", "String") */
+  gqlType: string;
+  /** TypeScript type (e.g., "string", "number") */
+  tsType: string;
+}
+
+/**
+ * Get primary key field information from table constraints
+ * Returns array to support composite primary keys
+ */
+export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
+  const pk = table.constraints?.primaryKey?.[0];
+  if (!pk || pk.fields.length === 0) {
+    // Fallback: try to find 'id' field in table fields
+    const idField = table.fields.find(f => f.name.toLowerCase() === 'id');
+    if (idField) {
+      return [{
+        name: idField.name,
+        gqlType: idField.type.gqlType,
+        tsType: fieldTypeToTs(idField.type),
+      }];
+    }
+    // Last resort: assume 'id' of type string (UUID)
+    return [{ name: 'id', gqlType: 'UUID', tsType: 'string' }];
+  }
+  return pk.fields.map((f) => ({
+    name: f.name,
+    gqlType: f.type.gqlType,
+    tsType: fieldTypeToTs(f.type),
+  }));
+}
+
+/**
+ * Get primary key field names (convenience wrapper)
  */
 export function getPrimaryKeyFields(table: CleanTable): string[] {
-  const pk = table.constraints?.primaryKey?.[0];
-  if (!pk) return ['id']; // Default assumption
-  return pk.fields.map((f) => f.name);
+  return getPrimaryKeyInfo(table).map((pk) => pk.name);
 }
 
 // ============================================================================

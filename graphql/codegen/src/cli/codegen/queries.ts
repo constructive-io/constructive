@@ -37,6 +37,7 @@ import {
   getOrderByTypeName,
   getScalarFields,
   getScalarFilterType,
+  getPrimaryKeyInfo,
   toScreamingSnake,
   ucFirst,
 } from './utils';
@@ -86,7 +87,7 @@ export function generateListQueryHook(
   // Collect all filter types used by this table's fields
   const filterTypesUsed = new Set<string>();
   for (const field of scalarFields) {
-    const filterType = getScalarFilterType(field.type.gqlType);
+    const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
     if (filterType) {
       filterTypesUsed.add(filterType);
     }
@@ -137,14 +138,16 @@ export function generateListQueryHook(
   // Generate filter interface
   const fieldFilters = scalarFields
     .map((field) => {
-      const filterType = getScalarFilterType(field.type.gqlType);
+      const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
       return filterType ? { fieldName: field.name, filterType } : null;
     })
     .filter((f): f is { fieldName: string; filterType: string } => f !== null);
 
-  sourceFile.addInterface(createFilterInterface(filterTypeName, fieldFilters));
+  // Note: Not exported to avoid conflicts with schema-types
+  sourceFile.addInterface(createFilterInterface(filterTypeName, fieldFilters, { isExported: false }));
 
   // Generate OrderBy type
+  // Note: Not exported to avoid conflicts with schema-types
   const orderByValues = [
     ...scalarFields.flatMap((f) => [
       `${toScreamingSnake(f.name)}_ASC`,
@@ -155,7 +158,7 @@ export function generateListQueryHook(
     'PRIMARY_KEY_DESC',
   ];
   sourceFile.addTypeAlias(
-    createTypeAlias(orderByTypeName, createUnionType(orderByValues))
+    createTypeAlias(orderByTypeName, createUnionType(orderByValues), { isExported: false })
   );
 
   // Variables interface
@@ -364,6 +367,14 @@ export function generateSingleQueryHook(
   const hookName = getSingleQueryHookName(table);
   const queryName = getSingleRowQueryName(table);
 
+  // Get primary key info dynamically from table constraints
+  const pkFields = getPrimaryKeyInfo(table);
+  // For simplicity, use first PK field (most common case)
+  // Composite PKs would need more complex handling
+  const pkField = pkFields[0];
+  const pkName = pkField.name;
+  const pkTsType = pkField.tsType;
+
   // Generate GraphQL document via AST
   const queryAST = buildSingleQueryAST({ table });
   const queryDocument = printGraphQL(queryAST);
@@ -418,10 +429,10 @@ export function generateSingleQueryHook(
   sourceFile.addStatements('// Types');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Variables interface
+  // Variables interface - use dynamic PK field name and type
   sourceFile.addInterface(
     createInterface(`${ucFirst(singularName)}QueryVariables`, [
-      { name: 'id', type: 'string' },
+      { name: pkName, type: pkTsType },
     ])
   );
 
@@ -437,12 +448,12 @@ export function generateSingleQueryHook(
   sourceFile.addStatements('// Query Key');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Query key factory
+  // Query key factory - use dynamic PK field name and type
   sourceFile.addVariableStatement(
     createConst(
       `${queryName}QueryKey`,
-      `(id: string) =>
-  ['${typeName.toLowerCase()}', 'detail', id] as const`
+      `(${pkName}: ${pkTsType}) =>
+  ['${typeName.toLowerCase()}', 'detail', ${pkName}] as const`
     )
   );
 
@@ -452,12 +463,12 @@ export function generateSingleQueryHook(
     sourceFile.addStatements('// Hook');
     sourceFile.addStatements('// ============================================================================\n');
 
-    // Hook function
+    // Hook function - use dynamic PK field name and type
     sourceFile.addFunction({
       name: hookName,
       isExported: true,
       parameters: [
-        { name: 'id', type: 'string' },
+        { name: pkName, type: pkTsType },
         {
           name: 'options',
           type: `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
@@ -465,24 +476,24 @@ export function generateSingleQueryHook(
         },
       ],
       statements: `return useQuery({
-    queryKey: ${queryName}QueryKey(id),
+    queryKey: ${queryName}QueryKey(${pkName}),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
-      { id }
+      { ${pkName} }
     ),
-    enabled: !!id && (options?.enabled !== false),
+    enabled: !!${pkName} && (options?.enabled !== false),
     ...options,
   });`,
       docs: [
         {
-          description: `Query hook for fetching a single ${typeName} by ID
+          description: `Query hook for fetching a single ${typeName} by primary key
 
 @example
 \`\`\`tsx
-const { data, isLoading } = ${hookName}('uuid-here');
+const { data, isLoading } = ${hookName}(${pkTsType === 'string' ? "'value-here'" : '123'});
 
 if (data?.${queryName}) {
-  console.log(data.${queryName}.id);
+  console.log(data.${queryName}.${pkName});
 }
 \`\`\``,
         },
@@ -495,13 +506,13 @@ if (data?.${queryName}) {
   sourceFile.addStatements('// Standalone Functions (non-React)');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Fetch function (standalone, no React)
+  // Fetch function (standalone, no React) - use dynamic PK
   sourceFile.addFunction({
     name: `fetch${ucFirst(singularName)}Query`,
     isExported: true,
     isAsync: true,
     parameters: [
-      { name: 'id', type: 'string' },
+      { name: pkName, type: pkTsType },
       {
         name: 'options',
         type: 'ExecuteOptions',
@@ -511,22 +522,22 @@ if (data?.${queryName}) {
     returnType: `Promise<${ucFirst(singularName)}QueryResult>`,
     statements: `return execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
     ${queryName}QueryDocument,
-    { id },
+    { ${pkName} },
     options
   );`,
     docs: [
       {
-        description: `Fetch a single ${typeName} by ID without React hooks
+        description: `Fetch a single ${typeName} by primary key without React hooks
 
 @example
 \`\`\`ts
-const data = await fetch${ucFirst(singularName)}Query('uuid-here');
+const data = await fetch${ucFirst(singularName)}Query(${pkTsType === 'string' ? "'value-here'" : '123'});
 \`\`\``,
       },
     ],
   });
 
-  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled
+  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled, use dynamic PK
   if (reactQueryEnabled) {
     sourceFile.addFunction({
       name: `prefetch${ucFirst(singularName)}Query`,
@@ -534,7 +545,7 @@ const data = await fetch${ucFirst(singularName)}Query('uuid-here');
       isAsync: true,
       parameters: [
         { name: 'queryClient', type: 'QueryClient' },
-        { name: 'id', type: 'string' },
+        { name: pkName, type: pkTsType },
         {
           name: 'options',
           type: 'ExecuteOptions',
@@ -543,10 +554,10 @@ const data = await fetch${ucFirst(singularName)}Query('uuid-here');
       ],
       returnType: 'Promise<void>',
       statements: `await queryClient.prefetchQuery({
-    queryKey: ${queryName}QueryKey(id),
+    queryKey: ${queryName}QueryKey(${pkName}),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
-      { id },
+      { ${pkName} },
       options
     ),
   });`,
@@ -556,7 +567,7 @@ const data = await fetch${ucFirst(singularName)}Query('uuid-here');
 
 @example
 \`\`\`ts
-await prefetch${ucFirst(singularName)}Query(queryClient, 'uuid-here');
+await prefetch${ucFirst(singularName)}Query(queryClient, ${pkTsType === 'string' ? "'value-here'" : '123'});
 \`\`\``,
         },
       ],
