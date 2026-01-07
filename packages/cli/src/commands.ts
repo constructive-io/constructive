@@ -6,6 +6,7 @@ import { ParsedArgs } from 'minimist';
 import codegen from './commands/codegen';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
+import jobs from './commands/jobs';
 import server from './commands/server';
 import { usageText } from './utils';
 
@@ -14,7 +15,8 @@ const createCommandMap = (): Record<string, Function> => {
     server,
     explorer,
     'get-graphql-schema': getGraphqlSchema,
-    codegen
+    codegen,
+    jobs
   };
 };
 

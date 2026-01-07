@@ -263,6 +263,6 @@ export default {
 
       res.status(200).json({ message: error.message });
     });
-    app.listen(port, cb);
+    return app.listen(port, cb);
   }
 };
