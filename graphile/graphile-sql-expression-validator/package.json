@@ -48,7 +48,7 @@
   "dependencies": {
     "graphile-build": "^4.14.1",
     "graphql": "15.10.1",
-    "pgsql-deparser": "^17.17.0",
-    "pgsql-parser": "^17.9.9"
+    "pgsql-deparser": "^17.17.2",
+    "pgsql-parser": "^17.9.11"
   }
 }

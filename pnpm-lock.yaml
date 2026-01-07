@@ -186,8 +186,8 @@ importers:
   graphile/graphile-many-to-many:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -270,8 +270,8 @@ importers:
   graphile/graphile-plugin-connection-filter:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -308,8 +308,8 @@ importers:
   graphile/graphile-plugin-connection-filter-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -381,8 +381,8 @@ importers:
   graphile/graphile-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -595,11 +595,11 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -1245,8 +1245,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/server/dist
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1260,11 +1260,11 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1288,8 +1288,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1339,20 +1339,20 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
       '@pgsql/utils':
-        specifier: ^17.8.9
-        version: 17.8.9
+        specifier: ^17.8.11
+        version: 17.8.11
       csv-parser:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1361,8 +1361,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     publishDirectory: dist
 
   packages/orm:
@@ -1435,8 +1435,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1450,17 +1450,17 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       appstash:
-        specifier: ^0.2.7
-        version: 0.2.7
+        specifier: ^0.2.8
+        version: 0.2.8
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1474,8 +1474,8 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       semver:
         specifier: ^7.6.2
         version: 7.7.3
@@ -1487,8 +1487,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1539,8 +1539,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1560,11 +1560,11 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
       yanse:
         specifier: ^0.1.11
         version: 0.1.11
@@ -1579,8 +1579,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       makage:
         specifier: ^0.1.10
         version: 0.1.10
@@ -1687,8 +1687,8 @@ importers:
         specifier: ^1.30.4
         version: 1.30.4
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -2668,16 +2668,16 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/test@1.2.3':
-    resolution: {integrity: sha512-un4n4VhvbRz7gqw+bpaaJdALtmnP+3fsljdZFItyHocr6SGug5R9SgyIxtIaC2CHCcZJjHIDT22hW32weSci0g==}
+  '@inquirerer/test@1.2.5':
+    resolution: {integrity: sha512-KbYVzo/hquctlPuA2uRb0fPbMP6SWpmU8VlLQQuUYoBsAYmQ32QzlEZzbYqSM/4fjr6TqCkqsLrfpNiTnK3+cg==}
     peerDependencies:
       jest: '>=29.0.0'
     peerDependenciesMeta:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.1.2':
-    resolution: {integrity: sha512-KjBp1sLzWBckHv1GbuWrpOyzXdRM8POkv6gNVgCWcshQPYgrWJs5tdH1zTPNGwwGOR5BpFHmnBbs7UJt9j4VZA==}
+  '@inquirerer/utils@3.1.3':
+    resolution: {integrity: sha512-aEw6nBfbVVv77pwNT0LJNHZiEwN/2rE8jiXLzeY+93cHgt4rPs0QY2A+/CPq6ryzAfXGnI5C79o6HbwZcODZMA==}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -3098,8 +3098,8 @@ packages:
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
 
-  '@pgsql/utils@17.8.9':
-    resolution: {integrity: sha512-CfSMMJygrUDBo/6Kj9Dp03IbZuGHM8M4RcMNHDpSquJZvGMH/DEr3fLFlLp05ikYInzgzbPn4ysOdajO0HckiQ==}
+  '@pgsql/utils@17.8.11':
+    resolution: {integrity: sha512-gcaS9ATilQyGSIq8596tq+6rcb7TX54sdjOvOzGa9lu9NjqkptEKLbBae5UTjfkFGfH50duDFD1EpFogMnZToA==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3911,8 +3911,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  appstash@0.2.7:
-    resolution: {integrity: sha512-EdJDs164q4OuKOBo/mdN6srwJdCy5e2NxmPKUyTBI8Z6aEAkX3ViSRFoAA78A4P0azysSMk8wqafsuM0R6weww==}
+  appstash@0.2.8:
+    resolution: {integrity: sha512-SLeV3iy7ygE7TNiU6AgDMQVhS6xVfO4ps3NDMUK3UcvZKOddykHuEtSuJr6wKzTu9yRnEeK/yisgztSARt/YJA==}
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -5140,8 +5140,8 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  find-and-require-package-json@0.8.5:
-    resolution: {integrity: sha512-I15lQmpt0rxbmDpIgdn1IEWJU/smOLuKrPZFQMnktnz6kn25XgjGNn1ouKLFGsXuDW1Ssd47YPdSPwhSIGuvnA==}
+  find-and-require-package-json@0.8.6:
+    resolution: {integrity: sha512-N+funttvcGC9h7JxCs089fAyNhEpKzFnP0nUYOS+V2RWvI40rtVhANPozc72pJl9lMzqoPFTimlfqZg6zZGPRQ==}
 
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
@@ -5243,8 +5243,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.2.1:
-    resolution: {integrity: sha512-7+6g0ib9katy7OFUeaPXKiBPFZZSmeDdc3BNUvBvgCASCrseLU9r7a4sBo6319zbX81IBniM1EdIRsWzYKz9Qg==}
+  genomic@5.2.3:
+    resolution: {integrity: sha512-h93BqFC0gZgnInrAhozkYFV1UT1Pf/ffU8kh6JgF8Cqm0ypY8Iol5AvINVsgGXcQtcA00xcBOlJ5xc4tOXXZBA==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5617,8 +5617,8 @@ packages:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
 
-  inquirerer@4.2.1:
-    resolution: {integrity: sha512-DlJzCWrs/GjuUUifhH1Bu+gjOY7DAWlODqESNBb8a9CE1qeiUDqdPrf9qQGy82clMOXDDqQlB3CLbYSKw3z/lA==}
+  inquirerer@4.3.1:
+    resolution: {integrity: sha512-CKbqcGXT1zdFaJrkTLuTxdEe0yplUSmm1JbmJDDm2v6LuRaS34BE85rmnX0v8HQrli98Y4iFP99f6V0ny3RkDg==}
 
   ip-address@10.1.0:
     resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
@@ -7037,11 +7037,11 @@ packages:
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
-  pgsql-deparser@17.17.0:
-    resolution: {integrity: sha512-mnEzQGEEWF52KfN8dn8gzK+8zbkYt0K+t+4Ka1sklrAczzIqWyWoFO1HWdBdnkociQxMJtkEbKg7wYNGcwVi4Q==}
+  pgsql-deparser@17.17.2:
+    resolution: {integrity: sha512-FCjqKY3Sdmce3VUd3CxCXF0kqaZ0s4a6yIMT5UJ9vETh0cF54A8Tpqjn0qBKaPUD8xqTKeLdS+SfiwjAC64wrA==}
 
-  pgsql-parser@17.9.9:
-    resolution: {integrity: sha512-GhX+VaQYCgi+PSzCNoxbm3dssJYSMkkceDhpgVCyeIuniBC2a5T4igjdz8qOKkZi+P4wocyfjE1/KINnrQZTrw==}
+  pgsql-parser@17.9.11:
+    resolution: {integrity: sha512-Bqp9uLvJK0Qht9PXzI6eC/Fn+lFRL+2eMvXss4D4qt7lxPLIHS8FMKYOHUQNTI3m6ylExSOdNXhx/DL5UGm3xg==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -9083,17 +9083,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  '@inquirerer/test@1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
+  '@inquirerer/test@1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
     dependencies:
       clean-ansi: 0.1.8
-      inquirerer: 4.2.1
+      inquirerer: 4.3.1
     optionalDependencies:
       jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
 
-  '@inquirerer/utils@3.1.2':
+  '@inquirerer/utils@3.1.3':
     dependencies:
-      appstash: 0.2.7
-      find-and-require-package-json: 0.8.5
+      appstash: 0.2.8
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
 
   '@isaacs/balanced-match@4.0.1': {}
@@ -9894,7 +9894,7 @@ snapshots:
 
   '@pgsql/types@17.6.2': {}
 
-  '@pgsql/utils@17.8.9':
+  '@pgsql/utils@17.8.11':
     dependencies:
       '@pgsql/types': 17.6.2
       nested-obj: 0.1.5
@@ -10893,7 +10893,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  appstash@0.2.7: {}
+  appstash@0.2.8: {}
 
   aproba@2.0.0: {}
 
@@ -12190,7 +12190,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-and-require-package-json@0.8.5: {}
+  find-and-require-package-json@0.8.6: {}
 
   find-up@2.1.0:
     dependencies:
@@ -12287,10 +12287,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.2.1:
+  genomic@5.2.3:
     dependencies:
-      appstash: 0.2.7
-      inquirerer: 4.2.1
+      appstash: 0.2.8
+      inquirerer: 4.3.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -12752,11 +12752,10 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@4.2.1:
+  inquirerer@4.3.1:
     dependencies:
       deepmerge: 4.3.1
-      find-and-require-package-json: 0.8.5
-      js-yaml: 4.1.1
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
       yanse: 0.1.11
 
@@ -14924,15 +14923,15 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pgsql-deparser@17.17.0:
+  pgsql-deparser@17.17.2:
     dependencies:
       '@pgsql/types': 17.6.2
 
-  pgsql-parser@17.9.9:
+  pgsql-parser@17.9.11:
     dependencies:
       '@pgsql/types': 17.6.2
       libpg-query: 17.7.3
-      pgsql-deparser: 17.17.0
+      pgsql-deparser: 17.17.2
 
   picocolors@1.1.1: {}
 
