@@ -51,20 +51,16 @@
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
     "@inquirerer/utils": "^3.1.3",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-<<<<<<< Updated upstream
-    "find-and-require-package-json": "^0.8.6",
-    "inquirerer": "^4.3.1",
-=======
     "express": "^5.2.1",
     "graphile-settings": "workspace:^",
-    "find-and-require-package-json": "^0.8.5",
-    "inquirerer": "^4.2.0",
->>>>>>> Stashed changes
+    "find-and-require-package-json": "^0.8.6",
+    "inquirerer": "^4.3.1",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",

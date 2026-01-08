@@ -5,6 +5,7 @@ import { postgraphile } from 'postgraphile'
 import { getGraphileSettings } from 'graphile-settings'
 import { getPgPool } from 'pg-cache'
 import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
+import { getEnvOptions } from '@constructive-io/graphql-env'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -38,7 +39,6 @@ export default async (
     process.exit(0)
   }
 
-  const cwd = (argv.cwd as string) || process.cwd()
   const endpointArg = (argv.endpoint as string) || ''
   const outDir = (argv.out as string) || 'graphql/codegen/dist'
   const auth = (argv.auth as string) || ''
@@ -47,7 +47,7 @@ export default async (
   const verbose = !!(argv.verbose || argv.v)
 
   const database = (argv.database as string) || 'constructive_db'
-  const schemasArg = (argv.schemas as string) || 'public'
+  const schemasArg = (argv.schemas as string) || getEnvOptions().api.metaSchemas.join(',')
   const pgHost = (argv.pgHost as string) || process.env.PGHOST || ''
   const pgPort = argv.pgPort ? String(argv.pgPort) : (process.env.PGPORT || '')
   const pgUser = (argv.pgUser as string) || process.env.PGUSER || ''
@@ -79,7 +79,7 @@ export default async (
     return
   }
 
-  const schemas = schemasArg.split(',').map(s => s.trim()).filter(Boolean)
+  const schemas = schemasArg.split(',').map((s: string) => s.trim()).filter(Boolean)
   const startTempServer = async () => {
     const settings = getGraphileSettings({ graphile: { schema: schemas } })
     settings.graphiql = false
