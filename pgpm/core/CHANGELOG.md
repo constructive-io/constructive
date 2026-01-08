@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.1...@pgpmjs/core@4.13.2) (2026-01-08)
+
+### Bug Fixes
+
+- **pgpm/core:** dynamically query table columns for export instead of hardcoded config ([e0c59b2](https://github.com/constructive-io/constructive/commit/e0c59b20130a9e6d4a8a5ebd0dff8fea703ed60f))
+
 ## [4.13.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.0...@pgpmjs/core@4.13.1) (2026-01-08)
 
 **Note:** Version bump only for package @pgpmjs/core
