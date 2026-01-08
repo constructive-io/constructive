@@ -334,12 +334,7 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName
     });
 
-    // Apply replacer to each schema type's SQL
-    const metaschemaPublicSql = metaReplacer.replacer(metaResult.metaschema_public);
-    const servicesPublicSql = metaReplacer.replacer(metaResult.services_public);
-    const metaschemaModulesPublicSql = metaReplacer.replacer(metaResult.metaschema_modules_public);
-
-    // Create separate files for each schema type
+    // Create separate files for each table type
     const metaPackage: PgpmRow[] = [];
 
     // Common header for all meta files
@@ -360,58 +355,95 @@ DO $LQLMIGRATION$
 $LQLMIGRATION$;`;
 
     const commonFooter = `
--- TODO: Research needed - These UPDATE statements may be a security leak.
--- They appear to rebind exported metadata to the target database after import,
--- but exposing dbname in services_public tables could leak internal database names.
--- Consider removing entirely or gating behind an explicit flag.
--- UPDATE services_public.apis
---       SET dbname = current_database() WHERE TRUE;
-
--- UPDATE services_public.sites
---       SET dbname = current_database() WHERE TRUE;
-
 SET session_replication_role TO DEFAULT;`;
 
-    // Add metaschema_public file if there's content
-    if (metaschemaPublicSql) {
-      metaPackage.push({
-        deps: [],
-        deploy: 'migrate/metaschema_public',
-        content: `${commonHeader}
+    // Define table ordering with dependencies
+    // Tables that depend on 'database' being inserted first
+    const tableOrder = [
+      'database',
+      'database_extension',
+      'schema',
+      'table',
+      'field',
+      'policy',
+      'index',
+      'trigger',
+      'trigger_function',
+      'rls_function',
+      'limit_function',
+      'procedure',
+      'foreign_key_constraint',
+      'primary_key_constraint',
+      'unique_constraint',
+      'check_constraint',
+      'full_text_search',
+      'schema_grant',
+      'table_grant',
+      'domains',
+      'sites',
+      'apis',
+      'apps',
+      'site_modules',
+      'site_themes',
+      'site_metadata',
+      'api_modules',
+      'api_extensions',
+      'api_schemas',
+      'rls_module',
+      'user_auth_module',
+      'memberships_module',
+      'permissions_module',
+      'limits_module',
+      'levels_module',
+      'users_module',
+      'hierarchy_module',
+      'membership_types_module',
+      'invites_module',
+      'emails_module',
+      'tokens_module',
+      'secrets_module',
+      'profiles_module',
+      'encrypted_secrets_module',
+      'connected_accounts_module',
+      'phone_numbers_module',
+      'crypto_addresses_module',
+      'crypto_auth_module',
+      'field_module',
+      'uuid_module',
+      'default_ids_module',
+      'denormalized_table_field'
+    ];
 
-${metaschemaPublicSql}
+    // Track which tables have content for dependency resolution
+    const tablesWithContent: string[] = [];
+
+    // Create a file for each table type that has content
+    for (const tableName of tableOrder) {
+      const tableSql = metaResult[tableName];
+      if (tableSql) {
+        const replacedSql = metaReplacer.replacer(tableSql);
+        
+        // Determine dependencies - each table depends on the previous tables that have content
+        // This ensures proper ordering during deployment
+        const deps = tableName === 'database' 
+          ? [] 
+          : tablesWithContent.length > 0 
+            ? [`migrate/${tablesWithContent[tablesWithContent.length - 1]}`]
+            : [];
+
+        metaPackage.push({
+          deps,
+          deploy: `migrate/${tableName}`,
+          content: `${commonHeader}
+
+${replacedSql}
 
 ${commonFooter}
 `
-      });
-    }
+        });
 
-    // Add services_public file if there's content (depends on metaschema_public)
-    if (servicesPublicSql) {
-      metaPackage.push({
-        deps: metaschemaPublicSql ? ['migrate/metaschema_public'] : [],
-        deploy: 'migrate/services_public',
-        content: `${commonHeader}
-
-${servicesPublicSql}
-
-${commonFooter}
-`
-      });
-    }
-
-    // Add metaschema_modules_public file if there's content (depends on metaschema_public)
-    if (metaschemaModulesPublicSql) {
-      metaPackage.push({
-        deps: metaschemaPublicSql ? ['migrate/metaschema_public'] : [],
-        deploy: 'migrate/metaschema_modules_public',
-        content: `${commonHeader}
-
-${metaschemaModulesPublicSql}
-
-${commonFooter}
-`
-      });
+        tablesWithContent.push(tableName);
+      }
     }
 
     opts.replacer = metaReplacer.replacer;
