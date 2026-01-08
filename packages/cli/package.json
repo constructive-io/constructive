@@ -38,6 +38,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20.12.7",
+    "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "@types/shelljs": "^0.8.16",
     "glob": "^13.0.0",
@@ -55,13 +56,21 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
+<<<<<<< Updated upstream
     "find-and-require-package-json": "^0.8.6",
     "inquirerer": "^4.3.1",
+=======
+    "express": "^5.2.1",
+    "graphile-settings": "workspace:^",
+    "find-and-require-package-json": "^0.8.5",
+    "inquirerer": "^4.2.0",
+>>>>>>> Stashed changes
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgpm": "workspace:^",
+    "postgraphile": "^4.14.1",
     "shelljs": "^0.10.0",
     "yanse": "^0.1.11"
   },

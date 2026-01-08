@@ -14,7 +14,7 @@ const createCommandMap = (): Record<string, Function> => {
     server,
     explorer,
     'get-graphql-schema': getGraphqlSchema,
-    codegen
+    codegen,
   };
 };
 

@@ -1258,9 +1258,20 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
       find-and-require-package-json:
+<<<<<<< Updated upstream
         specifier: ^0.8.6
         version: 0.8.6
+=======
+        specifier: ^0.8.5
+        version: 0.8.5
+      graphile-settings:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-settings/dist
+>>>>>>> Stashed changes
       inquirerer:
         specifier: ^4.3.1
         version: 4.3.1
@@ -1279,6 +1290,9 @@ importers:
       pgpm:
         specifier: workspace:^
         version: link:../../pgpm/cli/dist
+      postgraphile:
+        specifier: ^4.14.1
+        version: 4.14.1
       shelljs:
         specifier: ^0.10.0
         version: 0.10.0
@@ -1287,8 +1301,16 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
+<<<<<<< Updated upstream
         specifier: ^1.2.5
         version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+=======
+        specifier: ^1.2.3
+        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
+>>>>>>> Stashed changes
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -7823,11 +7845,16 @@ packages:
       graphql: '>=0.11 <=16'
 
   graphql@15.10.1:
+<<<<<<< Updated upstream
     resolution:
       {
         integrity: sha512-BL/Xd/T9baO6NFzoMpiMD7YUZ62R6viR5tp/MULVEnbYJXZA//kRNW7J0j1w/wXArgL0sCxhDfK5dczSKn3+cg==,
       }
     engines: { node: '>= 10.x' }
+=======
+    resolution: {integrity: sha512-BL/Xd/T9baO6NFzoMpiMD7YUZ62R6viR5tp/MULVEnbYJXZA//kRNW7J0j1w/wXArgL0sCxhDfK5dczSKn3+cg==}
+    engines: {node: '>= 10.x'}
+>>>>>>> Stashed changes
 
   handlebars@4.7.8:
     resolution:
