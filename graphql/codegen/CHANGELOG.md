@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.1...@constructive-io/graphql-codegen@2.23.2) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.23.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.0...@constructive-io/graphql-codegen@2.23.1) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.1...@constructive-io/graphql-codegen@2.23.0) (2026-01-07)
+
+### Features
+
+- codegen source modes ([922f943](https://github.com/constructive-io/constructive/commit/922f943d6bd45c5a6e0ea8192101b310241a7b36))
+
+## [2.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.0...@constructive-io/graphql-codegen@2.22.1) (2026-01-07)
+
+### Bug Fixes
+
+- upgrade inflection to v3.0.2 and update imports to use named exports ([4e6bf94](https://github.com/constructive-io/constructive/commit/4e6bf94749437bb0594e83dfe30bd34a2d69bb97)), closes [#571](https://github.com/constructive-io/constructive/issues/571)
+
+# [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.21.0...@constructive-io/graphql-codegen@2.22.0) (2026-01-07)
+
+### Bug Fixes
+
+- align @constructive-io/graphql-codegen to graphql@15.10.1 ([009a31b](https://github.com/constructive-io/constructive/commit/009a31ba76aa91c01f9df3e609d3eb3168588b97))
+- headers set ([795be0f](https://github.com/constructive-io/constructive/commit/795be0f444b2f3da00de76c83b3fb79690f2d45a))
+
+### Features
+
+- improve the codegen logic to be more robust and fixes bugs ([e407e1d](https://github.com/constructive-io/constructive/commit/e407e1da6a16252c1b1a9962cc6c8180080340e4))
+
 # [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.1...@constructive-io/graphql-codegen@2.21.0) (2026-01-07)
 
 ### Features

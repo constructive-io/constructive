@@ -186,8 +186,8 @@ importers:
   graphile/graphile-many-to-many:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -270,8 +270,8 @@ importers:
   graphile/graphile-plugin-connection-filter:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -308,8 +308,8 @@ importers:
   graphile/graphile-plugin-connection-filter-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -381,8 +381,8 @@ importers:
   graphile/graphile-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -568,6 +568,9 @@ importers:
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
+      inflekt:
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       graphile-test:
         specifier: workspace:^
@@ -592,11 +595,11 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -705,9 +708,9 @@ importers:
       graphql:
         specifier: 15.10.1
         version: 15.10.1
-      inflection:
-        specifier: ^3.0.2
-        version: 3.0.2
+      inflekt:
+        specifier: ^0.2.0
+        version: 0.2.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -721,9 +724,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.90.16
         version: 5.90.16(react@19.2.3)
-      '@types/inflection':
-        specifier: ^1.13.2
-        version: 1.13.2
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
@@ -742,6 +742,9 @@ importers:
       ts-jest:
         specifier: ^29.2.5
         version: 29.4.6(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@29.7.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))(typescript@5.9.3)
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -855,8 +858,8 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       inflection:
-        specifier: 1.12.0
-        version: 1.12.0
+        specifier: ^3.0.2
+        version: 3.0.2
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -1245,8 +1248,8 @@ importers:
         specifier: workspace:^
         version: link:../server/dist
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1260,11 +1263,11 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1288,8 +1291,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1339,20 +1342,20 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
       '@pgsql/utils':
-        specifier: ^17.8.9
-        version: 17.8.9
+        specifier: ^17.8.11
+        version: 17.8.11
       csv-parser:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1361,8 +1364,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     publishDirectory: dist
 
   packages/orm:
@@ -1485,8 +1488,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1500,17 +1503,17 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       appstash:
-        specifier: ^0.2.7
-        version: 0.2.7
+        specifier: ^0.2.8
+        version: 0.2.8
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1523,6 +1526,9 @@ importers:
       pg-env:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
+      pgsql-deparser:
+        specifier: ^17.17.2
+        version: 17.17.2
       semver:
         specifier: ^7.6.2
         version: 7.7.3
@@ -1534,8 +1540,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1586,8 +1592,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1607,11 +1613,11 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
       yanse:
         specifier: ^0.1.11
         version: 0.1.11
@@ -1626,8 +1632,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       makage:
         specifier: ^0.1.10
         version: 0.1.10
@@ -1734,8 +1740,8 @@ importers:
         specifier: ^1.30.4
         version: 1.30.4
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -2477,6 +2483,162 @@ packages:
   '@emotion/unitless@0.7.5':
     resolution: {integrity: sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==}
 
+  '@esbuild/aix-ppc64@0.27.2':
+    resolution: {integrity: sha512-GZMB+a0mOMZs4MpDbj8RJp4cw+w1WV5NYD6xzgvzUJ5Ek2jerwfO2eADyI6ExDSUED+1X8aMbegahsJi+8mgpw==}
+    engines: {node: '>=18'}
+    cpu: [ppc64]
+    os: [aix]
+
+  '@esbuild/android-arm64@0.27.2':
+    resolution: {integrity: sha512-pvz8ZZ7ot/RBphf8fv60ljmaoydPU12VuXHImtAs0XhLLw+EXBi2BLe3OYSBslR4rryHvweW5gmkKFwTiFy6KA==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [android]
+
+  '@esbuild/android-arm@0.27.2':
+    resolution: {integrity: sha512-DVNI8jlPa7Ujbr1yjU2PfUSRtAUZPG9I1RwW4F4xFB1Imiu2on0ADiI/c3td+KmDtVKNbi+nffGDQMfcIMkwIA==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [android]
+
+  '@esbuild/android-x64@0.27.2':
+    resolution: {integrity: sha512-z8Ank4Byh4TJJOh4wpz8g2vDy75zFL0TlZlkUkEwYXuPSgX8yzep596n6mT7905kA9uHZsf/o2OJZubl2l3M7A==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [android]
+
+  '@esbuild/darwin-arm64@0.27.2':
+    resolution: {integrity: sha512-davCD2Zc80nzDVRwXTcQP/28fiJbcOwvdolL0sOiOsbwBa72kegmVU0Wrh1MYrbuCL98Omp5dVhQFWRKR2ZAlg==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@esbuild/darwin-x64@0.27.2':
+    resolution: {integrity: sha512-ZxtijOmlQCBWGwbVmwOF/UCzuGIbUkqB1faQRf5akQmxRJ1ujusWsb3CVfk/9iZKr2L5SMU5wPBi1UWbvL+VQA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@esbuild/freebsd-arm64@0.27.2':
+    resolution: {integrity: sha512-lS/9CN+rgqQ9czogxlMcBMGd+l8Q3Nj1MFQwBZJyoEKI50XGxwuzznYdwcav6lpOGv5BqaZXqvBSiB/kJ5op+g==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [freebsd]
+
+  '@esbuild/freebsd-x64@0.27.2':
+    resolution: {integrity: sha512-tAfqtNYb4YgPnJlEFu4c212HYjQWSO/w/h/lQaBK7RbwGIkBOuNKQI9tqWzx7Wtp7bTPaGC6MJvWI608P3wXYA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@esbuild/linux-arm64@0.27.2':
+    resolution: {integrity: sha512-hYxN8pr66NsCCiRFkHUAsxylNOcAQaxSSkHMMjcpx0si13t1LHFphxJZUiGwojB1a/Hd5OiPIqDdXONia6bhTw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@esbuild/linux-arm@0.27.2':
+    resolution: {integrity: sha512-vWfq4GaIMP9AIe4yj1ZUW18RDhx6EPQKjwe7n8BbIecFtCQG4CfHGaHuh7fdfq+y3LIA2vGS/o9ZBGVxIDi9hw==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [linux]
+
+  '@esbuild/linux-ia32@0.27.2':
+    resolution: {integrity: sha512-MJt5BRRSScPDwG2hLelYhAAKh9imjHK5+NE/tvnRLbIqUWa+0E9N4WNMjmp/kXXPHZGqPLxggwVhz7QP8CTR8w==}
+    engines: {node: '>=18'}
+    cpu: [ia32]
+    os: [linux]
+
+  '@esbuild/linux-loong64@0.27.2':
+    resolution: {integrity: sha512-lugyF1atnAT463aO6KPshVCJK5NgRnU4yb3FUumyVz+cGvZbontBgzeGFO1nF+dPueHD367a2ZXe1NtUkAjOtg==}
+    engines: {node: '>=18'}
+    cpu: [loong64]
+    os: [linux]
+
+  '@esbuild/linux-mips64el@0.27.2':
+    resolution: {integrity: sha512-nlP2I6ArEBewvJ2gjrrkESEZkB5mIoaTswuqNFRv/WYd+ATtUpe9Y09RnJvgvdag7he0OWgEZWhviS1OTOKixw==}
+    engines: {node: '>=18'}
+    cpu: [mips64el]
+    os: [linux]
+
+  '@esbuild/linux-ppc64@0.27.2':
+    resolution: {integrity: sha512-C92gnpey7tUQONqg1n6dKVbx3vphKtTHJaNG2Ok9lGwbZil6DrfyecMsp9CrmXGQJmZ7iiVXvvZH6Ml5hL6XdQ==}
+    engines: {node: '>=18'}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@esbuild/linux-riscv64@0.27.2':
+    resolution: {integrity: sha512-B5BOmojNtUyN8AXlK0QJyvjEZkWwy/FKvakkTDCziX95AowLZKR6aCDhG7LeF7uMCXEJqwa8Bejz5LTPYm8AvA==}
+    engines: {node: '>=18'}
+    cpu: [riscv64]
+    os: [linux]
+
+  '@esbuild/linux-s390x@0.27.2':
+    resolution: {integrity: sha512-p4bm9+wsPwup5Z8f4EpfN63qNagQ47Ua2znaqGH6bqLlmJ4bx97Y9JdqxgGZ6Y8xVTixUnEkoKSHcpRlDnNr5w==}
+    engines: {node: '>=18'}
+    cpu: [s390x]
+    os: [linux]
+
+  '@esbuild/linux-x64@0.27.2':
+    resolution: {integrity: sha512-uwp2Tip5aPmH+NRUwTcfLb+W32WXjpFejTIOWZFw/v7/KnpCDKG66u4DLcurQpiYTiYwQ9B7KOeMJvLCu/OvbA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux]
+
+  '@esbuild/netbsd-arm64@0.27.2':
+    resolution: {integrity: sha512-Kj6DiBlwXrPsCRDeRvGAUb/LNrBASrfqAIok+xB0LxK8CHqxZ037viF13ugfsIpePH93mX7xfJp97cyDuTZ3cw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [netbsd]
+
+  '@esbuild/netbsd-x64@0.27.2':
+    resolution: {integrity: sha512-HwGDZ0VLVBY3Y+Nw0JexZy9o/nUAWq9MlV7cahpaXKW6TOzfVno3y3/M8Ga8u8Yr7GldLOov27xiCnqRZf0tCA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [netbsd]
+
+  '@esbuild/openbsd-arm64@0.27.2':
+    resolution: {integrity: sha512-DNIHH2BPQ5551A7oSHD0CKbwIA/Ox7+78/AWkbS5QoRzaqlev2uFayfSxq68EkonB+IKjiuxBFoV8ESJy8bOHA==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [openbsd]
+
+  '@esbuild/openbsd-x64@0.27.2':
+    resolution: {integrity: sha512-/it7w9Nb7+0KFIzjalNJVR5bOzA9Vay+yIPLVHfIQYG/j+j9VTH84aNB8ExGKPU4AzfaEvN9/V4HV+F+vo8OEg==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [openbsd]
+
+  '@esbuild/openharmony-arm64@0.27.2':
+    resolution: {integrity: sha512-LRBbCmiU51IXfeXk59csuX/aSaToeG7w48nMwA6049Y4J4+VbWALAuXcs+qcD04rHDuSCSRKdmY63sruDS5qag==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@esbuild/sunos-x64@0.27.2':
+    resolution: {integrity: sha512-kMtx1yqJHTmqaqHPAzKCAkDaKsffmXkPHThSfRwZGyuqyIeBvf08KSsYXl+abf5HDAPMJIPnbBfXvP2ZC2TfHg==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [sunos]
+
+  '@esbuild/win32-arm64@0.27.2':
+    resolution: {integrity: sha512-Yaf78O/B3Kkh+nKABUF++bvJv5Ijoy9AN1ww904rOXZFLWVc5OLOfL56W+C8F9xn5JQZa3UX6m+IktJnIb1Jjg==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@esbuild/win32-ia32@0.27.2':
+    resolution: {integrity: sha512-Iuws0kxo4yusk7sw70Xa2E2imZU5HoixzxfGCdxwBdhiDgt9vX9VUCBhqcwY7/uh//78A1hMkkROMJq9l27oLQ==}
+    engines: {node: '>=18'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@esbuild/win32-x64@0.27.2':
+    resolution: {integrity: sha512-sRdU18mcKf7F+YgheI/zGf5alZatMUTKj/jNS6l744f9u3WFu4v7twcUI9vu4mknF4Y9aDlblIie0IM+5xxaqQ==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [win32]
+
   '@eslint-community/eslint-utils@4.9.0':
     resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -2559,16 +2721,16 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/test@1.2.3':
-    resolution: {integrity: sha512-un4n4VhvbRz7gqw+bpaaJdALtmnP+3fsljdZFItyHocr6SGug5R9SgyIxtIaC2CHCcZJjHIDT22hW32weSci0g==}
+  '@inquirerer/test@1.2.5':
+    resolution: {integrity: sha512-KbYVzo/hquctlPuA2uRb0fPbMP6SWpmU8VlLQQuUYoBsAYmQ32QzlEZzbYqSM/4fjr6TqCkqsLrfpNiTnK3+cg==}
     peerDependencies:
       jest: '>=29.0.0'
     peerDependenciesMeta:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.1.2':
-    resolution: {integrity: sha512-KjBp1sLzWBckHv1GbuWrpOyzXdRM8POkv6gNVgCWcshQPYgrWJs5tdH1zTPNGwwGOR5BpFHmnBbs7UJt9j4VZA==}
+  '@inquirerer/utils@3.1.3':
+    resolution: {integrity: sha512-aEw6nBfbVVv77pwNT0LJNHZiEwN/2rE8jiXLzeY+93cHgt4rPs0QY2A+/CPq6ryzAfXGnI5C79o6HbwZcODZMA==}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -2996,8 +3158,8 @@ packages:
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
 
-  '@pgsql/utils@17.8.9':
-    resolution: {integrity: sha512-CfSMMJygrUDBo/6Kj9Dp03IbZuGHM8M4RcMNHDpSquJZvGMH/DEr3fLFlLp05ikYInzgzbPn4ysOdajO0HckiQ==}
+  '@pgsql/utils@17.8.11':
+    resolution: {integrity: sha512-gcaS9ATilQyGSIq8596tq+6rcb7TX54sdjOvOzGa9lu9NjqkptEKLbBae5UTjfkFGfH50duDFD1EpFogMnZToA==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3446,9 +3608,6 @@ packages:
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
-  '@types/inflection@1.13.2':
-    resolution: {integrity: sha512-VxXY8dNLrxn7nDvsud77K60uD3a9RSmKfa0k/N/zvP2G55R5/8DSO5Ferz3mQdlAo8jPnpQLilCx9rABdPHSVg==}
-
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
 
@@ -3824,8 +3983,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  appstash@0.2.7:
-    resolution: {integrity: sha512-EdJDs164q4OuKOBo/mdN6srwJdCy5e2NxmPKUyTBI8Z6aEAkX3ViSRFoAA78A4P0azysSMk8wqafsuM0R6weww==}
+  appstash@0.2.8:
+    resolution: {integrity: sha512-SLeV3iy7ygE7TNiU6AgDMQVhS6xVfO4ps3NDMUK3UcvZKOddykHuEtSuJr6wKzTu9yRnEeK/yisgztSARt/YJA==}
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -4843,6 +5002,11 @@ packages:
   es6-promisify@5.0.0:
     resolution: {integrity: sha512-C+d6UdsYDk0lMebHNR4S2NybQMMngAOnOwYBQjTOiv0MkoJMP0Myw2mgpDLBcpfCmRLxyFqYhS/CfOENq4SJhQ==}
 
+  esbuild@0.27.2:
+    resolution: {integrity: sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   escalade@3.2.0:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
@@ -5063,8 +5227,8 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  find-and-require-package-json@0.8.5:
-    resolution: {integrity: sha512-I15lQmpt0rxbmDpIgdn1IEWJU/smOLuKrPZFQMnktnz6kn25XgjGNn1ouKLFGsXuDW1Ssd47YPdSPwhSIGuvnA==}
+  find-and-require-package-json@0.8.6:
+    resolution: {integrity: sha512-N+funttvcGC9h7JxCs089fAyNhEpKzFnP0nUYOS+V2RWvI40rtVhANPozc72pJl9lMzqoPFTimlfqZg6zZGPRQ==}
 
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
@@ -5170,8 +5334,8 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  genomic@5.2.1:
-    resolution: {integrity: sha512-7+6g0ib9katy7OFUeaPXKiBPFZZSmeDdc3BNUvBvgCASCrseLU9r7a4sBo6319zbX81IBniM1EdIRsWzYKz9Qg==}
+  genomic@5.2.3:
+    resolution: {integrity: sha512-h93BqFC0gZgnInrAhozkYFV1UT1Pf/ffU8kh6JgF8Cqm0ypY8Iol5AvINVsgGXcQtcA00xcBOlJ5xc4tOXXZBA==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5209,6 +5373,9 @@ packages:
   get-stream@6.0.1:
     resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
     engines: {node: '>=10'}
+
+  get-tsconfig@4.13.0:
+    resolution: {integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==}
 
   get-uri@2.0.4:
     resolution: {integrity: sha512-v7LT/s8kVjs+Tx0ykk1I+H/rbpzkHvuIq87LmeXptcf5sNWm9uQiwjNAt94SJPA1zOlCntmnOlJvVWKmzsxG8Q==}
@@ -5513,6 +5680,9 @@ packages:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
 
+  inflekt@0.2.0:
+    resolution: {integrity: sha512-eznjYm6FOl6sX2fgDGe48WiCPO0db+BQhirptPBS1BhIAwqnbCgWHHCgmuzk1ldwQTKx8ot/v1ecJrFjVAe3xg==}
+
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
     deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
@@ -5538,8 +5708,8 @@ packages:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
 
-  inquirerer@4.2.1:
-    resolution: {integrity: sha512-DlJzCWrs/GjuUUifhH1Bu+gjOY7DAWlODqESNBb8a9CE1qeiUDqdPrf9qQGy82clMOXDDqQlB3CLbYSKw3z/lA==}
+  inquirerer@4.3.1:
+    resolution: {integrity: sha512-CKbqcGXT1zdFaJrkTLuTxdEe0yplUSmm1JbmJDDm2v6LuRaS34BE85rmnX0v8HQrli98Y4iFP99f6V0ny3RkDg==}
 
   ip-address@10.1.0:
     resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
@@ -6962,11 +7132,11 @@ packages:
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
-  pgsql-deparser@17.17.0:
-    resolution: {integrity: sha512-mnEzQGEEWF52KfN8dn8gzK+8zbkYt0K+t+4Ka1sklrAczzIqWyWoFO1HWdBdnkociQxMJtkEbKg7wYNGcwVi4Q==}
+  pgsql-deparser@17.17.2:
+    resolution: {integrity: sha512-FCjqKY3Sdmce3VUd3CxCXF0kqaZ0s4a6yIMT5UJ9vETh0cF54A8Tpqjn0qBKaPUD8xqTKeLdS+SfiwjAC64wrA==}
 
-  pgsql-parser@17.9.9:
-    resolution: {integrity: sha512-GhX+VaQYCgi+PSzCNoxbm3dssJYSMkkceDhpgVCyeIuniBC2a5T4igjdz8qOKkZi+P4wocyfjE1/KINnrQZTrw==}
+  pgsql-parser@17.9.11:
+    resolution: {integrity: sha512-Bqp9uLvJK0Qht9PXzI6eC/Fn+lFRL+2eMvXss4D4qt7lxPLIHS8FMKYOHUQNTI3m6ylExSOdNXhx/DL5UGm3xg==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -7302,6 +7472,9 @@ packages:
   resolve-from@5.0.0:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
     engines: {node: '>=8'}
+
+  resolve-pkg-maps@1.0.0:
+    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
 
   resolve.exports@2.0.3:
     resolution: {integrity: sha512-OcXjMsGdhL4XnbShKpAcSqPMzQoYkYyhbEaeSko47MjRP9NfEQMhZkXL1DoFlt9LWQn4YttrdnV6X2OiyzBi+A==}
@@ -7787,6 +7960,11 @@ packages:
   tsscmp@1.0.6:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
+
+  tsx@4.21.0:
+    resolution: {integrity: sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   tuf-js@2.2.1:
     resolution: {integrity: sha512-GwIJau9XaA8nLVbUXsN3IlFi7WmQ48gBUrl3FTkkL/XLu/POhBzfmX9hd33FNMX1qAsfl6ozO1iMmW9NC8YniA==}
@@ -8856,6 +9034,84 @@ snapshots:
 
   '@emotion/unitless@0.7.5': {}
 
+  '@esbuild/aix-ppc64@0.27.2':
+    optional: true
+
+  '@esbuild/android-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/android-arm@0.27.2':
+    optional: true
+
+  '@esbuild/android-x64@0.27.2':
+    optional: true
+
+  '@esbuild/darwin-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/darwin-x64@0.27.2':
+    optional: true
+
+  '@esbuild/freebsd-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/freebsd-x64@0.27.2':
+    optional: true
+
+  '@esbuild/linux-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/linux-arm@0.27.2':
+    optional: true
+
+  '@esbuild/linux-ia32@0.27.2':
+    optional: true
+
+  '@esbuild/linux-loong64@0.27.2':
+    optional: true
+
+  '@esbuild/linux-mips64el@0.27.2':
+    optional: true
+
+  '@esbuild/linux-ppc64@0.27.2':
+    optional: true
+
+  '@esbuild/linux-riscv64@0.27.2':
+    optional: true
+
+  '@esbuild/linux-s390x@0.27.2':
+    optional: true
+
+  '@esbuild/linux-x64@0.27.2':
+    optional: true
+
+  '@esbuild/netbsd-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/netbsd-x64@0.27.2':
+    optional: true
+
+  '@esbuild/openbsd-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/openbsd-x64@0.27.2':
+    optional: true
+
+  '@esbuild/openharmony-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/sunos-x64@0.27.2':
+    optional: true
+
+  '@esbuild/win32-arm64@0.27.2':
+    optional: true
+
+  '@esbuild/win32-ia32@0.27.2':
+    optional: true
+
+  '@esbuild/win32-x64@0.27.2':
+    optional: true
+
   '@eslint-community/eslint-utils@4.9.0(eslint@9.39.2(jiti@2.6.1))':
     dependencies:
       eslint: 9.39.2(jiti@2.6.1)
@@ -8934,17 +9190,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  '@inquirerer/test@1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
+  '@inquirerer/test@1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
     dependencies:
       clean-ansi: 0.1.8
-      inquirerer: 4.2.1
+      inquirerer: 4.3.1
     optionalDependencies:
       jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
 
-  '@inquirerer/utils@3.1.2':
+  '@inquirerer/utils@3.1.3':
     dependencies:
-      appstash: 0.2.7
-      find-and-require-package-json: 0.8.5
+      appstash: 0.2.8
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
 
   '@isaacs/balanced-match@4.0.1': {}
@@ -9751,7 +10007,7 @@ snapshots:
 
   '@pgsql/types@17.6.2': {}
 
-  '@pgsql/utils@17.8.9':
+  '@pgsql/utils@17.8.11':
     dependencies:
       '@pgsql/types': 17.6.2
       nested-obj: 0.1.5
@@ -10372,8 +10628,6 @@ snapshots:
 
   '@types/http-errors@2.0.5': {}
 
-  '@types/inflection@1.13.2': {}
-
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -10768,7 +11022,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  appstash@0.2.7: {}
+  appstash@0.2.8: {}
 
   aproba@2.0.0: {}
 
@@ -11773,6 +12027,35 @@ snapshots:
     dependencies:
       es6-promise: 4.2.8
 
+  esbuild@0.27.2:
+    optionalDependencies:
+      '@esbuild/aix-ppc64': 0.27.2
+      '@esbuild/android-arm': 0.27.2
+      '@esbuild/android-arm64': 0.27.2
+      '@esbuild/android-x64': 0.27.2
+      '@esbuild/darwin-arm64': 0.27.2
+      '@esbuild/darwin-x64': 0.27.2
+      '@esbuild/freebsd-arm64': 0.27.2
+      '@esbuild/freebsd-x64': 0.27.2
+      '@esbuild/linux-arm': 0.27.2
+      '@esbuild/linux-arm64': 0.27.2
+      '@esbuild/linux-ia32': 0.27.2
+      '@esbuild/linux-loong64': 0.27.2
+      '@esbuild/linux-mips64el': 0.27.2
+      '@esbuild/linux-ppc64': 0.27.2
+      '@esbuild/linux-riscv64': 0.27.2
+      '@esbuild/linux-s390x': 0.27.2
+      '@esbuild/linux-x64': 0.27.2
+      '@esbuild/netbsd-arm64': 0.27.2
+      '@esbuild/netbsd-x64': 0.27.2
+      '@esbuild/openbsd-arm64': 0.27.2
+      '@esbuild/openbsd-x64': 0.27.2
+      '@esbuild/openharmony-arm64': 0.27.2
+      '@esbuild/sunos-x64': 0.27.2
+      '@esbuild/win32-arm64': 0.27.2
+      '@esbuild/win32-ia32': 0.27.2
+      '@esbuild/win32-x64': 0.27.2
+
   escalade@3.2.0: {}
 
   escape-goat@3.0.0: {}
@@ -12049,7 +12332,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-and-require-package-json@0.8.5: {}
+  find-and-require-package-json@0.8.6: {}
 
   find-up@2.1.0:
     dependencies:
@@ -12152,10 +12435,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.2.1:
+  genomic@5.2.3:
     dependencies:
-      appstash: 0.2.7
-      inquirerer: 4.2.1
+      appstash: 0.2.8
+      inquirerer: 4.3.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -12193,6 +12476,10 @@ snapshots:
   get-stream@6.0.0: {}
 
   get-stream@6.0.1: {}
+
+  get-tsconfig@4.13.0:
+    dependencies:
+      resolve-pkg-maps: 1.0.0
 
   get-uri@2.0.4:
     dependencies:
@@ -12564,6 +12851,10 @@ snapshots:
 
   inflection@3.0.2: {}
 
+  inflekt@0.2.0:
+    dependencies:
+      inflection: 3.0.2
+
   inflight@1.0.6:
     dependencies:
       once: 1.4.0
@@ -12609,11 +12900,10 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@4.2.1:
+  inquirerer@4.3.1:
     dependencies:
       deepmerge: 4.3.1
-      find-and-require-package-json: 0.8.5
-      js-yaml: 4.1.1
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
       yanse: 0.1.11
 
@@ -14783,15 +15073,15 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pgsql-deparser@17.17.0:
+  pgsql-deparser@17.17.2:
     dependencies:
       '@pgsql/types': 17.6.2
 
-  pgsql-parser@17.9.9:
+  pgsql-parser@17.9.11:
     dependencies:
       '@pgsql/types': 17.6.2
       libpg-query: 17.7.3
-      pgsql-deparser: 17.17.0
+      pgsql-deparser: 17.17.2
 
   picocolors@1.1.1: {}
 
@@ -15149,6 +15439,8 @@ snapshots:
   resolve-from@4.0.0: {}
 
   resolve-from@5.0.0: {}
+
+  resolve-pkg-maps@1.0.0: {}
 
   resolve.exports@2.0.3: {}
 
@@ -15712,6 +16004,13 @@ snapshots:
   tslib@2.8.1: {}
 
   tsscmp@1.0.6: {}
+
+  tsx@4.21.0:
+    dependencies:
+      esbuild: 0.27.2
+      get-tsconfig: 4.13.0
+    optionalDependencies:
+      fsevents: 2.3.3
 
   tuf-js@2.2.1:
     dependencies:

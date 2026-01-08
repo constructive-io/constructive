@@ -23,6 +23,7 @@ import {
   getFilterTypeName,
   getOrderByTypeName,
   getScalarFields,
+  getPrimaryKeyInfo,
   ucFirst,
 } from './utils';
 
@@ -153,17 +154,22 @@ export function buildSingleQueryAST(config: SingleQueryConfig): DocumentNode {
   const queryName = getSingleRowQueryName(table);
   const scalarFields = getScalarFields(table);
 
-  // Variable definitions - assume UUID primary key
+  // Get primary key info dynamically from table constraints
+  const pkFields = getPrimaryKeyInfo(table);
+  // For simplicity, use first PK field (most common case)
+  const pkField = pkFields[0];
+
+  // Variable definitions - use dynamic PK field name and type
   const variableDefinitions: VariableDefinitionNode[] = [
     t.variableDefinition({
-      variable: t.variable({ name: 'id' }),
-      type: t.nonNullType({ type: t.namedType({ type: 'UUID' }) }),
+      variable: t.variable({ name: pkField.name }),
+      type: t.nonNullType({ type: t.namedType({ type: pkField.gqlType }) }),
     }),
   ];
 
-  // Query arguments
+  // Query arguments - use dynamic PK field name
   const args: ArgumentNode[] = [
-    t.argument({ name: 'id', value: t.variable({ name: 'id' }) }),
+    t.argument({ name: pkField.name, value: t.variable({ name: pkField.name }) }),
   ];
 
   // Field selections

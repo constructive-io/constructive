@@ -34,10 +34,12 @@ export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile 
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     const modelName = `${typeName}Model`;
-    const fileName = lcFirst(typeName);
+    // Use same naming logic as model-generator to avoid "index.ts" clash with barrel file
+    const baseFileName = lcFirst(typeName);
+    const moduleFileName = baseFileName === 'index' ? `${baseFileName}Model` : baseFileName;
 
     sourceFile.addExportDeclaration({
-      moduleSpecifier: `./${fileName}`,
+      moduleSpecifier: `./${moduleFileName}`,
       namedExports: [modelName],
     });
   }

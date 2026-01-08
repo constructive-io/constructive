@@ -74,11 +74,32 @@ export function scanBoilerplates(baseDir: string): ScannedBoilerplate[] {
     const config = readBoilerplateConfig(boilerplatePath);
 
     if (config) {
+      // Validate and normalize the type field
+      const validTypes = ['workspace', 'module', 'generic'] as const;
+      const configType = config.type as string;
+      const type: 'workspace' | 'module' | 'generic' = validTypes.includes(configType as any) 
+        ? (configType as 'workspace' | 'module' | 'generic')
+        : 'module';
+
+      // Validate and normalize requiresWorkspace field
+      const validWorkspaceTypes = ['pgpm', 'pnpm', 'lerna', 'npm'] as const;
+      let requiresWorkspace: ScannedBoilerplate['requiresWorkspace'];
+      if (config.requiresWorkspace === false) {
+        requiresWorkspace = false;
+      } else if (typeof config.requiresWorkspace === 'string' && 
+                 validWorkspaceTypes.includes(config.requiresWorkspace as any)) {
+        requiresWorkspace = config.requiresWorkspace as 'pgpm' | 'pnpm' | 'lerna' | 'npm';
+      } else {
+        // Default: 'pgpm' for module type (backward compatibility), undefined for others
+        requiresWorkspace = type === 'module' ? 'pgpm' : undefined;
+      }
+
       boilerplates.push({
         name: entry.name,
         path: boilerplatePath,
-        type: config.type ?? 'module',
-        questions: config.questions
+        type,
+        requiresWorkspace,
+        questions: config.questions as ScannedBoilerplate['questions']
       });
     }
   }
