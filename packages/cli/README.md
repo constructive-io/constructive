@@ -64,8 +64,8 @@ Generate TypeScript types, operations, and SDK from a PostGraphile API.
 # From endpoint
 cnc codegen --endpoint http://localhost:5555/graphql --out ./codegen
 
-# From database (spins a temporary PostGraphile server, introspects, generates, then tears down)
-cnc codegen --database constructive_db --schemas public --pgHost localhost --pgPort 5432 --pgUser postgres --pgPassword password --out ./codegen --verbose
+# From database (uses env PG settings; spins a temporary PostGraphile server, introspects, generates, then tears down)
+cnc codegen --database constructive_db --out ./codegen --verbose
 ```
 
 **Options:**
@@ -76,12 +76,8 @@ cnc codegen --database constructive_db --schemas public --pgHost localhost --pgP
 - `--dry-run` - Preview without writing files
 - `--verbose` - Verbose output
 
-- `--database <name>` - Database name for DB mode (default: constructive_db)
-- `--schemas <list>` - Comma-separated schema list for DB mode (default: public)
-- `--pgHost <host>` - PGHOST override for DB mode
-- `--pgPort <port>` - PGPORT override for DB mode
-- `--pgUser <user>` - PGUSER override for DB mode
-- `--pgPassword <password>` - PGPASSWORD override for DB mode
+- `--database <name>` - Database override for DB mode (defaults to PGDATABASE)
+- `--schemas <list>` - Comma-separated schemas (defaults to API_META_SCHEMAS)
 
 ### `cnc get-graphql-schema`
 

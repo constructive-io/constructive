@@ -4,8 +4,8 @@ import express from 'express'
 import { postgraphile } from 'postgraphile'
 import { getGraphileSettings } from 'graphile-settings'
 import { getPgPool } from 'pg-cache'
-import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
-import { getEnvOptions } from '@constructive-io/graphql-env'
+import { generateCommand } from '@constructive-io/graphql-codegen'
+import { ConstructiveOptions, getEnvOptions } from '@constructive-io/graphql-env'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -21,12 +21,8 @@ Options:
   --dry-run                  Preview without writing files
   -v, --verbose              Verbose output
 
-  --database <name>          Database name for DB mode (default: constructive_db)
-  --schemas <list>           Comma-separated schema list for DB mode (default: public)
-  --pgHost <host>            PGHOST override for DB mode
-  --pgPort <port>            PGPORT override for DB mode
-  --pgUser <user>            PGUSER override for DB mode
-  --pgPassword <password>    PGPASSWORD override for DB mode
+  --database <name>          Database override for DB mode (defaults to PGDATABASE)
+  --schemas <list>           Comma-separated schemas (defaults to API_META_SCHEMAS)
 `
 
 export default async (
@@ -46,12 +42,9 @@ export default async (
   const dryRun = !!(argv['dry-run'] || argv.dryRun)
   const verbose = !!(argv.verbose || argv.v)
 
-  const database = (argv.database as string) || 'constructive_db'
-  const schemasArg = (argv.schemas as string) || getEnvOptions().api.metaSchemas.join(',')
-  const pgHost = (argv.pgHost as string) || process.env.PGHOST || ''
-  const pgPort = argv.pgPort ? String(argv.pgPort) : (process.env.PGPORT || '')
-  const pgUser = (argv.pgUser as string) || process.env.PGUSER || ''
-  const pgPassword = (argv.pgPassword as string) || process.env.PGPASSWORD || ''
+  const selectedDb = (argv.database as string) || undefined
+  const options: ConstructiveOptions = selectedDb ? getEnvOptions({ pg: { database: selectedDb } }) : getEnvOptions()
+  const schemasArg = (argv.schemas as string) || options.api.metaSchemas.join(',')
 
   const runGenerate = async (endpoint: string) => {
     const result = await generateCommand({
@@ -87,13 +80,7 @@ export default async (
     settings.graphiqlRoute = '/graphiql'
     settings.pgSettings = async () => ({ role: 'administrator' })
 
-    const pool = getPgPool({
-      host: pgHost || undefined,
-      port: pgPort ? Number(pgPort) : undefined,
-      user: pgUser || undefined,
-      password: pgPassword || undefined,
-      database,
-    })
+    const pool = getPgPool(options.pg)
 
     const handler = postgraphile(pool, schemas, settings)
     const app = express()

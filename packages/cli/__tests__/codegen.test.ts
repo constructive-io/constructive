@@ -1,8 +1,8 @@
 import type { ParsedArgs } from 'minimist'
 import codegenCommand from '../src/commands/codegen'
-import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
+import { generateCommand } from '@constructive-io/graphql-codegen'
 
-jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
+jest.mock('@constructive-io/graphql-codegen', () => ({
   generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
 }))
 
@@ -70,10 +70,6 @@ describe('codegen command', () => {
     const argv: Partial<ParsedArgs> = {
       database: 'constructive_db',
       schemas: 'public',
-      pgHost: 'localhost',
-      pgPort: 5432,
-      pgUser: 'postgres',
-      pgPassword: 'password',
       out: 'graphql/codegen/dist'
     }
 
