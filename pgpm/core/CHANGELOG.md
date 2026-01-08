@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.1...@pgpmjs/core@4.12.2) (2026-01-08)
+
+### Bug Fixes
+
+- remove extension table export (not scoped to database_id) ([3e80509](https://github.com/constructive-io/constructive/commit/3e805096794d108c4231b524de9cf03f1ab5fc07))
+
 ## [4.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.0...@pgpmjs/core@4.12.1) (2026-01-08)
 
 ### Bug Fixes
