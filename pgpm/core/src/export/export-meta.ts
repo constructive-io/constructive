@@ -210,8 +210,8 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      name: 'text',
+      code: 'text'
     }
   },
   rls_function: {
@@ -220,8 +220,13 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      table_id: 'uuid',
+      name: 'text',
+      label: 'text',
+      description: 'text',
+      data: 'jsonb',
+      inline: 'boolean',
+      security: 'int'
     }
   },
   limit_function: {
@@ -230,8 +235,12 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      table_id: 'uuid',
+      name: 'text',
+      label: 'text',
+      description: 'text',
+      data: 'jsonb',
+      security: 'int'
     }
   },
   procedure: {
@@ -240,8 +249,12 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      name: 'text',
+      argnames: 'text[]',
+      argtypes: 'text[]',
+      argdefaults: 'text[]',
+      lang_name: 'text',
+      definition: 'text'
     }
   },
   foreign_key_constraint: {
@@ -252,11 +265,14 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      description: 'text',
+      smart_tags: 'jsonb',
+      type: 'text',
       field_ids: 'uuid[]',
       ref_table_id: 'uuid',
       ref_field_ids: 'uuid[]',
-      on_delete: 'text',
-      on_update: 'text'
+      delete_action: 'text',
+      update_action: 'text'
     }
   },
   primary_key_constraint: {
@@ -267,6 +283,7 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      type: 'text',
       field_ids: 'uuid[]'
     }
   },
@@ -278,6 +295,9 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      description: 'text',
+      smart_tags: 'jsonb',
+      type: 'text',
       field_ids: 'uuid[]'
     }
   },
@@ -289,7 +309,9 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
-      expression: 'text'
+      type: 'text',
+      field_ids: 'uuid[]',
+      expr: 'jsonb'
     }
   },
   full_text_search: {
@@ -299,9 +321,10 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       table_id: 'uuid',
-      name: 'text',
+      field_id: 'uuid',
       field_ids: 'uuid[]',
-      weights: 'text[]'
+      weights: 'text[]',
+      langs: 'text[]'
     }
   },
   schema_grant: {
@@ -311,8 +334,7 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       schema_id: 'uuid',
-      role_name: 'text',
-      privilege: 'text'
+      grantee_name: 'text'
     }
   },
   table_grant: {
@@ -322,8 +344,9 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       table_id: 'uuid',
+      privilege: 'text',
       role_name: 'text',
-      privilege: 'text'
+      field_ids: 'uuid[]'
     }
   },
   // =============================================================================
