@@ -800,12 +800,20 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   }, {} as Record<string, Parser>);
 
   const queryAndParse = async (key: string, query: string) => {
-    const result = await pool.query(query, [database_id]);
-    if (result.rows.length) {
-      const parsed = await parsers[key].parse(result.rows);
-      if (parsed) {
-        sql[key] = parsed;
+    try {
+      const result = await pool.query(query, [database_id]);
+      if (result.rows.length) {
+        const parsed = await parsers[key].parse(result.rows);
+        if (parsed) {
+          sql[key] = parsed;
+        }
       }
+    } catch (err: unknown) {
+      const pgError = err as { code?: string };
+      if (pgError.code === '42P01') {
+        return;
+      }
+      throw err;
     }
   };
 
