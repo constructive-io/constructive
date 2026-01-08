@@ -844,7 +844,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1`);
   await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1`);
   await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1`);
-  await queryAndParse('extension', `SELECT * FROM metaschema_public.extension`);
+  await queryAndParse('extension', `SELECT DISTINCT e.* FROM metaschema_public.extension e JOIN metaschema_public.database_extension de ON de.name = e.name WHERE de.database_id = $1`);
 
   // =============================================================================
   // services_public tables
