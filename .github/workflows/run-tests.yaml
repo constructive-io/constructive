@@ -33,6 +33,8 @@ jobs:
             env: {}
           - package: packages/cli
             env: {}
+          - package: packages/server
+            env: {}
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres

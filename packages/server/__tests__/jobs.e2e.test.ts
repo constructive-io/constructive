@@ -394,7 +394,6 @@ describe('jobs e2e', () => {
     const callbackUrl = `http://127.0.0.1:${ports.callbackPort}/callback`;
 
     process.env.NODE_ENV = 'test';
-    process.env.TEST_DB = pg.config.database;
     process.env.PGDATABASE = pg.config.database;
     process.env.TEST_DATABASE_ID = databaseId;
     process.env.DEFAULT_DATABASE_ID = databaseId;
