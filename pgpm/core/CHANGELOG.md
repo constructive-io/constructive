@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.1...@pgpmjs/core@4.11.0) (2026-01-08)
+
+### Bug Fixes
+
+- **core:** gracefully handle missing tables in exportMeta ([42cce5a](https://github.com/constructive-io/constructive/commit/42cce5adad29c5e45baa5bed7bcc0cc57fd87220))
+
+### Features
+
+- **core:** export all tables from metaschema_public, services_public, and metaschema_modules_public ([0fa6a1f](https://github.com/constructive-io/constructive/commit/0fa6a1f09766e4762f59a382e66efd32b59584e3))
+
 ## [4.10.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.0...@pgpmjs/core@4.10.1) (2026-01-07)
 
 **Note:** Version bump only for package @pgpmjs/core
