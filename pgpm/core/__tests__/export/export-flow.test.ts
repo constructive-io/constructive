@@ -738,17 +738,19 @@ relocatable = false
       
       const planContent = readFileSync(planPath, 'utf-8');
       expect(planContent).toContain('%project=' + META_EXTENSION_NAME);
-      expect(planContent).toContain('migrate/meta');
+      // Now generates separate files per table type instead of single meta.sql
+      expect(planContent).toContain('migrate/database');
     });
 
-    it('should have created deploy/migrate/meta.sql with collections data', () => {
-      const metaSqlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate', 'meta.sql');
-      expect(existsSync(metaSqlPath)).toBe(true);
+    it('should have created deploy/migrate/*.sql files with collections data', () => {
+      // Now generates separate files per table type instead of single meta.sql
+      const databaseSqlPath = join(exportWorkspaceDir, 'packages', META_EXTENSION_NAME, 'deploy', 'migrate', 'database.sql');
+      expect(existsSync(databaseSqlPath)).toBe(true);
       
-      const metaContent = readFileSync(metaSqlPath, 'utf-8');
+      const databaseContent = readFileSync(databaseSqlPath, 'utf-8');
       // Should contain INSERT statements for meta tables
-      expect(metaContent).toContain('INSERT INTO');
-      expect(metaContent).toContain('session_replication_role');
+      expect(databaseContent).toContain('INSERT INTO');
+      expect(databaseContent).toContain('session_replication_role');
     });
 
     it('should have created control files for both modules', () => {

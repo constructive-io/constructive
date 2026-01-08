@@ -1,6 +1,7 @@
 import { PgpmOptions } from '@pgpmjs/types';
 import { Parser } from 'csv-to-pg';
 import { getPgPool } from 'pg-cache';
+import type { Pool } from 'pg';
 
 type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'int' | 'interval' | 'timestamptz';
 
@@ -10,6 +11,94 @@ interface TableConfig {
   conflictDoNothing?: boolean;
   fields: Record<string, FieldType>;
 }
+
+/**
+ * Map PostgreSQL data types to FieldType values.
+ * Uses udt_name from information_schema which gives the base type name.
+ */
+const mapPgTypeToFieldType = (udtName: string): FieldType => {
+  switch (udtName) {
+    case 'uuid':
+      return 'uuid';
+    case '_uuid':
+      return 'uuid[]';
+    case 'text':
+    case 'varchar':
+    case 'bpchar':
+    case 'name':
+      return 'text';
+    case '_text':
+    case '_varchar':
+      return 'text[]';
+    case 'bool':
+      return 'boolean';
+    case 'jsonb':
+    case 'json':
+      return 'jsonb';
+    case 'int4':
+    case 'int8':
+    case 'int2':
+    case 'numeric':
+      return 'int';
+    case 'interval':
+      return 'interval';
+    case 'timestamptz':
+    case 'timestamp':
+      return 'timestamptz';
+    default:
+      return 'text';
+  }
+};
+
+/**
+ * Query actual columns from information_schema for a given table.
+ * Returns a map of column_name -> udt_name (PostgreSQL type).
+ */
+const getTableColumns = async (pool: Pool, schemaName: string, tableName: string): Promise<Map<string, string>> => {
+  const result = await pool.query(`
+    SELECT column_name, udt_name
+    FROM information_schema.columns
+    WHERE table_schema = $1 AND table_name = $2
+    ORDER BY ordinal_position
+  `, [schemaName, tableName]);
+  
+  const columns = new Map<string, string>();
+  for (const row of result.rows) {
+    columns.set(row.column_name, row.udt_name);
+  }
+  return columns;
+};
+
+/**
+ * Build dynamic fields config by intersecting the hardcoded config with actual database columns.
+ * - Only includes columns that exist in the database
+ * - Preserves special type hints from config (image, upload, url) for columns that exist
+ * - Infers types from PostgreSQL for columns not in config
+ */
+const buildDynamicFields = async (
+  pool: Pool,
+  tableConfig: TableConfig
+): Promise<Record<string, FieldType>> => {
+  const actualColumns = await getTableColumns(pool, tableConfig.schema, tableConfig.table);
+  
+  if (actualColumns.size === 0) {
+    // Table doesn't exist, return empty fields
+    return {};
+  }
+  
+  const dynamicFields: Record<string, FieldType> = {};
+  
+  // For each column in the hardcoded config, check if it exists in the database
+  for (const [fieldName, fieldType] of Object.entries(tableConfig.fields)) {
+    if (actualColumns.has(fieldName)) {
+      // Column exists - use the config's type hint (preserves special types like 'image', 'upload', 'url')
+      dynamicFields[fieldName] = fieldType;
+    }
+    // If column doesn't exist in database, skip it (this fixes the bug)
+  }
+  
+  return dynamicFields;
+};
 
 const config: Record<string, TableConfig> = {
   // =============================================================================
@@ -237,15 +326,6 @@ const config: Record<string, TableConfig> = {
       privilege: 'text'
     }
   },
-  extension: {
-    schema: 'metaschema_public',
-    table: 'extension',
-    fields: {
-      id: 'uuid',
-      name: 'text'
-    }
-  },
-
   // =============================================================================
   // services_public tables
   // =============================================================================
@@ -793,22 +873,58 @@ interface ExportMetaParams {
   database_id: string;
 }
 
-export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<string> => {
+export type ExportMetaResult = Record<string, string>;
+
+export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<ExportMetaResult> => {
   const pool = getPgPool({
     ...opts.pg,
     database: dbname
   });
   const sql: Record<string, string> = {};
-  const parsers: Record<string, Parser> = Object.entries(config).reduce((m, [name, config]) => {
-    m[name] = new Parser(config);
-    return m;
-  }, {} as Record<string, Parser>);
+  
+  // Cache for dynamically built parsers
+  const parsers: Record<string, Parser> = {};
+  
+  // Build parser dynamically by querying actual columns from the database
+  const getParser = async (key: string): Promise<Parser | null> => {
+    if (parsers[key]) {
+      return parsers[key];
+    }
+    
+    const tableConfig = config[key];
+    if (!tableConfig) {
+      return null;
+    }
+    
+    // Build fields dynamically based on actual database columns
+    const dynamicFields = await buildDynamicFields(pool, tableConfig);
+    
+    if (Object.keys(dynamicFields).length === 0) {
+      // No columns found (table doesn't exist or no matching columns)
+      return null;
+    }
+    
+    const parser = new Parser({
+      schema: tableConfig.schema,
+      table: tableConfig.table,
+      conflictDoNothing: tableConfig.conflictDoNothing,
+      fields: dynamicFields
+    });
+    
+    parsers[key] = parser;
+    return parser;
+  };
 
   const queryAndParse = async (key: string, query: string) => {
     try {
+      const parser = await getParser(key);
+      if (!parser) {
+        return;
+      }
+      
       const result = await pool.query(query, [database_id]);
       if (result.rows.length) {
-        const parsed = await parsers[key].parse(result.rows);
+        const parsed = await parser.parse(result.rows);
         if (parsed) {
           sql[key] = parsed;
         }
@@ -844,7 +960,6 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1`);
   await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1`);
   await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1`);
-  await queryAndParse('extension', `SELECT * FROM metaschema_public.extension`);
 
   // =============================================================================
   // services_public tables
@@ -887,5 +1002,5 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
 
-  return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
+  return sql;
 };

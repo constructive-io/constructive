@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.0...@pgpmjs/core@4.13.1) (2026-01-08)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.2...@pgpmjs/core@4.13.0) (2026-01-08)
+
+### Bug Fixes
+
+- **export:** generate separate meta.sql files per table type ([10ba703](https://github.com/constructive-io/constructive/commit/10ba703f203a33c64b1f13c1bac9e73e14a8b029))
+
+### Features
+
+- **export:** generate separate meta.sql files for each schema type ([e3a65da](https://github.com/constructive-io/constructive/commit/e3a65dacb922a54f2b3747591d0ff3836c6717ff))
+
+## [4.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.1...@pgpmjs/core@4.12.2) (2026-01-08)
+
+### Bug Fixes
+
+- remove extension table export (not scoped to database_id) ([3e80509](https://github.com/constructive-io/constructive/commit/3e805096794d108c4231b524de9cf03f1ab5fc07))
+
+## [4.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.0...@pgpmjs/core@4.12.1) (2026-01-08)
+
+### Bug Fixes
+
+- scope extension export query by database_id via database_extension join ([e4ad67c](https://github.com/constructive-io/constructive/commit/e4ad67ce8c592536f804049876c8e5c78be636eb))
+- use simple WHERE database_id clause for extension export ([295238e](https://github.com/constructive-io/constructive/commit/295238e7efad54801e4bb656f9748c7c44c0ec31))
+
 # [4.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.11.0...@pgpmjs/core@4.12.0) (2026-01-08)
 
 ### Features

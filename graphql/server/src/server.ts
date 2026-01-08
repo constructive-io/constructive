@@ -3,6 +3,7 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { randomUUID } from 'crypto';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
@@ -44,6 +45,37 @@ class Server {
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
+    const requestLogger: RequestHandler = (req, res, next) => {
+      const headerRequestId = req.header('x-request-id');
+      const reqId = headerRequestId || randomUUID();
+      const start = process.hrtime.bigint();
+
+      req.requestId = reqId;
+
+      const host = req.hostname || req.headers.host || 'unknown';
+      const ip = req.clientIp || req.ip;
+
+      log.debug(
+        `[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`
+      );
+
+      res.on('finish', () => {
+        const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
+        const apiInfo = req.api
+          ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
+          : 'api=unresolved';
+        const authInfo = req.token ? 'auth=token' : 'auth=anon';
+        const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
+
+        log.debug(
+          `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
+            1
+          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`
+        );
+      });
+
+      next();
+    };
 
     // Log startup config in dev mode
     if (isDev()) {
@@ -76,6 +108,7 @@ class Server {
     app.use(graphqlUpload.graphqlUploadExpress());
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
+    app.use(requestLogger);
     app.use(api);
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
