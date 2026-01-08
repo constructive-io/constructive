@@ -148,4 +148,96 @@ it('arrays', async () => {
 
   expect(sql).toMatchSnapshot();
   });
+
+it('uuid[] arrays', async () => {
+  const parser = new Parser({
+    schema: 'metaschema_public',
+    singleStmts: true,
+    table: 'primary_key_constraint',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      table_id: 'uuid',
+      name: 'text',
+      field_ids: 'uuid[]'
+    }
+  });
+
+  const sql = await parser.parse([
+    {
+      id: 'cdc96a32-572c-4f69-8bce-4c7bd4024a4e',
+      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+      table_id: '6616358d-8da8-45e4-834f-d735a0f02acc',
+      name: 'object_pkey',
+      field_ids: ['f853daae-f563-447d-ac09-901ddd68586e', 'a4257181-147d-4558-a51f-4b43246527a2']
+    },
+    {
+      id: '03d7007c-5262-4250-9ce1-efcabc5bedea',
+      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+      table_id: '535d5894-679a-4a7b-aa5a-bd07cce8a505',
+      name: 'ref_pkey',
+      field_ids: ['8cc2da93-a8e0-4565-9d14-f814c3a1432d', '40a34889-eb4c-4833-8daf-b99441962971']
+    }
+  ]);
+
+  expect(sql).toMatchSnapshot();
+});
+
+it('interval type', async () => {
+  const parser = new Parser({
+    schema: 'metaschema_modules_public',
+    singleStmts: true,
+    table: 'tokens_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      tokens_default_expiration: 'interval',
+      tokens_table: 'text'
+    }
+  });
+
+  const sql = await parser.parse([
+    {
+      id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+      tokens_default_expiration: { hours: 24 },
+      tokens_table: 'api_tokens'
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+      tokens_default_expiration: { days: 7, hours: 12, minutes: 30 },
+      tokens_table: 'refresh_tokens'
+    },
+    {
+      id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+      database_id: '8e739194-ced7-479b-b46c-e6b06146ac11',
+      tokens_default_expiration: { years: 1, months: 6 },
+      tokens_table: 'long_lived_tokens'
+    }
+  ]);
+
+  expect(sql).toMatchSnapshot();
+});
+
+it('interval type with string value', async () => {
+  const parser = new Parser({
+    schema: 'metaschema_modules_public',
+    singleStmts: true,
+    table: 'tokens_module',
+    fields: {
+      id: 'uuid',
+      tokens_default_expiration: 'interval'
+    }
+  });
+
+  const sql = await parser.parse([
+    {
+      id: '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+      tokens_default_expiration: '1 day 02:30:00'
+    }
+  ]);
+
+  expect(sql).toMatchSnapshot();
+});
 });
