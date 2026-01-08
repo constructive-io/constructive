@@ -303,7 +303,7 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
         dbname text
       );
 
-      CREATE TABLE IF NOT EXISTS services_public.api_schemata (
+      CREATE TABLE IF NOT EXISTS services_public.api_schemas (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         database_id uuid,
         schema_id uuid,
@@ -530,7 +530,7 @@ INSERT INTO services_public.sites (id, database_id, title, description, dbname) 
 INSERT INTO services_public.domains (id, database_id, domain, subdomain) VALUES
   ('dddd0001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'localhost', 'pets');
 
-INSERT INTO services_public.api_schemata (id, database_id, schema_id, api_id) VALUES
+INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VALUES
   ('1111aaaa-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-4708-b250-000000000001', 'aaaa0001-0000-0000-0000-000000000001', 'eeee0001-0000-0000-0000-000000000001');
 `;
   }
