@@ -57,6 +57,7 @@ async function loadWatchConfig(options: {
     postgraphile: baseConfig.postgraphile,
     codegen: baseConfig.codegen,
     orm: baseConfig.orm,
+    reactQuery: baseConfig.reactQuery,
     watch: {
       ...baseConfig.watch,
       // CLI options override config

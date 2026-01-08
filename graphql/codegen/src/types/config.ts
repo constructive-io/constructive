@@ -269,7 +269,7 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
   },
   orm: null, // ORM generation disabled by default
   reactQuery: {
-    enabled: false, // React Query hooks disabled by default
+    enabled: true, // React Query hooks enabled by default for generate command
   },
   watch: DEFAULT_WATCH_CONFIG,
 };
