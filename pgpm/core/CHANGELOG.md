@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.11.0...@pgpmjs/core@4.12.0) (2026-01-08)
+
+### Features
+
+- **csv-to-pg:** add conflictDoNothing option for ON CONFLICT DO NOTHING ([735bfeb](https://github.com/constructive-io/constructive/commit/735bfebc5c4dfb2ee41460a920f2b0560b77a0c6))
+
 # [4.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.1...@pgpmjs/core@4.11.0) (2026-01-08)
 
 ### Bug Fixes
