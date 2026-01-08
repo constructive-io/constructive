@@ -277,4 +277,6 @@ export interface ResolvedType {
   inputFields?: CleanArgument[];
   /** Values for ENUM types */
   enumValues?: string[];
+  /** Possible types for UNION types */
+  possibleTypes?: string[];
 }

@@ -89,6 +89,25 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
     ];
     const usedInputTypes = collectInputTypeNames(allOps);
     const usedPayloadTypes = collectPayloadTypeNames(allOps);
+
+    // Also include payload types for table CRUD mutations (they reference Edge types)
+    if (typeRegistry) {
+      for (const table of tables) {
+        const typeName = table.name;
+        // Add standard CRUD payload types
+        const crudPayloadTypes = [
+          `Create${typeName}Payload`,
+          `Update${typeName}Payload`,
+          `Delete${typeName}Payload`,
+        ];
+        for (const payloadType of crudPayloadTypes) {
+          if (typeRegistry.has(payloadType)) {
+            usedPayloadTypes.add(payloadType);
+          }
+        }
+      }
+    }
+
     const inputTypesFile = generateInputTypesFile(
       typeRegistry ?? new Map(),
       usedInputTypes,

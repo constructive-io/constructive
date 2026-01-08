@@ -34,6 +34,8 @@ import {
   getOperationVariablesTypeName,
   getOperationResultTypeName,
   getDocumentConstName,
+  createTypeTracker,
+  type TypeTracker,
 } from './type-resolver';
 
 export interface GeneratedCustomMutationFile {
@@ -51,15 +53,25 @@ export interface GenerateCustomMutationHookOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+  /** Table entity type names (for import path resolution) */
+  tableTypeNames?: Set<string>;
 }
 
 /**
  * Generate a custom mutation hook file
+ * When reactQueryEnabled is false, returns null since mutations require React Query
  */
 export function generateCustomMutationHook(
   options: GenerateCustomMutationHookOptions
-): GeneratedCustomMutationFile {
-  const { operation } = options;
+): GeneratedCustomMutationFile | null {
+  const { operation, reactQueryEnabled = true } = options;
+
+  // Mutations require React Query - skip generation when disabled
+  if (!reactQueryEnabled) {
+    return null;
+  }
 
   try {
     return generateCustomMutationHookInternal(options);
@@ -73,7 +85,7 @@ export function generateCustomMutationHook(
 function generateCustomMutationHookInternal(
   options: GenerateCustomMutationHookOptions
 ): GeneratedCustomMutationFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, tableTypeNames } = options;
 
   const project = createProject();
   const hookName = getOperationHookName(operation.name, 'mutation');
@@ -81,6 +93,9 @@ function generateCustomMutationHookInternal(
   const variablesTypeName = getOperationVariablesTypeName(operation.name, 'mutation');
   const resultTypeName = getOperationResultTypeName(operation.name, 'mutation');
   const documentConstName = getDocumentConstName(operation.name, 'mutation');
+
+  // Create type tracker to collect referenced types (with table type awareness)
+  const tracker = createTypeTracker({ tableTypeNames });
 
   // Generate GraphQL document
   const mutationDocument = buildCustomMutationString({
@@ -98,8 +113,24 @@ function generateCustomMutationHookInternal(
     createFileHeader(`Custom mutation hook for ${operation.name}`) + '\n\n'
   );
 
+  // Generate variables interface if there are arguments (with tracking)
+  let variablesProps: InterfaceProperty[] = [];
+  if (operation.args.length > 0) {
+    variablesProps = generateVariablesProperties(operation.args, tracker);
+  }
+
+  // Generate result interface (with tracking)
+  const resultType = typeRefToTsType(operation.returnType, tracker);
+  const resultProps: InterfaceProperty[] = [
+    { name: operation.name, type: resultType },
+  ];
+
+  // Get importable types from tracker (separated by source)
+  const schemaTypes = tracker.getImportableTypes();  // From schema-types.ts
+  const tableTypes = tracker.getTableTypes();        // From types.ts
+
   // Add imports
-  sourceFile.addImportDeclarations([
+  const imports = [
     createImport({
       moduleSpecifier: '@tanstack/react-query',
       namedImports: ['useMutation'],
@@ -109,7 +140,29 @@ function generateCustomMutationHookInternal(
       moduleSpecifier: '../client',
       namedImports: ['execute'],
     }),
-  ]);
+  ];
+
+  // Add types.ts import for table entity types
+  if (tableTypes.length > 0) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../types',
+        typeOnlyNamedImports: tableTypes,
+      })
+    );
+  }
+
+  // Add schema-types import for Input/Payload/Enum types
+  if (schemaTypes.length > 0) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../schema-types',
+        typeOnlyNamedImports: schemaTypes,
+      })
+    );
+  }
+
+  sourceFile.addImportDeclarations(imports);
 
   // Add mutation document constant
   sourceFile.addVariableStatement(
@@ -118,17 +171,12 @@ function generateCustomMutationHookInternal(
     })
   );
 
-  // Generate variables interface if there are arguments
+  // Add variables interface
   if (operation.args.length > 0) {
-    const variablesProps = generateVariablesProperties(operation.args);
     sourceFile.addInterface(createInterface(variablesTypeName, variablesProps));
   }
 
-  // Generate result interface
-  const resultType = typeRefToTsType(operation.returnType);
-  const resultProps: InterfaceProperty[] = [
-    { name: operation.name, type: resultType },
-  ];
+  // Add result interface
   sourceFile.addInterface(createInterface(resultTypeName, resultProps));
 
   // Generate hook function
@@ -157,10 +205,13 @@ function generateCustomMutationHookInternal(
 /**
  * Generate interface properties from CleanArguments
  */
-function generateVariablesProperties(args: CleanArgument[]): InterfaceProperty[] {
+function generateVariablesProperties(
+  args: CleanArgument[],
+  tracker?: TypeTracker
+): InterfaceProperty[] {
   return args.map((arg) => ({
     name: arg.name,
-    type: typeRefToTsType(arg.type),
+    type: typeRefToTsType(arg.type, tracker),
     optional: !isTypeRequired(arg.type),
     docs: arg.description ? [arg.description] : undefined,
   }));
@@ -229,15 +280,20 @@ export interface GenerateAllCustomMutationHooksOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+  /** Table entity type names (for import path resolution) */
+  tableTypeNames?: Set<string>;
 }
 
 /**
  * Generate all custom mutation hook files
+ * When reactQueryEnabled is false, returns empty array since mutations require React Query
  */
 export function generateAllCustomMutationHooks(
   options: GenerateAllCustomMutationHooksOptions
 ): GeneratedCustomMutationFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
 
   return operations
     .filter((op) => op.kind === 'mutation')
@@ -247,6 +303,9 @@ export function generateAllCustomMutationHooks(
         typeRegistry,
         maxDepth,
         skipQueryField,
+        reactQueryEnabled,
+        tableTypeNames,
       })
-    );
+    )
+    .filter((result): result is GeneratedCustomMutationFile => result !== null);
 }

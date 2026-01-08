@@ -35,6 +35,8 @@ import {
   getOperationResultTypeName,
   getDocumentConstName,
   getQueryKeyName,
+  createTypeTracker,
+  type TypeTracker,
 } from './type-resolver';
 import { ucFirst } from './utils';
 
@@ -53,6 +55,10 @@ export interface GenerateCustomQueryHookOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+  /** Table entity type names (for import path resolution) */
+  tableTypeNames?: Set<string>;
 }
 
 /**
@@ -61,7 +67,7 @@ export interface GenerateCustomQueryHookOptions {
 export function generateCustomQueryHook(
   options: GenerateCustomQueryHookOptions
 ): GeneratedCustomQueryFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
 
   const project = createProject();
   const hookName = getOperationHookName(operation.name, 'query');
@@ -70,6 +76,9 @@ export function generateCustomQueryHook(
   const resultTypeName = getOperationResultTypeName(operation.name, 'query');
   const documentConstName = getDocumentConstName(operation.name, 'query');
   const queryKeyName = getQueryKeyName(operation.name);
+
+  // Create type tracker to collect referenced types (with table type awareness)
+  const tracker = createTypeTracker({ tableTypeNames });
 
   // Generate GraphQL document
   const queryDocument = buildCustomQueryString({
@@ -82,24 +91,67 @@ export function generateCustomQueryHook(
   const sourceFile = createSourceFile(project, fileName);
 
   // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader(`Custom query hook for ${operation.name}`) + '\n\n'
-  );
+  const headerText = reactQueryEnabled
+    ? `Custom query hook for ${operation.name}`
+    : `Custom query functions for ${operation.name}`;
+  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
 
-  // Add imports
-  sourceFile.addImportDeclarations([
-    createImport({
-      moduleSpecifier: '@tanstack/react-query',
-      namedImports: ['useQuery'],
-      typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-    }),
+  // Generate variables interface if there are arguments (with tracking)
+  let variablesProps: InterfaceProperty[] = [];
+  if (operation.args.length > 0) {
+    variablesProps = generateVariablesProperties(operation.args, tracker);
+  }
+
+  // Generate result interface (with tracking)
+  const resultType = typeRefToTsType(operation.returnType, tracker);
+  const resultProps: InterfaceProperty[] = [
+    { name: operation.name, type: resultType },
+  ];
+
+  // Get importable types from tracker (separated by source)
+  const schemaTypes = tracker.getImportableTypes();  // From schema-types.ts
+  const tableTypes = tracker.getTableTypes();        // From types.ts
+
+  // Add imports - conditionally include React Query imports
+  const imports = [];
+  if (reactQueryEnabled) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '@tanstack/react-query',
+        namedImports: ['useQuery'],
+        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
+      })
+    );
+  }
+  imports.push(
     createImport({
       moduleSpecifier: '../client',
       namedImports: ['execute'],
       typeOnlyNamedImports: ['ExecuteOptions'],
-    }),
-  ]);
+    })
+  );
+
+  // Add types.ts import for table entity types
+  if (tableTypes.length > 0) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../types',
+        typeOnlyNamedImports: tableTypes,
+      })
+    );
+  }
+
+  // Add schema-types import for Input/Payload/Enum types
+  if (schemaTypes.length > 0) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../schema-types',
+        typeOnlyNamedImports: schemaTypes,
+      })
+    );
+  }
+
+  sourceFile.addImportDeclarations(imports);
 
   // Add query document constant
   sourceFile.addVariableStatement(
@@ -108,17 +160,12 @@ export function generateCustomQueryHook(
     })
   );
 
-  // Generate variables interface if there are arguments
+  // Add variables interface
   if (operation.args.length > 0) {
-    const variablesProps = generateVariablesProperties(operation.args);
     sourceFile.addInterface(createInterface(variablesTypeName, variablesProps));
   }
 
-  // Generate result interface
-  const resultType = typeRefToTsType(operation.returnType);
-  const resultProps: InterfaceProperty[] = [
-    { name: operation.name, type: resultType },
-  ];
+  // Add result interface
   sourceFile.addInterface(createInterface(resultTypeName, resultProps));
 
   // Query key factory
@@ -139,18 +186,20 @@ export function generateCustomQueryHook(
     );
   }
 
-  // Generate hook function
-  const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
-  const hookBody = generateHookBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-  const hookDoc = generateHookDoc(operation, hookName);
+  // Generate hook function (only if React Query is enabled)
+  if (reactQueryEnabled) {
+    const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
+    const hookBody = generateHookBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
+    const hookDoc = generateHookDoc(operation, hookName);
 
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: hookParams,
-    statements: hookBody,
-    docs: [{ description: hookDoc }],
-  });
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: hookParams,
+      statements: hookBody,
+      docs: [{ description: hookDoc }],
+    });
+  }
 
   // Add standalone functions section
   sourceFile.addStatements('\n// ============================================================================');
@@ -173,21 +222,23 @@ export function generateCustomQueryHook(
     docs: [{ description: fetchDoc }],
   });
 
-  // Generate prefetch function
-  const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
-  const prefetchParams = generatePrefetchParameters(operation, variablesTypeName);
-  const prefetchBody = generatePrefetchBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-  const prefetchDoc = generatePrefetchDoc(operation, prefetchFnName);
+  // Generate prefetch function (only if React Query is enabled)
+  if (reactQueryEnabled) {
+    const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
+    const prefetchParams = generatePrefetchParameters(operation, variablesTypeName);
+    const prefetchBody = generatePrefetchBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
+    const prefetchDoc = generatePrefetchDoc(operation, prefetchFnName);
 
-  sourceFile.addFunction({
-    name: prefetchFnName,
-    isExported: true,
-    isAsync: true,
-    parameters: prefetchParams,
-    returnType: 'Promise<void>',
-    statements: prefetchBody,
-    docs: [{ description: prefetchDoc }],
-  });
+    sourceFile.addFunction({
+      name: prefetchFnName,
+      isExported: true,
+      isAsync: true,
+      parameters: prefetchParams,
+      returnType: 'Promise<void>',
+      statements: prefetchBody,
+      docs: [{ description: prefetchDoc }],
+    });
+  }
 
   return {
     fileName,
@@ -203,10 +254,13 @@ export function generateCustomQueryHook(
 /**
  * Generate interface properties from CleanArguments
  */
-function generateVariablesProperties(args: CleanArgument[]): InterfaceProperty[] {
+function generateVariablesProperties(
+  args: CleanArgument[],
+  tracker?: TypeTracker
+): InterfaceProperty[] {
   return args.map((arg) => ({
     name: arg.name,
-    type: typeRefToTsType(arg.type),
+    type: typeRefToTsType(arg.type, tracker),
     optional: !isTypeRequired(arg.type),
     docs: arg.description ? [arg.description] : undefined,
   }));
@@ -482,6 +536,10 @@ export interface GenerateAllCustomQueryHooksOptions {
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
+  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
+  reactQueryEnabled?: boolean;
+  /** Table entity type names (for import path resolution) */
+  tableTypeNames?: Set<string>;
 }
 
 /**
@@ -490,7 +548,7 @@ export interface GenerateAllCustomQueryHooksOptions {
 export function generateAllCustomQueryHooks(
   options: GenerateAllCustomQueryHooksOptions
 ): GeneratedCustomQueryFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
 
   return operations
     .filter((op) => op.kind === 'query')
@@ -500,6 +558,8 @@ export function generateAllCustomQueryHooks(
         typeRegistry,
         maxDepth,
         skipQueryField,
+        reactQueryEnabled,
+        tableTypeNames,
       })
     );
 }

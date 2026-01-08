@@ -1,19 +1,18 @@
 /**
  * In-memory schema cache for watch mode
- * 
+ *
  * Only stores the hash in memory - no file I/O during normal operation.
  * Touch file feature is optional and only writes when explicitly configured.
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { MetaQueryResponse } from '../introspect/meta-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
-import { hashObject, combineHashes } from './hash';
+import { hashObject } from './hash';
 
 /**
  * Lightweight in-memory schema cache
- * Only stores the combined hash string to detect changes
+ * Only stores the schema hash string to detect changes
  */
 export class SchemaCache {
   /** Current schema hash (in-memory only) */
@@ -24,10 +23,9 @@ export class SchemaCache {
    * This is the hot path - must be efficient
    */
   async hasChanged(
-    meta: MetaQueryResponse,
     schema: IntrospectionQueryResponse
   ): Promise<{ changed: boolean; newHash: string }> {
-    const newHash = await this.computeHash(meta, schema);
+    const newHash = await this.computeHash(schema);
     const changed = this.currentHash === null || this.currentHash !== newHash;
     return { changed, newHash };
   }
@@ -54,17 +52,12 @@ export class SchemaCache {
   }
 
   /**
-   * Compute hash from meta and schema responses
+   * Compute hash from schema response
    */
   private async computeHash(
-    meta: MetaQueryResponse,
     schema: IntrospectionQueryResponse
   ): Promise<string> {
-    // Hash each response separately then combine
-    // This is more efficient than stringifying both together
-    const metaHash = await hashObject(meta);
-    const schemaHash = await hashObject(schema);
-    return combineHashes(metaHash, schemaHash);
+    return hashObject(schema);
   }
 }
 
@@ -78,7 +71,7 @@ export function touchFile(filePath: string): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   // Touch the file (create if doesn't exist, update mtime if it does)
   const time = new Date();
   try {

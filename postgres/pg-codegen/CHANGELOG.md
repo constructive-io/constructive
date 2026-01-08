@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.6](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.5...pg-codegen@2.17.6) (2026-01-08)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.17.5](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.4...pg-codegen@2.17.5) (2026-01-08)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.17.4](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.3...pg-codegen@2.17.4) (2026-01-08)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.17.3](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.2...pg-codegen@2.17.3) (2026-01-07)
+
+**Note:** Version bump only for package pg-codegen
+
+## [2.17.2](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.1...pg-codegen@2.17.2) (2026-01-07)
+
+**Note:** Version bump only for package pg-codegen
+
 ## [2.17.1](https://github.com/constructive-io/constructive/compare/pg-codegen@2.17.0...pg-codegen@2.17.1) (2026-01-06)
 
 **Note:** Version bump only for package pg-codegen

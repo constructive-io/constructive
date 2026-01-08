@@ -18,6 +18,7 @@ export const usageText = `
     upgrade            Upgrade installed pgpm modules to latest versions (alias: up)
 
   Database Administration:
+    dump               Dump a database to a sql file
     kill               Terminate database connections and optionally drop databases
     install            Install database modules
     tag                Add tags to changes for versioning

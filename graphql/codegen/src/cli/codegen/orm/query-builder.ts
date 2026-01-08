@@ -250,7 +250,8 @@ export function buildFindManyDocument(
     before?: string;
     offset?: number;
   },
-  filterTypeName: string
+  filterTypeName: string,
+  orderByTypeName: string
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select ? buildSelections(select) : 'id';
 
@@ -265,7 +266,7 @@ export function buildFindManyDocument(
     variables.where = args.where;
   }
   if (args.orderBy && args.orderBy.length > 0) {
-    varDefs.push(`$orderBy: [${operationName}OrderBy!]`);
+    varDefs.push(`$orderBy: [${orderByTypeName}!]`);
     queryArgs.push('orderBy: $orderBy');
     variables.orderBy = args.orderBy;
   }

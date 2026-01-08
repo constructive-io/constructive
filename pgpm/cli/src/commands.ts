@@ -11,6 +11,7 @@ import cache from './commands/cache';
 import clear from './commands/clear';
 import deploy from './commands/deploy';
 import docker from './commands/docker';
+import dump from './commands/dump';
 import env from './commands/env';
 import _export from './commands/export';
 import extension from './commands/extension';
@@ -48,6 +49,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     clear: pgt(clear),
     deploy: pgt(deploy),
     docker,
+    dump: pgt(dump),
     env,
     verify: pgt(verify),
     revert: pgt(revert),

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.6](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.5...graphile-plugin-connection-filter-postgis@1.3.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.5](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.4...graphile-plugin-connection-filter-postgis@1.3.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.4](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.3...graphile-plugin-connection-filter-postgis@1.3.4) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.3](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.2...graphile-plugin-connection-filter-postgis@1.3.3) (2026-01-07)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.2](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.1...graphile-plugin-connection-filter-postgis@1.3.2) (2026-01-07)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
 ## [1.3.1](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.0...graphile-plugin-connection-filter-postgis@1.3.1) (2026-01-06)
 
 **Note:** Version bump only for package graphile-plugin-connection-filter-postgis

@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.7](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.6...graphile-simple-inflector@0.4.7) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.6](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.5...graphile-simple-inflector@0.4.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.5](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.4...graphile-simple-inflector@0.4.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.4](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.3...graphile-simple-inflector@0.4.4) (2026-01-07)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.3](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.2...graphile-simple-inflector@0.4.3) (2026-01-07)
+
+### Bug Fixes
+
+- **inflection:** add special case for 'regimen' pluralization ([6316b85](https://github.com/constructive-io/constructive/commit/6316b85b0573dc6884175a39c5a47a2b36f95686))
+
+## [0.4.2](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.1...graphile-simple-inflector@0.4.2) (2026-01-07)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
 ## [0.4.1](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.0...graphile-simple-inflector@0.4.1) (2026-01-06)
 
 **Note:** Version bump only for package graphile-simple-inflector

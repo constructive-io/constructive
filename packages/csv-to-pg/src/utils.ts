@@ -130,7 +130,18 @@ const indexElem = (name: string): Node => ({
 
 import type { OnConflictClause } from '@pgsql/types';
 
-const makeConflictClause = (conflictElems: string[] | undefined, fields: string[]): OnConflictClause | undefined => {
+const makeConflictClause = (
+  conflictElems: string[] | undefined,
+  fields: string[],
+  conflictDoNothing?: boolean
+): OnConflictClause | undefined => {
+  // If conflictDoNothing is true, generate ON CONFLICT DO NOTHING without specifying columns
+  // This catches any unique constraint violation
+  if (conflictDoNothing) {
+    return {
+      action: 'ONCONFLICT_NOTHING'
+    };
+  }
   if (!conflictElems || !conflictElems.length) return undefined;
   const setElems = fields.filter((el) => !conflictElems.includes(el));
   if (setElems.length) {
@@ -157,6 +168,7 @@ interface InsertOneParams {
   types: TypesMap;
   record: Record<string, unknown>;
   conflict?: string[];
+  conflictDoNothing?: boolean;
 }
 
 export const InsertOne = ({
@@ -164,7 +176,8 @@ export const InsertOne = ({
   table,
   types,
   record,
-  conflict
+  conflict,
+  conflictDoNothing
 }: InsertOneParams): Node => ({
   RawStmt: {
     stmt: {
@@ -189,7 +202,7 @@ export const InsertOne = ({
             limitOption: 'LIMIT_OPTION_DEFAULT'
           }
         },
-        onConflictClause: makeConflictClause(conflict, Object.keys(types)),
+        onConflictClause: makeConflictClause(conflict, Object.keys(types), conflictDoNothing),
         override: 'OVERRIDING_NOT_SET'
       }
     },
@@ -203,6 +216,7 @@ interface InsertManyParams {
   types: TypesMap;
   records: Record<string, unknown>[];
   conflict?: string[];
+  conflictDoNothing?: boolean;
 }
 
 export const InsertMany = ({
@@ -210,7 +224,8 @@ export const InsertMany = ({
   table,
   types,
   records,
-  conflict
+  conflict,
+  conflictDoNothing
 }: InsertManyParams): Node => ({
   RawStmt: {
     stmt: {
@@ -233,7 +248,7 @@ export const InsertMany = ({
             limitOption: 'LIMIT_OPTION_DEFAULT'
           }
         },
-        onConflictClause: makeConflictClause(conflict, Object.keys(types)),
+        onConflictClause: makeConflictClause(conflict, Object.keys(types), conflictDoNothing),
         override: 'OVERRIDING_NOT_SET'
       }
     },

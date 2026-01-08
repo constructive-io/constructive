@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.0...@pgpmjs/core@4.12.1) (2026-01-08)
+
+### Bug Fixes
+
+- scope extension export query by database_id via database_extension join ([e4ad67c](https://github.com/constructive-io/constructive/commit/e4ad67ce8c592536f804049876c8e5c78be636eb))
+- use simple WHERE database_id clause for extension export ([295238e](https://github.com/constructive-io/constructive/commit/295238e7efad54801e4bb656f9748c7c44c0ec31))
+
+# [4.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.11.0...@pgpmjs/core@4.12.0) (2026-01-08)
+
+### Features
+
+- **csv-to-pg:** add conflictDoNothing option for ON CONFLICT DO NOTHING ([735bfeb](https://github.com/constructive-io/constructive/commit/735bfebc5c4dfb2ee41460a920f2b0560b77a0c6))
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.1...@pgpmjs/core@4.11.0) (2026-01-08)
+
+### Bug Fixes
+
+- **core:** gracefully handle missing tables in exportMeta ([42cce5a](https://github.com/constructive-io/constructive/commit/42cce5adad29c5e45baa5bed7bcc0cc57fd87220))
+
+### Features
+
+- **core:** export all tables from metaschema_public, services_public, and metaschema_modules_public ([0fa6a1f](https://github.com/constructive-io/constructive/commit/0fa6a1f09766e4762f59a382e66efd32b59584e3))
+
+## [4.10.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.0...@pgpmjs/core@4.10.1) (2026-01-07)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.9.1...@pgpmjs/core@4.10.0) (2026-01-07)
+
+### Features
+
+- **pgpm:** support non-pgpm templates in init command ([1c8f8c6](https://github.com/constructive-io/constructive/commit/1c8f8c6b75db89687e3976aad00da1ddeded3ecc))
+
 ## [4.9.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.9.0...@pgpmjs/core@4.9.1) (2026-01-06)
 
 **Note:** Version bump only for package @pgpmjs/core

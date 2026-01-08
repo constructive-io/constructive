@@ -23,11 +23,16 @@
  *     useRegisterMutation.ts
  *     ...
  */
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../types/schema';
+import type {
+  CleanTable,
+  CleanOperation,
+  TypeRegistry,
+} from '../../types/schema';
 import type { ResolvedConfig } from '../../types/config';
 
 import { generateClientFile } from './client';
 import { generateTypesFile } from './types';
+import { generateSchemaTypesFile } from './schema-types-generator';
 import { generateAllQueryHooks } from './queries';
 import { generateAllMutationHooks } from './mutations';
 import { generateAllCustomQueryHooks } from './custom-queries';
@@ -39,6 +44,7 @@ import {
   generateCustomQueriesBarrel,
   generateCustomMutationsBarrel,
 } from './barrel';
+import { getTableNames } from './utils';
 
 // ============================================================================
 // Types
@@ -100,6 +106,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   // Extract codegen options
   const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
+  const reactQueryEnabled = config.reactQuery.enabled;
 
   // 1. Generate client.ts
   files.push({
@@ -107,14 +114,40 @@ export function generate(options: GenerateOptions): GenerateResult {
     content: generateClientFile(),
   });
 
-  // 2. Generate types.ts
+  // Collect table type names for import path resolution
+  const tableTypeNames = new Set(tables.map((t) => getTableNames(t).typeName));
+
+  // 2. Generate schema-types.ts for custom operations (if any)
+  // NOTE: This must come BEFORE types.ts so that types.ts can import enum types
+  let hasSchemaTypes = false;
+  let generatedEnumNames: string[] = [];
+  if (customOperations && customOperations.typeRegistry) {
+    const schemaTypesResult = generateSchemaTypesFile({
+      typeRegistry: customOperations.typeRegistry,
+      tableTypeNames,
+    });
+
+    // Only include if there's meaningful content
+    if (schemaTypesResult.content.split('\n').length > 10) {
+      files.push({
+        path: 'schema-types.ts',
+        content: schemaTypesResult.content,
+      });
+      hasSchemaTypes = true;
+      generatedEnumNames = schemaTypesResult.generatedEnums || [];
+    }
+  }
+
+  // 3. Generate types.ts (can now import enums from schema-types)
   files.push({
     path: 'types.ts',
-    content: generateTypesFile(tables),
+    content: generateTypesFile(tables, {
+      enumsFromSchemaTypes: generatedEnumNames,
+    }),
   });
 
-  // 3. Generate table-based query hooks (queries/*.ts)
-  const queryHooks = generateAllQueryHooks(tables);
+  // 4. Generate table-based query hooks (queries/*.ts)
+  const queryHooks = generateAllQueryHooks(tables, { reactQueryEnabled });
   for (const hook of queryHooks) {
     files.push({
       path: `queries/${hook.fileName}`,
@@ -122,14 +155,20 @@ export function generate(options: GenerateOptions): GenerateResult {
     });
   }
 
-  // 4. Generate custom query hooks if available
-  let customQueryHooks: Array<{ fileName: string; content: string; operationName: string }> = [];
+  // 5. Generate custom query hooks if available
+  let customQueryHooks: Array<{
+    fileName: string;
+    content: string;
+    operationName: string;
+  }> = [];
   if (customOperations && customOperations.queries.length > 0) {
     customQueryHooks = generateAllCustomQueryHooks({
       operations: customOperations.queries,
       typeRegistry: customOperations.typeRegistry,
       maxDepth,
       skipQueryField,
+      reactQueryEnabled,
+      tableTypeNames,
     });
 
     for (const hook of customQueryHooks) {
@@ -143,13 +182,20 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 5. Generate queries/index.ts barrel (includes both table and custom queries)
   files.push({
     path: 'queries/index.ts',
-    content: customQueryHooks.length > 0
-      ? generateCustomQueriesBarrel(tables, customQueryHooks.map((h) => h.operationName))
-      : generateQueriesBarrel(tables),
+    content:
+      customQueryHooks.length > 0
+        ? generateCustomQueriesBarrel(
+            tables,
+            customQueryHooks.map((h) => h.operationName)
+          )
+        : generateQueriesBarrel(tables),
   });
 
   // 6. Generate table-based mutation hooks (mutations/*.ts)
-  const mutationHooks = generateAllMutationHooks(tables);
+  const mutationHooks = generateAllMutationHooks(tables, {
+    reactQueryEnabled,
+    enumsFromSchemaTypes: generatedEnumNames,
+  });
   for (const hook of mutationHooks) {
     files.push({
       path: `mutations/${hook.fileName}`,
@@ -158,13 +204,19 @@ export function generate(options: GenerateOptions): GenerateResult {
   }
 
   // 7. Generate custom mutation hooks if available
-  let customMutationHooks: Array<{ fileName: string; content: string; operationName: string }> = [];
+  let customMutationHooks: Array<{
+    fileName: string;
+    content: string;
+    operationName: string;
+  }> = [];
   if (customOperations && customOperations.mutations.length > 0) {
     customMutationHooks = generateAllCustomMutationHooks({
       operations: customOperations.mutations,
       typeRegistry: customOperations.typeRegistry,
       maxDepth,
       skipQueryField,
+      reactQueryEnabled,
+      tableTypeNames,
     });
 
     for (const hook of customMutationHooks) {
@@ -175,18 +227,27 @@ export function generate(options: GenerateOptions): GenerateResult {
     }
   }
 
-  // 8. Generate mutations/index.ts barrel (includes both table and custom mutations)
-  files.push({
-    path: 'mutations/index.ts',
-    content: customMutationHooks.length > 0
-      ? generateCustomMutationsBarrel(tables, customMutationHooks.map((h) => h.operationName))
-      : generateMutationsBarrel(tables),
-  });
+  // 8. Generate mutations/index.ts barrel (only if React Query is enabled)
+  // When reactQuery is disabled, no mutation hooks are generated, so skip the barrel
+  const hasMutations =
+    mutationHooks.length > 0 || customMutationHooks.length > 0;
+  if (hasMutations) {
+    files.push({
+      path: 'mutations/index.ts',
+      content:
+        customMutationHooks.length > 0
+          ? generateCustomMutationsBarrel(
+              tables,
+              customMutationHooks.map((h) => h.operationName)
+            )
+          : generateMutationsBarrel(tables),
+    });
+  }
 
-  // 9. Generate main index.ts barrel
+  // 9. Generate main index.ts barrel (with schema-types if present)
   files.push({
     path: 'index.ts',
-    content: generateMainBarrel(tables),
+    content: generateMainBarrel(tables, { hasSchemaTypes, hasMutations }),
   });
 
   return {
@@ -208,15 +269,25 @@ export function generate(options: GenerateOptions): GenerateResult {
 
 export { generateClientFile } from './client';
 export { generateTypesFile } from './types';
-export { generateAllQueryHooks, generateListQueryHook, generateSingleQueryHook } from './queries';
+export {
+  generateAllQueryHooks,
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from './queries';
 export {
   generateAllMutationHooks,
   generateCreateMutationHook,
   generateUpdateMutationHook,
   generateDeleteMutationHook,
 } from './mutations';
-export { generateAllCustomQueryHooks, generateCustomQueryHook } from './custom-queries';
-export { generateAllCustomMutationHooks, generateCustomMutationHook } from './custom-mutations';
+export {
+  generateAllCustomQueryHooks,
+  generateCustomQueryHook,
+} from './custom-queries';
+export {
+  generateAllCustomMutationHooks,
+  generateCustomMutationHook,
+} from './custom-mutations';
 export {
   generateQueriesBarrel,
   generateMutationsBarrel,
