@@ -353,9 +353,9 @@ const config: Record<string, TableConfig> = {
       schema_name: 'text'
     }
   },
-  api_schemata: {
+  api_schemas: {
     schema: 'services_public',
-    table: 'api_schemata',
+    table: 'api_schemas',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
@@ -853,7 +853,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('site_metadata', `SELECT * FROM services_public.site_metadata WHERE database_id = $1`);
   await queryAndParse('api_modules', `SELECT * FROM services_public.api_modules WHERE database_id = $1`);
   await queryAndParse('api_extensions', `SELECT * FROM services_public.api_extensions WHERE database_id = $1`);
-  await queryAndParse('api_schemata', `SELECT * FROM services_public.api_schemata WHERE database_id = $1`);
+  await queryAndParse('api_schemas', `SELECT * FROM services_public.api_schemas WHERE database_id = $1`);
 
   // =============================================================================
   // metaschema_modules_public tables
