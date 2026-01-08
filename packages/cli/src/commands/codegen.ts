@@ -4,7 +4,7 @@ import express from 'express'
 import { postgraphile } from 'postgraphile'
 import { getGraphileSettings } from 'graphile-settings'
 import { getPgPool } from 'pg-cache'
-import { generateCommand } from '@constructive-io/graphql-codegen'
+import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
 import { ConstructiveOptions, getEnvOptions } from '@constructive-io/graphql-env'
 
 const usage = `

@@ -1,6 +1,6 @@
 import type { ParsedArgs } from 'minimist'
 import codegenCommand from '../src/commands/codegen'
-import { generateCommand } from '@constructive-io/graphql-codegen'
+import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
 
 jest.mock('@constructive-io/graphql-codegen', () => ({
   generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
