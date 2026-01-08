@@ -784,7 +784,9 @@ interface ExportMetaParams {
   database_id: string;
 }
 
-export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<string> => {
+export type ExportMetaResult = Record<string, string>;
+
+export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<ExportMetaResult> => {
   const pool = getPgPool({
     ...opts.pg,
     database: dbname
@@ -877,5 +879,5 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
 
-  return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
+  return sql;
 };
