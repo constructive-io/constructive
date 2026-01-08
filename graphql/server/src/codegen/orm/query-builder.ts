@@ -314,14 +314,37 @@ export function buildCustomDocument<TSelect, TArgs>(
   args: TArgs,
   variableDefinitions: Array<{ name: string; type: string }>
 ): { document: string; variables: Record<string, unknown> } {
-  const selections = select ? buildSelections(select) : '';
+  // Check if select is wrapped with connection metadata
+  let actualSelect = select;
+  let isConnection = false;
+  
+  if (select && typeof select === 'object' && 'select' in select) {
+    const wrapper = select as { select?: any; connection?: boolean };
+    if (wrapper.select) {
+      actualSelect = wrapper.select as TSelect;
+      isConnection = wrapper.connection === true;
+    }
+  }
+  
+  const selections = actualSelect ? buildSelections(actualSelect) : '';
 
   const varDefs = variableDefinitions.map((v) => `$${v.name}: ${v.type}`);
   const fieldArgs = variableDefinitions.map((v) => `${v.name}: $${v.name}`);
 
   const varDefsStr = varDefs.length > 0 ? `(${varDefs.join(', ')})` : '';
   const fieldArgsStr = fieldArgs.length > 0 ? `(${fieldArgs.join(', ')})` : '';
-  const selectionsBlock = selections ? ` { ${selections} }` : '';
+  
+  let selectionsBlock: string;
+  if (isConnection) {
+    // Wrap in connection structure
+    selectionsBlock = ` {
+    nodes { ${selections} }
+    totalCount
+    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+  }`;
+  } else {
+    selectionsBlock = selections ? ` { ${selections} }` : '';
+  }
 
   const opType = operationType === 'query' ? 'query' : 'mutation';
   const document = `${opType} ${operationName}${varDefsStr} {
