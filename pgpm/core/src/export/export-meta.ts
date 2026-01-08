@@ -7,6 +7,7 @@ type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | '
 interface TableConfig {
   schema: string;
   table: string;
+  conflictDoNothing?: boolean;
   fields: Record<string, FieldType>;
 }
 
@@ -57,6 +58,10 @@ const config: Record<string, TableConfig> = {
   field: {
     schema: 'metaschema_public',
     table: 'field',
+    // Use ON CONFLICT DO NOTHING to handle the unique constraint (databases_field_uniq_names_idx)
+    // which normalizes UUID field names by stripping suffixes like _id, _uuid, etc.
+    // This causes collisions when tables have both 'foo' (text) and 'foo_id' (uuid) columns.
+    conflictDoNothing: true,
     fields: {
       id: 'uuid',
       database_id: 'uuid',
