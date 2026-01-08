@@ -64,8 +64,8 @@ export interface OldApiStructure {
   dbname: string;
   anonRole: string;
   roleName: string;
-  schemaNames: SchemaNodes;
-  schemaNamesFromExt: SchemaNodes;
+  schemasByApiSchemaApiIdAndSchemaId: SchemaNodes;
+  apiExtensions: SchemaNodes;
   apiModules: ApiModuleNodes;
   rlsModule?: RlsModule;
   database?: Database;
