@@ -242,6 +242,7 @@ const config: Record<string, TableConfig> = {
     table: 'extension',
     fields: {
       id: 'uuid',
+      database_id: 'uuid',
       name: 'text'
     }
   },
@@ -844,7 +845,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1`);
   await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1`);
   await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1`);
-  await queryAndParse('extension', `SELECT * FROM metaschema_public.extension`);
+  await queryAndParse('extension', `SELECT * FROM metaschema_public.extension WHERE database_id = $1`);
 
   // =============================================================================
   // services_public tables
