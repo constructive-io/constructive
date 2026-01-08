@@ -287,6 +287,35 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         });
         return wrapValue(val, opts);
       };
+    case 'uuid[]':
+      return (record: Record<string, unknown>): Node => {
+        const rawValue = record[from[0]];
+        if (isNullToken(rawValue)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+        }
+        // Handle array values - validate each UUID
+        if (Array.isArray(rawValue)) {
+          if (rawValue.length === 0) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+          }
+          const uuidRegex = /^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i;
+          for (const item of rawValue) {
+            if (!uuidRegex.test(String(item))) {
+              return makeNullOrThrow(fieldName, rawValue, type, required, `array contains invalid UUID: ${item}`);
+            }
+          }
+          const arrayLiteral = psqlArray(rawValue);
+          if (isEmpty(arrayLiteral)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(arrayLiteral) })
+          });
+          return wrapValue(val, opts);
+        }
+        // If not an array, treat as empty/null
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
+      };
     case 'timestamp':
     case 'timestamptz':
     case 'date':
