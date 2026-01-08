@@ -29,7 +29,9 @@
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "bucket:create": "ts-node src/scripts/create-bucket.ts"
+    "bucket:create": "ts-node src/scripts/create-bucket.ts",
+    "codegen:schema": "ts-node src/scripts/codegen-schema.ts",
+    "codegen": "npm run codegen:schema && graphql-codegen generate-orm --schema codegen/schema.graphql --output codegen/orm"
   },
   "keywords": [
     "server",
@@ -74,6 +76,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
+    "@constructive-io/graphql-codegen": "^2.23.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/graphql-upload": "^8.0.12",
