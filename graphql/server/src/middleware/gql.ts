@@ -9,18 +9,26 @@ export const ApiQuery: GraphQLDocument = gql`
   query ApiRoot($domain: String!, $subdomain: String) {
     domains(condition: { domain: $domain, subdomain: $subdomain }) {
       nodes {
+        domain
+        subdomain
         api {
           databaseId
           dbname
           roleName
           anonRole
           isPublic
+          domains {
+            nodes {
+              subdomain
+              domain
+            }
+          }
           schemaNamesFromExt: apiExtensions {
             nodes {
               schemaName
             }
           }
-          schemaNames: schemataByApiSchemaApiIdAndSchemaId {
+          schemaNames: schemasByApiSchemaApiIdAndSchemaId {
             nodes {
               schemaName
             }
@@ -66,12 +74,18 @@ export const ApiByNameQuery: GraphQLDocument = gql`
       roleName
       anonRole
       isPublic
+      domains {
+        nodes {
+          subdomain
+          domain
+        }
+      }
       schemaNamesFromExt: apiExtensions {
         nodes {
           schemaName
         }
       }
-      schemaNames: schemataByApiSchemaApiIdAndSchemaId {
+      schemaNames: schemasByApiSchemaApiIdAndSchemaId {
         nodes {
           schemaName
         }
@@ -122,6 +136,18 @@ export const ListOfAllDomainsOfDb: GraphQLDocument = gql`
           nodes {
             domain
             subdomain
+          }
+        }
+        database {
+          sites {
+            nodes {
+              domains {
+                nodes {
+                  domain
+                  subdomain
+                }
+              }
+            }
           }
         }
       }
