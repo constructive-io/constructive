@@ -1,5 +1,3 @@
-import { readFile } from 'fs/promises';
-import { createServer } from 'net';
 import { dirname, join } from 'path';
 import supertest from 'supertest';
 
@@ -139,6 +137,10 @@ const waitForJobCompletion = async (
 
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
+const GRAPHQL_PORT = 3000;
+const CALLBACK_PORT = 8080;
+const SIMPLE_EMAIL_PORT = 8081;
+const SEND_EMAIL_LINK_PORT = 8082;
 
 const getPgpmModulePath = (pkgName: string): string =>
   dirname(require.resolve(`${pkgName}/pgpm.plan`));
@@ -212,106 +214,7 @@ const createTestDb = async (): Promise<SeededConnections> => {
   return { db, pg, teardown };
 };
 
-const hasSchema = async (client: PgTestClient, schema: string) => {
-  const row = await client.oneOrNone<{ schema_name: string }>(
-    'SELECT schema_name FROM information_schema.schemata WHERE schema_name = $1',
-    [schema]
-  );
-  return Boolean(row?.schema_name);
-};
 
-const ensureJobsSchema = async (client: PgTestClient) => {
-  if (await hasSchema(client, 'app_jobs')) return;
-  await runMetaMigrations(client.config);
-  if (!(await hasSchema(client, 'app_jobs'))) {
-    throw new Error('app_jobs schema was not created by pgpm migrations');
-  }
-};
-
-const getAvailablePort = (): Promise<number> =>
-  new Promise((resolvePort, reject) => {
-    const server = createServer();
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      if (!address || typeof address === 'string') {
-        server.close(() => reject(new Error('Failed to allocate a port')));
-        return;
-      }
-      const port = address.port;
-      server.close((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolvePort(port);
-      });
-    });
-    server.on('error', reject);
-  });
-
-const waitForReady = async (
-  label: string,
-  check: () => Promise<boolean>,
-  timeoutMs = 30000,
-  getLastError?: () => string | undefined
-) => {
-  const started = Date.now();
-
-  while (Date.now() - started < timeoutMs) {
-    try {
-      if (await check()) return;
-    } catch {
-      // ignore and retry
-    }
-    await delay(500);
-  }
-
-  const lastError = getLastError?.();
-  if (lastError) {
-    throw new Error(
-      `${label} did not become ready within ${timeoutMs}ms. Last error: ${lastError}`
-    );
-  }
-  throw new Error(`${label} did not become ready within ${timeoutMs}ms.`);
-};
-
-const waitForGraphql = async (client: GraphqlClient) => {
-  let lastError: string | undefined;
-  await waitForReady(
-    'GraphQL server',
-    async () => {
-      const response = await sendGraphql(client, '{ __typename }');
-      if (response.status !== 200) {
-        const detail =
-          response.text ||
-          (response.body ? JSON.stringify(response.body) : undefined);
-        lastError = detail
-          ? `HTTP ${response.status}: ${detail}`
-          : `HTTP ${response.status}`;
-        return false;
-      }
-      if (response.body?.errors?.length) {
-        lastError = response.body.errors
-          .map((err: { message: string }) => err.message)
-          .join('; ');
-        return false;
-      }
-      lastError = undefined;
-      return true;
-    },
-    30000,
-    () => lastError
-  );
-};
-
-const waitForCallbackServer = async (callbackUrl: string) => {
-  const origin = callbackUrl.replace(/\/callback$/, '');
-  const http = supertest(origin);
-  await waitForReady('Jobs callback server', async () => {
-    const response = await http.post('/callback').send({});
-    return response.status === 200;
-  });
-};
 
 describe('jobs e2e', () => {
   let teardown: () => Promise<void>;
@@ -358,8 +261,6 @@ describe('jobs e2e', () => {
     if (!pg) {
       throw new Error('Test database connection is missing');
     }
-    await ensureJobsSchema(pg);
-
     databaseId = seededDatabaseId;
     if (pg?.oneOrNone) {
       const row = await pg.oneOrNone<{ id: string }>(
@@ -367,15 +268,7 @@ describe('jobs e2e', () => {
         [databaseId]
       );
       if (!row?.id) {
-        const seedSql = await readFile(sql('jobs.seed.sql'), 'utf8');
-        await pg.query(seedSql);
-        const seeded = await pg.oneOrNone<{ id: string }>(
-          'SELECT id FROM metaschema_public.database WHERE id = $1',
-          [databaseId]
-        );
-        if (!seeded?.id) {
-          throw new Error(`Seeded database id ${databaseId} was not found`);
-        }
+        throw new Error(`Seeded database id ${databaseId} was not found`);
       }
     }
 
@@ -383,15 +276,8 @@ describe('jobs e2e', () => {
       throw new Error('Test database config is missing a database name');
     }
 
-    const ports = {
-      graphqlPort: await getAvailablePort(),
-      callbackPort: await getAvailablePort(),
-      simpleEmailPort: await getAvailablePort(),
-      sendEmailLinkPort: await getAvailablePort()
-    };
-
-    const graphqlUrl = `http://127.0.0.1:${ports.graphqlPort}/graphql`;
-    const callbackUrl = `http://127.0.0.1:${ports.callbackPort}/callback`;
+    const graphqlUrl = `http://127.0.0.1:${GRAPHQL_PORT}/graphql`;
+    const callbackUrl = `http://127.0.0.1:${CALLBACK_PORT}/callback`;
 
     process.env.NODE_ENV = 'test';
     process.env.PGDATABASE = pg.config.database;
@@ -402,7 +288,7 @@ describe('jobs e2e', () => {
     process.env.META_GRAPHQL_URL = graphqlUrl;
     process.env.SIMPLE_EMAIL_DRY_RUN = 'true';
     process.env.SEND_EMAIL_LINK_DRY_RUN = 'true';
-    process.env.LOCAL_APP_PORT = String(ports.graphqlPort);
+    process.env.LOCAL_APP_PORT = String(GRAPHQL_PORT);
     process.env.MAILGUN_DOMAIN = 'mg.constructive.io';
     process.env.MAILGUN_FROM = 'no-reply@mg.constructive.io';
     process.env.MAILGUN_REPLY = 'info@mg.constructive.io';
@@ -411,10 +297,10 @@ describe('jobs e2e', () => {
     process.env.JOBS_SUPPORT_ANY = 'false';
     process.env.JOBS_SUPPORTED = 'simple-email,send-email-link';
     process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP = JSON.stringify({
-      'simple-email': `http://127.0.0.1:${ports.simpleEmailPort}`,
-      'send-email-link': `http://127.0.0.1:${ports.sendEmailLinkPort}`
+      'simple-email': `http://127.0.0.1:${SIMPLE_EMAIL_PORT}`,
+      'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`
     });
-    process.env.INTERNAL_JOBS_CALLBACK_PORT = String(ports.callbackPort);
+    process.env.INTERNAL_JOBS_CALLBACK_PORT = String(CALLBACK_PORT);
     process.env.JOBS_CALLBACK_BASE_URL = callbackUrl;
     process.env.FEATURES_POSTGIS = 'false';
 
@@ -424,8 +310,8 @@ describe('jobs e2e', () => {
     if (pg.config.password) process.env.PGPASSWORD = pg.config.password;
 
     const services: FunctionServiceConfig[] = [
-      { name: 'simple-email', port: ports.simpleEmailPort },
-      { name: 'send-email-link', port: ports.sendEmailLinkPort }
+      { name: 'simple-email', port: SIMPLE_EMAIL_PORT },
+      { name: 'send-email-link', port: SEND_EMAIL_LINK_PORT }
     ];
 
     const combinedServerOptions: CombinedServerOptions = {
@@ -441,7 +327,7 @@ describe('jobs e2e', () => {
           },
           server: {
             host: '127.0.0.1',
-            port: ports.graphqlPort
+            port: GRAPHQL_PORT
           },
           api: {
             enableMetaApi: false,
@@ -473,8 +359,6 @@ describe('jobs e2e', () => {
     await combinedServer.start();
 
     graphqlClient = getGraphqlClient();
-    await waitForGraphql(graphqlClient);
-    await waitForCallbackServer(callbackUrl);
   });
 
   afterAll(async () => {
