@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.2...@pgpmjs/core@4.13.3) (2026-01-08)
+
+### Bug Fixes
+
+- **pgpm/core:** update export-meta.ts config to match actual metaschema table definitions ([e1addd0](https://github.com/constructive-io/constructive/commit/e1addd012d7d7ee755df6680b767e0e60542823a))
+
 ## [4.13.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.1...@pgpmjs/core@4.13.2) (2026-01-08)
 
 ### Bug Fixes
