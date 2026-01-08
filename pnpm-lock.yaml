@@ -1244,9 +1244,6 @@ importers:
       '@constructive-io/graphql-server':
         specifier: workspace:^
         version: link:../../graphql/server/dist
-      '@constructive-io/graphql-types':
-        specifier: workspace:^
-        version: link:../../graphql/types/dist
       '@inquirerer/utils':
         specifier: ^3.1.3
         version: 3.1.3
@@ -1265,9 +1262,6 @@ importers:
       find-and-require-package-json:
         specifier: ^0.8.6
         version: 0.8.6
-      graphile-settings:
-        specifier: workspace:^
-        version: link:../../graphile/graphile-settings/dist
       inquirerer:
         specifier: ^4.3.1
         version: 4.3.1
@@ -1286,9 +1280,6 @@ importers:
       pgpm:
         specifier: workspace:^
         version: link:../../pgpm/cli/dist
-      postgraphile:
-        specifier: ^4.14.1
-        version: 4.14.1
       shelljs:
         specifier: ^0.10.0
         version: 0.10.0

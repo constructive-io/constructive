@@ -10,18 +10,6 @@ jest.mock('@constructive-io/graphql-server', () => ({
   buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\nschema { query: Query }')
 }))
 
-jest.mock('express', () => {
-  const mApp = () => ({
-    use: jest.fn(),
-    listen: (_port: number, _host: string, cb: Function) => {
-      const server = { address: () => ({ port: 4321 }), on: jest.fn(), close: (done: Function) => setImmediate(() => done && done()) };
-      setImmediate(() => cb());
-      return server;
-    }
-  })
-  return { __esModule: true, default: mApp }
-})
-
 jest.mock('postgraphile', () => ({ postgraphile: jest.fn(() => (req: any, res: any, next: any) => next && next()) }))
 jest.mock('graphile-settings', () => ({ getGraphileSettings: jest.fn(() => ({ graphiql: false })) }))
 jest.mock('pg-cache', () => ({ getPgPool: jest.fn(() => ({ end: jest.fn() })) }))
