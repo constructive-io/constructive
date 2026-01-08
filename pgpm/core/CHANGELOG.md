@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.2...@pgpmjs/core@4.13.0) (2026-01-08)
+
+### Bug Fixes
+
+- **export:** generate separate meta.sql files per table type ([10ba703](https://github.com/constructive-io/constructive/commit/10ba703f203a33c64b1f13c1bac9e73e14a8b029))
+
+### Features
+
+- **export:** generate separate meta.sql files for each schema type ([e3a65da](https://github.com/constructive-io/constructive/commit/e3a65dacb922a54f2b3747591d0ff3836c6717ff))
+
 ## [4.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.1...@pgpmjs/core@4.12.2) (2026-01-08)
 
 ### Bug Fixes

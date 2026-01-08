@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.8...@constructive-io/graphql-server@2.15.0) (2026-01-08)
+
+### Features
+
+- improve loggings and type safe codegen ([#581](https://github.com/constructive-io/constructive/issues/581)) ([e0f103a](https://github.com/constructive-io/constructive/commit/e0f103ab21bd0dd7349a3952d5b19f8762864daa))
+
 ## [2.14.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.7...@constructive-io/graphql-server@2.14.8) (2026-01-08)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
