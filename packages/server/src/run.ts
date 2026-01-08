@@ -84,8 +84,10 @@ export const buildCombinedServerOptionsFromEnv = (): CombinedServerOptions => ({
   functions: buildFunctionsOptions()
 });
 
-export const startCombinedServerFromEnv = async (): Promise<CombinedServerResult> =>
-  CombinedServer(buildCombinedServerOptionsFromEnv());
+export const startCombinedServerFromEnv = async (): Promise<CombinedServerResult> => {
+  const server = new CombinedServer(buildCombinedServerOptionsFromEnv());
+  return server.start();
+};
 
 if (require.main === module) {
   void startCombinedServerFromEnv().catch((error) => {

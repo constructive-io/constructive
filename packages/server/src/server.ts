@@ -1,7 +1,17 @@
-import { GraphQLServer } from '@constructive-io/graphql-server';
-import { bootJobs } from '@constructive-io/knative-job-service/dist/run';
+import { Server as GraphQLServer } from '@constructive-io/graphql-server';
+import jobServerFactory from '@constructive-io/knative-job-server';
+import Worker from '@constructive-io/knative-job-worker';
+import Scheduler from '@constructive-io/job-scheduler';
+import poolManager from '@constructive-io/job-pg';
+import {
+  getJobSupported,
+  getJobsCallbackPort,
+  getSchedulerHostname,
+  getWorkerHostname
+} from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
 import { createRequire } from 'module';
+import type { Server as HttpServer } from 'http';
 
 import {
   CombinedServerOptions,
@@ -30,7 +40,6 @@ const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
 
 const log = new Logger('combined-server');
 const requireFn = createRequire(__filename);
-const functionServers = new Map<FunctionName, unknown>();
 
 const resolveFunctionEntry = (name: FunctionName): FunctionRegistryEntry => {
   const entry = functionRegistry[name];
@@ -94,7 +103,8 @@ const ensureUniquePorts = (services: FunctionServiceConfig[]) => {
 };
 
 const startFunction = async (
-  service: FunctionServiceConfig
+  service: FunctionServiceConfig,
+  functionServers: Map<FunctionName, HttpServer>
 ): Promise<StartedFunction> => {
   const entry = resolveFunctionEntry(service.name);
   const port = resolveFunctionPort(service);
@@ -104,7 +114,7 @@ const startFunction = async (
     const server = app.listen(port, () => {
       log.info(`function:${service.name} listening on ${port}`);
       resolve();
-    }) as { on?: (event: string, cb: (err: Error) => void) => void };
+    }) as HttpServer & { on?: (event: string, cb: (err: Error) => void) => void };
 
     if (server?.on) {
       server.on('error', (err) => {
@@ -119,8 +129,9 @@ const startFunction = async (
   return { name: service.name, port };
 };
 
-export const startFunctions = async (
-  options?: FunctionsOptions
+const startFunctions = async (
+  options: FunctionsOptions | undefined,
+  functionServers: Map<FunctionName, HttpServer>
 ): Promise<StartedFunction[]> => {
   const services = normalizeFunctionServices(options);
   if (!services.length) return [];
@@ -129,37 +140,174 @@ export const startFunctions = async (
 
   const started: StartedFunction[] = [];
   for (const service of services) {
-    started.push(await startFunction(service));
+    started.push(await startFunction(service, functionServers));
   }
 
   return started;
 };
 
-export const CombinedServer = async (
-  options: CombinedServerOptions = {}
-): Promise<CombinedServerResult> => {
-  const result: CombinedServerResult = {
+type JobRunner = {
+  listen: () => void;
+  stop?: () => Promise<void> | void;
+};
+
+const listenApp = async (
+  app: { listen: (port: number, host?: string) => HttpServer },
+  port: number,
+  host?: string
+): Promise<HttpServer> =>
+  new Promise((resolveListen, rejectListen) => {
+    const server = host ? app.listen(port, host) : app.listen(port);
+
+    const cleanup = () => {
+      server.off('listening', handleListen);
+      server.off('error', handleError);
+    };
+
+    const handleListen = () => {
+      cleanup();
+      resolveListen(server);
+    };
+
+    const handleError = (err: Error) => {
+      cleanup();
+      rejectListen(err);
+    };
+
+    server.once('listening', handleListen);
+    server.once('error', handleError);
+  });
+
+const closeServer = async (server?: HttpServer | null): Promise<void> => {
+  if (!server || !server.listening) return;
+  await new Promise<void>((resolveClose, rejectClose) => {
+    server.close((err) => {
+      if (err) {
+        rejectClose(err);
+        return;
+      }
+      resolveClose();
+    });
+  });
+};
+
+export class CombinedServer {
+  private options: CombinedServerOptions;
+  private started = false;
+  private result: CombinedServerResult = {
     functions: [],
     jobs: false,
     graphql: false
   };
+  private graphqlServer?: GraphQLServer;
+  private graphqlHttpServer?: HttpServer;
+  private functionServers = new Map<FunctionName, HttpServer>();
+  private jobsHttpServer?: HttpServer;
+  private worker?: JobRunner;
+  private scheduler?: JobRunner;
+  private jobsPoolManager?: { close: () => Promise<void> };
 
-  if (options.graphql?.enabled) {
-    log.info('starting GraphQL server');
-    GraphQLServer(options.graphql.options ?? {});
-    result.graphql = true;
+  constructor(options: CombinedServerOptions = {}) {
+    this.options = options;
   }
 
-  if (shouldEnableFunctions(options.functions)) {
-    log.info('starting functions');
-    result.functions = await startFunctions(options.functions);
+  async start(): Promise<CombinedServerResult> {
+    if (this.started) return this.result;
+    this.started = true;
+    this.result = {
+      functions: [],
+      jobs: false,
+      graphql: false
+    };
+
+    if (this.options.graphql?.enabled) {
+      log.info('starting GraphQL server');
+      this.graphqlServer = new GraphQLServer(
+        this.options.graphql.options ?? {}
+      );
+      this.graphqlServer.addEventListener();
+      this.graphqlHttpServer = this.graphqlServer.listen();
+      if (!this.graphqlHttpServer.listening) {
+        await new Promise<void>((resolveListen) => {
+          this.graphqlHttpServer!.once('listening', () => resolveListen());
+        });
+      }
+      this.result.graphql = true;
+    }
+
+    if (shouldEnableFunctions(this.options.functions)) {
+      log.info('starting functions');
+      this.result.functions = await startFunctions(
+        this.options.functions,
+        this.functionServers
+      );
+    }
+
+    if (this.options.jobs?.enabled) {
+      log.info('starting jobs service');
+      await this.startJobs();
+      this.result.jobs = true;
+    }
+
+    return this.result;
   }
 
-  if (options.jobs?.enabled) {
-    log.info('starting jobs service');
-    await bootJobs();
-    result.jobs = true;
+  async stop(): Promise<void> {
+    if (!this.started) return;
+    this.started = false;
+
+    if (this.worker?.stop) {
+      await this.worker.stop();
+    }
+    if (this.scheduler?.stop) {
+      await this.scheduler.stop();
+    }
+    this.worker = undefined;
+    this.scheduler = undefined;
+
+    await closeServer(this.jobsHttpServer);
+    this.jobsHttpServer = undefined;
+
+    if (this.jobsPoolManager) {
+      await this.jobsPoolManager.close();
+      this.jobsPoolManager = undefined;
+    }
+
+    for (const server of this.functionServers.values()) {
+      await closeServer(server);
+    }
+    this.functionServers.clear();
+
+    await closeServer(this.graphqlHttpServer);
+    this.graphqlHttpServer = undefined;
+
+    if (this.graphqlServer?.close) {
+      await this.graphqlServer.close({ closeCaches: true });
+    }
+    this.graphqlServer = undefined;
   }
 
-  return result;
-};
+  private async startJobs(): Promise<void> {
+    const pgPool = poolManager.getPool();
+    const jobsApp = jobServerFactory(pgPool);
+    const callbackPort = getJobsCallbackPort();
+    this.jobsHttpServer = await listenApp(jobsApp, callbackPort);
+
+    const tasks = getJobSupported();
+    this.worker = new Worker({
+      pgPool,
+      tasks,
+      workerId: getWorkerHostname()
+    });
+    this.scheduler = new Scheduler({
+      pgPool,
+      tasks,
+      workerId: getSchedulerHostname()
+    });
+
+    this.jobsPoolManager = poolManager;
+
+    this.worker.listen();
+    this.scheduler.listen();
+  }
+}

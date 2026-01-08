@@ -20,7 +20,7 @@
 ```ts
 import { CombinedServer } from '@constructive-io/server';
 
-await CombinedServer({
+const server = new CombinedServer({
   graphql: { enabled: true },
   functions: {
     enabled: true,
@@ -31,6 +31,9 @@ await CombinedServer({
   },
   jobs: { enabled: true }
 });
+
+await server.start();
+// await server.stop();
 ```
 
 ### Local Development (this repo)

@@ -1,4 +1,4 @@
-import app from '@constructive-io/knative-job-fn';
+import { createJobApp } from '@constructive-io/knative-job-fn';
 import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
@@ -6,6 +6,7 @@ import { send } from '@launchql/postmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
+const app = createJobApp();
 
 const GetUser = gql`
   query GetUser($userId: UUID!) {

@@ -1,4 +1,6 @@
-import app from '@constructive-io/knative-job-fn';
+import { createJobApp } from '@constructive-io/knative-job-fn';
+
+const app = createJobApp();
 
 app.post('/', async (req: any, res: any, next: any) => {
   if (req.body.throw) {

@@ -1397,12 +1397,27 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../../graphql/types/dist
+      '@constructive-io/job-pg':
+        specifier: workspace:^
+        version: link:../../jobs/job-pg
+      '@constructive-io/job-scheduler':
+        specifier: workspace:^
+        version: link:../../jobs/job-scheduler
+      '@constructive-io/job-utils':
+        specifier: workspace:^
+        version: link:../../jobs/job-utils
       '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
+      '@constructive-io/knative-job-server':
+        specifier: workspace:^
+        version: link:../../jobs/knative-job-server
       '@constructive-io/knative-job-service':
         specifier: workspace:^
         version: link:../../jobs/knative-job-service
+      '@constructive-io/knative-job-worker':
+        specifier: workspace:^
+        version: link:../../jobs/knative-job-worker
       '@constructive-io/send-email-link-fn':
         specifier: workspace:^
         version: link:../../functions/send-email-link
@@ -1419,6 +1434,30 @@ importers:
       '@constructive-io/graphql-test':
         specifier: workspace:^
         version: link:../../graphql/test/dist
+      '@pgpm/database-jobs':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/inflection':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/metaschema-modules':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/metaschema-schema':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/services':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/types':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/verify':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
       '@types/supertest':
         specifier: ^6.0.3
         version: 6.0.3
@@ -3154,6 +3193,27 @@ packages:
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
+
+  '@pgpm/database-jobs@0.16.0':
+    resolution: {integrity: sha512-s8I7958PlhfYXZKhYoU76R03yk6dlevjGk/Uy9uktveJkZ8C3JVsIhP6Lv4lo0SFEZCjFmXRCYpOY5xINIcX4w==}
+
+  '@pgpm/inflection@0.16.0':
+    resolution: {integrity: sha512-otjWGx+KkB113Wc5I9nsvoqPhBK6zD1ON2OcXw9PQRgqU43Y9f0yZjb559dDzZwDn5XUeiZMf6il5SIvJE5NPg==}
+
+  '@pgpm/metaschema-modules@0.16.1':
+    resolution: {integrity: sha512-qH0l4Xe0f0CSzXAC2nItu+ZpGliZ4eezl332HCLpI/bLkIMsmIZYlcjgiPmv7lZae+3uWbn7DQuDxeomsn5kBw==}
+
+  '@pgpm/metaschema-schema@0.16.1':
+    resolution: {integrity: sha512-FwLy+z8pwfrBeQYErpcDpD55ZtB1X+Ghj6bbE28GVURBlUxmPY1llrLfKLqcA6xaKMyZ+aHOeBlKYRuyo9xdag==}
+
+  '@pgpm/services@0.16.1':
+    resolution: {integrity: sha512-9wp3nstcTtsARw5cuE/x9Dwq/v7FQUPXlzjsBR/2V6z7oHBjOI8HiQ8y+tc1pnrFL1PJtcthkZKvBZbQBQJbTw==}
+
+  '@pgpm/types@0.16.0':
+    resolution: {integrity: sha512-CioHCxZGQUnpLANw4aMOOq7Z6zi2SXCxJIRZ8CSBPJfJkWU1OgxX+EpSjnm4Td4bznJhOViXniLltibaaGkMPA==}
+
+  '@pgpm/verify@0.16.0':
+    resolution: {integrity: sha512-uG0zTXAWGLV8wTUiLdBn+2b4AO+gtiw7sZf+TFFU8h/mVGMBTHUb9Gbsl/GL/5/0zZKOxak7cRJ5deec79KB/A==}
 
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
@@ -10004,6 +10064,38 @@ snapshots:
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@pgpm/database-jobs@0.16.0':
+    dependencies:
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/inflection@0.16.0':
+    dependencies:
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/metaschema-modules@0.16.1':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.16.1
+      '@pgpm/services': 0.16.1
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/metaschema-schema@0.16.1':
+    dependencies:
+      '@pgpm/database-jobs': 0.16.0
+      '@pgpm/inflection': 0.16.0
+      '@pgpm/types': 0.16.0
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/services@0.16.1':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.16.1
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/types@0.16.0':
+    dependencies:
+      '@pgpm/verify': 0.16.0
+
+  '@pgpm/verify@0.16.0': {}
 
   '@pgsql/types@17.6.2': {}
 

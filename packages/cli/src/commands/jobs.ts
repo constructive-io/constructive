@@ -200,7 +200,8 @@ export default async (
     try {
       ensureCwd((args.cwd as string) || process.cwd());
       const promptAnswers = await prompter.prompt(args, questions);
-      await CombinedServer(buildCombinedServerOptions(promptAnswers));
+      const server = new CombinedServer(buildCombinedServerOptions(promptAnswers));
+      await server.start();
     } catch (error) {
       await cliExitWithError(
         `Failed to start combined server: ${(error as Error).message}`

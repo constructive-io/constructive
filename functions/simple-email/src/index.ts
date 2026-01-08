@@ -1,4 +1,4 @@
-import app from '@constructive-io/knative-job-fn';
+import { createJobApp } from '@constructive-io/knative-job-fn';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { send as sendEmail } from '@launchql/postmaster';
 
@@ -26,6 +26,7 @@ const getRequiredField = (
 };
 
 const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
+const app = createJobApp();
 
 app.post('/', async (req: any, res: any, next: any) => {
   try {
