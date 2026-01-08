@@ -1,9 +1,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
-import express from 'express'
-import { postgraphile } from 'postgraphile'
-import { getGraphileSettings } from 'graphile-settings'
-import { getPgPool } from 'pg-cache'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { buildSchemaSDL } from '@constructive-io/graphql-server'
 import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
 import { ConstructiveOptions, getEnvOptions } from '@constructive-io/graphql-env'
 
@@ -46,10 +45,11 @@ export default async (
   const options: ConstructiveOptions = selectedDb ? getEnvOptions({ pg: { database: selectedDb } }) : getEnvOptions()
   const schemasArg = (argv.schemas as string) || options.api.metaSchemas.join(',')
 
-  const runGenerate = async (endpoint: string) => {
+  const runGenerate = async ({ endpoint, schema }: { endpoint?: string; schema?: string }) => {
     const result = await generateCommand({
       config: configPath || undefined,
       endpoint,
+      schema,
       output: outDir,
       authorization: auth || undefined,
       verbose,
@@ -68,40 +68,22 @@ export default async (
   }
 
   if (endpointArg) {
-    await runGenerate(endpointArg)
+    await runGenerate({ endpoint: endpointArg })
     return
   }
 
   const schemas = schemasArg.split(',').map((s: string) => s.trim()).filter(Boolean)
-  const startTempServer = async () => {
-    const settings = getGraphileSettings({ graphile: { schema: schemas } })
-    settings.graphiql = false
-    settings.graphqlRoute = '/graphql'
-    settings.graphiqlRoute = '/graphiql'
-    settings.pgSettings = async () => ({ role: 'administrator' })
+  await fs.promises.mkdir(outDir, { recursive: true })
+  const sdl = await buildSchemaSDL({
+    database: options.pg.database,
+    schemas,
+    graphile: {
+      pgSettings: async () => ({ role: 'administrator' }),
+    },
+  })
 
-    const pool = getPgPool(options.pg)
+  const schemaPath = path.join(outDir, 'schema.graphql')
+  await fs.promises.writeFile(schemaPath, sdl, 'utf-8')
 
-    const handler = postgraphile(pool, schemas, settings)
-    const app = express()
-    app.use(handler)
-
-    const server = await new Promise<any>((resolve, reject) => {
-      const srv = app.listen(0, '127.0.0.1', () => resolve(srv))
-      srv.on('error', reject)
-    })
-
-    const address = server.address()
-    const port = typeof address === 'object' && address ? address.port : 0
-    const url = `http://127.0.0.1:${port}/graphql`
-    return { server, pool, url }
-  }
-
-  const { server, pool, url } = await startTempServer()
-  try {
-    await runGenerate(url)
-  } finally {
-    await new Promise(r => server.close(r))
-    await pool.end()
-  }
+  await runGenerate({ schema: schemaPath })
 }

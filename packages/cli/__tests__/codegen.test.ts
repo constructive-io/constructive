@@ -6,6 +6,10 @@ jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
   generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
 }))
 
+jest.mock('@constructive-io/graphql-server', () => ({
+  buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\nschema { query: Query }')
+}))
+
 jest.mock('express', () => {
   const mApp = () => ({
     use: jest.fn(),
@@ -77,7 +81,8 @@ describe('codegen command', () => {
 
     expect(generateCommand).toHaveBeenCalled()
     const call = (generateCommand as jest.Mock).mock.calls[0][0]
-    expect(call.endpoint).toBe('http://127.0.0.1:4321/graphql')
+    expect(call.schema).toBe('graphql/codegen/dist/schema.graphql')
     expect(call.output).toBe('graphql/codegen/dist')
+    expect(call.endpoint).toBeUndefined()
   })
 })
