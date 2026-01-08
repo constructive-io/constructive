@@ -10,10 +10,6 @@ jest.mock('@constructive-io/graphql-server', () => ({
   buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\nschema { query: Query }')
 }))
 
-jest.mock('postgraphile', () => ({ postgraphile: jest.fn(() => (req: any, res: any, next: any) => next && next()) }))
-jest.mock('graphile-settings', () => ({ getGraphileSettings: jest.fn(() => ({ graphiql: false })) }))
-jest.mock('pg-cache', () => ({ getPgPool: jest.fn(() => ({ end: jest.fn() })) }))
-
 describe('codegen command', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -57,7 +53,7 @@ describe('codegen command', () => {
     })
   })
 
-  it('spins temp server and calls generateCommand with ephemeral endpoint when DB options provided', async () => {
+  it('builds schema file and calls generateCommand with schema when DB options provided', async () => {
 
     const argv: Partial<ParsedArgs> = {
       database: 'constructive_db',
