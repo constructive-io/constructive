@@ -294,13 +294,11 @@ const exportMigrationsToDisk = async ({
     writePgpmPlan(results.rows, opts);
     writePgpmFiles(results.rows, opts);
 
-    let meta = await exportMeta({
+    const metaResult = await exportMeta({
       opts: options,
       dbname: database,
       database_id: databaseId
     });
-
-    meta = replacer(meta);
 
     // Build description for the meta/service extension package
     const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
@@ -336,11 +334,16 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName
     });
 
-    const metaPackage: PgpmRow[] = [
-      {
-        deps: [],
-        deploy: 'migrate/meta',
-        content: `SET session_replication_role TO replica;
+    // Apply replacer to each schema type's SQL
+    const metaschemaPublicSql = metaReplacer.replacer(metaResult.metaschema_public);
+    const servicesPublicSql = metaReplacer.replacer(metaResult.services_public);
+    const metaschemaModulesPublicSql = metaReplacer.replacer(metaResult.metaschema_modules_public);
+
+    // Create separate files for each schema type
+    const metaPackage: PgpmRow[] = [];
+
+    // Common header for all meta files
+    const commonHeader = `SET session_replication_role TO replica;
 -- using replica in case we are deploying triggers to metaschema_public
 
 -- unaccent, postgis affected and require grants
@@ -354,10 +357,9 @@ DO $LQLMIGRATION$
     EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
 
   END;
-$LQLMIGRATION$;
+$LQLMIGRATION$;`;
 
-${meta}
-
+    const commonFooter = `
 -- TODO: Research needed - These UPDATE statements may be a security leak.
 -- They appear to rebind exported metadata to the target database after import,
 -- but exposing dbname in services_public tables could leak internal database names.
@@ -368,10 +370,49 @@ ${meta}
 -- UPDATE services_public.sites
 --       SET dbname = current_database() WHERE TRUE;
 
-SET session_replication_role TO DEFAULT;
+SET session_replication_role TO DEFAULT;`;
+
+    // Add metaschema_public file if there's content
+    if (metaschemaPublicSql) {
+      metaPackage.push({
+        deps: [],
+        deploy: 'migrate/metaschema_public',
+        content: `${commonHeader}
+
+${metaschemaPublicSql}
+
+${commonFooter}
 `
-      }
-    ];
+      });
+    }
+
+    // Add services_public file if there's content (depends on metaschema_public)
+    if (servicesPublicSql) {
+      metaPackage.push({
+        deps: metaschemaPublicSql ? ['migrate/metaschema_public'] : [],
+        deploy: 'migrate/services_public',
+        content: `${commonHeader}
+
+${servicesPublicSql}
+
+${commonFooter}
+`
+      });
+    }
+
+    // Add metaschema_modules_public file if there's content (depends on metaschema_public)
+    if (metaschemaModulesPublicSql) {
+      metaPackage.push({
+        deps: metaschemaPublicSql ? ['migrate/metaschema_public'] : [],
+        deploy: 'migrate/metaschema_modules_public',
+        content: `${commonHeader}
+
+${metaschemaModulesPublicSql}
+
+${commonFooter}
+`
+      });
+    }
 
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;

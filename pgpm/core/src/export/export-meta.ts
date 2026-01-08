@@ -784,7 +784,74 @@ interface ExportMetaParams {
   database_id: string;
 }
 
-export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<string> => {
+export interface ExportMetaResult {
+  metaschema_public: string;
+  services_public: string;
+  metaschema_modules_public: string;
+}
+
+const METASCHEMA_PUBLIC_TABLES = [
+  'database',
+  'database_extension',
+  'schema',
+  'table',
+  'field',
+  'policy',
+  'index',
+  'trigger',
+  'trigger_function',
+  'rls_function',
+  'limit_function',
+  'procedure',
+  'foreign_key_constraint',
+  'primary_key_constraint',
+  'unique_constraint',
+  'check_constraint',
+  'full_text_search',
+  'schema_grant',
+  'table_grant'
+] as const;
+
+const SERVICES_PUBLIC_TABLES = [
+  'domains',
+  'sites',
+  'apis',
+  'apps',
+  'site_modules',
+  'site_themes',
+  'site_metadata',
+  'api_modules',
+  'api_extensions',
+  'api_schemas'
+] as const;
+
+const METASCHEMA_MODULES_PUBLIC_TABLES = [
+  'rls_module',
+  'user_auth_module',
+  'memberships_module',
+  'permissions_module',
+  'limits_module',
+  'levels_module',
+  'users_module',
+  'hierarchy_module',
+  'membership_types_module',
+  'invites_module',
+  'emails_module',
+  'tokens_module',
+  'secrets_module',
+  'profiles_module',
+  'encrypted_secrets_module',
+  'connected_accounts_module',
+  'phone_numbers_module',
+  'crypto_addresses_module',
+  'crypto_auth_module',
+  'field_module',
+  'uuid_module',
+  'default_ids_module',
+  'denormalized_table_field'
+] as const;
+
+export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<ExportMetaResult> => {
   const pool = getPgPool({
     ...opts.pg,
     database: dbname
@@ -877,5 +944,16 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
 
-  return Object.entries(sql).reduce((m, [_, v]) => m + '\n\n' + v, '');
+  const collectSql = (tables: readonly string[]): string => {
+    return tables
+      .filter(key => sql[key])
+      .map(key => sql[key])
+      .join('\n\n');
+  };
+
+  return {
+    metaschema_public: collectSql(METASCHEMA_PUBLIC_TABLES),
+    services_public: collectSql(SERVICES_PUBLIC_TABLES),
+    metaschema_modules_public: collectSql(METASCHEMA_MODULES_PUBLIC_TABLES)
+  };
 };

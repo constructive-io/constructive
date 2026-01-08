@@ -20,6 +20,6 @@ exports[`Export Flow E2E Export to second workspace should match snapshot for da
 exports[`Export Flow E2E Export to second workspace should match snapshot for service export deploy/ folder structure: pets-export-svc deploy folder 1`] = `
 [
   "migrate/",
-  "migrate/meta.sql",
+  "migrate/metaschema_public.sql",
 ]
 `;
