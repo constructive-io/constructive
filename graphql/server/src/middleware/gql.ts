@@ -1,130 +1,155 @@
-import gql from 'graphql-tag';
+import { buildFindFirstDocument } from '../codegen/orm/query-builder';
 
-type GraphQLDocument = ReturnType<typeof gql>;
+type BuiltDocument = { document: string; variables: Record<string, unknown> };
 
-// DO NOT CHANGE TO domainBySubdomainAndDomain(domain: $domain, subdomain: $subdomain)
-// condition is the way to handle since it will pass in null properly
-// e.g. subdomain.domain or domain both work
-export const ApiQuery: GraphQLDocument = gql`
-  query ApiRoot($domain: String!, $subdomain: String) {
-    domains(condition: { domain: $domain, subdomain: $subdomain }) {
-      nodes {
-        api {
-          databaseId
-          dbname
-          roleName
-          anonRole
-          isPublic
-          schemaNamesFromExt: apiExtensions {
-            nodes {
-              schemaName
-            }
-          }
-          schemaNames: schemataByApiSchemaApiIdAndSchemaId {
-            nodes {
-              schemaName
-            }
-          }
-          rlsModule {
-            privateSchema {
-              schemaName
-            }
-            authenticateStrict
-            authenticate
-            currentRole
-            currentRoleId
-          }
-          database {
-            sites {
-              nodes {
-                domains {
-                  nodes {
-                    subdomain
-                    domain
-                  }
-                }
-              }
-            }
-          } # for now keep this for patches
-          apiModules {
-            nodes {
-              name
-              data
-            }
-          }
-        }
-      }
-    }
+const apiSelect = {
+  databaseId: true,
+  dbname: true,
+  roleName: true,
+  anonRole: true,
+  isPublic: true,
+  domains: {
+    select: {
+      subdomain: true,
+      domain: true,
+    },
+    connection: true,
+  },
+  apiExtensions: {
+    select: { schemaName: true },
+    connection: true,
+  },
+  schemasByApiSchemaApiIdAndSchemaId: {
+    select: { schemaName: true },
+    connection: true,
+  },
+  rlsModule: {
+    select: {
+      privateSchema: { select: { schemaName: true } },
+      authenticateStrict: true,
+      authenticate: true,
+      currentRole: true,
+      currentRoleId: true,
+    },
+  },
+  database: {
+    select: {
+      sites: {
+        select: {
+          domains: {
+            select: { subdomain: true, domain: true },
+            connection: true,
+          },
+        },
+        connection: true,
+      },
+    },
+  },
+  apiModules: {
+    select: { name: true, data: true },
+    connection: true,
+  },
+} as const;
+
+const domainSelect = {
+  domain: true,
+  subdomain: true,
+  api: { select: apiSelect },
+} as const;
+
+const apisSelect = {
+  id: true,
+  databaseId: true,
+  name: true,
+  dbname: true,
+  roleName: true,
+  anonRole: true,
+  isPublic: true,
+  domains: {
+    select: { domain: true, subdomain: true },
+    connection: true,
+  },
+  database: {
+    select: {
+      sites: {
+        select: {
+          domains: {
+            select: { domain: true, subdomain: true },
+            connection: true,
+          },
+        },
+        connection: true,
+      },
+    },
+  },
+} as const;
+
+/**
+ * Build query for domain lookup with optional subdomain
+ * This uses domains connection instead of domainBySubdomainAndDomain
+ * because we need to handle null subdomain with condition filter
+ */
+export const buildDomainLookup = (vars: {
+  domain: string;
+  subdomain?: string | null;
+}): BuiltDocument => {
+  const where: Record<string, unknown> = {
+    domain: { equalTo: vars.domain },
+  };
+
+  if (vars.subdomain === null || vars.subdomain === undefined) {
+    where.subdomain = { isNull: true };
+  } else {
+    where.subdomain = { equalTo: vars.subdomain };
   }
-`;
 
-export const ApiByNameQuery: GraphQLDocument = gql`
-  query ApiByName($name: String!, $databaseId: UUID!) {
-    api: apiByDatabaseIdAndName(name: $name, databaseId: $databaseId) {
-      databaseId
-      dbname
-      roleName
-      anonRole
-      isPublic
-      schemaNamesFromExt: apiExtensions {
-        nodes {
-          schemaName
-        }
-      }
-      schemaNames: schemataByApiSchemaApiIdAndSchemaId {
-        nodes {
-          schemaName
-        }
-      }
-      rlsModule {
-        privateSchema {
-          schemaName
-        }
-        authenticate
-        authenticateStrict
-        currentRole
-        currentRoleId
-      }
-      database {
-        sites {
-          nodes {
-            domains {
-              nodes {
-                subdomain
-                domain
-              }
-            }
-          }
-        }
-      } # for now keep this for patches
-      apiModules {
-        nodes {
-          name
-          data
-        }
-      }
-    }
-  }
-`;
+  return buildFindFirstDocument(
+    'DomainLookup',
+    'domains',
+    domainSelect,
+    { where },
+    'DomainFilter'
+  );
+};
 
-export const ListOfAllDomainsOfDb: GraphQLDocument = gql`
-  query ListApisByDatabaseId {
-    apis {
-      nodes {
-        id
-        databaseId
-        name
-        dbname
-        roleName
-        anonRole
-        isPublic
-        domains {
-          nodes {
-            domain
-            subdomain
-          }
-        }
-      }
-    }
-  }
-`;
+/**
+ * Build query for API lookup by database ID and name
+ * Uses the generated apiByDatabaseIdAndName custom query
+ */
+export const buildApiByDatabaseIdAndName = (vars: {
+  databaseId: string;
+  name: string;
+}): BuiltDocument => {
+  // Import buildCustomDocument locally to avoid circular dependency
+  const { buildCustomDocument } = require('../codegen/orm/query-builder');
+  return buildCustomDocument(
+    'query',
+    'ApiByDatabaseIdAndName',
+    'apiByDatabaseIdAndName',
+    apiSelect,
+    vars,
+    [
+      { name: 'databaseId', type: 'UUID!' },
+      { name: 'name', type: 'String!' },
+    ]
+  );
+};
+
+/**
+ * Build query to list all APIs
+ */
+export const buildListApis = (): BuiltDocument => {
+  // Import buildCustomDocument locally to avoid circular dependency
+  const { buildCustomDocument } = require('../codegen/orm/query-builder');
+  return buildCustomDocument(
+    'query',
+    'ListApisByDatabaseId',
+    'apis',
+    {
+      select: apisSelect,
+      connection: true,
+    },
+    undefined,
+    []
+  );
+};
