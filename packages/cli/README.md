@@ -58,13 +58,13 @@ cnc explorer --origin http://localhost:3000
 
 ### `cnc codegen`
 
-Generate TypeScript types, operations, and SDK from a PostGraphile API.
+Generate TypeScript types, operations, and SDK from a GraphQL.
 
 ```bash
 # From endpoint
 cnc codegen --endpoint http://localhost:5555/graphql --out ./codegen
 
-# From database (uses env PG settings; spins a temporary PostGraphile server, introspects, generates, then tears down)
+# From database
 cnc codegen --database constructive_db --out ./codegen --verbose
 ```
 
