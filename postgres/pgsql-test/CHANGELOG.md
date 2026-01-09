@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.24.11](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.10...pgsql-test@2.24.11) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.10](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.9...pgsql-test@2.24.10) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.9](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.8...pgsql-test@2.24.9) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.8](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.7...pgsql-test@2.24.8) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.7](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.6...pgsql-test@2.24.7) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.6](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.5...pgsql-test@2.24.6) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.5](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.4...pgsql-test@2.24.5) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.4](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.3...pgsql-test@2.24.4) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.3](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.2...pgsql-test@2.24.3) (2026-01-07)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.2](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.1...pgsql-test@2.24.2) (2026-01-07)
+
+**Note:** Version bump only for package pgsql-test
+
 ## [2.24.1](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.0...pgsql-test@2.24.1) (2026-01-06)
 
 **Note:** Version bump only for package pgsql-test

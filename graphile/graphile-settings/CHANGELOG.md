@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.12](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.11...graphile-settings@2.12.12) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.11](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.10...graphile-settings@2.12.11) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.10](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.9...graphile-settings@2.12.10) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.9](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.8...graphile-settings@2.12.9) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.8](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.7...graphile-settings@2.12.8) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.7](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.6...graphile-settings@2.12.7) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.6](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.5...graphile-settings@2.12.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.5](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.4...graphile-settings@2.12.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.4](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.3...graphile-settings@2.12.4) (2026-01-07)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.3](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.2...graphile-settings@2.12.3) (2026-01-07)
+
+**Note:** Version bump only for package graphile-settings
+
+## [2.12.2](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.1...graphile-settings@2.12.2) (2026-01-07)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [2.12.1](https://github.com/constructive-io/constructive/compare/graphile-settings@2.12.0...graphile-settings@2.12.1) (2026-01-06)
 
 **Note:** Version bump only for package graphile-settings

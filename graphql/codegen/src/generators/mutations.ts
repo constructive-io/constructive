@@ -5,7 +5,7 @@
 import * as t from 'gql-ast';
 import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
-import * as inflection from 'inflection';
+import { camelize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
@@ -48,7 +48,7 @@ export function buildPostGraphileCreate(
   { input: { [key: string]: Record<string, unknown> } }
 > {
   const mutationName = `create${table.name}`;
-  const singularName = inflection.camelize(table.name, true);
+  const singularName = camelize(table.name, true);
 
   // Create the variable definition for $input
   const variableDefinitions: VariableDefinitionNode[] = [
@@ -124,7 +124,7 @@ export function buildPostGraphileUpdate(
   { input: { id: string | number; patch: Record<string, unknown> } }
 > {
   const mutationName = `update${table.name}`;
-  const singularName = inflection.camelize(table.name, true);
+  const singularName = camelize(table.name, true);
 
   // Create the variable definition for $input
   const variableDefinitions: VariableDefinitionNode[] = [

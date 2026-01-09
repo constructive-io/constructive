@@ -24,7 +24,11 @@ import {
   createImport,
 } from '../ts-ast';
 import { ucFirst } from '../utils';
-import { typeRefToTsType, isTypeRequired, getTypeBaseName } from '../type-resolver';
+import {
+  typeRefToTsType,
+  isTypeRequired,
+  getTypeBaseName,
+} from '../type-resolver';
 import { SCALAR_NAMES } from '../scalars';
 
 export interface GeneratedCustomOpsFile {
@@ -34,6 +38,7 @@ export interface GeneratedCustomOpsFile {
 
 /**
  * Collect all input type names used by operations
+ * Includes Input, Filter, OrderBy, and Condition types
  */
 function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
   const inputTypes = new Set<string>();
@@ -41,7 +46,13 @@ function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
   for (const op of operations) {
     for (const arg of op.args) {
       const baseName = getTypeBaseName(arg.type);
-      if (baseName && (baseName.endsWith('Input') || baseName.endsWith('Filter'))) {
+      if (
+        baseName &&
+        (baseName.endsWith('Input') ||
+          baseName.endsWith('Filter') ||
+          baseName.endsWith('OrderBy') ||
+          baseName.endsWith('Condition'))
+      ) {
         inputTypes.add(baseName);
       }
     }
@@ -51,22 +62,30 @@ function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
 }
 
 // Types that don't need Select types
-const NON_SELECT_TYPES = new Set<string>([...SCALAR_NAMES, 'Query', 'Mutation']);
+const NON_SELECT_TYPES = new Set<string>([
+  ...SCALAR_NAMES,
+  'Query',
+  'Mutation',
+]);
 
 /**
  * Collect all payload/return type names from operations (for Select types)
  * Filters out scalar types
  */
-function collectPayloadTypeNamesFromOps(operations: CleanOperation[]): string[] {
+function collectPayloadTypeNamesFromOps(
+  operations: CleanOperation[]
+): string[] {
   const payloadTypes = new Set<string>();
 
   for (const op of operations) {
     const baseName = getTypeBaseName(op.returnType);
-    if (baseName && 
-        !baseName.endsWith('Connection') && 
-        baseName !== 'Query' && 
-        baseName !== 'Mutation' &&
-        !NON_SELECT_TYPES.has(baseName)) {
+    if (
+      baseName &&
+      !baseName.endsWith('Connection') &&
+      baseName !== 'Query' &&
+      baseName !== 'Mutation' &&
+      !NON_SELECT_TYPES.has(baseName)
+    ) {
       payloadTypes.add(baseName);
     }
   }
@@ -80,11 +99,13 @@ function collectPayloadTypeNamesFromOps(operations: CleanOperation[]): string[] 
  */
 function getSelectTypeName(returnType: CleanArgument['type']): string | null {
   const baseName = getTypeBaseName(returnType);
-  if (baseName && 
-      !NON_SELECT_TYPES.has(baseName) && 
-      baseName !== 'Query' && 
-      baseName !== 'Mutation' &&
-      !baseName.endsWith('Connection')) {
+  if (
+    baseName &&
+    !NON_SELECT_TYPES.has(baseName) &&
+    baseName !== 'Query' &&
+    baseName !== 'Mutation' &&
+    !baseName.endsWith('Connection')
+  ) {
     return `${baseName}Select`;
   }
   return null;
@@ -102,12 +123,14 @@ export function generateCustomQueryOpsFile(
   // Collect all input type names and payload type names
   const inputTypeNames = collectInputTypeNamesFromOps(operations);
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
-  
+
   // Generate Select type names for payloads
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
-  
+
   // Combine all type imports
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames])];
+  const allTypeImports = [
+    ...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames]),
+  ];
 
   // Add file header
   sourceFile.insertText(
@@ -142,9 +165,13 @@ export function generateCustomQueryOpsFile(
   }
 
   // Generate variable definitions type for each operation
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Variable Types');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   for (const op of operations) {
     if (op.args.length > 0) {
@@ -153,14 +180,20 @@ export function generateCustomQueryOpsFile(
         const optional = !isTypeRequired(arg.type);
         return `${arg.name}${optional ? '?' : ''}: ${typeRefToTsType(arg.type)};`;
       });
-      sourceFile.addStatements(`export interface ${varTypeName} {\n  ${props.join('\n  ')}\n}\n`);
+      sourceFile.addStatements(
+        `export interface ${varTypeName} {\n  ${props.join('\n  ')}\n}\n`
+      );
     }
   }
 
   // Generate factory function
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Query Operations Factory');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   // Build the operations object
   const operationMethods = operations.map((op) => {
@@ -171,16 +204,17 @@ export function generateCustomQueryOpsFile(
       type: formatGraphQLType(arg.type),
     }));
     const varDefsJson = JSON.stringify(varDefs);
-    
+
     // Get Select type for return type
     const selectTypeName = getSelectTypeName(op.returnType);
     const payloadTypeName = getTypeBaseName(op.returnType);
-    
+
     // Use typed select if available, otherwise fall back to Record<string, unknown>
     const selectType = selectTypeName ?? 'Record<string, unknown>';
-    const returnTypePart = selectTypeName && payloadTypeName
-      ? `{ ${op.name}: InferSelectResult<${payloadTypeName}, S> }`
-      : 'unknown';
+    const returnTypePart =
+      selectTypeName && payloadTypeName
+        ? `{ ${op.name}: InferSelectResult<${payloadTypeName}, S> }`
+        : 'unknown';
 
     if (hasArgs) {
       if (selectTypeName) {
@@ -253,12 +287,14 @@ export function generateCustomMutationOpsFile(
   // Collect all input type names and payload type names
   const inputTypeNames = collectInputTypeNamesFromOps(operations);
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
-  
+
   // Generate Select type names for payloads
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
-  
+
   // Combine all type imports
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames])];
+  const allTypeImports = [
+    ...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames]),
+  ];
 
   // Add file header
   sourceFile.insertText(
@@ -293,9 +329,13 @@ export function generateCustomMutationOpsFile(
   }
 
   // Generate variable definitions type for each operation
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Variable Types');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   for (const op of operations) {
     if (op.args.length > 0) {
@@ -304,14 +344,20 @@ export function generateCustomMutationOpsFile(
         const optional = !isTypeRequired(arg.type);
         return `${arg.name}${optional ? '?' : ''}: ${typeRefToTsType(arg.type)};`;
       });
-      sourceFile.addStatements(`export interface ${varTypeName} {\n  ${props.join('\n  ')}\n}\n`);
+      sourceFile.addStatements(
+        `export interface ${varTypeName} {\n  ${props.join('\n  ')}\n}\n`
+      );
     }
   }
 
   // Generate factory function
-  sourceFile.addStatements('\n// ============================================================================');
+  sourceFile.addStatements(
+    '\n// ============================================================================'
+  );
   sourceFile.addStatements('// Mutation Operations Factory');
-  sourceFile.addStatements('// ============================================================================\n');
+  sourceFile.addStatements(
+    '// ============================================================================\n'
+  );
 
   // Build the operations object
   const operationMethods = operations.map((op) => {
@@ -322,16 +368,17 @@ export function generateCustomMutationOpsFile(
       type: formatGraphQLType(arg.type),
     }));
     const varDefsJson = JSON.stringify(varDefs);
-    
+
     // Get Select type for return type
     const selectTypeName = getSelectTypeName(op.returnType);
     const payloadTypeName = getTypeBaseName(op.returnType);
-    
+
     // Use typed select if available, otherwise fall back to Record<string, unknown>
     const selectType = selectTypeName ?? 'Record<string, unknown>';
-    const returnTypePart = selectTypeName && payloadTypeName
-      ? `{ ${op.name}: InferSelectResult<${payloadTypeName}, S> }`
-      : 'unknown';
+    const returnTypePart =
+      selectTypeName && payloadTypeName
+        ? `{ ${op.name}: InferSelectResult<${payloadTypeName}, S> }`
+        : 'unknown';
 
     if (hasArgs) {
       if (selectTypeName) {

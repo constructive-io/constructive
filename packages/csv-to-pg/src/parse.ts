@@ -39,6 +39,52 @@ const parseJson = (value: unknown): string | undefined => {
 };
 
 /**
+ * PostgreSQL interval object type as returned by node-postgres
+ */
+interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+}
+
+/**
+ * Convert a PostgreSQL interval object to a PostgreSQL interval string.
+ * node-postgres returns intervals as objects like { hours: 12, minutes: 6, seconds: 41 }
+ */
+const formatInterval = (value: unknown): string | undefined => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value && typeof value === 'object') {
+    const interval = value as PgInterval;
+    const parts: string[] = [];
+    
+    if (interval.years) parts.push(`${interval.years} year${interval.years !== 1 ? 's' : ''}`);
+    if (interval.months) parts.push(`${interval.months} mon${interval.months !== 1 ? 's' : ''}`);
+    if (interval.days) parts.push(`${interval.days} day${interval.days !== 1 ? 's' : ''}`);
+    
+    // Build time component
+    const hours = interval.hours || 0;
+    const minutes = interval.minutes || 0;
+    const seconds = interval.seconds || 0;
+    const milliseconds = interval.milliseconds || 0;
+    
+    if (hours || minutes || seconds || milliseconds) {
+      const totalSeconds = seconds + milliseconds / 1000;
+      const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${totalSeconds.toFixed(milliseconds ? 6 : 0).padStart(milliseconds ? 9 : 2, '0')}`;
+      parts.push(timeStr);
+    }
+    
+    return parts.length > 0 ? parts.join(' ') : '00:00:00';
+  }
+  return undefined;
+};
+
+/**
  * Escape a single array element for PostgreSQL array literal format.
  * Handles: NULL, quotes, backslashes, commas, braces, and whitespace.
  */
@@ -281,6 +327,50 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         }
         if (!/^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i.test(String(value))) {
           return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not a valid UUID');
+        }
+        const val = nodes.aConst({
+          sval: ast.string({ sval: String(value) })
+        });
+        return wrapValue(val, opts);
+      };
+    case 'uuid[]':
+      return (record: Record<string, unknown>): Node => {
+        const rawValue = record[from[0]];
+        if (isNullToken(rawValue)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+        }
+        // Handle array values - validate each UUID
+        if (Array.isArray(rawValue)) {
+          if (rawValue.length === 0) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+          }
+          const uuidRegex = /^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$/i;
+          for (const item of rawValue) {
+            if (!uuidRegex.test(String(item))) {
+              return makeNullOrThrow(fieldName, rawValue, type, required, `array contains invalid UUID: ${item}`);
+            }
+          }
+          const arrayLiteral = psqlArray(rawValue);
+          if (isEmpty(arrayLiteral)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(arrayLiteral) })
+          });
+          return wrapValue(val, opts);
+        }
+        // If not an array, treat as empty/null
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
+      };
+    case 'interval':
+      return (record: Record<string, unknown>): Node => {
+        const rawValue = record[from[0]];
+        if (isNullToken(rawValue)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+        }
+        const value = formatInterval(rawValue);
+        if (isEmpty(value)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or invalid interval');
         }
         const val = nodes.aConst({
           sval: ast.string({ sval: String(value) })

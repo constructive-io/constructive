@@ -11,7 +11,11 @@
  * Uses ts-morph for robust AST-based code generation.
  */
 import type { SourceFile } from 'ts-morph';
-import type { TypeRegistry, CleanArgument, CleanTable } from '../../../types/schema';
+import type {
+  TypeRegistry,
+  CleanArgument,
+  CleanTable,
+} from '../../../types/schema';
 import {
   createProject,
   createSourceFile,
@@ -25,9 +29,11 @@ import {
 import {
   getTableNames,
   getFilterTypeName,
+  getConditionTypeName,
   getOrderByTypeName,
   isRelationField,
 } from '../utils';
+import { pluralize } from 'inflekt';
 import { getTypeBaseName } from '../type-resolver';
 import { scalarToTsType, scalarToFilterType } from '../scalars';
 
@@ -41,7 +47,12 @@ export interface GeneratedInputTypesFile {
 // ============================================================================
 
 /** Fields excluded from Create/Update inputs (auto-generated or system fields) */
-const EXCLUDED_MUTATION_FIELDS = ['id', 'createdAt', 'updatedAt', 'nodeId'] as const;
+const EXCLUDED_MUTATION_FIELDS = [
+  'id',
+  'createdAt',
+  'updatedAt',
+  'nodeId',
+] as const;
 
 // ============================================================================
 // Type Conversion Utilities
@@ -99,7 +110,15 @@ function isRequired(typeRef: CleanArgument['type']): boolean {
 // ============================================================================
 
 /** Filter operator sets for different scalar types */
-type FilterOperators = 'equality' | 'distinct' | 'inArray' | 'comparison' | 'string' | 'json' | 'inet' | 'fulltext';
+type FilterOperators =
+  | 'equality'
+  | 'distinct'
+  | 'inArray'
+  | 'comparison'
+  | 'string'
+  | 'json'
+  | 'inet'
+  | 'fulltext';
 
 interface ScalarFilterConfig {
   name: string;
@@ -109,25 +128,67 @@ interface ScalarFilterConfig {
 
 /** Configuration for all scalar filter types - matches PostGraphile's generated filters */
 const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
-  { name: 'StringFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'] },
-  { name: 'IntFilter', tsType: 'number', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'FloatFilter', tsType: 'number', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
+  {
+    name: 'StringFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'],
+  },
+  {
+    name: 'IntFilter',
+    tsType: 'number',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'FloatFilter',
+    tsType: 'number',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
   { name: 'BooleanFilter', tsType: 'boolean', operators: ['equality'] },
-  { name: 'UUIDFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray'] },
-  { name: 'DatetimeFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'DateFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'JSONFilter', tsType: 'Record<string, unknown>', operators: ['equality', 'distinct', 'json'] },
-  { name: 'BigIntFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'BigFloatFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
+  {
+    name: 'UUIDFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray'],
+  },
+  {
+    name: 'DatetimeFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'DateFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'JSONFilter',
+    tsType: 'Record<string, unknown>',
+    operators: ['equality', 'distinct', 'json'],
+  },
+  {
+    name: 'BigIntFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'BigFloatFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
   { name: 'BitStringFilter', tsType: 'string', operators: ['equality'] },
-  { name: 'InternetAddressFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'] },
+  {
+    name: 'InternetAddressFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
+  },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
 ];
 
 /**
  * Build filter properties based on operator sets
  */
-function buildScalarFilterProperties(config: ScalarFilterConfig): InterfaceProperty[] {
+function buildScalarFilterProperties(
+  config: ScalarFilterConfig
+): InterfaceProperty[] {
   const { tsType, operators } = config;
   const props: InterfaceProperty[] = [];
 
@@ -136,7 +197,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
     props.push(
       { name: 'isNull', type: 'boolean', optional: true },
       { name: 'equalTo', type: tsType, optional: true },
-      { name: 'notEqualTo', type: tsType, optional: true },
+      { name: 'notEqualTo', type: tsType, optional: true }
     );
   }
 
@@ -144,7 +205,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
   if (operators.includes('distinct')) {
     props.push(
       { name: 'distinctFrom', type: tsType, optional: true },
-      { name: 'notDistinctFrom', type: tsType, optional: true },
+      { name: 'notDistinctFrom', type: tsType, optional: true }
     );
   }
 
@@ -152,7 +213,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
   if (operators.includes('inArray')) {
     props.push(
       { name: 'in', type: `${tsType}[]`, optional: true },
-      { name: 'notIn', type: `${tsType}[]`, optional: true },
+      { name: 'notIn', type: `${tsType}[]`, optional: true }
     );
   }
 
@@ -162,7 +223,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
       { name: 'lessThan', type: tsType, optional: true },
       { name: 'lessThanOrEqualTo', type: tsType, optional: true },
       { name: 'greaterThan', type: tsType, optional: true },
-      { name: 'greaterThanOrEqualTo', type: tsType, optional: true },
+      { name: 'greaterThanOrEqualTo', type: tsType, optional: true }
     );
   }
 
@@ -184,7 +245,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
       { name: 'like', type: 'string', optional: true },
       { name: 'notLike', type: 'string', optional: true },
       { name: 'likeInsensitive', type: 'string', optional: true },
-      { name: 'notLikeInsensitive', type: 'string', optional: true },
+      { name: 'notLikeInsensitive', type: 'string', optional: true }
     );
   }
 
@@ -195,7 +256,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
       { name: 'containedBy', type: 'Record<string, unknown>', optional: true },
       { name: 'containsKey', type: 'string', optional: true },
       { name: 'containsAllKeys', type: 'string[]', optional: true },
-      { name: 'containsAnyKeys', type: 'string[]', optional: true },
+      { name: 'containsAnyKeys', type: 'string[]', optional: true }
     );
   }
 
@@ -206,7 +267,7 @@ function buildScalarFilterProperties(config: ScalarFilterConfig): InterfacePrope
       { name: 'containsOrEqualTo', type: 'string', optional: true },
       { name: 'containedBy', type: 'string', optional: true },
       { name: 'containedByOrEqualTo', type: 'string', optional: true },
-      { name: 'containsOrContainedBy', type: 'string', optional: true },
+      { name: 'containsOrContainedBy', type: 'string', optional: true }
     );
   }
 
@@ -238,7 +299,10 @@ function addScalarFilterTypes(sourceFile: SourceFile): void {
 /**
  * Check if a type is likely an enum (not a scalar and not ending with Input/Filter/etc)
  */
-function isLikelyEnumType(typeName: string, typeRegistry: TypeRegistry): boolean {
+function isLikelyEnumType(
+  typeName: string,
+  typeRegistry: TypeRegistry
+): boolean {
   const typeInfo = typeRegistry.get(typeName);
   return typeInfo?.kind === 'ENUM';
 }
@@ -254,7 +318,8 @@ function collectEnumTypesFromTables(
 
   for (const table of tables) {
     for (const field of table.fields) {
-      const fieldType = typeof field.type === 'string' ? field.type : field.type.gqlType;
+      const fieldType =
+        typeof field.type === 'string' ? field.type : field.type.gqlType;
       // Check if this type is an enum in the registry
       if (isLikelyEnumType(fieldType, typeRegistry)) {
         enumTypes.add(fieldType);
@@ -299,7 +364,8 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
   for (const field of table.fields) {
     if (isRelationField(field.name, table)) continue;
 
-    const fieldType = typeof field.type === 'string' ? field.type : field.type.gqlType;
+    const fieldType =
+      typeof field.type === 'string' ? field.type : field.type.gqlType;
     const tsType = scalarToInputTs(fieldType);
     const isNullable = field.name !== 'id' && field.name !== 'nodeId';
 
@@ -318,7 +384,9 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
  */
 function addEntityType(sourceFile: SourceFile, table: CleanTable): void {
   const { typeName } = getTableNames(table);
-  sourceFile.addInterface(createInterface(typeName, buildEntityProperties(table)));
+  sourceFile.addInterface(
+    createInterface(typeName, buildEntityProperties(table))
+  );
 }
 
 /**
@@ -341,18 +409,22 @@ function addEntityTypes(sourceFile: SourceFile, tables: CleanTable[]): void {
 function addRelationHelperTypes(sourceFile: SourceFile): void {
   addSectionComment(sourceFile, 'Relation Helper Types');
 
-  sourceFile.addInterface(createInterface('ConnectionResult<T>', [
-    { name: 'nodes', type: 'T[]', optional: false },
-    { name: 'totalCount', type: 'number', optional: false },
-    { name: 'pageInfo', type: 'PageInfo', optional: false },
-  ]));
+  sourceFile.addInterface(
+    createInterface('ConnectionResult<T>', [
+      { name: 'nodes', type: 'T[]', optional: false },
+      { name: 'totalCount', type: 'number', optional: false },
+      { name: 'pageInfo', type: 'PageInfo', optional: false },
+    ])
+  );
 
-  sourceFile.addInterface(createInterface('PageInfo', [
-    { name: 'hasNextPage', type: 'boolean', optional: false },
-    { name: 'hasPreviousPage', type: 'boolean', optional: false },
-    { name: 'startCursor', type: 'string | null', optional: true },
-    { name: 'endCursor', type: 'string | null', optional: true },
-  ]));
+  sourceFile.addInterface(
+    createInterface('PageInfo', [
+      { name: 'hasNextPage', type: 'boolean', optional: false },
+      { name: 'hasPreviousPage', type: 'boolean', optional: false },
+      { name: 'startCursor', type: 'string | null', optional: true },
+      { name: 'endCursor', type: 'string | null', optional: true },
+    ])
+  );
 }
 
 // ============================================================================
@@ -372,7 +444,15 @@ function getRelatedOrderByName(
   tableByName: Map<string, CleanTable>
 ): string {
   const relatedTable = tableByName.get(tableName);
-  return relatedTable ? getOrderByTypeName(relatedTable) : `${tableName}sOrderBy`;
+  if (relatedTable) {
+    return getOrderByTypeName(relatedTable);
+  }
+  // For ManyToMany connection types, don't pluralize - just append OrderBy
+  // These types already have a fixed suffix pattern like "UserUsersByFooManyToMany"
+  if (tableName.endsWith('ManyToMany')) {
+    return `${tableName}OrderBy`;
+  }
+  return `${pluralize(tableName)}OrderBy`;
 }
 
 function getRelatedFilterName(
@@ -394,7 +474,10 @@ function buildEntityRelationProperties(
 
   for (const relation of table.relations.belongsTo) {
     if (!relation.fieldName) continue;
-    const relatedTypeName = getRelatedTypeName(relation.referencesTable, tableByName);
+    const relatedTypeName = getRelatedTypeName(
+      relation.referencesTable,
+      tableByName
+    );
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
@@ -404,7 +487,10 @@ function buildEntityRelationProperties(
 
   for (const relation of table.relations.hasOne) {
     if (!relation.fieldName) continue;
-    const relatedTypeName = getRelatedTypeName(relation.referencedByTable, tableByName);
+    const relatedTypeName = getRelatedTypeName(
+      relation.referencedByTable,
+      tableByName
+    );
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
@@ -414,7 +500,10 @@ function buildEntityRelationProperties(
 
   for (const relation of table.relations.hasMany) {
     if (!relation.fieldName) continue;
-    const relatedTypeName = getRelatedTypeName(relation.referencedByTable, tableByName);
+    const relatedTypeName = getRelatedTypeName(
+      relation.referencedByTable,
+      tableByName
+    );
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
@@ -424,7 +513,10 @@ function buildEntityRelationProperties(
 
   for (const relation of table.relations.manyToMany) {
     if (!relation.fieldName) continue;
-    const relatedTypeName = getRelatedTypeName(relation.rightTable, tableByName);
+    const relatedTypeName = getRelatedTypeName(
+      relation.rightTable,
+      tableByName
+    );
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
@@ -448,7 +540,10 @@ function addEntityRelationTypes(
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     sourceFile.addInterface(
-      createInterface(`${typeName}Relations`, buildEntityRelationProperties(table, tableByName))
+      createInterface(
+        `${typeName}Relations`,
+        buildEntityRelationProperties(table, tableByName)
+      )
     );
   }
 }
@@ -456,13 +551,19 @@ function addEntityRelationTypes(
 /**
  * Add entity types with relations (intersection types)
  */
-function addEntityWithRelations(sourceFile: SourceFile, tables: CleanTable[]): void {
+function addEntityWithRelations(
+  sourceFile: SourceFile,
+  tables: CleanTable[]
+): void {
   addSectionComment(sourceFile, 'Entity Types With Relations');
 
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     sourceFile.addTypeAlias(
-      createTypeAlias(`${typeName}WithRelations`, `${typeName} & ${typeName}Relations`)
+      createTypeAlias(
+        `${typeName}WithRelations`,
+        `${typeName} & ${typeName}Relations`
+      )
     );
   }
 }
@@ -490,17 +591,31 @@ function buildSelectTypeBody(
   // Add belongsTo relations
   for (const relation of table.relations.belongsTo) {
     if (relation.fieldName) {
-      const relatedTypeName = getRelatedTypeName(relation.referencesTable, tableByName);
-      lines.push(`${relation.fieldName}?: boolean | { select?: ${relatedTypeName}Select };`);
+      const relatedTypeName = getRelatedTypeName(
+        relation.referencesTable,
+        tableByName
+      );
+      lines.push(
+        `${relation.fieldName}?: boolean | { select?: ${relatedTypeName}Select };`
+      );
     }
   }
 
   // Add hasMany relations
   for (const relation of table.relations.hasMany) {
     if (relation.fieldName) {
-      const relatedTypeName = getRelatedTypeName(relation.referencedByTable, tableByName);
-      const filterName = getRelatedFilterName(relation.referencedByTable, tableByName);
-      const orderByName = getRelatedOrderByName(relation.referencedByTable, tableByName);
+      const relatedTypeName = getRelatedTypeName(
+        relation.referencedByTable,
+        tableByName
+      );
+      const filterName = getRelatedFilterName(
+        relation.referencedByTable,
+        tableByName
+      );
+      const orderByName = getRelatedOrderByName(
+        relation.referencedByTable,
+        tableByName
+      );
       lines.push(`${relation.fieldName}?: boolean | {`);
       lines.push(`  select?: ${relatedTypeName}Select;`);
       lines.push(`  first?: number;`);
@@ -513,9 +628,15 @@ function buildSelectTypeBody(
   // Add manyToMany relations
   for (const relation of table.relations.manyToMany) {
     if (relation.fieldName) {
-      const relatedTypeName = getRelatedTypeName(relation.rightTable, tableByName);
+      const relatedTypeName = getRelatedTypeName(
+        relation.rightTable,
+        tableByName
+      );
       const filterName = getRelatedFilterName(relation.rightTable, tableByName);
-      const orderByName = getRelatedOrderByName(relation.rightTable, tableByName);
+      const orderByName = getRelatedOrderByName(
+        relation.rightTable,
+        tableByName
+      );
       lines.push(`${relation.fieldName}?: boolean | {`);
       lines.push(`  select?: ${relatedTypeName}Select;`);
       lines.push(`  first?: number;`);
@@ -528,8 +649,13 @@ function buildSelectTypeBody(
   // Add hasOne relations
   for (const relation of table.relations.hasOne) {
     if (relation.fieldName) {
-      const relatedTypeName = getRelatedTypeName(relation.referencedByTable, tableByName);
-      lines.push(`${relation.fieldName}?: boolean | { select?: ${relatedTypeName}Select };`);
+      const relatedTypeName = getRelatedTypeName(
+        relation.referencedByTable,
+        tableByName
+      );
+      lines.push(
+        `${relation.fieldName}?: boolean | { select?: ${relatedTypeName}Select };`
+      );
     }
   }
 
@@ -550,7 +676,10 @@ function addEntitySelectTypes(
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     sourceFile.addTypeAlias(
-      createTypeAlias(`${typeName}Select`, buildSelectTypeBody(table, tableByName))
+      createTypeAlias(
+        `${typeName}Select`,
+        buildSelectTypeBody(table, tableByName)
+      )
     );
   }
 }
@@ -574,7 +703,8 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
 
   for (const field of table.fields) {
-    const fieldType = typeof field.type === 'string' ? field.type : field.type.gqlType;
+    const fieldType =
+      typeof field.type === 'string' ? field.type : field.type.gqlType;
     if (isRelationField(field.name, table)) continue;
 
     const filterType = getFilterTypeForField(fieldType);
@@ -592,12 +722,62 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Add table filter types
  */
-function addTableFilterTypes(sourceFile: SourceFile, tables: CleanTable[]): void {
+function addTableFilterTypes(
+  sourceFile: SourceFile,
+  tables: CleanTable[]
+): void {
   addSectionComment(sourceFile, 'Table Filter Types');
 
   for (const table of tables) {
     const filterName = getFilterTypeName(table);
-    sourceFile.addInterface(createInterface(filterName, buildTableFilterProperties(table)));
+    sourceFile.addInterface(
+      createInterface(filterName, buildTableFilterProperties(table))
+    );
+  }
+}
+
+// ============================================================================
+// Condition Types Generator (AST-based)
+// ============================================================================
+
+/**
+ * Build properties for a table condition interface
+ * Condition types are simpler than Filter types - they use direct value equality
+ */
+function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
+  const properties: InterfaceProperty[] = [];
+
+  for (const field of table.fields) {
+    const fieldType =
+      typeof field.type === 'string' ? field.type : field.type.gqlType;
+    if (isRelationField(field.name, table)) continue;
+
+    // Condition types use the raw scalar type (nullable)
+    const tsType = scalarToTsType(fieldType, { unknownScalar: 'unknown' });
+    properties.push({
+      name: field.name,
+      type: `${tsType} | null`,
+      optional: true,
+    });
+  }
+
+  return properties;
+}
+
+/**
+ * Add table condition types
+ */
+function addTableConditionTypes(
+  sourceFile: SourceFile,
+  tables: CleanTable[]
+): void {
+  addSectionComment(sourceFile, 'Table Condition Types');
+
+  for (const table of tables) {
+    const conditionName = getConditionTypeName(table);
+    sourceFile.addInterface(
+      createInterface(conditionName, buildTableConditionProperties(table))
+    );
   }
 }
 
@@ -631,7 +811,9 @@ function addOrderByTypes(sourceFile: SourceFile, tables: CleanTable[]): void {
   for (const table of tables) {
     // Use getOrderByTypeName which respects table.inflection.orderByType
     const enumName = getOrderByTypeName(table);
-    sourceFile.addTypeAlias(createTypeAlias(enumName, buildOrderByUnion(table)));
+    sourceFile.addTypeAlias(
+      createTypeAlias(enumName, buildOrderByUnion(table))
+    );
   }
 }
 
@@ -642,14 +824,22 @@ function addOrderByTypes(sourceFile: SourceFile, tables: CleanTable[]): void {
 /**
  * Build the nested data object fields for Create input
  */
-function buildCreateDataFields(table: CleanTable): Array<{ name: string; type: string; optional: boolean }> {
+function buildCreateDataFields(
+  table: CleanTable
+): Array<{ name: string; type: string; optional: boolean }> {
   const fields: Array<{ name: string; type: string; optional: boolean }> = [];
 
   for (const field of table.fields) {
-    if (EXCLUDED_MUTATION_FIELDS.includes(field.name as typeof EXCLUDED_MUTATION_FIELDS[number])) continue;
+    if (
+      EXCLUDED_MUTATION_FIELDS.includes(
+        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number]
+      )
+    )
+      continue;
     if (isRelationField(field.name, table)) continue;
 
-    const fieldType = typeof field.type === 'string' ? field.type : field.type.gqlType;
+    const fieldType =
+      typeof field.type === 'string' ? field.type : field.type.gqlType;
     const tsType = scalarToInputTs(fieldType);
     const isOptional = !field.name.endsWith('Id');
 
@@ -661,7 +851,7 @@ function buildCreateDataFields(table: CleanTable): Array<{ name: string; type: s
 
 /**
  * Generate Create input interface as formatted string.
- * 
+ *
  * ts-morph doesn't handle nested object types in interface properties well,
  * so we build this manually with pre-doubled indentation (4→2, 8→4) since
  * getMinimalFormattedOutput halves all indentation.
@@ -669,21 +859,21 @@ function buildCreateDataFields(table: CleanTable): Array<{ name: string; type: s
 function buildCreateInputInterface(table: CleanTable): string {
   const { typeName, singularName } = getTableNames(table);
   const fields = buildCreateDataFields(table);
-  
+
   const lines = [
     `export interface Create${typeName}Input {`,
     `    clientMutationId?: string;`,
     `    ${singularName}: {`,
   ];
-  
+
   for (const field of fields) {
     const opt = field.optional ? '?' : '';
     lines.push(`        ${field.name}${opt}: ${field.type};`);
   }
-  
+
   lines.push('    };');
   lines.push('}');
-  
+
   return lines.join('\n');
 }
 
@@ -694,13 +884,23 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
 
   for (const field of table.fields) {
-    if (EXCLUDED_MUTATION_FIELDS.includes(field.name as typeof EXCLUDED_MUTATION_FIELDS[number])) continue;
+    if (
+      EXCLUDED_MUTATION_FIELDS.includes(
+        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number]
+      )
+    )
+      continue;
     if (isRelationField(field.name, table)) continue;
 
-    const fieldType = typeof field.type === 'string' ? field.type : field.type.gqlType;
+    const fieldType =
+      typeof field.type === 'string' ? field.type : field.type.gqlType;
     const tsType = scalarToInputTs(fieldType);
 
-    properties.push({ name: field.name, type: `${tsType} | null`, optional: true });
+    properties.push({
+      name: field.name,
+      type: `${tsType} | null`,
+      optional: true,
+    });
   }
 
   return properties;
@@ -717,26 +917,35 @@ function addCrudInputTypes(sourceFile: SourceFile, table: CleanTable): void {
   sourceFile.addStatements(buildCreateInputInterface(table));
 
   // Patch interface
-  sourceFile.addInterface(createInterface(patchName, buildPatchProperties(table)));
+  sourceFile.addInterface(
+    createInterface(patchName, buildPatchProperties(table))
+  );
 
   // Update input
-  sourceFile.addInterface(createInterface(`Update${typeName}Input`, [
-    { name: 'clientMutationId', type: 'string', optional: true },
-    { name: 'id', type: 'string', optional: false },
-    { name: 'patch', type: patchName, optional: false },
-  ]));
+  sourceFile.addInterface(
+    createInterface(`Update${typeName}Input`, [
+      { name: 'clientMutationId', type: 'string', optional: true },
+      { name: 'id', type: 'string', optional: false },
+      { name: 'patch', type: patchName, optional: false },
+    ])
+  );
 
   // Delete input
-  sourceFile.addInterface(createInterface(`Delete${typeName}Input`, [
-    { name: 'clientMutationId', type: 'string', optional: true },
-    { name: 'id', type: 'string', optional: false },
-  ]));
+  sourceFile.addInterface(
+    createInterface(`Delete${typeName}Input`, [
+      { name: 'clientMutationId', type: 'string', optional: true },
+      { name: 'id', type: 'string', optional: false },
+    ])
+  );
 }
 
 /**
  * Add all CRUD input types
  */
-function addAllCrudInputTypes(sourceFile: SourceFile, tables: CleanTable[]): void {
+function addAllCrudInputTypes(
+  sourceFile: SourceFile,
+  tables: CleanTable[]
+): void {
   addSectionComment(sourceFile, 'CRUD Input Types');
 
   for (const table of tables) {
@@ -828,7 +1037,9 @@ function addCustomInputTypes(
     const typeInfo = typeRegistry.get(typeName);
     if (!typeInfo) {
       sourceFile.addStatements(`// Type '${typeName}' not found in schema`);
-      sourceFile.addTypeAlias(createTypeAlias(typeName, 'Record<string, unknown>'));
+      sourceFile.addTypeAlias(
+        createTypeAlias(typeName, 'Record<string, unknown>')
+      );
       continue;
     }
 
@@ -842,7 +1053,11 @@ function addCustomInputTypes(
 
         // Follow nested Input types
         const baseType = getTypeBaseName(field.type);
-        if (baseType && baseType.endsWith('Input') && !generatedTypes.has(baseType)) {
+        if (
+          baseType &&
+          baseType.endsWith('Input') &&
+          !generatedTypes.has(baseType)
+        ) {
           typesToGenerate.add(baseType);
         }
       }
@@ -872,7 +1087,10 @@ export function collectPayloadTypeNames(
 
   for (const op of operations) {
     const baseName = getTypeBaseName(op.returnType);
-    if (baseName && (baseName.endsWith('Payload') || !baseName.endsWith('Connection'))) {
+    if (
+      baseName &&
+      (baseName.endsWith('Payload') || !baseName.endsWith('Connection'))
+    ) {
       payloadTypes.add(baseName);
     }
   }
@@ -895,8 +1113,21 @@ function addPayloadTypes(
   const typesToGenerate = new Set(Array.from(usedPayloadTypes));
 
   const skipTypes = new Set<string>([
-    'String', 'Int', 'Float', 'Boolean', 'ID', 'UUID', 'Datetime', 'Date',
-    'Time', 'JSON', 'BigInt', 'BigFloat', 'Cursor', 'Query', 'Mutation',
+    'String',
+    'Int',
+    'Float',
+    'Boolean',
+    'ID',
+    'UUID',
+    'Datetime',
+    'Date',
+    'Time',
+    'JSON',
+    'BigInt',
+    'BigFloat',
+    'Cursor',
+    'Query',
+    'Mutation',
   ]);
 
   // Process all types - no artificial limit
@@ -930,7 +1161,11 @@ function addPayloadTypes(
       });
 
       // Follow nested OBJECT types
-      if (baseType && !generatedTypes.has(baseType) && !skipTypes.has(baseType)) {
+      if (
+        baseType &&
+        !generatedTypes.has(baseType) &&
+        !skipTypes.has(baseType)
+      ) {
         const nestedType = typeRegistry.get(baseType);
         if (nestedType?.kind === 'OBJECT') {
           typesToGenerate.add(baseType);
@@ -948,14 +1183,18 @@ function addPayloadTypes(
 
       const nestedType = baseType ? typeRegistry.get(baseType) : null;
       if (nestedType?.kind === 'OBJECT') {
-        selectLines.push(`${field.name}?: boolean | { select?: ${baseType}Select };`);
+        selectLines.push(
+          `${field.name}?: boolean | { select?: ${baseType}Select };`
+        );
       } else {
         selectLines.push(`${field.name}?: boolean;`);
       }
     }
     selectLines.push('}');
 
-    sourceFile.addTypeAlias(createTypeAlias(`${typeName}Select`, selectLines.join('\n')));
+    sourceFile.addTypeAlias(
+      createTypeAlias(`${typeName}Select`, selectLines.join('\n'))
+    );
   }
 }
 
@@ -976,7 +1215,10 @@ export function generateInputTypesFile(
   const sourceFile = createSourceFile(project, 'input-types.ts');
 
   // Add file header
-  sourceFile.insertText(0, createFileHeader('GraphQL types for ORM client') + '\n');
+  sourceFile.insertText(
+    0,
+    createFileHeader('GraphQL types for ORM client') + '\n'
+  );
 
   // 1. Scalar filter types
   addScalarFilterTypes(sourceFile);
@@ -1000,6 +1242,9 @@ export function generateInputTypesFile(
     // 4. Table filter types
     addTableFilterTypes(sourceFile, tables);
 
+    // 4b. Table condition types (simple equality filter)
+    addTableConditionTypes(sourceFile, tables);
+
     // 5. OrderBy types
     addOrderByTypes(sourceFile, tables);
 
@@ -1020,7 +1265,12 @@ export function generateInputTypesFile(
         alreadyGeneratedTypes.add(typeName);
       }
     }
-    addPayloadTypes(sourceFile, typeRegistry, usedPayloadTypes, alreadyGeneratedTypes);
+    addPayloadTypes(
+      sourceFile,
+      typeRegistry,
+      usedPayloadTypes,
+      alreadyGeneratedTypes
+    );
   }
 
   return {

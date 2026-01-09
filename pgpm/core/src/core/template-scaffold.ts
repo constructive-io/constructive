@@ -1,7 +1,35 @@
 import os from 'os';
 import path from 'path';
-import { TemplateScaffolder, BoilerplateConfig } from 'genomic';
+import { TemplateScaffolder, BoilerplateConfig as GenomicBoilerplateConfig } from 'genomic';
 import type { Inquirerer, Question } from 'inquirerer';
+
+/**
+ * Supported workspace types for template requirements.
+ * - 'pgpm': Requires pgpm workspace (pgpm.json/pgpm.config.js) and creates pgpm.plan/.control files
+ * - 'pnpm': Requires pnpm workspace (pnpm-workspace.yaml)
+ * - 'lerna': Requires lerna workspace (lerna.json)
+ * - 'npm': Requires npm workspace (package.json with workspaces field)
+ * - false: No workspace required, can be scaffolded anywhere
+ */
+export type WorkspaceType = 'pgpm' | 'pnpm' | 'lerna' | 'npm' | false;
+
+/**
+ * Extended BoilerplateConfig that adds workspace requirement field.
+ * This field controls both workspace detection and whether pgpm-specific files are created.
+ */
+export interface BoilerplateConfig extends GenomicBoilerplateConfig {
+  /**
+   * Specifies what type of workspace this template requires.
+   * - 'pgpm': Requires pgpm workspace AND creates pgpm.plan/.control files
+   * - 'pnpm': Requires pnpm workspace (pnpm-workspace.yaml), no pgpm files
+   * - 'lerna': Requires lerna workspace (lerna.json), no pgpm files
+   * - 'npm': Requires npm workspace (package.json with workspaces), no pgpm files
+   * - false: No workspace required, no pgpm files
+   * 
+   * Defaults to 'pgpm' for 'module' type (backward compatibility), false for others.
+   */
+  requiresWorkspace?: WorkspaceType;
+}
 
 export interface InspectTemplateOptions {
   /**

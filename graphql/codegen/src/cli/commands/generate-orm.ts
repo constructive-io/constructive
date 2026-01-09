@@ -1,26 +1,19 @@
 /**
- * Generate ORM command - generates Prisma-like ORM client
+ * Generate ORM command - generates Prisma-like ORM client from GraphQL schema
  *
  * This command:
- * 1. Fetches _meta query for table-based CRUD operations
- * 2. Fetches __schema introspection for custom operations
+ * 1. Fetches schema from endpoint or loads from file
+ * 2. Infers table metadata from introspection (replaces _meta)
  * 3. Generates a Prisma-like ORM client with fluent API
  */
 
 import type { GraphQLSDKConfig, ResolvedConfig } from '../../types/config';
 import { resolveConfig } from '../../types/config';
-import { fetchMeta, validateEndpoint } from '../introspect/fetch-meta';
-import { fetchSchema } from '../introspect/fetch-schema';
 import {
-  transformMetaToCleanTables,
-  filterTables,
-} from '../introspect/transform';
-import {
-  transformSchemaToOperations,
-  filterOperations,
-  getTableOperationNames,
-  getCustomOperations,
-} from '../introspect/transform-schema';
+  createSchemaSource,
+  validateSourceOptions,
+} from '../introspect/source';
+import { runCodegenPipeline, validateTablesFound } from './shared';
 import { findConfigFile, loadConfigFile } from './init';
 import { writeGeneratedFiles } from './generate';
 import { generateOrm } from '../codegen/orm';
@@ -30,6 +23,8 @@ export interface GenerateOrmOptions {
   config?: string;
   /** GraphQL endpoint URL (overrides config) */
   endpoint?: string;
+  /** Path to GraphQL schema file (.graphql) */
+  schema?: string;
   /** Output directory (overrides config) */
   output?: string;
   /** Authorization header */
@@ -75,151 +70,84 @@ export async function generateOrmCommand(
   // Use ORM output directory if specified, otherwise default
   const outputDir = options.output || config.orm?.output || './generated/orm';
 
-  log(`  Endpoint: ${config.endpoint}`);
+  // Log source
+  if (config.schema) {
+    log(`  Schema: ${config.schema}`);
+  } else {
+    log(`  Endpoint: ${config.endpoint}`);
+  }
   log(`  Output: ${outputDir}`);
 
-  // 2. Validate endpoint
-  const endpointValidation = validateEndpoint(config.endpoint);
-  if (!endpointValidation.valid) {
+  // 2. Create schema source
+  const sourceValidation = validateSourceOptions({
+    endpoint: config.endpoint || undefined,
+    schema: config.schema || undefined,
+  });
+  if (!sourceValidation.valid) {
     return {
       success: false,
-      message: `Invalid endpoint: ${endpointValidation.error}`,
+      message: sourceValidation.error!,
     };
   }
 
-  // Build authorization header if provided
-  const authHeader = options.authorization || config.headers['Authorization'];
-
-  // 3. Fetch _meta for table-based operations
-  log('Fetching schema metadata (_meta)...');
-
-  const metaResult = await fetchMeta({
-    endpoint: config.endpoint,
-    authorization: authHeader,
+  const source = createSchemaSource({
+    endpoint: config.endpoint || undefined,
+    schema: config.schema || undefined,
+    authorization: options.authorization || config.headers['Authorization'],
     headers: config.headers,
-    timeout: 30000,
   });
 
-  if (!metaResult.success) {
-    return {
-      success: false,
-      message: `Failed to fetch _meta: ${metaResult.error}`,
-    };
-  }
-
-  // 4. Transform to CleanTable[]
-  log('Transforming table schema...');
-  let tables = transformMetaToCleanTables(metaResult.data!);
-  log(`  Found ${tables.length} tables`);
-
-  // 5. Filter tables
-  tables = filterTables(tables, config.tables.include, config.tables.exclude);
-  log(`  After filtering: ${tables.length} tables`);
-
-  if (tables.length === 0) {
-    return {
-      success: false,
-      message:
-        'No tables found after filtering. Check your include/exclude patterns.',
-    };
-  }
-
-  // Get table operation names for filtering custom operations
-  const tableOperationNames = getTableOperationNames(tables);
-
-  // 6. Fetch __schema for custom operations (unless skipped)
-  let customQueries: string[] = [];
-  let customMutations: string[] = [];
-  let customOperationsData:
-    | {
-        queries: ReturnType<typeof getCustomOperations>;
-        mutations: ReturnType<typeof getCustomOperations>;
-        typeRegistry: ReturnType<typeof transformSchemaToOperations>['typeRegistry'];
-      }
-    | undefined;
-
-  if (!options.skipCustomOperations) {
-    log('Fetching schema introspection (__schema)...');
-
-    const schemaResult = await fetchSchema({
-      endpoint: config.endpoint,
-      authorization: authHeader,
-      headers: config.headers,
-      timeout: 30000,
+  // 3. Run the codegen pipeline
+  let pipelineResult;
+  try {
+    pipelineResult = await runCodegenPipeline({
+      source,
+      config,
+      verbose: options.verbose,
+      skipCustomOperations: options.skipCustomOperations,
     });
-
-    if (schemaResult.success && schemaResult.data) {
-      log('Transforming custom operations...');
-
-      // Transform to CleanOperation[]
-      const { queries: allQueries, mutations: allMutations, typeRegistry } =
-        transformSchemaToOperations(schemaResult.data);
-
-      log(
-        `  Found ${allQueries.length} queries and ${allMutations.length} mutations total`
-      );
-
-      // Filter by config include/exclude
-      const filteredQueries = filterOperations(
-        allQueries,
-        config.queries.include,
-        config.queries.exclude
-      );
-      const filteredMutations = filterOperations(
-        allMutations,
-        config.mutations.include,
-        config.mutations.exclude
-      );
-
-      log(
-        `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`
-      );
-
-      // Remove table operations (already handled by table generators)
-      const customQueriesOps = getCustomOperations(
-        filteredQueries,
-        tableOperationNames
-      );
-      const customMutationsOps = getCustomOperations(
-        filteredMutations,
-        tableOperationNames
-      );
-
-      log(
-        `  Custom operations: ${customQueriesOps.length} queries, ${customMutationsOps.length} mutations`
-      );
-
-      customQueries = customQueriesOps.map((q) => q.name);
-      customMutations = customMutationsOps.map((m) => m.name);
-
-      customOperationsData = {
-        queries: customQueriesOps,
-        mutations: customMutationsOps,
-        typeRegistry,
-      };
-    } else {
-      log(`  Warning: Could not fetch __schema: ${schemaResult.error}`);
-      log('  Continuing with table-only generation...');
-    }
+  } catch (err) {
+    return {
+      success: false,
+      message: `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`,
+    };
   }
 
-  // 7. Generate ORM code
+  const { tables, customOperations, stats } = pipelineResult;
+
+  // 4. Validate tables found
+  const tablesValidation = validateTablesFound(tables);
+  if (!tablesValidation.valid) {
+    return {
+      success: false,
+      message: tablesValidation.error!,
+    };
+  }
+
+  // 5. Generate ORM code
   console.log('Generating code...');
-  const { files: generatedFiles, stats } = generateOrm({
+  const { files: generatedFiles, stats: genStats } = generateOrm({
     tables,
-    customOperations: customOperationsData,
+    customOperations: {
+      queries: customOperations.queries,
+      mutations: customOperations.mutations,
+      typeRegistry: customOperations.typeRegistry,
+    },
     config,
   });
-  console.log(`Generated ${stats.totalFiles} files`);
+  console.log(`Generated ${genStats.totalFiles} files`);
 
-  log(`  ${stats.tables} table models`);
-  log(`  ${stats.customQueries} custom query operations`);
-  log(`  ${stats.customMutations} custom mutation operations`);
+  log(`  ${genStats.tables} table models`);
+  log(`  ${genStats.customQueries} custom query operations`);
+  log(`  ${genStats.customMutations} custom mutation operations`);
+
+  const customQueries = customOperations.queries.map((q) => q.name);
+  const customMutations = customOperations.mutations.map((m) => m.name);
 
   if (options.dryRun) {
     return {
       success: true,
-      message: `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${customQueries.length + customMutations.length} custom operations.`,
+      message: `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${stats.customQueries + stats.customMutations} custom operations.`,
       tables: tables.map((t) => t.name),
       customQueries,
       customMutations,
@@ -227,13 +155,13 @@ export async function generateOrmCommand(
     };
   }
 
-  // 8. Write files
+  // 6. Write files
   log('Writing files...');
-  const writeResult = await writeGeneratedFiles(
-    generatedFiles,
-    outputDir,
-    ['models', 'query', 'mutation']
-  );
+  const writeResult = await writeGeneratedFiles(generatedFiles, outputDir, [
+    'models',
+    'query',
+    'mutation',
+  ]);
 
   if (!writeResult.success) {
     return {
@@ -283,7 +211,8 @@ async function loadConfig(
 
   // Override with CLI options
   const mergedConfig: GraphQLSDKConfig = {
-    endpoint: options.endpoint || baseConfig.endpoint || '',
+    endpoint: options.endpoint || baseConfig.endpoint,
+    schema: options.schema || baseConfig.schema,
     output: options.output || baseConfig.output,
     headers: baseConfig.headers,
     tables: baseConfig.tables,
@@ -296,11 +225,12 @@ async function loadConfig(
     orm: baseConfig.orm,
   };
 
-  if (!mergedConfig.endpoint) {
+  // Validate at least one source is provided
+  if (!mergedConfig.endpoint && !mergedConfig.schema) {
     return {
       success: false,
       error:
-        'No endpoint specified. Use --endpoint or create a config file with "graphql-codegen init".',
+        'No source specified. Use --endpoint or --schema, or create a config file with "graphql-codegen init".',
     };
   }
 
@@ -309,4 +239,3 @@ async function loadConfig(
 
   return { success: true, config };
 }
-

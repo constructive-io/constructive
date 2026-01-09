@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.11](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.10...graphile-pg-type-mappings@0.5.11) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.10](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.9...graphile-pg-type-mappings@0.5.10) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.9](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.8...graphile-pg-type-mappings@0.5.9) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.8](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.7...graphile-pg-type-mappings@0.5.8) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.7](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.6...graphile-pg-type-mappings@0.5.7) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.6](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.5...graphile-pg-type-mappings@0.5.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.5](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.4...graphile-pg-type-mappings@0.5.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.4](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.3...graphile-pg-type-mappings@0.5.4) (2026-01-08)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.3](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.2...graphile-pg-type-mappings@0.5.3) (2026-01-07)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
+## [0.5.2](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.1...graphile-pg-type-mappings@0.5.2) (2026-01-07)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
 ## [0.5.1](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.5.0...graphile-pg-type-mappings@0.5.1) (2026-01-06)
 
 **Note:** Version bump only for package graphile-pg-type-mappings

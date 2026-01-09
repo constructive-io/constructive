@@ -132,7 +132,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-i18n:
@@ -185,8 +185,8 @@ importers:
   graphile/graphile-many-to-many:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -269,8 +269,8 @@ importers:
   graphile/graphile-plugin-connection-filter:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -307,8 +307,8 @@ importers:
   graphile/graphile-plugin-connection-filter-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -380,8 +380,8 @@ importers:
   graphile/graphile-postgis:
     dependencies:
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
@@ -559,7 +559,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-simple-inflector:
@@ -567,6 +567,9 @@ importers:
       graphile-build:
         specifier: ^4.14.1
         version: 4.14.1(graphql@15.10.1)
+      inflekt:
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       graphile-test:
         specifier: workspace:^
@@ -591,11 +594,11 @@ importers:
         specifier: 15.10.1
         version: 15.10.1
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -704,9 +707,9 @@ importers:
       graphql:
         specifier: 15.10.1
         version: 15.10.1
-      inflection:
-        specifier: ^3.0.2
-        version: 3.0.2
+      inflekt:
+        specifier: ^0.2.0
+        version: 0.2.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -828,7 +831,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/gql-ast:
@@ -999,6 +1002,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.958.0
         version: 3.958.0
+      '@constructive-io/graphql-codegen':
+        specifier: workspace:*
+        version: link:../codegen/dist
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
@@ -1014,6 +1020,9 @@ importers:
       '@types/request-ip':
         specifier: ^0.0.41
         version: 0.0.41
+      graphile-test:
+        specifier: workspace:*
+        version: link:../../graphile/graphile-test/dist
       makage:
         specifier: ^0.1.10
         version: 0.1.10
@@ -1022,7 +1031,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/test:
@@ -1202,7 +1211,7 @@ importers:
     devDependencies:
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
 
   jobs/knative-job-worker:
     dependencies:
@@ -1241,8 +1250,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/server/dist
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1256,11 +1265,11 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1284,8 +1293,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1335,20 +1344,20 @@ importers:
         specifier: ^17.6.2
         version: 17.6.2
       '@pgsql/utils':
-        specifier: ^17.8.9
-        version: 17.8.9
+        specifier: ^17.8.11
+        version: 17.8.11
       csv-parser:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -1357,8 +1366,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
     publishDirectory: dist
 
   packages/orm:
@@ -1411,7 +1420,7 @@ importers:
         version: 0.1.10
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/url-domains:
@@ -1431,8 +1440,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1446,17 +1455,17 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       appstash:
-        specifier: ^0.2.7
-        version: 0.2.7
+        specifier: ^0.2.8
+        version: 0.2.8
       find-and-require-package-json:
-        specifier: ^0.8.5
-        version: 0.8.5
+        specifier: ^0.8.6
+        version: 0.8.6
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1469,6 +1478,9 @@ importers:
       pg-env:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
+      pgsql-deparser:
+        specifier: ^17.17.2
+        version: 17.17.2
       semver:
         specifier: ^7.6.2
         version: 7.7.3
@@ -1480,8 +1492,8 @@ importers:
         version: 0.1.11
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.2.3
-        version: 1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.2.5
+        version: 1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1532,8 +1544,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.2.0
-        version: 5.2.1
+        specifier: ^5.2.3
+        version: 5.2.3
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -1553,11 +1565,11 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
       pgsql-parser:
-        specifier: ^17.9.9
-        version: 17.9.9
+        specifier: ^17.9.11
+        version: 17.9.11
       yanse:
         specifier: ^0.1.11
         version: 0.1.11
@@ -1572,8 +1584,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.2.0
-        version: 4.2.1
+        specifier: ^4.3.1
+        version: 4.3.1
       makage:
         specifier: ^0.1.10
         version: 0.1.10
@@ -1680,8 +1692,8 @@ importers:
         specifier: ^1.30.4
         version: 1.30.4
       pgsql-deparser:
-        specifier: ^17.17.0
-        version: 17.17.0
+        specifier: ^17.17.2
+        version: 17.17.2
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -3062,10 +3074,10 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/test@1.2.3':
+  '@inquirerer/test@1.2.5':
     resolution:
       {
-        integrity: sha512-un4n4VhvbRz7gqw+bpaaJdALtmnP+3fsljdZFItyHocr6SGug5R9SgyIxtIaC2CHCcZJjHIDT22hW32weSci0g==,
+        integrity: sha512-KbYVzo/hquctlPuA2uRb0fPbMP6SWpmU8VlLQQuUYoBsAYmQ32QzlEZzbYqSM/4fjr6TqCkqsLrfpNiTnK3+cg==,
       }
     peerDependencies:
       jest: '>=29.0.0'
@@ -3073,10 +3085,10 @@ packages:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.1.2':
+  '@inquirerer/utils@3.1.3':
     resolution:
       {
-        integrity: sha512-KjBp1sLzWBckHv1GbuWrpOyzXdRM8POkv6gNVgCWcshQPYgrWJs5tdH1zTPNGwwGOR5BpFHmnBbs7UJt9j4VZA==,
+        integrity: sha512-aEw6nBfbVVv77pwNT0LJNHZiEwN/2rE8jiXLzeY+93cHgt4rPs0QY2A+/CPq6ryzAfXGnI5C79o6HbwZcODZMA==,
       }
 
   '@isaacs/balanced-match@4.0.1':
@@ -3783,10 +3795,10 @@ packages:
         integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==,
       }
 
-  '@pgsql/utils@17.8.9':
+  '@pgsql/utils@17.8.11':
     resolution:
       {
-        integrity: sha512-CfSMMJygrUDBo/6Kj9Dp03IbZuGHM8M4RcMNHDpSquJZvGMH/DEr3fLFlLp05ikYInzgzbPn4ysOdajO0HckiQ==,
+        integrity: sha512-gcaS9ATilQyGSIq8596tq+6rcb7TX54sdjOvOzGa9lu9NjqkptEKLbBae5UTjfkFGfH50duDFD1EpFogMnZToA==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -4713,12 +4725,6 @@ packages:
         integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==,
       }
 
-  '@types/node@25.0.3':
-    resolution:
-      {
-        integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==,
-      }
-
   '@types/normalize-package-data@2.4.4':
     resolution:
       {
@@ -5253,10 +5259,10 @@ packages:
       }
     engines: { node: '>= 8' }
 
-  appstash@0.2.7:
+  appstash@0.2.8:
     resolution:
       {
-        integrity: sha512-EdJDs164q4OuKOBo/mdN6srwJdCy5e2NxmPKUyTBI8Z6aEAkX3ViSRFoAA78A4P0azysSMk8wqafsuM0R6weww==,
+        integrity: sha512-SLeV3iy7ygE7TNiU6AgDMQVhS6xVfO4ps3NDMUK3UcvZKOddykHuEtSuJr6wKzTu9yRnEeK/yisgztSARt/YJA==,
       }
 
   aproba@2.0.0:
@@ -6189,6 +6195,7 @@ packages:
       {
         integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==,
       }
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
 
   core-util-is@1.0.2:
     resolution:
@@ -7369,10 +7376,10 @@ packages:
       }
     engines: { node: '>= 18.0.0' }
 
-  find-and-require-package-json@0.8.5:
+  find-and-require-package-json@0.8.6:
     resolution:
       {
-        integrity: sha512-I15lQmpt0rxbmDpIgdn1IEWJU/smOLuKrPZFQMnktnz6kn25XgjGNn1ouKLFGsXuDW1Ssd47YPdSPwhSIGuvnA==,
+        integrity: sha512-N+funttvcGC9h7JxCs089fAyNhEpKzFnP0nUYOS+V2RWvI40rtVhANPozc72pJl9lMzqoPFTimlfqZg6zZGPRQ==,
       }
 
   find-up@2.1.0:
@@ -7550,10 +7557,10 @@ packages:
         integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==,
       }
 
-  genomic@5.2.1:
+  genomic@5.2.3:
     resolution:
       {
-        integrity: sha512-7+6g0ib9katy7OFUeaPXKiBPFZZSmeDdc3BNUvBvgCASCrseLU9r7a4sBo6319zbX81IBniM1EdIRsWzYKz9Qg==,
+        integrity: sha512-h93BqFC0gZgnInrAhozkYFV1UT1Pf/ffU8kh6JgF8Cqm0ypY8Iol5AvINVsgGXcQtcA00xcBOlJ5xc4tOXXZBA==,
       }
 
   gensync@1.0.0-beta.2:
@@ -7720,6 +7727,7 @@ packages:
       {
         integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==,
       }
+    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@9.3.5:
     resolution:
@@ -7827,13 +7835,6 @@ packages:
       }
     engines: { node: '>= 10.x' }
 
-  graphql@15.8.0:
-    resolution:
-      {
-        integrity: sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==,
-      }
-    engines: { node: '>= 10.x' }
-
   handlebars@4.7.8:
     resolution:
       {
@@ -7855,6 +7856,7 @@ packages:
         integrity: sha512-nmT2T0lljbxdQZfspsno9hgrG3Uir6Ks5afism62poxqBM6sDnMEuPmzTq8XN0OEwqKLLdh1jQI3qyE66Nzb3w==,
       }
     engines: { node: '>=6' }
+    deprecated: this library is no longer supported
 
   hard-rejection@2.1.0:
     resolution:
@@ -8156,11 +8158,18 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
+  inflekt@0.2.0:
+    resolution:
+      {
+        integrity: sha512-eznjYm6FOl6sX2fgDGe48WiCPO0db+BQhirptPBS1BhIAwqnbCgWHHCgmuzk1ldwQTKx8ot/v1ecJrFjVAe3xg==,
+      }
+
   inflight@1.0.6:
     resolution:
       {
         integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==,
       }
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.3:
     resolution:
@@ -8201,10 +8210,10 @@ packages:
       }
     engines: { node: '>=12.0.0' }
 
-  inquirerer@4.2.1:
+  inquirerer@4.3.1:
     resolution:
       {
-        integrity: sha512-DlJzCWrs/GjuUUifhH1Bu+gjOY7DAWlODqESNBb8a9CE1qeiUDqdPrf9qQGy82clMOXDDqQlB3CLbYSKw3z/lA==,
+        integrity: sha512-CKbqcGXT1zdFaJrkTLuTxdEe0yplUSmm1JbmJDDm2v6LuRaS34BE85rmnX0v8HQrli98Y4iFP99f6V0ny3RkDg==,
       }
 
   ip-address@10.1.0:
@@ -9392,6 +9401,7 @@ packages:
         integrity: sha512-a2alg5nuTZA9Psa1pSEIEsbxr1Zrmqx4VkgGCQ30xVh0kIH7Bu57AYILo+0v8QLSdXtCyLaS+KVmdCrQo0uWFA==,
       }
     engines: { node: '>=6.0.0' }
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   makage@0.1.10:
     resolution:
@@ -10718,16 +10728,16 @@ packages:
         integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==,
       }
 
-  pgsql-deparser@17.17.0:
+  pgsql-deparser@17.17.2:
     resolution:
       {
-        integrity: sha512-mnEzQGEEWF52KfN8dn8gzK+8zbkYt0K+t+4Ka1sklrAczzIqWyWoFO1HWdBdnkociQxMJtkEbKg7wYNGcwVi4Q==,
+        integrity: sha512-FCjqKY3Sdmce3VUd3CxCXF0kqaZ0s4a6yIMT5UJ9vETh0cF54A8Tpqjn0qBKaPUD8xqTKeLdS+SfiwjAC64wrA==,
       }
 
-  pgsql-parser@17.9.9:
+  pgsql-parser@17.9.11:
     resolution:
       {
-        integrity: sha512-GhX+VaQYCgi+PSzCNoxbm3dssJYSMkkceDhpgVCyeIuniBC2a5T4igjdz8qOKkZi+P4wocyfjE1/KINnrQZTrw==,
+        integrity: sha512-Bqp9uLvJK0Qht9PXzI6eC/Fn+lFRL+2eMvXss4D4qt7lxPLIHS8FMKYOHUQNTI3m6ylExSOdNXhx/DL5UGm3xg==,
       }
 
   picocolors@1.1.1:
@@ -11270,6 +11280,7 @@ packages:
         integrity: sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==,
       }
     engines: { node: '>= 6' }
+    deprecated: request has been deprecated, see https://github.com/request/request/issues/3142
 
   require-directory@2.1.1:
     resolution:
@@ -11359,6 +11370,7 @@ packages:
       {
         integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==,
       }
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@4.4.1:
@@ -11641,6 +11653,7 @@ packages:
       {
         integrity: sha512-KXBr9d/fO/bWo97NXsPIAW1bFSBOuCnjbNTBMO7N59hsv5i9yzRDfcYwwt0l04+VqnKC+EwzvJZIP/qkuMgR/w==,
       }
+    deprecated: See https://github.com/lydell/source-map-resolve#deprecated
 
   source-map-support@0.5.13:
     resolution:
@@ -11875,6 +11888,7 @@ packages:
       {
         integrity: sha512-dxdemxFFB0ppCLg10FTtRqH/31FNRL1y1BQv8209MK5I4CwALb7iihQg+7p65lFcIl8MHatINWBLOqpgU4Kyyw==,
       }
+    deprecated: The `subscriptions-transport-ws` package is no longer maintained. We recommend you use `graphql-ws` instead. For help migrating Apollo software to `graphql-ws`, see https://www.apollographql.com/docs/apollo-server/data/subscriptions/#switching-from-subscriptions-transport-ws    For general help using `graphql-ws`, see https://github.com/enisdenjo/graphql-ws/blob/master/README.md
     peerDependencies:
       graphql: '>=0.10.0'
 
@@ -12295,12 +12309,6 @@ packages:
         integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==,
       }
 
-  undici-types@7.16.0:
-    resolution:
-      {
-        integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==,
-      }
-
   undici@7.16.0:
     resolution:
       {
@@ -12407,6 +12415,7 @@ packages:
       {
         integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==,
       }
+    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -12506,6 +12515,7 @@ packages:
         integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==,
       }
     engines: { node: '>=18' }
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution:
@@ -13642,17 +13652,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  '@inquirerer/test@1.2.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
+  '@inquirerer/test@1.2.5(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
     dependencies:
       clean-ansi: 0.1.8
-      inquirerer: 4.2.1
+      inquirerer: 4.3.1
     optionalDependencies:
       jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
 
-  '@inquirerer/utils@3.1.2':
+  '@inquirerer/utils@3.1.3':
     dependencies:
-      appstash: 0.2.7
-      find-and-require-package-json: 0.8.5
+      appstash: 0.2.8
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
 
   '@isaacs/balanced-match@4.0.1': {}
@@ -14453,7 +14463,7 @@ snapshots:
 
   '@pgsql/types@17.6.2': {}
 
-  '@pgsql/utils@17.8.9':
+  '@pgsql/utils@17.8.11':
     dependencies:
       '@pgsql/types': 17.6.2
       nested-obj: 0.1.5
@@ -15139,10 +15149,6 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@25.0.3':
-    dependencies:
-      undici-types: 7.16.0
-
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/pg-copy-streams@1.2.5':
@@ -15456,7 +15462,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  appstash@0.2.7: {}
+  appstash@0.2.8: {}
 
   aproba@2.0.0: {}
 
@@ -16753,7 +16759,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-and-require-package-json@0.8.5: {}
+  find-and-require-package-json@0.8.6: {}
 
   find-up@2.1.0:
     dependencies:
@@ -16850,10 +16856,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.2.1:
+  genomic@5.2.3:
     dependencies:
-      appstash: 0.2.7
-      inquirerer: 4.2.1
+      appstash: 0.2.8
+      inquirerer: 4.3.1
 
   gensync@1.0.0-beta.2: {}
 
@@ -17029,7 +17035,7 @@ snapshots:
       debug: 4.4.3(supports-color@5.5.0)
       graphile-build: 4.14.1(graphql@15.10.1)
       graphile-build-pg: 4.14.1(graphql@15.10.1)(pg@8.16.3)
-      graphql: 15.8.0
+      graphql: 15.10.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -17065,8 +17071,6 @@ snapshots:
       graphql: 15.10.1
 
   graphql@15.10.1: {}
-
-  graphql@15.8.0: {}
 
   handlebars@4.7.8:
     dependencies:
@@ -17268,6 +17272,10 @@ snapshots:
 
   inflection@3.0.2: {}
 
+  inflekt@0.2.0:
+    dependencies:
+      inflection: 3.0.2
+
   inflight@1.0.6:
     dependencies:
       once: 1.4.0
@@ -17313,11 +17321,10 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@4.2.1:
+  inquirerer@4.3.1:
     dependencies:
       deepmerge: 4.3.1
-      find-and-require-package-json: 0.8.5
-      js-yaml: 4.1.1
+      find-and-require-package-json: 0.8.6
       minimist: 1.2.8
       yanse: 0.1.11
 
@@ -19485,15 +19492,15 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pgsql-deparser@17.17.0:
+  pgsql-deparser@17.17.2:
     dependencies:
       '@pgsql/types': 17.6.2
 
-  pgsql-parser@17.9.9:
+  pgsql-parser@17.9.11:
     dependencies:
       '@pgsql/types': 17.6.2
       libpg-query: 17.7.3
-      pgsql-deparser: 17.17.0
+      pgsql-deparser: 17.17.2
 
   picocolors@1.1.1: {}
 
@@ -20381,24 +20388,6 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  ts-node@10.9.2(@types/node@25.0.3)(typescript@5.9.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.12
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 25.0.3
-      acorn: 8.15.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.9.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -20480,8 +20469,6 @@ snapshots:
   undici-types@5.26.5: {}
 
   undici-types@6.21.0: {}
-
-  undici-types@7.16.0: {}
 
   undici@7.16.0: {}
 

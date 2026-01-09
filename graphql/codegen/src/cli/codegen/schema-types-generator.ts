@@ -12,7 +12,11 @@
  * Uses ts-morph for robust AST-based code generation.
  */
 import type { SourceFile } from 'ts-morph';
-import type { TypeRegistry, CleanArgument, ResolvedType } from '../../types/schema';
+import type {
+  TypeRegistry,
+  CleanArgument,
+  ResolvedType,
+} from '../../types/schema';
 import {
   createProject,
   createSourceFile,
@@ -24,7 +28,11 @@ import {
   type InterfaceProperty,
 } from './ts-ast';
 import { getTypeBaseName } from './type-resolver';
-import { scalarToTsType, SCALAR_NAMES, BASE_FILTER_TYPE_NAMES } from './scalars';
+import {
+  scalarToTsType,
+  SCALAR_NAMES,
+  BASE_FILTER_TYPE_NAMES,
+} from './scalars';
 
 export interface GeneratedSchemaTypesFile {
   fileName: string;
@@ -69,13 +77,13 @@ const SKIP_TYPES = new Set([
 /**
  * Type name patterns to skip (regex patterns)
  *
- * Note: We intentionally DO NOT skip Connection, Edge, Filter, or Patch types
- * because they may be referenced by custom operations or payload types.
- * Only skip Condition and OrderBy which are typically not needed.
+ * Note: We intentionally DO NOT skip Connection, Edge, Filter, Patch, Condition,
+ * or OrderBy types because they may be referenced by custom operations.
+ * Previously Condition and OrderBy were skipped but they ARE needed for
+ * custom queries like `schemata`, `apiSchemata`, etc.
  */
-const SKIP_TYPE_PATTERNS = [
-  /Condition$/,     // e.g., UserCondition (filter conditions are separate)
-  /OrderBy$/,       // e.g., UsersOrderBy (ordering is handled separately)
+const SKIP_TYPE_PATTERNS: RegExp[] = [
+  // Currently no patterns are skipped - all types may be needed by custom operations
 ];
 
 // ============================================================================
@@ -280,7 +288,8 @@ function addUnionTypes(
   for (const typeName of unionTypesToGenerate) {
     const typeInfo = typeRegistry.get(typeName);
     if (!typeInfo || typeInfo.kind !== 'UNION') continue;
-    if (!typeInfo.possibleTypes || typeInfo.possibleTypes.length === 0) continue;
+    if (!typeInfo.possibleTypes || typeInfo.possibleTypes.length === 0)
+      continue;
 
     // Generate union type as TypeScript union
     const unionMembers = typeInfo.possibleTypes.join(' | ');
@@ -352,7 +361,10 @@ function addPayloadObjectTypes(
   const referencedTableTypes = new Set<string>();
 
   // Dynamically collect return types from Query and Mutation
-  const typesToGenerate = collectReturnTypesFromRootTypes(typeRegistry, tableTypeNames);
+  const typesToGenerate = collectReturnTypesFromRootTypes(
+    typeRegistry,
+    tableTypeNames
+  );
 
   // Filter out already generated types
   for (const typeName of Array.from(typesToGenerate)) {
@@ -460,7 +472,12 @@ export function generateSchemaTypesFile(
   generatedTypes = new Set([...generatedTypes, ...enumTypes]);
 
   // 2. Generate UNION types
-  const unionTypes = addUnionTypes(sourceFile, typeRegistry, tableTypeNames, generatedTypes);
+  const unionTypes = addUnionTypes(
+    sourceFile,
+    typeRegistry,
+    tableTypeNames,
+    generatedTypes
+  );
   generatedTypes = new Set([...generatedTypes, ...unionTypes]);
 
   // 3. Generate INPUT_OBJECT types
@@ -481,7 +498,9 @@ export function generateSchemaTypesFile(
   );
 
   // 5. Add imports from types.ts (table entity types + base filter types)
-  const referencedTableTypes = Array.from(payloadResult.referencedTableTypes).sort();
+  const referencedTableTypes = Array.from(
+    payloadResult.referencedTableTypes
+  ).sort();
   // Always import base filter types since generated Filter interfaces reference them
   const baseFilterImports = Array.from(BASE_FILTER_TYPE_NAMES).sort();
   const allTypesImports = [...referencedTableTypes, ...baseFilterImports];

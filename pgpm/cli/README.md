@@ -328,6 +328,28 @@ pgpm package --no-plan
 
 ### Utilities
 
+#### `pgpm dump`
+
+Dump a postgres database to a sql file.
+
+```bash
+# dump to default timestamped file
+pgpm dump --database mydb
+
+# interactive mode (prompts for database)
+pgpm dump
+
+# dump to specific file
+pgpm dump --database mydb --out ./backup.sql
+
+# dump from a specific working directory
+pgpm dump --database mydb --cwd ./packages/my-module
+
+# dump with pruning 
+# useful for creating test fixtures or development snapshots
+pgpm dump --database mydb --database-id <uuid>
+```
+
 #### `pgpm export`
 
 Export migrations from existing databases.

@@ -5,7 +5,7 @@
 import * as t from 'gql-ast';
 import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
-import * as inflection from 'inflection';
+import { camelize, pluralize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
@@ -35,9 +35,9 @@ import { convertToSelectionOptions, isRelationalField } from './field-selector';
  */
 export function toCamelCasePlural(tableName: string): string {
   // First convert to camelCase (lowercase first letter)
-  const camelCase = inflection.camelize(tableName, true);
+  const camelCase = camelize(tableName, true);
   // Then pluralize properly
-  return inflection.pluralize(camelCase);
+  return pluralize(camelCase);
 }
 
 /**
@@ -129,7 +129,7 @@ export function generateIntrospectionSchema(
     } as QueryDefinition;
 
     // Add getOne query (by ID)
-    const singularName = inflection.camelize(modelName, true);
+    const singularName = camelize(modelName, true);
     schema[singularName] = {
       qtype: 'getOne',
       model: modelName,
@@ -151,8 +151,8 @@ export function generateIntrospectionSchema(
           isArray: false,
           isArrayNotNull: false,
           properties: {
-            [inflection.camelize(modelName, true)]: {
-              name: inflection.camelize(modelName, true),
+            [camelize(modelName, true)]: {
+              name: camelize(modelName, true),
               type: `${modelName}Input`,
               isNotNull: true,
               isArray: false,
@@ -725,7 +725,7 @@ function findRelatedTable(
  * Generate FindOne query AST directly from CleanTable
  */
 function generateFindOneQueryAST(table: CleanTable): string {
-  const singularName = inflection.camelize(table.name, true);
+  const singularName = camelize(table.name, true);
 
   // Generate field selections (include all non-relational fields, including complex types)
   const fieldSelections = table.fields

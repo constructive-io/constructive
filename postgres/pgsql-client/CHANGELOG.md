@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.11](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.10...pgsql-client@1.3.11) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.10](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.9...pgsql-client@1.3.10) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.9](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.8...pgsql-client@1.3.9) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.8](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.7...pgsql-client@1.3.8) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.7](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.6...pgsql-client@1.3.7) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.6](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.5...pgsql-client@1.3.6) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.5](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.4...pgsql-client@1.3.5) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.4](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.3...pgsql-client@1.3.4) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.3](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.2...pgsql-client@1.3.3) (2026-01-07)
+
+**Note:** Version bump only for package pgsql-client
+
+## [1.3.2](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.1...pgsql-client@1.3.2) (2026-01-07)
+
+**Note:** Version bump only for package pgsql-client
+
 ## [1.3.1](https://github.com/constructive-io/constructive/compare/pgsql-client@1.3.0...pgsql-client@1.3.1) (2026-01-06)
 
 **Note:** Version bump only for package pgsql-client

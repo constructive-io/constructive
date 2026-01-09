@@ -8,7 +8,11 @@ import { initCommand, findConfigFile, loadConfigFile } from './commands/init';
 import { generateCommand } from './commands/generate';
 import { generateOrmCommand } from './commands/generate-orm';
 import { startWatch } from './watch';
-import { resolveConfig, type GraphQLSDKConfig, type ResolvedConfig } from '../types/config';
+import {
+  resolveConfig,
+  type GraphQLSDKConfig,
+  type ResolvedConfig,
+} from '../types/config';
 
 const program = new Command();
 
@@ -34,7 +38,7 @@ async function loadWatchConfig(options: {
   if (configPath) {
     const loadResult = await loadConfigFile(configPath);
     if (!loadResult.success) {
-      console.error('✗', loadResult.error);
+      console.error('x', loadResult.error);
       return null;
     }
     baseConfig = loadResult.config;
@@ -53,10 +57,13 @@ async function loadWatchConfig(options: {
     postgraphile: baseConfig.postgraphile,
     codegen: baseConfig.codegen,
     orm: baseConfig.orm,
+    reactQuery: baseConfig.reactQuery,
     watch: {
       ...baseConfig.watch,
       // CLI options override config
-      ...(options.pollInterval !== undefined && { pollInterval: options.pollInterval }),
+      ...(options.pollInterval !== undefined && {
+        pollInterval: options.pollInterval,
+      }),
       ...(options.debounce !== undefined && { debounce: options.debounce }),
       ...(options.touch !== undefined && { touchFile: options.touch }),
       ...(options.clear !== undefined && { clearScreen: options.clear }),
@@ -64,7 +71,9 @@ async function loadWatchConfig(options: {
   };
 
   if (!mergedConfig.endpoint) {
-    console.error('✗ No endpoint specified. Use --endpoint or create a config file with "graphql-codegen init".');
+    console.error(
+      'x No endpoint specified. Use --endpoint or create a config file with "graphql-codegen init".'
+    );
     return null;
   }
 
@@ -73,7 +82,9 @@ async function loadWatchConfig(options: {
 
 program
   .name('graphql-codegen')
-  .description('CLI for generating GraphQL SDK from PostGraphile endpoints')
+  .description(
+    'CLI for generating GraphQL SDK from PostGraphile endpoints or schema files'
+  )
   .version('2.17.48');
 
 // Init command
@@ -83,7 +94,11 @@ program
   .option('-d, --directory <dir>', 'Target directory for the config file', '.')
   .option('-f, --force', 'Force overwrite existing config', false)
   .option('-e, --endpoint <url>', 'GraphQL endpoint URL to pre-populate')
-  .option('-o, --output <dir>', 'Output directory to pre-populate', './generated')
+  .option(
+    '-o, --output <dir>',
+    'Output directory to pre-populate',
+    './generated'
+  )
   .action(async (options) => {
     const result = await initCommand({
       directory: options.directory,
@@ -93,9 +108,9 @@ program
     });
 
     if (result.success) {
-      console.log('✓', result.message);
+      console.log('[ok]', result.message);
     } else {
-      console.error('✗', result.message);
+      console.error('x', result.message);
       process.exit(1);
     }
   });
@@ -103,26 +118,57 @@ program
 // Generate command
 program
   .command('generate')
-  .description('Generate SDK from GraphQL endpoint')
+  .description('Generate SDK from GraphQL endpoint or schema file')
   .option('-c, --config <path>', 'Path to config file')
   .option('-e, --endpoint <url>', 'GraphQL endpoint URL (overrides config)')
+  .option('-s, --schema <path>', 'Path to GraphQL schema file (.graphql)')
   .option('-o, --output <dir>', 'Output directory (overrides config)')
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('-v, --verbose', 'Verbose output', false)
-  .option('--dry-run', 'Dry run - show what would be generated without writing files', false)
-  .option('-w, --watch', 'Watch mode - poll endpoint for schema changes (in-memory)', false)
-  .option('--poll-interval <ms>', 'Polling interval in milliseconds (default: 3000)', parseInt)
-  .option('--debounce <ms>', 'Debounce delay before regenerating (default: 800)', parseInt)
+  .option(
+    '--dry-run',
+    'Dry run - show what would be generated without writing files',
+    false
+  )
+  .option(
+    '-w, --watch',
+    'Watch mode - poll endpoint for schema changes (in-memory)',
+    false
+  )
+  .option(
+    '--poll-interval <ms>',
+    'Polling interval in milliseconds (default: 3000)',
+    parseInt
+  )
+  .option(
+    '--debounce <ms>',
+    'Debounce delay before regenerating (default: 800)',
+    parseInt
+  )
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
-    // Watch mode
+    // Validate source options
+    if (options.endpoint && options.schema) {
+      console.error(
+        'x Cannot use both --endpoint and --schema. Choose one source.'
+      );
+      process.exit(1);
+    }
+
+    // Watch mode (only for endpoint)
     if (options.watch) {
+      if (options.schema) {
+        console.error(
+          'x Watch mode is only supported with --endpoint, not --schema.'
+        );
+        process.exit(1);
+      }
       const config = await loadWatchConfig(options);
       if (!config) {
         process.exit(1);
       }
-      
+
       await startWatch({
         config,
         generatorType: 'generate',
@@ -137,6 +183,7 @@ program
     const result = await generateCommand({
       config: options.config,
       endpoint: options.endpoint,
+      schema: options.schema,
       output: options.output,
       authorization: options.authorization,
       verbose: options.verbose,
@@ -144,7 +191,7 @@ program
     });
 
     if (result.success) {
-      console.log('✓', result.message);
+      console.log('[ok]', result.message);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -154,7 +201,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('✗', result.message);
+      console.error('x', result.message);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -165,27 +212,68 @@ program
 // Generate ORM command
 program
   .command('generate-orm')
-  .description('Generate Prisma-like ORM client from GraphQL endpoint')
+  .description(
+    'Generate Prisma-like ORM client from GraphQL endpoint or schema file'
+  )
   .option('-c, --config <path>', 'Path to config file')
   .option('-e, --endpoint <url>', 'GraphQL endpoint URL (overrides config)')
-  .option('-o, --output <dir>', 'Output directory (overrides config)', './generated/orm')
+  .option('-s, --schema <path>', 'Path to GraphQL schema file (.graphql)')
+  .option(
+    '-o, --output <dir>',
+    'Output directory (overrides config)',
+    './generated/orm'
+  )
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('-v, --verbose', 'Verbose output', false)
-  .option('--dry-run', 'Dry run - show what would be generated without writing files', false)
-  .option('--skip-custom-operations', 'Skip custom operations (only generate table CRUD)', false)
-  .option('-w, --watch', 'Watch mode - poll endpoint for schema changes (in-memory)', false)
-  .option('--poll-interval <ms>', 'Polling interval in milliseconds (default: 3000)', parseInt)
-  .option('--debounce <ms>', 'Debounce delay before regenerating (default: 800)', parseInt)
+  .option(
+    '--dry-run',
+    'Dry run - show what would be generated without writing files',
+    false
+  )
+  .option(
+    '--skip-custom-operations',
+    'Skip custom operations (only generate table CRUD)',
+    false
+  )
+  .option(
+    '-w, --watch',
+    'Watch mode - poll endpoint for schema changes (in-memory)',
+    false
+  )
+  .option(
+    '--poll-interval <ms>',
+    'Polling interval in milliseconds (default: 3000)',
+    parseInt
+  )
+  .option(
+    '--debounce <ms>',
+    'Debounce delay before regenerating (default: 800)',
+    parseInt
+  )
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
-    // Watch mode
+    // Validate source options
+    if (options.endpoint && options.schema) {
+      console.error(
+        'x Cannot use both --endpoint and --schema. Choose one source.'
+      );
+      process.exit(1);
+    }
+
+    // Watch mode (only for endpoint)
     if (options.watch) {
+      if (options.schema) {
+        console.error(
+          'x Watch mode is only supported with --endpoint, not --schema.'
+        );
+        process.exit(1);
+      }
       const config = await loadWatchConfig(options);
       if (!config) {
         process.exit(1);
       }
-      
+
       await startWatch({
         config,
         generatorType: 'generate-orm',
@@ -201,6 +289,7 @@ program
     const result = await generateOrmCommand({
       config: options.config,
       endpoint: options.endpoint,
+      schema: options.schema,
       output: options.output,
       authorization: options.authorization,
       verbose: options.verbose,
@@ -209,7 +298,7 @@ program
     });
 
     if (result.success) {
-      console.log('✓', result.message);
+      console.log('[ok]', result.message);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -227,7 +316,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('✗', result.message);
+      console.error('x', result.message);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -235,53 +324,67 @@ program
     }
   });
 
-// Introspect command (for debugging)
+// Introspect command (for debugging) - uses the new inference system
 program
   .command('introspect')
-  .description('Introspect a GraphQL endpoint and print table info')
-  .requiredOption('-e, --endpoint <url>', 'GraphQL endpoint URL')
+  .description(
+    'Introspect a GraphQL endpoint or schema file and print table info'
+  )
+  .option('-e, --endpoint <url>', 'GraphQL endpoint URL')
+  .option('-s, --schema <path>', 'Path to GraphQL schema file (.graphql)')
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('--json', 'Output as JSON', false)
   .action(async (options) => {
-    const { fetchMeta, validateEndpoint } = await import('./introspect/fetch-meta');
-    const { transformMetaToCleanTables, getTableNames } = await import('./introspect/transform');
-
-    // Validate endpoint
-    const validation = validateEndpoint(options.endpoint);
-    if (!validation.valid) {
-      console.error('✗ Invalid endpoint:', validation.error);
+    // Validate source options
+    if (!options.endpoint && !options.schema) {
+      console.error('x Either --endpoint or --schema must be provided.');
+      process.exit(1);
+    }
+    if (options.endpoint && options.schema) {
+      console.error(
+        'x Cannot use both --endpoint and --schema. Choose one source.'
+      );
       process.exit(1);
     }
 
-    console.log('Fetching schema from', options.endpoint, '...');
+    const { createSchemaSource } = await import('./introspect/source');
+    const { inferTablesFromIntrospection } =
+      await import('./introspect/infer-tables');
 
-    const result = await fetchMeta({
-      endpoint: options.endpoint,
-      authorization: options.authorization,
-    });
-
-    if (!result.success) {
-      console.error('✗ Failed to fetch schema:', result.error);
-      process.exit(1);
-    }
-
-    const tables = transformMetaToCleanTables(result.data!);
-    const tableNames = getTableNames(tables);
-
-    if (options.json) {
-      console.log(JSON.stringify(tables, null, 2));
-    } else {
-      console.log(`\n✓ Found ${tables.length} tables:\n`);
-      tableNames.forEach((name) => {
-        const table = tables.find((t) => t.name === name)!;
-        const fieldCount = table.fields.length;
-        const relationCount =
-          table.relations.belongsTo.length +
-          table.relations.hasOne.length +
-          table.relations.hasMany.length +
-          table.relations.manyToMany.length;
-        console.log(`  ${name} (${fieldCount} fields, ${relationCount} relations)`);
+    try {
+      const source = createSchemaSource({
+        endpoint: options.endpoint,
+        schema: options.schema,
+        authorization: options.authorization,
       });
+
+      console.log('Fetching schema from', source.describe(), '...');
+
+      const { introspection } = await source.fetch();
+      const tables = inferTablesFromIntrospection(introspection);
+
+      if (options.json) {
+        console.log(JSON.stringify(tables, null, 2));
+      } else {
+        console.log(`\n[ok] Found ${tables.length} tables:\n`);
+        tables.forEach((table) => {
+          const fieldCount = table.fields.length;
+          const relationCount =
+            table.relations.belongsTo.length +
+            table.relations.hasOne.length +
+            table.relations.hasMany.length +
+            table.relations.manyToMany.length;
+          console.log(
+            `  ${table.name} (${fieldCount} fields, ${relationCount} relations)`
+          );
+        });
+      }
+    } catch (err) {
+      console.error(
+        'x Failed to introspect schema:',
+        err instanceof Error ? err.message : err
+      );
+      process.exit(1);
     }
   });
 
