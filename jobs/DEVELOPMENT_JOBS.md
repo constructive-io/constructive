@@ -84,8 +84,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
    pgpm deploy --yes --database "$PGDATABASE" --package metaschema
    ```
 
-   `app-svc-local` is no longer available in this repo, so use `app`.
-   `app` pulls in `pgpm-database-jobs`, so you don't need to deploy it separately.
+   NOTE: The `app` package pulls in `pgpm-database-jobs`, so you don't need to deploy it separately.
 
 At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `constructive` database.
 
@@ -135,8 +134,8 @@ In dry-run mode:
 
 Constructive selects the API by the HTTP `Host` header using rows in `services_public.domains`.
 
-For local development, you need a domain route for `admin.localhost` in `services_public.domains`.
-This repo no longer ships `app-svc-local`, so seed a domain route yourself (or skip the `send-email-link` test).
+For local development, you need a domain route for `admin.localhost` in `services_public.domains`. Seed a domain route yourself (or skip the `send-email-link` test).
+
 `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
 
 - `GRAPHQL_URL=http://admin.localhost:3000/graphql`
