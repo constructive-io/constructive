@@ -305,25 +305,3 @@ docker compose -f docker-compose.jobs.yml -f docker-compose.jobs.override.yml up
 
 To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
 
-
-## NOTES:
-- change all launchql names to constructive, including the DB-name and more.
-- run bootstrap command for test user, 
-- need to run some manual migrations like:
-```sql
- BEGIN;
-   UPDATE services_public.domains SET domain = 'localhost';
-   UPDATE services_public.apis SET dbname = 'constructive';
- COMMIT;
-
------- Some more
-ALTER TABLE metaschema_public.database
-ADD CONSTRAINT database_owner_id_fkey
-FOREIGN KEY (owner_id)
-REFERENCES constructive_public.users(id)
-ON DELETE RESTRICT
-ON UPDATE CASCADE;
-```
-
-> NOTE: please make similar changes to the devnet as well please
-
