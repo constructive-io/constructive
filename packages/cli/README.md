@@ -58,7 +58,7 @@ cnc explorer --origin http://localhost:3000
 
 ### `cnc codegen`
 
-Generate TypeScript types, operations, and SDK from a GraphQL.
+Generate TypeScript types, operations, and SDK from a GraphQL schema or endpoint.
 
 ```bash
 # From endpoint
