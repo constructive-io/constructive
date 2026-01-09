@@ -2,6 +2,23 @@ import { formatQueryHistory, truncateErrorOutput, QueryHistoryEntry } from '../.
 
 describe('error output formatting', () => {
   describe('formatQueryHistory', () => {
+    it('snapshot: realistic deployment error with collapsed queries', () => {
+      // This snapshot captures the exact format of error output for a realistic
+      // deployment scenario with many pgpm_migrate.deploy calls
+      const history: QueryHistoryEntry[] = [
+        { query: 'BEGIN', params: [], timestamp: 1704800000000 },
+        { query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)', params: ['constructive', 'schemas/metaschema_public/tables/extension/table', 'hash1', null, 'CREATE TABLE...', false], timestamp: 1704800000100 },
+        { query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)', params: ['constructive', 'schemas/metaschema_public/tables/field/table', 'hash2', null, 'CREATE TABLE...', false], timestamp: 1704800000200 },
+        { query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)', params: ['constructive', 'schemas/metaschema_public/tables/foreign_key_constraint/table', 'hash3', null, 'CREATE TABLE...', false], timestamp: 1704800000300 },
+        { query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)', params: ['constructive', 'schemas/metaschema_public/tables/index/table', 'hash4', null, 'CREATE TABLE...', false], timestamp: 1704800000400 },
+        { query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)', params: ['constructive', 'schemas/metaschema_modules_public/tables/permissions_module/table', 'hash5', null, 'CREATE TABLE...', false], timestamp: 1704800000500 },
+        { query: 'ROLLBACK', params: [], timestamp: 1704800000600, duration: 10 }
+      ];
+      
+      const result = formatQueryHistory(history);
+      expect(result.join('\n')).toMatchSnapshot();
+    });
+
     it('formats a single query correctly', () => {
       const history: QueryHistoryEntry[] = [
         { query: 'SELECT 1', params: [], timestamp: Date.now(), duration: 10 }
