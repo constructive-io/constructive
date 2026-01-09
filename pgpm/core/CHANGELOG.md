@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.3...@pgpmjs/core@4.14.0) (2026-01-09)
+
+### Bug Fixes
+
+- update tests to match actual error output formatting behavior ([06fa326](https://github.com/constructive-io/constructive/commit/06fa3269c0b0cdbd3936ebc7da4101413959655d))
+
+### Features
+
+- **pgpm/core:** add smart error output collapsing and limiting ([ad02849](https://github.com/constructive-io/constructive/commit/ad02849f4482a0d409923b69d446f8daf06b04d0))
+
 ## [4.13.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.2...@pgpmjs/core@4.13.3) (2026-01-08)
 
 ### Bug Fixes

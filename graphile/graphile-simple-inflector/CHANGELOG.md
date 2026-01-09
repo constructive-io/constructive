@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.13](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.12...graphile-simple-inflector@0.4.13) (2026-01-09)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
 ## [0.4.12](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.11...graphile-simple-inflector@0.4.12) (2026-01-08)
 
 **Note:** Version bump only for package graphile-simple-inflector
