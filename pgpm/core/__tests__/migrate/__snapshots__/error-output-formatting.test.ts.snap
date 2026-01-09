@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`error output formatting formatQueryHistory snapshot: realistic deployment error with collapsed queries 1`] = `
+"  1. BEGIN
+  2-6. CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN) (5 calls)
+       First: schemas/metaschema_public/tables/extension/table
+       Last:  schemas/metaschema_modules_public/tables/permissions_module/table
+  7. ROLLBACK (10ms)"
+`;
