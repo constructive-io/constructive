@@ -84,7 +84,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
    pgpm deploy --yes --database "$PGDATABASE" --package metaschema
    ```
 
-   The `app` package pulls in `pgpm-database-jobs`, so you don't need to deploy it separately.
+   NOTE: The `app` package pulls in `pgpm-database-jobs`, so you don't need to deploy it separately.
 
 At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `constructive` database.
 
