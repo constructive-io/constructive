@@ -219,6 +219,7 @@ async function loadConfig(options: GenerateOptions): Promise<LoadConfigResult> {
     hooks: baseConfig.hooks,
     postgraphile: baseConfig.postgraphile,
     codegen: baseConfig.codegen,
+    reactQuery: baseConfig.reactQuery,
   };
 
   // Validate at least one source is provided
