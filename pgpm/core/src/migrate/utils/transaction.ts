@@ -1,18 +1,25 @@
+import { getEnvVars } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
-import { extractPgErrorFields, formatPgErrorFields } from '@pgpmjs/types';
+import { extractPgErrorFields, formatPgErrorFields, pgpmDefaults } from '@pgpmjs/types';
 import { Pool, PoolClient } from 'pg';
 
 const log = new Logger('migrate:transaction');
 
 /**
- * Environment variables for controlling error output verbosity:
- * - PGPM_ERROR_QUERY_HISTORY_LIMIT: Max queries to show (default: 30)
- * - PGPM_ERROR_MAX_LENGTH: Max chars for error output (default: 10000)
- * - PGPM_ERROR_VERBOSE: Set to 'true' to disable all limiting
+ * Get error output configuration from environment variables with defaults.
+ * Uses centralized env var parsing from @pgpmjs/env and defaults from @pgpmjs/types.
  */
-const ERROR_QUERY_HISTORY_LIMIT = parseInt(process.env.PGPM_ERROR_QUERY_HISTORY_LIMIT || '30', 10);
-const ERROR_MAX_LENGTH = parseInt(process.env.PGPM_ERROR_MAX_LENGTH || '10000', 10);
-const ERROR_VERBOSE = process.env.PGPM_ERROR_VERBOSE === 'true';
+const getErrorOutputConfig = () => {
+  const envVars = getEnvVars();
+  const defaults = pgpmDefaults.errorOutput!;
+  return {
+    queryHistoryLimit: envVars.errorOutput?.queryHistoryLimit ?? defaults.queryHistoryLimit!,
+    maxLength: envVars.errorOutput?.maxLength ?? defaults.maxLength!,
+    verbose: envVars.errorOutput?.verbose ?? defaults.verbose!,
+  };
+};
+
+const errorConfig = getErrorOutputConfig();
 
 /**
  * Represents a group of consecutive queries with the same query template
@@ -134,7 +141,7 @@ export function formatQueryHistory(history: QueryHistoryEntry[]): string[] {
   if (history.length === 0) return [];
   
   // In verbose mode, show everything without collapsing
-  if (ERROR_VERBOSE) {
+  if (errorConfig.verbose) {
     return history.map((entry, index) => formatQueryEntry(entry, index));
   }
   
@@ -147,7 +154,7 @@ export function formatQueryHistory(history: QueryHistoryEntry[]): string[] {
   
   for (let i = groups.length - 1; i >= 0; i--) {
     totalQueries += groups[i].count;
-    if (totalQueries > ERROR_QUERY_HISTORY_LIMIT) {
+    if (totalQueries > errorConfig.queryHistoryLimit) {
       startGroupIndex = i + 1;
       break;
     }
@@ -177,19 +184,19 @@ export function formatQueryHistory(history: QueryHistoryEntry[]): string[] {
  * Truncate error output if it exceeds the max length
  */
 export function truncateErrorOutput(lines: string[]): string[] {
-  if (ERROR_VERBOSE) return lines;
+  if (errorConfig.verbose) return lines;
   
   const joined = lines.join('\n');
-  if (joined.length <= ERROR_MAX_LENGTH) return lines;
+  if (joined.length <= errorConfig.maxLength) return lines;
   
   // Truncate and add notice
-  const truncated = joined.slice(0, ERROR_MAX_LENGTH);
+  const truncated = joined.slice(0, errorConfig.maxLength);
   const lastNewline = truncated.lastIndexOf('\n');
   const cleanTruncated = lastNewline > 0 ? truncated.slice(0, lastNewline) : truncated;
   
   return [
     ...cleanTruncated.split('\n'),
-    `... (output truncated at ${ERROR_MAX_LENGTH} chars, total was ${joined.length} chars)`,
+    `... (output truncated at ${errorConfig.maxLength} chars, total was ${joined.length} chars)`,
     `    Set PGPM_ERROR_VERBOSE=true to see full output`
   ];
 }

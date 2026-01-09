@@ -75,7 +75,12 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     JOBS_SUPPORTED,
     INTERNAL_GATEWAY_URL,
     INTERNAL_JOBS_CALLBACK_URL,
-    INTERNAL_JOBS_CALLBACK_PORT
+    INTERNAL_JOBS_CALLBACK_PORT,
+
+    // Error output formatting env vars
+    PGPM_ERROR_QUERY_HISTORY_LIMIT,
+    PGPM_ERROR_MAX_LENGTH,
+    PGPM_ERROR_VERBOSE
   } = env;
 
   return {
@@ -184,6 +189,11 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
           })
         }
       })
+    },
+    errorOutput: {
+      ...(PGPM_ERROR_QUERY_HISTORY_LIMIT && { queryHistoryLimit: parseEnvNumber(PGPM_ERROR_QUERY_HISTORY_LIMIT) }),
+      ...(PGPM_ERROR_MAX_LENGTH && { maxLength: parseEnvNumber(PGPM_ERROR_MAX_LENGTH) }),
+      ...(PGPM_ERROR_VERBOSE && { verbose: parseEnvBoolean(PGPM_ERROR_VERBOSE) }),
     }
   };
 };
