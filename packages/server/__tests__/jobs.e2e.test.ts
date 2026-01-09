@@ -138,7 +138,7 @@ const waitForJobCompletion = async (
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 const GRAPHQL_PORT = 3000;
-const CALLBACK_PORT = 8080;
+const CALLBACK_PORT = 12345;
 const SIMPLE_EMAIL_PORT = 8081;
 const SEND_EMAIL_LINK_PORT = 8082;
 
