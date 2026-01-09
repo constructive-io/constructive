@@ -24,14 +24,19 @@ describe('error output formatting', () => {
       ];
       
       const result = formatQueryHistory(history);
+      const resultText = result.join('\n');
       
-      // Should have: BEGIN, collapsed deploy calls, ROLLBACK
-      expect(result.length).toBeLessThan(5);
+      // Should show the collapsed range with count
+      expect(resultText).toContain('(3 calls)');
+      expect(resultText).toContain('2-4');
       
-      // Should show the collapsed range
-      const collapsedLine = result.find(line => line.includes('(3 calls)'));
-      expect(collapsedLine).toBeDefined();
-      expect(collapsedLine).toContain('2-4');
+      // Should show BEGIN and ROLLBACK
+      expect(resultText).toContain('BEGIN');
+      expect(resultText).toContain('ROLLBACK');
+      
+      // Should show first and last change names for context
+      expect(resultText).toContain('First: change1');
+      expect(resultText).toContain('Last:  change3');
     });
 
     it('shows first and last change names for pgpm_migrate.deploy', () => {
@@ -111,13 +116,49 @@ describe('error output formatting', () => {
   });
 
   describe('integration: large deploy scenario', () => {
-    it('handles realistic large deployment error output', () => {
-      // Simulate a realistic scenario with many pgpm_migrate.deploy calls
+    it('handles realistic deployment error output within limit', () => {
+      // Simulate a scenario with deploy calls that stays within the default limit (30)
       const history: QueryHistoryEntry[] = [
         { query: 'BEGIN', params: [], timestamp: Date.now() }
       ];
       
-      // Add 100 deploy calls
+      // Add 20 deploy calls (within the 30 query limit)
+      for (let i = 0; i < 20; i++) {
+        history.push({
+          query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
+          params: ['constructive', `schemas/table_${i}/table`, 'hash123', null, 'CREATE TABLE...', false],
+          timestamp: Date.now(),
+          duration: 5
+        });
+      }
+      
+      history.push({ query: 'ROLLBACK', params: [], timestamp: Date.now(), duration: 10 });
+      
+      const result = formatQueryHistory(history);
+      const resultText = result.join('\n');
+      
+      // Should be much shorter than 22 lines (collapsed)
+      expect(result.length).toBeLessThan(10);
+      
+      // Should show collapsed deploy calls
+      expect(resultText).toContain('calls)');
+      
+      // Should show first and last change names
+      expect(resultText).toContain('First:');
+      expect(resultText).toContain('Last:');
+      
+      // Should show BEGIN and ROLLBACK
+      expect(resultText).toContain('BEGIN');
+      expect(resultText).toContain('ROLLBACK');
+    });
+
+    it('truncates query history when exceeding limit', () => {
+      // Simulate a scenario with many queries that exceeds the default limit (30)
+      const history: QueryHistoryEntry[] = [
+        { query: 'BEGIN', params: [], timestamp: Date.now() }
+      ];
+      
+      // Add 100 deploy calls (exceeds the 30 query limit)
       for (let i = 0; i < 100; i++) {
         history.push({
           query: 'CALL pgpm_migrate.deploy($1::TEXT, $2::TEXT, $3::TEXT, $4::TEXT[], $5::TEXT, $6::BOOLEAN)',
@@ -132,18 +173,11 @@ describe('error output formatting', () => {
       const result = formatQueryHistory(history);
       const resultText = result.join('\n');
       
-      // Should be much shorter than 102 lines
-      expect(result.length).toBeLessThan(20);
+      // Should show omitted message since we exceed the limit
+      expect(resultText).toContain('earlier queries omitted');
+      expect(resultText).toContain('PGPM_ERROR_VERBOSE');
       
-      // Should show collapsed deploy calls
-      expect(resultText).toContain('calls)');
-      
-      // Should show first and last change names
-      expect(resultText).toContain('First:');
-      expect(resultText).toContain('Last:');
-      
-      // Should show BEGIN and ROLLBACK
-      expect(resultText).toContain('BEGIN');
+      // Should still show ROLLBACK (the last query)
       expect(resultText).toContain('ROLLBACK');
     });
   });
