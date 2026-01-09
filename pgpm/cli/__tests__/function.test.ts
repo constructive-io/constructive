@@ -8,11 +8,34 @@ const beforeEachSetup = setupTests();
 
 describe('cmds:init function', () => {
     let fixture: TestFixture;
-    // Use relative path to local boilerplates to verify unpushed changes
-    const localBoilerplatesPath = path.resolve(__dirname, '../../../../pgpm-boilerplates');
+    let mockRepoPath: string;
 
     beforeAll(() => {
         fixture = new TestFixture();
+        mockRepoPath = path.join(fixture.tempDir, 'mock-repo');
+        const fs = require('fs');
+
+        // Create mock repo structure
+        fs.mkdirSync(path.join(mockRepoPath, 'default/function-template/src'), { recursive: true });
+        fs.mkdirSync(path.join(mockRepoPath, 'default/function-template/__tests__'), { recursive: true });
+        fs.mkdirSync(path.join(mockRepoPath, 'default/handler/src'), { recursive: true });
+
+        // .boilerplates.json
+        fs.writeFileSync(path.join(mockRepoPath, '.boilerplates.json'), JSON.stringify({ dir: 'default' }));
+
+        // function-template files
+        fs.writeFileSync(path.join(mockRepoPath, 'default/function-template/.boilerplate.json'), JSON.stringify({ type: 'function' }));
+        fs.writeFileSync(path.join(mockRepoPath, 'default/function-template/package.json'), JSON.stringify({
+            name: '@constructive-io/____functionName____',
+            description: '____functionDesc____',
+            author: '____author____'
+        }));
+        fs.writeFileSync(path.join(mockRepoPath, 'default/function-template/tsconfig.json'), '{}');
+        fs.writeFileSync(path.join(mockRepoPath, 'default/function-template/Makefile'), 'IMAGE_NAME=____functionName____');
+
+        // handler files
+        fs.writeFileSync(path.join(mockRepoPath, 'default/handler/.boilerplate.json'), JSON.stringify({ type: 'handler' }));
+        fs.writeFileSync(path.join(mockRepoPath, 'default/handler/src/index.ts'), 'export default async () => ({ status: "ok" });');
     });
 
     afterAll(() => {
@@ -29,7 +52,7 @@ describe('cmds:init function', () => {
 
         const args = withInitDefaults({
             ...argv,
-            repo: localBoilerplatesPath // Override repo to use local path
+            repo: mockRepoPath // Use mock repo created in temp dir
         });
 
         await commands(args, prompter, {
