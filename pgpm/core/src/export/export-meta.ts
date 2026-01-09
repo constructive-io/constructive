@@ -61,7 +61,7 @@ const getTableColumns = async (pool: Pool, schemaName: string, tableName: string
     WHERE table_schema = $1 AND table_name = $2
     ORDER BY ordinal_position
   `, [schemaName, tableName]);
-  
+
   const columns = new Map<string, string>();
   for (const row of result.rows) {
     columns.set(row.column_name, row.udt_name);
@@ -80,14 +80,14 @@ const buildDynamicFields = async (
   tableConfig: TableConfig
 ): Promise<Record<string, FieldType>> => {
   const actualColumns = await getTableColumns(pool, tableConfig.schema, tableConfig.table);
-  
+
   if (actualColumns.size === 0) {
     // Table doesn't exist, return empty fields
     return {};
   }
-  
+
   const dynamicFields: Record<string, FieldType> = {};
-  
+
   // For each column in the hardcoded config, check if it exists in the database
   for (const [fieldName, fieldType] of Object.entries(tableConfig.fields)) {
     if (actualColumns.has(fieldName)) {
@@ -96,7 +96,7 @@ const buildDynamicFields = async (
     }
     // If column doesn't exist in database, skip it (this fixes the bug)
   }
-  
+
   return dynamicFields;
 };
 
@@ -904,36 +904,36 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
     database: dbname
   });
   const sql: Record<string, string> = {};
-  
+
   // Cache for dynamically built parsers
   const parsers: Record<string, Parser> = {};
-  
+
   // Build parser dynamically by querying actual columns from the database
   const getParser = async (key: string): Promise<Parser | null> => {
     if (parsers[key]) {
       return parsers[key];
     }
-    
+
     const tableConfig = config[key];
     if (!tableConfig) {
       return null;
     }
-    
+
     // Build fields dynamically based on actual database columns
     const dynamicFields = await buildDynamicFields(pool, tableConfig);
-    
+
     if (Object.keys(dynamicFields).length === 0) {
       // No columns found (table doesn't exist or no matching columns)
       return null;
     }
-    
+
     const parser = new Parser({
       schema: tableConfig.schema,
       table: tableConfig.table,
       conflictDoNothing: tableConfig.conflictDoNothing,
       fields: dynamicFields
-    });
-    
+    } as any);
+
     parsers[key] = parser;
     return parser;
   };
@@ -944,7 +944,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
       if (!parser) {
         return;
       }
-      
+
       const result = await pool.query(query, [database_id]);
       if (result.rows.length) {
         const parsed = await parser.parse(result.rows);
