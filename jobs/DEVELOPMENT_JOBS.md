@@ -69,16 +69,23 @@ From the `constructive-db/` directory (with `pgenv` applied):
 
    ```sh
    pgpm admin-users bootstrap --yes
+   ```
+
+   If you need seeded test users, run:
+
+   ```sh
    pgpm admin-users add --test --yes
    ```
 
-3. Deploy the main app and jobs packages into DB:
+3. Deploy the main app and metaschema packages into DB:
 
    ```sh
-   pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
+   pgpm deploy --yes --database "$PGDATABASE" --package app
    pgpm deploy --yes --database "$PGDATABASE" --package metaschema
-   pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
    ```
+
+   `app-svc-local` is no longer available in this repo, so use `app`.
+   `app` pulls in `pgpm-database-jobs`, so you don't need to deploy it separately.
 
 At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `constructive` database.
 
@@ -128,7 +135,9 @@ In dry-run mode:
 
 Constructive selects the API by the HTTP `Host` header using rows in `services_public.domains`.
 
-For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
+For local development, you need a domain route for `admin.localhost` in `services_public.domains`.
+This repo no longer ships `app-svc-local`, so seed a domain route yourself (or skip the `send-email-link` test).
+`docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
 
 - `GRAPHQL_URL=http://admin.localhost:3000/graphql`
 
@@ -179,7 +188,7 @@ You should then see the job picked up by `knative-job-service` and the email pay
 
 `send-email-link` queries GraphQL for site/database metadata, so it requires:
 
-- The app/meta packages deployed in step 3 (`app-svc-local`, `metaschema-schema`, `services`, `metaschema-modules`)
+- The app/meta packages deployed in step 3 (`app`, `metaschema-schema`, `services`, `metaschema-modules`)
 - A real `database_id` (use `$DBID` above)
 - A GraphQL hostname that matches a seeded domain route (step 5)
 - For localhost development, the site/domain metadata usually resolves to `localhost`.
