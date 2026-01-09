@@ -6,6 +6,9 @@
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-fn#readme",
   "license": "SEE LICENSE IN LICENSE",
   "main": "dist/index.js",
+  "bin": {
+    "knative-job-run": "dist/run.js"
+  },
   "directories": {
     "lib": "src",
     "test": "__tests__"
@@ -29,6 +32,8 @@
   },
   "dependencies": {
     "body-parser": "1.19.0",
-    "express": "5.2.1"
+    "express": "5.2.1",
+    "graphql-request": "^6.1.0",
+    "cross-fetch": "^4.0.0"
   }
 }
