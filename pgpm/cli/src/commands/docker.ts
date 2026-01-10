@@ -211,7 +211,6 @@ export default async (
     await cliExitWithError('No subcommand provided. Use "start" or "stop".');
     return;
   }
-  pyramation/postgres:17
   const name = (args.name as string) || 'postgres';
   const image = (args.image as string) || 'pyramation/postgres:17';
   const port = typeof args.port === 'number' ? args.port : 5432;
