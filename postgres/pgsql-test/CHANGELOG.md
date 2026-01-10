@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.24.13](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.12...pgsql-test@2.24.13) (2026-01-10)
+
+### Bug Fixes
+
+- update snapshot for PG17 error message format ([29add38](https://github.com/constructive-io/constructive/commit/29add384c25fadff12291bd72f0d390e53787425))
+
 ## [2.24.12](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.11...pgsql-test@2.24.12) (2026-01-09)
 
 **Note:** Version bump only for package pgsql-test

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.11](https://github.com/constructive-io/constructive/compare/pgpm@2.10.10...pgpm@2.10.11) (2026-01-10)
+
+### Bug Fixes
+
+- update default Docker image to ghcr.io/constructive-io/docker/postgres-plus:17 ([aec76a0](https://github.com/constructive-io/constructive/commit/aec76a059d55ac5e6523968e587f6c63eb58b234))
+
 ## [2.10.10](https://github.com/constructive-io/constructive/compare/pgpm@2.10.9...pgpm@2.10.10) (2026-01-09)
 
 **Note:** Version bump only for package pgpm
