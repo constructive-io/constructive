@@ -4,6 +4,7 @@ exports[`Enhanced PostgreSQL Error Messages JSON/JSONB Type Mismatch Errors snap
 "invalid input syntax for type json
 Detail: Token "not_valid_json" is invalid.
 Where: JSON data, line 1: not_valid_json
+unnamed portal parameter $2 = '...'
 Query: INSERT INTO test_json_errors (name, config) VALUES ($1, $2)
 Values: ["test_name","not_valid_json"]"
 `;
