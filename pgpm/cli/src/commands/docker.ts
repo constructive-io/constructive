@@ -16,7 +16,7 @@ Subcommands:
 Options:
   --help, -h         Show this help message
   --name <name>      Container name (default: postgres)
-  --image <image>    Docker image (default: pyramation/pgvector:13.3-alpine)
+  --image <image>    Docker image (default: ghcr.io/constructive-io/docker/postgres-plus:17)
   --port <port>      Host port mapping (default: 5432)
   --user <user>      PostgreSQL user (default: postgres)
   --password <pass>  PostgreSQL password (default: password)
@@ -213,7 +213,7 @@ export default async (
   }
 
   const name = (args.name as string) || 'postgres';
-  const image = (args.image as string) || 'pyramation/pgvector:13.3-alpine';
+  const image = (args.image as string) || 'ghcr.io/constructive-io/docker/postgres-plus:17';
   const port = typeof args.port === 'number' ? args.port : 5432;
   const user = (args.user as string) || 'postgres';
   const password = (args.password as string) || 'password';
