@@ -7,7 +7,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-- update default Docker image to ghcr.io/constructive-io/docker/postgres-plus:17 ([aec76a0](https://github.com/constructive-io/constructive/commit/aec76a059d55ac5e6523968e587f6c63eb58b234))
+- update default Docker image to pyramation/postgres:17 ([aec76a0](https://github.com/constructive-io/constructive/commit/aec76a059d55ac5e6523968e587f6c63eb58b234))
 
 ## [2.10.10](https://github.com/constructive-io/constructive/compare/pgpm@2.10.9...pgpm@2.10.10) (2026-01-09)
 

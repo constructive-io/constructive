@@ -107,7 +107,7 @@ jobs:
 
     services:
       pg_db:
-        image: ghcr.io/constructive-io/docker/postgres-plus:17
+        image: pyramation/postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
