@@ -25,10 +25,11 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "playwright test",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "makage": "^0.1.10"

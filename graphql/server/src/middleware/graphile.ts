@@ -65,7 +65,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       }
 
       options.appendPlugins = options.appendPlugins ?? [];
-      options.appendPlugins.push(...opts.graphile.appendPlugins);
+      if (opts.graphile?.appendPlugins) {
+        options.appendPlugins.push(...opts.graphile.appendPlugins);
+      }
 
       options.pgSettings = async function pgSettings(request: IncomingMessage) {
         const gqlReq = request as Request;
@@ -105,12 +107,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       options.graphileBuildOptions = {
         ...options.graphileBuildOptions,
-        ...opts.graphile.graphileBuildOptions,
+        ...opts.graphile?.graphileBuildOptions,
       };
 
       const graphileOpts: PostGraphileOptions = {
         ...options,
-        ...opts.graphile.overrideSettings,
+        ...opts.graphile?.overrideSettings,
       };
 
       log.info(
