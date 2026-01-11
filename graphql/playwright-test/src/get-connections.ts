@@ -54,9 +54,8 @@ const createConnectionsWithServerBase = async (
     api: {
       enableServicesApi: false,
       exposedSchemas: input.schemas,
-      anonRole: input.authRole ?? 'anonymous',
-      roleName: input.authRole ?? 'authenticated',
-      defaultDatabaseId: 'test-database'
+      defaultDatabaseId: 'test-database',
+      ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile
   });
