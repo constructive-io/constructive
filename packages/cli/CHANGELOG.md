@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.21](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.20...@constructive-io/cli@5.6.21) (2026-01-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.6.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.19...@constructive-io/cli@5.6.20) (2026-01-10)
 
 **Note:** Version bump only for package @constructive-io/cli
