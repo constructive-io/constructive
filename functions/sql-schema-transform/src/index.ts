@@ -63,11 +63,12 @@ function create_sql_visitor(
     RangeVar: (path: any) => {
       const node = path.node;
       if (node.schemaname && should_transform_schema(node.schemaname, schema_mapping)) {
-        ctx.schemas_found.add(node.schemaname);
-        const new_name = schema_mapping.get(node.schemaname);
+        const schema_name = node.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
         if (new_name) {
           node.schemaname = new_name;
-          ctx.schemas_transformed.set(node.schemaname, new_name);
+          ctx.schemas_transformed.set(schema_name, new_name);
         }
       }
     },
@@ -75,11 +76,107 @@ function create_sql_visitor(
     CreateSchemaStmt: (path: any) => {
       const node = path.node;
       if (node.schemaname && should_transform_schema(node.schemaname, schema_mapping)) {
-        ctx.schemas_found.add(node.schemaname);
-        const new_name = schema_mapping.get(node.schemaname);
+        const schema_name = node.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
         if (new_name) {
           node.schemaname = new_name;
-          ctx.schemas_transformed.set(node.schemaname, new_name);
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    CreateStmt: (path: any) => {
+      const node = path.node;
+      if (node.relation?.schemaname && should_transform_schema(node.relation.schemaname, schema_mapping)) {
+        const schema_name = node.relation.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.relation.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    IndexStmt: (path: any) => {
+      const node = path.node;
+      if (node.relation?.schemaname && should_transform_schema(node.relation.schemaname, schema_mapping)) {
+        const schema_name = node.relation.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.relation.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    AlterTableStmt: (path: any) => {
+      const node = path.node;
+      if (node.relation?.schemaname && should_transform_schema(node.relation.schemaname, schema_mapping)) {
+        const schema_name = node.relation.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.relation.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    TruncateStmt: (path: any) => {
+      const node = path.node;
+      if (node.relations) {
+        for (const rel of node.relations) {
+          if (rel?.RangeVar?.schemaname && should_transform_schema(rel.RangeVar.schemaname, schema_mapping)) {
+            const schema_name = rel.RangeVar.schemaname;
+            ctx.schemas_found.add(schema_name);
+            const new_name = schema_mapping.get(schema_name);
+            if (new_name) {
+              rel.RangeVar.schemaname = new_name;
+              ctx.schemas_transformed.set(schema_name, new_name);
+            }
+          }
+        }
+      }
+    },
+
+    CreateTrigStmt: (path: any) => {
+      const node = path.node;
+      if (node.relation?.schemaname && should_transform_schema(node.relation.schemaname, schema_mapping)) {
+        const schema_name = node.relation.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.relation.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    RuleStmt: (path: any) => {
+      const node = path.node;
+      if (node.relation?.schemaname && should_transform_schema(node.relation.schemaname, schema_mapping)) {
+        const schema_name = node.relation.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.relation.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
+        }
+      }
+    },
+
+    CreatePolicyStmt: (path: any) => {
+      const node = path.node;
+      if (node.table?.schemaname && should_transform_schema(node.table.schemaname, schema_mapping)) {
+        const schema_name = node.table.schemaname;
+        ctx.schemas_found.add(schema_name);
+        const new_name = schema_mapping.get(schema_name);
+        if (new_name) {
+          node.table.schemaname = new_name;
+          ctx.schemas_transformed.set(schema_name, new_name);
         }
       }
     },
