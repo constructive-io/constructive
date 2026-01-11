@@ -85,7 +85,7 @@ export const createApiMiddleware = (opts: any) => {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (opts.api?.enableMetaApi === false) {
+    if (opts.api?.enableServicesApi === false) {
       const schemas = opts.api.exposedSchemas;
       const anonRole = opts.api.anonRole;
       const roleName = opts.api.roleName;
