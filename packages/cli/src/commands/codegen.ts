@@ -21,7 +21,7 @@ Options:
   -v, --verbose              Verbose output
 
   --database <name>          Database override for DB mode (defaults to PGDATABASE)
-  --schemas <list>           Comma-separated schemas (defaults to API_META_SCHEMAS)
+  --schemas <list>           Comma-separated schemas (required for DB mode)
 `
 
 export default async (
@@ -43,7 +43,7 @@ export default async (
 
   const selectedDb = (argv.database as string) || undefined
   const options: ConstructiveOptions = selectedDb ? getEnvOptions({ pg: { database: selectedDb } }) : getEnvOptions()
-  const schemasArg = (argv.schemas as string) || options.api.metaSchemas.join(',')
+  const schemasArg = (argv.schemas as string) || ''
 
   const runGenerate = async ({ endpoint, schema }: { endpoint?: string; schema?: string }) => {
     const result = await generateCommand({
@@ -70,6 +70,11 @@ export default async (
   if (endpointArg) {
     await runGenerate({ endpoint: endpointArg })
     return
+  }
+
+  if (!schemasArg.trim()) {
+    console.error('Error: --schemas is required when building from database. Provide a comma-separated list of schemas.')
+    process.exit(1)
   }
 
   const schemas = schemasArg.split(',').map((s: string) => s.trim()).filter(Boolean)

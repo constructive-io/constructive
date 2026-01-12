@@ -77,7 +77,7 @@ cnc codegen --database constructive_db --out ./codegen --verbose
 - `--verbose` - Verbose output
 
 - `--database <name>` - Database override for DB mode (defaults to PGDATABASE)
-- `--schemas <list>` - Comma-separated schemas (defaults to API_META_SCHEMAS)
+- `--schemas <list>` - Comma-separated schemas (required unless using --endpoint)
 
 ### `cnc get-graphql-schema`
 
@@ -94,7 +94,7 @@ cnc get-graphql-schema --endpoint http://localhost:3000/graphql --out ./schema.g
 **Options:**
 
 - `--database <name>` - Database name (for programmatic builder)
-- `--schemas <list>` - Comma-separated schemas to include
+- `--schemas <list>` - Comma-separated schemas to include (required unless using --endpoint)
 - `--endpoint <url>` - GraphQL endpoint to fetch schema via introspection
 - `--headerHost <host>` - Optional Host header for endpoint requests
 - `--auth <token>` - Optional Authorization header value
