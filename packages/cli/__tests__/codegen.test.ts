@@ -64,6 +64,26 @@ describe('codegen command', () => {
     expect(args).toEqual(expect.arrayContaining(['-o', 'graphql/codegen/dist']))
   })
 
+  it('resolves graphql-codegen CLI from package bin by default', async () => {
+    const child = require('child_process')
+    delete process.env.CONSTRUCTIVE_CODEGEN_BIN
+
+    const argv: Partial<ParsedArgs> = {
+      out: 'graphql/codegen/dist'
+    }
+
+    await codegenCommand(argv, {} as any, {} as any)
+
+    const pkgPath = require.resolve('@constructive-io/graphql-codegen/package.json')
+    const pkg = require(pkgPath)
+    const binField = pkg.bin
+    const rel = typeof binField === 'string' ? binField : (binField['graphql-codegen'] || Object.values(binField)[0])
+    const expected = require('path').join(require('path').dirname(pkgPath), rel)
+
+    const args = (child.spawnSync as jest.Mock).mock.calls[0][1] as string[]
+    expect(args[0]).toEqual(expected)
+  })
+
   it('exits with non-zero when underlying CLI fails', async () => {
     const child = require('child_process');
     (child.spawnSync as jest.Mock).mockReturnValueOnce({ status: 1 })

@@ -1,7 +1,7 @@
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
 import { spawnSync } from 'child_process'
-import { join } from 'path'
+import { join, dirname } from 'path'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -37,7 +37,26 @@ export default async (
   const verbose = !!(argv.verbose || argv.v)
 
   const envBin = process.env.CONSTRUCTIVE_CODEGEN_BIN
-  const bin = envBin || require.resolve('@constructive-io/graphql-codegen/bin/graphql-codegen.js')
+  let bin = envBin || ''
+  if (!bin) {
+    try {
+      const pkgPath = require.resolve('@constructive-io/graphql-codegen/package.json')
+      const pkg = require(pkgPath)
+      const binField = pkg.bin
+      let rel: string | undefined
+      if (typeof binField === 'string') {
+        rel = binField
+      } else if (binField && typeof binField === 'object') {
+        rel = binField['graphql-codegen'] || Object.values(binField)[0]
+      }
+      if (rel) bin = join(dirname(pkgPath), rel)
+    } catch {}
+  }
+  if (!bin) {
+    try {
+      bin = require.resolve('@constructive-io/graphql-codegen/dist/cli/index.js')
+    } catch {}
+  }
   const args: string[] = ['generate']
   if (configPath) args.push('-c', configPath)
   if (endpoint) args.push('-e', endpoint)
