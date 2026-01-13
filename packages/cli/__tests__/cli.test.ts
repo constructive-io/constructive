@@ -1,3 +1,6 @@
+jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
+  generateCommand: async () => ({ success: true, message: 'ok' })
+}));
 import { Inquirerer, Question } from 'inquirerer';
 
 import { KEY_SEQUENCES, setupTests, TestEnvironment } from '../test-utils';
