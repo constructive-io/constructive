@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.14.0...@pgpmjs/core@4.15.0) (2026-01-14)
+
+### Bug Fixes
+
+- update export-meta.ts to use 'policy_type' instead of 'template' ([b30ddae](https://github.com/constructive-io/constructive/commit/b30ddae617228619b6500af304fa37a0c90ed436))
+
+### Features
+
+- update export flow for new metaschema tables and columns ([1de4ae5](https://github.com/constructive-io/constructive/commit/1de4ae52429391ac120d326d850cb273ee02fd55))
+
 # [4.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.3...@pgpmjs/core@4.14.0) (2026-01-09)
 
 ### Bug Fixes
