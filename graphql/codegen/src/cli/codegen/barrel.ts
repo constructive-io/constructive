@@ -12,6 +12,7 @@ import {
   getCreateMutationHookName,
   getUpdateMutationHookName,
   getDeleteMutationHookName,
+  hasValidPrimaryKey,
 } from './utils';
 import { getOperationHookName } from './type-resolver';
 
@@ -31,10 +32,13 @@ export function generateQueriesBarrel(tables: CleanTable[]): string {
   // Export all query hooks
   for (const table of tables) {
     const listHookName = getListQueryHookName(table);
-    const singleHookName = getSingleQueryHookName(table);
-
     statements.push(exportAllFrom(`./${listHookName}`));
-    statements.push(exportAllFrom(`./${singleHookName}`));
+
+    // Only export single query hook if table has valid primary key
+    if (hasValidPrimaryKey(table)) {
+      const singleHookName = getSingleQueryHookName(table);
+      statements.push(exportAllFrom(`./${singleHookName}`));
+    }
   }
 
   // Add file header as leading comment on first statement
@@ -204,20 +208,33 @@ export function generateCustomQueriesBarrel(
   customQueryNames: string[]
 ): string {
   const statements: t.Statement[] = [];
+  const exportedHooks = new Set<string>();
 
   // Export all table query hooks
   for (const table of tables) {
     const listHookName = getListQueryHookName(table);
-    const singleHookName = getSingleQueryHookName(table);
+    if (!exportedHooks.has(listHookName)) {
+      statements.push(exportAllFrom(`./${listHookName}`));
+      exportedHooks.add(listHookName);
+    }
 
-    statements.push(exportAllFrom(`./${listHookName}`));
-    statements.push(exportAllFrom(`./${singleHookName}`));
+    // Only export single query hook if table has valid primary key
+    if (hasValidPrimaryKey(table)) {
+      const singleHookName = getSingleQueryHookName(table);
+      if (!exportedHooks.has(singleHookName)) {
+        statements.push(exportAllFrom(`./${singleHookName}`));
+        exportedHooks.add(singleHookName);
+      }
+    }
   }
 
-  // Add custom query hooks
+  // Add custom query hooks (skip if already exported from table hooks)
   for (const name of customQueryNames) {
     const hookName = getOperationHookName(name, 'query');
-    statements.push(exportAllFrom(`./${hookName}`));
+    if (!exportedHooks.has(hookName)) {
+      statements.push(exportAllFrom(`./${hookName}`));
+      exportedHooks.add(hookName);
+    }
   }
 
   // Add file header as leading comment on first statement
@@ -240,28 +257,40 @@ export function generateCustomMutationsBarrel(
   customMutationNames: string[]
 ): string {
   const statements: t.Statement[] = [];
+  const exportedHooks = new Set<string>();
 
   // Export all table mutation hooks
   for (const table of tables) {
     const createHookName = getCreateMutationHookName(table);
-    const updateHookName = getUpdateMutationHookName(table);
-    const deleteHookName = getDeleteMutationHookName(table);
-
-    statements.push(exportAllFrom(`./${createHookName}`));
+    if (!exportedHooks.has(createHookName)) {
+      statements.push(exportAllFrom(`./${createHookName}`));
+      exportedHooks.add(createHookName);
+    }
 
     // Only add update/delete if they exist
     if (table.query?.update !== null) {
-      statements.push(exportAllFrom(`./${updateHookName}`));
+      const updateHookName = getUpdateMutationHookName(table);
+      if (!exportedHooks.has(updateHookName)) {
+        statements.push(exportAllFrom(`./${updateHookName}`));
+        exportedHooks.add(updateHookName);
+      }
     }
     if (table.query?.delete !== null) {
-      statements.push(exportAllFrom(`./${deleteHookName}`));
+      const deleteHookName = getDeleteMutationHookName(table);
+      if (!exportedHooks.has(deleteHookName)) {
+        statements.push(exportAllFrom(`./${deleteHookName}`));
+        exportedHooks.add(deleteHookName);
+      }
     }
   }
 
-  // Add custom mutation hooks
+  // Add custom mutation hooks (skip if already exported from table hooks)
   for (const name of customMutationNames) {
     const hookName = getOperationHookName(name, 'mutation');
-    statements.push(exportAllFrom(`./${hookName}`));
+    if (!exportedHooks.has(hookName)) {
+      statements.push(exportAllFrom(`./${hookName}`));
+      exportedHooks.add(hookName);
+    }
   }
 
   // Add file header as leading comment on first statement

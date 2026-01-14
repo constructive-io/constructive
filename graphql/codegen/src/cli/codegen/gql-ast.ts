@@ -21,6 +21,7 @@ import {
   getUpdateMutationName,
   getDeleteMutationName,
   getFilterTypeName,
+  getConditionTypeName,
   getOrderByTypeName,
   getScalarFields,
   getPrimaryKeyInfo,
@@ -72,13 +73,18 @@ export function buildListQueryAST(config: ListQueryConfig): DocumentNode {
   const { table } = config;
   const queryName = getAllRowsQueryName(table);
   const filterType = getFilterTypeName(table);
+  const conditionType = getConditionTypeName(table);
   const orderByType = getOrderByTypeName(table);
   const scalarFields = getScalarFields(table);
 
-  // Variable definitions
+  // Variable definitions - all pagination arguments from PostGraphile
   const variableDefinitions: VariableDefinitionNode[] = [
     t.variableDefinition({
       variable: t.variable({ name: 'first' }),
+      type: t.namedType({ type: 'Int' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'last' }),
       type: t.namedType({ type: 'Int' }),
     }),
     t.variableDefinition({
@@ -86,8 +92,20 @@ export function buildListQueryAST(config: ListQueryConfig): DocumentNode {
       type: t.namedType({ type: 'Int' }),
     }),
     t.variableDefinition({
+      variable: t.variable({ name: 'before' }),
+      type: t.namedType({ type: 'Cursor' }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'after' }),
+      type: t.namedType({ type: 'Cursor' }),
+    }),
+    t.variableDefinition({
       variable: t.variable({ name: 'filter' }),
       type: t.namedType({ type: filterType }),
+    }),
+    t.variableDefinition({
+      variable: t.variable({ name: 'condition' }),
+      type: t.namedType({ type: conditionType }),
     }),
     t.variableDefinition({
       variable: t.variable({ name: 'orderBy' }),
@@ -100,8 +118,12 @@ export function buildListQueryAST(config: ListQueryConfig): DocumentNode {
   // Query arguments
   const args: ArgumentNode[] = [
     t.argument({ name: 'first', value: t.variable({ name: 'first' }) }),
+    t.argument({ name: 'last', value: t.variable({ name: 'last' }) }),
     t.argument({ name: 'offset', value: t.variable({ name: 'offset' }) }),
+    t.argument({ name: 'before', value: t.variable({ name: 'before' }) }),
+    t.argument({ name: 'after', value: t.variable({ name: 'after' }) }),
     t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
+    t.argument({ name: 'condition', value: t.variable({ name: 'condition' }) }),
     t.argument({ name: 'orderBy', value: t.variable({ name: 'orderBy' }) }),
   ];
 

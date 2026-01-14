@@ -23,10 +23,13 @@ import {
   getAllRowsQueryName,
   getSingleRowQueryName,
   getFilterTypeName,
+  getConditionTypeName,
   getOrderByTypeName,
   getScalarFields,
   getScalarFilterType,
   getPrimaryKeyInfo,
+  hasValidPrimaryKey,
+  fieldTypeToTs,
   toScreamingSnake,
   ucFirst,
   lcFirst,
@@ -106,6 +109,7 @@ export function generateListQueryHook(
   const hookName = getListQueryHookName(table);
   const queryName = getAllRowsQueryName(table);
   const filterTypeName = getFilterTypeName(table);
+  const conditionTypeName = getConditionTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
   const scalarFields = getScalarFields(table);
   const keysName = `${lcFirst(typeName)}Keys`;
@@ -232,6 +236,80 @@ export function generateListQueryHook(
     createFilterInterfaceDeclaration(filterTypeName, fieldFilters, false)
   );
 
+  // Generate Condition interface (simple equality filter with scalar types)
+  // Track non-primitive types (enums) that need to be imported
+  const enumTypesUsed = new Set<string>();
+  const conditionProperties: t.TSPropertySignature[] = scalarFields.map(
+    (field) => {
+      const tsType = fieldTypeToTs(field.type);
+      const isPrimitive =
+        tsType === 'string' ||
+        tsType === 'number' ||
+        tsType === 'boolean' ||
+        tsType === 'unknown' ||
+        tsType.endsWith('[]');
+      let typeAnnotation: t.TSType;
+      if (field.type.isArray) {
+        const baseType = tsType.replace('[]', '');
+        const isBasePrimitive =
+          baseType === 'string' ||
+          baseType === 'number' ||
+          baseType === 'boolean' ||
+          baseType === 'unknown';
+        if (!isBasePrimitive) {
+          enumTypesUsed.add(baseType);
+        }
+        typeAnnotation = t.tsArrayType(
+          baseType === 'string'
+            ? t.tsStringKeyword()
+            : baseType === 'number'
+              ? t.tsNumberKeyword()
+              : baseType === 'boolean'
+                ? t.tsBooleanKeyword()
+                : t.tsTypeReference(t.identifier(baseType))
+        );
+      } else {
+        if (!isPrimitive) {
+          enumTypesUsed.add(tsType);
+        }
+        typeAnnotation =
+          tsType === 'string'
+            ? t.tsStringKeyword()
+            : tsType === 'number'
+              ? t.tsNumberKeyword()
+              : tsType === 'boolean'
+                ? t.tsBooleanKeyword()
+                : t.tsTypeReference(t.identifier(tsType));
+      }
+      const prop = t.tsPropertySignature(
+        t.identifier(field.name),
+        t.tsTypeAnnotation(typeAnnotation)
+      );
+      prop.optional = true;
+      return prop;
+    }
+  );
+
+  // Add import for enum types if any are used
+  if (enumTypesUsed.size > 0) {
+    const schemaTypesImport = t.importDeclaration(
+      Array.from(enumTypesUsed).map((et) =>
+        t.importSpecifier(t.identifier(et), t.identifier(et))
+      ),
+      t.stringLiteral('../schema-types')
+    );
+    schemaTypesImport.importKind = 'type';
+    statements.push(schemaTypesImport);
+  }
+
+  const conditionInterface = t.tsInterfaceDeclaration(
+    t.identifier(conditionTypeName),
+    null,
+    null,
+    t.tsInterfaceBody(conditionProperties)
+  );
+  statements.push(conditionInterface);
+
   const orderByValues = [
     ...scalarFields.flatMap((f) => [
       `${toScreamingSnake(f.name)}_ASC`,
@@ -259,6 +337,14 @@ export function generateListQueryHook(
     })(),
     (() => {
       const p = t.tsPropertySignature(
+        t.identifier('last'),
+        t.tsTypeAnnotation(t.tsNumberKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
         t.identifier('offset'),
         t.tsTypeAnnotation(t.tsNumberKeyword())
       );
@@ -267,8 +353,32 @@ export function generateListQueryHook(
     })(),
     (() => {
       const p = t.tsPropertySignature(
+        t.identifier('before'),
+        t.tsTypeAnnotation(t.tsStringKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('after'),
+        t.tsTypeAnnotation(t.tsStringKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
         t.identifier('filter'),
         t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterTypeName)))
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('condition'),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(conditionTypeName)))
       );
       p.optional = true;
       return p;
@@ -735,7 +845,12 @@ export function generateListQueryHook(
 export function generateSingleQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
-): GeneratedQueryFile {
+): GeneratedQueryFile | null {
+  // Skip tables with composite keys - they are handled as custom queries
+  if (!hasValidPrimaryKey(table)) {
+    return null;
+  }
+
   const {
     reactQueryEnabled = true,
     useCentralizedKeys = true,
@@ -1279,7 +1394,10 @@ export function generateAllQueryHooks(
   const files: GeneratedQueryFile[] = [];
   for (const table of tables) {
     files.push(generateListQueryHook(table, options));
-    files.push(generateSingleQueryHook(table, options));
+    const singleHook = generateSingleQueryHook(table, options);
+    if (singleHook) {
+      files.push(singleHook);
+    }
   }
   return files;
 }
