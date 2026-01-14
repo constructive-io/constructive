@@ -172,7 +172,7 @@ const config: Record<string, TableConfig> = {
       privilege: 'text',
       permissive: 'boolean',
       disabled: 'boolean',
-      template: 'text',
+      policy_type: 'text',
       data: 'jsonb'
     }
   },
