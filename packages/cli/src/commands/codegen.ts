@@ -1,6 +1,10 @@
 import { CLIOptions, Inquirerer } from 'inquirerer'
 import { ParsedArgs } from 'minimist'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { buildSchemaSDL } from '@constructive-io/graphql-server'
 import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
+import { ConstructiveOptions, getEnvOptions } from '@constructive-io/graphql-env'
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -15,6 +19,9 @@ Options:
   --out <dir>                Output directory (default: graphql/codegen/dist)
   --dry-run                  Preview without writing files
   -v, --verbose              Verbose output
+
+  --database <name>          Database override for DB mode (defaults to PGDATABASE)
+  --schemas <list>           Comma-separated schemas (required for DB mode)
 `
 
 export default async (
@@ -27,24 +34,61 @@ export default async (
     process.exit(0)
   }
 
-  const endpoint = (argv.endpoint as string) || ''
+  const endpointArg = (argv.endpoint as string) || ''
   const outDir = (argv.out as string) || 'codegen'
   const auth = (argv.auth as string) || ''
   const configPath = (argv.config as string) || ''
   const dryRun = !!(argv['dry-run'] || argv.dryRun)
   const verbose = !!(argv.verbose || argv.v)
 
-  const result = await generateCommand({
-    config: configPath,
-    endpoint,
-    output: outDir,
-    authorization: auth,
-    verbose,
-    dryRun,
-  })
-  if (!result.success) {
-    console.error('x', result.message)
+  const selectedDb = (argv.database as string) || undefined
+  const options: ConstructiveOptions = selectedDb ? getEnvOptions({ pg: { database: selectedDb } }) : getEnvOptions()
+  const schemasArg = (argv.schemas as string) || ''
+
+  const runGenerate = async ({ endpoint, schema }: { endpoint?: string; schema?: string }) => {
+    const result = await generateCommand({
+      config: configPath || undefined,
+      endpoint,
+      schema,
+      output: outDir,
+      authorization: auth || undefined,
+      verbose,
+      dryRun,
+    })
+
+    if (!result.success) {
+      console.error(result.message)
+      if (result.errors?.length) result.errors.forEach(e => console.error('  -', e))
+      process.exit(1)
+    }
+    console.log(result.message)
+    if (result.filesWritten?.length) {
+      result.filesWritten.forEach(f => console.log(f))
+    }
+  }
+
+  if (endpointArg) {
+    await runGenerate({ endpoint: endpointArg })
+    return
+  }
+
+  if (!schemasArg.trim()) {
+    console.error('Error: --schemas is required when building from database. Provide a comma-separated list of schemas.')
     process.exit(1)
   }
-  console.log('[ok]', result.message)
+
+  const schemas = schemasArg.split(',').map((s: string) => s.trim()).filter(Boolean)
+  await fs.promises.mkdir(outDir, { recursive: true })
+  const sdl = await buildSchemaSDL({
+    database: options.pg.database,
+    schemas,
+    graphile: {
+      pgSettings: async () => ({ role: 'administrator' }),
+    },
+  })
+
+  const schemaPath = path.join(outDir, 'schema.graphql')
+  await fs.promises.writeFile(schemaPath, sdl, 'utf-8')
+
+  await runGenerate({ schema: schemaPath })
 }
