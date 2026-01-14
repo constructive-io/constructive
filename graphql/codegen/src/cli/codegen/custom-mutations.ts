@@ -15,16 +15,8 @@ import type {
   CleanArgument,
   TypeRegistry,
 } from '../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-  createInterface,
-  createConst,
-  type InterfaceProperty,
-} from './ts-ast';
+import * as t from '@babel/types';
+import { generateCode, addJSDocComment, typedParam } from './babel-ast';
 import { buildCustomMutationString } from './schema-gql-ast';
 import {
   typeRefToTsType,
@@ -37,6 +29,7 @@ import {
   createTypeTracker,
   type TypeTracker,
 } from './type-resolver';
+import { getGeneratedFileHeader } from './utils';
 
 export interface GeneratedCustomMutationFile {
   fileName: string;
@@ -44,33 +37,40 @@ export interface GeneratedCustomMutationFile {
   operationName: string;
 }
 
-// ============================================================================
-// Single custom mutation hook generator
-// ============================================================================
-
 export interface GenerateCustomMutationHookOptions {
   operation: CleanOperation;
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
-  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
-  /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
-  /** Whether to use centralized mutation keys from mutation-keys.ts (default: true) */
   useCentralizedKeys?: boolean;
 }
 
-/**
- * Generate a custom mutation hook file
- * When reactQueryEnabled is false, returns null since mutations require React Query
- */
+interface VariablesProp {
+  name: string;
+  type: string;
+  optional: boolean;
+  docs?: string[];
+}
+
+function generateVariablesProperties(
+  args: CleanArgument[],
+  tracker?: TypeTracker
+): VariablesProp[] {
+  return args.map((arg) => ({
+    name: arg.name,
+    type: typeRefToTsType(arg.type, tracker),
+    optional: !isTypeRequired(arg.type),
+    docs: arg.description ? [arg.description] : undefined,
+  }));
+}
+
 export function generateCustomMutationHook(
   options: GenerateCustomMutationHookOptions
 ): GeneratedCustomMutationFile | null {
   const { operation, reactQueryEnabled = true } = options;
 
-  // Mutations require React Query - skip generation when disabled
   if (!reactQueryEnabled) {
     return null;
   }
@@ -87,21 +87,23 @@ export function generateCustomMutationHook(
 function generateCustomMutationHookInternal(
   options: GenerateCustomMutationHookOptions
 ): GeneratedCustomMutationFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, tableTypeNames, useCentralizedKeys = true } = options;
+  const {
+    operation,
+    typeRegistry,
+    maxDepth = 2,
+    skipQueryField = true,
+    tableTypeNames,
+    useCentralizedKeys = true,
+  } = options;
 
-  const project = createProject();
   const hookName = getOperationHookName(operation.name, 'mutation');
   const fileName = getOperationFileName(operation.name, 'mutation');
   const variablesTypeName = getOperationVariablesTypeName(operation.name, 'mutation');
   const resultTypeName = getOperationResultTypeName(operation.name, 'mutation');
   const documentConstName = getDocumentConstName(operation.name, 'mutation');
-  // For centralized keys, use customMutationKeys.operationName
-  const centralizedKeyRef = `customMutationKeys.${operation.name}`;
 
-  // Create type tracker to collect referenced types (with table type awareness)
   const tracker = createTypeTracker({ tableTypeNames });
 
-  // Generate GraphQL document
   const mutationDocument = buildCustomMutationString({
     operation,
     typeRegistry,
@@ -109,209 +111,206 @@ function generateCustomMutationHookInternal(
     skipQueryField,
   });
 
-  const sourceFile = createSourceFile(project, fileName);
+  const statements: t.Statement[] = [];
 
-  // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader(`Custom mutation hook for ${operation.name}`) + '\n\n'
-  );
+  const variablesProps =
+    operation.args.length > 0
+      ? generateVariablesProperties(operation.args, tracker)
+      : [];
 
-  // Generate variables interface if there are arguments (with tracking)
-  let variablesProps: InterfaceProperty[] = [];
-  if (operation.args.length > 0) {
-    variablesProps = generateVariablesProperties(operation.args, tracker);
-  }
-
-  // Generate result interface (with tracking)
   const resultType = typeRefToTsType(operation.returnType, tracker);
-  const resultProps: InterfaceProperty[] = [
-    { name: operation.name, type: resultType },
-  ];
 
-  // Get importable types from tracker (separated by source)
-  const schemaTypes = tracker.getImportableTypes();  // From schema-types.ts
-  const tableTypes = tracker.getTableTypes();        // From types.ts
+  const schemaTypes = tracker.getImportableTypes();
+  const tableTypes = tracker.getTableTypes();
 
-  // Add imports
-  const imports = [
-    createImport({
-      moduleSpecifier: '@tanstack/react-query',
-      namedImports: ['useMutation'],
-      typeOnlyNamedImports: ['UseMutationOptions'],
-    }),
-    createImport({
-      moduleSpecifier: '../client',
-      namedImports: ['execute'],
-    }),
-  ];
-
-  // Add types.ts import for table entity types
-  if (tableTypes.length > 0) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '../types',
-        typeOnlyNamedImports: tableTypes,
-      })
-    );
-  }
-
-  // Add schema-types import for Input/Payload/Enum types
-  if (schemaTypes.length > 0) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '../schema-types',
-        typeOnlyNamedImports: schemaTypes,
-      })
-    );
-  }
-
-  // Import centralized mutation keys
-  if (useCentralizedKeys) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '../mutation-keys',
-        namedImports: ['customMutationKeys'],
-      })
-    );
-  }
-
-  sourceFile.addImportDeclarations(imports);
-
-  // Add mutation document constant
-  sourceFile.addVariableStatement(
-    createConst(documentConstName, '`\n' + mutationDocument + '`', {
-      docs: ['GraphQL mutation document'],
-    })
+  const reactQueryImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('useMutation'), t.identifier('useMutation'))],
+    t.stringLiteral('@tanstack/react-query')
   );
+  statements.push(reactQueryImport);
 
-  // Add variables interface
-  if (operation.args.length > 0) {
-    sourceFile.addInterface(createInterface(variablesTypeName, variablesProps));
+  const reactQueryTypeImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('UseMutationOptions'), t.identifier('UseMutationOptions'))],
+    t.stringLiteral('@tanstack/react-query')
+  );
+  reactQueryTypeImport.importKind = 'type';
+  statements.push(reactQueryTypeImport);
+
+  const clientImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
+    t.stringLiteral('../client')
+  );
+  statements.push(clientImport);
+
+  if (tableTypes.length > 0) {
+    const typesImport = t.importDeclaration(
+      tableTypes.map((tt) => t.importSpecifier(t.identifier(tt), t.identifier(tt))),
+      t.stringLiteral('../types')
+    );
+    typesImport.importKind = 'type';
+    statements.push(typesImport);
   }
 
-  // Add result interface
-  sourceFile.addInterface(createInterface(resultTypeName, resultProps));
+  if (schemaTypes.length > 0) {
+    const schemaTypesImport = t.importDeclaration(
+      schemaTypes.map((st) => t.importSpecifier(t.identifier(st), t.identifier(st))),
+      t.stringLiteral('../schema-types')
+    );
+    schemaTypesImport.importKind = 'type';
+    statements.push(schemaTypesImport);
+  }
 
-  // Generate hook function
-  const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
-  const hookBody = generateHookBody(operation, documentConstName, variablesTypeName, resultTypeName, useCentralizedKeys ? centralizedKeyRef : undefined);
+  if (useCentralizedKeys) {
+    const mutationKeyImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier('customMutationKeys'), t.identifier('customMutationKeys'))],
+      t.stringLiteral('../mutation-keys')
+    );
+    statements.push(mutationKeyImport);
+  }
 
-  // Note: docs can cause ts-morph issues with certain content, so we skip them
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: hookParams,
-    statements: hookBody,
-  });
+  const mutationDocConst = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier(documentConstName),
+      t.templateLiteral(
+        [t.templateElement({ raw: '\n' + mutationDocument, cooked: '\n' + mutationDocument }, true)],
+        []
+      )
+    ),
+  ]);
+  const mutationDocExport = t.exportNamedDeclaration(mutationDocConst);
+  addJSDocComment(mutationDocExport, ['GraphQL mutation document']);
+  statements.push(mutationDocExport);
 
-  return {
-    fileName,
-    content: getFormattedOutput(sourceFile),
-    operationName: operation.name,
-  };
-}
+  if (operation.args.length > 0) {
+    const variablesInterfaceProps = variablesProps.map((vp) => {
+      const prop = t.tsPropertySignature(
+        t.identifier(vp.name),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(vp.type)))
+      );
+      prop.optional = vp.optional;
+      return prop;
+    });
+    const variablesInterface = t.tsInterfaceDeclaration(
+      t.identifier(variablesTypeName),
+      null,
+      null,
+      t.tsInterfaceBody(variablesInterfaceProps)
+    );
+    statements.push(t.exportNamedDeclaration(variablesInterface));
+  }
 
-// ============================================================================
-// Helper functions
-// ============================================================================
+  const resultInterfaceBody = t.tsInterfaceBody([
+    t.tsPropertySignature(
+      t.identifier(operation.name),
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier(resultType)))
+    ),
+  ]);
+  const resultInterface = t.tsInterfaceDeclaration(
+    t.identifier(resultTypeName),
+    null,
+    null,
+    resultInterfaceBody
+  );
+  statements.push(t.exportNamedDeclaration(resultInterface));
 
-/**
- * Generate interface properties from CleanArguments
- */
-function generateVariablesProperties(
-  args: CleanArgument[],
-  tracker?: TypeTracker
-): InterfaceProperty[] {
-  return args.map((arg) => ({
-    name: arg.name,
-    type: typeRefToTsType(arg.type, tracker),
-    optional: !isTypeRequired(arg.type),
-    docs: arg.description ? [arg.description] : undefined,
-  }));
-}
-
-/**
- * Generate hook function parameters
- */
-function generateHookParameters(
-  operation: CleanOperation,
-  variablesTypeName: string,
-  resultTypeName: string
-): Array<{ name: string; type: string; hasQuestionToken?: boolean }> {
   const hasArgs = operation.args.length > 0;
 
-  // Mutation hooks use UseMutationOptions with variables as the second type param
+  const hookBodyStatements: t.Statement[] = [];
+  const mutationOptions: (t.ObjectProperty | t.SpreadElement)[] = [];
+
+  if (useCentralizedKeys) {
+    mutationOptions.push(
+      t.objectProperty(
+        t.identifier('mutationKey'),
+        t.callExpression(
+          t.memberExpression(t.identifier('customMutationKeys'), t.identifier(operation.name)),
+          []
+        )
+      )
+    );
+  }
+
+  if (hasArgs) {
+    mutationOptions.push(
+      t.objectProperty(
+        t.identifier('mutationFn'),
+        t.arrowFunctionExpression(
+          [typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)))],
+          t.callExpression(t.identifier('execute'), [
+            t.identifier(documentConstName),
+            t.identifier('variables'),
+          ])
+        )
+      )
+    );
+  } else {
+    mutationOptions.push(
+      t.objectProperty(
+        t.identifier('mutationFn'),
+        t.arrowFunctionExpression(
+          [],
+          t.callExpression(t.identifier('execute'), [t.identifier(documentConstName)])
+        )
+      )
+    );
+  }
+
+  mutationOptions.push(t.spreadElement(t.identifier('options')));
+
+  hookBodyStatements.push(
+    t.returnStatement(
+      t.callExpression(t.identifier('useMutation'), [t.objectExpression(mutationOptions)])
+    )
+  );
+
   const optionsType = hasArgs
     ? `Omit<UseMutationOptions<${resultTypeName}, Error, ${variablesTypeName}>, 'mutationFn'>`
     : `Omit<UseMutationOptions<${resultTypeName}, Error, void>, 'mutationFn'>`;
 
-  return [
-    {
-      name: 'options',
-      type: optionsType,
-      hasQuestionToken: true,
-    },
-  ];
+  const optionsParam = t.identifier('options');
+  optionsParam.optional = true;
+  optionsParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(optionsType)));
+
+  const hookFunc = t.functionDeclaration(
+    t.identifier(hookName),
+    [optionsParam],
+    t.blockStatement(hookBodyStatements)
+  );
+  const hookExport = t.exportNamedDeclaration(hookFunc);
+  statements.push(hookExport);
+
+  const code = generateCode(statements);
+  const content = getGeneratedFileHeader(`Custom mutation hook for ${operation.name}`) + '\n\n' + code;
+
+  return {
+    fileName,
+    content,
+    operationName: operation.name,
+  };
 }
-
-/**
- * Generate hook function body
- */
-function generateHookBody(
-  operation: CleanOperation,
-  documentConstName: string,
-  variablesTypeName: string,
-  resultTypeName: string,
-  mutationKeyRef?: string
-): string {
-  const hasArgs = operation.args.length > 0;
-  const mutationKeyLine = mutationKeyRef ? `mutationKey: ${mutationKeyRef}(),\n    ` : '';
-
-  if (hasArgs) {
-    return `return useMutation({
-    ${mutationKeyLine}mutationFn: (variables: ${variablesTypeName}) =>
-      execute<${resultTypeName}, ${variablesTypeName}>(
-        ${documentConstName},
-        variables
-      ),
-    ...options,
-  });`;
-  } else {
-    return `return useMutation({
-    ${mutationKeyLine}mutationFn: () => execute<${resultTypeName}>(${documentConstName}),
-    ...options,
-  });`;
-  }
-}
-
-// NOTE: JSDoc generation removed due to ts-morph issues with certain content
-
-// ============================================================================
-// Batch generator
-// ============================================================================
 
 export interface GenerateAllCustomMutationHooksOptions {
   operations: CleanOperation[];
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
-  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
-  /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
-  /** Whether to use centralized mutation keys from mutation-keys.ts (default: true) */
   useCentralizedKeys?: boolean;
 }
 
-/**
- * Generate all custom mutation hook files
- * When reactQueryEnabled is false, returns empty array since mutations require React Query
- */
 export function generateAllCustomMutationHooks(
   options: GenerateAllCustomMutationHooksOptions
 ): GeneratedCustomMutationFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames, useCentralizedKeys = true } = options;
+  const {
+    operations,
+    typeRegistry,
+    maxDepth = 2,
+    skipQueryField = true,
+    reactQueryEnabled = true,
+    tableTypeNames,
+    useCentralizedKeys = true,
+  } = options;
 
   return operations
     .filter((op) => op.kind === 'mutation')
