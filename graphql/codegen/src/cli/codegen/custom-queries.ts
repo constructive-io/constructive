@@ -16,7 +16,7 @@ import type {
   TypeRegistry,
 } from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam } from './babel-ast';
+import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import { buildCustomQueryString } from './schema-gql-ast';
 import {
   typeRefToTsType,
@@ -267,10 +267,14 @@ export function generateCustomQueryHook(
           t.identifier('queryFn'),
           t.arrowFunctionExpression(
             [],
-            t.callExpression(t.identifier('execute'), [
-              t.identifier(documentConstName),
-              t.identifier('variables'),
-            ])
+            createTypedCallExpression(
+              t.identifier('execute'),
+              [t.identifier(documentConstName), t.identifier('variables')],
+              [
+                t.tsTypeReference(t.identifier(resultTypeName)),
+                t.tsTypeReference(t.identifier(variablesTypeName)),
+              ]
+            )
           )
         )
       );
@@ -307,7 +311,11 @@ export function generateCustomQueryHook(
           t.identifier('queryFn'),
           t.arrowFunctionExpression(
             [],
-            t.callExpression(t.identifier('execute'), [t.identifier(documentConstName)])
+            createTypedCallExpression(
+              t.identifier('execute'),
+              [t.identifier(documentConstName)],
+              [t.tsTypeReference(t.identifier(resultTypeName))]
+            )
           )
         )
       );
@@ -365,21 +373,24 @@ export function generateCustomQueryHook(
   if (hasArgs) {
     fetchBodyStatements.push(
       t.returnStatement(
-        t.callExpression(t.identifier('execute'), [
-          t.identifier(documentConstName),
-          t.identifier('variables'),
-          t.identifier('options'),
-        ])
+        createTypedCallExpression(
+          t.identifier('execute'),
+          [t.identifier(documentConstName), t.identifier('variables'), t.identifier('options')],
+          [
+            t.tsTypeReference(t.identifier(resultTypeName)),
+            t.tsTypeReference(t.identifier(variablesTypeName)),
+          ]
+        )
       )
     );
   } else {
     fetchBodyStatements.push(
       t.returnStatement(
-        t.callExpression(t.identifier('execute'), [
-          t.identifier(documentConstName),
-          t.identifier('undefined'),
-          t.identifier('options'),
-        ])
+        createTypedCallExpression(
+          t.identifier('execute'),
+          [t.identifier(documentConstName), t.identifier('undefined'), t.identifier('options')],
+          [t.tsTypeReference(t.identifier(resultTypeName))]
+        )
       )
     );
   }
@@ -436,11 +447,14 @@ export function generateCustomQueryHook(
           t.identifier('queryFn'),
           t.arrowFunctionExpression(
             [],
-            t.callExpression(t.identifier('execute'), [
-              t.identifier(documentConstName),
-              t.identifier('variables'),
-              t.identifier('options'),
-            ])
+            createTypedCallExpression(
+              t.identifier('execute'),
+              [t.identifier(documentConstName), t.identifier('variables'), t.identifier('options')],
+              [
+                t.tsTypeReference(t.identifier(resultTypeName)),
+                t.tsTypeReference(t.identifier(variablesTypeName)),
+              ]
+            )
           )
         )
       );
@@ -456,11 +470,11 @@ export function generateCustomQueryHook(
           t.identifier('queryFn'),
           t.arrowFunctionExpression(
             [],
-            t.callExpression(t.identifier('execute'), [
-              t.identifier(documentConstName),
-              t.identifier('undefined'),
-              t.identifier('options'),
-            ])
+            createTypedCallExpression(
+              t.identifier('execute'),
+              [t.identifier(documentConstName), t.identifier('undefined'), t.identifier('options')],
+              [t.tsTypeReference(t.identifier(resultTypeName))]
+            )
           )
         )
       );

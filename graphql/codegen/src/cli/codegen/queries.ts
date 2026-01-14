@@ -8,7 +8,7 @@
  */
 import type { CleanTable } from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam } from './babel-ast';
+import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import {
   buildListQueryAST,
   buildSingleQueryAST,
@@ -426,10 +426,14 @@ export function generateListQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('queryOptions')),
@@ -456,10 +460,14 @@ export function generateListQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('options')),
@@ -482,10 +490,14 @@ export function generateListQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('options')),
@@ -549,11 +561,14 @@ export function generateListQueryHook(
 
   const fetchFuncBody = t.blockStatement([
     t.returnStatement(
-      t.callExpression(t.identifier('execute'), [
-        t.identifier(`${queryName}QueryDocument`),
-        t.identifier('variables'),
-        t.identifier('options'),
-      ])
+      createTypedCallExpression(
+        t.identifier('execute'),
+        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+        [
+          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+        ]
+      )
     ),
   ]);
   const fetchFunc = t.functionDeclaration(
@@ -664,11 +679,14 @@ export function generateListQueryHook(
                   t.identifier('queryFn'),
                   t.arrowFunctionExpression(
                     [],
-                    t.callExpression(t.identifier('execute'), [
-                      t.identifier(`${queryName}QueryDocument`),
-                      t.identifier('variables'),
-                      t.identifier('options'),
-                    ])
+                    createTypedCallExpression(
+                      t.identifier('execute'),
+                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+                      [
+                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                      ]
+                    )
                   )
                 ),
               ]),
@@ -951,10 +969,14 @@ export function generateSingleQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('queryOptions')),
@@ -986,10 +1008,14 @@ export function generateSingleQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('options')),
@@ -1015,10 +1041,14 @@ export function generateSingleQueryHook(
                 t.identifier('queryFn'),
                 t.arrowFunctionExpression(
                   [],
-                  t.callExpression(t.identifier('execute'), [
-                    t.identifier(`${queryName}QueryDocument`),
-                    t.identifier('variables'),
-                  ])
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
                 )
               ),
               t.spreadElement(t.identifier('options')),
@@ -1077,11 +1107,14 @@ export function generateSingleQueryHook(
 
   const fetchFuncBody = t.blockStatement([
     t.returnStatement(
-      t.callExpression(t.identifier('execute'), [
-        t.identifier(`${queryName}QueryDocument`),
-        t.identifier('variables'),
-        t.identifier('options'),
-      ])
+      createTypedCallExpression(
+        t.identifier('execute'),
+        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+        [
+          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+        ]
+      )
     ),
   ]);
   const fetchFunc = t.functionDeclaration(
@@ -1186,11 +1219,14 @@ export function generateSingleQueryHook(
                   t.identifier('queryFn'),
                   t.arrowFunctionExpression(
                     [],
-                    t.callExpression(t.identifier('execute'), [
-                      t.identifier(`${queryName}QueryDocument`),
-                      t.identifier('variables'),
-                      t.identifier('options'),
-                    ])
+                    createTypedCallExpression(
+                      t.identifier('execute'),
+                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+                      [
+                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                      ]
+                    )
                   )
                 ),
               ]),

@@ -16,7 +16,7 @@ import type {
   TypeRegistry,
 } from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam } from './babel-ast';
+import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import { buildCustomMutationString } from './schema-gql-ast';
 import {
   typeRefToTsType,
@@ -236,10 +236,14 @@ function generateCustomMutationHookInternal(
         t.identifier('mutationFn'),
         t.arrowFunctionExpression(
           [typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)))],
-          t.callExpression(t.identifier('execute'), [
-            t.identifier(documentConstName),
-            t.identifier('variables'),
-          ])
+          createTypedCallExpression(
+            t.identifier('execute'),
+            [t.identifier(documentConstName), t.identifier('variables')],
+            [
+              t.tsTypeReference(t.identifier(resultTypeName)),
+              t.tsTypeReference(t.identifier(variablesTypeName)),
+            ]
+          )
         )
       )
     );
@@ -249,7 +253,11 @@ function generateCustomMutationHookInternal(
         t.identifier('mutationFn'),
         t.arrowFunctionExpression(
           [],
-          t.callExpression(t.identifier('execute'), [t.identifier(documentConstName)])
+          createTypedCallExpression(
+            t.identifier('execute'),
+            [t.identifier(documentConstName)],
+            [t.tsTypeReference(t.identifier(resultTypeName))]
+          )
         )
       )
     );

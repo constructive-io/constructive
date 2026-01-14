@@ -109,9 +109,28 @@ export function typedParam(
 export function keyofTypeof(name: string): t.TSTypeOperator {
   const typeofOp = t.tsTypeOperator(t.tsTypeReference(t.identifier(name)));
   typeofOp.operator = 'typeof';
-  
+
   const keyofOp = t.tsTypeOperator(typeofOp);
   keyofOp.operator = 'keyof';
-  
+
   return keyofOp;
+}
+
+/**
+ * Create a call expression with TypeScript type parameters
+ *
+ * This is used to generate typed function calls like:
+ * execute<ResultType, VariablesType>(document, variables)
+ */
+export function createTypedCallExpression(
+  callee: t.Expression,
+  args: (t.Expression | t.SpreadElement)[],
+  typeParams: t.TSType[]
+): t.CallExpression {
+  const call = t.callExpression(callee, args);
+  if (typeParams.length > 0) {
+    // @ts-ignore - Babel types support typeParameters on CallExpression for TS
+    call.typeParameters = t.tsTypeParameterInstantiation(typeParams);
+  }
+  return call;
 }

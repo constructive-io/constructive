@@ -5,7 +5,7 @@
 import {
   createClient,
   GraphQLRequestError,
-} from '../examples/output/generated-orm';
+} from './output/generated-orm';
 
 const ENDPOINT = 'http://api.localhost:3000/graphql';
 let db = createClient({ endpoint: ENDPOINT });
@@ -17,23 +17,23 @@ async function main() {
   console.log('ORM SDK Demo\n');
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 1. Login & Auth
+  // 1. SignIn & Auth
   // ─────────────────────────────────────────────────────────────────────────────
-  section('1. Login Mutation');
-  const loginResult = await db.mutation
-    .login(
+  section('1. SignIn Mutation');
+  const signInResult = await db.mutation
+    .signIn(
       { input: { email: 'admin@gmail.com', password: 'password1111!@#$' } },
       { select: { apiToken: { select: { accessToken: true } } } }
     )
     .execute();
 
-  const token = loginResult.data?.login?.apiToken?.accessToken;
+  const token = signInResult.data?.signIn?.apiToken?.accessToken;
   if (token) {
     db = createClient({
       endpoint: ENDPOINT,
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log('✓ Logged in, token:', token.slice(0, 30) + '...');
+    console.log('✓ Signed in, token:', token.slice(0, 30) + '...');
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -169,11 +169,11 @@ async function main() {
   // ─────────────────────────────────────────────────────────────────────────────
   section('6. Custom Queries');
   const currentUser = await db.query
-    .getCurrentUser({
+    .currentUser({
       select: { id: true, username: true, displayName: true },
     })
     .execute();
-  console.log('Current user:', currentUser.data?.getCurrentUser?.username);
+  console.log('Current user:', currentUser.data?.currentUser?.username);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // 7. Error Handling: execute(), unwrap(), unwrapOr()
@@ -223,7 +223,7 @@ async function main() {
     select: {
       id: true,
       username: true,
-      userProfile: { select: { displayName: true } },
+      roleTypeByType: { select: { name: true } },
     },
     first: 5,
     where: { username: { isNull: false } },
