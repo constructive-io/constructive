@@ -1,16 +1,12 @@
 /**
- * Barrel file generators for ORM client
+ * Barrel file generators for ORM client (Babel AST-based)
  *
  * Generates index.ts files that re-export all models and operations.
  */
 import type { CleanTable } from '../../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-} from '../ts-ast';
-import { getTableNames, lcFirst } from '../utils';
+import * as t from '@babel/types';
+import { generateCode } from '../babel-ast';
+import { getTableNames, lcFirst, getGeneratedFileHeader } from '../utils';
 
 export interface GeneratedBarrelFile {
   fileName: string;
@@ -21,14 +17,7 @@ export interface GeneratedBarrelFile {
  * Generate the models/index.ts barrel file
  */
 export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile {
-  const project = createProject();
-  const sourceFile = createSourceFile(project, 'index.ts');
-
-  // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader('Models barrel export') + '\n\n'
-  );
+  const statements: t.Statement[] = [];
 
   // Export all model classes (Select types are now in input-types.ts)
   for (const table of tables) {
@@ -38,15 +27,21 @@ export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile 
     const baseFileName = lcFirst(typeName);
     const moduleFileName = baseFileName === 'index' ? `${baseFileName}Model` : baseFileName;
 
-    sourceFile.addExportDeclaration({
-      moduleSpecifier: `./${moduleFileName}`,
-      namedExports: [modelName],
-    });
+    // Create: export { ModelName } from './moduleName';
+    const exportDecl = t.exportNamedDeclaration(
+      null,
+      [t.exportSpecifier(t.identifier(modelName), t.identifier(modelName))],
+      t.stringLiteral(`./${moduleFileName}`)
+    );
+    statements.push(exportDecl);
   }
+
+  const header = getGeneratedFileHeader('Models barrel export');
+  const code = generateCode(statements);
 
   return {
     fileName: 'models/index.ts',
-    content: getFormattedOutput(sourceFile),
+    content: header + '\n' + code,
   };
 }
 

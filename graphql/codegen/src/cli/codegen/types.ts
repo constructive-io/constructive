@@ -1,17 +1,16 @@
 /**
- * Types generator - generates types.ts with entity interfaces using AST
+ * Types generator - generates types.ts with entity interfaces using Babel AST
  */
 import type { CleanTable } from '../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-  createInterface,
-  type InterfaceProperty,
-} from './ts-ast';
-import { getScalarFields, fieldTypeToTs } from './utils';
+import * as t from '@babel/types';
+import { generateCode } from './babel-ast';
+import { getScalarFields, fieldTypeToTs, getGeneratedFileHeader } from './utils';
+
+interface InterfaceProperty {
+  name: string;
+  type: string;
+  optional?: boolean;
+}
 
 // ============================================================================
 // Filter Types Configuration
@@ -155,6 +154,48 @@ export interface GenerateTypesOptions {
   enumsFromSchemaTypes?: string[];
 }
 
+function parseTypeAnnotation(typeStr: string): t.TSType {
+  if (typeStr === 'string') return t.tsStringKeyword();
+  if (typeStr === 'number') return t.tsNumberKeyword();
+  if (typeStr === 'boolean') return t.tsBooleanKeyword();
+  if (typeStr === 'unknown') return t.tsUnknownKeyword();
+
+  if (typeStr.includes(' | ')) {
+    const parts = typeStr.split(' | ').map((p) => parseTypeAnnotation(p.trim()));
+    return t.tsUnionType(parts);
+  }
+
+  if (typeStr.endsWith('[]')) {
+    return t.tsArrayType(parseTypeAnnotation(typeStr.slice(0, -2)));
+  }
+
+  if (typeStr === 'null') return t.tsNullKeyword();
+
+  return t.tsTypeReference(t.identifier(typeStr));
+}
+
+function createInterfaceDeclaration(
+  name: string,
+  properties: InterfaceProperty[]
+): t.ExportNamedDeclaration {
+  const props = properties.map((prop) => {
+    const propSig = t.tsPropertySignature(
+      t.identifier(prop.name),
+      t.tsTypeAnnotation(parseTypeAnnotation(prop.type))
+    );
+    propSig.optional = prop.optional ?? false;
+    return propSig;
+  });
+
+  const interfaceDecl = t.tsInterfaceDeclaration(
+    t.identifier(name),
+    null,
+    null,
+    t.tsInterfaceBody(props)
+  );
+  return t.exportNamedDeclaration(interfaceDecl);
+}
+
 /**
  * Generate types.ts content with all entity interfaces and base filter types
  */
@@ -165,11 +206,7 @@ export function generateTypesFile(
   const { enumsFromSchemaTypes = [] } = options;
   const enumSet = new Set(enumsFromSchemaTypes);
 
-  const project = createProject();
-  const sourceFile = createSourceFile(project, 'types.ts');
-
-  // Add file header
-  sourceFile.insertText(0, createFileHeader('Entity types and filter types') + '\n\n');
+  const statements: t.Statement[] = [];
 
   // Collect which enums are actually used by entity fields
   const usedEnums = new Set<string>();
@@ -186,19 +223,13 @@ export function generateTypesFile(
 
   // Add import for enum types from schema-types if any are used
   if (usedEnums.size > 0) {
-    sourceFile.addImportDeclaration(
-      createImport({
-        moduleSpecifier: './schema-types',
-        typeOnlyNamedImports: Array.from(usedEnums).sort(),
-      })
-    );
-    sourceFile.addStatements('');
+    const specifiers = Array.from(usedEnums)
+      .sort()
+      .map((name) => t.importSpecifier(t.identifier(name), t.identifier(name)));
+    const importDecl = t.importDeclaration(specifiers, t.stringLiteral('./schema-types'));
+    importDecl.importKind = 'type';
+    statements.push(importDecl);
   }
-
-  // Add section comment for entity types
-  sourceFile.addStatements('// ============================================================================');
-  sourceFile.addStatements('// Entity types');
-  sourceFile.addStatements('// ============================================================================\n');
 
   // Generate entity interfaces
   for (const table of tables) {
@@ -209,18 +240,16 @@ export function generateTypesFile(
       type: `${fieldTypeToTs(field.type)} | null`,
     }));
 
-    sourceFile.addInterface(createInterface(table.name, properties));
+    statements.push(createInterfaceDeclaration(table.name, properties));
   }
-
-  // Add section comment for filter types
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Filter types (shared PostGraphile filter interfaces)');
-  sourceFile.addStatements('// ============================================================================\n');
 
   // Generate all filter types
   for (const { name, tsType, operators } of FILTER_CONFIGS) {
-    sourceFile.addInterface(createInterface(name, buildFilterProperties(tsType, operators)));
+    statements.push(createInterfaceDeclaration(name, buildFilterProperties(tsType, operators)));
   }
 
-  return getFormattedOutput(sourceFile);
+  const header = getGeneratedFileHeader('Entity types and filter types');
+  const code = generateCode(statements);
+
+  return header + '\n' + code;
 }
