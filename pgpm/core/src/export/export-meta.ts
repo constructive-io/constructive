@@ -865,44 +865,19 @@ const config: Record<string, TableConfig> = {
       fields: 'uuid[]'
     }
   },
-  user_profiles_module: {
+  table_template_module: {
     schema: 'metaschema_modules_public',
-    table: 'user_profiles_module',
+    table: 'table_template_module',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
       table_id: 'uuid',
+      owner_table_id: 'uuid',
       table_name: 'text',
-      users_table_id: 'uuid'
-    }
-  },
-  user_settings_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_settings_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      table_name: 'text',
-      users_table_id: 'uuid'
-    }
-  },
-  organization_settings_module: {
-    schema: 'metaschema_modules_public',
-    table: 'organization_settings_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      table_name: 'text',
-      entity_table_id: 'uuid',
-      membership_type: 'int'
+      node_type: 'text',
+      data: 'jsonb'
     }
   },
   uuid_module: {
@@ -1075,6 +1050,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('crypto_addresses_module', `SELECT * FROM metaschema_modules_public.crypto_addresses_module WHERE database_id = $1`);
   await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1`);
   await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1`);
+  await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1`);
   await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1`);
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
