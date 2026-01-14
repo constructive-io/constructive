@@ -10,19 +10,13 @@
 import type { CleanTable, CleanOperation } from '../../types/schema';
 import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, lcFirst } from './utils';
+import * as t from '@babel/types';
 import {
-  t,
   generateCode,
   addJSDocComment,
   asConst,
   constArray,
-  arrow,
-  objectProp,
-  exportConst,
   typedParam,
-  stringOrNumberType,
-  ternary,
-  shorthandObject,
 } from './babel-ast';
 
 export interface MutationKeyGeneratorOptions {
@@ -52,8 +46,8 @@ function generateEntityMutationKeysDeclaration(
   const properties: t.ObjectProperty[] = [];
 
   // all property
-  const allProp = objectProp(
-    'all',
+  const allProp = t.objectProperty(
+    t.identifier('all'),
     constArray([t.stringLiteral('mutation'), t.stringLiteral(entityKey)])
   );
   addJSDocComment(allProp, [`All ${singularName} mutation keys`]);
@@ -66,31 +60,23 @@ function generateEntityMutationKeysDeclaration(
     fkParam.optional = true;
     fkParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
 
-    createProp = objectProp(
-      'create',
-      arrow(
-        [fkParam],
-        ternary(
-          t.identifier(relationship.foreignKey),
-          constArray([
-            t.stringLiteral('mutation'),
-            t.stringLiteral(entityKey),
-            t.stringLiteral('create'),
-            shorthandObject(relationship.foreignKey),
+    const arrowFn = t.arrowFunctionExpression(
+      [fkParam],
+      t.conditionalExpression(
+        t.identifier(relationship.foreignKey),
+        constArray([
+          t.stringLiteral('mutation'),
+          t.stringLiteral(entityKey),
+          t.stringLiteral('create'),
+          t.objectExpression([
+            t.objectProperty(
+              t.identifier(relationship.foreignKey),
+              t.identifier(relationship.foreignKey),
+              false,
+              true
+            )
           ]),
-          constArray([
-            t.stringLiteral('mutation'),
-            t.stringLiteral(entityKey),
-            t.stringLiteral('create'),
-          ])
-        )
-      )
-    );
-  } else {
-    createProp = objectProp(
-      'create',
-      arrow(
-        [],
+        ]),
         constArray([
           t.stringLiteral('mutation'),
           t.stringLiteral(entityKey),
@@ -98,43 +84,59 @@ function generateEntityMutationKeysDeclaration(
         ])
       )
     );
+
+    createProp = t.objectProperty(t.identifier('create'), arrowFn);
+  } else {
+    const arrowFn = t.arrowFunctionExpression(
+      [],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral('create'),
+      ])
+    );
+
+    createProp = t.objectProperty(t.identifier('create'), arrowFn);
   }
   addJSDocComment(createProp, [`Create ${singularName} mutation key`]);
   properties.push(createProp);
 
   // update property
-  const updateProp = objectProp(
-    'update',
-    arrow(
-      [typedParam('id', stringOrNumberType())],
-      constArray([
-        t.stringLiteral('mutation'),
-        t.stringLiteral(entityKey),
-        t.stringLiteral('update'),
-        t.identifier('id'),
-      ])
-    )
+  const updateArrowFn = t.arrowFunctionExpression(
+    [typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]))],
+    constArray([
+      t.stringLiteral('mutation'),
+      t.stringLiteral(entityKey),
+      t.stringLiteral('update'),
+      t.identifier('id'),
+    ])
   );
+  const updateProp = t.objectProperty(t.identifier('update'), updateArrowFn);
   addJSDocComment(updateProp, [`Update ${singularName} mutation key`]);
   properties.push(updateProp);
 
   // delete property
-  const deleteProp = objectProp(
-    'delete',
-    arrow(
-      [typedParam('id', stringOrNumberType())],
-      constArray([
-        t.stringLiteral('mutation'),
-        t.stringLiteral(entityKey),
-        t.stringLiteral('delete'),
-        t.identifier('id'),
-      ])
-    )
+  const deleteArrowFn = t.arrowFunctionExpression(
+    [typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]))],
+    constArray([
+      t.stringLiteral('mutation'),
+      t.stringLiteral(entityKey),
+      t.stringLiteral('delete'),
+      t.identifier('id'),
+    ])
   );
+  const deleteProp = t.objectProperty(t.identifier('delete'), deleteArrowFn);
   addJSDocComment(deleteProp, [`Delete ${singularName} mutation key`]);
   properties.push(deleteProp);
 
-  return exportConst(keysName, asConst(t.objectExpression(properties)));
+  return t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(keysName),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 }
 
 /**
@@ -157,33 +159,41 @@ function generateCustomMutationKeysDeclaration(
       identifierParam.optional = true;
       identifierParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
 
-      prop = objectProp(
-        op.name,
-        arrow(
-          [identifierParam],
-          ternary(
+      const arrowFn = t.arrowFunctionExpression(
+        [identifierParam],
+        t.conditionalExpression(
+          t.identifier('identifier'),
+          constArray([
+            t.stringLiteral('mutation'),
+            t.stringLiteral(op.name),
             t.identifier('identifier'),
-            constArray([
-              t.stringLiteral('mutation'),
-              t.stringLiteral(op.name),
-              t.identifier('identifier'),
-            ]),
-            constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
-          )
+          ]),
+          constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
         )
       );
+
+      prop = t.objectProperty(t.identifier(op.name), arrowFn);
     } else {
-      prop = objectProp(
-        op.name,
-        arrow([], constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)]))
+      const arrowFn = t.arrowFunctionExpression(
+        [],
+        constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
       );
+
+      prop = t.objectProperty(t.identifier(op.name), arrowFn);
     }
 
     addJSDocComment(prop, [`Mutation key for ${op.name}`]);
     properties.push(prop);
   }
 
-  return exportConst('customMutationKeys', asConst(t.objectExpression(properties)));
+  return t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('customMutationKeys'),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 }
 
 /**
@@ -209,7 +219,14 @@ function generateUnifiedMutationStoreDeclaration(
     );
   }
 
-  const decl = exportConst('mutationKeys', asConst(t.objectExpression(properties)));
+  const decl = t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('mutationKeys'),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 
   addJSDocComment(decl, [
     'Unified mutation key store',

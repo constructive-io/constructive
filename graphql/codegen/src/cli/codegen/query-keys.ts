@@ -18,20 +18,7 @@ import {
   addJSDocComment,
   asConst,
   constArray,
-  spread,
-  member,
-  call,
   typedParam,
-  stringOrNumberType,
-  objectType,
-  typeRef,
-  arrow,
-  objectProp,
-  exportConst,
-  exportType,
-  ifStmt,
-  returnStmt,
-  block,
   keyofTypeof,
 } from './babel-ast';
 
@@ -108,15 +95,21 @@ function generateScopeTypeDeclaration(
     members.push(signature);
   }
 
-  return exportType(typeName, t.tsTypeLiteral(members));
+  return t.exportNamedDeclaration(
+    t.tsTypeAliasDeclaration(
+      t.identifier(typeName),
+      null,
+      t.tsTypeLiteral(members)
+    )
+  );
 }
 
 /**
  * Build the 'all' property: all: ['entityKey'] as const
  */
 function buildAllProperty(entityKey: string, singularName: string): t.ObjectProperty {
-  const prop = objectProp(
-    'all',
+  const prop = t.objectProperty(
+    t.identifier('all'),
     constArray([t.stringLiteral(entityKey)])
   );
   addJSDocComment(prop, [`All ${singularName} queries`]);
@@ -135,17 +128,19 @@ function buildByParentProperty(
   const parentUpper = ucFirst(parent);
   const parentLower = lcFirst(parent);
 
-  const prop = objectProp(
-    `by${parentUpper}`,
-    arrow(
-      [typedParam(fkField, t.tsStringKeyword())],
-      constArray([
-        t.stringLiteral(entityKey),
-        t.objectExpression([
-          t.objectProperty(t.identifier(fkField), t.identifier(fkField), false, true)
-        ])
+  const arrowFn = t.arrowFunctionExpression(
+    [typedParam(fkField, t.tsStringKeyword())],
+    constArray([
+      t.stringLiteral(entityKey),
+      t.objectExpression([
+        t.objectProperty(t.identifier(fkField), t.identifier(fkField), false, true)
       ])
-    )
+    ])
+  );
+
+  const prop = t.objectProperty(
+    t.identifier(`by${parentUpper}`),
+    arrowFn
   );
   addJSDocComment(prop, [`${typeName} queries scoped to a specific ${parentLower}`]);
   return prop;
@@ -161,25 +156,30 @@ function buildScopedProperty(
   ancestors: string[]
 ): t.ObjectProperty {
   const scopeTypeName = `${typeName}Scope`;
-  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+  const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
 
   const statements: t.Statement[] = [];
 
   if (relationship.parent) {
     statements.push(
-      ifStmt(
+      t.ifStatement(
         t.optionalMemberExpression(
           t.identifier('scope'),
           t.identifier(relationship.foreignKey),
           false,
           true
         ),
-        returnStmt(
-          call(
-            member(keysName, `by${ucFirst(relationship.parent)}`),
-            [member('scope', relationship.foreignKey)]
+        t.blockStatement([
+          t.returnStatement(
+            t.callExpression(
+              t.memberExpression(
+                t.identifier(keysName),
+                t.identifier(`by${ucFirst(relationship.parent)}`)
+              ),
+              [t.memberExpression(t.identifier('scope'), t.identifier(relationship.foreignKey))]
+            )
           )
-        )
+        ])
       )
     );
   }
@@ -188,29 +188,40 @@ function buildScopedProperty(
     const ancestorLower = lcFirst(ancestor);
     const fkField = `${ancestorLower}Id`;
     statements.push(
-      ifStmt(
+      t.ifStatement(
         t.optionalMemberExpression(
           t.identifier('scope'),
           t.identifier(fkField),
           false,
           true
         ),
-        returnStmt(
-          call(
-            member(keysName, `by${ucFirst(ancestor)}`),
-            [member('scope', fkField)]
+        t.blockStatement([
+          t.returnStatement(
+            t.callExpression(
+              t.memberExpression(
+                t.identifier(keysName),
+                t.identifier(`by${ucFirst(ancestor)}`)
+              ),
+              [t.memberExpression(t.identifier('scope'), t.identifier(fkField))]
+            )
           )
-        )
+        ])
       )
     );
   }
 
-  statements.push(returnStmt(member(keysName, 'all')));
-
-  const prop = objectProp(
-    'scoped',
-    arrow([scopeParam], block(statements))
+  statements.push(
+    t.returnStatement(
+      t.memberExpression(t.identifier(keysName), t.identifier('all'))
+    )
   );
+
+  const arrowFn = t.arrowFunctionExpression(
+    [scopeParam],
+    t.blockStatement(statements)
+  );
+
+  const prop = t.objectProperty(t.identifier('scoped'), arrowFn);
   addJSDocComment(prop, ['Get scope-aware base key']);
   return prop;
 }
@@ -219,18 +230,22 @@ function buildScopedProperty(
  * Build lists property (scoped version)
  */
 function buildScopedListsProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
-  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+  const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
 
-  const prop = objectProp(
-    'lists',
-    arrow(
-      [scopeParam],
-      constArray([
-        spread(call(member(keysName, 'scoped'), [t.identifier('scope')])),
-        t.stringLiteral('list')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [scopeParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('scoped')),
+          [t.identifier('scope')]
+        )
+      ),
+      t.stringLiteral('list')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('lists'), arrowFn);
   addJSDocComment(prop, ['List query keys (optionally scoped)']);
   return prop;
 }
@@ -239,19 +254,23 @@ function buildScopedListsProperty(keysName: string, scopeTypeName: string): t.Ob
  * Build list property (scoped version)
  */
 function buildScopedListProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
-  const variablesParam = typedParam('variables', objectType(), true);
-  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+  const variablesParam = typedParam('variables', t.tsTypeReference(t.identifier('object')), true);
+  const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
 
-  const prop = objectProp(
-    'list',
-    arrow(
-      [variablesParam, scopeParam],
-      constArray([
-        spread(call(member(keysName, 'lists'), [t.identifier('scope')])),
-        t.identifier('variables')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [variablesParam, scopeParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+          [t.identifier('scope')]
+        )
+      ),
+      t.identifier('variables')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('list'), arrowFn);
   addJSDocComment(prop, ['List query key with variables']);
   return prop;
 }
@@ -260,18 +279,22 @@ function buildScopedListProperty(keysName: string, scopeTypeName: string): t.Obj
  * Build details property (scoped version)
  */
 function buildScopedDetailsProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
-  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+  const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
 
-  const prop = objectProp(
-    'details',
-    arrow(
-      [scopeParam],
-      constArray([
-        spread(call(member(keysName, 'scoped'), [t.identifier('scope')])),
-        t.stringLiteral('detail')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [scopeParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('scoped')),
+          [t.identifier('scope')]
+        )
+      ),
+      t.stringLiteral('detail')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('details'), arrowFn);
   addJSDocComment(prop, ['Detail query keys (optionally scoped)']);
   return prop;
 }
@@ -280,19 +303,23 @@ function buildScopedDetailsProperty(keysName: string, scopeTypeName: string): t.
  * Build detail property (scoped version)
  */
 function buildScopedDetailProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
-  const idParam = typedParam('id', stringOrNumberType());
-  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+  const idParam = typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]));
+  const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
 
-  const prop = objectProp(
-    'detail',
-    arrow(
-      [idParam, scopeParam],
-      constArray([
-        spread(call(member(keysName, 'details'), [t.identifier('scope')])),
-        t.identifier('id')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [idParam, scopeParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('details')),
+          [t.identifier('scope')]
+        )
+      ),
+      t.identifier('id')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('detail'), arrowFn);
   addJSDocComment(prop, ['Detail query key for specific item']);
   return prop;
 }
@@ -301,16 +328,15 @@ function buildScopedDetailProperty(keysName: string, scopeTypeName: string): t.O
  * Build simple (non-scoped) lists property
  */
 function buildSimpleListsProperty(keysName: string): t.ObjectProperty {
-  const prop = objectProp(
-    'lists',
-    arrow(
-      [],
-      constArray([
-        spread(member(keysName, 'all')),
-        t.stringLiteral('list')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [],
+    constArray([
+      t.spreadElement(t.memberExpression(t.identifier(keysName), t.identifier('all'))),
+      t.stringLiteral('list')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('lists'), arrowFn);
   addJSDocComment(prop, ['List query keys']);
   return prop;
 }
@@ -319,18 +345,22 @@ function buildSimpleListsProperty(keysName: string): t.ObjectProperty {
  * Build simple (non-scoped) list property
  */
 function buildSimpleListProperty(keysName: string): t.ObjectProperty {
-  const variablesParam = typedParam('variables', objectType(), true);
+  const variablesParam = typedParam('variables', t.tsTypeReference(t.identifier('object')), true);
 
-  const prop = objectProp(
-    'list',
-    arrow(
-      [variablesParam],
-      constArray([
-        spread(call(member(keysName, 'lists'), [])),
-        t.identifier('variables')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [variablesParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+          []
+        )
+      ),
+      t.identifier('variables')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('list'), arrowFn);
   addJSDocComment(prop, ['List query key with variables']);
   return prop;
 }
@@ -339,16 +369,15 @@ function buildSimpleListProperty(keysName: string): t.ObjectProperty {
  * Build simple (non-scoped) details property
  */
 function buildSimpleDetailsProperty(keysName: string): t.ObjectProperty {
-  const prop = objectProp(
-    'details',
-    arrow(
-      [],
-      constArray([
-        spread(member(keysName, 'all')),
-        t.stringLiteral('detail')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [],
+    constArray([
+      t.spreadElement(t.memberExpression(t.identifier(keysName), t.identifier('all'))),
+      t.stringLiteral('detail')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('details'), arrowFn);
   addJSDocComment(prop, ['Detail query keys']);
   return prop;
 }
@@ -357,18 +386,22 @@ function buildSimpleDetailsProperty(keysName: string): t.ObjectProperty {
  * Build simple (non-scoped) detail property
  */
 function buildSimpleDetailProperty(keysName: string): t.ObjectProperty {
-  const idParam = typedParam('id', stringOrNumberType());
+  const idParam = typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]));
 
-  const prop = objectProp(
-    'detail',
-    arrow(
-      [idParam],
-      constArray([
-        spread(call(member(keysName, 'details'), [])),
-        t.identifier('id')
-      ])
-    )
+  const arrowFn = t.arrowFunctionExpression(
+    [idParam],
+    constArray([
+      t.spreadElement(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('details')),
+          []
+        )
+      ),
+      t.identifier('id')
+    ])
   );
+
+  const prop = t.objectProperty(t.identifier('detail'), arrowFn);
   addJSDocComment(prop, ['Detail query key for specific item']);
   return prop;
 }
@@ -418,7 +451,14 @@ function generateEntityKeysDeclaration(
     properties.push(buildSimpleDetailProperty(keysName));
   }
 
-  return exportConst(keysName, asConst(t.objectExpression(properties)));
+  return t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(keysName),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 }
 
 /**
@@ -440,27 +480,35 @@ function generateCustomQueryKeysDeclaration(
     let prop: t.ObjectProperty;
 
     if (hasArgs) {
-      const variablesParam = typedParam('variables', objectType(), !hasRequiredArgs);
+      const variablesParam = typedParam('variables', t.tsTypeReference(t.identifier('object')), !hasRequiredArgs);
 
-      prop = objectProp(
-        op.name,
-        arrow(
-          [variablesParam],
-          constArray([t.stringLiteral(op.name), t.identifier('variables')])
-        )
+      const arrowFn = t.arrowFunctionExpression(
+        [variablesParam],
+        constArray([t.stringLiteral(op.name), t.identifier('variables')])
       );
+
+      prop = t.objectProperty(t.identifier(op.name), arrowFn);
     } else {
-      prop = objectProp(
-        op.name,
-        arrow([], constArray([t.stringLiteral(op.name)]))
+      const arrowFn = t.arrowFunctionExpression(
+        [],
+        constArray([t.stringLiteral(op.name)])
       );
+
+      prop = t.objectProperty(t.identifier(op.name), arrowFn);
     }
 
     addJSDocComment(prop, [`Query key for ${op.name}`]);
     properties.push(prop);
   }
 
-  return exportConst('customQueryKeys', asConst(t.objectExpression(properties)));
+  return t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('customQueryKeys'),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 }
 
 /**
@@ -486,7 +534,14 @@ function generateUnifiedStoreDeclaration(
     );
   }
 
-  const decl = exportConst('queryKeys', asConst(t.objectExpression(properties)));
+  const decl = t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('queryKeys'),
+        asConst(t.objectExpression(properties))
+      )
+    ])
+  );
 
   addJSDocComment(decl, [
     'Unified query key store',
@@ -552,7 +607,13 @@ export function generateQueryKeysFile(
   statements.push(generateUnifiedStoreDeclaration(tables, queryOperations.length > 0));
 
   // Generate QueryKeyScope type
-  const scopeTypeDecl = exportType('QueryKeyScope', keyofTypeof('queryKeys'));
+  const scopeTypeDecl = t.exportNamedDeclaration(
+    t.tsTypeAliasDeclaration(
+      t.identifier('QueryKeyScope'),
+      null,
+      keyofTypeof('queryKeys')
+    )
+  );
   addJSDocComment(scopeTypeDecl, ['Type representing all available query key scopes']);
   statements.push(scopeTypeDecl);
 

@@ -7,23 +7,12 @@
 import type { CleanTable } from '../../types/schema';
 import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
+import * as t from '@babel/types';
 import {
-  t,
   generateCode,
   addJSDocComment,
   asConst,
-  arrow,
-  objectProp,
-  exportConst,
   typedParam,
-  stringOrNumberType,
-  member,
-  call,
-  typeRef,
-  block,
-  exprStmt,
-  queryClientType,
-  queryClientCall,
   addLineComment,
 } from './babel-ast';
 
@@ -98,14 +87,23 @@ function buildEntityInvalidateProperty(
 
   const innerProperties: t.ObjectProperty[] = [];
 
+  // Helper to create QueryClient type reference
+  const queryClientTypeRef = () => t.tsTypeReference(t.identifier('QueryClient'));
+  const stringOrNumberType = () => t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]);
+
+  // Helper to create queryClient.invalidateQueries({ queryKey: ... })
+  const invalidateCall = (queryKeyExpr: t.Expression) =>
+    t.callExpression(
+      t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+      [t.objectExpression([t.objectProperty(t.identifier('queryKey'), queryKeyExpr)])]
+    );
+
   // all property
-  const allProp = objectProp(
-    'all',
-    arrow(
-      [typedParam('queryClient', queryClientType())],
-      queryClientCall('invalidateQueries', member(keysName, 'all'))
-    )
+  const allArrowFn = t.arrowFunctionExpression(
+    [typedParam('queryClient', queryClientTypeRef())],
+    invalidateCall(t.memberExpression(t.identifier(keysName), t.identifier('all')))
   );
+  const allProp = t.objectProperty(t.identifier('all'), allArrowFn);
   addJSDocComment(allProp, [`Invalidate all ${singularName} queries`]);
   innerProperties.push(allProp);
 
@@ -113,22 +111,28 @@ function buildEntityInvalidateProperty(
   let listsProp: t.ObjectProperty;
   if (hasParent) {
     const scopeTypeName = `${typeName}Scope`;
-    const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
-    listsProp = objectProp(
-      'lists',
-      arrow(
-        [typedParam('queryClient', queryClientType()), scopeParam],
-        queryClientCall('invalidateQueries', call(member(keysName, 'lists'), [t.identifier('scope')]))
+    const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
+    const listsArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), scopeParam],
+      invalidateCall(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+          [t.identifier('scope')]
+        )
       )
     );
+    listsProp = t.objectProperty(t.identifier('lists'), listsArrowFn);
   } else {
-    listsProp = objectProp(
-      'lists',
-      arrow(
-        [typedParam('queryClient', queryClientType())],
-        queryClientCall('invalidateQueries', call(member(keysName, 'lists')))
+    const listsArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef())],
+      invalidateCall(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+          []
+        )
       )
     );
+    listsProp = t.objectProperty(t.identifier('lists'), listsArrowFn);
   }
   addJSDocComment(listsProp, [`Invalidate ${singularName} list queries`]);
   innerProperties.push(listsProp);
@@ -137,22 +141,28 @@ function buildEntityInvalidateProperty(
   let detailProp: t.ObjectProperty;
   if (hasParent) {
     const scopeTypeName = `${typeName}Scope`;
-    const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
-    detailProp = objectProp(
-      'detail',
-      arrow(
-        [typedParam('queryClient', queryClientType()), typedParam('id', stringOrNumberType()), scopeParam],
-        queryClientCall('invalidateQueries', call(member(keysName, 'detail'), [t.identifier('id'), t.identifier('scope')]))
+    const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
+    const detailArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), typedParam('id', stringOrNumberType()), scopeParam],
+      invalidateCall(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+          [t.identifier('id'), t.identifier('scope')]
+        )
       )
     );
+    detailProp = t.objectProperty(t.identifier('detail'), detailArrowFn);
   } else {
-    detailProp = objectProp(
-      'detail',
-      arrow(
-        [typedParam('queryClient', queryClientType()), typedParam('id', stringOrNumberType())],
-        queryClientCall('invalidateQueries', call(member(keysName, 'detail'), [t.identifier('id')]))
+    const detailArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), typedParam('id', stringOrNumberType())],
+      invalidateCall(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+          [t.identifier('id')]
+        )
       )
     );
+    detailProp = t.objectProperty(t.identifier('detail'), detailArrowFn);
   }
   addJSDocComment(detailProp, [`Invalidate a specific ${singularName}`]);
   innerProperties.push(detailProp);
@@ -162,11 +172,27 @@ function buildEntityInvalidateProperty(
     const cascadeStatements: t.Statement[] = [];
 
     // Comment: Invalidate this entity
-    const selfDetailStmt = exprStmt(queryClientCall('invalidateQueries', call(member(keysName, 'detail'), [t.identifier('id')])));
+    const selfDetailStmt = t.expressionStatement(
+      invalidateCall(
+        t.callExpression(
+          t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+          [t.identifier('id')]
+        )
+      )
+    );
     addLineComment(selfDetailStmt, `Invalidate this ${singularName}`);
     cascadeStatements.push(selfDetailStmt);
 
-    cascadeStatements.push(exprStmt(queryClientCall('invalidateQueries', call(member(keysName, 'lists')))));
+    cascadeStatements.push(
+      t.expressionStatement(
+        invalidateCall(
+          t.callExpression(
+            t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+            []
+          )
+        )
+      )
+    );
 
     // Comment: Cascade to child entities
     let firstCascade = true;
@@ -189,9 +215,20 @@ function buildEntityInvalidateProperty(
           const descKeysName = `${lcFirst(descTypeName)}Keys`;
           let cascadeStmt: t.Statement;
           if (fkField) {
-            cascadeStmt = exprStmt(queryClientCall('invalidateQueries', call(member(descKeysName, `by${ucFirst(typeName)}`), [t.identifier('id')])));
+            cascadeStmt = t.expressionStatement(
+              invalidateCall(
+                t.callExpression(
+                  t.memberExpression(t.identifier(descKeysName), t.identifier(`by${ucFirst(typeName)}`)),
+                  [t.identifier('id')]
+                )
+              )
+            );
           } else {
-            cascadeStmt = exprStmt(queryClientCall('invalidateQueries', member(descKeysName, 'all')));
+            cascadeStmt = t.expressionStatement(
+              invalidateCall(
+                t.memberExpression(t.identifier(descKeysName), t.identifier('all'))
+              )
+            );
           }
 
           if (firstCascade) {
@@ -203,13 +240,11 @@ function buildEntityInvalidateProperty(
       }
     }
 
-    const withChildrenProp = objectProp(
-      'withChildren',
-      arrow(
-        [typedParam('queryClient', queryClientType()), typedParam('id', stringOrNumberType())],
-        block(cascadeStatements)
-      )
+    const withChildrenArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), typedParam('id', stringOrNumberType())],
+      t.blockStatement(cascadeStatements)
     );
+    const withChildrenProp = t.objectProperty(t.identifier('withChildren'), withChildrenArrowFn);
     addJSDocComment(withChildrenProp, [
       `Invalidate ${singularName} and all child entities`,
       `Cascades to: ${descendants.join(', ')}`,
@@ -217,7 +252,7 @@ function buildEntityInvalidateProperty(
     innerProperties.push(withChildrenProp);
   }
 
-  const entityProp = objectProp(singularName, t.objectExpression(innerProperties));
+  const entityProp = t.objectProperty(t.identifier(singularName), t.objectExpression(innerProperties));
   addJSDocComment(entityProp, [`Invalidate ${singularName} queries`]);
   return entityProp;
 }
@@ -233,37 +268,50 @@ function buildEntityRemoveProperty(
   const keysName = `${lcFirst(typeName)}Keys`;
   const relationship = relationships[typeName.toLowerCase()];
 
+  // Helper types
+  const queryClientTypeRef = () => t.tsTypeReference(t.identifier('QueryClient'));
+  const stringOrNumberType = () => t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]);
+
+  // Helper to create queryClient.removeQueries({ queryKey: ... })
+  const removeCall = (queryKeyExpr: t.Expression) =>
+    t.callExpression(
+      t.memberExpression(t.identifier('queryClient'), t.identifier('removeQueries')),
+      [t.objectExpression([t.objectProperty(t.identifier('queryKey'), queryKeyExpr)])]
+    );
+
   let removeProp: t.ObjectProperty;
   if (relationship) {
     const scopeTypeName = `${typeName}Scope`;
-    const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
-    removeProp = objectProp(
-      singularName,
-      arrow(
-        [typedParam('queryClient', queryClientType()), typedParam('id', stringOrNumberType()), scopeParam],
-        block([
-          exprStmt(call(member('queryClient', 'removeQueries'), [
-            t.objectExpression([
-              t.objectProperty(t.identifier('queryKey'), call(member(keysName, 'detail'), [t.identifier('id'), t.identifier('scope')]))
-            ])
-          ]))
-        ])
-      )
+    const scopeParam = typedParam('scope', t.tsTypeReference(t.identifier(scopeTypeName)), true);
+    const removeArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), typedParam('id', stringOrNumberType()), scopeParam],
+      t.blockStatement([
+        t.expressionStatement(
+          removeCall(
+            t.callExpression(
+              t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+              [t.identifier('id'), t.identifier('scope')]
+            )
+          )
+        )
+      ])
     );
+    removeProp = t.objectProperty(t.identifier(singularName), removeArrowFn);
   } else {
-    removeProp = objectProp(
-      singularName,
-      arrow(
-        [typedParam('queryClient', queryClientType()), typedParam('id', stringOrNumberType())],
-        block([
-          exprStmt(call(member('queryClient', 'removeQueries'), [
-            t.objectExpression([
-              t.objectProperty(t.identifier('queryKey'), call(member(keysName, 'detail'), [t.identifier('id')]))
-            ])
-          ]))
-        ])
-      )
+    const removeArrowFn = t.arrowFunctionExpression(
+      [typedParam('queryClient', queryClientTypeRef()), typedParam('id', stringOrNumberType())],
+      t.blockStatement([
+        t.expressionStatement(
+          removeCall(
+            t.callExpression(
+              t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+              [t.identifier('id')]
+            )
+          )
+        )
+      ])
     );
+    removeProp = t.objectProperty(t.identifier(singularName), removeArrowFn);
   }
 
   addJSDocComment(removeProp, [`Remove ${singularName} from cache`]);
@@ -327,7 +375,14 @@ export function generateInvalidationFile(
     invalidateProperties.push(buildEntityInvalidateProperty(table, relationships, childrenMap, tables));
   }
 
-  const invalidateDecl = exportConst('invalidate', asConst(t.objectExpression(invalidateProperties)));
+  const invalidateDecl = t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('invalidate'),
+        asConst(t.objectExpression(invalidateProperties))
+      )
+    ])
+  );
 
   // Build JSDoc for invalidate
   const invalidateDocLines = [
@@ -359,7 +414,14 @@ export function generateInvalidationFile(
     removeProperties.push(buildEntityRemoveProperty(table, relationships));
   }
 
-  const removeDecl = exportConst('remove', asConst(t.objectExpression(removeProperties)));
+  const removeDecl = t.exportNamedDeclaration(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('remove'),
+        asConst(t.objectExpression(removeProperties))
+      )
+    ])
+  );
   addJSDocComment(removeDecl, [
     'Remove queries from cache (for delete operations)',
     '',
