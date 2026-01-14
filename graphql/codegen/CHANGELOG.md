@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.3...@constructive-io/graphql-codegen@2.24.0) (2026-01-14)
+
+### Features
+
+- **codegen:** add query keys factory pattern for codegen RQ mode ([f8c3cab](https://github.com/constructive-io/constructive/commit/f8c3cabfeb1b5c27ad5dd70393f19fed916b3ccc))
+
 ## [2.23.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.2...@constructive-io/graphql-codegen@2.23.3) (2026-01-09)
 
 ### Bug Fixes
