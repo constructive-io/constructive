@@ -865,6 +865,21 @@ const config: Record<string, TableConfig> = {
       fields: 'uuid[]'
     }
   },
+  table_template_module: {
+    schema: 'metaschema_modules_public',
+    table: 'table_template_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      owner_table_id: 'uuid',
+      table_name: 'text',
+      node_type: 'text',
+      data: 'jsonb'
+    }
+  },
   user_profiles_module: {
     schema: 'metaschema_modules_public',
     table: 'user_profiles_module',
@@ -1075,6 +1090,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('crypto_addresses_module', `SELECT * FROM metaschema_modules_public.crypto_addresses_module WHERE database_id = $1`);
   await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1`);
   await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1`);
+  await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1`);
   await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1`);
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
