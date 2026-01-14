@@ -57,6 +57,8 @@ export interface GenerateCustomMutationHookOptions {
   reactQueryEnabled?: boolean;
   /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  /** Whether to use centralized mutation keys from mutation-keys.ts (default: true) */
+  useCentralizedKeys?: boolean;
 }
 
 /**
@@ -85,7 +87,7 @@ export function generateCustomMutationHook(
 function generateCustomMutationHookInternal(
   options: GenerateCustomMutationHookOptions
 ): GeneratedCustomMutationFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, tableTypeNames } = options;
+  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, tableTypeNames, useCentralizedKeys = true } = options;
 
   const project = createProject();
   const hookName = getOperationHookName(operation.name, 'mutation');
@@ -93,6 +95,8 @@ function generateCustomMutationHookInternal(
   const variablesTypeName = getOperationVariablesTypeName(operation.name, 'mutation');
   const resultTypeName = getOperationResultTypeName(operation.name, 'mutation');
   const documentConstName = getDocumentConstName(operation.name, 'mutation');
+  // For centralized keys, use customMutationKeys.operationName
+  const centralizedKeyRef = `customMutationKeys.${operation.name}`;
 
   // Create type tracker to collect referenced types (with table type awareness)
   const tracker = createTypeTracker({ tableTypeNames });
@@ -162,6 +166,16 @@ function generateCustomMutationHookInternal(
     );
   }
 
+  // Import centralized mutation keys
+  if (useCentralizedKeys) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../mutation-keys',
+        namedImports: ['customMutationKeys'],
+      })
+    );
+  }
+
   sourceFile.addImportDeclarations(imports);
 
   // Add mutation document constant
@@ -181,7 +195,7 @@ function generateCustomMutationHookInternal(
 
   // Generate hook function
   const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
-  const hookBody = generateHookBody(operation, documentConstName, variablesTypeName, resultTypeName);
+  const hookBody = generateHookBody(operation, documentConstName, variablesTypeName, resultTypeName, useCentralizedKeys ? centralizedKeyRef : undefined);
 
   // Note: docs can cause ts-morph issues with certain content, so we skip them
   sourceFile.addFunction({
@@ -248,13 +262,15 @@ function generateHookBody(
   operation: CleanOperation,
   documentConstName: string,
   variablesTypeName: string,
-  resultTypeName: string
+  resultTypeName: string,
+  mutationKeyRef?: string
 ): string {
   const hasArgs = operation.args.length > 0;
+  const mutationKeyLine = mutationKeyRef ? `mutationKey: ${mutationKeyRef}(),\n    ` : '';
 
   if (hasArgs) {
     return `return useMutation({
-    mutationFn: (variables: ${variablesTypeName}) =>
+    ${mutationKeyLine}mutationFn: (variables: ${variablesTypeName}) =>
       execute<${resultTypeName}, ${variablesTypeName}>(
         ${documentConstName},
         variables
@@ -263,7 +279,7 @@ function generateHookBody(
   });`;
   } else {
     return `return useMutation({
-    mutationFn: () => execute<${resultTypeName}>(${documentConstName}),
+    ${mutationKeyLine}mutationFn: () => execute<${resultTypeName}>(${documentConstName}),
     ...options,
   });`;
   }
@@ -284,6 +300,8 @@ export interface GenerateAllCustomMutationHooksOptions {
   reactQueryEnabled?: boolean;
   /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  /** Whether to use centralized mutation keys from mutation-keys.ts (default: true) */
+  useCentralizedKeys?: boolean;
 }
 
 /**
@@ -293,7 +311,7 @@ export interface GenerateAllCustomMutationHooksOptions {
 export function generateAllCustomMutationHooks(
   options: GenerateAllCustomMutationHooksOptions
 ): GeneratedCustomMutationFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames, useCentralizedKeys = true } = options;
 
   return operations
     .filter((op) => op.kind === 'mutation')
@@ -305,6 +323,7 @@ export function generateAllCustomMutationHooks(
         skipQueryField,
         reactQueryEnabled,
         tableTypeNames,
+        useCentralizedKeys,
       })
     )
     .filter((result): result is GeneratedCustomMutationFile => result !== null);

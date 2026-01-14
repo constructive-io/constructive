@@ -71,6 +71,12 @@ export function generateMutationsBarrel(tables: CleanTable[]): string {
 export interface MainBarrelOptions {
   hasSchemaTypes?: boolean;
   hasMutations?: boolean;
+  /** Whether query-keys.ts was generated */
+  hasQueryKeys?: boolean;
+  /** Whether mutation-keys.ts was generated */
+  hasMutationKeys?: boolean;
+  /** Whether invalidation.ts was generated */
+  hasInvalidation?: boolean;
 }
 
 export function generateMainBarrel(
@@ -83,7 +89,13 @@ export function generateMainBarrel(
       ? { hasSchemaTypes: options, hasMutations: true }
       : options;
 
-  const { hasSchemaTypes = false, hasMutations = true } = opts;
+  const {
+    hasSchemaTypes = false,
+    hasMutations = true,
+    hasQueryKeys = false,
+    hasMutationKeys = false,
+    hasInvalidation = false,
+  } = opts;
   const tableNames = tables.map((t) => t.name).join(', ');
 
   const schemaTypesExport = hasSchemaTypes
@@ -97,6 +109,27 @@ export * from './schema-types';
     ? `
 // Mutation hooks
 export * from './mutations';
+`
+    : '';
+
+  const queryKeysExport = hasQueryKeys
+    ? `
+// Centralized query keys (for cache management)
+export * from './query-keys';
+`
+    : '';
+
+  const mutationKeysExport = hasMutationKeys
+    ? `
+// Centralized mutation keys (for tracking in-flight mutations)
+export * from './mutation-keys';
+`
+    : '';
+
+  const invalidationExport = hasInvalidation
+    ? `
+// Cache invalidation helpers
+export * from './invalidation';
 `
     : '';
 
@@ -135,7 +168,7 @@ export * from './client';
 
 // Entity and filter types
 export * from './types';
-${schemaTypesExport}
+${schemaTypesExport}${queryKeysExport}${mutationKeysExport}${invalidationExport}
 // Query hooks
 export * from './queries';
 ${mutationsExport}`;

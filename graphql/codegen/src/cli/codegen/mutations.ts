@@ -73,6 +73,10 @@ export interface MutationGeneratorOptions {
   reactQueryEnabled?: boolean;
   /** Enum type names that are available from schema-types.ts */
   enumsFromSchemaTypes?: string[];
+  /** Whether to use centralized mutation/query keys (default: true) */
+  useCentralizedKeys?: boolean;
+  /** Whether this entity has parent relationships (for scoped invalidation) */
+  hasRelationships?: boolean;
 }
 
 // ============================================================================
@@ -87,7 +91,7 @@ export function generateCreateMutationHook(
   table: CleanTable,
   options: MutationGeneratorOptions = {}
 ): GeneratedMutationFile | null {
-  const { reactQueryEnabled = true, enumsFromSchemaTypes = [] } = options;
+  const { reactQueryEnabled = true, enumsFromSchemaTypes = [], useCentralizedKeys = true, hasRelationships = false } = options;
 
   // Mutations require React Query - skip generation when disabled
   if (!reactQueryEnabled) {
@@ -99,6 +103,9 @@ export function generateCreateMutationHook(
   const project = createProject();
   const { typeName, singularName } = getTableNames(table);
   const hookName = getCreateMutationHookName(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const mutationKeysName = `${lcFirst(typeName)}MutationKeys`;
+  const scopeTypeName = `${typeName}Scope`;
   const mutationName = getCreateMutationName(table);
   const scalarFields = getScalarFields(table);
 
@@ -146,6 +153,27 @@ export function generateCreateMutationHook(
       createImport({
         moduleSpecifier: '../schema-types',
         typeOnlyNamedImports: Array.from(usedEnums).sort(),
+      })
+    );
+  }
+
+  // Add centralized key imports
+  if (useCentralizedKeys) {
+    // Import query keys for invalidation
+    const queryKeyImports = [keysName];
+    const queryKeyTypeImports = hasRelationships ? [scopeTypeName] : [];
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: queryKeyImports,
+        typeOnlyNamedImports: queryKeyTypeImports,
+      })
+    );
+    // Import mutation keys for tracking
+    imports.push(
+      createImport({
+        moduleSpecifier: '../mutation-keys',
+        namedImports: [mutationKeysName],
       })
     );
   }
@@ -217,18 +245,26 @@ export function generateCreateMutationHook(
   sourceFile.addStatements('// Hook');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Hook function
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: [
-      {
-        name: 'options',
-        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
-        hasQuestionToken: true,
-      },
-    ],
-    statements: `const queryClient = useQueryClient();
+  // Hook function body depends on whether we use centralized keys
+  let hookBody: string;
+  if (useCentralizedKeys) {
+    hookBody = `const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ${mutationKeysName}.create(),
+    mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
+      execute<${ucFirst(mutationName)}MutationResult, ${ucFirst(mutationName)}MutationVariables>(
+        ${mutationName}MutationDocument,
+        variables
+      ),
+    onSuccess: () => {
+      // Invalidate list queries to refetch
+      queryClient.invalidateQueries({ queryKey: ${keysName}.lists() });
+    },
+    ...options,
+  });`;
+  } else {
+    hookBody = `const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
@@ -241,7 +277,20 @@ export function generateCreateMutationHook(
       queryClient.invalidateQueries({ queryKey: ['${typeName.toLowerCase()}', 'list'] });
     },
     ...options,
-  });`,
+  });`;
+  }
+
+  sourceFile.addFunction({
+    name: hookName,
+    isExported: true,
+    parameters: [
+      {
+        name: 'options',
+        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
+        hasQuestionToken: true,
+      },
+    ],
+    statements: hookBody,
     docs: [
       {
         description: `Mutation hook for creating a ${typeName}
@@ -280,7 +329,7 @@ export function generateUpdateMutationHook(
   table: CleanTable,
   options: MutationGeneratorOptions = {}
 ): GeneratedMutationFile | null {
-  const { reactQueryEnabled = true, enumsFromSchemaTypes = [] } = options;
+  const { reactQueryEnabled = true, enumsFromSchemaTypes = [], useCentralizedKeys = true, hasRelationships = false } = options;
 
   // Mutations require React Query - skip generation when disabled
   if (!reactQueryEnabled) {
@@ -299,6 +348,9 @@ export function generateUpdateMutationHook(
   const hookName = getUpdateMutationHookName(table);
   const mutationName = getUpdateMutationName(table);
   const scalarFields = getScalarFields(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const mutationKeysName = `${lcFirst(typeName)}MutationKeys`;
+  const scopeTypeName = `${typeName}Scope`;
 
   // Get primary key info dynamically from table constraints
   const pkFields = getPrimaryKeyInfo(table);
@@ -346,6 +398,27 @@ export function generateUpdateMutationHook(
       createImport({
         moduleSpecifier: '../schema-types',
         typeOnlyNamedImports: Array.from(usedEnums).sort(),
+      })
+    );
+  }
+
+  // Add centralized key imports
+  if (useCentralizedKeys) {
+    // Import query keys for invalidation
+    const queryKeyImports = [keysName];
+    const queryKeyTypeImports = hasRelationships ? [scopeTypeName] : [];
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: queryKeyImports,
+        typeOnlyNamedImports: queryKeyTypeImports,
+      })
+    );
+    // Import mutation keys for tracking
+    imports.push(
+      createImport({
+        moduleSpecifier: '../mutation-keys',
+        namedImports: [mutationKeysName],
       })
     );
   }
@@ -418,18 +491,27 @@ export function generateUpdateMutationHook(
   sourceFile.addStatements('// Hook');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Hook function
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: [
-      {
-        name: 'options',
-        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
-        hasQuestionToken: true,
-      },
-    ],
-    statements: `const queryClient = useQueryClient();
+  // Hook function body depends on whether we use centralized keys
+  let hookBody: string;
+  if (useCentralizedKeys) {
+    hookBody = `const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ${mutationKeysName}.all,
+    mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
+      execute<${ucFirst(mutationName)}MutationResult, ${ucFirst(mutationName)}MutationVariables>(
+        ${mutationName}MutationDocument,
+        variables
+      ),
+    onSuccess: (_, variables) => {
+      // Invalidate specific item and list queries
+      queryClient.invalidateQueries({ queryKey: ${keysName}.detail(variables.input.${pkField.name}) });
+      queryClient.invalidateQueries({ queryKey: ${keysName}.lists() });
+    },
+    ...options,
+  });`;
+  } else {
+    hookBody = `const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
@@ -443,7 +525,20 @@ export function generateUpdateMutationHook(
       queryClient.invalidateQueries({ queryKey: ['${typeName.toLowerCase()}', 'list'] });
     },
     ...options,
-  });`,
+  });`;
+  }
+
+  sourceFile.addFunction({
+    name: hookName,
+    isExported: true,
+    parameters: [
+      {
+        name: 'options',
+        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
+        hasQuestionToken: true,
+      },
+    ],
+    statements: hookBody,
     docs: [
       {
         description: `Mutation hook for updating a ${typeName}
@@ -483,7 +578,7 @@ export function generateDeleteMutationHook(
   table: CleanTable,
   options: MutationGeneratorOptions = {}
 ): GeneratedMutationFile | null {
-  const { reactQueryEnabled = true } = options;
+  const { reactQueryEnabled = true, useCentralizedKeys = true, hasRelationships = false } = options;
 
   // Mutations require React Query - skip generation when disabled
   if (!reactQueryEnabled) {
@@ -499,6 +594,9 @@ export function generateDeleteMutationHook(
   const { typeName } = getTableNames(table);
   const hookName = getDeleteMutationHookName(table);
   const mutationName = getDeleteMutationName(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const mutationKeysName = `${lcFirst(typeName)}MutationKeys`;
+  const scopeTypeName = `${typeName}Scope`;
 
   // Get primary key info dynamically from table constraints
   const pkFields = getPrimaryKeyInfo(table);
@@ -513,8 +611,8 @@ export function generateDeleteMutationHook(
   // Add file header
   sourceFile.insertText(0, createFileHeader(`Delete mutation hook for ${typeName}`) + '\n\n');
 
-  // Add imports
-  sourceFile.addImportDeclarations([
+  // Build imports
+  const imports = [
     createImport({
       moduleSpecifier: '@tanstack/react-query',
       namedImports: ['useMutation', 'useQueryClient'],
@@ -524,7 +622,31 @@ export function generateDeleteMutationHook(
       moduleSpecifier: '../client',
       namedImports: ['execute'],
     }),
-  ]);
+  ];
+
+  // Add centralized key imports
+  if (useCentralizedKeys) {
+    // Import query keys for invalidation
+    const queryKeyImports = [keysName];
+    const queryKeyTypeImports = hasRelationships ? [scopeTypeName] : [];
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: queryKeyImports,
+        typeOnlyNamedImports: queryKeyTypeImports,
+      })
+    );
+    // Import mutation keys for tracking
+    imports.push(
+      createImport({
+        moduleSpecifier: '../mutation-keys',
+        namedImports: [mutationKeysName],
+      })
+    );
+  }
+
+  // Add imports
+  sourceFile.addImportDeclarations(imports);
 
   // Add section comment
   sourceFile.addStatements('\n// ============================================================================');
@@ -571,18 +693,27 @@ export function generateDeleteMutationHook(
   sourceFile.addStatements('// Hook');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Hook function
-  sourceFile.addFunction({
-    name: hookName,
-    isExported: true,
-    parameters: [
-      {
-        name: 'options',
-        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
-        hasQuestionToken: true,
-      },
-    ],
-    statements: `const queryClient = useQueryClient();
+  // Hook function body depends on whether we use centralized keys
+  let hookBody: string;
+  if (useCentralizedKeys) {
+    hookBody = `const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ${mutationKeysName}.all,
+    mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
+      execute<${ucFirst(mutationName)}MutationResult, ${ucFirst(mutationName)}MutationVariables>(
+        ${mutationName}MutationDocument,
+        variables
+      ),
+    onSuccess: (_, variables) => {
+      // Remove from cache and invalidate list
+      queryClient.removeQueries({ queryKey: ${keysName}.detail(variables.input.${pkField.name}) });
+      queryClient.invalidateQueries({ queryKey: ${keysName}.lists() });
+    },
+    ...options,
+  });`;
+  } else {
+    hookBody = `const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (variables: ${ucFirst(mutationName)}MutationVariables) =>
@@ -596,7 +727,20 @@ export function generateDeleteMutationHook(
       queryClient.invalidateQueries({ queryKey: ['${typeName.toLowerCase()}', 'list'] });
     },
     ...options,
-  });`,
+  });`;
+  }
+
+  sourceFile.addFunction({
+    name: hookName,
+    isExported: true,
+    parameters: [
+      {
+        name: 'options',
+        type: `Omit<UseMutationOptions<${ucFirst(mutationName)}MutationResult, Error, ${ucFirst(mutationName)}MutationVariables>, 'mutationFn'>`,
+        hasQuestionToken: true,
+      },
+    ],
+    statements: hookBody,
     docs: [
       {
         description: `Mutation hook for deleting a ${typeName}

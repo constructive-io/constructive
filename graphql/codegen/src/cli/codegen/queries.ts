@@ -40,6 +40,7 @@ import {
   getPrimaryKeyInfo,
   toScreamingSnake,
   ucFirst,
+  lcFirst,
 } from './utils';
 
 export interface GeneratedQueryFile {
@@ -50,6 +51,10 @@ export interface GeneratedQueryFile {
 export interface QueryGeneratorOptions {
   /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
+  /** Whether to use centralized query keys from query-keys.ts (default: true) */
+  useCentralizedKeys?: boolean;
+  /** Whether this entity has parent relationships (for scope support) */
+  hasRelationships?: boolean;
 }
 
 // ============================================================================
@@ -63,7 +68,7 @@ export function generateListQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile {
-  const { reactQueryEnabled = true } = options;
+  const { reactQueryEnabled = true, useCentralizedKeys = true, hasRelationships = false } = options;
   const project = createProject();
   const { typeName, pluralName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
@@ -71,6 +76,8 @@ export function generateListQueryHook(
   const filterTypeName = getFilterTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
   const scalarFields = getScalarFields(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const scopeTypeName = `${typeName}Scope`;
 
   // Generate GraphQL document via AST
   const queryAST = buildListQueryAST({ table });
@@ -115,6 +122,20 @@ export function generateListQueryHook(
       typeOnlyNamedImports: [typeName, ...Array.from(filterTypesUsed)],
     })
   );
+
+  // Import centralized query keys
+  if (useCentralizedKeys) {
+    const queryKeyImports = [keysName];
+    const queryKeyTypeImports = hasRelationships ? [scopeTypeName] : [];
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: queryKeyImports,
+        typeOnlyNamedImports: queryKeyTypeImports,
+      })
+    );
+  }
+
   sourceFile.addImportDeclarations(imports);
 
   // Re-export entity type
@@ -197,14 +218,26 @@ export function generateListQueryHook(
   sourceFile.addStatements('// Query Key');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Query key factory
-  sourceFile.addVariableStatement(
-    createConst(
-      `${queryName}QueryKey`,
-      `(variables?: ${ucFirst(pluralName)}QueryVariables) =>
+  // Query key - either re-export from centralized keys or define inline
+  if (useCentralizedKeys) {
+    // Re-export the query key function from centralized keys
+    sourceFile.addVariableStatement(
+      createConst(
+        `${queryName}QueryKey`,
+        `${keysName}.list`,
+        { docs: ['Query key factory - re-exported from query-keys.ts'] }
+      )
+    );
+  } else {
+    // Legacy: Define inline query key factory
+    sourceFile.addVariableStatement(
+      createConst(
+        `${queryName}QueryKey`,
+        `(variables?: ${ucFirst(pluralName)}QueryVariables) =>
   ['${typeName.toLowerCase()}', 'list', variables] as const`
-    )
-  );
+      )
+    );
+  }
 
   // Add React Query hook section (only if enabled)
   if (reactQueryEnabled) {
@@ -212,33 +245,63 @@ export function generateListQueryHook(
     sourceFile.addStatements('// Hook');
     sourceFile.addStatements('// ============================================================================\n');
 
-    // Hook function
-    sourceFile.addFunction({
-      name: hookName,
-      isExported: true,
-      parameters: [
-        {
-          name: 'variables',
-          type: `${ucFirst(pluralName)}QueryVariables`,
-          hasQuestionToken: true,
-        },
-        {
-          name: 'options',
-          type: `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-          hasQuestionToken: true,
-        },
-      ],
-      statements: `return useQuery({
+    // Hook parameters - add scope support when entity has relationships
+    const hookParameters: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [
+      {
+        name: 'variables',
+        type: `${ucFirst(pluralName)}QueryVariables`,
+        hasQuestionToken: true,
+      },
+    ];
+
+    // Options type - include scope if entity has relationships
+    let optionsType: string;
+    if (hasRelationships && useCentralizedKeys) {
+      optionsType = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
+    } else {
+      optionsType = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
+    }
+
+    hookParameters.push({
+      name: 'options',
+      type: optionsType,
+      hasQuestionToken: true,
+    });
+
+    // Hook body - use scope if available
+    let hookBody: string;
+    if (hasRelationships && useCentralizedKeys) {
+      hookBody = `const { scope, ...queryOptions } = options ?? {};
+  return useQuery({
+    queryKey: ${keysName}.list(variables, scope),
+    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      variables
+    ),
+    ...queryOptions,
+  });`;
+    } else if (useCentralizedKeys) {
+      hookBody = `return useQuery({
+    queryKey: ${keysName}.list(variables),
+    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      variables
+    ),
+    ...options,
+  });`;
+    } else {
+      hookBody = `return useQuery({
     queryKey: ${queryName}QueryKey(variables),
     queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
       ${queryName}QueryDocument,
       variables
     ),
     ...options,
-  });`,
-      docs: [
-        {
-          description: `Query hook for fetching ${typeName} list
+  });`;
+    }
+
+    // Doc example
+    let docExample = `Query hook for fetching ${typeName} list
 
 @example
 \`\`\`tsx
@@ -247,9 +310,27 @@ const { data, isLoading } = ${hookName}({
   filter: { name: { equalTo: "example" } },
   orderBy: ['CREATED_AT_DESC'],
 });
-\`\`\``,
-        },
-      ],
+\`\`\``;
+
+    if (hasRelationships && useCentralizedKeys) {
+      docExample += `
+
+@example With scope for hierarchical cache invalidation
+\`\`\`tsx
+const { data } = ${hookName}(
+  { first: 10 },
+  { scope: { parentId: 'parent-id' } }
+);
+\`\`\``;
+    }
+
+    // Hook function
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: hookParameters,
+      statements: hookBody,
+      docs: [{ description: docExample }],
     });
   }
 
@@ -302,35 +383,56 @@ const data = await queryClient.fetchQuery({
 
   // Prefetch function (for SSR/QueryClient) - only if React Query is enabled
   if (reactQueryEnabled) {
-    sourceFile.addFunction({
-      name: `prefetch${ucFirst(pluralName)}Query`,
-      isExported: true,
-      isAsync: true,
-      parameters: [
-        {
-          name: 'queryClient',
-          type: 'QueryClient',
-        },
-        {
-          name: 'variables',
-          type: `${ucFirst(pluralName)}QueryVariables`,
-          hasQuestionToken: true,
-        },
-        {
-          name: 'options',
-          type: 'ExecuteOptions',
-          hasQuestionToken: true,
-        },
-      ],
-      returnType: 'Promise<void>',
-      statements: `await queryClient.prefetchQuery({
+    // Prefetch parameters - add scope support when entity has relationships
+    const prefetchParams: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [
+      { name: 'queryClient', type: 'QueryClient' },
+      { name: 'variables', type: `${ucFirst(pluralName)}QueryVariables`, hasQuestionToken: true },
+    ];
+
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchParams.push({ name: 'scope', type: scopeTypeName, hasQuestionToken: true });
+    }
+
+    prefetchParams.push({ name: 'options', type: 'ExecuteOptions', hasQuestionToken: true });
+
+    // Prefetch body
+    let prefetchBody: string;
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchBody = `await queryClient.prefetchQuery({
+    queryKey: ${keysName}.list(variables, scope),
+    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      variables,
+      options
+    ),
+  });`;
+    } else if (useCentralizedKeys) {
+      prefetchBody = `await queryClient.prefetchQuery({
+    queryKey: ${keysName}.list(variables),
+    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      variables,
+      options
+    ),
+  });`;
+    } else {
+      prefetchBody = `await queryClient.prefetchQuery({
     queryKey: ${queryName}QueryKey(variables),
     queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
       ${queryName}QueryDocument,
       variables,
       options
     ),
-  });`,
+  });`;
+    }
+
+    sourceFile.addFunction({
+      name: `prefetch${ucFirst(pluralName)}Query`,
+      isExported: true,
+      isAsync: true,
+      parameters: prefetchParams,
+      returnType: 'Promise<void>',
+      statements: prefetchBody,
       docs: [
         {
           description: `Prefetch ${typeName} list for SSR or cache warming
@@ -361,11 +463,13 @@ export function generateSingleQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile {
-  const { reactQueryEnabled = true } = options;
+  const { reactQueryEnabled = true, useCentralizedKeys = true, hasRelationships = false } = options;
   const project = createProject();
   const { typeName, singularName } = getTableNames(table);
   const hookName = getSingleQueryHookName(table);
   const queryName = getSingleRowQueryName(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const scopeTypeName = `${typeName}Scope`;
 
   // Get primary key info dynamically from table constraints
   const pkFields = getPrimaryKeyInfo(table);
@@ -409,6 +513,20 @@ export function generateSingleQueryHook(
       typeOnlyNamedImports: [typeName],
     })
   );
+
+  // Import centralized query keys
+  if (useCentralizedKeys) {
+    const queryKeyImports = [keysName];
+    const queryKeyTypeImports = hasRelationships ? [scopeTypeName] : [];
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: queryKeyImports,
+        typeOnlyNamedImports: queryKeyTypeImports,
+      })
+    );
+  }
+
   sourceFile.addImportDeclarations(imports);
 
   // Re-export entity type
@@ -448,14 +566,26 @@ export function generateSingleQueryHook(
   sourceFile.addStatements('// Query Key');
   sourceFile.addStatements('// ============================================================================\n');
 
-  // Query key factory - use dynamic PK field name and type
-  sourceFile.addVariableStatement(
-    createConst(
-      `${queryName}QueryKey`,
-      `(${pkName}: ${pkTsType}) =>
+  // Query key - either re-export from centralized keys or define inline
+  if (useCentralizedKeys) {
+    // Re-export the query key function from centralized keys
+    sourceFile.addVariableStatement(
+      createConst(
+        `${queryName}QueryKey`,
+        `${keysName}.detail`,
+        { docs: ['Query key factory - re-exported from query-keys.ts'] }
+      )
+    );
+  } else {
+    // Legacy: Define inline query key factory
+    sourceFile.addVariableStatement(
+      createConst(
+        `${queryName}QueryKey`,
+        `(${pkName}: ${pkTsType}) =>
   ['${typeName.toLowerCase()}', 'detail', ${pkName}] as const`
-    )
-  );
+      )
+    );
+  }
 
   // Add React Query hook section (only if enabled)
   if (reactQueryEnabled) {
@@ -463,19 +593,50 @@ export function generateSingleQueryHook(
     sourceFile.addStatements('// Hook');
     sourceFile.addStatements('// ============================================================================\n');
 
-    // Hook function - use dynamic PK field name and type
-    sourceFile.addFunction({
-      name: hookName,
-      isExported: true,
-      parameters: [
-        { name: pkName, type: pkTsType },
-        {
-          name: 'options',
-          type: `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-          hasQuestionToken: true,
-        },
-      ],
-      statements: `return useQuery({
+    // Hook parameters - add scope support when entity has relationships
+    const hookParameters: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [
+      { name: pkName, type: pkTsType },
+    ];
+
+    // Options type - include scope if entity has relationships
+    let optionsType: string;
+    if (hasRelationships && useCentralizedKeys) {
+      optionsType = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
+    } else {
+      optionsType = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
+    }
+
+    hookParameters.push({
+      name: 'options',
+      type: optionsType,
+      hasQuestionToken: true,
+    });
+
+    // Hook body - use scope if available
+    let hookBody: string;
+    if (hasRelationships && useCentralizedKeys) {
+      hookBody = `const { scope, ...queryOptions } = options ?? {};
+  return useQuery({
+    queryKey: ${keysName}.detail(${pkName}, scope),
+    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      { ${pkName} }
+    ),
+    enabled: !!${pkName} && (queryOptions?.enabled !== false),
+    ...queryOptions,
+  });`;
+    } else if (useCentralizedKeys) {
+      hookBody = `return useQuery({
+    queryKey: ${keysName}.detail(${pkName}),
+    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      { ${pkName} }
+    ),
+    enabled: !!${pkName} && (options?.enabled !== false),
+    ...options,
+  });`;
+    } else {
+      hookBody = `return useQuery({
     queryKey: ${queryName}QueryKey(${pkName}),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
@@ -483,7 +644,15 @@ export function generateSingleQueryHook(
     ),
     enabled: !!${pkName} && (options?.enabled !== false),
     ...options,
-  });`,
+  });`;
+    }
+
+    // Hook function
+    sourceFile.addFunction({
+      name: hookName,
+      isExported: true,
+      parameters: hookParameters,
+      statements: hookBody,
       docs: [
         {
           description: `Query hook for fetching a single ${typeName} by primary key
@@ -539,28 +708,56 @@ const data = await fetch${ucFirst(singularName)}Query(${pkTsType === 'string' ? 
 
   // Prefetch function (for SSR/QueryClient) - only if React Query is enabled, use dynamic PK
   if (reactQueryEnabled) {
-    sourceFile.addFunction({
-      name: `prefetch${ucFirst(singularName)}Query`,
-      isExported: true,
-      isAsync: true,
-      parameters: [
-        { name: 'queryClient', type: 'QueryClient' },
-        { name: pkName, type: pkTsType },
-        {
-          name: 'options',
-          type: 'ExecuteOptions',
-          hasQuestionToken: true,
-        },
-      ],
-      returnType: 'Promise<void>',
-      statements: `await queryClient.prefetchQuery({
+    // Prefetch parameters - add scope support when entity has relationships
+    const prefetchParams: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [
+      { name: 'queryClient', type: 'QueryClient' },
+      { name: pkName, type: pkTsType },
+    ];
+
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchParams.push({ name: 'scope', type: scopeTypeName, hasQuestionToken: true });
+    }
+
+    prefetchParams.push({ name: 'options', type: 'ExecuteOptions', hasQuestionToken: true });
+
+    // Prefetch body
+    let prefetchBody: string;
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchBody = `await queryClient.prefetchQuery({
+    queryKey: ${keysName}.detail(${pkName}, scope),
+    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      { ${pkName} },
+      options
+    ),
+  });`;
+    } else if (useCentralizedKeys) {
+      prefetchBody = `await queryClient.prefetchQuery({
+    queryKey: ${keysName}.detail(${pkName}),
+    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
+      ${queryName}QueryDocument,
+      { ${pkName} },
+      options
+    ),
+  });`;
+    } else {
+      prefetchBody = `await queryClient.prefetchQuery({
     queryKey: ${queryName}QueryKey(${pkName}),
     queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
       ${queryName}QueryDocument,
       { ${pkName} },
       options
     ),
-  });`,
+  });`;
+    }
+
+    sourceFile.addFunction({
+      name: `prefetch${ucFirst(singularName)}Query`,
+      isExported: true,
+      isAsync: true,
+      parameters: prefetchParams,
+      returnType: 'Promise<void>',
+      statements: prefetchBody,
       docs: [
         {
           description: `Prefetch a single ${typeName} for SSR or cache warming

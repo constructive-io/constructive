@@ -59,6 +59,8 @@ export interface GenerateCustomQueryHookOptions {
   reactQueryEnabled?: boolean;
   /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  /** Whether to use centralized query keys from query-keys.ts (default: true) */
+  useCentralizedKeys?: boolean;
 }
 
 /**
@@ -67,7 +69,7 @@ export interface GenerateCustomQueryHookOptions {
 export function generateCustomQueryHook(
   options: GenerateCustomQueryHookOptions
 ): GeneratedCustomQueryFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
+  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames, useCentralizedKeys = true } = options;
 
   const project = createProject();
   const hookName = getOperationHookName(operation.name, 'query');
@@ -76,6 +78,8 @@ export function generateCustomQueryHook(
   const resultTypeName = getOperationResultTypeName(operation.name, 'query');
   const documentConstName = getDocumentConstName(operation.name, 'query');
   const queryKeyName = getQueryKeyName(operation.name);
+  // For centralized keys, use customQueryKeys.operationName
+  const centralizedKeyRef = `customQueryKeys.${operation.name}`;
 
   // Create type tracker to collect referenced types (with table type awareness)
   const tracker = createTypeTracker({ tableTypeNames });
@@ -151,6 +155,16 @@ export function generateCustomQueryHook(
     );
   }
 
+  // Import centralized query keys
+  if (useCentralizedKeys) {
+    imports.push(
+      createImport({
+        moduleSpecifier: '../query-keys',
+        namedImports: ['customQueryKeys'],
+      })
+    );
+  }
+
   sourceFile.addImportDeclarations(imports);
 
   // Add query document constant
@@ -168,8 +182,15 @@ export function generateCustomQueryHook(
   // Add result interface
   sourceFile.addInterface(createInterface(resultTypeName, resultProps));
 
-  // Query key factory
-  if (operation.args.length > 0) {
+  // Query key factory - either re-export from centralized keys or define inline
+  if (useCentralizedKeys) {
+    // Re-export the query key function from centralized keys
+    sourceFile.addVariableStatement(
+      createConst(queryKeyName, centralizedKeyRef, {
+        docs: ['Query key factory - re-exported from query-keys.ts'],
+      })
+    );
+  } else if (operation.args.length > 0) {
     sourceFile.addVariableStatement(
       createConst(
         queryKeyName,
@@ -540,6 +561,8 @@ export interface GenerateAllCustomQueryHooksOptions {
   reactQueryEnabled?: boolean;
   /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  /** Whether to use centralized query keys from query-keys.ts (default: true) */
+  useCentralizedKeys?: boolean;
 }
 
 /**
@@ -548,7 +571,7 @@ export interface GenerateAllCustomQueryHooksOptions {
 export function generateAllCustomQueryHooks(
   options: GenerateAllCustomQueryHooksOptions
 ): GeneratedCustomQueryFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
+  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames, useCentralizedKeys = true } = options;
 
   return operations
     .filter((op) => op.kind === 'query')
@@ -560,6 +583,7 @@ export function generateAllCustomQueryHooks(
         skipQueryField,
         reactQueryEnabled,
         tableTypeNames,
+        useCentralizedKeys,
       })
     );
 }
