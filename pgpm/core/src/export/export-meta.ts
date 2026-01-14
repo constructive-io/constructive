@@ -553,7 +553,9 @@ const config: Record<string, TableConfig> = {
       actor_perm_check: 'text',
       entity_ids_by_mask: 'text',
       entity_ids_by_perm: 'text',
-      entity_ids_function: 'text'
+      entity_ids_function: 'text',
+      default_is_approved: 'boolean',
+      default_is_verified: 'boolean'
     }
   },
   permissions_module: {
@@ -846,9 +848,63 @@ const config: Record<string, TableConfig> = {
       private_schema_id: 'uuid',
       table_id: 'uuid',
       field_id: 'uuid',
+      node_type: 'text',
       data: 'jsonb',
       triggers: 'text[]',
       functions: 'text[]'
+    }
+  },
+  table_module: {
+    schema: 'metaschema_modules_public',
+    table: 'table_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      node_type: 'text',
+      data: 'jsonb',
+      fields: 'uuid[]'
+    }
+  },
+  user_profiles_module: {
+    schema: 'metaschema_modules_public',
+    table: 'user_profiles_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      users_table_id: 'uuid'
+    }
+  },
+  user_settings_module: {
+    schema: 'metaschema_modules_public',
+    table: 'user_settings_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      users_table_id: 'uuid'
+    }
+  },
+  organization_settings_module: {
+    schema: 'metaschema_modules_public',
+    table: 'organization_settings_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      entity_table_id: 'uuid',
+      membership_type: 'int'
     }
   },
   uuid_module: {
