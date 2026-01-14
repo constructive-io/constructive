@@ -1,35 +1,12 @@
 /**
- * ORM Client generator
+ * ORM Client generator (Babel AST-based)
  *
  * Generates the createClient() factory function and main client file.
- *
- * Example output:
- * ```typescript
- * import { OrmClient, OrmClientConfig } from './client';
- * import { UserModel } from './models/user';
- * import { queryOperations } from './query';
- * import { mutationOperations } from './mutation';
- *
- * export function createClient(config: OrmClientConfig) {
- *   const client = new OrmClient(config);
- *   return {
- *     user: new UserModel(client),
- *     post: new PostModel(client),
- *     query: queryOperations(client),
- *     mutation: mutationOperations(client),
- *   };
- * }
- * ```
  */
 import type { CleanTable } from '../../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-} from '../ts-ast';
-import { getTableNames, lcFirst } from '../utils';
+import * as t from '@babel/types';
+import { generateCode, commentBlock } from '../babel-ast';
+import { getTableNames, lcFirst, getGeneratedFileHeader } from '../utils';
 
 export interface GeneratedClientFile {
   fileName: string;
@@ -579,6 +556,19 @@ export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
   };
 }
 
+function createImportDeclaration(
+  moduleSpecifier: string,
+  namedImports: string[],
+  typeOnly: boolean = false
+): t.ImportDeclaration {
+  const specifiers = namedImports.map((name) =>
+    t.importSpecifier(t.identifier(name), t.identifier(name))
+  );
+  const decl = t.importDeclaration(specifiers, t.stringLiteral(moduleSpecifier));
+  decl.importKind = typeOnly ? 'type' : 'value';
+  return decl;
+}
+
 /**
  * Generate the main index.ts with createClient factory
  */
@@ -587,127 +577,149 @@ export function generateCreateClientFile(
   hasCustomQueries: boolean,
   hasCustomMutations: boolean
 ): GeneratedClientFile {
-  const project = createProject();
-  const sourceFile = createSourceFile(project, 'index.ts');
-
-  // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader('ORM Client - createClient factory') + '\n\n'
-  );
+  const statements: t.Statement[] = [];
 
   // Add imports
-  const imports = [
-    createImport({
-      moduleSpecifier: './client',
-      namedImports: ['OrmClient'],
-      typeOnlyNamedImports: ['OrmClientConfig'],
-    }),
-  ];
+  // Import OrmClient (value) and OrmClientConfig (type) separately
+  statements.push(createImportDeclaration('./client', ['OrmClient']));
+  statements.push(createImportDeclaration('./client', ['OrmClientConfig'], true));
 
   // Import models
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     const modelName = `${typeName}Model`;
     const fileName = lcFirst(typeName);
-    imports.push(
-      createImport({
-        moduleSpecifier: `./models/${fileName}`,
-        namedImports: [modelName],
-      })
-    );
+    statements.push(createImportDeclaration(`./models/${fileName}`, [modelName]));
   }
 
   // Import custom operations
   if (hasCustomQueries) {
-    imports.push(
-      createImport({
-        moduleSpecifier: './query',
-        namedImports: ['createQueryOperations'],
-      })
-    );
+    statements.push(createImportDeclaration('./query', ['createQueryOperations']));
   }
   if (hasCustomMutations) {
-    imports.push(
-      createImport({
-        moduleSpecifier: './mutation',
-        namedImports: ['createMutationOperations'],
-      })
-    );
+    statements.push(createImportDeclaration('./mutation', ['createMutationOperations']));
   }
-
-  sourceFile.addImportDeclarations(imports);
 
   // Re-export types and classes
-  sourceFile.addStatements('\n// Re-export types and classes');
-  sourceFile.addStatements(
-    "export type { OrmClientConfig, QueryResult, GraphQLError } from './client';"
-  );
-  sourceFile.addStatements("export { GraphQLRequestError } from './client';");
-  sourceFile.addStatements("export { QueryBuilder } from './query-builder';");
-  sourceFile.addStatements("export * from './select-types';");
-
-  // Generate createClient function
-  sourceFile.addStatements(
-    '\n// ============================================================================'
-  );
-  sourceFile.addStatements('// Client Factory');
-  sourceFile.addStatements(
-    '// ============================================================================\n'
-  );
-
-  // Build the return object
-  const modelEntries = tables.map((table) => {
-    const { typeName, singularName } = getTableNames(table);
-    return `${singularName}: new ${typeName}Model(client)`;
-  });
-
-  let returnObject = modelEntries.join(',\n    ');
-  if (hasCustomQueries) {
-    returnObject += ',\n    query: createQueryOperations(client)';
-  }
-  if (hasCustomMutations) {
-    returnObject += ',\n    mutation: createMutationOperations(client)';
-  }
-
-  sourceFile.addFunction({
-    name: 'createClient',
-    isExported: true,
-    parameters: [{ name: 'config', type: 'OrmClientConfig' }],
-    statements: `const client = new OrmClient(config);
-  
-  return {
-    ${returnObject},
-  };`,
-    docs: [
-      {
-        description: `Create an ORM client instance
-
-@example
-\`\`\`typescript
-const db = createClient({
-  endpoint: 'https://api.example.com/graphql',
-  headers: { Authorization: 'Bearer token' },
-});
-
-// Query users
-const users = await db.user.findMany({
-  select: { id: true, name: true },
-  first: 10,
-}).execute();
-
-// Create a user
-const newUser = await db.user.create({
-  data: { name: 'John', email: 'john@example.com' },
-  select: { id: true },
-}).execute();
-\`\`\``,
-      },
+  // export type { OrmClientConfig, QueryResult, GraphQLError } from './client';
+  const typeExportDecl = t.exportNamedDeclaration(
+    null,
+    [
+      t.exportSpecifier(t.identifier('OrmClientConfig'), t.identifier('OrmClientConfig')),
+      t.exportSpecifier(t.identifier('QueryResult'), t.identifier('QueryResult')),
+      t.exportSpecifier(t.identifier('GraphQLError'), t.identifier('GraphQLError')),
     ],
-  });
+    t.stringLiteral('./client')
+  );
+  typeExportDecl.exportKind = 'type';
+  statements.push(typeExportDecl);
+
+  // export { GraphQLRequestError } from './client';
+  statements.push(
+    t.exportNamedDeclaration(
+      null,
+      [t.exportSpecifier(t.identifier('GraphQLRequestError'), t.identifier('GraphQLRequestError'))],
+      t.stringLiteral('./client')
+    )
+  );
+
+  // export { QueryBuilder } from './query-builder';
+  statements.push(
+    t.exportNamedDeclaration(
+      null,
+      [t.exportSpecifier(t.identifier('QueryBuilder'), t.identifier('QueryBuilder'))],
+      t.stringLiteral('./query-builder')
+    )
+  );
+
+  // export * from './select-types';
+  statements.push(t.exportAllDeclaration(t.stringLiteral('./select-types')));
+
+  // Build the return object properties
+  const returnProperties: t.ObjectProperty[] = [];
+
+  for (const table of tables) {
+    const { typeName, singularName } = getTableNames(table);
+    const modelName = `${typeName}Model`;
+    returnProperties.push(
+      t.objectProperty(
+        t.identifier(singularName),
+        t.newExpression(t.identifier(modelName), [t.identifier('client')])
+      )
+    );
+  }
+
+  if (hasCustomQueries) {
+    returnProperties.push(
+      t.objectProperty(
+        t.identifier('query'),
+        t.callExpression(t.identifier('createQueryOperations'), [t.identifier('client')])
+      )
+    );
+  }
+
+  if (hasCustomMutations) {
+    returnProperties.push(
+      t.objectProperty(
+        t.identifier('mutation'),
+        t.callExpression(t.identifier('createMutationOperations'), [t.identifier('client')])
+      )
+    );
+  }
+
+  // Build the createClient function body
+  const clientDecl = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier('client'),
+      t.newExpression(t.identifier('OrmClient'), [t.identifier('config')])
+    ),
+  ]);
+
+  const returnStmt = t.returnStatement(t.objectExpression(returnProperties));
+
+  const configParam = t.identifier('config');
+  configParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClientConfig')));
+
+  const createClientFunc = t.functionDeclaration(
+    t.identifier('createClient'),
+    [configParam],
+    t.blockStatement([clientDecl, returnStmt])
+  );
+
+  // Add JSDoc comment
+  const jsdocComment = commentBlock(`*
+ * Create an ORM client instance
+ *
+ * @example
+ * \`\`\`typescript
+ * const db = createClient({
+ *   endpoint: 'https://api.example.com/graphql',
+ *   headers: { Authorization: 'Bearer token' },
+ * });
+ *
+ * // Query users
+ * const users = await db.user.findMany({
+ *   select: { id: true, name: true },
+ *   first: 10,
+ * }).execute();
+ *
+ * // Create a user
+ * const newUser = await db.user.create({
+ *   data: { name: 'John', email: 'john@example.com' },
+ *   select: { id: true },
+ * }).execute();
+ * \`\`\`
+ `);
+
+  const exportedFunc = t.exportNamedDeclaration(createClientFunc);
+  exportedFunc.leadingComments = [jsdocComment];
+  statements.push(exportedFunc);
+
+  const header = getGeneratedFileHeader('ORM Client - createClient factory');
+  const code = generateCode(statements);
 
   return {
     fileName: 'index.ts',
-    content: getFormattedOutput(sourceFile),
+    content: header + '\n' + code,
   };
 }

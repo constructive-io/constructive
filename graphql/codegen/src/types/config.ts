@@ -3,6 +3,67 @@
  */
 
 /**
+ * Entity relationship definition for cascade invalidation
+ */
+export interface EntityRelationship {
+  /** Parent entity name (e.g., 'database' for a table) */
+  parent: string;
+  /** Foreign key field name that references the parent (e.g., 'databaseId') */
+  foreignKey: string;
+  /** Optional transitive ancestors for deep invalidation (e.g., ['database', 'organization']) */
+  ancestors?: string[];
+}
+
+/**
+ * Query key generation configuration
+ */
+export interface QueryKeyConfig {
+  /**
+   * Key structure style
+   * - 'flat': Simple ['entity', 'scope', data] structure
+   * - 'hierarchical': Nested factory pattern with scope support (lukemorales-style)
+   * @default 'hierarchical'
+   */
+  style?: 'flat' | 'hierarchical';
+
+  /**
+   * Define entity relationships for cascade invalidation and scoped keys
+   * Key: child entity name (lowercase), Value: relationship definition
+   *
+   * @example
+   * ```ts
+   * relationships: {
+   *   database: { parent: 'organization', foreignKey: 'organizationId' },
+   *   table: { parent: 'database', foreignKey: 'databaseId', ancestors: ['organization'] },
+   *   field: { parent: 'table', foreignKey: 'tableId', ancestors: ['database', 'organization'] },
+   * }
+   * ```
+   */
+  relationships?: Record<string, EntityRelationship>;
+
+  /**
+   * Generate scope-aware query keys for entities with relationships
+   * When true, keys include optional scope parameters for hierarchical invalidation
+   * @default true
+   */
+  generateScopedKeys?: boolean;
+
+  /**
+   * Generate cascade invalidation helpers
+   * Creates helpers that invalidate parent entities and all their children
+   * @default true
+   */
+  generateCascadeHelpers?: boolean;
+
+  /**
+   * Generate mutation keys for tracking in-flight mutations
+   * Useful for optimistic updates and mutation deduplication
+   * @default true
+   */
+  generateMutationKeys?: boolean;
+}
+
+/**
  * Main configuration for graphql-codegen
  */
 export interface GraphQLSDKConfig {
@@ -128,6 +189,12 @@ export interface GraphQLSDKConfig {
   };
 
   /**
+   * Query key generation configuration
+   * Controls how query keys are structured for cache management
+   */
+  queryKeys?: QueryKeyConfig;
+
+  /**
    * Watch mode configuration (dev-only feature)
    * When enabled via CLI --watch flag, the CLI will poll the endpoint for schema changes
    */
@@ -178,6 +245,17 @@ export interface ResolvedWatchConfig {
 }
 
 /**
+ * Resolved query key configuration with defaults applied
+ */
+export interface ResolvedQueryKeyConfig {
+  style: 'flat' | 'hierarchical';
+  relationships: Record<string, EntityRelationship>;
+  generateScopedKeys: boolean;
+  generateCascadeHelpers: boolean;
+  generateMutationKeys: boolean;
+}
+
+/**
  * Resolved configuration with defaults applied
  */
 export interface ResolvedConfig {
@@ -223,6 +301,7 @@ export interface ResolvedConfig {
   reactQuery: {
     enabled: boolean;
   };
+  queryKeys: ResolvedQueryKeyConfig;
   watch: ResolvedWatchConfig;
 }
 
@@ -234,6 +313,17 @@ export const DEFAULT_WATCH_CONFIG: ResolvedWatchConfig = {
   debounce: 800,
   touchFile: null,
   clearScreen: true,
+};
+
+/**
+ * Default query key configuration values
+ */
+export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
+  style: 'hierarchical',
+  relationships: {},
+  generateScopedKeys: true,
+  generateCascadeHelpers: true,
+  generateMutationKeys: true,
 };
 
 /**
@@ -271,6 +361,7 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
   reactQuery: {
     enabled: true, // React Query hooks enabled by default for generate command
   },
+  queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
 
@@ -335,6 +426,13 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
       : null,
     reactQuery: {
       enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
+    },
+    queryKeys: {
+      style: config.queryKeys?.style ?? DEFAULT_QUERY_KEY_CONFIG.style,
+      relationships: config.queryKeys?.relationships ?? DEFAULT_QUERY_KEY_CONFIG.relationships,
+      generateScopedKeys: config.queryKeys?.generateScopedKeys ?? DEFAULT_QUERY_KEY_CONFIG.generateScopedKeys,
+      generateCascadeHelpers: config.queryKeys?.generateCascadeHelpers ?? DEFAULT_QUERY_KEY_CONFIG.generateCascadeHelpers,
+      generateMutationKeys: config.queryKeys?.generateMutationKeys ?? DEFAULT_QUERY_KEY_CONFIG.generateMutationKeys,
     },
     watch: {
       pollInterval:

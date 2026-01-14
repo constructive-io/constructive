@@ -1,33 +1,17 @@
 /**
- * Model class generator for ORM client
+ * Model class generator for ORM client (Babel AST-based)
  *
  * Generates per-table model classes with findMany, findFirst, create, update, delete methods.
- *
- * Example output:
- * ```typescript
- * export class UserModel {
- *   constructor(private client: OrmClient) {}
- *
- *   findMany<S extends UserSelect>(args?: FindManyArgs<S, UserWhereInput, UserOrderBy>) {
- *     return new QueryBuilder<...>({ ... });
- *   }
- *   // ...
- * }
- * ```
  */
 import type { CleanTable } from '../../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-} from '../ts-ast';
+import * as t from '@babel/types';
+import { generateCode } from '../babel-ast';
 import {
   getTableNames,
   getOrderByTypeName,
   getFilterTypeName,
   lcFirst,
+  getGeneratedFileHeader,
 } from '../utils';
 
 export interface GeneratedModelFile {
@@ -37,23 +21,85 @@ export interface GeneratedModelFile {
   tableName: string;
 }
 
-/**
- * Generate a model class file for a table
- */
+function createImportDeclaration(
+  moduleSpecifier: string,
+  namedImports: string[],
+  typeOnly: boolean = false
+): t.ImportDeclaration {
+  const specifiers = namedImports.map((name) =>
+    t.importSpecifier(t.identifier(name), t.identifier(name))
+  );
+  const decl = t.importDeclaration(specifiers, t.stringLiteral(moduleSpecifier));
+  decl.importKind = typeOnly ? 'type' : 'value';
+  return decl;
+}
+
+function buildMethodBody(
+  builderFn: string,
+  args: t.Expression[],
+  operation: string,
+  typeName: string,
+  fieldName: string
+): t.Statement[] {
+  const destructureDecl = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.objectPattern([
+        t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+        t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+      ]),
+      t.callExpression(t.identifier(builderFn), args)
+    ),
+  ]);
+
+  const returnStmt = t.returnStatement(
+    t.newExpression(t.identifier('QueryBuilder'), [
+      t.objectExpression([
+        t.objectProperty(t.identifier('client'), t.memberExpression(t.thisExpression(), t.identifier('client'))),
+        t.objectProperty(t.identifier('operation'), t.stringLiteral(operation)),
+        t.objectProperty(t.identifier('operationName'), t.stringLiteral(typeName)),
+        t.objectProperty(t.identifier('fieldName'), t.stringLiteral(fieldName)),
+        t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+        t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+      ]),
+    ])
+  );
+
+  return [destructureDecl, returnStmt];
+}
+
+function createClassMethod(
+  name: string,
+  typeParameters: t.TSTypeParameterDeclaration | null,
+  params: (t.Identifier | t.TSParameterProperty)[],
+  returnType: t.TSTypeAnnotation | null,
+  body: t.Statement[]
+): t.ClassMethod {
+  const method = t.classMethod('method', t.identifier(name), params, t.blockStatement(body));
+  method.typeParameters = typeParameters;
+  method.returnType = returnType;
+  return method;
+}
+
+function createConstTypeParam(constraintTypeName: string): t.TSTypeParameterDeclaration {
+  const param = t.tsTypeParameter(
+    t.tsTypeReference(t.identifier(constraintTypeName)),
+    null,
+    'S'
+  );
+  (param as any).const = true;
+  return t.tsTypeParameterDeclaration([param]);
+}
+
 export function generateModelFile(
   table: CleanTable,
   _useSharedTypes: boolean
 ): GeneratedModelFile {
-  const project = createProject();
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
-  // Avoid "index.ts" which clashes with barrel file
   const baseFileName = lcFirst(typeName);
-  const fileName =
-    baseFileName === 'index' ? `${baseFileName}Model.ts` : `${baseFileName}.ts`;
+  const fileName = baseFileName === 'index' ? `${baseFileName}Model.ts` : `${baseFileName}.ts`;
   const entityLower = singularName;
 
-  // Type names for this entity - use inflection from table metadata
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const whereTypeName = getFilterTypeName(table);
@@ -62,270 +108,235 @@ export function generateModelFile(
   const updateInputTypeName = `Update${typeName}Input`;
   const deleteInputTypeName = `Delete${typeName}Input`;
   const patchTypeName = `${typeName}Patch`;
-  const createDataType = `${createInputTypeName}['${singularName}']`;
 
-  // Query names from PostGraphile
   const pluralQueryName = table.query?.all ?? pluralName;
   const createMutationName = table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
 
-  const sourceFile = createSourceFile(project, fileName);
+  const statements: t.Statement[] = [];
 
-  // Add file header
-  sourceFile.insertText(
-    0,
-    createFileHeader(`${typeName} model for ORM client`) + '\n\n'
-  );
+  statements.push(createImportDeclaration('../client', ['OrmClient']));
+  statements.push(createImportDeclaration('../query-builder', [
+    'QueryBuilder', 'buildFindManyDocument', 'buildFindFirstDocument',
+    'buildCreateDocument', 'buildUpdateDocument', 'buildDeleteDocument',
+  ]));
+  statements.push(createImportDeclaration('../select-types', [
+    'ConnectionResult', 'FindManyArgs', 'FindFirstArgs', 'CreateArgs',
+    'UpdateArgs', 'DeleteArgs', 'InferSelectResult',
+  ], true));
+  statements.push(createImportDeclaration('../input-types', [
+    typeName, relationTypeName, selectTypeName, whereTypeName, orderByTypeName,
+    createInputTypeName, updateInputTypeName, patchTypeName,
+  ], true));
 
-  // Add imports - import types from respective modules
-  sourceFile.addImportDeclarations([
-    createImport({
-      moduleSpecifier: '../client',
-      namedImports: ['OrmClient'],
-    }),
-    createImport({
-      moduleSpecifier: '../query-builder',
-      namedImports: [
-        'QueryBuilder',
-        'buildFindManyDocument',
-        'buildFindFirstDocument',
-        'buildCreateDocument',
-        'buildUpdateDocument',
-        'buildDeleteDocument',
-      ],
-    }),
-    createImport({
-      moduleSpecifier: '../select-types',
-      typeOnlyNamedImports: [
-        'ConnectionResult',
-        'FindManyArgs',
-        'FindFirstArgs',
-        'CreateArgs',
-        'UpdateArgs',
-        'DeleteArgs',
-        'InferSelectResult',
-      ],
-    }),
-  ]);
-
-  // Build complete set of input-types imports
-  // Select types are now centralized in input-types.ts with relations included
-  const inputTypeImports = new Set<string>([
-    typeName,
-    relationTypeName,
-    selectTypeName,
-    whereTypeName,
-    orderByTypeName,
-    createInputTypeName,
-    updateInputTypeName,
-    patchTypeName,
-  ]);
-
-  // Add single combined import from input-types
-  sourceFile.addImportDeclaration(
-    createImport({
-      moduleSpecifier: '../input-types',
-      typeOnlyNamedImports: Array.from(inputTypeImports),
-    })
-  );
-
-  // Add Model class
-  sourceFile.addStatements(
-    '\n// ============================================================================'
-  );
-  sourceFile.addStatements('// Model Class');
-  sourceFile.addStatements(
-    '// ============================================================================\n'
-  );
-
-  // Generate the model class
-  const classDeclaration = sourceFile.addClass({
-    name: modelName,
-    isExported: true,
-  });
+  const classBody: t.ClassBody['body'] = [];
 
   // Constructor
-  classDeclaration.addConstructor({
-    parameters: [
-      {
-        name: 'client',
-        type: 'OrmClient',
-        scope: 'private' as any,
-      },
-    ],
-  });
+  const constructorParam = t.identifier('client');
+  constructorParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClient')));
+  const paramProp = t.tsParameterProperty(constructorParam);
+  paramProp.accessibility = 'private';
+  classBody.push(t.classMethod('constructor', t.identifier('constructor'), [paramProp], t.blockStatement([])));
 
-  // findMany method - uses const generic for proper literal type inference
-  classDeclaration.addMethod({
-    name: 'findMany',
-    typeParameters: [`const S extends ${selectTypeName}`],
-    parameters: [
-      {
-        name: 'args',
-        type: `FindManyArgs<S, ${whereTypeName}, ${orderByTypeName}>`,
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: `QueryBuilder<{ ${pluralQueryName}: ConnectionResult<InferSelectResult<${relationTypeName}, S>> }>`,
-    statements: `const { document, variables } = buildFindManyDocument(
-      '${typeName}',
-      '${pluralQueryName}',
-      args?.select,
-      {
-        where: args?.where,
-        orderBy: args?.orderBy as string[] | undefined,
-        first: args?.first,
-        last: args?.last,
-        after: args?.after,
-        before: args?.before,
-        offset: args?.offset,
-      },
-      '${whereTypeName}',
-      '${orderByTypeName}'
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'query',
-      operationName: '${typeName}',
-      fieldName: '${pluralQueryName}',
-      document,
-      variables,
-    });`,
-  });
+  // findMany method
+  const findManyParam = t.identifier('args');
+  findManyParam.optional = true;
+  findManyParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('FindManyArgs'), t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier(whereTypeName)),
+      t.tsTypeReference(t.identifier(orderByTypeName)),
+    ]))
+  );
+  const findManyReturnType = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
+          t.tsTypeReference(t.identifier('ConnectionResult'), t.tsTypeParameterInstantiation([
+            t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+              t.tsTypeReference(t.identifier(relationTypeName)),
+              t.tsTypeReference(t.identifier('S')),
+            ])),
+          ]))
+        )),
+      ]),
+    ]))
+  );
+  const findManyArgs = [
+    t.stringLiteral(typeName),
+    t.stringLiteral(pluralQueryName),
+    t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
+    t.objectExpression([
+      t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true)),
+      t.objectProperty(t.identifier('orderBy'), t.tsAsExpression(
+        t.optionalMemberExpression(t.identifier('args'), t.identifier('orderBy'), false, true),
+        t.tsUnionType([t.tsArrayType(t.tsStringKeyword()), t.tsUndefinedKeyword()])
+      )),
+      t.objectProperty(t.identifier('first'), t.optionalMemberExpression(t.identifier('args'), t.identifier('first'), false, true)),
+      t.objectProperty(t.identifier('last'), t.optionalMemberExpression(t.identifier('args'), t.identifier('last'), false, true)),
+      t.objectProperty(t.identifier('after'), t.optionalMemberExpression(t.identifier('args'), t.identifier('after'), false, true)),
+      t.objectProperty(t.identifier('before'), t.optionalMemberExpression(t.identifier('args'), t.identifier('before'), false, true)),
+      t.objectProperty(t.identifier('offset'), t.optionalMemberExpression(t.identifier('args'), t.identifier('offset'), false, true)),
+    ]),
+    t.stringLiteral(whereTypeName),
+    t.stringLiteral(orderByTypeName),
+  ];
+  classBody.push(createClassMethod('findMany', createConstTypeParam(selectTypeName), [findManyParam], findManyReturnType,
+    buildMethodBody('buildFindManyDocument', findManyArgs, 'query', typeName, pluralQueryName)));
 
-  // findFirst method - uses const generic for proper literal type inference
-  classDeclaration.addMethod({
-    name: 'findFirst',
-    typeParameters: [`const S extends ${selectTypeName}`],
-    parameters: [
-      {
-        name: 'args',
-        type: `FindFirstArgs<S, ${whereTypeName}>`,
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: `QueryBuilder<{ ${pluralQueryName}: { nodes: InferSelectResult<${relationTypeName}, S>[] } }>`,
-    statements: `const { document, variables } = buildFindFirstDocument(
-      '${typeName}',
-      '${pluralQueryName}',
-      args?.select,
-      { where: args?.where },
-      '${whereTypeName}'
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'query',
-      operationName: '${typeName}',
-      fieldName: '${pluralQueryName}',
-      document,
-      variables,
-    });`,
-  });
+  // findFirst method
+  const findFirstParam = t.identifier('args');
+  findFirstParam.optional = true;
+  findFirstParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('FindFirstArgs'), t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier(whereTypeName)),
+    ]))
+  );
+  const findFirstReturnType = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier('nodes'), t.tsTypeAnnotation(
+              t.tsArrayType(t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                t.tsTypeReference(t.identifier(relationTypeName)),
+                t.tsTypeReference(t.identifier('S')),
+              ])))
+            )),
+          ])
+        )),
+      ]),
+    ]))
+  );
+  const findFirstArgs = [
+    t.stringLiteral(typeName),
+    t.stringLiteral(pluralQueryName),
+    t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
+    t.objectExpression([
+      t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true)),
+    ]),
+    t.stringLiteral(whereTypeName),
+  ];
+  classBody.push(createClassMethod('findFirst', createConstTypeParam(selectTypeName), [findFirstParam], findFirstReturnType,
+    buildMethodBody('buildFindFirstDocument', findFirstArgs, 'query', typeName, pluralQueryName)));
 
-  // create method - uses const generic for proper literal type inference
-  classDeclaration.addMethod({
-    name: 'create',
-    typeParameters: [`const S extends ${selectTypeName}`],
-    parameters: [
-      {
-        name: 'args',
-        type: `CreateArgs<S, ${createDataType}>`,
-      },
-    ],
-    returnType: `QueryBuilder<{ ${createMutationName}: { ${entityLower}: InferSelectResult<${relationTypeName}, S> } }>`,
-    statements: `const { document, variables } = buildCreateDocument(
-      '${typeName}',
-      '${createMutationName}',
-      '${entityLower}',
-      args.select,
-      args.data,
-      '${createInputTypeName}'
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: '${typeName}',
-      fieldName: '${createMutationName}',
-      document,
-      variables,
-    });`,
-  });
+  // create method
+  const createParam = t.identifier('args');
+  createParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('CreateArgs'), t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier('S')),
+      t.tsIndexedAccessType(t.tsTypeReference(t.identifier(createInputTypeName)), t.tsLiteralType(t.stringLiteral(singularName))),
+    ]))
+  );
+  const createReturnType = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(t.identifier(createMutationName), t.tsTypeAnnotation(
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+              t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                t.tsTypeReference(t.identifier(relationTypeName)),
+                t.tsTypeReference(t.identifier('S')),
+              ]))
+            )),
+          ])
+        )),
+      ]),
+    ]))
+  );
+  const createArgs = [
+    t.stringLiteral(typeName),
+    t.stringLiteral(createMutationName),
+    t.stringLiteral(entityLower),
+    t.memberExpression(t.identifier('args'), t.identifier('select')),
+    t.memberExpression(t.identifier('args'), t.identifier('data')),
+    t.stringLiteral(createInputTypeName),
+  ];
+  classBody.push(createClassMethod('create', createConstTypeParam(selectTypeName), [createParam], createReturnType,
+    buildMethodBody('buildCreateDocument', createArgs, 'mutation', typeName, createMutationName)));
 
-  // update method (if available) - uses const generic for proper literal type inference
+  // update method (if available)
   if (updateMutationName) {
-    classDeclaration.addMethod({
-      name: 'update',
-      typeParameters: [`const S extends ${selectTypeName}`],
-      parameters: [
-        {
-          name: 'args',
-          type: `UpdateArgs<S, { id: string }, ${patchTypeName}>`,
-        },
-      ],
-      returnType: `QueryBuilder<{ ${updateMutationName}: { ${entityLower}: InferSelectResult<${relationTypeName}, S> } }>`,
-      statements: `const { document, variables } = buildUpdateDocument(
-      '${typeName}',
-      '${updateMutationName}',
-      '${entityLower}',
-      args.select,
-      args.where,
-      args.data,
-      '${updateInputTypeName}'
+    const updateParam = t.identifier('args');
+    updateParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier('UpdateArgs'), t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier('S')),
+        t.tsTypeLiteral([t.tsPropertySignature(t.identifier('id'), t.tsTypeAnnotation(t.tsStringKeyword()))]),
+        t.tsTypeReference(t.identifier(patchTypeName)),
+      ]))
     );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: '${typeName}',
-      fieldName: '${updateMutationName}',
-      document,
-      variables,
-    });`,
-    });
+    const updateReturnType = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+        t.tsTypeLiteral([
+          t.tsPropertySignature(t.identifier(updateMutationName), t.tsTypeAnnotation(
+            t.tsTypeLiteral([
+              t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+                t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                  t.tsTypeReference(t.identifier(relationTypeName)),
+                  t.tsTypeReference(t.identifier('S')),
+                ]))
+              )),
+            ])
+          )),
+        ]),
+      ]))
+    );
+    const updateArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(updateMutationName),
+      t.stringLiteral(entityLower),
+      t.memberExpression(t.identifier('args'), t.identifier('select')),
+      t.memberExpression(t.identifier('args'), t.identifier('where')),
+      t.memberExpression(t.identifier('args'), t.identifier('data')),
+      t.stringLiteral(updateInputTypeName),
+    ];
+    classBody.push(createClassMethod('update', createConstTypeParam(selectTypeName), [updateParam], updateReturnType,
+      buildMethodBody('buildUpdateDocument', updateArgs, 'mutation', typeName, updateMutationName)));
   }
 
   // delete method (if available)
   if (deleteMutationName) {
-    classDeclaration.addMethod({
-      name: 'delete',
-      parameters: [
-        {
-          name: 'args',
-          type: `DeleteArgs<{ id: string }>`,
-        },
-      ],
-      returnType: `QueryBuilder<{ ${deleteMutationName}: { ${entityLower}: { id: string } } }>`,
-      statements: `const { document, variables } = buildDeleteDocument(
-      '${typeName}',
-      '${deleteMutationName}',
-      '${entityLower}',
-      args.where,
-      '${deleteInputTypeName}'
+    const deleteParam = t.identifier('args');
+    deleteParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier('DeleteArgs'), t.tsTypeParameterInstantiation([
+        t.tsTypeLiteral([t.tsPropertySignature(t.identifier('id'), t.tsTypeAnnotation(t.tsStringKeyword()))]),
+      ]))
     );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: '${typeName}',
-      fieldName: '${deleteMutationName}',
-      document,
-      variables,
-    });`,
-    });
+    const deleteReturnType = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+        t.tsTypeLiteral([
+          t.tsPropertySignature(t.identifier(deleteMutationName), t.tsTypeAnnotation(
+            t.tsTypeLiteral([
+              t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+                t.tsTypeLiteral([t.tsPropertySignature(t.identifier('id'), t.tsTypeAnnotation(t.tsStringKeyword()))])
+              )),
+            ])
+          )),
+        ]),
+      ]))
+    );
+    const deleteArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(deleteMutationName),
+      t.stringLiteral(entityLower),
+      t.memberExpression(t.identifier('args'), t.identifier('where')),
+      t.stringLiteral(deleteInputTypeName),
+    ];
+    classBody.push(createClassMethod('delete', null, [deleteParam], deleteReturnType,
+      buildMethodBody('buildDeleteDocument', deleteArgs, 'mutation', typeName, deleteMutationName)));
   }
 
-  return {
-    fileName,
-    content: getFormattedOutput(sourceFile),
-    modelName,
-    tableName: table.name,
-  };
+  const classDecl = t.classDeclaration(t.identifier(modelName), null, t.classBody(classBody));
+  statements.push(t.exportNamedDeclaration(classDecl));
+
+  const header = getGeneratedFileHeader(`${typeName} model for ORM client`);
+  const code = generateCode(statements);
+
+  return { fileName, content: header + '\n' + code, modelName, tableName: table.name };
 }
 
-// Select types with relations are now generated in input-types.ts
-
-/**
- * Generate all model files for a list of tables
- */
 export function generateAllModelFiles(
   tables: CleanTable[],
   useSharedTypes: boolean

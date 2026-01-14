@@ -837,12 +837,12 @@ import { useCreateCarMutation, useCarsQuery } from './generated/hooks';
 
 function CreateCarWithInvalidation() {
   const queryClient = useQueryClient();
-  
+
   const createCar = useCreateCarMutation({
     onSuccess: () => {
       // Invalidate all car queries to refetch
       queryClient.invalidateQueries({ queryKey: ['cars'] });
-      
+
       // Or invalidate specific queries
       queryClient.invalidateQueries({ queryKey: ['cars', { first: 10 }] });
     },
@@ -851,6 +851,151 @@ function CreateCarWithInvalidation() {
   // ...
 }
 ```
+
+### Centralized Query Keys
+
+The codegen generates a centralized query key factory following the [lukemorales query-key-factory](https://tanstack.com/query/docs/framework/react/community/lukemorales-query-key-factory) pattern. This provides type-safe cache management with autocomplete support.
+
+#### Generated Files
+
+| File | Purpose |
+|------|---------|
+| `query-keys.ts` | Query key factories for all entities |
+| `mutation-keys.ts` | Mutation key factories for tracking in-flight mutations |
+| `invalidation.ts` | Type-safe cache invalidation helpers |
+
+#### Using Query Keys
+
+```tsx
+import { userKeys, invalidate } from './generated/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+
+// Query key structure
+userKeys.all                    // ['user']
+userKeys.lists()                // ['user', 'list']
+userKeys.list({ first: 10 })    // ['user', 'list', { first: 10 }]
+userKeys.details()              // ['user', 'detail']
+userKeys.detail('user-123')     // ['user', 'detail', 'user-123']
+
+// Granular cache invalidation
+const queryClient = useQueryClient();
+
+// Invalidate ALL user queries
+queryClient.invalidateQueries({ queryKey: userKeys.all });
+
+// Invalidate only list queries
+queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+
+// Invalidate a specific user
+queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+```
+
+#### Invalidation Helpers
+
+Type-safe invalidation utilities:
+
+```tsx
+import { invalidate, remove } from './generated/hooks';
+
+// Invalidate queries (triggers refetch)
+invalidate.user.all(queryClient);
+invalidate.user.lists(queryClient);
+invalidate.user.detail(queryClient, userId);
+
+// Remove from cache (for delete operations)
+remove.user(queryClient, userId);
+```
+
+#### Mutation Key Tracking
+
+Track in-flight mutations with `useIsMutating`:
+
+```tsx
+import { useIsMutating } from '@tanstack/react-query';
+import { userMutationKeys } from './generated/hooks';
+
+function UserList() {
+  // Check if any user mutations are in progress
+  const isMutating = useIsMutating({ mutationKey: userMutationKeys.all });
+
+  // Check if a specific user is being deleted
+  const isDeleting = useIsMutating({
+    mutationKey: userMutationKeys.delete(userId)
+  });
+
+  return (
+    <div>
+      {isMutating > 0 && <Spinner />}
+      <button disabled={isDeleting > 0}>Delete</button>
+    </div>
+  );
+}
+```
+
+#### Optimistic Updates with Query Keys
+
+```tsx
+import { useCreateUserMutation, userKeys } from './generated/hooks';
+
+const createUser = useCreateUserMutation({
+  onMutate: async (newUser) => {
+    // Cancel outgoing refetches
+    await queryClient.cancelQueries({ queryKey: userKeys.lists() });
+
+    // Snapshot previous value
+    const previous = queryClient.getQueryData(userKeys.list());
+
+    // Optimistically update cache
+    queryClient.setQueryData(userKeys.list(), (old) => ({
+      ...old,
+      users: {
+        ...old.users,
+        nodes: [...old.users.nodes, { id: 'temp', ...newUser.input.user }]
+      },
+    }));
+
+    return { previous };
+  },
+  onError: (err, variables, context) => {
+    // Rollback on error
+    queryClient.setQueryData(userKeys.list(), context.previous);
+  },
+  onSettled: () => {
+    // Refetch after mutation
+    queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+  },
+});
+```
+
+#### Configuration
+
+Query key generation is enabled by default. Configure in your config file:
+
+```typescript
+// graphql-sdk.config.ts
+export default defineConfig({
+  endpoint: 'https://api.example.com/graphql',
+
+  queryKeys: {
+    // Generate scope-aware keys (default: true)
+    generateScopedKeys: true,
+
+    // Generate mutation keys (default: true)
+    generateMutationKeys: true,
+
+    // Generate invalidation helpers (default: true)
+    generateCascadeHelpers: true,
+
+    // Define entity relationships for cascade invalidation
+    relationships: {
+      table: { parent: 'database', foreignKey: 'databaseId' },
+      field: { parent: 'table', foreignKey: 'tableId' },
+    },
+  },
+});
+```
+
+For detailed documentation on query key factory design and implementation, see [docs/QUERY-KEY-FACTORY.md](./docs/QUERY-KEY-FACTORY.md).
 
 ### Prefetching
 

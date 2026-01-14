@@ -28,7 +28,8 @@ import type {
   CleanOperation,
   TypeRegistry,
 } from '../../types/schema';
-import type { ResolvedConfig } from '../../types/config';
+import type { ResolvedConfig, ResolvedQueryKeyConfig } from '../../types/config';
+import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
 
 import { generateClientFile } from './client';
 import { generateTypesFile } from './types';
@@ -37,6 +38,9 @@ import { generateAllQueryHooks } from './queries';
 import { generateAllMutationHooks } from './mutations';
 import { generateAllCustomQueryHooks } from './custom-queries';
 import { generateAllCustomMutationHooks } from './custom-mutations';
+import { generateQueryKeysFile } from './query-keys';
+import { generateMutationKeysFile } from './mutation-keys';
+import { generateInvalidationFile } from './invalidation';
 import {
   generateQueriesBarrel,
   generateMutationsBarrel,
@@ -108,6 +112,11 @@ export function generate(options: GenerateOptions): GenerateResult {
   const skipQueryField = config.codegen.skipQueryField;
   const reactQueryEnabled = config.reactQuery.enabled;
 
+  // Query key configuration (use defaults if not provided)
+  const queryKeyConfig: ResolvedQueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
+  const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
+  const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
+
   // 1. Generate client.ts
   files.push({
     path: 'client.ts',
@@ -146,8 +155,56 @@ export function generate(options: GenerateOptions): GenerateResult {
     }),
   });
 
+  // 3b. Generate centralized query keys (query-keys.ts)
+  let hasQueryKeys = false;
+  if (useCentralizedKeys) {
+    const queryKeysResult = generateQueryKeysFile({
+      tables,
+      customQueries: customOperations?.queries ?? [],
+      config: queryKeyConfig,
+    });
+    files.push({
+      path: queryKeysResult.fileName,
+      content: queryKeysResult.content,
+    });
+    hasQueryKeys = true;
+  }
+
+  // 3c. Generate centralized mutation keys (mutation-keys.ts)
+  let hasMutationKeys = false;
+  if (useCentralizedKeys && queryKeyConfig.generateMutationKeys) {
+    const mutationKeysResult = generateMutationKeysFile({
+      tables,
+      customMutations: customOperations?.mutations ?? [],
+      config: queryKeyConfig,
+    });
+    files.push({
+      path: mutationKeysResult.fileName,
+      content: mutationKeysResult.content,
+    });
+    hasMutationKeys = true;
+  }
+
+  // 3d. Generate cache invalidation helpers (invalidation.ts)
+  let hasInvalidation = false;
+  if (useCentralizedKeys && queryKeyConfig.generateCascadeHelpers) {
+    const invalidationResult = generateInvalidationFile({
+      tables,
+      config: queryKeyConfig,
+    });
+    files.push({
+      path: invalidationResult.fileName,
+      content: invalidationResult.content,
+    });
+    hasInvalidation = true;
+  }
+
   // 4. Generate table-based query hooks (queries/*.ts)
-  const queryHooks = generateAllQueryHooks(tables, { reactQueryEnabled });
+  const queryHooks = generateAllQueryHooks(tables, {
+    reactQueryEnabled,
+    useCentralizedKeys,
+    hasRelationships,
+  });
   for (const hook of queryHooks) {
     files.push({
       path: `queries/${hook.fileName}`,
@@ -169,6 +226,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
+      useCentralizedKeys,
     });
 
     for (const hook of customQueryHooks) {
@@ -195,6 +253,8 @@ export function generate(options: GenerateOptions): GenerateResult {
   const mutationHooks = generateAllMutationHooks(tables, {
     reactQueryEnabled,
     enumsFromSchemaTypes: generatedEnumNames,
+    useCentralizedKeys,
+    hasRelationships,
   });
   for (const hook of mutationHooks) {
     files.push({
@@ -217,6 +277,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
+      useCentralizedKeys,
     });
 
     for (const hook of customMutationHooks) {
@@ -247,7 +308,13 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 9. Generate main index.ts barrel (with schema-types if present)
   files.push({
     path: 'index.ts',
-    content: generateMainBarrel(tables, { hasSchemaTypes, hasMutations }),
+    content: generateMainBarrel(tables, {
+      hasSchemaTypes,
+      hasMutations,
+      hasQueryKeys,
+      hasMutationKeys,
+      hasInvalidation,
+    }),
   });
 
   return {
@@ -295,3 +362,6 @@ export {
   generateCustomQueriesBarrel,
   generateCustomMutationsBarrel,
 } from './barrel';
+export { generateQueryKeysFile } from './query-keys';
+export { generateMutationKeysFile } from './mutation-keys';
+export { generateInvalidationFile } from './invalidation';

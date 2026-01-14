@@ -183,7 +183,7 @@ async function main() {
       TablesQueryResult,
       TablesQueryVariables
     >(tablesQueryDocument, {
-      first: 5,
+      first: 10,
       filter: tableFilter,
       orderBy: ['NAME_ASC'],
     });

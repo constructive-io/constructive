@@ -23,6 +23,7 @@ export const SCALAR_TS_MAP: Record<string, string> = {
   // Geometry types
   GeoJSON: 'unknown',
   Geometry: 'unknown',
+  GeometryPoint: 'unknown',
   Point: 'unknown',
 
   // Interval
