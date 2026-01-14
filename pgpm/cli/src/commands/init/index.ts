@@ -45,6 +45,7 @@ Examples:
   ${binaryName} init                                   Initialize new module (default)
   ${binaryName} init workspace                         Initialize new workspace
   ${binaryName} init module                            Initialize new module explicitly
+  ${binaryName} init function                          Initialize new cloud function
   ${binaryName} init workspace --dir <variant>         Use variant templates
   ${binaryName} init --boilerplate                     Select from available boilerplates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
@@ -90,7 +91,13 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   }
 
   // Regular init path: default to 'module' if no fromPath provided
-  const fromPath = positionalFromPath || 'module';
+  let fromPath = positionalFromPath || 'module';
+
+  // Alias 'function' to 'function-template' for better UX match with folder structure
+  if (fromPath === 'function') {
+    fromPath = 'function-template';
+  }
+
   // Track if user explicitly requested module (e.g., `pgpm init module`)
   const wasExplicitModuleRequest = positionalFromPath === 'module';
 
@@ -109,6 +116,17 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   // Branch based on template type
   if (templateType === 'workspace') {
     return handleWorkspaceInit(argv, prompter, {
+      fromPath,
+      templateRepo,
+      branch,
+      dir,
+      noTty,
+      cwd,
+    });
+  }
+
+  if (templateType === 'function') {
+    return handleFunctionInit(argv, prompter, {
       fromPath,
       templateRepo,
       branch,
@@ -412,8 +430,8 @@ async function handleModuleInit(
 
   const extensions = isPgpmTemplate && answers.extensions
     ? answers.extensions
-        .filter((opt: OptionValue) => opt.selected)
-        .map((opt: OptionValue) => opt.name)
+      .filter((opt: OptionValue) => opt.selected)
+      .map((opt: OptionValue) => opt.name)
     : [];
 
   const templateAnswers = {
@@ -483,4 +501,64 @@ async function handleModuleInit(
   process.stdout.write(`\n✨ Enjoy!\n\ncd ./${modName}\n`);
 
   return { ...argv, ...answers };
+}
+
+async function handleFunctionInit(
+  argv: Partial<Record<string, any>>,
+  prompter: Inquirerer,
+  ctx: InitContext
+) {
+  const functionQuestions: Question[] = [
+    {
+      name: 'functionName',
+      message: 'Enter function name',
+      required: true,
+      type: 'text'
+    }
+  ];
+
+  const answers = await prompter.prompt(argv, functionQuestions);
+  const targetPath = path.join(ctx.cwd, sluggify(answers.functionName));
+
+  var params = {
+    ...argv,
+    ...answers,
+    ____functionName____: answers.functionName,
+    ____functionDesc____: argv.functionDesc || argv.____functionDesc____ || 'Default Description',
+    ____author____: argv.author || argv.____author____ || 'Constructive',
+    // Workaround mappings
+    functionName_: answers.functionName,
+    functionDesc: argv.functionDesc || argv.____functionDesc____ || 'Default Description',
+    author: argv.author || argv.____author____ || 'Constructive'
+  };
+
+  await scaffoldTemplate({
+    fromPath: ctx.fromPath,
+    outputDir: targetPath,
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    answers: params,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    noTty: ctx.noTty,
+    cwd: ctx.cwd,
+    prompter
+  });
+
+  await scaffoldTemplate({
+    fromPath: 'handler',
+    outputDir: targetPath,
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    dir: ctx.dir,
+    answers: params,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    noTty: ctx.noTty,
+    cwd: ctx.cwd,
+    prompter
+  });
+
+  process.stdout.write(`\n✨ Function created at ${targetPath}\n`);
+
+  return { ...argv, ...answers, cwd: targetPath };
 }
