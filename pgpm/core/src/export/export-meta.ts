@@ -553,12 +553,10 @@ const config: Record<string, TableConfig> = {
       actor_perm_check: 'text',
       entity_ids_by_mask: 'text',
       entity_ids_by_perm: 'text',
-      entity_ids_function: 'text',
-      default_is_approved: 'boolean',
-      default_is_verified: 'boolean'
+      entity_ids_function: 'text'
     }
   },
-  permissions_module: {
+  permissions_module:{
     schema: 'metaschema_modules_public',
     table: 'permissions_module',
     fields: {
