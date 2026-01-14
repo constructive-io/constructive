@@ -880,46 +880,6 @@ const config: Record<string, TableConfig> = {
       data: 'jsonb'
     }
   },
-  user_profiles_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_profiles_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      table_name: 'text',
-      users_table_id: 'uuid'
-    }
-  },
-  user_settings_module: {
-    schema: 'metaschema_modules_public',
-    table: 'user_settings_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      table_name: 'text',
-      users_table_id: 'uuid'
-    }
-  },
-  organization_settings_module: {
-    schema: 'metaschema_modules_public',
-    table: 'organization_settings_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      table_name: 'text',
-      entity_table_id: 'uuid',
-      membership_type: 'int'
-    }
-  },
   uuid_module: {
     schema: 'metaschema_modules_public',
     table: 'uuid_module',
