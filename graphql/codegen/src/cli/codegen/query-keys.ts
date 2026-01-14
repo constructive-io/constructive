@@ -4,11 +4,36 @@
  * Generates centralized query keys following the lukemorales query-key-factory pattern.
  * Supports hierarchical scoped keys for parent-child entity relationships.
  *
+ * Uses Babel AST for code generation - no string concatenation.
+ *
  * @see https://tanstack.com/query/docs/framework/react/community/lukemorales-query-key-factory
  */
+import * as t from '@babel/types';
+
 import type { CleanTable, CleanOperation } from '../../types/schema';
 import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
+import {
+  generateCode,
+  addJSDocComment,
+  asConst,
+  constArray,
+  spread,
+  member,
+  call,
+  typedParam,
+  stringOrNumberType,
+  objectType,
+  typeRef,
+  arrow,
+  objectProp,
+  exportConst,
+  exportType,
+  ifStmt,
+  returnStmt,
+  block,
+  keyofTypeof,
+} from './babel-ast';
 
 export interface QueryKeyGeneratorOptions {
   tables: CleanTable[];
@@ -31,12 +56,10 @@ function getAncestors(
   const relationship = relationships[entityName.toLowerCase()];
   if (!relationship) return [];
 
-  // Use explicit ancestors if defined, otherwise traverse parent chain
   if (relationship.ancestors && relationship.ancestors.length > 0) {
     return relationship.ancestors;
   }
 
-  // Build ancestor chain by following parent relationships
   const ancestors: string[] = [];
   let current = relationship.parent;
   while (current) {
@@ -48,12 +71,12 @@ function getAncestors(
 }
 
 /**
- * Generate scope type for an entity
+ * Generate scope type declaration for an entity
  */
-function generateScopeType(
+function generateScopeTypeDeclaration(
   entityName: string,
   relationships: Record<string, EntityRelationship>
-): { typeName: string; typeDefinition: string } | null {
+): t.ExportNamedDeclaration | null {
   const relationship = relationships[entityName.toLowerCase()];
   if (!relationship) return null;
 
@@ -61,14 +84,14 @@ function generateScopeType(
   const allParents = [relationship.parent, ...ancestors];
 
   const typeName = `${ucFirst(entityName)}Scope`;
-  const fields = allParents.map((parent) => {
+  const members: t.TSPropertySignature[] = [];
+
+  for (const parent of allParents) {
     const rel = relationships[entityName.toLowerCase()];
-    // Find the foreign key for this parent
     let fkField = `${lcFirst(parent)}Id`;
     if (rel && rel.parent === parent) {
       fkField = rel.foreignKey;
     } else {
-      // Check if any ancestor has a direct relationship
       const directRel = Object.entries(relationships).find(
         ([, r]) => r.parent === parent
       );
@@ -76,21 +99,288 @@ function generateScopeType(
         fkField = directRel[1].foreignKey;
       }
     }
-    return `${fkField}?: string`;
-  });
 
-  const typeDefinition = `export type ${typeName} = { ${fields.join('; ')} };`;
-  return { typeName, typeDefinition };
+    const signature = t.tsPropertySignature(
+      t.identifier(fkField),
+      t.tsTypeAnnotation(t.tsStringKeyword())
+    );
+    signature.optional = true;
+    members.push(signature);
+  }
+
+  return exportType(typeName, t.tsTypeLiteral(members));
 }
 
 /**
- * Generate query keys for a single table entity
+ * Build the 'all' property: all: ['entityKey'] as const
  */
-function generateEntityKeys(
+function buildAllProperty(entityKey: string, singularName: string): t.ObjectProperty {
+  const prop = objectProp(
+    'all',
+    constArray([t.stringLiteral(entityKey)])
+  );
+  addJSDocComment(prop, [`All ${singularName} queries`]);
+  return prop;
+}
+
+/**
+ * Build a byParent property for scoped keys
+ */
+function buildByParentProperty(
+  entityKey: string,
+  typeName: string,
+  parent: string,
+  fkField: string
+): t.ObjectProperty {
+  const parentUpper = ucFirst(parent);
+  const parentLower = lcFirst(parent);
+
+  const prop = objectProp(
+    `by${parentUpper}`,
+    arrow(
+      [typedParam(fkField, t.tsStringKeyword())],
+      constArray([
+        t.stringLiteral(entityKey),
+        t.objectExpression([
+          t.objectProperty(t.identifier(fkField), t.identifier(fkField), false, true)
+        ])
+      ])
+    )
+  );
+  addJSDocComment(prop, [`${typeName} queries scoped to a specific ${parentLower}`]);
+  return prop;
+}
+
+/**
+ * Build the scoped helper function property
+ */
+function buildScopedProperty(
+  keysName: string,
+  typeName: string,
+  relationship: EntityRelationship,
+  ancestors: string[]
+): t.ObjectProperty {
+  const scopeTypeName = `${typeName}Scope`;
+  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+
+  const statements: t.Statement[] = [];
+
+  if (relationship.parent) {
+    statements.push(
+      ifStmt(
+        t.optionalMemberExpression(
+          t.identifier('scope'),
+          t.identifier(relationship.foreignKey),
+          false,
+          true
+        ),
+        returnStmt(
+          call(
+            member(keysName, `by${ucFirst(relationship.parent)}`),
+            [member('scope', relationship.foreignKey)]
+          )
+        )
+      )
+    );
+  }
+
+  for (const ancestor of ancestors) {
+    const ancestorLower = lcFirst(ancestor);
+    const fkField = `${ancestorLower}Id`;
+    statements.push(
+      ifStmt(
+        t.optionalMemberExpression(
+          t.identifier('scope'),
+          t.identifier(fkField),
+          false,
+          true
+        ),
+        returnStmt(
+          call(
+            member(keysName, `by${ucFirst(ancestor)}`),
+            [member('scope', fkField)]
+          )
+        )
+      )
+    );
+  }
+
+  statements.push(returnStmt(member(keysName, 'all')));
+
+  const prop = objectProp(
+    'scoped',
+    arrow([scopeParam], block(statements))
+  );
+  addJSDocComment(prop, ['Get scope-aware base key']);
+  return prop;
+}
+
+/**
+ * Build lists property (scoped version)
+ */
+function buildScopedListsProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
+  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+
+  const prop = objectProp(
+    'lists',
+    arrow(
+      [scopeParam],
+      constArray([
+        spread(call(member(keysName, 'scoped'), [t.identifier('scope')])),
+        t.stringLiteral('list')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['List query keys (optionally scoped)']);
+  return prop;
+}
+
+/**
+ * Build list property (scoped version)
+ */
+function buildScopedListProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
+  const variablesParam = typedParam('variables', objectType(), true);
+  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+
+  const prop = objectProp(
+    'list',
+    arrow(
+      [variablesParam, scopeParam],
+      constArray([
+        spread(call(member(keysName, 'lists'), [t.identifier('scope')])),
+        t.identifier('variables')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['List query key with variables']);
+  return prop;
+}
+
+/**
+ * Build details property (scoped version)
+ */
+function buildScopedDetailsProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
+  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+
+  const prop = objectProp(
+    'details',
+    arrow(
+      [scopeParam],
+      constArray([
+        spread(call(member(keysName, 'scoped'), [t.identifier('scope')])),
+        t.stringLiteral('detail')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['Detail query keys (optionally scoped)']);
+  return prop;
+}
+
+/**
+ * Build detail property (scoped version)
+ */
+function buildScopedDetailProperty(keysName: string, scopeTypeName: string): t.ObjectProperty {
+  const idParam = typedParam('id', stringOrNumberType());
+  const scopeParam = typedParam('scope', typeRef(scopeTypeName), true);
+
+  const prop = objectProp(
+    'detail',
+    arrow(
+      [idParam, scopeParam],
+      constArray([
+        spread(call(member(keysName, 'details'), [t.identifier('scope')])),
+        t.identifier('id')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['Detail query key for specific item']);
+  return prop;
+}
+
+/**
+ * Build simple (non-scoped) lists property
+ */
+function buildSimpleListsProperty(keysName: string): t.ObjectProperty {
+  const prop = objectProp(
+    'lists',
+    arrow(
+      [],
+      constArray([
+        spread(member(keysName, 'all')),
+        t.stringLiteral('list')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['List query keys']);
+  return prop;
+}
+
+/**
+ * Build simple (non-scoped) list property
+ */
+function buildSimpleListProperty(keysName: string): t.ObjectProperty {
+  const variablesParam = typedParam('variables', objectType(), true);
+
+  const prop = objectProp(
+    'list',
+    arrow(
+      [variablesParam],
+      constArray([
+        spread(call(member(keysName, 'lists'), [])),
+        t.identifier('variables')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['List query key with variables']);
+  return prop;
+}
+
+/**
+ * Build simple (non-scoped) details property
+ */
+function buildSimpleDetailsProperty(keysName: string): t.ObjectProperty {
+  const prop = objectProp(
+    'details',
+    arrow(
+      [],
+      constArray([
+        spread(member(keysName, 'all')),
+        t.stringLiteral('detail')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['Detail query keys']);
+  return prop;
+}
+
+/**
+ * Build simple (non-scoped) detail property
+ */
+function buildSimpleDetailProperty(keysName: string): t.ObjectProperty {
+  const idParam = typedParam('id', stringOrNumberType());
+
+  const prop = objectProp(
+    'detail',
+    arrow(
+      [idParam],
+      constArray([
+        spread(call(member(keysName, 'details'), [])),
+        t.identifier('id')
+      ])
+    )
+  );
+  addJSDocComment(prop, ['Detail query key for specific item']);
+  return prop;
+}
+
+/**
+ * Generate query keys declaration for a single table entity
+ */
+function generateEntityKeysDeclaration(
   table: CleanTable,
   relationships: Record<string, EntityRelationship>,
   generateScopedKeys: boolean
-): string {
+): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
   const keysName = `${lcFirst(typeName)}Keys`;
@@ -98,114 +388,48 @@ function generateEntityKeys(
   const relationship = relationships[entityKey];
   const hasRelationship = !!relationship && generateScopedKeys;
 
-  const lines: string[] = [];
+  const properties: t.ObjectProperty[] = [];
 
-  lines.push(`export const ${keysName} = {`);
-  lines.push(`  /** All ${singularName} queries */`);
-  lines.push(`  all: ['${entityKey}'] as const,`);
+  properties.push(buildAllProperty(entityKey, singularName));
 
   if (hasRelationship) {
-    // Generate scope factories for parent relationships
     const ancestors = getAncestors(typeName, relationships);
     const allParents = [relationship.parent, ...ancestors];
 
-    // Add scope factories for each parent level
     for (const parent of allParents) {
-      const parentUpper = ucFirst(parent);
-      const parentLower = lcFirst(parent);
-      let fkField = `${parentLower}Id`;
-
-      // Try to find the correct foreign key
+      let fkField = `${lcFirst(parent)}Id`;
       if (relationship.parent === parent) {
         fkField = relationship.foreignKey;
       }
-
-      lines.push(``);
-      lines.push(`  /** ${typeName} queries scoped to a specific ${parentLower} */`);
-      lines.push(`  by${parentUpper}: (${fkField}: string) =>`);
-      lines.push(`    ['${entityKey}', { ${fkField} }] as const,`);
+      properties.push(buildByParentProperty(entityKey, typeName, parent, fkField));
     }
 
-    // Scoped helper function
+    properties.push(buildScopedProperty(keysName, typeName, relationship, ancestors));
+
     const scopeTypeName = `${typeName}Scope`;
-    lines.push(``);
-    lines.push(`  /** Get scope-aware base key */`);
-    lines.push(`  scoped: (scope?: ${scopeTypeName}) => {`);
-
-    // Generate scope resolution logic (most specific first)
-    const scopeChecks: string[] = [];
-    if (relationship.parent) {
-      scopeChecks.push(
-        `    if (scope?.${relationship.foreignKey}) return ${keysName}.by${ucFirst(relationship.parent)}(scope.${relationship.foreignKey});`
-      );
-    }
-    for (const ancestor of ancestors) {
-      const ancestorLower = lcFirst(ancestor);
-      const fkField = `${ancestorLower}Id`;
-      scopeChecks.push(
-        `    if (scope?.${fkField}) return ${keysName}.by${ucFirst(ancestor)}(scope.${fkField});`
-      );
-    }
-
-    lines.push(...scopeChecks);
-    lines.push(`    return ${keysName}.all;`);
-    lines.push(`  },`);
-
-    // Lists with scope
-    lines.push(``);
-    lines.push(`  /** List query keys (optionally scoped) */`);
-    lines.push(`  lists: (scope?: ${scopeTypeName}) =>`);
-    lines.push(`    [...${keysName}.scoped(scope), 'list'] as const,`);
-
-    lines.push(``);
-    lines.push(`  /** List query key with variables */`);
-    lines.push(`  list: (variables?: object, scope?: ${scopeTypeName}) =>`);
-    lines.push(`    [...${keysName}.lists(scope), variables] as const,`);
-
-    // Details with scope
-    lines.push(``);
-    lines.push(`  /** Detail query keys (optionally scoped) */`);
-    lines.push(`  details: (scope?: ${scopeTypeName}) =>`);
-    lines.push(`    [...${keysName}.scoped(scope), 'detail'] as const,`);
-
-    lines.push(``);
-    lines.push(`  /** Detail query key for specific item */`);
-    lines.push(`  detail: (id: string | number, scope?: ${scopeTypeName}) =>`);
-    lines.push(`    [...${keysName}.details(scope), id] as const,`);
+    properties.push(buildScopedListsProperty(keysName, scopeTypeName));
+    properties.push(buildScopedListProperty(keysName, scopeTypeName));
+    properties.push(buildScopedDetailsProperty(keysName, scopeTypeName));
+    properties.push(buildScopedDetailProperty(keysName, scopeTypeName));
   } else {
-    // Simple non-scoped keys
-    lines.push(``);
-    lines.push(`  /** List query keys */`);
-    lines.push(`  lists: () => [...${keysName}.all, 'list'] as const,`);
-
-    lines.push(``);
-    lines.push(`  /** List query key with variables */`);
-    lines.push(`  list: (variables?: object) =>`);
-    lines.push(`    [...${keysName}.lists(), variables] as const,`);
-
-    lines.push(``);
-    lines.push(`  /** Detail query keys */`);
-    lines.push(`  details: () => [...${keysName}.all, 'detail'] as const,`);
-
-    lines.push(``);
-    lines.push(`  /** Detail query key for specific item */`);
-    lines.push(`  detail: (id: string | number) =>`);
-    lines.push(`    [...${keysName}.details(), id] as const,`);
+    properties.push(buildSimpleListsProperty(keysName));
+    properties.push(buildSimpleListProperty(keysName));
+    properties.push(buildSimpleDetailsProperty(keysName));
+    properties.push(buildSimpleDetailProperty(keysName));
   }
 
-  lines.push(`} as const;`);
-
-  return lines.join('\n');
+  return exportConst(keysName, asConst(t.objectExpression(properties)));
 }
 
 /**
- * Generate query keys for custom operations (non-table queries)
+ * Generate query keys declaration for custom operations
  */
-function generateCustomQueryKeys(operations: CleanOperation[]): string {
-  if (operations.length === 0) return '';
+function generateCustomQueryKeysDeclaration(
+  operations: CleanOperation[]
+): t.ExportNamedDeclaration | null {
+  if (operations.length === 0) return null;
 
-  const lines: string[] = [];
-  lines.push(`export const customQueryKeys = {`);
+  const properties: t.ObjectProperty[] = [];
 
   for (const op of operations) {
     const hasArgs = op.args.length > 0;
@@ -213,69 +437,76 @@ function generateCustomQueryKeys(operations: CleanOperation[]): string {
       (arg) => arg.type.kind === 'NON_NULL'
     );
 
+    let prop: t.ObjectProperty;
+
     if (hasArgs) {
-      const argsType = hasRequiredArgs ? 'object' : 'object | undefined';
-      lines.push(`  /** Query key for ${op.name} */`);
-      lines.push(`  ${op.name}: (variables${hasRequiredArgs ? '' : '?'}: ${argsType}) =>`);
-      lines.push(`    ['${op.name}', variables] as const,`);
+      const variablesParam = typedParam('variables', objectType(), !hasRequiredArgs);
+
+      prop = objectProp(
+        op.name,
+        arrow(
+          [variablesParam],
+          constArray([t.stringLiteral(op.name), t.identifier('variables')])
+        )
+      );
     } else {
-      lines.push(`  /** Query key for ${op.name} */`);
-      lines.push(`  ${op.name}: () => ['${op.name}'] as const,`);
+      prop = objectProp(
+        op.name,
+        arrow([], constArray([t.stringLiteral(op.name)]))
+      );
     }
-    lines.push(``);
+
+    addJSDocComment(prop, [`Query key for ${op.name}`]);
+    properties.push(prop);
   }
 
-  // Remove trailing empty line
-  if (lines[lines.length - 1] === '') {
-    lines.pop();
-  }
-
-  lines.push(`} as const;`);
-
-  return lines.join('\n');
+  return exportConst('customQueryKeys', asConst(t.objectExpression(properties)));
 }
 
 /**
- * Generate the unified query keys store object
+ * Generate the unified query keys store declaration
  */
-function generateUnifiedStore(
+function generateUnifiedStoreDeclaration(
   tables: CleanTable[],
   hasCustomQueries: boolean
-): string {
-  const lines: string[] = [];
-
-  lines.push(`/**`);
-  lines.push(` * Unified query key store`);
-  lines.push(` *`);
-  lines.push(` * Use this for type-safe query key access across your application.`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`ts`);
-  lines.push(` * // Invalidate all user queries`);
-  lines.push(` * queryClient.invalidateQueries({ queryKey: queryKeys.user.all });`);
-  lines.push(` *`);
-  lines.push(` * // Invalidate user list queries`);
-  lines.push(` * queryClient.invalidateQueries({ queryKey: queryKeys.user.lists() });`);
-  lines.push(` *`);
-  lines.push(` * // Invalidate specific user`);
-  lines.push(` * queryClient.invalidateQueries({ queryKey: queryKeys.user.detail(userId) });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  lines.push(`export const queryKeys = {`);
+): t.ExportNamedDeclaration {
+  const properties: t.ObjectProperty[] = [];
 
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     const keysName = `${lcFirst(typeName)}Keys`;
-    lines.push(`  ${lcFirst(typeName)}: ${keysName},`);
+    properties.push(
+      t.objectProperty(t.identifier(lcFirst(typeName)), t.identifier(keysName))
+    );
   }
 
   if (hasCustomQueries) {
-    lines.push(`  custom: customQueryKeys,`);
+    properties.push(
+      t.objectProperty(t.identifier('custom'), t.identifier('customQueryKeys'))
+    );
   }
 
-  lines.push(`} as const;`);
+  const decl = exportConst('queryKeys', asConst(t.objectExpression(properties)));
 
-  return lines.join('\n');
+  addJSDocComment(decl, [
+    'Unified query key store',
+    '',
+    'Use this for type-safe query key access across your application.',
+    '',
+    '@example',
+    '```ts',
+    '// Invalidate all user queries',
+    'queryClient.invalidateQueries({ queryKey: queryKeys.user.all });',
+    '',
+    '// Invalidate user list queries',
+    'queryClient.invalidateQueries({ queryKey: queryKeys.user.lists() });',
+    '',
+    '// Invalidate specific user',
+    'queryClient.invalidateQueries({ queryKey: queryKeys.user.detail(userId) });',
+    '```',
+  ]);
+
+  return decl;
 }
 
 /**
@@ -287,89 +518,141 @@ export function generateQueryKeysFile(
   const { tables, customQueries, config } = options;
   const { relationships, generateScopedKeys } = config;
 
-  const lines: string[] = [];
-
-  // File header
-  lines.push(getGeneratedFileHeader('Centralized query key factory'));
-  lines.push(``);
-
-  // Imports
-  lines.push(`// ============================================================================`);
-  lines.push(`// This file provides a centralized, type-safe query key factory following`);
-  lines.push(`// the lukemorales query-key-factory pattern for React Query.`);
-  lines.push(`//`);
-  lines.push(`// Benefits:`);
-  lines.push(`// - Single source of truth for all query keys`);
-  lines.push(`// - Type-safe key access with autocomplete`);
-  lines.push(`// - Hierarchical invalidation (invalidate all 'user.*' queries)`);
-  lines.push(`// - Scoped keys for parent-child relationships`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
+  const statements: t.Statement[] = [];
 
   // Generate scope types for entities with relationships
   if (generateScopedKeys && Object.keys(relationships).length > 0) {
-    lines.push(`// ============================================================================`);
-    lines.push(`// Scope Types`);
-    lines.push(`// ============================================================================`);
-    lines.push(``);
-
     const generatedScopes = new Set<string>();
     for (const table of tables) {
       const { typeName } = getTableNames(table);
-      const scopeType = generateScopeType(typeName, relationships);
-      if (scopeType && !generatedScopes.has(scopeType.typeName)) {
-        lines.push(scopeType.typeDefinition);
-        generatedScopes.add(scopeType.typeName);
+      const scopeTypeName = `${typeName}Scope`;
+      if (!generatedScopes.has(scopeTypeName)) {
+        const scopeType = generateScopeTypeDeclaration(typeName, relationships);
+        if (scopeType) {
+          statements.push(scopeType);
+          generatedScopes.add(scopeTypeName);
+        }
       }
-    }
-
-    if (generatedScopes.size > 0) {
-      lines.push(``);
     }
   }
 
   // Generate entity keys
-  lines.push(`// ============================================================================`);
-  lines.push(`// Entity Query Keys`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
-
-  for (let i = 0; i < tables.length; i++) {
-    const table = tables[i];
-    lines.push(generateEntityKeys(table, relationships, generateScopedKeys));
-    if (i < tables.length - 1) {
-      lines.push(``);
-    }
+  for (const table of tables) {
+    statements.push(generateEntityKeysDeclaration(table, relationships, generateScopedKeys));
   }
 
   // Generate custom query keys
   const queryOperations = customQueries.filter((op) => op.kind === 'query');
-  if (queryOperations.length > 0) {
-    lines.push(``);
-    lines.push(`// ============================================================================`);
-    lines.push(`// Custom Query Keys`);
-    lines.push(`// ============================================================================`);
-    lines.push(``);
-    lines.push(generateCustomQueryKeys(queryOperations));
+  const customKeysDecl = generateCustomQueryKeysDeclaration(queryOperations);
+  if (customKeysDecl) {
+    statements.push(customKeysDecl);
   }
 
   // Generate unified store
-  lines.push(``);
-  lines.push(`// ============================================================================`);
-  lines.push(`// Unified Query Key Store`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
-  lines.push(generateUnifiedStore(tables, queryOperations.length > 0));
+  statements.push(generateUnifiedStoreDeclaration(tables, queryOperations.length > 0));
 
-  // Export type for query key scope
-  lines.push(``);
-  lines.push(`/** Type representing all available query key scopes */`);
-  lines.push(`export type QueryKeyScope = keyof typeof queryKeys;`);
+  // Generate QueryKeyScope type
+  const scopeTypeDecl = exportType('QueryKeyScope', keyofTypeof('queryKeys'));
+  addJSDocComment(scopeTypeDecl, ['Type representing all available query key scopes']);
+  statements.push(scopeTypeDecl);
 
-  lines.push(``);
+  // Generate code from AST
+  const code = generateCode(statements);
+
+  // Build final content with header and section comments
+  const header = getGeneratedFileHeader('Centralized query key factory');
+  const description = `// ============================================================================
+// This file provides a centralized, type-safe query key factory following
+// the lukemorales query-key-factory pattern for React Query.
+//
+// Benefits:
+// - Single source of truth for all query keys
+// - Type-safe key access with autocomplete
+// - Hierarchical invalidation (invalidate all 'user.*' queries)
+// - Scoped keys for parent-child relationships
+// ============================================================================`;
+
+  let content = `${header}
+
+${description}
+
+`;
+
+  // Add scope types section if present
+  if (generateScopedKeys && Object.keys(relationships).length > 0) {
+    const hasScopes = tables.some(table => {
+      const { typeName } = getTableNames(table);
+      return !!relationships[typeName.toLowerCase()];
+    });
+    if (hasScopes) {
+      content += `// ============================================================================
+// Scope Types
+// ============================================================================
+
+`;
+    }
+  }
+
+  // Insert section comments into the generated code
+  const codeLines = code.split('\n');
+  let inScopeTypes = generateScopedKeys && Object.keys(relationships).length > 0;
+  let addedEntitySection = false;
+  let addedCustomSection = false;
+  let addedUnifiedSection = false;
+
+  for (let i = 0; i < codeLines.length; i++) {
+    const line = codeLines[i];
+
+    // Detect transition from scope types to entity keys
+    if (inScopeTypes && line.startsWith('export const') && line.includes('Keys =')) {
+      content += `// ============================================================================
+// Entity Query Keys
+// ============================================================================
+
+`;
+      inScopeTypes = false;
+      addedEntitySection = true;
+    }
+
+    // Detect custom query keys section
+    if (!addedCustomSection && line.startsWith('export const customQueryKeys')) {
+      content += `
+// ============================================================================
+// Custom Query Keys
+// ============================================================================
+
+`;
+      addedCustomSection = true;
+    }
+
+    // Detect unified store section
+    if (!addedUnifiedSection && line.includes('* Unified query key store')) {
+      content += `
+// ============================================================================
+// Unified Query Key Store
+// ============================================================================
+
+`;
+      addedUnifiedSection = true;
+    }
+
+    content += line + '\n';
+  }
+
+  // If no scope types, add entity section at the beginning
+  if (!addedEntitySection && !inScopeTypes) {
+    const firstExportIndex = content.indexOf('\nexport const');
+    if (firstExportIndex !== -1) {
+      content = content.slice(0, firstExportIndex) + `
+// ============================================================================
+// Entity Query Keys
+// ============================================================================
+` + content.slice(firstExportIndex);
+    }
+  }
 
   return {
     fileName: 'query-keys.ts',
-    content: lines.join('\n'),
+    content,
   };
 }

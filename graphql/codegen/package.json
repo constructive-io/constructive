@@ -49,6 +49,8 @@
     "example:orm": "tsx examples/orm-sdk.ts"
   },
   "dependencies": {
+    "@babel/generator": "^7.28.5",
+    "@babel/types": "^7.28.5",
     "ajv": "^8.17.1",
     "commander": "^12.1.0",
     "gql-ast": "workspace:^",
@@ -72,6 +74,7 @@
   },
   "devDependencies": {
     "@tanstack/react-query": "^5.90.16",
+    "@types/babel__generator": "^7.27.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.19.27",
     "@types/react": "^19.2.7",

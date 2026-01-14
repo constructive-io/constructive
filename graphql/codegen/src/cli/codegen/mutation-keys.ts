@@ -10,6 +10,20 @@
 import type { CleanTable, CleanOperation } from '../../types/schema';
 import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, lcFirst } from './utils';
+import {
+  t,
+  generateCode,
+  addJSDocComment,
+  asConst,
+  constArray,
+  arrow,
+  objectProp,
+  exportConst,
+  typedParam,
+  stringOrNumberType,
+  ternary,
+  shorthandObject,
+} from './babel-ast';
 
 export interface MutationKeyGeneratorOptions {
   tables: CleanTable[];
@@ -23,130 +37,199 @@ export interface GeneratedMutationKeysFile {
 }
 
 /**
- * Generate mutation keys for a single table entity
+ * Generate mutation keys declaration for a single table entity
  */
-function generateEntityMutationKeys(
+function generateEntityMutationKeysDeclaration(
   table: CleanTable,
   relationships: Record<string, EntityRelationship>
-): string {
+): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
   const keysName = `${lcFirst(typeName)}MutationKeys`;
 
   const relationship = relationships[entityKey];
 
-  const lines: string[] = [];
+  const properties: t.ObjectProperty[] = [];
 
-  lines.push(`export const ${keysName} = {`);
-  lines.push(`  /** All ${singularName} mutation keys */`);
-  lines.push(`  all: ['mutation', '${entityKey}'] as const,`);
+  // all property
+  const allProp = objectProp(
+    'all',
+    constArray([t.stringLiteral('mutation'), t.stringLiteral(entityKey)])
+  );
+  addJSDocComment(allProp, [`All ${singularName} mutation keys`]);
+  properties.push(allProp);
 
-  // Create mutation
-  lines.push(``);
-  lines.push(`  /** Create ${singularName} mutation key */`);
+  // create property
+  let createProp: t.ObjectProperty;
   if (relationship) {
-    // Include optional parent scope for tracking creates within a parent context
-    lines.push(`  create: (${relationship.foreignKey}?: string) =>`);
-    lines.push(`    ${relationship.foreignKey}`);
-    lines.push(`      ? ['mutation', '${entityKey}', 'create', { ${relationship.foreignKey} }] as const`);
-    lines.push(`      : ['mutation', '${entityKey}', 'create'] as const,`);
+    const fkParam = t.identifier(relationship.foreignKey);
+    fkParam.optional = true;
+    fkParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+
+    createProp = objectProp(
+      'create',
+      arrow(
+        [fkParam],
+        ternary(
+          t.identifier(relationship.foreignKey),
+          constArray([
+            t.stringLiteral('mutation'),
+            t.stringLiteral(entityKey),
+            t.stringLiteral('create'),
+            shorthandObject(relationship.foreignKey),
+          ]),
+          constArray([
+            t.stringLiteral('mutation'),
+            t.stringLiteral(entityKey),
+            t.stringLiteral('create'),
+          ])
+        )
+      )
+    );
   } else {
-    lines.push(`  create: () => ['mutation', '${entityKey}', 'create'] as const,`);
+    createProp = objectProp(
+      'create',
+      arrow(
+        [],
+        constArray([
+          t.stringLiteral('mutation'),
+          t.stringLiteral(entityKey),
+          t.stringLiteral('create'),
+        ])
+      )
+    );
   }
+  addJSDocComment(createProp, [`Create ${singularName} mutation key`]);
+  properties.push(createProp);
 
-  // Update mutation
-  lines.push(``);
-  lines.push(`  /** Update ${singularName} mutation key */`);
-  lines.push(`  update: (id: string | number) =>`);
-  lines.push(`    ['mutation', '${entityKey}', 'update', id] as const,`);
+  // update property
+  const updateProp = objectProp(
+    'update',
+    arrow(
+      [typedParam('id', stringOrNumberType())],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral('update'),
+        t.identifier('id'),
+      ])
+    )
+  );
+  addJSDocComment(updateProp, [`Update ${singularName} mutation key`]);
+  properties.push(updateProp);
 
-  // Delete mutation
-  lines.push(``);
-  lines.push(`  /** Delete ${singularName} mutation key */`);
-  lines.push(`  delete: (id: string | number) =>`);
-  lines.push(`    ['mutation', '${entityKey}', 'delete', id] as const,`);
+  // delete property
+  const deleteProp = objectProp(
+    'delete',
+    arrow(
+      [typedParam('id', stringOrNumberType())],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral('delete'),
+        t.identifier('id'),
+      ])
+    )
+  );
+  addJSDocComment(deleteProp, [`Delete ${singularName} mutation key`]);
+  properties.push(deleteProp);
 
-  lines.push(`} as const;`);
-
-  return lines.join('\n');
+  return exportConst(keysName, asConst(t.objectExpression(properties)));
 }
 
 /**
- * Generate mutation keys for custom mutations
+ * Generate custom mutation keys declaration
  */
-function generateCustomMutationKeys(operations: CleanOperation[]): string {
-  if (operations.length === 0) return '';
+function generateCustomMutationKeysDeclaration(
+  operations: CleanOperation[]
+): t.ExportNamedDeclaration | null {
+  if (operations.length === 0) return null;
 
-  const lines: string[] = [];
-  lines.push(`export const customMutationKeys = {`);
+  const properties: t.ObjectProperty[] = [];
 
   for (const op of operations) {
     const hasArgs = op.args.length > 0;
 
-    lines.push(`  /** Mutation key for ${op.name} */`);
+    let prop: t.ObjectProperty;
+
     if (hasArgs) {
-      // For mutations with args, include a way to identify the specific mutation
-      lines.push(`  ${op.name}: (identifier?: string) =>`);
-      lines.push(`    identifier`);
-      lines.push(`      ? ['mutation', '${op.name}', identifier] as const`);
-      lines.push(`      : ['mutation', '${op.name}'] as const,`);
+      const identifierParam = t.identifier('identifier');
+      identifierParam.optional = true;
+      identifierParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+
+      prop = objectProp(
+        op.name,
+        arrow(
+          [identifierParam],
+          ternary(
+            t.identifier('identifier'),
+            constArray([
+              t.stringLiteral('mutation'),
+              t.stringLiteral(op.name),
+              t.identifier('identifier'),
+            ]),
+            constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
+          )
+        )
+      );
     } else {
-      lines.push(`  ${op.name}: () => ['mutation', '${op.name}'] as const,`);
+      prop = objectProp(
+        op.name,
+        arrow([], constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)]))
+      );
     }
-    lines.push(``);
+
+    addJSDocComment(prop, [`Mutation key for ${op.name}`]);
+    properties.push(prop);
   }
 
-  // Remove trailing empty line
-  if (lines[lines.length - 1] === '') {
-    lines.pop();
-  }
-
-  lines.push(`} as const;`);
-
-  return lines.join('\n');
+  return exportConst('customMutationKeys', asConst(t.objectExpression(properties)));
 }
 
 /**
- * Generate the unified mutation keys store object
+ * Generate the unified mutation keys store declaration
  */
-function generateUnifiedMutationStore(
+function generateUnifiedMutationStoreDeclaration(
   tables: CleanTable[],
   hasCustomMutations: boolean
-): string {
-  const lines: string[] = [];
-
-  lines.push(`/**`);
-  lines.push(` * Unified mutation key store`);
-  lines.push(` *`);
-  lines.push(` * Use this for tracking in-flight mutations with useIsMutating.`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`ts`);
-  lines.push(` * import { useIsMutating } from '@tanstack/react-query';`);
-  lines.push(` * import { mutationKeys } from './generated';`);
-  lines.push(` *`);
-  lines.push(` * // Check if any user mutations are in progress`);
-  lines.push(` * const isMutatingUser = useIsMutating({ mutationKey: mutationKeys.user.all });`);
-  lines.push(` *`);
-  lines.push(` * // Check if a specific user is being updated`);
-  lines.push(` * const isUpdating = useIsMutating({ mutationKey: mutationKeys.user.update(userId) });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  lines.push(`export const mutationKeys = {`);
+): t.ExportNamedDeclaration {
+  const properties: t.ObjectProperty[] = [];
 
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     const keysName = `${lcFirst(typeName)}MutationKeys`;
-    lines.push(`  ${lcFirst(typeName)}: ${keysName},`);
+    properties.push(
+      t.objectProperty(t.identifier(lcFirst(typeName)), t.identifier(keysName))
+    );
   }
 
   if (hasCustomMutations) {
-    lines.push(`  custom: customMutationKeys,`);
+    properties.push(
+      t.objectProperty(t.identifier('custom'), t.identifier('customMutationKeys'))
+    );
   }
 
-  lines.push(`} as const;`);
+  const decl = exportConst('mutationKeys', asConst(t.objectExpression(properties)));
 
-  return lines.join('\n');
+  addJSDocComment(decl, [
+    'Unified mutation key store',
+    '',
+    'Use this for tracking in-flight mutations with useIsMutating.',
+    '',
+    '@example',
+    '```ts',
+    "import { useIsMutating } from '@tanstack/react-query';",
+    "import { mutationKeys } from './generated';",
+    '',
+    '// Check if any user mutations are in progress',
+    'const isMutatingUser = useIsMutating({ mutationKey: mutationKeys.user.all });',
+    '',
+    '// Check if a specific user is being updated',
+    'const isUpdating = useIsMutating({ mutationKey: mutationKeys.user.update(userId) });',
+    '```',
+  ]);
+
+  return decl;
 }
 
 /**
@@ -158,61 +241,83 @@ export function generateMutationKeysFile(
   const { tables, customMutations, config } = options;
   const { relationships } = config;
 
-  const lines: string[] = [];
-
-  // File header
-  lines.push(getGeneratedFileHeader('Centralized mutation key factory'));
-  lines.push(``);
-
-  // Description comments
-  lines.push(`// ============================================================================`);
-  lines.push(`// Mutation keys for tracking in-flight mutations`);
-  lines.push(`//`);
-  lines.push(`// Benefits:`);
-  lines.push(`// - Track mutation state with useIsMutating`);
-  lines.push(`// - Implement optimistic updates with proper rollback`);
-  lines.push(`// - Deduplicate identical mutations`);
-  lines.push(`// - Coordinate related mutations`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
+  const statements: t.Statement[] = [];
 
   // Generate entity mutation keys
-  lines.push(`// ============================================================================`);
-  lines.push(`// Entity Mutation Keys`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
-
-  for (let i = 0; i < tables.length; i++) {
-    const table = tables[i];
-    lines.push(generateEntityMutationKeys(table, relationships));
-    if (i < tables.length - 1) {
-      lines.push(``);
-    }
+  for (const table of tables) {
+    statements.push(generateEntityMutationKeysDeclaration(table, relationships));
   }
 
   // Generate custom mutation keys
   const mutationOperations = customMutations.filter((op) => op.kind === 'mutation');
-  if (mutationOperations.length > 0) {
-    lines.push(``);
-    lines.push(`// ============================================================================`);
-    lines.push(`// Custom Mutation Keys`);
-    lines.push(`// ============================================================================`);
-    lines.push(``);
-    lines.push(generateCustomMutationKeys(mutationOperations));
+  const customKeysDecl = generateCustomMutationKeysDeclaration(mutationOperations);
+  if (customKeysDecl) {
+    statements.push(customKeysDecl);
   }
 
   // Generate unified store
-  lines.push(``);
-  lines.push(`// ============================================================================`);
-  lines.push(`// Unified Mutation Key Store`);
-  lines.push(`// ============================================================================`);
-  lines.push(``);
-  lines.push(generateUnifiedMutationStore(tables, mutationOperations.length > 0));
+  statements.push(generateUnifiedMutationStoreDeclaration(tables, mutationOperations.length > 0));
 
-  lines.push(``);
+  // Generate code from AST
+  const code = generateCode(statements);
+
+  // Build final content with header and section comments
+  const header = getGeneratedFileHeader('Centralized mutation key factory');
+  const description = `// ============================================================================
+// Mutation keys for tracking in-flight mutations
+//
+// Benefits:
+// - Track mutation state with useIsMutating
+// - Implement optimistic updates with proper rollback
+// - Deduplicate identical mutations
+// - Coordinate related mutations
+// ============================================================================`;
+
+  let content = `${header}
+
+${description}
+
+// ============================================================================
+// Entity Mutation Keys
+// ============================================================================
+
+`;
+
+  // Insert section comments into the generated code
+  const codeLines = code.split('\n');
+  let addedCustomSection = false;
+  let addedUnifiedSection = false;
+
+  for (let i = 0; i < codeLines.length; i++) {
+    const line = codeLines[i];
+
+    // Detect custom mutation keys section
+    if (!addedCustomSection && line.startsWith('export const customMutationKeys')) {
+      content += `
+// ============================================================================
+// Custom Mutation Keys
+// ============================================================================
+
+`;
+      addedCustomSection = true;
+    }
+
+    // Detect unified store section
+    if (!addedUnifiedSection && line.includes('* Unified mutation key store')) {
+      content += `
+// ============================================================================
+// Unified Mutation Key Store
+// ============================================================================
+
+`;
+      addedUnifiedSection = true;
+    }
+
+    content += line + '\n';
+  }
 
   return {
     fileName: 'mutation-keys.ts',
-    content: lines.join('\n'),
+    content,
   };
 }
