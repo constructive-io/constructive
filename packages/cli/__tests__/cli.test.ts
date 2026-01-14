@@ -1,3 +1,6 @@
+jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
+  generateCommand: async () => ({ success: true, message: 'ok' })
+}));
 import { Inquirerer, Question } from 'inquirerer';
 jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
   generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))

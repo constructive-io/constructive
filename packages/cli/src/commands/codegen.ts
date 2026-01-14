@@ -35,7 +35,7 @@ export default async (
   }
 
   const endpointArg = (argv.endpoint as string) || ''
-  const outDir = (argv.out as string) || 'graphql/codegen/dist'
+  const outDir = (argv.out as string) || 'codegen'
   const auth = (argv.auth as string) || ''
   const configPath = (argv.config as string) || ''
   const dryRun = !!(argv['dry-run'] || argv.dryRun)
