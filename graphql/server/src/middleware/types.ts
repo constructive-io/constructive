@@ -31,6 +31,7 @@ declare global {
             svc_key?: string;
             clientIp?: string;
             databaseId?: string;
+            requestId?: string;
             token?: ConstructiveAPIToken;
         }
     }

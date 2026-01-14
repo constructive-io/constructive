@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.13](https://github.com/constructive-io/constructive/compare/pgpm@2.10.12...pgpm@2.10.13) (2026-01-10)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.12](https://github.com/constructive-io/constructive/compare/pgpm@2.10.11...pgpm@2.10.12) (2026-01-10)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.11](https://github.com/constructive-io/constructive/compare/pgpm@2.10.10...pgpm@2.10.11) (2026-01-10)
+
+### Bug Fixes
+
+- update default Docker image to pyramation/postgres:17 ([aec76a0](https://github.com/constructive-io/constructive/commit/aec76a059d55ac5e6523968e587f6c63eb58b234))
+
+## [2.10.10](https://github.com/constructive-io/constructive/compare/pgpm@2.10.9...pgpm@2.10.10) (2026-01-09)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.9](https://github.com/constructive-io/constructive/compare/pgpm@2.10.8...pgpm@2.10.9) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.8](https://github.com/constructive-io/constructive/compare/pgpm@2.10.7...pgpm@2.10.8) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.7](https://github.com/constructive-io/constructive/compare/pgpm@2.10.6...pgpm@2.10.7) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.6](https://github.com/constructive-io/constructive/compare/pgpm@2.10.5...pgpm@2.10.6) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.5](https://github.com/constructive-io/constructive/compare/pgpm@2.10.4...pgpm@2.10.5) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.4](https://github.com/constructive-io/constructive/compare/pgpm@2.10.3...pgpm@2.10.4) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.3](https://github.com/constructive-io/constructive/compare/pgpm@2.10.2...pgpm@2.10.3) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
+## [2.10.2](https://github.com/constructive-io/constructive/compare/pgpm@2.10.1...pgpm@2.10.2) (2026-01-08)
+
+**Note:** Version bump only for package pgpm
+
 ## [2.10.1](https://github.com/constructive-io/constructive/compare/pgpm@2.10.0...pgpm@2.10.1) (2026-01-07)
 
 **Note:** Version bump only for package pgpm

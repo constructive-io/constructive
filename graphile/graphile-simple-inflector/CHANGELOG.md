@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.15](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.14...graphile-simple-inflector@0.4.15) (2026-01-11)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.14](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.13...graphile-simple-inflector@0.4.14) (2026-01-10)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.13](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.12...graphile-simple-inflector@0.4.13) (2026-01-09)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.12](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.11...graphile-simple-inflector@0.4.12) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.11](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.10...graphile-simple-inflector@0.4.11) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.10](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.9...graphile-simple-inflector@0.4.10) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.9](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.8...graphile-simple-inflector@0.4.9) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.8](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.7...graphile-simple-inflector@0.4.8) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.7](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.6...graphile-simple-inflector@0.4.7) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.6](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.5...graphile-simple-inflector@0.4.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
+## [0.4.5](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.4...graphile-simple-inflector@0.4.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-simple-inflector
+
 ## [0.4.4](https://github.com/constructive-io/constructive/compare/graphile-simple-inflector@0.4.3...graphile-simple-inflector@0.4.4) (2026-01-07)
 
 **Note:** Version bump only for package graphile-simple-inflector

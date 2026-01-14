@@ -1,0 +1,15 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.2.0 (2026-01-11)
+
+### Bug Fixes
+
+- remove ?? fallbacks in getEnvOptions call ([22e4f79](https://github.com/constructive-io/constructive/commit/22e4f79c06f88c714d217830e8779c4a76c9cc29))
+
+### Features
+
+- add @constructive-io/playwright-test package ([78a9c32](https://github.com/constructive-io/constructive/commit/78a9c32d203dd07417e1c64130c6abc3b0ceb25e))
+- add Playwright test for playwright-test package ([21e8dce](https://github.com/constructive-io/constructive/commit/21e8dcecb7ef3a181a5ada27020902e945ba7e86))

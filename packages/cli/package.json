@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/cli",
-  "version": "5.6.8",
+  "version": "5.6.21",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI",
   "main": "index.js",
@@ -75,5 +75,6 @@
     "pgsql",
     "postgres",
     "graphile"
-  ]
+  ],
+  "gitHead": "05d1197d6ff6e4c30afd0b8514427b612c5bc1e1"
 }

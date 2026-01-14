@@ -14,7 +14,11 @@ import errorPage404Message from '../errors/404-message';
  * Transforms the old service structure to the new api structure
  */
 import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
-import { ApiByNameQuery, ApiQuery, ListOfAllDomainsOfDb } from './gql';
+import {
+  buildApiByDatabaseIdAndName,
+  buildDomainLookup,
+  buildListApis,
+} from './gql';
 import './types'; // for Request type
 
 const log = new Logger('api');
@@ -23,9 +27,9 @@ const isDev = () => getNodeEnv() === 'development';
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
   const schemaNames =
-    api.schemaNamesFromExt?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
+    api.apiExtensions?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
   const additionalSchemas =
-    api.schemaNames?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
+    api.schemasByApiSchemaApiIdAndSchemaId?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
 
   let domains: string[] = [];
   if (api.database?.sites?.nodes) {
@@ -81,7 +85,7 @@ export const createApiMiddleware = (opts: any) => {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (opts.api?.enableMetaApi === false) {
+    if (opts.api?.enableServicesApi === false) {
       const schemas = opts.api.exposedSchemas;
       const anonRole = opts.api.anonRole;
       const roleName = opts.api.roleName;
@@ -224,10 +228,11 @@ const queryServiceByDomainAndSubdomain = async ({
   domain: string;
   subdomain: string;
 }): Promise<any> => {
+  const doc = buildDomainLookup({ domain, subdomain });
   const result = await client.query({
     role: 'administrator',
-    query: ApiQuery,
-    variables: { domain, subdomain },
+    query: doc.document,
+    variables: doc.variables,
   });
 
   if (result.errors?.length) {
@@ -261,10 +266,11 @@ const queryServiceByApiName = async ({
   databaseId: string;
   name: string;
 }): Promise<any> => {
+  const doc = buildApiByDatabaseIdAndName({ databaseId, name });
   const result = await client.query({
     role: 'administrator',
-    query: ApiByNameQuery,
-    variables: { databaseId, name },
+    query: doc.document,
+    variables: doc.variables,
   });
 
   if (result.errors?.length) {
@@ -406,8 +412,7 @@ export const getApiConfig = async (
           const fallbackResult = await client.query({
             role: 'administrator',
             // @ts-ignore
-            query: ListOfAllDomainsOfDb,
-            // variables: { databaseId }
+            query: buildListApis().document,
           });
 
           if (

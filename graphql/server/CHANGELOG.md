@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.5...@constructive-io/graphql-server@2.16.0) (2026-01-11)
+
+### Features
+
+- add @constructive-io/playwright-test package ([78a9c32](https://github.com/constructive-io/constructive/commit/78a9c32d203dd07417e1c64130c6abc3b0ceb25e))
+- add Playwright test for playwright-test package ([21e8dce](https://github.com/constructive-io/constructive/commit/21e8dcecb7ef3a181a5ada27020902e945ba7e86))
+
+## [2.15.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.4...@constructive-io/graphql-server@2.15.5) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.15.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.3...@constructive-io/graphql-server@2.15.4) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.2...@constructive-io/graphql-server@2.15.3) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.15.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.1...@constructive-io/graphql-server@2.15.2) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.15.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.15.0...@constructive-io/graphql-server@2.15.1) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [2.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.8...@constructive-io/graphql-server@2.15.0) (2026-01-08)
+
+### Features
+
+- improve loggings and type safe codegen ([#581](https://github.com/constructive-io/constructive/issues/581)) ([e0f103a](https://github.com/constructive-io/constructive/commit/e0f103ab21bd0dd7349a3952d5b19f8762864daa))
+
+## [2.14.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.7...@constructive-io/graphql-server@2.14.8) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.14.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.6...@constructive-io/graphql-server@2.14.7) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.14.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.5...@constructive-io/graphql-server@2.14.6) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [2.14.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.4...@constructive-io/graphql-server@2.14.5) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [2.14.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@2.14.3...@constructive-io/graphql-server@2.14.4) (2026-01-07)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
