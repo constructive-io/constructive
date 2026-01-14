@@ -15,16 +15,8 @@ import type {
   CleanArgument,
   TypeRegistry,
 } from '../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-  createInterface,
-  createConst,
-  type InterfaceProperty,
-} from './ts-ast';
+import * as t from '@babel/types';
+import { generateCode, addJSDocComment, typedParam } from './babel-ast';
 import { buildCustomQueryString } from './schema-gql-ast';
 import {
   typeRefToTsType,
@@ -38,7 +30,7 @@ import {
   createTypeTracker,
   type TypeTracker,
 } from './type-resolver';
-import { ucFirst } from './utils';
+import { ucFirst, getGeneratedFileHeader } from './utils';
 
 export interface GeneratedCustomQueryFile {
   fileName: string;
@@ -46,218 +38,27 @@ export interface GeneratedCustomQueryFile {
   operationName: string;
 }
 
-// ============================================================================
-// Single custom query hook generator
-// ============================================================================
-
 export interface GenerateCustomQueryHookOptions {
   operation: CleanOperation;
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
-  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
-  /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  useCentralizedKeys?: boolean;
 }
 
-/**
- * Generate a custom query hook file
- */
-export function generateCustomQueryHook(
-  options: GenerateCustomQueryHookOptions
-): GeneratedCustomQueryFile {
-  const { operation, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
-
-  const project = createProject();
-  const hookName = getOperationHookName(operation.name, 'query');
-  const fileName = getOperationFileName(operation.name, 'query');
-  const variablesTypeName = getOperationVariablesTypeName(operation.name, 'query');
-  const resultTypeName = getOperationResultTypeName(operation.name, 'query');
-  const documentConstName = getDocumentConstName(operation.name, 'query');
-  const queryKeyName = getQueryKeyName(operation.name);
-
-  // Create type tracker to collect referenced types (with table type awareness)
-  const tracker = createTypeTracker({ tableTypeNames });
-
-  // Generate GraphQL document
-  const queryDocument = buildCustomQueryString({
-    operation,
-    typeRegistry,
-    maxDepth,
-    skipQueryField,
-  });
-
-  const sourceFile = createSourceFile(project, fileName);
-
-  // Add file header
-  const headerText = reactQueryEnabled
-    ? `Custom query hook for ${operation.name}`
-    : `Custom query functions for ${operation.name}`;
-  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
-
-  // Generate variables interface if there are arguments (with tracking)
-  let variablesProps: InterfaceProperty[] = [];
-  if (operation.args.length > 0) {
-    variablesProps = generateVariablesProperties(operation.args, tracker);
-  }
-
-  // Generate result interface (with tracking)
-  const resultType = typeRefToTsType(operation.returnType, tracker);
-  const resultProps: InterfaceProperty[] = [
-    { name: operation.name, type: resultType },
-  ];
-
-  // Get importable types from tracker (separated by source)
-  const schemaTypes = tracker.getImportableTypes();  // From schema-types.ts
-  const tableTypes = tracker.getTableTypes();        // From types.ts
-
-  // Add imports - conditionally include React Query imports
-  const imports = [];
-  if (reactQueryEnabled) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '@tanstack/react-query',
-        namedImports: ['useQuery'],
-        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-      })
-    );
-  }
-  imports.push(
-    createImport({
-      moduleSpecifier: '../client',
-      namedImports: ['execute'],
-      typeOnlyNamedImports: ['ExecuteOptions'],
-    })
-  );
-
-  // Add types.ts import for table entity types
-  if (tableTypes.length > 0) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '../types',
-        typeOnlyNamedImports: tableTypes,
-      })
-    );
-  }
-
-  // Add schema-types import for Input/Payload/Enum types
-  if (schemaTypes.length > 0) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '../schema-types',
-        typeOnlyNamedImports: schemaTypes,
-      })
-    );
-  }
-
-  sourceFile.addImportDeclarations(imports);
-
-  // Add query document constant
-  sourceFile.addVariableStatement(
-    createConst(documentConstName, '`\n' + queryDocument + '`', {
-      docs: ['GraphQL query document'],
-    })
-  );
-
-  // Add variables interface
-  if (operation.args.length > 0) {
-    sourceFile.addInterface(createInterface(variablesTypeName, variablesProps));
-  }
-
-  // Add result interface
-  sourceFile.addInterface(createInterface(resultTypeName, resultProps));
-
-  // Query key factory
-  if (operation.args.length > 0) {
-    sourceFile.addVariableStatement(
-      createConst(
-        queryKeyName,
-        `(variables?: ${variablesTypeName}) =>
-  ['${operation.name}', variables] as const`,
-        { docs: ['Query key factory for caching'] }
-      )
-    );
-  } else {
-    sourceFile.addVariableStatement(
-      createConst(queryKeyName, `() => ['${operation.name}'] as const`, {
-        docs: ['Query key factory for caching'],
-      })
-    );
-  }
-
-  // Generate hook function (only if React Query is enabled)
-  if (reactQueryEnabled) {
-    const hookParams = generateHookParameters(operation, variablesTypeName, resultTypeName);
-    const hookBody = generateHookBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-    const hookDoc = generateHookDoc(operation, hookName);
-
-    sourceFile.addFunction({
-      name: hookName,
-      isExported: true,
-      parameters: hookParams,
-      statements: hookBody,
-      docs: [{ description: hookDoc }],
-    });
-  }
-
-  // Add standalone functions section
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Standalone Functions (non-React)');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Generate standalone fetch function
-  const fetchFnName = `fetch${ucFirst(operation.name)}Query`;
-  const fetchParams = generateFetchParameters(operation, variablesTypeName);
-  const fetchBody = generateFetchBody(operation, documentConstName, variablesTypeName, resultTypeName);
-  const fetchDoc = generateFetchDoc(operation, fetchFnName);
-
-  sourceFile.addFunction({
-    name: fetchFnName,
-    isExported: true,
-    isAsync: true,
-    parameters: fetchParams,
-    returnType: `Promise<${resultTypeName}>`,
-    statements: fetchBody,
-    docs: [{ description: fetchDoc }],
-  });
-
-  // Generate prefetch function (only if React Query is enabled)
-  if (reactQueryEnabled) {
-    const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
-    const prefetchParams = generatePrefetchParameters(operation, variablesTypeName);
-    const prefetchBody = generatePrefetchBody(operation, documentConstName, queryKeyName, variablesTypeName, resultTypeName);
-    const prefetchDoc = generatePrefetchDoc(operation, prefetchFnName);
-
-    sourceFile.addFunction({
-      name: prefetchFnName,
-      isExported: true,
-      isAsync: true,
-      parameters: prefetchParams,
-      returnType: 'Promise<void>',
-      statements: prefetchBody,
-      docs: [{ description: prefetchDoc }],
-    });
-  }
-
-  return {
-    fileName,
-    content: getFormattedOutput(sourceFile),
-    operationName: operation.name,
-  };
+interface VariablesProp {
+  name: string;
+  type: string;
+  optional: boolean;
+  docs?: string[];
 }
 
-// ============================================================================
-// Helper functions
-// ============================================================================
-
-/**
- * Generate interface properties from CleanArguments
- */
 function generateVariablesProperties(
   args: CleanArgument[],
   tracker?: TypeTracker
-): InterfaceProperty[] {
+): VariablesProp[] {
   return args.map((arg) => ({
     name: arg.name,
     type: typeRefToTsType(arg.type, tracker),
@@ -266,289 +67,489 @@ function generateVariablesProperties(
   }));
 }
 
-/**
- * Generate hook function parameters
- */
-function generateHookParameters(
-  operation: CleanOperation,
-  variablesTypeName: string,
-  resultTypeName: string
-): Array<{ name: string; type: string; hasQuestionToken?: boolean }> {
-  const params: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [];
+export function generateCustomQueryHook(
+  options: GenerateCustomQueryHookOptions
+): GeneratedCustomQueryFile {
+  const {
+    operation,
+    typeRegistry,
+    maxDepth = 2,
+    skipQueryField = true,
+    reactQueryEnabled = true,
+    tableTypeNames,
+    useCentralizedKeys = true,
+  } = options;
 
-  // Add variables parameter if there are required args
-  const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
+  const hookName = getOperationHookName(operation.name, 'query');
+  const fileName = getOperationFileName(operation.name, 'query');
+  const variablesTypeName = getOperationVariablesTypeName(operation.name, 'query');
+  const resultTypeName = getOperationResultTypeName(operation.name, 'query');
+  const documentConstName = getDocumentConstName(operation.name, 'query');
+  const queryKeyName = getQueryKeyName(operation.name);
 
-  if (operation.args.length > 0) {
-    params.push({
-      name: 'variables',
-      type: variablesTypeName,
-      hasQuestionToken: !hasRequiredArgs,
-    });
-  }
+  const tracker = createTypeTracker({ tableTypeNames });
 
-  // Add options parameter
-  params.push({
-    name: 'options',
-    type: `Omit<UseQueryOptions<${resultTypeName}, Error>, 'queryKey' | 'queryFn'>`,
-    hasQuestionToken: true,
+  const queryDocument = buildCustomQueryString({
+    operation,
+    typeRegistry,
+    maxDepth,
+    skipQueryField,
   });
 
-  return params;
-}
+  const statements: t.Statement[] = [];
 
-/**
- * Generate hook function body
- */
-function generateHookBody(
-  operation: CleanOperation,
-  documentConstName: string,
-  queryKeyName: string,
-  variablesTypeName: string,
-  resultTypeName: string
-): string {
+  const variablesProps =
+    operation.args.length > 0
+      ? generateVariablesProperties(operation.args, tracker)
+      : [];
+
+  const resultType = typeRefToTsType(operation.returnType, tracker);
+
+  const schemaTypes = tracker.getImportableTypes();
+  const tableTypes = tracker.getTableTypes();
+
+  if (reactQueryEnabled) {
+    const reactQueryImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier('useQuery'), t.identifier('useQuery'))],
+      t.stringLiteral('@tanstack/react-query')
+    );
+    statements.push(reactQueryImport);
+    const reactQueryTypeImport = t.importDeclaration(
+      [
+        t.importSpecifier(t.identifier('UseQueryOptions'), t.identifier('UseQueryOptions')),
+        t.importSpecifier(t.identifier('QueryClient'), t.identifier('QueryClient')),
+      ],
+      t.stringLiteral('@tanstack/react-query')
+    );
+    reactQueryTypeImport.importKind = 'type';
+    statements.push(reactQueryTypeImport);
+  }
+
+  const clientImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
+    t.stringLiteral('../client')
+  );
+  statements.push(clientImport);
+  const clientTypeImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('ExecuteOptions'), t.identifier('ExecuteOptions'))],
+    t.stringLiteral('../client')
+  );
+  clientTypeImport.importKind = 'type';
+  statements.push(clientTypeImport);
+
+  if (tableTypes.length > 0) {
+    const typesImport = t.importDeclaration(
+      tableTypes.map((tt) => t.importSpecifier(t.identifier(tt), t.identifier(tt))),
+      t.stringLiteral('../types')
+    );
+    typesImport.importKind = 'type';
+    statements.push(typesImport);
+  }
+
+  if (schemaTypes.length > 0) {
+    const schemaTypesImport = t.importDeclaration(
+      schemaTypes.map((st) => t.importSpecifier(t.identifier(st), t.identifier(st))),
+      t.stringLiteral('../schema-types')
+    );
+    schemaTypesImport.importKind = 'type';
+    statements.push(schemaTypesImport);
+  }
+
+  if (useCentralizedKeys) {
+    const queryKeyImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier('customQueryKeys'), t.identifier('customQueryKeys'))],
+      t.stringLiteral('../query-keys')
+    );
+    statements.push(queryKeyImport);
+  }
+
+  const queryDocConst = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier(documentConstName),
+      t.templateLiteral(
+        [t.templateElement({ raw: '\n' + queryDocument, cooked: '\n' + queryDocument }, true)],
+        []
+      )
+    ),
+  ]);
+  const queryDocExport = t.exportNamedDeclaration(queryDocConst);
+  addJSDocComment(queryDocExport, ['GraphQL query document']);
+  statements.push(queryDocExport);
+
+  if (operation.args.length > 0) {
+    const variablesInterfaceProps = variablesProps.map((vp) => {
+      const prop = t.tsPropertySignature(
+        t.identifier(vp.name),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(vp.type)))
+      );
+      prop.optional = vp.optional;
+      return prop;
+    });
+    const variablesInterface = t.tsInterfaceDeclaration(
+      t.identifier(variablesTypeName),
+      null,
+      null,
+      t.tsInterfaceBody(variablesInterfaceProps)
+    );
+    statements.push(t.exportNamedDeclaration(variablesInterface));
+  }
+
+  const resultInterfaceBody = t.tsInterfaceBody([
+    t.tsPropertySignature(
+      t.identifier(operation.name),
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier(resultType)))
+    ),
+  ]);
+  const resultInterface = t.tsInterfaceDeclaration(
+    t.identifier(resultTypeName),
+    null,
+    null,
+    resultInterfaceBody
+  );
+  statements.push(t.exportNamedDeclaration(resultInterface));
+
+  if (useCentralizedKeys) {
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(queryKeyName),
+        t.memberExpression(t.identifier('customQueryKeys'), t.identifier(operation.name))
+      ),
+    ]);
+    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
+    addJSDocComment(queryKeyExport, ['Query key factory - re-exported from query-keys.ts']);
+    statements.push(queryKeyExport);
+  } else if (operation.args.length > 0) {
+    const queryKeyArrow = t.arrowFunctionExpression(
+      [typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)), true)],
+      t.tsAsExpression(
+        t.arrayExpression([t.stringLiteral(operation.name), t.identifier('variables')]),
+        t.tsTypeReference(t.identifier('const'))
+      )
+    );
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier(queryKeyName), queryKeyArrow),
+    ]);
+    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
+    addJSDocComment(queryKeyExport, ['Query key factory for caching']);
+    statements.push(queryKeyExport);
+  } else {
+    const queryKeyArrow = t.arrowFunctionExpression(
+      [],
+      t.tsAsExpression(
+        t.arrayExpression([t.stringLiteral(operation.name)]),
+        t.tsTypeReference(t.identifier('const'))
+      )
+    );
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier(queryKeyName), queryKeyArrow),
+    ]);
+    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
+    addJSDocComment(queryKeyExport, ['Query key factory for caching']);
+    statements.push(queryKeyExport);
+  }
+
+  if (reactQueryEnabled) {
+    const hasArgs = operation.args.length > 0;
+    const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
+
+    const hookBodyStatements: t.Statement[] = [];
+    const useQueryOptions: (t.ObjectProperty | t.SpreadElement)[] = [];
+
+    if (hasArgs) {
+      useQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryKey'),
+          t.callExpression(t.identifier(queryKeyName), [t.identifier('variables')])
+        )
+      );
+      useQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryFn'),
+          t.arrowFunctionExpression(
+            [],
+            t.callExpression(t.identifier('execute'), [
+              t.identifier(documentConstName),
+              t.identifier('variables'),
+            ])
+          )
+        )
+      );
+      if (hasRequiredArgs) {
+        useQueryOptions.push(
+          t.objectProperty(
+            t.identifier('enabled'),
+            t.logicalExpression(
+              '&&',
+              t.unaryExpression('!', t.unaryExpression('!', t.identifier('variables'))),
+              t.binaryExpression(
+                '!==',
+                t.optionalMemberExpression(
+                  t.identifier('options'),
+                  t.identifier('enabled'),
+                  false,
+                  true
+                ),
+                t.booleanLiteral(false)
+              )
+            )
+          )
+        );
+      }
+    } else {
+      useQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryKey'),
+          t.callExpression(t.identifier(queryKeyName), [])
+        )
+      );
+      useQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryFn'),
+          t.arrowFunctionExpression(
+            [],
+            t.callExpression(t.identifier('execute'), [t.identifier(documentConstName)])
+          )
+        )
+      );
+    }
+    useQueryOptions.push(t.spreadElement(t.identifier('options')));
+
+    hookBodyStatements.push(
+      t.returnStatement(
+        t.callExpression(t.identifier('useQuery'), [t.objectExpression(useQueryOptions)])
+      )
+    );
+
+    const hookParams: t.Identifier[] = [];
+    if (hasArgs) {
+      hookParams.push(
+        typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)), !hasRequiredArgs)
+      );
+    }
+    const optionsTypeStr = `Omit<UseQueryOptions<${resultTypeName}, Error>, 'queryKey' | 'queryFn'>`;
+    const optionsParam = t.identifier('options');
+    optionsParam.optional = true;
+    optionsParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(optionsTypeStr)));
+    hookParams.push(optionsParam);
+
+    const hookFunc = t.functionDeclaration(
+      t.identifier(hookName),
+      hookParams,
+      t.blockStatement(hookBodyStatements)
+    );
+    const hookExport = t.exportNamedDeclaration(hookFunc);
+
+    const description = operation.description || `Query hook for ${operation.name}`;
+    const argNames = operation.args.map((a) => a.name).join(', ');
+    const exampleCall = hasArgs ? `${hookName}({ ${argNames} })` : `${hookName}()`;
+    addJSDocComment(hookExport, [
+      description,
+      '',
+      '@example',
+      '```tsx',
+      `const { data, isLoading } = ${exampleCall};`,
+      '',
+      `if (data?.${operation.name}) {`,
+      `  console.log(data.${operation.name});`,
+      '}',
+      '```',
+    ]);
+    statements.push(hookExport);
+  }
+
+  const fetchFnName = `fetch${ucFirst(operation.name)}Query`;
   const hasArgs = operation.args.length > 0;
   const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
 
+  const fetchBodyStatements: t.Statement[] = [];
   if (hasArgs) {
-    // With variables
-    const enabledCondition = hasRequiredArgs
-      ? `enabled: !!variables && (options?.enabled !== false),`
-      : '';
-
-    return `return useQuery({
-    queryKey: ${queryKeyName}(variables),
-    queryFn: () => execute<${resultTypeName}, ${variablesTypeName}>(
-      ${documentConstName},
-      variables
-    ),
-    ${enabledCondition}
-    ...options,
-  });`;
+    fetchBodyStatements.push(
+      t.returnStatement(
+        t.callExpression(t.identifier('execute'), [
+          t.identifier(documentConstName),
+          t.identifier('variables'),
+          t.identifier('options'),
+        ])
+      )
+    );
   } else {
-    // No variables
-    return `return useQuery({
-    queryKey: ${queryKeyName}(),
-    queryFn: () => execute<${resultTypeName}>(${documentConstName}),
-    ...options,
-  });`;
+    fetchBodyStatements.push(
+      t.returnStatement(
+        t.callExpression(t.identifier('execute'), [
+          t.identifier(documentConstName),
+          t.identifier('undefined'),
+          t.identifier('options'),
+        ])
+      )
+    );
   }
-}
 
-/**
- * Generate hook JSDoc documentation
- */
-function generateHookDoc(operation: CleanOperation, hookName: string): string {
-  const description = operation.description
-    ? operation.description
-    : `Query hook for ${operation.name}`;
-
-  const hasArgs = operation.args.length > 0;
-
-  let example: string;
+  const fetchParams: t.Identifier[] = [];
   if (hasArgs) {
-    const argNames = operation.args.map((a) => a.name).join(', ');
-    example = `
-@example
-\`\`\`tsx
-const { data, isLoading } = ${hookName}({ ${argNames} });
+    fetchParams.push(
+      typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)), !hasRequiredArgs)
+    );
+  }
+  fetchParams.push(typedParam('options', t.tsTypeReference(t.identifier('ExecuteOptions')), true));
 
-if (data?.${operation.name}) {
-  console.log(data.${operation.name});
-}
-\`\`\``;
-  } else {
-    example = `
-@example
-\`\`\`tsx
-const { data, isLoading } = ${hookName}();
+  const fetchFunc = t.functionDeclaration(
+    t.identifier(fetchFnName),
+    fetchParams,
+    t.blockStatement(fetchBodyStatements)
+  );
+  fetchFunc.async = true;
+  fetchFunc.returnType = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Promise'),
+      t.tsTypeParameterInstantiation([t.tsTypeReference(t.identifier(resultTypeName))])
+    )
+  );
+  const fetchExport = t.exportNamedDeclaration(fetchFunc);
 
-if (data?.${operation.name}) {
-  console.log(data.${operation.name});
-}
-\`\`\``;
+  const argNames = operation.args.map((a) => a.name).join(', ');
+  const fetchExampleCall = hasArgs ? `${fetchFnName}({ ${argNames} })` : `${fetchFnName}()`;
+  addJSDocComment(fetchExport, [
+    `Fetch ${operation.name} without React hooks`,
+    '',
+    '@example',
+    '```ts',
+    `const data = await ${fetchExampleCall};`,
+    '```',
+  ]);
+  statements.push(fetchExport);
+
+  if (reactQueryEnabled) {
+    const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
+
+    const prefetchBodyStatements: t.Statement[] = [];
+    const prefetchQueryOptions: t.ObjectProperty[] = [];
+
+    if (hasArgs) {
+      prefetchQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryKey'),
+          t.callExpression(t.identifier(queryKeyName), [t.identifier('variables')])
+        )
+      );
+      prefetchQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryFn'),
+          t.arrowFunctionExpression(
+            [],
+            t.callExpression(t.identifier('execute'), [
+              t.identifier(documentConstName),
+              t.identifier('variables'),
+              t.identifier('options'),
+            ])
+          )
+        )
+      );
+    } else {
+      prefetchQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryKey'),
+          t.callExpression(t.identifier(queryKeyName), [])
+        )
+      );
+      prefetchQueryOptions.push(
+        t.objectProperty(
+          t.identifier('queryFn'),
+          t.arrowFunctionExpression(
+            [],
+            t.callExpression(t.identifier('execute'), [
+              t.identifier(documentConstName),
+              t.identifier('undefined'),
+              t.identifier('options'),
+            ])
+          )
+        )
+      );
+    }
+
+    prefetchBodyStatements.push(
+      t.expressionStatement(
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
+            [t.objectExpression(prefetchQueryOptions)]
+          )
+        )
+      )
+    );
+
+    const prefetchParams: t.Identifier[] = [
+      typedParam('queryClient', t.tsTypeReference(t.identifier('QueryClient'))),
+    ];
+    if (hasArgs) {
+      prefetchParams.push(
+        typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)), !hasRequiredArgs)
+      );
+    }
+    prefetchParams.push(typedParam('options', t.tsTypeReference(t.identifier('ExecuteOptions')), true));
+
+    const prefetchFunc = t.functionDeclaration(
+      t.identifier(prefetchFnName),
+      prefetchParams,
+      t.blockStatement(prefetchBodyStatements)
+    );
+    prefetchFunc.async = true;
+    prefetchFunc.returnType = t.tsTypeAnnotation(
+      t.tsTypeReference(
+        t.identifier('Promise'),
+        t.tsTypeParameterInstantiation([t.tsVoidKeyword()])
+      )
+    );
+    const prefetchExport = t.exportNamedDeclaration(prefetchFunc);
+
+    const prefetchExampleCall = hasArgs
+      ? `${prefetchFnName}(queryClient, { ${argNames} })`
+      : `${prefetchFnName}(queryClient)`;
+    addJSDocComment(prefetchExport, [
+      `Prefetch ${operation.name} for SSR or cache warming`,
+      '',
+      '@example',
+      '```ts',
+      `await ${prefetchExampleCall};`,
+      '```',
+    ]);
+    statements.push(prefetchExport);
   }
 
-  return description + '\n' + example;
+  const code = generateCode(statements);
+  const headerText = reactQueryEnabled
+    ? `Custom query hook for ${operation.name}`
+    : `Custom query functions for ${operation.name}`;
+  const content = getGeneratedFileHeader(headerText) + '\n\n' + code;
+
+  return {
+    fileName,
+    content,
+    operationName: operation.name,
+  };
 }
-
-// ============================================================================
-// Standalone function generators
-// ============================================================================
-
-/**
- * Generate fetch function parameters
- */
-function generateFetchParameters(
-  operation: CleanOperation,
-  variablesTypeName: string
-): Array<{ name: string; type: string; hasQuestionToken?: boolean }> {
-  const params: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [];
-
-  if (operation.args.length > 0) {
-    const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
-    params.push({
-      name: 'variables',
-      type: variablesTypeName,
-      hasQuestionToken: !hasRequiredArgs,
-    });
-  }
-
-  params.push({
-    name: 'options',
-    type: 'ExecuteOptions',
-    hasQuestionToken: true,
-  });
-
-  return params;
-}
-
-/**
- * Generate fetch function body
- */
-function generateFetchBody(
-  operation: CleanOperation,
-  documentConstName: string,
-  variablesTypeName: string,
-  resultTypeName: string
-): string {
-  if (operation.args.length > 0) {
-    return `return execute<${resultTypeName}, ${variablesTypeName}>(
-    ${documentConstName},
-    variables,
-    options
-  );`;
-  } else {
-    return `return execute<${resultTypeName}>(${documentConstName}, undefined, options);`;
-  }
-}
-
-/**
- * Generate fetch function documentation
- */
-function generateFetchDoc(operation: CleanOperation, fnName: string): string {
-  const description = `Fetch ${operation.name} without React hooks`;
-
-  if (operation.args.length > 0) {
-    const argNames = operation.args.map((a) => a.name).join(', ');
-    return `${description}
-
-@example
-\`\`\`ts
-const data = await ${fnName}({ ${argNames} });
-\`\`\``;
-  } else {
-    return `${description}
-
-@example
-\`\`\`ts
-const data = await ${fnName}();
-\`\`\``;
-  }
-}
-
-/**
- * Generate prefetch function parameters
- */
-function generatePrefetchParameters(
-  operation: CleanOperation,
-  variablesTypeName: string
-): Array<{ name: string; type: string; hasQuestionToken?: boolean }> {
-  const params: Array<{ name: string; type: string; hasQuestionToken?: boolean }> = [
-    { name: 'queryClient', type: 'QueryClient' },
-  ];
-
-  if (operation.args.length > 0) {
-    const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
-    params.push({
-      name: 'variables',
-      type: variablesTypeName,
-      hasQuestionToken: !hasRequiredArgs,
-    });
-  }
-
-  params.push({
-    name: 'options',
-    type: 'ExecuteOptions',
-    hasQuestionToken: true,
-  });
-
-  return params;
-}
-
-/**
- * Generate prefetch function body
- */
-function generatePrefetchBody(
-  operation: CleanOperation,
-  documentConstName: string,
-  queryKeyName: string,
-  variablesTypeName: string,
-  resultTypeName: string
-): string {
-  if (operation.args.length > 0) {
-    return `await queryClient.prefetchQuery({
-    queryKey: ${queryKeyName}(variables),
-    queryFn: () => execute<${resultTypeName}, ${variablesTypeName}>(
-      ${documentConstName},
-      variables,
-      options
-    ),
-  });`;
-  } else {
-    return `await queryClient.prefetchQuery({
-    queryKey: ${queryKeyName}(),
-    queryFn: () => execute<${resultTypeName}>(${documentConstName}, undefined, options),
-  });`;
-  }
-}
-
-/**
- * Generate prefetch function documentation
- */
-function generatePrefetchDoc(operation: CleanOperation, fnName: string): string {
-  const description = `Prefetch ${operation.name} for SSR or cache warming`;
-
-  if (operation.args.length > 0) {
-    const argNames = operation.args.map((a) => a.name).join(', ');
-    return `${description}
-
-@example
-\`\`\`ts
-await ${fnName}(queryClient, { ${argNames} });
-\`\`\``;
-  } else {
-    return `${description}
-
-@example
-\`\`\`ts
-await ${fnName}(queryClient);
-\`\`\``;
-  }
-}
-
-// ============================================================================
-// Batch generator
-// ============================================================================
 
 export interface GenerateAllCustomQueryHooksOptions {
   operations: CleanOperation[];
   typeRegistry: TypeRegistry;
   maxDepth?: number;
   skipQueryField?: boolean;
-  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
-  /** Table entity type names (for import path resolution) */
   tableTypeNames?: Set<string>;
+  useCentralizedKeys?: boolean;
 }
 
-/**
- * Generate all custom query hook files
- */
 export function generateAllCustomQueryHooks(
   options: GenerateAllCustomQueryHooksOptions
 ): GeneratedCustomQueryFile[] {
-  const { operations, typeRegistry, maxDepth = 2, skipQueryField = true, reactQueryEnabled = true, tableTypeNames } = options;
+  const {
+    operations,
+    typeRegistry,
+    maxDepth = 2,
+    skipQueryField = true,
+    reactQueryEnabled = true,
+    tableTypeNames,
+    useCentralizedKeys = true,
+  } = options;
 
   return operations
     .filter((op) => op.kind === 'query')
@@ -560,6 +561,7 @@ export function generateAllCustomQueryHooks(
         skipQueryField,
         reactQueryEnabled,
         tableTypeNames,
+        useCentralizedKeys,
       })
     );
 }

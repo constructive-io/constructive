@@ -9,7 +9,6 @@ import type {
   CleanArgument,
   CleanObjectField,
 } from '../../types/schema';
-import type { InterfaceProperty } from './ts-ast';
 import { scalarToTsType as resolveScalarToTs, SCALAR_NAMES } from './scalars';
 
 // ============================================================================
@@ -212,60 +211,6 @@ export function getBaseTypeKind(typeRef: CleanTypeRef): CleanTypeRef['kind'] {
     }
   }
   return typeRef.kind;
-}
-
-// ============================================================================
-// Interface Property Generation
-// ============================================================================
-
-/**
- * Convert CleanArgument to InterfaceProperty for ts-morph
- *
- * @param arg - The GraphQL argument
- * @param tracker - Optional TypeTracker to collect referenced types
- */
-export function argumentToInterfaceProperty(arg: CleanArgument, tracker?: TypeTracker): InterfaceProperty {
-  return {
-    name: arg.name,
-    type: typeRefToTsType(arg.type, tracker),
-    optional: !isTypeRequired(arg.type),
-    docs: arg.description ? [arg.description] : undefined,
-  };
-}
-
-/**
- * Convert CleanObjectField to InterfaceProperty for ts-morph
- *
- * @param field - The GraphQL object field
- * @param tracker - Optional TypeTracker to collect referenced types
- */
-export function fieldToInterfaceProperty(field: CleanObjectField, tracker?: TypeTracker): InterfaceProperty {
-  return {
-    name: field.name,
-    type: typeRefToNullableTsType(field.type, tracker),
-    optional: false, // Fields are always present, just potentially null
-    docs: field.description ? [field.description] : undefined,
-  };
-}
-
-/**
- * Convert an array of CleanArguments to InterfaceProperty array
- *
- * @param args - The GraphQL arguments
- * @param tracker - Optional TypeTracker to collect referenced types
- */
-export function argumentsToInterfaceProperties(args: CleanArgument[], tracker?: TypeTracker): InterfaceProperty[] {
-  return args.map((arg) => argumentToInterfaceProperty(arg, tracker));
-}
-
-/**
- * Convert an array of CleanObjectFields to InterfaceProperty array
- *
- * @param fields - The GraphQL object fields
- * @param tracker - Optional TypeTracker to collect referenced types
- */
-export function fieldsToInterfaceProperties(fields: CleanObjectField[], tracker?: TypeTracker): InterfaceProperty[] {
-  return fields.map((field) => fieldToInterfaceProperty(field, tracker));
 }
 
 // ============================================================================
