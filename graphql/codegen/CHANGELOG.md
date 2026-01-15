@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.0...@constructive-io/graphql-codegen@2.24.1) (2026-01-15)
+
+### Bug Fixes
+
+- **codegen:** add generic type params to execute() calls and import table types ([fde9c62](https://github.com/constructive-io/constructive/commit/fde9c6224c3f5791ddcb9f96bfee6fd23e04e006))
+- **codegen:** add missing pagination variables and handle composite keys ([09523e9](https://github.com/constructive-io/constructive/commit/09523e9447c1d3bafd1dee6e6cc8d3e990a4d24b))
+
 # [2.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.3...@constructive-io/graphql-codegen@2.24.0) (2026-01-14)
 
 ### Features
