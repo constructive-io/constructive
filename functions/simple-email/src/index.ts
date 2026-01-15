@@ -1,6 +1,7 @@
 import { createJobApp } from '@constructive-io/knative-job-fn';
+import { send as sendSmtp } from '@constructive-io/smtppostmaster';
+import { send as sendPostmaster } from '@launchql/postmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
-import { send as sendEmail } from '@launchql/postmaster';
 
 type SimpleEmailPayload = {
   to: string;
@@ -26,6 +27,7 @@ const getRequiredField = (
 };
 
 const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
+const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
 const app = createJobApp();
 
 app.post('/', async (req: any, res: any, next: any) => {
@@ -42,7 +44,7 @@ app.post('/', async (req: any, res: any, next: any) => {
       throw new Error("Either 'html' or 'text' must be provided");
     }
 
-    const fromEnv = process.env.MAILGUN_FROM;
+    const fromEnv = useSmtp ? process.env.SMTP_FROM : process.env.MAILGUN_FROM;
     const from = isNonEmptyString(payload.from)
       ? payload.from
       : isNonEmptyString(fromEnv)
@@ -67,6 +69,7 @@ app.post('/', async (req: any, res: any, next: any) => {
       console.log('[simple-email] DRY RUN email (no send)', logContext);
     } else {
       // Send via the Postmaster package (Mailgun or configured provider)
+      const sendEmail = useSmtp ? sendSmtp : sendPostmaster;
       await sendEmail({
         to,
         subject,

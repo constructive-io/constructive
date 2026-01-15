@@ -2,10 +2,12 @@ import { createJobApp } from '@constructive-io/knative-job-fn';
 import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
-import { send } from '@launchql/postmaster';
+import { send as sendPostmaster } from '@launchql/postmaster';
+import { send as sendSmtp } from '@constructive-io/smtppostmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
+const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
 const app = createJobApp();
 
 const GetUser = gql`
@@ -282,7 +284,8 @@ export const sendEmailLink = async (
       link
     });
   } else {
-    await send({
+    const sendEmail = useSmtp ? sendSmtp : sendPostmaster;
+    await sendEmail({
       to: params.email,
       subject,
       html
