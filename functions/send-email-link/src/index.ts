@@ -5,9 +5,11 @@ import { generate } from '@launchql/mjml';
 import { send as sendPostmaster } from '@launchql/postmaster';
 import { send as sendSmtp } from '@constructive-io/smtppostmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
+import { createLogger } from '@pgpmjs/logger';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
+const logger = createLogger('send-email-link');
 const app = createJobApp();
 
 const GetUser = gql`
@@ -276,8 +278,7 @@ export const sendEmailLink = async (
   });
 
   if (isDryRun) {
-    // eslint-disable-next-line no-console
-    console.log('[send-email-link] DRY RUN email (skipping send)', {
+    logger.info('DRY RUN email (skipping send)', {
       email_type: params.email_type,
       email: params.email,
       subject,
@@ -334,7 +335,6 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`[send-email-link] listening on port ${port}`);
+    logger.info(`listening on port ${port}`);
   });
 }

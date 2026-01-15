@@ -14,17 +14,18 @@ import {
   getJobSupported,
   getJobsCallbackPort,
 } from '@constructive-io/job-utils';
+import { createLogger } from '@pgpmjs/logger';
+
+const logger = createLogger('knative-job-service');
 
 export const startJobsServices = () => {
-  // eslint-disable-next-line no-console
-  console.log('starting jobs services...');
+  logger.info('starting jobs services...');
   const pgPool = poolManager.getPool();
   const app = server(pgPool);
 
   const callbackPort = getJobsCallbackPort();
   const httpServer = app.listen(callbackPort, () => {
-    // eslint-disable-next-line no-console
-    console.log(`[cb] listening ON ${callbackPort}`);
+    logger.info(`listening ON ${callbackPort}`);
 
     const tasks = getJobSupported();
 
@@ -48,8 +49,7 @@ export const startJobsServices = () => {
 };
 
 export const waitForJobsPrereqs = async (): Promise<void> => {
-  // eslint-disable-next-line no-console
-  console.log('waiting for jobs prereqs');
+  logger.info('waiting for jobs prereqs');
   let client: Client | null = null;
   try {
     const cfg = getJobPgConfig();
@@ -64,8 +64,7 @@ export const waitForJobsPrereqs = async (): Promise<void> => {
     const schema = getJobSchema();
     await client.query(`SELECT * FROM "${schema}".jobs LIMIT 1;`);
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
+    logger.error(error);
     throw new Error('jobs server boot failed...');
   } finally {
     if (client) {
@@ -75,8 +74,7 @@ export const waitForJobsPrereqs = async (): Promise<void> => {
 };
 
 export const bootJobs = async (): Promise<void> => {
-  // eslint-disable-next-line no-console
-  console.log('attempting to boot jobs');
+  logger.info('attempting to boot jobs');
   await retry(
     async () => {
       await waitForJobsPrereqs();

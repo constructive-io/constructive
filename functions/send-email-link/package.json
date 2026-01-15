@@ -20,6 +20,7 @@
     "@launchql/postmaster": "0.1.4",
     "@launchql/styled-email": "0.1.0",
     "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
     "graphql-request": "^7.1.2",
     "graphql-tag": "^2.12.6"
   }

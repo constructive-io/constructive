@@ -4,6 +4,7 @@ import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
 import type { Server as HttpServer } from 'http';
+import { createLogger } from '@pgpmjs/logger';
 
 type JobCallbackStatus = 'success' | 'error';
 
@@ -108,8 +109,7 @@ const sendJobCallback = async (
   }
 
   try {
-    // eslint-disable-next-line no-console
-    console.log('[knative-job-fn] Sending job callback', {
+    logger.info('Sending job callback', {
       status,
       target: normalizeCallbackUrl(callbackUrl),
       workerId,
@@ -118,14 +118,15 @@ const sendJobCallback = async (
     });
     await postJson(target, headers, body);
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('[knative-job-fn] Failed to POST job callback', {
+    logger.error('Failed to POST job callback', {
       target,
       status,
       err
     });
   }
 };
+
+const logger = createLogger('knative-job-fn');
 
 const createJobApp = () => {
   const app: any = express();
@@ -149,8 +150,7 @@ const createJobApp = () => {
         body = undefined;
       }
 
-      // eslint-disable-next-line no-console
-      console.log('[knative-job-fn] Incoming job request', {
+      logger.info('Incoming job request', {
         method: req.method,
         path: req.originalUrl || req.url,
         headers,
@@ -192,8 +192,7 @@ const createJobApp = () => {
         // If an error handler already sent a callback, skip.
         if (res.locals.jobCallbackSent) return;
         res.locals.jobCallbackSent = true;
-        // eslint-disable-next-line no-console
-        console.log('[knative-job-fn] Function completed', {
+        logger.info('Function completed', {
           workerId: ctx.workerId,
           jobId: ctx.jobId,
           databaseId: ctx.databaseId,
@@ -233,8 +232,7 @@ const createJobApp = () => {
             await sendJobCallback(ctx, 'error', error?.message);
           }
         } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error('[knative-job-fn] Failed to send error callback', err);
+          logger.error('Failed to send error callback', err);
         }
 
         // Log the full error context for debugging.
@@ -257,8 +255,7 @@ const createJobApp = () => {
             };
           }
 
-          // eslint-disable-next-line no-console
-          console.error('[knative-job-fn] Function error', {
+          logger.error('Function error', {
             headers,
             path: req.originalUrl || req.url,
             error: errorDetails

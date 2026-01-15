@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { parseEnvBoolean } from '@pgpmjs/env';
+import { createLogger } from '@pgpmjs/logger';
 
 import { CombinedServer } from './server';
 import {
@@ -84,6 +85,8 @@ export const buildCombinedServerOptionsFromEnv = (): CombinedServerOptions => ({
   functions: buildFunctionsOptions()
 });
 
+const logger = createLogger('combined-server');
+
 export const startCombinedServerFromEnv = async (): Promise<CombinedServerResult> => {
   const server = new CombinedServer(buildCombinedServerOptionsFromEnv());
   return server.start();
@@ -91,8 +94,7 @@ export const startCombinedServerFromEnv = async (): Promise<CombinedServerResult
 
 if (require.main === module) {
   void startCombinedServerFromEnv().catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error('Combined server failed to start:', error);
+    logger.error('Combined server failed to start:', error);
     process.exit(1);
   });
 }
