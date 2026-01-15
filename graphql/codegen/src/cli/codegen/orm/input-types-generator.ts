@@ -242,7 +242,8 @@ type FilterOperators =
   | 'string'
   | 'json'
   | 'inet'
-  | 'fulltext';
+  | 'fulltext'
+  | 'listArray';
 
 interface ScalarFilterConfig {
   name: string;
@@ -305,6 +306,22 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
     operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
+  // List filters (for array fields like string[], int[], uuid[])
+  {
+    name: 'StringListFilter',
+    tsType: 'string[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
+  {
+    name: 'IntListFilter',
+    tsType: 'number[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
+  {
+    name: 'UUIDListFilter',
+    tsType: 'string[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
 ];
 
 /**
@@ -398,6 +415,23 @@ function buildScalarFilterProperties(
   // Full-text search operators
   if (operators.includes('fulltext')) {
     props.push({ name: 'matches', type: 'string', optional: true });
+  }
+
+  // List/Array operators (contains, overlaps, anyEqualTo, etc.)
+  if (operators.includes('listArray')) {
+    // Extract base type from array type (e.g., 'string[]' -> 'string')
+    const baseType = tsType.replace('[]', '');
+    props.push(
+      { name: 'contains', type: tsType, optional: true },
+      { name: 'containedBy', type: tsType, optional: true },
+      { name: 'overlaps', type: tsType, optional: true },
+      { name: 'anyEqualTo', type: baseType, optional: true },
+      { name: 'anyNotEqualTo', type: baseType, optional: true },
+      { name: 'anyLessThan', type: baseType, optional: true },
+      { name: 'anyLessThanOrEqualTo', type: baseType, optional: true },
+      { name: 'anyGreaterThan', type: baseType, optional: true },
+      { name: 'anyGreaterThanOrEqualTo', type: baseType, optional: true }
+    );
   }
 
   return props;

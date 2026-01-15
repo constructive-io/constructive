@@ -215,7 +215,7 @@ export interface LoginMutationResult {
 export function useLoginMutation(options?: Omit<UseMutationOptions<LoginMutationResult, Error, LoginMutationVariables>, 'mutationFn'>) {
   return useMutation({
     mutationKey: customMutationKeys.login(),
-    mutationFn: (variables: LoginMutationVariables) => execute(loginMutationDocument, variables),
+    mutationFn: (variables: LoginMutationVariables) => execute<LoginMutationResult, LoginMutationVariables>(loginMutationDocument, variables),
     ...options
   });
 }"
@@ -250,7 +250,7 @@ export interface RegisterMutationResult {
 export function useRegisterMutation(options?: Omit<UseMutationOptions<RegisterMutationResult, Error, RegisterMutationVariables>, 'mutationFn'>) {
   return useMutation({
     mutationKey: customMutationKeys.register(),
-    mutationFn: (variables: RegisterMutationVariables) => execute(registerMutationDocument, variables),
+    mutationFn: (variables: RegisterMutationVariables) => execute<RegisterMutationResult, RegisterMutationVariables>(registerMutationDocument, variables),
     ...options
   });
 }"
@@ -282,7 +282,7 @@ export interface LogoutMutationResult {
 export function useLogoutMutation(options?: Omit<UseMutationOptions<LogoutMutationResult, Error, void>, 'mutationFn'>) {
   return useMutation({
     mutationKey: customMutationKeys.logout(),
-    mutationFn: () => execute(logoutMutationDocument),
+    mutationFn: () => execute<LogoutMutationResult>(logoutMutationDocument),
     ...options
   });
 }"
@@ -316,7 +316,7 @@ export interface LoginMutationResult {
 }
 export function useLoginMutation(options?: Omit<UseMutationOptions<LoginMutationResult, Error, LoginMutationVariables>, 'mutationFn'>) {
   return useMutation({
-    mutationFn: (variables: LoginMutationVariables) => execute(loginMutationDocument, variables),
+    mutationFn: (variables: LoginMutationVariables) => execute<LoginMutationResult, LoginMutationVariables>(loginMutationDocument, variables),
     ...options
   });
 }"
@@ -365,7 +365,7 @@ export const searchUsersQueryKey = customQueryKeys.searchUsers;
 export function useSearchUsersQuery(variables: SearchUsersQueryVariables, options?: Omit<UseQueryOptions<SearchUsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => execute(searchUsersQueryDocument, variables),
+    queryFn: () => execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables),
     enabled: !!variables && options?.enabled !== false,
     ...options
   });
@@ -379,7 +379,7 @@ export function useSearchUsersQuery(variables: SearchUsersQueryVariables, option
  * \`\`\`
  */
 export async function fetchSearchUsersQuery(variables: SearchUsersQueryVariables, options?: ExecuteOptions): Promise<SearchUsersQueryResult> {
-  return execute(searchUsersQueryDocument, variables, options);
+  return execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables, options);
 }
 /**
  * Prefetch searchUsers for SSR or cache warming
@@ -392,7 +392,7 @@ export async function fetchSearchUsersQuery(variables: SearchUsersQueryVariables
 export async function prefetchSearchUsersQuery(queryClient: QueryClient, variables: SearchUsersQueryVariables, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => execute(searchUsersQueryDocument, variables, options)
+    queryFn: () => execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables, options)
   });
 }"
 `;
@@ -436,7 +436,7 @@ export const currentUserQueryKey = customQueryKeys.currentUser;
 export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute(currentUserQueryDocument),
+    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument),
     ...options
   });
 }
@@ -449,7 +449,7 @@ export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQu
  * \`\`\`
  */
 export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<CurrentUserQueryResult> {
-  return execute(currentUserQueryDocument, undefined, options);
+  return execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options);
 }
 /**
  * Prefetch currentUser for SSR or cache warming
@@ -462,7 +462,7 @@ export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<C
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute(currentUserQueryDocument, undefined, options)
+    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options)
   });
 }"
 `;
@@ -505,7 +505,7 @@ export const currentUserQueryKey = () => ["currentUser"] as const;
 export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute(currentUserQueryDocument),
+    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument),
     ...options
   });
 }
@@ -518,7 +518,7 @@ export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQu
  * \`\`\`
  */
 export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<CurrentUserQueryResult> {
-  return execute(currentUserQueryDocument, undefined, options);
+  return execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options);
 }
 /**
  * Prefetch currentUser for SSR or cache warming
@@ -531,7 +531,7 @@ export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<C
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute(currentUserQueryDocument, undefined, options)
+    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options)
   });
 }"
 `;
@@ -597,7 +597,7 @@ export function useCreateUserMutation(options?: Omit<UseMutationOptions<CreateUs
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.create(),
-    mutationFn: (variables: CreateUserMutationVariables) => execute(createUserMutationDocument, variables),
+    mutationFn: (variables: CreateUserMutationVariables) => execute<CreateUserMutationResult, CreateUserMutationVariables>(createUserMutationDocument, variables),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.lists()
@@ -674,7 +674,7 @@ export function useCreatePostMutation(options?: Omit<UseMutationOptions<CreatePo
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.create(),
-    mutationFn: (variables: CreatePostMutationVariables) => execute(createPostMutationDocument, variables),
+    mutationFn: (variables: CreatePostMutationVariables) => execute<CreatePostMutationResult, CreatePostMutationVariables>(createPostMutationDocument, variables),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: postKeys.lists()
@@ -743,7 +743,7 @@ export interface CreateUserMutationResult {
 export function useCreateUserMutation(options?: Omit<UseMutationOptions<CreateUserMutationResult, Error, CreateUserMutationVariables>, 'mutationFn'>) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: CreateUserMutationVariables) => execute(createUserMutationDocument, variables),
+    mutationFn: (variables: CreateUserMutationVariables) => execute<CreateUserMutationResult, CreateUserMutationVariables>(createUserMutationDocument, variables),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user", "list"]
@@ -803,7 +803,7 @@ export function useDeleteUserMutation(options?: Omit<UseMutationOptions<DeleteUs
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: (variables: DeleteUserMutationVariables) => execute(deleteUserMutationDocument, variables),
+    mutationFn: (variables: DeleteUserMutationVariables) => execute<DeleteUserMutationResult, DeleteUserMutationVariables>(deleteUserMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
         queryKey: userKeys.detail(variables.input.id)
@@ -867,7 +867,7 @@ export function useDeletePostMutation(options?: Omit<UseMutationOptions<DeletePo
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: (variables: DeletePostMutationVariables) => execute(deletePostMutationDocument, variables),
+    mutationFn: (variables: DeletePostMutationVariables) => execute<DeletePostMutationResult, DeletePostMutationVariables>(deletePostMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
         queryKey: postKeys.detail(variables.input.id)
@@ -927,7 +927,7 @@ export interface DeleteUserMutationResult {
 export function useDeleteUserMutation(options?: Omit<UseMutationOptions<DeleteUserMutationResult, Error, DeleteUserMutationVariables>, 'mutationFn'>) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: DeleteUserMutationVariables) => execute(deleteUserMutationDocument, variables),
+    mutationFn: (variables: DeleteUserMutationVariables) => execute<DeleteUserMutationResult, DeleteUserMutationVariables>(deleteUserMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
         queryKey: ["user", "detail", variables.input.id]
@@ -1005,7 +1005,7 @@ export function useUpdateUserMutation(options?: Omit<UseMutationOptions<UpdateUs
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: (variables: UpdateUserMutationVariables) => execute(updateUserMutationDocument, variables),
+    mutationFn: (variables: UpdateUserMutationVariables) => execute<UpdateUserMutationResult, UpdateUserMutationVariables>(updateUserMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: userKeys.detail(variables.input.id)
@@ -1088,7 +1088,7 @@ export function useUpdatePostMutation(options?: Omit<UseMutationOptions<UpdatePo
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: (variables: UpdatePostMutationVariables) => execute(updatePostMutationDocument, variables),
+    mutationFn: (variables: UpdatePostMutationVariables) => execute<UpdatePostMutationResult, UpdatePostMutationVariables>(updatePostMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: postKeys.detail(variables.input.id)
@@ -1163,7 +1163,7 @@ export interface UpdateUserMutationResult {
 export function useUpdateUserMutation(options?: Omit<UseMutationOptions<UpdateUserMutationResult, Error, UpdateUserMutationVariables>, 'mutationFn'>) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: UpdateUserMutationVariables) => execute(updateUserMutationDocument, variables),
+    mutationFn: (variables: UpdateUserMutationVariables) => execute<UpdateUserMutationResult, UpdateUserMutationVariables>(updateUserMutationDocument, variables),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["user", "detail", variables.input.id]
@@ -1192,8 +1192,17 @@ import type { User, UUIDFilter, StringFilter, DatetimeFilter } from "../types";
 import { userKeys } from "../query-keys";
 export type { User } from "../types";
 export const usersQueryDocument = \`
-query UsersQuery($first: Int, $offset: Int, $filter: UserFilter, $orderBy: [UsersOrderBy!]) {
-  users(first: $first, offset: $offset, filter: $filter, orderBy: $orderBy) {
+query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: UserFilter, $condition: UserCondition, $orderBy: [UsersOrderBy!]) {
+  users(
+    first: $first
+    last: $last
+    offset: $offset
+    before: $before
+    after: $after
+    filter: $filter
+    condition: $condition
+    orderBy: $orderBy
+  ) {
     totalCount
     nodes {
       id
@@ -1219,11 +1228,21 @@ interface UserFilter {
   or?: UserFilter[];
   not?: UserFilter;
 }
+interface UserCondition {
+  id?: string;
+  email?: string;
+  name?: string;
+  createdAt?: string;
+}
 type UsersOrderBy = "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 export interface UsersQueryVariables {
   first?: number;
+  last?: number;
   offset?: number;
+  before?: string;
+  after?: string;
   filter?: UserFilter;
+  condition?: UserCondition;
   orderBy?: UsersOrderBy[];
 }
 export interface UsersQueryResult {
@@ -1255,7 +1274,7 @@ export const usersQueryKey = userKeys.list;
 export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<UseQueryOptions<UsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: userKeys.list(variables),
-    queryFn: () => execute(usersQueryDocument, variables),
+    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables),
     ...options
   });
 }
@@ -1275,7 +1294,7 @@ export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<Us
  * \`\`\`
  */
 export async function fetchUsersQuery(variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<UsersQueryResult> {
-  return execute(usersQueryDocument, variables, options);
+  return execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options);
 }
 /**
  * Prefetch User list for SSR or cache warming
@@ -1288,7 +1307,7 @@ export async function fetchUsersQuery(variables?: UsersQueryVariables, options?:
 export async function prefetchUsersQuery(queryClient: QueryClient, variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: userKeys.list(variables),
-    queryFn: () => execute(usersQueryDocument, variables, options)
+    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options)
   });
 }"
 `;
@@ -1309,8 +1328,17 @@ import { postKeys } from "../query-keys";
 import type { PostScope } from "../query-keys";
 export type { Post } from "../types";
 export const postsQueryDocument = \`
-query PostsQuery($first: Int, $offset: Int, $filter: PostFilter, $orderBy: [PostsOrderBy!]) {
-  posts(first: $first, offset: $offset, filter: $filter, orderBy: $orderBy) {
+query PostsQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: PostFilter, $condition: PostCondition, $orderBy: [PostsOrderBy!]) {
+  posts(
+    first: $first
+    last: $last
+    offset: $offset
+    before: $before
+    after: $after
+    filter: $filter
+    condition: $condition
+    orderBy: $orderBy
+  ) {
     totalCount
     nodes {
       id
@@ -1340,11 +1368,23 @@ interface PostFilter {
   or?: PostFilter[];
   not?: PostFilter;
 }
+interface PostCondition {
+  id?: string;
+  title?: string;
+  content?: string;
+  authorId?: string;
+  published?: boolean;
+  createdAt?: string;
+}
 type PostsOrderBy = "ID_ASC" | "ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "PUBLISHED_ASC" | "PUBLISHED_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 export interface PostsQueryVariables {
   first?: number;
+  last?: number;
   offset?: number;
+  before?: string;
+  after?: string;
   filter?: PostFilter;
+  condition?: PostCondition;
   orderBy?: PostsOrderBy[];
 }
 export interface PostsQueryResult {
@@ -1388,7 +1428,7 @@ export function usePostsQuery(variables?: PostsQueryVariables, options?: Omit<Us
   } = options ?? {};
   return useQuery({
     queryKey: postKeys.list(variables, scope),
-    queryFn: () => execute(postsQueryDocument, variables),
+    queryFn: () => execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables),
     ...queryOptions
   });
 }
@@ -1408,7 +1448,7 @@ export function usePostsQuery(variables?: PostsQueryVariables, options?: Omit<Us
  * \`\`\`
  */
 export async function fetchPostsQuery(variables?: PostsQueryVariables, options?: ExecuteOptions): Promise<PostsQueryResult> {
-  return execute(postsQueryDocument, variables, options);
+  return execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables, options);
 }
 /**
  * Prefetch Post list for SSR or cache warming
@@ -1421,7 +1461,7 @@ export async function fetchPostsQuery(variables?: PostsQueryVariables, options?:
 export async function prefetchPostsQuery(queryClient: QueryClient, variables?: PostsQueryVariables, scope?: PostScope, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: postKeys.list(variables, scope),
-    queryFn: () => execute(postsQueryDocument, variables, options)
+    queryFn: () => execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables, options)
   });
 }"
 `;
@@ -1440,8 +1480,17 @@ import type { ExecuteOptions } from "../client";
 import type { User, UUIDFilter, StringFilter, DatetimeFilter } from "../types";
 export type { User } from "../types";
 export const usersQueryDocument = \`
-query UsersQuery($first: Int, $offset: Int, $filter: UserFilter, $orderBy: [UsersOrderBy!]) {
-  users(first: $first, offset: $offset, filter: $filter, orderBy: $orderBy) {
+query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: UserFilter, $condition: UserCondition, $orderBy: [UsersOrderBy!]) {
+  users(
+    first: $first
+    last: $last
+    offset: $offset
+    before: $before
+    after: $after
+    filter: $filter
+    condition: $condition
+    orderBy: $orderBy
+  ) {
     totalCount
     nodes {
       id
@@ -1467,11 +1516,21 @@ interface UserFilter {
   or?: UserFilter[];
   not?: UserFilter;
 }
+interface UserCondition {
+  id?: string;
+  email?: string;
+  name?: string;
+  createdAt?: string;
+}
 type UsersOrderBy = "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
 export interface UsersQueryVariables {
   first?: number;
+  last?: number;
   offset?: number;
+  before?: string;
+  after?: string;
   filter?: UserFilter;
+  condition?: UserCondition;
   orderBy?: UsersOrderBy[];
 }
 export interface UsersQueryResult {
@@ -1502,7 +1561,7 @@ export const usersQueryKey = (variables?: UsersQueryVariables) => ["user", "list
 export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<UseQueryOptions<UsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: usersQueryKey(variables),
-    queryFn: () => execute(usersQueryDocument, variables),
+    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables),
     ...options
   });
 }
@@ -1522,7 +1581,7 @@ export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<Us
  * \`\`\`
  */
 export async function fetchUsersQuery(variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<UsersQueryResult> {
-  return execute(usersQueryDocument, variables, options);
+  return execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options);
 }
 /**
  * Prefetch User list for SSR or cache warming
@@ -1535,7 +1594,7 @@ export async function fetchUsersQuery(variables?: UsersQueryVariables, options?:
 export async function prefetchUsersQuery(queryClient: QueryClient, variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: usersQueryKey(variables),
-    queryFn: () => execute(usersQueryDocument, variables, options)
+    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options)
   });
 }"
 `;
@@ -1583,7 +1642,7 @@ export const userQueryKey = userKeys.detail;
 export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQueryOptions<UserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: userKeys.detail(variables.id),
-    queryFn: () => execute(userQueryDocument, variables),
+    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables),
     ...options
   });
 }
@@ -1596,7 +1655,7 @@ export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQu
  * \`\`\`
  */
 export async function fetchUserQuery(variables: UserQueryVariables, options?: ExecuteOptions): Promise<UserQueryResult> {
-  return execute(userQueryDocument, variables, options);
+  return execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options);
 }
 /**
  * Prefetch a single User for SSR or cache warming
@@ -1609,7 +1668,7 @@ export async function fetchUserQuery(variables: UserQueryVariables, options?: Ex
 export async function prefetchUserQuery(queryClient: QueryClient, variables: UserQueryVariables, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: userKeys.detail(variables.id),
-    queryFn: () => execute(userQueryDocument, variables, options)
+    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options)
   });
 }"
 `;
@@ -1672,7 +1731,7 @@ export function usePostQuery(variables: PostQueryVariables, options?: Omit<UseQu
   } = options ?? {};
   return useQuery({
     queryKey: postKeys.detail(variables.id, scope),
-    queryFn: () => execute(postQueryDocument, variables),
+    queryFn: () => execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables),
     ...queryOptions
   });
 }
@@ -1685,7 +1744,7 @@ export function usePostQuery(variables: PostQueryVariables, options?: Omit<UseQu
  * \`\`\`
  */
 export async function fetchPostQuery(variables: PostQueryVariables, options?: ExecuteOptions): Promise<PostQueryResult> {
-  return execute(postQueryDocument, variables, options);
+  return execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables, options);
 }
 /**
  * Prefetch a single Post for SSR or cache warming
@@ -1698,7 +1757,7 @@ export async function fetchPostQuery(variables: PostQueryVariables, options?: Ex
 export async function prefetchPostQuery(queryClient: QueryClient, variables: PostQueryVariables, scope?: PostScope, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: postKeys.detail(variables.id, scope),
-    queryFn: () => execute(postQueryDocument, variables, options)
+    queryFn: () => execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables, options)
   });
 }"
 `;
@@ -1744,7 +1803,7 @@ export const userQueryKey = (id: string) => ["user", "detail", id] as const;
 export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQueryOptions<UserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
   return useQuery({
     queryKey: userQueryKey(variables.id),
-    queryFn: () => execute(userQueryDocument, variables),
+    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables),
     ...options
   });
 }
@@ -1757,7 +1816,7 @@ export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQu
  * \`\`\`
  */
 export async function fetchUserQuery(variables: UserQueryVariables, options?: ExecuteOptions): Promise<UserQueryResult> {
-  return execute(userQueryDocument, variables, options);
+  return execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options);
 }
 /**
  * Prefetch a single User for SSR or cache warming
@@ -1770,7 +1829,7 @@ export async function fetchUserQuery(variables: UserQueryVariables, options?: Ex
 export async function prefetchUserQuery(queryClient: QueryClient, variables: UserQueryVariables, options?: ExecuteOptions): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: userQueryKey(variables.id),
-    queryFn: () => execute(userQueryDocument, variables, options)
+    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options)
   });
 }"
 `;

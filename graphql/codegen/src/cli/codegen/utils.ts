@@ -381,6 +381,25 @@ export function getPrimaryKeyFields(table: CleanTable): string[] {
   return getPrimaryKeyInfo(table).map((pk) => pk.name);
 }
 
+/**
+ * Check if table has a valid single-field primary key
+ * Used to determine if a single query hook can be generated
+ * Tables with composite keys return false (handled as custom queries)
+ */
+export function hasValidPrimaryKey(table: CleanTable): boolean {
+  // Check for explicit primary key constraint with single field
+  const pk = table.constraints?.primaryKey?.[0];
+  if (pk && pk.fields.length === 1) {
+    return true;
+  }
+  // Check for 'id' field as fallback
+  const idField = table.fields.find((f) => f.name.toLowerCase() === 'id');
+  if (idField) {
+    return true;
+  }
+  return false;
+}
+
 // ============================================================================
 // Query key generation
 // ============================================================================

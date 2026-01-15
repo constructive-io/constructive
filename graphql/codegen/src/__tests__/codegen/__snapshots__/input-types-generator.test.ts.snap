@@ -166,6 +166,66 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
 // ============ Entity Types ============
 export interface User {
   id: string;
@@ -578,6 +638,66 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
 // ============ Entity Types ============
 export interface User {
   id: string;
@@ -833,6 +953,66 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
 }
 // ============ Entity Types ============
 export interface User {
@@ -1101,6 +1281,66 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
 }
 // ============ Entity Types ============
 export interface User {
@@ -1374,6 +1614,66 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
 }
 // ============ Entity Types ============
 export interface User {
@@ -1700,6 +2000,66 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
 // ============ Entity Types ============
 export interface Post {
   id: string;
@@ -2017,5 +2377,65 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface StringListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
+}
+export interface IntListFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+  lessThan?: number[];
+  lessThanOrEqualTo?: number[];
+  greaterThan?: number[];
+  greaterThanOrEqualTo?: number[];
+  contains?: number[];
+  containedBy?: number[];
+  overlaps?: number[];
+  anyEqualTo?: number;
+  anyNotEqualTo?: number;
+  anyLessThan?: number;
+  anyLessThanOrEqualTo?: number;
+  anyGreaterThan?: number;
+  anyGreaterThanOrEqualTo?: number;
+}
+export interface UUIDListFilter {
+  isNull?: boolean;
+  equalTo?: string[];
+  notEqualTo?: string[];
+  distinctFrom?: string[];
+  notDistinctFrom?: string[];
+  lessThan?: string[];
+  lessThanOrEqualTo?: string[];
+  greaterThan?: string[];
+  greaterThanOrEqualTo?: string[];
+  contains?: string[];
+  containedBy?: string[];
+  overlaps?: string[];
+  anyEqualTo?: string;
+  anyNotEqualTo?: string;
+  anyLessThan?: string;
+  anyLessThanOrEqualTo?: string;
+  anyGreaterThan?: string;
+  anyGreaterThanOrEqualTo?: string;
 }"
 `;

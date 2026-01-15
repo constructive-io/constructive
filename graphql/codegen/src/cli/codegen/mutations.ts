@@ -9,7 +9,7 @@
  */
 import type { CleanTable } from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam } from './babel-ast';
+import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import {
   buildCreateMutationAST,
   buildUpdateMutationAST,
@@ -56,6 +56,8 @@ export interface MutationGeneratorOptions {
   enumsFromSchemaTypes?: string[];
   useCentralizedKeys?: boolean;
   hasRelationships?: boolean;
+  /** All table type names for determining which types to import from types.ts vs schema-types.ts */
+  tableTypeNames?: Set<string>;
 }
 
 export function generateCreateMutationHook(
@@ -67,6 +69,7 @@ export function generateCreateMutationHook(
     enumsFromSchemaTypes = [],
     useCentralizedKeys = true,
     hasRelationships = false,
+    tableTypeNames = new Set<string>(),
   } = options;
 
   if (!reactQueryEnabled) {
@@ -85,10 +88,14 @@ export function generateCreateMutationHook(
   const pkFieldNames = new Set(getPrimaryKeyInfo(table).map((pk) => pk.name));
 
   const usedEnums = new Set<string>();
+  const usedTableTypes = new Set<string>();
   for (const field of scalarFields) {
     const cleanType = field.type.gqlType.replace(/!/g, '');
     if (enumSet.has(cleanType)) {
       usedEnums.add(cleanType);
+    } else if (tableTypeNames.has(cleanType) && cleanType !== typeName) {
+      // Track table types used in scalar fields (excluding the main type which is already imported)
+      usedTableTypes.add(cleanType);
     }
   }
 
@@ -119,8 +126,10 @@ export function generateCreateMutationHook(
   );
   statements.push(clientImport);
 
+  // Import the main type and any other table types used in scalar fields
+  const allTypesToImport = [typeName, ...Array.from(usedTableTypes)].sort();
   const typesImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier(typeName), t.identifier(typeName))],
+    allTypesToImport.map((t_) => t.importSpecifier(t.identifier(t_), t.identifier(t_))),
     t.stringLiteral('../types')
   );
   typesImport.importKind = 'type';
@@ -269,10 +278,14 @@ export function generateCreateMutationHook(
         t.identifier('mutationFn'),
         t.arrowFunctionExpression(
           [typedParam('variables', t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)))],
-          t.callExpression(t.identifier('execute'), [
-            t.identifier(`${mutationName}MutationDocument`),
-            t.identifier('variables'),
-          ])
+          createTypedCallExpression(
+            t.identifier('execute'),
+            [t.identifier(`${mutationName}MutationDocument`), t.identifier('variables')],
+            [
+              t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationResult`)),
+              t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)),
+            ]
+          )
         )
       )
     );
@@ -352,6 +365,7 @@ export function generateUpdateMutationHook(
     enumsFromSchemaTypes = [],
     useCentralizedKeys = true,
     hasRelationships = false,
+    tableTypeNames = new Set<string>(),
   } = options;
 
   if (!reactQueryEnabled) {
@@ -376,10 +390,13 @@ export function generateUpdateMutationHook(
   const pkFieldNames = new Set(pkFields.map((pk) => pk.name));
 
   const usedEnums = new Set<string>();
+  const usedTableTypes = new Set<string>();
   for (const field of scalarFields) {
     const cleanType = field.type.gqlType.replace(/!/g, '');
     if (enumSet.has(cleanType)) {
       usedEnums.add(cleanType);
+    } else if (tableTypeNames.has(cleanType) && cleanType !== typeName) {
+      usedTableTypes.add(cleanType);
     }
   }
 
@@ -410,8 +427,10 @@ export function generateUpdateMutationHook(
   );
   statements.push(clientImport);
 
+  // Import the main type and any other table types used in scalar fields
+  const allTypesToImportUpdate = [typeName, ...Array.from(usedTableTypes)].sort();
   const typesImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier(typeName), t.identifier(typeName))],
+    allTypesToImportUpdate.map((t_) => t.importSpecifier(t.identifier(t_), t.identifier(t_))),
     t.stringLiteral('../types')
   );
   typesImport.importKind = 'type';
@@ -565,10 +584,14 @@ export function generateUpdateMutationHook(
       t.identifier('mutationFn'),
       t.arrowFunctionExpression(
         [typedParam('variables', t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)))],
-        t.callExpression(t.identifier('execute'), [
-          t.identifier(`${mutationName}MutationDocument`),
-          t.identifier('variables'),
-        ])
+        createTypedCallExpression(
+          t.identifier('execute'),
+          [t.identifier(`${mutationName}MutationDocument`), t.identifier('variables')],
+          [
+            t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationResult`)),
+            t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)),
+          ]
+        )
       )
     )
   );
@@ -816,10 +839,14 @@ export function generateDeleteMutationHook(
       t.identifier('mutationFn'),
       t.arrowFunctionExpression(
         [typedParam('variables', t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)))],
-        t.callExpression(t.identifier('execute'), [
-          t.identifier(`${mutationName}MutationDocument`),
-          t.identifier('variables'),
-        ])
+        createTypedCallExpression(
+          t.identifier('execute'),
+          [t.identifier(`${mutationName}MutationDocument`), t.identifier('variables')],
+          [
+            t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationResult`)),
+            t.tsTypeReference(t.identifier(`${ucFirst(mutationName)}MutationVariables`)),
+          ]
+        )
       )
     )
   );

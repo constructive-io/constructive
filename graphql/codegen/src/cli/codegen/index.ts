@@ -255,6 +255,7 @@ export function generate(options: GenerateOptions): GenerateResult {
     enumsFromSchemaTypes: generatedEnumNames,
     useCentralizedKeys,
     hasRelationships,
+    tableTypeNames,
   });
   for (const hook of mutationHooks) {
     files.push({
