@@ -137,7 +137,7 @@ const waitForJobCompletion = async (
 
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
-// Ports are fixed, if these're occupied, then the test just feel free to fail.
+// Ports are fixed by test design, if these're occupied, then the test just feel free to fail.
 const GRAPHQL_PORT = 3000;
 const CALLBACK_PORT = 12345;
 const SIMPLE_EMAIL_PORT = 8081;
