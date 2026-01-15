@@ -1,5 +1,5 @@
 /**
- * Query hook generators using AST-based code generation
+ * Query hook generators using Babel AST-based code generation
  *
  * Output structure:
  * queries/
@@ -7,19 +7,8 @@
  *   useCarQuery.ts     - Single item query hook
  */
 import type { CleanTable } from '../../types/schema';
-import {
-  createProject,
-  createSourceFile,
-  getFormattedOutput,
-  createFileHeader,
-  createImport,
-  createInterface,
-  createConst,
-  createTypeAlias,
-  createUnionType,
-  createFilterInterface,
-  type InterfaceProperty,
-} from './ts-ast';
+import * as t from '@babel/types';
+import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import {
   buildListQueryAST,
   buildSingleQueryAST,
@@ -34,12 +23,17 @@ import {
   getAllRowsQueryName,
   getSingleRowQueryName,
   getFilterTypeName,
+  getConditionTypeName,
   getOrderByTypeName,
   getScalarFields,
   getScalarFilterType,
   getPrimaryKeyInfo,
+  hasValidPrimaryKey,
+  fieldTypeToTs,
   toScreamingSnake,
   ucFirst,
+  lcFirst,
+  getGeneratedFileHeader,
 } from './utils';
 
 export interface GeneratedQueryFile {
@@ -48,43 +42,84 @@ export interface GeneratedQueryFile {
 }
 
 export interface QueryGeneratorOptions {
-  /** Whether to generate React Query hooks (default: true for backwards compatibility) */
   reactQueryEnabled?: boolean;
+  useCentralizedKeys?: boolean;
+  hasRelationships?: boolean;
 }
 
-// ============================================================================
-// List query hook generator
-// ============================================================================
+function createUnionType(values: string[]): t.TSUnionType {
+  return t.tsUnionType(values.map((v) => t.tsLiteralType(t.stringLiteral(v))));
+}
 
-/**
- * Generate list query hook file content using AST
- */
+function createFilterInterfaceDeclaration(
+  name: string,
+  fieldFilters: Array<{ fieldName: string; filterType: string }>,
+  isExported: boolean = true
+): t.Statement {
+  const properties: t.TSPropertySignature[] = [];
+  for (const filter of fieldFilters) {
+    const prop = t.tsPropertySignature(
+      t.identifier(filter.fieldName),
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filter.filterType)))
+    );
+    prop.optional = true;
+    properties.push(prop);
+  }
+  const andProp = t.tsPropertySignature(
+    t.identifier('and'),
+    t.tsTypeAnnotation(t.tsArrayType(t.tsTypeReference(t.identifier(name))))
+  );
+  andProp.optional = true;
+  properties.push(andProp);
+  const orProp = t.tsPropertySignature(
+    t.identifier('or'),
+    t.tsTypeAnnotation(t.tsArrayType(t.tsTypeReference(t.identifier(name))))
+  );
+  orProp.optional = true;
+  properties.push(orProp);
+  const notProp = t.tsPropertySignature(
+    t.identifier('not'),
+    t.tsTypeAnnotation(t.tsTypeReference(t.identifier(name)))
+  );
+  notProp.optional = true;
+  properties.push(notProp);
+  const body = t.tsInterfaceBody(properties);
+  const interfaceDecl = t.tsInterfaceDeclaration(
+    t.identifier(name),
+    null,
+    null,
+    body
+  );
+  if (isExported) {
+    return t.exportNamedDeclaration(interfaceDecl);
+  }
+  return interfaceDecl;
+}
+
 export function generateListQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile {
-  const { reactQueryEnabled = true } = options;
-  const project = createProject();
+  const {
+    reactQueryEnabled = true,
+    useCentralizedKeys = true,
+    hasRelationships = false,
+  } = options;
   const { typeName, pluralName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
   const queryName = getAllRowsQueryName(table);
   const filterTypeName = getFilterTypeName(table);
+  const conditionTypeName = getConditionTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
   const scalarFields = getScalarFields(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const scopeTypeName = `${typeName}Scope`;
 
-  // Generate GraphQL document via AST
   const queryAST = buildListQueryAST({ table });
   const queryDocument = printGraphQL(queryAST);
 
-  const sourceFile = createSourceFile(project, getListQueryFileName(table));
+  const statements: t.Statement[] = [];
 
-  // Add file header as leading comment
-  const headerText = reactQueryEnabled
-    ? `List query hook for ${typeName}`
-    : `List query functions for ${typeName}`;
-  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
-
-  // Collect all filter types used by this table's fields
   const filterTypesUsed = new Set<string>();
   for (const field of scalarFields) {
     const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
@@ -93,49 +128,103 @@ export function generateListQueryHook(
     }
   }
 
-  // Add imports - conditionally include React Query imports
-  const imports = [];
   if (reactQueryEnabled) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '@tanstack/react-query',
-        namedImports: ['useQuery'],
-        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-      })
+    const reactQueryImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier('useQuery'), t.identifier('useQuery'))],
+      t.stringLiteral('@tanstack/react-query')
     );
+    statements.push(reactQueryImport);
+    const reactQueryTypeImport = t.importDeclaration(
+      [
+        t.importSpecifier(
+          t.identifier('UseQueryOptions'),
+          t.identifier('UseQueryOptions')
+        ),
+        t.importSpecifier(
+          t.identifier('QueryClient'),
+          t.identifier('QueryClient')
+        ),
+      ],
+      t.stringLiteral('@tanstack/react-query')
+    );
+    reactQueryTypeImport.importKind = 'type';
+    statements.push(reactQueryTypeImport);
   }
-  imports.push(
-    createImport({
-      moduleSpecifier: '../client',
-      namedImports: ['execute'],
-      typeOnlyNamedImports: ['ExecuteOptions'],
-    }),
-    createImport({
-      moduleSpecifier: '../types',
-      typeOnlyNamedImports: [typeName, ...Array.from(filterTypesUsed)],
-    })
+
+  const clientImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
+    t.stringLiteral('../client')
   );
-  sourceFile.addImportDeclarations(imports);
-
-  // Re-export entity type
-  sourceFile.addStatements(`\n// Re-export entity type for convenience\nexport type { ${typeName} };\n`);
-
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// GraphQL Document');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Add query document constant
-  sourceFile.addVariableStatement(
-    createConst(`${queryName}QueryDocument`, '`\n' + queryDocument + '`')
+  statements.push(clientImport);
+  const clientTypeImport = t.importDeclaration(
+    [
+      t.importSpecifier(
+        t.identifier('ExecuteOptions'),
+        t.identifier('ExecuteOptions')
+      ),
+    ],
+    t.stringLiteral('../client')
   );
+  clientTypeImport.importKind = 'type';
+  statements.push(clientTypeImport);
 
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Types');
-  sourceFile.addStatements('// ============================================================================\n');
+  const typesImport = t.importDeclaration(
+    [
+      t.importSpecifier(t.identifier(typeName), t.identifier(typeName)),
+      ...Array.from(filterTypesUsed).map((ft) =>
+        t.importSpecifier(t.identifier(ft), t.identifier(ft))
+      ),
+    ],
+    t.stringLiteral('../types')
+  );
+  typesImport.importKind = 'type';
+  statements.push(typesImport);
 
-  // Generate filter interface
+  if (useCentralizedKeys) {
+    const queryKeyImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier(keysName), t.identifier(keysName))],
+      t.stringLiteral('../query-keys')
+    );
+    statements.push(queryKeyImport);
+    if (hasRelationships) {
+      const scopeTypeImport = t.importDeclaration(
+        [
+          t.importSpecifier(
+            t.identifier(scopeTypeName),
+            t.identifier(scopeTypeName)
+          ),
+        ],
+        t.stringLiteral('../query-keys')
+      );
+      scopeTypeImport.importKind = 'type';
+      statements.push(scopeTypeImport);
+    }
+  }
+
+  const reExportDecl = t.exportNamedDeclaration(
+    null,
+    [t.exportSpecifier(t.identifier(typeName), t.identifier(typeName))],
+    t.stringLiteral('../types')
+  );
+  reExportDecl.exportKind = 'type';
+  statements.push(reExportDecl);
+
+  const queryDocConst = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier(`${queryName}QueryDocument`),
+      t.templateLiteral(
+        [
+          t.templateElement(
+            { raw: '\n' + queryDocument, cooked: '\n' + queryDocument },
+            true
+          ),
+        ],
+        []
+      )
+    ),
+  ]);
+  statements.push(t.exportNamedDeclaration(queryDocConst));
+
   const fieldFilters = scalarFields
     .map((field) => {
       const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
@@ -143,11 +232,84 @@ export function generateListQueryHook(
     })
     .filter((f): f is { fieldName: string; filterType: string } => f !== null);
 
-  // Note: Not exported to avoid conflicts with schema-types
-  sourceFile.addInterface(createFilterInterface(filterTypeName, fieldFilters, { isExported: false }));
+  statements.push(
+    createFilterInterfaceDeclaration(filterTypeName, fieldFilters, false)
+  );
 
-  // Generate OrderBy type
-  // Note: Not exported to avoid conflicts with schema-types
+  // Generate Condition interface (simple equality filter with scalar types)
+  // Track non-primitive types (enums) that need to be imported
+  const enumTypesUsed = new Set<string>();
+  const conditionProperties: t.TSPropertySignature[] = scalarFields.map(
+    (field) => {
+      const tsType = fieldTypeToTs(field.type);
+      const isPrimitive =
+        tsType === 'string' ||
+        tsType === 'number' ||
+        tsType === 'boolean' ||
+        tsType === 'unknown' ||
+        tsType.endsWith('[]');
+      let typeAnnotation: t.TSType;
+      if (field.type.isArray) {
+        const baseType = tsType.replace('[]', '');
+        const isBasePrimitive =
+          baseType === 'string' ||
+          baseType === 'number' ||
+          baseType === 'boolean' ||
+          baseType === 'unknown';
+        if (!isBasePrimitive) {
+          enumTypesUsed.add(baseType);
+        }
+        typeAnnotation = t.tsArrayType(
+          baseType === 'string'
+            ? t.tsStringKeyword()
+            : baseType === 'number'
+              ? t.tsNumberKeyword()
+              : baseType === 'boolean'
+                ? t.tsBooleanKeyword()
+                : t.tsTypeReference(t.identifier(baseType))
+        );
+      } else {
+        if (!isPrimitive) {
+          enumTypesUsed.add(tsType);
+        }
+        typeAnnotation =
+          tsType === 'string'
+            ? t.tsStringKeyword()
+            : tsType === 'number'
+              ? t.tsNumberKeyword()
+              : tsType === 'boolean'
+                ? t.tsBooleanKeyword()
+                : t.tsTypeReference(t.identifier(tsType));
+      }
+      const prop = t.tsPropertySignature(
+        t.identifier(field.name),
+        t.tsTypeAnnotation(typeAnnotation)
+      );
+      prop.optional = true;
+      return prop;
+    }
+  );
+
+  // Add import for enum types if any are used
+  if (enumTypesUsed.size > 0) {
+    const schemaTypesImport = t.importDeclaration(
+      Array.from(enumTypesUsed).map((et) =>
+        t.importSpecifier(t.identifier(et), t.identifier(et))
+      ),
+      t.stringLiteral('../schema-types')
+    );
+    schemaTypesImport.importKind = 'type';
+    statements.push(schemaTypesImport);
+  }
+
+  const conditionInterface = t.tsInterfaceDeclaration(
+    t.identifier(conditionTypeName),
+    null,
+    null,
+    t.tsInterfaceBody(conditionProperties)
+  );
+  statements.push(conditionInterface);
+
   const orderByValues = [
     ...scalarFields.flatMap((f) => [
       `${toScreamingSnake(f.name)}_ASC`,
@@ -157,446 +319,1085 @@ export function generateListQueryHook(
     'PRIMARY_KEY_ASC',
     'PRIMARY_KEY_DESC',
   ];
-  sourceFile.addTypeAlias(
-    createTypeAlias(orderByTypeName, createUnionType(orderByValues), { isExported: false })
+  const orderByTypeAlias = t.tsTypeAliasDeclaration(
+    t.identifier(orderByTypeName),
+    null,
+    createUnionType(orderByValues)
   );
+  statements.push(orderByTypeAlias);
 
-  // Variables interface
-  const variablesProps: InterfaceProperty[] = [
-    { name: 'first', type: 'number', optional: true },
-    { name: 'offset', type: 'number', optional: true },
-    { name: 'filter', type: filterTypeName, optional: true },
-    { name: 'orderBy', type: `${orderByTypeName}[]`, optional: true },
-  ];
-  sourceFile.addInterface(
-    createInterface(`${ucFirst(pluralName)}QueryVariables`, variablesProps)
+  const variablesInterfaceBody = t.tsInterfaceBody([
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('first'),
+        t.tsTypeAnnotation(t.tsNumberKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('last'),
+        t.tsTypeAnnotation(t.tsNumberKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('offset'),
+        t.tsTypeAnnotation(t.tsNumberKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('before'),
+        t.tsTypeAnnotation(t.tsStringKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('after'),
+        t.tsTypeAnnotation(t.tsStringKeyword())
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('filter'),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterTypeName)))
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('condition'),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(conditionTypeName)))
+      );
+      p.optional = true;
+      return p;
+    })(),
+    (() => {
+      const p = t.tsPropertySignature(
+        t.identifier('orderBy'),
+        t.tsTypeAnnotation(
+          t.tsArrayType(t.tsTypeReference(t.identifier(orderByTypeName)))
+        )
+      );
+      p.optional = true;
+      return p;
+    })(),
+  ]);
+  const variablesInterface = t.tsInterfaceDeclaration(
+    t.identifier(`${ucFirst(pluralName)}QueryVariables`),
+    null,
+    null,
+    variablesInterfaceBody
   );
+  statements.push(t.exportNamedDeclaration(variablesInterface));
 
-  // Result interface
-  const resultProps: InterfaceProperty[] = [
-    {
-      name: queryName,
-      type: `{
-    totalCount: number;
-    nodes: ${typeName}[];
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string | null;
-      endCursor: string | null;
-    };
-  }`,
-    },
-  ];
-  sourceFile.addInterface(
-    createInterface(`${ucFirst(pluralName)}QueryResult`, resultProps)
+  const pageInfoType = t.tsTypeLiteral([
+    t.tsPropertySignature(
+      t.identifier('hasNextPage'),
+      t.tsTypeAnnotation(t.tsBooleanKeyword())
+    ),
+    t.tsPropertySignature(
+      t.identifier('hasPreviousPage'),
+      t.tsTypeAnnotation(t.tsBooleanKeyword())
+    ),
+    t.tsPropertySignature(
+      t.identifier('startCursor'),
+      t.tsTypeAnnotation(
+        t.tsUnionType([t.tsStringKeyword(), t.tsNullKeyword()])
+      )
+    ),
+    t.tsPropertySignature(
+      t.identifier('endCursor'),
+      t.tsTypeAnnotation(
+        t.tsUnionType([t.tsStringKeyword(), t.tsNullKeyword()])
+      )
+    ),
+  ]);
+  const resultType = t.tsTypeLiteral([
+    t.tsPropertySignature(
+      t.identifier('totalCount'),
+      t.tsTypeAnnotation(t.tsNumberKeyword())
+    ),
+    t.tsPropertySignature(
+      t.identifier('nodes'),
+      t.tsTypeAnnotation(
+        t.tsArrayType(t.tsTypeReference(t.identifier(typeName)))
+      )
+    ),
+    t.tsPropertySignature(
+      t.identifier('pageInfo'),
+      t.tsTypeAnnotation(pageInfoType)
+    ),
+  ]);
+  const resultInterfaceBody = t.tsInterfaceBody([
+    t.tsPropertySignature(
+      t.identifier(queryName),
+      t.tsTypeAnnotation(resultType)
+    ),
+  ]);
+  const resultInterface = t.tsInterfaceDeclaration(
+    t.identifier(`${ucFirst(pluralName)}QueryResult`),
+    null,
+    null,
+    resultInterfaceBody
   );
+  statements.push(t.exportNamedDeclaration(resultInterface));
 
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Query Key');
-  sourceFile.addStatements('// ============================================================================\n');
+  if (useCentralizedKeys) {
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(`${queryName}QueryKey`),
+        t.memberExpression(t.identifier(keysName), t.identifier('list'))
+      ),
+    ]);
+    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
+    addJSDocComment(queryKeyExport, [
+      'Query key factory - re-exported from query-keys.ts',
+    ]);
+    statements.push(queryKeyExport);
+  } else {
+    const queryKeyArrow = t.arrowFunctionExpression(
+      [
+        typedParam(
+          'variables',
+          t.tsTypeReference(
+            t.identifier(`${ucFirst(pluralName)}QueryVariables`)
+          ),
+          true
+        ),
+      ],
+      t.tsAsExpression(
+        t.arrayExpression([
+          t.stringLiteral(typeName.toLowerCase()),
+          t.stringLiteral('list'),
+          t.identifier('variables'),
+        ]),
+        t.tsTypeReference(t.identifier('const'))
+      )
+    );
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(`${queryName}QueryKey`),
+        queryKeyArrow
+      ),
+    ]);
+    statements.push(t.exportNamedDeclaration(queryKeyConst));
+  }
 
-  // Query key factory
-  sourceFile.addVariableStatement(
-    createConst(
-      `${queryName}QueryKey`,
-      `(variables?: ${ucFirst(pluralName)}QueryVariables) =>
-  ['${typeName.toLowerCase()}', 'list', variables] as const`
+  if (reactQueryEnabled) {
+    const hookBodyStatements: t.Statement[] = [];
+    if (hasRelationships && useCentralizedKeys) {
+      hookBodyStatements.push(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.objectPattern([
+              t.objectProperty(
+                t.identifier('scope'),
+                t.identifier('scope'),
+                false,
+                true
+              ),
+              t.restElement(t.identifier('queryOptions')),
+            ]),
+            t.logicalExpression(
+              '??',
+              t.identifier('options'),
+              t.objectExpression([])
+            )
+          ),
+        ])
+      );
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(
+                  t.memberExpression(
+                    t.identifier(keysName),
+                    t.identifier('list')
+                  ),
+                  [t.identifier('variables'), t.identifier('scope')]
+                )
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('queryOptions')),
+            ]),
+          ])
+        )
+      );
+    } else if (useCentralizedKeys) {
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(
+                  t.memberExpression(
+                    t.identifier(keysName),
+                    t.identifier('list')
+                  ),
+                  [t.identifier('variables')]
+                )
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('options')),
+            ]),
+          ])
+        )
+      );
+    } else {
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(t.identifier(`${queryName}QueryKey`), [
+                  t.identifier('variables'),
+                ])
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('options')),
+            ]),
+          ])
+        )
+      );
+    }
+
+    const hookParams: t.Identifier[] = [
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+        true
+      ),
+    ];
+    let optionsTypeStr: string;
+    if (hasRelationships && useCentralizedKeys) {
+      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
+    } else {
+      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
+    }
+    const optionsParam = t.identifier('options');
+    optionsParam.optional = true;
+    optionsParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier(optionsTypeStr))
+    );
+    hookParams.push(optionsParam);
+
+    const hookFunc = t.functionDeclaration(
+      t.identifier(hookName),
+      hookParams,
+      t.blockStatement(hookBodyStatements)
+    );
+    const hookExport = t.exportNamedDeclaration(hookFunc);
+    const docLines = [
+      `Query hook for fetching ${typeName} list`,
+      '',
+      '@example',
+      '```tsx',
+      `const { data, isLoading } = ${hookName}({`,
+      '  first: 10,',
+      '  filter: { name: { equalTo: "example" } },',
+      "  orderBy: ['CREATED_AT_DESC'],",
+      '});',
+      '```',
+    ];
+    if (hasRelationships && useCentralizedKeys) {
+      docLines.push('');
+      docLines.push('@example With scope for hierarchical cache invalidation');
+      docLines.push('```tsx');
+      docLines.push(`const { data } = ${hookName}(`);
+      docLines.push('  { first: 10 },');
+      docLines.push("  { scope: { parentId: 'parent-id' } }");
+      docLines.push(');');
+      docLines.push('```');
+    }
+    addJSDocComment(hookExport, docLines);
+    statements.push(hookExport);
+  }
+
+  const fetchFuncBody = t.blockStatement([
+    t.returnStatement(
+      createTypedCallExpression(
+        t.identifier('execute'),
+        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+        [
+          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+        ]
+      )
+    ),
+  ]);
+  const fetchFunc = t.functionDeclaration(
+    t.identifier(`fetch${ucFirst(pluralName)}Query`),
+    [
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+        true
+      ),
+      typedParam(
+        'options',
+        t.tsTypeReference(t.identifier('ExecuteOptions')),
+        true
+      ),
+    ],
+    fetchFuncBody
+  );
+  fetchFunc.async = true;
+  fetchFunc.returnType = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Promise'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+      ])
     )
   );
+  const fetchExport = t.exportNamedDeclaration(fetchFunc);
+  addJSDocComment(fetchExport, [
+    `Fetch ${typeName} list without React hooks`,
+    '',
+    '@example',
+    '```ts',
+    '// Direct fetch',
+    `const data = await fetch${ucFirst(pluralName)}Query({ first: 10 });`,
+    '',
+    '// With QueryClient',
+    'const data = await queryClient.fetchQuery({',
+    `  queryKey: ${queryName}QueryKey(variables),`,
+    `  queryFn: () => fetch${ucFirst(pluralName)}Query(variables),`,
+    '});',
+    '```',
+  ]);
+  statements.push(fetchExport);
 
-  // Add React Query hook section (only if enabled)
   if (reactQueryEnabled) {
-    sourceFile.addStatements('\n// ============================================================================');
-    sourceFile.addStatements('// Hook');
-    sourceFile.addStatements('// ============================================================================\n');
+    const prefetchParams: t.Identifier[] = [
+      typedParam(
+        'queryClient',
+        t.tsTypeReference(t.identifier('QueryClient'))
+      ),
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+        true
+      ),
+    ];
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchParams.push(
+        typedParam(
+          'scope',
+          t.tsTypeReference(t.identifier(scopeTypeName)),
+          true
+        )
+      );
+    }
+    prefetchParams.push(
+      typedParam(
+        'options',
+        t.tsTypeReference(t.identifier('ExecuteOptions')),
+        true
+      )
+    );
 
-    // Hook function
-    sourceFile.addFunction({
-      name: hookName,
-      isExported: true,
-      parameters: [
-        {
-          name: 'variables',
-          type: `${ucFirst(pluralName)}QueryVariables`,
-          hasQuestionToken: true,
-        },
-        {
-          name: 'options',
-          type: `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-          hasQuestionToken: true,
-        },
-      ],
-      statements: `return useQuery({
-    queryKey: ${queryName}QueryKey(variables),
-    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
-      ${queryName}QueryDocument,
-      variables
-    ),
-    ...options,
-  });`,
-      docs: [
-        {
-          description: `Query hook for fetching ${typeName} list
+    let prefetchQueryKeyExpr: t.Expression;
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.memberExpression(t.identifier(keysName), t.identifier('list')),
+        [t.identifier('variables'), t.identifier('scope')]
+      );
+    } else if (useCentralizedKeys) {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.memberExpression(t.identifier(keysName), t.identifier('list')),
+        [t.identifier('variables')]
+      );
+    } else {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.identifier(`${queryName}QueryKey`),
+        [t.identifier('variables')]
+      );
+    }
 
-@example
-\`\`\`tsx
-const { data, isLoading } = ${hookName}({
-  first: 10,
-  filter: { name: { equalTo: "example" } },
-  orderBy: ['CREATED_AT_DESC'],
-});
-\`\`\``,
-        },
-      ],
-    });
+    const prefetchFuncBody = t.blockStatement([
+      t.expressionStatement(
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier('queryClient'),
+              t.identifier('prefetchQuery')
+            ),
+            [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('queryKey'),
+                  prefetchQueryKeyExpr
+                ),
+                t.objectProperty(
+                  t.identifier('queryFn'),
+                  t.arrowFunctionExpression(
+                    [],
+                    createTypedCallExpression(
+                      t.identifier('execute'),
+                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+                      [
+                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
+                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
+                      ]
+                    )
+                  )
+                ),
+              ]),
+            ]
+          )
+        )
+      ),
+    ]);
+
+    const prefetchFunc = t.functionDeclaration(
+      t.identifier(`prefetch${ucFirst(pluralName)}Query`),
+      prefetchParams,
+      prefetchFuncBody
+    );
+    prefetchFunc.async = true;
+    prefetchFunc.returnType = t.tsTypeAnnotation(
+      t.tsTypeReference(
+        t.identifier('Promise'),
+        t.tsTypeParameterInstantiation([t.tsVoidKeyword()])
+      )
+    );
+    const prefetchExport = t.exportNamedDeclaration(prefetchFunc);
+    addJSDocComment(prefetchExport, [
+      `Prefetch ${typeName} list for SSR or cache warming`,
+      '',
+      '@example',
+      '```ts',
+      `await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });`,
+      '```',
+    ]);
+    statements.push(prefetchExport);
   }
 
-  // Add section comment for standalone functions
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Standalone Functions (non-React)');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Fetch function (standalone, no React)
-  sourceFile.addFunction({
-    name: `fetch${ucFirst(pluralName)}Query`,
-    isExported: true,
-    isAsync: true,
-    parameters: [
-      {
-        name: 'variables',
-        type: `${ucFirst(pluralName)}QueryVariables`,
-        hasQuestionToken: true,
-      },
-      {
-        name: 'options',
-        type: 'ExecuteOptions',
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: `Promise<${ucFirst(pluralName)}QueryResult>`,
-    statements: `return execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
-    ${queryName}QueryDocument,
-    variables,
-    options
-  );`,
-    docs: [
-      {
-        description: `Fetch ${typeName} list without React hooks
-
-@example
-\`\`\`ts
-// Direct fetch
-const data = await fetch${ucFirst(pluralName)}Query({ first: 10 });
-
-// With QueryClient
-const data = await queryClient.fetchQuery({
-  queryKey: ${queryName}QueryKey(variables),
-  queryFn: () => fetch${ucFirst(pluralName)}Query(variables),
-});
-\`\`\``,
-      },
-    ],
-  });
-
-  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled
-  if (reactQueryEnabled) {
-    sourceFile.addFunction({
-      name: `prefetch${ucFirst(pluralName)}Query`,
-      isExported: true,
-      isAsync: true,
-      parameters: [
-        {
-          name: 'queryClient',
-          type: 'QueryClient',
-        },
-        {
-          name: 'variables',
-          type: `${ucFirst(pluralName)}QueryVariables`,
-          hasQuestionToken: true,
-        },
-        {
-          name: 'options',
-          type: 'ExecuteOptions',
-          hasQuestionToken: true,
-        },
-      ],
-      returnType: 'Promise<void>',
-      statements: `await queryClient.prefetchQuery({
-    queryKey: ${queryName}QueryKey(variables),
-    queryFn: () => execute<${ucFirst(pluralName)}QueryResult, ${ucFirst(pluralName)}QueryVariables>(
-      ${queryName}QueryDocument,
-      variables,
-      options
-    ),
-  });`,
-      docs: [
-        {
-          description: `Prefetch ${typeName} list for SSR or cache warming
-
-@example
-\`\`\`ts
-await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });
-\`\`\``,
-        },
-      ],
-    });
-  }
+  const code = generateCode(statements);
+  const headerText = reactQueryEnabled
+    ? `List query hook for ${typeName}`
+    : `List query functions for ${typeName}`;
+  const content = getGeneratedFileHeader(headerText) + '\n\n' + code;
 
   return {
     fileName: getListQueryFileName(table),
-    content: getFormattedOutput(sourceFile),
+    content,
   };
 }
 
-// ============================================================================
-// Single item query hook generator
-// ============================================================================
-
-/**
- * Generate single item query hook file content using AST
- */
 export function generateSingleQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
-): GeneratedQueryFile {
-  const { reactQueryEnabled = true } = options;
-  const project = createProject();
+): GeneratedQueryFile | null {
+  // Skip tables with composite keys - they are handled as custom queries
+  if (!hasValidPrimaryKey(table)) {
+    return null;
+  }
+
+  const {
+    reactQueryEnabled = true,
+    useCentralizedKeys = true,
+    hasRelationships = false,
+  } = options;
   const { typeName, singularName } = getTableNames(table);
   const hookName = getSingleQueryHookName(table);
   const queryName = getSingleRowQueryName(table);
+  const keysName = `${lcFirst(typeName)}Keys`;
+  const scopeTypeName = `${typeName}Scope`;
 
-  // Get primary key info dynamically from table constraints
   const pkFields = getPrimaryKeyInfo(table);
-  // For simplicity, use first PK field (most common case)
-  // Composite PKs would need more complex handling
   const pkField = pkFields[0];
   const pkName = pkField.name;
   const pkTsType = pkField.tsType;
 
-  // Generate GraphQL document via AST
   const queryAST = buildSingleQueryAST({ table });
   const queryDocument = printGraphQL(queryAST);
 
-  const sourceFile = createSourceFile(project, getSingleQueryFileName(table));
+  const statements: t.Statement[] = [];
 
-  // Add file header
+  if (reactQueryEnabled) {
+    const reactQueryImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier('useQuery'), t.identifier('useQuery'))],
+      t.stringLiteral('@tanstack/react-query')
+    );
+    statements.push(reactQueryImport);
+    const reactQueryTypeImport = t.importDeclaration(
+      [
+        t.importSpecifier(
+          t.identifier('UseQueryOptions'),
+          t.identifier('UseQueryOptions')
+        ),
+        t.importSpecifier(
+          t.identifier('QueryClient'),
+          t.identifier('QueryClient')
+        ),
+      ],
+      t.stringLiteral('@tanstack/react-query')
+    );
+    reactQueryTypeImport.importKind = 'type';
+    statements.push(reactQueryTypeImport);
+  }
+
+  const clientImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
+    t.stringLiteral('../client')
+  );
+  statements.push(clientImport);
+  const clientTypeImport = t.importDeclaration(
+    [
+      t.importSpecifier(
+        t.identifier('ExecuteOptions'),
+        t.identifier('ExecuteOptions')
+      ),
+    ],
+    t.stringLiteral('../client')
+  );
+  clientTypeImport.importKind = 'type';
+  statements.push(clientTypeImport);
+
+  const typesImport = t.importDeclaration(
+    [t.importSpecifier(t.identifier(typeName), t.identifier(typeName))],
+    t.stringLiteral('../types')
+  );
+  typesImport.importKind = 'type';
+  statements.push(typesImport);
+
+  if (useCentralizedKeys) {
+    const queryKeyImport = t.importDeclaration(
+      [t.importSpecifier(t.identifier(keysName), t.identifier(keysName))],
+      t.stringLiteral('../query-keys')
+    );
+    statements.push(queryKeyImport);
+    if (hasRelationships) {
+      const scopeTypeImport = t.importDeclaration(
+        [
+          t.importSpecifier(
+            t.identifier(scopeTypeName),
+            t.identifier(scopeTypeName)
+          ),
+        ],
+        t.stringLiteral('../query-keys')
+      );
+      scopeTypeImport.importKind = 'type';
+      statements.push(scopeTypeImport);
+    }
+  }
+
+  const reExportDecl = t.exportNamedDeclaration(
+    null,
+    [t.exportSpecifier(t.identifier(typeName), t.identifier(typeName))],
+    t.stringLiteral('../types')
+  );
+  reExportDecl.exportKind = 'type';
+  statements.push(reExportDecl);
+
+  const queryDocConst = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier(`${queryName}QueryDocument`),
+      t.templateLiteral(
+        [
+          t.templateElement(
+            { raw: '\n' + queryDocument, cooked: '\n' + queryDocument },
+            true
+          ),
+        ],
+        []
+      )
+    ),
+  ]);
+  statements.push(t.exportNamedDeclaration(queryDocConst));
+
+  const pkTypeAnnotation =
+    pkTsType === 'string'
+      ? t.tsStringKeyword()
+      : pkTsType === 'number'
+        ? t.tsNumberKeyword()
+        : t.tsTypeReference(t.identifier(pkTsType));
+
+  const variablesInterfaceBody = t.tsInterfaceBody([
+    t.tsPropertySignature(
+      t.identifier(pkName),
+      t.tsTypeAnnotation(pkTypeAnnotation)
+    ),
+  ]);
+  const variablesInterface = t.tsInterfaceDeclaration(
+    t.identifier(`${ucFirst(singularName)}QueryVariables`),
+    null,
+    null,
+    variablesInterfaceBody
+  );
+  statements.push(t.exportNamedDeclaration(variablesInterface));
+
+  const resultInterfaceBody = t.tsInterfaceBody([
+    t.tsPropertySignature(
+      t.identifier(queryName),
+      t.tsTypeAnnotation(
+        t.tsUnionType([
+          t.tsTypeReference(t.identifier(typeName)),
+          t.tsNullKeyword(),
+        ])
+      )
+    ),
+  ]);
+  const resultInterface = t.tsInterfaceDeclaration(
+    t.identifier(`${ucFirst(singularName)}QueryResult`),
+    null,
+    null,
+    resultInterfaceBody
+  );
+  statements.push(t.exportNamedDeclaration(resultInterface));
+
+  if (useCentralizedKeys) {
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(`${queryName}QueryKey`),
+        t.memberExpression(t.identifier(keysName), t.identifier('detail'))
+      ),
+    ]);
+    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
+    addJSDocComment(queryKeyExport, [
+      'Query key factory - re-exported from query-keys.ts',
+    ]);
+    statements.push(queryKeyExport);
+  } else {
+    const queryKeyArrow = t.arrowFunctionExpression(
+      [typedParam(pkName, pkTypeAnnotation)],
+      t.tsAsExpression(
+        t.arrayExpression([
+          t.stringLiteral(typeName.toLowerCase()),
+          t.stringLiteral('detail'),
+          t.identifier(pkName),
+        ]),
+        t.tsTypeReference(t.identifier('const'))
+      )
+    );
+    const queryKeyConst = t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier(`${queryName}QueryKey`),
+        queryKeyArrow
+      ),
+    ]);
+    statements.push(t.exportNamedDeclaration(queryKeyConst));
+  }
+
+  if (reactQueryEnabled) {
+    const hookBodyStatements: t.Statement[] = [];
+    if (hasRelationships && useCentralizedKeys) {
+      hookBodyStatements.push(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.objectPattern([
+              t.objectProperty(
+                t.identifier('scope'),
+                t.identifier('scope'),
+                false,
+                true
+              ),
+              t.restElement(t.identifier('queryOptions')),
+            ]),
+            t.logicalExpression(
+              '??',
+              t.identifier('options'),
+              t.objectExpression([])
+            )
+          ),
+        ])
+      );
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(
+                  t.memberExpression(
+                    t.identifier(keysName),
+                    t.identifier('detail')
+                  ),
+                  [
+                    t.memberExpression(
+                      t.identifier('variables'),
+                      t.identifier(pkName)
+                    ),
+                    t.identifier('scope'),
+                  ]
+                )
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('queryOptions')),
+            ]),
+          ])
+        )
+      );
+    } else if (useCentralizedKeys) {
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(
+                  t.memberExpression(
+                    t.identifier(keysName),
+                    t.identifier('detail')
+                  ),
+                  [
+                    t.memberExpression(
+                      t.identifier('variables'),
+                      t.identifier(pkName)
+                    ),
+                  ]
+                )
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('options')),
+            ]),
+          ])
+        )
+      );
+    } else {
+      hookBodyStatements.push(
+        t.returnStatement(
+          t.callExpression(t.identifier('useQuery'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('queryKey'),
+                t.callExpression(t.identifier(`${queryName}QueryKey`), [
+                  t.memberExpression(
+                    t.identifier('variables'),
+                    t.identifier(pkName)
+                  ),
+                ])
+              ),
+              t.objectProperty(
+                t.identifier('queryFn'),
+                t.arrowFunctionExpression(
+                  [],
+                  createTypedCallExpression(
+                    t.identifier('execute'),
+                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
+                    [
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                    ]
+                  )
+                )
+              ),
+              t.spreadElement(t.identifier('options')),
+            ]),
+          ])
+        )
+      );
+    }
+
+    const hookParams: t.Identifier[] = [
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
+      ),
+    ];
+    let optionsTypeStr: string;
+    if (hasRelationships && useCentralizedKeys) {
+      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
+    } else {
+      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
+    }
+    const optionsParam = t.identifier('options');
+    optionsParam.optional = true;
+    optionsParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier(optionsTypeStr))
+    );
+    hookParams.push(optionsParam);
+
+    const hookFunc = t.functionDeclaration(
+      t.identifier(hookName),
+      hookParams,
+      t.blockStatement(hookBodyStatements)
+    );
+    const hookExport = t.exportNamedDeclaration(hookFunc);
+    const docLines = [
+      `Query hook for fetching a single ${typeName}`,
+      '',
+      '@example',
+      '```tsx',
+      `const { data, isLoading } = ${hookName}({ ${pkName}: 'some-id' });`,
+      '```',
+    ];
+    if (hasRelationships && useCentralizedKeys) {
+      docLines.push('');
+      docLines.push('@example With scope for hierarchical cache invalidation');
+      docLines.push('```tsx');
+      docLines.push(`const { data } = ${hookName}(`);
+      docLines.push(`  { ${pkName}: 'some-id' },`);
+      docLines.push("  { scope: { parentId: 'parent-id' } }");
+      docLines.push(');');
+      docLines.push('```');
+    }
+    addJSDocComment(hookExport, docLines);
+    statements.push(hookExport);
+  }
+
+  const fetchFuncBody = t.blockStatement([
+    t.returnStatement(
+      createTypedCallExpression(
+        t.identifier('execute'),
+        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+        [
+          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+        ]
+      )
+    ),
+  ]);
+  const fetchFunc = t.functionDeclaration(
+    t.identifier(`fetch${ucFirst(singularName)}Query`),
+    [
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
+      ),
+      typedParam(
+        'options',
+        t.tsTypeReference(t.identifier('ExecuteOptions')),
+        true
+      ),
+    ],
+    fetchFuncBody
+  );
+  fetchFunc.async = true;
+  fetchFunc.returnType = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Promise'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+      ])
+    )
+  );
+  const fetchExport = t.exportNamedDeclaration(fetchFunc);
+  addJSDocComment(fetchExport, [
+    `Fetch a single ${typeName} without React hooks`,
+    '',
+    '@example',
+    '```ts',
+    `const data = await fetch${ucFirst(singularName)}Query({ ${pkName}: 'some-id' });`,
+    '```',
+  ]);
+  statements.push(fetchExport);
+
+  if (reactQueryEnabled) {
+    const prefetchParams: t.Identifier[] = [
+      typedParam(
+        'queryClient',
+        t.tsTypeReference(t.identifier('QueryClient'))
+      ),
+      typedParam(
+        'variables',
+        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
+      ),
+    ];
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchParams.push(
+        typedParam(
+          'scope',
+          t.tsTypeReference(t.identifier(scopeTypeName)),
+          true
+        )
+      );
+    }
+    prefetchParams.push(
+      typedParam(
+        'options',
+        t.tsTypeReference(t.identifier('ExecuteOptions')),
+        true
+      )
+    );
+
+    let prefetchQueryKeyExpr: t.Expression;
+    if (hasRelationships && useCentralizedKeys) {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+        [
+          t.memberExpression(t.identifier('variables'), t.identifier(pkName)),
+          t.identifier('scope'),
+        ]
+      );
+    } else if (useCentralizedKeys) {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+        [t.memberExpression(t.identifier('variables'), t.identifier(pkName))]
+      );
+    } else {
+      prefetchQueryKeyExpr = t.callExpression(
+        t.identifier(`${queryName}QueryKey`),
+        [t.memberExpression(t.identifier('variables'), t.identifier(pkName))]
+      );
+    }
+
+    const prefetchFuncBody = t.blockStatement([
+      t.expressionStatement(
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier('queryClient'),
+              t.identifier('prefetchQuery')
+            ),
+            [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('queryKey'),
+                  prefetchQueryKeyExpr
+                ),
+                t.objectProperty(
+                  t.identifier('queryFn'),
+                  t.arrowFunctionExpression(
+                    [],
+                    createTypedCallExpression(
+                      t.identifier('execute'),
+                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
+                      [
+                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
+                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
+                      ]
+                    )
+                  )
+                ),
+              ]),
+            ]
+          )
+        )
+      ),
+    ]);
+
+    const prefetchFunc = t.functionDeclaration(
+      t.identifier(`prefetch${ucFirst(singularName)}Query`),
+      prefetchParams,
+      prefetchFuncBody
+    );
+    prefetchFunc.async = true;
+    prefetchFunc.returnType = t.tsTypeAnnotation(
+      t.tsTypeReference(
+        t.identifier('Promise'),
+        t.tsTypeParameterInstantiation([t.tsVoidKeyword()])
+      )
+    );
+    const prefetchExport = t.exportNamedDeclaration(prefetchFunc);
+    addJSDocComment(prefetchExport, [
+      `Prefetch a single ${typeName} for SSR or cache warming`,
+      '',
+      '@example',
+      '```ts',
+      `await prefetch${ucFirst(singularName)}Query(queryClient, { ${pkName}: 'some-id' });`,
+      '```',
+    ]);
+    statements.push(prefetchExport);
+  }
+
+  const code = generateCode(statements);
   const headerText = reactQueryEnabled
     ? `Single item query hook for ${typeName}`
     : `Single item query functions for ${typeName}`;
-  sourceFile.insertText(0, createFileHeader(headerText) + '\n\n');
-
-  // Add imports - conditionally include React Query imports
-  const imports = [];
-  if (reactQueryEnabled) {
-    imports.push(
-      createImport({
-        moduleSpecifier: '@tanstack/react-query',
-        namedImports: ['useQuery'],
-        typeOnlyNamedImports: ['UseQueryOptions', 'QueryClient'],
-      })
-    );
-  }
-  imports.push(
-    createImport({
-      moduleSpecifier: '../client',
-      namedImports: ['execute'],
-      typeOnlyNamedImports: ['ExecuteOptions'],
-    }),
-    createImport({
-      moduleSpecifier: '../types',
-      typeOnlyNamedImports: [typeName],
-    })
-  );
-  sourceFile.addImportDeclarations(imports);
-
-  // Re-export entity type
-  sourceFile.addStatements(`\n// Re-export entity type for convenience\nexport type { ${typeName} };\n`);
-
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// GraphQL Document');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Add query document constant
-  sourceFile.addVariableStatement(
-    createConst(`${queryName}QueryDocument`, '`\n' + queryDocument + '`')
-  );
-
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Types');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Variables interface - use dynamic PK field name and type
-  sourceFile.addInterface(
-    createInterface(`${ucFirst(singularName)}QueryVariables`, [
-      { name: pkName, type: pkTsType },
-    ])
-  );
-
-  // Result interface
-  sourceFile.addInterface(
-    createInterface(`${ucFirst(singularName)}QueryResult`, [
-      { name: queryName, type: `${typeName} | null` },
-    ])
-  );
-
-  // Add section comment
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Query Key');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Query key factory - use dynamic PK field name and type
-  sourceFile.addVariableStatement(
-    createConst(
-      `${queryName}QueryKey`,
-      `(${pkName}: ${pkTsType}) =>
-  ['${typeName.toLowerCase()}', 'detail', ${pkName}] as const`
-    )
-  );
-
-  // Add React Query hook section (only if enabled)
-  if (reactQueryEnabled) {
-    sourceFile.addStatements('\n// ============================================================================');
-    sourceFile.addStatements('// Hook');
-    sourceFile.addStatements('// ============================================================================\n');
-
-    // Hook function - use dynamic PK field name and type
-    sourceFile.addFunction({
-      name: hookName,
-      isExported: true,
-      parameters: [
-        { name: pkName, type: pkTsType },
-        {
-          name: 'options',
-          type: `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`,
-          hasQuestionToken: true,
-        },
-      ],
-      statements: `return useQuery({
-    queryKey: ${queryName}QueryKey(${pkName}),
-    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
-      ${queryName}QueryDocument,
-      { ${pkName} }
-    ),
-    enabled: !!${pkName} && (options?.enabled !== false),
-    ...options,
-  });`,
-      docs: [
-        {
-          description: `Query hook for fetching a single ${typeName} by primary key
-
-@example
-\`\`\`tsx
-const { data, isLoading } = ${hookName}(${pkTsType === 'string' ? "'value-here'" : '123'});
-
-if (data?.${queryName}) {
-  console.log(data.${queryName}.${pkName});
-}
-\`\`\``,
-        },
-      ],
-    });
-  }
-
-  // Add section comment for standalone functions
-  sourceFile.addStatements('\n// ============================================================================');
-  sourceFile.addStatements('// Standalone Functions (non-React)');
-  sourceFile.addStatements('// ============================================================================\n');
-
-  // Fetch function (standalone, no React) - use dynamic PK
-  sourceFile.addFunction({
-    name: `fetch${ucFirst(singularName)}Query`,
-    isExported: true,
-    isAsync: true,
-    parameters: [
-      { name: pkName, type: pkTsType },
-      {
-        name: 'options',
-        type: 'ExecuteOptions',
-        hasQuestionToken: true,
-      },
-    ],
-    returnType: `Promise<${ucFirst(singularName)}QueryResult>`,
-    statements: `return execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
-    ${queryName}QueryDocument,
-    { ${pkName} },
-    options
-  );`,
-    docs: [
-      {
-        description: `Fetch a single ${typeName} by primary key without React hooks
-
-@example
-\`\`\`ts
-const data = await fetch${ucFirst(singularName)}Query(${pkTsType === 'string' ? "'value-here'" : '123'});
-\`\`\``,
-      },
-    ],
-  });
-
-  // Prefetch function (for SSR/QueryClient) - only if React Query is enabled, use dynamic PK
-  if (reactQueryEnabled) {
-    sourceFile.addFunction({
-      name: `prefetch${ucFirst(singularName)}Query`,
-      isExported: true,
-      isAsync: true,
-      parameters: [
-        { name: 'queryClient', type: 'QueryClient' },
-        { name: pkName, type: pkTsType },
-        {
-          name: 'options',
-          type: 'ExecuteOptions',
-          hasQuestionToken: true,
-        },
-      ],
-      returnType: 'Promise<void>',
-      statements: `await queryClient.prefetchQuery({
-    queryKey: ${queryName}QueryKey(${pkName}),
-    queryFn: () => execute<${ucFirst(singularName)}QueryResult, ${ucFirst(singularName)}QueryVariables>(
-      ${queryName}QueryDocument,
-      { ${pkName} },
-      options
-    ),
-  });`,
-      docs: [
-        {
-          description: `Prefetch a single ${typeName} for SSR or cache warming
-
-@example
-\`\`\`ts
-await prefetch${ucFirst(singularName)}Query(queryClient, ${pkTsType === 'string' ? "'value-here'" : '123'});
-\`\`\``,
-        },
-      ],
-    });
-  }
+  const content = getGeneratedFileHeader(headerText) + '\n\n' + code;
 
   return {
     fileName: getSingleQueryFileName(table),
-    content: getFormattedOutput(sourceFile),
+    content,
   };
 }
 
-// ============================================================================
-// Batch generator
-// ============================================================================
-
-/**
- * Generate all query hook files for all tables
- */
 export function generateAllQueryHooks(
   tables: CleanTable[],
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile[] {
   const files: GeneratedQueryFile[] = [];
-
   for (const table of tables) {
     files.push(generateListQueryHook(table, options));
-    files.push(generateSingleQueryHook(table, options));
+    const singleHook = generateSingleQueryHook(table, options);
+    if (singleHook) {
+      files.push(singleHook);
+    }
   }
-
   return files;
 }

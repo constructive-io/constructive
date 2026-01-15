@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.15.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.15.0...@pgpmjs/core@4.15.1) (2026-01-14)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.14.0...@pgpmjs/core@4.15.0) (2026-01-14)
+
+### Bug Fixes
+
+- update export-meta.ts to use 'policy_type' instead of 'template' ([b30ddae](https://github.com/constructive-io/constructive/commit/b30ddae617228619b6500af304fa37a0c90ed436))
+
+### Features
+
+- update export flow for new metaschema tables and columns ([1de4ae5](https://github.com/constructive-io/constructive/commit/1de4ae52429391ac120d326d850cb273ee02fd55))
+
+# [4.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.3...@pgpmjs/core@4.14.0) (2026-01-09)
+
+### Bug Fixes
+
+- update tests to match actual error output formatting behavior ([06fa326](https://github.com/constructive-io/constructive/commit/06fa3269c0b0cdbd3936ebc7da4101413959655d))
+
+### Features
+
+- **pgpm/core:** add smart error output collapsing and limiting ([ad02849](https://github.com/constructive-io/constructive/commit/ad02849f4482a0d409923b69d446f8daf06b04d0))
+
+## [4.13.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.2...@pgpmjs/core@4.13.3) (2026-01-08)
+
+### Bug Fixes
+
+- **pgpm/core:** update export-meta.ts config to match actual metaschema table definitions ([e1addd0](https://github.com/constructive-io/constructive/commit/e1addd012d7d7ee755df6680b767e0e60542823a))
+
 ## [4.13.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.1...@pgpmjs/core@4.13.2) (2026-01-08)
 
 ### Bug Fixes

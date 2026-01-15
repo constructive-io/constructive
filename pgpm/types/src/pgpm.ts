@@ -146,6 +146,18 @@ export interface MigrationOptions {
 }
 
 /**
+ * Error output formatting options for controlling verbosity of error messages
+ */
+export interface ErrorOutputOptions {
+    /** Maximum number of queries to show in error output (default: 30) */
+    queryHistoryLimit?: number;
+    /** Maximum total characters for error output before truncation (default: 10000) */
+    maxLength?: number;
+    /** When true, disables all limiting and shows full error output (default: false) */
+    verbose?: boolean;
+}
+
+/**
  * Configuration for PGPM workspace
  */
 export interface PgpmWorkspaceConfig {
@@ -205,6 +217,8 @@ export interface PgpmOptions {
     migrations?: MigrationOptions;
     /** Job system configuration */
     jobs?: JobsConfig;
+    /** Error output formatting options */
+    errorOutput?: ErrorOutputOptions;
 }
 
 /**
@@ -288,6 +302,11 @@ export const pgpmDefaults: PgpmOptions = {
       pollInterval: 1000,
       gracefulShutdown: true
     }
+  },
+  errorOutput: {
+    queryHistoryLimit: 30,
+    maxLength: 10000,
+    verbose: false
   }
 };
 

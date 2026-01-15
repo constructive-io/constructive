@@ -31,8 +31,8 @@ export interface GraphileFeatureOptions {
  * Configuration options for the Constructive API
  */
 export interface ApiOptions {
-  /** Whether to enable the meta API endpoints */
-  enableMetaApi?: boolean;
+  /** Whether to enable the services API (domain/subdomain routing via services_public) */
+  enableServicesApi?: boolean;
   /** Database schemas to expose through the API */
   exposedSchemas?: string[];
   /** Anonymous role name for unauthenticated requests */
@@ -70,7 +70,7 @@ export const graphileFeatureDefaults: GraphileFeatureOptions = {
  * Default API configuration values
  */
 export const apiDefaults: ApiOptions = {
-  enableMetaApi: true,
+  enableServicesApi: true,
   exposedSchemas: [],
   anonRole: 'administrator',
   roleName: 'administrator',

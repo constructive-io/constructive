@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.16](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.15...graphile-plugin-connection-filter-postgis@1.3.16) (2026-01-14)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.15](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.14...graphile-plugin-connection-filter-postgis@1.3.15) (2026-01-14)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.14](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.13...graphile-plugin-connection-filter-postgis@1.3.14) (2026-01-11)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.13](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.12...graphile-plugin-connection-filter-postgis@1.3.13) (2026-01-10)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.12](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.11...graphile-plugin-connection-filter-postgis@1.3.12) (2026-01-09)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
+## [1.3.11](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.10...graphile-plugin-connection-filter-postgis@1.3.11) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-connection-filter-postgis
+
 ## [1.3.10](https://github.com/constructive-io/constructive/compare/graphile-plugin-connection-filter-postgis@1.3.9...graphile-plugin-connection-filter-postgis@1.3.10) (2026-01-08)
 
 **Note:** Version bump only for package graphile-plugin-connection-filter-postgis

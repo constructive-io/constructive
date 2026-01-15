@@ -8,45 +8,45 @@ import {
   execute,
   executeWithErrors,
   GraphQLClientError,
-} from '../examples/output/generated-sdk/client';
+} from './output/generated-sdk/client';
 import {
   usersQueryDocument,
   type UsersQueryResult,
   type UsersQueryVariables,
-} from '../examples/output/generated-sdk/queries/useUsersQuery';
+} from './output/generated-sdk/queries/useUsersQuery';
 import {
   userQueryDocument,
   type UserQueryResult,
   type UserQueryVariables,
-} from '../examples/output/generated-sdk/queries/useUserQuery';
+} from './output/generated-sdk/queries/useUserQuery';
 import {
   databasesQueryDocument,
   type DatabasesQueryResult,
   type DatabasesQueryVariables,
-} from '../examples/output/generated-sdk/queries/useDatabasesQuery';
+} from './output/generated-sdk/queries/useDatabasesQuery';
 import {
   tablesQueryDocument,
   type TablesQueryResult,
   type TablesQueryVariables,
-} from '../examples/output/generated-sdk/queries/useTablesQuery';
+} from './output/generated-sdk/queries/useTablesQuery';
 import {
-  getCurrentUserQueryDocument,
-  type GetCurrentUserQueryResult,
-} from '../examples/output/generated-sdk/queries/useGetCurrentUserQuery';
+  currentUserQueryDocument,
+  type CurrentUserQueryResult,
+} from './output/generated-sdk/queries/useCurrentUserQuery';
 import {
   userByUsernameQueryDocument,
   type UserByUsernameQueryResult,
   type UserByUsernameQueryVariables,
-} from '../examples/output/generated-sdk/queries/useUserByUsernameQuery';
+} from './output/generated-sdk/queries/useUserByUsernameQuery';
 import {
-  loginMutationDocument,
-  type LoginMutationResult,
-  type LoginMutationVariables,
-} from '../examples/output/generated-sdk/mutations/useLoginMutation';
+  signInMutationDocument,
+  type SignInMutationResult,
+  type SignInMutationVariables,
+} from './output/generated-sdk/mutations/useSignInMutation';
 import type {
   UserFilter,
   TableFilter,
-} from '../examples/output/generated-sdk/schema-types';
+} from './output/generated-sdk/schema-types';
 
 const ENDPOINT = 'http://api.localhost:3000/graphql';
 const section = (title: string) =>
@@ -66,25 +66,25 @@ async function main() {
   console.log('✓ Client configured');
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 2. Login Mutation
+  // 2. SignIn Mutation
   // ─────────────────────────────────────────────────────────────────────────────
-  section('2. Login Mutation');
+  section('2. SignIn Mutation');
   try {
-    const loginResult = await execute<
-      LoginMutationResult,
-      LoginMutationVariables
-    >(loginMutationDocument, {
+    const signInResult = await execute<
+      SignInMutationResult,
+      SignInMutationVariables
+    >(signInMutationDocument, {
       input: { email: 'admin@gmail.com', password: 'password1111!@#$' },
     });
-    const token = loginResult.login?.apiToken?.accessToken;
+    const token = signInResult.signIn?.apiToken?.accessToken;
     if (token) {
       // Use setHeader() to update auth without re-configuring
       setHeader('Authorization', `Bearer ${token}`);
-      console.log('✓ Logged in, token:', token.slice(0, 30) + '...');
+      console.log('✓ Signed in, token:', token.slice(0, 30) + '...');
     }
   } catch (e) {
     if (e instanceof GraphQLClientError)
-      console.log('Login failed:', e.errors[0]?.message);
+      console.log('SignIn failed:', e.errors[0]?.message);
     else throw e;
   }
 
@@ -162,11 +162,10 @@ async function main() {
   // 6. Custom Queries
   // ─────────────────────────────────────────────────────────────────────────────
   section('6. Custom Queries');
-  const { data: currentUser } =
-    await executeWithErrors<GetCurrentUserQueryResult>(
-      getCurrentUserQueryDocument
-    );
-  console.log('Current user:', currentUser?.getCurrentUser?.username);
+  const { data: currentUser } = await executeWithErrors<CurrentUserQueryResult>(
+    currentUserQueryDocument
+  );
+  console.log('Current user:', currentUser?.currentUser?.username);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // 7. Relation Queries (Foreign Key Filter)
@@ -183,7 +182,7 @@ async function main() {
       TablesQueryResult,
       TablesQueryVariables
     >(tablesQueryDocument, {
-      first: 5,
+      first: 10,
       filter: tableFilter,
       orderBy: ['NAME_ASC'],
     });
@@ -212,8 +211,8 @@ async function main() {
 
   // execute - throws on error
   try {
-    await execute<LoginMutationResult, LoginMutationVariables>(
-      loginMutationDocument,
+    await execute<SignInMutationResult, SignInMutationVariables>(
+      signInMutationDocument,
       { input: { email: 'invalid@x.com', password: 'wrong' } }
     );
   } catch (e) {

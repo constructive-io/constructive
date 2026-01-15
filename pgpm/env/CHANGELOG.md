@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.9.3...@pgpmjs/env@2.9.4) (2026-01-09)
+
+### Bug Fixes
+
+- update snapshot test for errorOutput field in getEnvVars ([46f5314](https://github.com/constructive-io/constructive/commit/46f5314c80b75013dd0965c7bcb0006d8c623077))
+
 ## [2.9.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.9.2...@pgpmjs/env@2.9.3) (2026-01-07)
 
 **Note:** Version bump only for package @pgpmjs/env

@@ -38,7 +38,7 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 - `FEATURES_POSTGIS` - Enable PostGIS support
 
 ### API Configuration
-- `API_ENABLE_META` - Enable meta API
+- `API_ENABLE_SERVICES` - Enable services API (domain/subdomain routing)
 - `API_IS_PUBLIC` - Whether API is public
 - `API_EXPOSED_SCHEMAS` - Comma-separated list of exposed schemas
 - `API_META_SCHEMAS` - Comma-separated list of meta schemas
@@ -59,7 +59,7 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     postgis: true
   },
   api: {
-    enableMetaApi: true,
+    enableServicesApi: true,
     exposedSchemas: [],
     anonRole: 'administrator',
     roleName: 'administrator',

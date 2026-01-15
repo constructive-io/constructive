@@ -58,55 +58,26 @@ cnc explorer --origin http://localhost:3000
 
 ### `cnc codegen`
 
-Generate TypeScript types, operations, and SDK from a GraphQL schema.
+Generate TypeScript types, operations, and SDK from a GraphQL schema or endpoint.
 
 ```bash
-# From SDL file
-cnc codegen --schema ./schema.graphql --out ./codegen
+# From endpoint
+cnc codegen --endpoint http://localhost:5555/graphql --out ./codegen
 
-# From endpoint with Host override
-cnc codegen --endpoint http://localhost:3000/graphql --headerHost meta8.localhost --out ./codegen
+# From database
+cnc codegen --database constructive_db --out ./codegen --verbose
 ```
 
 **Options:**
 
-- `--schema <path>` - Schema SDL file path
-- `--endpoint <url>` - GraphQL endpoint to fetch schema via introspection
-- `--headerHost <host>` - Optional Host header for endpoint requests
-- `--auth <token>` - Optional Authorization header value
-- `--header "Name: Value"` - Optional HTTP header (repeatable)
-- `--out <dir>` - Output root directory (default: graphql/codegen/dist)
-- `--format <gql|ts>` - Document format (default: gql)
-- `--convention <style>` - Filename convention (dashed|underscore|camelcase|camelUpper)
-- `--emitTypes <bool>` - Emit types (default: true)
-- `--emitOperations <bool>` - Emit operations (default: true)
-- `--emitSdk <bool>` - Emit SDK (default: true)
-- `--config <path>` - Config file (JSON/YAML)
+- `--endpoint <url>` - GraphQL endpoint URL
+- `--auth <token>` - Authorization header value (e.g., "Bearer 123")
+- `--out <dir>` - Output directory (default: graphql/codegen/dist)
+- `--dry-run` - Preview without writing files
+- `--verbose` - Verbose output
 
-**Config file example (`codegen.json`):**
-
-```json
-{
-  "input": {
-    "schema": "./schema.graphql",
-    "headers": { "Host": "meta8.localhost" }
-  },
-  "output": {
-    "root": "graphql/codegen/dist"
-  },
-  "documents": {
-    "format": "gql",
-    "convention": "dashed",
-    "excludePatterns": [".*Module$"]
-  },
-  "features": {
-    "emitTypes": true,
-    "emitOperations": true,
-    "emitSdk": true,
-    "emitReactQuery": true
-  }
-}
-```
+- `--database <name>` - Database override for DB mode (defaults to PGDATABASE)
+- `--schemas <list>` - Comma-separated schemas (required unless using --endpoint)
 
 ### `cnc get-graphql-schema`
 
@@ -123,7 +94,7 @@ cnc get-graphql-schema --endpoint http://localhost:3000/graphql --out ./schema.g
 **Options:**
 
 - `--database <name>` - Database name (for programmatic builder)
-- `--schemas <list>` - Comma-separated schemas to include
+- `--schemas <list>` - Comma-separated schemas to include (required unless using --endpoint)
 - `--endpoint <url>` - GraphQL endpoint to fetch schema via introspection
 - `--headerHost <host>` - Optional Host header for endpoint requests
 - `--auth <token>` - Optional Authorization header value

@@ -16,7 +16,7 @@ const createCommandMap = (): Record<string, Function> => {
     explorer,
     'get-graphql-schema': getGraphqlSchema,
     codegen,
-    jobs
+    jobs,
   };
 };
 
@@ -51,7 +51,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     console.log(usageText);
     process.exit(0);
   }
-  
+
   // Show usage for help command specifically
   if (command === 'help') {
     console.log(usageText);

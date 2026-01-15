@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.15](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.14...@constructive-io/knative-job-worker@0.7.15) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.14](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.13...@constructive-io/knative-job-worker@0.7.14) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.13](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.12...@constructive-io/knative-job-worker@0.7.13) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.12](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.11...@constructive-io/knative-job-worker@0.7.12) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.11](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.10...@constructive-io/knative-job-worker@0.7.11) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
 ## [0.7.10](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.9...@constructive-io/knative-job-worker@0.7.10) (2026-01-08)
 
 **Note:** Version bump only for package @constructive-io/knative-job-worker

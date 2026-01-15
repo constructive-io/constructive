@@ -172,7 +172,7 @@ const config: Record<string, TableConfig> = {
       privilege: 'text',
       permissive: 'boolean',
       disabled: 'boolean',
-      template: 'text',
+      policy_type: 'text',
       data: 'jsonb'
     }
   },
@@ -210,8 +210,8 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      name: 'text',
+      code: 'text'
     }
   },
   rls_function: {
@@ -220,8 +220,13 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      table_id: 'uuid',
+      name: 'text',
+      label: 'text',
+      description: 'text',
+      data: 'jsonb',
+      inline: 'boolean',
+      security: 'int'
     }
   },
   limit_function: {
@@ -230,8 +235,12 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      table_id: 'uuid',
+      name: 'text',
+      label: 'text',
+      description: 'text',
+      data: 'jsonb',
+      security: 'int'
     }
   },
   procedure: {
@@ -240,8 +249,12 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      schema_id: 'uuid',
-      name: 'text'
+      name: 'text',
+      argnames: 'text[]',
+      argtypes: 'text[]',
+      argdefaults: 'text[]',
+      lang_name: 'text',
+      definition: 'text'
     }
   },
   foreign_key_constraint: {
@@ -252,11 +265,14 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      description: 'text',
+      smart_tags: 'jsonb',
+      type: 'text',
       field_ids: 'uuid[]',
       ref_table_id: 'uuid',
       ref_field_ids: 'uuid[]',
-      on_delete: 'text',
-      on_update: 'text'
+      delete_action: 'text',
+      update_action: 'text'
     }
   },
   primary_key_constraint: {
@@ -267,6 +283,7 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      type: 'text',
       field_ids: 'uuid[]'
     }
   },
@@ -278,6 +295,9 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
+      description: 'text',
+      smart_tags: 'jsonb',
+      type: 'text',
       field_ids: 'uuid[]'
     }
   },
@@ -289,7 +309,9 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
-      expression: 'text'
+      type: 'text',
+      field_ids: 'uuid[]',
+      expr: 'jsonb'
     }
   },
   full_text_search: {
@@ -299,9 +321,10 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       table_id: 'uuid',
-      name: 'text',
+      field_id: 'uuid',
       field_ids: 'uuid[]',
-      weights: 'text[]'
+      weights: 'text[]',
+      langs: 'text[]'
     }
   },
   schema_grant: {
@@ -311,8 +334,7 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       schema_id: 'uuid',
-      role_name: 'text',
-      privilege: 'text'
+      grantee_name: 'text'
     }
   },
   table_grant: {
@@ -322,8 +344,9 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       table_id: 'uuid',
+      privilege: 'text',
       role_name: 'text',
-      privilege: 'text'
+      field_ids: 'uuid[]'
     }
   },
   // =============================================================================
@@ -533,7 +556,7 @@ const config: Record<string, TableConfig> = {
       entity_ids_function: 'text'
     }
   },
-  permissions_module: {
+  permissions_module:{
     schema: 'metaschema_modules_public',
     table: 'permissions_module',
     fields: {
@@ -823,9 +846,38 @@ const config: Record<string, TableConfig> = {
       private_schema_id: 'uuid',
       table_id: 'uuid',
       field_id: 'uuid',
+      node_type: 'text',
       data: 'jsonb',
       triggers: 'text[]',
       functions: 'text[]'
+    }
+  },
+  table_module: {
+    schema: 'metaschema_modules_public',
+    table: 'table_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      node_type: 'text',
+      data: 'jsonb',
+      fields: 'uuid[]'
+    }
+  },
+  table_template_module: {
+    schema: 'metaschema_modules_public',
+    table: 'table_template_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      owner_table_id: 'uuid',
+      table_name: 'text',
+      node_type: 'text',
+      data: 'jsonb'
     }
   },
   uuid_module: {
@@ -998,6 +1050,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('crypto_addresses_module', `SELECT * FROM metaschema_modules_public.crypto_addresses_module WHERE database_id = $1`);
   await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1`);
   await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1`);
+  await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1`);
   await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1`);
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);

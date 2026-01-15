@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.26](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.25...@constructive-io/cli@5.6.26) (2026-01-15)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.25](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.24...@constructive-io/cli@5.6.25) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.24](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.23...@constructive-io/cli@5.6.24) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.23](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.22...@constructive-io/cli@5.6.23) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.22](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.21...@constructive-io/cli@5.6.22) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.21](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.20...@constructive-io/cli@5.6.21) (2026-01-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.19...@constructive-io/cli@5.6.20) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.19](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.18...@constructive-io/cli@5.6.19) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.18](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.17...@constructive-io/cli@5.6.18) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.17](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.16...@constructive-io/cli@5.6.17) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.16](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.15...@constructive-io/cli@5.6.16) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.6.15](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.14...@constructive-io/cli@5.6.15) (2026-01-08)
 
 **Note:** Version bump only for package @constructive-io/cli

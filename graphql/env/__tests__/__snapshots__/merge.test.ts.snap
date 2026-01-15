@@ -5,7 +5,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   "api": {
     "anonRole": "env_anon",
     "defaultDatabaseId": "override_db",
-    "enableMetaApi": false,
+    "enableServicesApi": false,
     "exposedSchemas": [
       "public",
       "app",
@@ -59,6 +59,11 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "logOnly": false,
     "usePlan": true,
     "useTx": true,
+  },
+  "errorOutput": {
+    "maxLength": 10000,
+    "queryHistoryLimit": 30,
+    "verbose": false,
   },
   "features": {
     "oppositeBaseNames": false,
