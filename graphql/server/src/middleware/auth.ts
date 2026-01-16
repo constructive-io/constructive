@@ -1,17 +1,19 @@
-import { getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
+import { resolveNodeEnvConfig, type NodeEnv } from '../config';
 import './types'; // for Request type
 
 const log = new Logger('auth');
-const isDev = () => getNodeEnv() === 'development';
 
 export const createAuthenticateMiddleware = (
-  opts: PgpmOptions
+  opts: PgpmOptions,
+  nodeEnvConfig?: NodeEnv
 ): RequestHandler => {
+  const nodeEnv = nodeEnvConfig ?? resolveNodeEnvConfig();
+  const isDev = nodeEnv === 'development';
   return async (
     req: Request,
     res: Response,
@@ -30,7 +32,7 @@ export const createAuthenticateMiddleware = (
     const rlsModule = api.rlsModule;
 
     if (!rlsModule) {
-      if (isDev()) log.debug('No RLS module configured, skipping auth');
+      if (isDev) log.debug('No RLS module configured, skipping auth');
       return next();
     }
 
@@ -71,7 +73,7 @@ export const createAuthenticateMiddleware = (
           }
 
           token = result.rows[0];
-          if (isDev()) log.debug(`Auth success: role=${token.role}`);
+          if (isDev) log.debug(`Auth success: role=${token.role}`);
         } catch (e: any) {
           log.error('Auth error:', e.message);
           res.status(200).json({

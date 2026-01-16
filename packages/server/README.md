@@ -36,6 +36,54 @@ await server.start();
 // await server.stop();
 ```
 
+### Config-first usage (no env required)
+
+```ts
+import { CombinedServer } from '@constructive-io/server';
+
+const server = new CombinedServer({
+  graphql: {
+    enabled: true,
+    graphqlConfig: {
+      pg: { host: 'localhost', port: 5432, user: 'postgres', password: 'password', database: 'app' },
+      server: { host: '127.0.0.1', port: 3000 }
+    }
+  },
+  jobs: {
+    enabled: true,
+    jobsConfig: {
+      worker: { supportAny: false, supported: ['simple-email', 'send-email-link'] },
+      gateway: {
+        gatewayUrl: 'http://127.0.0.1:8080',
+        callbackUrl: 'http://127.0.0.1:12345/callback',
+        callbackPort: 12345
+      }
+    },
+    devMapConfig: {
+      'simple-email': 'http://127.0.0.1:8081',
+      'send-email-link': 'http://127.0.0.1:8082'
+    }
+  },
+  functions: {
+    enabled: true,
+    services: [
+      { name: 'simple-email', port: 8081 },
+      { name: 'send-email-link', port: 8082 }
+    ],
+    functionsConfig: {
+      'simple-email': { dryRun: true },
+      'send-email-link': {
+        dryRun: true,
+        graphqlUrl: 'http://127.0.0.1:3000/graphql',
+        defaultDatabaseId: '00000000-0000-0000-0000-000000000000'
+      }
+    }
+  }
+});
+
+await server.start();
+```
+
 ### Local Development (this repo)
 
 ```bash

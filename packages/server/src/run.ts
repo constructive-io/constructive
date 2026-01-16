@@ -75,15 +75,24 @@ const buildFunctionsOptions = (): CombinedServerOptions['functions'] => {
   };
 };
 
-export const buildCombinedServerOptionsFromEnv = (): CombinedServerOptions => ({
-  graphql: {
-    enabled: parseEnvBoolean(process.env.CONSTRUCTIVE_GRAPHQL_ENABLED) ?? true
-  },
-  jobs: {
-    enabled: parseEnvBoolean(process.env.CONSTRUCTIVE_JOBS_ENABLED) ?? false
-  },
-  functions: buildFunctionsOptions()
-});
+export const buildCombinedServerOptionsFromEnv = (): CombinedServerOptions => {
+  const functions = buildFunctionsOptions();
+  if (functions) {
+    functions.envConfig = process.env;
+  }
+
+  return {
+    graphql: {
+      enabled: parseEnvBoolean(process.env.CONSTRUCTIVE_GRAPHQL_ENABLED) ?? true,
+      envConfig: process.env
+    },
+    jobs: {
+      enabled: parseEnvBoolean(process.env.CONSTRUCTIVE_JOBS_ENABLED) ?? false,
+      envConfig: process.env
+    },
+    functions
+  };
+};
 
 const logger = createLogger('combined-server');
 

@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@constructive-io/job-utils';
+import type { JobsRuntimeConfigOptions } from '@constructive-io/job-utils';
 import poolManager from '@constructive-io/job-pg';
 import { createLogger } from '@pgpmjs/logger';
 
@@ -37,7 +38,28 @@ type WithClientHandler = (
 
 const logger = createLogger('knative-job-server');
 
-export default (pgPool: Pool = poolManager.getPool()) => {
+type JobServerConfig = JobsRuntimeConfigOptions & {
+  pgPool?: Pool;
+};
+
+const resolveJobServerConfig = (
+  config: Pool | JobServerConfig
+): JobServerConfig => {
+  if (config && typeof (config as Pool).connect === 'function') {
+    return { pgPool: config as Pool };
+  }
+  return config as JobServerConfig;
+};
+
+export default (config: Pool | JobServerConfig = {}) => {
+  const resolved = resolveJobServerConfig(config);
+  const pgPool = resolved.pgPool ?? poolManager.getPool();
+  const jobsConfigOptions: JobsRuntimeConfigOptions = {
+    jobsConfig: resolved.jobsConfig,
+    pgConfig: resolved.pgConfig,
+    envConfig: resolved.envConfig,
+    devMapConfig: resolved.devMapConfig
+  };
   const app = express();
   app.use(bodyParser.json());
 
@@ -67,7 +89,11 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     }
 
     logger.info(`Completed task ${jobIdHeader} with success`);
-    await jobs.completeJob(client, { workerId, jobId: jobIdHeader });
+    await jobs.completeJob(
+      client,
+      { workerId, jobId: jobIdHeader },
+      jobsConfigOptions
+    );
 
     res
       .set({
@@ -99,7 +125,7 @@ export default (pgPool: Pool = poolManager.getPool()) => {
       workerId,
       jobId: jobIdHeader,
       message: errorMessage
-    });
+    }, jobsConfigOptions);
 
     res.status(200).json({ workerId, jobId: jobIdHeader });
   });

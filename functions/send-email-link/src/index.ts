@@ -2,15 +2,75 @@ import { createJobApp } from '@constructive-io/knative-job-fn';
 import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
-import { send as sendPostmaster } from '@launchql/postmaster';
 import { send as sendSmtp } from '@constructive-io/smtppostmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { createLogger } from '@pgpmjs/logger';
 
-const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
-const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
 const logger = createLogger('send-email-link');
-const app = createJobApp();
+let cachedPostmasterSend: typeof sendSmtp | null = null;
+
+const getPostmasterSend = (): typeof sendSmtp => {
+  if (!cachedPostmasterSend) {
+    const postmaster = require('@launchql/postmaster') as { send: typeof sendSmtp };
+    cachedPostmasterSend = postmaster.send;
+  }
+  return cachedPostmasterSend;
+};
+
+export type SendEmailLinkFunctionConfig = {
+  dryRun?: boolean;
+  useSmtp?: boolean;
+  graphqlUrl?: string;
+  metaGraphqlUrl?: string;
+  graphqlAuthToken?: string;
+  graphqlHostHeader?: string;
+  metaGraphqlHostHeader?: string;
+  localAppPort?: string;
+  defaultDatabaseId?: string;
+  envConfig?: NodeJS.ProcessEnv;
+};
+
+type ResolvedSendEmailLinkConfig = {
+  isDryRun: boolean;
+  useSmtp: boolean;
+  graphqlUrl?: string;
+  metaGraphqlUrl?: string;
+  graphqlAuthToken?: string;
+  graphqlHostHeader?: string;
+  metaGraphqlHostHeader?: string;
+  localAppPort?: string;
+  defaultDatabaseId?: string;
+  envConfig: NodeJS.ProcessEnv;
+};
+
+const resolveSendEmailLinkConfig = (
+  config: SendEmailLinkFunctionConfig = {}
+): ResolvedSendEmailLinkConfig => {
+  const envConfig = config.envConfig ?? process.env;
+  const isDryRun =
+    typeof config.dryRun === 'boolean'
+      ? config.dryRun
+      : parseEnvBoolean(envConfig.SEND_EMAIL_LINK_DRY_RUN) ?? false;
+  const useSmtp =
+    typeof config.useSmtp === 'boolean'
+      ? config.useSmtp
+      : parseEnvBoolean(envConfig.EMAIL_SEND_USE_SMTP) ?? false;
+
+  return {
+    isDryRun,
+    useSmtp,
+    graphqlUrl: config.graphqlUrl ?? envConfig.GRAPHQL_URL,
+    metaGraphqlUrl: config.metaGraphqlUrl ?? envConfig.META_GRAPHQL_URL,
+    graphqlAuthToken: config.graphqlAuthToken ?? envConfig.GRAPHQL_AUTH_TOKEN,
+    graphqlHostHeader: config.graphqlHostHeader ?? envConfig.GRAPHQL_HOST_HEADER,
+    metaGraphqlHostHeader:
+      config.metaGraphqlHostHeader ?? envConfig.META_GRAPHQL_HOST_HEADER,
+    localAppPort: config.localAppPort ?? envConfig.LOCAL_APP_PORT,
+    defaultDatabaseId:
+      config.defaultDatabaseId ?? envConfig.DEFAULT_DATABASE_ID,
+    envConfig
+  };
+};
 
 const GetUser = gql`
   query GetUser($userId: UUID!) {
@@ -69,8 +129,7 @@ type GraphQLContext = {
   databaseId: string;
 };
 
-const getRequiredEnv = (name: string): string => {
-  const value = process.env[name];
+const getRequiredConfigValue = (name: string, value?: string): string => {
   if (!value) {
     throw new Error(`Missing required environment variable ${name}`);
   }
@@ -79,16 +138,20 @@ const getRequiredEnv = (name: string): string => {
 
 const createGraphQLClient = (
   url: string,
-  hostHeaderEnvVar?: string
+  {
+    authToken,
+    hostHeader
+  }: {
+    authToken?: string;
+    hostHeader?: string;
+  } = {}
 ): GraphQLClient => {
   const headers: Record<string, string> = {};
 
-  if (process.env.GRAPHQL_AUTH_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GRAPHQL_AUTH_TOKEN}`;
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
-  const envName = hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
-  const hostHeader = process.env[envName];
   if (hostHeader) {
     headers.host = hostHeader;
   }
@@ -98,8 +161,10 @@ const createGraphQLClient = (
 
 export const sendEmailLink = async (
   params: SendEmailParams,
-  context: GraphQLContext
+  context: GraphQLContext,
+  sendEmailConfig: SendEmailLinkFunctionConfig = {}
 ) => {
+  const resolved = resolveSendEmailLinkConfig(sendEmailConfig);
   const { client, meta, databaseId } = context;
 
   const validateForType = (): { missing?: string } | null => {
@@ -177,13 +242,13 @@ export const sendEmailLink = async (
   // e.g. LOCAL_APP_PORT=3000 -> http://localhost:3000
   // It is ignored for non-local hostnames. Only allow on DRY RUNs
   const localPort =
-    isLocalHost && isDryRun && process.env.LOCAL_APP_PORT
-      ? `:${process.env.LOCAL_APP_PORT}`
+    isLocalHost && resolved.isDryRun && resolved.localAppPort
+      ? `:${resolved.localAppPort}`
       : '';
 
   // Use http only for local dry-run to avoid browser TLS warnings
   // in dev; production stays https.
-  const protocol = isLocalHost && isDryRun ? 'http' : 'https';
+  const protocol = isLocalHost && resolved.isDryRun ? 'http' : 'https';
   const url = new URL(`${protocol}://${hostname}${localPort}`);
 
   let subject: string;
@@ -277,7 +342,7 @@ export const sendEmailLink = async (
     }
   });
 
-  if (isDryRun) {
+  if (resolved.isDryRun) {
     logger.info('DRY RUN email (skipping send)', {
       email_type: params.email_type,
       email: params.email,
@@ -285,7 +350,7 @@ export const sendEmailLink = async (
       link
     });
   } else {
-    const sendEmail = useSmtp ? sendSmtp : sendPostmaster;
+    const sendEmail = resolved.useSmtp ? sendSmtp : getPostmasterSend();
     await sendEmail({
       to: params.email,
       subject,
@@ -295,39 +360,68 @@ export const sendEmailLink = async (
 
   return {
     complete: true,
-    ...(isDryRun ? { dryRun: true } : null)
+    ...(resolved.isDryRun ? { dryRun: true } : null)
   };
 };
 
-// HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
-app.post('/', async (req: any, res: any, next: any) => {
-  try {
-    const params = (req.body || {}) as SendEmailParams;
+const createSendEmailLinkApp = (
+  sendEmailConfig: SendEmailLinkFunctionConfig = {}
+) => {
+  const resolved = resolveSendEmailLinkConfig(sendEmailConfig);
+  const app = createJobApp();
 
-    const databaseId =
-      req.get('X-Database-Id') || req.get('x-database-id') || process.env.DEFAULT_DATABASE_ID;
-    if (!databaseId) {
-      return res.status(400).json({ error: 'Missing X-Database-Id header or DEFAULT_DATABASE_ID' });
+  // HTTP/Knative entrypoint (used by @constructive-io/knative-job-fn wrapper)
+  app.post('/', async (req: any, res: any, next: any) => {
+    try {
+      const params = (req.body || {}) as SendEmailParams;
+
+      const databaseId =
+        req.get('X-Database-Id') ||
+        req.get('x-database-id') ||
+        resolved.defaultDatabaseId;
+      if (!databaseId) {
+        return res.status(400).json({
+          error: 'Missing X-Database-Id header or DEFAULT_DATABASE_ID'
+        });
+      }
+
+      const graphqlUrl = getRequiredConfigValue(
+        'GRAPHQL_URL',
+        resolved.graphqlUrl
+      );
+      const metaGraphqlUrl = resolved.metaGraphqlUrl || graphqlUrl;
+
+      const client = createGraphQLClient(graphqlUrl, {
+        authToken: resolved.graphqlAuthToken,
+        hostHeader: resolved.graphqlHostHeader
+      });
+      const meta = createGraphQLClient(metaGraphqlUrl, {
+        authToken: resolved.graphqlAuthToken,
+        hostHeader: resolved.metaGraphqlHostHeader
+      });
+
+      const result = await sendEmailLink(
+        params,
+        {
+          client,
+          meta,
+          databaseId
+        },
+        sendEmailConfig
+      );
+
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
     }
+  });
 
-    const graphqlUrl = getRequiredEnv('GRAPHQL_URL');
-    const metaGraphqlUrl = process.env.META_GRAPHQL_URL || graphqlUrl;
+  return app;
+};
 
-    const client = createGraphQLClient(graphqlUrl, 'GRAPHQL_HOST_HEADER');
-    const meta = createGraphQLClient(metaGraphqlUrl, 'META_GRAPHQL_HOST_HEADER');
+const app = createSendEmailLinkApp();
 
-    const result = await sendEmailLink(params, {
-      client,
-      meta,
-      databaseId
-    });
-
-    res.status(200).json(result);
-  } catch (err) {
-    next(err);
-  }
-});
-
+export { createSendEmailLinkApp };
 export default app;
 
 // When executed directly (e.g. via `node dist/index.js`), start an HTTP server.

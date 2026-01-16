@@ -13,7 +13,8 @@ const worker = new Worker({
       await pgPool.query('select 1');
       logger.info(JSON.stringify(job, null, 2));
     }
-  }
+  },
+  envConfig: process.env
 });
 
 worker.listen();

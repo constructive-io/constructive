@@ -8,11 +8,13 @@ import {
 } from '@constructive-io/job-utils';
 
 const pgPool = poolManager.getPool();
+const jobsConfigOptions = { envConfig: process.env };
 
 const scheduler = new Scheduler({
   pgPool,
-  workerId: getSchedulerHostname(),
-  tasks: getJobSupported()
+  workerId: getSchedulerHostname(jobsConfigOptions),
+  tasks: getJobSupported(jobsConfigOptions),
+  envConfig: process.env
 });
 
 scheduler.listen();

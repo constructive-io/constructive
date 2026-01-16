@@ -1,4 +1,3 @@
-import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { getGraphileSettings } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
@@ -6,16 +5,39 @@ import { getSchema } from 'graphile-query';
 import { printSchema } from 'graphql';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import {
+  resolveGraphqlConfig,
+  type GraphqlRuntimeConfigOptions
+} from '../config';
 
 const log = new Logger('codegen-schema');
 
-const getSchemaOutputPath = () =>
+type CodegenSchemaConfig = GraphqlRuntimeConfigOptions & {
+  schemaOutputPathConfig?: string;
+  databaseConfig?: {
+    databaseName?: string;
+  };
+};
+
+const getSchemaOutputPath = (
+  outputPathConfig?: string,
+  envConfig?: NodeJS.ProcessEnv
+) =>
+  outputPathConfig ??
+  envConfig?.CODEGEN_SCHEMA_OUT ??
   process.env.CODEGEN_SCHEMA_OUT ??
   path.resolve(__dirname, '../../codegen/schema.graphql');
 
-(async () => {
+export const runCodegenSchema = async (
+  codegenConfig: CodegenSchemaConfig = {}
+) => {
   try {
-    const opts = getEnvOptions();
+    const envConfig = codegenConfig.envConfig ?? process.env;
+    const opts = resolveGraphqlConfig({
+      graphqlConfig: codegenConfig.graphqlConfig,
+      envConfig,
+      cwd: codegenConfig.cwd
+    });
     const apiOpts = (opts as any).api || {};
     const metaSchemas = Array.isArray(apiOpts.metaSchemas)
       ? apiOpts.metaSchemas
@@ -25,7 +47,10 @@ const getSchemaOutputPath = () =>
     let usingFallback = false;
 
     const dbName =
-      process.env.CODEGEN_DATABASE || process.env.PGDATABASE || 'constructive';
+      codegenConfig.databaseConfig?.databaseName ||
+      envConfig.CODEGEN_DATABASE ||
+      envConfig.PGDATABASE ||
+      'constructive';
     const pgConfig = { ...opts.pg, database: dbName } as typeof opts.pg;
     log.info(`Target database for codegen: ${dbName}`);
 
@@ -86,7 +111,10 @@ const getSchemaOutputPath = () =>
     const graphqlSchema = await getSchema(pool, settings as any);
     const sdl = printSchema(graphqlSchema);
 
-    const outputPath = getSchemaOutputPath();
+    const outputPath = getSchemaOutputPath(
+      codegenConfig.schemaOutputPathConfig,
+      envConfig
+    );
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, sdl, 'utf8');
 
@@ -95,4 +123,8 @@ const getSchemaOutputPath = () =>
     log.error('Failed to write schema', error?.stack || error);
     process.exitCode = 1;
   }
-})();
+};
+
+if (require.main === module) {
+  void runCodegenSchema();
+}

@@ -1,7 +1,7 @@
 import * as jobs from '@constructive-io/job-utils';
-import type { PgClientLike } from '@constructive-io/job-utils';
+import type { PgClientLike, JobsRuntimeConfigOptions } from '@constructive-io/job-utils';
 import schedule from 'node-schedule';
-import poolManager from '@constructive-io/job-pg';
+import poolManager, { createPoolManager } from '@constructive-io/job-pg';
 import type { Pool, PoolClient } from 'pg';
 import { Logger } from '@pgpmjs/logger';
 
@@ -28,17 +28,29 @@ export default class Scheduler {
   listenClient?: PoolClient;
   listenRelease?: () => void;
   stopped?: boolean;
+  jobsConfigOptions: JobsRuntimeConfigOptions;
+  poolManagerInstance: {
+    getPool: () => Pool;
+    onClose: (...args: any[]) => void;
+    close: () => Promise<void>;
+  };
 
   constructor({
     tasks,
     idleDelay = 15000,
-    pgPool = poolManager.getPool(),
-    workerId = 'scheduler-0'
+    pgPool,
+    workerId,
+    jobsConfig,
+    pgConfig,
+    envConfig
   }: {
     tasks: string[];
     idleDelay?: number;
     pgPool?: Pool;
     workerId?: string;
+    jobsConfig?: JobsRuntimeConfigOptions['jobsConfig'];
+    pgConfig?: JobsRuntimeConfigOptions['pgConfig'];
+    envConfig?: JobsRuntimeConfigOptions['envConfig'];
   }) {
     /*
      * idleDelay: This is how long to wait between polling for jobs.
@@ -49,16 +61,25 @@ export default class Scheduler {
      */
     this.idleDelay = idleDelay;
     this.supportedTaskNames = tasks;
-    this.workerId = workerId;
+    this.jobsConfigOptions = { jobsConfig, pgConfig, envConfig };
+    this.workerId =
+      workerId ?? jobs.getSchedulerHostname(this.jobsConfigOptions);
     this.doNextTimer = undefined;
-    this.pgPool = pgPool;
+    const manager =
+      pgPool
+        ? createPoolManager({ pgPool })
+        : (jobsConfig || pgConfig || envConfig)
+          ? createPoolManager(this.jobsConfigOptions)
+          : poolManager;
+    this.poolManagerInstance = manager;
+    this.pgPool = manager.getPool();
     this.jobs = {};
-    poolManager.onClose(async () => {
-      await jobs.releaseScheduledJobs(pgPool, {
+    manager.onClose(async () => {
+      await jobs.releaseScheduledJobs(this.pgPool, {
         workerId: this.workerId,
         // When ids is omitted the DB function releases all scheduled jobs
         ids: undefined as unknown as Array<number | string>
-      });
+      }, this.jobsConfigOptions);
     });
   }
   async initialize(client: PgClientLike) {
@@ -67,7 +88,7 @@ export default class Scheduler {
       workerId: this.workerId,
       // When ids is omitted the DB function releases all scheduled jobs
       ids: undefined as unknown as Array<number | string>
-    });
+    }, this.jobsConfigOptions);
     this._initialized = true;
     await this.doNext(client);
   }
@@ -82,7 +103,7 @@ export default class Scheduler {
     const when = err ? `after failure '${err.message}'` : 'after success';
     log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
     log.error(String(fatalError));
-    await poolManager.close();
+    await this.poolManagerInstance.close();
     process.exit(1);
   }
   async handleError(
@@ -101,7 +122,7 @@ export default class Scheduler {
     await jobs.releaseScheduledJobs(client, {
       workerId: this.workerId,
       ids: [job.id]
-    });
+    }, this.jobsConfigOptions);
   }
   async handleSuccess(
     client: PgClientLike,
@@ -116,7 +137,7 @@ export default class Scheduler {
     const j = schedule.scheduleJob(schedule_info as never, async () => {
       const newjob = (await jobs.runScheduledJob(client, {
         jobId: id
-      })) as ScheduledJobRow | null;
+      }, this.jobsConfigOptions)) as ScheduledJobRow | null;
 
       if (newjob) {
         if (newjob.id) {
@@ -150,10 +171,10 @@ export default class Scheduler {
     try {
       const job = await jobs.getScheduledJob<ScheduledJobRow>(client, {
         workerId: this.workerId,
-        supportedTaskNames: jobs.getJobSupportAny()
+        supportedTaskNames: jobs.getJobSupportAny(this.jobsConfigOptions)
           ? null
           : this.supportedTaskNames
-      });
+      }, this.jobsConfigOptions);
       if (!job || !job.id) {
         if (!this.stopped) {
           this.doNextTimer = setTimeout(

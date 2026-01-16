@@ -1,4 +1,3 @@
-import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -18,33 +17,58 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import {
+  normalizeGraphqlConfigInput,
+  resolveGraphqlConfig,
+  resolveNodeEnvConfig,
+  type GraphqlRuntimeConfigOptions,
+  type NodeEnv
+} from './config';
 
 const log = new Logger('server');
-const isDev = () => getNodeEnv() === 'development';
-
-export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
-  const envOptions = getEnvOptions(rawOpts);
-  const app = new Server(envOptions);
+export const GraphQLServer = (
+  rawOpts: PgpmOptions | GraphqlRuntimeConfigOptions = {}
+) => {
+  const normalized = normalizeGraphqlConfigInput(rawOpts);
+  const envOptions = resolveGraphqlConfig(normalized);
+  const app = new Server(envOptions, {
+    envConfig: normalized.envConfig,
+    resolved: true
+  });
   app.addEventListener();
   app.listen();
 };
 
-class Server {
+export class Server {
   private app: Express;
   private opts: PgpmOptions;
+  private nodeEnv: NodeEnv;
   private listenClient: PoolClient | null = null;
   private listenRelease: (() => void) | null = null;
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
 
-  constructor(opts: PgpmOptions) {
-    this.opts = getEnvOptions(opts);
+  constructor(
+    opts: PgpmOptions,
+    {
+      envConfig,
+      cwd,
+      resolved
+    }: { envConfig?: NodeJS.ProcessEnv; cwd?: string; resolved?: boolean } = {}
+  ) {
+    this.nodeEnv = resolveNodeEnvConfig(envConfig);
+    this.opts = resolved
+      ? opts
+      : resolveGraphqlConfig({ graphqlConfig: opts, envConfig, cwd });
     const effectiveOpts = this.opts;
 
     const app = express();
-    const api = createApiMiddleware(effectiveOpts);
-    const authenticate = createAuthenticateMiddleware(effectiveOpts);
+    const api = createApiMiddleware(effectiveOpts, this.nodeEnv);
+    const authenticate = createAuthenticateMiddleware(
+      effectiveOpts,
+      this.nodeEnv
+    );
     const requestLogger: RequestHandler = (req, res, next) => {
       const headerRequestId = req.header('x-request-id');
       const reqId = headerRequestId || randomUUID();
@@ -78,7 +102,7 @@ class Server {
     };
 
     // Log startup config in dev mode
-    if (isDev()) {
+    if (this.nodeEnv === 'development') {
       log.debug(
         `Database: ${effectiveOpts.pg?.database}@${effectiveOpts.pg?.host}:${effectiveOpts.pg?.port}`
       );
@@ -91,7 +115,7 @@ class Server {
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
-    if (fallbackOrigin && process.env.NODE_ENV === 'production') {
+    if (fallbackOrigin && this.nodeEnv === 'production') {
       if (fallbackOrigin === '*') {
         log.warn(
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
@@ -255,5 +279,3 @@ class Server {
     log.error(text, err);
   }
 }
-
-export { Server };

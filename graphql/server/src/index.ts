@@ -1,5 +1,6 @@
 export * from './server';
 export * from './schema';
+export * from './config';
 
 // Export middleware for use in testing packages
 export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/api';

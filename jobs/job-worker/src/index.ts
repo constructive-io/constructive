@@ -1,12 +1,8 @@
 import pg from 'pg';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@constructive-io/job-utils';
-import type { PgClientLike } from '@constructive-io/job-utils';
+import type { PgClientLike, JobsRuntimeConfigOptions } from '@constructive-io/job-utils';
 import { createLogger } from '@pgpmjs/logger';
-
-const pgPoolConfig = {
-  connectionString: jobs.getJobConnectionString()
-};
 
 function once<T extends (...args: unknown[]) => unknown>(
   fn: T,
@@ -48,18 +44,25 @@ export default class Worker {
   doNextTimer?: NodeJS.Timeout;
   pgPool: Pool;
   _ended?: boolean;
+  jobsConfigOptions: JobsRuntimeConfigOptions;
 
   // tasks is required; other options are optional
   constructor({
     tasks,
     idleDelay = 15000,
-    pgPool = new (pg as any).Pool(pgPoolConfig),
-    workerId = jobs.getWorkerHostname()
+    pgPool,
+    workerId,
+    jobsConfig,
+    pgConfig,
+    envConfig
   }: {
     tasks: Record<string, TaskHandler>;
     idleDelay?: number;
     pgPool?: Pool;
     workerId?: string;
+    jobsConfig?: JobsRuntimeConfigOptions['jobsConfig'];
+    pgConfig?: JobsRuntimeConfigOptions['pgConfig'];
+    envConfig?: JobsRuntimeConfigOptions['envConfig'];
   }) {
     this.tasks = tasks;
     /*
@@ -72,9 +75,17 @@ export default class Worker {
     this.idleDelay = idleDelay;
 
     this.supportedTaskNames = Object.keys(this.tasks);
-    this.workerId = workerId;
+    this.jobsConfigOptions = { jobsConfig, pgConfig, envConfig };
+    const resolvedWorkerId =
+      workerId ?? jobs.getWorkerHostname(this.jobsConfigOptions);
+    this.workerId = resolvedWorkerId;
     this.doNextTimer = undefined;
-    this.pgPool = pgPool;
+    const resolvedPool =
+      pgPool ??
+      new (pg as any).Pool({
+        connectionString: jobs.getJobConnectionString(this.jobsConfigOptions)
+      });
+    this.pgPool = resolvedPool;
     const close = () => {
       logger.info('closing connection...');
       this.close();
@@ -117,7 +128,7 @@ export default class Worker {
       workerId: this.workerId,
       jobId: job.id,
       message: err.message
-    });
+    }, this.jobsConfigOptions);
   }
   async handleSuccess(
     client: PgClientLike,
@@ -126,7 +137,11 @@ export default class Worker {
     logger.info(
       `Completed task ${job.id} (${job.task_identifier}) with success (${duration}ms)`
     );
-    await jobs.completeJob(client, { workerId: this.workerId, jobId: job.id });
+    await jobs.completeJob(
+      client,
+      { workerId: this.workerId, jobId: job.id },
+      this.jobsConfigOptions
+    );
   }
   async doWork(job: JobRow) {
     const { task_identifier } = job;
@@ -151,7 +166,7 @@ export default class Worker {
       const job = (await jobs.getJob<JobRow>(client, {
         workerId: this.workerId,
         supportedTaskNames: this.supportedTaskNames
-      })) as JobRow | undefined;
+      }, this.jobsConfigOptions)) as JobRow | undefined;
       if (!job || !job.id) {
         this.doNextTimer = setTimeout(
           () => this.doNext(client),

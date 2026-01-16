@@ -34,16 +34,6 @@ const buildGraphqlClient = (
   };
 };
 
-const getGraphqlClient = (): GraphqlClient => {
-  const rawUrl =
-    process.env.TEST_GRAPHQL_URL ||
-    process.env.GRAPHQL_URL ||
-    'http://localhost:3000/graphql';
-  const host = process.env.TEST_GRAPHQL_HOST || process.env.GRAPHQL_HOST;
-
-  return buildGraphqlClient(rawUrl, host);
-};
-
 const sendGraphql = async (
   client: GraphqlClient,
   query: string,
@@ -223,41 +213,8 @@ describe('jobs e2e', () => {
   let databaseId = '';
   let pg: PgTestClient | undefined;
   let combinedServer: CombinedServerType | null = null;
-  const envSnapshot: Record<string, string | undefined> = {
-    NODE_ENV: process.env.NODE_ENV,
-    TEST_DB: process.env.TEST_DB,
-    PGHOST: process.env.PGHOST,
-    PGPORT: process.env.PGPORT,
-    PGUSER: process.env.PGUSER,
-    PGPASSWORD: process.env.PGPASSWORD,
-    PGDATABASE: process.env.PGDATABASE,
-    TEST_DATABASE_ID: process.env.TEST_DATABASE_ID,
-    DEFAULT_DATABASE_ID: process.env.DEFAULT_DATABASE_ID,
-    TEST_GRAPHQL_URL: process.env.TEST_GRAPHQL_URL,
-    TEST_GRAPHQL_HOST: process.env.TEST_GRAPHQL_HOST,
-    GRAPHQL_URL: process.env.GRAPHQL_URL,
-    META_GRAPHQL_URL: process.env.META_GRAPHQL_URL,
-    SIMPLE_EMAIL_DRY_RUN: process.env.SIMPLE_EMAIL_DRY_RUN,
-    SEND_EMAIL_LINK_DRY_RUN: process.env.SEND_EMAIL_LINK_DRY_RUN,
-    LOCAL_APP_PORT: process.env.LOCAL_APP_PORT,
-    MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN,
-    MAILGUN_FROM: process.env.MAILGUN_FROM,
-    MAILGUN_REPLY: process.env.MAILGUN_REPLY,
-    MAILGUN_API_KEY: process.env.MAILGUN_API_KEY,
-    MAILGUN_KEY: process.env.MAILGUN_KEY,
-    JOBS_SUPPORT_ANY: process.env.JOBS_SUPPORT_ANY,
-    JOBS_SUPPORTED: process.env.JOBS_SUPPORTED,
-    INTERNAL_GATEWAY_DEVELOPMENT_MAP:
-      process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP,
-    INTERNAL_JOBS_CALLBACK_PORT: process.env.INTERNAL_JOBS_CALLBACK_PORT,
-    JOBS_CALLBACK_BASE_URL: process.env.JOBS_CALLBACK_BASE_URL,
-    FEATURES_POSTGIS: process.env.FEATURES_POSTGIS
-  };
 
   beforeAll(async () => {
-    delete process.env.TEST_DB;
-    delete process.env.PGDATABASE;
-
     ({ teardown, pg } = await createTestDb());
     if (!pg) {
       throw new Error('Test database connection is missing');
@@ -279,36 +236,14 @@ describe('jobs e2e', () => {
 
     const graphqlUrl = `http://127.0.0.1:${GRAPHQL_PORT}/graphql`;
     const callbackUrl = `http://127.0.0.1:${CALLBACK_PORT}/callback`;
-
-    process.env.NODE_ENV = 'test';
-    process.env.PGDATABASE = pg.config.database;
-    process.env.TEST_DATABASE_ID = databaseId;
-    process.env.DEFAULT_DATABASE_ID = databaseId;
-    process.env.TEST_GRAPHQL_URL = graphqlUrl;
-    process.env.GRAPHQL_URL = graphqlUrl;
-    process.env.META_GRAPHQL_URL = graphqlUrl;
-    process.env.SIMPLE_EMAIL_DRY_RUN = 'true';
-    process.env.SEND_EMAIL_LINK_DRY_RUN = 'true';
-    process.env.LOCAL_APP_PORT = String(GRAPHQL_PORT);
-    process.env.MAILGUN_DOMAIN = 'mg.constructive.io';
-    process.env.MAILGUN_FROM = 'no-reply@mg.constructive.io';
-    process.env.MAILGUN_REPLY = 'info@mg.constructive.io';
-    process.env.MAILGUN_API_KEY = 'change-me-mailgun-api-key';
-    process.env.MAILGUN_KEY = 'change-me-mailgun-api-key';
-    process.env.JOBS_SUPPORT_ANY = 'false';
-    process.env.JOBS_SUPPORTED = 'simple-email,send-email-link';
-    process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP = JSON.stringify({
-      'simple-email': `http://127.0.0.1:${SIMPLE_EMAIL_PORT}`,
-      'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`
-    });
-    process.env.INTERNAL_JOBS_CALLBACK_PORT = String(CALLBACK_PORT);
-    process.env.JOBS_CALLBACK_BASE_URL = callbackUrl;
-    process.env.FEATURES_POSTGIS = 'false';
-
-    if (pg.config.host) process.env.PGHOST = pg.config.host;
-    if (pg.config.port) process.env.PGPORT = String(pg.config.port);
-    if (pg.config.user) process.env.PGUSER = pg.config.user;
-    if (pg.config.password) process.env.PGPASSWORD = pg.config.password;
+    const pgConfig = {
+      host: pg.config.host,
+      port: pg.config.port,
+      user: pg.config.user,
+      password: pg.config.password,
+      database: pg.config.database
+    };
+    const envConfig: NodeJS.ProcessEnv = { NODE_ENV: 'test' };
 
     const services: FunctionServiceConfig[] = [
       { name: 'simple-email', port: SIMPLE_EMAIL_PORT },
@@ -318,20 +253,14 @@ describe('jobs e2e', () => {
     const combinedServerOptions: CombinedServerOptions = {
       graphql: {
         enabled: true,
-        options: {
-          pg: {
-            host: pg.config.host,
-            port: pg.config.port,
-            user: pg.config.user,
-            password: pg.config.password,
-            database: pg.config.database
-          },
+        graphqlConfig: {
+          pg: pgConfig,
           server: {
             host: '127.0.0.1',
             port: GRAPHQL_PORT
           },
           api: {
-            enableMetaApi: false,
+            enableServicesApi: false,
             exposedSchemas: [
               'app_jobs',
               'app_public',
@@ -346,20 +275,55 @@ describe('jobs e2e', () => {
           features: {
             postgis: false
           }
-        }
+        },
+        envConfig
       },
       functions: {
         enabled: true,
-        services
+        services,
+        functionsConfig: {
+          'simple-email': { dryRun: true },
+          'send-email-link': {
+            dryRun: true,
+            graphqlUrl,
+            metaGraphqlUrl: graphqlUrl,
+            defaultDatabaseId: databaseId
+          }
+        }
       },
-      jobs: { enabled: true }
+      jobs: {
+        enabled: true,
+        pgConfig,
+        jobsConfig: {
+          schema: { schema: 'app_jobs' },
+          worker: {
+            supportAny: false,
+            supported: ['simple-email', 'send-email-link']
+          },
+          scheduler: {
+            supportAny: false,
+            supported: ['simple-email', 'send-email-link']
+          },
+          gateway: {
+            gatewayUrl: 'http://gateway:8080',
+            callbackUrl,
+            callbackPort: CALLBACK_PORT
+          }
+        },
+        devMapConfig: {
+          'simple-email': `http://127.0.0.1:${SIMPLE_EMAIL_PORT}`,
+          'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`
+        },
+        callbackServerConfig: { port: CALLBACK_PORT },
+        envConfig
+      }
     };
 
     const { CombinedServer } = await import('../src/server');
     combinedServer = new CombinedServer(combinedServerOptions);
     await combinedServer.start();
 
-    graphqlClient = getGraphqlClient();
+    graphqlClient = buildGraphqlClient(graphqlUrl);
   });
 
   afterAll(async () => {
@@ -368,13 +332,6 @@ describe('jobs e2e', () => {
     }
     if (teardown) {
       await teardown();
-    }
-    for (const [key, value] of Object.entries(envSnapshot)) {
-      if (value === undefined) {
-        delete process.env[key];
-      } else {
-        process.env[key] = value;
-      }
     }
   });
 

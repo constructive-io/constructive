@@ -3,14 +3,22 @@
 
 import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
-import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
+import { resolveGraphqlConfig, type GraphqlRuntimeConfigOptions } from '../config';
 
 const log = new Logger('create-bucket');
 
-(async () => {
+type CreateBucketConfig = GraphqlRuntimeConfigOptions;
+
+export const runCreateBucket = async (
+  createBucketConfig: CreateBucketConfig = {}
+) => {
   try {
-    const opts = getEnvOptions();
+    const opts = resolveGraphqlConfig({
+      graphqlConfig: createBucketConfig.graphqlConfig,
+      envConfig: createBucketConfig.envConfig,
+      cwd: createBucketConfig.cwd
+    });
     const { cdn } = opts;
 
     const provider = cdn?.provider || 'minio';
@@ -43,4 +51,8 @@ const log = new Logger('create-bucket');
     log.error('error', e);
     process.exitCode = 1;
   }
-})();
+};
+
+if (require.main === module) {
+  void runCreateBucket();
+}

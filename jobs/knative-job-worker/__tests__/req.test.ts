@@ -23,6 +23,7 @@ describe('knative request wrapper', () => {
     delete process.env.INTERNAL_GATEWAY_URL;
     delete process.env.KNATIVE_SERVICE_URL;
     delete process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP;
+    delete process.env.JOBS_CALLBACK_BASE_URL;
   });
 
   it('uses KNATIVE_SERVICE_URL as base and preserves headers and body', async () => {
@@ -102,6 +103,38 @@ describe('knative request wrapper', () => {
     expect(options.url).toBe('http://localhost:3000/dev-fn');
   });
 
+  it('prefers config overrides for gateway and callback', async () => {
+    process.env.KNATIVE_SERVICE_URL = 'http://knative.internal';
+    process.env.JOBS_CALLBACK_BASE_URL = 'http://env-callback';
+
+    postMock.mockImplementation(
+      (options: any, callback: (err: any) => void) => callback(null)
+    );
+
+    const { createRequest } = await import('../src/req');
+
+    const request = createRequest({
+      jobsConfig: {
+        gateway: {
+          gatewayUrl: 'http://config-gateway',
+          callbackUrl: 'http://config-callback',
+          callbackPort: 12345
+        }
+      }
+    });
+
+    await request('example-fn', {
+      body: {},
+      databaseId: 'db-111',
+      workerId: 'worker-5',
+      jobId: 46
+    });
+
+    const [options] = postMock.mock.calls[0];
+    expect(options.url).toBe('http://config-gateway/example-fn');
+    expect(options.headers['X-Callback-Url']).toBe('http://config-callback');
+  });
+
   it('rejects when HTTP request errors', async () => {
     process.env.KNATIVE_SERVICE_URL = 'http://knative.internal';
 
@@ -122,9 +155,21 @@ describe('knative request wrapper', () => {
     ).rejects.toThrow('network failure');
   });
 
-  it('throws on startup when no base URL env vars are set', async () => {
-    await expect(import('../src/env')).rejects.toThrow(
-      /KNATIVE_SERVICE_URL \(or INTERNAL_GATEWAY_URL as fallback\) is required/
+  it('falls back to default gateway when no base URL env vars are set', async () => {
+    postMock.mockImplementation(
+      (options: any, callback: (err: any) => void) => callback(null)
     );
+
+    const { request } = await import('../src/req');
+
+    await request('example-fn', {
+      body: {},
+      databaseId: 'db-999',
+      workerId: 'worker-6',
+      jobId: 47
+    });
+
+    const [options] = postMock.mock.calls[0];
+    expect(options.url).toBe('http://gateway:8080/example-fn');
   });
 });

@@ -1,4 +1,3 @@
-import { getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -19,10 +18,10 @@ import {
   buildDomainLookup,
   buildListApis,
 } from './gql';
+import { resolveNodeEnvConfig, type NodeEnv } from '../config';
 import './types'; // for Request type
 
 const log = new Logger('api');
-const isDev = () => getNodeEnv() === 'development';
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
@@ -79,7 +78,12 @@ export const getSubdomain = (reqDomains: string[]): string | null => {
   return !names.length ? null : names.join('.');
 };
 
-export const createApiMiddleware = (opts: any) => {
+export const createApiMiddleware = (
+  opts: any,
+  nodeEnvConfig?: NodeEnv
+) => {
+  const nodeEnv = nodeEnvConfig ?? resolveNodeEnvConfig();
+  const isDev = nodeEnv === 'development';
   return async (
     req: Request,
     res: Response,
@@ -106,7 +110,7 @@ export const createApiMiddleware = (opts: any) => {
       return next();
     }
     try {
-      const svc = await getApiConfig(opts, req);
+      const svc = await getApiConfig(opts, req, nodeEnv);
 
       if (svc?.errorHtml) {
         res
@@ -126,7 +130,7 @@ export const createApiMiddleware = (opts: any) => {
       const api = transformServiceToApi(svc);
       req.api = api;
       req.databaseId = api.databaseId;
-      if (isDev())
+      if (isDev)
         log.debug(
           `Resolved API: db=${api.dbname}, schemas=[${api.schema?.join(', ')}]`
         );
@@ -325,8 +329,11 @@ const validateSchemata = async (
 
 export const getApiConfig = async (
   opts: PgpmOptions,
-  req: Request
+  req: Request,
+  nodeEnvConfig?: NodeEnv
 ): Promise<any> => {
+  const nodeEnv = nodeEnvConfig ?? resolveNodeEnvConfig();
+  const isDev = nodeEnv === 'development';
   const rootPgPool = getPgPool(opts.pg);
   // @ts-ignore
   const subdomain = getSubdomain(req.urlDomains.subdomains);
@@ -337,18 +344,20 @@ export const getApiConfig = async (
 
   let svc;
   if (svcCache.has(key)) {
-    if (isDev()) log.debug(`Cache HIT for key=${key}`);
+    if (isDev) log.debug(`Cache HIT for key=${key}`);
     svc = svcCache.get(key);
   } else {
-    if (isDev()) log.debug(`Cache MISS for key=${key}, looking up API`);
+    if (isDev) log.debug(`Cache MISS for key=${key}, looking up API`);
     const apiOpts = (opts as any).api || {};
     const allSchemata = apiOpts.metaSchemas || [];
     const validatedSchemata = await validateSchemata(rootPgPool, allSchemata);
 
     if (validatedSchemata.length === 0) {
       const apiOpts2 = (opts as any).api || {};
-      const message = `No valid schemas found. Configured metaSchemas: [${(apiOpts2.metaSchemas || []).join(', ')}]`;
-      if (isDev()) log.debug(message);
+      const message = `No valid schemas found. Configured metaSchemas: [${(
+        apiOpts2.metaSchemas || []
+      ).join(', ')}]`;
+      if (isDev) log.debug(message);
       const error: any = new Error(message);
       error.code = 'NO_VALID_SCHEMAS';
       throw error;
@@ -406,57 +415,56 @@ export const getApiConfig = async (
         subdomain,
       });
 
-      if (!svc) {
-        if (getNodeEnv() === 'development') {
-          // TODO ONLY DO THIS IN DEV MODE
-          const fallbackResult = await client.query({
-            role: 'administrator',
-            // @ts-ignore
-            query: buildListApis().document,
-          });
+      if (!svc && nodeEnv === 'development') {
+        // TODO ONLY DO THIS IN DEV MODE
+        const fallbackResult = await client.query({
+          role: 'administrator',
+          // @ts-ignore
+          query: buildListApis().document,
+        });
 
-          if (
-            !fallbackResult.errors?.length &&
-            fallbackResult.data?.apis?.nodes?.length
-          ) {
-            const port = getPortFromRequest(req);
+        if (
+          !fallbackResult.errors?.length &&
+          fallbackResult.data?.apis?.nodes?.length
+        ) {
+          const port = getPortFromRequest(req);
 
-            const allDomains = fallbackResult.data.apis.nodes.flatMap(
-              (api: any) =>
-                api.domains.nodes.map((d: any) => ({
-                  domain: d.domain,
-                  subdomain: d.subdomain,
-                  href: d.subdomain
-                    ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
-                    : `http://${d.domain}${port}/graphiql`,
-                }))
-            );
+          const allDomains = fallbackResult.data.apis.nodes.flatMap(
+            (api: any) =>
+              api.domains.nodes.map((d: any) => ({
+                domain: d.domain,
+                subdomain: d.subdomain,
+                href: d.subdomain
+                  ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
+                  : `http://${d.domain}${port}/graphiql`,
+              }))
+          );
 
-            const linksHtml = allDomains.length
-              ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
-                allDomains
-                  .map(
-                    (d: any) =>
-                      `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`
-                  )
-                  .join('') +
-                `</ul>`
-              : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
+          const linksHtml = allDomains.length
+            ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
+              allDomains
+                .map(
+                  (d: any) =>
+                    `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`
+                )
+                .join('') +
+              `</ul>`
+            : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
 
-            const errorHtml = `
+          const errorHtml = `
           <p class="text-sm text-gray-700">Try some of these:</p>
           <div class="mt-4">
             ${linksHtml}
           </div>
         `.trim();
 
-            return {
-              errorHtml,
-            };
-          }
+          return {
+            errorHtml,
+          };
         }
       }
     }
   }
+
   return svc;
 };

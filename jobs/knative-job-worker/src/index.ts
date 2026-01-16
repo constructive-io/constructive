@@ -1,9 +1,9 @@
-import poolManager from '@constructive-io/job-pg';
+import poolManager, { createPoolManager } from '@constructive-io/job-pg';
 import * as jobs from '@constructive-io/job-utils';
-import type { PgClientLike } from '@constructive-io/job-utils';
+import type { PgClientLike, JobsRuntimeConfigOptions } from '@constructive-io/job-utils';
 import type { Pool, PoolClient } from 'pg';
 import { Logger } from '@pgpmjs/logger';
-import { request as req } from './req';
+import { createRequest } from './req';
 
 export interface JobRow {
   id: number | string;
@@ -24,17 +24,32 @@ export default class Worker {
   listenClient?: PoolClient;
   listenRelease?: () => void;
   stopped?: boolean;
+  jobsConfigOptions: JobsRuntimeConfigOptions;
+  poolManagerInstance: {
+    getPool: () => Pool;
+    onClose: (...args: any[]) => void;
+    close: () => Promise<void>;
+  };
+  requestJob: ReturnType<typeof createRequest>;
 
   constructor({
     tasks,
     idleDelay = 15000,
-    pgPool = poolManager.getPool(),
-    workerId = 'worker-0'
+    pgPool,
+    workerId,
+    jobsConfig,
+    pgConfig,
+    envConfig,
+    devMapConfig
   }: {
     tasks: string[];
     idleDelay?: number;
     pgPool?: Pool;
     workerId?: string;
+    jobsConfig?: JobsRuntimeConfigOptions['jobsConfig'];
+    pgConfig?: JobsRuntimeConfigOptions['pgConfig'];
+    envConfig?: JobsRuntimeConfigOptions['envConfig'];
+    devMapConfig?: JobsRuntimeConfigOptions['devMapConfig'];
   }) {
     /*
      * idleDelay: This is how long to wait between polling for jobs.
@@ -46,18 +61,41 @@ export default class Worker {
 
     this.idleDelay = idleDelay;
     this.supportedTaskNames = tasks;
-    this.workerId = workerId;
+    this.jobsConfigOptions = {
+      jobsConfig,
+      pgConfig,
+      envConfig,
+      devMapConfig
+    };
+    this.workerId =
+      workerId ?? jobs.getWorkerHostname(this.jobsConfigOptions);
     this.doNextTimer = undefined;
-    this.pgPool = pgPool;
-    poolManager.onClose(async () => {
-      await jobs.releaseJobs(pgPool, { workerId: this.workerId });
+    const manager =
+      pgPool
+        ? createPoolManager({ pgPool })
+        : (jobsConfig || pgConfig || envConfig || devMapConfig)
+          ? createPoolManager(this.jobsConfigOptions)
+          : poolManager;
+    this.poolManagerInstance = manager;
+    this.pgPool = manager.getPool();
+    this.requestJob = createRequest(this.jobsConfigOptions);
+    manager.onClose(async () => {
+      await jobs.releaseJobs(
+        this.pgPool,
+        { workerId: this.workerId },
+        this.jobsConfigOptions
+      );
     });
   }
   async initialize(client: PgClientLike) {
     if (this._initialized === true) return;
 
     // release any jobs not finished from before if fatal error prevented cleanup
-    await jobs.releaseJobs(client, { workerId: this.workerId });
+    await jobs.releaseJobs(
+      client,
+      { workerId: this.workerId },
+      this.jobsConfigOptions
+    );
 
     this._initialized = true;
     await this.doNext(client);
@@ -72,7 +110,7 @@ export default class Worker {
   ) {
     const when = err ? `after failure '${err.message}'` : 'after success';
     log.error(`Failed to release job '${jobId}' ${when}; committing seppuku`);
-    await poolManager.close();
+    await this.poolManagerInstance.close();
     log.error(String(fatalError));
     process.exit(1);
   }
@@ -90,7 +128,7 @@ export default class Worker {
       workerId: this.workerId,
       jobId: job.id,
       message: err.message
-    });
+    }, this.jobsConfigOptions);
   }
   async handleSuccess(
     client: PgClientLike,
@@ -108,12 +146,12 @@ export default class Worker {
       databaseId: job.database_id
     });
     if (
-      !jobs.getJobSupportAny() &&
+      !jobs.getJobSupportAny(this.jobsConfigOptions) &&
       !this.supportedTaskNames.includes(task_identifier)
     ) {
       throw new Error('Unsupported task');
     }
-    await req(task_identifier, {
+    await this.requestJob(task_identifier, {
       body: payload,
       databaseId: job.database_id,
       workerId: this.workerId,
@@ -134,10 +172,10 @@ export default class Worker {
     try {
       const job = (await jobs.getJob<JobRow>(client, {
         workerId: this.workerId,
-        supportedTaskNames: jobs.getJobSupportAny()
+        supportedTaskNames: jobs.getJobSupportAny(this.jobsConfigOptions)
           ? null
           : this.supportedTaskNames
-      })) as JobRow | undefined;
+      }, this.jobsConfigOptions)) as JobRow | undefined;
 
       if (!job || !job.id) {
         if (!this.stopped) {

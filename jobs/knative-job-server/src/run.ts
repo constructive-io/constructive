@@ -7,8 +7,9 @@ import { createLogger } from '@pgpmjs/logger';
 
 const logger = createLogger('knative-job-server');
 const pgPool = poolManager.getPool();
-const port = getJobsCallbackPort();
+const jobsConfigOptions = { envConfig: process.env };
+const port = getJobsCallbackPort(jobsConfigOptions);
 
-server(pgPool).listen(port, () => {
+server({ pgPool, ...jobsConfigOptions }).listen(port, () => {
   logger.info(`listening ON ${port}`);
 });

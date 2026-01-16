@@ -1,5 +1,8 @@
 import { Pool, PoolConfig } from 'pg';
-import { getJobPgConfig } from '@constructive-io/job-utils';
+import {
+  getJobPgConfig,
+  type JobsRuntimeConfigOptions
+} from '@constructive-io/job-utils';
 import { createLogger } from '@pgpmjs/logger';
 
 // k8s only does SIGINT
@@ -30,8 +33,6 @@ function once<T extends (...args: unknown[]) => unknown>(
   };
 }
 
-const pgPoolConfig: PoolConfig = getJobPgConfig() as PoolConfig;
-
 const logger = createLogger('job-pg');
 
 const end = (pool: Pool): void => {
@@ -57,14 +58,19 @@ const end = (pool: Pool): void => {
 // Callbacks registered for pool close events can accept arbitrary arguments
 // (we forward whatever was passed to `onClose`).
 type PoolCloseCallback = (...args: any[]) => Promise<void> | void;
+type PoolManagerOptions = JobsRuntimeConfigOptions & {
+  pgPool?: Pool;
+};
 
 class PoolManager {
   private pgPool: Pool;
   private callbacks: Array<[PoolCloseCallback, any, any[]]>;
   private _closed: boolean;
 
-  constructor({ pgPool = new Pool(pgPoolConfig) }: { pgPool?: Pool } = {}) {
-    this.pgPool = pgPool;
+  constructor({ pgPool, ...config }: PoolManagerOptions = {}) {
+    const resolvedPool =
+      pgPool ?? new Pool(getJobPgConfig(config) as PoolConfig);
+    this.pgPool = resolvedPool;
     this.callbacks = [];
     this._closed = false;
 
@@ -99,6 +105,10 @@ class PoolManager {
   }
 }
 
-const mngr = new PoolManager();
+const createPoolManager = (options: PoolManagerOptions = {}) =>
+  new PoolManager(options);
+
+const mngr = createPoolManager();
 
 export default mngr;
+export { PoolManager, createPoolManager };

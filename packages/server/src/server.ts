@@ -2,12 +2,13 @@ import { Server as GraphQLServer } from '@constructive-io/graphql-server';
 import jobServerFactory from '@constructive-io/knative-job-server';
 import Worker from '@constructive-io/knative-job-worker';
 import Scheduler from '@constructive-io/job-scheduler';
-import poolManager from '@constructive-io/job-pg';
+import poolManager, { createPoolManager } from '@constructive-io/job-pg';
 import {
   getJobSupported,
   getJobsCallbackPort,
   getSchedulerHostname,
-  getWorkerHostname
+  getWorkerHostname,
+  type JobsRuntimeConfigOptions
 } from '@constructive-io/job-utils';
 import { Logger } from '@pgpmjs/logger';
 import { createRequire } from 'module';
@@ -25,16 +26,19 @@ import {
 type FunctionRegistryEntry = {
   moduleName: string;
   defaultPort: number;
+  factoryExport?: string;
 };
 
 const functionRegistry: Record<FunctionName, FunctionRegistryEntry> = {
   'simple-email': {
     moduleName: '@constructive-io/simple-email-fn',
-    defaultPort: 8081
+    defaultPort: 8081,
+    factoryExport: 'createSimpleEmailApp'
   },
   'send-email-link': {
     moduleName: '@constructive-io/send-email-link-fn',
-    defaultPort: 8082
+    defaultPort: 8082,
+    factoryExport: 'createSendEmailLinkApp'
   }
 };
 
@@ -49,15 +53,27 @@ const resolveFunctionEntry = (name: FunctionName): FunctionRegistryEntry => {
   return entry;
 };
 
-const loadFunctionApp = (moduleName: string) => {
+const loadFunctionApp = (
+  moduleName: string,
+  factoryExport?: string,
+  functionConfig?: unknown
+) => {
   const knativeModuleId = requireFn.resolve('@constructive-io/knative-job-fn');
   delete requireFn.cache[knativeModuleId];
 
   const moduleId = requireFn.resolve(moduleName);
   delete requireFn.cache[moduleId];
 
-  const mod = requireFn(moduleName) as { default?: { listen: (port: number, cb?: () => void) => unknown } };
-  const app = mod.default ?? mod;
+  const mod = requireFn(moduleName) as {
+    default?: { listen: (port: number, cb?: () => void) => unknown };
+    [key: string]: unknown;
+  };
+  const factory =
+    factoryExport && typeof mod[factoryExport] === 'function'
+      ? (mod[factoryExport] as (cfg?: unknown) => unknown)
+      : undefined;
+  const app =
+    functionConfig && factory ? factory(functionConfig) : mod.default ?? mod;
 
   if (!app || typeof (app as { listen?: unknown }).listen !== 'function') {
     throw new Error(`Function module "${moduleName}" does not export a listenable app.`);
@@ -104,11 +120,25 @@ const ensureUniquePorts = (services: FunctionServiceConfig[]) => {
 
 const startFunction = async (
   service: FunctionServiceConfig,
-  functionServers: Map<FunctionName, HttpServer>
+  functionServers: Map<FunctionName, HttpServer>,
+  functionsConfig?: FunctionsOptions['functionsConfig'],
+  functionsEnvConfig?: FunctionsOptions['envConfig']
 ): Promise<StartedFunction> => {
   const entry = resolveFunctionEntry(service.name);
   const port = resolveFunctionPort(service);
-  const app = loadFunctionApp(entry.moduleName);
+  const functionConfig = functionsConfig?.[service.name];
+  const resolvedFunctionConfig =
+    functionConfig || functionsEnvConfig
+      ? {
+          ...(functionConfig ?? {}),
+          envConfig: functionConfig?.envConfig ?? functionsEnvConfig
+        }
+      : undefined;
+  const app = loadFunctionApp(
+    entry.moduleName,
+    entry.factoryExport,
+    resolvedFunctionConfig
+  );
 
   await new Promise<void>((resolve, reject) => {
     const server = app.listen(port, () => {
@@ -140,7 +170,14 @@ const startFunctions = async (
 
   const started: StartedFunction[] = [];
   for (const service of services) {
-    started.push(await startFunction(service, functionServers));
+    started.push(
+      await startFunction(
+        service,
+        functionServers,
+        options?.functionsConfig,
+        options?.envConfig
+      )
+    );
   }
 
   return started;
@@ -222,9 +259,14 @@ export class CombinedServer {
 
     if (this.options.graphql?.enabled) {
       log.info('starting GraphQL server');
-      this.graphqlServer = new GraphQLServer(
-        this.options.graphql.options ?? {}
-      );
+      const graphqlOptions =
+        this.options.graphql.graphqlConfig ??
+        this.options.graphql.options ??
+        {};
+      this.graphqlServer = new GraphQLServer(graphqlOptions, {
+        envConfig: this.options.graphql.envConfig,
+        cwd: this.options.graphql.cwd
+      });
       this.graphqlServer.addEventListener();
       this.graphqlHttpServer = this.graphqlServer.listen();
       if (!this.graphqlHttpServer.listening) {
@@ -288,24 +330,57 @@ export class CombinedServer {
   }
 
   private async startJobs(): Promise<void> {
-    const pgPool = poolManager.getPool();
-    const jobsApp = jobServerFactory(pgPool);
-    const callbackPort = getJobsCallbackPort();
+    const jobsOptions = this.options.jobs ?? {};
+    const runtimeOptions: JobsRuntimeConfigOptions = {
+      jobsConfig: jobsOptions.jobsConfig,
+      pgConfig: jobsOptions.pgConfig,
+      envConfig: jobsOptions.envConfig,
+      devMapConfig: jobsOptions.devMapConfig
+    };
+
+    const manager =
+      jobsOptions.pgPool
+        ? createPoolManager({ pgPool: jobsOptions.pgPool })
+        : (jobsOptions.jobsConfig ||
+            jobsOptions.pgConfig ||
+            jobsOptions.envConfig ||
+            jobsOptions.devMapConfig)
+          ? createPoolManager(runtimeOptions)
+          : poolManager;
+    const pgPool = manager.getPool();
+    const jobsApp = jobServerFactory({ pgPool, ...runtimeOptions });
+    const callbackPort =
+      jobsOptions.callbackServerConfig?.port ??
+      getJobsCallbackPort(runtimeOptions);
     this.jobsHttpServer = await listenApp(jobsApp, callbackPort);
 
-    const tasks = getJobSupported();
+    const tasks =
+      jobsOptions.workerConfig?.tasks ?? getJobSupported(runtimeOptions);
     this.worker = new Worker({
       pgPool,
       tasks,
-      workerId: getWorkerHostname()
+      workerId:
+        jobsOptions.workerConfig?.workerId ??
+        getWorkerHostname(runtimeOptions),
+      idleDelay: jobsOptions.workerConfig?.idleDelay,
+      jobsConfig: runtimeOptions.jobsConfig,
+      pgConfig: runtimeOptions.pgConfig,
+      envConfig: runtimeOptions.envConfig,
+      devMapConfig: runtimeOptions.devMapConfig
     });
     this.scheduler = new Scheduler({
       pgPool,
-      tasks,
-      workerId: getSchedulerHostname()
+      tasks: jobsOptions.schedulerConfig?.tasks ?? tasks,
+      workerId:
+        jobsOptions.schedulerConfig?.workerId ??
+        getSchedulerHostname(runtimeOptions),
+      idleDelay: jobsOptions.schedulerConfig?.idleDelay,
+      jobsConfig: runtimeOptions.jobsConfig,
+      pgConfig: runtimeOptions.pgConfig,
+      envConfig: runtimeOptions.envConfig
     });
 
-    this.jobsPoolManager = poolManager;
+    this.jobsPoolManager = manager;
 
     this.worker.listen();
     this.scheduler.listen();
