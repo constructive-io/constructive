@@ -331,7 +331,7 @@ describe('jobs e2e', () => {
             port: GRAPHQL_PORT
           },
           api: {
-            enableMetaApi: false,
+            enableServicesApi: false,
             exposedSchemas: [
               'app_jobs',
               'app_public',
