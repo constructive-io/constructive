@@ -72,9 +72,20 @@ const getRequiredEnv = (name: string): string => {
   return value;
 };
 
+type GraphQLClientOptions = {
+  hostHeaderEnvVar?: string;
+  databaseId?: string;
+  useMetaSchema?: boolean;
+  apiName?: string;
+  schemata?: string;
+};
+
+// TODO: Consider moving this to @constructive-io/knative-job-fn as a shared
+// utility so all job functions can create GraphQL clients with consistent
+// header-based routing without duplicating this logic.
 const createGraphQLClient = (
   url: string,
-  hostHeaderEnvVar?: string
+  options: GraphQLClientOptions = {}
 ): GraphQLClient => {
   const headers: Record<string, string> = {};
 
@@ -82,10 +93,24 @@ const createGraphQLClient = (
     headers.Authorization = `Bearer ${process.env.GRAPHQL_AUTH_TOKEN}`;
   }
 
-  const envName = hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
+  const envName = options.hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
   const hostHeader = process.env[envName];
   if (hostHeader) {
     headers.host = hostHeader;
+  }
+
+  // Header-based routing for internal cluster services (API_IS_PUBLIC=false)
+  if (options.databaseId) {
+    headers['X-Database-Id'] = options.databaseId;
+  }
+  if (options.useMetaSchema) {
+    headers['X-Meta-Schema'] = 'true';
+  }
+  if (options.apiName) {
+    headers['X-Api-Name'] = options.apiName;
+  }
+  if (options.schemata) {
+    headers['X-Schemata'] = options.schemata;
   }
 
   return new GraphQLClient(url, { headers });
@@ -308,8 +333,24 @@ app.post('/', async (req: any, res: any, next: any) => {
     const graphqlUrl = getRequiredEnv('GRAPHQL_URL');
     const metaGraphqlUrl = process.env.META_GRAPHQL_URL || graphqlUrl;
 
-    const client = createGraphQLClient(graphqlUrl, 'GRAPHQL_HOST_HEADER');
-    const meta = createGraphQLClient(metaGraphqlUrl, 'META_GRAPHQL_HOST_HEADER');
+    // Get API name or schemata from env (for tenant queries like GetUser)
+    const apiName = process.env.GRAPHQL_API_NAME;
+    const schemata = process.env.GRAPHQL_SCHEMATA;
+
+    // For GetUser query - needs tenant API access via X-Api-Name or X-Schemata
+    const client = createGraphQLClient(graphqlUrl, {
+      hostHeaderEnvVar: 'GRAPHQL_HOST_HEADER',
+      databaseId,
+      ...(apiName && { apiName }),
+      ...(schemata && { schemata }),
+    });
+
+    // For GetDatabaseInfo query - needs meta schema access via X-Meta-Schema
+    const meta = createGraphQLClient(metaGraphqlUrl, {
+      hostHeaderEnvVar: 'META_GRAPHQL_HOST_HEADER',
+      databaseId,
+      useMetaSchema: true,
+    });
 
     const result = await sendEmailLink(params, {
       client,

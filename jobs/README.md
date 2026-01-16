@@ -86,104 +86,176 @@ From `jobs/knative-job-service/src/env.ts`:
 
 ---
 
-## 3. Example function: `simple-email` (dry-run)
+## 3. Example function: `send-email-link`
 
-The `functions/simple-email` package is a **Knative function** that:
+The `functions/send-email-link` package is a **Knative function** that sends email links for:
 
-- Uses `@constructive-io/knative-job-fn` as the HTTP wrapper
-- Expects JSON payload:
+- **invite_email** - User invitations
+- **forgot_password** - Password reset emails
+- **email_verification** - Email verification links
 
-```json
-{
-  "to": "user@example.com",
-  "subject": "Hello from jobs",
-  "html": "<p>Hi from simple-email</p>"
-}
-```
+### How it works
 
-- Validates `to`, `subject`, and at least one of `html` or `text`
-- Logs the email and payload, but does **not** send anything:
+1. Receives job payload with email type and parameters
+2. Queries GraphQL API (via `private.localhost` host routing) for:
+   - `GetDatabaseInfo` - Site configuration (domains, logo, theme, legal terms)
+   - `GetUser` - Sender info for invite emails
+3. Generates HTML email using MJML templates
+4. Sends via Mailgun (or logs in dry-run mode)
 
-```ts
-console.log('[simple-email] DRY RUN email', { ... });
-console.log('[simple-email] DRY RUN payload', payload);
-res.status(200).json({ complete: true });
-```
-
-It also starts an HTTP server when run directly (for Knative):
-
-```ts
-if (require.main === module) {
-  const port = Number(process.env.PORT ?? 8080);
-  (app as any).listen(port, () => {
-    console.log(`[simple-email] listening on port ${port}`);
-  });
-}
-```
-
-### Knative Service (simple-email)
-
-Example Knative `Service` manifest:
+### Required env vars (send-email-link)
 
 ```yaml
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: simple-email
-  namespace: interweb
-spec:
-  template:
-    spec:
-      containers:
-      - name: simple-email
-        image: ghcr.io/constructive-io/constructive:<tag>
-        command: ["node"]
-        args: ["functions/simple-email/dist/index.js"]
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        env:
-        - name: NODE_ENV
-          value: "production"
-```
+# GraphQL endpoints (admin server with host-based routing)
+GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+META_GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+GRAPHQL_HOST_HEADER: "private.localhost"
+META_GRAPHQL_HOST_HEADER: "private.localhost"
 
-With this in place, the in-cluster URL is:
+# Mailgun configuration
+MAILGUN_API_KEY: "your-api-key"
+MAILGUN_DOMAIN: "mg.example.com"
+MAILGUN_FROM: "no-reply@mg.example.com"
+MAILGUN_REPLY: "support@example.com"
 
-```text
-http://simple-email.interweb.svc.cluster.local
-```
-
-and the worker will call:
-
-```text
-POST http://simple-email.interweb.svc.cluster.local/
+# Dry run mode (no actual emails sent)
+SEND_EMAIL_LINK_DRY_RUN: "true"
 ```
 
 ---
 
-## 4. Enqueue a job (simple-email)
+## 4. Local Development with Docker Compose
 
-To enqueue a job directly via SQL:
+### Start the jobs stack
 
-```sql
-SELECT app_jobs.add_job(
-  '00000000-0000-0000-0000-000000000001'::uuid,  -- database_id (any UUID; used for multi-tenant routing)
-  'simple-email',                                -- task_identifier (must match function name)
-  json_build_object(
-    'to',      'user@example.com',
-    'subject', 'Hello from Constructive jobs',
-    'html',    '<p>Hi from simple-email (dry run)</p>'
-  )::json                                         -- payload
-);
+```bash
+# Start postgres and minio first
+docker-compose up -d
+
+# Start the jobs services
+docker-compose -f docker-compose.jobs.yml up --build
 ```
 
-Flow:
+### Services started
 
-1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`.
-2. `@constructive-io/knative-job-worker` receives the notification, calls `getJob`, and picks up the row.
-3. The worker `POST`s the payload to `KNATIVE_SERVICE_URL + '/simple-email'`.
-4. `simple-email` logs the email and payload, then returns `{ complete: true }`.
-5. The worker logs success. (In the current Knative flow we rely on immediate responses; callback-based completion can be added later if needed.)
+| Service | Port | Description |
+|---------|------|-------------|
+| `constructive-admin-server` | 3001 | GraphQL API with `API_IS_PUBLIC=false` |
+| `send-email-link` | 8082 | Email link function |
+| `knative-job-service` | 8080 | Job worker + callback server |
+
+### Test GraphQL access
+
+```bash
+# Introspect the private API
+curl -X POST http://localhost:3001/graphql \
+  -H "Content-Type: application/json" \
+  -H "Host: private.localhost" \
+  -d '{"query": "{ __schema { queryType { fields { name } } } }"}'
+
+# List databases
+curl -X POST http://localhost:3001/graphql \
+  -H "Content-Type: application/json" \
+  -H "Host: private.localhost" \
+  -d '{"query": "{ databases { nodes { id name } } }"}'
+
+# List users
+curl -X POST http://localhost:3001/graphql \
+  -H "Content-Type: application/json" \
+  -H "Host: private.localhost" \
+  -d '{"query": "{ users { nodes { id username displayName } } }"}'
+```
+
+---
+
+## 5. Enqueue a job (send-email-link)
+
+### Get required IDs
+
+```bash
+# Get Database ID
+DBID="$(docker exec -i postgres psql -U postgres -d constructive -Atc \
+  'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
+echo "Database ID: $DBID"
+
+# Get User ID (for sender_id in invite emails)
+SENDER_ID="$(docker exec -i postgres psql -U postgres -d constructive -Atc \
+  'SELECT id FROM roles_public.users ORDER BY created_at LIMIT 1;')"
+echo "Sender ID: $SENDER_ID"
+```
+
+### Enqueue invite_email job
+
+```bash
+docker exec -it postgres \
+  psql -U postgres -d constructive -c "
+    SELECT app_jobs.add_job(
+      '$DBID'::uuid,
+      'send-email-link',
+      json_build_object(
+        'email_type',   'invite_email',
+        'email',        'user@example.com',
+        'invite_token', 'invite-token-123',
+        'sender_id',    '$SENDER_ID'
+      )::json
+    );
+  "
+```
+
+### Enqueue forgot_password job
+
+```bash
+docker exec -it postgres \
+  psql -U postgres -d constructive -c "
+    SELECT app_jobs.add_job(
+      '$DBID'::uuid,
+      'send-email-link',
+      json_build_object(
+        'email_type',   'forgot_password',
+        'email',        'user@example.com',
+        'user_id',      '$SENDER_ID',
+        'reset_token',  'reset-token-123'
+      )::json
+    );
+  "
+```
+
+### Enqueue email_verification job
+
+```bash
+docker exec -it postgres \
+  psql -U postgres -d constructive -c "
+    SELECT app_jobs.add_job(
+      '$DBID'::uuid,
+      'send-email-link',
+      json_build_object(
+        'email_type',   'email_verification',
+        'email',        'user@example.com',
+        'email_id',     '$(uuidgen)',
+        'verification_token', 'verify-token-123'
+      )::json
+    );
+  "
+```
+
+### Watch the logs
+
+```bash
+# Watch send-email-link function logs
+docker logs -f send-email-link
+
+# Watch job service logs
+docker logs -f knative-job-service
+```
+
+### Job flow
+
+1. `app_jobs.add_job` inserts into `app_jobs.jobs` and fires `NOTIFY "jobs:insert"`
+2. `knative-job-worker` receives notification, picks up the job
+3. Worker `POST`s payload to `http://send-email-link:8080/`
+4. `send-email-link` queries GraphQL for site/user info
+5. Generates email HTML and sends (or logs in dry-run mode)
+6. Returns `{ complete: true }` and job is marked complete
 
 You can inspect the queue directly:
 
