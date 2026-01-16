@@ -96,7 +96,7 @@ const createGraphQLClient = (
   const envName = options.hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
   const hostHeader = process.env[envName];
   if (hostHeader) {
-    headers.host = hostHeader;
+    headers.Host = hostHeader;
   }
 
   // Header-based routing for internal cluster services (API_IS_PUBLIC=false)
@@ -345,11 +345,13 @@ app.post('/', async (req: any, res: any, next: any) => {
       ...(schemata && { schemata }),
     });
 
-    // For GetDatabaseInfo query - needs meta schema access via X-Meta-Schema
+    // For GetDatabaseInfo query - uses same API routing as client
+    // The private API exposes both user and database queries
     const meta = createGraphQLClient(metaGraphqlUrl, {
       hostHeaderEnvVar: 'META_GRAPHQL_HOST_HEADER',
       databaseId,
-      useMetaSchema: true,
+      ...(apiName && { apiName }),
+      ...(schemata && { schemata }),
     });
 
     const result = await sendEmailLink(params, {

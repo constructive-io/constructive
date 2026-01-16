@@ -27,14 +27,17 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
+
+    SERVER_HOST,
+    SERVER_PORT,
   } = env;
 
   return {
     graphile: {
-      ...(GRAPHILE_SCHEMA && { 
-        schema: GRAPHILE_SCHEMA.includes(',') 
+      ...(GRAPHILE_SCHEMA && {
+        schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
-          : GRAPHILE_SCHEMA 
+          : GRAPHILE_SCHEMA
       }),
     },
     features: {
@@ -50,6 +53,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
       ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID }),
+    },
+    server: {
+      ...(SERVER_HOST && { host: SERVER_HOST }),
+      ...(SERVER_PORT && { port: parseInt(SERVER_PORT, 10) }),
     },
   };
 };
