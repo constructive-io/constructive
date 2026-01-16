@@ -27,9 +27,6 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
-
-    SERVER_HOST,
-    SERVER_PORT,
   } = env;
 
   return {
@@ -53,10 +50,6 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
       ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID }),
-    },
-    server: {
-      ...(SERVER_HOST && { host: SERVER_HOST }),
-      ...(SERVER_PORT && { port: parseInt(SERVER_PORT, 10) }),
     },
   };
 };
