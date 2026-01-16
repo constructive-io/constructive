@@ -117,6 +117,7 @@ Generate React Query hooks from a PostGraphile endpoint.
 ```bash
 Options:
   -e, --endpoint <url>     GraphQL endpoint URL (overrides config)
+  -t, --target <name>      Target name in config file
   -o, --output <dir>       Output directory (default: ./generated/graphql)
   -c, --config <path>      Path to config file
   -a, --authorization <token>  Authorization header value
@@ -132,6 +133,7 @@ Generate Prisma-like ORM client from a PostGraphile endpoint.
 ```bash
 Options:
   -e, --endpoint <url>           GraphQL endpoint URL
+  -t, --target <name>            Target name in config file
   -o, --output <dir>             Output directory (default: ./generated/orm)
   -c, --config <path>            Path to config file
   -a, --authorization <token>    Authorization header value
@@ -164,9 +166,10 @@ Options:
 ## Configuration
 
 ```typescript
-interface GraphQLSDKConfig {
-  // Required
-  endpoint: string;
+interface GraphQLSDKConfigTarget {
+  // Required (choose one)
+  endpoint?: string;
+  schema?: string;
 
   // Output
   output?: string; // default: './generated/graphql'
@@ -194,25 +197,62 @@ interface GraphQLSDKConfig {
 
   // Code generation options
   codegen?: {
-    maxFieldDepth?: number;    // default: 2
-    skipQueryField?: boolean;  // default: true
+    maxFieldDepth?: number; // default: 2
+    skipQueryField?: boolean; // default: true
   };
 
   // ORM-specific config
   orm?: {
-    output?: string;           // default: './generated/orm'
-    useSharedTypes?: boolean;  // default: true
+    output?: string; // default: './generated/orm'
+    useSharedTypes?: boolean; // default: true
   };
 }
+
+interface GraphQLSDKMultiConfig {
+  defaults?: GraphQLSDKConfigTarget;
+  targets: Record<string, GraphQLSDKConfigTarget>;
+}
+
+type GraphQLSDKConfig = GraphQLSDKConfigTarget | GraphQLSDKMultiConfig;
 ```
+
+### Multi-target Configuration
+
+Configure multiple schema sources and outputs in one file:
+
+```typescript
+export default defineConfig({
+  defaults: {
+    headers: { Authorization: 'Bearer <token>' },
+  },
+  targets: {
+    public: {
+      endpoint: 'https://api.example.com/graphql',
+      output: './generated/public',
+    },
+    admin: {
+      schema: './admin.schema.graphql',
+      output: './generated/admin',
+    },
+  },
+});
+```
+
+CLI behavior:
+
+- `graphql-codegen generate` runs all targets
+- `graphql-codegen generate --target admin` runs a single target
+- `--output` requires `--target` when multiple targets exist
 
 ### Glob Patterns
 
 Filter patterns support wildcards:
+
 - `*` - matches any string
 - `?` - matches single character
 
 Examples:
+
 ```typescript
 {
   tables: {
@@ -308,30 +348,25 @@ Fetches multiple records with pagination, filtering, and ordering:
 import { useCarsQuery } from './generated/hooks';
 
 function CarList() {
-  const { 
-    data, 
-    isLoading, 
-    isError, 
-    error,
-    refetch,
-    isFetching,
-  } = useCarsQuery({
-    // Pagination
-    first: 10,           // First N records
-    // last: 10,         // Last N records
-    // after: 'cursor',  // Cursor-based pagination
-    // before: 'cursor',
-    // offset: 20,       // Offset pagination
-    
-    // Filtering
-    filter: {
-      brand: { equalTo: 'Tesla' },
-      price: { greaterThan: 50000 },
-    },
-    
-    // Ordering
-    orderBy: ['CREATED_AT_DESC', 'NAME_ASC'],
-  });
+  const { data, isLoading, isError, error, refetch, isFetching } = useCarsQuery(
+    {
+      // Pagination
+      first: 10, // First N records
+      // last: 10,         // Last N records
+      // after: 'cursor',  // Cursor-based pagination
+      // before: 'cursor',
+      // offset: 20,       // Offset pagination
+
+      // Filtering
+      filter: {
+        brand: { equalTo: 'Tesla' },
+        price: { greaterThan: 50000 },
+      },
+
+      // Ordering
+      orderBy: ['CREATED_AT_DESC', 'NAME_ASC'],
+    }
+  );
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {error.message}</div>;
@@ -340,11 +375,13 @@ function CarList() {
     <div>
       <p>Total: {data?.cars.totalCount}</p>
       <ul>
-        {data?.cars.nodes.map(car => (
-          <li key={car.id}>{car.brand} - ${car.price}</li>
+        {data?.cars.nodes.map((car) => (
+          <li key={car.id}>
+            {car.brand} - ${car.price}
+          </li>
         ))}
       </ul>
-      
+
       {/* Pagination info */}
       {data?.cars.pageInfo.hasNextPage && (
         <button onClick={() => refetch()}>Load More</button>
@@ -411,7 +448,12 @@ function CreateCarForm() {
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit({ brand: 'Tesla', price: 80000 }); }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit({ brand: 'Tesla', price: 80000 });
+      }}
+    >
       {/* form fields */}
       <button type="submit" disabled={createCar.isPending}>
         {createCar.isPending ? 'Creating...' : 'Create Car'}
@@ -427,7 +469,13 @@ function CreateCarForm() {
 ```tsx
 import { useUpdateCarMutation } from './generated/hooks';
 
-function EditCarForm({ carId, currentBrand }: { carId: string; currentBrand: string }) {
+function EditCarForm({
+  carId,
+  currentBrand,
+}: {
+  carId: string;
+  currentBrand: string;
+}) {
   const updateCar = useUpdateCarMutation({
     onSuccess: (data) => {
       console.log('Updated car:', data.updateCar.car.brand);
@@ -446,7 +494,7 @@ function EditCarForm({ carId, currentBrand }: { carId: string; currentBrand: str
   };
 
   return (
-    <button 
+    <button
       onClick={() => handleUpdate('Updated Brand')}
       disabled={updateCar.isPending}
     >
@@ -470,7 +518,7 @@ function DeleteCarButton({ carId }: { carId: string }) {
   });
 
   return (
-    <button 
+    <button
       onClick={() => deleteCar.mutate({ input: { id: carId } })}
       disabled={deleteCar.isPending}
     >
@@ -517,9 +565,9 @@ function NodeViewer({ nodeId }: { nodeId: string }) {
 Custom mutations (like `login`, `register`, `logout`) get dedicated hooks:
 
 ```tsx
-import { 
-  useLoginMutation, 
-  useRegisterMutation, 
+import {
+  useLoginMutation,
+  useRegisterMutation,
   useLogoutMutation,
   useForgotPasswordMutation,
 } from './generated/hooks';
@@ -550,7 +598,12 @@ function LoginForm() {
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleLogin('user@example.com', 'password'); }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleLogin('user@example.com', 'password');
+      }}
+    >
       {/* email and password inputs */}
       <button disabled={login.isPending}>
         {login.isPending ? 'Logging in...' : 'Login'}
@@ -567,7 +620,11 @@ function RegisterForm() {
     },
   });
 
-  const handleRegister = (data: { email: string; password: string; username: string }) => {
+  const handleRegister = (data: {
+    email: string;
+    password: string;
+    username: string;
+  }) => {
     register.mutate({
       input: {
         email: data.email,
@@ -578,7 +635,15 @@ function RegisterForm() {
   };
 
   return (
-    <button onClick={() => handleRegister({ email: 'new@example.com', password: 'secret', username: 'newuser' })}>
+    <button
+      onClick={() =>
+        handleRegister({
+          email: 'new@example.com',
+          password: 'secret',
+          username: 'newuser',
+        })
+      }
+    >
       Register
     </button>
   );
@@ -593,11 +658,7 @@ function LogoutButton() {
     },
   });
 
-  return (
-    <button onClick={() => logout.mutate({ input: {} })}>
-      Logout
-    </button>
-  );
+  return <button onClick={() => logout.mutate({ input: {} })}>Logout</button>;
 }
 
 // Forgot Password
@@ -609,7 +670,11 @@ function ForgotPasswordForm() {
   });
 
   return (
-    <button onClick={() => forgotPassword.mutate({ input: { email: 'user@example.com' } })}>
+    <button
+      onClick={() =>
+        forgotPassword.mutate({ input: { email: 'user@example.com' } })
+      }
+    >
       Reset Password
     </button>
   );
@@ -629,10 +694,10 @@ useCarsQuery({
       notEqualTo: 'Ford',
       in: ['Tesla', 'BMW', 'Mercedes'],
       notIn: ['Unknown'],
-      contains: 'es',           // LIKE '%es%'
-      startsWith: 'Tes',        // LIKE 'Tes%'
-      endsWith: 'la',           // LIKE '%la'
-      includesInsensitive: 'TESLA',  // Case-insensitive
+      contains: 'es', // LIKE '%es%'
+      startsWith: 'Tes', // LIKE 'Tes%'
+      endsWith: 'la', // LIKE '%la'
+      includesInsensitive: 'TESLA', // Case-insensitive
     },
   },
 });
@@ -671,7 +736,7 @@ useOrdersQuery({
 // Null checks
 useUsersQuery({
   filter: {
-    deletedAt: { isNull: true },  // Only non-deleted
+    deletedAt: { isNull: true }, // Only non-deleted
   },
 });
 
@@ -687,10 +752,7 @@ useUsersQuery({
 useUsersQuery({
   filter: {
     // OR
-    or: [
-      { role: { equalTo: 'ADMIN' } },
-      { role: { equalTo: 'MODERATOR' } },
-    ],
+    or: [{ role: { equalTo: 'ADMIN' } }, { role: { equalTo: 'MODERATOR' } }],
   },
 });
 
@@ -746,12 +808,12 @@ useCarsQuery({ first: 10 });
 useCarsQuery({ last: 10 });
 
 // Offset pagination
-useCarsQuery({ first: 10, offset: 20 });  // Skip 20, take 10
+useCarsQuery({ first: 10, offset: 20 }); // Skip 20, take 10
 
 // Cursor-based pagination
 function PaginatedList() {
   const [cursor, setCursor] = useState<string | null>(null);
-  
+
   const { data } = useCarsQuery({
     first: 10,
     after: cursor,
@@ -759,8 +821,10 @@ function PaginatedList() {
 
   return (
     <div>
-      {data?.cars.nodes.map(car => <div key={car.id}>{car.brand}</div>)}
-      
+      {data?.cars.nodes.map((car) => (
+        <div key={car.id}>{car.brand}</div>
+      ))}
+
       {data?.cars.pageInfo.hasNextPage && (
         <button onClick={() => setCursor(data.cars.pageInfo.endCursor)}>
           Load More
@@ -786,18 +850,18 @@ All hooks accept standard React Query options:
 ```tsx
 // Query hooks
 useCarsQuery(
-  { first: 10 },  // Variables
+  { first: 10 }, // Variables
   {
     // React Query options
-    enabled: isAuthenticated,           // Conditional fetching
-    refetchInterval: 30000,             // Poll every 30s
-    refetchOnWindowFocus: true,         // Refetch on tab focus
-    staleTime: 5 * 60 * 1000,           // Consider fresh for 5 min
-    gcTime: 30 * 60 * 1000,             // Keep in cache for 30 min
-    retry: 3,                           // Retry failed requests
+    enabled: isAuthenticated, // Conditional fetching
+    refetchInterval: 30000, // Poll every 30s
+    refetchOnWindowFocus: true, // Refetch on tab focus
+    staleTime: 5 * 60 * 1000, // Consider fresh for 5 min
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 min
+    retry: 3, // Retry failed requests
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    placeholderData: previousData,      // Show previous data while loading
-    select: (data) => data.cars.nodes,  // Transform data
+    placeholderData: previousData, // Show previous data while loading
+    select: (data) => data.cars.nodes, // Transform data
   }
 );
 
@@ -858,11 +922,11 @@ The codegen generates a centralized query key factory following the [lukemorales
 
 #### Generated Files
 
-| File | Purpose |
-|------|---------|
-| `query-keys.ts` | Query key factories for all entities |
+| File               | Purpose                                                 |
+| ------------------ | ------------------------------------------------------- |
+| `query-keys.ts`    | Query key factories for all entities                    |
 | `mutation-keys.ts` | Mutation key factories for tracking in-flight mutations |
-| `invalidation.ts` | Type-safe cache invalidation helpers |
+| `invalidation.ts`  | Type-safe cache invalidation helpers                    |
 
 #### Using Query Keys
 
@@ -871,11 +935,11 @@ import { userKeys, invalidate } from './generated/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Query key structure
-userKeys.all                    // ['user']
-userKeys.lists()                // ['user', 'list']
-userKeys.list({ first: 10 })    // ['user', 'list', { first: 10 }]
-userKeys.details()              // ['user', 'detail']
-userKeys.detail('user-123')     // ['user', 'detail', 'user-123']
+userKeys.all; // ['user']
+userKeys.lists(); // ['user', 'list']
+userKeys.list({ first: 10 }); // ['user', 'list', { first: 10 }]
+userKeys.details(); // ['user', 'detail']
+userKeys.detail('user-123'); // ['user', 'detail', 'user-123']
 
 // Granular cache invalidation
 const queryClient = useQueryClient();
@@ -920,7 +984,7 @@ function UserList() {
 
   // Check if a specific user is being deleted
   const isDeleting = useIsMutating({
-    mutationKey: userMutationKeys.delete(userId)
+    mutationKey: userMutationKeys.delete(userId),
   });
 
   return (
@@ -950,7 +1014,7 @@ const createUser = useCreateUserMutation({
       ...old,
       users: {
         ...old.users,
-        nodes: [...old.users.nodes, { id: 'temp', ...newUser.input.user }]
+        nodes: [...old.users.nodes, { id: 'temp', ...newUser.input.user }],
       },
     }));
 
@@ -1032,7 +1096,7 @@ import type {
   User,
   Product,
   Order,
-  
+
   // Filter types
   CarFilter,
   UserFilter,
@@ -1040,17 +1104,17 @@ import type {
   IntFilter,
   UUIDFilter,
   DatetimeFilter,
-  
+
   // OrderBy types
   CarsOrderBy,
   UsersOrderBy,
-  
+
   // Input types
   CreateCarInput,
   UpdateCarInput,
   CarPatch,
   LoginInput,
-  
+
   // Payload types
   LoginPayload,
   CreateCarPayload,
@@ -1131,7 +1195,7 @@ type UseQueryResult<TData> = {
 type UseMutationResult<TData, TVariables> = {
   data: TData | undefined;
   error: Error | null;
-  isLoading: boolean;  // deprecated, use isPending
+  isLoading: boolean; // deprecated, use isPending
   isPending: boolean;
   isError: boolean;
   isSuccess: boolean;
@@ -1196,10 +1260,12 @@ const db = createClient({
 });
 
 // Query users
-const result = await db.user.findMany({
-  select: { id: true, username: true, email: true },
-  first: 20,
-}).execute();
+const result = await db.user
+  .findMany({
+    select: { id: true, username: true, email: true },
+    first: 20,
+  })
+  .execute();
 
 if (result.ok) {
   console.log(result.data.users.nodes);
@@ -1208,28 +1274,36 @@ if (result.ok) {
 }
 
 // Find first matching user
-const user = await db.user.findFirst({
-  select: { id: true, username: true },
-  where: { username: { equalTo: 'john' } },
-}).execute();
+const user = await db.user
+  .findFirst({
+    select: { id: true, username: true },
+    where: { username: { equalTo: 'john' } },
+  })
+  .execute();
 
 // Create a user
-const newUser = await db.user.create({
-  data: { username: 'john', email: 'john@example.com' },
-  select: { id: true, username: true },
-}).execute();
+const newUser = await db.user
+  .create({
+    data: { username: 'john', email: 'john@example.com' },
+    select: { id: true, username: true },
+  })
+  .execute();
 
 // Update a user
-const updated = await db.user.update({
-  where: { id: 'user-id' },
-  data: { displayName: 'John Doe' },
-  select: { id: true, displayName: true },
-}).execute();
+const updated = await db.user
+  .update({
+    where: { id: 'user-id' },
+    data: { displayName: 'John Doe' },
+    select: { id: true, displayName: true },
+  })
+  .execute();
 
 // Delete a user
-const deleted = await db.user.delete({
-  where: { id: 'user-id' },
-}).execute();
+const deleted = await db.user
+  .delete({
+    where: { id: 'user-id' },
+  })
+  .execute();
 ```
 
 ### Select & Type Inference
@@ -1238,9 +1312,11 @@ The ORM uses **const generics** to infer return types based on your select claus
 
 ```typescript
 // Select specific fields - return type is narrowed
-const users = await db.user.findMany({
-  select: { id: true, username: true }  // Only id and username
-}).unwrap();
+const users = await db.user
+  .findMany({
+    select: { id: true, username: true }, // Only id and username
+  })
+  .unwrap();
 
 // TypeScript knows the exact shape:
 // users.users.nodes[0] is { id: string; username: string | null }
@@ -1261,16 +1337,18 @@ Relations are fully typed in Select types. The ORM supports all PostGraphile rel
 
 ```typescript
 // Order.customer is a belongsTo relation to User
-const orders = await db.order.findMany({
-  select: {
-    id: true,
-    orderNumber: true,
-    // Nested select for belongsTo relation
-    customer: {
-      select: { id: true, username: true, displayName: true }
-    }
-  }
-}).unwrap();
+const orders = await db.order
+  .findMany({
+    select: {
+      id: true,
+      orderNumber: true,
+      // Nested select for belongsTo relation
+      customer: {
+        select: { id: true, username: true, displayName: true },
+      },
+    },
+  })
+  .unwrap();
 
 // TypeScript knows:
 // orders.orders.nodes[0].customer is { id: string; username: string | null; displayName: string | null }
@@ -1280,18 +1358,20 @@ const orders = await db.order.findMany({
 
 ```typescript
 // Order.orderItems is a hasMany relation to OrderItem
-const orders = await db.order.findMany({
-  select: {
-    id: true,
-    // HasMany with pagination and filtering
-    orderItems: {
-      select: { id: true, quantity: true, price: true },
-      first: 10,  // Pagination
-      filter: { quantity: { greaterThan: 0 } },  // Filtering
-      orderBy: ['QUANTITY_DESC']  // Ordering
-    }
-  }
-}).unwrap();
+const orders = await db.order
+  .findMany({
+    select: {
+      id: true,
+      // HasMany with pagination and filtering
+      orderItems: {
+        select: { id: true, quantity: true, price: true },
+        first: 10, // Pagination
+        filter: { quantity: { greaterThan: 0 } }, // Filtering
+        orderBy: ['QUANTITY_DESC'], // Ordering
+      },
+    },
+  })
+  .unwrap();
 
 // orders.orders.nodes[0].orderItems is a connection:
 // { nodes: Array<{ id: string; quantity: number | null; price: number | null }>, totalCount: number, pageInfo: PageInfo }
@@ -1301,49 +1381,53 @@ const orders = await db.order.findMany({
 
 ```typescript
 // Order.productsByOrderItemOrderIdAndProductId is a manyToMany through OrderItem
-const orders = await db.order.findMany({
-  select: {
-    id: true,
-    productsByOrderItemOrderIdAndProductId: {
-      select: { id: true, name: true, price: true },
-      first: 5
-    }
-  }
-}).unwrap();
+const orders = await db.order
+  .findMany({
+    select: {
+      id: true,
+      productsByOrderItemOrderIdAndProductId: {
+        select: { id: true, name: true, price: true },
+        first: 5,
+      },
+    },
+  })
+  .unwrap();
 ```
 
 #### Deeply Nested Relations
 
 ```typescript
 // Multiple levels of nesting
-const products = await db.product.findMany({
-  select: {
-    id: true,
-    name: true,
-    // BelongsTo: Product -> User (seller)
-    seller: {
-      select: { 
-        id: true, 
-        username: true,
-        // Even deeper nesting if needed
-      }
-    },
-    // BelongsTo: Product -> Category
-    category: {
-      select: { id: true, name: true }
-    },
-    // HasMany: Product -> Review
-    reviews: {
-      select: { 
-        id: true, 
-        rating: true, 
-        comment: true 
+const products = await db.product
+  .findMany({
+    select: {
+      id: true,
+      name: true,
+      // BelongsTo: Product -> User (seller)
+      seller: {
+        select: {
+          id: true,
+          username: true,
+          // Even deeper nesting if needed
+        },
       },
-      first: 5,
-      orderBy: ['CREATED_AT_DESC']
-    }
-  }
-}).unwrap();
+      // BelongsTo: Product -> Category
+      category: {
+        select: { id: true, name: true },
+      },
+      // HasMany: Product -> Review
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+        },
+        first: 5,
+        orderBy: ['CREATED_AT_DESC'],
+      },
+    },
+  })
+  .unwrap();
 ```
 
 ### Filtering & Ordering
@@ -1462,13 +1546,15 @@ where: {
 #### Ordering
 
 ```typescript
-const users = await db.user.findMany({
-  select: { id: true, username: true, createdAt: true },
-  orderBy: [
-    'CREATED_AT_DESC',  // Newest first
-    'USERNAME_ASC',     // Then alphabetical
-  ]
-}).unwrap();
+const users = await db.user
+  .findMany({
+    select: { id: true, username: true, createdAt: true },
+    orderBy: [
+      'CREATED_AT_DESC', // Newest first
+      'USERNAME_ASC', // Then alphabetical
+    ],
+  })
+  .unwrap();
 
 // Available OrderBy values (generated per entity):
 // - PRIMARY_KEY_ASC / PRIMARY_KEY_DESC
@@ -1482,37 +1568,47 @@ The ORM supports cursor-based and offset pagination:
 
 ```typescript
 // First N records
-const first10 = await db.user.findMany({
-  select: { id: true },
-  first: 10
-}).unwrap();
+const first10 = await db.user
+  .findMany({
+    select: { id: true },
+    first: 10,
+  })
+  .unwrap();
 
 // Last N records
-const last10 = await db.user.findMany({
-  select: { id: true },
-  last: 10
-}).unwrap();
+const last10 = await db.user
+  .findMany({
+    select: { id: true },
+    last: 10,
+  })
+  .unwrap();
 
 // Cursor-based pagination (after/before)
-const page1 = await db.user.findMany({
-  select: { id: true },
-  first: 10
-}).unwrap();
+const page1 = await db.user
+  .findMany({
+    select: { id: true },
+    first: 10,
+  })
+  .unwrap();
 
 const endCursor = page1.users.pageInfo.endCursor;
 
-const page2 = await db.user.findMany({
-  select: { id: true },
-  first: 10,
-  after: endCursor  // Get records after this cursor
-}).unwrap();
+const page2 = await db.user
+  .findMany({
+    select: { id: true },
+    first: 10,
+    after: endCursor, // Get records after this cursor
+  })
+  .unwrap();
 
 // Offset pagination
-const page3 = await db.user.findMany({
-  select: { id: true },
-  first: 10,
-  offset: 20  // Skip first 20 records
-}).unwrap();
+const page3 = await db.user
+  .findMany({
+    select: { id: true },
+    first: 10,
+    offset: 20, // Skip first 20 records
+  })
+  .unwrap();
 
 // PageInfo structure
 // {
@@ -1523,7 +1619,7 @@ const page3 = await db.user.findMany({
 // }
 
 // Total count is always included
-console.log(page1.users.totalCount);  // Total matching records
+console.log(page1.users.totalCount); // Total matching records
 ```
 
 ### Error Handling
@@ -1533,9 +1629,11 @@ The ORM provides multiple ways to handle errors:
 #### Discriminated Union (Recommended)
 
 ```typescript
-const result = await db.user.findMany({
-  select: { id: true }
-}).execute();
+const result = await db.user
+  .findMany({
+    select: { id: true },
+  })
+  .execute();
 
 if (result.ok) {
   // TypeScript knows result.data is non-null
@@ -1555,10 +1653,12 @@ import { GraphQLRequestError } from './generated/orm';
 
 try {
   // Throws GraphQLRequestError if query fails
-  const data = await db.user.findMany({
-    select: { id: true }
-  }).unwrap();
-  
+  const data = await db.user
+    .findMany({
+      select: { id: true },
+    })
+    .unwrap();
+
   console.log(data.users.nodes);
 } catch (error) {
   if (error instanceof GraphQLRequestError) {
@@ -1572,15 +1672,17 @@ try {
 
 ```typescript
 // Returns default value if query fails (no throwing)
-const data = await db.user.findMany({
-  select: { id: true }
-}).unwrapOr({
-  users: {
-    nodes: [],
-    totalCount: 0,
-    pageInfo: { hasNextPage: false, hasPreviousPage: false }
-  }
-});
+const data = await db.user
+  .findMany({
+    select: { id: true },
+  })
+  .unwrapOr({
+    users: {
+      nodes: [],
+      totalCount: 0,
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+    },
+  });
 
 // Always returns data (either real or default)
 console.log(data.users.nodes);
@@ -1590,21 +1692,23 @@ console.log(data.users.nodes);
 
 ```typescript
 // Call a function to handle errors and return fallback
-const data = await db.user.findMany({
-  select: { id: true }
-}).unwrapOrElse((errors) => {
-  // Log errors, send to monitoring, etc.
-  console.error('Query failed:', errors.map(e => e.message).join(', '));
-  
-  // Return fallback data
-  return {
-    users: {
-      nodes: [],
-      totalCount: 0,
-      pageInfo: { hasNextPage: false, hasPreviousPage: false }
-    }
-  };
-});
+const data = await db.user
+  .findMany({
+    select: { id: true },
+  })
+  .unwrapOrElse((errors) => {
+    // Log errors, send to monitoring, etc.
+    console.error('Query failed:', errors.map((e) => e.message).join(', '));
+
+    // Return fallback data
+    return {
+      users: {
+        nodes: [],
+        totalCount: 0,
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      },
+    };
+  });
 ```
 
 #### Error Types
@@ -1619,7 +1723,7 @@ interface GraphQLError {
 
 class GraphQLRequestError extends Error {
   readonly errors: GraphQLError[];
-  readonly data: unknown;  // Partial data if available
+  readonly data: unknown; // Partial data if available
 }
 
 type QueryResult<T> =
@@ -1635,57 +1739,73 @@ Custom queries and mutations (like `login`, `currentUser`, etc.) are available o
 
 ```typescript
 // Query with select
-const currentUser = await db.query.currentUser({
-  select: { id: true, username: true, email: true }
-}).unwrap();
+const currentUser = await db.query
+  .currentUser({
+    select: { id: true, username: true, email: true },
+  })
+  .unwrap();
 
 // Query without select (returns full type)
 const me = await db.query.currentUser({}).unwrap();
 
 // Query with arguments
-const node = await db.query.nodeById({
-  id: 'some-node-id'
-}, {
-  select: { id: true }
-}).unwrap();
+const node = await db.query
+  .nodeById(
+    {
+      id: 'some-node-id',
+    },
+    {
+      select: { id: true },
+    }
+  )
+  .unwrap();
 ```
 
 #### Custom Mutations
 
 ```typescript
 // Login mutation with typed select
-const login = await db.mutation.login({
-  input: {
-    email: 'user@example.com',
-    password: 'secret123'
-  }
-}, {
-  select: {
-    clientMutationId: true,
-    apiToken: {
+const login = await db.mutation
+  .login(
+    {
+      input: {
+        email: 'user@example.com',
+        password: 'secret123',
+      },
+    },
+    {
       select: {
-        accessToken: true,
-        accessTokenExpiresAt: true
-      }
+        clientMutationId: true,
+        apiToken: {
+          select: {
+            accessToken: true,
+            accessTokenExpiresAt: true,
+          },
+        },
+      },
     }
-  }
-}).unwrap();
+  )
+  .unwrap();
 
 console.log(login.login.apiToken?.accessToken);
 
 // Register mutation
-const register = await db.mutation.register({
-  input: {
-    email: 'new@example.com',
-    password: 'secret123',
-    username: 'newuser'
-  }
-}).unwrap();
+const register = await db.mutation
+  .register({
+    input: {
+      email: 'new@example.com',
+      password: 'secret123',
+      username: 'newuser',
+    },
+  })
+  .unwrap();
 
 // Logout mutation
-await db.mutation.logout({
-  input: { clientMutationId: 'optional-id' }
-}).execute();
+await db.mutation
+  .logout({
+    input: { clientMutationId: 'optional-id' },
+  })
+  .execute();
 ```
 
 ### Query Builder API
@@ -1696,7 +1816,7 @@ Every operation returns a `QueryBuilder` that can be inspected before execution:
 const query = db.user.findMany({
   select: { id: true, username: true },
   where: { isActive: { equalTo: true } },
-  first: 10
+  first: 10,
 });
 
 // Inspect the generated GraphQL
@@ -1838,25 +1958,29 @@ export type OrderSelect = {
   id?: boolean;
   orderNumber?: boolean;
   status?: boolean;
-  
+
   // BelongsTo relation
   customer?: boolean | { select?: UserSelect };
-  
+
   // HasMany relation
-  orderItems?: boolean | {
-    select?: OrderItemSelect;
-    first?: number;
-    filter?: OrderItemFilter;
-    orderBy?: OrderItemsOrderBy[];
-  };
-  
+  orderItems?:
+    | boolean
+    | {
+        select?: OrderItemSelect;
+        first?: number;
+        filter?: OrderItemFilter;
+        orderBy?: OrderItemsOrderBy[];
+      };
+
   // ManyToMany relation
-  productsByOrderItemOrderIdAndProductId?: boolean | {
-    select?: ProductSelect;
-    first?: number;
-    filter?: ProductFilter;
-    orderBy?: ProductsOrderBy[];
-  };
+  productsByOrderItemOrderIdAndProductId?:
+    | boolean
+    | {
+        select?: ProductSelect;
+        first?: number;
+        filter?: ProductFilter;
+        orderBy?: ProductsOrderBy[];
+      };
 };
 ```
 
