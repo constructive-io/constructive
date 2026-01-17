@@ -183,7 +183,19 @@ export const sendEmailLink = async (
   const name = company.name;
   const primary = theme.primary;
 
-  const hostname = subdomain ? [subdomain, domain].join('.') : domain;
+  // Check if this is a localhost-style domain before building hostname
+  // TODO: Security consideration - this only affects localhost domains which
+  // should not exist in production. The isLocalHost check combined with isDryRun
+  // ensures special behavior (http, custom port) only applies in dev environments.
+  const isLocalDomain =
+    domain === 'localhost' ||
+    domain.startsWith('localhost') ||
+    domain === '0.0.0.0';
+
+  // For localhost, skip subdomain to generate cleaner URLs (http://localhost:3000)
+  const hostname = subdomain && !isLocalDomain
+    ? [subdomain, domain].join('.')
+    : domain;
 
   // Treat localhost-style hosts specially so we can generate
   // http://localhost[:port]/... links for local dev without
