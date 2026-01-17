@@ -15,27 +15,62 @@ services:
       SERVER_TRUST_PROXY: "true"
       SERVER_ORIGIN: "*"
       SERVER_STRICT_AUTH: "false"
-      # Postgres connection (matches postgres service)
-      PGHOST: postgres
+      # Postgres connection (matches constructive-tests-postgres service)
+      PGHOST: constructive-tests-postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: password
       PGDATABASE: constructive
       # Api configuration
-      API_ENABLE_META: "true"
-      API_EXPOSED_SCHEMAS: "metaschema_public,services_public"
+      API_ENABLE_SERVICES: "true"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
       # API_IS_PUBLIC=false enables header-based routing (X-Api-Name, X-Database-Id, X-Meta-Schema)
       API_IS_PUBLIC: "false"
       # Meta schemas used for schema validation and X-Meta-Schema routing
-      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public"
+      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
       API_ANON_ROLE: "administrator"
       API_ROLE_NAME: "administrator"
     ports:
-      - "3001:3000"
+      - "3101:3000"
     networks:
-      constructive-net:
+      constructive-tests-net:
         aliases:
           - constructive-admin-server
+
+  # Constructive Public GraphQL API server (external, domain-based routing)
+  constructive-server:
+    container_name: constructive-server
+    image: constructive:dev
+    entrypoint: ["constructive", "server", "--host", "0.0.0.0", "--port", "3000", "--origin", "*"]
+    environment:
+      NODE_ENV: development
+      # Server
+      PORT: "3000"
+      SERVER_HOST: "0.0.0.0"
+      SERVER_TRUST_PROXY: "true"
+      SERVER_ORIGIN: "*"
+      SERVER_STRICT_AUTH: "false"
+      # Postgres connection (matches constructive-tests-postgres service)
+      PGHOST: constructive-tests-postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: constructive
+      # Api configuration
+      API_ENABLE_SERVICES: "false"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      # Public-facing server
+      API_IS_PUBLIC: "true"
+      # Meta schemas used for schema validation
+      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_ANON_ROLE: "anonymous"
+      API_ROLE_NAME: "authenticated"
+    ports:
+      - "3102:3000"
+    networks:
+      constructive-tests-net:
+        aliases:
+          - constructive-server
 
   # Send email link function (invite, password reset, verification)
   send-email-link:
@@ -67,7 +102,7 @@ services:
     ports:
       - "8082:8080"
     networks:
-      - constructive-net
+      - constructive-tests-net
 
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
@@ -81,7 +116,7 @@ services:
 
       # Postgres (jobs extension lives in this DB)
       PGUSER: postgres
-      PGHOST: postgres
+      PGHOST: constructive-tests-postgres
       PGPASSWORD: password
       PGPORT: "5432"
       PGDATABASE: constructive
@@ -107,9 +142,9 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - constructive-net
+      - constructive-tests-net
 
 networks:
-  constructive-net:
+  constructive-tests-net:
     external: true
-    name: constructive-net
+    name: constructive-tests-net
