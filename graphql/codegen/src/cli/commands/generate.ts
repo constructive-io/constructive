@@ -8,7 +8,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as prettier from 'prettier';
+import { execSync } from 'node:child_process';
 
 import type {
   GraphQLSDKConfig,
@@ -499,9 +499,7 @@ export async function writeGeneratedFiles(
     }
 
     try {
-      // Format with prettier
-      const formattedContent = await formatCode(file.content);
-      fs.writeFileSync(filePath, formattedContent, 'utf-8');
+      fs.writeFileSync(filePath, file.content, 'utf-8');
       written.push(filePath);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -514,6 +512,17 @@ export async function writeGeneratedFiles(
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
+  // Format all generated files with oxfmt
+  if (errors.length === 0) {
+    if (showProgress) {
+      console.log('Formatting generated files...');
+    }
+    const formatResult = formatOutput(outputDir);
+    if (!formatResult.success && showProgress) {
+      console.warn('Warning: Failed to format generated files:', formatResult.error);
+    }
+  }
+
   return {
     success: errors.length === 0,
     filesWritten: written,
@@ -521,16 +530,29 @@ export async function writeGeneratedFiles(
   };
 }
 
-async function formatCode(code: string): Promise<string> {
+/**
+ * Format generated files using oxfmt
+ * Runs oxfmt on the output directory after all files are written
+ */
+export function formatOutput(outputDir: string): { success: boolean; error?: string } {
+  // Resolve to absolute path for reliable execution
+  const absoluteOutputDir = path.resolve(outputDir);
+
   try {
-    return await prettier.format(code, {
-      parser: 'typescript',
-      singleQuote: true,
-      trailingComma: 'es5',
-      tabWidth: 2,
+    // Find oxfmt binary from this package's node_modules/.bin
+    // oxfmt is a dependency of @constructive-io/graphql-codegen
+    const oxfmtPkgPath = require.resolve('oxfmt/package.json');
+    const oxfmtDir = path.dirname(oxfmtPkgPath);
+    const oxfmtBin = path.join(oxfmtDir, 'bin', 'oxfmt');
+
+    execSync(`"${oxfmtBin}" "${absoluteOutputDir}"`, {
+      stdio: 'pipe',
+      encoding: 'utf-8',
     });
-  } catch {
-    // If prettier fails, return unformatted code
-    return code;
+    return { success: true };
+  } catch (err) {
+    // oxfmt may fail if files have syntax errors or if not installed
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: message };
   }
 }

@@ -20,7 +20,14 @@ async function main() {
   const signInResult = await db.mutation
     .signIn(
       { input: { email: 'admin@gmail.com', password: 'password1111!@#$' } },
-      { select: { apiToken: { select: { accessToken: true } } } }
+      { select: { apiToken: { select: {
+        accessToken: true,
+        accessTokenExpiresAt: true,
+        id: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+      }}}}
     )
     .execute();
 
@@ -67,7 +74,7 @@ async function main() {
   const stringFilters = await db.user
     .findMany({
       select: { id: true, username: true },
-      first: 5,
+      first: 10,
       where: { username: { includesInsensitive: 'seed' } },
     })
     .execute();
