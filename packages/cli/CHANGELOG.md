@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.26...@constructive-io/cli@5.7.0) (2026-01-18)
+
+### Features
+
+- **codegen:** add multi-target config support ([5cd0ef3](https://github.com/constructive-io/constructive/commit/5cd0ef31207382763657203b638aa006b8785050))
+
 ## [5.6.26](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.25...@constructive-io/cli@5.6.26) (2026-01-15)
 
 **Note:** Version bump only for package @constructive-io/cli

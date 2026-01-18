@@ -1,6 +1,6 @@
 {
   "name": "simple-smtp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "SMTP email sender for Constructive",
   "main": "index.js",
@@ -30,11 +30,11 @@
     "test:send": "ts-node __tests__/test-send.ts",
     "test:send:dev": "ts-node __tests__/test-send.ts"
   },
-    "dependencies": {
-      "@pgpmjs/env": "workspace:^",
-      "@pgpmjs/types": "workspace:^",
-      "nodemailer": "^6.9.13"
-    },
+  "dependencies": {
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "nodemailer": "^6.9.13"
+  },
   "devDependencies": {
     "@types/nodemailer": "^7.0.5",
     "@types/smtp-server": "^3.5.12",

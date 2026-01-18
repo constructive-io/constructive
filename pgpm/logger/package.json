@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/logger",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "author": "Constructive <developers@constructive.io>",
   "description": "Simple logger utility",
   "main": "index.js",

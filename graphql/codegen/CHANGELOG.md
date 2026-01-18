@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.1...@constructive-io/graphql-codegen@2.25.0) (2026-01-18)
+
+### Features
+
+- **codegen:** add multi-target config support ([5cd0ef3](https://github.com/constructive-io/constructive/commit/5cd0ef31207382763657203b638aa006b8785050))
+
 ## [2.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.0...@constructive-io/graphql-codegen@2.24.1) (2026-01-15)
 
 ### Bug Fixes

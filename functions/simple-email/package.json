@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/simple-email-fn",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "Simple Knative email function that sends emails directly from job payload",
   "author": "Constructive",
   "private": true,
@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
-    "simple-smtp-server": "workspace:^",
     "@launchql/postmaster": "0.1.4",
     "@pgpmjs/env": "workspace:^",
-    "@pgpmjs/logger": "workspace:^"
+    "@pgpmjs/logger": "workspace:^",
+    "simple-smtp-server": "workspace:^"
   }
 }
