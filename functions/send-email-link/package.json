@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/send-email-link-fn",
-  "version": "0.2.21",
+  "version": "0.3.0",
   "description": "Knative function to send email links (invite, password reset, email verification) using Constructive jobs",
   "author": "Constructive",
   "private": true,
