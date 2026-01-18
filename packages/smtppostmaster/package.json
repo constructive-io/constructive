@@ -1,5 +1,5 @@
 {
-  "name": "@constructive-io/smtppostmaster",
+  "name": "simple-smtp-server",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "SMTP email sender for Constructive",

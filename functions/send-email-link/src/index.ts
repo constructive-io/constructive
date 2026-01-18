@@ -3,7 +3,7 @@ import { GraphQLClient } from 'graphql-request';
 import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send as sendPostmaster } from '@launchql/postmaster';
-import { send as sendSmtp } from '@constructive-io/smtppostmaster';
+import { send as sendSmtp } from 'simple-smtp-server';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { createLogger } from '@pgpmjs/logger';
 

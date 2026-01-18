@@ -73,7 +73,7 @@ importers:
       '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
-      '@constructive-io/smtppostmaster':
+      'simple-smtp-server':
         specifier: workspace:^
         version: link:../../packages/smtppostmaster/dist
       '@launchql/mjml':
@@ -103,7 +103,7 @@ importers:
       '@constructive-io/knative-job-fn':
         specifier: workspace:^
         version: link:../../jobs/knative-job-fn
-      '@constructive-io/smtppostmaster':
+      'simple-smtp-server':
         specifier: workspace:^
         version: link:../../packages/smtppostmaster/dist
       '@launchql/postmaster':

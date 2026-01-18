@@ -35,10 +35,10 @@ const main = async () => {
   const subject = process.env.SMTP_TEST_SUBJECT ?? 'SMTP postmaster test email';
   const html =
     process.env.SMTP_TEST_HTML ??
-    '<p>This is a test email from @constructive-io/smtppostmaster.</p>';
+    '<p>This is a test email from simple-smtp-server.</p>';
   const text =
     process.env.SMTP_TEST_TEXT ??
-    'This is a test email from @constructive-io/smtppostmaster.';
+    'This is a test email from simple-smtp-server.';
   const from = process.env.SMTP_TEST_FROM;
 
   const start = Date.now();

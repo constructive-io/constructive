@@ -87,7 +87,7 @@ Recommended / optional:
 
 Email delivery (default: `@launchql/postmaster`):
 
-- Set `EMAIL_SEND_USE_SMTP=true` to switch to `@constructive-io/smtppostmaster` (SMTP). Otherwise it uses `@launchql/postmaster`.
+- Set `EMAIL_SEND_USE_SMTP=true` to switch to `simple-smtp-server` (SMTP). Otherwise it uses `@launchql/postmaster`.
 
 - Mailgun or another provider; consult `@launchql/postmaster` docs. A common pattern is:
   - `MAILGUN_API_KEY`

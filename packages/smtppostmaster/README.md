@@ -1,4 +1,4 @@
-# @constructive-io/smtppostmaster
+# simple-smtp-server
 
 SMTP-based email sender for Constructive services. This package exposes a `send` helper with the same call shape used by `@launchql/postmaster` (e.g. `{ to, subject, html, text }`).
 
@@ -7,13 +7,13 @@ Configuration is managed through the centralized `@pgpmjs/env` system, which mer
 ## Install
 
 ```bash
-pnpm add @constructive-io/smtppostmaster
+pnpm add simple-smtp-server
 ```
 
 ## Usage
 
 ```ts
-import { send } from '@constructive-io/smtppostmaster';
+import { send } from 'simple-smtp-server';
 
 await send({
   to: 'user@example.com',
@@ -27,7 +27,7 @@ await send({
 You can pass SMTP configuration overrides as a second argument to `send()`:
 
 ```ts
-import { send } from '@constructive-io/smtppostmaster';
+import { send } from 'simple-smtp-server';
 
 await send(
   {
@@ -51,7 +51,7 @@ await send(
 If you need to reset the cached SMTP transport (e.g., in tests), use `resetTransport()`:
 
 ```ts
-import { resetTransport } from '@constructive-io/smtppostmaster';
+import { resetTransport } from 'simple-smtp-server';
 
 resetTransport();
 ```
@@ -90,14 +90,14 @@ SMTP_USER=example \
 SMTP_PASS=secret \
 SMTP_FROM="no-reply@example.com" \
 SMTP_TEST_TO="you@example.com" \
-pnpm --filter "@constructive-io/smtppostmaster" test:send
+pnpm --filter "simple-smtp-server" test:send
 ```
 
 To use the built-in local SMTP catcher instead of a real SMTP server:
 
 ```bash
 SMTP_TEST_USE_CATCHER=true \
-pnpm --filter "@constructive-io/smtppostmaster" test:send
+pnpm --filter "simple-smtp-server" test:send
 ```
 
 Optional test overrides:

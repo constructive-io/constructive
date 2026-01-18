@@ -67,7 +67,7 @@ Email provider configuration is only required when not running in dry‑run mode
 Optional:
 
 - `SIMPLE_EMAIL_DRY_RUN` (`true`/`false`): log only, skip send.
-- `EMAIL_SEND_USE_SMTP` (`true`/`false`): use SMTP (`@constructive-io/smtppostmaster`).
+- `EMAIL_SEND_USE_SMTP` (`true`/`false`): use SMTP (`simple-smtp-server`).
 
 Mailgun (`@launchql/postmaster`) env vars when `EMAIL_SEND_USE_SMTP` is false:
 

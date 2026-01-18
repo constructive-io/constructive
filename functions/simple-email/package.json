@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
-    "@constructive-io/smtppostmaster": "workspace:^",
+    "simple-smtp-server": "workspace:^",
     "@launchql/postmaster": "0.1.4",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^"
