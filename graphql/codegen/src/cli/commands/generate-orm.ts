@@ -7,8 +7,12 @@
  * 3. Generates a Prisma-like ORM client with fluent API
  */
 
-import type { GraphQLSDKConfig, ResolvedConfig } from '../../types/config';
-import { resolveConfig } from '../../types/config';
+import type {
+  GraphQLSDKConfig,
+  GraphQLSDKConfigTarget,
+  ResolvedTargetConfig,
+} from '../../types/config';
+import { isMultiConfig, mergeConfig, resolveConfig } from '../../types/config';
 import {
   createSchemaSource,
   validateSourceOptions,
@@ -21,6 +25,8 @@ import { generateOrm } from '../codegen/orm';
 export interface GenerateOrmOptions {
   /** Path to config file */
   config?: string;
+  /** Named target in a multi-target config */
+  target?: string;
   /** GraphQL endpoint URL (overrides config) */
   endpoint?: string;
   /** Path to GraphQL schema file (.graphql) */
@@ -37,9 +43,22 @@ export interface GenerateOrmOptions {
   skipCustomOperations?: boolean;
 }
 
+export interface GenerateOrmTargetResult {
+  name: string;
+  output: string;
+  success: boolean;
+  message: string;
+  tables?: string[];
+  customQueries?: string[];
+  customMutations?: string[];
+  filesWritten?: string[];
+  errors?: string[];
+}
+
 export interface GenerateOrmResult {
   success: boolean;
   message: string;
+  targets?: GenerateOrmTargetResult[];
   tables?: string[];
   customQueries?: string[];
   customMutations?: string[];
@@ -53,10 +72,10 @@ export interface GenerateOrmResult {
 export async function generateOrmCommand(
   options: GenerateOrmOptions = {}
 ): Promise<GenerateOrmResult> {
-  const log = options.verbose ? console.log : () => {};
+  if (options.verbose) {
+    console.log('Loading configuration...');
+  }
 
-  // 1. Load config
-  log('Loading configuration...');
   const configResult = await loadConfig(options);
   if (!configResult.success) {
     return {
@@ -65,28 +84,88 @@ export async function generateOrmCommand(
     };
   }
 
-  const config = configResult.config!;
-
-  // Use ORM output directory if specified, otherwise default
-  const outputDir = options.output || config.orm?.output || './generated/orm';
-
-  // Log source
-  if (config.schema) {
-    log(`  Schema: ${config.schema}`);
-  } else {
-    log(`  Endpoint: ${config.endpoint}`);
+  const targets = configResult.targets ?? [];
+  if (targets.length === 0) {
+    return {
+      success: false,
+      message: 'No targets resolved from configuration.',
+    };
   }
-  log(`  Output: ${outputDir}`);
 
-  // 2. Create schema source
+  const isMultiTarget = configResult.isMulti ?? targets.length > 1;
+  const results: GenerateOrmTargetResult[] = [];
+
+  for (const target of targets) {
+    const result = await generateOrmForTarget(target, options, isMultiTarget);
+    results.push(result);
+  }
+
+  if (!isMultiTarget) {
+    const [result] = results;
+    return {
+      success: result.success,
+      message: result.message,
+      targets: results,
+      tables: result.tables,
+      customQueries: result.customQueries,
+      customMutations: result.customMutations,
+      filesWritten: result.filesWritten,
+      errors: result.errors,
+    };
+  }
+
+  const successCount = results.filter((result) => result.success).length;
+  const failedCount = results.length - successCount;
+  const summaryMessage =
+    failedCount === 0
+      ? `Generated ORM clients for ${results.length} targets.`
+      : `Generated ORM clients for ${successCount} of ${results.length} targets.`;
+
+  return {
+    success: failedCount === 0,
+    message: summaryMessage,
+    targets: results,
+    errors:
+      failedCount > 0
+        ? results.flatMap((result) => result.errors ?? [])
+        : undefined,
+  };
+}
+
+async function generateOrmForTarget(
+  target: ResolvedTargetConfig,
+  options: GenerateOrmOptions,
+  isMultiTarget: boolean
+): Promise<GenerateOrmTargetResult> {
+  const config = target.config;
+  const outputDir = options.output || config.orm?.output || './generated/orm';
+  const prefix = isMultiTarget ? `[${target.name}] ` : '';
+  const log = options.verbose
+    ? (message: string) => console.log(`${prefix}${message}`)
+    : () => {};
+  const formatMessage = (message: string) =>
+    isMultiTarget ? `Target "${target.name}": ${message}` : message;
+
+  if (isMultiTarget) {
+    console.log(`\nTarget "${target.name}"`);
+    const sourceLabel = config.schema
+      ? `schema: ${config.schema}`
+      : `endpoint: ${config.endpoint}`;
+    console.log(`  Source: ${sourceLabel}`);
+    console.log(`  Output: ${outputDir}`);
+  }
+
+  // 1. Validate source
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
   });
   if (!sourceValidation.valid) {
     return {
+      name: target.name,
+      output: outputDir,
       success: false,
-      message: sourceValidation.error!,
+      message: formatMessage(sourceValidation.error!),
     };
   }
 
@@ -97,7 +176,7 @@ export async function generateOrmCommand(
     headers: config.headers,
   });
 
-  // 3. Run the codegen pipeline
+  // 2. Run the codegen pipeline
   let pipelineResult;
   try {
     pipelineResult = await runCodegenPipeline({
@@ -108,24 +187,30 @@ export async function generateOrmCommand(
     });
   } catch (err) {
     return {
+      name: target.name,
+      output: outputDir,
       success: false,
-      message: `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      message: formatMessage(
+        `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`
+      ),
     };
   }
 
   const { tables, customOperations, stats } = pipelineResult;
 
-  // 4. Validate tables found
+  // 3. Validate tables found
   const tablesValidation = validateTablesFound(tables);
   if (!tablesValidation.valid) {
     return {
+      name: target.name,
+      output: outputDir,
       success: false,
-      message: tablesValidation.error!,
+      message: formatMessage(tablesValidation.error!),
     };
   }
 
-  // 5. Generate ORM code
-  console.log('Generating code...');
+  // 4. Generate ORM code
+  console.log(`${prefix}Generating code...`);
   const { files: generatedFiles, stats: genStats } = generateOrm({
     tables,
     customOperations: {
@@ -135,7 +220,7 @@ export async function generateOrmCommand(
     },
     config,
   });
-  console.log(`Generated ${genStats.totalFiles} files`);
+  console.log(`${prefix}Generated ${genStats.totalFiles} files`);
 
   log(`  ${genStats.tables} table models`);
   log(`  ${genStats.customQueries} custom query operations`);
@@ -146,8 +231,12 @@ export async function generateOrmCommand(
 
   if (options.dryRun) {
     return {
+      name: target.name,
+      output: outputDir,
       success: true,
-      message: `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${stats.customQueries + stats.customMutations} custom operations.`,
+      message: formatMessage(
+        `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${stats.customQueries + stats.customMutations} custom operations.`
+      ),
       tables: tables.map((t) => t.name),
       customQueries,
       customMutations,
@@ -155,7 +244,7 @@ export async function generateOrmCommand(
     };
   }
 
-  // 6. Write files
+  // 5. Write files
   log('Writing files...');
   const writeResult = await writeGeneratedFiles(generatedFiles, outputDir, [
     'models',
@@ -165,8 +254,12 @@ export async function generateOrmCommand(
 
   if (!writeResult.success) {
     return {
+      name: target.name,
+      output: outputDir,
       success: false,
-      message: `Failed to write files: ${writeResult.errors?.join(', ')}`,
+      message: formatMessage(
+        `Failed to write files: ${writeResult.errors?.join(', ')}`
+      ),
       errors: writeResult.errors,
     };
   }
@@ -175,8 +268,12 @@ export async function generateOrmCommand(
   const customOpsMsg = totalOps > 0 ? ` and ${totalOps} custom operations` : '';
 
   return {
+    name: target.name,
+    output: outputDir,
     success: true,
-    message: `Generated ORM client for ${tables.length} tables${customOpsMsg}. Files written to ${outputDir}`,
+    message: formatMessage(
+      `Generated ORM client for ${tables.length} tables${customOpsMsg}. Files written to ${outputDir}`
+    ),
     tables: tables.map((t) => t.name),
     customQueries,
     customMutations,
@@ -186,20 +283,46 @@ export async function generateOrmCommand(
 
 interface LoadConfigResult {
   success: boolean;
-  config?: ResolvedConfig;
+  targets?: ResolvedTargetConfig[];
+  isMulti?: boolean;
   error?: string;
+}
+
+function buildTargetOverrides(
+  options: GenerateOrmOptions
+): GraphQLSDKConfigTarget {
+  const overrides: GraphQLSDKConfigTarget = {};
+
+  if (options.endpoint) {
+    overrides.endpoint = options.endpoint;
+    overrides.schema = undefined;
+  }
+
+  if (options.schema) {
+    overrides.schema = options.schema;
+    overrides.endpoint = undefined;
+  }
+
+  return overrides;
 }
 
 async function loadConfig(
   options: GenerateOrmOptions
 ): Promise<LoadConfigResult> {
+  if (options.endpoint && options.schema) {
+    return {
+      success: false,
+      error: 'Cannot use both --endpoint and --schema. Choose one source.',
+    };
+  }
+
   // Find config file
   let configPath = options.config;
   if (!configPath) {
     configPath = findConfigFile() ?? undefined;
   }
 
-  let baseConfig: Partial<GraphQLSDKConfig> = {};
+  let baseConfig: GraphQLSDKConfig = {};
 
   if (configPath) {
     const loadResult = await loadConfigFile(configPath);
@@ -209,23 +332,76 @@ async function loadConfig(
     baseConfig = loadResult.config;
   }
 
-  // Override with CLI options
-  const mergedConfig: GraphQLSDKConfig = {
-    endpoint: options.endpoint || baseConfig.endpoint,
-    schema: options.schema || baseConfig.schema,
-    output: options.output || baseConfig.output,
-    headers: baseConfig.headers,
-    tables: baseConfig.tables,
-    queries: baseConfig.queries,
-    mutations: baseConfig.mutations,
-    excludeFields: baseConfig.excludeFields,
-    hooks: baseConfig.hooks,
-    postgraphile: baseConfig.postgraphile,
-    codegen: baseConfig.codegen,
-    orm: baseConfig.orm,
-  };
+  const overrides = buildTargetOverrides(options);
 
-  // Validate at least one source is provided
+  if (isMultiConfig(baseConfig)) {
+    if (Object.keys(baseConfig.targets).length === 0) {
+      return {
+        success: false,
+        error: 'Config file defines no targets.',
+      };
+    }
+
+    if (
+      !options.target &&
+      (options.endpoint || options.schema || options.output)
+    ) {
+      return {
+        success: false,
+        error:
+          'Multiple targets configured. Use --target with --endpoint, --schema, or --output.',
+      };
+    }
+
+    if (options.target && !baseConfig.targets[options.target]) {
+      return {
+        success: false,
+        error: `Target "${options.target}" not found in config file.`,
+      };
+    }
+
+    const selectedTargets = options.target
+      ? { [options.target]: baseConfig.targets[options.target] }
+      : baseConfig.targets;
+    const defaults = baseConfig.defaults ?? {};
+    const resolvedTargets: ResolvedTargetConfig[] = [];
+
+    for (const [name, target] of Object.entries(selectedTargets)) {
+      let mergedTarget = mergeConfig(defaults, target);
+      if (options.target && name === options.target) {
+        mergedTarget = mergeConfig(mergedTarget, overrides);
+      }
+
+      if (!mergedTarget.endpoint && !mergedTarget.schema) {
+        return {
+          success: false,
+          error: `Target "${name}" is missing an endpoint or schema.`,
+        };
+      }
+
+      resolvedTargets.push({
+        name,
+        config: resolveConfig(mergedTarget),
+      });
+    }
+
+    return {
+      success: true,
+      targets: resolvedTargets,
+      isMulti: true,
+    };
+  }
+
+  if (options.target) {
+    return {
+      success: false,
+      error:
+        'Config file does not define targets. Remove --target to continue.',
+    };
+  }
+
+  const mergedConfig = mergeConfig(baseConfig, overrides);
+
   if (!mergedConfig.endpoint && !mergedConfig.schema) {
     return {
       success: false,
@@ -234,8 +410,9 @@ async function loadConfig(
     };
   }
 
-  // Resolve with defaults
-  const config = resolveConfig(mergedConfig);
-
-  return { success: true, config };
+  return {
+    success: true,
+    targets: [{ name: 'default', config: resolveConfig(mergedConfig) }],
+    isMulti: false,
+  };
 }

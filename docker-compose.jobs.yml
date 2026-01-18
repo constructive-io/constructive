@@ -22,7 +22,7 @@ services:
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: password
-      PGDATABASE: launchql
+      PGDATABASE: constructive
       # API meta configuration (static mode for dev)
       API_ENABLE_META: "true"
       API_EXPOSED_SCHEMAS: "metaschema_public,services_public"
@@ -108,7 +108,7 @@ services:
       PGHOST: postgres
       PGPASSWORD: password
       PGPORT: "5432"
-      PGDATABASE: launchql
+      PGDATABASE: constructive
       JOBS_SCHEMA: app_jobs
 
       # Worker configuration

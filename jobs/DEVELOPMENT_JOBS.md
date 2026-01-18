@@ -38,7 +38,7 @@ pgenv() {
   export PGPORT=5432
   export PGUSER=postgres
   export PGPASSWORD=password
-  export PGDATABASE=launchql
+  export PGDATABASE=constructive
   echo "PostgreSQL environment variables set"
 }
 ```
@@ -62,22 +62,23 @@ From the `constructive-db/` directory (with `pgenv` applied):
 1. Create the `constructive` database (if it does not already exist):
 
    ```sh
-   createdb launchql
+   createdb constructive
    ```
 
 2. Bootstrap admin users:
 
    ```sh
    pgpm admin-users bootstrap --yes
-   pgpm admin-users add --test --yes
+   pgpm admin-users add --test --yes ## NOTE: not to be run in production
    ```
 
 3. Deploy the main app and jobs packages into DB:
 
    ```sh
-   pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
-   pgpm deploy --yes --database "$PGDATABASE" --package metaschema
-   pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
+   pgpm deploy --yes --database "$PGDATABASE" --package constructive
+   pgpm deploy --yes --database "$PGDATABASE" --package constructive-services
+   pgpm deploy --yes --database "$PGDATABASE" --package app
+   pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs     # for sanity, not needed to run
    ```
 
 At this point, the app schema and `database-jobs` should be installed and `app_jobs.*` should be available in the `constructive` database.
@@ -96,7 +97,7 @@ docker compose -f docker-compose.jobs.yml up
 Or run detached:
 
 ```sh
-docker compose -f docker-compose.jobs.yml up -d --build
+docker compose -f docker-compose.jobs.yml up --build
 ```
 
 This starts:
@@ -152,13 +153,13 @@ With the jobs stack running, you can enqueue a test job from your host into the 
 First, grab a real `database_id` (required by `send-email-link`, optional for `simple-email`):
 
 ```sh
-DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
+DBID="$(docker exec -i postgres psql -U postgres -d constructive -Atc 'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
 echo "$DBID"
 ```
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d launchql -c "
+  psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'simple-email',
@@ -191,7 +192,7 @@ With `SEND_EMAIL_LINK_DRY_RUN=true` (default in `docker-compose.jobs.yml`), enqu
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d launchql -c "
+  psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'send-email-link',
@@ -303,3 +304,26 @@ docker compose -f docker-compose.jobs.yml -f docker-compose.jobs.override.yml up
 ```
 
 To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
+
+
+## NOTES:
+- change all launchql names to constructive, including the DB-name and more.
+- run bootstrap command for test user, 
+- need to run some manual migrations like:
+```sql
+ BEGIN;
+   UPDATE services_public.domains SET domain = 'localhost';
+   UPDATE services_public.apis SET dbname = 'constructive';
+ COMMIT;
+
+------ Some more
+ALTER TABLE metaschema_public.database
+ADD CONSTRAINT database_owner_id_fkey
+FOREIGN KEY (owner_id)
+REFERENCES constructive_public.users(id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE;
+```
+
+> NOTE: please make similar changes to the devnet as well please
+
