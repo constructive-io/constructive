@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.25.0...@constructive-io/graphql-codegen@2.26.0) (2026-01-18)
+
+### Bug Fixes
+
+- **codegen:** add DeepExact for strict select type validation ([11790c7](https://github.com/constructive-io/constructive/commit/11790c79c5ea5a7f6fd0c0a6219cffb58ac40a04))
+
+### Features
+
+- **codegen:** add command timing to CLI output ([6322af2](https://github.com/constructive-io/constructive/commit/6322af2c0f84decaf6dd0a9da1e6db181e24d29c))
+
 # [2.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.1...@constructive-io/graphql-codegen@2.25.0) (2026-01-18)
 
 ### Features
