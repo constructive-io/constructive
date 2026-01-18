@@ -1563,6 +1563,9 @@ importers:
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../../pgpm/env/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../../pgpm/types/dist
       nodemailer:
         specifier: ^6.9.13
         version: 6.10.1
