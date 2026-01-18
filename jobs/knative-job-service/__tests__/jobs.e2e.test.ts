@@ -1,13 +1,15 @@
 import { dirname, join } from 'path';
 import type { Server as HttpServer } from 'http';
 import supertest from 'supertest';
+import { Server as GraphQLServer } from '@constructive-io/graphql-server';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { createJobApp } from '@constructive-io/knative-job-fn';
 
 import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
 import { getConnections, seed, type PgTestClient } from 'pgsql-test';
 
-import type { CombinedServer as CombinedServerType } from '../src/server';
-import type { CombinedServerOptions, FunctionServiceConfig } from '../src/types';
+import type { KnativeJobsSvc as KnativeJobsSvcType } from '../src';
+import type { KnativeJobsSvcOptions, FunctionServiceConfig } from '../src/types';
 
 jest.setTimeout(120000);
 
@@ -320,9 +322,10 @@ const createTestDb = async (): Promise<SeededConnections> => {
 describe('jobs e2e', () => {
   let teardown: () => Promise<void>;
   let graphqlClient: GraphqlClient;
+  let graphqlServer: GraphQLServer | null = null;
   let databaseId = '';
   let pg: PgTestClient | undefined;
-  let combinedServer: CombinedServerType | null = null;
+  let knativeJobsSvc: KnativeJobsSvcType | null = null;
   let mailgunServer: HttpServer | null = null;
   const envSnapshot: Record<string, string | undefined> = {
     NODE_ENV: process.env.NODE_ENV,
@@ -417,39 +420,46 @@ describe('jobs e2e', () => {
       { name: 'send-email-link', port: SEND_EMAIL_LINK_PORT }
     ];
 
-    const combinedServerOptions: CombinedServerOptions = {
-      graphql: {
-        enabled: true,
-        options: {
-          pg: {
-            host: pg.config.host,
-            port: pg.config.port,
-            user: pg.config.user,
-            password: pg.config.password,
-            database: pg.config.database
-          },
-          server: {
-            host: '127.0.0.1',
-            port: GRAPHQL_PORT
-          },
-          api: {
-            enableServicesApi: false,
-            exposedSchemas: [
-              'app_jobs',
-              'app_public',
-              'metaschema_modules_public',
-              'metaschema_public',
-              'services_public'
-            ],
-            anonRole: 'administrator',
-            roleName: 'administrator',
-            defaultDatabaseId: databaseId
-          },
-          features: {
-            postgis: false
-          }
-        }
+    const graphqlOptions: ConstructiveOptions = {
+      pg: {
+        host: pg.config.host,
+        port: pg.config.port,
+        user: pg.config.user,
+        password: pg.config.password,
+        database: pg.config.database
       },
+      server: {
+        host: '127.0.0.1',
+        port: GRAPHQL_PORT
+      },
+      api: {
+        enableServicesApi: false,
+        exposedSchemas: [
+          'app_jobs',
+          'app_public',
+          'metaschema_modules_public',
+          'metaschema_public',
+          'services_public'
+        ],
+        anonRole: 'administrator',
+        roleName: 'administrator',
+        defaultDatabaseId: databaseId
+      },
+      features: {
+        postgis: false
+      }
+    };
+
+    graphqlServer = new GraphQLServer(graphqlOptions);
+    graphqlServer.addEventListener();
+    const graphqlHttpServer = graphqlServer.listen();
+    if (!graphqlHttpServer.listening) {
+      await new Promise<void>((resolveListen) => {
+        graphqlHttpServer.once('listening', () => resolveListen());
+      });
+    }
+
+    const knativeJobsSvcOptions: KnativeJobsSvcOptions = {
       functions: {
         enabled: true,
         services
@@ -457,9 +467,9 @@ describe('jobs e2e', () => {
       jobs: { enabled: true }
     };
 
-    const { CombinedServer } = await import('../src/server');
-    combinedServer = new CombinedServer(combinedServerOptions);
-    await combinedServer.start();
+    const { KnativeJobsSvc } = await import('../src');
+    knativeJobsSvc = new KnativeJobsSvc(knativeJobsSvcOptions);
+    await knativeJobsSvc.start();
 
     graphqlClient = getGraphqlClient();
 
@@ -471,8 +481,12 @@ describe('jobs e2e', () => {
   });
 
   afterAll(async () => {
-    if (combinedServer) {
-      await combinedServer.stop();
+    if (knativeJobsSvc) {
+      await knativeJobsSvc.stop();
+    }
+    if (graphqlServer) {
+      await graphqlServer.close({ closeCaches: true });
+      graphqlServer = null;
     }
     await closeHttpServer(mailgunServer);
     mailgunServer = null;

@@ -1,11 +1,11 @@
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import {
-  CombinedServer,
-  CombinedServerOptions,
+  KnativeJobsSvc,
+  KnativeJobsSvcOptions,
   FunctionName,
   FunctionServiceConfig
-} from '@constructive-io/server';
+} from '@constructive-io/knative-job-service';
 import { cliExitWithError, extractFirst } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 
@@ -17,35 +17,25 @@ Constructive Jobs:
   Start or manage Constructive jobs services.
 
 Subcommands:
-  up                  Start combined server (jobs runtime)
+  up                  Start jobs runtime (jobs + functions)
 
 Options:
   --help, -h           Show this help message
   --cwd <directory>    Working directory (default: current directory)
-  --with-graphql-server  Enable GraphQL server (default: disabled; flag-only)
-  --with-jobs-svc         Enable jobs service (default: disabled; flag-only)
+  --with-jobs-server      Enable jobs server (default: disabled; flag-only)
   --functions <list>   Comma-separated functions, optionally with ports (e.g. "fn=8080")
 
 Examples:
   cnc jobs up
   cnc jobs up --cwd /path/to/constructive
-  cnc jobs up --with-graphql-server --functions simple-email,send-email-link=8082
+  cnc jobs up --with-jobs-server --functions simple-email,send-email-link=8082
 `;
 
 const questions: Question[] = [
   {
-    name: 'withGraphqlServer',
-    alias: 'with-graphql-server',
-    message: 'Enable GraphQL server?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true
-  },
-  {
-    name: 'withJobsSvc',
-    alias: 'with-jobs-svc',
-    message: 'Enable jobs service?',
+    name: 'withJobsServer',
+    alias: 'with-jobs-server',
+    message: 'Enable jobs server?',
     type: 'confirm',
     required: false,
     default: false,
@@ -147,12 +137,12 @@ const parseFunctionsArg = (value: unknown): ParsedFunctionsArg | undefined => {
   return { mode: 'list', names: uniqueNames, ports };
 };
 
-const buildCombinedServerOptions = (
+const buildKnativeJobsSvcOptions = (
   args: Partial<Record<string, any>>
-): CombinedServerOptions => {
+): KnativeJobsSvcOptions => {
   const parsedFunctions = parseFunctionsArg(args.functions);
 
-  let functions: CombinedServerOptions['functions'];
+  let functions: KnativeJobsSvcOptions['functions'];
   if (parsedFunctions) {
     if (parsedFunctions.mode === 'all') {
       functions = { enabled: true };
@@ -170,8 +160,7 @@ const buildCombinedServerOptions = (
   }
 
   return {
-    graphql: { enabled: args.withGraphqlServer === true },
-    jobs: { enabled: args.withJobsSvc === true },
+    jobs: { enabled: args.withJobsServer === true },
     functions
   };
 };
@@ -200,11 +189,11 @@ export default async (
     try {
       ensureCwd((args.cwd as string) || process.cwd());
       const promptAnswers = await prompter.prompt(args, questions);
-      const server = new CombinedServer(buildCombinedServerOptions(promptAnswers));
+      const server = new KnativeJobsSvc(buildKnativeJobsSvcOptions(promptAnswers));
       await server.start();
     } catch (error) {
       await cliExitWithError(
-        `Failed to start combined server: ${(error as Error).message}`
+        `Failed to start jobs runtime: ${(error as Error).message}`
       );
     }
     break;

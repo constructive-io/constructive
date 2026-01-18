@@ -1274,12 +1274,24 @@ importers:
       '@constructive-io/job-utils':
         specifier: workspace:^
         version: link:../job-utils
+      '@constructive-io/knative-job-fn':
+        specifier: workspace:^
+        version: link:../knative-job-fn
       '@constructive-io/knative-job-server':
         specifier: workspace:^
         version: link:../knative-job-server
       '@constructive-io/knative-job-worker':
         specifier: workspace:^
         version: link:../knative-job-worker
+      '@constructive-io/send-email-link-fn':
+        specifier: workspace:^
+        version: link:../../functions/send-email-link
+      '@constructive-io/simple-email-fn':
+        specifier: workspace:^
+        version: link:../../functions/simple-email
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -1290,6 +1302,45 @@ importers:
         specifier: 8.16.3
         version: 8.16.3
     devDependencies:
+      '@constructive-io/graphql-server':
+        specifier: workspace:^
+        version: link:../../graphql/server/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
+      '@pgpm/database-jobs':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/inflection':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/metaschema-modules':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/metaschema-schema':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/services':
+        specifier: ^0.16.1
+        version: 0.16.1
+      '@pgpm/types':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/verify':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
+      '@types/supertest':
+        specifier: ^6.0.3
+        version: 6.0.3
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+      supertest:
+        specifier: ^7.2.2
+        version: 7.2.2
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
@@ -1330,9 +1381,9 @@ importers:
       '@constructive-io/graphql-server':
         specifier: workspace:^
         version: link:../../graphql/server/dist
-      '@constructive-io/server':
+      '@constructive-io/knative-job-service':
         specifier: workspace:^
-        version: link:../server/dist
+        version: link:../../jobs/knative-job-service
       '@inquirerer/utils':
         specifier: ^3.1.3
         version: 3.1.3
