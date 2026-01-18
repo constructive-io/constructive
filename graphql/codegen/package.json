@@ -39,6 +39,8 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "example:codegen:sdk": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts",
@@ -58,7 +60,7 @@
     "graphql": "15.10.1",
     "inflekt": "^0.2.0",
     "jiti": "^2.6.1",
-    "prettier": "^3.7.4"
+    "oxfmt": "^0.13.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
