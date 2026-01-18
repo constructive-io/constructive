@@ -64,9 +64,10 @@ export interface QueryKeyConfig {
 }
 
 /**
- * Main configuration for graphql-codegen
+ * Target configuration for graphql-codegen
+ * Represents a single schema source and output destination.
  */
-export interface GraphQLSDKConfig {
+export interface GraphQLSDKConfigTarget {
   /**
    * GraphQL endpoint URL for live introspection
    * Either endpoint or schema must be provided
@@ -200,6 +201,26 @@ export interface GraphQLSDKConfig {
    */
   watch?: WatchConfig;
 }
+
+/**
+ * Multi-target configuration for graphql-codegen
+ */
+export interface GraphQLSDKMultiConfig {
+  /**
+   * Shared defaults applied to every target
+   */
+  defaults?: GraphQLSDKConfigTarget;
+
+  /**
+   * Named target configurations
+   */
+  targets: Record<string, GraphQLSDKConfigTarget>;
+}
+
+/**
+ * Main configuration type for graphql-codegen
+ */
+export type GraphQLSDKConfig = GraphQLSDKConfigTarget | GraphQLSDKMultiConfig;
 
 /**
  * Watch mode configuration options
@@ -381,9 +402,119 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
 }
 
 /**
+ * Resolved target configuration helper
+ */
+export interface ResolvedTargetConfig {
+  name: string;
+  config: ResolvedConfig;
+}
+
+/**
+ * Type guard for multi-target configs
+ */
+export function isMultiConfig(
+  config: GraphQLSDKConfig
+): config is GraphQLSDKMultiConfig {
+  const targets = (config as GraphQLSDKMultiConfig).targets;
+  return typeof targets === 'object' && targets !== null;
+}
+
+/**
+ * Merge two target configs (defaults + overrides)
+ */
+export function mergeConfig(
+  base: GraphQLSDKConfigTarget,
+  overrides: GraphQLSDKConfigTarget
+): GraphQLSDKConfigTarget {
+  const headers =
+    base.headers || overrides.headers
+      ? { ...(base.headers ?? {}), ...(overrides.headers ?? {}) }
+      : undefined;
+
+  const tables =
+    base.tables || overrides.tables
+      ? { ...(base.tables ?? {}), ...(overrides.tables ?? {}) }
+      : undefined;
+
+  const queries =
+    base.queries || overrides.queries
+      ? { ...(base.queries ?? {}), ...(overrides.queries ?? {}) }
+      : undefined;
+
+  const mutations =
+    base.mutations || overrides.mutations
+      ? { ...(base.mutations ?? {}), ...(overrides.mutations ?? {}) }
+      : undefined;
+
+  const hooks =
+    base.hooks || overrides.hooks
+      ? { ...(base.hooks ?? {}), ...(overrides.hooks ?? {}) }
+      : undefined;
+
+  const postgraphile =
+    base.postgraphile || overrides.postgraphile
+      ? { ...(base.postgraphile ?? {}), ...(overrides.postgraphile ?? {}) }
+      : undefined;
+
+  const codegen =
+    base.codegen || overrides.codegen
+      ? { ...(base.codegen ?? {}), ...(overrides.codegen ?? {}) }
+      : undefined;
+
+  const orm =
+    base.orm || overrides.orm
+      ? { ...(base.orm ?? {}), ...(overrides.orm ?? {}) }
+      : undefined;
+
+  const reactQuery =
+    base.reactQuery || overrides.reactQuery
+      ? { ...(base.reactQuery ?? {}), ...(overrides.reactQuery ?? {}) }
+      : undefined;
+
+  const queryKeys =
+    base.queryKeys || overrides.queryKeys
+      ? {
+          ...(base.queryKeys ?? {}),
+          ...(overrides.queryKeys ?? {}),
+          relationships: {
+            ...(base.queryKeys?.relationships ?? {}),
+            ...(overrides.queryKeys?.relationships ?? {}),
+          },
+        }
+      : undefined;
+
+  const watch =
+    base.watch || overrides.watch
+      ? { ...(base.watch ?? {}), ...(overrides.watch ?? {}) }
+      : undefined;
+
+  return {
+    ...base,
+    ...overrides,
+    headers,
+    tables,
+    queries,
+    mutations,
+    hooks,
+    postgraphile,
+    codegen,
+    orm,
+    reactQuery,
+    queryKeys,
+    watch,
+  };
+}
+
+/**
  * Resolve configuration by applying defaults
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
+  if (isMultiConfig(config)) {
+    throw new Error(
+      'Multi-target config cannot be resolved with resolveConfig(). Use resolveConfigTargets().'
+    );
+  }
+
   return {
     endpoint: config.endpoint ?? '',
     schema: config.schema ?? null,
@@ -429,10 +560,18 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     },
     queryKeys: {
       style: config.queryKeys?.style ?? DEFAULT_QUERY_KEY_CONFIG.style,
-      relationships: config.queryKeys?.relationships ?? DEFAULT_QUERY_KEY_CONFIG.relationships,
-      generateScopedKeys: config.queryKeys?.generateScopedKeys ?? DEFAULT_QUERY_KEY_CONFIG.generateScopedKeys,
-      generateCascadeHelpers: config.queryKeys?.generateCascadeHelpers ?? DEFAULT_QUERY_KEY_CONFIG.generateCascadeHelpers,
-      generateMutationKeys: config.queryKeys?.generateMutationKeys ?? DEFAULT_QUERY_KEY_CONFIG.generateMutationKeys,
+      relationships:
+        config.queryKeys?.relationships ??
+        DEFAULT_QUERY_KEY_CONFIG.relationships,
+      generateScopedKeys:
+        config.queryKeys?.generateScopedKeys ??
+        DEFAULT_QUERY_KEY_CONFIG.generateScopedKeys,
+      generateCascadeHelpers:
+        config.queryKeys?.generateCascadeHelpers ??
+        DEFAULT_QUERY_KEY_CONFIG.generateCascadeHelpers,
+      generateMutationKeys:
+        config.queryKeys?.generateMutationKeys ??
+        DEFAULT_QUERY_KEY_CONFIG.generateMutationKeys,
     },
     watch: {
       pollInterval:
@@ -443,4 +582,18 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
         config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
     },
   };
+}
+
+/**
+ * Resolve all targets in a multi-target config
+ */
+export function resolveConfigTargets(
+  config: GraphQLSDKMultiConfig
+): ResolvedTargetConfig[] {
+  const defaults = config.defaults ?? {};
+
+  return Object.entries(config.targets).map(([name, target]) => ({
+    name,
+    config: resolveConfig(mergeConfig(defaults, target)),
+  }));
 }
