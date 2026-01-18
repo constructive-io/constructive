@@ -1,5 +1,7 @@
 import { dirname, join } from 'path';
+import type { Server as HttpServer } from 'http';
 import supertest from 'supertest';
+import { createJobApp } from '@constructive-io/knative-job-fn';
 
 import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
 import { getConnections, seed, type PgTestClient } from 'pgsql-test';
@@ -74,6 +76,7 @@ const jobByIdQuery = `
       id
       lastError
       attempts
+      maxAttempts
     }
   }
 `;
@@ -98,6 +101,12 @@ const unwrapGraphqlData = <T>(
   return response.body.data as T;
 };
 
+type JobDetails = {
+  lastError?: string | null;
+  attempts?: number | null;
+  maxAttempts?: number | null;
+};
+
 const getJobById = async (
   client: GraphqlClient,
   jobId: string | number
@@ -105,7 +114,7 @@ const getJobById = async (
   const response = await sendGraphql(client, jobByIdQuery, {
     id: String(jobId)
   });
-  const data = unwrapGraphqlData<{ job: { lastError?: string | null; attempts?: number } | null }>(
+  const data = unwrapGraphqlData<{ job: JobDetails | null }>(
     response,
     'Job query'
   );
@@ -135,6 +144,96 @@ const waitForJobCompletion = async (
   throw new Error(`Job ${jobId} did not complete within ${timeoutMs}ms`);
 };
 
+const waitForJobFailure = async (
+  client: GraphqlClient,
+  jobId: string | number,
+  {
+    minAttempts = 1,
+    timeoutMs = 30000
+  }: { minAttempts?: number; timeoutMs?: number } = {}
+) => {
+  const started = Date.now();
+  let lastJob: JobDetails | null = null;
+
+  while (Date.now() - started < timeoutMs) {
+    const job = await getJobById(client, jobId);
+
+    if (!job) {
+      throw new Error(`Job ${jobId} disappeared before failure was observed`);
+    }
+
+    lastJob = job;
+    const attempts = job.attempts ?? 0;
+
+    if (job.lastError && attempts >= minAttempts) {
+      return job;
+    }
+
+    await delay(250);
+  }
+
+  throw new Error(
+    `Job ${jobId} did not fail after ${minAttempts} attempt(s) within ${timeoutMs}ms (attempts=${
+      lastJob?.attempts ?? 'unknown'
+    }, maxAttempts=${lastJob?.maxAttempts ?? 'unknown'}, lastError=${
+      lastJob?.lastError ?? 'null'
+    })`
+  );
+};
+
+const closeHttpServer = async (server?: HttpServer | null): Promise<void> => {
+  if (!server || !server.listening) return;
+  await new Promise<void>((resolveClose, rejectClose) => {
+    server.close((err) => {
+      if (err) {
+        rejectClose(err);
+        return;
+      }
+      resolveClose();
+    });
+  });
+};
+
+type MailgunFailurePayload = {
+  to?: string;
+  subject?: string;
+  html?: string;
+  text?: string;
+  from?: string;
+  replyTo?: string;
+};
+
+const createMailgunFailureApp = () => {
+  const { send: sendPostmaster } = require('@launchql/postmaster');
+  const app = createJobApp();
+
+  app.post('/', async (req: any, res: any, next: any) => {
+    try {
+      const payload = (req.body || {}) as MailgunFailurePayload;
+      const to = payload.to ?? 'user@example.com';
+      const subject = payload.subject ?? 'Mailgun failure test';
+      const html = payload.html ?? '<p>mailgun failure</p>';
+      const from = payload.from ?? process.env.MAILGUN_FROM;
+      const replyTo = payload.replyTo ?? process.env.MAILGUN_REPLY;
+
+      await sendPostmaster({
+        to,
+        subject,
+        ...(html && { html }),
+        ...(payload.text && { text: payload.text }),
+        ...(from && { from }),
+        ...(replyTo && { replyTo })
+      });
+
+      res.status(200).json({ complete: true });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return app;
+};
+
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
 // Ports are fixed by test design, if these're occupied, then the test just feel free to fail.
@@ -142,6 +241,7 @@ const GRAPHQL_PORT = 3000;
 const CALLBACK_PORT = 12345;
 const SIMPLE_EMAIL_PORT = 8081;
 const SEND_EMAIL_LINK_PORT = 8082;
+const MAILGUN_FAILURE_PORT = 8083;
 
 const getPgpmModulePath = (pkgName: string): string =>
   dirname(require.resolve(`${pkgName}/pgpm.plan`));
@@ -223,6 +323,7 @@ describe('jobs e2e', () => {
   let databaseId = '';
   let pg: PgTestClient | undefined;
   let combinedServer: CombinedServerType | null = null;
+  let mailgunServer: HttpServer | null = null;
   const envSnapshot: Record<string, string | undefined> = {
     NODE_ENV: process.env.NODE_ENV,
     TEST_DB: process.env.TEST_DB,
@@ -296,10 +397,11 @@ describe('jobs e2e', () => {
     process.env.MAILGUN_API_KEY = 'change-me-mailgun-api-key';
     process.env.MAILGUN_KEY = 'change-me-mailgun-api-key';
     process.env.JOBS_SUPPORT_ANY = 'false';
-    process.env.JOBS_SUPPORTED = 'simple-email,send-email-link';
+    process.env.JOBS_SUPPORTED = 'simple-email,send-email-link,mailgun-failure';
     process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP = JSON.stringify({
       'simple-email': `http://127.0.0.1:${SIMPLE_EMAIL_PORT}`,
-      'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`
+      'send-email-link': `http://127.0.0.1:${SEND_EMAIL_LINK_PORT}`,
+      'mailgun-failure': `http://127.0.0.1:${MAILGUN_FAILURE_PORT}`
     });
     process.env.INTERNAL_JOBS_CALLBACK_PORT = String(CALLBACK_PORT);
     process.env.JOBS_CALLBACK_BASE_URL = callbackUrl;
@@ -360,12 +462,20 @@ describe('jobs e2e', () => {
     await combinedServer.start();
 
     graphqlClient = getGraphqlClient();
+
+    const mailgunApp = createMailgunFailureApp();
+    mailgunServer = await new Promise<HttpServer>((resolve, reject) => {
+      const server = mailgunApp.listen(MAILGUN_FAILURE_PORT, () => resolve(server));
+      server.on('error', reject);
+    });
   });
 
   afterAll(async () => {
     if (combinedServer) {
       await combinedServer.stop();
     }
+    await closeHttpServer(mailgunServer);
+    mailgunServer = null;
     if (teardown) {
       await teardown();
     }
@@ -427,5 +537,112 @@ describe('jobs e2e', () => {
     expect(jobId).toBeTruthy();
 
     await waitForJobCompletion(graphqlClient, jobId);
+  });
+
+  it('records failed jobs when a function throws', async () => {
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'simple-email',
+      maxAttempts: 1,
+      payload: {
+        to: 'user@example.com',
+        html: '<p>missing subject</p>'
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    const job = await waitForJobFailure(graphqlClient, jobId, {
+      minAttempts: 1,
+      timeoutMs: 30000
+    });
+
+    expect(job.attempts).toBe(1);
+    expect(job.maxAttempts).toBe(1);
+    expect(job.lastError).toContain('Missing required field');
+  });
+
+  it('retries failed jobs until max attempts is reached', async () => {
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'simple-email',
+      maxAttempts: 2,
+      payload: {
+        to: 'user@example.com',
+        html: '<p>missing subject</p>'
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    const firstFailure = await waitForJobFailure(graphqlClient, jobId, {
+      minAttempts: 1,
+      timeoutMs: 30000
+    });
+
+    expect(firstFailure.attempts).toBe(1);
+
+    const retried = await waitForJobFailure(graphqlClient, jobId, {
+      minAttempts: 2,
+      timeoutMs: 60000
+    });
+
+    expect(retried.attempts).toBe(2);
+    expect(retried.maxAttempts).toBe(2);
+    expect(retried.lastError).toContain('Missing required field');
+  });
+
+  it('records mailgun failures when dry run is disabled', async () => {
+    process.env.MAILGUN_API_KEY = 'invalid-mailgun-api-key';
+    process.env.MAILGUN_KEY = 'invalid-mailgun-api-key';
+
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'mailgun-failure',
+      maxAttempts: 1,
+      payload: {
+        to: 'user@example.com',
+        subject: 'Mailgun failure test',
+        html: '<p>mailgun should reject this</p>'
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    const job = await waitForJobFailure(graphqlClient, jobId, {
+      minAttempts: 1,
+      timeoutMs: 60000
+    });
+
+    expect(job.attempts).toBe(1);
+    expect(job.maxAttempts).toBe(1);
+    expect(job.lastError).toBeTruthy();
   });
 });
