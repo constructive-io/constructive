@@ -179,12 +179,22 @@ function buildOperationMethod(
   const optionsParam = t.identifier('options');
   optionsParam.optional = true;
   if (selectTypeName) {
+    // Use DeepExact<S, SelectType> to enforce strict field validation
+    // This catches invalid fields even when mixed with valid ones
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsTypeLiteral([
         (() => {
           const prop = t.tsPropertySignature(
             t.identifier('select'),
-            t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S')))
+            t.tsTypeAnnotation(
+              t.tsTypeReference(
+                t.identifier('DeepExact'),
+                t.tsTypeParameterInstantiation([
+                  t.tsTypeReference(t.identifier('S')),
+                  t.tsTypeReference(t.identifier(selectTypeName)),
+                ])
+              )
+            )
           );
           prop.optional = true;
           return prop;
@@ -292,7 +302,7 @@ export function generateCustomQueryOpsFile(
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
   statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult'], true));
+  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
 
   if (allTypeImports.length > 0) {
     statements.push(createImportDeclaration('../input-types', allTypeImports, true));
@@ -346,7 +356,7 @@ export function generateCustomMutationOpsFile(
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
   statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult'], true));
+  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
 
   if (allTypeImports.length > 0) {
     statements.push(createImportDeclaration('../input-types', allTypeImports, true));
