@@ -17,6 +17,18 @@ import {
   type ResolvedConfig,
 } from '../types/config';
 
+/**
+ * Format duration in a human-readable way
+ * - Under 1 second: show milliseconds (e.g., "123ms")
+ * - Over 1 second: show seconds with 2 decimal places (e.g., "1.23s")
+ */
+function formatDuration(ms: number): string {
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`;
+  }
+  return `${(ms / 1000).toFixed(2)}s`;
+}
+
 const program = new Command();
 
 /**
@@ -133,17 +145,19 @@ program
     './generated'
   )
   .action(async (options) => {
+    const startTime = performance.now();
     const result = await initCommand({
       directory: options.directory,
       force: options.force,
       endpoint: options.endpoint,
       output: options.output,
     });
+    const duration = formatDuration(performance.now() - startTime);
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       process.exit(1);
     }
   });
@@ -182,6 +196,8 @@ program
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (options.endpoint && options.schema) {
       console.error(
@@ -226,6 +242,7 @@ program
       verbose: options.verbose,
       dryRun: options.dryRun,
     });
+    const duration = formatDuration(performance.now() - startTime);
 
     const targetResults = result.targets ?? [];
     const hasNamedTargets =
@@ -258,7 +275,7 @@ program
     }
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -268,7 +285,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -317,6 +334,8 @@ program
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (options.endpoint && options.schema) {
       console.error(
@@ -363,6 +382,7 @@ program
       dryRun: options.dryRun,
       skipCustomOperations: options.skipCustomOperations,
     });
+    const duration = formatDuration(performance.now() - startTime);
 
     const targetResults = result.targets ?? [];
     const hasNamedTargets =
@@ -407,7 +427,7 @@ program
     }
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -425,7 +445,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -444,6 +464,8 @@ program
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('--json', 'Output as JSON', false)
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (!options.endpoint && !options.schema) {
       console.error('x Either --endpoint or --schema must be provided.');
@@ -471,11 +493,12 @@ program
 
       const { introspection } = await source.fetch();
       const tables = inferTablesFromIntrospection(introspection);
+      const duration = formatDuration(performance.now() - startTime);
 
       if (options.json) {
         console.log(JSON.stringify(tables, null, 2));
       } else {
-        console.log(`\n[ok] Found ${tables.length} tables:\n`);
+        console.log(`\n[ok] Found ${tables.length} tables (${duration}):\n`);
         tables.forEach((table) => {
           const fieldCount = table.fields.length;
           const relationCount =
@@ -489,9 +512,11 @@ program
         });
       }
     } catch (err) {
+      const duration = formatDuration(performance.now() - startTime);
       console.error(
         'x Failed to introspect schema:',
-        err instanceof Error ? err.message : err
+        err instanceof Error ? err.message : err,
+        `(${duration})`
       );
       process.exit(1);
     }
