@@ -91,5 +91,12 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "strictAuth": false,
     "trustProxy": false,
   },
+  "smtp": {
+    "debug": false,
+    "logger": false,
+    "pool": false,
+    "port": 587,
+    "secure": false,
+  },
 }
 `;
