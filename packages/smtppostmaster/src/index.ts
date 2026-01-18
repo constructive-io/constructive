@@ -1,6 +1,7 @@
 import nodemailer, { SendMailOptions } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { parseEnvBoolean, parseEnvNumber } from '@pgpmjs/env';
+import { getEnvOptions } from '@pgpmjs/env';
+import { SmtpOptions } from '@pgpmjs/types';
 
 type SendInput = {
   to: string | string[];
@@ -23,49 +24,22 @@ type TransportConfig = SMTPTransport.Options & {
   maxMessages?: number;
 };
 
-const parseNumberFromEnv = (name: string) => {
-  const raw = process.env[name];
-  if (raw === undefined || raw === '') {
-    return undefined;
-  }
+const buildTransportOptions = (smtpOpts: SmtpOptions): TransportConfig => {
+  const { host, port, secure, user, pass, requireTLS, tlsRejectUnauthorized, pool, maxConnections, maxMessages, name, logger, debug } = smtpOpts;
 
-  const parsed = parseEnvNumber(raw);
-  if (parsed === undefined) {
-    throw new Error(`${name} must be a number`);
-  }
-
-  return parsed;
-};
-
-const buildTransportOptions = (): TransportConfig => {
-  const host = process.env.SMTP_HOST;
   if (!host) {
     throw new Error('Missing SMTP_HOST');
   }
 
-  const portFromEnv = parseNumberFromEnv('SMTP_PORT');
-  const secureFromEnv = parseEnvBoolean(process.env.SMTP_SECURE);
+  const resolvedPort = port ?? (secure ? 465 : 587);
+  const resolvedSecure = secure ?? resolvedPort === 465;
 
-  const resolvedPort = portFromEnv ?? (secureFromEnv ? 465 : 587);
-  const resolvedSecure = secureFromEnv ?? resolvedPort === 465;
-
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
   const auth = user
     ? {
         user,
         pass: pass ?? ''
       }
     : undefined;
-
-  const requireTLS = parseEnvBoolean(process.env.SMTP_REQUIRE_TLS);
-  const tlsRejectUnauthorized = parseEnvBoolean(process.env.SMTP_TLS_REJECT_UNAUTHORIZED);
-  const pool = parseEnvBoolean(process.env.SMTP_POOL);
-  const maxConnections = parseNumberFromEnv('SMTP_MAX_CONNECTIONS');
-  const maxMessages = parseNumberFromEnv('SMTP_MAX_MESSAGES');
-  const name = process.env.SMTP_NAME;
-  const logger = parseEnvBoolean(process.env.SMTP_LOGGER);
-  const debug = parseEnvBoolean(process.env.SMTP_DEBUG);
 
   const options: TransportConfig = {
     host,
@@ -115,24 +89,29 @@ const buildTransportOptions = (): TransportConfig => {
 };
 
 let transport: nodemailer.Transporter<SMTPTransport.SentMessageInfo> | undefined;
+let cachedSmtpOpts: SmtpOptions | undefined;
 
-const getTransport = () => {
-  if (!transport) {
-    transport = nodemailer.createTransport(buildTransportOptions());
+const getTransport = (overrides?: SmtpOptions) => {
+  const opts = getEnvOptions({ smtp: overrides });
+  const smtpOpts = opts.smtp ?? {};
+
+  if (!transport || overrides) {
+    transport = nodemailer.createTransport(buildTransportOptions(smtpOpts));
+    cachedSmtpOpts = smtpOpts;
   }
 
-  return transport;
+  return { transport, smtpOpts: cachedSmtpOpts ?? smtpOpts };
 };
 
-const resolveFrom = (from?: string) => {
-  const resolved = from ?? process.env.SMTP_FROM;
+const resolveFrom = (from: string | undefined, smtpOpts: SmtpOptions) => {
+  const resolved = from ?? smtpOpts.from;
   if (!resolved) {
     throw new Error('Missing from address. Set SMTP_FROM or pass from in send().');
   }
   return resolved;
 };
 
-export const send = async (options: SendInput) => {
+export const send = async (options: SendInput, smtpOverrides?: SmtpOptions) => {
   if (!options.to) {
     throw new Error('Missing "to"');
   }
@@ -145,20 +124,27 @@ export const send = async (options: SendInput) => {
     throw new Error('Missing "html" or "text"');
   }
 
+  const { transport: mailer, smtpOpts } = getTransport(smtpOverrides);
+
   const mailOptions: SendMailOptions = {
     to: options.to,
     subject: options.subject,
     html: options.html,
     text: options.text,
-    from: resolveFrom(options.from),
+    from: resolveFrom(options.from, smtpOpts),
     cc: options.cc,
     bcc: options.bcc,
-    replyTo: options.replyTo ?? process.env.SMTP_REPLY_TO,
+    replyTo: options.replyTo ?? smtpOpts.replyTo,
     headers: options.headers,
     attachments: options.attachments
   };
 
-  return getTransport().sendMail(mailOptions);
+  return mailer.sendMail(mailOptions);
+};
+
+export const resetTransport = () => {
+  transport = undefined;
+  cachedSmtpOpts = undefined;
 };
 
 export type { SendInput as SendOptions };

@@ -2,6 +2,8 @@
 
 SMTP-based email sender for Constructive services. This package exposes a `send` helper with the same call shape used by `@launchql/postmaster` (e.g. `{ to, subject, html, text }`).
 
+Configuration is managed through the centralized `@pgpmjs/env` system, which merges defaults, config files, environment variables, and runtime overrides.
+
 ## Install
 
 ```bash
@@ -18,6 +20,40 @@ await send({
   subject: 'Welcome',
   html: '<p>Hello from SMTP</p>'
 });
+```
+
+### Programmatic overrides
+
+You can pass SMTP configuration overrides as a second argument to `send()`:
+
+```ts
+import { send } from '@constructive-io/smtppostmaster';
+
+await send(
+  {
+    to: 'user@example.com',
+    subject: 'Welcome',
+    html: '<p>Hello from SMTP</p>'
+  },
+  {
+    host: 'smtp.example.com',
+    port: 587,
+    secure: false,
+    user: 'myuser',
+    pass: 'mypassword',
+    from: 'no-reply@example.com'
+  }
+);
+```
+
+### Resetting the transport
+
+If you need to reset the cached SMTP transport (e.g., in tests), use `resetTransport()`:
+
+```ts
+import { resetTransport } from '@constructive-io/smtppostmaster';
+
+resetTransport();
 ```
 
 ## Environment variables

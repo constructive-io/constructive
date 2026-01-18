@@ -1,28 +1,35 @@
-import { parseEnvBoolean } from '@pgpmjs/env';
+import { getEnvOptions } from '@pgpmjs/env';
+import { SmtpOptions } from '@pgpmjs/types';
 import { send } from '../src/index';
 import { createSmtpCatcher } from './smtp-catcher';
+
+const parseEnvBoolean = (val?: string): boolean | undefined => {
+  if (val === undefined) return undefined;
+  return ['true', '1', 'yes'].includes(val.toLowerCase());
+};
 
 const main = async () => {
   const useCatcher = parseEnvBoolean(process.env.SMTP_TEST_USE_CATCHER) ?? false;
   const catcher = useCatcher ? await createSmtpCatcher() : null;
 
-  if (catcher) {
-    process.env.SMTP_HOST = catcher.host;
-    process.env.SMTP_PORT = String(catcher.port);
-    process.env.SMTP_SECURE = 'false';
-    process.env.SMTP_TLS_REJECT_UNAUTHORIZED = 'false';
+  const envOpts = getEnvOptions();
+  const smtpFromEnv = envOpts.smtp ?? {};
 
-    if (!process.env.SMTP_FROM && !process.env.SMTP_TEST_FROM) {
-      process.env.SMTP_FROM = 'no-reply@example.com';
-    }
-  }
+  const smtpOverrides: SmtpOptions = catcher
+    ? {
+        host: catcher.host,
+        port: catcher.port,
+        secure: false,
+        tlsRejectUnauthorized: false,
+        from: smtpFromEnv.from ?? process.env.SMTP_TEST_FROM ?? 'no-reply@example.com'
+      }
+    : {};
 
   const to =
     process.env.SMTP_TEST_TO ??
-    process.env.SMTP_TO ??
-    (catcher ? 'test-recipient@example.com' : undefined);
+    (catcher ? 'test-recipient@example.com' : smtpFromEnv.from);
   if (!to) {
-    throw new Error('Missing SMTP_TEST_TO (or SMTP_TO)');
+    throw new Error('Missing SMTP_TEST_TO');
   }
 
   const subject = process.env.SMTP_TEST_SUBJECT ?? 'SMTP postmaster test email';
@@ -37,13 +44,16 @@ const main = async () => {
   const start = Date.now();
 
   try {
-    const info = await send({
-      to,
-      subject,
-      html,
-      text,
-      ...(from ? { from } : {})
-    });
+    const info = await send(
+      {
+        to,
+        subject,
+        html,
+        text,
+        ...(from ? { from } : {})
+      },
+      smtpOverrides
+    );
 
     if (catcher) {
       const message = await catcher.waitForMessage(5000);
