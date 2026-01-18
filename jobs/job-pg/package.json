@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@constructive-io/job-utils": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
     "pg": "8.16.3"
   }
 }

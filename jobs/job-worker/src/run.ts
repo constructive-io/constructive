@@ -1,4 +1,7 @@
 import Worker, { WorkerContext, JobRow } from './index';
+import { createLogger } from '@pgpmjs/logger';
+
+const logger = createLogger('job-worker-run');
 
 const worker = new Worker({
   tasks: {
@@ -6,9 +9,9 @@ const worker = new Worker({
       { pgPool, workerId }: WorkerContext,
       job: JobRow
     ) => {
-      console.log('hello');
+      logger.info('hello');
       await pgPool.query('select 1');
-      console.log(JSON.stringify(job, null, 2));
+      logger.info(JSON.stringify(job, null, 2));
     }
   }
 });

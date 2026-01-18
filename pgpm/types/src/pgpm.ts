@@ -130,6 +130,42 @@ export interface CDNOptions {
 }
 
 /**
+ * SMTP email configuration options
+ */
+export interface SmtpOptions {
+    /** SMTP server hostname */
+    host?: string;
+    /** SMTP server port (defaults to 587 for non-secure, 465 for secure) */
+    port?: number;
+    /** Use TLS/SSL connection (defaults based on port: true for 465, false otherwise) */
+    secure?: boolean;
+    /** SMTP authentication username */
+    user?: string;
+    /** SMTP authentication password */
+    pass?: string;
+    /** Default sender email address */
+    from?: string;
+    /** Default reply-to email address */
+    replyTo?: string;
+    /** Require TLS upgrade via STARTTLS */
+    requireTLS?: boolean;
+    /** Reject unauthorized TLS certificates */
+    tlsRejectUnauthorized?: boolean;
+    /** Use connection pooling for multiple emails */
+    pool?: boolean;
+    /** Maximum number of pooled connections */
+    maxConnections?: number;
+    /** Maximum messages per connection before reconnecting */
+    maxMessages?: number;
+    /** SMTP client hostname for EHLO/HELO */
+    name?: string;
+    /** Enable nodemailer logging */
+    logger?: boolean;
+    /** Enable nodemailer debug output */
+    debug?: boolean;
+}
+
+/**
  * Code generation settings
  */
 export interface CodegenOptions {
@@ -219,6 +255,8 @@ export interface PgpmOptions {
     jobs?: JobsConfig;
     /** Error output formatting options */
     errorOutput?: ErrorOutputOptions;
+    /** SMTP email configuration */
+    smtp?: SmtpOptions;
 }
 
 /**
@@ -307,6 +345,13 @@ export const pgpmDefaults: PgpmOptions = {
     queryHistoryLimit: 30,
     maxLength: 10000,
     verbose: false
+  },
+  smtp: {
+    port: 587,
+    secure: false,
+    pool: false,
+    logger: false,
+    debug: false
   }
 };
 
