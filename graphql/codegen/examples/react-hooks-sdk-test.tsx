@@ -40,15 +40,26 @@ import { useSignOutMutation } from './output/generated-sdk/mutations/useSignOutM
 import { useSignUpMutation } from './output/generated-sdk/mutations/useSignUpMutation';
 
 // Import types
-import type { UserFilter, DatabaseFilter, TableFilter } from './output/generated-sdk/schema-types';
+import type {
+  UserFilter,
+  DatabaseFilter,
+  TableFilter,
+} from './output/generated-sdk/schema-types';
 import type { User, Database, Table } from './output/generated-sdk/types';
 
 // Import client configuration
 import { configure } from './output/generated-sdk/client';
 
 // Import query/mutation keys for cache invalidation
-import { queryKeys, userKeys, customQueryKeys } from './output/generated-sdk/query-keys';
-import { mutationKeys, customMutationKeys } from './output/generated-sdk/mutation-keys';
+import {
+  queryKeys,
+  userKeys,
+  customQueryKeys,
+} from './output/generated-sdk/query-keys';
+import {
+  mutationKeys,
+  customMutationKeys,
+} from './output/generated-sdk/mutation-keys';
 import { invalidate } from './output/generated-sdk/invalidation';
 
 const queryClient = new QueryClient();
@@ -72,8 +83,10 @@ function UsersListComponent() {
   const users: User[] | undefined = data?.users?.nodes;
   const totalCount: number | undefined = data?.users?.totalCount;
   const hasNextPage: boolean | undefined = data?.users?.pageInfo.hasNextPage;
-  const hasPreviousPage: boolean | undefined = data?.users?.pageInfo.hasPreviousPage;
-  const startCursor: string | null | undefined = data?.users?.pageInfo.startCursor;
+  const hasPreviousPage: boolean | undefined =
+    data?.users?.pageInfo.hasPreviousPage;
+  const startCursor: string | null | undefined =
+    data?.users?.pageInfo.startCursor;
   const endCursor: string | null | undefined = data?.users?.pageInfo.endCursor;
 
   if (isLoading) return <div>Loading...</div>;

@@ -2,10 +2,7 @@
  * ORM SDK Example - Prisma-like API for GraphQL
  * Run: pnpm exec tsx examples/orm-sdk.ts
  */
-import {
-  createClient,
-  GraphQLRequestError,
-} from './output/generated-orm';
+import { createClient, GraphQLRequestError } from './output/generated-orm';
 
 const ENDPOINT = 'http://api.localhost:3000/graphql';
 let db = createClient({ endpoint: ENDPOINT });
@@ -23,7 +20,14 @@ async function main() {
   const signInResult = await db.mutation
     .signIn(
       { input: { email: 'admin@gmail.com', password: 'password1111!@#$' } },
-      { select: { apiToken: { select: { accessToken: true } } } }
+      { select: { apiToken: { select: {
+        accessToken: true,
+        accessTokenExpiresAt: true,
+        id: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+      }}}}
     )
     .execute();
 
@@ -70,7 +74,7 @@ async function main() {
   const stringFilters = await db.user
     .findMany({
       select: { id: true, username: true },
-      first: 5,
+      first: 10,
       where: { username: { includesInsensitive: 'seed' } },
     })
     .execute();

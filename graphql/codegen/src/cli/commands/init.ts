@@ -27,6 +27,15 @@ export default defineConfig({
   // Output directory for generated files
   output: '{{OUTPUT}}',
 
+  // Optional: Multi-target config (use instead of endpoint/output)
+  // defaults: {
+  //   headers: { Authorization: 'Bearer YOUR_TOKEN' },
+  // },
+  // targets: {
+  //   public: { endpoint: 'https://api.example.com/graphql', output: './generated/public' },
+  //   admin: { schema: './admin.schema.graphql', output: './generated/admin' },
+  // },
+
   // Optional: Tables to include/exclude (supports glob patterns)
   // tables: {
   //   include: ['*'],
@@ -57,8 +66,15 @@ export interface InitResult {
 /**
  * Execute the init command
  */
-export async function initCommand(options: InitOptions = {}): Promise<InitResult> {
-  const { directory = process.cwd(), force = false, endpoint = '', output = './generated' } = options;
+export async function initCommand(
+  options: InitOptions = {}
+): Promise<InitResult> {
+  const {
+    directory = process.cwd(),
+    force = false,
+    endpoint = '',
+    output = './generated',
+  } = options;
 
   const configPath = path.join(directory, CONFIG_FILENAME);
 
@@ -71,9 +87,10 @@ export async function initCommand(options: InitOptions = {}): Promise<InitResult
   }
 
   // Generate config content
-  const content = CONFIG_TEMPLATE
-    .replace('{{ENDPOINT}}', endpoint || 'http://localhost:5000/graphql')
-    .replace('{{OUTPUT}}', output);
+  const content = CONFIG_TEMPLATE.replace(
+    '{{ENDPOINT}}',
+    endpoint || 'http://localhost:5000/graphql'
+  ).replace('{{OUTPUT}}', output);
 
   try {
     // Ensure directory exists
@@ -99,7 +116,9 @@ export async function initCommand(options: InitOptions = {}): Promise<InitResult
 /**
  * Find the nearest config file by walking up directories
  */
-export function findConfigFile(startDir: string = process.cwd()): string | null {
+export function findConfigFile(
+  startDir: string = process.cwd()
+): string | null {
   let currentDir = startDir;
 
   while (true) {
@@ -119,7 +138,7 @@ export function findConfigFile(startDir: string = process.cwd()): string | null 
 
 /**
  * Load and validate a config file
- * 
+ *
  * Uses jiti to support TypeScript config files (.ts) in addition to
  * JavaScript (.js, .mjs, .cjs) without requiring the user to have
  * tsx or ts-node installed.
@@ -130,10 +149,12 @@ export async function loadConfigFile(configPath: string): Promise<{
   config?: any;
   error?: string;
 }> {
-  if (!fs.existsSync(configPath)) {
+  const resolvedPath = path.resolve(configPath);
+
+  if (!fs.existsSync(resolvedPath)) {
     return {
       success: false,
-      error: `Config file not found: ${configPath}`,
+      error: `Config file not found: ${resolvedPath}`,
     };
   }
 
@@ -146,7 +167,7 @@ export async function loadConfigFile(configPath: string): Promise<{
     });
 
     // jiti.import() with { default: true } returns mod?.default ?? mod
-    const config = await jiti.import(configPath, { default: true });
+    const config = await jiti.import(resolvedPath, { default: true });
 
     if (!config || typeof config !== 'object') {
       return {
@@ -155,11 +176,25 @@ export async function loadConfigFile(configPath: string): Promise<{
       };
     }
 
-    if (!('endpoint' in config)) {
+    const hasEndpoint = 'endpoint' in config;
+    const hasSchema = 'schema' in config;
+    const hasTargets = 'targets' in config;
+
+    if (!hasEndpoint && !hasSchema && !hasTargets) {
       return {
         success: false,
-        error: 'Config file missing required "endpoint" property',
+        error: 'Config file must define "endpoint", "schema", or "targets".',
       };
+    }
+
+    if (hasTargets) {
+      const targets = config.targets as unknown;
+      if (!targets || typeof targets !== 'object' || Array.isArray(targets)) {
+        return {
+          success: false,
+          error: 'Config file "targets" must be an object of named configs.',
+        };
+      }
     }
 
     return {

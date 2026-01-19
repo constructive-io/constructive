@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@2.6.0...@constructive-io/graphql-query@2.7.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+# [2.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@2.5.1...@constructive-io/graphql-query@2.6.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
 ## [2.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@2.5.0...@constructive-io/graphql-query@2.5.1) (2026-01-07)
 
 ### Bug Fixes

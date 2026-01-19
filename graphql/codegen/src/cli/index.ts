@@ -9,10 +9,25 @@ import { generateCommand } from './commands/generate';
 import { generateOrmCommand } from './commands/generate-orm';
 import { startWatch } from './watch';
 import {
+  isMultiConfig,
+  mergeConfig,
   resolveConfig,
   type GraphQLSDKConfig,
+  type GraphQLSDKConfigTarget,
   type ResolvedConfig,
 } from '../types/config';
+
+/**
+ * Format duration in a human-readable way
+ * - Under 1 second: show milliseconds (e.g., "123ms")
+ * - Over 1 second: show seconds with 2 decimal places (e.g., "1.23s")
+ */
+function formatDuration(ms: number): string {
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`;
+  }
+  return `${(ms / 1000).toFixed(2)}s`;
+}
 
 const program = new Command();
 
@@ -21,7 +36,9 @@ const program = new Command();
  */
 async function loadWatchConfig(options: {
   config?: string;
+  target?: string;
   endpoint?: string;
+  output?: string;
   pollInterval?: number;
   debounce?: number;
   touch?: string;
@@ -33,7 +50,7 @@ async function loadWatchConfig(options: {
     configPath = findConfigFile() ?? undefined;
   }
 
-  let baseConfig: Partial<GraphQLSDKConfig> = {};
+  let baseConfig: GraphQLSDKConfig = {};
 
   if (configPath) {
     const loadResult = await loadConfigFile(configPath);
@@ -44,23 +61,31 @@ async function loadWatchConfig(options: {
     baseConfig = loadResult.config;
   }
 
-  // Merge CLI options with config
-  const mergedConfig: GraphQLSDKConfig = {
-    endpoint: options.endpoint || baseConfig.endpoint || '',
-    output: baseConfig.output,
-    headers: baseConfig.headers,
-    tables: baseConfig.tables,
-    queries: baseConfig.queries,
-    mutations: baseConfig.mutations,
-    excludeFields: baseConfig.excludeFields,
-    hooks: baseConfig.hooks,
-    postgraphile: baseConfig.postgraphile,
-    codegen: baseConfig.codegen,
-    orm: baseConfig.orm,
-    reactQuery: baseConfig.reactQuery,
+  if (isMultiConfig(baseConfig)) {
+    if (!options.target) {
+      console.error(
+        'x Watch mode requires --target when using multiple targets.'
+      );
+      return null;
+    }
+
+    if (!baseConfig.targets[options.target]) {
+      console.error(`x Target "${options.target}" not found in config file.`);
+      return null;
+    }
+  } else if (options.target) {
+    console.error('x Config file does not define targets. Remove --target.');
+    return null;
+  }
+
+  const sourceOverrides: GraphQLSDKConfigTarget = {};
+  if (options.endpoint) {
+    sourceOverrides.endpoint = options.endpoint;
+    sourceOverrides.schema = undefined;
+  }
+
+  const watchOverrides: GraphQLSDKConfigTarget = {
     watch: {
-      ...baseConfig.watch,
-      // CLI options override config
       ...(options.pollInterval !== undefined && {
         pollInterval: options.pollInterval,
       }),
@@ -70,14 +95,34 @@ async function loadWatchConfig(options: {
     },
   };
 
-  if (!mergedConfig.endpoint) {
+  let mergedTarget: GraphQLSDKConfigTarget;
+
+  if (isMultiConfig(baseConfig)) {
+    const defaults = baseConfig.defaults ?? {};
+    const targetConfig = baseConfig.targets[options.target!];
+    mergedTarget = mergeConfig(defaults, targetConfig);
+  } else {
+    mergedTarget = baseConfig;
+  }
+
+  mergedTarget = mergeConfig(mergedTarget, sourceOverrides);
+  mergedTarget = mergeConfig(mergedTarget, watchOverrides);
+
+  if (!mergedTarget.endpoint) {
     console.error(
-      'x No endpoint specified. Use --endpoint or create a config file with "graphql-codegen init".'
+      'x No endpoint specified. Watch mode only supports live endpoints.'
     );
     return null;
   }
 
-  return resolveConfig(mergedConfig);
+  if (mergedTarget.schema) {
+    console.error(
+      'x Watch mode is only supported with an endpoint, not schema.'
+    );
+    return null;
+  }
+
+  return resolveConfig(mergedTarget);
 }
 
 program
@@ -100,17 +145,19 @@ program
     './generated'
   )
   .action(async (options) => {
+    const startTime = performance.now();
     const result = await initCommand({
       directory: options.directory,
       force: options.force,
       endpoint: options.endpoint,
       output: options.output,
     });
+    const duration = formatDuration(performance.now() - startTime);
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       process.exit(1);
     }
   });
@@ -120,6 +167,7 @@ program
   .command('generate')
   .description('Generate SDK from GraphQL endpoint or schema file')
   .option('-c, --config <path>', 'Path to config file')
+  .option('-t, --target <name>', 'Target name in config file')
   .option('-e, --endpoint <url>', 'GraphQL endpoint URL (overrides config)')
   .option('-s, --schema <path>', 'Path to GraphQL schema file (.graphql)')
   .option('-o, --output <dir>', 'Output directory (overrides config)')
@@ -148,6 +196,8 @@ program
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (options.endpoint && options.schema) {
       console.error(
@@ -174,6 +224,8 @@ program
         generatorType: 'generate',
         verbose: options.verbose,
         authorization: options.authorization,
+        configPath: options.config,
+        target: options.target,
         outputDir: options.output,
       });
       return;
@@ -182,6 +234,7 @@ program
     // Normal one-shot generation
     const result = await generateCommand({
       config: options.config,
+      target: options.target,
       endpoint: options.endpoint,
       schema: options.schema,
       output: options.output,
@@ -189,9 +242,40 @@ program
       verbose: options.verbose,
       dryRun: options.dryRun,
     });
+    const duration = formatDuration(performance.now() - startTime);
+
+    const targetResults = result.targets ?? [];
+    const hasNamedTargets =
+      targetResults.length > 0 &&
+      (targetResults.length > 1 || targetResults[0]?.name !== 'default');
+
+    if (hasNamedTargets) {
+      console.log(result.success ? '[ok]' : 'x', result.message);
+      targetResults.forEach((target) => {
+        const status = target.success ? '[ok]' : 'x';
+        console.log(`\n${status} ${target.message}`);
+
+        if (target.tables && target.tables.length > 0) {
+          console.log('  Tables:');
+          target.tables.forEach((table) => console.log(`    - ${table}`));
+        }
+        if (target.filesWritten && target.filesWritten.length > 0) {
+          console.log('  Files written:');
+          target.filesWritten.forEach((file) => console.log(`    - ${file}`));
+        }
+        if (!target.success && target.errors) {
+          target.errors.forEach((error) => console.error(`  - ${error}`));
+        }
+      });
+
+      if (!result.success) {
+        process.exit(1);
+      }
+      return;
+    }
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -201,7 +285,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -216,13 +300,10 @@ program
     'Generate Prisma-like ORM client from GraphQL endpoint or schema file'
   )
   .option('-c, --config <path>', 'Path to config file')
+  .option('-t, --target <name>', 'Target name in config file')
   .option('-e, --endpoint <url>', 'GraphQL endpoint URL (overrides config)')
   .option('-s, --schema <path>', 'Path to GraphQL schema file (.graphql)')
-  .option(
-    '-o, --output <dir>',
-    'Output directory (overrides config)',
-    './generated/orm'
-  )
+  .option('-o, --output <dir>', 'Output directory (overrides config)')
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('-v, --verbose', 'Verbose output', false)
   .option(
@@ -253,6 +334,8 @@ program
   .option('--touch <file>', 'File to touch on schema change')
   .option('--no-clear', 'Do not clear terminal on regeneration')
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (options.endpoint && options.schema) {
       console.error(
@@ -279,6 +362,8 @@ program
         generatorType: 'generate-orm',
         verbose: options.verbose,
         authorization: options.authorization,
+        configPath: options.config,
+        target: options.target,
         outputDir: options.output,
         skipCustomOperations: options.skipCustomOperations,
       });
@@ -288,6 +373,7 @@ program
     // Normal one-shot generation
     const result = await generateOrmCommand({
       config: options.config,
+      target: options.target,
       endpoint: options.endpoint,
       schema: options.schema,
       output: options.output,
@@ -296,9 +382,52 @@ program
       dryRun: options.dryRun,
       skipCustomOperations: options.skipCustomOperations,
     });
+    const duration = formatDuration(performance.now() - startTime);
+
+    const targetResults = result.targets ?? [];
+    const hasNamedTargets =
+      targetResults.length > 0 &&
+      (targetResults.length > 1 || targetResults[0]?.name !== 'default');
+
+    if (hasNamedTargets) {
+      console.log(result.success ? '[ok]' : 'x', result.message);
+      targetResults.forEach((target) => {
+        const status = target.success ? '[ok]' : 'x';
+        console.log(`\n${status} ${target.message}`);
+
+        if (target.tables && target.tables.length > 0) {
+          console.log('  Tables:');
+          target.tables.forEach((table) => console.log(`    - ${table}`));
+        }
+        if (target.customQueries && target.customQueries.length > 0) {
+          console.log('  Custom Queries:');
+          target.customQueries.forEach((query) =>
+            console.log(`    - ${query}`)
+          );
+        }
+        if (target.customMutations && target.customMutations.length > 0) {
+          console.log('  Custom Mutations:');
+          target.customMutations.forEach((mutation) =>
+            console.log(`    - ${mutation}`)
+          );
+        }
+        if (target.filesWritten && target.filesWritten.length > 0) {
+          console.log('  Files written:');
+          target.filesWritten.forEach((file) => console.log(`    - ${file}`));
+        }
+        if (!target.success && target.errors) {
+          target.errors.forEach((error) => console.error(`  - ${error}`));
+        }
+      });
+
+      if (!result.success) {
+        process.exit(1);
+      }
+      return;
+    }
 
     if (result.success) {
-      console.log('[ok]', result.message);
+      console.log('[ok]', result.message, `(${duration})`);
       if (result.tables && result.tables.length > 0) {
         console.log('\nTables:');
         result.tables.forEach((t) => console.log(`  - ${t}`));
@@ -316,7 +445,7 @@ program
         result.filesWritten.forEach((f) => console.log(`  - ${f}`));
       }
     } else {
-      console.error('x', result.message);
+      console.error('x', result.message, `(${duration})`);
       if (result.errors) {
         result.errors.forEach((e) => console.error('  -', e));
       }
@@ -335,6 +464,8 @@ program
   .option('-a, --authorization <header>', 'Authorization header value')
   .option('--json', 'Output as JSON', false)
   .action(async (options) => {
+    const startTime = performance.now();
+
     // Validate source options
     if (!options.endpoint && !options.schema) {
       console.error('x Either --endpoint or --schema must be provided.');
@@ -362,11 +493,12 @@ program
 
       const { introspection } = await source.fetch();
       const tables = inferTablesFromIntrospection(introspection);
+      const duration = formatDuration(performance.now() - startTime);
 
       if (options.json) {
         console.log(JSON.stringify(tables, null, 2));
       } else {
-        console.log(`\n[ok] Found ${tables.length} tables:\n`);
+        console.log(`\n[ok] Found ${tables.length} tables (${duration}):\n`);
         tables.forEach((table) => {
           const fieldCount = table.fields.length;
           const relationCount =
@@ -380,9 +512,11 @@ program
         });
       }
     } catch (err) {
+      const duration = formatDuration(performance.now() - startTime);
       console.error(
         'x Failed to introspect schema:',
-        err instanceof Error ? err.message : err
+        err instanceof Error ? err.message : err,
+        `(${duration})`
       );
       process.exit(1);
     }

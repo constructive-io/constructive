@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.24.1",
+  "version": "2.27.1",
   "description": "CLI-based GraphQL SDK generator for PostGraphile endpoints with React Query hooks",
   "keywords": [
     "graphql",
@@ -39,14 +39,17 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "example:codegen:sdk": "node dist/cli/index.js generate --endpoint http://api.localhost:3000/graphql --output examples/output/generated-sdk",
-    "example:codegen:orm": "node dist/cli/index.js generate-orm --endpoint http://api.localhost:3000/graphql --output examples/output/generated-orm",
+    "example:codegen:sdk": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts",
+    "example:codegen:orm": "tsx src/cli/index.ts generate-orm --config examples/multi-target.config.ts",
     "example:codegen:sdk:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-sdk-schema",
     "example:codegen:orm:schema": "node dist/cli/index.js generate-orm --schema examples/example.schema.graphql --output examples/output/generated-orm-schema",
-    "example:sdk": "tsx examples/react-query-sdk.ts",
-    "example:orm": "tsx examples/orm-sdk.ts"
+    "example:sdk": "tsx examples/react-hooks-sdk-test.tsx",
+    "example:orm": "tsx examples/orm-sdk-test.ts",
+    "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
   },
   "dependencies": {
     "@babel/generator": "^7.28.5",
@@ -57,7 +60,7 @@
     "graphql": "15.10.1",
     "inflekt": "^0.2.0",
     "jiti": "^2.6.1",
-    "prettier": "^3.7.4"
+    "oxfmt": "^0.13.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",

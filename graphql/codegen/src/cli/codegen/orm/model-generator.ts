@@ -123,7 +123,7 @@ export function generateModelFile(
   ]));
   statements.push(createImportDeclaration('../select-types', [
     'ConnectionResult', 'FindManyArgs', 'FindFirstArgs', 'CreateArgs',
-    'UpdateArgs', 'DeleteArgs', 'InferSelectResult',
+    'UpdateArgs', 'DeleteArgs', 'InferSelectResult', 'DeepExact',
   ], true));
   statements.push(createImportDeclaration('../input-types', [
     typeName, relationTypeName, selectTypeName, whereTypeName, orderByTypeName,
@@ -140,11 +140,15 @@ export function generateModelFile(
   classBody.push(t.classMethod('constructor', t.identifier('constructor'), [paramProp], t.blockStatement([])));
 
   // findMany method
+  // Use DeepExact<S, SelectType> to enforce strict field validation
   const findManyParam = t.identifier('args');
   findManyParam.optional = true;
   findManyParam.typeAnnotation = t.tsTypeAnnotation(
     t.tsTypeReference(t.identifier('FindManyArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier('S')),
+        t.tsTypeReference(t.identifier(selectTypeName)),
+      ])),
       t.tsTypeReference(t.identifier(whereTypeName)),
       t.tsTypeReference(t.identifier(orderByTypeName)),
     ]))
@@ -190,7 +194,10 @@ export function generateModelFile(
   findFirstParam.optional = true;
   findFirstParam.typeAnnotation = t.tsTypeAnnotation(
     t.tsTypeReference(t.identifier('FindFirstArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier('S')),
+        t.tsTypeReference(t.identifier(selectTypeName)),
+      ])),
       t.tsTypeReference(t.identifier(whereTypeName)),
     ]))
   );
@@ -226,7 +233,10 @@ export function generateModelFile(
   const createParam = t.identifier('args');
   createParam.typeAnnotation = t.tsTypeAnnotation(
     t.tsTypeReference(t.identifier('CreateArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
+        t.tsTypeReference(t.identifier('S')),
+        t.tsTypeReference(t.identifier(selectTypeName)),
+      ])),
       t.tsIndexedAccessType(t.tsTypeReference(t.identifier(createInputTypeName)), t.tsLiteralType(t.stringLiteral(singularName))),
     ]))
   );
@@ -262,7 +272,10 @@ export function generateModelFile(
     const updateParam = t.identifier('args');
     updateParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsTypeReference(t.identifier('UpdateArgs'), t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier('S')),
+        t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
+          t.tsTypeReference(t.identifier('S')),
+          t.tsTypeReference(t.identifier(selectTypeName)),
+        ])),
         t.tsTypeLiteral([t.tsPropertySignature(t.identifier('id'), t.tsTypeAnnotation(t.tsStringKeyword()))]),
         t.tsTypeReference(t.identifier(patchTypeName)),
       ]))

@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
-
 import { Pool, PoolConfig } from 'pg';
 import { getJobPgConfig } from '@constructive-io/job-utils';
+import { createLogger } from '@pgpmjs/logger';
 
 // k8s only does SIGINT
 // other events are bad for babel-watch
@@ -33,6 +32,8 @@ function once<T extends (...args: unknown[]) => unknown>(
 
 const pgPoolConfig: PoolConfig = getJobPgConfig() as PoolConfig;
 
+const logger = createLogger('job-pg');
+
 const end = (pool: Pool): void => {
   try {
     // Pool has internal state flags, but they are not part of the public type
@@ -41,13 +42,13 @@ const end = (pool: Pool): void => {
       ending?: boolean;
     };
     if (state.ended || state.ending) {
-      console.error(
+      logger.error(
         'DO NOT CLOSE pool, why are you trying to call end() when already ended?'
       );
       return;
     }
     void pool.end();
-    console.log('successfully closed pool.');
+    logger.info('successfully closed pool.');
   } catch (e) {
     process.stderr.write(String(e));
   }
@@ -68,7 +69,7 @@ class PoolManager {
     this._closed = false;
 
     const closeOnce = once(async () => {
-      console.log('closing pg pool manager...');
+      logger.info('closing pg pool manager...');
       await this.close();
     }, this);
 
@@ -89,7 +90,7 @@ class PoolManager {
     if (this._closed) return;
 
     for (const [fn, context, args] of this.callbacks) {
-      console.log('closing fn', fn.name);
+      logger.info('closing fn', fn.name);
       await fn.apply(context, args);
     }
 

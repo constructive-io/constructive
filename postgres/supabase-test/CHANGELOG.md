@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/constructive-io/constructive/compare/supabase-test@0.6.16...supabase-test@0.7.0) (2026-01-18)
+
+**Note:** Version bump only for package supabase-test
+
+## [0.6.16](https://github.com/constructive-io/constructive/compare/supabase-test@0.6.15...supabase-test@0.6.16) (2026-01-18)
+
+**Note:** Version bump only for package supabase-test
+
 ## [0.6.15](https://github.com/constructive-io/constructive/compare/supabase-test@0.6.14...supabase-test@0.6.15) (2026-01-14)
 
 **Note:** Version bump only for package supabase-test

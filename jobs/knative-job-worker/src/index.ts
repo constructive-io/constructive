@@ -21,6 +21,9 @@ export default class Worker {
   doNextTimer?: NodeJS.Timeout;
   pgPool: Pool;
   _initialized?: boolean;
+  listenClient?: PoolClient;
+  listenRelease?: () => void;
+  stopped?: boolean;
 
   constructor({
     tasks,
@@ -118,6 +121,7 @@ export default class Worker {
     });
   }
   async doNext(client: PgClientLike): Promise<void> {
+    if (this.stopped) return;
     if (!this._initialized) {
       return await this.initialize(client);
     }
@@ -136,10 +140,12 @@ export default class Worker {
       })) as JobRow | undefined;
 
       if (!job || !job.id) {
-        this.doNextTimer = setTimeout(
-          () => this.doNext(client),
-          this.idleDelay
-        );
+        if (!this.stopped) {
+          this.doNextTimer = setTimeout(
+            () => this.doNext(client),
+            this.idleDelay
+          );
+        }
         return;
       }
       const start = process.hrtime();
@@ -164,12 +170,21 @@ export default class Worker {
       } catch (fatalError: unknown) {
         await this.handleFatalError(client, { err, fatalError, jobId });
       }
-      return this.doNext(client);
+      if (!this.stopped) {
+        return this.doNext(client);
+      }
+      return;
     } catch (err: unknown) {
-      this.doNextTimer = setTimeout(() => this.doNext(client), this.idleDelay);
+      if (!this.stopped) {
+        this.doNextTimer = setTimeout(
+          () => this.doNext(client),
+          this.idleDelay
+        );
+      }
     }
   }
   listen() {
+    if (this.stopped) return;
     const listenForChanges = (
       err: Error | null,
       client: PoolClient,
@@ -182,9 +197,17 @@ export default class Worker {
         }
         // Try again in 5 seconds
         // should this really be done in the node process?
-        setTimeout(this.listen, 5000);
+        if (!this.stopped) {
+          setTimeout(this.listen, 5000);
+        }
         return;
       }
+      if (this.stopped) {
+        release();
+        return;
+      }
+      this.listenClient = client;
+      this.listenRelease = release;
       client.on('notification', () => {
         if (this.doNextTimer) {
           // Must be idle, do something!
@@ -193,17 +216,46 @@ export default class Worker {
       });
       client.query('LISTEN "jobs:insert"');
       client.on('error', (e: unknown) => {
+        if (this.stopped) {
+          release();
+          return;
+        }
         log.error('Error with database notify listener', e);
         if (e instanceof Error && e.stack) {
           log.debug(e.stack);
         }
         release();
-        this.listen();
+        if (!this.stopped) {
+          this.listen();
+        }
       });
       log.info(`${this.workerId} connected and looking for jobs...`);
       this.doNext(client);
     };
     this.pgPool.connect(listenForChanges);
+  }
+
+  async stop(): Promise<void> {
+    this.stopped = true;
+    if (this.doNextTimer) {
+      clearTimeout(this.doNextTimer);
+      this.doNextTimer = undefined;
+    }
+    const client = this.listenClient;
+    const release = this.listenRelease;
+    this.listenClient = undefined;
+    this.listenRelease = undefined;
+
+    if (client && release) {
+      client.removeAllListeners('notification');
+      client.removeAllListeners('error');
+      try {
+        await client.query('UNLISTEN "jobs:insert"');
+      } catch {
+        // Ignore listener cleanup errors during shutdown.
+      }
+      release();
+    }
   }
 }
 
