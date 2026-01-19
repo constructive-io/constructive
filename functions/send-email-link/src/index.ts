@@ -101,7 +101,7 @@ const createGraphQLClient = (
   const envName = options.hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
   const hostHeader = process.env[envName];
   if (hostHeader) {
-    headers.Host = hostHeader;
+    headers.host = hostHeader;
   }
 
   // Header-based routing for internal cluster services (API_IS_PUBLIC=false)
