@@ -52,8 +52,8 @@
     "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
   },
   "dependencies": {
-    "@babel/generator": "^7.28.5",
-    "@babel/types": "^7.28.5",
+    "@babel/generator": "^7.28.6",
+    "@babel/types": "^7.28.6",
     "ajv": "^8.17.1",
     "commander": "^12.1.0",
     "gql-ast": "workspace:^",

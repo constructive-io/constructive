@@ -55,7 +55,7 @@
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
     "makage": "^0.1.10",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pgsql-test": "workspace:^",
     "postgraphile": "^4.14.1"
   }

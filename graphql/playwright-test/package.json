@@ -42,7 +42,7 @@
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
     "graphile-test": "workspace:^",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-cache": "workspace:^",
     "pgsql-test": "workspace:^"
   },

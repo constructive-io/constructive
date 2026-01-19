@@ -39,7 +39,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.958.0",
+    "@aws-sdk/client-s3": "^3.971.0",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@types/pg": "^8.16.0",

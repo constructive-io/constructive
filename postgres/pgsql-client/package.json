@@ -48,7 +48,7 @@
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-env": "workspace:^"
   }
 }

@@ -50,6 +50,6 @@
     "graphile-build-pg": "^4.14.1",
     "graphile-utils": "^4.14.1",
     "graphql": "15.10.1",
-    "pg": "^8.16.3"
+    "pg": "^8.17.1"
   }
 }

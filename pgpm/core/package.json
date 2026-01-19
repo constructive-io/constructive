@@ -57,7 +57,7 @@
     "glob": "^13.0.0",
     "komoji": "^0.7.14",
     "parse-package-name": "^1.0.0",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^17.17.2",
