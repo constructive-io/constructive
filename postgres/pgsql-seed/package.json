@@ -1,6 +1,6 @@
 {
   "name": "pgsql-seed",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL seeding utilities with pgpm integration - batteries included",
   "main": "index.js",

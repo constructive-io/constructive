@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.16.0...@pgpmjs/core@4.16.1) (2026-01-19)
+
+### Bug Fixes
+
+- **export:** add missing is_public field to schema export config ([17a2d2a](https://github.com/constructive-io/constructive/commit/17a2d2aa443b63865e82ae174039801062ce2fae))
+
 # [4.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.15.2...@pgpmjs/core@4.16.0) (2026-01-18)
 
 **Note:** Version bump only for package @pgpmjs/core

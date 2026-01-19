@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/s3-utils",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "s3 utils",
   "main": "index.js",

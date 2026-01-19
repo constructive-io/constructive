@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/client",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Client",
   "main": "index.js",

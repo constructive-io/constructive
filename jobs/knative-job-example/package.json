@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-example",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "job example",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-example#readme",
