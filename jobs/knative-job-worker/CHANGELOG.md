@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.16...@constructive-io/knative-job-worker@0.8.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.16](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.15...@constructive-io/knative-job-worker@0.7.16) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.15](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.14...@constructive-io/knative-job-worker@0.7.15) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.14](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.13...@constructive-io/knative-job-worker@0.7.14) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.13](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.12...@constructive-io/knative-job-worker@0.7.13) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.12](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.11...@constructive-io/knative-job-worker@0.7.12) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.11](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.10...@constructive-io/knative-job-worker@0.7.11) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.10](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.9...@constructive-io/knative-job-worker@0.7.10) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.9](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.8...@constructive-io/knative-job-worker@0.7.9) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.8](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.7...@constructive-io/knative-job-worker@0.7.8) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.7](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.6...@constructive-io/knative-job-worker@0.7.7) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.6](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.5...@constructive-io/knative-job-worker@0.7.6) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.5](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.4...@constructive-io/knative-job-worker@0.7.5) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.3...@constructive-io/knative-job-worker@0.7.4) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.3](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.2...@constructive-io/knative-job-worker@0.7.3) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
+## [0.7.2](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.1...@constructive-io/knative-job-worker@0.7.2) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/knative-job-worker
+
 ## [0.7.1](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-worker@0.7.0...@constructive-io/knative-job-worker@0.7.1) (2026-01-06)
 
 **Note:** Version bump only for package @constructive-io/knative-job-worker

@@ -22,6 +22,24 @@ const hasAnsi = (text: string): boolean => {
   return typeof text === 'string' && /\u001b\[\d+m/.test(text);
 };
 
+const safeStringify = (obj: unknown): string => {
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return '[Unserializable Object]';
+  }
+};
+
+const formatArg = (arg: unknown): unknown => {
+  if (typeof arg === 'string') return arg;
+  if (arg instanceof Error) return arg.stack ?? arg.message;
+  if (typeof arg === 'bigint') return arg.toString();
+  if (typeof arg === 'object' || typeof arg === 'function') {
+    return safeStringify(arg);
+  }
+  return arg;
+};
+
 // Parse LOG_LEVEL from environment
 let globalLogLevel: LogLevel =
   (process.env.LOG_LEVEL?.toLowerCase() as LogLevel) ?? 'info';
@@ -102,9 +120,12 @@ export class Logger {
     const color = levelColors[level];
     const prefix = color(`${level.toUpperCase()}:`);
 
-    const formattedArgs = args.map(arg =>
-      typeof arg === 'string' && !hasAnsi(arg) ? color(arg) : arg
-    );
+    const formattedArgs = args.map(arg => {
+      const normalized = formatArg(arg);
+      return typeof normalized === 'string' && !hasAnsi(normalized)
+        ? color(normalized)
+        : normalized;
+    });
 
     const stream = level === 'error' ? process.stderr : process.stdout;
     const outputParts = showTimestamp

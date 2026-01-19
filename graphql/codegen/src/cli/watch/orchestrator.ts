@@ -1,6 +1,6 @@
 /**
  * Watch mode orchestrator
- * 
+ *
  * Coordinates schema polling, change detection, and code regeneration
  */
 
@@ -9,13 +9,20 @@ import type { GeneratorType, WatchOptions, PollEvent } from './types';
 import { SchemaPoller } from './poller';
 import { debounce } from './debounce';
 import { generateCommand, type GenerateResult } from '../commands/generate';
-import { generateOrmCommand, type GenerateOrmResult } from '../commands/generate-orm';
+import {
+  generateOrmCommand,
+  type GenerateOrmResult,
+} from '../commands/generate-orm';
 
 export interface WatchOrchestratorOptions {
   config: ResolvedConfig;
   generatorType: GeneratorType;
   verbose: boolean;
   authorization?: string;
+  /** Config file path for regeneration */
+  configPath?: string;
+  /** Target name for multi-target configs */
+  target?: string;
   /** Override output directory (for ORM) */
   outputDir?: string;
   /** Skip custom operations flag */
@@ -143,7 +150,9 @@ export class WatchOrchestrator {
 
     // Start polling loop
     this.poller.start();
-    this.log(`Watching for schema changes (poll interval: ${this.watchOptions.pollInterval}ms)`);
+    this.log(
+      `Watching for schema changes (poll interval: ${this.watchOptions.pollInterval}ms)`
+    );
   }
 
   /**
@@ -174,7 +183,7 @@ export class WatchOrchestrator {
     }
 
     const startTime = Date.now();
-    
+
     if (this.watchOptions.clearScreen) {
       this.clearScreen();
       this.logHeader();
@@ -187,6 +196,8 @@ export class WatchOrchestrator {
 
       if (this.options.generatorType === 'generate') {
         result = await generateCommand({
+          config: this.options.configPath,
+          target: this.options.target,
           endpoint: this.options.config.endpoint,
           output: this.options.outputDir ?? this.options.config.output,
           authorization: this.options.authorization,
@@ -195,6 +206,8 @@ export class WatchOrchestrator {
         });
       } else {
         result = await generateOrmCommand({
+          config: this.options.configPath,
+          target: this.options.target,
           endpoint: this.options.config.endpoint,
           output: this.options.outputDir ?? this.options.config.orm?.output,
           authorization: this.options.authorization,
@@ -209,7 +222,7 @@ export class WatchOrchestrator {
         this.status.regenerateCount++;
         this.status.lastRegenTime = Date.now();
         this.logSuccess(`Generated in ${duration}ms`);
-        
+
         if (result.tables && result.tables.length > 0) {
           this.log(`  Tables: ${result.tables.length}`);
         }
@@ -247,9 +260,10 @@ export class WatchOrchestrator {
   }
 
   private logHeader(): void {
-    const generatorName = this.options.generatorType === 'generate' 
-      ? 'React Query hooks' 
-      : 'ORM client';
+    const generatorName =
+      this.options.generatorType === 'generate'
+        ? 'React Query hooks'
+        : 'ORM client';
     console.log(`\n${'─'.repeat(50)}`);
     console.log(`graphql-codegen watch mode (${generatorName})`);
     console.log(`Endpoint: ${this.options.config.endpoint}`);
@@ -275,7 +289,9 @@ export class WatchOrchestrator {
 /**
  * Start watch mode for a generator
  */
-export async function startWatch(options: WatchOrchestratorOptions): Promise<void> {
+export async function startWatch(
+  options: WatchOrchestratorOptions
+): Promise<void> {
   const orchestrator = new WatchOrchestrator(options);
   await orchestrator.start();
 

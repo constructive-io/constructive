@@ -3,6 +3,88 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.27.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.27.0...@constructive-io/graphql-codegen@2.27.1) (2026-01-18)
+
+### Bug Fixes
+
+- **codegen:** correct example script paths in package.json ([1eff799](https://github.com/constructive-io/constructive/commit/1eff7998c7b0f9f78f3e92a7769b9311f7db40e3))
+
+# [2.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.26.0...@constructive-io/graphql-codegen@2.27.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [2.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.25.0...@constructive-io/graphql-codegen@2.26.0) (2026-01-18)
+
+### Bug Fixes
+
+- **codegen:** add DeepExact for strict select type validation ([11790c7](https://github.com/constructive-io/constructive/commit/11790c79c5ea5a7f6fd0c0a6219cffb58ac40a04))
+
+### Features
+
+- **codegen:** add command timing to CLI output ([6322af2](https://github.com/constructive-io/constructive/commit/6322af2c0f84decaf6dd0a9da1e6db181e24d29c))
+
+# [2.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.1...@constructive-io/graphql-codegen@2.25.0) (2026-01-18)
+
+### Features
+
+- **codegen:** add multi-target config support ([5cd0ef3](https://github.com/constructive-io/constructive/commit/5cd0ef31207382763657203b638aa006b8785050))
+
+## [2.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.24.0...@constructive-io/graphql-codegen@2.24.1) (2026-01-15)
+
+### Bug Fixes
+
+- **codegen:** add generic type params to execute() calls and import table types ([fde9c62](https://github.com/constructive-io/constructive/commit/fde9c6224c3f5791ddcb9f96bfee6fd23e04e006))
+- **codegen:** add missing pagination variables and handle composite keys ([09523e9](https://github.com/constructive-io/constructive/commit/09523e9447c1d3bafd1dee6e6cc8d3e990a4d24b))
+
+# [2.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.3...@constructive-io/graphql-codegen@2.24.0) (2026-01-14)
+
+### Features
+
+- **codegen:** add query keys factory pattern for codegen RQ mode ([f8c3cab](https://github.com/constructive-io/constructive/commit/f8c3cabfeb1b5c27ad5dd70393f19fed916b3ccc))
+
+## [2.23.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.2...@constructive-io/graphql-codegen@2.23.3) (2026-01-09)
+
+### Bug Fixes
+
+- react query mode output should be default for generate ([#593](https://github.com/constructive-io/constructive/issues/593)) ([e63f839](https://github.com/constructive-io/constructive/commit/e63f8397b479daf2081e43ef9d160da66de794f0))
+
+## [2.23.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.1...@constructive-io/graphql-codegen@2.23.2) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [2.23.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.23.0...@constructive-io/graphql-codegen@2.23.1) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [2.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.1...@constructive-io/graphql-codegen@2.23.0) (2026-01-07)
+
+### Features
+
+- codegen source modes ([922f943](https://github.com/constructive-io/constructive/commit/922f943d6bd45c5a6e0ea8192101b310241a7b36))
+
+## [2.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.22.0...@constructive-io/graphql-codegen@2.22.1) (2026-01-07)
+
+### Bug Fixes
+
+- upgrade inflection to v3.0.2 and update imports to use named exports ([4e6bf94](https://github.com/constructive-io/constructive/commit/4e6bf94749437bb0594e83dfe30bd34a2d69bb97)), closes [#571](https://github.com/constructive-io/constructive/issues/571)
+
+# [2.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.21.0...@constructive-io/graphql-codegen@2.22.0) (2026-01-07)
+
+### Bug Fixes
+
+- align @constructive-io/graphql-codegen to graphql@15.10.1 ([009a31b](https://github.com/constructive-io/constructive/commit/009a31ba76aa91c01f9df3e609d3eb3168588b97))
+- headers set ([795be0f](https://github.com/constructive-io/constructive/commit/795be0f444b2f3da00de76c83b3fb79690f2d45a))
+
+### Features
+
+- improve the codegen logic to be more robust and fixes bugs ([e407e1d](https://github.com/constructive-io/constructive/commit/e407e1da6a16252c1b1a9962cc6c8180080340e4))
+
+# [2.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.1...@constructive-io/graphql-codegen@2.21.0) (2026-01-07)
+
+### Features
+
+- **graphql-codegen:** make React Query optional with config flag ([07c5ccc](https://github.com/constructive-io/constructive/commit/07c5ccc404aec3c66fe5e6680d465a9fcbc26f68))
+
 ## [2.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.20.0...@constructive-io/graphql-codegen@2.20.1) (2026-01-06)
 
 ### Bug Fixes

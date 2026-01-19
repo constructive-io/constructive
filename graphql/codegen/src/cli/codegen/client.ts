@@ -54,6 +54,39 @@ export function getConfig(): GraphQLClientConfig {
   return globalConfig;
 }
 
+/**
+ * Set a single header value
+ * Useful for updating Authorization after login
+ *
+ * @example
+ * \`\`\`ts
+ * setHeader('Authorization', 'Bearer <new-token>');
+ * \`\`\`
+ */
+export function setHeader(key: string, value: string): void {
+  const config = getConfig();
+  globalConfig = {
+    ...config,
+    headers: { ...config.headers, [key]: value },
+  };
+}
+
+/**
+ * Merge multiple headers into the current configuration
+ *
+ * @example
+ * \`\`\`ts
+ * setHeaders({ Authorization: 'Bearer <token>', 'X-Custom': 'value' });
+ * \`\`\`
+ */
+export function setHeaders(headers: Record<string, string>): void {
+  const config = getConfig();
+  globalConfig = {
+    ...config,
+    headers: { ...config.headers, ...headers },
+  };
+}
+
 // ============================================================================
 // Error handling
 // ============================================================================
@@ -164,5 +197,66 @@ export async function executeWithErrors<TData = unknown, TVariables = Record<str
     errors: json.errors ?? null,
   };
 }
+
+// ============================================================================
+// QueryClient Factory
+// ============================================================================
+
+/**
+ * Default QueryClient configuration optimized for GraphQL
+ *
+ * These defaults provide a good balance between freshness and performance:
+ * - staleTime: 1 minute - data considered fresh, won't refetch
+ * - gcTime: 5 minutes - unused data kept in cache
+ * - refetchOnWindowFocus: false - don't refetch when tab becomes active
+ * - retry: 1 - retry failed requests once
+ */
+export const defaultQueryClientOptions = {
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1 minute
+      gcTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+};
+
+/**
+ * QueryClient options type for createQueryClient
+ */
+export interface CreateQueryClientOptions {
+  defaultOptions?: {
+    queries?: {
+      staleTime?: number;
+      gcTime?: number;
+      refetchOnWindowFocus?: boolean;
+      retry?: number | boolean;
+      retryDelay?: number | ((attemptIndex: number) => number);
+    };
+    mutations?: {
+      retry?: number | boolean;
+      retryDelay?: number | ((attemptIndex: number) => number);
+    };
+  };
+}
+
+// Note: createQueryClient is available when using with @tanstack/react-query
+// Import QueryClient from '@tanstack/react-query' and use these options:
+//
+// import { QueryClient } from '@tanstack/react-query';
+// const queryClient = new QueryClient(defaultQueryClientOptions);
+//
+// Or merge with your own options:
+// const queryClient = new QueryClient({
+//   ...defaultQueryClientOptions,
+//   defaultOptions: {
+//     ...defaultQueryClientOptions.defaultOptions,
+//     queries: {
+//       ...defaultQueryClientOptions.defaultOptions.queries,
+//       staleTime: 30000, // Override specific options
+//     },
+//   },
+// });
 `;
 }

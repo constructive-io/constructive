@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@0.5.16...@constructive-io/job-utils@0.6.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/job-utils
+
+## [0.5.16](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@0.5.15...@constructive-io/job-utils@0.5.16) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/job-utils
+
+## [0.5.15](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@0.5.14...@constructive-io/job-utils@0.5.15) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/job-utils
+
+## [0.5.14](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@0.5.13...@constructive-io/job-utils@0.5.14) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/job-utils
+
 ## [0.5.13](https://github.com/constructive-io/jobs/compare/@constructive-io/job-utils@0.5.12...@constructive-io/job-utils@0.5.13) (2026-01-02)
 
 **Note:** Version bump only for package @constructive-io/job-utils

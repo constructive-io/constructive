@@ -6,6 +6,7 @@ import { ParsedArgs } from 'minimist';
 import codegen from './commands/codegen';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
+import jobs from './commands/jobs';
 import server from './commands/server';
 import { usageText } from './utils';
 
@@ -14,7 +15,8 @@ const createCommandMap = (): Record<string, Function> => {
     server,
     explorer,
     'get-graphql-schema': getGraphqlSchema,
-    codegen
+    codegen,
+    jobs,
   };
 };
 
@@ -49,7 +51,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     console.log(usageText);
     process.exit(0);
   }
-  
+
   // Show usage for help command specifically
   if (command === 'help') {
     console.log(usageText);

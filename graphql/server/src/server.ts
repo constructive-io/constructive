@@ -1,15 +1,17 @@
 import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
+import { healthz, poweredBy, svcCache, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import { randomUUID } from 'crypto';
 import { graphileCache } from 'graphile-cache';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
-import { getPgPool, pgCache } from 'pg-cache';
+import { graphileCache } from 'graphile-cache';
+import { getPgPool, pgCache, pgCache } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createApiMiddleware } from './middleware/api';
@@ -35,28 +37,65 @@ class Server {
   private listenRelease: (() => void) | null = null;
   private shuttingDown = false;
   private closed = false;
+  private httpServer: HttpServer | null = null;
+  private listenClient: PoolClient | null = null;
+  private listenRelease: (() => void) | null = null;
+  private shuttingDown = false;
+  private closed = false;
 
   constructor(opts: PgpmOptions) {
     this.opts = getEnvOptions(opts);
+    const effectiveOpts = this.opts;
 
     const app = express();
-    const api = createApiMiddleware(opts);
-    const authenticate = createAuthenticateMiddleware(opts);
+    const api = createApiMiddleware(effectiveOpts);
+    const authenticate = createAuthenticateMiddleware(effectiveOpts);
+    const requestLogger: RequestHandler = (req, res, next) => {
+      const headerRequestId = req.header('x-request-id');
+      const reqId = headerRequestId || randomUUID();
+      const start = process.hrtime.bigint();
+
+      req.requestId = reqId;
+
+      const host = req.hostname || req.headers.host || 'unknown';
+      const ip = req.clientIp || req.ip;
+
+      log.debug(
+        `[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`
+      );
+
+      res.on('finish', () => {
+        const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
+        const apiInfo = req.api
+          ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
+          : 'api=unresolved';
+        const authInfo = req.token ? 'auth=token' : 'auth=anon';
+        const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
+
+        log.debug(
+          `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
+            1
+          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`
+        );
+      });
+
+      next();
+    };
 
     // Log startup config in dev mode
     if (isDev()) {
       log.debug(
-        `Database: ${opts.pg?.database}@${opts.pg?.host}:${opts.pg?.port}`
+        `Database: ${effectiveOpts.pg?.database}@${effectiveOpts.pg?.host}:${effectiveOpts.pg?.port}`
       );
       log.debug(
-        `Meta schemas: ${(opts as any).api?.metaSchemas?.join(', ') || 'default'}`
+        `Meta schemas: ${(effectiveOpts as any).api?.metaSchemas?.join(', ') || 'default'}`
       );
     }
 
     healthz(app);
-    trustProxy(app, opts.server.trustProxy);
+    trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
-    const fallbackOrigin = opts.server?.origin?.trim();
+    const fallbackOrigin = effectiveOpts.server?.origin?.trim();
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
         log.warn(
@@ -73,10 +112,11 @@ class Server {
     app.use(graphqlUpload.graphqlUploadExpress());
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
+    app.use(requestLogger);
     app.use(api);
     app.use(cors(fallbackOrigin));
     app.use(authenticate);
-    app.use(graphile(opts));
+    app.use(graphile(effectiveOpts));
     app.use(flush);
 
     this.app = app;
@@ -96,6 +136,9 @@ class Server {
       }
       throw err;
     });
+
+    this.httpServer = httpServer;
+    return httpServer;
 
     return httpServer;
   }
@@ -155,6 +198,60 @@ class Server {
     });
 
     this.log('connected and listening for changes...');
+  }
+
+  async removeEventListener(): Promise<void> {
+    if (!this.listenClient || !this.listenRelease) {
+      return;
+    }
+
+    const client = this.listenClient;
+    const release = this.listenRelease;
+    this.listenClient = null;
+    this.listenRelease = null;
+
+    client.removeAllListeners('notification');
+    client.removeAllListeners('error');
+
+    try {
+      await client.query('UNLISTEN "schema:update"');
+    } catch {
+      // Ignore listener cleanup errors during shutdown.
+    }
+
+    release();
+  }
+
+  async close(opts: { closeCaches?: boolean } = {}): Promise<void> {
+    const { closeCaches = false } = opts;
+    if (this.closed) {
+      if (closeCaches) {
+        await Server.closeCaches({ closePools: true });
+      }
+      return;
+    }
+    this.closed = true;
+    this.shuttingDown = true;
+    await this.removeEventListener();
+    if (this.httpServer?.listening) {
+      await new Promise<void>((resolve) =>
+        this.httpServer!.close(() => resolve())
+      );
+    }
+    if (closeCaches) {
+      await Server.closeCaches({ closePools: true });
+    }
+  }
+
+  static async closeCaches(
+    opts: { closePools?: boolean } = {}
+  ): Promise<void> {
+    const { closePools = false } = opts;
+    svcCache.clear();
+    graphileCache.clear();
+    if (closePools) {
+      await pgCache.close();
+    }
   }
 
   async removeEventListener(): Promise<void> {

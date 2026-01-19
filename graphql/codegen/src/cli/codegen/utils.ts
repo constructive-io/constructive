@@ -1,8 +1,13 @@
 /**
  * Codegen utilities - naming conventions, type mapping, and helpers
  */
-import type { CleanTable, CleanField, CleanFieldType } from '../../types/schema';
+import type {
+  CleanTable,
+  CleanField,
+  CleanFieldType,
+} from '../../types/schema';
 import { scalarToTsType, scalarToFilterType } from './scalars';
+import { pluralize } from 'inflekt';
 
 // ============================================================================
 // String manipulation
@@ -62,7 +67,10 @@ export interface TableNames {
 export function getTableNames(table: CleanTable): TableNames {
   const typeName = table.name;
   const singularName = table.inflection?.tableFieldName || lcFirst(typeName);
-  const pluralName = table.query?.all || table.inflection?.allRows || singularName + 's';
+  const pluralName =
+    table.query?.all ||
+    table.inflection?.allRows ||
+    lcFirst(pluralize(typeName));
   const pluralTypeName = ucFirst(pluralName);
 
   return {
@@ -164,14 +172,20 @@ export function getDeleteMutationFileName(table: CleanTable): string {
  * Uses inflection from _meta, falls back to convention
  */
 export function getAllRowsQueryName(table: CleanTable): string {
-  return table.query?.all || table.inflection?.allRows || lcFirst(table.name) + 's';
+  return (
+    table.query?.all ||
+    table.inflection?.allRows ||
+    lcFirst(pluralize(table.name))
+  );
 }
 
 /**
  * Get the GraphQL query name for fetching single row
  */
 export function getSingleRowQueryName(table: CleanTable): string {
-  return table.query?.one || table.inflection?.tableFieldName || lcFirst(table.name);
+  return (
+    table.query?.one || table.inflection?.tableFieldName || lcFirst(table.name)
+  );
 }
 
 /**
@@ -209,10 +223,18 @@ export function getFilterTypeName(table: CleanTable): string {
 
 /**
  * Get PostGraphile OrderBy enum type name
- * e.g., "CarsOrderBy"
+ * e.g., "CarsOrderBy", "AddressesOrderBy"
  */
 export function getOrderByTypeName(table: CleanTable): string {
-  return table.inflection?.orderByType || `${table.name}sOrderBy`;
+  return table.inflection?.orderByType || `${pluralize(table.name)}OrderBy`;
+}
+
+/**
+ * Get PostGraphile Condition type name (simple equality filter)
+ * e.g., "CarCondition", "AddressCondition"
+ */
+export function getConditionTypeName(table: CleanTable): string {
+  return table.inflection?.conditionType || `${table.name}Condition`;
 }
 
 /**
@@ -277,10 +299,15 @@ export function fieldTypeToTs(fieldType: CleanFieldType): string {
 
 /**
  * Get the PostGraphile filter type for a GraphQL scalar
+ * @param gqlType - The GraphQL type string (e.g., "String", "UUID")
+ * @param isArray - Whether this is an array type
  */
-export function getScalarFilterType(gqlType: string): string | null {
+export function getScalarFilterType(
+  gqlType: string,
+  isArray = false
+): string | null {
   const cleanType = gqlType.replace(/!/g, '');
-  return scalarToFilterType(cleanType);
+  return scalarToFilterType(cleanType, isArray);
 }
 
 // ============================================================================
@@ -308,12 +335,69 @@ export function getScalarFields(table: CleanTable): CleanField[] {
 }
 
 /**
- * Get primary key field names
+ * Primary key field information
+ */
+export interface PrimaryKeyField {
+  /** Field name */
+  name: string;
+  /** GraphQL type (e.g., "UUID", "Int", "String") */
+  gqlType: string;
+  /** TypeScript type (e.g., "string", "number") */
+  tsType: string;
+}
+
+/**
+ * Get primary key field information from table constraints
+ * Returns array to support composite primary keys
+ */
+export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
+  const pk = table.constraints?.primaryKey?.[0];
+  if (!pk || pk.fields.length === 0) {
+    // Fallback: try to find 'id' field in table fields
+    const idField = table.fields.find((f) => f.name.toLowerCase() === 'id');
+    if (idField) {
+      return [
+        {
+          name: idField.name,
+          gqlType: idField.type.gqlType,
+          tsType: fieldTypeToTs(idField.type),
+        },
+      ];
+    }
+    // Last resort: assume 'id' of type string (UUID)
+    return [{ name: 'id', gqlType: 'UUID', tsType: 'string' }];
+  }
+  return pk.fields.map((f) => ({
+    name: f.name,
+    gqlType: f.type.gqlType,
+    tsType: fieldTypeToTs(f.type),
+  }));
+}
+
+/**
+ * Get primary key field names (convenience wrapper)
  */
 export function getPrimaryKeyFields(table: CleanTable): string[] {
+  return getPrimaryKeyInfo(table).map((pk) => pk.name);
+}
+
+/**
+ * Check if table has a valid single-field primary key
+ * Used to determine if a single query hook can be generated
+ * Tables with composite keys return false (handled as custom queries)
+ */
+export function hasValidPrimaryKey(table: CleanTable): boolean {
+  // Check for explicit primary key constraint with single field
   const pk = table.constraints?.primaryKey?.[0];
-  if (!pk) return ['id']; // Default assumption
-  return pk.fields.map((f) => f.name);
+  if (pk && pk.fields.length === 1) {
+    return true;
+  }
+  // Check for 'id' field as fallback
+  const idField = table.fields.find((f) => f.name.toLowerCase() === 'id');
+  if (idField) {
+    return true;
+  }
+  return false;
 }
 
 // ============================================================================

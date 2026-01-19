@@ -7,7 +7,7 @@ import type {
   ValueNode,
   VariableDefinitionNode,
 } from 'graphql';
-import inflection from 'inflection';
+import { camelize, singularize } from 'inflection';
 
 import { getCustomAst } from './custom-ast';
 import type {
@@ -373,14 +373,14 @@ export const createOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
-    true
-  );
+    const modelName = camelize(
+      [singularize(mutation.model)].join('_'),
+      true
+    );
 
-  const inputProperties = mutation.properties.input
-    .properties as NestedProperties;
-  const modelProperties = inputProperties[modelName] as QueryProperty;
+    const inputProperties = mutation.properties.input
+      .properties as NestedProperties;
+    const modelProperties = inputProperties[modelName] as QueryProperty;
 
   if (!modelProperties.properties) {
     throw new Error(`No properties found for model: ${modelName}`);
@@ -442,14 +442,14 @@ export const patchOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
-    true
-  );
+    const modelName = camelize(
+      [singularize(mutation.model)].join('_'),
+      true
+    );
 
-  const inputProperties = mutation.properties.input
-    .properties as NestedProperties;
-  const patchProperties = inputProperties['patch'] as QueryProperty;
+    const inputProperties = mutation.properties.input
+      .properties as NestedProperties;
+    const patchProperties = inputProperties['patch'] as QueryProperty;
 
   const allAttrs = patchProperties?.properties
     ? objectToArray(patchProperties.properties as Record<string, QueryProperty>)
@@ -519,14 +519,14 @@ export const deleteOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = inflection.camelize(
-    [inflection.singularize(mutation.model)].join('_'),
-    true
-  );
+    const modelName = camelize(
+      [singularize(mutation.model)].join('_'),
+      true
+    );
 
-  const inputProperties = mutation.properties.input
-    .properties as NestedProperties;
-  const deleteAttrs = objectToArray(
+    const inputProperties = mutation.properties.input
+      .properties as NestedProperties;
+    const deleteAttrs = objectToArray(
     inputProperties as Record<string, QueryProperty>
   );
 

@@ -41,6 +41,11 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "usePlan": true,
     "useTx": true,
   },
+  "errorOutput": {
+    "maxLength": 10000,
+    "queryHistoryLimit": 30,
+    "verbose": false,
+  },
   "jobs": {
     "scheduler": {
       "gracefulShutdown": true,
@@ -85,6 +90,13 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "port": 9999,
     "strictAuth": false,
     "trustProxy": false,
+  },
+  "smtp": {
+    "debug": false,
+    "logger": false,
+    "pool": false,
+    "port": 587,
+    "secure": false,
   },
 }
 `;

@@ -1,23 +1,26 @@
 /**
  * Schema polling logic with EventEmitter pattern
- * 
+ *
  * Uses in-memory hash comparison for efficiency.
  * No file I/O during normal polling - only touchFile is optional file write.
  */
 
 import { EventEmitter } from 'node:events';
-import type { MetaQueryResponse } from '../introspect/meta-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
-import { fetchMeta } from '../introspect/fetch-meta';
 import { fetchSchema } from '../introspect/fetch-schema';
 import { SchemaCache, touchFile } from './cache';
-import type { PollResult, PollEvent, PollEventType, WatchOptions } from './types';
-import { hashObject, combineHashes } from './hash';
+import type {
+  PollResult,
+  PollEvent,
+  PollEventType,
+  WatchOptions,
+} from './types';
+import { hashObject } from './hash';
 
 /**
  * Schema poller that periodically introspects a GraphQL endpoint
  * and emits events when the schema changes.
- * 
+ *
  * Uses in-memory caching for hash comparison - no file I/O overhead.
  */
 export class SchemaPoller extends EventEmitter {
@@ -67,7 +70,11 @@ export class SchemaPoller extends EventEmitter {
   async poll(): Promise<PollResult> {
     // Prevent concurrent polls
     if (this.isPolling) {
-      return { success: false, changed: false, error: 'Poll already in progress' };
+      return {
+        success: false,
+        changed: false,
+        error: 'Poll already in progress',
+      };
     }
 
     this.isPolling = true;
@@ -75,37 +82,28 @@ export class SchemaPoller extends EventEmitter {
     this.emit('poll-start', this.createEvent('poll-start'));
 
     try {
-      // Fetch both _meta and __schema
-      const [metaResult, schemaResult] = await Promise.all([
-        fetchMeta({
-          endpoint: this.options.endpoint,
-          authorization: this.options.authorization,
-          headers: this.options.headers,
-          timeout: 30000,
-        }),
-        fetchSchema({
-          endpoint: this.options.endpoint,
-          authorization: this.options.authorization,
-          headers: this.options.headers,
-          timeout: 30000,
-        }),
-      ]);
+      // Fetch __schema via standard introspection
+      const schemaResult = await fetchSchema({
+        endpoint: this.options.endpoint,
+        authorization: this.options.authorization,
+        headers: this.options.headers,
+        timeout: 30000,
+      });
 
       const duration = Date.now() - startTime;
 
       // Check for errors
-      if (!metaResult.success) {
-        return this.handleError(`_meta fetch failed: ${metaResult.error}`, duration);
-      }
       if (!schemaResult.success) {
-        return this.handleError(`__schema fetch failed: ${schemaResult.error}`, duration);
+        return this.handleError(
+          `__schema fetch failed: ${schemaResult.error}`,
+          duration
+        );
       }
 
-      const meta = metaResult.data!;
       const schema = schemaResult.data!;
 
       // Check if schema changed
-      const { changed, newHash } = await this.cache.hasChanged(meta, schema);
+      const { changed, newHash } = await this.cache.hasChanged(schema);
 
       // Reset error counter on success
       this.consecutiveErrors = 0;
@@ -119,14 +117,19 @@ export class SchemaPoller extends EventEmitter {
           touchFile(this.options.touchFile);
         }
 
-        this.emit('schema-changed', this.createEvent('schema-changed', { hash: newHash, duration }));
-        return { success: true, changed: true, hash: newHash, meta, schema };
+        this.emit(
+          'schema-changed',
+          this.createEvent('schema-changed', { hash: newHash, duration })
+        );
+        return { success: true, changed: true, hash: newHash, schema };
       }
 
-      this.emit('schema-unchanged', this.createEvent('schema-unchanged', { duration }));
+      this.emit(
+        'schema-unchanged',
+        this.createEvent('schema-unchanged', { duration })
+      );
       this.emit('poll-success', this.createEvent('poll-success', { duration }));
-      return { success: true, changed: false, hash: newHash, meta, schema };
-
+      return { success: true, changed: false, hash: newHash, schema };
     } catch (err) {
       const duration = Date.now() - startTime;
       const error = err instanceof Error ? err.message : 'Unknown error';
@@ -149,23 +152,15 @@ export class SchemaPoller extends EventEmitter {
    */
   async seedCache(): Promise<void> {
     try {
-      const [metaResult, schemaResult] = await Promise.all([
-        fetchMeta({
-          endpoint: this.options.endpoint,
-          authorization: this.options.authorization,
-          headers: this.options.headers,
-          timeout: 30000,
-        }),
-        fetchSchema({
-          endpoint: this.options.endpoint,
-          authorization: this.options.authorization,
-          headers: this.options.headers,
-          timeout: 30000,
-        }),
-      ]);
+      const schemaResult = await fetchSchema({
+        endpoint: this.options.endpoint,
+        authorization: this.options.authorization,
+        headers: this.options.headers,
+        timeout: 30000,
+      });
 
-      if (metaResult.success && schemaResult.success) {
-        const { newHash } = await this.cache.hasChanged(metaResult.data!, schemaResult.data!);
+      if (schemaResult.success) {
+        const { newHash } = await this.cache.hasChanged(schemaResult.data!);
         this.cache.updateHash(newHash);
       }
     } catch {
@@ -196,10 +191,16 @@ export class SchemaPoller extends EventEmitter {
 
   private handleError(error: string, duration: number): PollResult {
     this.consecutiveErrors++;
-    this.emit('poll-error', this.createEvent('poll-error', { error, duration }));
+    this.emit(
+      'poll-error',
+      this.createEvent('poll-error', { error, duration })
+    );
 
     // Slow down polling after multiple consecutive errors
-    if (this.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS && this.pollTimer) {
+    if (
+      this.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS &&
+      this.pollTimer
+    ) {
       this.stop();
       const newInterval = this.options.pollInterval * 2;
       this.pollTimer = setInterval(() => {
@@ -210,7 +211,10 @@ export class SchemaPoller extends EventEmitter {
     return { success: false, changed: false, error };
   }
 
-  private createEvent(type: PollEventType, extra?: Partial<PollEvent>): PollEvent {
+  private createEvent(
+    type: PollEventType,
+    extra?: Partial<PollEvent>
+  ): PollEvent {
     return {
       type,
       timestamp: Date.now(),
@@ -223,10 +227,7 @@ export class SchemaPoller extends EventEmitter {
  * Utility to compute schema hash without full poll
  */
 export async function computeSchemaHash(
-  meta: MetaQueryResponse,
   schema: IntrospectionQueryResponse
 ): Promise<string> {
-  const metaHash = await hashObject(meta);
-  const schemaHash = await hashObject(schema);
-  return combineHashes(metaHash, schemaHash);
+  return hashObject(schema);
 }

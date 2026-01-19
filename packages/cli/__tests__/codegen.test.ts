@@ -1,13 +1,17 @@
 import type { ParsedArgs } from 'minimist'
 import codegenCommand from '../src/commands/codegen'
+import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
 
-jest.mock('child_process', () => ({
-  spawnSync: jest.fn(() => ({ status: 0 }))
+jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
+  generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
+}))
+
+jest.mock('@constructive-io/graphql-server', () => ({
+  buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\nschema { query: Query }')
 }))
 
 describe('codegen command', () => {
   beforeEach(() => {
-    process.env.CONSTRUCTIVE_CODEGEN_BIN = '/fake/bin/graphql-codegen.js'
     jest.clearAllMocks()
   })
 
@@ -26,55 +30,43 @@ describe('codegen command', () => {
     spyExit.mockRestore()
   })
 
-  it('invokes graphql-codegen CLI with endpoint, out, auth, and flags', async () => {
-    const child = require('child_process')
+  it('calls generateCommand with endpoint flow options', async () => {
 
     const argv: Partial<ParsedArgs> = {
       endpoint: 'http://localhost:3000/graphql',
       auth: 'Bearer testtoken',
       out: 'graphql/codegen/dist',
-      v: true,
+      verbose: true,
       'dry-run': true
     }
 
     await codegenCommand(argv, {} as any, {} as any)
 
-    expect(child.spawnSync).toHaveBeenCalled()
-    const args = (child.spawnSync as jest.Mock).mock.calls[0][1] as string[]
-    expect(args).toEqual(expect.arrayContaining(['generate']))
-    expect(args).toEqual(expect.arrayContaining(['-e', 'http://localhost:3000/graphql']))
-    expect(args).toEqual(expect.arrayContaining(['-o', 'graphql/codegen/dist']))
-    expect(args).toEqual(expect.arrayContaining(['-a', 'Bearer testtoken']))
-    expect(args).toEqual(expect.arrayContaining(['--dry-run']))
-    expect(args).toEqual(expect.arrayContaining(['-v']))
+    expect(generateCommand).toHaveBeenCalled()
+    const call = (generateCommand as jest.Mock).mock.calls[0][0]
+    expect(call).toMatchObject({
+      endpoint: 'http://localhost:3000/graphql',
+      output: 'graphql/codegen/dist',
+      authorization: 'Bearer testtoken',
+      verbose: true,
+      dryRun: true
+    })
   })
 
-  it('passes config path and out directory through to CLI', async () => {
-    const child = require('child_process')
+  it('builds schema file and calls generateCommand with schema when DB options provided', async () => {
 
     const argv: Partial<ParsedArgs> = {
-      config: '/tmp/codegen.json',
+      database: 'constructive_db',
+      schemas: 'public',
       out: 'graphql/codegen/dist'
     }
 
     await codegenCommand(argv, {} as any, {} as any)
 
-    const args = (child.spawnSync as jest.Mock).mock.calls[0][1] as string[]
-    expect(args).toEqual(expect.arrayContaining(['-c', '/tmp/codegen.json']))
-    expect(args).toEqual(expect.arrayContaining(['-o', 'graphql/codegen/dist']))
-  })
-
-  it('exits with non-zero when underlying CLI fails', async () => {
-    const child = require('child_process');
-    (child.spawnSync as jest.Mock).mockReturnValueOnce({ status: 1 })
-    const spyExit = jest.spyOn(process, 'exit').mockImplementation(((code?: number) => { throw new Error('exit:' + code) }) as any)
-
-    const argv: Partial<ParsedArgs> = {
-      endpoint: 'http://localhost:3000/graphql',
-      out: 'graphql/codegen/dist'
-    }
-
-    await expect(codegenCommand(argv, {} as any, {} as any)).rejects.toThrow('exit:1')
-    spyExit.mockRestore()
+    expect(generateCommand).toHaveBeenCalled()
+    const call = (generateCommand as jest.Mock).mock.calls[0][0]
+    expect(call.schema).toBe('graphql/codegen/dist/schema.graphql')
+    expect(call.output).toBe('graphql/codegen/dist')
+    expect(call.endpoint).toBeUndefined()
   })
 })

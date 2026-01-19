@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "2.14.1",
+  "version": "2.18.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -29,7 +29,9 @@
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "bucket:create": "ts-node src/scripts/create-bucket.ts"
+    "bucket:create": "ts-node src/scripts/create-bucket.ts",
+    "codegen:schema": "ts-node src/scripts/codegen-schema.ts",
+    "codegen": "npm run codegen:schema && graphql-codegen generate-orm --schema codegen/schema.graphql --output src/codegen/orm"
   },
   "keywords": [
     "server",
@@ -74,6 +76,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
+    "@constructive-io/graphql-codegen": "workspace:*",
     "@pgpm/database-jobs": "^0.16.0",
     "@pgpm/geotypes": "^0.16.0",
     "@pgpm/inflection": "^0.15.5",
@@ -88,8 +91,8 @@
     "@types/graphql-upload": "^8.0.12",
     "@types/pg": "^8.16.0",
     "@types/request-ip": "^0.0.41",
+    "graphile-test": "workspace:*",
     "@types/supertest": "^6.0.3",
-    "graphile-test": "^2.11.15",
     "makage": "^0.1.10",
     "nodemon": "^3.1.10",
     "pgsql-test": "workspace:^",

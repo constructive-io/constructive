@@ -70,7 +70,7 @@ describe('Export Meta Config Validation', () => {
         'site_themes',
         'api_modules',
         'api_extensions',
-        'api_schemata'
+        'api_schemas'
       ];
 
       for (const table of requiredTables) {
@@ -128,7 +128,7 @@ describe('Export Meta Config Drift Detection', () => {
       'apis',
       'api_extensions',
       'api_modules',
-      'api_schemata',
+      'api_schemas',
       'apps',
       'domains',
       'site_modules',

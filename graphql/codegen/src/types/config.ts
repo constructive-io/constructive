@@ -3,13 +3,82 @@
  */
 
 /**
- * Main configuration for graphql-codegen
+ * Entity relationship definition for cascade invalidation
  */
-export interface GraphQLSDKConfig {
+export interface EntityRelationship {
+  /** Parent entity name (e.g., 'database' for a table) */
+  parent: string;
+  /** Foreign key field name that references the parent (e.g., 'databaseId') */
+  foreignKey: string;
+  /** Optional transitive ancestors for deep invalidation (e.g., ['database', 'organization']) */
+  ancestors?: string[];
+}
+
+/**
+ * Query key generation configuration
+ */
+export interface QueryKeyConfig {
   /**
-   * GraphQL endpoint URL (must expose _meta query)
+   * Key structure style
+   * - 'flat': Simple ['entity', 'scope', data] structure
+   * - 'hierarchical': Nested factory pattern with scope support (lukemorales-style)
+   * @default 'hierarchical'
    */
-  endpoint: string;
+  style?: 'flat' | 'hierarchical';
+
+  /**
+   * Define entity relationships for cascade invalidation and scoped keys
+   * Key: child entity name (lowercase), Value: relationship definition
+   *
+   * @example
+   * ```ts
+   * relationships: {
+   *   database: { parent: 'organization', foreignKey: 'organizationId' },
+   *   table: { parent: 'database', foreignKey: 'databaseId', ancestors: ['organization'] },
+   *   field: { parent: 'table', foreignKey: 'tableId', ancestors: ['database', 'organization'] },
+   * }
+   * ```
+   */
+  relationships?: Record<string, EntityRelationship>;
+
+  /**
+   * Generate scope-aware query keys for entities with relationships
+   * When true, keys include optional scope parameters for hierarchical invalidation
+   * @default true
+   */
+  generateScopedKeys?: boolean;
+
+  /**
+   * Generate cascade invalidation helpers
+   * Creates helpers that invalidate parent entities and all their children
+   * @default true
+   */
+  generateCascadeHelpers?: boolean;
+
+  /**
+   * Generate mutation keys for tracking in-flight mutations
+   * Useful for optimistic updates and mutation deduplication
+   * @default true
+   */
+  generateMutationKeys?: boolean;
+}
+
+/**
+ * Target configuration for graphql-codegen
+ * Represents a single schema source and output destination.
+ */
+export interface GraphQLSDKConfigTarget {
+  /**
+   * GraphQL endpoint URL for live introspection
+   * Either endpoint or schema must be provided
+   */
+  endpoint?: string;
+
+  /**
+   * Path to GraphQL schema file (.graphql) for file-based generation
+   * Either endpoint or schema must be provided
+   */
+  schema?: string;
 
   /**
    * Headers to include in introspection requests
@@ -23,7 +92,7 @@ export interface GraphQLSDKConfig {
   output?: string;
 
   /**
-   * Table filtering options (for table-based CRUD operations from _meta)
+   * Table filtering options (for table-based CRUD operations)
    */
   tables?: {
     /** Tables to include (glob patterns supported) */
@@ -108,6 +177,25 @@ export interface GraphQLSDKConfig {
   };
 
   /**
+   * React Query integration options
+   * Controls whether React Query hooks are generated
+   */
+  reactQuery?: {
+    /**
+     * Whether to generate React Query hooks (useQuery, useMutation)
+     * When false, only standalone fetch functions are generated (no React dependency)
+     * @default false
+     */
+    enabled?: boolean;
+  };
+
+  /**
+   * Query key generation configuration
+   * Controls how query keys are structured for cache management
+   */
+  queryKeys?: QueryKeyConfig;
+
+  /**
    * Watch mode configuration (dev-only feature)
    * When enabled via CLI --watch flag, the CLI will poll the endpoint for schema changes
    */
@@ -115,8 +203,28 @@ export interface GraphQLSDKConfig {
 }
 
 /**
+ * Multi-target configuration for graphql-codegen
+ */
+export interface GraphQLSDKMultiConfig {
+  /**
+   * Shared defaults applied to every target
+   */
+  defaults?: GraphQLSDKConfigTarget;
+
+  /**
+   * Named target configurations
+   */
+  targets: Record<string, GraphQLSDKConfigTarget>;
+}
+
+/**
+ * Main configuration type for graphql-codegen
+ */
+export type GraphQLSDKConfig = GraphQLSDKConfigTarget | GraphQLSDKMultiConfig;
+
+/**
  * Watch mode configuration options
- * 
+ *
  * Watch mode uses in-memory caching for efficiency - no file I/O during polling.
  */
 export interface WatchConfig {
@@ -158,10 +266,30 @@ export interface ResolvedWatchConfig {
 }
 
 /**
+ * Resolved query key configuration with defaults applied
+ */
+export interface ResolvedQueryKeyConfig {
+  style: 'flat' | 'hierarchical';
+  relationships: Record<string, EntityRelationship>;
+  generateScopedKeys: boolean;
+  generateCascadeHelpers: boolean;
+  generateMutationKeys: boolean;
+}
+
+/**
  * Resolved configuration with defaults applied
  */
-export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers' | 'tables' | 'queries' | 'mutations' | 'hooks' | 'postgraphile' | 'codegen' | 'orm' | 'watch'>> {
+export interface ResolvedConfig {
+  /**
+   * GraphQL endpoint URL (empty string if using schema file)
+   */
+  endpoint: string;
+  /**
+   * Path to GraphQL schema file (null if using endpoint)
+   */
+  schema: string | null;
   headers: Record<string, string>;
+  output: string;
   tables: {
     include: string[];
     exclude: string[];
@@ -174,6 +302,7 @@ export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers
     include: string[];
     exclude: string[];
   };
+  excludeFields: string[];
   hooks: {
     queries: boolean;
     mutations: boolean;
@@ -190,6 +319,10 @@ export interface ResolvedConfig extends Required<Omit<GraphQLSDKConfig, 'headers
     output: string;
     useSharedTypes: boolean;
   } | null;
+  reactQuery: {
+    enabled: boolean;
+  };
+  queryKeys: ResolvedQueryKeyConfig;
   watch: ResolvedWatchConfig;
 }
 
@@ -204,9 +337,20 @@ export const DEFAULT_WATCH_CONFIG: ResolvedWatchConfig = {
 };
 
 /**
+ * Default query key configuration values
+ */
+export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
+  style: 'hierarchical',
+  relationships: {},
+  generateScopedKeys: true,
+  generateCascadeHelpers: true,
+  generateMutationKeys: true,
+};
+
+/**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint'> = {
+export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
   headers: {},
   output: './generated/graphql',
   tables: {
@@ -235,6 +379,10 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint'> = {
     skipQueryField: true,
   },
   orm: null, // ORM generation disabled by default
+  reactQuery: {
+    enabled: true, // React Query hooks enabled by default for generate command
+  },
+  queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
 
@@ -254,11 +402,122 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
 }
 
 /**
+ * Resolved target configuration helper
+ */
+export interface ResolvedTargetConfig {
+  name: string;
+  config: ResolvedConfig;
+}
+
+/**
+ * Type guard for multi-target configs
+ */
+export function isMultiConfig(
+  config: GraphQLSDKConfig
+): config is GraphQLSDKMultiConfig {
+  const targets = (config as GraphQLSDKMultiConfig).targets;
+  return typeof targets === 'object' && targets !== null;
+}
+
+/**
+ * Merge two target configs (defaults + overrides)
+ */
+export function mergeConfig(
+  base: GraphQLSDKConfigTarget,
+  overrides: GraphQLSDKConfigTarget
+): GraphQLSDKConfigTarget {
+  const headers =
+    base.headers || overrides.headers
+      ? { ...(base.headers ?? {}), ...(overrides.headers ?? {}) }
+      : undefined;
+
+  const tables =
+    base.tables || overrides.tables
+      ? { ...(base.tables ?? {}), ...(overrides.tables ?? {}) }
+      : undefined;
+
+  const queries =
+    base.queries || overrides.queries
+      ? { ...(base.queries ?? {}), ...(overrides.queries ?? {}) }
+      : undefined;
+
+  const mutations =
+    base.mutations || overrides.mutations
+      ? { ...(base.mutations ?? {}), ...(overrides.mutations ?? {}) }
+      : undefined;
+
+  const hooks =
+    base.hooks || overrides.hooks
+      ? { ...(base.hooks ?? {}), ...(overrides.hooks ?? {}) }
+      : undefined;
+
+  const postgraphile =
+    base.postgraphile || overrides.postgraphile
+      ? { ...(base.postgraphile ?? {}), ...(overrides.postgraphile ?? {}) }
+      : undefined;
+
+  const codegen =
+    base.codegen || overrides.codegen
+      ? { ...(base.codegen ?? {}), ...(overrides.codegen ?? {}) }
+      : undefined;
+
+  const orm =
+    base.orm || overrides.orm
+      ? { ...(base.orm ?? {}), ...(overrides.orm ?? {}) }
+      : undefined;
+
+  const reactQuery =
+    base.reactQuery || overrides.reactQuery
+      ? { ...(base.reactQuery ?? {}), ...(overrides.reactQuery ?? {}) }
+      : undefined;
+
+  const queryKeys =
+    base.queryKeys || overrides.queryKeys
+      ? {
+          ...(base.queryKeys ?? {}),
+          ...(overrides.queryKeys ?? {}),
+          relationships: {
+            ...(base.queryKeys?.relationships ?? {}),
+            ...(overrides.queryKeys?.relationships ?? {}),
+          },
+        }
+      : undefined;
+
+  const watch =
+    base.watch || overrides.watch
+      ? { ...(base.watch ?? {}), ...(overrides.watch ?? {}) }
+      : undefined;
+
+  return {
+    ...base,
+    ...overrides,
+    headers,
+    tables,
+    queries,
+    mutations,
+    hooks,
+    postgraphile,
+    codegen,
+    orm,
+    reactQuery,
+    queryKeys,
+    watch,
+  };
+}
+
+/**
  * Resolve configuration by applying defaults
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
+  if (isMultiConfig(config)) {
+    throw new Error(
+      'Multi-target config cannot be resolved with resolveConfig(). Use resolveConfigTargets().'
+    );
+  }
+
   return {
-    endpoint: config.endpoint,
+    endpoint: config.endpoint ?? '',
+    schema: config.schema ?? null,
     headers: config.headers ?? DEFAULT_CONFIG.headers,
     output: config.output ?? DEFAULT_CONFIG.output,
     tables: {
@@ -277,26 +536,64 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     hooks: {
       queries: config.hooks?.queries ?? DEFAULT_CONFIG.hooks.queries,
       mutations: config.hooks?.mutations ?? DEFAULT_CONFIG.hooks.mutations,
-      queryKeyPrefix: config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
+      queryKeyPrefix:
+        config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
     },
     postgraphile: {
       schema: config.postgraphile?.schema ?? DEFAULT_CONFIG.postgraphile.schema,
     },
     codegen: {
-      maxFieldDepth: config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
-      skipQueryField: config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
+      maxFieldDepth:
+        config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
+      skipQueryField:
+        config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
     },
     orm: config.orm
       ? {
           output: config.orm.output ?? DEFAULT_ORM_CONFIG.output,
-          useSharedTypes: config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
+          useSharedTypes:
+            config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
         }
       : null,
+    reactQuery: {
+      enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
+    },
+    queryKeys: {
+      style: config.queryKeys?.style ?? DEFAULT_QUERY_KEY_CONFIG.style,
+      relationships:
+        config.queryKeys?.relationships ??
+        DEFAULT_QUERY_KEY_CONFIG.relationships,
+      generateScopedKeys:
+        config.queryKeys?.generateScopedKeys ??
+        DEFAULT_QUERY_KEY_CONFIG.generateScopedKeys,
+      generateCascadeHelpers:
+        config.queryKeys?.generateCascadeHelpers ??
+        DEFAULT_QUERY_KEY_CONFIG.generateCascadeHelpers,
+      generateMutationKeys:
+        config.queryKeys?.generateMutationKeys ??
+        DEFAULT_QUERY_KEY_CONFIG.generateMutationKeys,
+    },
     watch: {
-      pollInterval: config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
+      pollInterval:
+        config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
       debounce: config.watch?.debounce ?? DEFAULT_WATCH_CONFIG.debounce,
       touchFile: config.watch?.touchFile ?? DEFAULT_WATCH_CONFIG.touchFile,
-      clearScreen: config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
+      clearScreen:
+        config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
     },
   };
+}
+
+/**
+ * Resolve all targets in a multi-target config
+ */
+export function resolveConfigTargets(
+  config: GraphQLSDKMultiConfig
+): ResolvedTargetConfig[] {
+  const defaults = config.defaults ?? {};
+
+  return Object.entries(config.targets).map(([name, target]) => ({
+    name,
+    config: resolveConfig(mergeConfig(defaults, target)),
+  }));
 }

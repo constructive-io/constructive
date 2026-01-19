@@ -3,6 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.17.0...@constructive-io/graphql-react@2.18.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+# [2.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.19...@constructive-io/graphql-react@2.17.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.19](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.18...@constructive-io/graphql-react@2.16.19) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.17...@constructive-io/graphql-react@2.16.18) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.16...@constructive-io/graphql-react@2.16.17) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.15...@constructive-io/graphql-react@2.16.16) (2026-01-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.15](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.14...@constructive-io/graphql-react@2.16.15) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.13...@constructive-io/graphql-react@2.16.14) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.13](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.12...@constructive-io/graphql-react@2.16.13) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.11...@constructive-io/graphql-react@2.16.12) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.10...@constructive-io/graphql-react@2.16.11) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.9...@constructive-io/graphql-react@2.16.10) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.8...@constructive-io/graphql-react@2.16.9) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.7...@constructive-io/graphql-react@2.16.8) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.6...@constructive-io/graphql-react@2.16.7) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.5...@constructive-io/graphql-react@2.16.6) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.4...@constructive-io/graphql-react@2.16.5) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.3...@constructive-io/graphql-react@2.16.4) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.2...@constructive-io/graphql-react@2.16.3) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
+## [2.16.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.1...@constructive-io/graphql-react@2.16.2) (2026-01-07)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
 ## [2.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@2.16.0...@constructive-io/graphql-react@2.16.1) (2026-01-06)
 
 **Note:** Version bump only for package @constructive-io/graphql-react

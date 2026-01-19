@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@constructive-io/job-utils';
 import poolManager from '@constructive-io/job-pg';
+import { createLogger } from '@pgpmjs/logger';
 
 type JobRequestBody = {
   message?: string;
@@ -34,6 +35,8 @@ type WithClientHandler = (
   next: NextFn
 ) => Promise<void>;
 
+const logger = createLogger('knative-job-server');
+
 export default (pgPool: Pool = poolManager.getPool()) => {
   const app = express();
   app.use(bodyParser.json());
@@ -56,15 +59,14 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     const jobIdHeader = req.get('X-Job-Id');
 
     if (!workerId || !jobIdHeader) {
-      console.log(
-        'server: missing worker/job headers on completion callback',
+      logger.warn('missing worker/job headers on completion callback',
         { workerId, jobIdHeader }
       );
       res.status(400).json({ error: 'Missing X-Worker-Id or X-Job-Id header' });
       return;
     }
 
-    console.log(`server: Completed task ${jobIdHeader} with success`);
+    logger.info(`Completed task ${jobIdHeader} with success`);
     await jobs.completeJob(client, { workerId, jobId: jobIdHeader });
 
     res
@@ -80,8 +82,7 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     const jobIdHeader = req.get('X-Job-Id');
 
     if (!workerId || !jobIdHeader) {
-      console.log(
-        'server: missing worker/job headers on failure callback',
+      logger.warn('missing worker/job headers on failure callback',
         { workerId, jobIdHeader }
       );
       res.status(400).json({ error: 'Missing X-Worker-Id or X-Job-Id header' });
@@ -90,8 +91,8 @@ export default (pgPool: Pool = poolManager.getPool()) => {
 
     const errorMessage = req.body.error || req.body.message || 'UNKNOWN_ERROR';
 
-    console.log(
-      `server: Failed task ${jobIdHeader} with error: \n${errorMessage}\n\n`
+    logger.error(
+      `Failed task ${jobIdHeader} with error: \n${errorMessage}\n\n`
     );
 
     await jobs.failJob(client, {
@@ -107,9 +108,9 @@ export default (pgPool: Pool = poolManager.getPool()) => {
     const jobId = req.get('X-Job-Id');
 
     if (typeof jobId === 'undefined') {
-      console.log('server: undefined JOB, what is this? healthcheck?');
-      console.log(req.url);
-      console.log(req.originalUrl);
+      logger.warn('undefined JOB, what is this? healthcheck?');
+      logger.debug(req.url);
+      logger.debug(req.originalUrl);
       return res.status(200).json('OK');
     }
 

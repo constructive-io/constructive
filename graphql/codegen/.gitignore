@@ -1,9 +1,8 @@
 # Build output
 dist/
 
-# Generated SDK output (for testing)
-output-rq
-output-orm/
+# Artifacts of codegen for testing
+examples/output/
 
 # Dependencies
 node_modules/

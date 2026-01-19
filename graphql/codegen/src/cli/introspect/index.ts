@@ -2,28 +2,30 @@
  * Introspection module exports
  */
 
-export { META_QUERY } from './meta-query';
-export type {
-  MetaQueryResponse,
-  MetaTable,
-  MetaField,
-  MetaFieldType,
-  MetaConstraint,
-  MetaForeignKeyConstraint,
-  MetaTableQuery,
-  MetaTableInflection,
-  MetaBelongsToRelation,
-  MetaHasRelation,
-  MetaManyToManyRelation,
-  MetaTableRelations,
-} from './meta-query';
+// Table inference from introspection
+export { inferTablesFromIntrospection } from './infer-tables';
+export type { InferTablesOptions } from './infer-tables';
 
-export { fetchMeta, validateEndpoint } from './fetch-meta';
-export type { FetchMetaOptions, FetchMetaResult } from './fetch-meta';
+// Pluralization utilities (from inflekt)
+export { singularize, pluralize } from 'inflekt';
 
+// Schema sources
 export {
-  transformMetaToCleanTables,
-  getTableNames,
-  findTable,
-  filterTables,
-} from './transform';
+  createSchemaSource,
+  validateSourceOptions,
+  EndpointSchemaSource,
+  FileSchemaSource,
+  SchemaSourceError,
+} from './source';
+export type {
+  SchemaSource,
+  SchemaSourceResult,
+  CreateSchemaSourceOptions,
+} from './source';
+
+// Schema fetching (still used by watch mode)
+export { fetchSchema } from './fetch-schema';
+export type { FetchSchemaOptions, FetchSchemaResult } from './fetch-schema';
+
+// Transform utilities (only filterTables, getTableNames, findTable are still useful)
+export { getTableNames, findTable, filterTables } from './transform';
