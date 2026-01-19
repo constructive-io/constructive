@@ -44,6 +44,9 @@
     "request": "2.88.2"
   },
   "devDependencies": {
+    "@pgpmjs/core": "workspace:^",
+    "@pgpm/verify": "^0.16.0",
+    "@pgpm/database-jobs": "^0.16.0",
     "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   }

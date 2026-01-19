@@ -1412,6 +1412,15 @@ importers:
         specifier: 2.88.2
         version: 2.88.2
     devDependencies:
+      '@pgpm/database-jobs':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpm/verify':
+        specifier: ^0.16.0
+        version: 0.16.0
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
       makage:
         specifier: ^0.1.10
         version: 0.1.10
