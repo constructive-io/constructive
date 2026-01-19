@@ -553,6 +553,91 @@ describe('jobs e2e', () => {
     await waitForJobCompletion(graphqlClient, jobId);
   });
 
+  it('creates and processes a send-email-link forgot_password job', async () => {
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'send-email-link',
+      payload: {
+        email_type: 'forgot_password',
+        email: 'user@example.com',
+        user_id: '00000000-0000-0000-0000-000000000000',
+        reset_token: 'reset-token-123'
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    await waitForJobCompletion(graphqlClient, jobId);
+  });
+
+  it('creates and processes a send-email-link email_verification job', async () => {
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'send-email-link',
+      payload: {
+        email_type: 'email_verification',
+        email: 'user@example.com',
+        email_id: '55555555-5555-5555-5555-555555555555',
+        verification_token: 'verify-token-123'
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    await waitForJobCompletion(graphqlClient, jobId);
+  });
+
+  it('fails send-email-link job when required fields are missing', async () => {
+    const jobInput = {
+      dbId: databaseId,
+      identifier: 'send-email-link',
+      maxAttempts: 1,
+      payload: {
+        email_type: 'forgot_password',
+        email: 'user@example.com'
+        // Missing: user_id, reset_token
+      }
+    };
+
+    const response = await sendGraphql(graphqlClient, addJobMutation, {
+      input: jobInput
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body?.errors).toBeUndefined();
+
+    const jobId = response.body?.data?.addJob?.job?.id;
+
+    expect(jobId).toBeTruthy();
+
+    const job = await waitForJobFailure(graphqlClient, jobId, {
+      minAttempts: 1,
+      timeoutMs: 30000
+    });
+
+    expect(job.attempts).toBe(1);
+    expect(job.maxAttempts).toBe(1);
+    expect(job.lastError).toBeTruthy();
+  });
+
   it('records failed jobs when a function throws', async () => {
     const jobInput = {
       dbId: databaseId,

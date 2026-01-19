@@ -15,8 +15,8 @@ services:
       SERVER_TRUST_PROXY: "true"
       SERVER_ORIGIN: "*"
       SERVER_STRICT_AUTH: "false"
-      # Postgres connection (matches constructive-tests-postgres service)
-      PGHOST: constructive-tests-postgres
+      # Postgres connection (matches postgres service)
+      PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: password
@@ -33,7 +33,7 @@ services:
     ports:
       - "3101:3000"
     networks:
-      constructive-tests-net:
+      constructive-net:
         aliases:
           - constructive-admin-server
 
@@ -50,8 +50,8 @@ services:
       SERVER_TRUST_PROXY: "true"
       SERVER_ORIGIN: "*"
       SERVER_STRICT_AUTH: "false"
-      # Postgres connection (matches constructive-tests-postgres service)
-      PGHOST: constructive-tests-postgres
+      # Postgres connection (matches postgres service)
+      PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: password
@@ -68,7 +68,7 @@ services:
     ports:
       - "3102:3000"
     networks:
-      constructive-tests-net:
+      constructive-net:
         aliases:
           - constructive-server
 
@@ -102,7 +102,7 @@ services:
     ports:
       - "8082:8080"
     networks:
-      - constructive-tests-net
+      - constructive-net
 
   # Jobs runtime: callback server + worker + scheduler
   knative-job-service:
@@ -116,7 +116,7 @@ services:
 
       # Postgres (jobs extension lives in this DB)
       PGUSER: postgres
-      PGHOST: constructive-tests-postgres
+      PGHOST: postgres
       PGPASSWORD: password
       PGPORT: "5432"
       PGDATABASE: constructive
@@ -142,9 +142,9 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - constructive-tests-net
+      - constructive-net
 
 networks:
-  constructive-tests-net:
+  constructive-net:
     external: true
-    name: constructive-tests-net
+    name: constructive-net

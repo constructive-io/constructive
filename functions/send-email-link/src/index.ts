@@ -388,6 +388,22 @@ export default app;
 // When executed directly (e.g. via `node dist/index.js`), start an HTTP server.
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
+
+  // Log startup configuration (non-sensitive values only - no API keys or tokens)
+  logger.info('[send-email-link] Starting with config:', {
+    port,
+    graphqlUrl: process.env.GRAPHQL_URL || 'not set',
+    metaGraphqlUrl: process.env.META_GRAPHQL_URL || process.env.GRAPHQL_URL || 'not set',
+    apiName: process.env.GRAPHQL_API_NAME || 'not set',
+    defaultDatabaseId: process.env.DEFAULT_DATABASE_ID || 'not set',
+    dryRun: isDryRun,
+    useSmtp,
+    mailgunDomain: process.env.MAILGUN_DOMAIN || 'not set',
+    mailgunFrom: process.env.MAILGUN_FROM || 'not set',
+    localAppPort: process.env.LOCAL_APP_PORT || 'not set',
+    hasAuthToken: !!process.env.GRAPHQL_AUTH_TOKEN
+  });
+
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
     logger.info(`listening on port ${port}`);

@@ -376,12 +376,12 @@ export const getApiConfig = async (
     const client = new GraphileQuery({ schema, pool: rootPgPool, settings });
 
     const apiPublic = (opts as any).api?.isPublic;
-    log.info(`[api-middleware] Routing: apiPublic=${apiPublic} (type: ${typeof apiPublic})`);
+    log.debug(`[api-middleware] Routing: apiPublic=${apiPublic} (type: ${typeof apiPublic})`);
 
     if (apiPublic === false) {
-      log.info(`[api-middleware] Using header-based routing (apiPublic === false)`);
+      log.debug(`[api-middleware] Using header-based routing (apiPublic === false)`);
       if (req.get('X-Schemata')) {
-        log.info(`[api-middleware] Route: X-Schemata`);
+        log.debug(`[api-middleware] Route: X-Schemata`);
         svc = getHardCodedSchemata({
           opts,
           key,
@@ -389,7 +389,7 @@ export const getApiConfig = async (
           databaseId: req.get('X-Database-Id'),
         });
       } else if (req.get('X-Api-Name')) {
-        log.info(`[api-middleware] Route: X-Api-Name=${req.get('X-Api-Name')}, X-Database-Id=${req.get('X-Database-Id')}`);
+        log.debug(`[api-middleware] Route: X-Api-Name=${req.get('X-Api-Name')}, X-Database-Id=${req.get('X-Database-Id')}`);
         svc = await queryServiceByApiName({
           opts,
           key,
@@ -397,16 +397,16 @@ export const getApiConfig = async (
           name: req.get('X-Api-Name'),
           databaseId: req.get('X-Database-Id'),
         });
-        log.info(`[api-middleware] queryServiceByApiName result: ${svc ? 'found' : 'null'}`);
+        log.debug(`[api-middleware] queryServiceByApiName result: ${svc ? 'found' : 'null'}`);
       } else if (req.get('X-Meta-Schema')) {
-        log.info(`[api-middleware] Route: X-Meta-Schema`);
+        log.debug(`[api-middleware] Route: X-Meta-Schema`);
         svc = getMetaSchema({
           opts,
           key,
           databaseId: req.get('X-Database-Id'),
         });
       } else {
-        log.info(`[api-middleware] Route: domain/subdomain fallback`);
+        log.debug(`[api-middleware] Route: domain/subdomain fallback`);
         svc = await queryServiceByDomainAndSubdomain({
           opts,
           key,
@@ -416,7 +416,7 @@ export const getApiConfig = async (
         });
       }
     } else {
-      log.info(`[api-middleware] Using domain-based routing (apiPublic !== false)`);
+      log.debug(`[api-middleware] Using domain-based routing (apiPublic !== false)`);
       svc = await queryServiceByDomainAndSubdomain({
         opts,
         key,
