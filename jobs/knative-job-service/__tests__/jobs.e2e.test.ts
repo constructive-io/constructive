@@ -354,7 +354,7 @@ describe('jobs e2e', () => {
     INTERNAL_GATEWAY_DEVELOPMENT_MAP:
       process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP,
     INTERNAL_JOBS_CALLBACK_PORT: process.env.INTERNAL_JOBS_CALLBACK_PORT,
-    JOBS_CALLBACK_BASE_URL: process.env.JOBS_CALLBACK_BASE_URL,
+    INTERNAL_JOBS_CALLBACK_URL: process.env.INTERNAL_JOBS_CALLBACK_URL,
     FEATURES_POSTGIS: process.env.FEATURES_POSTGIS
   };
 
@@ -407,7 +407,7 @@ describe('jobs e2e', () => {
       'mailgun-failure': `http://127.0.0.1:${MAILGUN_FAILURE_PORT}`
     });
     process.env.INTERNAL_JOBS_CALLBACK_PORT = String(CALLBACK_PORT);
-    process.env.JOBS_CALLBACK_BASE_URL = callbackUrl;
+    process.env.INTERNAL_JOBS_CALLBACK_URL = callbackUrl;
     process.env.FEATURES_POSTGIS = 'false';
 
     if (pg.config.host) process.env.PGHOST = pg.config.host;

@@ -1,7 +1,7 @@
 process.env.KNATIVE_SERVICE_URL =
   process.env.KNATIVE_SERVICE_URL || 'http://knative.internal';
-process.env.JOBS_CALLBACK_BASE_URL =
-  process.env.JOBS_CALLBACK_BASE_URL ||
+process.env.INTERNAL_JOBS_CALLBACK_URL =
+  process.env.INTERNAL_JOBS_CALLBACK_URL ||
   'http://callback.internal/jobs-complete';
 
 const postMock = jest.fn();

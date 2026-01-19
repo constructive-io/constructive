@@ -17,7 +17,7 @@ describe('knative request wrapper', () => {
     process.env.PGPORT = '5432';
     process.env.PGDATABASE = 'jobs';
     process.env.JOBS_SCHEMA = 'app_jobs';
-    process.env.JOBS_CALLBACK_BASE_URL =
+    process.env.INTERNAL_JOBS_CALLBACK_URL =
       'http://callback.internal/jobs-complete';
     process.env.NODE_ENV = 'test';
     delete process.env.INTERNAL_GATEWAY_URL;
