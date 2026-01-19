@@ -377,6 +377,11 @@ app.post('/', async (req: any, res: any, next: any) => {
       databaseId
     });
 
+    // Validation failures return { missing: '...' } - treat as client error
+    if (result && typeof result === 'object' && 'missing' in result) {
+      return res.status(400).json({ error: `Missing required field: ${result.missing}` });
+    }
+
     res.status(200).json(result);
   } catch (err) {
     next(err);
