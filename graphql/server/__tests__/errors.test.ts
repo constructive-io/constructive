@@ -123,6 +123,9 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
   if (!started) return;
 
   await started.server.close();
+  if (!started.httpServer.listening) {
+    return;
+  }
   await new Promise<void>((resolve, reject) => {
     started.httpServer.close((error) => {
       if (error) {
@@ -201,7 +204,7 @@ const buildOptions = ({
       port: 0,
     },
     api: {
-      enableMetaApi: true,
+      enableServicesApi: true,
       isPublic: true,
     },
   });
@@ -227,7 +230,7 @@ const buildAppOptions = ({
       port: 0,
     },
     api: {
-      enableMetaApi: false,
+      enableServicesApi: false,
       isPublic: true,
       exposedSchemas: ['app_public'],
       defaultDatabaseId: seededDatabaseId,
@@ -251,7 +254,7 @@ const buildUnreachableOptions = (): ConstructiveOptions => {
       port: 0,
     },
     api: {
-      enableMetaApi: false,
+      enableServicesApi: false,
       isPublic: true,
       exposedSchemas: ['app_public'],
       defaultDatabaseId: seededDatabaseId,

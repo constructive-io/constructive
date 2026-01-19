@@ -35,7 +35,7 @@ export const getEnvOptions = (
   const configOptions = loadConfigSync(cwd) as Partial<ConstructiveOptions>;
   
   // Merge in order: core -> graphql defaults -> config (for graphql keys) -> graphql env -> overrides
-  return deepmerge.all([
+  const merged = deepmerge.all([
     coreOptions,
     constructiveGraphqlDefaults,
     // Only merge graphql-related keys from config (if present)
@@ -49,6 +49,13 @@ export const getEnvOptions = (
   ], {
     arrayMerge: mergeArraysUnique
   }) as ConstructiveOptions;
+
+  Object.defineProperty(merged as any, '__merged', {
+    value: true,
+    enumerable: false,
+  });
+
+  return merged;
 };
 
 /**

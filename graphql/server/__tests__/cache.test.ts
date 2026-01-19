@@ -137,6 +137,9 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
   if (!started) return;
 
   await started.server.close();
+  if (!started.httpServer.listening) {
+    return;
+  }
   await new Promise<void>((resolve, reject) => {
     started.httpServer.close((error) => {
       if (error) {
@@ -190,7 +193,7 @@ const buildOptions = ({ db }: { db: PgTestClient }): ConstructiveOptions => {
       port: 0,
     },
     api: {
-      enableMetaApi: true,
+      enableServicesApi: true,
       isPublic: true,
       metaSchemas,
     },

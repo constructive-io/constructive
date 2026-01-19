@@ -131,6 +131,9 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
   if (!started) return;
 
   await started.server.close();
+  if (!started.httpServer.listening) {
+    return;
+  }
   await new Promise<void>((resolve, reject) => {
     started.httpServer.close((error) => {
       if (error) {
@@ -187,21 +190,21 @@ const createMetaDb = async (): Promise<SeededConnections> => {
 
 const buildOptions = ({
   db,
-  enableMetaApi,
+  enableServicesApi,
   isPublic,
 }: {
   db: PgTestClient;
-  enableMetaApi: boolean;
+  enableServicesApi: boolean;
   isPublic: boolean;
 }): ConstructiveOptions => {
-  const api = enableMetaApi
+  const api = enableServicesApi
     ? {
-        enableMetaApi: true,
+        enableServicesApi: true,
         isPublic,
         metaSchemas,
       }
     : {
-        enableMetaApi: false,
+        enableServicesApi: false,
         isPublic,
         exposedSchemas: appSchemas,
         defaultDatabaseId: seededDatabaseId,
@@ -252,7 +255,7 @@ describe('Domain Routing', () => {
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: true,
+          enableServicesApi: true,
           isPublic: true,
         })
       );
@@ -357,7 +360,7 @@ describe('Domain Routing', () => {
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: true,
+          enableServicesApi: true,
           isPublic: false,
         })
       );
@@ -415,7 +418,7 @@ describe('Domain Routing', () => {
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi: false,
+          enableServicesApi: false,
           isPublic: true,
         })
       );

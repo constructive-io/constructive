@@ -39,7 +39,7 @@ type SeededConnections = Pick<PgsqlConnections, 'db' | 'pg' | 'teardown'>;
 
 type RouteCase = {
   name: string;
-  enableMetaApi: boolean;
+  enableServicesApi: boolean;
   isPublic: boolean;
   seed: () => SeededConnections;
   getHeaders?: () => Record<string, string>;
@@ -128,6 +128,9 @@ const stopServer = async (started: StartedServer | null): Promise<void> => {
   if (!started) return;
 
   await started.server.close();
+  if (!started.httpServer.listening) {
+    return;
+  }
   await new Promise<void>((resolve, reject) => {
     started.httpServer.close((error) => {
       if (error) {
@@ -184,21 +187,21 @@ const createMetaDb = async (): Promise<SeededConnections> => {
 
 const buildOptions = ({
   db,
-  enableMetaApi,
+  enableServicesApi,
   isPublic,
 }: {
   db: PgTestClient;
-  enableMetaApi: boolean;
+  enableServicesApi: boolean;
   isPublic: boolean;
 }): ConstructiveOptions => {
-  const api = enableMetaApi
+  const api = enableServicesApi
     ? {
-        enableMetaApi: true,
+        enableServicesApi: true,
         isPublic,
         metaSchemas,
       }
     : {
-        enableMetaApi: false,
+        enableServicesApi: false,
         isPublic,
         exposedSchemas: appSchemas,
         defaultDatabaseId: seededDatabaseId,
@@ -241,27 +244,27 @@ afterAll(async () => {
 const cases: RouteCase[] = [
   {
     name: 'meta enabled, public',
-    enableMetaApi: true,
+    enableServicesApi: true,
     isPublic: true,
     seed: () => requireConnections(metaDb, 'meta'),
     getHeaders: () => ({ Host: metaHosts.publicHost }),
   },
   {
     name: 'meta enabled, private',
-    enableMetaApi: true,
+    enableServicesApi: true,
     isPublic: false,
     seed: () => requireConnections(metaDb, 'meta'),
     getHeaders: () => ({ Host: metaHosts.privateHost }),
   },
   {
     name: 'meta disabled, public',
-    enableMetaApi: false,
+    enableServicesApi: false,
     isPublic: true,
     seed: () => requireConnections(appDb, 'app'),
   },
   {
     name: 'meta disabled, private',
-    enableMetaApi: false,
+    enableServicesApi: false,
     isPublic: false,
     seed: () => requireConnections(appDb, 'app'),
   },
@@ -269,7 +272,7 @@ const cases: RouteCase[] = [
 
 describe.each(cases)(
   '$name',
-  ({ enableMetaApi, isPublic, seed, getHeaders }) => {
+  ({ enableServicesApi, isPublic, seed, getHeaders }) => {
     let started: StartedServer | null = null;
     let db: PgTestClient;
     let headers: Record<string, string> | undefined;
@@ -281,7 +284,7 @@ describe.each(cases)(
       started = await startServer(
         buildOptions({
           db,
-          enableMetaApi,
+          enableServicesApi,
           isPublic,
         })
       );
@@ -289,7 +292,7 @@ describe.each(cases)(
 
     beforeEach(async () => {
       db.setContext({
-        role: enableMetaApi && isPublic ? 'anonymous' : 'administrator',
+        role: enableServicesApi && isPublic ? 'anonymous' : 'administrator',
         'jwt.claims.database_id': seededDatabaseId,
       });
       await db.beforeEach();

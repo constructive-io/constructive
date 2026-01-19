@@ -1,17 +1,16 @@
 import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { healthz, poweredBy, svcCache, svcCache, trustProxy } from '@pgpmjs/server-utils';
+import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { randomUUID } from 'crypto';
-import { graphileCache } from 'graphile-cache';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
 import { graphileCache } from 'graphile-cache';
-import { getPgPool, pgCache, pgCache } from 'pg-cache';
+import { getPgPool, pgCache } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createApiMiddleware } from './middleware/api';
@@ -24,7 +23,8 @@ const log = new Logger('server');
 const isDev = () => getNodeEnv() === 'development';
 
 export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
-  const envOptions = getEnvOptions(rawOpts);
+  const envOptions =
+    (rawOpts as any).__merged ? (rawOpts as PgpmOptions) : getEnvOptions(rawOpts);
   const app = new Server(envOptions);
   app.addEventListener();
   app.listen();
@@ -38,13 +38,10 @@ class Server {
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
-  private listenClient: PoolClient | null = null;
-  private listenRelease: (() => void) | null = null;
-  private shuttingDown = false;
-  private closed = false;
 
   constructor(opts: PgpmOptions) {
-    this.opts = getEnvOptions(opts);
+    this.opts =
+      (opts as any).__merged ? (opts as PgpmOptions) : getEnvOptions(opts);
     const effectiveOpts = this.opts;
 
     const app = express();
@@ -138,8 +135,6 @@ class Server {
     });
 
     this.httpServer = httpServer;
-    return httpServer;
-
     return httpServer;
   }
 
@@ -238,55 +233,6 @@ class Server {
         this.httpServer!.close(() => resolve())
       );
     }
-    if (closeCaches) {
-      await Server.closeCaches({ closePools: true });
-    }
-  }
-
-  static async closeCaches(
-    opts: { closePools?: boolean } = {}
-  ): Promise<void> {
-    const { closePools = false } = opts;
-    svcCache.clear();
-    graphileCache.clear();
-    if (closePools) {
-      await pgCache.close();
-    }
-  }
-
-  async removeEventListener(): Promise<void> {
-    if (!this.listenClient || !this.listenRelease) {
-      return;
-    }
-
-    const client = this.listenClient;
-    const release = this.listenRelease;
-    this.listenClient = null;
-    this.listenRelease = null;
-
-    client.removeAllListeners('notification');
-    client.removeAllListeners('error');
-
-    try {
-      await client.query('UNLISTEN "schema:update"');
-    } catch {
-      // Ignore listener cleanup errors during shutdown.
-    }
-
-    release();
-  }
-
-  async close(opts: { closeCaches?: boolean } = {}): Promise<void> {
-    const { closeCaches = false } = opts;
-    if (this.closed) {
-      if (closeCaches) {
-        await Server.closeCaches({ closePools: true });
-      }
-      return;
-    }
-    this.closed = true;
-    this.shuttingDown = true;
-    await this.removeEventListener();
     if (closeCaches) {
       await Server.closeCaches({ closePools: true });
     }
