@@ -5,24 +5,29 @@
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-service#readme",
   "license": "SEE LICENSE IN LICENSE",
-  "main": "dist/index.js",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
   "directories": {
     "lib": "src",
     "test": "__tests__"
   },
   "bin": {
-    "faas-job-service": "src/run.ts"
+    "faas-job-service": "run.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/constructive-io/jobs"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w",
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
     "start": "node dist/run.js",
     "dev": "ts-node --transpile-only src/run.ts",
     "test": "jest --passWithNoTests",
@@ -44,6 +49,7 @@
     "@pgpm/verify": "^0.16.0",
     "@pgpmjs/core": "workspace:^",
     "@types/supertest": "^6.0.3",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2"

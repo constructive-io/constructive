@@ -3,11 +3,11 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-    '^.+\\.tsx?$': [
+    '^.+\\.[tj]sx?$': [
       'ts-jest',
       {
         babelConfig: false,
-        tsconfig: 'tsconfig.json',
+        tsconfig: 'tsconfig.jest.json',
       },
     ],
   },

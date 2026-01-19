@@ -1,5 +1,5 @@
 process.env.KNATIVE_SERVICE_URL =
-  process.env.KNATIVE_SERVICE_URL || 'knative.internal';
+  process.env.KNATIVE_SERVICE_URL || 'http://knative.internal';
 process.env.INTERNAL_JOBS_CALLBACK_URL =
   process.env.INTERNAL_JOBS_CALLBACK_URL ||
   'http://callback.internal/jobs-complete';
@@ -22,20 +22,73 @@ jest.mock('@constructive-io/job-pg', () => ({
 }));
 
 import path from 'path';
-import { getConnections, seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
+import { PgpmInit, PgpmMigrate } from '@pgpmjs/core';
+import { getConnections, seed, type PgTestClient } from 'pgsql-test';
 import * as jobUtils from '@constructive-io/job-utils';
 import Worker from '../src';
 
 let db: PgTestClient;
 let teardown: () => Promise<void>;
 
-beforeAll(async () => {
-  const modulePath = path.resolve(
-    __dirname,
-    '../../../extensions/@pgpm/database-jobs'
+const metaDbExtensions = ['pgcrypto'];
+
+const getPgpmModulePath = (pkgName: string): string =>
+  path.dirname(require.resolve(`${pkgName}/pgpm.plan`));
+
+const metaSeedModules = [
+  getPgpmModulePath('@pgpm/verify'),
+  getPgpmModulePath('@pgpm/database-jobs')
+];
+
+type PgConfigLike = PgTestClient['config'];
+
+const runMetaMigrations = async (config: PgConfigLike) => {
+  const migrator = new PgpmMigrate(config);
+  for (const modulePath of metaSeedModules) {
+    const result = await migrator.deploy({ modulePath, usePlan: true });
+    if (result.failed) {
+      throw new Error(`Failed to deploy ${modulePath}: ${result.failed}`);
+    }
+  }
+};
+
+const bootstrapAdminUsers = seed.fn(async ({ admin, config, connect }) => {
+  const roles = connect?.roles;
+  const connections = connect?.connections;
+
+  if (!roles || !connections) {
+    throw new Error('Missing pgpm role or connection defaults for admin users.');
+  }
+
+  const init = new PgpmInit(config);
+  try {
+    await init.bootstrapRoles(roles);
+    await init.bootstrapTestRoles(roles, connections);
+  } finally {
+    await init.close();
+  }
+
+  const appUser = connections.app?.user;
+  if (appUser) {
+    await admin.grantRole(roles.administrator, appUser, config.database);
+  }
+});
+
+const deployMetaModules = seed.fn(async ({ config }) => {
+  await runMetaMigrations(config);
+});
+
+const createTestDb = async () => {
+  const { db, teardown } = await getConnections(
+    { db: { extensions: metaDbExtensions } },
+    [bootstrapAdminUsers, deployMetaModules]
   );
-  ({ db, teardown } = await getConnections({}, [seed.loadPgpm(modulePath)]));
+
+  return { db, teardown };
+};
+
+beforeAll(async () => {
+  ({ db, teardown } = await createTestDb());
   db.setContext({ role: 'administrator' });
 });
 
@@ -83,7 +136,7 @@ describe('knative worker integration with job queue', () => {
 
     expect(postMock).toHaveBeenCalledTimes(1);
     const [options] = postMock.mock.calls[0];
-    expect(options.url).toBe('http://example-fn.knative.internal');
+    expect(options.url).toBe('http://knative.internal/example-fn');
     expect(options.headers['X-Job-Id']).toBe(job.id);
     expect(options.headers['X-Database-Id']).toBe(databaseId);
   });

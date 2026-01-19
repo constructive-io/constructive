@@ -145,8 +145,8 @@ export const getJobsCallbackPort = (): number => {
 };
 
 export const getCallbackBaseUrl = (): string => {
-  if (process.env.JOBS_CALLBACK_BASE_URL) {
-    return process.env.JOBS_CALLBACK_BASE_URL;
+  if (process.env.INTERNAL_JOBS_CALLBACK_URL) {
+    return process.env.INTERNAL_JOBS_CALLBACK_URL;
   }
   const host = process.env.JOBS_CALLBACK_HOST || 'jobs-callback';
   const port = getJobsCallbackPort();
