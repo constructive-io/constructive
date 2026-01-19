@@ -12,7 +12,7 @@ import type {
   ArgumentNode,
   VariableDefinitionNode,
 } from 'graphql';
-import type { CleanTable, CleanField } from '../../types/schema';
+import type { CleanTable, CleanField, TypeRegistry } from '../../types/schema';
 import {
   getTableNames,
   getAllRowsQueryName,
@@ -26,6 +26,8 @@ import {
   getScalarFields,
   getPrimaryKeyInfo,
   ucFirst,
+  getDeletedNodeIdFieldName,
+  getDeletePayloadTypeName,
 } from './utils';
 
 
@@ -345,16 +347,24 @@ export function buildUpdateMutationAST(config: UpdateMutationConfig): DocumentNo
 
 export interface DeleteMutationConfig {
   table: CleanTable;
+  /** TypeRegistry for looking up actual payload field names from schema */
+  typeRegistry?: TypeRegistry;
 }
 
 /**
  * Build a delete mutation AST for a table
  */
 export function buildDeleteMutationAST(config: DeleteMutationConfig): DocumentNode {
-  const { table } = config;
+  const { table, typeRegistry } = config;
   const { typeName } = getTableNames(table);
   const mutationName = getDeleteMutationName(table);
   const inputTypeName = `Delete${typeName}Input`;
+  const deletePayloadTypeName = getDeletePayloadTypeName(table);
+  const deletedNodeIdFieldName = getDeletedNodeIdFieldName(
+    typeRegistry,
+    deletePayloadTypeName,
+    typeName
+  );
 
   // Variable definitions
   const variableDefinitions: VariableDefinitionNode[] = [
@@ -383,7 +393,7 @@ export function buildDeleteMutationAST(config: DeleteMutationConfig): DocumentNo
               selectionSet: t.selectionSet({
                 selections: [
                   t.field({ name: 'clientMutationId' }),
-                  t.field({ name: 'deletedId' }),
+                  t.field({ name: deletedNodeIdFieldName }),
                 ],
               }),
             }),

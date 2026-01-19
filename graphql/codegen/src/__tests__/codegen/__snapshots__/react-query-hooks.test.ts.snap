@@ -770,7 +770,7 @@ export const deleteUserMutationDocument = \`
 mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
-    deletedId
+    deletedUserNodeId
   }
 }
 \`;
@@ -782,7 +782,7 @@ export interface DeleteUserMutationVariables {
 export interface DeleteUserMutationResult {
   deleteUser: {
     clientMutationId: string | null;
-    deletedId: string | null;
+    deletedUserNodeId: string | null;
   };
 }
 /**
@@ -834,7 +834,7 @@ export const deletePostMutationDocument = \`
 mutation DeletePostMutation($input: DeletePostInput!) {
   deletePost(input: $input) {
     clientMutationId
-    deletedId
+    deletedPostNodeId
   }
 }
 \`;
@@ -846,7 +846,7 @@ export interface DeletePostMutationVariables {
 export interface DeletePostMutationResult {
   deletePost: {
     clientMutationId: string | null;
-    deletedId: string | null;
+    deletedPostNodeId: string | null;
   };
 }
 /**
@@ -895,7 +895,7 @@ export const deleteUserMutationDocument = \`
 mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
-    deletedId
+    deletedUserNodeId
   }
 }
 \`;
@@ -907,7 +907,7 @@ export interface DeleteUserMutationVariables {
 export interface DeleteUserMutationResult {
   deleteUser: {
     clientMutationId: string | null;
-    deletedId: string | null;
+    deletedUserNodeId: string | null;
   };
 }
 /**
