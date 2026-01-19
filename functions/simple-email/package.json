@@ -2,14 +2,22 @@
   "name": "@constructive-io/simple-email-fn",
   "version": "0.3.0",
   "description": "Simple Knative email function that sends emails directly from job payload",
-  "author": "Constructive",
-  "private": true,
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
   "publishConfig": {
     "access": "public",
     "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
   },
   "directories": {
     "lib": "src",
