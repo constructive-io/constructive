@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.0...@constructive-io/graphql-codegen@2.28.1) (2026-01-20)
+
+### Bug Fixes
+
+- **codegen:** remove deleted{Entity}NodeId field from delete mutations ([63929a2](https://github.com/constructive-io/constructive/commit/63929a2421e6fcd68fb107ef4d45a30359e6af4f))
+- **codegen:** use correct deleted{Entity}NodeId field in delete mutations ([6785de2](https://github.com/constructive-io/constructive/commit/6785de272bd55d489ab91a8d5fe630f274ce9b45))
+
 # [2.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.27.3...@constructive-io/graphql-codegen@2.28.0) (2026-01-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
