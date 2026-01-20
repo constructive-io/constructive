@@ -169,14 +169,14 @@ const getHardCodedSchemata = ({
         dbname: opts.pg.database,
         anonRole: 'administrator',
         roleName: 'administrator',
-        schemaNamesFromExt: {
+        apiExtensions: {
           nodes: schemata
             .split(',')
             .map((schema) => schema.trim())
             .map((schemaName) => ({ schemaName })),
         },
-        schemaNames: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: [] as Array<any>,
+        schemasByApiSchemaApiIdAndSchemaId: { nodes: [] as Array<{ schemaName: string }> },
+        apiModules: { nodes: [] as Array<any> },
       },
     },
   };
@@ -203,11 +203,11 @@ const getMetaSchema = ({
         dbname: opts.pg.database,
         anonRole: 'administrator',
         roleName: 'administrator',
-        schemaNamesFromExt: {
+        apiExtensions: {
           nodes: schemata.map((schemaName: string) => ({ schemaName })),
         },
-        schemaNames: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: [] as Array<any>,
+        schemasByApiSchemaApiIdAndSchemaId: { nodes: [] as Array<{ schemaName: string }> },
+        apiModules: { nodes: [] as Array<any> },
       },
     },
   };
@@ -278,10 +278,10 @@ const queryServiceByApiName = async ({
     return null;
   }
 
-  const data = result?.data;
+  const api = result?.data?.apiByDatabaseIdAndName;
   const apiPublic = (opts as any).api?.isPublic;
-  if (data?.api && data.api.isPublic === apiPublic) {
-    const svc = { data };
+  if (api && api.isPublic === apiPublic) {
+    const svc = { data: { api } };
     svcCache.set(key, svc);
     return svc;
   }
