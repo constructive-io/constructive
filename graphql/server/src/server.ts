@@ -23,8 +23,7 @@ const log = new Logger('server');
 const isDev = () => getNodeEnv() === 'development';
 
 export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
-  const envOptions =
-    (rawOpts as any).__merged ? (rawOpts as PgpmOptions) : getEnvOptions(rawOpts);
+  const envOptions = getEnvOptions(rawOpts);
   const app = new Server(envOptions);
   app.addEventListener();
   app.listen();
@@ -40,8 +39,7 @@ class Server {
   private httpServer: HttpServer | null = null;
 
   constructor(opts: PgpmOptions) {
-    this.opts =
-      (opts as any).__merged ? (opts as PgpmOptions) : getEnvOptions(opts);
+    this.opts = getEnvOptions(opts);
     const effectiveOpts = this.opts;
 
     const app = express();

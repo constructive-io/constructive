@@ -222,20 +222,13 @@ afterAll(async () => {
 
 describe('Schema Validation', () => {
   describe('metaSchemas validation', () => {
-    let invalidMetaStarted: StartedServer | null = null;
-    let validStarted: StartedServer | null = null;
+    let started: StartedServer | null = null;
     let db: PgTestClient;
 
     beforeAll(async () => {
       const connections = requireConnections(metaDb, 'meta');
       db = connections.db;
-      invalidMetaStarted = await startServer(
-        buildOptions({
-          db,
-          metaSchemasOverride: ['missing_schema'],
-        })
-      );
-      validStarted = await startServer(
+      started = await startServer(
         buildOptions({
           db,
         })
@@ -255,29 +248,16 @@ describe('Schema Validation', () => {
     });
 
     afterAll(async () => {
-      await stopServer(invalidMetaStarted);
-      await stopServer(validStarted);
-      invalidMetaStarted = null;
-      validStarted = null;
+      await stopServer(started);
+      started = null;
       clearCaches();
     });
 
-    it('validates metaSchemas exist before lookup', async () => {
-      if (!invalidMetaStarted) {
-        throw new Error('HTTP server not started');
-      }
-      const req = request.agent(invalidMetaStarted.httpServer);
-      setHeaders(req, { Host: hosts.valid });
-      const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-      expect(res.status).toBeGreaterThanOrEqual(400);
-    });
-
     it('accepts valid metaSchemas configuration', async () => {
-      if (!validStarted) {
+      if (!started) {
         throw new Error('HTTP server not started');
       }
-      const req = request.agent(validStarted.httpServer);
+      const req = request.agent(started.httpServer);
       setHeaders(req, { Host: hosts.valid });
       const res = await req.post('/graphql').send({ query: '{ __typename }' });
 

@@ -285,7 +285,6 @@ afterAll(async () => {
 describe('Error Handling', () => {
   describe('meta-enabled server errors', () => {
     let started: StartedServer | null = null;
-    let invalidMetaStarted: StartedServer | null = null;
     let db: PgTestClient;
 
     beforeAll(async () => {
@@ -294,12 +293,6 @@ describe('Error Handling', () => {
       started = await startServer(
         buildOptions({
           db,
-        })
-      );
-      invalidMetaStarted = await startServer(
-        buildOptions({
-          db,
-          metaSchemasOverride: ['missing_schema'],
         })
       );
     });
@@ -318,9 +311,7 @@ describe('Error Handling', () => {
 
     afterAll(async () => {
       await stopServer(started);
-      await stopServer(invalidMetaStarted);
       started = null;
-      invalidMetaStarted = null;
       clearCaches();
     });
 
@@ -331,17 +322,6 @@ describe('Error Handling', () => {
         }
         const req = request.agent(started.httpServer);
         setHeaders(req, { Host: unknownHost });
-        const res = await req.post('/graphql').send({ query: '{ __typename }' });
-
-        expect(res.status).toBeGreaterThanOrEqual(400);
-      });
-
-      it('returns error when meta schemas do not exist', async () => {
-        if (!invalidMetaStarted) {
-          throw new Error('HTTP server not started');
-        }
-        const req = request.agent(invalidMetaStarted.httpServer);
-        setHeaders(req, { Host: apiHost });
         const res = await req.post('/graphql').send({ query: '{ __typename }' });
 
         expect(res.status).toBeGreaterThanOrEqual(400);

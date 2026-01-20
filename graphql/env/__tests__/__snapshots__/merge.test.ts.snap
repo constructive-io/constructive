@@ -120,5 +120,12 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "strictAuth": false,
     "trustProxy": false,
   },
+  "smtp": {
+    "debug": false,
+    "logger": false,
+    "pool": false,
+    "port": 587,
+    "secure": false,
+  },
 }
 `;

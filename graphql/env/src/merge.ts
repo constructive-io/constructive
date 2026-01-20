@@ -50,11 +50,6 @@ export const getEnvOptions = (
     arrayMerge: mergeArraysUnique
   }) as ConstructiveOptions;
 
-  Object.defineProperty(merged as any, '__merged', {
-    value: true,
-    enumerable: false,
-  });
-
   return merged;
 };
 
