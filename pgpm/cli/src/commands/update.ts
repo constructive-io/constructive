@@ -1,7 +1,5 @@
-import { cliExitWithError } from '@inquirerer/utils';
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Inquirerer, cliExitWithError, getPackageJson } from 'inquirerer';
 import { spawn } from 'child_process';
 import { fetchLatestVersion } from '../utils/npm-version';
 
@@ -51,7 +49,7 @@ export default async (
     process.exit(0);
   }
 
-  const pkgJson = findAndRequirePackageJson(__dirname);
+  const pkgJson = getPackageJson(__dirname);
   const pkgName = (argv.package as string) || pkgJson.name || 'pgpm';
   const registry = argv.registry as string | undefined;
   const dryRun = Boolean(argv['dry-run']);

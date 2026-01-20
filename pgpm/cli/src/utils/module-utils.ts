@@ -1,8 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { errors } from '@pgpmjs/types';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 
 import { resolvePackageAlias } from './package-alias';
 

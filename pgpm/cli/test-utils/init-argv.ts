@@ -1,4 +1,4 @@
-import { ParsedArgs } from 'minimist';
+import { ParsedArgs } from 'inquirerer';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
 
 export const addInitDefaults = (argv: ParsedArgs): ParsedArgs => {

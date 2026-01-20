@@ -1,7 +1,7 @@
 import path from 'path';
 import { DEFAULT_TEMPLATE_REPO } from '@pgpmjs/core';
 import { createTestFixture, TestFixture as BaseTestFixture, TestFixtureOptions } from '@inquirerer/test';
-import { ParsedArgs } from 'minimist';
+import { ParsedArgs } from 'inquirerer';
 
 import { commands } from '../src/commands';
 import { withInitDefaults } from './init-argv';

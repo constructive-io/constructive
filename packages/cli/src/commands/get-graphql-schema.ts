@@ -1,5 +1,4 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
-import { ParsedArgs } from 'minimist'
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer'
 import { promises as fs } from 'fs'
 import { buildSchemaSDL, fetchEndpointSchemaSDL } from '@constructive-io/graphql-server'
 

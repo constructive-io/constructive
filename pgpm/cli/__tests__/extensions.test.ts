@@ -3,8 +3,7 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 
 import { PgpmPackage } from '@pgpmjs/core';
 import { sync as glob } from 'glob';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
 
 import { commands } from '../src/commands';
