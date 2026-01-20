@@ -55,13 +55,13 @@
     "csv-to-pg": "workspace:^",
     "genomic": "^5.3.0",
     "glob": "^13.0.0",
-    "komoji": "^0.7.14",
+    "komoji": "^0.8.0",
     "parse-package-name": "^1.0.0",
     "pg": "^8.17.1",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^17.17.2",
     "pgsql-parser": "^17.9.11",
-    "yanse": "^0.1.11"
+    "yanse": "^0.2.0"
   }
 }

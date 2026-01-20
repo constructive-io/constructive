@@ -37,7 +37,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "5.11.10",
     "@testing-library/react": "11.2.5",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.8",
     "makage": "^0.1.10"
   }
 }

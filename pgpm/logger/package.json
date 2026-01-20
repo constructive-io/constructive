@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "yanse": "^0.1.11"
+    "yanse": "^0.2.0"
   },
   "keywords": [
     "logger",
