@@ -512,7 +512,7 @@ export async function writeGeneratedFiles(
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
-  // Format all generated files with oxfmt
+  // Format all generated files with prettier
   if (errors.length === 0) {
     if (showProgress) {
       console.log('Formatting generated files...');
@@ -531,28 +531,32 @@ export async function writeGeneratedFiles(
 }
 
 /**
- * Format generated files using oxfmt
- * Runs oxfmt on the output directory after all files are written
+ * Format generated files using prettier
+ * Runs prettier on the output directory after all files are written
+ * Uses bundled config with sensible defaults (singleQuote, trailingComma, etc.)
  */
 export function formatOutput(outputDir: string): { success: boolean; error?: string } {
   // Resolve to absolute path for reliable execution
   const absoluteOutputDir = path.resolve(outputDir);
 
   try {
-    // Find oxfmt binary from this package's node_modules/.bin
-    // oxfmt is a dependency of @constructive-io/graphql-codegen
-    const oxfmtPkgPath = require.resolve('oxfmt/package.json');
-    const oxfmtDir = path.dirname(oxfmtPkgPath);
-    const oxfmtBin = path.join(oxfmtDir, 'bin', 'oxfmt');
+    // Find prettier binary from this package's node_modules/.bin
+    // prettier is a dependency of @constructive-io/graphql-codegen
+    const prettierPkgPath = require.resolve('prettier/package.json');
+    const prettierDir = path.dirname(prettierPkgPath);
+    const prettierBin = path.join(prettierDir, 'bin', 'prettier.cjs');
 
-    execSync(`"${oxfmtBin}" "${absoluteOutputDir}"`, {
+    // Use bundled config with sensible defaults
+    const configPath = path.join(__dirname, 'codegen-prettier.json');
+
+    execSync(`"${prettierBin}" --write --config "${configPath}" "${absoluteOutputDir}"`, {
       stdio: 'pipe',
       encoding: 'utf-8',
     });
     return { success: true };
   } catch (err) {
-    // oxfmt may fail if files have syntax errors or if not installed
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    // prettier may fail if files have syntax errors or if not installed
+    const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
   }
 }

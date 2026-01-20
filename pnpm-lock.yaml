@@ -748,9 +748,9 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
-      oxfmt:
-        specifier: ^0.13.0
-        version: 0.13.0
+      prettier:
+        specifier: ^3.7.4
+        version: 3.7.4
     devDependencies:
       '@tanstack/react-query':
         specifier: ^5.90.16
@@ -3409,46 +3409,6 @@ packages:
 
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
-
-  '@oxfmt/darwin-arm64@0.13.0':
-    resolution: {integrity: sha512-WJKGJp9t8lMG3Vmsyz77qj4GIp2Z/z5KkS4Mpbn7nfiVZLVNdxf9k85vHnuGtBZcuxIAjJIRDgitePFPD+timA==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@oxfmt/darwin-x64@0.13.0':
-    resolution: {integrity: sha512-b9r+uOrnsFIl8DEimw5G69/aXbY5XURzFz0j6Hr8GiAZIrp2GlMLz0B8zhylAXh882GalZGxtcVbLZt5SSe2jw==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@oxfmt/linux-arm64-gnu@0.13.0':
-    resolution: {integrity: sha512-v9+rE/d38wBRli0iYvhgGWlgSAgFBJnnK6kefwQ6POu6n6y/tGiQXjWIyvkBqpQhxxavGnk3z3WXP+DAJSC2eA==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@oxfmt/linux-arm64-musl@0.13.0':
-    resolution: {integrity: sha512-g9A8dOoM/XwToz70aq8XodQZMWwWWPjuTUCI9cxkB1uvpQe4JN6VcHRLMY6Ft1LLh4MIARqq3mCbuXwMVseKiA==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@oxfmt/linux-x64-gnu@0.13.0':
-    resolution: {integrity: sha512-CbMEtJ+0mVWnBHOF+Fx8CYApAs3Iywmo6E+buokXEli98167R2eJ/g7dqNiU6R8hBiO0n4KyoT4KaeYhmQp7KA==}
-    cpu: [x64]
-    os: [linux]
-
-  '@oxfmt/linux-x64-musl@0.13.0':
-    resolution: {integrity: sha512-KqE6qmwLqxbC2I1t65JNqbu87qL4my3Bi1nsmwXzJBW/xFAVNS4OgZnKQwOpW9dDXw8Ng/IoBO24GgOOECkd/w==}
-    cpu: [x64]
-    os: [linux]
-
-  '@oxfmt/win32-arm64@0.13.0':
-    resolution: {integrity: sha512-jVvlnkgdKHT/l13zIG9511KoVwCKGAvQ4CUtiwiP4Nv4K1F586dV4IcOawcRnKpw9KHTV/Q0E8jB5m3tnz2yeQ==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@oxfmt/win32-x64@0.13.0':
-    resolution: {integrity: sha512-HgC7Efv1Eqv8Ag/3LP2WjSvzIFHsxBLBaYOgMhvq4WhZMM3xG9zsb/1A3/pVqdPhvw+Kh62WaYm1WQM9J4l0lQ==}
-    cpu: [x64]
-    os: [win32]
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
@@ -7362,11 +7322,6 @@ packages:
     resolution: {integrity: sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ==}
     engines: {node: '>=10'}
 
-  oxfmt@0.13.0:
-    resolution: {integrity: sha512-WhWYL1nRxevnezPK3GsGlZ2uPnO+rPlJ1U44TEfET+UwDPhKDVFyqlblduAgu3PFwTMgY/GRbaZwlWugvpfbWQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    hasBin: true
-
   p-finally@1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
     engines: {node: '>=4'}
@@ -10794,30 +10749,6 @@ snapshots:
       '@octokit/openapi-types': 24.2.0
 
   '@one-ini/wasm@0.1.1': {}
-
-  '@oxfmt/darwin-arm64@0.13.0':
-    optional: true
-
-  '@oxfmt/darwin-x64@0.13.0':
-    optional: true
-
-  '@oxfmt/linux-arm64-gnu@0.13.0':
-    optional: true
-
-  '@oxfmt/linux-arm64-musl@0.13.0':
-    optional: true
-
-  '@oxfmt/linux-x64-gnu@0.13.0':
-    optional: true
-
-  '@oxfmt/linux-x64-musl@0.13.0':
-    optional: true
-
-  '@oxfmt/win32-arm64@0.13.0':
-    optional: true
-
-  '@oxfmt/win32-x64@0.13.0':
-    optional: true
 
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
@@ -15889,17 +15820,6 @@ snapshots:
       log-symbols: 4.1.0
       strip-ansi: 6.0.1
       wcwidth: 1.0.1
-
-  oxfmt@0.13.0:
-    optionalDependencies:
-      '@oxfmt/darwin-arm64': 0.13.0
-      '@oxfmt/darwin-x64': 0.13.0
-      '@oxfmt/linux-arm64-gnu': 0.13.0
-      '@oxfmt/linux-arm64-musl': 0.13.0
-      '@oxfmt/linux-x64-gnu': 0.13.0
-      '@oxfmt/linux-x64-musl': 0.13.0
-      '@oxfmt/win32-arm64': 0.13.0
-      '@oxfmt/win32-x64': 0.13.0
 
   p-finally@1.0.0: {}
 
