@@ -7,11 +7,29 @@ import {
   generateCommand,
   type GenerateTargetResult,
 } from '@constructive-io/graphql-codegen/cli/commands/generate';
+import {
+  generateOrmCommand,
+  type GenerateOrmTargetResult,
+} from '@constructive-io/graphql-codegen/cli/commands/generate-orm';
 import { findConfigFile } from '@constructive-io/graphql-codegen/cli/commands/init';
 import {
   ConstructiveOptions,
   getEnvOptions,
 } from '@constructive-io/graphql-env';
+
+function parseHeaders(headerArg: string | string[] | undefined): Record<string, string> {
+  const headerList = Array.isArray(headerArg) ? headerArg : headerArg ? [headerArg] : [];
+  const headers: Record<string, string> = {};
+  for (const h of headerList) {
+    const idx = typeof h === 'string' ? h.indexOf(':') : -1;
+    if (idx <= 0) continue;
+    const name = h.slice(0, idx).trim();
+    const value = h.slice(idx + 1).trim();
+    if (!name) continue;
+    headers[name] = value;
+  }
+  return headers;
+}
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -20,16 +38,23 @@ Constructive GraphQL Codegen:
 
 Options:
   --help, -h                 Show this help message
+  --mode <type>              Generation mode: "hooks" (default) or "orm"
   --config <path>            Path to graphql-codegen config file
   --target <name>            Target name in config file
   --endpoint <url>           GraphQL endpoint URL
   --auth <token>             Authorization header value (e.g., "Bearer 123")
-  --out <dir>                Output directory (default: graphql/codegen/dist)
+  --header "Name: Value"    Optional HTTP header; repeat to add multiple
+  --out <dir>                Output directory
   --dry-run                  Preview without writing files
   -v, --verbose              Verbose output
 
   --database <name>          Database override for DB mode (defaults to PGDATABASE)
   --schemas <list>           Comma-separated schemas (required for DB mode)
+
+Examples:
+  cnc codegen --endpoint https://api.example.com/graphql
+  cnc codegen --mode orm --endpoint https://api.example.com/graphql
+  cnc codegen --mode hooks --schemas public --database mydb
 `;
 
 export default async (
@@ -42,6 +67,7 @@ export default async (
     process.exit(0);
   }
 
+  const mode = (argv.mode as string) || 'hooks';
   const endpointArg = (argv.endpoint as string) || '';
   const outputArg = argv.out as string | undefined;
   const outDir = outputArg || 'codegen';
@@ -50,6 +76,11 @@ export default async (
   const target = (argv.target as string) || '';
   const dryRun = !!(argv['dry-run'] || argv.dryRun);
   const verbose = !!(argv.verbose || argv.v);
+
+  if (mode !== 'hooks' && mode !== 'orm') {
+    console.error(`Error: Invalid mode "${mode}". Must be "hooks" or "orm".`);
+    process.exit(1);
+  }
   const resolvedConfigPath = configPath || findConfigFile() || '';
   const hasConfigFile = Boolean(resolvedConfigPath);
   const outputForGenerate = outputArg || !hasConfigFile ? outDir : undefined;
@@ -60,6 +91,8 @@ export default async (
     : getEnvOptions();
   const schemasArg = (argv.schemas as string) || '';
 
+  const headers = parseHeaders(argv.header as string | string[] | undefined);
+
   const runGenerate = async ({
     endpoint,
     schema,
@@ -67,17 +100,30 @@ export default async (
     endpoint?: string;
     schema?: string;
   }) => {
-    const result = await generateCommand({
-      config: configPath || undefined,
-      target: target || undefined,
-      endpoint,
-      schema,
-      output: outputForGenerate,
-      authorization: auth || undefined,
-      verbose,
-      dryRun,
-    });
-    const targetResults: GenerateTargetResult[] = result.targets ?? [];
+    const result = mode === 'orm'
+      ? await generateOrmCommand({
+          config: configPath || undefined,
+          target: target || undefined,
+          endpoint,
+          schema,
+          output: outputForGenerate,
+          authorization: auth || undefined,
+          headers,
+          verbose,
+          dryRun,
+        })
+      : await generateCommand({
+          config: configPath || undefined,
+          target: target || undefined,
+          endpoint,
+          schema,
+          output: outputForGenerate,
+          authorization: auth || undefined,
+          headers,
+          verbose,
+          dryRun,
+        });
+    const targetResults: (GenerateTargetResult | GenerateOrmTargetResult)[] = result.targets ?? [];
     const hasNamedTargets =
       targetResults.length > 0 &&
       (targetResults.length > 1 || targetResults[0]?.name !== 'default');
@@ -90,14 +136,14 @@ export default async (
 
         if (target.tables?.length) {
           console.log('  Tables:');
-          target.tables.forEach((table) => console.log(`    - ${table}`));
+          (target.tables as any).forEach((table: any) => console.log(`    - ${table}`));
         }
         if (target.filesWritten?.length) {
           console.log('  Files written:');
-          target.filesWritten.forEach((file) => console.log(`    - ${file}`));
+          (target.filesWritten as any).forEach((file: any) => console.log(`    - ${file}`));
         }
         if (!target.success && target.errors?.length) {
-          target.errors.forEach((error) => console.error(`  - ${error}`));
+          (target.errors as any).forEach((error: any) => console.error(`  - ${error}`));
         }
       });
 
@@ -110,12 +156,12 @@ export default async (
     if (!result.success) {
       console.error(result.message);
       if (result.errors?.length)
-        result.errors.forEach((e) => console.error('  -', e));
+        (result.errors as any).forEach((e: any) => console.error('  -', e));
       process.exit(1);
     }
     console.log(result.message);
     if (result.filesWritten?.length) {
-      result.filesWritten.forEach((f) => console.log(f));
+      (result.filesWritten as any).forEach((f: any) => console.log(f));
     }
   };
 

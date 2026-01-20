@@ -35,6 +35,8 @@ export interface GenerateOrmOptions {
   output?: string;
   /** Authorization header */
   authorization?: string;
+  /** Additional HTTP headers for endpoint requests */
+  headers?: Record<string, string>;
   /** Verbose output */
   verbose?: boolean;
   /** Dry run - don't write files */
@@ -173,7 +175,7 @@ async function generateOrmForTarget(
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
     authorization: options.authorization || config.headers['Authorization'],
-    headers: config.headers,
+    headers: { ...config.headers, ...options.headers },
   });
 
   // 2. Run the codegen pipeline
