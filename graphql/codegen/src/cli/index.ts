@@ -3,10 +3,7 @@
  * CLI entry point for graphql-codegen
  */
 
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { cliExitWithError, extractFirst } from '@inquirerer/utils';
-import { CLI, CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLI, CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
 import { initCommand, findConfigFile, loadConfigFile } from './commands/init';
 import { generateCommand } from './commands/generate';
@@ -610,7 +607,7 @@ export const commands = async (
   _options: CLIOptions
 ): Promise<Partial<ParsedArgs>> => {
   if (argv.version || argv.v) {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }
@@ -685,7 +682,7 @@ export const options: Partial<CLIOptions> = {
 
 if (require.main === module) {
   if (process.argv.includes('--version') || process.argv.includes('-v')) {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }

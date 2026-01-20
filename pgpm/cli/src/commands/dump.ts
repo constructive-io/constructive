@@ -1,6 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { getPgEnvOptions, getSpawnEnvWithPg } from 'pg-env';
 import { getPgPool } from 'pg-cache';
 import { spawn } from 'child_process';

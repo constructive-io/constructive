@@ -1,5 +1,4 @@
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 

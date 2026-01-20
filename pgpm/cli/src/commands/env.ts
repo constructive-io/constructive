@@ -1,6 +1,5 @@
 import { spawn } from 'child_process';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 import { defaultPgConfig, PgConfig } from 'pg-env';
 
 const envUsageText = `

@@ -1,8 +1,7 @@
 import { PgpmPackage } from '@pgpmjs/core';
 import * as fs from 'fs';
 import { sync as glob } from 'glob';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as os from 'os';
 import * as path from 'path';
 
