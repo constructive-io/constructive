@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",
@@ -51,7 +51,7 @@
     "graphql-tag": "2.12.6",
     "graphql-upload": "^13.0.0",
     "lru-cache": "^11.2.4",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "postgraphile": "^4.14.1",
     "request-ip": "^3.3.0"
   },

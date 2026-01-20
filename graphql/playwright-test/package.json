@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/playwright-test",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive Playwright Testing with HTTP server support",
   "main": "index.js",
@@ -42,7 +42,7 @@
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
     "graphile-test": "workspace:^",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-cache": "workspace:^",
     "pgsql-test": "workspace:^"
   },

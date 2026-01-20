@@ -1,6 +1,5 @@
 import { PgpmMigrate } from '@pgpmjs/core';
-import { CLIOptions,Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';

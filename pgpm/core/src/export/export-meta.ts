@@ -130,7 +130,8 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       name: 'text',
       schema_name: 'text',
-      description: 'text'
+      description: 'text',
+      is_public: 'boolean'
     }
   },
   table: {

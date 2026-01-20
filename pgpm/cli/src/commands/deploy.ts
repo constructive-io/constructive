@@ -2,8 +2,7 @@ import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { execSync } from 'child_process';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, ParsedArgs, Question } from 'inquirerer';
 import {
   getPgEnvOptions,
   getSpawnEnvWithPg,
