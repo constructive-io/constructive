@@ -36,7 +36,6 @@
   "devDependencies": {
     "@inquirerer/test": "^1.2.5",
     "@types/js-yaml": "^4.0.9",
-    "@types/minimist": "^1.2.5",
     "@types/node": "^20.12.7",
     "@types/pg": "^8.16.0",
     "@types/shelljs": "^0.8.16",
@@ -59,7 +58,6 @@
     "find-and-require-package-json": "^0.8.6",
     "inquirerer": "^4.4.0",
     "js-yaml": "^4.1.0",
-    "minimist": "^1.2.8",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgpm": "workspace:^",

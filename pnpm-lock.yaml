@@ -748,9 +748,6 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
-      minimist:
-        specifier: ^1.2.8
-        version: 1.2.8
       oxfmt:
         specifier: ^0.13.0
         version: 0.13.0
@@ -764,9 +761,6 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
-      '@types/minimist':
-        specifier: ^1.2.5
-        version: 1.2.5
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.27
@@ -1482,9 +1476,6 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
-      minimist:
-        specifier: ^1.2.8
-        version: 1.2.8
       pg-cache:
         specifier: workspace:^
         version: link:../../postgres/pg-cache/dist
@@ -1507,9 +1498,6 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
-      '@types/minimist':
-        specifier: ^1.2.5
-        version: 1.2.5
       '@types/node':
         specifier: ^20.12.7
         version: 20.19.27
@@ -1707,9 +1695,6 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
-      minimist:
-        specifier: ^1.2.8
-        version: 1.2.8
       pg-cache:
         specifier: workspace:^
         version: link:../../postgres/pg-cache/dist
@@ -1735,9 +1720,6 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
-      '@types/minimist':
-        specifier: ^1.2.5
-        version: 1.2.5
       '@types/node':
         specifier: ^20.12.7
         version: 20.19.27
