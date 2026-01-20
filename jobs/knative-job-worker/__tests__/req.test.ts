@@ -21,12 +21,12 @@ describe('knative request wrapper', () => {
       'http://callback.internal/jobs-complete';
     process.env.NODE_ENV = 'test';
     delete process.env.INTERNAL_GATEWAY_URL;
-    delete process.env.KNATIVE_SERVICE_URL;
     delete process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP;
   });
 
-  it('uses KNATIVE_SERVICE_URL as base and preserves headers and body', async () => {
-    process.env.KNATIVE_SERVICE_URL = 'http://knative.internal';
+  it('uses INTERNAL_GATEWAY_URL as base and preserves headers and body', async () => {
+    process.env.INTERNAL_GATEWAY_URL =
+      'http://gateway.internal/async-function';
 
     postMock.mockImplementation(
       (options: any, callback: (err: any) => void) => callback(null)
@@ -44,7 +44,9 @@ describe('knative request wrapper', () => {
     expect(postMock).toHaveBeenCalledTimes(1);
     const [options] = postMock.mock.calls[0];
 
-    expect(options.url).toBe('http://knative.internal/example-fn');
+    expect(options.url).toBe(
+      'http://gateway.internal/async-function/example-fn'
+    );
     expect(options.headers['Content-Type']).toBe('application/json');
     expect(options.headers['X-Worker-Id']).toBe('worker-1');
     expect(options.headers['X-Job-Id']).toBe(42);
@@ -55,9 +57,7 @@ describe('knative request wrapper', () => {
     expect(options.body).toEqual({ value: 1 });
   });
 
-  it('falls back to INTERNAL_GATEWAY_URL when KNATIVE_SERVICE_URL is not set', async () => {
-    process.env.INTERNAL_GATEWAY_URL =
-      'http://gateway.internal/async-function';
+  it('uses default gateway URL when INTERNAL_GATEWAY_URL is not set', async () => {
 
     postMock.mockImplementation(
       (options: any, callback: (err: any) => void) => callback(null)
@@ -73,13 +73,12 @@ describe('knative request wrapper', () => {
     });
 
     const [options] = postMock.mock.calls[0];
-    expect(options.url).toBe(
-      'http://gateway.internal/async-function/example-fn'
-    );
+    expect(options.url).toBe('http://gateway:8080/example-fn');
   });
 
   it('uses development map override when provided', async () => {
-    process.env.KNATIVE_SERVICE_URL = 'http://knative.internal';
+    process.env.INTERNAL_GATEWAY_URL =
+      'http://gateway.internal/async-function';
     process.env.INTERNAL_GATEWAY_DEVELOPMENT_MAP = JSON.stringify({
       'example-fn': 'http://localhost:3000/dev-fn'
     });
@@ -103,7 +102,8 @@ describe('knative request wrapper', () => {
   });
 
   it('rejects when HTTP request errors', async () => {
-    process.env.KNATIVE_SERVICE_URL = 'http://knative.internal';
+    process.env.INTERNAL_GATEWAY_URL =
+      'http://gateway.internal/async-function';
 
     postMock.mockImplementation(
       (options: any, callback: (err: any) => void) =>
@@ -122,9 +122,4 @@ describe('knative request wrapper', () => {
     ).rejects.toThrow('network failure');
   });
 
-  it('throws on startup when no base URL env vars are set', async () => {
-    await expect(import('../src/env')).rejects.toThrow(
-      /KNATIVE_SERVICE_URL \(or INTERNAL_GATEWAY_URL as fallback\) is required/
-    );
-  });
 });

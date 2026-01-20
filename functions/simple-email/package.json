@@ -1,17 +1,36 @@
 {
   "name": "@constructive-io/simple-email-fn",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Simple Knative email function that sends emails directly from job payload",
-  "author": "Constructive",
-  "private": true,
-  "main": "dist/index.js",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
   "directories": {
     "lib": "src",
     "test": "__tests__"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w"
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev"
+  },
+  "devDependencies": {
+    "makage": "^0.1.10"
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",

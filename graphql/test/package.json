@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-test",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Testing with all plugins loaded",
   "main": "index.js",
@@ -41,7 +41,7 @@
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
     "mock-req": "^0.2.0",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pgsql-test": "workspace:^",
     "postgraphile": "^4.14.1"
   },
