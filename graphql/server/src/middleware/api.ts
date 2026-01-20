@@ -1,7 +1,7 @@
 import { getNodeEnv } from '@constructive-io/graphql-env';
+import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
-import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, Response } from 'express';
 import { getSchema, GraphileQuery } from 'graphile-query';
 import { getGraphileSettings } from 'graphile-settings';
@@ -13,7 +13,16 @@ import errorPage404Message from '../errors/404-message';
 /**
  * Transforms the old service structure to the new api structure
  */
-import { ApiStructure, Domain, SchemaNode, Service, Site } from '../types';
+import {
+  ApiErrorWithCode,
+  ApiModule,
+  ApiStructure,
+  Domain,
+  ErrorResult,
+  SchemaNode,
+  Service,
+  Site,
+} from '../types';
 import {
   buildApiByDatabaseIdAndName,
   buildDomainLookup,
@@ -23,6 +32,18 @@ import './types'; // for Request type
 
 const log = new Logger('api');
 const isDev = () => getNodeEnv() === 'development';
+
+/** Local interface for API listing query results */
+interface FallbackApi {
+  domains: { nodes: Domain[] };
+}
+
+/** Local interface for link results */
+interface DomainLink {
+  domain: string;
+  subdomain?: string;
+  href: string;
+}
 
 const transformServiceToApi = (svc: Service): ApiStructure => {
   const api = svc.data.api;
@@ -79,7 +100,7 @@ export const getSubdomain = (reqDomains: string[]): string | null => {
   return !names.length ? null : names.join('.');
 };
 
-export const createApiMiddleware = (opts: any) => {
+export const createApiMiddleware = (opts: ConstructiveOptions) => {
   return async (
     req: Request,
     res: Response,
@@ -108,12 +129,7 @@ export const createApiMiddleware = (opts: any) => {
     try {
       const svc = await getApiConfig(opts, req);
 
-      if (svc?.errorHtml) {
-        res
-          .status(404)
-          .send(errorPage404Message('API not found', svc.errorHtml));
-        return;
-      } else if (!svc) {
+      if (!svc) {
         res
           .status(404)
           .send(
@@ -121,6 +137,12 @@ export const createApiMiddleware = (opts: any) => {
               'API service not found for the given domain/subdomain.'
             )
           );
+        return;
+      }
+      if ('errorHtml' in svc) {
+        res
+          .status(404)
+          .send(errorPage404Message('API not found', svc.errorHtml));
         return;
       }
       const api = transformServiceToApi(svc);
@@ -131,10 +153,11 @@ export const createApiMiddleware = (opts: any) => {
           `Resolved API: db=${api.dbname}, schemas=[${api.schema?.join(', ')}]`
         );
       next();
-    } catch (e: any) {
-      if (e.code === 'NO_VALID_SCHEMAS') {
-        res.status(404).send(errorPage404Message(e.message));
-      } else if (e.message.match(/does not exist/)) {
+    } catch (e: unknown) {
+      const error = e as ApiErrorWithCode;
+      if (error.code === 'NO_VALID_SCHEMAS') {
+        res.status(404).send(errorPage404Message(error.message));
+      } else if (error.message?.match(/does not exist/)) {
         res
           .status(404)
           .send(
@@ -143,7 +166,7 @@ export const createApiMiddleware = (opts: any) => {
             )
           );
       } else {
-        log.error('API middleware error:', e);
+        log.error('API middleware error:', error);
         res.status(500).send(errorPage50x);
       }
     }
@@ -156,12 +179,12 @@ const getHardCodedSchemata = ({
   databaseId,
   key,
 }: {
-  opts: PgpmOptions;
+  opts: ConstructiveOptions;
   schemata: string;
   databaseId: string;
   key: string;
-}): any => {
-  const svc = {
+}): Service => {
+  const svc: Service = {
     data: {
       api: {
         databaseId,
@@ -176,7 +199,7 @@ const getHardCodedSchemata = ({
             .map((schemaName) => ({ schemaName })),
         },
         schemasByApiSchemaApiIdAndSchemaId: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: { nodes: [] as Array<any> },
+        apiModules: { nodes: [] as ApiModule[] },
       },
     },
   };
@@ -189,13 +212,12 @@ const getMetaSchema = ({
   key,
   databaseId,
 }: {
-  opts: PgpmOptions;
+  opts: ConstructiveOptions;
   key: string;
   databaseId: string;
-}): any => {
-  const apiOpts = (opts as any).api || {};
-  const schemata = apiOpts.metaSchemas || [];
-  const svc = {
+}): Service => {
+  const schemata = opts.api?.metaSchemas || [];
+  const svc: Service = {
     data: {
       api: {
         databaseId,
@@ -207,7 +229,7 @@ const getMetaSchema = ({
           nodes: schemata.map((schemaName: string) => ({ schemaName })),
         },
         schemasByApiSchemaApiIdAndSchemaId: { nodes: [] as Array<{ schemaName: string }> },
-        apiModules: { nodes: [] as Array<any> },
+        apiModules: { nodes: [] as ApiModule[] },
       },
     },
   };
@@ -222,12 +244,12 @@ const queryServiceByDomainAndSubdomain = async ({
   domain,
   subdomain,
 }: {
-  opts: PgpmOptions;
+  opts: ConstructiveOptions;
   key: string;
-  client: any;
+  client: GraphileQuery;
   domain: string;
   subdomain: string;
-}): Promise<any> => {
+}): Promise<Service | null> => {
   const doc = buildDomainLookup({ domain, subdomain });
   const result = await client.query({
     role: 'administrator',
@@ -243,7 +265,7 @@ const queryServiceByDomainAndSubdomain = async ({
   const nodes = result?.data?.domains?.nodes;
   if (nodes?.length) {
     const data = nodes[0];
-    const apiPublic = (opts as any).api?.isPublic;
+    const apiPublic = opts.api?.isPublic;
     if (!data.api || data.api.isPublic !== apiPublic) return null;
     const svc = { data };
     svcCache.set(key, svc);
@@ -260,12 +282,12 @@ const queryServiceByApiName = async ({
   databaseId,
   name,
 }: {
-  opts: PgpmOptions;
+  opts: ConstructiveOptions;
   key: string;
-  client: any;
+  client: GraphileQuery;
   databaseId: string;
   name: string;
-}): Promise<any> => {
+}): Promise<Service | null> => {
   const doc = buildApiByDatabaseIdAndName({ databaseId, name });
   const result = await client.query({
     role: 'administrator',
@@ -279,7 +301,7 @@ const queryServiceByApiName = async ({
   }
 
   const api = result?.data?.apiByDatabaseIdAndName;
-  const apiPublic = (opts as any).api?.isPublic;
+  const apiPublic = opts.api?.isPublic;
   if (api && api.isPublic === apiPublic) {
     const svc = { data: { api } };
     svcCache.set(key, svc);
@@ -288,14 +310,14 @@ const queryServiceByApiName = async ({
   return null;
 };
 
-const getSvcKey = (opts: PgpmOptions, req: Request): string => {
+const getSvcKey = (opts: ConstructiveOptions, req: Request): string => {
   const domain = req.urlDomains.domain;
   const key = (req.urlDomains.subdomains as string[])
     .filter((name: string) => !['www'].includes(name))
     .concat(domain)
     .join('.');
 
-  const apiPublic = (opts as any).api?.isPublic;
+  const apiPublic = opts.api?.isPublic;
   if (apiPublic === false) {
     if (req.get('X-Api-Name')) {
       return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
@@ -324,9 +346,9 @@ const validateSchemata = async (
 };
 
 export const getApiConfig = async (
-  opts: PgpmOptions,
+  opts: ConstructiveOptions,
   req: Request
-): Promise<any> => {
+): Promise<Service | ErrorResult | null> => {
   const rootPgPool = getPgPool(opts.pg);
   // @ts-ignore
   const subdomain = getSubdomain(req.urlDomains.subdomains);
@@ -335,21 +357,19 @@ export const getApiConfig = async (
   const key = getSvcKey(opts, req);
   req.svc_key = key;
 
-  let svc;
+  let svc: Service | null | undefined;
   if (svcCache.has(key)) {
     if (isDev()) log.debug(`Cache HIT for key=${key}`);
     svc = svcCache.get(key);
   } else {
     if (isDev()) log.debug(`Cache MISS for key=${key}, looking up API`);
-    const apiOpts = (opts as any).api || {};
-    const allSchemata = apiOpts.metaSchemas || [];
+    const allSchemata = opts.api?.metaSchemas || [];
     const validatedSchemata = await validateSchemata(rootPgPool, allSchemata);
 
     if (validatedSchemata.length === 0) {
-      const apiOpts2 = (opts as any).api || {};
-      const message = `No valid schemas found. Configured metaSchemas: [${(apiOpts2.metaSchemas || []).join(', ')}]`;
+      const message = `No valid schemas found. Configured metaSchemas: [${(opts.api?.metaSchemas || []).join(', ')}]`;
       if (isDev()) log.debug(message);
-      const error: any = new Error(message);
+      const error: ApiErrorWithCode = new Error(message) as ApiErrorWithCode;
       error.code = 'NO_VALID_SCHEMAS';
       throw error;
     }
@@ -365,7 +385,7 @@ export const getApiConfig = async (
     // @ts-ignore
     const client = new GraphileQuery({ schema, pool: rootPgPool, settings });
 
-    const apiPublic = (opts as any).api?.isPublic;
+    const apiPublic = opts.api?.isPublic;
     if (apiPublic === false) {
       if (req.get('X-Schemata')) {
         svc = getHardCodedSchemata({
@@ -421,9 +441,9 @@ export const getApiConfig = async (
           ) {
             const port = getPortFromRequest(req);
 
-            const allDomains = fallbackResult.data.apis.nodes.flatMap(
-              (api: any) =>
-                api.domains.nodes.map((d: any) => ({
+            const allDomains: DomainLink[] = fallbackResult.data.apis.nodes.flatMap(
+              (api: FallbackApi) =>
+                api.domains.nodes.map((d: Domain) => ({
                   domain: d.domain,
                   subdomain: d.subdomain,
                   href: d.subdomain
@@ -436,7 +456,7 @@ export const getApiConfig = async (
               ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
                 allDomains
                   .map(
-                    (d: any) =>
+                    (d: DomainLink) =>
                       `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`
                   )
                   .join('') +

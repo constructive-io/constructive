@@ -92,3 +92,11 @@ export interface ApiStructure {
   databaseId?: string;
   isPublic?: boolean;
 }
+
+export interface ErrorResult {
+  errorHtml: string;
+}
+
+export interface ApiErrorWithCode extends Error {
+  code?: string;
+}
