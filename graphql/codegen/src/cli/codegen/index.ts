@@ -256,7 +256,6 @@ export function generate(options: GenerateOptions): GenerateResult {
     useCentralizedKeys,
     hasRelationships,
     tableTypeNames,
-    typeRegistry: customOperations?.typeRegistry,
   });
   for (const hook of mutationHooks) {
     files.push({

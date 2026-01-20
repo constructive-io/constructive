@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Barrel File Generators generateCustomMutationsBarrel generates custom mutations barrel 1`] = `
 "/**
@@ -770,7 +770,6 @@ export const deleteUserMutationDocument = \`
 mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
-    deletedUserNodeId
   }
 }
 \`;
@@ -782,7 +781,6 @@ export interface DeleteUserMutationVariables {
 export interface DeleteUserMutationResult {
   deleteUser: {
     clientMutationId: string | null;
-    deletedUserNodeId: string | null;
   };
 }
 /**
@@ -834,7 +832,6 @@ export const deletePostMutationDocument = \`
 mutation DeletePostMutation($input: DeletePostInput!) {
   deletePost(input: $input) {
     clientMutationId
-    deletedPostNodeId
   }
 }
 \`;
@@ -846,7 +843,6 @@ export interface DeletePostMutationVariables {
 export interface DeletePostMutationResult {
   deletePost: {
     clientMutationId: string | null;
-    deletedPostNodeId: string | null;
   };
 }
 /**
@@ -895,7 +891,6 @@ export const deleteUserMutationDocument = \`
 mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
-    deletedUserNodeId
   }
 }
 \`;
@@ -907,7 +902,6 @@ export interface DeleteUserMutationVariables {
 export interface DeleteUserMutationResult {
   deleteUser: {
     clientMutationId: string | null;
-    deletedUserNodeId: string | null;
   };
 }
 /**

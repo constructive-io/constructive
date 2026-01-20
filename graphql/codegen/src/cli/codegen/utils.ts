@@ -5,7 +5,6 @@ import type {
   CleanTable,
   CleanField,
   CleanFieldType,
-  TypeRegistry,
 } from '../../types/schema';
 import { scalarToTsType, scalarToFilterType } from './scalars';
 import { pluralize } from 'inflekt';
@@ -411,51 +410,6 @@ export function hasValidPrimaryKey(table: CleanTable): boolean {
  */
 export function getQueryKeyPrefix(table: CleanTable): string {
   return lcFirst(table.name);
-}
-
-// ============================================================================
-// Delete mutation helpers
-// ============================================================================
-
-/**
- * Get the deleted node ID field name from a delete mutation payload.
- *
- * PostGraphile generates delete payloads with a field following the pattern
- * `deleted{EntityName}NodeId`. This function looks up the actual field name
- * from the TypeRegistry if available, or falls back to the convention.
- *
- * @param typeRegistry - The type registry from schema introspection
- * @param deletePayloadTypeName - The payload type name (e.g., "DeleteUserPayload")
- * @param entityTypeName - The entity type name (e.g., "User") for fallback
- * @returns The field name (e.g., "deletedUserNodeId")
- */
-export function getDeletedNodeIdFieldName(
-  typeRegistry: TypeRegistry | undefined,
-  deletePayloadTypeName: string,
-  entityTypeName: string
-): string {
-  if (typeRegistry) {
-    const payloadType = typeRegistry.get(deletePayloadTypeName);
-    if (payloadType?.fields) {
-      // Find the field that matches the pattern deleted*NodeId
-      const deletedNodeIdField = payloadType.fields.find(
-        (f) => f.name.startsWith('deleted') && f.name.endsWith('NodeId')
-      );
-      if (deletedNodeIdField) {
-        return deletedNodeIdField.name;
-      }
-    }
-  }
-  // Fallback to PostGraphile naming convention
-  return `deleted${entityTypeName}NodeId`;
-}
-
-/**
- * Get the delete payload type name for a table.
- * Uses inflection if available, otherwise falls back to convention.
- */
-export function getDeletePayloadTypeName(table: CleanTable): string {
-  return table.inflection?.deletePayloadType || `Delete${table.name}Payload`;
 }
 
 // ============================================================================
