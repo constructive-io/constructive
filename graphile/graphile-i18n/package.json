@@ -1,6 +1,6 @@
 {
   "name": "graphile-i18n",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Graphile i18n plugin",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -53,6 +53,6 @@
     "graphile-utils": "^4.14.1",
     "graphql": "15.10.1",
     "graphql-tag": "2.12.6",
-    "pg": "^8.16.3"
+    "pg": "^8.17.1"
   }
 }

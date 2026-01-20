@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-server",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "knative job server",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-server#readme",
@@ -44,6 +44,6 @@
     "@pgpmjs/logger": "workspace:^",
     "body-parser": "1.19.0",
     "express": "5.2.1",
-    "pg": "8.16.3"
+    "pg": "8.17.1"
   }
 }

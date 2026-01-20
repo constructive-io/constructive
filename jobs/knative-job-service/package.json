@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-service",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "knative job service",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-service#readme",
@@ -66,6 +66,6 @@
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "async-retry": "1.3.1",
-    "pg": "8.16.3"
+    "pg": "8.17.1"
   }
 }

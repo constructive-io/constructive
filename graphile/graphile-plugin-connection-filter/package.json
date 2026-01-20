@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Filtering on PostGraphile connections",
   "author": "Matt Bretl",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -53,7 +53,7 @@
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pgsql-test": "workspace:^"
   }
 }

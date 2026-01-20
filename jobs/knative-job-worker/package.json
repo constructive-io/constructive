@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-worker",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "knative job worker",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-worker#readme",
@@ -40,13 +40,13 @@
     "@constructive-io/job-pg": "workspace:^",
     "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "pg": "8.16.3",
+    "pg": "8.17.1",
     "request": "2.88.2"
   },
   "devDependencies": {
-    "@pgpmjs/core": "workspace:^",
-    "@pgpm/verify": "^0.16.0",
     "@pgpm/database-jobs": "^0.16.0",
+    "@pgpm/verify": "^0.16.0",
+    "@pgpmjs/core": "workspace:^",
     "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   }

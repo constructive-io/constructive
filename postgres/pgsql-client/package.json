@@ -1,6 +1,6 @@
 {
   "name": "pgsql-client",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL client utilities with query helpers, RLS context management, and database administration",
   "main": "index.js",
@@ -48,7 +48,7 @@
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-env": "workspace:^"
   }
 }
