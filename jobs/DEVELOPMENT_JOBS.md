@@ -74,9 +74,7 @@ From the `constructive-db/` directory (with `pgenv` applied):
 3. Deploy the main app and jobs packages into DB:
 
    ```sh
-   pgpm deploy --yes --database "$PGDATABASE" --package constructive
-   pgpm deploy --yes --database "$PGDATABASE" --package constructive-services
-   pgpm deploy --yes --database "$PGDATABASE" --package app
+   pgpm deploy --yes --database "$PGDATABASE" --package constructive-local
    pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs     # for sanity, not needed to run
    ```
 
@@ -182,7 +180,7 @@ echo "Database ID: $DBID"
 
 # Get User ID (for sender_id in invite emails)
 SENDER_ID="$(docker exec -i postgres psql -U postgres -d constructive -Atc \
-  'SELECT id FROM roles_public.users ORDER BY created_at LIMIT 1;')"
+  'SELECT id FROM constructive_users_public.users ORDER BY created_at LIMIT 1;')"
 echo "Sender ID: $SENDER_ID"
 ```
 
