@@ -383,7 +383,6 @@ export function buildDeleteMutationAST(config: DeleteMutationConfig): DocumentNo
               selectionSet: t.selectionSet({
                 selections: [
                   t.field({ name: 'clientMutationId' }),
-                  t.field({ name: 'deletedId' }),
                 ],
               }),
             }),
