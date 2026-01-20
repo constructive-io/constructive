@@ -1,6 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { Inquirerer, ParsedArgs } from 'inquirerer';
 import path from 'path';
 
 export default async (argv: Partial<ParsedArgs>, _prompter: Inquirerer) => {

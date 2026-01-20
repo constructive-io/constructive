@@ -1,6 +1,5 @@
 import { PgpmPackage } from '@pgpmjs/core';
-import { CLIOptions, Inquirerer, OptionValue, Question } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, OptionValue, ParsedArgs, Question } from 'inquirerer';
 
 const extensionUsageText = `
 Extension Command:

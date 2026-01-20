@@ -6,8 +6,7 @@ import {
   FunctionName,
   FunctionServiceConfig
 } from '@constructive-io/knative-job-service';
-import { cliExitWithError, extractFirst } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
+import { CLIOptions, Inquirerer, Question, cliExitWithError, extractFirst } from 'inquirerer';
 
 const jobsUsageText = `
 Constructive Jobs:

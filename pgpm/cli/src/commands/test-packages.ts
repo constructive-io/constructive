@@ -2,8 +2,7 @@ import { PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import path from 'path';
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { getPgEnvOptions } from 'pg-env';
 import { getPgPool } from 'pg-cache';
 

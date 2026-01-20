@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.27.1",
+  "version": "2.28.2",
   "description": "CLI-based GraphQL SDK generator for PostGraphile endpoints with React Query hooks",
   "keywords": [
     "graphql",
@@ -39,8 +39,8 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-    "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "example:codegen:sdk": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts",
@@ -52,15 +52,17 @@
     "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
   },
   "dependencies": {
-    "@babel/generator": "^7.28.5",
-    "@babel/types": "^7.28.5",
+    "@babel/generator": "^7.28.6",
+    "@babel/types": "^7.28.6",
+    "@inquirerer/utils": "^3.2.0",
     "ajv": "^8.17.1",
-    "commander": "^12.1.0",
+    "find-and-require-package-json": "^0.9.0",
     "gql-ast": "workspace:^",
     "graphql": "15.10.1",
-    "inflekt": "^0.2.0",
+    "inflekt": "^0.3.0",
+    "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
-    "oxfmt": "^0.13.0"
+    "prettier": "^3.7.4"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
@@ -75,12 +77,12 @@
     }
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.90.16",
+    "@tanstack/react-query": "^5.90.19",
     "@types/babel__generator": "^7.27.0",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.27",
-    "@types/react": "^19.2.7",
-    "jest": "^29.7.0",
+    "@types/react": "^19.2.8",
+    "jest": "^30.2.0",
     "react": "^19.2.3",
     "ts-jest": "^29.2.5",
     "tsx": "^4.21.0",

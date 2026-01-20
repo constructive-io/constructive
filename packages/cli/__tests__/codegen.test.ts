@@ -1,4 +1,4 @@
-import type { ParsedArgs } from 'minimist'
+import type { ParsedArgs } from 'inquirerer'
 import codegenCommand from '../src/commands/codegen'
 import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
 

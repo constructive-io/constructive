@@ -59,7 +59,7 @@ GraphQL Schema (endpoint or .graphql file)
     │
     ▼
 ┌─────────────────────────────────────┐
-│  Output Formatting (oxfmt)          │
+│  Output Formatting (prettier)       │
 └─────────────────────────────────────┘
 ```
 
