@@ -1,38 +1,20 @@
-import type { Request } from 'express';
-
-import { ApiModule } from "../types";
+import type { ApiStructure } from '../types';
 
 export type ConstructiveAPIToken = {
-    id: string;
-    user_id: string;
-    [key: string]: any;
+  id: string;
+  user_id: string;
+  [key: string]: unknown;
 };
 
 declare global {
-    namespace Express {
-        interface Request {
-            api?: {
-                dbname: string;
-                anonRole: string;
-                roleName: string;
-                schema: string[];  // Pre-processed schema names
-                apiModules: ApiModule[];
-                rlsModule?: {
-                    authenticate?: string;
-                    authenticateStrict?: string;
-                    privateSchema: {
-                        schemaName: string;
-                    };
-                };
-                domains?: string[];  // Simplified from database.sites.nodes
-                databaseId?: string;
-                isPublic?: boolean;
-            };
-            svc_key?: string;
-            clientIp?: string;
-            databaseId?: string;
-            requestId?: string;
-            token?: ConstructiveAPIToken;
-        }
+  namespace Express {
+    interface Request {
+      api?: ApiStructure;
+      svc_key?: string;
+      clientIp?: string;
+      databaseId?: string;
+      requestId?: string;
+      token?: ConstructiveAPIToken;
     }
+  }
 }
