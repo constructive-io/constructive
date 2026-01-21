@@ -1,7 +1,7 @@
 import type { Server } from 'http';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { GraphileOptions } from '@constructive-io/graphql-types';
+import type { GraphileOptions, ApiOptions } from '@constructive-io/graphql-types';
 import type supertest from 'supertest';
 
 /**
@@ -53,6 +53,26 @@ export interface GetConnectionsInput {
    * @default false
    */
   enableServicesApi?: boolean;
+  /**
+   * Full API configuration options for the GraphQL server.
+   * This allows fine-grained control over all API settings.
+   * 
+   * Note: The convenience properties `schemas`, `authRole`, and `enableServicesApi` 
+   * take precedence over values in this object when both are specified.
+   * 
+   * @example
+   * ```typescript
+   * const { query } = await getConnections({
+   *   schemas: ['app_public'],
+   *   api: {
+   *     isPublic: false,
+   *     defaultDatabaseId: 'my-database',
+   *     metaSchemas: ['services_public', 'metaschema_public']
+   *   }
+   * });
+   * ```
+   */
+  api?: Partial<ApiOptions>;
 }
 
 /**

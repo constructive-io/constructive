@@ -166,27 +166,58 @@ it('matches snapshot', async () => {
 | `server.port` | `number` | random | Port to run the server on |
 | `server.host` | `string` | `localhost` | Host to bind the server to |
 | `enableServicesApi` | `boolean` | `false` | Enable domain/subdomain routing via services_public |
+| `api` | `Partial<ApiOptions>` | - | Full API configuration options (see below) |
+
+### API Options
+
+The `api` option provides full control over the GraphQL server configuration. It accepts a partial `ApiOptions` object from `@constructive-io/graphql-types`:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enableServicesApi` | `boolean` | `false` | Enable domain/subdomain routing via services_public |
+| `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
+| `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
+| `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
+| `defaultDatabaseId` | `string` | `'test-database'` | Default database identifier |
+| `isPublic` | `boolean` | - | Whether the API is publicly accessible |
+| `metaSchemas` | `string[]` | - | Schemas containing metadata tables |
+
+The convenience properties (`schemas`, `authRole`, `enableServicesApi`) take precedence over values in the `api` object when both are specified.
+
+```typescript
+// Using convenience properties (recommended for most cases)
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  authRole: 'anonymous'
+});
+
+// Using full api options for advanced configuration
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  api: {
+    isPublic: false,
+    defaultDatabaseId: 'my-test-db',
+    metaSchemas: ['services_public', 'metaschema_public']
+  }
+});
+
+// Combining convenience properties with api options
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  authRole: 'authenticated',
+  enableServicesApi: true,
+  api: {
+    isPublic: true,
+    metaSchemas: ['services_public']
+  }
+});
+```
 
 ### Services API
 
 By default, `enableServicesApi` is set to `false`, which bypasses domain/subdomain routing and directly exposes the schemas you specify. This is the recommended setting for most testing scenarios.
 
 When `enableServicesApi` is `true`, the server uses the `services_public` schema to resolve which API and schemas to expose based on the incoming request's domain/subdomain. This is useful when you need to test the full domain routing behavior.
-
-```typescript
-// Default: bypasses domain routing, directly exposes specified schemas
-const { query } = await getConnections({
-  schemas: ['app_public'],
-  authRole: 'anonymous'
-});
-
-// With Services API enabled: uses domain/subdomain routing
-const { query } = await getConnections({
-  schemas: ['app_public'],
-  authRole: 'anonymous',
-  enableServicesApi: true
-});
-```
 
 ## Comparison with Other Test Packages
 
