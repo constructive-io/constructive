@@ -35,8 +35,9 @@
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "copy:ts": "makage copy src/cli/codegen/orm/query-builder.ts dist/cli/codegen/orm --flat",
+    "build": "makage build && npm run copy:ts",
+    "build:dev": "makage build --dev && npm run copy:ts",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "fmt": "prettier --write .",
