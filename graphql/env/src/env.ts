@@ -31,10 +31,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
 
   return {
     graphile: {
-      ...(GRAPHILE_SCHEMA && { 
-        schema: GRAPHILE_SCHEMA.includes(',') 
+      ...(GRAPHILE_SCHEMA && {
+        schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
-          : GRAPHILE_SCHEMA 
+          : GRAPHILE_SCHEMA
       }),
     },
     features: {

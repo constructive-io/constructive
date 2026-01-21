@@ -77,6 +77,10 @@ export const createApiMiddleware = (opts: ApiOptions) => {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
+    // Log incoming request details at debug level to avoid excessive info logs in production
+    log.debug(`[api-middleware] Request: ${req.method} ${req.path}`);
+    log.debug(`[api-middleware] Headers: X-Api-Name=${req.get('X-Api-Name')}, X-Database-Id=${req.get('X-Database-Id')}, X-Meta-Schema=${req.get('X-Meta-Schema')}, Host=${req.get('Host')}`);
+
     if (opts.api?.enableServicesApi === false) {
       const schemas = opts.api.exposedSchemas ?? [];
       const anonRole = opts.api.anonRole ?? '';

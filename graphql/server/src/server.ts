@@ -77,15 +77,21 @@ class Server {
       next();
     };
 
-    // Log startup config in dev mode
-    if (isDev()) {
-      log.debug(
-        `Database: ${effectiveOpts.pg?.database}@${effectiveOpts.pg?.host}:${effectiveOpts.pg?.port}`
-      );
-      log.debug(
-        `Meta schemas: ${(effectiveOpts as any).api?.metaSchemas?.join(', ') || 'default'}`
-      );
-    }
+    // Log startup configuration (non-sensitive values only)
+    const apiOpts = (effectiveOpts as any).api || {};
+    log.info('[server] Starting with config:', {
+      database: effectiveOpts.pg?.database,
+      host: effectiveOpts.pg?.host,
+      port: effectiveOpts.pg?.port,
+      serverHost: effectiveOpts.server?.host,
+      serverPort: effectiveOpts.server?.port,
+      apiIsPublic: apiOpts.isPublic,
+      enableServicesApi: apiOpts.enableServicesApi,
+      metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
+      exposedSchemas: apiOpts.exposedSchemas?.join(',') || 'none',
+      anonRole: apiOpts.anonRole,
+      roleName: apiOpts.roleName
+    });
 
     healthz(app);
     trustProxy(app, effectiveOpts.server.trustProxy);

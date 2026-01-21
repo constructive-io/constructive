@@ -211,6 +211,16 @@ export default async (
     log.debug(`${key}: ${JSON.stringify(value)}`);
   }
 
+  // Debug: Log API routing configuration
+  const apiOpts = (options as any).api || {};
+  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, enableServicesApi=${apiOpts.enableServicesApi}`);
+  if (apiOpts.isPublic === false) {
+    log.debug(`   Header-based routing enabled (X-Api-Name, X-Database-Id, X-Meta-Schema)`);
+  }
+  if (apiOpts.metaSchemas?.length) {
+    log.debug(`   Meta schemas: ${apiOpts.metaSchemas.join(', ')}`);
+  }
+
   log.success('🚀 Launching Server...\n');
   server(options);
 };

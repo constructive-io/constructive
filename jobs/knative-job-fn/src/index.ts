@@ -192,13 +192,22 @@ const createJobApp = () => {
         // If an error handler already sent a callback, skip.
         if (res.locals.jobCallbackSent) return;
         res.locals.jobCallbackSent = true;
+
+        // Treat 4xx/5xx status codes as errors
+        const isError = res.statusCode >= 400;
+
         logger.info('Function completed', {
           workerId: ctx.workerId,
           jobId: ctx.jobId,
           databaseId: ctx.databaseId,
           statusCode: res.statusCode
         });
-        void sendJobCallback(ctx, 'success');
+
+        if (isError) {
+          void sendJobCallback(ctx, 'error', `HTTP ${res.statusCode}`);
+        } else {
+          void sendJobCallback(ctx, 'success');
+        }
       });
     }
 

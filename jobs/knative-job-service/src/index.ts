@@ -433,6 +433,23 @@ export const bootJobs = async (): Promise<void> => {
   );
 
   const options = buildKnativeJobsSvcOptionsFromEnv();
+
+  // Log startup configuration (non-sensitive values only)
+  const pgConfig = getJobPgConfig();
+  log.info('[knative-job-service] Starting with config:', {
+    database: pgConfig.database,
+    host: pgConfig.host,
+    port: pgConfig.port,
+    schema: getJobSchema(),
+    callbackPort: getJobsCallbackPort(),
+    workerHostname: getWorkerHostname(),
+    schedulerHostname: getSchedulerHostname(),
+    supportedTasks: getJobSupported(),
+    jobsEnabled: options.jobs?.enabled ?? true,
+    functionsEnabled: shouldEnableFunctions(options.functions),
+    functions: normalizeFunctionServices(options.functions).map(s => s.name)
+  });
+
   if (options.jobs?.enabled === false) {
     log.info('jobs disabled; skipping startup');
     return;

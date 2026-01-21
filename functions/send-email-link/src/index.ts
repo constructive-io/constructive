@@ -77,9 +77,20 @@ const getRequiredEnv = (name: string): string => {
   return value;
 };
 
+type GraphQLClientOptions = {
+  hostHeaderEnvVar?: string;
+  databaseId?: string;
+  useMetaSchema?: boolean;
+  apiName?: string;
+  schemata?: string;
+};
+
+// TODO: Consider moving this to @constructive-io/knative-job-fn as a shared
+// utility so all job functions can create GraphQL clients with consistent
+// header-based routing without duplicating this logic.
 const createGraphQLClient = (
   url: string,
-  hostHeaderEnvVar?: string
+  options: GraphQLClientOptions = {}
 ): GraphQLClient => {
   const headers: Record<string, string> = {};
 
@@ -87,10 +98,24 @@ const createGraphQLClient = (
     headers.Authorization = `Bearer ${process.env.GRAPHQL_AUTH_TOKEN}`;
   }
 
-  const envName = hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
+  const envName = options.hostHeaderEnvVar || 'GRAPHQL_HOST_HEADER';
   const hostHeader = process.env[envName];
   if (hostHeader) {
     headers.host = hostHeader;
+  }
+
+  // Header-based routing for internal cluster services (API_IS_PUBLIC=false)
+  if (options.databaseId) {
+    headers['X-Database-Id'] = options.databaseId;
+  }
+  if (options.useMetaSchema) {
+    headers['X-Meta-Schema'] = 'true';
+  }
+  if (options.apiName) {
+    headers['X-Api-Name'] = options.apiName;
+  }
+  if (options.schemata) {
+    headers['X-Schemata'] = options.schemata;
   }
 
   return new GraphQLClient(url, { headers });
@@ -163,7 +188,19 @@ export const sendEmailLink = async (
   const name = company.name;
   const primary = theme.primary;
 
-  const hostname = subdomain ? [subdomain, domain].join('.') : domain;
+  // Check if this is a localhost-style domain before building hostname
+  // TODO: Security consideration - this only affects localhost domains which
+  // should not exist in production. The isLocalHost check combined with isDryRun
+  // ensures special behavior (http, custom port) only applies in dev environments.
+  const isLocalDomain =
+    domain === 'localhost' ||
+    domain.startsWith('localhost') ||
+    domain === '0.0.0.0';
+
+  // For localhost, skip subdomain to generate cleaner URLs (http://localhost:3000)
+  const hostname = subdomain && !isLocalDomain
+    ? [subdomain, domain].join('.')
+    : domain;
 
   // Treat localhost-style hosts specially so we can generate
   // http://localhost[:port]/... links for local dev without
@@ -313,14 +350,37 @@ app.post('/', async (req: any, res: any, next: any) => {
     const graphqlUrl = getRequiredEnv('GRAPHQL_URL');
     const metaGraphqlUrl = process.env.META_GRAPHQL_URL || graphqlUrl;
 
-    const client = createGraphQLClient(graphqlUrl, 'GRAPHQL_HOST_HEADER');
-    const meta = createGraphQLClient(metaGraphqlUrl, 'META_GRAPHQL_HOST_HEADER');
+    // Get API name or schemata from env (for tenant queries like GetUser)
+    const apiName = process.env.GRAPHQL_API_NAME;
+    const schemata = process.env.GRAPHQL_SCHEMATA;
+
+    // For GetUser query - needs tenant API access via X-Api-Name or X-Schemata
+    const client = createGraphQLClient(graphqlUrl, {
+      hostHeaderEnvVar: 'GRAPHQL_HOST_HEADER',
+      databaseId,
+      ...(apiName && { apiName }),
+      ...(schemata && { schemata }),
+    });
+
+    // For GetDatabaseInfo query - uses same API routing as client
+    // The private API exposes both user and database queries
+    const meta = createGraphQLClient(metaGraphqlUrl, {
+      hostHeaderEnvVar: 'META_GRAPHQL_HOST_HEADER',
+      databaseId,
+      ...(apiName && { apiName }),
+      ...(schemata && { schemata }),
+    });
 
     const result = await sendEmailLink(params, {
       client,
       meta,
       databaseId
     });
+
+    // Validation failures return { missing: '...' } - treat as client error
+    if (result && typeof result === 'object' && 'missing' in result) {
+      return res.status(400).json({ error: `Missing required field: ${result.missing}` });
+    }
 
     res.status(200).json(result);
   } catch (err) {
@@ -333,6 +393,22 @@ export default app;
 // When executed directly (e.g. via `node dist/index.js`), start an HTTP server.
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
+
+  // Log startup configuration (non-sensitive values only - no API keys or tokens)
+  logger.info('[send-email-link] Starting with config:', {
+    port,
+    graphqlUrl: process.env.GRAPHQL_URL || 'not set',
+    metaGraphqlUrl: process.env.META_GRAPHQL_URL || process.env.GRAPHQL_URL || 'not set',
+    apiName: process.env.GRAPHQL_API_NAME || 'not set',
+    defaultDatabaseId: process.env.DEFAULT_DATABASE_ID || 'not set',
+    dryRun: isDryRun,
+    useSmtp,
+    mailgunDomain: process.env.MAILGUN_DOMAIN || 'not set',
+    mailgunFrom: process.env.MAILGUN_FROM || 'not set',
+    localAppPort: process.env.LOCAL_APP_PORT || 'not set',
+    hasAuthToken: !!process.env.GRAPHQL_AUTH_TOKEN
+  });
+
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the Express app
   (app as any).listen(port, () => {
     logger.info(`listening on port ${port}`);
