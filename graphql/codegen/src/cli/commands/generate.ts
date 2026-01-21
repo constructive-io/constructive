@@ -548,11 +548,27 @@ export function formatOutput(outputDir: string): { success: boolean; error?: str
 
     // Use bundled config with sensible defaults
     const configPath = path.join(__dirname, 'codegen-prettier.json');
+    const fallbackConfigPath = path.resolve(
+      __dirname,
+      '../../../src/cli/commands/codegen-prettier.json'
+    );
+    const resolvedConfigPath = fs.existsSync(configPath)
+      ? configPath
+      : fs.existsSync(fallbackConfigPath)
+        ? fallbackConfigPath
+        : null;
 
-    execSync(`"${prettierBin}" --write --config "${configPath}" "${absoluteOutputDir}"`, {
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
+    if (!resolvedConfigPath) {
+      return { success: true };
+    }
+
+    execSync(
+      `"${prettierBin}" --write --config "${resolvedConfigPath}" "${absoluteOutputDir}"`,
+      {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      }
+    );
     return { success: true };
   } catch (err) {
     // prettier may fail if files have syntax errors or if not installed
