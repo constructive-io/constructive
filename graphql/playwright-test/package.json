@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/playwright-test",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive Playwright Testing with HTTP server support",
   "main": "index.js",
