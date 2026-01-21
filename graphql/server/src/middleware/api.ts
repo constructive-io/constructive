@@ -1,7 +1,6 @@
 import { getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
-import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, Response } from 'express';
 import { getSchema, GraphileQuery } from 'graphile-query';
 import { getGraphileSettings } from 'graphile-settings';
@@ -26,7 +25,12 @@ import {
   type DomainLookupModel,
   type DomainRecord,
 } from './gql';
-import { ApiStructure } from '../types';
+import {
+  ApiConfigResult,
+  ApiError,
+  ApiOptions,
+  ApiStructure,
+} from '../types';
 import './types'; // for Request type
 
 export { normalizeApiRecord } from './gql';
@@ -34,20 +38,6 @@ export { normalizeApiRecord } from './gql';
 const log = new Logger('api');
 const isDev = () => getNodeEnv() === 'development';
 
-type ApiOptions = PgpmOptions & {
-  api?: {
-    enableServicesApi?: boolean;
-    exposedSchemas?: string[];
-    anonRole?: string;
-    roleName?: string;
-    defaultDatabaseId?: string;
-    metaSchemas?: string[];
-    isPublic?: boolean;
-  };
-};
-
-type ApiError = { errorHtml: string };
-type ApiConfigResult = ApiStructure | ApiError | null;
 type GraphileQuerySettings = ReturnType<typeof getGraphileSettings> & {
   schema: string[] | string;
 };

@@ -1,3 +1,5 @@
+import type { PgpmOptions } from '@pgpmjs/types';
+
 export interface CorsModuleData {
   urls: string[];
 }
@@ -39,3 +41,18 @@ export interface ApiStructure {
   databaseId?: string;
   isPublic?: boolean;
 }
+
+export type ApiError = { errorHtml: string };
+export type ApiConfigResult = ApiStructure | ApiError | null;
+
+export type ApiOptions = PgpmOptions & {
+  api?: {
+    enableServicesApi?: boolean;
+    exposedSchemas?: string[];
+    anonRole?: string;
+    roleName?: string;
+    defaultDatabaseId?: string;
+    metaSchemas?: string[];
+    isPublic?: boolean;
+  };
+};
