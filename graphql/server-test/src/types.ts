@@ -46,6 +46,13 @@ export interface GetConnectionsInput {
   graphile?: GraphileOptions;
   /** Server configuration options */
   server?: ServerOptions;
+  /**
+   * Enable the Services API (domain/subdomain routing via services_public).
+   * When false (default), bypasses domain routing and directly exposes the specified schemas.
+   * When true, uses services_public to resolve which API/schemas to expose based on domain/subdomain.
+   * @default false
+   */
+  enableServicesApi?: boolean;
 }
 
 /**
