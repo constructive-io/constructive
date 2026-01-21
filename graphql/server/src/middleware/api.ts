@@ -63,6 +63,12 @@ const getPortFromRequest = (req: Request): string | null => {
   return parts.length === 2 ? `:${parts[1]}` : null;
 };
 
+const parseSchemataHeader = (schemata: string): string[] =>
+  schemata
+    .split(',')
+    .map((schemaName) => schemaName.trim())
+    .filter((schemaName) => schemaName.length > 0);
+
 const getUrlDomains = (
   req: Request
 ): { domain: string; subdomains: string[] } => {
@@ -160,19 +166,15 @@ const getHardCodedSchemata = ({
   key,
 }: {
   opts: ApiOptions;
-  schemata: string;
+  schemata: string[];
   databaseId?: string;
   key: string;
 }): ApiStructure => {
-  const schema = schemata
-    .split(',')
-    .map((schemaName) => schemaName.trim())
-    .filter((schemaName) => schemaName.length > 0);
   const api: ApiStructure = {
     dbname: opts.pg?.database ?? '',
     anonRole: 'administrator',
     roleName: 'administrator',
-    schema,
+    schema: schemata,
     apiModules: [],
     domains: [],
     databaseId,
@@ -184,15 +186,15 @@ const getHardCodedSchemata = ({
 
 const getMetaSchema = ({
   opts,
+  schemata,
   key,
   databaseId,
 }: {
   opts: ApiOptions;
+  schemata: string[];
   key: string;
   databaseId?: string;
 }): ApiStructure => {
-  const apiOpts = opts.api || {};
-  const schemata = apiOpts.metaSchemas || [];
   const api: ApiStructure = {
     dbname: opts.pg?.database ?? '',
     anonRole: 'administrator',
@@ -333,17 +335,39 @@ export const getApiConfig = async (
   } else {
     if (isDev()) log.debug(`Cache MISS for key=${key}, looking up API`);
     const apiOpts = opts.api || {};
-    const allSchemata = apiOpts.metaSchemas || [];
-    const validatedSchemata = await validateSchemata(rootPgPool, allSchemata);
+    const apiPublic = apiOpts.isPublic;
+    const schemataHeader = req.get('X-Schemata');
+    const apiNameHeader = req.get('X-Api-Name');
+    const metaSchemaHeader = req.get('X-Meta-Schema');
+    const databaseIdHeader = req.get('X-Database-Id');
+    const headerSchemata = schemataHeader
+      ? parseSchemataHeader(schemataHeader)
+      : [];
+    const candidateSchemata =
+      apiPublic === false && headerSchemata.length
+        ? Array.from(new Set([...(apiOpts.metaSchemas || []), ...headerSchemata]))
+        : apiOpts.metaSchemas || [];
+    const validatedSchemata = await validateSchemata(
+      rootPgPool,
+      candidateSchemata
+    );
 
     if (validatedSchemata.length === 0) {
-      const apiOpts2 = opts.api || {};
-      const message = `No valid schemas found. Configured metaSchemas: [${(apiOpts2.metaSchemas || []).join(', ')}]`;
+      const schemaSource = headerSchemata.length
+        ? headerSchemata
+        : apiOpts.metaSchemas || [];
+      const label = headerSchemata.length ? 'X-Schemata' : 'metaSchemas';
+      const message = `No valid schemas found. Configured ${label}: [${schemaSource.join(', ')}]`;
       if (isDev()) log.debug(message);
       const error = new Error(message) as Error & { code?: string };
       error.code = 'NO_VALID_SCHEMAS';
       throw error;
     }
+
+    const validSchemaSet = new Set(validatedSchemata);
+    const validatedHeaderSchemata = headerSchemata.filter((schemaName) =>
+      validSchemaSet.has(schemaName)
+    );
 
     const settings = getGraphileSettings({
       graphile: {
@@ -363,17 +387,18 @@ export const getApiConfig = async (
     });
     const orm = createGraphileOrm(graphileClient);
 
-    const apiPublic = opts.api?.isPublic;
     if (apiPublic === false) {
-      const schemataHeader = req.get('X-Schemata');
-      const apiNameHeader = req.get('X-Api-Name');
-      const metaSchemaHeader = req.get('X-Meta-Schema');
-      const databaseIdHeader = req.get('X-Database-Id');
       if (schemataHeader) {
+        if (validatedHeaderSchemata.length === 0) {
+          return {
+            errorHtml:
+              'No valid schemas found for the supplied X-Schemata header.',
+          };
+        }
         apiConfig = getHardCodedSchemata({
           opts,
           key,
-          schemata: schemataHeader,
+          schemata: validatedHeaderSchemata,
           databaseId: databaseIdHeader,
         });
       } else if (apiNameHeader) {
@@ -387,6 +412,7 @@ export const getApiConfig = async (
       } else if (metaSchemaHeader) {
         apiConfig = getMetaSchema({
           opts,
+          schemata: validatedSchemata,
           key,
           databaseId: databaseIdHeader,
         });

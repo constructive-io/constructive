@@ -15,7 +15,7 @@ import {
 import { ApiModel, DomainModel } from '../codegen/orm/models';
 import { createQueryOperations } from '../codegen/orm/query';
 import type { InferSelectResult } from '../codegen/orm/select-types';
-import { ApiStructure, RlsModule, SchemaNode } from '../types';
+import { ApiStructure, RlsModule } from '../types';
 
 export const connectionFirst = 1000;
 
@@ -146,12 +146,12 @@ export const createGraphileOrm = (graphile: GraphileQuery) => {
 };
 
 export const normalizeApiRecord = (api: ApiRecord): ApiStructure => {
-  const schemaNames =
-    api.apiExtensions?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
-  const additionalSchemas =
-    api.schemasByApiSchemaApiIdAndSchemaId?.nodes?.map(
-      (n: SchemaNode) => n.schemaName
-    ) || [];
+  const schemaNames = (api.apiExtensions?.nodes ?? []).flatMap((node) =>
+    node.schemaName ? [node.schemaName] : []
+  );
+  const additionalSchemas = (
+    api.schemasByApiSchemaApiIdAndSchemaId?.nodes ?? []
+  ).flatMap((node) => (node.schemaName ? [node.schemaName] : []));
 
   let domains: string[] = [];
   if (api.domains?.nodes?.length) {

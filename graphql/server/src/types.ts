@@ -12,7 +12,7 @@ export interface PublicKeyChallengeData {
 }
 
 export interface GenericModuleData {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type ApiModule =
@@ -26,38 +26,6 @@ export interface RlsModule {
   privateSchema: {
     schemaName: string;
   };
-}
-
-export interface SchemaNode {
-  schemaName: string;
-}
-
-export interface SchemaNodes {
-  nodes: SchemaNode[];
-}
-
-export interface Domain {
-  subdomain?: string;
-  domain: string;
-}
-
-export interface DomainNodes {
-  nodes: Domain[];
-}
-
-export interface Site {
-  domains: DomainNodes;
-}
-
-export interface SiteNodes {
-  nodes: Site[];
-}
-export interface ApiModuleNodes {
-  nodes: ApiModule[];
-}
-
-export interface Database {
-  sites: SiteNodes;
 }
 
 export interface ApiStructure {
