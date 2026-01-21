@@ -227,15 +227,6 @@ export class GraphQLRequestError extends Error {
   }
 }
 
-/**
- * Legacy QueryResult type for backwards compatibility
- * @deprecated Use QueryResult discriminated union instead
- */
-export interface LegacyQueryResult<T> {
-  data: T | null;
-  errors?: GraphQLError[];
-}
-
 export class OrmClient {
   private adapter: GraphQLAdapter;
   private fetchAdapter: FetchAdapter | null = null;
