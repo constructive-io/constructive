@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@0.3.1...graphql-server-test@0.4.0) (2026-01-21)
+
+### Features
+
+- **graphql-server-test:** expose full ApiOptions for server configuration ([44d5fbe](https://github.com/constructive-io/constructive/commit/44d5fbe8d74745cc48dfaeec1eaded163cc29b17))
+
 ## [0.3.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@0.3.0...graphql-server-test@0.3.1) (2026-01-21)
 
 **Note:** Version bump only for package graphql-server-test
