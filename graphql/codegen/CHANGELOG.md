@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.4...@constructive-io/graphql-codegen@2.28.5) (2026-01-21)
+
+### Bug Fixes
+
+- **graphql-codegen:** re-export models and custom operations from index.ts ([e63af2e](https://github.com/constructive-io/constructive/commit/e63af2e8e9c91a15dae8ad20204d5dfafd732c32))
+
 ## [2.28.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.3...@constructive-io/graphql-codegen@2.28.4) (2026-01-21)
 
 ### Bug Fixes
