@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`graphql-server-test getConnections should snapshot query results 1`] = `
+{
+  "users": {
+    "nodes": [
+      {
+        "email": "alice@example.com",
+        "username": "alice",
+      },
+      {
+        "email": "bob@example.com",
+        "username": "bob",
+      },
+    ],
+  },
+}
+`;

@@ -96,6 +96,30 @@ jobs:
             env: {}
           - package: graphile/graphile-sql-expression-validator
             env: {}
+          - package: graphql/server-test
+            env: {}
+          - package: graphql/env
+            env: {}
+          - package: graphql/server
+            env: {}
+          - package: graphql/test
+            env: {}
+          - package: graphql/playwright-test
+            env: {}
+          # - package: jobs/knative-job-worker
+          #   env: {}
+          - package: packages/csv-to-pg
+            env: {}
+          - package: packages/smtppostmaster
+            env: {}
+          - package: postgres/drizzle-orm-test
+            env: {}
+          - package: uploads/etag-hash
+            env: {}
+          - package: uploads/etag-stream
+            env: {}
+          - package: uploads/stream-to-etag
+            env: {}
 
     env:
       PGHOST: localhost

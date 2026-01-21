@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@0.4.2...graphql-server-test@0.4.3) (2026-01-21)
+
+### Bug Fixes
+
+- **graphql-server-test:** fix IPv6/IPv4 mismatch and update tests ([8aa6a92](https://github.com/constructive-io/constructive/commit/8aa6a923dbbad5f7c8f6ed8fb94369f3af8a6bc6))
+- **graphql-server-test:** wait for server to be listening before getting address ([4dff024](https://github.com/constructive-io/constructive/commit/4dff024915662eada8218527936d23be7f6863fb))
+
 ## [0.4.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@0.4.1...graphql-server-test@0.4.2) (2026-01-21)
 
 **Note:** Version bump only for package graphql-server-test
