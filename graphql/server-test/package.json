@@ -1,5 +1,5 @@
 {
-  "name": "@constructive-io/graphql-server-test",
+  "name": "graphql-server-test",
   "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",

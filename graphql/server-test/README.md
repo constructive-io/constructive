@@ -1,4 +1,4 @@
-# @constructive-io/graphql-server-test
+# graphql-server-test
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -11,17 +11,17 @@
   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
     <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
   </a>
-  <a href="https://www.npmjs.com/package/@constructive-io/graphql-server-test">
+  <a href="https://www.npmjs.com/package/graphql-server-test">
     <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Fserver-test%2Fpackage.json"/>
   </a>
 </p>
 
-`@constructive-io/graphql-server-test` provides a testing framework that spins up a real HTTP server using `@constructive-io/graphql-server` and tests it using SuperTest. Unlike `@constructive-io/graphql-test` which uses direct PostGraphile execution, this package makes actual HTTP requests to test the full middleware stack.
+`graphql-server-test` provides a testing framework that spins up a real HTTP server using `@constructive-io/graphql-server` and tests it using SuperTest. Unlike `@constructive-io/graphql-test` which uses direct PostGraphile execution, this package makes actual HTTP requests to test the full middleware stack.
 
 ## Install
 
 ```sh
-npm install @constructive-io/graphql-server-test
+npm install graphql-server-test
 ```
 
 ## Features
@@ -37,7 +37,7 @@ npm install @constructive-io/graphql-server-test
 ### Basic Usage
 
 ```typescript
-import { getConnections, seed } from '@constructive-io/graphql-server-test';
+import { getConnections, seed } from 'graphql-server-test';
 
 let db, pg, server, query, request, teardown;
 
@@ -127,7 +127,7 @@ await db.query('SELECT * FROM app_public.users');
 Use the `seed` utilities from `pgsql-test`:
 
 ```typescript
-import { getConnections, seed } from '@constructive-io/graphql-server-test';
+import { getConnections, seed } from 'graphql-server-test';
 
 const { db, query, teardown } = await getConnections(
   { schemas: ['app_public'] },
@@ -145,7 +145,7 @@ const { db, query, teardown } = await getConnections(
 Use the `snapshot` utility for snapshot testing:
 
 ```typescript
-import { getConnections, snapshot } from '@constructive-io/graphql-server-test';
+import { getConnections, snapshot } from 'graphql-server-test';
 
 it('matches snapshot', async () => {
   const res = await query('{ allUsers { nodes { username } } }');
@@ -173,7 +173,7 @@ it('matches snapshot', async () => {
 | `graphile-test` | None | Direct PostGraphile execution |
 | `@constructive-io/graphql-test` | None | Direct PostGraphile execution |
 | `@constructive-io/playwright-test` | Real HTTP | Direct PostGraphile execution |
-| **`@constructive-io/graphql-server-test`** | Real HTTP | **SuperTest HTTP requests** |
+| **`graphql-server-test`** | Real HTTP | **SuperTest HTTP requests** |
 
 ## License
 
