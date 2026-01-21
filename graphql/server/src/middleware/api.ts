@@ -291,13 +291,13 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 
   const apiPublic = opts.api?.isPublic;
   if (apiPublic === false) {
+    if (req.get('X-Api-Name')) {
+      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
+    }
     if (req.get('X-Schemata')) {
       return (
         'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
       );
-    }
-    if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
     }
     if (req.get('X-Meta-Schema')) {
       return 'metaschema:api:' + req.get('X-Database-Id');
