@@ -1,13 +1,27 @@
 # @constructive-io/graphql-server-test
 
-Constructive GraphQL Server Testing with SuperTest HTTP requests.
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
 
-This package provides a testing framework that spins up a real HTTP server using `@constructive-io/graphql-server` and tests it using SuperTest. Unlike `@constructive-io/graphql-test` which uses direct PostGraphile execution, this package makes actual HTTP requests to test the full middleware stack.
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+  <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
+    <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
+  </a>
+  <a href="https://www.npmjs.com/package/@constructive-io/graphql-server-test">
+    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Fserver-test%2Fpackage.json"/>
+  </a>
+</p>
 
-## Installation
+`@constructive-io/graphql-server-test` provides a testing framework that spins up a real HTTP server using `@constructive-io/graphql-server` and tests it using SuperTest. Unlike `@constructive-io/graphql-test` which uses direct PostGraphile execution, this package makes actual HTTP requests to test the full middleware stack.
 
-```bash
-pnpm add @constructive-io/graphql-server-test
+## Install
+
+```sh
+npm install @constructive-io/graphql-server-test
 ```
 
 ## Features
