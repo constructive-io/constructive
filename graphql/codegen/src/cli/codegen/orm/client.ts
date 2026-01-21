@@ -8,11 +8,6 @@
  * @internal This file is NOT part of the generated output
  */
 
-export interface OrmClientConfig {
-  endpoint: string;
-  headers?: Record<string, string>;
-}
-
 export interface GraphQLError {
   message: string;
   locations?: { line: number; column: number }[];
@@ -20,28 +15,34 @@ export interface GraphQLError {
   extensions?: Record<string, unknown>;
 }
 
-export class GraphQLRequestError extends Error {
-  constructor(
-    public readonly errors: GraphQLError[],
-    public readonly data: unknown = null
-  ) {
-    const messages = errors.map((e) => e.message).join('; ');
-    super(`GraphQL Error: ${messages}`);
-    this.name = 'GraphQLRequestError';
-  }
-}
-
 export type QueryResult<T> =
   | { ok: true; data: T; errors: undefined }
   | { ok: false; data: null; errors: GraphQLError[] };
 
-export class OrmClient {
-  private endpoint: string;
+/**
+ * Pluggable adapter interface for GraphQL execution.
+ * Implement this interface to provide custom execution logic (e.g., for testing).
+ */
+export interface GraphQLAdapter {
+  execute<T>(
+    document: string,
+    variables?: Record<string, unknown>
+  ): Promise<QueryResult<T>>;
+  setHeaders?(headers: Record<string, string>): void;
+  getEndpoint?(): string;
+}
+
+/**
+ * Default adapter that uses fetch for HTTP requests.
+ */
+export class FetchAdapter implements GraphQLAdapter {
   private headers: Record<string, string>;
 
-  constructor(config: OrmClientConfig) {
-    this.endpoint = config.endpoint;
-    this.headers = config.headers ?? {};
+  constructor(
+    private endpoint: string,
+    headers?: Record<string, string>
+  ) {
+    this.headers = headers ?? {};
   }
 
   async execute<T>(
@@ -95,5 +96,61 @@ export class OrmClient {
 
   getEndpoint(): string {
     return this.endpoint;
+  }
+}
+
+/**
+ * Configuration for creating an ORM client.
+ */
+export interface OrmClientConfig {
+  /** GraphQL endpoint URL (required if adapter not provided) */
+  endpoint?: string;
+  /** Default headers for HTTP requests (only used with endpoint) */
+  headers?: Record<string, string>;
+  /** Custom adapter for GraphQL execution (overrides endpoint/headers) */
+  adapter?: GraphQLAdapter;
+}
+
+export class GraphQLRequestError extends Error {
+  constructor(
+    public readonly errors: GraphQLError[],
+    public readonly data: unknown = null
+  ) {
+    const messages = errors.map((e) => e.message).join('; ');
+    super(`GraphQL Error: ${messages}`);
+    this.name = 'GraphQLRequestError';
+  }
+}
+
+export class OrmClient {
+  private adapter: GraphQLAdapter;
+
+  constructor(config: OrmClientConfig) {
+    if (config.adapter) {
+      this.adapter = config.adapter;
+    } else if (config.endpoint) {
+      this.adapter = new FetchAdapter(config.endpoint, config.headers);
+    } else {
+      throw new Error(
+        'OrmClientConfig requires either an endpoint or a custom adapter'
+      );
+    }
+  }
+
+  async execute<T>(
+    document: string,
+    variables?: Record<string, unknown>
+  ): Promise<QueryResult<T>> {
+    return this.adapter.execute<T>(document, variables);
+  }
+
+  setHeaders(headers: Record<string, string>): void {
+    if (this.adapter.setHeaders) {
+      this.adapter.setHeaders(headers);
+    }
+  }
+
+  getEndpoint(): string {
+    return this.adapter.getEndpoint?.() ?? '';
   }
 }
