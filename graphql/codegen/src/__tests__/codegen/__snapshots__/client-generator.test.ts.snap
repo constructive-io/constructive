@@ -14,6 +14,7 @@ export type { OrmClientConfig, QueryResult, GraphQLError } from "./client";
 export { GraphQLRequestError } from "./client";
 export { QueryBuilder } from "./query-builder";
 export * from "./select-types";
+export * from "./models";
 /**
  * Create an ORM client instance
  *
@@ -61,6 +62,9 @@ export type { OrmClientConfig, QueryResult, GraphQLError } from "./client";
 export { GraphQLRequestError } from "./client";
 export { QueryBuilder } from "./query-builder";
 export * from "./select-types";
+export * from "./models";
+export { createQueryOperations } from "./query";
+export { createMutationOperations } from "./mutation";
 /**
  * Create an ORM client instance
  *
