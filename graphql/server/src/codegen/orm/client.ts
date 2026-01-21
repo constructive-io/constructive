@@ -24,9 +24,9 @@ export class GraphQLRequestError extends Error {
     public readonly errors: GraphQLError[],
     public readonly data: unknown = null,
   ) {
-    const messages = errors.map((e) => e.message).join("; ");
+    const messages = errors.map((e) => e.message).join('; ');
     super(`GraphQL Error: ${messages}`);
-    this.name = "GraphQLRequestError";
+    this.name = 'GraphQLRequestError';
   }
 }
 
@@ -61,10 +61,10 @@ export class OrmClient {
     variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>> {
     const response = await fetch(this.endpoint, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
         ...this.headers,
       },
       body: JSON.stringify({

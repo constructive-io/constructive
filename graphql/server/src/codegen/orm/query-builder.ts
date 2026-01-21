@@ -4,19 +4,19 @@
  * DO NOT EDIT - changes will be overwritten
  */
 
-import * as t from "gql-ast";
-import { parseType, print } from "graphql";
+import * as t from 'gql-ast';
+import { parseType, print } from 'graphql';
 import type {
   ArgumentNode,
   FieldNode,
   VariableDefinitionNode,
   EnumValueNode,
-} from "graphql";
-import { OrmClient, QueryResult, GraphQLRequestError } from "./client";
+} from 'graphql';
+import { OrmClient, QueryResult, GraphQLRequestError } from './client';
 
 export interface QueryBuilderConfig {
   client: OrmClient;
-  operation: "query" | "mutation";
+  operation: 'query' | 'mutation';
   operationName: string;
   fieldName: string;
   document: string;
@@ -68,7 +68,7 @@ export class QueryBuilder<TResult> {
    * Execute and unwrap, calling onError callback on failure
    */
   async unwrapOrElse<D>(
-    onError: (errors: import("./client").GraphQLError[]) => D,
+    onError: (errors: import('./client').GraphQLError[]) => D,
   ): Promise<TResult | D> {
     const result = await this.execute();
     if (!result.ok) {
@@ -109,7 +109,7 @@ export function buildSelections(
       continue;
     }
 
-    if (typeof value === "object" && value !== null) {
+    if (typeof value === 'object' && value !== null) {
       const nested = value as {
         select?: Record<string, unknown>;
         first?: number;
@@ -125,14 +125,14 @@ export function buildSelections(
           nested.first !== undefined ||
           nested.filter !== undefined;
         const args = buildArgs([
-          buildOptionalArg("first", nested.first),
+          buildOptionalArg('first', nested.first),
           nested.filter
             ? t.argument({
-                name: "filter",
+                name: 'filter',
                 value: buildValueAst(nested.filter),
               })
             : null,
-          buildEnumListArg("orderBy", nested.orderBy),
+          buildEnumListArg('orderBy', nested.orderBy),
         ]);
 
         if (isConnection) {
@@ -183,7 +183,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>)
-    : [t.field({ name: "id" })];
+    : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
   const queryArgs: ArgumentNode[] = [];
@@ -191,8 +191,8 @@ export function buildFindManyDocument<TSelect, TWhere>(
 
   addVariable(
     {
-      varName: "where",
-      argName: "filter",
+      varName: 'where',
+      argName: 'filter',
       typeName: filterTypeName,
       value: args.where,
     },
@@ -202,8 +202,8 @@ export function buildFindManyDocument<TSelect, TWhere>(
   );
   addVariable(
     {
-      varName: "orderBy",
-      typeName: "[" + orderByTypeName + "!]",
+      varName: 'orderBy',
+      typeName: '[' + orderByTypeName + '!]',
       value: args.orderBy?.length ? args.orderBy : undefined,
     },
     variableDefinitions,
@@ -211,31 +211,31 @@ export function buildFindManyDocument<TSelect, TWhere>(
     variables,
   );
   addVariable(
-    { varName: "first", typeName: "Int", value: args.first },
+    { varName: 'first', typeName: 'Int', value: args.first },
     variableDefinitions,
     queryArgs,
     variables,
   );
   addVariable(
-    { varName: "last", typeName: "Int", value: args.last },
+    { varName: 'last', typeName: 'Int', value: args.last },
     variableDefinitions,
     queryArgs,
     variables,
   );
   addVariable(
-    { varName: "after", typeName: "Cursor", value: args.after },
+    { varName: 'after', typeName: 'Cursor', value: args.after },
     variableDefinitions,
     queryArgs,
     variables,
   );
   addVariable(
-    { varName: "before", typeName: "Cursor", value: args.before },
+    { varName: 'before', typeName: 'Cursor', value: args.before },
     variableDefinitions,
     queryArgs,
     variables,
   );
   addVariable(
-    { varName: "offset", typeName: "Int", value: args.offset },
+    { varName: 'offset', typeName: 'Int', value: args.offset },
     variableDefinitions,
     queryArgs,
     variables,
@@ -244,8 +244,8 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: "query",
-        name: operationName + "Query",
+        operation: 'query',
+        name: operationName + 'Query',
         variableDefinitions: variableDefinitions.length
           ? variableDefinitions
           : undefined,
@@ -276,7 +276,7 @@ export function buildFindFirstDocument<TSelect, TWhere>(
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>)
-    : [t.field({ name: "id" })];
+    : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
   const queryArgs: ArgumentNode[] = [];
@@ -284,15 +284,15 @@ export function buildFindFirstDocument<TSelect, TWhere>(
 
   // Always add first: 1 for findFirst
   addVariable(
-    { varName: "first", typeName: "Int", value: 1 },
+    { varName: 'first', typeName: 'Int', value: 1 },
     variableDefinitions,
     queryArgs,
     variables,
   );
   addVariable(
     {
-      varName: "where",
-      argName: "filter",
+      varName: 'where',
+      argName: 'filter',
       typeName: filterTypeName,
       value: args.where,
     },
@@ -304,8 +304,8 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: "query",
-        name: operationName + "Query",
+        operation: 'query',
+        name: operationName + 'Query',
         variableDefinitions,
         selectionSet: t.selectionSet({
           selections: [
@@ -315,7 +315,7 @@ export function buildFindFirstDocument<TSelect, TWhere>(
               selectionSet: t.selectionSet({
                 selections: [
                   t.field({
-                    name: "nodes",
+                    name: 'nodes',
                     selectionSet: t.selectionSet({ selections }),
                   }),
                 ],
@@ -340,7 +340,7 @@ export function buildCreateDocument<TSelect, TData>(
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>)
-    : [t.field({ name: "id" })];
+    : [t.field({ name: 'id' })];
 
   return {
     document: buildInputMutationDocument({
@@ -377,7 +377,7 @@ export function buildUpdateDocument<
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>)
-    : [t.field({ name: "id" })];
+    : [t.field({ name: 'id' })];
 
   return {
     document: buildInputMutationDocument({
@@ -416,7 +416,7 @@ export function buildDeleteDocument<TWhere extends { id: string }>(
         t.field({
           name: entityField,
           selectionSet: t.selectionSet({
-            selections: [t.field({ name: "id" })],
+            selections: [t.field({ name: 'id' })],
           }),
         }),
       ],
@@ -430,7 +430,7 @@ export function buildDeleteDocument<TWhere extends { id: string }>(
 }
 
 export function buildCustomDocument<TSelect, TArgs>(
-  operationType: "query" | "mutation",
+  operationType: 'query' | 'mutation',
   operationName: string,
   fieldName: string,
   select: TSelect,
@@ -440,7 +440,7 @@ export function buildCustomDocument<TSelect, TArgs>(
   let actualSelect = select;
   let isConnection = false;
 
-  if (select && typeof select === "object" && "select" in select) {
+  if (select && typeof select === 'object' && 'select' in select) {
     const wrapper = select as { select?: TSelect; connection?: boolean };
     if (wrapper.select) {
       actualSelect = wrapper.select;
@@ -512,7 +512,7 @@ function buildOptionalArg(
     return null;
   }
   const valueNode =
-    typeof value === "number"
+    typeof value === 'number'
       ? t.intValue({ value: value.toString() })
       : t.stringValue({ value });
   return t.argument({ name, value: valueNode });
@@ -535,29 +535,29 @@ function buildEnumListArg(
 
 function buildEnumValue(value: string): EnumValueNode {
   return {
-    kind: "EnumValue",
+    kind: 'EnumValue',
     value,
   };
 }
 
 function buildPageInfoSelections(): FieldNode[] {
   return [
-    t.field({ name: "hasNextPage" }),
-    t.field({ name: "hasPreviousPage" }),
-    t.field({ name: "startCursor" }),
-    t.field({ name: "endCursor" }),
+    t.field({ name: 'hasNextPage' }),
+    t.field({ name: 'hasPreviousPage' }),
+    t.field({ name: 'startCursor' }),
+    t.field({ name: 'endCursor' }),
   ];
 }
 
 function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
   return [
     t.field({
-      name: "nodes",
+      name: 'nodes',
       selectionSet: t.selectionSet({ selections: nodeSelections }),
     }),
-    t.field({ name: "totalCount" }),
+    t.field({ name: 'totalCount' }),
     t.field({
-      name: "pageInfo",
+      name: 'pageInfo',
       selectionSet: t.selectionSet({ selections: buildPageInfoSelections() }),
     }),
   ];
@@ -581,12 +581,12 @@ function buildInputMutationDocument(config: InputMutationConfig): string {
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: "mutation",
-        name: config.operationName + "Mutation",
+        operation: 'mutation',
+        name: config.operationName + 'Mutation',
         variableDefinitions: [
           t.variableDefinition({
-            variable: t.variable({ name: "input" }),
-            type: parseType(config.inputTypeName + "!"),
+            variable: t.variable({ name: 'input' }),
+            type: parseType(config.inputTypeName + '!'),
           }),
         ],
         selectionSet: t.selectionSet({
@@ -595,8 +595,8 @@ function buildInputMutationDocument(config: InputMutationConfig): string {
               name: config.mutationField,
               args: [
                 t.argument({
-                  name: "input",
-                  value: t.variable({ name: "input" }),
+                  name: 'input',
+                  value: t.variable({ name: 'input' }),
                 }),
               ],
               selectionSet: t.selectionSet({
@@ -649,17 +649,17 @@ function buildValueAst(
     return t.nullValue();
   }
 
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     return t.booleanValue({ value });
   }
 
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return Number.isInteger(value)
       ? t.intValue({ value: value.toString() })
       : t.floatValue({ value: value.toString() });
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return t.stringValue({ value });
   }
 
@@ -669,7 +669,7 @@ function buildValueAst(
     });
   }
 
-  if (typeof value === "object" && value !== null) {
+  if (typeof value === 'object' && value !== null) {
     const obj = value as Record<string, unknown>;
     return t.objectValue({
       fields: Object.entries(obj).map(([key, val]) =>
@@ -681,5 +681,5 @@ function buildValueAst(
     });
   }
 
-  throw new Error("Unsupported value type: " + typeof value);
+  throw new Error('Unsupported value type: ' + typeof value);
 }
