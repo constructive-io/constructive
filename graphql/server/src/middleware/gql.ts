@@ -1,8 +1,25 @@
-import { buildFindFirstDocument } from '../codegen/orm/query-builder';
+import { GraphileQuery } from 'graphile-query';
 
-type BuiltDocument = { document: string; variables: Record<string, unknown> };
+import {
+  type ApiSelect,
+  type ApiWithRelations,
+  type DomainFilter,
+  type DomainSelect,
+  type DomainWithRelations,
+} from '../codegen/orm/input-types';
+import {
+  OrmClient,
+  type GraphQLError,
+  type QueryResult,
+} from '../codegen/orm/client';
+import { ApiModel, DomainModel } from '../codegen/orm/models';
+import { createQueryOperations } from '../codegen/orm/query';
+import type { InferSelectResult } from '../codegen/orm/select-types';
+import { ApiStructure, RlsModule, SchemaNode } from '../types';
 
-const apiSelect = {
+export const connectionFirst = 1000;
+
+export const apiSelect = {
   databaseId: true,
   dbname: true,
   roleName: true,
@@ -13,15 +30,15 @@ const apiSelect = {
       subdomain: true,
       domain: true,
     },
-    connection: true,
+    first: connectionFirst,
   },
   apiExtensions: {
     select: { schemaName: true },
-    connection: true,
+    first: connectionFirst,
   },
   schemasByApiSchemaApiIdAndSchemaId: {
     select: { schemaName: true },
-    connection: true,
+    first: connectionFirst,
   },
   rlsModule: {
     select: {
@@ -32,32 +49,19 @@ const apiSelect = {
       currentRoleId: true,
     },
   },
-  database: {
-    select: {
-      sites: {
-        select: {
-          domains: {
-            select: { subdomain: true, domain: true },
-            connection: true,
-          },
-        },
-        connection: true,
-      },
-    },
-  },
   apiModules: {
     select: { name: true, data: true },
-    connection: true,
+    first: connectionFirst,
   },
-} as const;
+} satisfies ApiSelect;
 
-const domainSelect = {
+export const domainSelect = {
   domain: true,
   subdomain: true,
   api: { select: apiSelect },
-} as const;
+} satisfies DomainSelect;
 
-const apisSelect = {
+export const apiListSelect = {
   id: true,
   databaseId: true,
   name: true,
@@ -67,89 +71,113 @@ const apisSelect = {
   isPublic: true,
   domains: {
     select: { domain: true, subdomain: true },
-    connection: true,
+    first: connectionFirst,
   },
-  database: {
-    select: {
-      sites: {
-        select: {
-          domains: {
-            select: { domain: true, subdomain: true },
-            connection: true,
-          },
-        },
-        connection: true,
-      },
-    },
-  },
-} as const;
+} satisfies ApiSelect;
 
-/**
- * Build query for domain lookup with optional subdomain
- * This uses domains connection instead of domainBySubdomainAndDomain
- * because we need to handle null subdomain with condition filter
- */
-export const buildDomainLookup = (vars: {
-  domain: string;
-  subdomain?: string | null;
-}): BuiltDocument => {
-  const where: Record<string, unknown> = {
-    domain: { equalTo: vars.domain },
-  };
+export type ApiRecord = InferSelectResult<ApiWithRelations, typeof apiSelect>;
+export type DomainRecord = InferSelectResult<
+  DomainWithRelations,
+  typeof domainSelect
+>;
+export type ApiListRecord = InferSelectResult<
+  ApiWithRelations,
+  typeof apiListSelect
+>;
 
-  if (vars.subdomain === null || vars.subdomain === undefined) {
-    where.subdomain = { isNull: true };
-  } else {
-    where.subdomain = { equalTo: vars.subdomain };
+class GraphileOrmClient extends OrmClient {
+  constructor(private readonly graphile: GraphileQuery) {
+    super({ endpoint: 'http://localhost/graphql' });
   }
 
-  return buildFindFirstDocument(
-    'DomainLookup',
-    'domains',
-    domainSelect,
-    { where },
-    'DomainFilter'
-  );
+  async execute<T>(
+    document: string,
+    variables?: Record<string, unknown>
+  ): Promise<QueryResult<T>> {
+    const result = await this.graphile.query({
+      role: 'administrator',
+      query: document,
+      variables,
+    });
+
+    if (result.errors?.length) {
+      return {
+        ok: false,
+        data: null,
+        errors: result.errors as unknown as GraphQLError[],
+      };
+    }
+
+    return {
+      ok: true,
+      data: result.data as T,
+      errors: undefined,
+    };
+  }
+}
+
+type ApiByNameResult = QueryResult<{ apiByDatabaseIdAndName: ApiRecord }>;
+export type ApiQueryOps = {
+  apiByDatabaseIdAndName: (
+    args: { databaseId: string; name: string },
+    options: { select: typeof apiSelect }
+  ) => { execute: () => Promise<ApiByNameResult> };
+};
+type DomainLookupResult = QueryResult<{ domains: { nodes: DomainRecord[] } }>;
+export type DomainLookupModel = {
+  findFirst: (args: { select: typeof domainSelect; where: DomainFilter }) => {
+    execute: () => Promise<DomainLookupResult>;
+  };
+};
+type ApiListResult = QueryResult<{ apis: { nodes: ApiListRecord[] } }>;
+export type ApiListModel = {
+  findMany: (args: { select: typeof apiListSelect; first: number }) => {
+    execute: () => Promise<ApiListResult>;
+  };
 };
 
-/**
- * Build query for API lookup by database ID and name
- * Uses the generated apiByDatabaseIdAndName custom query
- */
-export const buildApiByDatabaseIdAndName = (vars: {
-  databaseId: string;
-  name: string;
-}): BuiltDocument => {
-  // Import buildCustomDocument locally to avoid circular dependency
-  const { buildCustomDocument } = require('../codegen/orm/query-builder');
-  return buildCustomDocument(
-    'query',
-    'ApiByDatabaseIdAndName',
-    'apiByDatabaseIdAndName',
-    apiSelect,
-    vars,
-    [
-      { name: 'databaseId', type: 'UUID!' },
-      { name: 'name', type: 'String!' },
-    ]
-  );
+export const createGraphileOrm = (graphile: GraphileQuery) => {
+  const client = new GraphileOrmClient(graphile);
+  return {
+    api: new ApiModel(client),
+    domain: new DomainModel(client),
+    query: createQueryOperations(client),
+  };
 };
 
-/**
- * Build query to list all APIs
- */
-export const buildListApis = (): BuiltDocument => {
-  // Import buildCustomDocument locally to avoid circular dependency
-  const { buildCustomDocument } = require('../codegen/orm/query-builder');
-  return buildCustomDocument(
-    'query',
-    'ListApisByDatabaseId',
-    'apis',
-    {
-      select: apisSelect,
-      connection: true,
-    },
-    undefined,
-    []
-  );
+export const normalizeApiRecord = (api: ApiRecord): ApiStructure => {
+  const schemaNames =
+    api.apiExtensions?.nodes?.map((n: SchemaNode) => n.schemaName) || [];
+  const additionalSchemas =
+    api.schemasByApiSchemaApiIdAndSchemaId?.nodes?.map(
+      (n: SchemaNode) => n.schemaName
+    ) || [];
+
+  let domains: string[] = [];
+  if (api.domains?.nodes?.length) {
+    domains = api.domains.nodes.reduce((acc: string[], domain) => {
+      if (!domain.domain) return acc;
+      const hostname = domain.subdomain
+        ? `${domain.subdomain}.${domain.domain}`
+        : domain.domain;
+      const protocol = domain.domain === 'localhost' ? 'http://' : 'https://';
+      return [...acc, protocol + hostname];
+    }, []);
+  }
+
+  return {
+    dbname: api.dbname,
+    anonRole: api.anonRole,
+    roleName: api.roleName,
+    schema: [...schemaNames, ...additionalSchemas],
+    apiModules:
+      api.apiModules?.nodes?.map((node) => ({
+        name: node.name,
+        data: node.data,
+      })) || [],
+    rlsModule: api.rlsModule as RlsModule | null,
+    domains,
+    databaseId: api.databaseId,
+    isPublic: api.isPublic,
+  };
 };

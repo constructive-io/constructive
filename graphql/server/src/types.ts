@@ -60,27 +60,6 @@ export interface Database {
   sites: SiteNodes;
 }
 
-export interface OldApiStructure {
-  dbname: string;
-  anonRole: string;
-  roleName: string;
-  schemasByApiSchemaApiIdAndSchemaId: SchemaNodes;
-  apiExtensions: SchemaNodes;
-  apiModules: ApiModuleNodes;
-  rlsModule?: RlsModule;
-  database?: Database;
-  databaseId?: string;
-  isPublic?: boolean;
-}
-
-export interface ServiceData {
-  api: OldApiStructure;
-}
-
-export interface Service {
-  data: ServiceData;
-}
-
 export interface ApiStructure {
   dbname: string;
   anonRole: string;
