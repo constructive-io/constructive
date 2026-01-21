@@ -157,14 +157,36 @@ it('matches snapshot', async () => {
 
 ### GetConnectionsInput
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `schemas` | `string[]` | PostgreSQL schemas to expose in GraphQL |
-| `authRole` | `string` | Default role for anonymous requests |
-| `useRoot` | `boolean` | Use root/superuser for queries (bypasses RLS) |
-| `graphile` | `GraphileOptions` | Graphile/PostGraphile configuration |
-| `server.port` | `number` | Port to run the server on (default: random) |
-| `server.host` | `string` | Host to bind the server to (default: localhost) |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `schemas` | `string[]` | required | PostgreSQL schemas to expose in GraphQL |
+| `authRole` | `string` | - | Default role for anonymous requests |
+| `useRoot` | `boolean` | `false` | Use root/superuser for queries (bypasses RLS) |
+| `graphile` | `GraphileOptions` | - | Graphile/PostGraphile configuration |
+| `server.port` | `number` | random | Port to run the server on |
+| `server.host` | `string` | `localhost` | Host to bind the server to |
+| `enableServicesApi` | `boolean` | `false` | Enable domain/subdomain routing via services_public |
+
+### Services API
+
+By default, `enableServicesApi` is set to `false`, which bypasses domain/subdomain routing and directly exposes the schemas you specify. This is the recommended setting for most testing scenarios.
+
+When `enableServicesApi` is `true`, the server uses the `services_public` schema to resolve which API and schemas to expose based on the incoming request's domain/subdomain. This is useful when you need to test the full domain routing behavior.
+
+```typescript
+// Default: bypasses domain routing, directly exposes specified schemas
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  authRole: 'anonymous'
+});
+
+// With Services API enabled: uses domain/subdomain routing
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  authRole: 'anonymous',
+  enableServicesApi: true
+});
+```
 
 ## Comparison with Other Test Packages
 

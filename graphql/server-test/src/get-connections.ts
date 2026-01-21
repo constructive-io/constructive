@@ -44,11 +44,12 @@ export const getConnections = async (
   const conn: GetConnectionResult = await getPgConnections(input, seedAdapters);
   const { pg, db, teardown: dbTeardown } = conn;
 
-  // Build options for the HTTP server with enableServicesApi: false
+  // Build options for the HTTP server
+  // enableServicesApi defaults to false for testing (bypasses domain routing)
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      enableServicesApi: false,
+      enableServicesApi: input.enableServicesApi ?? false,
       exposedSchemas: input.schemas,
       defaultDatabaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
