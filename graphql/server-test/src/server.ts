@@ -1,14 +1,6 @@
-import {
-  createApiMiddleware,
-  createAuthenticateMiddleware,
-  cors,
-  graphile
-} from '@constructive-io/graphql-server';
+import { Server } from '@constructive-io/graphql-server';
 import { PgpmOptions } from '@pgpmjs/types';
-import express from 'express';
 import { Server as HttpServer, createServer } from 'http';
-import { Pool } from 'pg';
-import { getPgPool } from 'pg-cache';
 
 import type { ServerInfo, ServerOptions } from './types';
 
@@ -36,8 +28,8 @@ const findAvailablePort = async (startPort: number): Promise<number> => {
 /**
  * Create a test server for SuperTest testing
  * 
- * This creates an Express server with the Constructive GraphQL middleware
- * configured with enableServicesApi: false to bypass domain routing.
+ * This uses the Server class from @constructive-io/graphql-server directly,
+ * which includes all the standard middleware (CORS, authentication, GraphQL, etc.)
  */
 export const createTestServer = async (
   opts: PgpmOptions,
@@ -47,35 +39,26 @@ export const createTestServer = async (
   const requestedPort = serverOpts.port ?? 0;
   const port = requestedPort === 0 ? await findAvailablePort(5555) : requestedPort;
 
-  const app = express();
+  // Merge server options into the PgpmOptions
+  const serverConfig: PgpmOptions = {
+    ...opts,
+    server: {
+      ...opts.server,
+      host,
+      port
+    }
+  };
 
-  // Create middleware with enableServicesApi: false to bypass domain routing
-  const api = createApiMiddleware(opts);
-  const authenticate = createAuthenticateMiddleware(opts);
-
-  // Basic middleware setup
-  app.use(cors('*'));
-  app.use(api);
-  app.use(authenticate);
-  app.use(graphile(opts));
-
-  // Create HTTP server
-  const httpServer: HttpServer = await new Promise((resolve, reject) => {
-    const server = app.listen(port, host, () => {
-      resolve(server);
-    });
-    server.on('error', reject);
-  });
-
+  // Create the server using @constructive-io/graphql-server
+  const server = new Server(serverConfig);
+  
+  // Start listening and get the HTTP server
+  const httpServer: HttpServer = server.listen();
+  
   const actualPort = (httpServer.address() as { port: number }).port;
 
   const stop = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      httpServer.close((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    await server.close();
   };
 
   return {
@@ -86,11 +69,4 @@ export const createTestServer = async (
     host,
     stop
   };
-};
-
-/**
- * Get the PostgreSQL pool for the test server
- */
-export const getTestPool = (opts: PgpmOptions): Pool => {
-  return getPgPool(opts.pg);
 };

@@ -49,18 +49,6 @@ export interface GetConnectionsInput {
 }
 
 /**
- * GraphQL query options (object-based API)
- */
-export interface GraphQLQueryOptions<TVariables = Record<string, any>> {
-  /** GraphQL query or mutation string or DocumentNode */
-  query: string | DocumentNode;
-  /** Variables to pass to the query */
-  variables?: TVariables;
-  /** HTTP headers to include in the request */
-  headers?: Record<string, string>;
-}
-
-/**
  * GraphQL response structure
  */
 export interface GraphQLResponse<T> {
@@ -69,14 +57,7 @@ export interface GraphQLResponse<T> {
 }
 
 /**
- * GraphQL query function type (object-based API)
- */
-export type GraphQLQueryFnObj = <TResult = any, TVariables = Record<string, any>>(
-  opts: GraphQLQueryOptions<TVariables>
-) => Promise<GraphQLResponse<TResult>>;
-
-/**
- * GraphQL query function type (positional API)
+ * GraphQL query function type
  */
 export type GraphQLQueryFn = <TResult = any, TVariables = Record<string, any>>(
   query: string | DocumentNode,
@@ -85,25 +66,7 @@ export type GraphQLQueryFn = <TResult = any, TVariables = Record<string, any>>(
 ) => Promise<GraphQLResponse<TResult>>;
 
 /**
- * GraphQL query function type (unwrapped, object-based API)
- * Throws on GraphQL errors instead of returning them
- */
-export type GraphQLQueryUnwrappedFnObj = <TResult = any, TVariables = Record<string, any>>(
-  opts: GraphQLQueryOptions<TVariables>
-) => Promise<TResult>;
-
-/**
- * GraphQL query function type (unwrapped, positional API)
- * Throws on GraphQL errors instead of returning them
- */
-export type GraphQLQueryUnwrappedFn = <TResult = any, TVariables = Record<string, any>>(
-  query: string | DocumentNode,
-  variables?: TVariables,
-  headers?: Record<string, string>
-) => Promise<TResult>;
-
-/**
- * Result from getConnections (positional API)
+ * Result from getConnections
  */
 export interface GetConnectionsResult {
   /** PostgreSQL client for superuser operations (bypasses RLS) */
@@ -114,62 +77,8 @@ export interface GetConnectionsResult {
   server: ServerInfo;
   /** Raw SuperTest agent for custom HTTP requests */
   request: supertest.Agent;
-  /** GraphQL query function (positional API) */
+  /** GraphQL query function */
   query: GraphQLQueryFn;
-  /** Teardown function to clean up database and server */
-  teardown: () => Promise<void>;
-}
-
-/**
- * Result from getConnectionsObject (object-based API)
- */
-export interface GetConnectionsObjectResult {
-  /** PostgreSQL client for superuser operations (bypasses RLS) */
-  pg: PgTestClient;
-  /** PostgreSQL client for app-level operations (respects RLS) */
-  db: PgTestClient;
-  /** Server information including URL and stop function */
-  server: ServerInfo;
-  /** Raw SuperTest agent for custom HTTP requests */
-  request: supertest.Agent;
-  /** GraphQL query function (object API) */
-  query: GraphQLQueryFnObj;
-  /** Teardown function to clean up database and server */
-  teardown: () => Promise<void>;
-}
-
-/**
- * Result from getConnectionsUnwrapped (positional API, throws on errors)
- */
-export interface GetConnectionsUnwrappedResult {
-  /** PostgreSQL client for superuser operations (bypasses RLS) */
-  pg: PgTestClient;
-  /** PostgreSQL client for app-level operations (respects RLS) */
-  db: PgTestClient;
-  /** Server information including URL and stop function */
-  server: ServerInfo;
-  /** Raw SuperTest agent for custom HTTP requests */
-  request: supertest.Agent;
-  /** GraphQL query function (positional API, throws on errors) */
-  query: GraphQLQueryUnwrappedFn;
-  /** Teardown function to clean up database and server */
-  teardown: () => Promise<void>;
-}
-
-/**
- * Result from getConnectionsObjectUnwrapped (object API, throws on errors)
- */
-export interface GetConnectionsObjectUnwrappedResult {
-  /** PostgreSQL client for superuser operations (bypasses RLS) */
-  pg: PgTestClient;
-  /** PostgreSQL client for app-level operations (respects RLS) */
-  db: PgTestClient;
-  /** Server information including URL and stop function */
-  server: ServerInfo;
-  /** Raw SuperTest agent for custom HTTP requests */
-  request: supertest.Agent;
-  /** GraphQL query function (object API, throws on errors) */
-  query: GraphQLQueryUnwrappedFnObj;
   /** Teardown function to clean up database and server */
   teardown: () => Promise<void>;
 }

@@ -1,21 +1,14 @@
 import path from 'path';
 
-import {
-  getConnections,
-  getConnectionsUnwrapped,
-  getConnectionsObject,
-  getConnectionsObjectUnwrapped,
-  seed,
-  snapshot
-} from '../src';
+import { getConnections, seed, snapshot } from '../src';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { ServerInfo, GraphQLQueryFn, GraphQLQueryFnObj } from '../src/types';
+import type { ServerInfo, GraphQLQueryFn } from '../src/types';
 import type supertest from 'supertest';
 
 const sql = (file: string) => path.join(__dirname, '..', 'sql', file);
 
 describe('graphql-server-test', () => {
-  describe('getConnections (positional API)', () => {
+  describe('getConnections', () => {
     let db: PgTestClient;
     let pg: PgTestClient;
     let server: ServerInfo;
@@ -98,119 +91,6 @@ describe('graphql-server-test', () => {
     it('should snapshot query results', async () => {
       const res = await query(`query { allUsers { nodes { username email } } }`);
       expect(snapshot(res.data)).toMatchSnapshot();
-    });
-  });
-
-  describe('getConnectionsUnwrapped (positional API, throws on errors)', () => {
-    let db: PgTestClient;
-    let query: (q: any, v?: any, h?: any) => Promise<any>;
-    let teardown: () => Promise<void>;
-
-    beforeAll(async () => {
-      ({ db, query, teardown } = await getConnectionsUnwrapped(
-        {
-          schemas: ['app_public'],
-          authRole: 'anonymous'
-        },
-        [seed.sqlfile([sql('test.sql')])]
-      ));
-    });
-
-    afterAll(async () => {
-      await teardown();
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-
-    it('should return data directly without .data wrapper', async () => {
-      const result = await query(`query { allUsers { nodes { username } } }`);
-
-      // Result is unwrapped - no .data needed
-      expect(result.allUsers.nodes).toHaveLength(2);
-      expect(result.allUsers.nodes[0].username).toBe('alice');
-    });
-
-    it('should throw on GraphQL errors', async () => {
-      await expect(
-        query(`query { nonExistentField }`)
-      ).rejects.toThrow();
-    });
-  });
-
-  describe('getConnectionsObject (object-based API)', () => {
-    let db: PgTestClient;
-    let query: GraphQLQueryFnObj;
-    let teardown: () => Promise<void>;
-
-    beforeAll(async () => {
-      ({ db, query, teardown } = await getConnectionsObject(
-        {
-          schemas: ['app_public'],
-          authRole: 'anonymous'
-        },
-        [seed.sqlfile([sql('test.sql')])]
-      ));
-    });
-
-    afterAll(async () => {
-      await teardown();
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-
-    it('should query using object-based API', async () => {
-      const res = await query({
-        query: `query { allUsers { nodes { username } } }`
-      });
-
-      expect(res.data?.allUsers.nodes).toHaveLength(2);
-    });
-
-    it('should support variables in object-based API', async () => {
-      const res = await query({
-        query: `query GetUser($username: String!) { 
-          userByUsername(username: $username) { 
-            username 
-          } 
-        }`,
-        variables: { username: 'bob' }
-      });
-
-      expect(res.data?.userByUsername?.username).toBe('bob');
-    });
-  });
-
-  describe('getConnectionsObjectUnwrapped (object-based API, throws on errors)', () => {
-    let db: PgTestClient;
-    let query: (opts: any) => Promise<any>;
-    let teardown: () => Promise<void>;
-
-    beforeAll(async () => {
-      ({ db, query, teardown } = await getConnectionsObjectUnwrapped(
-        {
-          schemas: ['app_public'],
-          authRole: 'anonymous'
-        },
-        [seed.sqlfile([sql('test.sql')])]
-      ));
-    });
-
-    afterAll(async () => {
-      await teardown();
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-
-    it('should return data directly with object-based API', async () => {
-      const result = await query({
-        query: `query { allUsers { nodes { username } } }`
-      });
-
-      // Result is unwrapped - no .data needed
-      expect(result.allUsers.nodes).toHaveLength(2);
     });
   });
 

@@ -13,9 +13,8 @@ pnpm add @constructive-io/graphql-server-test
 ## Features
 
 - Real HTTP server testing with SuperTest
-- Full middleware stack testing (CORS, authentication, etc.)
+- Uses `@constructive-io/graphql-server` directly for the full middleware stack
 - Per-test database isolation with transaction rollback
-- Multiple API variants (positional, object-based, unwrapped)
 - Built on top of `pgsql-test` for database management
 - Compatible with Jest and other test runners
 
@@ -77,48 +76,6 @@ it('tests error responses', async () => {
 
   expect(res.body.errors).toBeDefined();
 });
-```
-
-### API Variants
-
-The package provides multiple connection function variants:
-
-#### Positional API
-
-```typescript
-// Standard - returns { data, errors }
-const { query } = await getConnections({ schemas: ['app_public'] });
-const res = await query('{ allUsers { nodes { id } } }', { variable: 'value' });
-console.log(res.data);
-
-// Unwrapped - throws on errors, returns data directly
-const { query } = await getConnectionsUnwrapped({ schemas: ['app_public'] });
-const data = await query('{ allUsers { nodes { id } } }');
-console.log(data.allUsers.nodes);
-
-// With logging
-const { query } = await getConnectionsWithLogging({ schemas: ['app_public'] });
-
-// With timing
-const { query } = await getConnectionsWithTiming({ schemas: ['app_public'] });
-```
-
-#### Object-based API
-
-```typescript
-// Standard - returns { data, errors }
-const { query } = await getConnectionsObject({ schemas: ['app_public'] });
-const res = await query({ query: '{ allUsers { nodes { id } } }', variables: {} });
-
-// Unwrapped - throws on errors
-const { query } = await getConnectionsObjectUnwrapped({ schemas: ['app_public'] });
-const data = await query({ query: '{ allUsers { nodes { id } } }' });
-
-// With logging
-const { query } = await getConnectionsObjectWithLogging({ schemas: ['app_public'] });
-
-// With timing
-const { query } = await getConnectionsObjectWithTiming({ schemas: ['app_public'] });
 ```
 
 ### Server Information
