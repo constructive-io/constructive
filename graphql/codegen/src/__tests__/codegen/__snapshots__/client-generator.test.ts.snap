@@ -129,6 +129,14 @@ export interface GraphQLAdapter {
    * Execute a GraphQL operation and return the result.
    */
   execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>>;
+  /**
+   * Set headers for requests (optional - only implement if adapter supports headers).
+   */
+  setHeaders?(headers: Record<string, string>): void;
+  /**
+   * Get the endpoint URL (optional - only implement if adapter has an endpoint).
+   */
+  getEndpoint?(): string;
 }
 
 /**
@@ -229,14 +237,12 @@ export class GraphQLRequestError extends Error {
 
 export class OrmClient {
   private adapter: GraphQLAdapter;
-  private fetchAdapter: FetchAdapter | null = null;
 
   constructor(config: OrmClientConfig) {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else if (config.endpoint) {
-      this.fetchAdapter = new FetchAdapter(config.endpoint, config.headers);
-      this.adapter = this.fetchAdapter;
+      this.adapter = new FetchAdapter(config.endpoint, config.headers);
     } else {
       throw new Error('OrmClientConfig requires either an endpoint or a custom adapter');
     }
@@ -250,24 +256,21 @@ export class OrmClient {
   }
 
   /**
-   * Set headers for HTTP requests.
-   * Only works when using the default FetchAdapter.
+   * Set headers for requests.
+   * Only works if the adapter supports headers.
    */
   setHeaders(headers: Record<string, string>): void {
-    if (this.fetchAdapter) {
-      this.fetchAdapter.setHeaders(headers);
+    if (this.adapter.setHeaders) {
+      this.adapter.setHeaders(headers);
     }
   }
 
   /**
    * Get the endpoint URL.
-   * Only works when using the default FetchAdapter.
+   * Returns empty string if the adapter doesn't have an endpoint.
    */
   getEndpoint(): string {
-    if (this.fetchAdapter) {
-      return this.fetchAdapter.getEndpoint();
-    }
-    return '';
+    return this.adapter.getEndpoint?.() ?? '';
   }
 }
 "

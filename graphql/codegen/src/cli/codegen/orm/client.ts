@@ -28,6 +28,8 @@ export interface GraphQLAdapter {
     document: string,
     variables?: Record<string, unknown>
   ): Promise<QueryResult<T>>;
+  setHeaders?(headers: Record<string, string>): void;
+  getEndpoint?(): string;
 }
 
 /**
@@ -122,14 +124,12 @@ export class GraphQLRequestError extends Error {
 
 export class OrmClient {
   private adapter: GraphQLAdapter;
-  private fetchAdapter: FetchAdapter | null = null;
 
   constructor(config: OrmClientConfig) {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else if (config.endpoint) {
-      this.fetchAdapter = new FetchAdapter(config.endpoint, config.headers);
-      this.adapter = this.fetchAdapter;
+      this.adapter = new FetchAdapter(config.endpoint, config.headers);
     } else {
       throw new Error(
         'OrmClientConfig requires either an endpoint or a custom adapter'
@@ -145,15 +145,12 @@ export class OrmClient {
   }
 
   setHeaders(headers: Record<string, string>): void {
-    if (this.fetchAdapter) {
-      this.fetchAdapter.setHeaders(headers);
+    if (this.adapter.setHeaders) {
+      this.adapter.setHeaders(headers);
     }
   }
 
   getEndpoint(): string {
-    if (this.fetchAdapter) {
-      return this.fetchAdapter.getEndpoint();
-    }
-    return '';
+    return this.adapter.getEndpoint?.() ?? '';
   }
 }
