@@ -533,29 +533,24 @@ export async function writeGeneratedFiles(
 /**
  * Format generated files using prettier
  * Runs prettier on the output directory after all files are written
- * Uses bundled config with sensible defaults (singleQuote, trailingComma, etc.)
  */
 export function formatOutput(outputDir: string): { success: boolean; error?: string } {
-  // Resolve to absolute path for reliable execution
   const absoluteOutputDir = path.resolve(outputDir);
 
   try {
-    // Find prettier binary from this package's node_modules/.bin
-    // prettier is a dependency of @constructive-io/graphql-codegen
     const prettierPkgPath = require.resolve('prettier/package.json');
     const prettierDir = path.dirname(prettierPkgPath);
     const prettierBin = path.join(prettierDir, 'bin', 'prettier.cjs');
 
-    // Use bundled config with sensible defaults
-    const configPath = path.join(__dirname, 'codegen-prettier.json');
-
-    execSync(`"${prettierBin}" --write --config "${configPath}" "${absoluteOutputDir}"`, {
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
+    execSync(
+      `"${prettierBin}" --write --single-quote --trailing-comma all --tab-width 2 --no-tabs --semi "${absoluteOutputDir}"`,
+      {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      },
+    );
     return { success: true };
   } catch (err) {
-    // prettier may fail if files have syntax errors or if not installed
     const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
   }
