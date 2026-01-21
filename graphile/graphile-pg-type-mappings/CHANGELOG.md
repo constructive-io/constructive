@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.7.1...graphile-pg-type-mappings@0.7.2) (2026-01-21)
+
+**Note:** Version bump only for package graphile-pg-type-mappings
+
 ## [0.7.1](https://github.com/constructive-io/constructive/compare/graphile-pg-type-mappings@0.7.0...graphile-pg-type-mappings@0.7.1) (2026-01-21)
 
 **Note:** Version bump only for package graphile-pg-type-mappings
