@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.3...@constructive-io/graphql-codegen@2.28.4) (2026-01-21)
+
+### Bug Fixes
+
+- **graphql-codegen:** copy query-builder.ts to dist during build ([3bc5595](https://github.com/constructive-io/constructive/commit/3bc5595a48c93b3ed7542cd2fd50dc5184623034))
+
 ## [2.28.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.2...@constructive-io/graphql-codegen@2.28.3) (2026-01-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

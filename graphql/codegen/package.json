@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.28.3",
+  "version": "2.28.4",
   "description": "CLI-based GraphQL SDK generator for PostGraphile endpoints with React Query hooks",
   "keywords": [
     "graphql",
