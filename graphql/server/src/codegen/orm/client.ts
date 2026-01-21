@@ -22,7 +22,7 @@ export interface GraphQLError {
 export class GraphQLRequestError extends Error {
   constructor(
     public readonly errors: GraphQLError[],
-    public readonly data: unknown = null
+    public readonly data: unknown = null,
   ) {
     const messages = errors.map((e) => e.message).join('; ');
     super(`GraphQL Error: ${messages}`);
@@ -58,7 +58,7 @@ export class OrmClient {
 
   async execute<T>(
     document: string,
-    variables?: Record<string, unknown>
+    variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>> {
     const response = await fetch(this.endpoint, {
       method: 'POST',

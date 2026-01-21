@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter-postgis",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "PostGIS filtering options in PostGraphile",
   "author": "Matt Bretl",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -41,7 +41,7 @@
     "pgpm"
   ],
   "dependencies": {
-    "find-and-require-package-json": "^0.8.6",
+    "find-and-require-package-json": "^0.9.0",
     "graphile-build": "^4.14.1",
     "graphile-build-pg": "^4.14.1",
     "graphile-plugin-connection-filter": "workspace:^",
@@ -55,7 +55,7 @@
     "graphile-test": "workspace:^",
     "graphql": "15.10.1",
     "makage": "^0.1.10",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pgsql-test": "workspace:^",
     "postgraphile": "^4.14.1"
   }

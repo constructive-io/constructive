@@ -792,10 +792,6 @@ export function generateDeleteMutationHook(
   );
   statements.push(t.exportNamedDeclaration(variablesInterface));
 
-  const deletedPkProp = t.tsPropertySignature(
-    t.identifier(`deleted${ucFirst(pkField.name)}`),
-    t.tsTypeAnnotation(t.tsUnionType([pkTypeAnnotation, t.tsNullKeyword()]))
-  );
   const clientMutationIdProp = t.tsPropertySignature(
     t.identifier('clientMutationId'),
     t.tsTypeAnnotation(t.tsUnionType([t.tsStringKeyword(), t.tsNullKeyword()]))
@@ -804,7 +800,7 @@ export function generateDeleteMutationHook(
   const resultInterfaceBody = t.tsInterfaceBody([
     t.tsPropertySignature(
       t.identifier(mutationName),
-      t.tsTypeAnnotation(t.tsTypeLiteral([clientMutationIdProp, deletedPkProp]))
+      t.tsTypeAnnotation(t.tsTypeLiteral([clientMutationIdProp]))
     ),
   ]);
   const resultInterface = t.tsInterfaceDeclaration(

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "2.18.1",
+  "version": "2.19.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -31,7 +31,8 @@
     "test:watch": "jest --watch",
     "bucket:create": "ts-node src/scripts/create-bucket.ts",
     "codegen:schema": "ts-node src/scripts/codegen-schema.ts",
-    "codegen": "npm run codegen:schema && graphql-codegen generate-orm --schema codegen/schema.graphql --output src/codegen/orm"
+    "codegen:clean": "rimraf src/codegen/orm codegen/schema.graphql",
+    "codegen": "npm run codegen:clean && npm run codegen:schema && graphql-codegen generate-orm --schema codegen/schema.graphql --output src/codegen/orm"
   },
   "keywords": [
     "server",
@@ -52,6 +53,7 @@
     "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.5",
     "express": "^5.2.1",
+    "gql-ast": "workspace:^",
     "graphile-build": "^4.14.1",
     "graphile-cache": "workspace:^",
     "graphile-i18n": "workspace:^",
@@ -68,14 +70,14 @@
     "graphql-tag": "2.12.6",
     "graphql-upload": "^13.0.0",
     "lru-cache": "^11.2.4",
-    "pg": "^8.16.3",
+    "pg": "^8.17.1",
     "pg-cache": "workspace:^",
     "pg-query-context": "workspace:^",
     "postgraphile": "^4.14.1",
     "request-ip": "^3.3.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.958.0",
+    "@aws-sdk/client-s3": "^3.971.0",
     "@constructive-io/graphql-codegen": "workspace:*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
@@ -85,6 +87,7 @@
     "graphile-test": "workspace:*",
     "makage": "^0.1.10",
     "nodemon": "^3.1.10",
+    "rimraf": "^6.1.2",
     "ts-node": "^10.9.2"
   }
 }

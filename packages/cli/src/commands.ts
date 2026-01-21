@@ -1,7 +1,5 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { cliExitWithError, checkForUpdates, extractFirst } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { checkForUpdates } from '@inquirerer/utils';
+import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
 import codegen from './commands/codegen';
 import explorer from './commands/explorer';
@@ -26,7 +24,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   // Run update check early so it shows on help/version paths too
   // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / CONSTRUCTIVE_SKIP_UPDATE_CHECK is set)
   try {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     const updateResult = await checkForUpdates({
       pkgName: pkg.name,
       pkgVersion: pkg.version,
@@ -41,7 +39,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   }
 
   if (argv.version || argv.v) {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }

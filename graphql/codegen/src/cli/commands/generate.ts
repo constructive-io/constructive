@@ -512,7 +512,7 @@ export async function writeGeneratedFiles(
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
-  // Format all generated files with oxfmt
+  // Format all generated files with prettier
   if (errors.length === 0) {
     if (showProgress) {
       console.log('Formatting generated files...');
@@ -531,28 +531,23 @@ export async function writeGeneratedFiles(
 }
 
 /**
- * Format generated files using oxfmt
- * Runs oxfmt on the output directory after all files are written
+ * Format generated files using prettier
+ * Runs prettier on the output directory after all files are written
  */
 export function formatOutput(outputDir: string): { success: boolean; error?: string } {
-  // Resolve to absolute path for reliable execution
   const absoluteOutputDir = path.resolve(outputDir);
 
   try {
-    // Find oxfmt binary from this package's node_modules/.bin
-    // oxfmt is a dependency of @constructive-io/graphql-codegen
-    const oxfmtPkgPath = require.resolve('oxfmt/package.json');
-    const oxfmtDir = path.dirname(oxfmtPkgPath);
-    const oxfmtBin = path.join(oxfmtDir, 'bin', 'oxfmt');
-
-    execSync(`"${oxfmtBin}" "${absoluteOutputDir}"`, {
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
+    execSync(
+      `npx prettier --write --single-quote --trailing-comma all --tab-width 2 --semi "${absoluteOutputDir}"`,
+      {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      },
+    );
     return { success: true };
   } catch (err) {
-    // oxfmt may fail if files have syntax errors or if not installed
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
   }
 }

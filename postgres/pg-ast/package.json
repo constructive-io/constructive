@@ -1,6 +1,6 @@
 {
   "name": "pg-ast",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ASTs in JS",
   "main": "index.js",
@@ -43,6 +43,6 @@
   },
   "dependencies": {
     "@pgsql/types": "^17.6.2",
-    "nested-obj": "0.1.10"
+    "nested-obj": "0.2.0"
   }
 }
