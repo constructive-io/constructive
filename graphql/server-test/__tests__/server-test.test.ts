@@ -20,7 +20,12 @@ describe('graphql-server-test', () => {
       ({ db, pg, server, query, request, teardown } = await getConnections(
         {
           schemas: ['app_public'],
-          authRole: 'anonymous'
+          authRole: 'anonymous',
+          server: {
+            api: {
+              enableServicesApi: false
+            }
+          }
         },
         [seed.sqlfile([sql('test.sql')])]
       ));
@@ -104,7 +109,12 @@ describe('graphql-server-test', () => {
       ({ db, pg, query, teardown } = await getConnections(
         {
           schemas: ['app_public'],
-          authRole: 'authenticated'
+          authRole: 'authenticated',
+          server: {
+            api: {
+              enableServicesApi: false
+            }
+          }
         },
         [seed.sqlfile([sql('test.sql')])]
       ));

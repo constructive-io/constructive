@@ -45,17 +45,14 @@ export const getConnections = async (
   const { pg, db, teardown: dbTeardown } = conn;
 
   // Build options for the HTTP server
-  // Merge user-provided api options with convenience properties
-  // Convenience properties (schemas, authRole, enableServicesApi) take precedence
+  // Merge user-provided server.api options with convenience properties (schemas, authRole)
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      // Start with user-provided api options
-      ...input.api,
-      // Apply defaults and convenience properties (these take precedence)
-      enableServicesApi: input.enableServicesApi ?? input.api?.enableServicesApi ?? false,
+      // Start with user-provided api options from server.api
+      ...input.server?.api,
+      // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
-      defaultDatabaseId: input.api?.defaultDatabaseId ?? 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile

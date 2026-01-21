@@ -12,6 +12,26 @@ export interface ServerOptions {
   port?: number;
   /** Host to bind the server to (defaults to localhost) */
   host?: string;
+  /**
+   * API configuration options for the GraphQL server.
+   * These options control how the server handles requests and which features are enabled.
+   * 
+   * @example
+   * ```typescript
+   * const { query } = await getConnections({
+   *   schemas: ['app_public'],
+   *   server: {
+   *     port: 5555,
+   *     api: {
+   *       enableServicesApi: false,
+   *       isPublic: false,
+   *       defaultDatabaseId: 'my-database'
+   *     }
+   *   }
+   * });
+   * ```
+   */
+  api?: Partial<ApiOptions>;
 }
 
 /**
@@ -44,35 +64,8 @@ export interface GetConnectionsInput {
   authRole?: string;
   /** Graphile/PostGraphile configuration options */
   graphile?: GraphileOptions;
-  /** Server configuration options */
+  /** Server configuration options (port, host, and API configuration) */
   server?: ServerOptions;
-  /**
-   * Enable the Services API (domain/subdomain routing via services_public).
-   * When false (default), bypasses domain routing and directly exposes the specified schemas.
-   * When true, uses services_public to resolve which API/schemas to expose based on domain/subdomain.
-   * @default false
-   */
-  enableServicesApi?: boolean;
-  /**
-   * Full API configuration options for the GraphQL server.
-   * This allows fine-grained control over all API settings.
-   * 
-   * Note: The convenience properties `schemas`, `authRole`, and `enableServicesApi` 
-   * take precedence over values in this object when both are specified.
-   * 
-   * @example
-   * ```typescript
-   * const { query } = await getConnections({
-   *   schemas: ['app_public'],
-   *   api: {
-   *     isPublic: false,
-   *     defaultDatabaseId: 'my-database',
-   *     metaSchemas: ['services_public', 'metaschema_public']
-   *   }
-   * });
-   * ```
-   */
-  api?: Partial<ApiOptions>;
 }
 
 /**
