@@ -12,34 +12,30 @@ import {
   buildUpdateDocument,
   buildDeleteDocument,
 } from '../query-builder';
-import {
-  type ConnectionResult,
-  type FindManyArgs,
-  type FindFirstArgs,
-  type CreateArgs,
-  type UpdateArgs,
-  type DeleteArgs,
-  type InferSelectResult,
+import type {
+  ConnectionResult,
+  FindManyArgs,
+  FindFirstArgs,
+  CreateArgs,
+  UpdateArgs,
+  DeleteArgs,
+  InferSelectResult,
+  DeepExact,
 } from '../select-types';
-import {
-  type Api,
-  type ApiWithRelations,
-  type ApiSelect,
-  type ApiFilter,
-  type ApisOrderBy,
-  type CreateApiInput,
-  type UpdateApiInput,
-  type ApiPatch,
+import type {
+  Api,
+  ApiWithRelations,
+  ApiSelect,
+  ApiFilter,
+  ApisOrderBy,
+  CreateApiInput,
+  UpdateApiInput,
+  ApiPatch,
 } from '../input-types';
-
-// ============================================================================
-// Model Class
-// ============================================================================
 export class ApiModel {
   constructor(private client: OrmClient) {}
-
   findMany<const S extends ApiSelect>(
-    args?: FindManyArgs<S, ApiFilter, ApisOrderBy>
+    args?: FindManyArgs<DeepExact<S, ApiSelect>, ApiFilter, ApisOrderBy>,
   ): QueryBuilder<{
     apis: ConnectionResult<InferSelectResult<ApiWithRelations, S>>;
   }> {
@@ -57,7 +53,7 @@ export class ApiModel {
         offset: args?.offset,
       },
       'ApiFilter',
-      'ApisOrderBy'
+      'ApisOrderBy',
     );
     return new QueryBuilder({
       client: this.client,
@@ -68,18 +64,21 @@ export class ApiModel {
       variables,
     });
   }
-
   findFirst<const S extends ApiSelect>(
-    args?: FindFirstArgs<S, ApiFilter>
+    args?: FindFirstArgs<DeepExact<S, ApiSelect>, ApiFilter>,
   ): QueryBuilder<{
-    apis: { nodes: InferSelectResult<ApiWithRelations, S>[] };
+    apis: {
+      nodes: InferSelectResult<ApiWithRelations, S>[];
+    };
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Api',
       'apis',
       args?.select,
-      { where: args?.where },
-      'ApiFilter'
+      {
+        where: args?.where,
+      },
+      'ApiFilter',
     );
     return new QueryBuilder({
       client: this.client,
@@ -90,11 +89,12 @@ export class ApiModel {
       variables,
     });
   }
-
   create<const S extends ApiSelect>(
-    args: CreateArgs<S, CreateApiInput['api']>
+    args: CreateArgs<DeepExact<S, ApiSelect>, CreateApiInput['api']>,
   ): QueryBuilder<{
-    createApi: { api: InferSelectResult<ApiWithRelations, S> };
+    createApi: {
+      api: InferSelectResult<ApiWithRelations, S>;
+    };
   }> {
     const { document, variables } = buildCreateDocument(
       'Api',
@@ -102,7 +102,7 @@ export class ApiModel {
       'api',
       args.select,
       args.data,
-      'CreateApiInput'
+      'CreateApiInput',
     );
     return new QueryBuilder({
       client: this.client,
@@ -113,11 +113,18 @@ export class ApiModel {
       variables,
     });
   }
-
   update<const S extends ApiSelect>(
-    args: UpdateArgs<S, { id: string }, ApiPatch>
+    args: UpdateArgs<
+      DeepExact<S, ApiSelect>,
+      {
+        id: string;
+      },
+      ApiPatch
+    >,
   ): QueryBuilder<{
-    updateApi: { api: InferSelectResult<ApiWithRelations, S> };
+    updateApi: {
+      api: InferSelectResult<ApiWithRelations, S>;
+    };
   }> {
     const { document, variables } = buildUpdateDocument(
       'Api',
@@ -126,7 +133,7 @@ export class ApiModel {
       args.select,
       args.where,
       args.data,
-      'UpdateApiInput'
+      'UpdateApiInput',
     );
     return new QueryBuilder({
       client: this.client,
@@ -137,16 +144,23 @@ export class ApiModel {
       variables,
     });
   }
-
   delete(
-    args: DeleteArgs<{ id: string }>
-  ): QueryBuilder<{ deleteApi: { api: { id: string } } }> {
+    args: DeleteArgs<{
+      id: string;
+    }>,
+  ): QueryBuilder<{
+    deleteApi: {
+      api: {
+        id: string;
+      };
+    };
+  }> {
     const { document, variables } = buildDeleteDocument(
       'Api',
       'deleteApi',
       'api',
       args.where,
-      'DeleteApiInput'
+      'DeleteApiInput',
     );
     return new QueryBuilder({
       client: this.client,

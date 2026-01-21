@@ -12,34 +12,34 @@ import {
   buildUpdateDocument,
   buildDeleteDocument,
 } from '../query-builder';
-import {
-  type ConnectionResult,
-  type FindManyArgs,
-  type FindFirstArgs,
-  type CreateArgs,
-  type UpdateArgs,
-  type DeleteArgs,
-  type InferSelectResult,
+import type {
+  ConnectionResult,
+  FindManyArgs,
+  FindFirstArgs,
+  CreateArgs,
+  UpdateArgs,
+  DeleteArgs,
+  InferSelectResult,
+  DeepExact,
 } from '../select-types';
-import {
-  type Domain,
-  type DomainWithRelations,
-  type DomainSelect,
-  type DomainFilter,
-  type DomainsOrderBy,
-  type CreateDomainInput,
-  type UpdateDomainInput,
-  type DomainPatch,
+import type {
+  Domain,
+  DomainWithRelations,
+  DomainSelect,
+  DomainFilter,
+  DomainsOrderBy,
+  CreateDomainInput,
+  UpdateDomainInput,
+  DomainPatch,
 } from '../input-types';
-
-// ============================================================================
-// Model Class
-// ============================================================================
 export class DomainModel {
   constructor(private client: OrmClient) {}
-
   findMany<const S extends DomainSelect>(
-    args?: FindManyArgs<S, DomainFilter, DomainsOrderBy>
+    args?: FindManyArgs<
+      DeepExact<S, DomainSelect>,
+      DomainFilter,
+      DomainsOrderBy
+    >,
   ): QueryBuilder<{
     domains: ConnectionResult<InferSelectResult<DomainWithRelations, S>>;
   }> {
@@ -57,7 +57,7 @@ export class DomainModel {
         offset: args?.offset,
       },
       'DomainFilter',
-      'DomainsOrderBy'
+      'DomainsOrderBy',
     );
     return new QueryBuilder({
       client: this.client,
@@ -68,18 +68,21 @@ export class DomainModel {
       variables,
     });
   }
-
   findFirst<const S extends DomainSelect>(
-    args?: FindFirstArgs<S, DomainFilter>
+    args?: FindFirstArgs<DeepExact<S, DomainSelect>, DomainFilter>,
   ): QueryBuilder<{
-    domains: { nodes: InferSelectResult<DomainWithRelations, S>[] };
+    domains: {
+      nodes: InferSelectResult<DomainWithRelations, S>[];
+    };
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Domain',
       'domains',
       args?.select,
-      { where: args?.where },
-      'DomainFilter'
+      {
+        where: args?.where,
+      },
+      'DomainFilter',
     );
     return new QueryBuilder({
       client: this.client,
@@ -90,11 +93,12 @@ export class DomainModel {
       variables,
     });
   }
-
   create<const S extends DomainSelect>(
-    args: CreateArgs<S, CreateDomainInput['domain']>
+    args: CreateArgs<DeepExact<S, DomainSelect>, CreateDomainInput['domain']>,
   ): QueryBuilder<{
-    createDomain: { domain: InferSelectResult<DomainWithRelations, S> };
+    createDomain: {
+      domain: InferSelectResult<DomainWithRelations, S>;
+    };
   }> {
     const { document, variables } = buildCreateDocument(
       'Domain',
@@ -102,7 +106,7 @@ export class DomainModel {
       'domain',
       args.select,
       args.data,
-      'CreateDomainInput'
+      'CreateDomainInput',
     );
     return new QueryBuilder({
       client: this.client,
@@ -113,11 +117,18 @@ export class DomainModel {
       variables,
     });
   }
-
   update<const S extends DomainSelect>(
-    args: UpdateArgs<S, { id: string }, DomainPatch>
+    args: UpdateArgs<
+      DeepExact<S, DomainSelect>,
+      {
+        id: string;
+      },
+      DomainPatch
+    >,
   ): QueryBuilder<{
-    updateDomain: { domain: InferSelectResult<DomainWithRelations, S> };
+    updateDomain: {
+      domain: InferSelectResult<DomainWithRelations, S>;
+    };
   }> {
     const { document, variables } = buildUpdateDocument(
       'Domain',
@@ -126,7 +137,7 @@ export class DomainModel {
       args.select,
       args.where,
       args.data,
-      'UpdateDomainInput'
+      'UpdateDomainInput',
     );
     return new QueryBuilder({
       client: this.client,
@@ -137,16 +148,23 @@ export class DomainModel {
       variables,
     });
   }
-
   delete(
-    args: DeleteArgs<{ id: string }>
-  ): QueryBuilder<{ deleteDomain: { domain: { id: string } } }> {
+    args: DeleteArgs<{
+      id: string;
+    }>,
+  ): QueryBuilder<{
+    deleteDomain: {
+      domain: {
+        id: string;
+      };
+    };
+  }> {
     const { document, variables } = buildDeleteDocument(
       'Domain',
       'deleteDomain',
       'domain',
       args.where,
-      'DeleteDomainInput'
+      'DeleteDomainInput',
     );
     return new QueryBuilder({
       client: this.client,
