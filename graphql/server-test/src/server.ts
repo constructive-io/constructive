@@ -58,7 +58,7 @@ export const createTestServer = async (
   const actualPort = (httpServer.address() as { port: number }).port;
 
   const stop = async (): Promise<void> => {
-    await server.close();
+    await server.close({ closeCaches: true });
   };
 
   return {
