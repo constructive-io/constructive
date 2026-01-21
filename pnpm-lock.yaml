@@ -1122,6 +1122,53 @@ importers:
         version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
+  graphql/server-test:
+    dependencies:
+      '@constructive-io/graphql-env':
+        specifier: workspace:^
+        version: link:../env/dist
+      '@constructive-io/graphql-server':
+        specifier: workspace:^
+        version: link:../server/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../types/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../../pgpm/types/dist
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
+      graphql:
+        specifier: 15.10.1
+        version: 15.10.1
+      pg:
+        specifier: ^8.17.1
+        version: 8.17.1
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+      supertest:
+        specifier: ^7.0.0
+        version: 7.2.2
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      '@types/supertest':
+        specifier: ^6.0.2
+        version: 6.0.3
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+    publishDirectory: dist
+
   graphql/test:
     dependencies:
       '@constructive-io/graphql-env':
