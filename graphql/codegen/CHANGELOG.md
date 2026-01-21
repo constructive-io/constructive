@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.5...@constructive-io/graphql-codegen@2.29.0) (2026-01-21)
+
+### Features
+
+- **codegen:** add pluggable GraphQL adapter pattern ([3b51bac](https://github.com/constructive-io/constructive/commit/3b51bac29d1c848af8e1d1bb60cd5b6887db230f))
+
 ## [2.28.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.4...@constructive-io/graphql-codegen@2.28.5) (2026-01-21)
 
 ### Bug Fixes
