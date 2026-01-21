@@ -163,28 +163,65 @@ it('matches snapshot', async () => {
 | `authRole` | `string` | - | Default role for anonymous requests |
 | `useRoot` | `boolean` | `false` | Use root/superuser for queries (bypasses RLS) |
 | `graphile` | `GraphileOptions` | - | Graphile/PostGraphile configuration |
+| `server` | `ServerOptions` | - | Server configuration (port, host, and API options) |
+
+### ServerOptions
+
+All server configuration lives under the `server` key:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
 | `server.port` | `number` | random | Port to run the server on |
 | `server.host` | `string` | `localhost` | Host to bind the server to |
-| `enableServicesApi` | `boolean` | `false` | Enable domain/subdomain routing via services_public |
+| `server.api` | `Partial<ApiOptions>` | - | API configuration options (see below) |
 
-### Services API
+### API Options
 
-By default, `enableServicesApi` is set to `false`, which bypasses domain/subdomain routing and directly exposes the schemas you specify. This is the recommended setting for most testing scenarios.
+The `server.api` option provides full control over the GraphQL server configuration. It accepts a partial `ApiOptions` object from `@constructive-io/graphql-types`:
 
-When `enableServicesApi` is `true`, the server uses the `services_public` schema to resolve which API and schemas to expose based on the incoming request's domain/subdomain. This is useful when you need to test the full domain routing behavior.
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enableServicesApi` | `boolean` | package default | Enable domain/subdomain routing via services_public |
+| `exposedSchemas` | `string[]` | from `schemas` | Database schemas to expose (overridden by `schemas`) |
+| `anonRole` | `string` | from `authRole` | Anonymous role name (overridden by `authRole`) |
+| `roleName` | `string` | from `authRole` | Default role name (overridden by `authRole`) |
+| `defaultDatabaseId` | `string` | package default | Default database identifier |
+| `isPublic` | `boolean` | package default | Whether the API is publicly accessible |
+| `metaSchemas` | `string[]` | package default | Schemas containing metadata tables |
+
+The convenience properties (`schemas`, `authRole`) take precedence over corresponding values in `server.api`.
 
 ```typescript
-// Default: bypasses domain routing, directly exposes specified schemas
+// Basic usage with convenience properties
 const { query } = await getConnections({
   schemas: ['app_public'],
   authRole: 'anonymous'
 });
 
-// With Services API enabled: uses domain/subdomain routing
+// Disabling Services API for testing (bypasses domain routing)
 const { query } = await getConnections({
   schemas: ['app_public'],
-  authRole: 'anonymous',
-  enableServicesApi: true
+  server: {
+    api: {
+      enableServicesApi: false
+    }
+  }
+});
+
+// Full server configuration
+const { query } = await getConnections({
+  schemas: ['app_public'],
+  authRole: 'authenticated',
+  server: {
+    port: 5555,
+    host: 'localhost',
+    api: {
+      enableServicesApi: false,
+      isPublic: false,
+      defaultDatabaseId: 'my-test-db',
+      metaSchemas: ['services_public', 'metaschema_public']
+    }
+  }
 });
 ```
 

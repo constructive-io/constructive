@@ -1,7 +1,7 @@
 import type { Server } from 'http';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { GraphileOptions } from '@constructive-io/graphql-types';
+import type { GraphileOptions, ApiOptions } from '@constructive-io/graphql-types';
 import type supertest from 'supertest';
 
 /**
@@ -12,6 +12,26 @@ export interface ServerOptions {
   port?: number;
   /** Host to bind the server to (defaults to localhost) */
   host?: string;
+  /**
+   * API configuration options for the GraphQL server.
+   * These options control how the server handles requests and which features are enabled.
+   * 
+   * @example
+   * ```typescript
+   * const { query } = await getConnections({
+   *   schemas: ['app_public'],
+   *   server: {
+   *     port: 5555,
+   *     api: {
+   *       enableServicesApi: false,
+   *       isPublic: false,
+   *       defaultDatabaseId: 'my-database'
+   *     }
+   *   }
+   * });
+   * ```
+   */
+  api?: Partial<ApiOptions>;
 }
 
 /**
@@ -44,15 +64,8 @@ export interface GetConnectionsInput {
   authRole?: string;
   /** Graphile/PostGraphile configuration options */
   graphile?: GraphileOptions;
-  /** Server configuration options */
+  /** Server configuration options (port, host, and API configuration) */
   server?: ServerOptions;
-  /**
-   * Enable the Services API (domain/subdomain routing via services_public).
-   * When false (default), bypasses domain routing and directly exposes the specified schemas.
-   * When true, uses services_public to resolve which API/schemas to expose based on domain/subdomain.
-   * @default false
-   */
-  enableServicesApi?: boolean;
 }
 
 /**

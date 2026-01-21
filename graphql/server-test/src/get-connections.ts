@@ -45,13 +45,14 @@ export const getConnections = async (
   const { pg, db, teardown: dbTeardown } = conn;
 
   // Build options for the HTTP server
-  // enableServicesApi defaults to false for testing (bypasses domain routing)
+  // Merge user-provided server.api options with convenience properties (schemas, authRole)
   const serverOpts = getEnvOptions({
     pg: pg.config,
     api: {
-      enableServicesApi: input.enableServicesApi ?? false,
+      // Start with user-provided api options from server.api
+      ...input.server?.api,
+      // Apply convenience properties (these take precedence)
       exposedSchemas: input.schemas,
-      defaultDatabaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
     graphile: input.graphile
