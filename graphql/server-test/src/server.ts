@@ -55,6 +55,16 @@ export const createTestServer = async (
   // Start listening and get the HTTP server
   const httpServer: HttpServer = server.listen();
   
+  // Wait for the server to actually be listening before getting the address
+  // The listen() call is async - it returns immediately but the server isn't ready yet
+  await new Promise<void>((resolve) => {
+    if (httpServer.listening) {
+      resolve();
+    } else {
+      httpServer.once('listening', () => resolve());
+    }
+  });
+  
   const actualPort = (httpServer.address() as { port: number }).port;
 
   const stop = async (): Promise<void> => {
