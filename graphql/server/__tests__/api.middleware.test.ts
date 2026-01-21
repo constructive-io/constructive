@@ -70,7 +70,7 @@ describe('api middleware helpers', () => {
     ]);
   });
 
-  it('prefers X-Schemata when building svc key', () => {
+  it('prefers X-Api-Name when building svc key', () => {
     const req = {
       urlDomains: { domain: 'example.com', subdomains: ['api'] },
       get: (header: string) => {
@@ -89,7 +89,7 @@ describe('api middleware helpers', () => {
 
     const opts = { api: { isPublic: false } } as PgpmOptions;
 
-    expect(getSvcKey(opts, req)).toBe('schemata:db-123:app_public,app_private');
+    expect(getSvcKey(opts, req)).toBe('api:db-123:public');
   });
 
   it('normalizes apiByDatabaseIdAndName into ApiStructure', async () => {
