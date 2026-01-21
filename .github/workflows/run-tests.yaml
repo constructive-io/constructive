@@ -96,6 +96,8 @@ jobs:
             env: {}
           - package: graphile/graphile-sql-expression-validator
             env: {}
+          - package: graphql/server-test
+            env: {}
 
     env:
       PGHOST: localhost
