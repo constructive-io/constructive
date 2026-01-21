@@ -49,6 +49,44 @@ export interface DeleteArgs<TWhere> {
 }
 
 /**
+ * Recursively validates select objects, rejecting unknown keys.
+ *
+ * This type ensures that users can only select fields that actually exist
+ * in the GraphQL schema. It returns `never` if any excess keys are found
+ * at any nesting level, causing a TypeScript compile error.
+ *
+ * Why this is needed:
+ * TypeScript's excess property checking has a quirk where it only catches
+ * invalid fields when they are the ONLY fields. When mixed with valid fields
+ * (e.g., `{ id: true, invalidField: true }`), the structural typing allows
+ * the excess property through. This type explicitly checks for and rejects
+ * such cases.
+ *
+ * @example
+ * // This will cause a type error because 'invalid' doesn't exist:
+ * type Result = DeepExact<{ id: true, invalid: true }, { id?: boolean }>;
+ * // Result = never (causes assignment error)
+ *
+ * @example
+ * // This works because all fields are valid:
+ * type Result = DeepExact<{ id: true }, { id?: boolean; name?: boolean }>;
+ * // Result = { id: true }
+ */
+export type DeepExact<T, Shape> = T extends Shape
+  ? Exclude<keyof T, keyof Shape> extends never
+    ? {
+        [K in keyof T]: K extends keyof Shape
+          ? T[K] extends { select: infer NS }
+            ? Shape[K] extends { select?: infer ShapeNS }
+              ? { select: DeepExact<NS, NonNullable<ShapeNS>> }
+              : T[K]
+            : T[K]
+          : never;
+      }
+    : never
+  : never;
+
+/**
  * Infer result type from select configuration
  */
 export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined

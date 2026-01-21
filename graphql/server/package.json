@@ -64,6 +64,7 @@
     "graphile-settings": "workspace:^",
     "graphile-simple-inflector": "workspace:^",
     "graphile-utils": "^4.14.1",
+    "gql-ast": "workspace:^",
     "graphql": "15.10.1",
     "graphql-tag": "2.12.6",
     "graphql-upload": "^13.0.0",

@@ -5,4 +5,4 @@
  */
 
 // Re-export all types from input-types
-export * from './input-types';
+export * from "./input-types";
