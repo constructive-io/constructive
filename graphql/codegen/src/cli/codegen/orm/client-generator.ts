@@ -424,6 +424,40 @@ export function generateCreateClientFile(
   // export * from './select-types';
   statements.push(t.exportAllDeclaration(t.stringLiteral('./select-types')));
 
+  // Re-export all models for backwards compatibility
+  // export * from './models';
+  statements.push(t.exportAllDeclaration(t.stringLiteral('./models')));
+
+  // Re-export custom operations for backwards compatibility
+  if (hasCustomQueries) {
+    statements.push(
+      t.exportNamedDeclaration(
+        null,
+        [
+          t.exportSpecifier(
+            t.identifier('createQueryOperations'),
+            t.identifier('createQueryOperations')
+          ),
+        ],
+        t.stringLiteral('./query')
+      )
+    );
+  }
+  if (hasCustomMutations) {
+    statements.push(
+      t.exportNamedDeclaration(
+        null,
+        [
+          t.exportSpecifier(
+            t.identifier('createMutationOperations'),
+            t.identifier('createMutationOperations')
+          ),
+        ],
+        t.stringLiteral('./mutation')
+      )
+    );
+  }
+
   // Build the return object properties
   const returnProperties: t.ObjectProperty[] = [];
 
