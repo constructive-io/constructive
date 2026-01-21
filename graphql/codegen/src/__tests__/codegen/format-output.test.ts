@@ -18,7 +18,7 @@ describe('formatOutput', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it('formats TypeScript files with bundled config', () => {
+  it('formats TypeScript files with prettier options', () => {
     // Write unformatted code (double quotes, missing semicolons)
     const unformatted = `const x = "hello"
 const obj = {a: 1,b: 2}

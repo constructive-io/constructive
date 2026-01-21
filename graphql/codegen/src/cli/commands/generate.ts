@@ -538,12 +538,8 @@ export function formatOutput(outputDir: string): { success: boolean; error?: str
   const absoluteOutputDir = path.resolve(outputDir);
 
   try {
-    const prettierPkgPath = require.resolve('prettier/package.json');
-    const prettierDir = path.dirname(prettierPkgPath);
-    const prettierBin = path.join(prettierDir, 'bin', 'prettier.cjs');
-
     execSync(
-      `"${prettierBin}" --write --single-quote --trailing-comma all --tab-width 2 --no-tabs --semi "${absoluteOutputDir}"`,
+      `npx prettier --write --single-quote --trailing-comma all --tab-width 2 --semi "${absoluteOutputDir}"`,
       {
         stdio: 'pipe',
         encoding: 'utf-8',
