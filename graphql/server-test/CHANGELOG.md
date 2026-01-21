@@ -1,0 +1,10 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.2.0 (2026-01-21)
+
+### Features
+
+- **graphql-server-test:** add new GraphQL server testing package with SuperTest ([32ace31](https://github.com/constructive-io/constructive/commit/32ace311ad6577be8fa6d176d2b3dd32ab79a03c))
