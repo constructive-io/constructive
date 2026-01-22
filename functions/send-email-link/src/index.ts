@@ -150,9 +150,13 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
     logger.warn('Blocked unsafe URL for logo fetch', { url });
     return undefined;
   }
+  // Add timeout to prevent hanging on unresponsive servers
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
+
     if (!response.ok) return url;
 
     const buffer = await response.arrayBuffer();
@@ -173,6 +177,8 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
   } catch {
     logger.warn('Failed to fetch logo for base64 encoding, using original URL', { url });
     return url;
+  } finally {
+    clearTimeout(timeoutId);
   }
 };
 
