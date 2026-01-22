@@ -18,6 +18,8 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import passport from 'passport';
+import { createOAuthRouter } from './auth/oauth';
 
 const log = new Logger('server');
 const isDev = () => getNodeEnv() === 'development';
@@ -115,6 +117,12 @@ class Server {
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(requestLogger);
+    app.use(passport.initialize());
+
+    // OAuth routes (Google/GitHub)
+    const oauthRouter = createOAuthRouter(effectiveOpts as any);
+    app.use('/auth', oauthRouter);
+
     app.use(api);
     app.use(authenticate);
     app.use(graphile(effectiveOpts));

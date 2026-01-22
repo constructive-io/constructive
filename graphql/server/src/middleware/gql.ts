@@ -49,6 +49,20 @@ export const apiSelect = {
       currentRoleId: true,
     },
   },
+  database: {
+    select: {
+      name: true,
+      sites: {
+        select: {
+          domains: {
+            select: { subdomain: true, domain: true },
+            first: connectionFirst,
+          },
+        },
+        first: connectionFirst,
+      },
+    },
+  },
   apiModules: {
     select: { name: true, data: true },
     first: connectionFirst,
@@ -73,7 +87,21 @@ export const apiListSelect = {
     select: { domain: true, subdomain: true },
     first: connectionFirst,
   },
-} satisfies ApiSelect;
+  database: {
+    select: {
+      name: true,
+      sites: {
+        select: {
+          domains: {
+            select: { domain: true, subdomain: true },
+            first: connectionFirst,
+          },
+        },
+        first: connectionFirst,
+      },
+    },
+  },
+} as const;
 
 export type ApiRecord = InferSelectResult<ApiWithRelations, typeof apiSelect>;
 export type DomainRecord = InferSelectResult<
