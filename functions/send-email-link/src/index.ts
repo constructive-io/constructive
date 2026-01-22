@@ -108,11 +108,11 @@ const isUrlSafeToFetch = (urlString: string): boolean => {
     // Block private IP ranges using regex patterns
     // IPv4 private ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (link-local)
     const ipv4PrivateRanges = [
-      /^10\./,                    // 10.0.0.0/8
-      /^172\.(1[6-9]|2\d|3[01])\./, // 172.16.0.0/12
-      /^192\.168\./,              // 192.168.0.0/16
-      /^169\.254\./,              // 169.254.0.0/16 (link-local/cloud metadata)
-      /^127\./                    // 127.0.0.0/8 (loopback)
+      /^10\./,                      // 10.0.0.0/8
+      /^172\.(1[6-9]|2\d|3[01])\./, // 172.16.0.0/12 (matches 172.16-31.x.x)
+      /^192\.168\./,                // 192.168.0.0/16
+      /^169\.254\./,                // 169.254.0.0/16 (link-local/cloud metadata)
+      /^127\./                      // 127.0.0.0/8 (loopback)
     ];
 
     for (const pattern of ipv4PrivateRanges) {
