@@ -179,6 +179,11 @@ export interface GraphQLSDKConfigTarget {
    */
   orm?: {
     /**
+     * Whether to generate ORM client
+     * @default false
+     */
+    enabled?: boolean;
+    /**
      * Output directory for generated ORM client
      * @default './generated/orm'
      */
@@ -334,9 +339,10 @@ export interface ResolvedConfig {
     skipQueryField: boolean;
   };
   orm: {
+    enabled: boolean;
     output: string;
     useSharedTypes: boolean;
-  } | null;
+  };
   reactQuery: {
     enabled: boolean;
   };
@@ -401,21 +407,18 @@ export const DEFAULT_CONFIG: ResolvedConfig = {
     maxFieldDepth: 2,
     skipQueryField: true,
   },
-  orm: null, // ORM generation disabled by default
+  orm: {
+    enabled: false,
+    output: './generated/orm',
+    useSharedTypes: true,
+  },
   reactQuery: {
-    enabled: true, // React Query hooks enabled by default for generate command
+    enabled: false,
   },
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
 
-/**
- * Default ORM configuration values
- */
-export const DEFAULT_ORM_CONFIG = {
-  output: './generated/orm',
-  useSharedTypes: true,
-};
 
 /**
  * Helper function to define configuration with type checking
@@ -465,14 +468,7 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     );
   }
 
-  const merged = deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
-
-  // ORM is null by default, but merge with ORM defaults when provided
-  if (merged.orm && typeof merged.orm === 'object') {
-    merged.orm = deepmerge(DEFAULT_ORM_CONFIG, merged.orm, { arrayMerge: replaceArrays });
-  }
-
-  return merged;
+  return deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
 }
 
 /**

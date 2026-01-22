@@ -6,8 +6,8 @@
 import { CLI, CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
 import { initCommand, findConfigFile, loadConfigFile } from './commands/init';
-import { generateCommand } from './commands/generate';
-import { generateOrmCommand } from './commands/generate-orm';
+import { generateReactQuery } from './commands/generate';
+import { generateOrm } from './commands/generate-orm';
 import { startWatch } from './watch';
 import {
   isMultiConfig,
@@ -312,7 +312,7 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
     return;
   }
 
-  const result = await generateCommand({
+  const result = await generateReactQuery({
     config,
     target,
     endpoint,
@@ -444,7 +444,7 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
     return;
   }
 
-  const result = await generateOrmCommand({
+  const result = await generateOrm({
     config,
     target,
     endpoint,
