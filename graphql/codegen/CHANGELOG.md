@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.30.0...@constructive-io/graphql-codegen@2.31.0) (2026-01-22)
+
+### Features
+
+- **cli:** improve codegen command with ORM mode and config file support ([8726489](https://github.com/constructive-io/constructive/commit/872648970e0994a82b170b3f969cbcf365e65679))
+
+### Performance Improvements
+
+- **graphql-codegen:** use graphql.web for smaller ORM SDK bundle ([09a4d20](https://github.com/constructive-io/constructive/commit/09a4d2059a678686e7ae83e883e7a5acfa4f5b51))
+
 # [2.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.29.0...@constructive-io/graphql-codegen@2.30.0) (2026-01-22)
 
 ### Features

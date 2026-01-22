@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.9...@constructive-io/cli@5.11.0) (2026-01-22)
+
+### Features
+
+- **cli:** improve codegen command with ORM mode and config file support ([8726489](https://github.com/constructive-io/constructive/commit/872648970e0994a82b170b3f969cbcf365e65679))
+
 ## [5.10.9](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.8...@constructive-io/cli@5.10.9) (2026-01-22)
 
 **Note:** Version bump only for package @constructive-io/cli
