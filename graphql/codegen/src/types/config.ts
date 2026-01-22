@@ -359,7 +359,9 @@ export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
 /**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
+export const DEFAULT_CONFIG: ResolvedConfig = {
+  endpoint: '',
+  schema: null,
   headers: {},
   output: './generated/graphql',
   tables: {
@@ -451,29 +453,14 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     );
   }
 
-  // Merge config with defaults using deepmerge
-  const merged = deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays });
+  const resolved = deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
 
-  return {
-    endpoint: merged.endpoint ?? '',
-    schema: merged.schema ?? null,
-    headers: merged.headers,
-    output: merged.output,
-    tables: merged.tables,
-    queries: merged.queries,
-    mutations: merged.mutations,
-    excludeFields: merged.excludeFields,
-    hooks: merged.hooks,
-    postgraphile: merged.postgraphile,
-    codegen: merged.codegen,
-    // ORM is special: null by default, but merge with ORM defaults when provided
-    orm: config.orm
-      ? deepmerge(DEFAULT_ORM_CONFIG, config.orm, { arrayMerge: replaceArrays })
-      : null,
-    reactQuery: merged.reactQuery,
-    queryKeys: merged.queryKeys,
-    watch: merged.watch,
-  };
+  // ORM is special: null by default, but merge with ORM defaults when provided
+  if (config.orm) {
+    resolved.orm = deepmerge(DEFAULT_ORM_CONFIG, config.orm, { arrayMerge: replaceArrays });
+  }
+
+  return resolved;
 }
 
 /**
