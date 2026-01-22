@@ -105,39 +105,9 @@ exports[`client-generator generateOrmClientFile generates OrmClient class with e
  * DO NOT EDIT - changes will be overwritten
  */
 
-export interface GraphQLError {
-  message: string;
-  locations?: { line: number; column: number }[];
-  path?: (string | number)[];
-  extensions?: Record<string, unknown>;
-}
+import type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';
 
-/**
- * Discriminated union for query results
- * Use .ok to check success, or use .unwrap() to get data or throw
- */
-export type QueryResult<T> =
-  | { ok: true; data: T; errors: undefined }
-  | { ok: false; data: null; errors: GraphQLError[] };
-
-/**
- * Pluggable adapter interface for GraphQL execution.
- * Implement this interface to provide custom execution logic (e.g., for testing).
- */
-export interface GraphQLAdapter {
-  /**
-   * Execute a GraphQL operation and return the result.
-   */
-  execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>>;
-  /**
-   * Set headers for requests (optional - only implement if adapter supports headers).
-   */
-  setHeaders?(headers: Record<string, string>): void;
-  /**
-   * Get the endpoint URL (optional - only implement if adapter has an endpoint).
-   */
-  getEndpoint?(): string;
-}
+export type { GraphQLAdapter, GraphQLError, QueryResult } from '@constructive-io/graphql-types';
 
 /**
  * Default adapter that uses fetch for HTTP requests.
