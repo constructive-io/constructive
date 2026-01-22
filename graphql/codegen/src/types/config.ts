@@ -456,7 +456,7 @@ export function mergeConfig(
 
 /**
  * Resolve configuration by applying defaults.
- * Uses deepmerge with array replacement strategy and custom ORM handling.
+ * Uses deepmerge with array replacement strategy.
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
   if (isMultiConfig(config)) {
@@ -465,21 +465,14 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     );
   }
 
-  return deepmerge(DEFAULT_CONFIG, config, {
-    arrayMerge: replaceArrays,
-    customMerge: (key) => {
-      if (key === 'orm') {
-        return (_defaultValue, sourceValue) => {
-          // ORM is null by default, but merge with ORM defaults when provided
-          if (sourceValue && typeof sourceValue === 'object') {
-            return deepmerge(DEFAULT_ORM_CONFIG, sourceValue, { arrayMerge: replaceArrays });
-          }
-          return sourceValue;
-        };
-      }
-      return undefined;
-    },
-  }) as ResolvedConfig;
+  const merged = deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
+
+  // ORM is null by default, but merge with ORM defaults when provided
+  if (merged.orm && typeof merged.orm === 'object') {
+    merged.orm = deepmerge(DEFAULT_ORM_CONFIG, merged.orm, { arrayMerge: replaceArrays });
+  }
+
+  return merged;
 }
 
 /**
