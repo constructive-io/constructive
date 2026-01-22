@@ -142,11 +142,16 @@ export class Logger {
         if (typeof arg === 'string') {
           strings.push(arg);
         } else if (arg instanceof Error) {
-          entry.error = {
-            name: arg.name,
-            message: arg.message,
-            stack: arg.stack
-          };
+          if (!entry.error) {
+            entry.error = {
+              name: arg.name,
+              message: arg.message,
+              stack: arg.stack
+            };
+          } else {
+            // Preserve additional errors in the message string
+            strings.push(`Error[${arg.name}]: ${arg.message}`);
+          }
         } else if (typeof arg === 'object' && arg !== null) {
           Object.assign(entry, arg);
         } else if (arg !== undefined && arg !== null) {
