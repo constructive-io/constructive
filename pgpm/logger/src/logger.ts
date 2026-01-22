@@ -163,7 +163,7 @@ export class Logger {
         entry.message = strings.join(' ');
       }
 
-      stream.write(JSON.stringify(entry) + '\n');
+      stream.write(safeStringify(entry) + '\n');
       return;
     }
 
