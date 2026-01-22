@@ -9,7 +9,7 @@
  */
 
 import * as t from 'gql-ast';
-import { parseType, print } from 'graphql';
+import { parseType, print } from '@0no-co/graphql.web';
 import type {
   ArgumentNode,
   FieldNode,

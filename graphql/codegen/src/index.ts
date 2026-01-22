@@ -20,3 +20,22 @@ export * from './client';
 
 // Config definition helper
 export { defineConfig } from './types/config';
+
+// CLI command exports (for packages/cli consumption)
+export {
+  generateCommand,
+  generateOrmCommand,
+  findConfigFile,
+  loadConfigFile,
+} from './cli/commands';
+
+export type {
+  GenerateOptions,
+  GenerateResult,
+  GenerateTargetResult,
+  GenerateOrmOptions,
+  GenerateOrmResult,
+  GenerateOrmTargetResult,
+  InitOptions,
+  InitResult,
+} from './cli/commands';

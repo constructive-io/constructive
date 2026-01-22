@@ -13,54 +13,54 @@ import {
   usersQueryKey,
   fetchUsersQuery,
   prefetchUsersQuery,
-} from './output/generated-sdk/queries/useUsersQuery';
+} from './output/generated-sdk-public/queries/useUsersQuery';
 import {
   useUserQuery,
   userQueryKey,
-} from './output/generated-sdk/queries/useUserQuery';
+} from './output/generated-sdk-public/queries/useUserQuery';
 import {
   useDatabasesQuery,
   databasesQueryKey,
-} from './output/generated-sdk/queries/useDatabasesQuery';
+} from './output/generated-sdk-public/queries/useDatabasesQuery';
 import {
   useTablesQuery,
   tablesQueryKey,
-} from './output/generated-sdk/queries/useTablesQuery';
+} from './output/generated-sdk-public/queries/useTablesQuery';
 import {
   useCurrentUserQuery,
   currentUserQueryKey,
-} from './output/generated-sdk/queries/useCurrentUserQuery';
+} from './output/generated-sdk-public/queries/useCurrentUserQuery';
 
 // Import mutation hooks
-import { useCreateUserMutation } from './output/generated-sdk/mutations/useCreateUserMutation';
-import { useUpdateUserMutation } from './output/generated-sdk/mutations/useUpdateUserMutation';
-import { useDeleteUserMutation } from './output/generated-sdk/mutations/useDeleteUserMutation';
-import { useSignInMutation } from './output/generated-sdk/mutations/useSignInMutation';
-import { useSignOutMutation } from './output/generated-sdk/mutations/useSignOutMutation';
-import { useSignUpMutation } from './output/generated-sdk/mutations/useSignUpMutation';
+import { useCreateUserMutation } from './output/generated-sdk-public/mutations/useCreateUserMutation';
+import { useUpdateUserMutation } from './output/generated-sdk-public/mutations/useUpdateUserMutation';
+import { useDeleteUserMutation } from './output/generated-sdk-public/mutations/useDeleteUserMutation';
+import { useSignInMutation } from './output/generated-sdk-public/mutations/useSignInMutation';
+import { useSignOutMutation } from './output/generated-sdk-public/mutations/useSignOutMutation';
+import { useSignUpMutation } from './output/generated-sdk-public/mutations/useSignUpMutation';
 
 // Import types
 import type {
   UserFilter,
   DatabaseFilter,
   TableFilter,
-} from './output/generated-sdk/schema-types';
-import type { User, Database, Table } from './output/generated-sdk/types';
+} from './output/generated-sdk-public/schema-types';
+import type { User, Database, Table } from './output/generated-sdk-public/types';
 
 // Import client configuration
-import { configure } from './output/generated-sdk/client';
+import { configure } from './output/generated-sdk-public/client';
 
 // Import query/mutation keys for cache invalidation
 import {
   queryKeys,
   userKeys,
   customQueryKeys,
-} from './output/generated-sdk/query-keys';
+} from './output/generated-sdk-public/query-keys';
 import {
   mutationKeys,
   customMutationKeys,
-} from './output/generated-sdk/mutation-keys';
-import { invalidate } from './output/generated-sdk/invalidation';
+} from './output/generated-sdk-public/mutation-keys';
+import { invalidate } from './output/generated-sdk-public/invalidation';
 
 const queryClient = new QueryClient();
 
