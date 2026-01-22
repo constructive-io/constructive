@@ -1,6 +1,7 @@
 import yanse from 'yanse';
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'success';
+export type LogFormat = 'pretty' | 'json';
 
 const levelPriority: Record<LogLevel, number> = {
   debug: 0,
@@ -61,6 +62,15 @@ export const setShowTimestamp = (show: boolean) => {
   showTimestamp = show;
 };
 
+// Parse LOG_FORMAT from environment (default: 'pretty')
+let logFormat: LogFormat =
+  process.env.LOG_FORMAT?.toLowerCase() === 'json' ? 'json' : 'pretty';
+
+// Update log format at runtime
+export const setLogFormat = (format: LogFormat) => {
+  logFormat = format;
+};
+
 // Scope filtering
 interface ScopeFilter {
   include: Set<string>;
@@ -116,6 +126,43 @@ export class Logger {
       return;
     }
 
+    const stream = level === 'error' ? process.stderr : process.stdout;
+
+    if (logFormat === 'json') {
+      // JSON format: structured output for log aggregators
+      const entry: Record<string, unknown> = {
+        timestamp: new Date().toISOString(),
+        level,
+        scope: this.scope
+      };
+
+      // Extract message and data from args
+      const strings: string[] = [];
+      for (const arg of args) {
+        if (typeof arg === 'string') {
+          strings.push(arg);
+        } else if (arg instanceof Error) {
+          entry.error = {
+            name: arg.name,
+            message: arg.message,
+            stack: arg.stack
+          };
+        } else if (typeof arg === 'object' && arg !== null) {
+          Object.assign(entry, arg);
+        } else if (arg !== undefined && arg !== null) {
+          strings.push(String(arg));
+        }
+      }
+
+      if (strings.length > 0) {
+        entry.message = strings.join(' ');
+      }
+
+      stream.write(JSON.stringify(entry) + '\n');
+      return;
+    }
+
+    // Pretty format: colored output for terminals
     const tag = yanse.bold(`[${this.scope}]`);
     const color = levelColors[level];
     const prefix = color(`${level.toUpperCase()}:`);
@@ -127,7 +174,6 @@ export class Logger {
         : normalized;
     });
 
-    const stream = level === 'error' ? process.stderr : process.stdout;
     const outputParts = showTimestamp
       ? [yanse.dim(`[${new Date().toISOString()}]`), tag, prefix, ...formattedArgs]
       : [tag, prefix, ...formattedArgs];
