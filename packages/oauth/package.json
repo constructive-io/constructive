@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@pgpmjs/logger": "workspace:^"
+    "@constructive-io/csrf": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

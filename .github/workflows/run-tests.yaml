@@ -122,6 +122,8 @@ jobs:
             env: {}
           - package: packages/oauth
             env: {}
+          - package: packages/csrf
+            env: {}
 
     env:
       PGHOST: localhost
