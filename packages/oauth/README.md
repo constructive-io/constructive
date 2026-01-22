@@ -1,6 +1,8 @@
 # @constructive-io/oauth
 
-A minimal OAuth 2.0 client for social authentication with Google, GitHub, Facebook, and LinkedIn.
+> Minimal OAuth 2.0 client for social authentication
+
+A lightweight OAuth 2.0 client for social authentication with Google, GitHub, Facebook, and LinkedIn. No external auth library dependencies - uses native fetch for HTTP requests.
 
 ## Installation
 

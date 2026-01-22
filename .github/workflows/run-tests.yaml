@@ -120,6 +120,8 @@ jobs:
             env: {}
           - package: uploads/stream-to-etag
             env: {}
+          - package: packages/oauth
+            env: {}
 
     env:
       PGHOST: localhost
