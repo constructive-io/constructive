@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-env",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive environment configuration with GraphQL/Graphile support",
   "main": "index.js",

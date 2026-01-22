@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/job-worker",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "job worker",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/job-worker#readme",

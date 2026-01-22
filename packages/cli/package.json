@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/cli",
-  "version": "5.11.0",
+  "version": "5.11.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI",
   "main": "index.js",

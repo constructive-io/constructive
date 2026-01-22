@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.31.0...@constructive-io/graphql-codegen@2.32.0) (2026-01-22)
+
+### Features
+
+- **graphql-codegen:** add systemExclude field and clean up resolveConfig ([0dc623e](https://github.com/constructive-io/constructive/commit/0dc623e8bd538f6654b81fa290f7a9a9082b3307))
+
 # [2.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.30.0...@constructive-io/graphql-codegen@2.31.0) (2026-01-22)
 
 ### Features
