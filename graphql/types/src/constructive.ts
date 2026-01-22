@@ -32,6 +32,25 @@ export interface ConstructiveGraphQLOptions {
 }
 
 /**
+ * OAuth provider configuration
+ */
+export interface OAuthProviderOptions {
+  clientId?: string;
+  clientSecret?: string;
+  callbackUrl?: string;
+}
+
+/**
+ * Auth/OAuth configuration
+ */
+export interface OAuthOptions {
+  /** Optional front-end callback URL to redirect with token query */
+  frontendCallbackUrl?: string;
+  google?: OAuthProviderOptions;
+  github?: OAuthProviderOptions;
+}
+
+/**
  * Full Constructive configuration options
  * Extends PgpmOptions with GraphQL/Graphile configuration
  */
