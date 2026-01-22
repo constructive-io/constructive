@@ -2,7 +2,7 @@
  * ORM SDK Example - Prisma-like API for GraphQL
  * Run: pnpm exec tsx examples/orm-sdk.ts
  */
-import { createClient, GraphQLRequestError } from './output/generated-orm';
+import { createClient, GraphQLRequestError } from './output/generated-orm-public';
 
 const ENDPOINT = 'http://api.localhost:3000/graphql';
 let db = createClient({ endpoint: ENDPOINT });

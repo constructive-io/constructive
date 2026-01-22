@@ -53,6 +53,7 @@
     "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
   },
   "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
     "@babel/generator": "^7.28.6",
     "@babel/types": "^7.28.6",
     "@constructive-io/graphql-types": "workspace:^",
