@@ -108,6 +108,8 @@ export interface GraphQLSDKConfigTarget {
     include?: string[];
     /** Tables to exclude (glob patterns supported) */
     exclude?: string[];
+    /** System-level tables to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -117,8 +119,10 @@ export interface GraphQLSDKConfigTarget {
   queries?: {
     /** Query names to include - defaults to ['*'] */
     include?: string[];
-    /** Query names to exclude - defaults to ['_meta', 'query'] */
+    /** Query names to exclude */
     exclude?: string[];
+    /** System-level queries to always exclude (defaults to ['_meta', 'query'], can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -130,6 +134,8 @@ export interface GraphQLSDKConfigTarget {
     include?: string[];
     /** Mutation names to exclude */
     exclude?: string[];
+    /** System-level mutations to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -302,14 +308,17 @@ export interface ResolvedConfig {
   tables: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   queries: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   mutations: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   excludeFields: string[];
   hooks: {
@@ -367,14 +376,17 @@ export const DEFAULT_CONFIG: ResolvedConfig = {
   tables: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   queries: {
     include: ['*'],
-    exclude: ['_meta', 'query'], // Internal PostGraphile queries
+    exclude: [],
+    systemExclude: ['_meta', 'query'], // Internal PostGraphile queries
   },
   mutations: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   excludeFields: [],
   hooks: {
@@ -444,7 +456,7 @@ export function mergeConfig(
 
 /**
  * Resolve configuration by applying defaults.
- * Uses deepmerge with array replacement strategy to merge user config with defaults.
+ * Uses deepmerge with array replacement strategy and custom ORM handling.
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
   if (isMultiConfig(config)) {
@@ -453,14 +465,21 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     );
   }
 
-  const resolved = deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
-
-  // ORM is special: null by default, but merge with ORM defaults when provided
-  if (config.orm) {
-    resolved.orm = deepmerge(DEFAULT_ORM_CONFIG, config.orm, { arrayMerge: replaceArrays });
-  }
-
-  return resolved;
+  return deepmerge(DEFAULT_CONFIG, config, {
+    arrayMerge: replaceArrays,
+    customMerge: (key) => {
+      if (key === 'orm') {
+        return (_defaultValue, sourceValue) => {
+          // ORM is null by default, but merge with ORM defaults when provided
+          if (sourceValue && typeof sourceValue === 'object') {
+            return deepmerge(DEFAULT_ORM_CONFIG, sourceValue, { arrayMerge: replaceArrays });
+          }
+          return sourceValue;
+        };
+      }
+      return undefined;
+    },
+  }) as ResolvedConfig;
 }
 
 /**
