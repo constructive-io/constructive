@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@2.15.2...@constructive-io/graphql-test@2.16.0) (2026-01-22)
+
+### Features
+
+- **graphql-types:** add GraphQLAdapter interface and types ([439696e](https://github.com/constructive-io/constructive/commit/439696e8c423bd2726a5a9e1d4a1362315d0313b))
+
 ## [2.15.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@2.15.1...@constructive-io/graphql-test@2.15.2) (2026-01-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

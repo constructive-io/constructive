@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.29.0...@constructive-io/graphql-codegen@2.30.0) (2026-01-22)
+
+### Features
+
+- **graphql-types:** add GraphQLAdapter interface and types ([439696e](https://github.com/constructive-io/constructive/commit/439696e8c423bd2726a5a9e1d4a1362315d0313b))
+
 # [2.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.28.5...@constructive-io/graphql-codegen@2.29.0) (2026-01-21)
 
 ### Features

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.29.0",
+  "version": "2.30.0",
   "description": "CLI-based GraphQL SDK generator for PostGraphile endpoints with React Query hooks",
   "keywords": [
     "graphql",
@@ -52,10 +52,10 @@
     "example:orm": "tsx examples/orm-sdk-test.ts",
     "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
   },
-    "dependencies": {
-      "@babel/generator": "^7.28.6",
-      "@babel/types": "^7.28.6",
-      "@constructive-io/graphql-types": "workspace:^",
+  "dependencies": {
+    "@babel/generator": "^7.28.6",
+    "@babel/types": "^7.28.6",
+    "@constructive-io/graphql-types": "workspace:^",
     "@inquirerer/utils": "^3.2.0",
     "ajv": "^8.17.1",
     "find-and-require-package-json": "^0.9.0",
