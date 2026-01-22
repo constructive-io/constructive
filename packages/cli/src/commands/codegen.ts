@@ -3,8 +3,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { buildSchemaSDL } from '@constructive-io/graphql-server';
 import {
-  generateCommand,
-  generateOrmCommand,
+  generateReactQuery,
+  generateOrm,
   findConfigFile,
   type GenerateResult,
   type GenerateTargetResult,
@@ -95,8 +95,8 @@ export default async (
   };
 
   const result = opts.orm
-    ? await generateOrmCommand(commandOptions)
-    : await generateCommand(commandOptions);
+    ? await generateOrm(commandOptions)
+    : await generateReactQuery(commandOptions);
 
   printResult(result);
 

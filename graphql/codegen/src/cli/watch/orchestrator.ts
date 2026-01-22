@@ -8,9 +8,9 @@ import type { ResolvedConfig } from '../../types/config';
 import type { GeneratorType, WatchOptions, PollEvent } from './types';
 import { SchemaPoller } from './poller';
 import { debounce } from './debounce';
-import { generateCommand, type GenerateResult } from '../commands/generate';
+import { generateReactQuery, type GenerateResult } from '../commands/generate';
 import {
-  generateOrmCommand,
+  generateOrm,
   type GenerateOrmResult,
 } from '../commands/generate-orm';
 
@@ -195,7 +195,7 @@ export class WatchOrchestrator {
       let result: GenerateResult | GenerateOrmResult;
 
       if (this.options.generatorType === 'generate') {
-        result = await generateCommand({
+        result = await generateReactQuery({
           config: this.options.configPath,
           target: this.options.target,
           endpoint: this.options.config.endpoint,
@@ -205,11 +205,11 @@ export class WatchOrchestrator {
           skipCustomOperations: this.options.skipCustomOperations,
         });
       } else {
-        result = await generateOrmCommand({
+        result = await generateOrm({
           config: this.options.configPath,
           target: this.options.target,
           endpoint: this.options.config.endpoint,
-          output: this.options.outputDir ?? this.options.config.orm?.output,
+          output: this.options.outputDir ?? this.options.config.orm.output,
           authorization: this.options.authorization,
           verbose: this.watchOptions.verbose,
           skipCustomOperations: this.options.skipCustomOperations,

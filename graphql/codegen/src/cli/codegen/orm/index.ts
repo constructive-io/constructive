@@ -52,7 +52,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   const { tables, customOperations, config } = options;
   const files: GeneratedFile[] = [];
 
-  const useSharedTypes = config.orm?.useSharedTypes ?? true;
+  const useSharedTypes = config.orm.useSharedTypes;
   const hasCustomQueries = (customOperations?.queries.length ?? 0) > 0;
   const hasCustomMutations = (customOperations?.mutations.length ?? 0) > 0;
   const typeRegistry = customOperations?.typeRegistry;

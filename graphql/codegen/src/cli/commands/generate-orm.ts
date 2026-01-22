@@ -20,7 +20,7 @@ import {
 import { runCodegenPipeline, validateTablesFound } from './shared';
 import { findConfigFile, loadConfigFile } from './init';
 import { writeGeneratedFiles } from './generate';
-import { generateOrm } from '../codegen/orm';
+import { generateOrm as generateOrmFiles } from '../codegen/orm';
 
 export interface GenerateOrmOptions {
   /** Path to config file */
@@ -67,9 +67,9 @@ export interface GenerateOrmResult {
 }
 
 /**
- * Execute the generate-orm command
+ * Execute the generate-orm command (generates ORM client)
  */
-export async function generateOrmCommand(
+export async function generateOrm(
   options: GenerateOrmOptions = {}
 ): Promise<GenerateOrmResult> {
   if (options.verbose) {
@@ -138,7 +138,7 @@ async function generateOrmForTarget(
   isMultiTarget: boolean
 ): Promise<GenerateOrmTargetResult> {
   const config = target.config;
-  const outputDir = options.output || config.orm?.output || './generated/orm';
+  const outputDir = options.output || config.orm.output;
   const prefix = isMultiTarget ? `[${target.name}] ` : '';
   const log = options.verbose
     ? (message: string) => console.log(`${prefix}${message}`)
@@ -211,7 +211,7 @@ async function generateOrmForTarget(
 
   // 4. Generate ORM code
   console.log(`${prefix}Generating code...`);
-  const { files: generatedFiles, stats: genStats } = generateOrm({
+  const { files: generatedFiles, stats: genStats } = generateOrmFiles({
     tables,
     customOperations: {
       queries: customOperations.queries,

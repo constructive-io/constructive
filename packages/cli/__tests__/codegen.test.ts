@@ -1,9 +1,9 @@
 import type { ParsedArgs } from 'inquirerer'
 import codegenCommand from '../src/commands/codegen'
-import { generateCommand } from '@constructive-io/graphql-codegen/cli/commands/generate'
+import { generateReactQuery } from '@constructive-io/graphql-codegen/cli/commands/generate'
 
 jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
-  generateCommand: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
+  generateReactQuery: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
 }))
 
 jest.mock('@constructive-io/graphql-server', () => ({
@@ -30,7 +30,7 @@ describe('codegen command', () => {
     spyExit.mockRestore()
   })
 
-  it('calls generateCommand with endpoint flow options', async () => {
+  it('calls generateReactQuery with endpoint flow options', async () => {
 
     const argv: Partial<ParsedArgs> = {
       endpoint: 'http://localhost:3000/graphql',
@@ -42,8 +42,8 @@ describe('codegen command', () => {
 
     await codegenCommand(argv, {} as any, {} as any)
 
-    expect(generateCommand).toHaveBeenCalled()
-    const call = (generateCommand as jest.Mock).mock.calls[0][0]
+    expect(generateReactQuery).toHaveBeenCalled()
+    const call = (generateReactQuery as jest.Mock).mock.calls[0][0]
     expect(call).toMatchObject({
       endpoint: 'http://localhost:3000/graphql',
       output: 'graphql/codegen/dist',
@@ -53,7 +53,7 @@ describe('codegen command', () => {
     })
   })
 
-  it('builds schema file and calls generateCommand with schema when DB options provided', async () => {
+  it('builds schema file and calls generateReactQuery with schema when DB options provided', async () => {
 
     const argv: Partial<ParsedArgs> = {
       database: 'constructive_db',
@@ -63,8 +63,8 @@ describe('codegen command', () => {
 
     await codegenCommand(argv, {} as any, {} as any)
 
-    expect(generateCommand).toHaveBeenCalled()
-    const call = (generateCommand as jest.Mock).mock.calls[0][0]
+    expect(generateReactQuery).toHaveBeenCalled()
+    const call = (generateReactQuery as jest.Mock).mock.calls[0][0]
     expect(call.schema).toBe('graphql/codegen/dist/schema.graphql')
     expect(call.output).toBe('graphql/codegen/dist')
     expect(call.endpoint).toBeUndefined()
