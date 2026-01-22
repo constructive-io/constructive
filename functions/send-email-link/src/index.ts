@@ -1,11 +1,11 @@
 import { createJobApp } from '@constructive-io/knative-job-fn';
-import { GraphQLClient } from 'graphql-request';
-import gql from 'graphql-tag';
 import { generate } from '@launchql/mjml';
 import { send as sendPostmaster } from '@launchql/postmaster';
-import { send as sendSmtp } from 'simple-smtp-server';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { createLogger } from '@pgpmjs/logger';
+import { GraphQLClient } from 'graphql-request';
+import gql from 'graphql-tag';
+import { send as sendSmtp } from 'simple-smtp-server';
 
 const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
 const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
@@ -81,13 +81,75 @@ const getRequiredEnv = (name: string): string => {
 const MAX_LOGO_SIZE_BYTES = 50 * 1024;
 
 /**
+ * Validates that a URL is safe to fetch (prevents SSRF attacks).
+ * @param urlString - The URL to validate
+ * @returns true if the URL is safe to fetch, false otherwise
+ */
+const isUrlSafeToFetch = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+
+    // Only allow HTTP and HTTPS protocols
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      logger.warn('Blocked URL with disallowed protocol', { url: urlString, protocol: url.protocol });
+      return false;
+    }
+
+    // Get hostname for IP validation
+    const hostname = url.hostname.toLowerCase();
+
+    // Block localhost and local hostnames
+    const localHostnames = ['localhost', '0.0.0.0', '127.0.0.1'];
+    if (localHostnames.includes(hostname) || hostname.endsWith('.localhost')) {
+      logger.warn('Blocked URL pointing to localhost', { url: urlString, hostname });
+      return false;
+    }
+
+    // Block private IP ranges using regex patterns
+    // IPv4 private ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (link-local)
+    const ipv4PrivateRanges = [
+      /^10\./,                      // 10.0.0.0/8
+      /^172\.(1[6-9]|2\d|3[01])\./, // 172.16.0.0/12 (matches 172.16-31.x.x)
+      /^192\.168\./,                // 192.168.0.0/16
+      /^169\.254\./,                // 169.254.0.0/16 (link-local/cloud metadata)
+      /^127\./                      // 127.0.0.0/8 (loopback)
+    ];
+
+    for (const pattern of ipv4PrivateRanges) {
+      if (pattern.test(hostname)) {
+        logger.warn('Blocked URL pointing to private IP range', { url: urlString, hostname });
+        return false;
+      }
+    }
+
+    // Block IPv6 localhost and link-local addresses
+    if (hostname === '::1' || hostname.startsWith('fe80:') || hostname.startsWith('fc00:') || hostname.startsWith('fd00:')) {
+      logger.warn('Blocked URL pointing to private IPv6 address', { url: urlString, hostname });
+      return false;
+    }
+
+    return true;
+  } catch {
+    // Invalid URL
+    logger.warn('Invalid URL format', { url: urlString });
+    return false;
+  }
+};
+
+/**
  * Fetches an image and returns it as a base64 data URI.
  * This bypasses email client image proxies that may not handle SVG.
  * Falls back to original URL if image is too large or fetch fails.
+ * Validates URLs to prevent SSRF attacks.
  */
 const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | undefined> => {
   if (!url) return undefined;
 
+  // Validate URL to prevent SSRF attacks
+  if (!isUrlSafeToFetch(url)) {
+    logger.warn('Blocked unsafe URL for logo fetch', { url });
+    return undefined;
+  }
   // Add timeout to prevent hanging on unresponsive servers
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -112,7 +174,7 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
     const base64 = Buffer.from(buffer).toString('base64');
     const contentType = response.headers.get('content-type') || 'image/png';
     return `data:${contentType};base64,${base64}`;
-  } catch (error) {
+  } catch {
     logger.warn('Failed to fetch logo for base64 encoding, using original URL', { url });
     return url;
   } finally {
@@ -172,23 +234,23 @@ export const sendEmailLink = async (
 
   const validateForType = (): { missing?: string } | null => {
     switch (params.email_type) {
-      case 'invite_email':
-        if (!params.invite_token || !params.sender_id) {
-          return { missing: 'invite_token_or_sender_id' };
-        }
-        return null;
-      case 'forgot_password':
-        if (!params.user_id || !params.reset_token) {
-          return { missing: 'user_id_or_reset_token' };
-        }
-        return null;
-      case 'email_verification':
-        if (!params.email_id || !params.verification_token) {
-          return { missing: 'email_id_or_verification_token' };
-        }
-        return null;
-      default:
-        return { missing: 'email_type' };
+    case 'invite_email':
+      if (!params.invite_token || !params.sender_id) {
+        return { missing: 'invite_token_or_sender_id' };
+      }
+      return null;
+    case 'forgot_password':
+      if (!params.user_id || !params.reset_token) {
+        return { missing: 'user_id_or_reset_token' };
+      }
+      return null;
+    case 'email_verification':
+      if (!params.email_id || !params.verification_token) {
+        return { missing: 'email_id_or_verification_token' };
+      }
+      return null;
+    default:
+      return { missing: 'email_type' };
     }
   };
 
@@ -273,58 +335,58 @@ export const sendEmailLink = async (
   let inviterName: string | undefined;
 
   switch (params.email_type) {
-    case 'invite_email': {
-      if (!params.invite_token || !params.sender_id) {
-        return { missing: 'invite_token_or_sender_id' };
-      }
-      url.pathname = 'register';
-      url.searchParams.append('invite_token', params.invite_token);
-      url.searchParams.append('email', params.email);
-
-      const scope = Number(params.invite_type) === 2 ? 'org' : 'app';
-      url.searchParams.append('type', scope);
-
-      const inviter = await client.request<any>(GetUser, {
-        userId: params.sender_id
-      });
-      inviterName = inviter?.user?.displayName;
-
-      if (inviterName) {
-        subject = `${inviterName} invited you to ${nick}!`;
-        subMessage = `You've been invited to ${nick}`;
-      } else {
-        subject = `Welcome to ${nick}!`;
-        subMessage = `You've been invited to ${nick}`;
-      }
-      linkText = 'Join Us';
-      break;
+  case 'invite_email': {
+    if (!params.invite_token || !params.sender_id) {
+      return { missing: 'invite_token_or_sender_id' };
     }
-    case 'forgot_password': {
-      if (!params.user_id || !params.reset_token) {
-        return { missing: 'user_id_or_reset_token' };
-      }
-      url.pathname = 'reset-password';
-      url.searchParams.append('role_id', params.user_id);
-      url.searchParams.append('reset_token', params.reset_token);
-      subject = `${nick} Password Reset Request`;
-      subMessage = 'Click below to reset your password';
-      linkText = 'Reset Password';
-      break;
+    url.pathname = 'register';
+    url.searchParams.append('invite_token', params.invite_token);
+    url.searchParams.append('email', params.email);
+
+    const scope = Number(params.invite_type) === 2 ? 'org' : 'app';
+    url.searchParams.append('type', scope);
+
+    const inviter = await client.request<any>(GetUser, {
+      userId: params.sender_id
+    });
+    inviterName = inviter?.user?.displayName;
+
+    if (inviterName) {
+      subject = `${inviterName} invited you to ${nick}!`;
+      subMessage = `You've been invited to ${nick}`;
+    } else {
+      subject = `Welcome to ${nick}!`;
+      subMessage = `You've been invited to ${nick}`;
     }
-    case 'email_verification': {
-      if (!params.email_id || !params.verification_token) {
-        return { missing: 'email_id_or_verification_token' };
-      }
-      url.pathname = 'verify-email';
-      url.searchParams.append('email_id', params.email_id);
-      url.searchParams.append('verification_token', params.verification_token);
-      subject = `${nick} Email Verification`;
-      subMessage = 'Please confirm your email address';
-      linkText = 'Confirm Email';
-      break;
+    linkText = 'Join Us';
+    break;
+  }
+  case 'forgot_password': {
+    if (!params.user_id || !params.reset_token) {
+      return { missing: 'user_id_or_reset_token' };
     }
-    default:
-      return false;
+    url.pathname = 'reset-password';
+    url.searchParams.append('role_id', params.user_id);
+    url.searchParams.append('reset_token', params.reset_token);
+    subject = `${nick} Password Reset Request`;
+    subMessage = 'Click below to reset your password';
+    linkText = 'Reset Password';
+    break;
+  }
+  case 'email_verification': {
+    if (!params.email_id || !params.verification_token) {
+      return { missing: 'email_id_or_verification_token' };
+    }
+    url.pathname = 'verify-email';
+    url.searchParams.append('email_id', params.email_id);
+    url.searchParams.append('verification_token', params.verification_token);
+    subject = `${nick} Email Verification`;
+    subMessage = 'Please confirm your email address';
+    linkText = 'Confirm Email';
+    break;
+  }
+  default:
+    return false;
   }
 
   const link = url.href;
@@ -402,7 +464,7 @@ app.post('/', async (req: any, res: any, next: any) => {
       hostHeaderEnvVar: 'GRAPHQL_HOST_HEADER',
       databaseId,
       ...(apiName && { apiName }),
-      ...(schemata && { schemata }),
+      ...(schemata && { schemata })
     });
 
     // For GetDatabaseInfo query - uses same API routing as client
@@ -411,7 +473,7 @@ app.post('/', async (req: any, res: any, next: any) => {
       hostHeaderEnvVar: 'META_GRAPHQL_HOST_HEADER',
       databaseId,
       ...(apiName && { apiName }),
-      ...(schemata && { schemata }),
+      ...(schemata && { schemata })
     });
 
     const result = await sendEmailLink(params, {
