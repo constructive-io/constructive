@@ -23,8 +23,8 @@ export { defineConfig } from './types/config';
 
 // CLI command exports (for packages/cli consumption)
 export {
-  generateCommand,
-  generateOrmCommand,
+  generateReactQuery,
+  generateOrm,
   findConfigFile,
   loadConfigFile,
 } from './cli/commands';

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.11.0...@constructive-io/cli@5.11.1) (2026-01-22)
+
+### Bug Fixes
+
+- **cli:** update imports to use renamed codegen functions ([2036ac2](https://github.com/constructive-io/constructive/commit/2036ac28cc4944fef5838825ff7f85a2ff611c63))
+- **cli:** update test to use renamed generateReactQuery function ([d58e53e](https://github.com/constructive-io/constructive/commit/d58e53e70a212369538c1764bb37692812a8dc78))
+
 # [5.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.9...@constructive-io/cli@5.11.0) (2026-01-22)
 
 ### Features

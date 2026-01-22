@@ -113,8 +113,11 @@ export async function runCodegenPipeline(
   const totalTables = tables.length;
   log(`  Found ${totalTables} tables`);
 
-  // 3. Filter tables by config
-  tables = filterTables(tables, config.tables.include, config.tables.exclude);
+  // 3. Filter tables by config (combine exclude and systemExclude)
+  tables = filterTables(tables, config.tables.include, [
+    ...config.tables.exclude,
+    ...config.tables.systemExclude,
+  ]);
   const filteredTables = tables.length;
   log(`  After filtering: ${filteredTables} tables`);
 
@@ -138,16 +141,16 @@ export async function runCodegenPipeline(
   let customMutations: CleanOperation[] = [];
 
   if (!skipCustomOperations) {
-    // Filter by config include/exclude
+    // Filter by config include/exclude (combine exclude and systemExclude)
     const filteredQueries = filterOperations(
       allQueries,
       config.queries.include,
-      config.queries.exclude
+      [...config.queries.exclude, ...config.queries.systemExclude]
     );
     const filteredMutations = filterOperations(
       allMutations,
       config.mutations.include,
-      config.mutations.exclude
+      [...config.mutations.exclude, ...config.mutations.systemExclude]
     );
 
     log(

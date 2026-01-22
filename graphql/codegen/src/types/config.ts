@@ -2,6 +2,15 @@
  * SDK Configuration types
  */
 
+import deepmerge from 'deepmerge';
+
+/**
+ * Array merge strategy that replaces arrays (source wins over target).
+ * This ensures that when a user specifies include: ['users'], it replaces
+ * the default ['*'] rather than merging to ['*', 'users'].
+ */
+const replaceArrays = <T>(_target: T[], source: T[]): T[] => source;
+
 /**
  * Entity relationship definition for cascade invalidation
  */
@@ -99,6 +108,8 @@ export interface GraphQLSDKConfigTarget {
     include?: string[];
     /** Tables to exclude (glob patterns supported) */
     exclude?: string[];
+    /** System-level tables to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -108,8 +119,10 @@ export interface GraphQLSDKConfigTarget {
   queries?: {
     /** Query names to include - defaults to ['*'] */
     include?: string[];
-    /** Query names to exclude - defaults to ['_meta', 'query'] */
+    /** Query names to exclude */
     exclude?: string[];
+    /** System-level queries to always exclude (defaults to ['_meta', 'query'], can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -121,6 +134,8 @@ export interface GraphQLSDKConfigTarget {
     include?: string[];
     /** Mutation names to exclude */
     exclude?: string[];
+    /** System-level mutations to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -163,6 +178,11 @@ export interface GraphQLSDKConfigTarget {
    * When set, generates a Prisma-like ORM client in addition to or instead of React Query hooks
    */
   orm?: {
+    /**
+     * Whether to generate ORM client
+     * @default false
+     */
+    enabled?: boolean;
     /**
      * Output directory for generated ORM client
      * @default './generated/orm'
@@ -293,14 +313,17 @@ export interface ResolvedConfig {
   tables: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   queries: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   mutations: {
     include: string[];
     exclude: string[];
+    systemExclude: string[];
   };
   excludeFields: string[];
   hooks: {
@@ -316,9 +339,10 @@ export interface ResolvedConfig {
     skipQueryField: boolean;
   };
   orm: {
+    enabled: boolean;
     output: string;
     useSharedTypes: boolean;
-  } | null;
+  };
   reactQuery: {
     enabled: boolean;
   };
@@ -350,20 +374,25 @@ export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
 /**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
+export const DEFAULT_CONFIG: ResolvedConfig = {
+  endpoint: '',
+  schema: null,
   headers: {},
   output: './generated/graphql',
   tables: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   queries: {
     include: ['*'],
-    exclude: ['_meta', 'query'], // Internal PostGraphile queries
+    exclude: [],
+    systemExclude: ['_meta', 'query'], // Internal PostGraphile queries
   },
   mutations: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   excludeFields: [],
   hooks: {
@@ -378,21 +407,18 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
     maxFieldDepth: 2,
     skipQueryField: true,
   },
-  orm: null, // ORM generation disabled by default
+  orm: {
+    enabled: false,
+    output: './generated/orm',
+    useSharedTypes: true,
+  },
   reactQuery: {
-    enabled: true, // React Query hooks enabled by default for generate command
+    enabled: false,
   },
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
 
-/**
- * Default ORM configuration values
- */
-export const DEFAULT_ORM_CONFIG = {
-  output: './generated/orm',
-  useSharedTypes: true,
-};
 
 /**
  * Helper function to define configuration with type checking
@@ -420,93 +446,20 @@ export function isMultiConfig(
 }
 
 /**
- * Merge two target configs (defaults + overrides)
+ * Merge two target configs (defaults + overrides).
+ * Uses deepmerge with array replacement strategy - when a user specifies
+ * an array like include: ['users'], it replaces the default ['*'] entirely.
  */
 export function mergeConfig(
   base: GraphQLSDKConfigTarget,
   overrides: GraphQLSDKConfigTarget
 ): GraphQLSDKConfigTarget {
-  const headers =
-    base.headers || overrides.headers
-      ? { ...(base.headers ?? {}), ...(overrides.headers ?? {}) }
-      : undefined;
-
-  const tables =
-    base.tables || overrides.tables
-      ? { ...(base.tables ?? {}), ...(overrides.tables ?? {}) }
-      : undefined;
-
-  const queries =
-    base.queries || overrides.queries
-      ? { ...(base.queries ?? {}), ...(overrides.queries ?? {}) }
-      : undefined;
-
-  const mutations =
-    base.mutations || overrides.mutations
-      ? { ...(base.mutations ?? {}), ...(overrides.mutations ?? {}) }
-      : undefined;
-
-  const hooks =
-    base.hooks || overrides.hooks
-      ? { ...(base.hooks ?? {}), ...(overrides.hooks ?? {}) }
-      : undefined;
-
-  const postgraphile =
-    base.postgraphile || overrides.postgraphile
-      ? { ...(base.postgraphile ?? {}), ...(overrides.postgraphile ?? {}) }
-      : undefined;
-
-  const codegen =
-    base.codegen || overrides.codegen
-      ? { ...(base.codegen ?? {}), ...(overrides.codegen ?? {}) }
-      : undefined;
-
-  const orm =
-    base.orm || overrides.orm
-      ? { ...(base.orm ?? {}), ...(overrides.orm ?? {}) }
-      : undefined;
-
-  const reactQuery =
-    base.reactQuery || overrides.reactQuery
-      ? { ...(base.reactQuery ?? {}), ...(overrides.reactQuery ?? {}) }
-      : undefined;
-
-  const queryKeys =
-    base.queryKeys || overrides.queryKeys
-      ? {
-          ...(base.queryKeys ?? {}),
-          ...(overrides.queryKeys ?? {}),
-          relationships: {
-            ...(base.queryKeys?.relationships ?? {}),
-            ...(overrides.queryKeys?.relationships ?? {}),
-          },
-        }
-      : undefined;
-
-  const watch =
-    base.watch || overrides.watch
-      ? { ...(base.watch ?? {}), ...(overrides.watch ?? {}) }
-      : undefined;
-
-  return {
-    ...base,
-    ...overrides,
-    headers,
-    tables,
-    queries,
-    mutations,
-    hooks,
-    postgraphile,
-    codegen,
-    orm,
-    reactQuery,
-    queryKeys,
-    watch,
-  };
+  return deepmerge(base, overrides, { arrayMerge: replaceArrays });
 }
 
 /**
- * Resolve configuration by applying defaults
+ * Resolve configuration by applying defaults.
+ * Uses deepmerge with array replacement strategy.
  */
 export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
   if (isMultiConfig(config)) {
@@ -515,73 +468,7 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
     );
   }
 
-  return {
-    endpoint: config.endpoint ?? '',
-    schema: config.schema ?? null,
-    headers: config.headers ?? DEFAULT_CONFIG.headers,
-    output: config.output ?? DEFAULT_CONFIG.output,
-    tables: {
-      include: config.tables?.include ?? DEFAULT_CONFIG.tables.include,
-      exclude: config.tables?.exclude ?? DEFAULT_CONFIG.tables.exclude,
-    },
-    queries: {
-      include: config.queries?.include ?? DEFAULT_CONFIG.queries.include,
-      exclude: config.queries?.exclude ?? DEFAULT_CONFIG.queries.exclude,
-    },
-    mutations: {
-      include: config.mutations?.include ?? DEFAULT_CONFIG.mutations.include,
-      exclude: config.mutations?.exclude ?? DEFAULT_CONFIG.mutations.exclude,
-    },
-    excludeFields: config.excludeFields ?? DEFAULT_CONFIG.excludeFields,
-    hooks: {
-      queries: config.hooks?.queries ?? DEFAULT_CONFIG.hooks.queries,
-      mutations: config.hooks?.mutations ?? DEFAULT_CONFIG.hooks.mutations,
-      queryKeyPrefix:
-        config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
-    },
-    postgraphile: {
-      schema: config.postgraphile?.schema ?? DEFAULT_CONFIG.postgraphile.schema,
-    },
-    codegen: {
-      maxFieldDepth:
-        config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
-      skipQueryField:
-        config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
-    },
-    orm: config.orm
-      ? {
-          output: config.orm.output ?? DEFAULT_ORM_CONFIG.output,
-          useSharedTypes:
-            config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
-        }
-      : null,
-    reactQuery: {
-      enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
-    },
-    queryKeys: {
-      style: config.queryKeys?.style ?? DEFAULT_QUERY_KEY_CONFIG.style,
-      relationships:
-        config.queryKeys?.relationships ??
-        DEFAULT_QUERY_KEY_CONFIG.relationships,
-      generateScopedKeys:
-        config.queryKeys?.generateScopedKeys ??
-        DEFAULT_QUERY_KEY_CONFIG.generateScopedKeys,
-      generateCascadeHelpers:
-        config.queryKeys?.generateCascadeHelpers ??
-        DEFAULT_QUERY_KEY_CONFIG.generateCascadeHelpers,
-      generateMutationKeys:
-        config.queryKeys?.generateMutationKeys ??
-        DEFAULT_QUERY_KEY_CONFIG.generateMutationKeys,
-    },
-    watch: {
-      pollInterval:
-        config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
-      debounce: config.watch?.debounce ?? DEFAULT_WATCH_CONFIG.debounce,
-      touchFile: config.watch?.touchFile ?? DEFAULT_WATCH_CONFIG.touchFile,
-      clearScreen:
-        config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
-    },
-  };
+  return deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
 }
 
 /**
