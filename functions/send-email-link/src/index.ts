@@ -77,6 +77,42 @@ const getRequiredEnv = (name: string): string => {
   return value;
 };
 
+// Maximum logo size to embed as base64 (50 KB)
+const MAX_LOGO_SIZE_BYTES = 50 * 1024;
+
+/**
+ * Fetches an image and returns it as a base64 data URI.
+ * This bypasses email client image proxies that may not handle SVG.
+ * Falls back to original URL if image is too large or fetch fails.
+ */
+const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | undefined> => {
+  if (!url) return undefined;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return url;
+
+    const buffer = await response.arrayBuffer();
+
+    // Skip base64 for large images to avoid bloating emails
+    if (buffer.byteLength > MAX_LOGO_SIZE_BYTES) {
+      logger.debug('Logo too large for base64 embedding, using original URL', {
+        url,
+        size: buffer.byteLength,
+        maxSize: MAX_LOGO_SIZE_BYTES
+      });
+      return url;
+    }
+
+    const base64 = Buffer.from(buffer).toString('base64');
+    const contentType = response.headers.get('content-type') || 'image/png';
+    return `data:${contentType};base64,${base64}`;
+  } catch (error) {
+    logger.warn('Failed to fetch logo for base64 encoding, using original URL', { url });
+    return url;
+  }
+};
+
 type GraphQLClientOptions = {
   hostHeaderEnvVar?: string;
   databaseId?: string;
@@ -181,7 +217,7 @@ export const sendEmailLink = async (
   const subdomain = domainNode.subdomain;
   const domain = domainNode.domain;
   const supportEmail = legalTermsModule.data.emails.support;
-  const logo = site.logo?.url;
+  const logo = await fetchLogoAsBase64(site.logo?.url);
   const company = legalTermsModule.data.company;
   const website = company.website;
   const nick = company.nick;
