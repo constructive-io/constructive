@@ -88,13 +88,12 @@ const MAX_LOGO_SIZE_BYTES = 50 * 1024;
 const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | undefined> => {
   if (!url) return undefined;
 
-  try {
-    // Add timeout to prevent hanging on unresponsive servers
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+  // Add timeout to prevent hanging on unresponsive servers
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
+  try {
     const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
     
     if (!response.ok) return url;
 
@@ -116,6 +115,8 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
   } catch (error) {
     logger.warn('Failed to fetch logo for base64 encoding, using original URL', { url });
     return url;
+  } finally {
+    clearTimeout(timeoutId);
   }
 };
 
