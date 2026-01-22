@@ -89,7 +89,13 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
   if (!url) return undefined;
 
   try {
-    const response = await fetch(url);
+    // Add timeout to prevent hanging on unresponsive servers
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
     if (!response.ok) return url;
 
     const buffer = await response.arrayBuffer();
