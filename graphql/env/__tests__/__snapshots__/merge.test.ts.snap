@@ -12,10 +12,6 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     ],
     "isPublic": true,
     "metaSchemas": [
-      "config_meta",
-      "services_public",
-      "metaschema_public",
-      "metaschema_modules_public",
       "env_meta1",
       "env_meta2",
     ],
@@ -75,9 +71,6 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "graphileBuildOptions": {},
     "overrideSettings": {},
     "schema": [
-      "config_schema",
-      "env_schema_a",
-      "env_schema_b",
       "override_schema",
     ],
   },

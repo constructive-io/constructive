@@ -180,8 +180,8 @@ describe('getEnvOptions', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('dedupes array fields across config, env, and overrides', () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-dedupe-'));
+  it('replaces array fields with later values (overrides win)', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-replace-'));
     writeConfig(tempDir, {
       db: {
         extensions: ['uuid', 'postgis']
@@ -219,25 +219,10 @@ describe('getEnvOptions', () => {
 
     const result = getEnvOptions(overrides, tempDir, testEnv) as PgpmOptionsWithPackages;
 
-    expect(result.db?.extensions).toEqual([
-      'uuid',
-      'postgis',
-      'pgcrypto',
-      'hstore'
-    ]);
-    expect(result.jobs?.worker?.supported).toEqual([
-      'alpha',
-      'beta',
-      'gamma',
-      'delta',
-      'epsilon'
-    ]);
-    expect(result.jobs?.scheduler?.supported).toEqual([
-      'beta',
-      'gamma',
-      'delta',
-      'zeta'
-    ]);
-    expect(result.packages).toEqual(['testing/*', 'packages/*', 'extensions/*']);
+    // Arrays are replaced, not merged - overrides win completely
+    expect(result.db?.extensions).toEqual(['uuid', 'hstore']);
+    expect(result.jobs?.worker?.supported).toEqual(['delta', 'epsilon']);
+    expect(result.jobs?.scheduler?.supported).toEqual(['gamma', 'zeta']);
+    expect(result.packages).toEqual(['testing/*', 'extensions/*']);
   });
 });
