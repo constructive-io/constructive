@@ -14,3 +14,6 @@ export {
 export { GraphQLTest } from './graphile-test';
 export * from './get-connections';
 export { seed, snapshot } from 'pgsql-test';
+
+// Export GraphQL test adapter for SDK integration
+export { GraphQLTestAdapter } from './adapter';

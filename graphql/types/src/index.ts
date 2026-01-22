@@ -18,3 +18,10 @@ export {
   constructiveGraphqlDefaults,
   constructiveDefaults
 } from './constructive';
+
+// Export GraphQL adapter types
+export {
+  GraphQLAdapter,
+  GraphQLError,
+  QueryResult
+} from './adapter';
