@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/csrf",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "CSRF protection utilities for Express applications",
   "main": "index.js",
