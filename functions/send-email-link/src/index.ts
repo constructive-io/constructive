@@ -94,7 +94,7 @@ const fetchLogoAsBase64 = async (url: string | undefined): Promise<string | unde
 
   try {
     const response = await fetch(url, { signal: controller.signal });
-    
+
     if (!response.ok) return url;
 
     const buffer = await response.arrayBuffer();
