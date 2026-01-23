@@ -26,6 +26,10 @@ export interface ConfigOverrideOptions {
   endpoint?: string;
   /** Path to GraphQL schema file (.graphql) */
   schema?: string;
+  /** Database name or connection string (for database introspection) */
+  database?: string;
+  /** PostgreSQL schemas to include (for database mode) */
+  schemas?: string[];
   /** Output directory (overrides config) */
   output?: string;
 }
@@ -45,17 +49,26 @@ export interface LoadConfigResult {
  */
 export function buildTargetOverrides(
   options: ConfigOverrideOptions
-): GraphQLSDKConfigTarget {
-  const overrides: GraphQLSDKConfigTarget = {};
+): GraphQLSDKConfigTarget & { database?: string; schemas?: string[] } {
+  const overrides: GraphQLSDKConfigTarget & { database?: string; schemas?: string[] } = {};
 
   if (options.endpoint) {
     overrides.endpoint = options.endpoint;
     overrides.schema = undefined;
+    overrides.database = undefined;
   }
 
   if (options.schema) {
     overrides.schema = options.schema;
     overrides.endpoint = undefined;
+    overrides.database = undefined;
+  }
+
+  if (options.database) {
+    overrides.database = options.database;
+    overrides.schemas = options.schemas;
+    overrides.endpoint = undefined;
+    overrides.schema = undefined;
   }
 
   if (options.output) {
@@ -77,10 +90,12 @@ export function buildTargetOverrides(
 export async function loadAndResolveConfig(
   options: ConfigOverrideOptions
 ): Promise<LoadConfigResult> {
-  if (options.endpoint && options.schema) {
+  // Validate that at most one source is specified
+  const sources = [options.endpoint, options.schema, options.database].filter(Boolean);
+  if (sources.length > 1) {
     return {
       success: false,
-      error: 'Cannot use both --endpoint and --schema. Choose one source.',
+      error: 'Multiple sources specified. Use only one of: endpoint, schema, or database.',
     };
   }
 
@@ -192,17 +207,28 @@ function resolveSingleTargetConfig(
 
   const mergedConfig = mergeConfig(baseConfig, overrides);
 
-  if (!mergedConfig.endpoint && !mergedConfig.schema) {
+  // Check if we have a source (endpoint, schema, or database)
+  const hasSource = mergedConfig.endpoint || mergedConfig.schema || (overrides as any).database;
+  if (!hasSource) {
     return {
       success: false,
       error:
-        'No source specified. Use --endpoint or --schema, or create a config file with "graphql-codegen init".',
+        'No source specified. Use --endpoint, --schema, or --database, or create a config file with "graphql-codegen init".',
     };
+  }
+
+  // For database mode, we need to pass the database info through to the resolved config
+  const resolvedConfig = resolveConfig(mergedConfig);
+  
+  // Attach database options if present (they're not part of the standard config type)
+  if ((overrides as any).database) {
+    (resolvedConfig as any).database = (overrides as any).database;
+    (resolvedConfig as any).schemas = (overrides as any).schemas;
   }
 
   return {
     success: true,
-    targets: [{ name: 'default', config: resolveConfig(mergedConfig) }],
+    targets: [{ name: 'default', config: resolvedConfig }],
     isMulti: false,
   };
 }

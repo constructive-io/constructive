@@ -131,11 +131,20 @@ async function generateOrmForTarget(
   const formatMessage = (message: string) =>
     isMultiTarget ? `Target "${target.name}": ${message}` : message;
 
+  // Extract database options if present (attached by config resolver for database mode)
+  const database = (config as any).database as string | undefined;
+  const schemas = (config as any).schemas as string[] | undefined;
+
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
-    const sourceLabel = config.schema
-      ? `schema: ${config.schema}`
-      : `endpoint: ${config.endpoint}`;
+    let sourceLabel: string;
+    if (database) {
+      sourceLabel = `database: ${database} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+    } else if (config.schema) {
+      sourceLabel = `schema: ${config.schema}`;
+    } else {
+      sourceLabel = `endpoint: ${config.endpoint}`;
+    }
     console.log(`  Source: ${sourceLabel}`);
     console.log(`  Output: ${outputDir}`);
   }
@@ -144,6 +153,7 @@ async function generateOrmForTarget(
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
+    database,
   });
   if (!sourceValidation.valid) {
     return {
@@ -157,6 +167,8 @@ async function generateOrmForTarget(
   const source = createSchemaSource({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
+    database,
+    schemas,
     authorization: options.authorization || config.headers['Authorization'],
     headers: config.headers,
   });
