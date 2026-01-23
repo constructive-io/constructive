@@ -44,10 +44,10 @@
     "fmt:check": "prettier --check .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-        "example:codegen:sdk": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts --reactquery",
-        "example:codegen:orm": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts --orm",
-        "example:codegen:sdk:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-sdk-schema --reactquery",
-        "example:codegen:orm:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-orm-schema --orm",
+    "example:codegen:sdk": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts --reactquery",
+    "example:codegen:orm": "tsx src/cli/index.ts generate --config examples/multi-target.config.ts --orm",
+    "example:codegen:sdk:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-sdk-schema --reactquery",
+    "example:codegen:orm:schema": "node dist/cli/index.js generate --schema examples/example.schema.graphql --output examples/output/generated-orm-schema --orm",
     "example:sdk": "tsx examples/react-hooks-sdk-test.tsx",
     "example:orm": "tsx examples/orm-sdk-test.ts",
     "example:sdk:typecheck": "tsc --noEmit --jsx react --esModuleInterop --skipLibCheck --moduleResolution node examples/react-hooks-sdk-test.tsx"
@@ -72,7 +72,8 @@
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "undici": "^7.19.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",

@@ -778,6 +778,9 @@ importers:
       prettier:
         specifier: ^3.7.4
         version: 3.8.0
+      undici:
+        specifier: ^7.19.0
+        version: 7.19.0
     devDependencies:
       '@tanstack/react-query':
         specifier: ^5.90.19
@@ -8250,6 +8253,10 @@ packages:
 
   undici@7.16.0:
     resolution: {integrity: sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==}
+    engines: {node: '>=20.18.1'}
+
+  undici@7.19.0:
+    resolution: {integrity: sha512-Heho1hJD81YChi+uS2RkSjcVO+EQLmLSyUlHyp7Y/wFbxQaGb4WXVKD073JytrjXJVkSZVzoE2MCSOKugFGtOQ==}
     engines: {node: '>=20.18.1'}
 
   unique-filename@3.0.0:
@@ -16103,6 +16110,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici@7.16.0: {}
+
+  undici@7.19.0: {}
 
   unique-filename@3.0.0:
     dependencies:
