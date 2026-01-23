@@ -1,41 +1,33 @@
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
-import {
-  generate,
-  findConfigFile,
-  buildSchemaFromDatabase,
-  type GenerateResult,
-  type GenerateTargetResult,
-} from '@constructive-io/graphql-codegen';
-import { getEnvOptions } from '@constructive-io/graphql-env';
+import { generate, findConfigFile } from '@constructive-io/graphql-codegen';
 
 const usage = `
 Constructive GraphQL Codegen:
 
   cnc codegen [OPTIONS]
 
-Options:
-  --help, -h                 Show this help message
+Source Options (choose one):
   --config <path>            Path to graphql-codegen config file
-  --target <name>            Target name in config file
   --endpoint <url>           GraphQL endpoint URL
-  --auth <token>             Authorization header value (e.g., "Bearer 123")
+  --schemaFile <path>        Path to GraphQL schema file
+
+Database Options:
+  --schemas <list>           Comma-separated PostgreSQL schemas
+  --apiNames <list>          Comma-separated API names
+
+Generator Options:
+  --reactQuery               Generate React Query hooks (default)
+  --orm                      Generate ORM client
+  --target <name>            Target name in config file
   --out <dir>                Output directory (default: codegen)
-  --dry-run                  Preview without writing files
-  -v, --verbose              Verbose output
+  --auth <token>             Authorization header value
+  --dryRun                   Preview without writing files
+  --verbose                  Verbose output
 
-  --orm                      Generate Prisma-like ORM client instead of React Query hooks
-
-  --database <name>          Database override for DB mode (defaults to PGDATABASE)
-  --schemas <list>           Comma-separated schemas (required for DB mode)
+  --help, -h                 Show this help message
 `;
 
 const questions: Question[] = [
-  {
-    name: 'endpoint',
-    message: 'GraphQL endpoint URL',
-    type: 'text',
-    required: false,
-  },
   {
     name: 'config',
     message: 'Path to config file',
@@ -43,8 +35,8 @@ const questions: Question[] = [
     required: false,
   },
   {
-    name: 'target',
-    message: 'Target name in config file',
+    name: 'endpoint',
+    message: 'GraphQL endpoint URL',
     type: 'text',
     required: false,
   },
@@ -57,42 +49,16 @@ const questions: Question[] = [
     useDefault: true,
   },
   {
-    name: 'auth',
-    message: 'Authorization header value',
-    type: 'text',
+    name: 'reactQuery',
+    message: 'Generate React Query hooks?',
+    type: 'confirm',
     required: false,
-  },
-  {
-    name: 'database',
-    message: 'Database name (for DB mode)',
-    type: 'text',
-    required: false,
-  },
-  {
-    name: 'schemas',
-    message: 'Comma-separated schemas (for DB mode)',
-    type: 'text',
-    required: false,
+    default: true,
+    useDefault: true,
   },
   {
     name: 'orm',
-    message: 'Generate ORM client instead of React Query hooks?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true,
-  },
-  {
-    name: 'dryRun',
-    message: 'Preview without writing files?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true,
-  },
-  {
-    name: 'verbose',
-    message: 'Verbose output?',
+    message: 'Generate ORM client?',
     type: 'confirm',
     required: false,
     default: false,
@@ -100,11 +66,8 @@ const questions: Question[] = [
   },
 ];
 
-type AnyResult = GenerateResult;
-type AnyTargetResult = GenerateTargetResult;
-
 export default async (
-  argv: Partial<Record<string, any>>,
+  argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
   _options: CLIOptions
 ) => {
@@ -113,112 +76,49 @@ export default async (
     process.exit(0);
   }
 
-  // Handle CLI aliases and defaults
   const normalizedArgv = {
     ...argv,
-    dryRun: argv['dry-run'] || argv.dryRun,
-    verbose: argv.verbose || argv.v,
     config: argv.config || findConfigFile() || undefined,
+    endpoint: argv.endpoint,
+    out: argv.out,
+    reactQuery: argv.reactQuery,
+    orm: argv.orm,
   };
 
-  const answers: any = await prompter.prompt(normalizedArgv, questions);
-  const endpoint = answers.endpoint as string | undefined;
-  const config = answers.config as string | undefined;
-  const target = answers.target as string | undefined;
-  const out = answers.out as string | undefined;
-  const auth = answers.auth as string | undefined;
-  const database = answers.database as string | undefined;
-  const schemasArg = answers.schemas as string | undefined;
-  const orm = answers.orm as boolean | undefined;
-  const dryRun = answers.dryRun as boolean | undefined;
-  const verbose = answers.verbose as boolean | undefined;
-
-  // Parse schemas from comma-separated string
-  const schemas = schemasArg
-    ? String(schemasArg).split(',').map((s: string) => s.trim()).filter(Boolean)
-    : [];
-
-  // Determine output directory
-  const outDir = (out as string) || 'codegen';
-  let schemaPath: string | undefined;
-
-  // Build schema from database if schemas are provided
-  if (schemas.length > 0) {
-    const db = (database as string) || getEnvOptions().pg.database;
-    const result = await buildSchemaFromDatabase({
-      database: db,
-      schemas,
-      outDir,
-    });
-    schemaPath = result.schemaPath;
-  }
-
-  // Validate that we have a source
-  if (!endpoint && !schemaPath && !config) {
-    console.error(
-      'Error: No source specified. Use --endpoint, --config, or --schemas for database mode.'
-    );
-    process.exit(1);
-  }
-
-  // Determine output directory
-  const output = config ? out : outDir;
-
-  // Call unified generate function with appropriate flags
-  const result = await generate({
+  const {
     config,
-    target,
-    endpoint: endpoint || undefined,
-    schemaFile: schemaPath,
-    output,
-    authorization: auth,
-    verbose,
-    dryRun,
-    // Use flags to control which generators run
-    reactQuery: !orm,
-    orm: orm,
+    endpoint,
+    out,
+    reactQuery,
+    orm,
+  } = await prompter.prompt(normalizedArgv, questions);
+
+  const schemasArg = argv.schemas as string | undefined;
+  const apiNamesArg = argv.apiNames as string | undefined;
+  const db = (schemasArg || apiNamesArg) ? {
+    schemas: schemasArg ? schemasArg.split(',').map((s) => s.trim()) : undefined,
+    apiNames: apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined,
+  } : undefined;
+
+  const result = await generate({
+    config: config as string | undefined,
+    target: argv.target as string | undefined,
+    endpoint: endpoint as string | undefined,
+    schemaFile: argv.schemaFile as string | undefined,
+    db,
+    output: out as string | undefined,
+    authorization: argv.auth as string | undefined,
+    reactQuery: reactQuery as boolean,
+    orm: orm as boolean,
+    dryRun: !!argv.dryRun,
+    verbose: !!argv.verbose,
   });
 
-  printResult(result);
-
-  if (!result.success) {
+  if (result.success) {
+    console.log('[ok]', result.message);
+  } else {
+    console.error('x', result.message);
+    result.errors?.forEach((e) => console.error('  -', e));
     process.exit(1);
   }
 };
-
-function printTargetResult(target: AnyTargetResult): void {
-  const status = target.success ? '[ok]' : 'x';
-  console.log(`\n${status} ${target.message}`);
-
-  if (target.tables?.length) {
-    console.log('  Tables:');
-    target.tables.forEach((t) => console.log(`    - ${t}`));
-  }
-  if (target.filesWritten?.length) {
-    console.log('  Files written:');
-    target.filesWritten.forEach((f) => console.log(`    - ${f}`));
-  }
-  if (!target.success && target.errors?.length) {
-    target.errors.forEach((e) => console.error(`  - ${e}`));
-  }
-}
-
-function printResult(result: AnyResult): void {
-  const targets = result.targets ?? [];
-  const isMultiTarget =
-    targets.length > 1 || (targets.length === 1 && targets[0]?.name !== 'default');
-
-  if (isMultiTarget) {
-    console.log(result.message);
-    targets.forEach(printTargetResult);
-    return;
-  }
-
-  if (!result.success) {
-    console.error(result.message);
-    result.errors?.forEach((e) => console.error('  -', e));
-  } else {
-    console.log(result.message);
-    result.filesWritten?.forEach((f) => console.log(f));
-  }
-}

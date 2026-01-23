@@ -4,10 +4,6 @@ import codegenCommand from '../src/commands/codegen'
 jest.mock('@constructive-io/graphql-codegen', () => ({
   generate: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
   findConfigFile: jest.fn((): string | undefined => undefined),
-  buildSchemaFromDatabase: jest.fn(async ({ outDir }: { outDir: string }) => ({
-    schemaPath: `${outDir}/schema.graphql`,
-    sdl: 'type Query { hello: String }\nschema { query: Query }'
-  }))
 }))
 
 // Create a mock prompter that returns the argv values directly
@@ -44,7 +40,8 @@ describe('codegen command', () => {
       auth: 'Bearer testtoken',
       out: 'graphql/codegen/dist',
       verbose: true,
-      'dry-run': true
+      dryRun: true,
+      reactQuery: true,
     }
     const mockPrompter = createMockPrompter()
 
@@ -60,30 +57,24 @@ describe('codegen command', () => {
       dryRun: true,
       reactQuery: true
     })
-    // orm is undefined when not set (defaults to false via !orm)
-    expect(call.orm).toBeFalsy()
   })
 
-  it('builds schema file and calls generate with schema when DB options provided', async () => {
-    const { generate: mockGenerate, buildSchemaFromDatabase } = require('@constructive-io/graphql-codegen')
+  it('calls generate with db options when schemas provided', async () => {
+    const { generate: mockGenerate } = require('@constructive-io/graphql-codegen')
 
     const argv: Partial<ParsedArgs> = {
-      database: 'constructive_db',
-      schemas: 'public',
-      out: 'graphql/codegen/dist'
+      schemas: 'public,app',
+      out: 'graphql/codegen/dist',
+      reactQuery: true,
     }
     const mockPrompter = createMockPrompter()
 
     await codegenCommand(argv, mockPrompter as any, {} as any)
 
-    expect(buildSchemaFromDatabase).toHaveBeenCalled()
     expect(mockGenerate).toHaveBeenCalled()
     const call = mockGenerate.mock.calls[0][0]
-    expect(call.schemaFile).toBe('graphql/codegen/dist/schema.graphql')
+    expect(call.db).toEqual({ schemas: ['public', 'app'], apiNames: undefined })
     expect(call.output).toBe('graphql/codegen/dist')
-    expect(call.endpoint).toBeUndefined()
     expect(call.reactQuery).toBe(true)
-    // orm is undefined when not set (defaults to false via !orm)
-    expect(call.orm).toBeFalsy()
   })
 })
