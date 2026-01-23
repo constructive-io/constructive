@@ -69,7 +69,7 @@ export async function fetchSchema(
     const isHttps = url.protocol === 'https:';
     const lib = isHttps ? https : http;
 
-    const responseData: string = await new Promise((resolve, reject) => {
+    const { data: responseData, statusCode } = await new Promise<{ data: string; statusCode: number }>((resolve, reject) => {
       const req = lib.request({
         hostname,
         port: url.port ? Number(url.port) : (isHttps ? 443 : 80),
@@ -84,7 +84,7 @@ export async function fetchSchema(
             reject(new Error(`HTTP ${res.statusCode} – ${data}`));
             return;
           }
-          resolve(data);
+          resolve({ data, statusCode: res.statusCode || 200 });
         });
       });
 
@@ -111,7 +111,7 @@ export async function fetchSchema(
       return {
         success: false,
         error: `GraphQL errors: ${errorMessages}`,
-        statusCode: 200,
+        statusCode,
       };
     }
 
@@ -120,14 +120,14 @@ export async function fetchSchema(
       return {
         success: false,
         error: 'No __schema field in response. Introspection may be disabled on this endpoint.',
-        statusCode: 200,
+        statusCode,
       };
     }
 
     return {
       success: true,
       data: json.data,
-      statusCode: 200,
+      statusCode,
     };
   } catch (err) {
     clearTimeout(timeoutId);
