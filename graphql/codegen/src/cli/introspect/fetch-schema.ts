@@ -3,6 +3,8 @@
  */
 import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
+import * as http from 'http';
+import * as https from 'https';
 
 export interface FetchSchemaOptions {
   /** GraphQL endpoint URL */
@@ -46,27 +48,59 @@ export async function fetchSchema(
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify({
-        query: SCHEMA_INTROSPECTION_QUERY,
-        variables: {},
-      }),
-      signal: controller.signal,
+    const url = new URL(endpoint);
+    const postData = JSON.stringify({
+      query: SCHEMA_INTROSPECTION_QUERY,
+      variables: {},
+    });
+
+    // Handle localhost subdomains by resolving to IP but preserving Host header
+    let hostname = url.hostname;
+    let hostHeader = url.hostname;
+    
+    if (hostname.endsWith('.localhost') || hostname === 'localhost') {
+      hostname = '127.0.0.1';
+    }
+
+    // Add Host header for subdomain routing
+    requestHeaders['Host'] = hostHeader;
+    requestHeaders['Content-Length'] = String(Buffer.byteLength(postData));
+
+    const isHttps = url.protocol === 'https:';
+    const lib = isHttps ? https : http;
+
+    const responseData: string = await new Promise((resolve, reject) => {
+      const req = lib.request({
+        hostname,
+        port: url.port ? Number(url.port) : (isHttps ? 443 : 80),
+        path: url.pathname,
+        method: 'POST',
+        headers: requestHeaders,
+      }, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk });
+        res.on('end', () => {
+          if (res.statusCode && res.statusCode >= 400) {
+            reject(new Error(`HTTP ${res.statusCode} – ${data}`));
+            return;
+          }
+          resolve(data);
+        });
+      });
+
+      req.on('error', reject);
+      req.setTimeout(timeout, () => {
+        req.destroy();
+        reject(new Error(`Request timeout after ${timeout}ms`));
+      });
+
+      req.write(postData);
+      req.end();
     });
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      return {
-        success: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        statusCode: response.status,
-      };
-    }
-
-    const json = (await response.json()) as {
+    const json = JSON.parse(responseData) as {
       data?: IntrospectionQueryResponse;
       errors?: Array<{ message: string }>;
     };
@@ -77,7 +111,7 @@ export async function fetchSchema(
       return {
         success: false,
         error: `GraphQL errors: ${errorMessages}`,
-        statusCode: response.status,
+        statusCode: 200,
       };
     }
 
@@ -86,23 +120,32 @@ export async function fetchSchema(
       return {
         success: false,
         error: 'No __schema field in response. Introspection may be disabled on this endpoint.',
-        statusCode: response.status,
+        statusCode: 200,
       };
     }
 
     return {
       success: true,
       data: json.data,
-      statusCode: response.status,
+      statusCode: 200,
     };
   } catch (err) {
     clearTimeout(timeoutId);
 
     if (err instanceof Error) {
-      if (err.name === 'AbortError') {
+      if (err.message.includes('timeout')) {
         return {
           success: false,
           error: `Request timeout after ${timeout}ms`,
+        };
+      }
+      if (err.message.includes('HTTP')) {
+        const match = err.message.match(/HTTP (\d+)/);
+        const statusCode = match ? parseInt(match[1]) : 500;
+        return {
+          success: false,
+          error: err.message,
+          statusCode,
         };
       }
       return {
