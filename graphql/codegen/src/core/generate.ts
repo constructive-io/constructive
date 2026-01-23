@@ -6,114 +6,53 @@
  */
 import path from 'path';
 
-import { loadAndResolveConfig } from './config';
 import { createSchemaSource, validateSourceOptions } from './introspect';
 import { runCodegenPipeline, validateTablesFound } from './pipeline';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import { generateSharedTypes } from './codegen/shared';
 import { writeGeneratedFiles } from './output';
-import type { GraphQLSDKConfigTarget, TargetConfig } from '../types/config';
+import type { GraphQLSDKConfigTarget } from '../types/config';
+import { getConfigOptions } from '../types/config';
 
 export interface GenerateOptions extends GraphQLSDKConfigTarget {
-  config?: string;
-  target?: string;
   authorization?: string;
   verbose?: boolean;
   dryRun?: boolean;
   skipCustomOperations?: boolean;
 }
 
-export interface GenerateTargetResult {
-  name: string;
-  output: string;
-  success: boolean;
-  message: string;
-  tables?: string[];
-  filesWritten?: string[];
-  errors?: string[];
-}
-
 export interface GenerateResult {
   success: boolean;
   message: string;
-  targets?: GenerateTargetResult[];
+  output?: string;
   tables?: string[];
   filesWritten?: string[];
   errors?: string[];
 }
 
 /**
- * Main generate function - orchestrates the entire codegen pipeline
+ * Main generate function - takes a single config and generates code
+ *
+ * This is the primary entry point for programmatic usage.
+ * For multiple configs, call this function in a loop.
  */
 export async function generate(options: GenerateOptions = {}): Promise<GenerateResult> {
-  if (options.verbose) {
-    console.log('Loading configuration...');
-  }
+  // Apply defaults to get resolved config
+  const config = getConfigOptions(options);
+  const outputRoot = config.output;
 
-  const configResult = await loadAndResolveConfig(options);
-  if (!configResult.success) {
-    return { success: false, message: configResult.error! };
-  }
+  // Determine which generators to run
+  const runReactQuery = config.reactQuery ?? false;
+  const runOrm = config.orm ?? false;
 
-  const targets = configResult.targets ?? [];
-  if (targets.length === 0) {
-    return { success: false, message: 'No targets resolved from configuration.' };
-  }
-
-  const results: GenerateTargetResult[] = [];
-
-  for (const target of targets) {
-    const runReactQuery = options.reactQuery ?? target.config.reactQuery;
-    const runOrm = options.orm ?? target.config.orm;
-
-    if (!runReactQuery && !runOrm) {
-      results.push({
-        name: target.name,
-        output: target.config.output,
-        success: false,
-        message: `Target "${target.name}": No generators enabled. Use --react-query or --orm.`,
-      });
-      continue;
-    }
-
-    const result = await generateForTarget(target, options, runReactQuery, runOrm);
-    results.push(result);
-  }
-
-  if (results.length === 1) {
-    const [result] = results;
+  if (!runReactQuery && !runOrm) {
     return {
-      success: result.success,
-      message: result.message,
-      targets: results,
-      tables: result.tables,
-      filesWritten: result.filesWritten,
-      errors: result.errors,
+      success: false,
+      message: 'No generators enabled. Use reactQuery: true or orm: true in your config.',
+      output: outputRoot,
     };
   }
-
-  const successCount = results.filter((r) => r.success).length;
-  const failedCount = results.length - successCount;
-
-  return {
-    success: failedCount === 0,
-    message: failedCount === 0
-      ? `Generated ${results.length} outputs successfully.`
-      : `Generated ${successCount} of ${results.length} outputs.`,
-    targets: results,
-    errors: failedCount > 0 ? results.flatMap((r) => r.errors ?? []) : undefined,
-  };
-}
-
-async function generateForTarget(
-  target: TargetConfig,
-  options: GenerateOptions,
-  runReactQuery: boolean,
-  runOrm: boolean
-): Promise<GenerateTargetResult> {
-  const config = target.config;
-  const outputRoot = config.output;
 
   // Validate source
   const sourceValidation = validateSourceOptions({
@@ -123,10 +62,9 @@ async function generateForTarget(
   });
   if (!sourceValidation.valid) {
     return {
-      name: target.name,
-      output: outputRoot,
       success: false,
       message: sourceValidation.error!,
+      output: outputRoot,
     };
   }
 
@@ -150,10 +88,9 @@ async function generateForTarget(
     });
   } catch (err) {
     return {
-      name: target.name,
-      output: outputRoot,
       success: false,
       message: `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      output: outputRoot,
     };
   }
 
@@ -163,10 +100,9 @@ async function generateForTarget(
   const tablesValidation = validateTablesFound(tables);
   if (!tablesValidation.valid) {
     return {
-      name: target.name,
-      output: outputRoot,
       success: false,
       message: tablesValidation.error!,
+      output: outputRoot,
     };
   }
 
@@ -190,10 +126,9 @@ async function generateForTarget(
       const writeResult = await writeGeneratedFiles(sharedResult.files, outputRoot, []);
       if (!writeResult.success) {
         return {
-          name: target.name,
-          output: outputRoot,
           success: false,
           message: `Failed to write shared types: ${writeResult.errors?.join(', ')}`,
+          output: outputRoot,
           errors: writeResult.errors,
         };
       }
@@ -220,10 +155,9 @@ async function generateForTarget(
       const writeResult = await writeGeneratedFiles(files, hooksDir, ['queries', 'mutations']);
       if (!writeResult.success) {
         return {
-          name: target.name,
-          output: outputRoot,
           success: false,
           message: `Failed to write React Query hooks: ${writeResult.errors?.join(', ')}`,
+          output: outputRoot,
           errors: writeResult.errors,
         };
       }
@@ -250,10 +184,9 @@ async function generateForTarget(
       const writeResult = await writeGeneratedFiles(files, ormDir, ['models', 'query', 'mutation']);
       if (!writeResult.success) {
         return {
-          name: target.name,
-          output: outputRoot,
           success: false,
           message: `Failed to write ORM client: ${writeResult.errors?.join(', ')}`,
+          output: outputRoot,
           errors: writeResult.errors,
         };
       }
@@ -277,12 +210,11 @@ export * from './orm';
   const generators = [runReactQuery && 'React Query', runOrm && 'ORM'].filter(Boolean).join(' and ');
 
   return {
-    name: target.name,
-    output: outputRoot,
     success: true,
     message: options.dryRun
       ? `Dry run complete. Would generate ${generators} for ${tables.length} tables.`
       : `Generated ${generators} for ${tables.length} tables. Files written to ${outputRoot}`,
+    output: outputRoot,
     tables: tables.map((t) => t.name),
     filesWritten: allFilesWritten,
   };

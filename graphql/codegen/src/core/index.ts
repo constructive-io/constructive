@@ -7,7 +7,7 @@
 
 // Main generate function (orchestrates the entire pipeline)
 export { generate } from './generate';
-export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './generate';
+export type { GenerateOptions, GenerateResult } from './generate';
 
 // Types
 export * from './types';

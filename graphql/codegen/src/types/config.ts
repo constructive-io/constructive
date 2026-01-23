@@ -302,24 +302,10 @@ export interface GraphQLSDKConfigTarget {
 }
 
 /**
- * Multi-target configuration for graphql-codegen
- */
-export interface GraphQLSDKMultiConfig {
-  /**
-   * Shared defaults applied to every target
-   */
-  defaults?: GraphQLSDKConfigTarget;
-
-  /**
-   * Named target configurations
-   */
-  targets: Record<string, GraphQLSDKConfigTarget>;
-}
-
-/**
  * Main configuration type for graphql-codegen
+ * This is the same as GraphQLSDKConfigTarget - we keep the alias for clarity.
  */
-export type GraphQLSDKConfig = GraphQLSDKConfigTarget | GraphQLSDKMultiConfig;
+export type GraphQLSDKConfig = GraphQLSDKConfigTarget;
 
 /**
  * Watch mode configuration options
@@ -425,25 +411,7 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
 }
 
 /**
- * Target configuration with name (used after resolution)
- */
-export interface TargetConfig {
-  name: string;
-  config: GraphQLSDKConfigTarget;
-}
-
-/**
- * Type guard for multi-target configs
- */
-export function isMultiConfig(
-  config: GraphQLSDKConfig
-): config is GraphQLSDKMultiConfig {
-  const targets = (config as GraphQLSDKMultiConfig).targets;
-  return typeof targets === 'object' && targets !== null;
-}
-
-/**
- * Merge two target configs (defaults + overrides).
+ * Merge two configs (base + overrides).
  * Uses deepmerge with array replacement strategy - when a user specifies
  * an array like include: ['users'], it replaces the default ['*'] entirely.
  */
@@ -462,31 +430,4 @@ export function getConfigOptions(
   overrides: GraphQLSDKConfigTarget = {}
 ): GraphQLSDKConfigTarget {
   return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
-}
-
-/**
- * Resolve configuration by applying defaults.
- * For single-target configs only - throws for multi-target configs.
- */
-export function resolveConfig(config: GraphQLSDKConfig): GraphQLSDKConfigTarget {
-  if (isMultiConfig(config)) {
-    throw new Error(
-      'Multi-target config cannot be resolved with resolveConfig(). Use resolveConfigTargets().'
-    );
-  }
-  return getConfigOptions(config);
-}
-
-/**
- * Resolve all targets in a multi-target config
- */
-export function resolveConfigTargets(
-  config: GraphQLSDKMultiConfig
-): TargetConfig[] {
-  const defaults = config.defaults ?? {};
-
-  return Object.entries(config.targets).map(([name, target]) => ({
-    name,
-    config: getConfigOptions(mergeConfig(defaults, target)),
-  }));
 }

@@ -23,7 +23,7 @@ export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
 export { generate } from './core/generate';
-export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './core/generate';
+export type { GenerateOptions, GenerateResult } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';

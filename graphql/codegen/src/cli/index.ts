@@ -33,7 +33,6 @@ Generator Options:
   --react-query                 Generate React Query hooks
   --orm                         Generate ORM client
   -o, --output <dir>            Output directory
-  -t, --target <name>           Target name in config file
   -a, --authorization <token>   Authorization header value
   --keep-db                     Keep ephemeral database after generation
   --dry-run                     Preview without writing files
@@ -77,18 +76,7 @@ const questions: Question[] = [
 ];
 
 function printResult(result: GenerateResult): void {
-  const targets = result.targets ?? [];
-  const isMultiTarget = targets.length > 1 || (targets.length === 1 && targets[0]?.name !== 'default');
-
-  if (isMultiTarget) {
-    console.log(result.success ? '[ok]' : 'x', result.message);
-    for (const t of targets) {
-      console.log(`\n${t.success ? '[ok]' : 'x'} ${t.message}`);
-      if (t.tables?.length) {
-        console.log('  Tables:', t.tables.join(', '));
-      }
-    }
-  } else if (result.success) {
+  if (result.success) {
     console.log('[ok]', result.message);
     if (result.tables?.length) {
       console.log('Tables:', result.tables.join(', '));
@@ -123,7 +111,6 @@ export const commands = async (
     endpoint: argv.endpoint || argv.e,
     schemaFile: argv['schema-file'] || argv.s,
     authorization: argv.authorization || argv.a,
-    target: argv.target || argv.t,
     reactQuery: argv['react-query'],
     orm: argv.orm,
     dryRun: argv['dry-run'],
@@ -152,8 +139,6 @@ export const commands = async (
   } : undefined;
 
   const result = await generate({
-    config: answers.config as string | undefined,
-    target: normalizedArgv.target as string | undefined,
     endpoint: answers.endpoint as string | undefined,
     schemaFile: normalizedArgv.schemaFile as string | undefined,
     db,
@@ -184,14 +169,13 @@ export const options: Partial<CLIOptions> = {
       s: 'schema-file',
       o: 'output',
       a: 'authorization',
-      t: 'target',
       v: 'verbose',
     },
     boolean: [
       'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db',
     ],
     string: [
-      'config', 'endpoint', 'schema-file', 'output', 'authorization', 'target',
+      'config', 'endpoint', 'schema-file', 'output', 'authorization',
       'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
       'schemas', 'api-names',
     ],

@@ -18,7 +18,6 @@ Database Options:
 Generator Options:
   --reactQuery               Generate React Query hooks (default)
   --orm                      Generate ORM client
-  --target <name>            Target name in config file
   --out <dir>                Output directory (default: codegen)
   --auth <token>             Authorization header value
   --dryRun                   Preview without writing files
@@ -101,8 +100,6 @@ export default async (
   } : undefined;
 
   const result = await generate({
-    config: config as string | undefined,
-    target: argv.target as string | undefined,
     endpoint: endpoint as string | undefined,
     schemaFile: argv.schemaFile as string | undefined,
     db,

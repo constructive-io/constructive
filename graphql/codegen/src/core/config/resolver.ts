@@ -7,24 +7,17 @@
 import type {
   GraphQLSDKConfig,
   GraphQLSDKConfigTarget,
-  GraphQLSDKMultiConfig,
-  TargetConfig,
 } from '../../types/config';
-import { isMultiConfig, mergeConfig, getConfigOptions } from '../../types/config';
+import { mergeConfig, getConfigOptions } from '../../types/config';
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
  * Options that can override config file settings.
  * Extends GraphQLSDKConfigTarget with CLI-specific fields.
- * 
- * This is the same as GenerateOptions - both extend GraphQLSDKConfigTarget
- * with config and target fields for CLI usage.
  */
 export interface ConfigOverrideOptions extends GraphQLSDKConfigTarget {
   /** Path to config file (CLI-only) */
   config?: string;
-  /** Named target in a multi-target config (CLI-only) */
-  target?: string;
 }
 
 /**
@@ -32,8 +25,7 @@ export interface ConfigOverrideOptions extends GraphQLSDKConfigTarget {
  */
 export interface LoadConfigResult {
   success: boolean;
-  targets?: TargetConfig[];
-  isMulti?: boolean;
+  config?: GraphQLSDKConfigTarget;
   error?: string;
 }
 
@@ -43,14 +35,13 @@ export interface LoadConfigResult {
  * This is the main entry point for configuration loading. It:
  * 1. Finds and loads the config file (if any)
  * 2. Applies CLI option overrides
- * 3. Resolves multi-target or single-target configurations
- * 4. Returns fully resolved configuration ready for use
+ * 3. Returns fully resolved configuration ready for use
  */
 export async function loadAndResolveConfig(
   options: ConfigOverrideOptions
 ): Promise<LoadConfigResult> {
   // Destructure CLI-only fields, rest is config overrides
-  const { config: configPath, target: targetName, ...overrides } = options;
+  const { config: configPath, ...overrides } = options;
 
   // Validate that at most one source is specified
   const sources = [
@@ -82,99 +73,6 @@ export async function loadAndResolveConfig(
     baseConfig = loadResult.config;
   }
 
-  if (isMultiConfig(baseConfig)) {
-    return resolveMultiTargetConfig(baseConfig, targetName, overrides);
-  }
-
-  return resolveSingleTargetConfig(baseConfig as GraphQLSDKConfigTarget, targetName, overrides);
-}
-
-/**
- * Resolve a multi-target configuration
- */
-function resolveMultiTargetConfig(
-  baseConfig: GraphQLSDKMultiConfig,
-  targetName: string | undefined,
-  overrides: GraphQLSDKConfigTarget
-): LoadConfigResult {
-  if (Object.keys(baseConfig.targets).length === 0) {
-    return {
-      success: false,
-      error: 'Config file defines no targets.',
-    };
-  }
-
-  if (
-    !targetName &&
-    (overrides.endpoint || overrides.schemaFile || overrides.db || overrides.output)
-  ) {
-    return {
-      success: false,
-      error:
-        'Multiple targets configured. Use --target with source or output overrides.',
-    };
-  }
-
-  if (targetName && !baseConfig.targets[targetName]) {
-    return {
-      success: false,
-      error: `Target "${targetName}" not found in config file.`,
-    };
-  }
-
-  const selectedTargets = targetName
-    ? { [targetName]: baseConfig.targets[targetName] }
-    : baseConfig.targets;
-  const defaults = baseConfig.defaults ?? {};
-  const resolvedTargets: TargetConfig[] = [];
-
-  for (const [name, target] of Object.entries(selectedTargets)) {
-    let mergedTarget = mergeConfig(defaults, target);
-    if (targetName && name === targetName) {
-      mergedTarget = mergeConfig(mergedTarget, overrides);
-    }
-
-    const hasSource =
-      mergedTarget.endpoint ||
-      mergedTarget.schemaFile ||
-      mergedTarget.db;
-
-    if (!hasSource) {
-      return {
-        success: false,
-        error: `Target "${name}" is missing a source (endpoint, schemaFile, or db).`,
-      };
-    }
-
-    resolvedTargets.push({
-      name,
-      config: getConfigOptions(mergedTarget),
-    });
-  }
-
-  return {
-    success: true,
-    targets: resolvedTargets,
-    isMulti: true,
-  };
-}
-
-/**
- * Resolve a single-target configuration
- */
-function resolveSingleTargetConfig(
-  baseConfig: GraphQLSDKConfigTarget,
-  targetName: string | undefined,
-  overrides: GraphQLSDKConfigTarget
-): LoadConfigResult {
-  if (targetName) {
-    return {
-      success: false,
-      error:
-        'Config file does not define targets. Remove --target to continue.',
-    };
-  }
-
   const mergedConfig = mergeConfig(baseConfig, overrides);
 
   // Check if we have a source (endpoint, schemaFile, or db)
@@ -193,8 +91,7 @@ function resolveSingleTargetConfig(
 
   return {
     success: true,
-    targets: [{ name: 'default', config: getConfigOptions(mergedConfig) }],
-    isMulti: false,
+    config: getConfigOptions(mergedConfig),
   };
 }
 
@@ -205,7 +102,6 @@ function resolveSingleTargetConfig(
  */
 export async function loadWatchConfig(options: {
   config?: string;
-  target?: string;
   endpoint?: string;
   output?: string;
   pollInterval?: number;
@@ -229,23 +125,6 @@ export async function loadWatchConfig(options: {
     baseConfig = loadResult.config;
   }
 
-  if (isMultiConfig(baseConfig)) {
-    if (!options.target) {
-      console.error(
-        'x Watch mode requires --target when using multiple targets.'
-      );
-      return null;
-    }
-
-    if (!baseConfig.targets[options.target]) {
-      console.error(`x Target "${options.target}" not found in config file.`);
-      return null;
-    }
-  } else if (options.target) {
-    console.error('x Config file does not define targets. Remove --target.');
-    return null;
-  }
-
   const sourceOverrides: GraphQLSDKConfigTarget = {};
   if (options.endpoint) {
     sourceOverrides.endpoint = options.endpoint;
@@ -263,32 +142,22 @@ export async function loadWatchConfig(options: {
     },
   };
 
-  let mergedTarget: GraphQLSDKConfigTarget;
+  let mergedConfig = mergeConfig(baseConfig, sourceOverrides);
+  mergedConfig = mergeConfig(mergedConfig, watchOverrides);
 
-  if (isMultiConfig(baseConfig)) {
-    const defaults = baseConfig.defaults ?? {};
-    const targetConfig = baseConfig.targets[options.target!];
-    mergedTarget = mergeConfig(defaults, targetConfig);
-  } else {
-    mergedTarget = baseConfig;
-  }
-
-  mergedTarget = mergeConfig(mergedTarget, sourceOverrides);
-  mergedTarget = mergeConfig(mergedTarget, watchOverrides);
-
-  if (!mergedTarget.endpoint) {
+  if (!mergedConfig.endpoint) {
     console.error(
       'x No endpoint specified. Watch mode only supports live endpoints.'
     );
     return null;
   }
 
-  if (mergedTarget.schemaFile) {
+  if (mergedConfig.schemaFile) {
     console.error(
       'x Watch mode is only supported with an endpoint, not schemaFile.'
     );
     return null;
   }
 
-  return getConfigOptions(mergedTarget);
+  return getConfigOptions(mergedConfig);
 }
