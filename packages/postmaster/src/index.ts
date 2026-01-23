@@ -30,34 +30,35 @@ type SendInput = {
 
 type MailgunClient = ReturnType<Mailgun['client']>;
 
-const getEnvConfig = (): MailgunOptions => {
-  const envConfig = env(
-    process.env,
-    {
-      MAILGUN_KEY: str()
-    },
-    {
-      MAILGUN_DOMAIN: host(),
-      MAILGUN_FROM: email(),
-      MAILGUN_REPLY: email(),
-      MAILGUN_DEV_EMAIL: email()
-    }
-  );
+// Validate environment variables at module load time (like the original @launchql/postmaster)
+// This ensures env vars are validated once when the module is first imported
+const envConfig = env(
+  process.env,
+  {
+    MAILGUN_KEY: str()
+  },
+  {
+    MAILGUN_DOMAIN: host(),
+    MAILGUN_FROM: email(),
+    MAILGUN_REPLY: email()
+  }
+);
 
-  return {
-    key: envConfig.MAILGUN_KEY,
-    domain: envConfig.MAILGUN_DOMAIN,
-    from: envConfig.MAILGUN_FROM,
-    replyTo: envConfig.MAILGUN_REPLY,
-    devEmail: envConfig.MAILGUN_DEV_EMAIL
-  };
-};
+// MAILGUN_DEV_EMAIL is read directly from process.env (not validated by 12factor-env)
+// to match the original behavior where it was accessed but not in the env validation
+const getEnvOptions = (): MailgunOptions => ({
+  key: envConfig.MAILGUN_KEY,
+  domain: envConfig.MAILGUN_DOMAIN,
+  from: envConfig.MAILGUN_FROM,
+  replyTo: envConfig.MAILGUN_REPLY,
+  devEmail: process.env.MAILGUN_DEV_EMAIL
+});
 
 let client: MailgunClient | undefined;
 let cachedMailgunOpts: MailgunOptions | undefined;
 
 const getClient = (overrides?: MailgunOptions): { client: MailgunClient; mailgunOpts: MailgunOptions } => {
-  const envOpts = getEnvConfig();
+  const envOpts = getEnvOptions();
   const mailgunOpts: MailgunOptions = {
     ...envOpts,
     ...overrides
