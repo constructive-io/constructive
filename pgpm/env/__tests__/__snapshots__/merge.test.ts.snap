@@ -73,6 +73,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
       ],
     },
   },
+  "mailgun": {},
   "migrations": {
     "codegen": {
       "useTx": false,
