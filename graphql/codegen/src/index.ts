@@ -29,6 +29,16 @@ export {
   loadConfigFile,
 } from './cli/commands';
 
+// Database schema utilities (re-exported from core for convenience)
+export {
+  buildSchemaFromDatabase,
+  buildSchemaSDLFromDatabase,
+} from './core/database';
+export type {
+  BuildSchemaFromDatabaseOptions,
+  BuildSchemaFromDatabaseResult,
+} from './core/database';
+
 export type {
   GenerateOptions,
   GenerateResult,

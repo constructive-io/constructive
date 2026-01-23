@@ -35,3 +35,6 @@ export * from './output';
 
 // Watch mode
 export * from './watch';
+
+// Database schema utilities
+export * from './database';

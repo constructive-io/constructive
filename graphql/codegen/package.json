@@ -56,6 +56,7 @@
     "@0no-co/graphql.web": "^1.1.2",
     "@babel/generator": "^7.28.6",
     "@babel/types": "^7.28.6",
+    "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@inquirerer/utils": "^3.2.0",
     "ajv": "^8.17.1",

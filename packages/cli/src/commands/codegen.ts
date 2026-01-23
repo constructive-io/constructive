@@ -1,11 +1,9 @@
-import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import {
   generateReactQuery,
   generateOrm,
   findConfigFile,
+  buildSchemaFromDatabase,
   type GenerateResult,
   type GenerateTargetResult,
   type GenerateOrmResult,
@@ -34,31 +32,83 @@ Options:
   --schemas <list>           Comma-separated schemas (required for DB mode)
 `;
 
-interface CodegenOptions {
-  endpoint?: string;
-  config?: string;
-  target?: string;
-  output?: string;
-  auth?: string;
-  database?: string;
-  schemas?: string[];
-  dryRun: boolean;
-  verbose: boolean;
-  orm: boolean;
-}
-
-type SourceMode =
-  | { type: 'endpoint'; endpoint: string }
-  | { type: 'database'; database: string; schemas: string[] }
-  | { type: 'config'; configPath: string }
-  | { type: 'none' };
+const questions: Question[] = [
+  {
+    name: 'endpoint',
+    message: 'GraphQL endpoint URL',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'config',
+    message: 'Path to config file',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'target',
+    message: 'Target name in config file',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'out',
+    message: 'Output directory',
+    type: 'text',
+    required: false,
+    default: 'codegen',
+    useDefault: true,
+  },
+  {
+    name: 'auth',
+    message: 'Authorization header value',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'database',
+    message: 'Database name (for DB mode)',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'schemas',
+    message: 'Comma-separated schemas (for DB mode)',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'orm',
+    message: 'Generate ORM client instead of React Query hooks?',
+    type: 'confirm',
+    required: false,
+    default: false,
+    useDefault: true,
+  },
+  {
+    name: 'dryRun',
+    message: 'Preview without writing files?',
+    type: 'confirm',
+    required: false,
+    default: false,
+    useDefault: true,
+  },
+  {
+    name: 'verbose',
+    message: 'Verbose output?',
+    type: 'confirm',
+    required: false,
+    default: false,
+    useDefault: true,
+  },
+];
 
 type AnyResult = GenerateResult | GenerateOrmResult;
 type AnyTargetResult = GenerateTargetResult | GenerateOrmTargetResult;
 
 export default async (
-  argv: Partial<ParsedArgs>,
-  _prompter: Inquirerer,
+  argv: Partial<Record<string, any>>,
+  prompter: Inquirerer,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {
@@ -66,37 +116,76 @@ export default async (
     process.exit(0);
   }
 
-  const opts = parseArgs(argv);
-  const mode = determineMode(opts);
+  // Handle CLI aliases and defaults
+  const normalizedArgv = {
+    ...argv,
+    dryRun: argv['dry-run'] || argv.dryRun,
+    verbose: argv.verbose || argv.v,
+    config: argv.config || findConfigFile() || undefined,
+  };
 
-  if (mode.type === 'none') {
+  const answers: any = await prompter.prompt(normalizedArgv, questions);
+  const endpoint = answers.endpoint as string | undefined;
+  const config = answers.config as string | undefined;
+  const target = answers.target as string | undefined;
+  const out = answers.out as string | undefined;
+  const auth = answers.auth as string | undefined;
+  const database = answers.database as string | undefined;
+  const schemasArg = answers.schemas as string | undefined;
+  const orm = answers.orm as boolean | undefined;
+  const dryRun = answers.dryRun as boolean | undefined;
+  const verbose = answers.verbose as boolean | undefined;
+
+  // Parse schemas from comma-separated string
+  const schemas = schemasArg
+    ? String(schemasArg).split(',').map((s: string) => s.trim()).filter(Boolean)
+    : [];
+
+  // Determine output directory
+  const outDir = (out as string) || 'codegen';
+  let schemaPath: string | undefined;
+
+  // Build schema from database if schemas are provided
+  if (schemas.length > 0) {
+    const db = (database as string) || getEnvOptions().pg.database;
+    const result = await buildSchemaFromDatabase({
+      database: db,
+      schemas,
+      outDir,
+    });
+    schemaPath = result.schemaPath;
+  }
+
+  // Validate that we have a source
+  if (!endpoint && !schemaPath && !config) {
     console.error(
       'Error: No source specified. Use --endpoint, --config, or --schemas for database mode.'
     );
     process.exit(1);
   }
 
-  // Build schema from database if needed
-  const outDir = opts.output || 'codegen';
-  const schemaPath =
-    mode.type === 'database'
-      ? await buildSchemaFromDatabase(mode.database, mode.schemas, outDir)
-      : undefined;
-
-  const commandOptions = {
-    config: opts.config,
-    target: opts.target,
-    endpoint: mode.type === 'endpoint' ? mode.endpoint : undefined,
-    schema: schemaPath,
-    output: opts.config ? opts.output : outDir,
-    authorization: opts.auth,
-    verbose: opts.verbose,
-    dryRun: opts.dryRun,
-  };
-
-  const result = opts.orm
-    ? await generateOrm(commandOptions)
-    : await generateReactQuery(commandOptions);
+  // Call core generate function
+  const result = orm
+    ? await generateOrm({
+        config,
+        target,
+        endpoint: endpoint || undefined,
+        schema: schemaPath,
+        output: config ? out : outDir,
+        authorization: auth,
+        verbose,
+        dryRun,
+      })
+    : await generateReactQuery({
+        config,
+        target,
+        endpoint: endpoint || undefined,
+        schema: schemaPath,
+        output: config ? out : outDir,
+        authorization: auth,
+        verbose,
+        dryRun,
+      });
 
   printResult(result);
 
@@ -104,38 +193,6 @@ export default async (
     process.exit(1);
   }
 };
-
-function parseArgs(argv: Partial<ParsedArgs>): CodegenOptions {
-  const schemasArg = (argv.schemas as string) || '';
-  return {
-    endpoint: (argv.endpoint as string) || undefined,
-    config: (argv.config as string) || findConfigFile() || undefined,
-    target: (argv.target as string) || undefined,
-    output: (argv.out as string) || undefined,
-    auth: (argv.auth as string) || undefined,
-    database: (argv.database as string) || undefined,
-    schemas: schemasArg
-      ? schemasArg.split(',').map((s) => s.trim()).filter(Boolean)
-      : undefined,
-    dryRun: !!(argv['dry-run'] || argv.dryRun),
-    verbose: !!(argv.verbose || argv.v),
-    orm: !!argv.orm,
-  };
-}
-
-function determineMode(opts: CodegenOptions): SourceMode {
-  if (opts.endpoint) {
-    return { type: 'endpoint', endpoint: opts.endpoint };
-  }
-  if (opts.schemas?.length) {
-    const database = opts.database || getEnvOptions().pg.database;
-    return { type: 'database', database, schemas: opts.schemas };
-  }
-  if (opts.config) {
-    return { type: 'config', configPath: opts.config };
-  }
-  return { type: 'none' };
-}
 
 function printTargetResult(target: AnyTargetResult): void {
   const status = target.success ? '[ok]' : 'x';
@@ -172,20 +229,4 @@ function printResult(result: AnyResult): void {
     console.log(result.message);
     result.filesWritten?.forEach((f) => console.log(f));
   }
-}
-
-async function buildSchemaFromDatabase(
-  database: string,
-  schemas: string[],
-  outDir: string
-): Promise<string> {
-  await fs.promises.mkdir(outDir, { recursive: true });
-  const sdl = await buildSchemaSDL({
-    database,
-    schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
-  });
-  const schemaPath = path.join(outDir, 'schema.graphql');
-  await fs.promises.writeFile(schemaPath, sdl, 'utf-8');
-  return schemaPath;
 }
