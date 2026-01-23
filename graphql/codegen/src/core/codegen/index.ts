@@ -98,7 +98,7 @@ export interface GenerateOptions {
 // ============================================================================
 
 /**
- * Generate all SDK files for tables only (legacy function signature)
+ * Generate all SDK files for tables only
  */
 export function generateAllFiles(
   tables: CleanTable[],

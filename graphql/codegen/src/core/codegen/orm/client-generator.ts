@@ -460,11 +460,10 @@ export function generateCreateClientFile(
   // export * from './select-types';
   statements.push(t.exportAllDeclaration(t.stringLiteral('./select-types')));
 
-  // Re-export all models for backwards compatibility
-  // export * from './models';
+  // Re-export all models
   statements.push(t.exportAllDeclaration(t.stringLiteral('./models')));
 
-  // Re-export custom operations for backwards compatibility
+  // Re-export custom operations
   if (hasCustomQueries) {
     statements.push(
       t.exportNamedDeclaration(
