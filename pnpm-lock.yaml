@@ -1678,12 +1678,9 @@ importers:
 
   packages/postmaster:
     dependencies:
-      '@pgpmjs/env':
-        specifier: workspace:^
-        version: link:../../pgpm/env/dist
-      '@pgpmjs/types':
-        specifier: workspace:^
-        version: link:../../pgpm/types/dist
+      12factor-env:
+        specifier: 0.1.0
+        version: 0.1.0
       form-data:
         specifier: ^4.0.0
         version: 4.0.5
@@ -2395,6 +2392,9 @@ importers:
     publishDirectory: dist
 
 packages:
+
+  12factor-env@0.1.0:
+    resolution: {integrity: sha512-4SaHhlxwOSizIK5P/14r7V7HxcHmip1fpX2HEToV7NpLWVDkI+eb+nskkq5F0XzC5bq2vhzpIAHQwZVeEibZLg==}
 
   '@0no-co/graphql.web@1.2.0':
     resolution: {integrity: sha512-/1iHy9TTr63gE1YcR5idjx8UREz1s0kFhydf3bBLCXyqjhkIc6igAzTOx3zPifCwFR87tsh/4Pa9cNts6d2otw==}
@@ -5193,6 +5193,10 @@ packages:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
+  dotenv@8.6.0:
+    resolution: {integrity: sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==}
+    engines: {node: '>=10'}
+
   drizzle-orm@0.45.1:
     resolution: {integrity: sha512-Te0FOdKIistGNPMq2jscdqngBRfBpC8uMFVwqjf6gtTVJHIQ/dosgV/CLBU2N4ZJBsXL5savCba9b0YJskKdcA==}
     peerDependencies:
@@ -5358,6 +5362,10 @@ packages:
   env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
+
+  envalid@6.0.2:
+    resolution: {integrity: sha512-ChJb9a5rjwZ/NkcXfBrzEl5cFZaGLg38N7MlWJkv5qsmSypX2WJe28LkoAWcklC60nKZXYKRlBbsjuJSjYw0Xg==}
+    engines: {node: '>=8.12'}
 
   envalid@8.1.1:
     resolution: {integrity: sha512-vOUfHxAFFvkBjbVQbBfgnCO9d3GcNfMMTtVfgqSU2rQGMFEVqWy9GBuoSfHnwGu7EqR0/GeukQcL3KjFBaga9w==}
@@ -6632,6 +6640,9 @@ packages:
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
+
+  meant@1.0.3:
+    resolution: {integrity: sha512-88ZRGcNxAq4EH38cQ4D85PM57pikCwS8Z99EWHODxN7KBY+UuPiqzRTtZzS8KTXO/ywSWbdjjJST2Hly/EQxLw==}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -8301,6 +8312,10 @@ packages:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
+  validator@13.15.26:
+    resolution: {integrity: sha512-spH26xU080ydGggxRyR1Yhcbgx+j3y5jbNXk/8L+iRvdIEQ4uTRH2Sgf2dokud6Q4oAtsbNvJ1Ft+9xmm6IZcA==}
+    engines: {node: '>= 0.10'}
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -8466,6 +8481,11 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
+
+  12factor-env@0.1.0:
+    dependencies:
+      '@babel/runtime': 7.28.4
+      envalid: 6.0.2
 
   '@0no-co/graphql.web@1.2.0(graphql@15.10.1)':
     optionalDependencies:
@@ -12416,6 +12436,8 @@ snapshots:
 
   dotenv@16.4.7: {}
 
+  dotenv@8.6.0: {}
+
   drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.17.1):
     optionalDependencies:
       '@types/pg': 8.16.0
@@ -12488,6 +12510,13 @@ snapshots:
   entities@6.0.1: {}
 
   env-paths@2.2.1: {}
+
+  envalid@6.0.2:
+    dependencies:
+      chalk: 3.0.0
+      dotenv: 8.6.0
+      meant: 1.0.3
+      validator: 13.15.26
 
   envalid@8.1.1:
     dependencies:
@@ -14170,6 +14199,8 @@ snapshots:
       remove-accents: 0.5.0
 
   math-intrinsics@1.1.0: {}
+
+  meant@1.0.3: {}
 
   media-typer@0.3.0: {}
 
@@ -16158,6 +16189,8 @@ snapshots:
       spdx-expression-parse: 3.0.1
 
   validate-npm-package-name@5.0.1: {}
+
+  validator@13.15.26: {}
 
   vary@1.1.2: {}
 

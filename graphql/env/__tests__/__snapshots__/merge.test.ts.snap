@@ -95,7 +95,6 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
       "supported": [],
     },
   },
-  "mailgun": {},
   "migrations": {
     "codegen": {
       "useTx": false,

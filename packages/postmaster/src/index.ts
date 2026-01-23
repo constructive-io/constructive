@@ -1,8 +1,23 @@
 import Mailgun from 'mailgun.js';
 import type { MailgunMessageData } from 'mailgun.js';
 import FormData from 'form-data';
-import { getEnvOptions } from '@pgpmjs/env';
-import { MailgunOptions } from '@pgpmjs/types';
+import { str, email, host, env } from '12factor-env';
+
+/**
+ * Mailgun configuration options
+ */
+export interface MailgunOptions {
+  /** Mailgun API key */
+  key?: string;
+  /** Mailgun domain (e.g., 'mg.example.com') */
+  domain?: string;
+  /** Default sender email address */
+  from?: string;
+  /** Default reply-to email address */
+  replyTo?: string;
+  /** Development email address - when set, all emails are redirected to this address */
+  devEmail?: string;
+}
 
 type SendInput = {
   to: string | string[];
@@ -15,12 +30,38 @@ type SendInput = {
 
 type MailgunClient = ReturnType<Mailgun['client']>;
 
+const getEnvConfig = (): MailgunOptions => {
+  const envConfig = env(
+    process.env,
+    {
+      MAILGUN_KEY: str()
+    },
+    {
+      MAILGUN_DOMAIN: host(),
+      MAILGUN_FROM: email(),
+      MAILGUN_REPLY: email(),
+      MAILGUN_DEV_EMAIL: email()
+    }
+  );
+
+  return {
+    key: envConfig.MAILGUN_KEY,
+    domain: envConfig.MAILGUN_DOMAIN,
+    from: envConfig.MAILGUN_FROM,
+    replyTo: envConfig.MAILGUN_REPLY,
+    devEmail: envConfig.MAILGUN_DEV_EMAIL
+  };
+};
+
 let client: MailgunClient | undefined;
 let cachedMailgunOpts: MailgunOptions | undefined;
 
 const getClient = (overrides?: MailgunOptions): { client: MailgunClient; mailgunOpts: MailgunOptions } => {
-  const opts = getEnvOptions({ mailgun: overrides });
-  const mailgunOpts = opts.mailgun ?? {};
+  const envOpts = getEnvConfig();
+  const mailgunOpts: MailgunOptions = {
+    ...envOpts,
+    ...overrides
+  };
 
   if (!client || overrides) {
     if (!mailgunOpts.key) {

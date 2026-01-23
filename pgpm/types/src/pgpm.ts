@@ -166,22 +166,6 @@ export interface SmtpOptions {
 }
 
 /**
- * Mailgun email configuration options
- */
-export interface MailgunOptions {
-    /** Mailgun API key */
-    key?: string;
-    /** Mailgun domain (e.g., 'mg.example.com') */
-    domain?: string;
-    /** Default sender email address */
-    from?: string;
-    /** Default reply-to email address */
-    replyTo?: string;
-    /** Development email address - when set, all emails are redirected to this address with original recipient encoded in the local part */
-    devEmail?: string;
-}
-
-/**
  * Code generation settings
  */
 export interface CodegenOptions {
@@ -273,8 +257,6 @@ export interface PgpmOptions {
     errorOutput?: ErrorOutputOptions;
     /** SMTP email configuration */
     smtp?: SmtpOptions;
-    /** Mailgun email configuration */
-    mailgun?: MailgunOptions;
 }
 
 /**
