@@ -1695,7 +1695,7 @@ importers:
 
   packages/postmaster:
     dependencies:
-      '@constructive-io/12factor-env':
+      12factor-env:
         specifier: workspace:^
         version: link:../12factor-env/dist
       form-data:
