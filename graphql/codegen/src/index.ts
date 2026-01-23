@@ -22,10 +22,9 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // CLI command exports (for packages/cli consumption)
+// Note: generateReactQuery and generateOrm are internal - use generate() with config flags
 export {
   generate,
-  generateReactQuery,
-  generateOrm,
   findConfigFile,
   loadConfigFile,
 } from './cli/commands';

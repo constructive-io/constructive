@@ -1,10 +1,15 @@
 /**
  * Unified generate command - generates SDK from GraphQL schema
  *
- * This is a thin CLI wrapper around the core generation functions.
- * Supports generating React Query SDK, ORM client, or both based on config flags.
+ * This module provides a single public generate() function that:
+ * 1. Runs introspection ONCE per target
+ * 2. Generates shared types ONCE (when both React Query and ORM are enabled)
+ * 3. Generates React Query SDK and/or ORM client based on config
+ *
+ * The internal generator functions are not exported from the package.
  */
-import type { ResolvedTargetConfig, ResolvedConfig } from '../../types/config';
+import path from 'path';
+import type { ResolvedTargetConfig } from '../../types/config';
 import {
   loadAndResolveConfig,
   type ConfigOverrideOptions,
@@ -16,10 +21,11 @@ import {
 import { runCodegenPipeline, validateTablesFound } from '../../core/pipeline';
 import { generate as generateReactQueryFiles } from '../../core/codegen';
 import { generateOrm as generateOrmFiles } from '../../core/codegen/orm';
+import { generateSharedTypes } from '../../core/codegen/shared';
 import { writeGeneratedFiles } from '../../core/output';
 import type { CleanTable, CleanOperation, TypeRegistry } from '../../types/schema';
 
-export type GeneratorType = 'react-query' | 'orm';
+export type GeneratorType = 'react-query' | 'orm' | 'shared';
 
 export interface GenerateOptions extends ConfigOverrideOptions {
   /** Authorization header */
@@ -134,26 +140,40 @@ export async function generate(
       continue;
     }
 
-    // Generate React Query SDK if enabled
-    if (runReactQuery) {
-      const result = await generateReactQueryForTarget(
-        target,
-        pipelineResult.data!,
-        options,
-        isMultiTarget
-      );
-      results.push(result);
-    }
+    const bothEnabled = runReactQuery && runOrm;
 
-    // Generate ORM client if enabled
-    if (runOrm) {
-      const result = await generateOrmForTarget(
+    // When both are enabled, use unified output structure with shared types
+    if (bothEnabled) {
+      const unifiedResults = await generateUnifiedOutput(
         target,
         pipelineResult.data!,
         options,
         isMultiTarget
       );
-      results.push(result);
+      results.push(...unifiedResults);
+    } else {
+      // Single generator mode - use existing behavior
+      if (runReactQuery) {
+        const result = await generateReactQueryForTarget(
+          target,
+          pipelineResult.data!,
+          options,
+          isMultiTarget,
+          undefined // no shared types path
+        );
+        results.push(result);
+      }
+
+      if (runOrm) {
+        const result = await generateOrmForTarget(
+          target,
+          pipelineResult.data!,
+          options,
+          isMultiTarget,
+          undefined // no shared types path
+        );
+        results.push(result);
+      }
     }
   }
 
@@ -326,13 +346,128 @@ async function runPipelineForTarget(
   };
 }
 
-async function generateReactQueryForTarget(
+/**
+ * Generate unified output when both React Query and ORM are enabled
+ *
+ * Output structure:
+ * {output}/
+ *   index.ts          - Main barrel (re-exports shared + react-query + orm)
+ *   types.ts          - Shared entity types
+ *   schema-types.ts   - Shared schema types (enums, input types)
+ *   react-query/      - React Query SDK
+ *   orm/              - ORM client
+ */
+async function generateUnifiedOutput(
   target: ResolvedTargetConfig,
   pipelineResult: PipelineResult,
   options: GenerateOptions,
   isMultiTarget: boolean
+): Promise<GenerateTargetResult[]> {
+  const config = target.config;
+  const outputRoot = config.output;
+  const prefix = isMultiTarget ? `[${target.name}] ` : '';
+  const formatMessage = (message: string) =>
+    isMultiTarget ? `Target "${target.name}": ${message}` : message;
+
+  const results: GenerateTargetResult[] = [];
+  const { tables, customOperations } = pipelineResult;
+
+  // 1. Generate shared types to output root
+  console.log(`${prefix}Generating shared types...`);
+  const sharedResult = generateSharedTypes({
+    tables,
+    customOperations: {
+      queries: customOperations.queries,
+      mutations: customOperations.mutations,
+      typeRegistry: customOperations.typeRegistry,
+    },
+    config,
+  });
+
+  if (!options.dryRun) {
+    const writeResult = await writeGeneratedFiles(sharedResult.files, outputRoot, []);
+    if (!writeResult.success) {
+      results.push({
+        name: target.name,
+        output: outputRoot,
+        generatorType: 'shared',
+        success: false,
+        message: formatMessage(`Failed to write shared types: ${writeResult.errors?.join(', ')}`),
+        errors: writeResult.errors,
+      });
+      return results;
+    }
+    console.log(`${prefix}Shared types written to ${outputRoot}`);
+  }
+
+  // 2. Generate React Query SDK to react-query/ subdirectory
+  const reactQueryResult = await generateReactQueryForTarget(
+    target,
+    pipelineResult,
+    options,
+    isMultiTarget,
+    '..' // import types from parent directory
+  );
+  results.push(reactQueryResult);
+
+  // 3. Generate ORM client to orm/ subdirectory
+  const ormResult = await generateOrmForTarget(
+    target,
+    pipelineResult,
+    options,
+    isMultiTarget,
+    '..' // import types from parent directory
+  );
+  results.push(ormResult);
+
+  // 4. Generate unified barrel export
+  if (!options.dryRun) {
+    const unifiedBarrel = generateUnifiedBarrel(sharedResult.hasSchemaTypes);
+    await writeGeneratedFiles([{ path: 'index.ts', content: unifiedBarrel }], outputRoot, []);
+  }
+
+  return results;
+}
+
+/**
+ * Generate the unified barrel export for the root output directory
+ */
+function generateUnifiedBarrel(hasSchemaTypes: boolean): string {
+  const lines = [
+    '/**',
+    ' * Generated SDK - auto-generated, do not edit',
+    ' */',
+    '',
+    '// Shared types',
+    "export * from './types';",
+  ];
+
+  if (hasSchemaTypes) {
+    lines.push("export * from './schema-types';");
+  }
+
+  lines.push('');
+  lines.push('// React Query SDK');
+  lines.push("export * from './react-query';");
+  lines.push('');
+  lines.push('// ORM Client');
+  lines.push("export * from './orm';");
+  lines.push('');
+
+  return lines.join('\n');
+}
+
+async function generateReactQueryForTarget(
+  target: ResolvedTargetConfig,
+  pipelineResult: PipelineResult,
+  options: GenerateOptions,
+  isMultiTarget: boolean,
+  sharedTypesPath?: string
 ): Promise<GenerateTargetResult> {
   const config = target.config;
+  const outputDir = sharedTypesPath
+    ? path.join(config.output, 'react-query')
+    : config.output;
   const prefix = isMultiTarget ? `[${target.name}] ` : '';
   const log = options.verbose
     ? (message: string) => console.log(`${prefix}${message}`)
@@ -352,6 +487,7 @@ async function generateReactQueryForTarget(
       typeRegistry: customOperations.typeRegistry,
     },
     config,
+    sharedTypesPath,
   });
   console.log(`${prefix}Generated ${genStats.totalFiles} files`);
 
@@ -366,7 +502,7 @@ async function generateReactQueryForTarget(
   if (options.dryRun) {
     return {
       name: target.name,
-      output: config.output,
+      output: outputDir,
       generatorType: 'react-query',
       success: true,
       message: formatMessage(
@@ -381,8 +517,8 @@ async function generateReactQueryForTarget(
 
   // Write files
   log('Writing files...');
-  console.log(`${prefix}Output: ${config.output}`);
-  const writeResult = await writeGeneratedFiles(generatedFiles, config.output, [
+  console.log(`${prefix}Output: ${outputDir}`);
+  const writeResult = await writeGeneratedFiles(generatedFiles, outputDir, [
     'queries',
     'mutations',
   ]);
@@ -390,7 +526,7 @@ async function generateReactQueryForTarget(
   if (!writeResult.success) {
     return {
       name: target.name,
-      output: config.output,
+      output: outputDir,
       generatorType: 'react-query',
       success: false,
       message: formatMessage(
@@ -405,11 +541,11 @@ async function generateReactQueryForTarget(
 
   return {
     name: target.name,
-    output: config.output,
+    output: outputDir,
     generatorType: 'react-query',
     success: true,
     message: formatMessage(
-      `Generated React Query SDK for ${tables.length} tables${customOpsMsg}. Files written to ${config.output}`
+      `Generated React Query SDK for ${tables.length} tables${customOpsMsg}. Files written to ${outputDir}`
     ),
     tables: tables.map((t) => t.name),
     customQueries,
@@ -422,10 +558,13 @@ async function generateOrmForTarget(
   target: ResolvedTargetConfig,
   pipelineResult: PipelineResult,
   options: GenerateOptions,
-  isMultiTarget: boolean
+  isMultiTarget: boolean,
+  sharedTypesPath?: string
 ): Promise<GenerateTargetResult> {
   const config = target.config;
-  const outputDir = options.output || config.orm.output;
+  const outputDir = sharedTypesPath
+    ? path.join(config.output, 'orm')
+    : (options.output || config.orm.output);
   const prefix = isMultiTarget ? `[${target.name}] ` : '';
   const log = options.verbose
     ? (message: string) => console.log(`${prefix}${message}`)
@@ -445,6 +584,7 @@ async function generateOrmForTarget(
       typeRegistry: customOperations.typeRegistry,
     },
     config,
+    sharedTypesPath,
   });
   console.log(`${prefix}Generated ${genStats.totalFiles} files`);
 

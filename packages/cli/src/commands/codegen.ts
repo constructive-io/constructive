@@ -1,13 +1,10 @@
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 import {
-  generateReactQuery,
-  generateOrm,
+  generate,
   findConfigFile,
   buildSchemaFromDatabase,
   type GenerateResult,
   type GenerateTargetResult,
-  type GenerateOrmResult,
-  type GenerateOrmTargetResult,
 } from '@constructive-io/graphql-codegen';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 
@@ -103,8 +100,8 @@ const questions: Question[] = [
   },
 ];
 
-type AnyResult = GenerateResult | GenerateOrmResult;
-type AnyTargetResult = GenerateTargetResult | GenerateOrmTargetResult;
+type AnyResult = GenerateResult;
+type AnyTargetResult = GenerateTargetResult;
 
 export default async (
   argv: Partial<Record<string, any>>,
@@ -164,40 +161,23 @@ export default async (
     process.exit(1);
   }
 
-  // Determine generator type and output directory
-  const generatorType = orm ? 'orm' : 'react-query';
+  // Determine output directory
   const output = config ? out : outDir;
 
-  // Call core generate function
-  let result: AnyResult;
-  switch (generatorType) {
-    case 'orm':
-      result = await generateOrm({
-        config,
-        target,
-        endpoint: endpoint || undefined,
-        schema: schemaPath,
-        output,
-        authorization: auth,
-        verbose,
-        dryRun,
-      });
-      break;
-    case 'react-query':
-      result = await generateReactQuery({
-        config,
-        target,
-        endpoint: endpoint || undefined,
-        schema: schemaPath,
-        output,
-        authorization: auth,
-        verbose,
-        dryRun,
-      });
-      break;
-    default:
-      throw new Error(`Unknown generator type: ${generatorType}`);
-  }
+  // Call unified generate function with appropriate flags
+  const result = await generate({
+    config,
+    target,
+    endpoint: endpoint || undefined,
+    schema: schemaPath,
+    output,
+    authorization: auth,
+    verbose,
+    dryRun,
+    // Use flags to control which generators run
+    reactQuery: !orm,
+    orm: orm,
+  });
 
   printResult(result);
 

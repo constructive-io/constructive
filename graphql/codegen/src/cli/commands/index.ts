@@ -1,12 +1,21 @@
 /**
  * CLI commands exports
+ *
+ * Public API:
+ * - generate() - Unified generate function that respects config.reactQuery.enabled and config.orm.enabled
+ * - findConfigFile() - Find config file in directory
+ * - loadConfigFile() - Load and parse config file
+ *
+ * Internal (not exported from package):
+ * - generateReactQuery() - Convenience wrapper for generate({ reactQuery: true, orm: false })
+ * - generateOrm() - Convenience wrapper for generate({ reactQuery: false, orm: true })
  */
 
 export { initCommand, findConfigFile, loadConfigFile } from './init';
 export type { InitOptions, InitResult } from './init';
 
-// Unified generate function (recommended)
-export { generate, generateReactQuery, generateOrm } from './generate-unified';
+// Unified generate function (public API)
+export { generate } from './generate-unified';
 export type { GenerateOptions, GenerateResult, GenerateTargetResult, GeneratorType } from './generate-unified';
 
 // Legacy exports (deprecated - use unified generate instead)

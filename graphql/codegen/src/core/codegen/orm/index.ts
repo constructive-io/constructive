@@ -33,6 +33,13 @@ export interface GenerateOrmOptions {
     typeRegistry?: TypeRegistry;
   };
   config: ResolvedConfig;
+  /**
+   * Path to shared types directory (relative import path).
+   * When provided, entity types are imported from shared types
+   * instead of being generated in input-types.ts.
+   * Example: '..' means types are in parent directory
+   */
+  sharedTypesPath?: string;
 }
 
 export interface GenerateOrmResult {
