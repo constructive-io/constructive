@@ -1,0 +1,45 @@
+{
+  "name": "@constructive-io/postmaster",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Mailgun email sender for Constructive",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "mailgun.js": "^10.2.3",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "makage": "^0.1.10"
+  },
+  "keywords": [
+    "mailgun",
+    "email",
+    "postmaster"
+  ]
+}

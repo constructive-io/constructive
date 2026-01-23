@@ -1,4 +1,4 @@
-import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
+import { PgpmOptions, BucketProvider, MailgunOptions } from '@pgpmjs/types';
 
 export const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
@@ -97,7 +97,14 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SMTP_MAX_MESSAGES,
     SMTP_NAME,
     SMTP_LOGGER,
-    SMTP_DEBUG
+    SMTP_DEBUG,
+
+    // Mailgun email env vars
+    MAILGUN_KEY,
+    MAILGUN_DOMAIN,
+    MAILGUN_FROM,
+    MAILGUN_REPLY,
+    MAILGUN_DEV_EMAIL
   } = env;
 
   return {
@@ -228,6 +235,13 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SMTP_NAME && { name: SMTP_NAME }),
       ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
       ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
+    },
+    mailgun: {
+      ...(MAILGUN_KEY && { key: MAILGUN_KEY }),
+      ...(MAILGUN_DOMAIN && { domain: MAILGUN_DOMAIN }),
+      ...(MAILGUN_FROM && { from: MAILGUN_FROM }),
+      ...(MAILGUN_REPLY && { replyTo: MAILGUN_REPLY }),
+      ...(MAILGUN_DEV_EMAIL && { devEmail: MAILGUN_DEV_EMAIL }),
     }
   };
 };
