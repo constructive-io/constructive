@@ -1,8 +1,8 @@
 {
-  "name": "@constructive-io/postmaster",
+  "name": "@constructive-io/12factor-env",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Mailgun email sender for Constructive",
+  "description": "Environment variable validation with secret file support for 12-factor apps",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,16 +29,21 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@constructive-io/12factor-env": "workspace:^",
-    "mailgun.js": "^10.2.3",
-    "form-data": "^4.0.0"
+    "envalid": "^8.1.1"
   },
   "devDependencies": {
-    "makage": "^0.1.10"
+    "@types/node": "^20.12.7",
+    "makage": "^0.1.10",
+    "ts-node": "^10.9.2"
   },
   "keywords": [
-    "mailgun",
-    "email",
-    "postmaster"
+    "environment",
+    "env",
+    "validation",
+    "12factor",
+    "secrets",
+    "kubernetes",
+    "docker",
+    "constructive"
   ]
 }
