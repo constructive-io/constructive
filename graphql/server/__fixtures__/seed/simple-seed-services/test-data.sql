@@ -4,3 +4,4 @@ INSERT INTO "simple-pets-pets-public".animals (name, species) VALUES
 
 -- Explicit grants (ALTER DEFAULT PRIVILEGES doesn't apply in test context)
 GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-pets-public".animals TO administrator, authenticated, anonymous;
+

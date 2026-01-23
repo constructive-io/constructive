@@ -12,7 +12,8 @@ import type supertest from 'supertest';
 
 jest.setTimeout(30000);
 
-const sql = (file: string) => path.join(__dirname, '..', '__fixtures__', 'seed', file);
+const sql = (file: string) =>
+  path.join(__dirname, '..', '__fixtures__', 'seed', 'simple-seed', file);
 const schemas = ['simple-pets-public', 'simple-pets-pets-public'];
 const seedFiles = [seed.sqlfile([sql('setup.sql'), sql('schema.sql'), sql('test-data.sql')])];
 
