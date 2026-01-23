@@ -12,7 +12,7 @@
    <a href="https://www.npmjs.com/package/@constructive-io/graphql-codegen"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Fcodegen%2Fpackage.json"/></a>
 </p>
 
-CLI-based GraphQL SDK generator for PostGraphile endpoints. Generate type-safe React Query hooks or a Prisma-like ORM client from your GraphQL schema.
+GraphQL SDK generator for Constructive databases with React Query hooks. Generate type-safe React Query hooks or a Prisma-like ORM client from your GraphQL schema.
 
 ## Features
 
@@ -79,11 +79,20 @@ export default defineConfig({
 ### 2. Generate SDK
 
 ```bash
-# Generate React Query hooks
-npx graphql-sdk generate -e https://api.example.com/graphql -o ./generated/hooks
+# Generate React Query hooks from an endpoint
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/hooks --reactquery
 
-# Generate ORM client
-npx graphql-sdk generate-orm -e https://api.example.com/graphql -o ./generated/orm
+# Generate ORM client from an endpoint
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/orm --orm
+
+# Generate from a database directly
+npx graphql-sdk generate --database postgres://localhost/mydb --schemas public,app_public --reactquery
+
+# Generate from a PGPM module
+npx graphql-sdk generate --pgpm-module-path ./packages/my-module --schemas public --orm
+
+# Generate using apiNames for automatic schema discovery
+npx graphql-sdk generate --database postgres://localhost/mydb --api-names my_api --reactquery --orm
 ```
 
 ### 3. Use the Generated Code
@@ -112,34 +121,40 @@ function CarList() {
 
 ### `graphql-sdk generate`
 
-Generate React Query hooks from a PostGraphile endpoint.
+Generate React Query hooks and/or ORM client from various sources.
 
 ```bash
-Options:
-  -e, --endpoint <url>     GraphQL endpoint URL (overrides config)
-  -t, --target <name>      Target name in config file
-  -o, --output <dir>       Output directory (default: ./generated/graphql)
-  -c, --config <path>      Path to config file
-  -a, --authorization <token>  Authorization header value
-  --dry-run                Preview without writing files
-  --skip-custom-operations Only generate table CRUD hooks
-  -v, --verbose            Show detailed output
-```
+Source Options (choose one):
+  -c, --config <path>              Path to config file (graphql-sdk.config.ts)
+  -e, --endpoint <url>             GraphQL endpoint URL
+  -s, --schema <path>              Path to GraphQL schema file
+  --database <url>                 Database connection URL (postgres://...)
+  --pgpm-module-path <path>        Path to PGPM module directory
+  --pgpm-workspace-path <path>     Path to PGPM workspace (requires --pgpm-module-name)
+  --pgpm-module-name <name>        PGPM module name in workspace
 
-### `graphql-sdk generate-orm`
+Schema Options (for database/pgpm modes):
+  --schemas <list>                 Comma-separated list of schemas to introspect
+  --api-names <list>               Comma-separated API names for automatic schema discovery
+                                   (mutually exclusive with --schemas)
 
-Generate Prisma-like ORM client from a PostGraphile endpoint.
+Generator Options:
+  --reactquery                     Generate React Query hooks
+  --orm                            Generate ORM client
+  -t, --target <name>              Target name in config file
+  -o, --output <dir>               Output directory
+  -a, --authorization <token>      Authorization header value
+  --skip-custom-operations         Only generate table CRUD operations
+  --dry-run                        Preview without writing files
+  --keep-db                        Keep ephemeral database after generation (pgpm modes)
+  -v, --verbose                    Show detailed output
 
-```bash
-Options:
-  -e, --endpoint <url>           GraphQL endpoint URL
-  -t, --target <name>            Target name in config file
-  -o, --output <dir>             Output directory (default: ./generated/orm)
-  -c, --config <path>            Path to config file
-  -a, --authorization <token>    Authorization header value
-  --skip-custom-operations       Only generate table models
-  --dry-run                      Preview without writing files
-  -v, --verbose                  Show detailed output
+Watch Mode Options:
+  -w, --watch                      Watch for schema changes and regenerate
+  --poll-interval <ms>             Polling interval in milliseconds (default: 5000)
+  --debounce <ms>                  Debounce delay in milliseconds (default: 500)
+  --touch <path>                   Touch file after regeneration
+  --no-clear                       Don't clear console on regeneration
 ```
 
 ### `graphql-sdk init`

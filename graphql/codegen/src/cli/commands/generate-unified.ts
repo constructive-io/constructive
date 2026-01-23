@@ -1,0 +1,512 @@
+/**
+ * Unified generate command - generates SDK from GraphQL schema
+ *
+ * This is a thin CLI wrapper around the core generation functions.
+ * Supports generating React Query SDK, ORM client, or both based on config flags.
+ */
+import type { ResolvedTargetConfig, ResolvedConfig } from '../../types/config';
+import {
+  loadAndResolveConfig,
+  type ConfigOverrideOptions,
+} from '../../core/config';
+import {
+  createSchemaSource,
+  validateSourceOptions,
+} from '../../core/introspect';
+import { runCodegenPipeline, validateTablesFound } from '../../core/pipeline';
+import { generate as generateReactQueryFiles } from '../../core/codegen';
+import { generateOrm as generateOrmFiles } from '../../core/codegen/orm';
+import { writeGeneratedFiles } from '../../core/output';
+import type { CleanTable, CleanOperation, TypeRegistry } from '../../types/schema';
+
+export type GeneratorType = 'react-query' | 'orm';
+
+export interface GenerateOptions extends ConfigOverrideOptions {
+  /** Authorization header */
+  authorization?: string;
+  /** Verbose output */
+  verbose?: boolean;
+  /** Dry run - don't write files */
+  dryRun?: boolean;
+  /** Skip custom operations (only generate table CRUD) */
+  skipCustomOperations?: boolean;
+  /** Override: generate React Query SDK regardless of config */
+  reactQuery?: boolean;
+  /** Override: generate ORM client regardless of config */
+  orm?: boolean;
+}
+
+export interface GenerateTargetResult {
+  name: string;
+  output: string;
+  generatorType: GeneratorType;
+  success: boolean;
+  message: string;
+  tables?: string[];
+  customQueries?: string[];
+  customMutations?: string[];
+  filesWritten?: string[];
+  errors?: string[];
+}
+
+export interface GenerateResult {
+  success: boolean;
+  message: string;
+  targets?: GenerateTargetResult[];
+  tables?: string[];
+  customQueries?: string[];
+  customMutations?: string[];
+  filesWritten?: string[];
+  errors?: string[];
+}
+
+interface PipelineResult {
+  tables: CleanTable[];
+  customOperations: {
+    queries: CleanOperation[];
+    mutations: CleanOperation[];
+    typeRegistry: TypeRegistry;
+  };
+  stats: {
+    customQueries: number;
+    customMutations: number;
+  };
+}
+
+/**
+ * Unified generate function that respects config.reactQuery.enabled and config.orm.enabled
+ *
+ * Can generate React Query SDK, ORM client, or both based on configuration.
+ * Use the `reactQuery` and `orm` options to override config flags.
+ */
+export async function generate(
+  options: GenerateOptions = {}
+): Promise<GenerateResult> {
+  if (options.verbose) {
+    console.log('Loading configuration...');
+  }
+
+  const configResult = await loadAndResolveConfig(options);
+  if (!configResult.success) {
+    return {
+      success: false,
+      message: configResult.error!,
+    };
+  }
+
+  const targets = configResult.targets ?? [];
+  if (targets.length === 0) {
+    return {
+      success: false,
+      message: 'No targets resolved from configuration.',
+    };
+  }
+
+  const isMultiTarget = configResult.isMulti ?? targets.length > 1;
+  const results: GenerateTargetResult[] = [];
+
+  for (const target of targets) {
+    // Determine which generators to run based on config and options
+    const runReactQuery = options.reactQuery ?? target.config.reactQuery.enabled;
+    const runOrm = options.orm ?? target.config.orm.enabled;
+
+    if (!runReactQuery && !runOrm) {
+      results.push({
+        name: target.name,
+        output: target.config.output,
+        generatorType: 'react-query',
+        success: false,
+        message: `Target "${target.name}": No generators enabled. Set reactQuery.enabled or orm.enabled in config, or use --reactquery or --orm flags.`,
+      });
+      continue;
+    }
+
+    // Run pipeline once per target (shared between generators)
+    const pipelineResult = await runPipelineForTarget(target, options, isMultiTarget);
+    if (!pipelineResult.success) {
+      results.push({
+        name: target.name,
+        output: target.config.output,
+        generatorType: 'react-query',
+        success: false,
+        message: pipelineResult.error!,
+      });
+      continue;
+    }
+
+    // Generate React Query SDK if enabled
+    if (runReactQuery) {
+      const result = await generateReactQueryForTarget(
+        target,
+        pipelineResult.data!,
+        options,
+        isMultiTarget
+      );
+      results.push(result);
+    }
+
+    // Generate ORM client if enabled
+    if (runOrm) {
+      const result = await generateOrmForTarget(
+        target,
+        pipelineResult.data!,
+        options,
+        isMultiTarget
+      );
+      results.push(result);
+    }
+  }
+
+  // Build summary
+  const successCount = results.filter((r) => r.success).length;
+  const failedCount = results.length - successCount;
+
+  if (results.length === 1) {
+    const [result] = results;
+    return {
+      success: result.success,
+      message: result.message,
+      targets: results,
+      tables: result.tables,
+      customQueries: result.customQueries,
+      customMutations: result.customMutations,
+      filesWritten: result.filesWritten,
+      errors: result.errors,
+    };
+  }
+
+  const summaryMessage =
+    failedCount === 0
+      ? `Generated ${results.length} outputs successfully.`
+      : `Generated ${successCount} of ${results.length} outputs.`;
+
+  return {
+    success: failedCount === 0,
+    message: summaryMessage,
+    targets: results,
+    errors:
+      failedCount > 0
+        ? results.flatMap((r) => r.errors ?? [])
+        : undefined,
+  };
+}
+
+/**
+ * Generate React Query SDK only (convenience wrapper)
+ */
+export async function generateReactQuery(
+  options: GenerateOptions = {}
+): Promise<GenerateResult> {
+  return generate({ ...options, reactQuery: true, orm: false });
+}
+
+/**
+ * Generate ORM client only (convenience wrapper)
+ */
+export async function generateOrm(
+  options: GenerateOptions = {}
+): Promise<GenerateResult> {
+  return generate({ ...options, reactQuery: false, orm: true });
+}
+
+// ============================================================================
+// Internal helpers
+// ============================================================================
+
+interface PipelineRunResult {
+  success: boolean;
+  error?: string;
+  data?: PipelineResult;
+}
+
+async function runPipelineForTarget(
+  target: ResolvedTargetConfig,
+  options: GenerateOptions,
+  isMultiTarget: boolean
+): Promise<PipelineRunResult> {
+  const config = target.config;
+  const prefix = isMultiTarget ? `[${target.name}] ` : '';
+  const formatMessage = (message: string) =>
+    isMultiTarget ? `Target "${target.name}": ${message}` : message;
+
+  // Extract extended options if present (attached by config resolver)
+  const database = (config as any).database as string | undefined;
+  const schemas = (config as any).schemas as string[] | undefined;
+  const apiNames = (config as any).apiNames as string[] | undefined;
+  const pgpmModulePath = (config as any).pgpmModulePath as string | undefined;
+  const pgpmWorkspacePath = (config as any).pgpmWorkspacePath as string | undefined;
+  const pgpmModuleName = (config as any).pgpmModuleName as string | undefined;
+  const keepDb = (config as any).keepDb as boolean | undefined;
+
+  if (isMultiTarget) {
+    console.log(`\nTarget "${target.name}"`);
+    let sourceLabel: string;
+    const schemaInfo = apiNames && apiNames.length > 0
+      ? `apiNames: ${apiNames.join(', ')}`
+      : `schemas: ${(schemas ?? ['public']).join(', ')}`;
+    if (pgpmModulePath) {
+      sourceLabel = `pgpm module: ${pgpmModulePath} (${schemaInfo})`;
+    } else if (pgpmWorkspacePath && pgpmModuleName) {
+      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (${schemaInfo})`;
+    } else if (database) {
+      sourceLabel = `database: ${database} (${schemaInfo})`;
+    } else if (config.schema) {
+      sourceLabel = `schema: ${config.schema}`;
+    } else {
+      sourceLabel = `endpoint: ${config.endpoint}`;
+    }
+    console.log(`  Source: ${sourceLabel}`);
+  }
+
+  // 1. Validate source
+  const sourceValidation = validateSourceOptions({
+    endpoint: config.endpoint || undefined,
+    schema: config.schema || undefined,
+    database,
+    pgpmModulePath,
+    pgpmWorkspacePath,
+    pgpmModuleName,
+    schemas,
+    apiNames,
+  });
+  if (!sourceValidation.valid) {
+    return {
+      success: false,
+      error: formatMessage(sourceValidation.error!),
+    };
+  }
+
+  const source = createSchemaSource({
+    endpoint: config.endpoint || undefined,
+    schema: config.schema || undefined,
+    database,
+    pgpmModulePath,
+    pgpmWorkspacePath,
+    pgpmModuleName,
+    schemas,
+    apiNames,
+    keepDb,
+    authorization: options.authorization || config.headers['Authorization'],
+    headers: config.headers,
+  });
+
+  // 2. Run the codegen pipeline
+  let pipelineResult;
+  try {
+    console.log(`${prefix}Fetching schema...`);
+    pipelineResult = await runCodegenPipeline({
+      source,
+      config,
+      verbose: options.verbose,
+      skipCustomOperations: options.skipCustomOperations,
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: formatMessage(
+        `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`
+      ),
+    };
+  }
+
+  const { tables, customOperations, stats } = pipelineResult;
+
+  // 3. Validate tables found
+  const tablesValidation = validateTablesFound(tables);
+  if (!tablesValidation.valid) {
+    return {
+      success: false,
+      error: formatMessage(tablesValidation.error!),
+    };
+  }
+
+  return {
+    success: true,
+    data: { tables, customOperations, stats },
+  };
+}
+
+async function generateReactQueryForTarget(
+  target: ResolvedTargetConfig,
+  pipelineResult: PipelineResult,
+  options: GenerateOptions,
+  isMultiTarget: boolean
+): Promise<GenerateTargetResult> {
+  const config = target.config;
+  const prefix = isMultiTarget ? `[${target.name}] ` : '';
+  const log = options.verbose
+    ? (message: string) => console.log(`${prefix}${message}`)
+    : () => {};
+  const formatMessage = (message: string) =>
+    isMultiTarget ? `Target "${target.name}": ${message}` : message;
+
+  const { tables, customOperations, stats } = pipelineResult;
+
+  // Generate React Query SDK
+  console.log(`${prefix}Generating React Query SDK...`);
+  const { files: generatedFiles, stats: genStats } = generateReactQueryFiles({
+    tables,
+    customOperations: {
+      queries: customOperations.queries,
+      mutations: customOperations.mutations,
+      typeRegistry: customOperations.typeRegistry,
+    },
+    config,
+  });
+  console.log(`${prefix}Generated ${genStats.totalFiles} files`);
+
+  log(`  ${genStats.queryHooks} table query hooks`);
+  log(`  ${genStats.mutationHooks} table mutation hooks`);
+  log(`  ${genStats.customQueryHooks} custom query hooks`);
+  log(`  ${genStats.customMutationHooks} custom mutation hooks`);
+
+  const customQueries = customOperations.queries.map((q) => q.name);
+  const customMutations = customOperations.mutations.map((m) => m.name);
+
+  if (options.dryRun) {
+    return {
+      name: target.name,
+      output: config.output,
+      generatorType: 'react-query',
+      success: true,
+      message: formatMessage(
+        `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${stats.customQueries + stats.customMutations} custom operations.`
+      ),
+      tables: tables.map((t) => t.name),
+      customQueries,
+      customMutations,
+      filesWritten: generatedFiles.map((f) => f.path),
+    };
+  }
+
+  // Write files
+  log('Writing files...');
+  console.log(`${prefix}Output: ${config.output}`);
+  const writeResult = await writeGeneratedFiles(generatedFiles, config.output, [
+    'queries',
+    'mutations',
+  ]);
+
+  if (!writeResult.success) {
+    return {
+      name: target.name,
+      output: config.output,
+      generatorType: 'react-query',
+      success: false,
+      message: formatMessage(
+        `Failed to write files: ${writeResult.errors?.join(', ')}`
+      ),
+      errors: writeResult.errors,
+    };
+  }
+
+  const totalOps = customQueries.length + customMutations.length;
+  const customOpsMsg = totalOps > 0 ? ` and ${totalOps} custom operations` : '';
+
+  return {
+    name: target.name,
+    output: config.output,
+    generatorType: 'react-query',
+    success: true,
+    message: formatMessage(
+      `Generated React Query SDK for ${tables.length} tables${customOpsMsg}. Files written to ${config.output}`
+    ),
+    tables: tables.map((t) => t.name),
+    customQueries,
+    customMutations,
+    filesWritten: writeResult.filesWritten,
+  };
+}
+
+async function generateOrmForTarget(
+  target: ResolvedTargetConfig,
+  pipelineResult: PipelineResult,
+  options: GenerateOptions,
+  isMultiTarget: boolean
+): Promise<GenerateTargetResult> {
+  const config = target.config;
+  const outputDir = options.output || config.orm.output;
+  const prefix = isMultiTarget ? `[${target.name}] ` : '';
+  const log = options.verbose
+    ? (message: string) => console.log(`${prefix}${message}`)
+    : () => {};
+  const formatMessage = (message: string) =>
+    isMultiTarget ? `Target "${target.name}": ${message}` : message;
+
+  const { tables, customOperations, stats } = pipelineResult;
+
+  // Generate ORM client
+  console.log(`${prefix}Generating ORM client...`);
+  const { files: generatedFiles, stats: genStats } = generateOrmFiles({
+    tables,
+    customOperations: {
+      queries: customOperations.queries,
+      mutations: customOperations.mutations,
+      typeRegistry: customOperations.typeRegistry,
+    },
+    config,
+  });
+  console.log(`${prefix}Generated ${genStats.totalFiles} files`);
+
+  log(`  ${genStats.tables} table models`);
+  log(`  ${genStats.customQueries} custom query operations`);
+  log(`  ${genStats.customMutations} custom mutation operations`);
+
+  const customQueries = customOperations.queries.map((q) => q.name);
+  const customMutations = customOperations.mutations.map((m) => m.name);
+
+  if (options.dryRun) {
+    return {
+      name: target.name,
+      output: outputDir,
+      generatorType: 'orm',
+      success: true,
+      message: formatMessage(
+        `Dry run complete. Would generate ${generatedFiles.length} files for ${tables.length} tables and ${stats.customQueries + stats.customMutations} custom operations.`
+      ),
+      tables: tables.map((t) => t.name),
+      customQueries,
+      customMutations,
+      filesWritten: generatedFiles.map((f) => f.path),
+    };
+  }
+
+  // Write files
+  log('Writing files...');
+  console.log(`${prefix}Output: ${outputDir}`);
+  const writeResult = await writeGeneratedFiles(generatedFiles, outputDir, [
+    'models',
+    'query',
+    'mutation',
+  ]);
+
+  if (!writeResult.success) {
+    return {
+      name: target.name,
+      output: outputDir,
+      generatorType: 'orm',
+      success: false,
+      message: formatMessage(
+        `Failed to write files: ${writeResult.errors?.join(', ')}`
+      ),
+      errors: writeResult.errors,
+    };
+  }
+
+  const totalOps = customQueries.length + customMutations.length;
+  const customOpsMsg = totalOps > 0 ? ` and ${totalOps} custom operations` : '';
+
+  return {
+    name: target.name,
+    output: outputDir,
+    generatorType: 'orm',
+    success: true,
+    message: formatMessage(
+      `Generated ORM client for ${tables.length} tables${customOpsMsg}. Files written to ${outputDir}`
+    ),
+    tables: tables.map((t) => t.name),
+    customQueries,
+    customMutations,
+    filesWritten: writeResult.filesWritten,
+  };
+}

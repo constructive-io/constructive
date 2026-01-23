@@ -6,23 +6,21 @@
 import { CLI, CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
 import { initCommand } from './commands/init';
-import { generateReactQuery } from './commands/generate';
-import { generateOrm } from './commands/generate-orm';
+import { generate, generateReactQuery, generateOrm } from './commands/generate-unified';
 import { loadWatchConfig } from '../core/config';
 import { startWatch } from '../core/watch';
 import { createSchemaSource, inferTablesFromIntrospection } from '../core/introspect';
 import type { ResolvedConfig } from '../types/config';
 
 const usageText = `
-graphql-codegen - CLI for generating GraphQL SDK from PostGraphile endpoints or schema files
+graphql-codegen - GraphQL SDK generator for Constructive databases
 
 Usage:
   graphql-codegen <command> [options]
 
 Commands:
   init           Initialize a new graphql-codegen configuration file
-  generate       Generate SDK from GraphQL endpoint or schema file
-  generate-orm   Generate Prisma-like ORM client from GraphQL endpoint or schema file
+  generate       Generate SDK from GraphQL endpoint, schema file, database, or PGPM module
   introspect     Introspect a GraphQL endpoint or schema file and print table info
 
 Options:
@@ -47,50 +45,49 @@ Options:
 `;
 
 const generateUsageText = `
-graphql-codegen generate - Generate SDK from GraphQL endpoint or schema file
+graphql-codegen generate - Generate SDK from GraphQL endpoint, schema file, database, or PGPM module
 
 Usage:
   graphql-codegen generate [options]
 
-Options:
+Source Options (choose one):
   --config, -c <path>         Path to config file
-  --target, -t <name>         Target name in config file
-  --endpoint, -e <url>        GraphQL endpoint URL (overrides config)
+  --endpoint, -e <url>        GraphQL endpoint URL
   --schema, -s <path>         Path to GraphQL schema file (.graphql)
+  --database <name>           Database name or connection string
+  --pgpm-module-path <path>   Path to PGPM module (creates ephemeral database)
+  --pgpm-workspace-path <path> Path to PGPM workspace (use with --pgpm-module-name)
+  --pgpm-module-name <name>   Module name in workspace (use with --pgpm-workspace-path)
+
+Schema Options (for database/PGPM modes):
+  --schemas <list>            Comma-separated list of schemas to introspect (default: public)
+  --api-names <list>          Comma-separated list of API names (auto-resolves schemas from services_public.api_schemas)
+
+Generator Options:
+  --reactquery                Generate React Query SDK (hooks + fetch functions)
+  --orm                       Generate Prisma-like ORM client
+  --target, -t <name>         Target name in config file
   --output, -o <dir>          Output directory (overrides config)
   --authorization, -a <header> Authorization header value
-  --verbose, -v               Verbose output
-  --dry-run                   Dry run - show what would be generated without writing files
-  --watch, -w                 Watch mode - poll endpoint for schema changes (in-memory)
-  --poll-interval <ms>        Polling interval in milliseconds (default: 3000)
-  --debounce <ms>             Debounce delay before regenerating (default: 800)
-  --touch <file>              File to touch on schema change
-  --no-clear                  Do not clear terminal on regeneration
-  --help, -h                  Show this help message
-`;
-
-const generateOrmUsageText = `
-graphql-codegen generate-orm - Generate Prisma-like ORM client from GraphQL endpoint or schema file
-
-Usage:
-  graphql-codegen generate-orm [options]
-
-Options:
-  --config, -c <path>         Path to config file
-  --target, -t <name>         Target name in config file
-  --endpoint, -e <url>        GraphQL endpoint URL (overrides config)
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
-  --output, -o <dir>          Output directory (overrides config)
-  --authorization, -a <header> Authorization header value
-  --verbose, -v               Verbose output
+  --verbose                   Verbose output
   --dry-run                   Dry run - show what would be generated without writing files
   --skip-custom-operations    Skip custom operations (only generate table CRUD)
-  --watch, -w                 Watch mode - poll endpoint for schema changes (in-memory)
+  --keep-db                   Keep ephemeral database after generation (for debugging)
+
+Watch Mode Options:
+  --watch, -w                 Watch mode - poll endpoint for schema changes
   --poll-interval <ms>        Polling interval in milliseconds (default: 3000)
   --debounce <ms>             Debounce delay before regenerating (default: 800)
   --touch <file>              File to touch on schema change
   --no-clear                  Do not clear terminal on regeneration
+
   --help, -h                  Show this help message
+
+Examples:
+  graphql-codegen generate --endpoint http://localhost:5000/graphql --reactquery
+  graphql-codegen generate --database mydb --schemas public,app_public --orm
+  graphql-codegen generate --pgpm-module-path ./my-module --api-names my_api --reactquery --orm
+  graphql-codegen generate --config ./graphql-codegen.config.ts
 `;
 
 const introspectUsageText = `
@@ -147,7 +144,7 @@ async function handleInit(argv: Partial<ParsedArgs>): Promise<void> {
 }
 
 /**
- * Generate command handler
+ * Generate command handler - unified handler for React Query SDK and ORM generation
  */
 async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
   if (argv.help || argv.h) {
@@ -157,147 +154,33 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
 
   const startTime = performance.now();
 
+  // Source options
   const config = (argv.config as string) || (argv.c as string);
   const target = (argv.target as string) || (argv.t as string);
   const endpoint = (argv.endpoint as string) || (argv.e as string);
   const schema = (argv.schema as string) || (argv.s as string);
+  const database = argv.database as string | undefined;
+  const pgpmModulePath = argv['pgpm-module-path'] as string | undefined;
+  const pgpmWorkspacePath = argv['pgpm-workspace-path'] as string | undefined;
+  const pgpmModuleName = argv['pgpm-module-name'] as string | undefined;
+
+  // Schema options
+  const schemasArg = argv.schemas as string | undefined;
+  const schemas = schemasArg ? schemasArg.split(',').map((s) => s.trim()) : undefined;
+  const apiNamesArg = argv['api-names'] as string | undefined;
+  const apiNames = apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined;
+
+  // Generator options
+  const reactQuery = !!argv.reactquery;
+  const orm = !!argv.orm;
   const output = (argv.output as string) || (argv.o as string);
   const authorization = (argv.authorization as string) || (argv.a as string);
-  const verbose = !!(argv.verbose || argv.v);
-  const dryRun = !!(argv['dry-run'] || argv.dryRun);
-  const watch = !!(argv.watch || argv.w);
-  const pollInterval = argv['poll-interval'] !== undefined
-    ? parseInt(argv['poll-interval'] as string, 10)
-    : undefined;
-  const debounce = argv.debounce !== undefined
-    ? parseInt(argv.debounce as string, 10)
-    : undefined;
-  const touch = argv.touch as string | undefined;
-  const clear = argv.clear !== false;
-
-  if (endpoint && schema) {
-    console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
-    );
-    process.exit(1);
-  }
-
-  if (watch) {
-    if (schema) {
-      console.error(
-        'x Watch mode is only supported with --endpoint, not --schema.'
-      );
-      process.exit(1);
-    }
-    const watchConfig = await loadWatchConfig({
-      config,
-      target,
-      endpoint,
-      output,
-      pollInterval,
-      debounce,
-      touch,
-      clear,
-    });
-    if (!watchConfig) {
-      process.exit(1);
-    }
-
-    await startWatch({
-      config: watchConfig,
-      generatorType: 'react-query',
-      verbose,
-      authorization,
-      configPath: config,
-      target,
-      outputDir: output,
-      generateReactQuery,
-      generateOrm,
-    });
-    return;
-  }
-
-  const result = await generateReactQuery({
-    config,
-    target,
-    endpoint,
-    schema,
-    output,
-    authorization,
-    verbose,
-    dryRun,
-  });
-  const duration = formatDuration(performance.now() - startTime);
-
-  const targetResults = result.targets ?? [];
-  const hasNamedTargets =
-    targetResults.length > 0 &&
-    (targetResults.length > 1 || targetResults[0]?.name !== 'default');
-
-  if (hasNamedTargets) {
-    console.log(result.success ? '[ok]' : 'x', result.message);
-    targetResults.forEach((t) => {
-      const status = t.success ? '[ok]' : 'x';
-      console.log(`\n${status} ${t.message}`);
-
-      if (t.tables && t.tables.length > 0) {
-        console.log('  Tables:');
-        t.tables.forEach((table) => console.log(`    - ${table}`));
-      }
-      if (t.filesWritten && t.filesWritten.length > 0) {
-        console.log('  Files written:');
-        t.filesWritten.forEach((file) => console.log(`    - ${file}`));
-      }
-      if (!t.success && t.errors) {
-        t.errors.forEach((error) => console.error(`  - ${error}`));
-      }
-    });
-
-    if (!result.success) {
-      process.exit(1);
-    }
-    return;
-  }
-
-  if (result.success) {
-    console.log('[ok]', result.message, `(${duration})`);
-    if (result.tables && result.tables.length > 0) {
-      console.log('\nTables:');
-      result.tables.forEach((t) => console.log(`  - ${t}`));
-    }
-    if (result.filesWritten && result.filesWritten.length > 0) {
-      console.log('\nFiles written:');
-      result.filesWritten.forEach((f) => console.log(`  - ${f}`));
-    }
-  } else {
-    console.error('x', result.message, `(${duration})`);
-    if (result.errors) {
-      result.errors.forEach((e) => console.error('  -', e));
-    }
-    process.exit(1);
-  }
-}
-
-/**
- * Generate ORM command handler
- */
-async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
-  if (argv.help || argv.h) {
-    console.log(generateOrmUsageText);
-    process.exit(0);
-  }
-
-  const startTime = performance.now();
-
-  const config = (argv.config as string) || (argv.c as string);
-  const target = (argv.target as string) || (argv.t as string);
-  const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
-  const output = (argv.output as string) || (argv.o as string);
-  const authorization = (argv.authorization as string) || (argv.a as string);
-  const verbose = !!(argv.verbose || argv.v);
+  const verbose = !!argv.verbose;
   const dryRun = !!(argv['dry-run'] || argv.dryRun);
   const skipCustomOperations = !!(argv['skip-custom-operations'] || argv.skipCustomOperations);
+  const keepDb = !!(argv['keep-db'] || argv.keepDb);
+
+  // Watch options
   const watch = !!(argv.watch || argv.w);
   const pollInterval = argv['poll-interval'] !== undefined
     ? parseInt(argv['poll-interval'] as string, 10)
@@ -308,18 +191,33 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
   const touch = argv.touch as string | undefined;
   const clear = argv.clear !== false;
 
-  if (endpoint && schema) {
-    console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
-    );
+  // Validate source options
+  const sourceCount = [endpoint, schema, database, pgpmModulePath, pgpmWorkspacePath].filter(Boolean).length;
+  if (sourceCount > 1 && !pgpmWorkspacePath) {
+    console.error('x Cannot use multiple source options. Choose one: --endpoint, --schema, --database, or --pgpm-module-path');
     process.exit(1);
   }
 
+  // Validate pgpm workspace options
+  if (pgpmWorkspacePath && !pgpmModuleName) {
+    console.error('x --pgpm-workspace-path requires --pgpm-module-name');
+    process.exit(1);
+  }
+  if (pgpmModuleName && !pgpmWorkspacePath) {
+    console.error('x --pgpm-module-name requires --pgpm-workspace-path');
+    process.exit(1);
+  }
+
+  // Validate schema options
+  if (schemas && apiNames) {
+    console.error('x Cannot use both --schemas and --api-names. Choose one.');
+    process.exit(1);
+  }
+
+  // Watch mode
   if (watch) {
-    if (schema) {
-      console.error(
-        'x Watch mode is only supported with --endpoint, not --schema.'
-      );
+    if (schema || database || pgpmModulePath || pgpmWorkspacePath) {
+      console.error('x Watch mode is only supported with --endpoint or --config.');
       process.exit(1);
     }
     const watchConfig = await loadWatchConfig({
@@ -336,9 +234,10 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
       process.exit(1);
     }
 
+    const generatorType = orm ? 'orm' : 'react-query';
     await startWatch({
       config: watchConfig,
-      generatorType: 'orm',
+      generatorType,
       verbose,
       authorization,
       configPath: config,
@@ -351,26 +250,44 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
     return;
   }
 
-  const result = await generateOrm({
+  // Run generation
+  const result = await generate({
     config,
     target,
     endpoint,
     schema,
+    database,
+    pgpmModulePath,
+    pgpmWorkspacePath,
+    pgpmModuleName,
+    schemas,
+    apiNames,
     output,
     authorization,
     verbose,
     dryRun,
     skipCustomOperations,
+    keepDb,
+    reactQuery,
+    orm,
   });
   const duration = formatDuration(performance.now() - startTime);
 
+  // Print results
+  printGenerateResults(result, duration);
+}
+
+/**
+ * Print generate results in a consistent format
+ */
+function printGenerateResults(result: Awaited<ReturnType<typeof generate>>, duration: string): void {
   const targetResults = result.targets ?? [];
   const hasNamedTargets =
     targetResults.length > 0 &&
     (targetResults.length > 1 || targetResults[0]?.name !== 'default');
 
   if (hasNamedTargets) {
-    console.log(result.success ? '[ok]' : 'x', result.message);
+    console.log(result.success ? '[ok]' : 'x', result.message, `(${duration})`);
     targetResults.forEach((t) => {
       const status = t.success ? '[ok]' : 'x';
       console.log(`\n${status} ${t.message}`);
@@ -500,7 +417,6 @@ const createCommandMap = (): Record<string, (argv: Partial<ParsedArgs>) => Promi
   return {
     init: handleInit,
     generate: handleGenerate,
-    'generate-orm': handleGenerateOrm,
     introspect: handleIntrospect,
   };
 };
@@ -576,8 +492,16 @@ export const options: Partial<CLIOptions> = {
       f: 'force',
       w: 'watch',
     },
-    boolean: ['help', 'version', 'force', 'verbose', 'dry-run', 'watch', 'json', 'skip-custom-operations', 'clear'],
-    string: ['config', 'target', 'endpoint', 'schema', 'output', 'authorization', 'directory', 'touch', 'poll-interval', 'debounce'],
+    boolean: [
+      'help', 'version', 'force', 'verbose', 'dry-run', 'watch', 'json',
+      'skip-custom-operations', 'clear', 'reactquery', 'orm', 'keep-db',
+    ],
+    string: [
+      'config', 'target', 'endpoint', 'schema', 'output', 'authorization',
+      'directory', 'touch', 'poll-interval', 'debounce', 'database',
+      'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
+      'schemas', 'api-names',
+    ],
     default: {
       clear: true,
     },

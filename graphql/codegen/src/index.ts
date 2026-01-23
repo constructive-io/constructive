@@ -1,7 +1,7 @@
 /**
  * @constructive-io/graphql-codegen
  *
- * CLI-based GraphQL SDK generator for PostGraphile endpoints.
+ * GraphQL SDK generator for Constructive databases.
  * Introspects via _meta query and generates typed queries, mutations,
  * and React Query v5 hooks.
  */
@@ -23,6 +23,7 @@ export { defineConfig } from './types/config';
 
 // CLI command exports (for packages/cli consumption)
 export {
+  generate,
   generateReactQuery,
   generateOrm,
   findConfigFile,
@@ -43,6 +44,7 @@ export type {
   GenerateOptions,
   GenerateResult,
   GenerateTargetResult,
+  GeneratorType,
   GenerateOrmOptions,
   GenerateOrmResult,
   GenerateOrmTargetResult,
