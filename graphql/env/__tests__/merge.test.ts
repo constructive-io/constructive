@@ -84,8 +84,8 @@ describe('getEnvOptions', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('dedupes graphql array fields across config, env, and overrides', () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-dedupe-'));
+  it('replaces graphql array fields with later values (overrides win)', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-replace-'));
     writeConfig(tempDir, {
       graphile: {
         schema: ['config_schema', 'shared_schema']
@@ -116,25 +116,9 @@ describe('getEnvOptions', () => {
       testEnv
     );
 
-    expect(result.graphile?.schema).toEqual([
-      'config_schema',
-      'shared_schema',
-      'env_schema',
-      'override_schema'
-    ]);
-    expect(result.api?.exposedSchemas).toEqual([
-      'public',
-      'shared',
-      'env_schema',
-      'override_schema'
-    ]);
-    expect(result.api?.metaSchemas).toEqual([
-      'metaschema_public',
-      'services_public',
-      'config_meta',
-      'metaschema_modules_public',
-      'env_meta',
-      'override_meta'
-    ]);
+    // Arrays are replaced, not merged - overrides win completely
+    expect(result.graphile?.schema).toEqual(['override_schema', 'shared_schema']);
+    expect(result.api?.exposedSchemas).toEqual(['public', 'override_schema']);
+    expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 });

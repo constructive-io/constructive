@@ -736,6 +736,9 @@ importers:
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       find-and-require-package-json:
         specifier: ^0.9.0
         version: 0.9.0
@@ -1606,6 +1609,19 @@ importers:
         version: 0.1.10
     publishDirectory: dist
 
+  packages/csrf:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.7
+        version: 20.19.27
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+    publishDirectory: dist
+
   packages/csv-to-pg:
     dependencies:
       '@pgsql/types':
@@ -1636,6 +1652,23 @@ importers:
       pgsql-parser:
         specifier: ^17.9.11
         version: 17.9.11
+    publishDirectory: dist
+
+  packages/oauth:
+    dependencies:
+      '@constructive-io/csrf':
+        specifier: workspace:^
+        version: link:../csrf/dist
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.7
+        version: 20.19.27
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/orm:
@@ -2356,10 +2389,7 @@ packages:
     resolution: {integrity: sha512-4SaHhlxwOSizIK5P/14r7V7HxcHmip1fpX2HEToV7NpLWVDkI+eb+nskkq5F0XzC5bq2vhzpIAHQwZVeEibZLg==}
 
   '@0no-co/graphql.web@1.2.0':
-    resolution:
-      {
-        integrity: sha512-/1iHy9TTr63gE1YcR5idjx8UREz1s0kFhydf3bBLCXyqjhkIc6igAzTOx3zPifCwFR87tsh/4Pa9cNts6d2otw==,
-      }
+    resolution: {integrity: sha512-/1iHy9TTr63gE1YcR5idjx8UREz1s0kFhydf3bBLCXyqjhkIc6igAzTOx3zPifCwFR87tsh/4Pa9cNts6d2otw==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     peerDependenciesMeta:

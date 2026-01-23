@@ -69,9 +69,9 @@ export interface GenerateResult {
 }
 
 /**
- * Execute the generate command
+ * Execute the generate command (generates React Query SDK)
  */
-export async function generateCommand(
+export async function generateReactQuery(
   options: GenerateOptions = {}
 ): Promise<GenerateResult> {
   if (options.verbose) {
