@@ -1,5 +1,5 @@
 import {
-  cleanEnv,
+  cleanEnv as envalidCleanEnv,
   makeValidator,
   EnvError,
   EnvMissingError,
@@ -13,10 +13,37 @@ import {
   url,
   email
 } from 'envalid';
-import type { ValidatorSpec, CleanedEnv } from 'envalid';
+import type { ValidatorSpec, CleanedEnv, CleanOptions } from 'envalid';
 
 import { readFileSync } from 'fs';
 import { resolve, join } from 'path';
+
+/**
+ * Custom reporter that throws an error instead of calling process.exit
+ * This allows errors to be caught and handled properly in tests and applications
+ */
+const throwingReporter = <T>({ errors }: { errors: Partial<Record<keyof T, Error>> }) => {
+  const errorKeys = Object.keys(errors) as (keyof T)[];
+  if (errorKeys.length > 0) {
+    const missingVars = errorKeys.map((key) => `${String(key)}: ${errors[key]?.message ?? 'unknown error'}`);
+    throw new EnvError(`Missing or invalid environment variables:\n  ${missingVars.join('\n  ')}`);
+  }
+};
+
+/**
+ * Wrapper around envalid's cleanEnv that uses a throwing reporter by default
+ * This prevents process.exit from being called on validation errors
+ */
+const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
+  environment: Record<string, string | undefined>,
+  specs: S,
+  options?: CleanOptions<S>
+): CleanedEnv<S> => {
+  return envalidCleanEnv(environment, specs, {
+    reporter: throwingReporter,
+    ...options
+  });
+};
 
 /**
  * Default path for secret files (Docker/Kubernetes secrets)
