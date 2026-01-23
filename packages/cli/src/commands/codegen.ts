@@ -175,8 +175,8 @@ export default async (
     verbose,
     dryRun,
     // Use flags to control which generators run
-    reactQuery: !orm,
-    orm: orm,
+    enableReactQuery: !orm,
+    enableOrm: orm,
   });
 
   printResult(result);
