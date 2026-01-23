@@ -73,4 +73,4 @@ export interface PollEvent {
 /**
  * Generator type for watch mode
  */
-export type GeneratorType = 'generate' | 'generate-orm';
+export type GeneratorType = 'react-query' | 'orm';

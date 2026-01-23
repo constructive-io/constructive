@@ -213,16 +213,21 @@ export class WatchOrchestrator {
     this.log('Regenerating...');
 
     try {
-      const generateFn =
-        this.options.generatorType === 'generate'
-          ? this.options.generateReactQuery
-          : this.options.generateOrm;
+      let generateFn: GenerateFunction;
+      let outputDir: string | undefined;
 
-      const outputDir =
-        this.options.outputDir ??
-        (this.options.generatorType === 'generate'
-          ? this.options.config.output
-          : this.options.config.orm.output);
+      switch (this.options.generatorType) {
+        case 'react-query':
+          generateFn = this.options.generateReactQuery;
+          outputDir = this.options.outputDir ?? this.options.config.output;
+          break;
+        case 'orm':
+          generateFn = this.options.generateOrm;
+          outputDir = this.options.outputDir ?? this.options.config.orm.output;
+          break;
+        default:
+          throw new Error(`Unknown generator type: ${this.options.generatorType}`);
+      }
 
       const result = await generateFn({
         config: this.options.configPath,
@@ -278,10 +283,17 @@ export class WatchOrchestrator {
   }
 
   private logHeader(): void {
-    const generatorName =
-      this.options.generatorType === 'generate'
-        ? 'React Query hooks'
-        : 'ORM client';
+    let generatorName: string;
+    switch (this.options.generatorType) {
+      case 'react-query':
+        generatorName = 'React Query hooks';
+        break;
+      case 'orm':
+        generatorName = 'ORM client';
+        break;
+      default:
+        throw new Error(`Unknown generator type: ${this.options.generatorType}`);
+    }
     console.log(`\n${'─'.repeat(50)}`);
     console.log(`graphql-codegen watch mode (${generatorName})`);
     console.log(`Endpoint: ${this.options.config.endpoint}`);

@@ -205,7 +205,7 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
 
     await startWatch({
       config: watchConfig,
-      generatorType: 'generate',
+      generatorType: 'react-query',
       verbose,
       authorization,
       configPath: config,
@@ -338,7 +338,7 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
 
     await startWatch({
       config: watchConfig,
-      generatorType: 'generate-orm',
+      generatorType: 'orm',
       verbose,
       authorization,
       configPath: config,
