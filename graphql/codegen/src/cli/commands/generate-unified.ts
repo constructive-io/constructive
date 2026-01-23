@@ -124,7 +124,7 @@ export async function generate(
         output: target.config.output,
         generatorType: 'react-query',
         success: false,
-        message: `Target "${target.name}": No generators enabled. Set reactQuery.enabled or orm.enabled in config, or use --reactquery or --orm flags.`,
+        message: `Target "${target.name}": No generators enabled. Set reactQuery.enabled or orm.enabled in config, or use --react-query or --orm flags.`,
       });
       continue;
     }

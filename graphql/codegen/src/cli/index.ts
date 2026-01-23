@@ -64,7 +64,7 @@ Schema Options (for database/PGPM modes):
   --api-names <list>          Comma-separated list of API names (auto-resolves schemas from services_public.api_schemas)
 
 Generator Options:
-  --reactquery                Generate React Query SDK (hooks + fetch functions)
+  --react-query               Generate React Query SDK (hooks + fetch functions)
   --orm                       Generate Prisma-like ORM client
   --target, -t <name>         Target name in config file
   --output, -o <dir>          Output directory (overrides config)
@@ -84,9 +84,9 @@ Watch Mode Options:
   --help, -h                  Show this help message
 
 Examples:
-  graphql-codegen generate --endpoint http://localhost:5000/graphql --reactquery
+  graphql-codegen generate --endpoint http://localhost:5000/graphql --react-query
   graphql-codegen generate --database mydb --schemas public,app_public --orm
-  graphql-codegen generate --pgpm-module-path ./my-module --api-names my_api --reactquery --orm
+  graphql-codegen generate --pgpm-module-path ./my-module --api-names my_api --react-query --orm
   graphql-codegen generate --config ./graphql-codegen.config.ts
 `;
 
@@ -171,7 +171,7 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
   const apiNames = apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined;
 
   // Generator options
-  const reactQuery = !!argv.reactquery;
+  const reactQuery = !!argv['react-query'];
   const orm = !!argv.orm;
   const output = (argv.output as string) || (argv.o as string);
   const authorization = (argv.authorization as string) || (argv.a as string);
@@ -494,7 +494,7 @@ export const options: Partial<CLIOptions> = {
     },
     boolean: [
       'help', 'version', 'force', 'verbose', 'dry-run', 'watch', 'json',
-      'skip-custom-operations', 'clear', 'reactquery', 'orm', 'keep-db',
+      'skip-custom-operations', 'clear', 'react-query', 'orm', 'keep-db',
     ],
     string: [
       'config', 'target', 'endpoint', 'schema', 'output', 'authorization',

@@ -80,19 +80,19 @@ export default defineConfig({
 
 ```bash
 # Generate React Query hooks from an endpoint
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/hooks --reactquery
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/hooks --react-query
 
 # Generate ORM client from an endpoint
 npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/orm --orm
 
 # Generate from a database directly
-npx graphql-sdk generate --database postgres://localhost/mydb --schemas public,app_public --reactquery
+npx graphql-sdk generate --database postgres://localhost/mydb --schemas public,app_public --react-query
 
 # Generate from a PGPM module
 npx graphql-sdk generate --pgpm-module-path ./packages/my-module --schemas public --orm
 
 # Generate using apiNames for automatic schema discovery
-npx graphql-sdk generate --database postgres://localhost/mydb --api-names my_api --reactquery --orm
+npx graphql-sdk generate --database postgres://localhost/mydb --api-names my_api --react-query --orm
 ```
 
 ### 3. Use the Generated Code
@@ -139,7 +139,7 @@ Schema Options (for database/pgpm modes):
                                    (mutually exclusive with --schemas)
 
 Generator Options:
-  --reactquery                     Generate React Query hooks
+  --react-query                    Generate React Query hooks
   --orm                            Generate ORM client
   -t, --target <name>              Target name in config file
   -o, --output <dir>               Output directory
