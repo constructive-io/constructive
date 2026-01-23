@@ -35,7 +35,7 @@
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
     "@launchql/mjml": "0.1.1",
-    "@launchql/postmaster": "0.1.4",
+    "@constructive-io/postmaster": "workspace:^",
     "@launchql/styled-email": "0.1.0",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",

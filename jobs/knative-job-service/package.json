@@ -37,8 +37,9 @@
   "bugs": {
     "url": "https://github.com/constructive-io/jobs/issues"
   },
-  "devDependencies": {
-    "@constructive-io/graphql-server": "workspace:^",
+    "devDependencies": {
+      "@constructive-io/postmaster": "workspace:^",
+      "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpm/database-jobs": "^0.16.0",
     "@pgpm/inflection": "^0.16.0",
