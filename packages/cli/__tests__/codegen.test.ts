@@ -6,9 +6,20 @@ jest.mock('@constructive-io/graphql-codegen/cli/commands/generate', () => ({
   generateReactQuery: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] }))
 }))
 
-jest.mock('@constructive-io/graphql-server', () => ({
-  buildSchemaSDL: jest.fn(async () => 'type Query { hello: String }\nschema { query: Query }')
+jest.mock('@constructive-io/graphql-codegen', () => ({
+  generateReactQuery: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
+  generateOrm: jest.fn(async () => ({ success: true, message: 'Generated ORM', filesWritten: [] as string[] })),
+  findConfigFile: jest.fn((): string | undefined => undefined),
+  buildSchemaFromDatabase: jest.fn(async ({ outDir }: { outDir: string }) => ({
+    schemaPath: `${outDir}/schema.graphql`,
+    sdl: 'type Query { hello: String }\nschema { query: Query }'
+  }))
 }))
+
+// Create a mock prompter that returns the argv values directly
+const createMockPrompter = () => ({
+  prompt: jest.fn(async (argv: any, _questions: any) => argv)
+})
 
 describe('codegen command', () => {
   beforeEach(() => {
@@ -20,8 +31,9 @@ describe('codegen command', () => {
     const spyExit = jest.spyOn(process, 'exit').mockImplementation(((code?: number) => { throw new Error('exit:' + code) }) as any)
 
     const argv: Partial<ParsedArgs> = { help: true }
+    const mockPrompter = createMockPrompter()
 
-    await expect(codegenCommand(argv, {} as any, {} as any)).rejects.toThrow('exit:0')
+    await expect(codegenCommand(argv, mockPrompter as any, {} as any)).rejects.toThrow('exit:0')
     expect(spyLog).toHaveBeenCalled()
     const first = (spyLog.mock.calls[0]?.[0] as string) || ''
     expect(first).toContain('Constructive GraphQL Codegen')
@@ -31,6 +43,7 @@ describe('codegen command', () => {
   })
 
   it('calls generateReactQuery with endpoint flow options', async () => {
+    const { generateReactQuery: mockGenerateReactQuery } = require('@constructive-io/graphql-codegen')
 
     const argv: Partial<ParsedArgs> = {
       endpoint: 'http://localhost:3000/graphql',
@@ -39,11 +52,12 @@ describe('codegen command', () => {
       verbose: true,
       'dry-run': true
     }
+    const mockPrompter = createMockPrompter()
 
-    await codegenCommand(argv, {} as any, {} as any)
+    await codegenCommand(argv, mockPrompter as any, {} as any)
 
-    expect(generateReactQuery).toHaveBeenCalled()
-    const call = (generateReactQuery as jest.Mock).mock.calls[0][0]
+    expect(mockGenerateReactQuery).toHaveBeenCalled()
+    const call = mockGenerateReactQuery.mock.calls[0][0]
     expect(call).toMatchObject({
       endpoint: 'http://localhost:3000/graphql',
       output: 'graphql/codegen/dist',
@@ -54,17 +68,20 @@ describe('codegen command', () => {
   })
 
   it('builds schema file and calls generateReactQuery with schema when DB options provided', async () => {
+    const { generateReactQuery: mockGenerateReactQuery, buildSchemaFromDatabase } = require('@constructive-io/graphql-codegen')
 
     const argv: Partial<ParsedArgs> = {
       database: 'constructive_db',
       schemas: 'public',
       out: 'graphql/codegen/dist'
     }
+    const mockPrompter = createMockPrompter()
 
-    await codegenCommand(argv, {} as any, {} as any)
+    await codegenCommand(argv, mockPrompter as any, {} as any)
 
-    expect(generateReactQuery).toHaveBeenCalled()
-    const call = (generateReactQuery as jest.Mock).mock.calls[0][0]
+    expect(buildSchemaFromDatabase).toHaveBeenCalled()
+    expect(mockGenerateReactQuery).toHaveBeenCalled()
+    const call = mockGenerateReactQuery.mock.calls[0][0]
     expect(call.schema).toBe('graphql/codegen/dist/schema.graphql')
     expect(call.output).toBe('graphql/codegen/dist')
     expect(call.endpoint).toBeUndefined()
