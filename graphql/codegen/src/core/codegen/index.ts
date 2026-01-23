@@ -28,7 +28,7 @@ import type {
   CleanOperation,
   TypeRegistry,
 } from '../../types/schema';
-import type { ResolvedConfig, ResolvedQueryKeyConfig } from '../../types/config';
+import type { GraphQLSDKConfigTarget, QueryKeyConfig } from '../../types/config';
 import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
 
 import { generateClientFile } from './client';
@@ -82,8 +82,8 @@ export interface GenerateOptions {
     mutations: CleanOperation[];
     typeRegistry: TypeRegistry;
   };
-  /** Resolved configuration */
-  config: ResolvedConfig;
+  /** Configuration */
+  config: GraphQLSDKConfigTarget;
   /**
    * Path to shared types directory (relative import path).
    * When provided, types.ts and schema-types.ts are NOT generated
@@ -102,7 +102,7 @@ export interface GenerateOptions {
  */
 export function generateAllFiles(
   tables: CleanTable[],
-  config: ResolvedConfig
+  config: GraphQLSDKConfigTarget
 ): GenerateResult {
   return generate({ tables, config });
 }
@@ -123,7 +123,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   const reactQueryEnabled = config.reactQuery.enabled;
 
   // Query key configuration (use defaults if not provided)
-  const queryKeyConfig: ResolvedQueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
+  const queryKeyConfig: QueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
   const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
   const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
 

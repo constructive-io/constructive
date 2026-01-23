@@ -11,7 +11,7 @@
 import path from 'path';
 import * as t from '@babel/types';
 import { generateCode, addJSDocComment } from '../../core/codegen/babel-ast';
-import type { ResolvedTargetConfig } from '../../types/config';
+import type { TargetConfig } from '../../types/config';
 import {
   loadAndResolveConfig,
   type ConfigOverrideOptions,
@@ -38,10 +38,10 @@ export interface GenerateOptions extends ConfigOverrideOptions {
   dryRun?: boolean;
   /** Skip custom operations (only generate table CRUD) */
   skipCustomOperations?: boolean;
-  /** Override: generate React Query SDK regardless of config */
-  reactQuery?: boolean;
-  /** Override: generate ORM client regardless of config */
-  orm?: boolean;
+  /** Override: enable React Query SDK generation */
+  enableReactQuery?: boolean;
+  /** Override: enable ORM client generation */
+  enableOrm?: boolean;
 }
 
 export interface GenerateTargetResult {
@@ -115,8 +115,8 @@ export async function generate(
 
   for (const target of targets) {
     // Determine which generators to run based on config and options
-    const runReactQuery = options.reactQuery ?? target.config.reactQuery.enabled;
-    const runOrm = options.orm ?? target.config.orm.enabled;
+    const runReactQuery = options.enableReactQuery ?? target.config.reactQuery?.enabled;
+    const runOrm = options.enableOrm ?? target.config.orm?.enabled;
 
     if (!runReactQuery && !runOrm) {
       results.push({
@@ -219,7 +219,7 @@ export async function generate(
 export async function generateReactQuery(
   options: GenerateOptions = {}
 ): Promise<GenerateResult> {
-  return generate({ ...options, reactQuery: true, orm: false });
+  return generate({ ...options, enableReactQuery: true, enableOrm: false });
 }
 
 /**
@@ -228,7 +228,7 @@ export async function generateReactQuery(
 export async function generateOrm(
   options: GenerateOptions = {}
 ): Promise<GenerateResult> {
-  return generate({ ...options, reactQuery: false, orm: true });
+  return generate({ ...options, enableReactQuery: false, enableOrm: true });
 }
 
 // ============================================================================
@@ -242,7 +242,7 @@ interface PipelineRunResult {
 }
 
 async function runPipelineForTarget(
-  target: ResolvedTargetConfig,
+  target: TargetConfig,
   options: GenerateOptions,
   isMultiTarget: boolean
 ): Promise<PipelineRunResult> {
@@ -251,27 +251,18 @@ async function runPipelineForTarget(
   const formatMessage = (message: string) =>
     isMultiTarget ? `Target "${target.name}": ${message}` : message;
 
-  // Extract source options from config (now first-class citizens in ResolvedConfig)
-  const database = config.database ?? undefined;
-  const schemas = config.schemas.length > 0 ? config.schemas : undefined;
-  const apiNames = config.apiNames.length > 0 ? config.apiNames : undefined;
-  const pgpmModulePath = config.pgpmModulePath ?? undefined;
-  const pgpmWorkspacePath = config.pgpmWorkspacePath ?? undefined;
-  const pgpmModuleName = config.pgpmModuleName ?? undefined;
-  const keepDb = config.keepDb;
-
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
     let sourceLabel: string;
-    const schemaInfo = apiNames && apiNames.length > 0
-      ? `apiNames: ${apiNames.join(', ')}`
-      : `schemas: ${(schemas ?? ['public']).join(', ')}`;
-    if (pgpmModulePath) {
-      sourceLabel = `pgpm module: ${pgpmModulePath} (${schemaInfo})`;
-    } else if (pgpmWorkspacePath && pgpmModuleName) {
-      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (${schemaInfo})`;
-    } else if (database) {
-      sourceLabel = `database: ${database} (${schemaInfo})`;
+    const schemaInfo = config.apiNames && config.apiNames.length > 0
+      ? `apiNames: ${config.apiNames.join(', ')}`
+      : `schemas: ${(config.schemas ?? ['public']).join(', ')}`;
+    if (config.pgpmModulePath) {
+      sourceLabel = `pgpm module: ${config.pgpmModulePath} (${schemaInfo})`;
+    } else if (config.pgpmWorkspacePath && config.pgpmModuleName) {
+      sourceLabel = `pgpm workspace: ${config.pgpmWorkspacePath}, module: ${config.pgpmModuleName} (${schemaInfo})`;
+    } else if (config.database) {
+      sourceLabel = `database: ${config.database} (${schemaInfo})`;
     } else if (config.schema) {
       sourceLabel = `schema: ${config.schema}`;
     } else {
@@ -284,12 +275,12 @@ async function runPipelineForTarget(
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
-    database,
-    pgpmModulePath,
-    pgpmWorkspacePath,
-    pgpmModuleName,
-    schemas,
-    apiNames,
+    database: config.database,
+    pgpmModulePath: config.pgpmModulePath,
+    pgpmWorkspacePath: config.pgpmWorkspacePath,
+    pgpmModuleName: config.pgpmModuleName,
+    schemas: config.schemas,
+    apiNames: config.apiNames,
   });
   if (!sourceValidation.valid) {
     return {
@@ -301,14 +292,14 @@ async function runPipelineForTarget(
   const source = createSchemaSource({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
-    database,
-    pgpmModulePath,
-    pgpmWorkspacePath,
-    pgpmModuleName,
-    schemas,
-    apiNames,
-    keepDb,
-    authorization: options.authorization || config.headers['Authorization'],
+    database: config.database,
+    pgpmModulePath: config.pgpmModulePath,
+    pgpmWorkspacePath: config.pgpmWorkspacePath,
+    pgpmModuleName: config.pgpmModuleName,
+    schemas: config.schemas,
+    apiNames: config.apiNames,
+    keepDb: config.keepDb,
+    authorization: options.authorization || config.headers?.['Authorization'],
     headers: config.headers,
   });
 
@@ -360,7 +351,7 @@ async function runPipelineForTarget(
  *   orm/              - ORM client
  */
 async function generateUnifiedOutput(
-  target: ResolvedTargetConfig,
+  target: TargetConfig,
   pipelineResult: PipelineResult,
   options: GenerateOptions,
   isMultiTarget: boolean
@@ -474,7 +465,7 @@ function generateUnifiedBarrel(hasSchemaTypes: boolean): string {
 }
 
 async function generateReactQueryForTarget(
-  target: ResolvedTargetConfig,
+  target: TargetConfig,
   pipelineResult: PipelineResult,
   options: GenerateOptions,
   isMultiTarget: boolean,
@@ -571,7 +562,7 @@ async function generateReactQueryForTarget(
 }
 
 async function generateOrmForTarget(
-  target: ResolvedTargetConfig,
+  target: TargetConfig,
   pipelineResult: PipelineResult,
   options: GenerateOptions,
   isMultiTarget: boolean,

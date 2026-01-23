@@ -10,7 +10,6 @@ export {
 } from './loader';
 
 export {
-  buildTargetOverrides,
   loadAndResolveConfig,
   loadWatchConfig,
   type ConfigOverrideOptions,

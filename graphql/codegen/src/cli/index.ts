@@ -10,7 +10,7 @@ import { generate, generateReactQuery, generateOrm } from './commands/generate-u
 import { loadWatchConfig } from '../core/config';
 import { startWatch } from '../core/watch';
 import { createSchemaSource, inferTablesFromIntrospection } from '../core/introspect';
-import type { ResolvedConfig } from '../types/config';
+import type { GraphQLSDKConfigTarget } from '../types/config';
 
 const usageText = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -268,8 +268,8 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
     dryRun,
     skipCustomOperations,
     keepDb,
-    reactQuery,
-    orm,
+    enableReactQuery: reactQuery,
+    enableOrm: orm,
   });
   const duration = formatDuration(performance.now() - startTime);
 

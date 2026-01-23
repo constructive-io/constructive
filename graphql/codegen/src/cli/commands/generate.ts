@@ -4,7 +4,7 @@
  * This is a thin CLI wrapper around the core generation functions.
  * All business logic is in the core modules.
  */
-import type { ResolvedTargetConfig } from '../../types/config';
+import type { TargetConfig } from '../../types/config';
 import {
   loadAndResolveConfig,
   type ConfigOverrideOptions,
@@ -118,7 +118,7 @@ export async function generateReactQuery(
 }
 
 async function generateForTarget(
-  target: ResolvedTargetConfig,
+  target: TargetConfig,
   options: GenerateOptions,
   isMultiTarget: boolean
 ): Promise<GenerateTargetResult> {
@@ -130,27 +130,18 @@ async function generateForTarget(
   const formatMessage = (message: string) =>
     isMultiTarget ? `Target "${target.name}": ${message}` : message;
 
-  // Extract extended options if present (attached by config resolver)
-  const database = (config as any).database as string | undefined;
-  const schemas = (config as any).schemas as string[] | undefined;
-  const apiNames = (config as any).apiNames as string[] | undefined;
-  const pgpmModulePath = (config as any).pgpmModulePath as string | undefined;
-  const pgpmWorkspacePath = (config as any).pgpmWorkspacePath as string | undefined;
-  const pgpmModuleName = (config as any).pgpmModuleName as string | undefined;
-  const keepDb = (config as any).keepDb as boolean | undefined;
-
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
     let sourceLabel: string;
-    const schemaInfo = apiNames && apiNames.length > 0
-      ? `apiNames: ${apiNames.join(', ')}`
-      : `schemas: ${(schemas ?? ['public']).join(', ')}`;
-    if (pgpmModulePath) {
-      sourceLabel = `pgpm module: ${pgpmModulePath} (${schemaInfo})`;
-    } else if (pgpmWorkspacePath && pgpmModuleName) {
-      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (${schemaInfo})`;
-    } else if (database) {
-      sourceLabel = `database: ${database} (${schemaInfo})`;
+    const schemaInfo = config.apiNames && config.apiNames.length > 0
+      ? `apiNames: ${config.apiNames.join(', ')}`
+      : `schemas: ${(config.schemas ?? ['public']).join(', ')}`;
+    if (config.pgpmModulePath) {
+      sourceLabel = `pgpm module: ${config.pgpmModulePath} (${schemaInfo})`;
+    } else if (config.pgpmWorkspacePath && config.pgpmModuleName) {
+      sourceLabel = `pgpm workspace: ${config.pgpmWorkspacePath}, module: ${config.pgpmModuleName} (${schemaInfo})`;
+    } else if (config.database) {
+      sourceLabel = `database: ${config.database} (${schemaInfo})`;
     } else if (config.schema) {
       sourceLabel = `schema: ${config.schema}`;
     } else {
@@ -164,12 +155,12 @@ async function generateForTarget(
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
-    database,
-    pgpmModulePath,
-    pgpmWorkspacePath,
-    pgpmModuleName,
-    schemas,
-    apiNames,
+    database: config.database,
+    pgpmModulePath: config.pgpmModulePath,
+    pgpmWorkspacePath: config.pgpmWorkspacePath,
+    pgpmModuleName: config.pgpmModuleName,
+    schemas: config.schemas,
+    apiNames: config.apiNames,
   });
   if (!sourceValidation.valid) {
     return {
@@ -183,14 +174,14 @@ async function generateForTarget(
   const source = createSchemaSource({
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
-    database,
-    pgpmModulePath,
-    pgpmWorkspacePath,
-    pgpmModuleName,
-    schemas,
-    apiNames,
-    keepDb,
-    authorization: options.authorization || config.headers['Authorization'],
+    database: config.database,
+    pgpmModulePath: config.pgpmModulePath,
+    pgpmWorkspacePath: config.pgpmWorkspacePath,
+    pgpmModuleName: config.pgpmModuleName,
+    schemas: config.schemas,
+    apiNames: config.apiNames,
+    keepDb: config.keepDb,
+    authorization: options.authorization || config.headers?.['Authorization'],
     headers: config.headers,
   });
 

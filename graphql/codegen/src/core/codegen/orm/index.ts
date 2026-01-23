@@ -5,7 +5,7 @@
  * and produces the complete ORM client output.
  */
 import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
-import type { ResolvedConfig } from '../../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import {
   generateOrmClientFile,
   generateQueryBuilderFile,
@@ -32,7 +32,7 @@ export interface GenerateOrmOptions {
     mutations: CleanOperation[];
     typeRegistry?: TypeRegistry;
   };
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
   /**
    * Path to shared types directory (relative import path).
    * When provided, entity types are imported from shared types

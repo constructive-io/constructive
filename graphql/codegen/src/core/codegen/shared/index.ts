@@ -12,7 +12,7 @@
  *   filters.ts        - Filter types (StringFilter, IntFilter, etc.)
  */
 import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
-import type { ResolvedConfig } from '../../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import * as t from '@babel/types';
 import { generateCode, addJSDocComment } from '../babel-ast';
 import { generateTypesFile } from '../types';
@@ -38,7 +38,7 @@ export interface GenerateSharedOptions {
     mutations: CleanOperation[];
     typeRegistry: TypeRegistry;
   };
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
 }
 
 export interface GenerateSharedResult {

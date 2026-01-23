@@ -4,7 +4,7 @@
  * Coordinates schema polling, change detection, and code regeneration
  */
 
-import type { ResolvedConfig } from '../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type { GeneratorType, WatchOptions, PollEvent } from './types';
 import { SchemaPoller } from './poller';
 import { debounce } from './debounce';
@@ -32,7 +32,7 @@ export interface GenerateResult {
 }
 
 export interface WatchOrchestratorOptions {
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
   generatorType: GeneratorType;
   verbose: boolean;
   authorization?: string;

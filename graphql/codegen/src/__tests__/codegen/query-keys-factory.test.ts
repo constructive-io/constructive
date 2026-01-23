@@ -10,7 +10,7 @@ import { generateQueryKeysFile } from '../../core/codegen/query-keys';
 import { generateMutationKeysFile } from '../../core/codegen/mutation-keys';
 import { generateInvalidationFile } from '../../core/codegen/invalidation';
 import type { CleanTable, CleanFieldType, CleanRelations, CleanOperation, CleanTypeRef } from '../../types/schema';
-import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
+import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
 
 const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
@@ -141,7 +141,7 @@ const fieldTable = createTable({
   },
 });
 
-const simpleConfig: ResolvedQueryKeyConfig = {
+const simpleConfig: QueryKeyConfig = {
   style: 'hierarchical',
   relationships: {},
   generateScopedKeys: true,

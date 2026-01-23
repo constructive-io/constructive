@@ -5,7 +5,7 @@
  * for parent-child entity relationships.
  */
 import type { CleanTable } from '../../types/schema';
-import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
+import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
 import * as t from '@babel/types';
 import {
@@ -18,7 +18,7 @@ import {
 
 export interface InvalidationGeneratorOptions {
   tables: CleanTable[];
-  config: ResolvedQueryKeyConfig;
+  config: QueryKeyConfig;
 }
 
 export interface GeneratedInvalidationFile {

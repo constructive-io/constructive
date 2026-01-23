@@ -328,122 +328,19 @@ export interface WatchConfig {
 }
 
 /**
- * Resolved watch configuration with defaults applied
- */
-export interface ResolvedWatchConfig {
-  pollInterval: number;
-  debounce: number;
-  touchFile: string | null;
-  clearScreen: boolean;
-}
-
-/**
- * Resolved query key configuration with defaults applied
- */
-export interface ResolvedQueryKeyConfig {
-  style: 'flat' | 'hierarchical';
-  relationships: Record<string, EntityRelationship>;
-  generateScopedKeys: boolean;
-  generateCascadeHelpers: boolean;
-  generateMutationKeys: boolean;
-}
-
-/**
- * Resolved configuration with defaults applied
- */
-export interface ResolvedConfig {
-  /**
-   * GraphQL endpoint URL (empty string if using other source)
-   */
-  endpoint: string;
-  /**
-   * Path to GraphQL schema file (null if using other source)
-   */
-  schema: string | null;
-  /**
-   * Database name or connection string (null if using other source)
-   */
-  database: string | null;
-  /**
-   * Path to PGPM module (null if using other source)
-   */
-  pgpmModulePath: string | null;
-  /**
-   * Path to PGPM workspace (null if using other source)
-   */
-  pgpmWorkspacePath: string | null;
-  /**
-   * Module name within PGPM workspace (null if using other source)
-   */
-  pgpmModuleName: string | null;
-  /**
-   * PostgreSQL schemas to introspect (for database and PGPM modes)
-   */
-  schemas: string[];
-  /**
-   * API names to resolve schemas from (for database and PGPM modes)
-   */
-  apiNames: string[];
-  /**
-   * Keep ephemeral database after introspection (for PGPM modes)
-   */
-  keepDb: boolean;
-  headers: Record<string, string>;
-  output: string;
-  tables: {
-    include: string[];
-    exclude: string[];
-    systemExclude: string[];
-  };
-  queries: {
-    include: string[];
-    exclude: string[];
-    systemExclude: string[];
-  };
-  mutations: {
-    include: string[];
-    exclude: string[];
-    systemExclude: string[];
-  };
-  excludeFields: string[];
-  hooks: {
-    queries: boolean;
-    mutations: boolean;
-    queryKeyPrefix: string;
-  };
-  postgraphile: {
-    schema: string;
-  };
-  codegen: {
-    maxFieldDepth: number;
-    skipQueryField: boolean;
-  };
-  orm: {
-    enabled: boolean;
-    output: string;
-    useSharedTypes: boolean;
-  };
-  reactQuery: {
-    enabled: boolean;
-  };
-  queryKeys: ResolvedQueryKeyConfig;
-  watch: ResolvedWatchConfig;
-}
-
-/**
  * Default watch configuration values
  */
-export const DEFAULT_WATCH_CONFIG: ResolvedWatchConfig = {
+export const DEFAULT_WATCH_CONFIG: WatchConfig = {
   pollInterval: 3000,
   debounce: 800,
-  touchFile: null,
+  touchFile: undefined,
   clearScreen: true,
 };
 
 /**
  * Default query key configuration values
  */
-export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
+export const DEFAULT_QUERY_KEY_CONFIG: QueryKeyConfig = {
   style: 'hierarchical',
   relationships: {},
   generateScopedKeys: true,
@@ -454,16 +351,8 @@ export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
 /**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: ResolvedConfig = {
+export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   endpoint: '',
-  schema: null,
-  database: null,
-  pgpmModulePath: null,
-  pgpmWorkspacePath: null,
-  pgpmModuleName: null,
-  schemas: [],
-  apiNames: [],
-  keepDb: false,
   headers: {},
   output: './generated/graphql',
   tables: {
@@ -515,11 +404,11 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
 }
 
 /**
- * Resolved target configuration helper
+ * Target configuration with name (used after resolution)
  */
-export interface ResolvedTargetConfig {
+export interface TargetConfig {
   name: string;
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
 }
 
 /**
@@ -545,17 +434,26 @@ export function mergeConfig(
 }
 
 /**
- * Resolve configuration by applying defaults.
- * Uses deepmerge with array replacement strategy.
+ * Get configuration options by merging defaults with user config.
+ * Similar to getEnvOptions pattern from @pgpmjs/env.
  */
-export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
+export function getConfigOptions(
+  overrides: GraphQLSDKConfigTarget = {}
+): GraphQLSDKConfigTarget {
+  return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
+}
+
+/**
+ * Resolve configuration by applying defaults.
+ * For single-target configs only - throws for multi-target configs.
+ */
+export function resolveConfig(config: GraphQLSDKConfig): GraphQLSDKConfigTarget {
   if (isMultiConfig(config)) {
     throw new Error(
       'Multi-target config cannot be resolved with resolveConfig(). Use resolveConfigTargets().'
     );
   }
-
-  return deepmerge(DEFAULT_CONFIG, config, { arrayMerge: replaceArrays }) as ResolvedConfig;
+  return getConfigOptions(config);
 }
 
 /**
@@ -563,11 +461,11 @@ export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
  */
 export function resolveConfigTargets(
   config: GraphQLSDKMultiConfig
-): ResolvedTargetConfig[] {
+): TargetConfig[] {
   const defaults = config.defaults ?? {};
 
   return Object.entries(config.targets).map(([name, target]) => ({
     name,
-    config: resolveConfig(mergeConfig(defaults, target)),
+    config: getConfigOptions(mergeConfig(defaults, target)),
   }));
 }

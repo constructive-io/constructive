@@ -19,7 +19,7 @@ describe('config resolution', () => {
     const resolved = resolveConfig(config);
 
     expect(resolved.endpoint).toBe('https://api.example.com/graphql');
-    expect(resolved.schema).toBeNull();
+    expect(resolved.schema).toBeUndefined();
     expect(resolved.output).toBe(DEFAULT_CONFIG.output);
     expect(resolved.tables.include).toEqual(DEFAULT_CONFIG.tables.include);
     expect(resolved.queries.exclude).toEqual(DEFAULT_CONFIG.queries.exclude);

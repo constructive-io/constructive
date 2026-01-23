@@ -8,40 +8,20 @@ import type {
   GraphQLSDKConfig,
   GraphQLSDKConfigTarget,
   GraphQLSDKMultiConfig,
-  ResolvedConfig,
-  ResolvedTargetConfig,
+  TargetConfig,
 } from '../../types/config';
-import { isMultiConfig, mergeConfig, resolveConfig } from '../../types/config';
+import { isMultiConfig, mergeConfig, getConfigOptions } from '../../types/config';
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
- * Options that can override config file settings
+ * CLI options that can override config file settings.
+ * Extends GraphQLSDKConfigTarget with CLI-specific fields.
  */
-export interface ConfigOverrideOptions {
-  /** Path to config file */
+export interface ConfigOverrideOptions extends GraphQLSDKConfigTarget {
+  /** Path to config file (CLI-only) */
   config?: string;
-  /** Named target in a multi-target config */
+  /** Named target in a multi-target config (CLI-only) */
   target?: string;
-  /** GraphQL endpoint URL (overrides config) */
-  endpoint?: string;
-  /** Path to GraphQL schema file (.graphql) */
-  schema?: string;
-  /** Database name or connection string (for database introspection) */
-  database?: string;
-  /** Path to a PGPM module directory (for module introspection) */
-  pgpmModulePath?: string;
-  /** Path to a PGPM workspace directory (used with pgpmModuleName) */
-  pgpmWorkspacePath?: string;
-  /** Name of the module within the workspace (used with pgpmWorkspacePath) */
-  pgpmModuleName?: string;
-  /** PostgreSQL schemas to include (for database and pgpm module modes) - mutually exclusive with apiNames */
-  schemas?: string[];
-  /** API names to resolve schemas from (for database and pgpm module modes) - mutually exclusive with schemas */
-  apiNames?: string[];
-  /** Keep the ephemeral database after introspection (for debugging, pgpm module mode only) */
-  keepDb?: boolean;
-  /** Output directory (overrides config) */
-  output?: string;
 }
 
 /**
@@ -49,63 +29,9 @@ export interface ConfigOverrideOptions {
  */
 export interface LoadConfigResult {
   success: boolean;
-  targets?: ResolvedTargetConfig[];
+  targets?: TargetConfig[];
   isMulti?: boolean;
   error?: string;
-}
-
-/**
- * Build target overrides from CLI options
- *
- * Note: Validation that only one source is specified happens in loadAndResolveConfig,
- * so we don't need to clear other source fields here.
- */
-export function buildTargetOverrides(
-  options: ConfigOverrideOptions
-): GraphQLSDKConfigTarget {
-  const overrides: GraphQLSDKConfigTarget = {};
-
-  if (options.endpoint) {
-    overrides.endpoint = options.endpoint;
-  }
-
-  if (options.schema) {
-    overrides.schema = options.schema;
-  }
-
-  if (options.database) {
-    overrides.database = options.database;
-  }
-
-  if (options.pgpmModulePath) {
-    overrides.pgpmModulePath = options.pgpmModulePath;
-  }
-
-  if (options.pgpmWorkspacePath) {
-    overrides.pgpmWorkspacePath = options.pgpmWorkspacePath;
-  }
-
-  if (options.pgpmModuleName) {
-    overrides.pgpmModuleName = options.pgpmModuleName;
-  }
-
-  if (options.schemas) {
-    overrides.schemas = options.schemas;
-  }
-
-  if (options.apiNames) {
-    overrides.apiNames = options.apiNames;
-  }
-
-  if (options.keepDb !== undefined) {
-    overrides.keepDb = options.keepDb;
-  }
-
-  if (options.output) {
-    overrides.output = options.output;
-  }
-
-  return overrides;
 }
 
 /**
@@ -120,15 +46,18 @@ export function buildTargetOverrides(
 export async function loadAndResolveConfig(
   options: ConfigOverrideOptions
 ): Promise<LoadConfigResult> {
+  // Destructure CLI-only fields, rest is config overrides
+  const { config: configPath, target: targetName, ...overrides } = options;
+
   // Check for pgpm workspace mode (requires both pgpmWorkspacePath and pgpmModuleName)
-  const hasPgpmWorkspace = options.pgpmWorkspacePath && options.pgpmModuleName;
+  const hasPgpmWorkspace = overrides.pgpmWorkspacePath && overrides.pgpmModuleName;
 
   // Validate that at most one source is specified
   const sources = [
-    options.endpoint,
-    options.schema,
-    options.database,
-    options.pgpmModulePath,
+    overrides.endpoint,
+    overrides.schema,
+    overrides.database,
+    overrides.pgpmModulePath,
     hasPgpmWorkspace,
   ].filter(Boolean);
   if (sources.length > 1) {
@@ -140,28 +69,26 @@ export async function loadAndResolveConfig(
   }
 
   // Find config file
-  let configPath = options.config;
-  if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
+  let resolvedConfigPath = configPath;
+  if (!resolvedConfigPath) {
+    resolvedConfigPath = findConfigFile() ?? undefined;
   }
 
   let baseConfig: GraphQLSDKConfig = {};
 
-  if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
+  if (resolvedConfigPath) {
+    const loadResult = await loadConfigFile(resolvedConfigPath);
     if (!loadResult.success) {
       return { success: false, error: loadResult.error };
     }
     baseConfig = loadResult.config;
   }
 
-  const overrides = buildTargetOverrides(options);
-
   if (isMultiConfig(baseConfig)) {
-    return resolveMultiTargetConfig(baseConfig, options, overrides);
+    return resolveMultiTargetConfig(baseConfig, targetName, overrides);
   }
 
-  return resolveSingleTargetConfig(baseConfig as GraphQLSDKConfigTarget, options, overrides);
+  return resolveSingleTargetConfig(baseConfig as GraphQLSDKConfigTarget, targetName, overrides);
 }
 
 /**
@@ -169,7 +96,7 @@ export async function loadAndResolveConfig(
  */
 function resolveMultiTargetConfig(
   baseConfig: GraphQLSDKMultiConfig,
-  options: ConfigOverrideOptions,
+  targetName: string | undefined,
   overrides: GraphQLSDKConfigTarget
 ): LoadConfigResult {
   if (Object.keys(baseConfig.targets).length === 0) {
@@ -180,9 +107,9 @@ function resolveMultiTargetConfig(
   }
 
   if (
-    !options.target &&
-    (options.endpoint || options.schema || options.database || 
-     options.pgpmModulePath || options.pgpmWorkspacePath || options.output)
+    !targetName &&
+    (overrides.endpoint || overrides.schema || overrides.database || 
+     overrides.pgpmModulePath || overrides.pgpmWorkspacePath || overrides.output)
   ) {
     return {
       success: false,
@@ -191,22 +118,22 @@ function resolveMultiTargetConfig(
     };
   }
 
-  if (options.target && !baseConfig.targets[options.target]) {
+  if (targetName && !baseConfig.targets[targetName]) {
     return {
       success: false,
-      error: `Target "${options.target}" not found in config file.`,
+      error: `Target "${targetName}" not found in config file.`,
     };
   }
 
-  const selectedTargets = options.target
-    ? { [options.target]: baseConfig.targets[options.target] }
+  const selectedTargets = targetName
+    ? { [targetName]: baseConfig.targets[targetName] }
     : baseConfig.targets;
   const defaults = baseConfig.defaults ?? {};
-  const resolvedTargets: ResolvedTargetConfig[] = [];
+  const resolvedTargets: TargetConfig[] = [];
 
   for (const [name, target] of Object.entries(selectedTargets)) {
     let mergedTarget = mergeConfig(defaults, target);
-    if (options.target && name === options.target) {
+    if (targetName && name === targetName) {
       mergedTarget = mergeConfig(mergedTarget, overrides);
     }
 
@@ -226,7 +153,7 @@ function resolveMultiTargetConfig(
 
     resolvedTargets.push({
       name,
-      config: resolveConfig(mergedTarget),
+      config: getConfigOptions(mergedTarget),
     });
   }
 
@@ -242,10 +169,10 @@ function resolveMultiTargetConfig(
  */
 function resolveSingleTargetConfig(
   baseConfig: GraphQLSDKConfigTarget,
-  options: ConfigOverrideOptions,
+  targetName: string | undefined,
   overrides: GraphQLSDKConfigTarget
 ): LoadConfigResult {
-  if (options.target) {
+  if (targetName) {
     return {
       success: false,
       error:
@@ -271,13 +198,9 @@ function resolveSingleTargetConfig(
     };
   }
 
-  // All source options are now first-class citizens in the config types,
-  // so resolveConfig handles them properly without any casts
-  const resolvedConfig = resolveConfig(mergedConfig);
-
   return {
     success: true,
-    targets: [{ name: 'default', config: resolvedConfig }],
+    targets: [{ name: 'default', config: getConfigOptions(mergedConfig) }],
     isMulti: false,
   };
 }
@@ -296,7 +219,7 @@ export async function loadWatchConfig(options: {
   debounce?: number;
   touch?: string;
   clear?: boolean;
-}): Promise<ResolvedConfig | null> {
+}): Promise<GraphQLSDKConfigTarget | null> {
   let configPath = options.config;
   if (!configPath) {
     configPath = findConfigFile() ?? undefined;
@@ -374,5 +297,5 @@ export async function loadWatchConfig(options: {
     return null;
   }
 
-  return resolveConfig(mergedTarget);
+  return getConfigOptions(mergedTarget);
 }

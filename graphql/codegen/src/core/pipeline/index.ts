@@ -8,7 +8,7 @@
  * - Operation transformation
  * - Filtering
  */
-import type { ResolvedConfig } from '../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
   CleanTable,
   CleanOperation,
@@ -39,9 +39,9 @@ export interface CodegenPipelineOptions {
   source: SchemaSource;
 
   /**
-   * Resolved configuration
+   * Configuration
    */
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
 
   /**
    * Enable verbose logging
