@@ -43,10 +43,6 @@ export type {
   GenerateOptions,
   GenerateResult,
   GenerateTargetResult,
-  GeneratorType,
-  GenerateOrmOptions,
-  GenerateOrmResult,
-  GenerateOrmTargetResult,
   InitOptions,
   InitResult,
 } from './cli/commands';
