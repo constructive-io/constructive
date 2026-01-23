@@ -123,7 +123,8 @@ async function generateOrmForTarget(
   isMultiTarget: boolean
 ): Promise<GenerateOrmTargetResult> {
   const config = target.config;
-  const outputDir = options.output || config.orm.output;
+  // Always use conventional subdirectory: {output}/orm
+  const outputDir = options.output || `${config.output}/orm`;
   const prefix = isMultiTarget ? `[${target.name}] ` : '';
   const log = options.verbose
     ? (message: string) => console.log(`${prefix}${message}`)
@@ -134,17 +135,19 @@ async function generateOrmForTarget(
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
     let sourceLabel: string;
-    const schemaInfo = config.apiNames && config.apiNames.length > 0
-      ? `apiNames: ${config.apiNames.join(', ')}`
-      : `schemas: ${(config.schemas ?? ['public']).join(', ')}`;
-    if (config.pgpmModulePath) {
-      sourceLabel = `pgpm module: ${config.pgpmModulePath} (${schemaInfo})`;
-    } else if (config.pgpmWorkspacePath && config.pgpmModuleName) {
-      sourceLabel = `pgpm workspace: ${config.pgpmWorkspacePath}, module: ${config.pgpmModuleName} (${schemaInfo})`;
-    } else if (config.database) {
-      sourceLabel = `database: ${config.database} (${schemaInfo})`;
-    } else if (config.schema) {
-      sourceLabel = `schema: ${config.schema}`;
+    if (config.db) {
+      const schemaInfo = config.db.apiNames && config.db.apiNames.length > 0
+        ? `apiNames: ${config.db.apiNames.join(', ')}`
+        : `schemas: ${(config.db.schemas ?? ['public']).join(', ')}`;
+      if (config.db.pgpm?.modulePath) {
+        sourceLabel = `pgpm module: ${config.db.pgpm.modulePath} (${schemaInfo})`;
+      } else if (config.db.pgpm?.workspacePath && config.db.pgpm?.moduleName) {
+        sourceLabel = `pgpm workspace: ${config.db.pgpm.workspacePath}, module: ${config.db.pgpm.moduleName} (${schemaInfo})`;
+      } else {
+        sourceLabel = `database (${schemaInfo})`;
+      }
+    } else if (config.schemaFile) {
+      sourceLabel = `schemaFile: ${config.schemaFile}`;
     } else {
       sourceLabel = `endpoint: ${config.endpoint}`;
     }
@@ -155,13 +158,8 @@ async function generateOrmForTarget(
   // 1. Validate source
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
-    schema: config.schema || undefined,
-    database: config.database,
-    pgpmModulePath: config.pgpmModulePath,
-    pgpmWorkspacePath: config.pgpmWorkspacePath,
-    pgpmModuleName: config.pgpmModuleName,
-    schemas: config.schemas,
-    apiNames: config.apiNames,
+    schemaFile: config.schemaFile || undefined,
+    db: config.db,
   });
   if (!sourceValidation.valid) {
     return {
@@ -174,14 +172,8 @@ async function generateOrmForTarget(
 
   const source = createSchemaSource({
     endpoint: config.endpoint || undefined,
-    schema: config.schema || undefined,
-    database: config.database,
-    pgpmModulePath: config.pgpmModulePath,
-    pgpmWorkspacePath: config.pgpmWorkspacePath,
-    pgpmModuleName: config.pgpmModuleName,
-    schemas: config.schemas,
-    apiNames: config.apiNames,
-    keepDb: config.keepDb,
+    schemaFile: config.schemaFile || undefined,
+    db: config.db,
     authorization: options.authorization || config.headers?.['Authorization'],
     headers: config.headers,
   });

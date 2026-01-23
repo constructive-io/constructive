@@ -219,11 +219,13 @@ export class WatchOrchestrator {
       switch (this.options.generatorType) {
         case 'react-query':
           generateFn = this.options.generateReactQuery;
-          outputDir = this.options.outputDir ?? this.options.config.output;
+          // React Query hooks go to {output}/hooks
+          outputDir = this.options.outputDir ?? `${this.options.config.output}/hooks`;
           break;
         case 'orm':
           generateFn = this.options.generateOrm;
-          outputDir = this.options.outputDir ?? this.options.config.orm.output;
+          // ORM client goes to {output}/orm
+          outputDir = this.options.outputDir ?? `${this.options.config.output}/orm`;
           break;
         default:
           throw new Error(`Unknown generator type: ${this.options.generatorType}`);

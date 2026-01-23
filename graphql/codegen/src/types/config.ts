@@ -3,6 +3,7 @@
  */
 
 import deepmerge from 'deepmerge';
+import type { PgConfig } from 'pg-env';
 
 /**
  * Array merge strategy that replaces arrays (source wins over target).
@@ -73,15 +74,76 @@ export interface QueryKeyConfig {
 }
 
 /**
+ * PGPM module configuration for ephemeral database creation
+ */
+export interface PgpmConfig {
+  /**
+   * Path to a PGPM module directory
+   * Creates an ephemeral database, deploys the module, and introspects
+   */
+  modulePath?: string;
+
+  /**
+   * Path to a PGPM workspace directory
+   * Must be used together with `moduleName`
+   */
+  workspacePath?: string;
+
+  /**
+   * Name of the module within the PGPM workspace
+   * Must be used together with `workspacePath`
+   */
+  moduleName?: string;
+}
+
+/**
+ * Database configuration for direct database introspection
+ */
+export interface DbConfig {
+  /**
+   * PostgreSQL connection configuration
+   * Falls back to environment variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
+   * via @pgpmjs/env when not specified
+   */
+  config?: Partial<PgConfig>;
+
+  /**
+   * PGPM module configuration for ephemeral database creation
+   * When specified, creates an ephemeral database from the module
+   */
+  pgpm?: PgpmConfig;
+
+  /**
+   * PostgreSQL schemas to introspect
+   * Mutually exclusive with `apiNames`
+   * @example ['public', 'app_public']
+   */
+  schemas?: string[];
+
+  /**
+   * API names to resolve schemas from
+   * Queries services_public.api_schemas to automatically determine schemas
+   * Mutually exclusive with `schemas`
+   * @example ['my_api']
+   */
+  apiNames?: string[];
+
+  /**
+   * Keep the ephemeral database after introspection (for debugging)
+   * Only applies when using pgpm
+   * @default false
+   */
+  keepDb?: boolean;
+}
+
+/**
  * Target configuration for graphql-codegen
  * Represents a single schema source and output destination.
  *
  * Source options (choose one):
  * - endpoint: GraphQL endpoint URL for live introspection
- * - schema: Path to GraphQL schema file (.graphql)
- * - database: Database name or connection string for direct introspection
- * - pgpmModulePath: Path to PGPM module (creates ephemeral database)
- * - pgpmWorkspacePath + pgpmModuleName: PGPM workspace mode
+ * - schemaFile: Path to GraphQL schema file (.graphql)
+ * - db: Database configuration for direct introspection or PGPM module
  */
 export interface GraphQLSDKConfigTarget {
   /**
@@ -92,54 +154,13 @@ export interface GraphQLSDKConfigTarget {
   /**
    * Path to GraphQL schema file (.graphql) for file-based generation
    */
-  schema?: string;
+  schemaFile?: string;
 
   /**
-   * Database name or connection string for direct database introspection
-   * Use with `schemas` or `apiNames` to specify which schemas to introspect
+   * Database configuration for direct database introspection or PGPM module
+   * Use db.schemas or db.apiNames to specify which schemas to introspect
    */
-  database?: string;
-
-  /**
-   * Path to a PGPM module directory
-   * Creates an ephemeral database, deploys the module, and introspects
-   * Use with `schemas` or `apiNames` to specify which schemas to introspect
-   */
-  pgpmModulePath?: string;
-
-  /**
-   * Path to a PGPM workspace directory
-   * Must be used together with `pgpmModuleName`
-   */
-  pgpmWorkspacePath?: string;
-
-  /**
-   * Name of the module within the PGPM workspace
-   * Must be used together with `pgpmWorkspacePath`
-   */
-  pgpmModuleName?: string;
-
-  /**
-   * PostgreSQL schemas to introspect (for database and PGPM modes)
-   * Mutually exclusive with `apiNames`
-   * @example ['public', 'app_public']
-   */
-  schemas?: string[];
-
-  /**
-   * API names to resolve schemas from (for database and PGPM modes)
-   * Queries services_public.api_schemas to automatically determine schemas
-   * Mutually exclusive with `schemas`
-   * @example ['my_api']
-   */
-  apiNames?: string[];
-
-  /**
-   * Keep the ephemeral database after introspection (for debugging)
-   * Only applies to PGPM module modes
-   * @default false
-   */
-  keepDb?: boolean;
+  db?: DbConfig;
 
   /**
    * Headers to include in introspection requests
@@ -226,40 +247,19 @@ export interface GraphQLSDKConfigTarget {
   };
 
   /**
-   * ORM client generation options
-   * When set, generates a Prisma-like ORM client in addition to or instead of React Query hooks
+   * Whether to generate ORM client
+   * When enabled, generates a Prisma-like ORM client to {output}/orm
+   * @default false
    */
-  orm?: {
-    /**
-     * Whether to generate ORM client
-     * @default false
-     */
-    enabled?: boolean;
-    /**
-     * Output directory for generated ORM client
-     * @default './generated/orm'
-     */
-    output?: string;
-    /**
-     * Whether to import shared types from hooks output or generate standalone
-     * When true, ORM types.ts will re-export from ../graphql/types
-     * @default true
-     */
-    useSharedTypes?: boolean;
-  };
+  orm?: boolean;
 
   /**
-   * React Query integration options
-   * Controls whether React Query hooks are generated
+   * Whether to generate React Query hooks
+   * When enabled, generates React Query hooks to {output}/hooks
+   * When false, only standalone fetch functions are generated (no React dependency)
+   * @default false
    */
-  reactQuery?: {
-    /**
-     * Whether to generate React Query hooks (useQuery, useMutation)
-     * When false, only standalone fetch functions are generated (no React dependency)
-     * @default false
-     */
-    enabled?: boolean;
-  };
+  reactQuery?: boolean;
 
   /**
    * Query key generation configuration
@@ -272,6 +272,33 @@ export interface GraphQLSDKConfigTarget {
    * When enabled via CLI --watch flag, the CLI will poll the endpoint for schema changes
    */
   watch?: WatchConfig;
+
+  // ============================================================================
+  // Runtime options (used when calling generate() programmatically)
+  // ============================================================================
+
+  /**
+   * Authorization header value (convenience option, also available in headers)
+   */
+  authorization?: string;
+
+  /**
+   * Enable verbose output
+   * @default false
+   */
+  verbose?: boolean;
+
+  /**
+   * Dry run - don't write files, just show what would be generated
+   * @default false
+   */
+  dryRun?: boolean;
+
+  /**
+   * Skip custom operations (only generate table CRUD)
+   * @default false
+   */
+  skipCustomOperations?: boolean;
 }
 
 /**
@@ -383,14 +410,8 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
     maxFieldDepth: 2,
     skipQueryField: true,
   },
-  orm: {
-    enabled: false,
-    output: './generated/orm',
-    useSharedTypes: true,
-  },
-  reactQuery: {
-    enabled: false,
-  },
+  orm: false,
+  reactQuery: false,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };

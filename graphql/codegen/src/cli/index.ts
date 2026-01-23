@@ -53,14 +53,13 @@ Usage:
 Source Options (choose one):
   --config, -c <path>         Path to config file
   --endpoint, -e <url>        GraphQL endpoint URL
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
-  --database <name>           Database name or connection string
+  --schema-file, -s <path>    Path to GraphQL schema file (.graphql)
   --pgpm-module-path <path>   Path to PGPM module (creates ephemeral database)
   --pgpm-workspace-path <path> Path to PGPM workspace (use with --pgpm-module-name)
   --pgpm-module-name <name>   Module name in workspace (use with --pgpm-workspace-path)
 
-Schema Options (for database/PGPM modes):
-  --schemas <list>            Comma-separated list of schemas to introspect (default: public)
+Database Options (for database/PGPM modes):
+  --schemas <list>            Comma-separated list of PostgreSQL schemas to introspect
   --api-names <list>          Comma-separated list of API names (auto-resolves schemas from services_public.api_schemas)
 
 Generator Options:
@@ -85,7 +84,7 @@ Watch Mode Options:
 
 Examples:
   graphql-codegen generate --endpoint http://localhost:5000/graphql --react-query
-  graphql-codegen generate --database mydb --schemas public,app_public --orm
+  graphql-codegen generate --pgpm-module-path ./my-module --schemas public --orm
   graphql-codegen generate --pgpm-module-path ./my-module --api-names my_api --react-query --orm
   graphql-codegen generate --config ./graphql-codegen.config.ts
 `;
@@ -98,7 +97,7 @@ Usage:
 
 Options:
   --endpoint, -e <url>        GraphQL endpoint URL
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
+  --schema-file, -s <path>    Path to GraphQL schema file (.graphql)
   --authorization, -a <header> Authorization header value
   --json                      Output as JSON
   --help, -h                  Show this help message
@@ -158,17 +157,17 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
   const config = (argv.config as string) || (argv.c as string);
   const target = (argv.target as string) || (argv.t as string);
   const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
-  const database = argv.database as string | undefined;
+  const schemaFile = (argv['schema-file'] as string) || (argv.s as string);
   const pgpmModulePath = argv['pgpm-module-path'] as string | undefined;
   const pgpmWorkspacePath = argv['pgpm-workspace-path'] as string | undefined;
   const pgpmModuleName = argv['pgpm-module-name'] as string | undefined;
 
-  // Schema options
+  // Database options
   const schemasArg = argv.schemas as string | undefined;
   const schemas = schemasArg ? schemasArg.split(',').map((s) => s.trim()) : undefined;
   const apiNamesArg = argv['api-names'] as string | undefined;
   const apiNames = apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined;
+  const keepDb = !!(argv['keep-db'] || argv.keepDb);
 
   // Generator options
   const reactQuery = !!argv['react-query'];
@@ -178,7 +177,6 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
   const verbose = !!argv.verbose;
   const dryRun = !!(argv['dry-run'] || argv.dryRun);
   const skipCustomOperations = !!(argv['skip-custom-operations'] || argv.skipCustomOperations);
-  const keepDb = !!(argv['keep-db'] || argv.keepDb);
 
   // Watch options
   const watch = !!(argv.watch || argv.w);
@@ -192,9 +190,9 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
   const clear = argv.clear !== false;
 
   // Validate source options
-  const sourceCount = [endpoint, schema, database, pgpmModulePath, pgpmWorkspacePath].filter(Boolean).length;
+  const sourceCount = [endpoint, schemaFile, pgpmModulePath, pgpmWorkspacePath].filter(Boolean).length;
   if (sourceCount > 1 && !pgpmWorkspacePath) {
-    console.error('x Cannot use multiple source options. Choose one: --endpoint, --schema, --database, or --pgpm-module-path');
+    console.error('x Cannot use multiple source options. Choose one: --endpoint, --schema-file, or --pgpm-module-path');
     process.exit(1);
   }
 
@@ -208,7 +206,7 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
     process.exit(1);
   }
 
-  // Validate schema options
+  // Validate database options
   if (schemas && apiNames) {
     console.error('x Cannot use both --schemas and --api-names. Choose one.');
     process.exit(1);
@@ -216,7 +214,7 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
 
   // Watch mode
   if (watch) {
-    if (schema || database || pgpmModulePath || pgpmWorkspacePath) {
+    if (schemaFile || pgpmModulePath || pgpmWorkspacePath) {
       console.error('x Watch mode is only supported with --endpoint or --config.');
       process.exit(1);
     }
@@ -250,26 +248,32 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
     return;
   }
 
+  // Build db config if pgpm options are provided
+  const db = (pgpmModulePath || pgpmWorkspacePath) ? {
+    pgpm: {
+      modulePath: pgpmModulePath,
+      workspacePath: pgpmWorkspacePath,
+      moduleName: pgpmModuleName,
+    },
+    schemas,
+    apiNames,
+    keepDb,
+  } : undefined;
+
   // Run generation
   const result = await generate({
     config,
     target,
     endpoint,
-    schema,
-    database,
-    pgpmModulePath,
-    pgpmWorkspacePath,
-    pgpmModuleName,
-    schemas,
-    apiNames,
+    schemaFile,
+    db,
     output,
     authorization,
     verbose,
     dryRun,
     skipCustomOperations,
-    keepDb,
-    enableReactQuery: reactQuery,
-    enableOrm: orm,
+    reactQuery,
+    orm,
   });
   const duration = formatDuration(performance.now() - startTime);
 
@@ -358,17 +362,17 @@ async function handleIntrospect(argv: Partial<ParsedArgs>): Promise<void> {
   const startTime = performance.now();
 
   const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
+  const schemaFile = (argv['schema-file'] as string) || (argv.s as string);
   const authorization = (argv.authorization as string) || (argv.a as string);
   const json = !!argv.json;
 
-  if (!endpoint && !schema) {
-    console.error('x Either --endpoint or --schema must be provided.');
+  if (!endpoint && !schemaFile) {
+    console.error('x Either --endpoint or --schema-file must be provided.');
     process.exit(1);
   }
-  if (endpoint && schema) {
+  if (endpoint && schemaFile) {
     console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
+      'x Cannot use both --endpoint and --schema-file. Choose one source.'
     );
     process.exit(1);
   }
@@ -376,7 +380,7 @@ async function handleIntrospect(argv: Partial<ParsedArgs>): Promise<void> {
   try {
     const source = createSchemaSource({
       endpoint,
-      schema,
+      schemaFile,
       authorization,
     });
 
@@ -485,7 +489,7 @@ export const options: Partial<CLIOptions> = {
       c: 'config',
       t: 'target',
       e: 'endpoint',
-      s: 'schema',
+      s: 'schema-file',
       o: 'output',
       a: 'authorization',
       d: 'directory',
@@ -497,8 +501,8 @@ export const options: Partial<CLIOptions> = {
       'skip-custom-operations', 'clear', 'react-query', 'orm', 'keep-db',
     ],
     string: [
-      'config', 'target', 'endpoint', 'schema', 'output', 'authorization',
-      'directory', 'touch', 'poll-interval', 'debounce', 'database',
+      'config', 'target', 'endpoint', 'schema-file', 'output', 'authorization',
+      'directory', 'touch', 'poll-interval', 'debounce',
       'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
       'schemas', 'api-names',
     ],

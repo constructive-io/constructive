@@ -58,10 +58,10 @@ describe('codegen command', () => {
       authorization: 'Bearer testtoken',
       verbose: true,
       dryRun: true,
-      enableReactQuery: true
+      reactQuery: true
     })
-    // enableOrm is undefined when not set (defaults to false via !orm)
-    expect(call.enableOrm).toBeFalsy()
+    // orm is undefined when not set (defaults to false via !orm)
+    expect(call.orm).toBeFalsy()
   })
 
   it('builds schema file and calls generate with schema when DB options provided', async () => {
@@ -79,11 +79,11 @@ describe('codegen command', () => {
     expect(buildSchemaFromDatabase).toHaveBeenCalled()
     expect(mockGenerate).toHaveBeenCalled()
     const call = mockGenerate.mock.calls[0][0]
-    expect(call.schema).toBe('graphql/codegen/dist/schema.graphql')
+    expect(call.schemaFile).toBe('graphql/codegen/dist/schema.graphql')
     expect(call.output).toBe('graphql/codegen/dist')
     expect(call.endpoint).toBeUndefined()
-    expect(call.enableReactQuery).toBe(true)
-    // enableOrm is undefined when not set (defaults to false via !orm)
-    expect(call.enableOrm).toBeFalsy()
+    expect(call.reactQuery).toBe(true)
+    // orm is undefined when not set (defaults to false via !orm)
+    expect(call.orm).toBeFalsy()
   })
 })

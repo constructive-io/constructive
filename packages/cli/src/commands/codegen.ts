@@ -169,14 +169,14 @@ export default async (
     config,
     target,
     endpoint: endpoint || undefined,
-    schema: schemaPath,
+    schemaFile: schemaPath,
     output,
     authorization: auth,
     verbose,
     dryRun,
     // Use flags to control which generators run
-    enableReactQuery: !orm,
-    enableOrm: orm,
+    reactQuery: !orm,
+    orm: orm,
   });
 
   printResult(result);

@@ -120,7 +120,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   // Extract codegen options
   const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
-  const reactQueryEnabled = config.reactQuery.enabled;
+  const reactQueryEnabled = config.reactQuery;
 
   // Query key configuration (use defaults if not provided)
   const queryKeyConfig: QueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;

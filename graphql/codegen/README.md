@@ -58,25 +58,25 @@ import { generate } from '@constructive-io/graphql-codegen';
 // Generate React Query hooks from a GraphQL endpoint
 await generate({
   endpoint: 'https://api.example.com/graphql',
-  output: './generated/hooks',
+  output: './generated',
   headers: { Authorization: 'Bearer <token>' },
-  reactQuery: { enabled: true },
+  reactQuery: true,
 });
 
 // Generate ORM client from a GraphQL endpoint
 await generate({
   endpoint: 'https://api.example.com/graphql',
-  output: './generated/orm',
+  output: './generated',
   headers: { Authorization: 'Bearer <token>' },
-  orm: { enabled: true },
+  orm: true,
 });
 
 // Generate both React Query hooks and ORM client
 await generate({
   endpoint: 'https://api.example.com/graphql',
   output: './generated',
-  reactQuery: { enabled: true },
-  orm: { enabled: true, output: './generated/orm' },
+  reactQuery: true,
+  orm: true,
 });
 ```
 
@@ -89,18 +89,35 @@ import { generate } from '@constructive-io/graphql-codegen';
 
 // Generate from database with explicit schemas
 await generate({
-  database: 'postgres://localhost/mydb',
-  schemas: ['public', 'app_public'],
-  output: './generated/hooks',
-  reactQuery: { enabled: true },
+  db: {
+    schemas: ['public', 'app_public'],
+  },
+  output: './generated',
+  reactQuery: true,
 });
 
 // Generate from database using API names for automatic schema discovery
 await generate({
-  database: 'postgres://localhost/mydb',
-  apiNames: ['my_api'],
-  output: './generated/orm',
-  orm: { enabled: true },
+  db: {
+    apiNames: ['my_api'],
+  },
+  output: './generated',
+  orm: true,
+});
+
+// Generate with explicit database config (overrides environment variables)
+await generate({
+  db: {
+    config: {
+      host: 'localhost',
+      port: 5432,
+      database: 'mydb',
+      user: 'postgres',
+    },
+    schemas: ['public'],
+  },
+  output: './generated',
+  reactQuery: true,
 });
 ```
 
@@ -113,19 +130,36 @@ import { generate } from '@constructive-io/graphql-codegen';
 
 // Generate from a PGPM module directory
 await generate({
-  pgpmModulePath: './packages/my-module',
-  schemas: ['public'],
-  output: './generated/hooks',
-  reactQuery: { enabled: true },
+  db: {
+    pgpm: { modulePath: './packages/my-module' },
+    schemas: ['public'],
+  },
+  output: './generated',
+  reactQuery: true,
 });
 
 // Generate from a PGPM workspace with module name
 await generate({
-  pgpmWorkspacePath: '/path/to/workspace',
-  pgpmModuleName: 'my-module',
-  schemas: ['public'],
-  output: './generated/orm',
-  orm: { enabled: true },
+  db: {
+    pgpm: {
+      workspacePath: '/path/to/workspace',
+      moduleName: 'my-module',
+    },
+    schemas: ['public'],
+  },
+  output: './generated',
+  orm: true,
+});
+
+// Keep the ephemeral database after generation (for debugging)
+await generate({
+  db: {
+    pgpm: { modulePath: './packages/my-module' },
+    schemas: ['public'],
+    keepDb: true,
+  },
+  output: './generated',
+  reactQuery: true,
 });
 ```
 
@@ -137,15 +171,8 @@ The `generate` function accepts a configuration object with the following option
 interface GraphQLSDKConfigTarget {
   // Source (choose one)
   endpoint?: string;                    // GraphQL endpoint URL
-  schema?: string;                      // Path to GraphQL schema file
-  database?: string;                    // Database connection URL
-  pgpmModulePath?: string;              // Path to PGPM module directory
-  pgpmWorkspacePath?: string;           // Path to PGPM workspace
-  pgpmModuleName?: string;              // PGPM module name (with pgpmWorkspacePath)
-
-  // Schema selection (for database/pgpm modes, choose one)
-  schemas?: string[];                   // Explicit schema names
-  apiNames?: string[];                  // API names for automatic schema discovery
+  schemaFile?: string;                  // Path to GraphQL schema file (.graphql)
+  db?: DbConfig;                        // Database configuration (see below)
 
   // Output
   output?: string;                      // Output directory (default: './generated/graphql')
@@ -154,13 +181,8 @@ interface GraphQLSDKConfigTarget {
   headers?: Record<string, string>;     // HTTP headers for endpoint requests
 
   // Generator flags
-  reactQuery?: {
-    enabled?: boolean;                  // Generate React Query hooks
-  };
-  orm?: {
-    enabled?: boolean;                  // Generate ORM client
-    output?: string;                    // ORM output directory
-  };
+  reactQuery?: boolean;                 // Generate React Query hooks (output: {output}/hooks)
+  orm?: boolean;                        // Generate ORM client (output: {output}/orm)
 
   // Table filtering (for CRUD operations from _meta)
   tables?: {
@@ -193,6 +215,26 @@ interface GraphQLSDKConfigTarget {
     generateCascadeHelpers?: boolean;   // Generate invalidation helpers (default: true)
     relationships?: Record<string, { parent: string; foreignKey: string }>;
   };
+}
+
+// Database configuration for direct database introspection or PGPM module
+interface DbConfig {
+  // PostgreSQL connection config (falls back to PGHOST, PGPORT, etc. env vars)
+  config?: Partial<PgConfig>;
+
+  // PGPM module configuration for ephemeral database creation
+  pgpm?: {
+    modulePath?: string;                // Path to PGPM module directory
+    workspacePath?: string;             // Path to PGPM workspace (with moduleName)
+    moduleName?: string;                // Module name within workspace
+  };
+
+  // Schema selection (choose one)
+  schemas?: string[];                   // Explicit PostgreSQL schema names
+  apiNames?: string[];                  // API names for automatic schema discovery
+
+  // Debugging
+  keepDb?: boolean;                     // Keep ephemeral database after generation
 }
 ```
 
@@ -556,8 +598,8 @@ export default defineConfig({
   headers: {
     Authorization: 'Bearer <token>',
   },
-  reactQuery: { enabled: true },
-  orm: { enabled: true, output: './generated/orm' },
+  reactQuery: true,
+  orm: true,
 });
 ```
 
@@ -574,12 +616,21 @@ export default defineConfig({
     public: {
       endpoint: 'https://api.example.com/graphql',
       output: './generated/public',
-      reactQuery: { enabled: true },
+      reactQuery: true,
     },
     admin: {
-      schema: './admin.schema.graphql',
+      schemaFile: './admin.schema.graphql',
       output: './generated/admin',
-      orm: { enabled: true },
+      orm: true,
+    },
+    database: {
+      db: {
+        pgpm: { modulePath: './packages/my-module' },
+        schemas: ['public'],
+      },
+      output: './generated/db',
+      reactQuery: true,
+      orm: true,
     },
   },
 });
@@ -616,14 +667,13 @@ Generate React Query hooks and/or ORM client from various sources.
 Source Options (choose one):
   -c, --config <path>              Path to config file (graphql-sdk.config.ts)
   -e, --endpoint <url>             GraphQL endpoint URL
-  -s, --schema <path>              Path to GraphQL schema file
-  --database <url>                 Database connection URL (postgres://...)
+  -s, --schema-file <path>         Path to GraphQL schema file (.graphql)
   --pgpm-module-path <path>        Path to PGPM module directory
   --pgpm-workspace-path <path>     Path to PGPM workspace (requires --pgpm-module-name)
   --pgpm-module-name <name>        PGPM module name in workspace
 
-Schema Options (for database/pgpm modes):
-  --schemas <list>                 Comma-separated list of schemas to introspect
+Database Options (for pgpm modes):
+  --schemas <list>                 Comma-separated list of PostgreSQL schemas to introspect
   --api-names <list>               Comma-separated API names for automatic schema discovery
                                    (mutually exclusive with --schemas)
 
@@ -650,19 +700,19 @@ Examples:
 
 ```bash
 # Generate React Query hooks from an endpoint
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/hooks --react-query
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --react-query
 
 # Generate ORM client from an endpoint
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated/orm --orm
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --orm
 
-# Generate from a database directly
-npx graphql-sdk generate --database postgres://localhost/mydb --schemas public,app_public --react-query
+# Generate both React Query hooks and ORM client
+npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --react-query --orm
 
 # Generate from a PGPM module
-npx graphql-sdk generate --pgpm-module-path ./packages/my-module --schemas public --orm
+npx graphql-sdk generate --pgpm-module-path ./packages/my-module --schemas public --react-query
 
 # Generate using apiNames for automatic schema discovery
-npx graphql-sdk generate --database postgres://localhost/mydb --api-names my_api --react-query --orm
+npx graphql-sdk generate --pgpm-module-path ./packages/my-module --api-names my_api --react-query --orm
 ```
 
 ### `graphql-sdk init`

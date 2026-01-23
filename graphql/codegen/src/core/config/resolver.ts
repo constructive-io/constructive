@@ -14,8 +14,11 @@ import { isMultiConfig, mergeConfig, getConfigOptions } from '../../types/config
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
- * CLI options that can override config file settings.
+ * Options that can override config file settings.
  * Extends GraphQLSDKConfigTarget with CLI-specific fields.
+ * 
+ * This is the same as GenerateOptions - both extend GraphQLSDKConfigTarget
+ * with config and target fields for CLI usage.
  */
 export interface ConfigOverrideOptions extends GraphQLSDKConfigTarget {
   /** Path to config file (CLI-only) */
@@ -49,22 +52,17 @@ export async function loadAndResolveConfig(
   // Destructure CLI-only fields, rest is config overrides
   const { config: configPath, target: targetName, ...overrides } = options;
 
-  // Check for pgpm workspace mode (requires both pgpmWorkspacePath and pgpmModuleName)
-  const hasPgpmWorkspace = overrides.pgpmWorkspacePath && overrides.pgpmModuleName;
-
   // Validate that at most one source is specified
   const sources = [
     overrides.endpoint,
-    overrides.schema,
-    overrides.database,
-    overrides.pgpmModulePath,
-    hasPgpmWorkspace,
+    overrides.schemaFile,
+    overrides.db,
   ].filter(Boolean);
   if (sources.length > 1) {
     return {
       success: false,
       error:
-        'Multiple sources specified. Use only one of: endpoint, schema, database, pgpmModulePath, or pgpmWorkspacePath + pgpmModuleName.',
+        'Multiple sources specified. Use only one of: endpoint, schemaFile, or db.',
     };
   }
 
@@ -108,8 +106,7 @@ function resolveMultiTargetConfig(
 
   if (
     !targetName &&
-    (overrides.endpoint || overrides.schema || overrides.database || 
-     overrides.pgpmModulePath || overrides.pgpmWorkspacePath || overrides.output)
+    (overrides.endpoint || overrides.schemaFile || overrides.db || overrides.output)
   ) {
     return {
       success: false,
@@ -139,15 +136,13 @@ function resolveMultiTargetConfig(
 
     const hasSource =
       mergedTarget.endpoint ||
-      mergedTarget.schema ||
-      mergedTarget.database ||
-      mergedTarget.pgpmModulePath ||
-      (mergedTarget.pgpmWorkspacePath && mergedTarget.pgpmModuleName);
+      mergedTarget.schemaFile ||
+      mergedTarget.db;
 
     if (!hasSource) {
       return {
         success: false,
-        error: `Target "${name}" is missing a source (endpoint, schema, database, or pgpm module).`,
+        error: `Target "${name}" is missing a source (endpoint, schemaFile, or db).`,
       };
     }
 
@@ -182,19 +177,17 @@ function resolveSingleTargetConfig(
 
   const mergedConfig = mergeConfig(baseConfig, overrides);
 
-  // Check if we have a source (endpoint, schema, database, or pgpm module)
+  // Check if we have a source (endpoint, schemaFile, or db)
   const hasSource =
     mergedConfig.endpoint ||
-    mergedConfig.schema ||
-    mergedConfig.database ||
-    mergedConfig.pgpmModulePath ||
-    (mergedConfig.pgpmWorkspacePath && mergedConfig.pgpmModuleName);
+    mergedConfig.schemaFile ||
+    mergedConfig.db;
 
   if (!hasSource) {
     return {
       success: false,
       error:
-        'No source specified. Use --endpoint, --schema, --database, --pgpmModulePath, or --pgpmWorkspacePath + --pgpmModuleName, or create a config file with "graphql-codegen init".',
+        'No source specified. Use --endpoint, --schema-file, or --db, or create a config file with "graphql-codegen init".',
     };
   }
 
@@ -256,7 +249,7 @@ export async function loadWatchConfig(options: {
   const sourceOverrides: GraphQLSDKConfigTarget = {};
   if (options.endpoint) {
     sourceOverrides.endpoint = options.endpoint;
-    sourceOverrides.schema = undefined;
+    sourceOverrides.schemaFile = undefined;
   }
 
   const watchOverrides: GraphQLSDKConfigTarget = {
@@ -290,9 +283,9 @@ export async function loadWatchConfig(options: {
     return null;
   }
 
-  if (mergedTarget.schema) {
+  if (mergedTarget.schemaFile) {
     console.error(
-      'x Watch mode is only supported with an endpoint, not schema.'
+      'x Watch mode is only supported with an endpoint, not schemaFile.'
     );
     return null;
   }

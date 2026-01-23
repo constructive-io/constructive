@@ -19,7 +19,7 @@ describe('config resolution', () => {
     const resolved = resolveConfig(config);
 
     expect(resolved.endpoint).toBe('https://api.example.com/graphql');
-    expect(resolved.schema).toBeUndefined();
+    expect(resolved.schemaFile).toBeUndefined();
     expect(resolved.output).toBe(DEFAULT_CONFIG.output);
     expect(resolved.tables.include).toEqual(DEFAULT_CONFIG.tables.include);
     expect(resolved.queries.exclude).toEqual(DEFAULT_CONFIG.queries.exclude);
@@ -77,7 +77,7 @@ describe('config resolution', () => {
           output: './generated/public',
         },
         admin: {
-          schema: './admin.schema.graphql',
+          schemaFile: './admin.schema.graphql',
           output: './generated/admin',
           headers: { 'X-Admin': '1' },
         },
@@ -103,7 +103,7 @@ describe('config resolution', () => {
       Authorization: 'Bearer token',
       'X-Admin': '1',
     });
-    expect(adminTarget?.config.schema).toBe('./admin.schema.graphql');
+    expect(adminTarget?.config.schemaFile).toBe('./admin.schema.graphql');
   });
 
   it('detects multi-target configs', () => {
