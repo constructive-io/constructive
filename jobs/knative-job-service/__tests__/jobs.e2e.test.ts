@@ -206,7 +206,7 @@ type MailgunFailurePayload = {
 };
 
 const createMailgunFailureApp = () => {
-  const { send: sendPostmaster } = require('@launchql/postmaster');
+  const { send: sendPostmaster } = require('@constructive-io/postmaster');
   const app = createJobApp();
 
   app.post('/', async (req: any, res: any, next: any) => {
