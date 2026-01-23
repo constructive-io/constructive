@@ -164,28 +164,40 @@ export default async (
     process.exit(1);
   }
 
+  // Determine generator type and output directory
+  const generatorType = orm ? 'orm' : 'react-query';
+  const output = config ? out : outDir;
+
   // Call core generate function
-  const result = orm
-    ? await generateOrm({
+  let result: AnyResult;
+  switch (generatorType) {
+    case 'orm':
+      result = await generateOrm({
         config,
         target,
         endpoint: endpoint || undefined,
         schema: schemaPath,
-        output: config ? out : outDir,
-        authorization: auth,
-        verbose,
-        dryRun,
-      })
-    : await generateReactQuery({
-        config,
-        target,
-        endpoint: endpoint || undefined,
-        schema: schemaPath,
-        output: config ? out : outDir,
+        output,
         authorization: auth,
         verbose,
         dryRun,
       });
+      break;
+    case 'react-query':
+      result = await generateReactQuery({
+        config,
+        target,
+        endpoint: endpoint || undefined,
+        schema: schemaPath,
+        output,
+        authorization: auth,
+        verbose,
+        dryRun,
+      });
+      break;
+    default:
+      throw new Error(`Unknown generator type: ${generatorType}`);
+  }
 
   printResult(result);
 
