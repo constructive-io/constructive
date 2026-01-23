@@ -130,14 +130,22 @@ async function generateForTarget(
   const formatMessage = (message: string) =>
     isMultiTarget ? `Target "${target.name}": ${message}` : message;
 
-  // Extract database options if present (attached by config resolver for database mode)
+  // Extract extended options if present (attached by config resolver)
   const database = (config as any).database as string | undefined;
   const schemas = (config as any).schemas as string[] | undefined;
+  const pgpmModulePath = (config as any).pgpmModulePath as string | undefined;
+  const pgpmWorkspacePath = (config as any).pgpmWorkspacePath as string | undefined;
+  const pgpmModuleName = (config as any).pgpmModuleName as string | undefined;
+  const keepDb = (config as any).keepDb as boolean | undefined;
 
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
     let sourceLabel: string;
-    if (database) {
+    if (pgpmModulePath) {
+      sourceLabel = `pgpm module: ${pgpmModulePath} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+    } else if (pgpmWorkspacePath && pgpmModuleName) {
+      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+    } else if (database) {
       sourceLabel = `database: ${database} (schemas: ${(schemas ?? ['public']).join(', ')})`;
     } else if (config.schema) {
       sourceLabel = `schema: ${config.schema}`;
@@ -153,6 +161,9 @@ async function generateForTarget(
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
     database,
+    pgpmModulePath,
+    pgpmWorkspacePath,
+    pgpmModuleName,
   });
   if (!sourceValidation.valid) {
     return {
@@ -167,7 +178,11 @@ async function generateForTarget(
     endpoint: config.endpoint || undefined,
     schema: config.schema || undefined,
     database,
+    pgpmModulePath,
+    pgpmWorkspacePath,
+    pgpmModuleName,
     schemas,
+    keepDb,
     authorization: options.authorization || config.headers['Authorization'],
     headers: config.headers,
   });

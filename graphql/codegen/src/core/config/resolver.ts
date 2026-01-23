@@ -28,8 +28,16 @@ export interface ConfigOverrideOptions {
   schema?: string;
   /** Database name or connection string (for database introspection) */
   database?: string;
-  /** PostgreSQL schemas to include (for database mode) */
+  /** Path to a PGPM module directory (for module introspection) */
+  pgpmModulePath?: string;
+  /** Path to a PGPM workspace directory (used with pgpmModuleName) */
+  pgpmWorkspacePath?: string;
+  /** Name of the module within the workspace (used with pgpmWorkspacePath) */
+  pgpmModuleName?: string;
+  /** PostgreSQL schemas to include (for database and pgpm module modes) */
   schemas?: string[];
+  /** Keep the ephemeral database after introspection (for debugging, pgpm module mode only) */
+  keepDb?: boolean;
   /** Output directory (overrides config) */
   output?: string;
 }
@@ -45,23 +53,41 @@ export interface LoadConfigResult {
 }
 
 /**
+ * Extended overrides type that includes database and PGPM module options
+ */
+export interface ExtendedTargetOverrides extends GraphQLSDKConfigTarget {
+  database?: string;
+  schemas?: string[];
+  pgpmModulePath?: string;
+  pgpmWorkspacePath?: string;
+  pgpmModuleName?: string;
+  keepDb?: boolean;
+}
+
+/**
  * Build target overrides from options
  */
 export function buildTargetOverrides(
   options: ConfigOverrideOptions
-): GraphQLSDKConfigTarget & { database?: string; schemas?: string[] } {
-  const overrides: GraphQLSDKConfigTarget & { database?: string; schemas?: string[] } = {};
+): ExtendedTargetOverrides {
+  const overrides: ExtendedTargetOverrides = {};
 
   if (options.endpoint) {
     overrides.endpoint = options.endpoint;
     overrides.schema = undefined;
     overrides.database = undefined;
+    overrides.pgpmModulePath = undefined;
+    overrides.pgpmWorkspacePath = undefined;
+    overrides.pgpmModuleName = undefined;
   }
 
   if (options.schema) {
     overrides.schema = options.schema;
     overrides.endpoint = undefined;
     overrides.database = undefined;
+    overrides.pgpmModulePath = undefined;
+    overrides.pgpmWorkspacePath = undefined;
+    overrides.pgpmModuleName = undefined;
   }
 
   if (options.database) {
@@ -69,6 +95,31 @@ export function buildTargetOverrides(
     overrides.schemas = options.schemas;
     overrides.endpoint = undefined;
     overrides.schema = undefined;
+    overrides.pgpmModulePath = undefined;
+    overrides.pgpmWorkspacePath = undefined;
+    overrides.pgpmModuleName = undefined;
+  }
+
+  if (options.pgpmModulePath) {
+    overrides.pgpmModulePath = options.pgpmModulePath;
+    overrides.schemas = options.schemas;
+    overrides.keepDb = options.keepDb;
+    overrides.endpoint = undefined;
+    overrides.schema = undefined;
+    overrides.database = undefined;
+    overrides.pgpmWorkspacePath = undefined;
+    overrides.pgpmModuleName = undefined;
+  }
+
+  if (options.pgpmWorkspacePath && options.pgpmModuleName) {
+    overrides.pgpmWorkspacePath = options.pgpmWorkspacePath;
+    overrides.pgpmModuleName = options.pgpmModuleName;
+    overrides.schemas = options.schemas;
+    overrides.keepDb = options.keepDb;
+    overrides.endpoint = undefined;
+    overrides.schema = undefined;
+    overrides.database = undefined;
+    overrides.pgpmModulePath = undefined;
   }
 
   if (options.output) {
@@ -90,12 +141,22 @@ export function buildTargetOverrides(
 export async function loadAndResolveConfig(
   options: ConfigOverrideOptions
 ): Promise<LoadConfigResult> {
+  // Check for pgpm workspace mode (requires both pgpmWorkspacePath and pgpmModuleName)
+  const hasPgpmWorkspace = options.pgpmWorkspacePath && options.pgpmModuleName;
+
   // Validate that at most one source is specified
-  const sources = [options.endpoint, options.schema, options.database].filter(Boolean);
+  const sources = [
+    options.endpoint,
+    options.schema,
+    options.database,
+    options.pgpmModulePath,
+    hasPgpmWorkspace,
+  ].filter(Boolean);
   if (sources.length > 1) {
     return {
       success: false,
-      error: 'Multiple sources specified. Use only one of: endpoint, schema, or database.',
+      error:
+        'Multiple sources specified. Use only one of: endpoint, schema, database, pgpmModulePath, or pgpmWorkspacePath + pgpmModuleName.',
     };
   }
 
@@ -195,7 +256,7 @@ function resolveMultiTargetConfig(
 function resolveSingleTargetConfig(
   baseConfig: GraphQLSDKConfigTarget,
   options: ConfigOverrideOptions,
-  overrides: GraphQLSDKConfigTarget
+  overrides: ExtendedTargetOverrides
 ): LoadConfigResult {
   if (options.target) {
     return {
@@ -207,23 +268,42 @@ function resolveSingleTargetConfig(
 
   const mergedConfig = mergeConfig(baseConfig, overrides);
 
-  // Check if we have a source (endpoint, schema, or database)
-  const hasSource = mergedConfig.endpoint || mergedConfig.schema || (overrides as any).database;
+  // Check if we have a source (endpoint, schema, database, or pgpm module)
+  const hasSource =
+    mergedConfig.endpoint ||
+    mergedConfig.schema ||
+    overrides.database ||
+    overrides.pgpmModulePath ||
+    (overrides.pgpmWorkspacePath && overrides.pgpmModuleName);
+
   if (!hasSource) {
     return {
       success: false,
       error:
-        'No source specified. Use --endpoint, --schema, or --database, or create a config file with "graphql-codegen init".',
+        'No source specified. Use --endpoint, --schema, --database, --pgpmModulePath, or --pgpmWorkspacePath + --pgpmModuleName, or create a config file with "graphql-codegen init".',
     };
   }
 
   // For database mode, we need to pass the database info through to the resolved config
   const resolvedConfig = resolveConfig(mergedConfig);
-  
-  // Attach database options if present (they're not part of the standard config type)
-  if ((overrides as any).database) {
-    (resolvedConfig as any).database = (overrides as any).database;
-    (resolvedConfig as any).schemas = (overrides as any).schemas;
+
+  // Attach extended options if present (they're not part of the standard config type)
+  if (overrides.database) {
+    (resolvedConfig as any).database = overrides.database;
+    (resolvedConfig as any).schemas = overrides.schemas;
+  }
+
+  if (overrides.pgpmModulePath) {
+    (resolvedConfig as any).pgpmModulePath = overrides.pgpmModulePath;
+    (resolvedConfig as any).schemas = overrides.schemas;
+    (resolvedConfig as any).keepDb = overrides.keepDb;
+  }
+
+  if (overrides.pgpmWorkspacePath && overrides.pgpmModuleName) {
+    (resolvedConfig as any).pgpmWorkspacePath = overrides.pgpmWorkspacePath;
+    (resolvedConfig as any).pgpmModuleName = overrides.pgpmModuleName;
+    (resolvedConfig as any).schemas = overrides.schemas;
+    (resolvedConfig as any).keepDb = overrides.keepDb;
   }
 
   return {

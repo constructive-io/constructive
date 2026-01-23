@@ -736,6 +736,9 @@ importers:
       '@inquirerer/utils':
         specifier: ^3.2.0
         version: 3.2.0
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../../pgpm/core/dist
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
@@ -760,6 +763,12 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
+      pgsql-client:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-client/dist
+      pgsql-seed:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-seed/dist
       prettier:
         specifier: ^3.7.4
         version: 3.8.0

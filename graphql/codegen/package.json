@@ -59,6 +59,7 @@
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@inquirerer/utils": "^3.2.0",
+    "@pgpmjs/core": "workspace:^",
     "ajv": "^8.17.1",
     "deepmerge": "^4.3.1",
     "find-and-require-package-json": "^0.9.0",
@@ -67,6 +68,8 @@
     "inflekt": "^0.3.0",
     "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
+    "pgsql-client": "workspace:^",
+    "pgsql-seed": "workspace:^",
     "prettier": "^3.7.4"
   },
   "peerDependencies": {
