@@ -11,6 +11,7 @@ import './types'; // for Request type
 import PublicKeySignature, {
   PublicKeyChallengeConfig,
 } from '../plugins/PublicKeySignature';
+import { OAuthAccount } from '../plugins/OAuthAccount';
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string =>
@@ -63,6 +64,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           PublicKeySignature(pubkey_challenge.data as PublicKeyChallengeConfig)
         );
       }
+
+      // Always enable OAuthAccount plugin for SSO account management
+      // Database name is automatically obtained from context.req.api.dbname at runtime
+      log.info(`${label} Enabling OAuthAccount plugin for ${dbname}`);
+      options.appendPlugins.push(OAuthAccount(opts));
 
       options.appendPlugins = options.appendPlugins ?? [];
       if (opts.graphile?.appendPlugins) {
