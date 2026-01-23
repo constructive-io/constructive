@@ -5,6 +5,10 @@
  * The CLI is a thin wrapper around these core functions.
  */
 
+// Main generate function (orchestrates the entire pipeline)
+export { generate } from './generate';
+export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './generate';
+
 // Types
 export * from './types';
 

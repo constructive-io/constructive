@@ -21,9 +21,9 @@ export * from './client';
 // Config definition helper
 export { defineConfig } from './types/config';
 
-// CLI command exports (for packages/cli consumption)
-export { generate } from './cli';
-export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './cli';
+// Main generate function (orchestrates the entire pipeline)
+export { generate } from './core/generate';
+export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
