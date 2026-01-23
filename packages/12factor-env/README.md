@@ -1,4 +1,4 @@
-# @constructive-io/12factor-env
+# 12factor-env
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -11,7 +11,7 @@
   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
     <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
   </a>
-  <a href="https://www.npmjs.com/package/@constructive-io/12factor-env">
+  <a href="https://www.npmjs.com/package/12factor-env">
     <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2F12factor-env%2Fpackage.json"/>
   </a>
 </p>
@@ -23,13 +23,13 @@ A TypeScript library for validating environment variables with built-in support 
 ## Installation
 
 ```bash
-pnpm add @constructive-io/12factor-env
+npm install 12factor-env
 ```
 
 ## Usage
 
 ```ts
-import { env, str, num, bool, port, email, host } from '@constructive-io/12factor-env';
+import { env, str, num, bool, port, email, host } from '12factor-env';
 
 const config = env(
   process.env,
@@ -59,7 +59,7 @@ This library supports reading secrets from files, which is useful for Docker sec
 Secrets can be read from `/run/secrets/` (or a custom path via `ENV_SECRETS_PATH`):
 
 ```ts
-import { env, str } from '@constructive-io/12factor-env';
+import { env, str } from '12factor-env';
 
 // If /run/secrets/DATABASE_PASSWORD exists, it will be read automatically
 const config = env(process.env, {
@@ -77,7 +77,7 @@ export DATABASE_PASSWORD_FILE=/run/secrets/db-password
 ```
 
 ```ts
-import { env, str } from '@constructive-io/12factor-env';
+import { env, str } from '12factor-env';
 
 // Will read from the file specified in DATABASE_PASSWORD_FILE
 const config = env(process.env, {
@@ -113,7 +113,7 @@ All validators from [envalid](https://github.com/af/envalid) are re-exported:
 All validators accept options:
 
 ```ts
-import { str, num } from '@constructive-io/12factor-env';
+import { str, num } from '12factor-env';
 
 const config = env(process.env, {
   API_KEY: str({ desc: 'API key for external service' }),
@@ -136,7 +136,7 @@ Main function to validate environment variables.
 Create a validator for a secret file:
 
 ```ts
-import { env, secret } from '@constructive-io/12factor-env';
+import { env, secret } from '12factor-env';
 
 const config = env(process.env, {
   DB_PASSWORD: secret('DATABASE_PASSWORD')
@@ -148,7 +148,7 @@ const config = env(process.env, {
 Read a secret from a file:
 
 ```ts
-import { getSecret } from '@constructive-io/12factor-env';
+import { getSecret } from '12factor-env';
 
 const password = getSecret('DATABASE_PASSWORD');
 ```
@@ -158,7 +158,7 @@ const password = getSecret('DATABASE_PASSWORD');
 Resolve the full path to a secret file:
 
 ```ts
-import { secretPath } from '@constructive-io/12factor-env';
+import { secretPath } from '12factor-env';
 
 const path = secretPath('DATABASE_PASSWORD');
 // Returns: /run/secrets/DATABASE_PASSWORD

@@ -1,5 +1,5 @@
 {
-  "name": "@constructive-io/12factor-env",
+  "name": "12factor-env",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Environment variable validation with secret file support for 12-factor apps",

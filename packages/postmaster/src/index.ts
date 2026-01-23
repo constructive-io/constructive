@@ -1,8 +1,8 @@
 import Mailgun from 'mailgun.js';
 import type { MailgunMessageData } from 'mailgun.js';
 import FormData from 'form-data';
-import { str, email, host, env, cleanEnv } from '@constructive-io/12factor-env';
-import type { CleanedEnv, ValidatorSpec } from '@constructive-io/12factor-env';
+import { str, email, host, env, cleanEnv } from '12factor-env';
+import type { CleanedEnv, ValidatorSpec } from '12factor-env';
 
 /**
  * Mailgun configuration options

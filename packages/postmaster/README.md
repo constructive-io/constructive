@@ -23,7 +23,7 @@ This package exposes a `send` helper with the same call shape used by `simple-sm
 ## Installation
 
 ```bash
-pnpm add @constructive-io/postmaster
+npm install @constructive-io/postmaster
 ```
 
 ## Usage
