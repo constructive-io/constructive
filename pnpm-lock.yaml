@@ -763,6 +763,12 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pg-env:
+        specifier: workspace:^
+        version: link:../../postgres/pg-env/dist
       pgsql-client:
         specifier: workspace:^
         version: link:../../postgres/pgsql-client/dist

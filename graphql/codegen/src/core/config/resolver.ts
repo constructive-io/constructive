@@ -34,8 +34,10 @@ export interface ConfigOverrideOptions {
   pgpmWorkspacePath?: string;
   /** Name of the module within the workspace (used with pgpmWorkspacePath) */
   pgpmModuleName?: string;
-  /** PostgreSQL schemas to include (for database and pgpm module modes) */
+  /** PostgreSQL schemas to include (for database and pgpm module modes) - mutually exclusive with apiNames */
   schemas?: string[];
+  /** API names to resolve schemas from (for database and pgpm module modes) - mutually exclusive with schemas */
+  apiNames?: string[];
   /** Keep the ephemeral database after introspection (for debugging, pgpm module mode only) */
   keepDb?: boolean;
   /** Output directory (overrides config) */
@@ -58,6 +60,7 @@ export interface LoadConfigResult {
 export interface ExtendedTargetOverrides extends GraphQLSDKConfigTarget {
   database?: string;
   schemas?: string[];
+  apiNames?: string[];
   pgpmModulePath?: string;
   pgpmWorkspacePath?: string;
   pgpmModuleName?: string;
@@ -93,6 +96,7 @@ export function buildTargetOverrides(
   if (options.database) {
     overrides.database = options.database;
     overrides.schemas = options.schemas;
+    overrides.apiNames = options.apiNames;
     overrides.endpoint = undefined;
     overrides.schema = undefined;
     overrides.pgpmModulePath = undefined;
@@ -103,6 +107,7 @@ export function buildTargetOverrides(
   if (options.pgpmModulePath) {
     overrides.pgpmModulePath = options.pgpmModulePath;
     overrides.schemas = options.schemas;
+    overrides.apiNames = options.apiNames;
     overrides.keepDb = options.keepDb;
     overrides.endpoint = undefined;
     overrides.schema = undefined;
@@ -115,6 +120,7 @@ export function buildTargetOverrides(
     overrides.pgpmWorkspacePath = options.pgpmWorkspacePath;
     overrides.pgpmModuleName = options.pgpmModuleName;
     overrides.schemas = options.schemas;
+    overrides.apiNames = options.apiNames;
     overrides.keepDb = options.keepDb;
     overrides.endpoint = undefined;
     overrides.schema = undefined;
@@ -291,11 +297,13 @@ function resolveSingleTargetConfig(
   if (overrides.database) {
     (resolvedConfig as any).database = overrides.database;
     (resolvedConfig as any).schemas = overrides.schemas;
+    (resolvedConfig as any).apiNames = overrides.apiNames;
   }
 
   if (overrides.pgpmModulePath) {
     (resolvedConfig as any).pgpmModulePath = overrides.pgpmModulePath;
     (resolvedConfig as any).schemas = overrides.schemas;
+    (resolvedConfig as any).apiNames = overrides.apiNames;
     (resolvedConfig as any).keepDb = overrides.keepDb;
   }
 
@@ -303,6 +311,7 @@ function resolveSingleTargetConfig(
     (resolvedConfig as any).pgpmWorkspacePath = overrides.pgpmWorkspacePath;
     (resolvedConfig as any).pgpmModuleName = overrides.pgpmModuleName;
     (resolvedConfig as any).schemas = overrides.schemas;
+    (resolvedConfig as any).apiNames = overrides.apiNames;
     (resolvedConfig as any).keepDb = overrides.keepDb;
   }
 

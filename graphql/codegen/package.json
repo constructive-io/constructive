@@ -68,6 +68,8 @@
     "inflekt": "^0.3.0",
     "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
+    "pg-cache": "workspace:^",
+    "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
     "prettier": "^3.7.4"

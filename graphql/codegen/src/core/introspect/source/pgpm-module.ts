@@ -11,11 +11,13 @@ import { buildSchema, introspectionFromSchema } from 'graphql';
 import { PgpmPackage } from '@pgpmjs/core';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
+import { getPgPool } from 'pg-cache';
 
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
+import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
 
 /**
  * Options for PGPM module schema source using direct module path
@@ -29,9 +31,16 @@ export interface PgpmModulePathOptions {
 
   /**
    * PostgreSQL schemas to include in introspection
-   * @default ['public']
+   * Mutually exclusive with apiNames
    */
   schemas?: string[];
+
+  /**
+   * API names to resolve schemas from
+   * Queries services_public.api_schemas to get schema names
+   * Mutually exclusive with schemas
+   */
+  apiNames?: string[];
 
   /**
    * If true, keeps the ephemeral database after introspection (useful for debugging)
@@ -57,9 +66,16 @@ export interface PgpmWorkspaceOptions {
 
   /**
    * PostgreSQL schemas to include in introspection
-   * @default ['public']
+   * Mutually exclusive with apiNames
    */
   schemas?: string[];
+
+  /**
+   * API names to resolve schemas from
+   * Queries services_public.api_schemas to get schema names
+   * Mutually exclusive with schemas
+   */
+  apiNames?: string[];
 
   /**
    * If true, keeps the ephemeral database after introspection (useful for debugging)
@@ -103,8 +119,8 @@ export class PgpmModuleSchemaSource implements SchemaSource {
   }
 
   async fetch(): Promise<SchemaSourceResult> {
-    const schemas = this.getSchemas();
     const keepDb = this.getKeepDb();
+    const apiNames = this.getApiNames();
 
     // Resolve the module path
     let modulePath: string;
@@ -153,6 +169,29 @@ export class PgpmModuleSchemaSource implements SchemaSource {
           this.describe(),
           err instanceof Error ? err : undefined
         );
+      }
+
+      // Resolve schemas - either from explicit schemas option or from apiNames (after deployment)
+      let schemas: string[];
+      if (apiNames && apiNames.length > 0) {
+        // For PGPM mode, validate services schemas AFTER migration
+        const pool = getPgPool(dbConfig);
+        try {
+          const validation = await validateServicesSchemas(pool);
+          if (!validation.valid) {
+            throw new SchemaSourceError(validation.error!, this.describe());
+          }
+          schemas = await resolveApiSchemas(pool, apiNames);
+        } catch (err) {
+          if (err instanceof SchemaSourceError) throw err;
+          throw new SchemaSourceError(
+            `Failed to resolve API schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
+            this.describe(),
+            err instanceof Error ? err : undefined
+          );
+        }
+      } else {
+        schemas = this.getSchemas();
       }
 
       // Build SDL from the deployed database
@@ -219,10 +258,17 @@ export class PgpmModuleSchemaSource implements SchemaSource {
   }
 
   describe(): string {
+    const apiNames = this.getApiNames();
     if (isPgpmModulePathOptions(this.options)) {
+      if (apiNames && apiNames.length > 0) {
+        return `pgpm module: ${this.options.pgpmModulePath} (apiNames: ${apiNames.join(', ')})`;
+      }
       const schemas = this.options.schemas ?? ['public'];
       return `pgpm module: ${this.options.pgpmModulePath} (schemas: ${schemas.join(', ')})`;
     } else {
+      if (apiNames && apiNames.length > 0) {
+        return `pgpm workspace: ${this.options.pgpmWorkspacePath}, module: ${this.options.pgpmModuleName} (apiNames: ${apiNames.join(', ')})`;
+      }
       const schemas = this.options.schemas ?? ['public'];
       return `pgpm workspace: ${this.options.pgpmWorkspacePath}, module: ${this.options.pgpmModuleName} (schemas: ${schemas.join(', ')})`;
     }
@@ -257,6 +303,13 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       return this.options.schemas ?? ['public'];
     }
     return this.options.schemas ?? ['public'];
+  }
+
+  private getApiNames(): string[] | undefined {
+    if (isPgpmModulePathOptions(this.options)) {
+      return this.options.apiNames;
+    }
+    return this.options.apiNames;
   }
 
   private getKeepDb(): boolean {

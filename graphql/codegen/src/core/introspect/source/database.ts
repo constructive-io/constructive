@@ -9,6 +9,7 @@ import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
+import { createDatabasePool, resolveApiSchemas, validateServicesSchemas } from './api-schemas';
 
 export interface DatabaseSchemaSourceOptions {
   /**
@@ -20,9 +21,16 @@ export interface DatabaseSchemaSourceOptions {
 
   /**
    * PostgreSQL schemas to include in introspection
-   * @default ['public']
+   * Mutually exclusive with apiNames
    */
   schemas?: string[];
+
+  /**
+   * API names to resolve schemas from
+   * Queries services_public.api_schemas to get schema names
+   * Mutually exclusive with schemas
+   */
+  apiNames?: string[];
 }
 
 /**
@@ -39,7 +47,30 @@ export class DatabaseSchemaSource implements SchemaSource {
   }
 
   async fetch(): Promise<SchemaSourceResult> {
-    const { database, schemas = ['public'] } = this.options;
+    const { database, apiNames } = this.options;
+
+    // Resolve schemas - either from explicit schemas option or from apiNames
+    let schemas: string[];
+    if (apiNames && apiNames.length > 0) {
+      // Validate services schemas exist at the beginning for database mode
+      const pool = createDatabasePool(database);
+      try {
+        const validation = await validateServicesSchemas(pool);
+        if (!validation.valid) {
+          throw new SchemaSourceError(validation.error!, this.describe());
+        }
+        schemas = await resolveApiSchemas(pool, apiNames);
+      } catch (err) {
+        if (err instanceof SchemaSourceError) throw err;
+        throw new SchemaSourceError(
+          `Failed to resolve API schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          this.describe(),
+          err instanceof Error ? err : undefined
+        );
+      }
+    } else {
+      schemas = this.options.schemas ?? ['public'];
+    }
 
     // Build SDL from database
     let sdl: string;
@@ -97,7 +128,10 @@ export class DatabaseSchemaSource implements SchemaSource {
   }
 
   describe(): string {
-    const { database, schemas = ['public'] } = this.options;
-    return `database: ${database} (schemas: ${schemas.join(', ')})`;
+    const { database, schemas, apiNames } = this.options;
+    if (apiNames && apiNames.length > 0) {
+      return `database: ${database} (apiNames: ${apiNames.join(', ')})`;
+    }
+    return `database: ${database} (schemas: ${(schemas ?? ['public']).join(', ')})`;
   }
 }

@@ -134,6 +134,7 @@ async function generateOrmForTarget(
   // Extract extended options if present (attached by config resolver)
   const database = (config as any).database as string | undefined;
   const schemas = (config as any).schemas as string[] | undefined;
+  const apiNames = (config as any).apiNames as string[] | undefined;
   const pgpmModulePath = (config as any).pgpmModulePath as string | undefined;
   const pgpmWorkspacePath = (config as any).pgpmWorkspacePath as string | undefined;
   const pgpmModuleName = (config as any).pgpmModuleName as string | undefined;
@@ -142,12 +143,15 @@ async function generateOrmForTarget(
   if (isMultiTarget) {
     console.log(`\nTarget "${target.name}"`);
     let sourceLabel: string;
+    const schemaInfo = apiNames && apiNames.length > 0
+      ? `apiNames: ${apiNames.join(', ')}`
+      : `schemas: ${(schemas ?? ['public']).join(', ')}`;
     if (pgpmModulePath) {
-      sourceLabel = `pgpm module: ${pgpmModulePath} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+      sourceLabel = `pgpm module: ${pgpmModulePath} (${schemaInfo})`;
     } else if (pgpmWorkspacePath && pgpmModuleName) {
-      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+      sourceLabel = `pgpm workspace: ${pgpmWorkspacePath}, module: ${pgpmModuleName} (${schemaInfo})`;
     } else if (database) {
-      sourceLabel = `database: ${database} (schemas: ${(schemas ?? ['public']).join(', ')})`;
+      sourceLabel = `database: ${database} (${schemaInfo})`;
     } else if (config.schema) {
       sourceLabel = `schema: ${config.schema}`;
     } else {
@@ -165,6 +169,8 @@ async function generateOrmForTarget(
     pgpmModulePath,
     pgpmWorkspacePath,
     pgpmModuleName,
+    schemas,
+    apiNames,
   });
   if (!sourceValidation.valid) {
     return {
@@ -183,6 +189,7 @@ async function generateOrmForTarget(
     pgpmWorkspacePath,
     pgpmModuleName,
     schemas,
+    apiNames,
     keepDb,
     authorization: options.authorization || config.headers['Authorization'],
     headers: config.headers,

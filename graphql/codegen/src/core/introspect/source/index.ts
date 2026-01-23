@@ -12,6 +12,7 @@ export * from './endpoint';
 export * from './file';
 export * from './database';
 export * from './pgpm-module';
+export * from './api-schemas';
 
 import type { SchemaSource } from './types';
 import { EndpointSchemaSource } from './endpoint';
@@ -46,6 +47,7 @@ export interface FileSourceOptions {
 export interface DatabaseSourceOptions {
   database: string;
   schemas?: string[];
+  apiNames?: string[];
 }
 
 /**
@@ -54,6 +56,7 @@ export interface DatabaseSourceOptions {
 export interface PgpmModulePathSourceOptions {
   pgpmModulePath: string;
   schemas?: string[];
+  apiNames?: string[];
   keepDb?: boolean;
 }
 
@@ -64,6 +67,7 @@ export interface PgpmWorkspaceSourceOptions {
   pgpmWorkspacePath: string;
   pgpmModuleName: string;
   schemas?: string[];
+  apiNames?: string[];
   keepDb?: boolean;
 }
 
@@ -101,9 +105,16 @@ export interface CreateSchemaSourceOptions {
 
   /**
    * PostgreSQL schemas to include (for database and pgpm module modes)
-   * @default ['public']
+   * Mutually exclusive with apiNames - exactly one must be provided for database/pgpm modes
    */
   schemas?: string[];
+
+  /**
+   * API names to resolve schemas from (for database and pgpm module modes)
+   * Queries services_public.api_schemas to get schema names for the given APIs
+   * Mutually exclusive with schemas - exactly one must be provided for database/pgpm modes
+   */
+  apiNames?: string[];
 
   /**
    * Keep the ephemeral database after introspection (for debugging, pgpm module mode only)
@@ -178,12 +189,14 @@ export function createSchemaSource(
       return new DatabaseSchemaSource({
         database: options.database!,
         schemas: options.schemas,
+        apiNames: options.apiNames,
       });
 
     case 'pgpm-module':
       return new PgpmModuleSchemaSource({
         pgpmModulePath: options.pgpmModulePath!,
         schemas: options.schemas,
+        apiNames: options.apiNames,
         keepDb: options.keepDb,
       });
 
@@ -192,6 +205,7 @@ export function createSchemaSource(
         pgpmWorkspacePath: options.pgpmWorkspacePath!,
         pgpmModuleName: options.pgpmModuleName!,
         schemas: options.schemas,
+        apiNames: options.apiNames,
         keepDb: options.keepDb,
       });
 
@@ -250,6 +264,27 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
       valid: false,
       error: 'pgpmModuleName requires pgpmWorkspacePath to be specified.',
     };
+  }
+
+  // For database and pgpm modes, validate schemas/apiNames mutual exclusivity
+  const isDatabaseOrPgpmMode = options.database || options.pgpmModulePath || hasPgpmWorkspace;
+  if (isDatabaseOrPgpmMode) {
+    const hasSchemas = options.schemas && options.schemas.length > 0;
+    const hasApiNames = options.apiNames && options.apiNames.length > 0;
+
+    if (hasSchemas && hasApiNames) {
+      return {
+        valid: false,
+        error: 'Cannot specify both schemas and apiNames. Use one or the other.',
+      };
+    }
+
+    if (!hasSchemas && !hasApiNames) {
+      return {
+        valid: false,
+        error: 'Must specify either schemas or apiNames for database/pgpm modes.',
+      };
+    }
   }
 
   return { valid: true };
