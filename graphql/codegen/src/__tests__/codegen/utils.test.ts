@@ -13,7 +13,7 @@ import {
   gqlTypeToTs,
   getPrimaryKeyInfo,
   getGeneratedFileHeader,
-} from '../../cli/codegen/utils';
+} from '../../core/codegen/utils';
 import type { CleanTable, CleanRelations } from '../../types/schema';
 
 const emptyRelations: CleanRelations = {

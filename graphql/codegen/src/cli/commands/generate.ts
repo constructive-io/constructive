@@ -1,40 +1,23 @@
 /**
  * Generate command - generates SDK from GraphQL schema
  *
- * This command:
- * 1. Fetches schema from endpoint or loads from file
- * 2. Infers table metadata from introspection (replaces _meta)
- * 3. Generates hooks for both table CRUD and custom operations
+ * This is a thin CLI wrapper around the core generation functions.
+ * All business logic is in the core modules.
  */
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { execSync } from 'node:child_process';
-
-import type {
-  GraphQLSDKConfig,
-  GraphQLSDKConfigTarget,
-  ResolvedTargetConfig,
-} from '../../types/config';
-import { isMultiConfig, mergeConfig, resolveConfig } from '../../types/config';
+import type { ResolvedTargetConfig } from '../../types/config';
+import {
+  loadAndResolveConfig,
+  type ConfigOverrideOptions,
+} from '../../core/config';
 import {
   createSchemaSource,
   validateSourceOptions,
-} from '../introspect/source';
-import { runCodegenPipeline, validateTablesFound } from './shared';
-import { findConfigFile, loadConfigFile } from './init';
-import { generate } from '../codegen';
+} from '../../core/introspect';
+import { runCodegenPipeline, validateTablesFound } from '../../core/pipeline';
+import { generate } from '../../core/codegen';
+import { writeGeneratedFiles } from '../../core/output';
 
-export interface GenerateOptions {
-  /** Path to config file */
-  config?: string;
-  /** Named target in a multi-target config */
-  target?: string;
-  /** GraphQL endpoint URL (overrides config) */
-  endpoint?: string;
-  /** Path to GraphQL schema file (.graphql) */
-  schema?: string;
-  /** Output directory (overrides config) */
-  output?: string;
+export interface GenerateOptions extends ConfigOverrideOptions {
   /** Authorization header */
   authorization?: string;
   /** Verbose output */
@@ -78,7 +61,7 @@ export async function generateReactQuery(
     console.log('Loading configuration...');
   }
 
-  const configResult = await loadConfig(options);
+  const configResult = await loadAndResolveConfig(options);
   if (!configResult.success) {
     return {
       success: false,
@@ -280,274 +263,4 @@ async function generateForTarget(
     customMutations,
     filesWritten: writeResult.filesWritten,
   };
-}
-
-interface LoadConfigResult {
-  success: boolean;
-  targets?: ResolvedTargetConfig[];
-  isMulti?: boolean;
-  error?: string;
-}
-
-function buildTargetOverrides(
-  options: GenerateOptions
-): GraphQLSDKConfigTarget {
-  const overrides: GraphQLSDKConfigTarget = {};
-
-  if (options.endpoint) {
-    overrides.endpoint = options.endpoint;
-    overrides.schema = undefined;
-  }
-
-  if (options.schema) {
-    overrides.schema = options.schema;
-    overrides.endpoint = undefined;
-  }
-
-  if (options.output) {
-    overrides.output = options.output;
-  }
-
-  return overrides;
-}
-
-async function loadConfig(options: GenerateOptions): Promise<LoadConfigResult> {
-  if (options.endpoint && options.schema) {
-    return {
-      success: false,
-      error: 'Cannot use both --endpoint and --schema. Choose one source.',
-    };
-  }
-
-  // Find config file
-  let configPath = options.config;
-  if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
-  }
-
-  let baseConfig: GraphQLSDKConfig = {};
-
-  if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
-    if (!loadResult.success) {
-      return { success: false, error: loadResult.error };
-    }
-    baseConfig = loadResult.config;
-  }
-
-  const overrides = buildTargetOverrides(options);
-
-  if (isMultiConfig(baseConfig)) {
-    if (Object.keys(baseConfig.targets).length === 0) {
-      return {
-        success: false,
-        error: 'Config file defines no targets.',
-      };
-    }
-
-    if (
-      !options.target &&
-      (options.endpoint || options.schema || options.output)
-    ) {
-      return {
-        success: false,
-        error:
-          'Multiple targets configured. Use --target with --endpoint, --schema, or --output.',
-      };
-    }
-
-    if (options.target && !baseConfig.targets[options.target]) {
-      return {
-        success: false,
-        error: `Target "${options.target}" not found in config file.`,
-      };
-    }
-
-    const selectedTargets = options.target
-      ? { [options.target]: baseConfig.targets[options.target] }
-      : baseConfig.targets;
-    const defaults = baseConfig.defaults ?? {};
-    const resolvedTargets: ResolvedTargetConfig[] = [];
-
-    for (const [name, target] of Object.entries(selectedTargets)) {
-      let mergedTarget = mergeConfig(defaults, target);
-      if (options.target && name === options.target) {
-        mergedTarget = mergeConfig(mergedTarget, overrides);
-      }
-
-      if (!mergedTarget.endpoint && !mergedTarget.schema) {
-        return {
-          success: false,
-          error: `Target "${name}" is missing an endpoint or schema.`,
-        };
-      }
-
-      resolvedTargets.push({
-        name,
-        config: resolveConfig(mergedTarget),
-      });
-    }
-
-    return {
-      success: true,
-      targets: resolvedTargets,
-      isMulti: true,
-    };
-  }
-
-  if (options.target) {
-    return {
-      success: false,
-      error:
-        'Config file does not define targets. Remove --target to continue.',
-    };
-  }
-
-  const mergedConfig = mergeConfig(baseConfig, overrides);
-
-  if (!mergedConfig.endpoint && !mergedConfig.schema) {
-    return {
-      success: false,
-      error:
-        'No source specified. Use --endpoint or --schema, or create a config file with "graphql-codegen init".',
-    };
-  }
-
-  return {
-    success: true,
-    targets: [{ name: 'default', config: resolveConfig(mergedConfig) }],
-    isMulti: false,
-  };
-}
-
-export interface GeneratedFile {
-  path: string;
-  content: string;
-}
-
-export interface WriteResult {
-  success: boolean;
-  filesWritten?: string[];
-  errors?: string[];
-}
-
-export interface WriteOptions {
-  showProgress?: boolean;
-}
-
-export async function writeGeneratedFiles(
-  files: GeneratedFile[],
-  outputDir: string,
-  subdirs: string[],
-  options: WriteOptions = {}
-): Promise<WriteResult> {
-  const { showProgress = true } = options;
-  const errors: string[] = [];
-  const written: string[] = [];
-  const total = files.length;
-  const isTTY = process.stdout.isTTY;
-
-  // Ensure output directory exists
-  try {
-    fs.mkdirSync(outputDir, { recursive: true });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return {
-      success: false,
-      errors: [`Failed to create output directory: ${message}`],
-    };
-  }
-
-  // Create subdirectories
-  for (const subdir of subdirs) {
-    const subdirPath = path.join(outputDir, subdir);
-    try {
-      fs.mkdirSync(subdirPath, { recursive: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      errors.push(`Failed to create directory ${subdirPath}: ${message}`);
-    }
-  }
-
-  if (errors.length > 0) {
-    return { success: false, errors };
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const filePath = path.join(outputDir, file.path);
-
-    // Show progress
-    if (showProgress) {
-      const progress = Math.round(((i + 1) / total) * 100);
-      if (isTTY) {
-        process.stdout.write(
-          `\rWriting files: ${i + 1}/${total} (${progress}%)`
-        );
-      } else if (i % 100 === 0 || i === total - 1) {
-        // Non-TTY: periodic updates for CI/CD
-        console.log(`Writing files: ${i + 1}/${total}`);
-      }
-    }
-
-    // Ensure parent directory exists
-    const parentDir = path.dirname(filePath);
-    try {
-      fs.mkdirSync(parentDir, { recursive: true });
-    } catch {
-      // Ignore if already exists
-    }
-
-    try {
-      fs.writeFileSync(filePath, file.content, 'utf-8');
-      written.push(filePath);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      errors.push(`Failed to write ${filePath}: ${message}`);
-    }
-  }
-
-  // Clear progress line
-  if (showProgress && isTTY) {
-    process.stdout.write('\r' + ' '.repeat(40) + '\r');
-  }
-
-  // Format all generated files with prettier
-  if (errors.length === 0) {
-    if (showProgress) {
-      console.log('Formatting generated files...');
-    }
-    const formatResult = formatOutput(outputDir);
-    if (!formatResult.success && showProgress) {
-      console.warn('Warning: Failed to format generated files:', formatResult.error);
-    }
-  }
-
-  return {
-    success: errors.length === 0,
-    filesWritten: written,
-    errors: errors.length > 0 ? errors : undefined,
-  };
-}
-
-/**
- * Format generated files using prettier
- * Runs prettier on the output directory after all files are written
- */
-export function formatOutput(outputDir: string): { success: boolean; error?: string } {
-  const absoluteOutputDir = path.resolve(outputDir);
-
-  try {
-    execSync(
-      `npx prettier --write --single-quote --trailing-comma all --tab-width 2 --semi "${absoluteOutputDir}"`,
-      {
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      },
-    );
-    return { success: true };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return { success: false, error: message };
-  }
 }

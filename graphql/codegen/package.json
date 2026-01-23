@@ -35,7 +35,7 @@
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "copy:ts": "makage copy src/cli/codegen/orm/query-builder.ts dist/cli/codegen/orm --flat",
+    "copy:ts": "makage copy src/core/codegen/orm/query-builder.ts dist/core/codegen/orm --flat",
     "build": "makage build && npm run copy:ts",
     "build:dev": "makage build --dev && npm run copy:ts",
     "dev": "ts-node ./src/index.ts",

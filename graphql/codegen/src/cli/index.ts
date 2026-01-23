@@ -5,18 +5,13 @@
 
 import { CLI, CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
-import { initCommand, findConfigFile, loadConfigFile } from './commands/init';
+import { initCommand } from './commands/init';
 import { generateReactQuery } from './commands/generate';
 import { generateOrm } from './commands/generate-orm';
-import { startWatch } from './watch';
-import {
-  isMultiConfig,
-  mergeConfig,
-  resolveConfig,
-  type GraphQLSDKConfig,
-  type GraphQLSDKConfigTarget,
-  type ResolvedConfig,
-} from '../types/config';
+import { loadWatchConfig } from '../core/config';
+import { startWatch } from '../core/watch';
+import { createSchemaSource, inferTablesFromIntrospection } from '../core/introspect';
+import type { ResolvedConfig } from '../types/config';
 
 const usageText = `
 graphql-codegen - CLI for generating GraphQL SDK from PostGraphile endpoints or schema files
@@ -124,98 +119,6 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
-/**
- * Load configuration for watch mode, merging CLI options with config file
- */
-async function loadWatchConfig(options: {
-  config?: string;
-  target?: string;
-  endpoint?: string;
-  output?: string;
-  pollInterval?: number;
-  debounce?: number;
-  touch?: string;
-  clear?: boolean;
-}): Promise<ResolvedConfig | null> {
-  let configPath = options.config;
-  if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
-  }
-
-  let baseConfig: GraphQLSDKConfig = {};
-
-  if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
-    if (!loadResult.success) {
-      console.error('x', loadResult.error);
-      return null;
-    }
-    baseConfig = loadResult.config;
-  }
-
-  if (isMultiConfig(baseConfig)) {
-    if (!options.target) {
-      console.error(
-        'x Watch mode requires --target when using multiple targets.'
-      );
-      return null;
-    }
-
-    if (!baseConfig.targets[options.target]) {
-      console.error(`x Target "${options.target}" not found in config file.`);
-      return null;
-    }
-  } else if (options.target) {
-    console.error('x Config file does not define targets. Remove --target.');
-    return null;
-  }
-
-  const sourceOverrides: GraphQLSDKConfigTarget = {};
-  if (options.endpoint) {
-    sourceOverrides.endpoint = options.endpoint;
-    sourceOverrides.schema = undefined;
-  }
-
-  const watchOverrides: GraphQLSDKConfigTarget = {
-    watch: {
-      ...(options.pollInterval !== undefined && {
-        pollInterval: options.pollInterval,
-      }),
-      ...(options.debounce !== undefined && { debounce: options.debounce }),
-      ...(options.touch !== undefined && { touchFile: options.touch }),
-      ...(options.clear !== undefined && { clearScreen: options.clear }),
-    },
-  };
-
-  let mergedTarget: GraphQLSDKConfigTarget;
-
-  if (isMultiConfig(baseConfig)) {
-    const defaults = baseConfig.defaults ?? {};
-    const targetConfig = baseConfig.targets[options.target!];
-    mergedTarget = mergeConfig(defaults, targetConfig);
-  } else {
-    mergedTarget = baseConfig;
-  }
-
-  mergedTarget = mergeConfig(mergedTarget, sourceOverrides);
-  mergedTarget = mergeConfig(mergedTarget, watchOverrides);
-
-  if (!mergedTarget.endpoint) {
-    console.error(
-      'x No endpoint specified. Watch mode only supports live endpoints.'
-    );
-    return null;
-  }
-
-  if (mergedTarget.schema) {
-    console.error(
-      'x Watch mode is only supported with an endpoint, not schema.'
-    );
-    return null;
-  }
-
-  return resolveConfig(mergedTarget);
-}
 
 /**
  * Init command handler
@@ -308,6 +211,8 @@ async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
       configPath: config,
       target,
       outputDir: output,
+      generateReactQuery,
+      generateOrm,
     });
     return;
   }
@@ -440,6 +345,8 @@ async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
       target,
       outputDir: output,
       skipCustomOperations,
+      generateReactQuery,
+      generateOrm,
     });
     return;
   }
@@ -548,9 +455,6 @@ async function handleIntrospect(argv: Partial<ParsedArgs>): Promise<void> {
     );
     process.exit(1);
   }
-
-  const { createSchemaSource } = await import('./introspect/source');
-  const { inferTablesFromIntrospection } = await import('./introspect/infer-tables');
 
   try {
     const source = createSchemaSource({

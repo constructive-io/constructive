@@ -4,7 +4,7 @@
  * These tests verify that we can correctly infer CleanTable[] metadata
  * from standard GraphQL introspection (without _meta query).
  */
-import { inferTablesFromIntrospection } from '../../cli/introspect/infer-tables';
+import { inferTablesFromIntrospection } from '../../core/introspect/infer-tables';
 import type {
   IntrospectionQueryResponse,
   IntrospectionType,

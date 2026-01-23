@@ -8,7 +8,7 @@ import {
   generateQueryBuilderFile,
   generateSelectTypesFile,
   generateCreateClientFile,
-} from '../../cli/codegen/orm/client-generator';
+} from '../../core/codegen/orm/client-generator';
 import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
 
 // ============================================================================

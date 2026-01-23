@@ -1,9 +1,18 @@
 /**
  * Init command - creates a new graphql-codegen configuration file
+ *
+ * This is a thin CLI wrapper. Config loading utilities are in core/config.
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { createJiti } from 'jiti';
+
+import {
+  CONFIG_FILENAME,
+  findConfigFile,
+  loadConfigFile,
+} from '../../core/config';
+
+export { CONFIG_FILENAME, findConfigFile, loadConfigFile };
 
 export interface InitOptions {
   /** Target directory for the config file */
@@ -16,9 +25,7 @@ export interface InitOptions {
   output?: string;
 }
 
-const CONFIG_FILENAME = 'graphql-codegen.config.ts';
-
-const CONFIG_TEMPLATE = `import { defineConfig } from '@constructive-io/graphql-codegen';
+const CONFIG_TEMPLATE= `import { defineConfig } from '@constructive-io/graphql-codegen';
 
 export default defineConfig({
   // GraphQL endpoint URL (PostGraphile with _meta plugin)
@@ -109,103 +116,6 @@ export async function initCommand(
     return {
       success: false,
       message: `Failed to create configuration file: ${message}`,
-    };
-  }
-}
-
-/**
- * Find the nearest config file by walking up directories
- */
-export function findConfigFile(
-  startDir: string = process.cwd()
-): string | null {
-  let currentDir = startDir;
-
-  while (true) {
-    const configPath = path.join(currentDir, CONFIG_FILENAME);
-    if (fs.existsSync(configPath)) {
-      return configPath;
-    }
-
-    const parentDir = path.dirname(currentDir);
-    if (parentDir === currentDir) {
-      // Reached root
-      return null;
-    }
-    currentDir = parentDir;
-  }
-}
-
-/**
- * Load and validate a config file
- *
- * Uses jiti to support TypeScript config files (.ts) in addition to
- * JavaScript (.js, .mjs, .cjs) without requiring the user to have
- * tsx or ts-node installed.
- */
-export async function loadConfigFile(configPath: string): Promise<{
-  success: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config?: any;
-  error?: string;
-}> {
-  const resolvedPath = path.resolve(configPath);
-
-  if (!fs.existsSync(resolvedPath)) {
-    return {
-      success: false,
-      error: `Config file not found: ${resolvedPath}`,
-    };
-  }
-
-  try {
-    // Use jiti to load TypeScript/ESM config files seamlessly
-    // jiti handles .ts, .js, .mjs, .cjs and ESM/CJS interop
-    const jiti = createJiti(__filename, {
-      interopDefault: true,
-      debug: process.env.JITI_DEBUG === '1',
-    });
-
-    // jiti.import() with { default: true } returns mod?.default ?? mod
-    const config = await jiti.import(resolvedPath, { default: true });
-
-    if (!config || typeof config !== 'object') {
-      return {
-        success: false,
-        error: 'Config file must export a configuration object',
-      };
-    }
-
-    const hasEndpoint = 'endpoint' in config;
-    const hasSchema = 'schema' in config;
-    const hasTargets = 'targets' in config;
-
-    if (!hasEndpoint && !hasSchema && !hasTargets) {
-      return {
-        success: false,
-        error: 'Config file must define "endpoint", "schema", or "targets".',
-      };
-    }
-
-    if (hasTargets) {
-      const targets = config.targets as unknown;
-      if (!targets || typeof targets !== 'object' || Array.isArray(targets)) {
-        return {
-          success: false,
-          error: 'Config file "targets" must be an object of named configs.',
-        };
-      }
-    }
-
-    return {
-      success: true,
-      config,
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return {
-      success: false,
-      error: `Failed to load config file: ${message}`,
     };
   }
 }

@@ -1,38 +1,23 @@
 /**
  * Generate ORM command - generates Prisma-like ORM client from GraphQL schema
  *
- * This command:
- * 1. Fetches schema from endpoint or loads from file
- * 2. Infers table metadata from introspection (replaces _meta)
- * 3. Generates a Prisma-like ORM client with fluent API
+ * This is a thin CLI wrapper around the core generation functions.
+ * All business logic is in the core modules.
  */
-
-import type {
-  GraphQLSDKConfig,
-  GraphQLSDKConfigTarget,
-  ResolvedTargetConfig,
-} from '../../types/config';
-import { isMultiConfig, mergeConfig, resolveConfig } from '../../types/config';
+import type { ResolvedTargetConfig } from '../../types/config';
+import {
+  loadAndResolveConfig,
+  type ConfigOverrideOptions,
+} from '../../core/config';
 import {
   createSchemaSource,
   validateSourceOptions,
-} from '../introspect/source';
-import { runCodegenPipeline, validateTablesFound } from './shared';
-import { findConfigFile, loadConfigFile } from './init';
-import { writeGeneratedFiles } from './generate';
-import { generateOrm as generateOrmFiles } from '../codegen/orm';
+} from '../../core/introspect';
+import { runCodegenPipeline, validateTablesFound } from '../../core/pipeline';
+import { generateOrm as generateOrmFiles } from '../../core/codegen/orm';
+import { writeGeneratedFiles } from '../../core/output';
 
-export interface GenerateOrmOptions {
-  /** Path to config file */
-  config?: string;
-  /** Named target in a multi-target config */
-  target?: string;
-  /** GraphQL endpoint URL (overrides config) */
-  endpoint?: string;
-  /** Path to GraphQL schema file (.graphql) */
-  schema?: string;
-  /** Output directory (overrides config) */
-  output?: string;
+export interface GenerateOrmOptions extends ConfigOverrideOptions {
   /** Authorization header */
   authorization?: string;
   /** Verbose output */
@@ -76,7 +61,7 @@ export async function generateOrm(
     console.log('Loading configuration...');
   }
 
-  const configResult = await loadConfig(options);
+  const configResult = await loadAndResolveConfig(options);
   if (!configResult.success) {
     return {
       success: false,
@@ -278,141 +263,5 @@ async function generateOrmForTarget(
     customQueries,
     customMutations,
     filesWritten: writeResult.filesWritten,
-  };
-}
-
-interface LoadConfigResult {
-  success: boolean;
-  targets?: ResolvedTargetConfig[];
-  isMulti?: boolean;
-  error?: string;
-}
-
-function buildTargetOverrides(
-  options: GenerateOrmOptions
-): GraphQLSDKConfigTarget {
-  const overrides: GraphQLSDKConfigTarget = {};
-
-  if (options.endpoint) {
-    overrides.endpoint = options.endpoint;
-    overrides.schema = undefined;
-  }
-
-  if (options.schema) {
-    overrides.schema = options.schema;
-    overrides.endpoint = undefined;
-  }
-
-  return overrides;
-}
-
-async function loadConfig(
-  options: GenerateOrmOptions
-): Promise<LoadConfigResult> {
-  if (options.endpoint && options.schema) {
-    return {
-      success: false,
-      error: 'Cannot use both --endpoint and --schema. Choose one source.',
-    };
-  }
-
-  // Find config file
-  let configPath = options.config;
-  if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
-  }
-
-  let baseConfig: GraphQLSDKConfig = {};
-
-  if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
-    if (!loadResult.success) {
-      return { success: false, error: loadResult.error };
-    }
-    baseConfig = loadResult.config;
-  }
-
-  const overrides = buildTargetOverrides(options);
-
-  if (isMultiConfig(baseConfig)) {
-    if (Object.keys(baseConfig.targets).length === 0) {
-      return {
-        success: false,
-        error: 'Config file defines no targets.',
-      };
-    }
-
-    if (
-      !options.target &&
-      (options.endpoint || options.schema || options.output)
-    ) {
-      return {
-        success: false,
-        error:
-          'Multiple targets configured. Use --target with --endpoint, --schema, or --output.',
-      };
-    }
-
-    if (options.target && !baseConfig.targets[options.target]) {
-      return {
-        success: false,
-        error: `Target "${options.target}" not found in config file.`,
-      };
-    }
-
-    const selectedTargets = options.target
-      ? { [options.target]: baseConfig.targets[options.target] }
-      : baseConfig.targets;
-    const defaults = baseConfig.defaults ?? {};
-    const resolvedTargets: ResolvedTargetConfig[] = [];
-
-    for (const [name, target] of Object.entries(selectedTargets)) {
-      let mergedTarget = mergeConfig(defaults, target);
-      if (options.target && name === options.target) {
-        mergedTarget = mergeConfig(mergedTarget, overrides);
-      }
-
-      if (!mergedTarget.endpoint && !mergedTarget.schema) {
-        return {
-          success: false,
-          error: `Target "${name}" is missing an endpoint or schema.`,
-        };
-      }
-
-      resolvedTargets.push({
-        name,
-        config: resolveConfig(mergedTarget),
-      });
-    }
-
-    return {
-      success: true,
-      targets: resolvedTargets,
-      isMulti: true,
-    };
-  }
-
-  if (options.target) {
-    return {
-      success: false,
-      error:
-        'Config file does not define targets. Remove --target to continue.',
-    };
-  }
-
-  const mergedConfig = mergeConfig(baseConfig, overrides);
-
-  if (!mergedConfig.endpoint && !mergedConfig.schema) {
-    return {
-      success: false,
-      error:
-        'No source specified. Use --endpoint or --schema, or create a config file with "graphql-codegen init".',
-    };
-  }
-
-  return {
-    success: true,
-    targets: [{ name: 'default', config: resolveConfig(mergedConfig) }],
-    isMulti: false,
   };
 }

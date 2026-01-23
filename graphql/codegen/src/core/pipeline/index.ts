@@ -24,6 +24,10 @@ import {
   getCustomOperations,
 } from '../introspect/transform-schema';
 
+// Re-export for convenience
+export type { SchemaSource } from '../introspect/source';
+export { createSchemaSource, validateSourceOptions } from '../introspect/source';
+
 // ============================================================================
 // Pipeline Types
 // ============================================================================

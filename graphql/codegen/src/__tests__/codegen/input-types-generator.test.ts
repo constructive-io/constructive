@@ -6,7 +6,7 @@
  * used to validate the AST-based migration produces equivalent results.
  */
 // Jest globals - no import needed
-import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../cli/codegen/orm/input-types-generator';
+import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../core/codegen/orm/input-types-generator';
 import type {
   CleanTable,
   CleanFieldType,

@@ -8,11 +8,28 @@ import type { ResolvedConfig } from '../../types/config';
 import type { GeneratorType, WatchOptions, PollEvent } from './types';
 import { SchemaPoller } from './poller';
 import { debounce } from './debounce';
-import { generateReactQuery, type GenerateResult } from '../commands/generate';
-import {
-  generateOrm,
-  type GenerateOrmResult,
-} from '../commands/generate-orm';
+
+// These will be injected by the CLI layer to avoid circular dependencies
+// The watch orchestrator doesn't need to know about the full generate commands
+export interface GenerateFunction {
+  (options: {
+    config?: string;
+    target?: string;
+    endpoint?: string;
+    output?: string;
+    authorization?: string;
+    verbose?: boolean;
+    skipCustomOperations?: boolean;
+  }): Promise<GenerateResult>;
+}
+
+export interface GenerateResult {
+  success: boolean;
+  message: string;
+  tables?: string[];
+  filesWritten?: string[];
+  errors?: string[];
+}
 
 export interface WatchOrchestratorOptions {
   config: ResolvedConfig;
@@ -23,10 +40,14 @@ export interface WatchOrchestratorOptions {
   configPath?: string;
   /** Target name for multi-target configs */
   target?: string;
-  /** Override output directory (for ORM) */
+  /** Override output directory */
   outputDir?: string;
   /** Skip custom operations flag */
   skipCustomOperations?: boolean;
+  /** Generator function for React Query SDK */
+  generateReactQuery: GenerateFunction;
+  /** Generator function for ORM client */
+  generateOrm: GenerateFunction;
 }
 
 export interface WatchStatus {
@@ -192,29 +213,26 @@ export class WatchOrchestrator {
     this.log('Regenerating...');
 
     try {
-      let result: GenerateResult | GenerateOrmResult;
+      const generateFn =
+        this.options.generatorType === 'generate'
+          ? this.options.generateReactQuery
+          : this.options.generateOrm;
 
-      if (this.options.generatorType === 'generate') {
-        result = await generateReactQuery({
-          config: this.options.configPath,
-          target: this.options.target,
-          endpoint: this.options.config.endpoint,
-          output: this.options.outputDir ?? this.options.config.output,
-          authorization: this.options.authorization,
-          verbose: this.watchOptions.verbose,
-          skipCustomOperations: this.options.skipCustomOperations,
-        });
-      } else {
-        result = await generateOrm({
-          config: this.options.configPath,
-          target: this.options.target,
-          endpoint: this.options.config.endpoint,
-          output: this.options.outputDir ?? this.options.config.orm.output,
-          authorization: this.options.authorization,
-          verbose: this.watchOptions.verbose,
-          skipCustomOperations: this.options.skipCustomOperations,
-        });
-      }
+      const outputDir =
+        this.options.outputDir ??
+        (this.options.generatorType === 'generate'
+          ? this.options.config.output
+          : this.options.config.orm.output);
+
+      const result = await generateFn({
+        config: this.options.configPath,
+        target: this.options.target,
+        endpoint: this.options.config.endpoint,
+        output: outputDir,
+        authorization: this.options.authorization,
+        verbose: this.watchOptions.verbose,
+        skipCustomOperations: this.options.skipCustomOperations,
+      });
 
       const duration = Date.now() - startTime;
 
