@@ -75,19 +75,71 @@ export interface QueryKeyConfig {
 /**
  * Target configuration for graphql-codegen
  * Represents a single schema source and output destination.
+ *
+ * Source options (choose one):
+ * - endpoint: GraphQL endpoint URL for live introspection
+ * - schema: Path to GraphQL schema file (.graphql)
+ * - database: Database name or connection string for direct introspection
+ * - pgpmModulePath: Path to PGPM module (creates ephemeral database)
+ * - pgpmWorkspacePath + pgpmModuleName: PGPM workspace mode
  */
 export interface GraphQLSDKConfigTarget {
   /**
    * GraphQL endpoint URL for live introspection
-   * Either endpoint or schema must be provided
    */
   endpoint?: string;
 
   /**
    * Path to GraphQL schema file (.graphql) for file-based generation
-   * Either endpoint or schema must be provided
    */
   schema?: string;
+
+  /**
+   * Database name or connection string for direct database introspection
+   * Use with `schemas` or `apiNames` to specify which schemas to introspect
+   */
+  database?: string;
+
+  /**
+   * Path to a PGPM module directory
+   * Creates an ephemeral database, deploys the module, and introspects
+   * Use with `schemas` or `apiNames` to specify which schemas to introspect
+   */
+  pgpmModulePath?: string;
+
+  /**
+   * Path to a PGPM workspace directory
+   * Must be used together with `pgpmModuleName`
+   */
+  pgpmWorkspacePath?: string;
+
+  /**
+   * Name of the module within the PGPM workspace
+   * Must be used together with `pgpmWorkspacePath`
+   */
+  pgpmModuleName?: string;
+
+  /**
+   * PostgreSQL schemas to introspect (for database and PGPM modes)
+   * Mutually exclusive with `apiNames`
+   * @example ['public', 'app_public']
+   */
+  schemas?: string[];
+
+  /**
+   * API names to resolve schemas from (for database and PGPM modes)
+   * Queries services_public.api_schemas to automatically determine schemas
+   * Mutually exclusive with `schemas`
+   * @example ['my_api']
+   */
+  apiNames?: string[];
+
+  /**
+   * Keep the ephemeral database after introspection (for debugging)
+   * Only applies to PGPM module modes
+   * @default false
+   */
+  keepDb?: boolean;
 
   /**
    * Headers to include in introspection requests
@@ -301,13 +353,41 @@ export interface ResolvedQueryKeyConfig {
  */
 export interface ResolvedConfig {
   /**
-   * GraphQL endpoint URL (empty string if using schema file)
+   * GraphQL endpoint URL (empty string if using other source)
    */
   endpoint: string;
   /**
-   * Path to GraphQL schema file (null if using endpoint)
+   * Path to GraphQL schema file (null if using other source)
    */
   schema: string | null;
+  /**
+   * Database name or connection string (null if using other source)
+   */
+  database: string | null;
+  /**
+   * Path to PGPM module (null if using other source)
+   */
+  pgpmModulePath: string | null;
+  /**
+   * Path to PGPM workspace (null if using other source)
+   */
+  pgpmWorkspacePath: string | null;
+  /**
+   * Module name within PGPM workspace (null if using other source)
+   */
+  pgpmModuleName: string | null;
+  /**
+   * PostgreSQL schemas to introspect (for database and PGPM modes)
+   */
+  schemas: string[];
+  /**
+   * API names to resolve schemas from (for database and PGPM modes)
+   */
+  apiNames: string[];
+  /**
+   * Keep ephemeral database after introspection (for PGPM modes)
+   */
+  keepDb: boolean;
   headers: Record<string, string>;
   output: string;
   tables: {
@@ -377,6 +457,13 @@ export const DEFAULT_QUERY_KEY_CONFIG: ResolvedQueryKeyConfig = {
 export const DEFAULT_CONFIG: ResolvedConfig = {
   endpoint: '',
   schema: null,
+  database: null,
+  pgpmModulePath: null,
+  pgpmWorkspacePath: null,
+  pgpmModuleName: null,
+  schemas: [],
+  apiNames: [],
+  keepDb: false,
   headers: {},
   output: './generated/graphql',
   tables: {
