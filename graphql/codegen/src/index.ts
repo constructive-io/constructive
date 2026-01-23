@@ -22,12 +22,11 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // CLI command exports (for packages/cli consumption)
-// Note: generateReactQuery and generateOrm are internal - use generate() with config flags
-export {
-  generate,
-  findConfigFile,
-  loadConfigFile,
-} from './cli/commands';
+export { generate } from './cli';
+export type { GenerateOptions, GenerateResult, GenerateTargetResult } from './cli';
+
+// Config utilities
+export { findConfigFile, loadConfigFile } from './core/config';
 
 // Database schema utilities (re-exported from core for convenience)
 export {
@@ -38,11 +37,3 @@ export type {
   BuildSchemaFromDatabaseOptions,
   BuildSchemaFromDatabaseResult,
 } from './core/database';
-
-export type {
-  GenerateOptions,
-  GenerateResult,
-  GenerateTargetResult,
-  InitOptions,
-  InitResult,
-} from './cli/commands';
