@@ -1,7 +1,8 @@
 import Mailgun from 'mailgun.js';
 import type { MailgunMessageData } from 'mailgun.js';
 import FormData from 'form-data';
-import { str, email, host, env } from '@constructive-io/12factor-env';
+import { str, email, host, env, cleanEnv } from '@constructive-io/12factor-env';
+import type { CleanedEnv, ValidatorSpec } from '@constructive-io/12factor-env';
 
 /**
  * Mailgun configuration options
@@ -30,29 +31,49 @@ type SendInput = {
 
 type MailgunClient = ReturnType<Mailgun['client']>;
 
-// Validate environment variables at module load time (like the original @launchql/postmaster)
-// This ensures env vars are validated once when the module is first imported
-const envConfig = env(
-  process.env,
-  {
-    MAILGUN_KEY: str()
-  },
-  {
-    MAILGUN_DOMAIN: host(),
-    MAILGUN_FROM: email(),
-    MAILGUN_REPLY: email()
+// Lazy validation - env vars are validated on first use, not at module load time
+// This allows the module to be imported without env vars being set (useful for testing)
+type EnvConfig = {
+  MAILGUN_KEY: string;
+  MAILGUN_DOMAIN?: string;
+  MAILGUN_FROM?: string;
+  MAILGUN_REPLY?: string;
+};
+
+let cachedEnvConfig: EnvConfig | undefined;
+
+const getEnvConfig = (): EnvConfig => {
+  if (cachedEnvConfig) {
+    return cachedEnvConfig;
   }
-);
+  
+  cachedEnvConfig = env(
+    process.env,
+    {
+      MAILGUN_KEY: str()
+    },
+    {
+      MAILGUN_DOMAIN: host(),
+      MAILGUN_FROM: email(),
+      MAILGUN_REPLY: email()
+    }
+  ) as unknown as EnvConfig;
+  
+  return cachedEnvConfig;
+};
 
 // MAILGUN_DEV_EMAIL is read directly from process.env (not validated by 12factor-env)
 // to match the original behavior where it was accessed but not in the env validation
-const getEnvOptions = (): MailgunOptions => ({
-  key: envConfig.MAILGUN_KEY,
-  domain: envConfig.MAILGUN_DOMAIN,
-  from: envConfig.MAILGUN_FROM,
-  replyTo: envConfig.MAILGUN_REPLY,
-  devEmail: process.env.MAILGUN_DEV_EMAIL
-});
+const getEnvOptions = (): MailgunOptions => {
+  const envConfig = getEnvConfig();
+  return {
+    key: envConfig.MAILGUN_KEY,
+    domain: envConfig.MAILGUN_DOMAIN,
+    from: envConfig.MAILGUN_FROM,
+    replyTo: envConfig.MAILGUN_REPLY,
+    devEmail: process.env.MAILGUN_DEV_EMAIL
+  };
+};
 
 let client: MailgunClient | undefined;
 let cachedMailgunOpts: MailgunOptions | undefined;
@@ -140,6 +161,7 @@ export const send = async (options: SendInput, mailgunOverrides?: MailgunOptions
 export const resetClient = (): void => {
   client = undefined;
   cachedMailgunOpts = undefined;
+  cachedEnvConfig = undefined;
 };
 
 export type { SendInput as SendOptions };
