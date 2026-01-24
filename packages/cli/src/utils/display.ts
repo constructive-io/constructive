@@ -15,6 +15,11 @@ export const usageText = `
   Jobs:
     jobs up            Start combined server (jobs runtime)
 
+  Execution Engine:
+    project            Manage Constructive projects (init, list, use, info, delete)
+    auth               Manage authentication (set-token, status, logout)
+    execute            Execute JSON protocol operations against Constructive APIs
+
   Global Options:
     -h, --help         Display this help information
     -v, --version      Display version information
@@ -31,6 +36,11 @@ export const usageText = `
     cnc codegen --schema schema.graphql  Generate types from schema
     cnc get-graphql-schema --out schema.graphql  Export schema SDL
     cnc jobs up                       Start combined server (jobs runtime)
+
+    # Execution Engine
+    cnc project init my-app --domain constructive.io
+    cnc auth set-token <token>
+    cnc execute --model database --action findMany --first 10
 
   Database Operations:
     For database migrations, packages, and deployment, use pgpm:

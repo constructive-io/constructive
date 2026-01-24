@@ -55,6 +55,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
+    "appstash": "^0.3.0",
     "find-and-require-package-json": "^0.9.0",
     "inquirerer": "^4.4.0",
     "js-yaml": "^4.1.0",
