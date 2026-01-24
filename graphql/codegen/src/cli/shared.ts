@@ -74,7 +74,7 @@ export const codegenQuestions: Question[] = [
     message: 'Generate React Query hooks?',
     type: 'confirm',
     required: false,
-    default: true,
+    default: false,
     useDefault: true,
   },
   {

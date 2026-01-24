@@ -21,7 +21,7 @@ jest.mock('@constructive-io/graphql-codegen', () => {
       { name: 'output', message: 'Output directory', type: 'text', required: false, default: 'codegen', useDefault: true },
       { name: 'schemas', message: 'PostgreSQL schemas', type: 'text', required: false, sanitize: splitCommasMock },
       { name: 'apiNames', message: 'API names', type: 'text', required: false, sanitize: splitCommasMock },
-      { name: 'reactQuery', message: 'Generate React Query hooks?', type: 'confirm', required: false, default: true, useDefault: true },
+      { name: 'reactQuery', message: 'Generate React Query hooks?', type: 'confirm', required: false, default: false, useDefault: true },
       { name: 'orm', message: 'Generate ORM client?', type: 'confirm', required: false, default: false, useDefault: true },
       { name: 'authorization', message: 'Authorization header value', type: 'text', required: false },
       { name: 'dryRun', message: 'Preview without writing files?', type: 'confirm', required: false, default: false, useDefault: true },
