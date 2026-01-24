@@ -28,6 +28,10 @@ export type { GenerateOptions, GenerateResult } from './core/generate';
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
 
+// CLI shared utilities (for packages/cli to import)
+export { codegenQuestions, splitCommas, printResult } from './cli/shared';
+export type { CodegenAnswers } from './cli/shared';
+
 // Database schema utilities (re-exported from core for convenience)
 export {
   buildSchemaFromDatabase,

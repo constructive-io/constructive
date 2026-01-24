@@ -1,19 +1,53 @@
 import type { ParsedArgs, Question } from 'inquirerer'
 import codegenCommand from '../src/commands/codegen'
 
-jest.mock('@constructive-io/graphql-codegen', () => ({
-  generate: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
-  findConfigFile: jest.fn((): string | undefined => undefined),
-}))
+const splitCommas = (input: string | undefined): string[] | undefined => {
+  if (!input) return undefined;
+  return input.split(',').map((s) => s.trim()).filter(Boolean);
+};
+
+jest.mock('@constructive-io/graphql-codegen', () => {
+  const splitCommasMock = (input: string | undefined): string[] | undefined => {
+    if (!input) return undefined;
+    return input.split(',').map((s: string) => s.trim()).filter(Boolean);
+  };
+
+  return {
+    generate: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
+    findConfigFile: jest.fn((): string | undefined => undefined),
+    codegenQuestions: [
+      { name: 'endpoint', message: 'GraphQL endpoint URL', type: 'text', required: false },
+      { name: 'schemaFile', message: 'Path to GraphQL schema file', type: 'text', required: false },
+      { name: 'output', message: 'Output directory', type: 'text', required: false, default: 'codegen', useDefault: true },
+      { name: 'schemas', message: 'PostgreSQL schemas', type: 'text', required: false, sanitize: splitCommasMock },
+      { name: 'apiNames', message: 'API names', type: 'text', required: false, sanitize: splitCommasMock },
+      { name: 'reactQuery', message: 'Generate React Query hooks?', type: 'confirm', required: false, default: true, useDefault: true },
+      { name: 'orm', message: 'Generate ORM client?', type: 'confirm', required: false, default: false, useDefault: true },
+      { name: 'authorization', message: 'Authorization header value', type: 'text', required: false },
+      { name: 'dryRun', message: 'Preview without writing files?', type: 'confirm', required: false, default: false, useDefault: true },
+      { name: 'verbose', message: 'Verbose output?', type: 'confirm', required: false, default: false, useDefault: true },
+    ],
+    printResult: jest.fn((result: any) => {
+      if (result.success) {
+        console.log('[ok]', result.message);
+      } else {
+        console.error('x', result.message);
+        process.exit(1);
+      }
+    }),
+  };
+})
 
 // Create a mock prompter that returns argv values and applies sanitize functions from questions
 const createMockPrompter = () => ({
   prompt: jest.fn(async (argv: any, questions: Question[]) => {
     const result = { ...argv };
     // Apply sanitize functions from questions to simulate real prompter behavior
-    for (const q of questions) {
-      if (q.sanitize && result[q.name] !== undefined) {
-        result[q.name] = q.sanitize(result[q.name], result);
+    if (questions) {
+      for (const q of questions) {
+        if (q.sanitize && result[q.name] !== undefined) {
+          result[q.name] = q.sanitize(result[q.name], result);
+        }
       }
     }
     return result;

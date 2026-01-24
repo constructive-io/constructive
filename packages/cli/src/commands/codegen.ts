@@ -1,5 +1,11 @@
-import { CLIOptions, Inquirerer, Question } from 'inquirerer';
-import { generate, findConfigFile } from '@constructive-io/graphql-codegen';
+import { CLIOptions, Inquirerer } from 'inquirerer';
+import {
+  generate,
+  findConfigFile,
+  codegenQuestions,
+  printResult,
+  type CodegenAnswers,
+} from '@constructive-io/graphql-codegen';
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -26,99 +32,6 @@ Generator Options:
   --help, -h                 Show this help message
 `;
 
-const splitCommas = (input: string | undefined): string[] | undefined => {
-  if (!input) return undefined;
-  return input.split(',').map((s) => s.trim()).filter(Boolean);
-};
-
-const questions: Question[] = [
-  {
-    name: 'endpoint',
-    message: 'GraphQL endpoint URL',
-    type: 'text',
-    required: false,
-  },
-  {
-    name: 'schemaFile',
-    message: 'Path to GraphQL schema file',
-    type: 'text',
-    required: false,
-  },
-  {
-    name: 'output',
-    message: 'Output directory',
-    type: 'text',
-    required: false,
-    default: 'codegen',
-    useDefault: true,
-  },
-  {
-    name: 'schemas',
-    message: 'PostgreSQL schemas (comma-separated)',
-    type: 'text',
-    required: false,
-    sanitize: splitCommas,
-  },
-  {
-    name: 'apiNames',
-    message: 'API names (comma-separated)',
-    type: 'text',
-    required: false,
-    sanitize: splitCommas,
-  },
-  {
-    name: 'reactQuery',
-    message: 'Generate React Query hooks?',
-    type: 'confirm',
-    required: false,
-    default: true,
-    useDefault: true,
-  },
-  {
-    name: 'orm',
-    message: 'Generate ORM client?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true,
-  },
-  {
-    name: 'authorization',
-    message: 'Authorization header value',
-    type: 'text',
-    required: false,
-  },
-  {
-    name: 'dryRun',
-    message: 'Preview without writing files?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true,
-  },
-  {
-    name: 'verbose',
-    message: 'Verbose output?',
-    type: 'confirm',
-    required: false,
-    default: false,
-    useDefault: true,
-  },
-];
-
-interface CodegenAnswers {
-  endpoint?: string;
-  schemaFile?: string;
-  output?: string;
-  schemas?: string[];
-  apiNames?: string[];
-  reactQuery?: boolean;
-  orm?: boolean;
-  authorization?: string;
-  dryRun?: boolean;
-  verbose?: boolean;
-}
-
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -138,8 +51,8 @@ export default async (
     return;
   }
 
-  // No config file - prompt for options
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, questions);
+  // No config file - prompt for options using shared questions
+  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
 
   // Build db config if schemas or apiNames provided
   const db = (answers.schemas || answers.apiNames) ? {
@@ -161,13 +74,3 @@ export default async (
 
   printResult(result);
 };
-
-function printResult(result: Awaited<ReturnType<typeof generate>>) {
-  if (result.success) {
-    console.log('[ok]', result.message);
-  } else {
-    console.error('x', result.message);
-    result.errors?.forEach((e) => console.error('  -', e));
-    process.exit(1);
-  }
-}
