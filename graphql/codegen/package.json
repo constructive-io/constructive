@@ -40,8 +40,8 @@
     "build:dev": "makage build --dev && npm run copy:ts",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-    "fmt": "prettier --write .",
-    "fmt:check": "prettier --check .",
+        "fmt": "oxfmt --write .",
+        "fmt:check": "oxfmt --check .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "example:codegen:sdk": "tsx src/cli/index.ts --config examples/multi-target.config.ts --react-query",
@@ -72,7 +72,7 @@
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
-    "prettier": "^3.7.4",
+    "oxfmt": "^0.26.0",
     "undici": "^7.19.0"
   },
   "peerDependencies": {

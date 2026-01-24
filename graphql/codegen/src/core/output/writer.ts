@@ -27,7 +27,7 @@ export interface WriteResult {
 export interface WriteOptions {
   /** Show progress output (default: true) */
   showProgress?: boolean;
-  /** Format files with prettier after writing (default: true) */
+  /** Format files with oxfmt after writing (default: true) */
   formatFiles?: boolean;
 }
 
@@ -116,7 +116,7 @@ export async function writeGeneratedFiles(
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
-  // Format all generated files with prettier
+  // Format all generated files with oxfmt
   if (formatFiles && errors.length === 0) {
     if (showProgress) {
       console.log('Formatting generated files...');
@@ -138,9 +138,10 @@ export async function writeGeneratedFiles(
 }
 
 /**
- * Format generated files using prettier
+ * Format generated files using oxfmt
  *
- * Runs prettier on the output directory after all files are written.
+ * Runs oxfmt on the output directory after all files are written.
+ * Uses the same formatting options as prettier: single quotes, trailing commas, 2-space tabs, semicolons.
  */
 export function formatOutput(
   outputDir: string
@@ -149,7 +150,7 @@ export function formatOutput(
 
   try {
     execSync(
-      `npx prettier --write --single-quote --trailing-comma all --tab-width 2 --semi "${absoluteOutputDir}"`,
+      `npx oxfmt --write "${absoluteOutputDir}"`,
       {
         stdio: 'pipe',
         encoding: 'utf-8',
