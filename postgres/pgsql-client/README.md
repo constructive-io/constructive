@@ -123,6 +123,59 @@ await client.close();
 - `clearContext()` - Clear context and reset to anonymous
 - `close()` - Close connection
 
+### Ephemeral Databases
+
+Create temporary databases for testing, code generation, or other ephemeral use cases:
+
+```typescript
+import { createEphemeralDb } from 'pgsql-client';
+
+// Create a temporary database with a unique UUID-based name
+const { name, config, admin, teardown } = createEphemeralDb();
+
+// Use the database
+const pool = new Pool(config);
+await pool.query('SELECT 1');
+await pool.end();
+
+// Clean up when done
+teardown();
+
+// Or keep for debugging
+teardown({ keepDb: true });
+```
+
+#### Options
+
+```typescript
+const { config, teardown } = createEphemeralDb({
+  prefix: 'test_',           // Database name prefix (default: 'ephemeral_')
+  extensions: ['uuid-ossp'], // PostgreSQL extensions to install
+  baseConfig: {              // Override connection settings
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: 'password'
+  },
+  verbose: true              // Enable logging
+});
+```
+
+#### Return Value
+
+- `name` - The generated database name (e.g., `ephemeral_a1b2c3d4_...`)
+- `config` - Full PostgreSQL configuration for connecting
+- `admin` - DbAdmin instance for additional operations
+- `teardown(opts?)` - Function to drop the database (pass `{ keepDb: true }` to preserve)
+
+#### Use Cases
+
+Ephemeral databases are useful for:
+- **Code generation**: Generate types from a temporary schema
+- **Integration tests**: Isolated database per test suite
+- **CI pipelines**: Clean database state for each run
+- **Local development**: Experiment without affecting shared databases
+
 ## License
 
 MIT
