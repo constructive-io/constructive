@@ -28,7 +28,7 @@ import type {
   CleanOperation,
   TypeRegistry,
 } from '../../types/schema';
-import type { ResolvedConfig, ResolvedQueryKeyConfig } from '../../types/config';
+import type { GraphQLSDKConfigTarget, QueryKeyConfig } from '../../types/config';
 import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
 
 import { generateClientFile } from './client';
@@ -82,8 +82,15 @@ export interface GenerateOptions {
     mutations: CleanOperation[];
     typeRegistry: TypeRegistry;
   };
-  /** Resolved configuration */
-  config: ResolvedConfig;
+  /** Configuration */
+  config: GraphQLSDKConfigTarget;
+  /**
+   * Path to shared types directory (relative import path).
+   * When provided, types.ts and schema-types.ts are NOT generated
+   * and imports reference the shared types location instead.
+   * Example: '..' means types are in parent directory
+   */
+  sharedTypesPath?: string;
 }
 
 // ============================================================================
@@ -91,29 +98,32 @@ export interface GenerateOptions {
 // ============================================================================
 
 /**
- * Generate all SDK files for tables only (legacy function signature)
+ * Generate all SDK files for tables only
  */
 export function generateAllFiles(
   tables: CleanTable[],
-  config: ResolvedConfig
+  config: GraphQLSDKConfigTarget
 ): GenerateResult {
   return generate({ tables, config });
 }
 
 /**
  * Generate all SDK files with full support for custom operations
+ *
+ * When sharedTypesPath is provided, types.ts and schema-types.ts are NOT generated
+ * (they're expected to exist in the shared types directory).
  */
 export function generate(options: GenerateOptions): GenerateResult {
-  const { tables, customOperations, config } = options;
+  const { tables, customOperations, config, sharedTypesPath } = options;
   const files: GeneratedFile[] = [];
 
   // Extract codegen options
   const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
-  const reactQueryEnabled = config.reactQuery.enabled;
+  const reactQueryEnabled = config.reactQuery;
 
   // Query key configuration (use defaults if not provided)
-  const queryKeyConfig: ResolvedQueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
+  const queryKeyConfig: QueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
   const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
   const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
 
@@ -126,34 +136,51 @@ export function generate(options: GenerateOptions): GenerateResult {
   // Collect table type names for import path resolution
   const tableTypeNames = new Set(tables.map((t) => getTableNames(t).typeName));
 
-  // 2. Generate schema-types.ts for custom operations (if any)
-  // NOTE: This must come BEFORE types.ts so that types.ts can import enum types
+  // When using shared types, skip generating types.ts and schema-types.ts
+  // They're already generated in the shared directory
   let hasSchemaTypes = false;
   let generatedEnumNames: string[] = [];
-  if (customOperations && customOperations.typeRegistry) {
-    const schemaTypesResult = generateSchemaTypesFile({
-      typeRegistry: customOperations.typeRegistry,
-      tableTypeNames,
-    });
 
-    // Only include if there's meaningful content
-    if (schemaTypesResult.content.split('\n').length > 10) {
-      files.push({
-        path: 'schema-types.ts',
-        content: schemaTypesResult.content,
+  if (sharedTypesPath) {
+    // Using shared types - check if schema-types would be generated
+    if (customOperations && customOperations.typeRegistry) {
+      const schemaTypesResult = generateSchemaTypesFile({
+        typeRegistry: customOperations.typeRegistry,
+        tableTypeNames,
       });
-      hasSchemaTypes = true;
-      generatedEnumNames = schemaTypesResult.generatedEnums || [];
+      if (schemaTypesResult.content.split('\n').length > 10) {
+        hasSchemaTypes = true;
+        generatedEnumNames = schemaTypesResult.generatedEnums || [];
+      }
     }
-  }
+  } else {
+    // 2. Generate schema-types.ts for custom operations (if any)
+    // NOTE: This must come BEFORE types.ts so that types.ts can import enum types
+    if (customOperations && customOperations.typeRegistry) {
+      const schemaTypesResult = generateSchemaTypesFile({
+        typeRegistry: customOperations.typeRegistry,
+        tableTypeNames,
+      });
 
-  // 3. Generate types.ts (can now import enums from schema-types)
-  files.push({
-    path: 'types.ts',
-    content: generateTypesFile(tables, {
-      enumsFromSchemaTypes: generatedEnumNames,
-    }),
-  });
+      // Only include if there's meaningful content
+      if (schemaTypesResult.content.split('\n').length > 10) {
+        files.push({
+          path: 'schema-types.ts',
+          content: schemaTypesResult.content,
+        });
+        hasSchemaTypes = true;
+        generatedEnumNames = schemaTypesResult.generatedEnums || [];
+      }
+    }
+
+    // 3. Generate types.ts (can now import enums from schema-types)
+    files.push({
+      path: 'types.ts',
+      content: generateTypesFile(tables, {
+        enumsFromSchemaTypes: generatedEnumNames,
+      }),
+    });
+  }
 
   // 3b. Generate centralized query keys (query-keys.ts)
   let hasQueryKeys = false;

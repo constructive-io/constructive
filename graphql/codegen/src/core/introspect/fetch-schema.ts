@@ -1,8 +1,45 @@
 /**
  * Fetch GraphQL schema introspection from an endpoint
  */
+import dns from 'node:dns';
+import { Agent } from 'undici';
 import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
+
+/**
+ * Check if a hostname is localhost or a localhost subdomain
+ */
+function isLocalhostHostname(hostname: string): boolean {
+  return hostname === 'localhost' || hostname.endsWith('.localhost');
+}
+
+/**
+ * Create an undici Agent that resolves *.localhost to 127.0.0.1
+ * This fixes DNS resolution issues on macOS where subdomains like api.localhost
+ * don't resolve automatically (unlike browsers which handle *.localhost).
+ */
+function createLocalhostAgent(): Agent {
+  return new Agent({
+    connect: {
+      lookup(hostname, opts, cb) {
+        if (isLocalhostHostname(hostname)) {
+          cb(null, '127.0.0.1', 4);
+          return;
+        }
+        dns.lookup(hostname, opts, cb);
+      },
+    },
+  });
+}
+
+let localhostAgent: Agent | null = null;
+
+function getLocalhostAgent(): Agent {
+  if (!localhostAgent) {
+    localhostAgent = createLocalhostAgent();
+  }
+  return localhostAgent;
+}
 
 export interface FetchSchemaOptions {
   /** GraphQL endpoint URL */
@@ -30,12 +67,21 @@ export async function fetchSchema(
 ): Promise<FetchSchemaResult> {
   const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
 
+  // Parse the endpoint URL to check for localhost
+  const url = new URL(endpoint);
+  const useLocalhostAgent = isLocalhostHostname(url.hostname);
+
   // Build headers
   const requestHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     ...headers,
   };
+
+  // Set Host header for localhost subdomains to preserve routing
+  if (useLocalhostAgent && url.hostname !== 'localhost') {
+    requestHeaders['Host'] = url.hostname;
+  }
 
   if (authorization) {
     requestHeaders['Authorization'] = authorization;
@@ -45,16 +91,24 @@ export async function fetchSchema(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  // Build fetch options
+  const fetchOptions: RequestInit & { dispatcher?: Agent } = {
+    method: 'POST',
+    headers: requestHeaders,
+    body: JSON.stringify({
+      query: SCHEMA_INTROSPECTION_QUERY,
+      variables: {},
+    }),
+    signal: controller.signal,
+  };
+
+  // Use custom agent for localhost to fix DNS resolution on macOS
+  if (useLocalhostAgent) {
+    fetchOptions.dispatcher = getLocalhostAgent();
+  }
+
   try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify({
-        query: SCHEMA_INTROSPECTION_QUERY,
-        variables: {},
-      }),
-      signal: controller.signal,
-    });
+    const response = await fetch(endpoint, fetchOptions);
 
     clearTimeout(timeoutId);
 

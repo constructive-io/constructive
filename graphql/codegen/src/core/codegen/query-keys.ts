@@ -11,7 +11,7 @@
 import * as t from '@babel/types';
 
 import type { CleanTable, CleanOperation } from '../../types/schema';
-import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
+import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
 import {
   generateCode,
@@ -25,7 +25,7 @@ import {
 export interface QueryKeyGeneratorOptions {
   tables: CleanTable[];
   customQueries: CleanOperation[];
-  config: ResolvedQueryKeyConfig;
+  config: QueryKeyConfig;
 }
 
 export interface GeneratedQueryKeysFile {

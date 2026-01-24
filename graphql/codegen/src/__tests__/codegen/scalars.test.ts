@@ -8,7 +8,7 @@ import {
   BASE_FILTER_TYPE_NAMES,
   scalarToTsType,
   scalarToFilterType,
-} from '../../cli/codegen/scalars';
+} from '../../core/codegen/scalars';
 
 describe('scalars', () => {
   describe('SCALAR_TS_MAP', () => {

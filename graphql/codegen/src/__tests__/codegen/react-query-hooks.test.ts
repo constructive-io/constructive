@@ -9,18 +9,18 @@
  * - Schema types
  * - Barrel files
  */
-import { generateListQueryHook, generateSingleQueryHook } from '../../cli/codegen/queries';
-import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook } from '../../cli/codegen/mutations';
-import { generateCustomQueryHook } from '../../cli/codegen/custom-queries';
-import { generateCustomMutationHook } from '../../cli/codegen/custom-mutations';
-import { generateSchemaTypesFile } from '../../cli/codegen/schema-types-generator';
+import { generateListQueryHook, generateSingleQueryHook } from '../../core/codegen/queries';
+import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook } from '../../core/codegen/mutations';
+import { generateCustomQueryHook } from '../../core/codegen/custom-queries';
+import { generateCustomMutationHook } from '../../core/codegen/custom-mutations';
+import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import {
   generateQueriesBarrel,
   generateMutationsBarrel,
   generateMainBarrel,
   generateCustomQueriesBarrel,
   generateCustomMutationsBarrel,
-} from '../../cli/codegen/barrel';
+} from '../../core/codegen/barrel';
 import type {
   CleanTable,
   CleanFieldType,

@@ -8,7 +8,7 @@
  * - Tracking mutation state with useIsMutating
  */
 import type { CleanTable, CleanOperation } from '../../types/schema';
-import type { ResolvedQueryKeyConfig, EntityRelationship } from '../../types/config';
+import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
 import { getTableNames, getGeneratedFileHeader, lcFirst } from './utils';
 import * as t from '@babel/types';
 import {
@@ -22,7 +22,7 @@ import {
 export interface MutationKeyGeneratorOptions {
   tables: CleanTable[];
   customMutations: CleanOperation[];
-  config: ResolvedQueryKeyConfig;
+  config: QueryKeyConfig;
 }
 
 export interface GeneratedMutationKeysFile {

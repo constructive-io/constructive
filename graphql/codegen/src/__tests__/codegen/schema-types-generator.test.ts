@@ -1,7 +1,7 @@
 /**
  * Snapshot tests for schema-types-generator
  */
-import { generateSchemaTypesFile } from '../../cli/codegen/schema-types-generator';
+import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import type { TypeRegistry, ResolvedType } from '../../types/schema';
 
 function createTypeRegistry(types: Array<[string, ResolvedType]>): TypeRegistry {

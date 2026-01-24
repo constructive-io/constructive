@@ -1,11 +1,11 @@
 /**
  * Test for formatOutput function
- * Verifies that prettier formats generated code correctly
+ * Verifies that oxfmt formats generated code correctly
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { formatOutput } from '../../cli/commands/generate';
+import { formatOutput } from '../../core/output';
 
 describe('formatOutput', () => {
   let tempDir: string;
@@ -18,7 +18,7 @@ describe('formatOutput', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it('formats TypeScript files with prettier options', () => {
+  it('formats TypeScript files with oxfmt options', () => {
     // Write unformatted code (double quotes, missing semicolons)
     const unformatted = `const x = "hello"
 const obj = {a: 1,b: 2}

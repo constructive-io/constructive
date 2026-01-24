@@ -107,13 +107,9 @@ export interface MainBarrelOptions {
 
 export function generateMainBarrel(
   tables: CleanTable[],
-  options: MainBarrelOptions | boolean = {}
+  options: MainBarrelOptions = {}
 ): string {
-  // Support legacy signature where second arg was just hasSchemaTypes boolean
-  const opts: MainBarrelOptions =
-    typeof options === 'boolean'
-      ? { hasSchemaTypes: options, hasMutations: true }
-      : options;
+  const opts: MainBarrelOptions = options;
 
   const {
     hasSchemaTypes = false,

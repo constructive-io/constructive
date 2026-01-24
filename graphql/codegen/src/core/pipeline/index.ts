@@ -8,7 +8,7 @@
  * - Operation transformation
  * - Filtering
  */
-import type { ResolvedConfig } from '../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
   CleanTable,
   CleanOperation,
@@ -24,6 +24,10 @@ import {
   getCustomOperations,
 } from '../introspect/transform-schema';
 
+// Re-export for convenience
+export type { SchemaSource } from '../introspect/source';
+export { createSchemaSource, validateSourceOptions } from '../introspect/source';
+
 // ============================================================================
 // Pipeline Types
 // ============================================================================
@@ -35,9 +39,9 @@ export interface CodegenPipelineOptions {
   source: SchemaSource;
 
   /**
-   * Resolved configuration
+   * Configuration
    */
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
 
   /**
    * Enable verbose logging

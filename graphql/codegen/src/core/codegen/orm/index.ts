@@ -5,7 +5,7 @@
  * and produces the complete ORM client output.
  */
 import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
-import type { ResolvedConfig } from '../../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import {
   generateOrmClientFile,
   generateQueryBuilderFile,
@@ -32,7 +32,14 @@ export interface GenerateOrmOptions {
     mutations: CleanOperation[];
     typeRegistry?: TypeRegistry;
   };
-  config: ResolvedConfig;
+  config: GraphQLSDKConfigTarget;
+  /**
+   * Path to shared types directory (relative import path).
+   * When provided, entity types are imported from shared types
+   * instead of being generated in input-types.ts.
+   * Example: '..' means types are in parent directory
+   */
+  sharedTypesPath?: string;
 }
 
 export interface GenerateOrmResult {
@@ -49,10 +56,11 @@ export interface GenerateOrmResult {
  * Generate all ORM client files
  */
 export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
-  const { tables, customOperations, config } = options;
+  const { tables, customOperations, sharedTypesPath } = options;
   const files: GeneratedFile[] = [];
 
-  const useSharedTypes = config.orm.useSharedTypes;
+  // Use shared types when a sharedTypesPath is provided (unified output mode)
+  const useSharedTypes = !!sharedTypesPath;
   const hasCustomQueries = (customOperations?.queries.length ?? 0) > 0;
   const hasCustomMutations = (customOperations?.mutations.length ?? 0) > 0;
   const typeRegistry = customOperations?.typeRegistry;
