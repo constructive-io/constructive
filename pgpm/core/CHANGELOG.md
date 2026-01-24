@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.0.0...@pgpmjs/core@5.0.1) (2026-01-24)
+
+**Note:** Version bump only for package @pgpmjs/core
+
 # [5.0.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.17.1...@pgpmjs/core@5.0.0) (2026-01-24)
 
 **Note:** Version bump only for package @pgpmjs/core
