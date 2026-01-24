@@ -114,14 +114,6 @@ const config: Record<string, TableConfig> = {
       hash: 'uuid'
     }
   },
-  database_extension: {
-    schema: 'metaschema_public',
-    table: 'database_extension',
-    fields: {
-      name: 'text',
-      database_id: 'uuid'
-    }
-  },
   schema: {
     schema: 'metaschema_public',
     table: 'schema',
@@ -450,16 +442,6 @@ const config: Record<string, TableConfig> = {
       api_id: 'uuid',
       name: 'text',
       data: 'jsonb'
-    }
-  },
-  api_extensions: {
-    schema: 'services_public',
-    table: 'api_extensions',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      api_id: 'uuid',
-      schema_name: 'text'
     }
   },
   api_schemas: {

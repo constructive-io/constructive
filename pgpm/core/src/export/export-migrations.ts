@@ -361,7 +361,6 @@ SET session_replication_role TO DEFAULT;`;
     // Tables that depend on 'database' being inserted first
     const tableOrder = [
       'database',
-      'database_extension',
       'schema',
       'table',
       'field',
@@ -387,7 +386,6 @@ SET session_replication_role TO DEFAULT;`;
       'site_themes',
       'site_metadata',
       'api_modules',
-      'api_extensions',
       'api_schemas',
       'rls_module',
       'user_auth_module',
