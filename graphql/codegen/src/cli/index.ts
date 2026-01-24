@@ -8,8 +8,10 @@
 import { CLI, CLIOptions, Inquirerer, Question, getPackageJson } from 'inquirerer';
 
 import { generate } from '../core/generate';
-import { findConfigFile } from '../core/config';
+import { findConfigFile, loadConfigFile } from '../core/config';
+import { isMultiConfig } from '../types/config';
 import type { GenerateResult } from '../core/generate';
+import type { GraphQLSDKConfigTarget } from '../types/config';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -33,6 +35,7 @@ Generator Options:
   --react-query                 Generate React Query hooks
   --orm                         Generate ORM client
   -o, --output <dir>            Output directory
+  -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
   --keep-db                     Keep ephemeral database after generation
   --dry-run                     Preview without writing files
@@ -103,22 +106,54 @@ export const commands = async (
     process.exit(0);
   }
 
-  // Normalize CLI args
-  const normalizedArgv = {
+  const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
+  const targetName = (argv.target || argv.t) as string | undefined;
+
+  // If config file exists, load it and check for multi-target
+  if (configPath) {
+    const loaded = await loadConfigFile(configPath);
+    if (!loaded.success) {
+      console.error('x', loaded.error);
+      process.exit(1);
+    }
+
+    if (isMultiConfig(loaded.config)) {
+      // Multi-target config: loop through targets
+      const targets = loaded.config as Record<string, GraphQLSDKConfigTarget>;
+      const targetNames = targetName ? [targetName] : Object.keys(targets);
+
+      if (targetName && !targets[targetName]) {
+        console.error('x', `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`);
+        process.exit(1);
+      }
+
+      let hasError = false;
+      for (const name of targetNames) {
+        console.log(`\n[${name}]`);
+        const result = await generate(targets[name]);
+        printResult(result);
+        if (!result.success) hasError = true;
+      }
+
+      prompter.close();
+      if (hasError) process.exit(1);
+      return argv;
+    }
+
+    // Single config from file
+    const result = await generate(loaded.config as GraphQLSDKConfigTarget);
+    printResult(result);
+    if (!result.success) process.exit(1);
+    prompter.close();
+    return argv;
+  }
+
+  // No config file - use CLI args with prompts
+  const answers = await prompter.prompt({
     ...argv,
-    config: argv.config || findConfigFile() || undefined,
     output: argv.output || argv.o,
     endpoint: argv.endpoint || argv.e,
-    schemaFile: argv['schema-file'] || argv.s,
-    authorization: argv.authorization || argv.a,
-    reactQuery: argv['react-query'],
-    orm: argv.orm,
-    dryRun: argv['dry-run'],
-    verbose: argv.verbose || argv.v,
-    keepDb: argv['keep-db'],
-  };
-
-  const answers = await prompter.prompt(normalizedArgv, questions);
+  }, questions) as Record<string, unknown>;
 
   // Build db config if pgpm options provided
   const pgpmModulePath = argv['pgpm-module-path'] as string | undefined;
@@ -135,27 +170,23 @@ export const commands = async (
     },
     schemas: schemasArg ? schemasArg.split(',').map((s) => s.trim()) : undefined,
     apiNames: apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined,
-    keepDb: !!normalizedArgv.keepDb,
+    keepDb: !!(argv['keep-db']),
   } : undefined;
 
   const result = await generate({
-    endpoint: answers.endpoint as string | undefined,
-    schemaFile: normalizedArgv.schemaFile as string | undefined,
+    endpoint: (answers.endpoint || argv.endpoint || argv.e) as string | undefined,
+    schemaFile: (argv['schema-file'] || argv.s) as string | undefined,
     db,
-    output: answers.output as string | undefined,
-    authorization: normalizedArgv.authorization as string | undefined,
-    reactQuery: !!answers.reactQuery || !!normalizedArgv.reactQuery,
-    orm: !!answers.orm || !!normalizedArgv.orm,
-    dryRun: !!normalizedArgv.dryRun,
-    verbose: !!normalizedArgv.verbose,
+    output: (answers.output || argv.output || argv.o) as string | undefined,
+    authorization: (argv.authorization || argv.a) as string | undefined,
+    reactQuery: !!(answers.reactQuery ?? argv['react-query']),
+    orm: !!(answers.orm ?? argv.orm),
+    dryRun: !!argv['dry-run'],
+    verbose: !!argv.verbose || !!argv.v,
   });
 
   printResult(result);
-
-  if (!result.success) {
-    process.exit(1);
-  }
-
+  if (!result.success) process.exit(1);
   prompter.close();
   return argv;
 };
@@ -168,6 +199,7 @@ export const options: Partial<CLIOptions> = {
       e: 'endpoint',
       s: 'schema-file',
       o: 'output',
+      t: 'target',
       a: 'authorization',
       v: 'verbose',
     },
@@ -175,7 +207,7 @@ export const options: Partial<CLIOptions> = {
       'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db',
     ],
     string: [
-      'config', 'endpoint', 'schema-file', 'output', 'authorization',
+      'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
       'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
       'schemas', 'api-names',
     ],

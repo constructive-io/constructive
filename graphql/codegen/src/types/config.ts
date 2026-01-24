@@ -431,3 +431,21 @@ export function getConfigOptions(
 ): GraphQLSDKConfigTarget {
   return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
 }
+
+/**
+ * Multi-target config type - a record of named configs
+ */
+export type GraphQLSDKMultiConfig = Record<string, GraphQLSDKConfigTarget>;
+
+/**
+ * Check if a config is a multi-target config (record of named configs)
+ * A config is multi-target if it has no source fields at the top level
+ */
+export function isMultiConfig(config: unknown): config is GraphQLSDKMultiConfig {
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return false;
+  const c = config as Record<string, unknown>;
+  // If it has source fields at top level, it's a single config
+  if ('endpoint' in c || 'schemaFile' in c || 'db' in c) return false;
+  // Check if all values are objects (potential configs)
+  return Object.values(c).every(v => v && typeof v === 'object' && !Array.isArray(v));
+}

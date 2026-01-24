@@ -77,27 +77,6 @@ export async function loadConfigFile(
       };
     }
 
-    const hasEndpoint = 'endpoint' in config;
-    const hasSchema = 'schema' in config;
-    const hasTargets = 'targets' in config;
-
-    if (!hasEndpoint && !hasSchema && !hasTargets) {
-      return {
-        success: false,
-        error: 'Config file must define "endpoint", "schema", or "targets".',
-      };
-    }
-
-    if (hasTargets) {
-      const targets = config.targets as unknown;
-      if (!targets || typeof targets !== 'object' || Array.isArray(targets)) {
-        return {
-          success: false,
-          error: 'Config file "targets" must be an object of named configs.',
-        };
-      }
-    }
-
     return {
       success: true,
       config,
