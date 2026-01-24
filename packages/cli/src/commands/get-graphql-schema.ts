@@ -20,12 +20,6 @@ Options:
   --help, -h              Show this help message
 `;
 
-const defaultSchemas = [
-  'metaschema_public',
-  'metaschema_modules_public',
-  'services_public',
-];
-
 const questions: Question[] = [
   {
     name: 'endpoint',
@@ -38,16 +32,12 @@ const questions: Question[] = [
     message: 'Database name',
     type: 'text',
     required: false,
-    default: 'constructive',
-    useDefault: true,
   },
   {
     name: 'schemas',
     message: 'Comma-separated schemas',
     type: 'text',
     required: false,
-    default: defaultSchemas.join(','),
-    useDefault: true,
   },
   {
     name: 'out',
