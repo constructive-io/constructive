@@ -29,7 +29,6 @@ describe('api middleware helpers', () => {
       databaseId: 'db-1',
       isPublic: false,
       domains: connection([]),
-      apiExtensions: connection([{ schemaName: 'ext_schema' }]),
       schemasByApiSchemaApiIdAndSchemaId: connection([
         { schemaName: 'app_public' },
       ]),
@@ -38,7 +37,7 @@ describe('api middleware helpers', () => {
     };
     const result = normalizeApiRecord(api);
 
-    expect(result.schema).toEqual(['ext_schema', 'app_public']);
+    expect(result.schema).toEqual(['app_public']);
   });
 
   it('builds domains from api domains', () => {
@@ -54,7 +53,6 @@ describe('api middleware helpers', () => {
         { domain: 'example.org', subdomain: '' },
         { domain: 'example.net', subdomain: '' },
       ]),
-      apiExtensions: connection([]),
       schemasByApiSchemaApiIdAndSchemaId: connection([]),
       apiModules: connection([]),
       rlsModule: null,
@@ -100,7 +98,6 @@ describe('api middleware helpers', () => {
       databaseId: 'db-1',
       isPublic: false,
       domains: connection([]),
-      apiExtensions: connection([]),
       schemasByApiSchemaApiIdAndSchemaId: connection([
         { schemaName: 'app_public' },
       ]),

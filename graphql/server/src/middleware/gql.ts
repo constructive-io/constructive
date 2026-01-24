@@ -32,10 +32,6 @@ export const apiSelect = {
     },
     first: connectionFirst,
   },
-  apiExtensions: {
-    select: { schemaName: true },
-    first: connectionFirst,
-  },
   schemasByApiSchemaApiIdAndSchemaId: {
     select: { schemaName: true },
     first: connectionFirst,
@@ -146,10 +142,7 @@ export const createGraphileOrm = (graphile: GraphileQuery) => {
 };
 
 export const normalizeApiRecord = (api: ApiRecord): ApiStructure => {
-  const schemaNames = (api.apiExtensions?.nodes ?? []).flatMap((node) =>
-    node.schemaName ? [node.schemaName] : []
-  );
-  const additionalSchemas = (
+  const schemaNames = (
     api.schemasByApiSchemaApiIdAndSchemaId?.nodes ?? []
   ).flatMap((node) => (node.schemaName ? [node.schemaName] : []));
 
@@ -169,7 +162,7 @@ export const normalizeApiRecord = (api: ApiRecord): ApiStructure => {
     dbname: api.dbname,
     anonRole: api.anonRole,
     roleName: api.roleName,
-    schema: [...schemaNames, ...additionalSchemas],
+    schema: schemaNames,
     apiModules:
       api.apiModules?.nodes?.map((node) => ({
         name: node.name,
