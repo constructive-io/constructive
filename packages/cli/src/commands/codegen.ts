@@ -18,21 +18,20 @@ Database Options:
 Generator Options:
   --reactQuery               Generate React Query hooks (default)
   --orm                      Generate ORM client
-  --out <dir>                Output directory (default: codegen)
-  --auth <token>             Authorization header value
+  --output <dir>             Output directory (default: codegen)
+  --authorization <token>    Authorization header value
   --dryRun                   Preview without writing files
   --verbose                  Verbose output
 
   --help, -h                 Show this help message
 `;
 
+const splitCommas = (input: string | undefined): string[] | undefined => {
+  if (!input) return undefined;
+  return input.split(',').map((s) => s.trim()).filter(Boolean);
+};
+
 const questions: Question[] = [
-  {
-    name: 'config',
-    message: 'Path to config file',
-    type: 'text',
-    required: false,
-  },
   {
     name: 'endpoint',
     message: 'GraphQL endpoint URL',
@@ -40,12 +39,32 @@ const questions: Question[] = [
     required: false,
   },
   {
-    name: 'out',
+    name: 'schemaFile',
+    message: 'Path to GraphQL schema file',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'output',
     message: 'Output directory',
     type: 'text',
     required: false,
     default: 'codegen',
     useDefault: true,
+  },
+  {
+    name: 'schemas',
+    message: 'PostgreSQL schemas (comma-separated)',
+    type: 'text',
+    required: false,
+    sanitize: splitCommas,
+  },
+  {
+    name: 'apiNames',
+    message: 'API names (comma-separated)',
+    type: 'text',
+    required: false,
+    sanitize: splitCommas,
   },
   {
     name: 'reactQuery',
@@ -63,7 +82,42 @@ const questions: Question[] = [
     default: false,
     useDefault: true,
   },
+  {
+    name: 'authorization',
+    message: 'Authorization header value',
+    type: 'text',
+    required: false,
+  },
+  {
+    name: 'dryRun',
+    message: 'Preview without writing files?',
+    type: 'confirm',
+    required: false,
+    default: false,
+    useDefault: true,
+  },
+  {
+    name: 'verbose',
+    message: 'Verbose output?',
+    type: 'confirm',
+    required: false,
+    default: false,
+    useDefault: true,
+  },
 ];
+
+interface CodegenAnswers {
+  endpoint?: string;
+  schemaFile?: string;
+  output?: string;
+  schemas?: string[];
+  apiNames?: string[];
+  reactQuery?: boolean;
+  orm?: boolean;
+  authorization?: string;
+  dryRun?: boolean;
+  verbose?: boolean;
+}
 
 export default async (
   argv: Partial<Record<string, unknown>>,
@@ -75,42 +129,40 @@ export default async (
     process.exit(0);
   }
 
-  const normalizedArgv = {
-    ...argv,
-    config: argv.config || findConfigFile() || undefined,
-    endpoint: argv.endpoint,
-    out: argv.out,
-    reactQuery: argv.reactQuery,
-    orm: argv.orm,
-  };
+  // Auto-detect config file if not provided
+  const config = argv.config || findConfigFile();
+  if (config) {
+    // If config file exists, just run generate with it (config file handles everything)
+    const result = await generate({});
+    printResult(result);
+    return;
+  }
 
-  const {
-    config,
-    endpoint,
-    out,
-    reactQuery,
-    orm,
-  } = await prompter.prompt(normalizedArgv, questions);
+  // No config file - prompt for options
+  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, questions);
 
-  const schemasArg = argv.schemas as string | undefined;
-  const apiNamesArg = argv.apiNames as string | undefined;
-  const db = (schemasArg || apiNamesArg) ? {
-    schemas: schemasArg ? schemasArg.split(',').map((s) => s.trim()) : undefined,
-    apiNames: apiNamesArg ? apiNamesArg.split(',').map((s) => s.trim()) : undefined,
+  // Build db config if schemas or apiNames provided
+  const db = (answers.schemas || answers.apiNames) ? {
+    schemas: answers.schemas,
+    apiNames: answers.apiNames,
   } : undefined;
 
   const result = await generate({
-    endpoint: endpoint as string | undefined,
-    schemaFile: argv.schemaFile as string | undefined,
+    endpoint: answers.endpoint,
+    schemaFile: answers.schemaFile,
     db,
-    output: out as string | undefined,
-    authorization: argv.auth as string | undefined,
-    reactQuery: reactQuery as boolean,
-    orm: orm as boolean,
-    dryRun: !!argv.dryRun,
-    verbose: !!argv.verbose,
+    output: answers.output,
+    authorization: answers.authorization,
+    reactQuery: answers.reactQuery,
+    orm: answers.orm,
+    dryRun: answers.dryRun,
+    verbose: answers.verbose,
   });
 
+  printResult(result);
+};
+
+function printResult(result: Awaited<ReturnType<typeof generate>>) {
   if (result.success) {
     console.log('[ok]', result.message);
   } else {
@@ -118,4 +170,4 @@ export default async (
     result.errors?.forEach((e) => console.error('  -', e));
     process.exit(1);
   }
-};
+}

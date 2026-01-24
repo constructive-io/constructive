@@ -1,4 +1,4 @@
-import type { ParsedArgs } from 'inquirerer'
+import type { ParsedArgs, Question } from 'inquirerer'
 import codegenCommand from '../src/commands/codegen'
 
 jest.mock('@constructive-io/graphql-codegen', () => ({
@@ -6,9 +6,18 @@ jest.mock('@constructive-io/graphql-codegen', () => ({
   findConfigFile: jest.fn((): string | undefined => undefined),
 }))
 
-// Create a mock prompter that returns the argv values directly
+// Create a mock prompter that returns argv values and applies sanitize functions from questions
 const createMockPrompter = () => ({
-  prompt: jest.fn(async (argv: any, _questions: any) => argv)
+  prompt: jest.fn(async (argv: any, questions: Question[]) => {
+    const result = { ...argv };
+    // Apply sanitize functions from questions to simulate real prompter behavior
+    for (const q of questions) {
+      if (q.sanitize && result[q.name] !== undefined) {
+        result[q.name] = q.sanitize(result[q.name], result);
+      }
+    }
+    return result;
+  })
 })
 
 describe('codegen command', () => {
@@ -37,8 +46,8 @@ describe('codegen command', () => {
 
     const argv: Partial<ParsedArgs> = {
       endpoint: 'http://localhost:3000/graphql',
-      auth: 'Bearer testtoken',
-      out: 'graphql/codegen/dist',
+      authorization: 'Bearer testtoken',
+      output: 'graphql/codegen/dist',
       verbose: true,
       dryRun: true,
       reactQuery: true,
@@ -64,7 +73,7 @@ describe('codegen command', () => {
 
     const argv: Partial<ParsedArgs> = {
       schemas: 'public,app',
-      out: 'graphql/codegen/dist',
+      output: 'graphql/codegen/dist',
       reactQuery: true,
     }
     const mockPrompter = createMockPrompter()
