@@ -136,7 +136,7 @@ async function handleSetToken(
   if (!tokenValue) {
     const answer = await prompter.prompt(newArgv, [
       {
-        type: 'text',
+        type: 'password',
         name: 'token',
         message: 'API Token',
         required: true,
