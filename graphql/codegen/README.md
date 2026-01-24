@@ -587,12 +587,12 @@ console.log(login.login.apiToken?.accessToken);
 
 ### Config File
 
-Create a `graphql-sdk.config.ts` file:
+Create a `graphql-codegen.config.ts` file:
 
 ```typescript
-import { defineConfig } from '@constructive-io/graphql-codegen';
+import type { GraphQLSDKConfig } from '@constructive-io/graphql-codegen';
 
-export default defineConfig({
+export default {
   endpoint: 'https://api.example.com/graphql',
   output: './generated/graphql',
   headers: {
@@ -600,41 +600,41 @@ export default defineConfig({
   },
   reactQuery: true,
   orm: true,
-});
+} satisfies GraphQLSDKConfig;
 ```
 
 ### Multi-target Configuration
 
-Configure multiple schema sources and outputs:
+For multiple schema sources, export a record of named configs:
 
 ```typescript
-export default defineConfig({
-  defaults: {
+import type { GraphQLSDKMultiConfig } from '@constructive-io/graphql-codegen';
+
+export default {
+  public: {
+    endpoint: 'https://api.example.com/graphql',
+    output: './generated/public',
     headers: { Authorization: 'Bearer <token>' },
+    reactQuery: true,
   },
-  targets: {
-    public: {
-      endpoint: 'https://api.example.com/graphql',
-      output: './generated/public',
-      reactQuery: true,
-    },
-    admin: {
-      schemaFile: './admin.schema.graphql',
-      output: './generated/admin',
-      orm: true,
-    },
-    database: {
-      db: {
-        pgpm: { modulePath: './packages/my-module' },
-        schemas: ['public'],
-      },
-      output: './generated/db',
-      reactQuery: true,
-      orm: true,
-    },
+  admin: {
+    schemaFile: './admin.schema.graphql',
+    output: './generated/admin',
+    orm: true,
   },
-});
+  database: {
+    db: {
+      pgpm: { modulePath: './packages/my-module' },
+      schemas: ['public'],
+    },
+    output: './generated/db',
+    reactQuery: true,
+    orm: true,
+  },
+} satisfies GraphQLSDKMultiConfig;
 ```
+
+Run all targets with `graphql-codegen` or a specific target with `graphql-codegen --target public`.
 
 ### Glob Patterns
 
