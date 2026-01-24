@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/send-email-link-fn",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "description": "Knative function to send email links (invite, password reset, email verification) using Constructive jobs",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -34,8 +34,8 @@
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
-    "@launchql/mjml": "0.1.1",
     "@constructive-io/postmaster": "workspace:^",
+    "@launchql/mjml": "0.1.1",
     "@launchql/styled-email": "0.1.0",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "2.32.0",
+  "version": "3.0.0",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -40,8 +40,8 @@
     "build:dev": "makage build --dev && npm run copy:ts",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-        "fmt": "oxfmt --write .",
-        "fmt:check": "oxfmt --check .",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "example:codegen:sdk": "tsx src/cli/index.ts --config examples/multi-target.config.ts --react-query",
@@ -68,11 +68,11 @@
     "inflekt": "^0.3.0",
     "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
+    "oxfmt": "^0.26.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
-    "oxfmt": "^0.26.0",
     "undici": "^7.19.0"
   },
   "peerDependencies": {

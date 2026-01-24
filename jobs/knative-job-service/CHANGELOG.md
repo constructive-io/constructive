@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.9.11...@constructive-io/knative-job-service@1.0.0) (2026-01-24)
+
+### Features
+
+- modernize postmaster package with TypeScript Mailgun wrapper ([ac93185](https://github.com/constructive-io/jobs/commit/ac93185aadcfa7d2643d0d1736a6fb1a0b826802))
+
 ## [0.9.11](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@0.9.10...@constructive-io/knative-job-service@0.9.11) (2026-01-22)
 
 **Note:** Version bump only for package @constructive-io/knative-job-service

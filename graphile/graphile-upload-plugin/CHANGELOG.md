@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.10.4...graphile-upload-plugin@1.0.0) (2026-01-24)
+
+**Note:** Version bump only for package graphile-upload-plugin
+
 ## [0.10.4](https://github.com/constructive-io/constructive/compare/graphile-upload-plugin@0.10.3...graphile-upload-plugin@0.10.4) (2026-01-22)
 
 **Note:** Version bump only for package graphile-upload-plugin

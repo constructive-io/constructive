@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.32.0...@constructive-io/graphql-codegen@3.0.0) (2026-01-24)
+
+### Bug Fixes
+
+- **cli:** set reactQuery default to false to match agreed defaults ([e0f4571](https://github.com/constructive-io/constructive/commit/e0f45717261a63a7f559a19cdf557338d932c1bc))
+- **graphql-codegen:** remove non-existent type exports from index.ts ([5b8ad1a](https://github.com/constructive-io/constructive/commit/5b8ad1ab8b7a84ebd5ef49ed36a54c92ad101330))
+
+### Features
+
+- **graphql-codegen:** add apiNames support for automatic schema discovery ([b925092](https://github.com/constructive-io/constructive/commit/b92509283038d945789fe0ddcf978c0e4c219b40))
+- **graphql-codegen:** add localhost DNS resolution for \*.localhost endpoints during introspection ([6d9cd87](https://github.com/constructive-io/constructive/commit/6d9cd87ecd2e67e47d190faf44f270dbba333b93))
+- **graphql-codegen:** add minimal multi-target support with named configs ([bbbd062](https://github.com/constructive-io/constructive/commit/bbbd062331e5afb6302d5d9e9224894cc3c92a11))
+- **graphql-codegen:** add PGPM module schema source support ([d042f9c](https://github.com/constructive-io/constructive/commit/d042f9c8a68b3636c1f3d92ad01803c9246f05b3))
+- **graphql-codegen:** add shared types pipeline and make generateReactQuery/generateOrm private ([b219348](https://github.com/constructive-io/constructive/commit/b219348cc15fdff8c30cd19f21054601e14b7acd))
+- **graphql-codegen:** add single-step database generation support ([3130c67](https://github.com/constructive-io/constructive/commit/3130c67bc5b57ebe5beecca8128e92aad9daeaa6))
+- **graphql-codegen:** add unified generate function with --reactquery and --orm flags ([5a66484](https://github.com/constructive-io/constructive/commit/5a664841cae12ffab7fd2a33fdb8d887e75ea885))
+
 # [2.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@2.31.0...@constructive-io/graphql-codegen@2.32.0) (2026-01-22)
 
 ### Features
