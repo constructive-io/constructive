@@ -9,7 +9,6 @@ import { CLI, CLIOptions, Inquirerer, getPackageJson } from 'inquirerer';
 
 import { generate } from '../core/generate';
 import { findConfigFile, loadConfigFile } from '../core/config';
-import { isMultiConfig } from '../types/config';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import { codegenQuestions, printResult, type CodegenAnswers } from './shared';
 
@@ -60,7 +59,7 @@ export const commands = async (
   const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
   const targetName = (argv.target || argv.t) as string | undefined;
 
-  // If config file exists, load it and check for multi-target
+  // If config file exists, load and run
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
     if (!loaded.success) {
@@ -68,10 +67,15 @@ export const commands = async (
       process.exit(1);
     }
 
-    if (isMultiConfig(loaded.config)) {
-      // Multi-target config: loop through targets
-      const targets = loaded.config as Record<string, GraphQLSDKConfigTarget>;
-      const targetNames = targetName ? [targetName] : Object.keys(targets);
+    const config = loaded.config as Record<string, unknown>;
+
+    // Check if it's a multi-target config (no source fields at top level)
+    const isMulti = !('endpoint' in config || 'schemaFile' in config || 'db' in config);
+
+    if (isMulti) {
+      // Multi-target: simple for loop over targets
+      const targets = config as Record<string, GraphQLSDKConfigTarget>;
+      const names = targetName ? [targetName] : Object.keys(targets);
 
       if (targetName && !targets[targetName]) {
         console.error('x', `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`);
@@ -79,7 +83,7 @@ export const commands = async (
       }
 
       let hasError = false;
-      for (const name of targetNames) {
+      for (const name of names) {
         console.log(`\n[${name}]`);
         const result = await generate(targets[name]);
         printResult(result);
@@ -91,8 +95,8 @@ export const commands = async (
       return argv;
     }
 
-    // Single config from file
-    const result = await generate(loaded.config as GraphQLSDKConfigTarget);
+    // Single config
+    const result = await generate(config as GraphQLSDKConfigTarget);
     printResult(result);
     if (!result.success) process.exit(1);
     prompter.close();
