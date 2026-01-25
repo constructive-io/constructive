@@ -92,7 +92,7 @@ let transport: nodemailer.Transporter<SMTPTransport.SentMessageInfo> | undefined
 let cachedSmtpOpts: SmtpOptions | undefined;
 
 const getTransport = (overrides?: SmtpOptions) => {
-  const opts = getEnvOptions({ smtp: overrides });
+  const opts = getEnvOptions(overrides ? { smtp: overrides } : {});
   const smtpOpts = opts.smtp ?? {};
 
   if (!transport || overrides) {
