@@ -52,6 +52,8 @@ describe('send', () => {
     process.env.SMTP_PORT = String(catcher.port);
     process.env.SMTP_SECURE = 'false';
     process.env.SMTP_FROM = 'env-sender@example.com';
+    process.env.SMTP_TLS_REJECT_UNAUTHORIZED = 'false';
+    process.env.SMTP_REQUIRE_TLS = 'false';
 
     // Clear cached transport to pick up new env vars
     resetTransport();
