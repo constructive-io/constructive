@@ -138,6 +138,282 @@ CREATE INDEX animals_created_at_idx ON "simple-pets-pets-public".animals (create
 
 CREATE INDEX animals_updated_at_idx ON "simple-pets-pets-public".animals (updated_at);
 
+-- Minimal metaschema schema for tests
+CREATE SCHEMA IF NOT EXISTS metaschema_public;
+
+CREATE TYPE metaschema_public.object_category AS ENUM ('core', 'module', 'app');
+
+CREATE TABLE metaschema_public.database (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  owner_id uuid,
+  schema_hash text,
+  schema_name text,
+  private_schema_name text,
+  name text,
+  label text,
+  hash uuid,
+  UNIQUE(schema_hash),
+  UNIQUE(schema_name),
+  UNIQUE(private_schema_name)
+);
+
+ALTER TABLE metaschema_public.database
+  ADD CONSTRAINT db_namechk CHECK (char_length(name) > 2);
+
+CREATE TABLE metaschema_public.schema (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  name text NOT NULL,
+  schema_name text NOT NULL,
+  label text,
+  description text,
+  smart_tags jsonb,
+  category metaschema_public.object_category NOT NULL DEFAULT 'app',
+  module text NULL,
+  scope int NULL,
+  tags citext[] NOT NULL DEFAULT '{}',
+  is_public boolean NOT NULL DEFAULT TRUE,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  UNIQUE (database_id, name),
+  UNIQUE (schema_name)
+);
+
+ALTER TABLE metaschema_public.schema
+  ADD CONSTRAINT schema_namechk CHECK (char_length(name) > 2);
+
+CREATE TABLE metaschema_public.table (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL DEFAULT uuid_nil(),
+  schema_id uuid NOT NULL,
+  name text NOT NULL,
+  label text,
+  description text,
+  smart_tags jsonb,
+  category metaschema_public.object_category NOT NULL DEFAULT 'app',
+  module text NULL,
+  scope int NULL,
+  use_rls boolean NOT NULL DEFAULT FALSE,
+  timestamps boolean NOT NULL DEFAULT FALSE,
+  peoplestamps boolean NOT NULL DEFAULT FALSE,
+  plural_name text,
+  singular_name text,
+  tags citext[] NOT NULL DEFAULT '{}',
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
+  UNIQUE (database_id, name)
+);
+
+ALTER TABLE metaschema_public.table
+  ADD COLUMN inherits_id uuid NULL REFERENCES metaschema_public.table(id);
+
+CREATE TABLE metaschema_public.field (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL DEFAULT uuid_nil(),
+  table_id uuid NOT NULL,
+  name text NOT NULL,
+  label text,
+  description text,
+  smart_tags jsonb,
+  is_required boolean NOT NULL DEFAULT FALSE,
+  default_value text NULL DEFAULT NULL,
+  default_value_ast jsonb NULL DEFAULT NULL,
+  is_hidden boolean NOT NULL DEFAULT FALSE,
+  type citext NOT NULL,
+  field_order int NOT NULL DEFAULT 0,
+  regexp text DEFAULT NULL,
+  chk jsonb DEFAULT NULL,
+  chk_expr jsonb DEFAULT NULL,
+  min float DEFAULT NULL,
+  max float DEFAULT NULL,
+  tags citext[] NOT NULL DEFAULT '{}',
+  category metaschema_public.object_category NOT NULL DEFAULT 'app',
+  module text NULL,
+  scope int NULL,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
+  UNIQUE (table_id, name)
+);
+
+CREATE TABLE metaschema_public.primary_key_constraint (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL DEFAULT uuid_nil(),
+  table_id uuid NOT NULL,
+  name text,
+  type text,
+  field_ids uuid[] NOT NULL,
+  smart_tags jsonb,
+  category metaschema_public.object_category NOT NULL DEFAULT 'app',
+  module text NULL,
+  scope int NULL,
+  tags citext[] NOT NULL DEFAULT '{}',
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
+  UNIQUE (table_id, name),
+  CHECK (field_ids <> '{}')
+);
+
+CREATE TABLE metaschema_public.check_constraint (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL DEFAULT uuid_nil(),
+  table_id uuid NOT NULL,
+  name text,
+  type text,
+  field_ids uuid[] NOT NULL,
+  expr jsonb,
+  smart_tags jsonb,
+  category metaschema_public.object_category NOT NULL DEFAULT 'app',
+  module text NULL,
+  scope int NULL,
+  tags citext[] NOT NULL DEFAULT '{}',
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
+  UNIQUE (table_id, name),
+  CHECK (field_ids <> '{}')
+);
+
+
+-- Minimal services schema for tests
+CREATE DOMAIN hostname AS text CHECK (
+  VALUE ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
+);
+
+CREATE DOMAIN attachment AS text CHECK (
+  VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$'
+);
+COMMENT ON DOMAIN attachment IS E'@name pgpmInternalTypeAttachment';
+
+CREATE DOMAIN image AS jsonb CHECK (
+  value ?& ARRAY['url', 'mime']
+  AND
+  value->>'url' ~ '^(https?)://[^\s/$.?#].[^\s]*$'
+);
+COMMENT ON DOMAIN image IS E'@name pgpmInternalTypeImage';
+
+CREATE SCHEMA IF NOT EXISTS services_public;
+
+GRANT USAGE ON SCHEMA services_public TO authenticated;
+GRANT USAGE ON SCHEMA services_public TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON TABLES TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON SEQUENCES TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON FUNCTIONS TO administrator;
+
+CREATE TABLE services_public.apis (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  name text NOT NULL,
+  dbname text NOT NULL DEFAULT current_database(),
+  role_name text NOT NULL DEFAULT 'authenticated',
+  anon_role text NOT NULL DEFAULT 'anonymous',
+  is_public boolean NOT NULL DEFAULT true,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  UNIQUE(database_id, name)
+);
+
+CREATE TABLE services_public.sites (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  title text,
+  description text,
+  og_image image,
+  favicon attachment,
+  apple_touch_icon image,
+  logo image,
+  dbname text NOT NULL DEFAULT current_database(),
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT max_title CHECK (char_length(title) <= 120),
+  CONSTRAINT max_descr CHECK (char_length(description) <= 120)
+);
+
+CREATE INDEX sites_database_id_idx ON services_public.sites (database_id);
+
+CREATE TABLE services_public.domains (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  api_id uuid,
+  site_id uuid,
+  subdomain hostname,
+  domain hostname,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
+  CONSTRAINT site_fkey FOREIGN KEY (site_id) REFERENCES services_public.sites (id) ON DELETE CASCADE,
+  CONSTRAINT one_route_chk CHECK (
+    (api_id IS NULL AND site_id IS NULL) OR
+    (api_id IS NULL AND site_id IS NOT NULL) OR
+    (api_id IS NOT NULL AND site_id IS NULL)
+  ),
+  UNIQUE (subdomain, domain)
+);
+
+CREATE INDEX domains_database_id_idx ON services_public.domains (database_id);
+CREATE INDEX domains_api_id_idx ON services_public.domains (api_id);
+CREATE INDEX domains_site_id_idx ON services_public.domains (site_id);
+
+CREATE TABLE services_public.api_schemas (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  schema_id uuid NOT NULL,
+  api_id uuid NOT NULL,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
+  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
+  UNIQUE(api_id, schema_id)
+);
+
+CREATE TABLE services_public.api_extensions (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  schema_name text,
+  database_id uuid NOT NULL,
+  api_id uuid NOT NULL,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
+  UNIQUE (schema_name, api_id)
+);
+
+CREATE TABLE services_public.api_modules (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  api_id uuid NOT NULL,
+  name text NOT NULL,
+  data json NOT NULL,
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT api_modules_api_id_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id)
+);
+
+
+-- Minimal metaschema modules schema for tests
+CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
+
+GRANT USAGE ON SCHEMA metaschema_modules_public TO authenticated;
+GRANT USAGE ON SCHEMA metaschema_modules_public TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON SEQUENCES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON FUNCTIONS TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON TABLES TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON SEQUENCES TO administrator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON FUNCTIONS TO administrator;
+
+CREATE TABLE metaschema_modules_public.rls_module (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
+  database_id uuid NOT NULL,
+  api_id uuid NOT NULL DEFAULT uuid_nil(),
+  schema_id uuid NOT NULL DEFAULT uuid_nil(),
+  private_schema_id uuid NOT NULL DEFAULT uuid_nil(),
+  tokens_table_id uuid NOT NULL DEFAULT uuid_nil(),
+  users_table_id uuid NOT NULL DEFAULT uuid_nil(),
+  authenticate text NOT NULL DEFAULT 'authenticate',
+  authenticate_strict text NOT NULL DEFAULT 'authenticate_strict',
+  "current_role" text NOT NULL DEFAULT 'current_user',
+  current_role_id text NOT NULL DEFAULT 'current_user_id',
+  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
+  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
+  CONSTRAINT tokens_table_fkey FOREIGN KEY (tokens_table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
+  CONSTRAINT users_table_fkey FOREIGN KEY (users_table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
+  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
+  CONSTRAINT pschema_fkey FOREIGN KEY (private_schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
+  CONSTRAINT api_id_uniq UNIQUE(api_id)
+);
+
+
 SET session_replication_role TO replica;
 
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO PUBLIC;

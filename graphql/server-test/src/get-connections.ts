@@ -65,9 +65,9 @@ export const getConnections = async (
   const request = createSuperTestAgent(server);
 
   // Combined teardown function
-  const teardown = async () => {
+  const teardown = async (opts?: { keepDb?: boolean }) => {
     await server.stop();
-    await dbTeardown();
+    await dbTeardown(opts);
   };
 
   return {

@@ -100,5 +100,5 @@ export interface GetConnectionsResult {
   /** GraphQL query function */
   query: GraphQLQueryFn;
   /** Teardown function to clean up database and server */
-  teardown: () => Promise<void>;
+  teardown: (opts?: { keepDb?: boolean }) => Promise<void>;
 }
