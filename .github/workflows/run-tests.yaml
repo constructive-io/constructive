@@ -124,6 +124,10 @@ jobs:
             env: {}
           - package: packages/csrf
             env: {}
+          - package: packages/12factor-env
+            env: {}
+          - package: packages/postmaster
+            env: {}
 
     env:
       PGHOST: localhost
