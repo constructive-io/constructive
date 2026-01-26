@@ -46,15 +46,16 @@ const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
 };
 
 /**
- * Default path for secret files (Docker/Kubernetes secrets)
+ * Get the secrets path lazily to allow ENV_SECRETS_PATH changes at runtime
  */
-const ENV_SECRETS_PATH = process.env.ENV_SECRETS_PATH ?? '/run/secrets/';
+const getSecretsPath = (): string =>
+  process.env.ENV_SECRETS_PATH ?? '/run/secrets/';
 
 /**
  * Resolve the full path to a secret file
  */
 const secretPath = (name: string): string =>
-  name.startsWith('/') ? name : resolve(join(ENV_SECRETS_PATH, name));
+  name.startsWith('/') ? name : resolve(join(getSecretsPath(), name));
 
 /**
  * Read a secret from a file
@@ -155,6 +156,7 @@ export {
   secret,
   getSecret,
   secretPath,
+  getSecretsPath,
   // Re-export from envalid
   cleanEnv,
   makeValidator,

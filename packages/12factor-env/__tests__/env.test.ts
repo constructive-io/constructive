@@ -2,9 +2,10 @@ import { writeFileSync, unlinkSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
-import { env, str, port, bool } from '../src';
+import { env, str, port, bool, host } from '../src';
 
 describe('env', () => {
+  const ORIGINAL_ENV = { ...process.env };
   const testDir = join(tmpdir(), 'env-test-' + process.pid);
 
   beforeAll(() => {
@@ -17,6 +18,17 @@ describe('env', () => {
     } catch {
       // ignore cleanup errors
     }
+  });
+
+  afterEach(() => {
+    // Remove any env var added during the test
+    for (const key of Object.keys(process.env)) {
+      if (!(key in ORIGINAL_ENV)) {
+        delete process.env[key];
+      }
+    }
+    // Restore original values
+    Object.assign(process.env, ORIGINAL_ENV);
   });
 
   describe('_FILE secret detection', () => {
@@ -132,6 +144,77 @@ describe('env', () => {
       expect(result.API_KEY).toBe('test-key');
       expect(result.PORT).toBe(8080);
       expect(result.DEBUG).toBe(false);
+    });
+  });
+
+  describe('ENV_SECRETS_PATH resolution', () => {
+    it('A5: should read secrets from ENV_SECRETS_PATH directory', () => {
+      // Write file named 'API_KEY' (not API_KEY_FILE) to temp dir
+      const secretPath = join(testDir, 'API_KEY');
+      writeFileSync(secretPath, 'secret-from-path');
+
+      // Set ENV_SECRETS_PATH - now works without module reload thanks to lazy getSecretsPath()
+      process.env.ENV_SECRETS_PATH = testDir;
+
+      try {
+        const result = env(
+          {}, // No API_KEY_FILE, no API_KEY in env
+          { API_KEY: str() },
+          {}
+        );
+        expect(result.API_KEY).toBe('secret-from-path');
+      } finally {
+        unlinkSync(secretPath);
+      }
+    });
+  });
+
+  describe('fallback behavior', () => {
+    it('B1: _FILE present but file missing + env secret present → fallback', () => {
+      const result = env(
+        {
+          API_KEY: 'fallback-value',
+          API_KEY_FILE: '/nonexistent/path'
+        },
+        { API_KEY: str() },
+        {}
+      );
+      expect(result.API_KEY).toBe('fallback-value');
+    });
+
+    it('B2: _FILE present but file missing + env secret missing → throw', () => {
+      expect(() => {
+        env(
+          { API_KEY_FILE: '/nonexistent/path' },
+          { API_KEY: str() },
+          {}
+        );
+      }).toThrow(/API_KEY/);
+    });
+  });
+
+  describe('validation errors', () => {
+    it('B3: Invalid optional var format (host validator) → throw', () => {
+      expect(() => {
+        env(
+          {
+            API_KEY: 'test-key',
+            MAILGUN_DOMAIN: 'not a valid host!!!'
+          },
+          { API_KEY: str() },
+          { MAILGUN_DOMAIN: host() }
+        );
+      }).toThrow(/MAILGUN_DOMAIN/);
+    });
+
+    it('B4: Invalid required secret format (port validator) → throw', () => {
+      expect(() => {
+        env(
+          { DB_PORT: 'not-a-number' },
+          { DB_PORT: port() },
+          {}
+        );
+      }).toThrow(/DB_PORT/);
     });
   });
 });
