@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.0.3...@constructive-io/graphql-codegen@3.0.4) (2026-01-26)
+
+### Bug Fixes
+
+- **graphql-codegen:** generate barrel file for ORM-only mode ([52508bd](https://github.com/constructive-io/constructive/commit/52508bd86076b2a76de5a26821f1aac357de02ad))
+
 ## [3.0.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.0.2...@constructive-io/graphql-codegen@3.0.3) (2026-01-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
