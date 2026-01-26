@@ -3,12 +3,259 @@
  */
 import { getGeneratedFileHeader } from './utils';
 
+export interface GenerateClientFileOptions {
+  /**
+   * Generate browser-compatible code using native fetch
+   * When true (default), uses native W3C fetch API
+   * When false, uses undici fetch with dispatcher support for localhost DNS resolution
+   * @default true
+   */
+  browserCompatible?: boolean;
+}
+
+/**
+ * Generate the undici imports and localhost agent code for Node.js runtime
+ */
+function generateUndiciCode(): string {
+  return `import dns from 'node:dns';
+import { Agent, fetch, type RequestInit } from 'undici';
+
+// ============================================================================
+// Localhost DNS Resolution (Node.js only)
+// ============================================================================
+
+/**
+ * Check if a hostname is localhost or a localhost subdomain
+ */
+function isLocalhostHostname(hostname: string): boolean {
+  return hostname === 'localhost' || hostname.endsWith('.localhost');
+}
+
+/**
+ * Create an undici Agent that resolves *.localhost to 127.0.0.1
+ * This fixes DNS resolution issues on macOS where subdomains like api.localhost
+ * don't resolve automatically (unlike browsers which handle *.localhost).
+ */
+function createLocalhostAgent(): Agent {
+  return new Agent({
+    connect: {
+      lookup(hostname, opts, cb) {
+        if (isLocalhostHostname(hostname)) {
+          // When opts.all is true, callback expects an array of {address, family} objects
+          // When opts.all is false/undefined, callback expects (err, address, family)
+          if (opts.all) {
+            cb(null, [{ address: '127.0.0.1', family: 4 }]);
+          } else {
+            cb(null, '127.0.0.1', 4);
+          }
+          return;
+        }
+        dns.lookup(hostname, opts, cb);
+      },
+    },
+  });
+}
+
+let localhostAgent: Agent | null = null;
+
+function getLocalhostAgent(): Agent {
+  if (!localhostAgent) {
+    localhostAgent = createLocalhostAgent();
+  }
+  return localhostAgent;
+}
+
+/**
+ * Get fetch options with localhost agent if needed
+ */
+function getFetchOptions(
+  endpoint: string,
+  baseOptions: RequestInit
+): RequestInit {
+  const url = new URL(endpoint);
+  if (isLocalhostHostname(url.hostname)) {
+    const options: RequestInit = {
+      ...baseOptions,
+      dispatcher: getLocalhostAgent(),
+    };
+    // Set Host header for localhost subdomains to preserve routing
+    if (url.hostname !== 'localhost') {
+      options.headers = {
+        ...(baseOptions.headers as Record<string, string>),
+        Host: url.hostname,
+      };
+    }
+    return options;
+  }
+  return baseOptions;
+}
+
+`;
+}
+
+/**
+ * Generate the execute function code
+ */
+function generateExecuteFunction(browserCompatible: boolean): string {
+  if (browserCompatible) {
+    // Browser-compatible version using native fetch
+    return `export async function execute<TData = unknown, TVariables = Record<string, unknown>>(
+  document: string,
+  variables?: TVariables,
+  options?: ExecuteOptions
+): Promise<TData> {
+  const config = getConfig();
+
+  const response = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...config.headers,
+      ...options?.headers,
+    },
+    body: JSON.stringify({
+      query: document,
+      variables,
+    }),
+    signal: options?.signal,
+  });
+
+  const json = await response.json();
+
+  if (json.errors && json.errors.length > 0) {
+    throw new GraphQLClientError(
+      json.errors[0].message || 'GraphQL request failed',
+      json.errors,
+      response
+    );
+  }
+
+  return json.data as TData;
+}`;
+  } else {
+    // Node.js version using undici fetch with localhost DNS resolution
+    return `export async function execute<TData = unknown, TVariables = Record<string, unknown>>(
+  document: string,
+  variables?: TVariables,
+  options?: ExecuteOptions
+): Promise<TData> {
+  const config = getConfig();
+
+  const baseOptions: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...config.headers,
+      ...options?.headers,
+    },
+    body: JSON.stringify({
+      query: document,
+      variables,
+    }),
+    signal: options?.signal,
+  };
+
+  const fetchOptions = getFetchOptions(config.endpoint, baseOptions);
+  const response = await fetch(config.endpoint, fetchOptions);
+
+  const json = await response.json();
+
+  if (json.errors && json.errors.length > 0) {
+    throw new GraphQLClientError(
+      json.errors[0].message || 'GraphQL request failed',
+      json.errors,
+      response
+    );
+  }
+
+  return json.data as TData;
+}`;
+  }
+}
+
+/**
+ * Generate the executeWithErrors function code
+ */
+function generateExecuteWithErrorsFunction(browserCompatible: boolean): string {
+  if (browserCompatible) {
+    // Browser-compatible version using native fetch
+    return `export async function executeWithErrors<TData = unknown, TVariables = Record<string, unknown>>(
+  document: string,
+  variables?: TVariables,
+  options?: ExecuteOptions
+): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
+  const config = getConfig();
+
+  const response = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...config.headers,
+      ...options?.headers,
+    },
+    body: JSON.stringify({
+      query: document,
+      variables,
+    }),
+    signal: options?.signal,
+  });
+
+  const json = await response.json();
+
+  return {
+    data: json.data ?? null,
+    errors: json.errors ?? null,
+  };
+}`;
+  } else {
+    // Node.js version using undici fetch with localhost DNS resolution
+    return `export async function executeWithErrors<TData = unknown, TVariables = Record<string, unknown>>(
+  document: string,
+  variables?: TVariables,
+  options?: ExecuteOptions
+): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
+  const config = getConfig();
+
+  const baseOptions: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...config.headers,
+      ...options?.headers,
+    },
+    body: JSON.stringify({
+      query: document,
+      variables,
+    }),
+    signal: options?.signal,
+  };
+
+  const fetchOptions = getFetchOptions(config.endpoint, baseOptions);
+  const response = await fetch(config.endpoint, fetchOptions);
+
+  const json = await response.json();
+
+  return {
+    data: json.data ?? null,
+    errors: json.errors ?? null,
+  };
+}`;
+  }
+}
+
 /**
  * Generate client.ts content
+ * @param options - Generation options
  */
-export function generateClientFile(): string {
-  return `${getGeneratedFileHeader('GraphQL client configuration and execution')}
+export function generateClientFile(options: GenerateClientFileOptions = {}): string {
+  const { browserCompatible = true } = options;
 
+  const undiciImports = browserCompatible ? '' : generateUndiciCode();
+  const executeFunction = generateExecuteFunction(browserCompatible);
+  const executeWithErrorsFunction = generateExecuteWithErrorsFunction(browserCompatible);
+
+  return `${getGeneratedFileHeader('GraphQL client configuration and execution')}
+${undiciImports}
 // ============================================================================
 // Configuration
 // ============================================================================
@@ -131,72 +378,13 @@ export interface ExecuteOptions {
  * );
  * \`\`\`
  */
-export async function execute<TData = unknown, TVariables = Record<string, unknown>>(
-  document: string,
-  variables?: TVariables,
-  options?: ExecuteOptions
-): Promise<TData> {
-  const config = getConfig();
-
-  const response = await fetch(config.endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...config.headers,
-      ...options?.headers,
-    },
-    body: JSON.stringify({
-      query: document,
-      variables,
-    }),
-    signal: options?.signal,
-  });
-
-  const json = await response.json();
-
-  if (json.errors && json.errors.length > 0) {
-    throw new GraphQLClientError(
-      json.errors[0].message || 'GraphQL request failed',
-      json.errors,
-      response
-    );
-  }
-
-  return json.data as TData;
-}
+${executeFunction}
 
 /**
  * Execute a GraphQL operation with full response (data + errors)
  * Useful when you want to handle partial data with errors
  */
-export async function executeWithErrors<TData = unknown, TVariables = Record<string, unknown>>(
-  document: string,
-  variables?: TVariables,
-  options?: ExecuteOptions
-): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
-  const config = getConfig();
-
-  const response = await fetch(config.endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...config.headers,
-      ...options?.headers,
-    },
-    body: JSON.stringify({
-      query: document,
-      variables,
-    }),
-    signal: options?.signal,
-  });
-
-  const json = await response.json();
-
-  return {
-    data: json.data ?? null,
-    errors: json.errors ?? null,
-  };
-}
+${executeWithErrorsFunction}
 
 // ============================================================================
 // QueryClient Factory

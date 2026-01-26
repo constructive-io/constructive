@@ -262,6 +262,15 @@ export interface GraphQLSDKConfigTarget {
   reactQuery?: boolean;
 
   /**
+   * Generate browser-compatible code using native fetch
+   * When true (default), uses native W3C fetch API (works in browsers and Node.js)
+   * When false, uses undici fetch with dispatcher support for localhost DNS resolution
+   * (Node.js only - enables proper *.localhost subdomain resolution on macOS)
+   * @default true
+   */
+  browserCompatible?: boolean;
+
+  /**
    * Query key generation configuration
    * Controls how query keys are structured for cache management
    */
@@ -398,6 +407,7 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   },
   orm: false,
   reactQuery: false,
+  browserCompatible: true,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
