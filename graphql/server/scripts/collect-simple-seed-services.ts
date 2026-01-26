@@ -1,22 +1,147 @@
+/**
+ * Collect Simple Seed Services
+ *
+ * Collects the simple-seed and simple-seed-services bundles, along with
+ * metaschema/services/modules DDL from pgpm packages, to generate fixture files
+ * for integration tests.
+ *
+ * Reads directly from pre-generated bundle SQL files - no seed-generators dependency.
+ */
+
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-const SIMPLE_SEED_SQL = path.resolve(
-  __dirname,
-  '../../../../constructive-db/testing/simple-seed/sql/simple-seed--0.0.1.sql'
-);
-const SERVICES_SQL = path.resolve(
-  __dirname,
-  '../../../../constructive-db/testing/simple-seed-services/sql/simple-seed-services--0.0.1.sql'
-);
-const DEST_DIR = path.resolve(
-  __dirname,
-  '../__fixtures__/seed/simple-seed-services'
-);
+// ============================================================================
+// Paths to pre-generated bundle SQL files
+// ============================================================================
+
+const CONSTRUCTIVE_DB_ROOT = path.resolve(__dirname, '../../../../../constructive-db');
+const TESTING_DIR = path.join(CONSTRUCTIVE_DB_ROOT, 'testing');
+const PGPM_MODULES_DIR = path.join(CONSTRUCTIVE_DB_ROOT, 'pgpm-modules');
+
+// Bundle file paths
+const SIMPLE_SEED_BUNDLE = path.join(TESTING_DIR, 'simple-seed/sql/simple-seed--0.0.1.sql');
+const SIMPLE_SEED_SERVICES_BUNDLE = path.join(TESTING_DIR, 'simple-seed-services/sql/simple-seed-services--0.0.1.sql');
+const METASCHEMA_SCHEMA_BUNDLE = path.join(PGPM_MODULES_DIR, 'metaschema-schema/sql/metaschema-schema--0.15.5.sql');
+const METASCHEMA_MODULES_BUNDLE = path.join(PGPM_MODULES_DIR, 'metaschema-modules/sql/metaschema-modules--0.15.5.sql');
+const SERVICES_DEPLOY_DIR = path.join(PGPM_MODULES_DIR, 'services/deploy/schemas');
+
+// Output directory
+const DEST_DIR = path.resolve(__dirname, '../__fixtures__/seed/simple-seed-services');
+
+// ============================================================================
+// Fixed IDs (from seed-generators constants, stable for testing)
+// ============================================================================
+
+const FIXED_IDS = {
+  DATABASE_ID: '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  PUBLIC_SCHEMA_ID: '6d264733-40be-4214-0c97-c3dbe8ba3b05',
+  PETS_SCHEMA_ID: '6d263af4-8431-4454-0f8b-301a421fd6cc',
+  APP_API_ID: '6c9997a4-591b-4cb3-9313-4ef45d6f134e',
+  PRIVATE_API_ID: 'e257c53d-6ba6-40de-b679-61b37188a316',
+} as const;
+
+// ============================================================================
+// Utility functions
+// ============================================================================
+
+/**
+ * Strips the pgpm header from bundle SQL files.
+ * Removes \echo and \quit lines that prevent direct execution.
+ */
+function stripPgpmHeader(sql: string): string {
+  const lines = sql.split(/\r?\n/);
+  const filtered = lines.filter((line) => {
+    if (line.startsWith('\\echo Use "CREATE EXTENSION')) return false;
+    if (line.trim() === '\\quit') return false;
+    return true;
+  });
+  return filtered.join('\n').trim();
+}
+
+/**
+ * Strips sqitch deploy file headers (BEGIN/COMMIT, comments).
+ */
+function stripSqitchHeader(sql: string): string {
+  const lines = sql.split(/\r?\n/);
+  const filtered = lines.filter((line) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('-- Deploy ')) return false;
+    if (trimmed.startsWith('-- requires:')) return false;
+    if (trimmed === 'BEGIN;') return false;
+    if (trimmed === 'COMMIT;') return false;
+    return true;
+  });
+  return filtered.join('\n').trim();
+}
+
+/**
+ * Reads a bundle SQL file and strips the pgpm header.
+ */
+async function readBundle(bundlePath: string): Promise<string> {
+  const sql = await fs.readFile(bundlePath, 'utf8');
+  return stripPgpmHeader(sql);
+}
+
+/**
+ * Reads a sqitch deploy file and strips headers.
+ */
+async function readDeployFile(filePath: string): Promise<string> {
+  try {
+    const sql = await fs.readFile(filePath, 'utf8');
+    return stripSqitchHeader(sql);
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Reads the services schema DDL from deploy files.
+ * Since services doesn't have a pre-built bundle, we concatenate the deploy files.
+ */
+async function readServicesDeployFiles(): Promise<string> {
+  const parts: string[] = [];
+
+  // Read services_public schema
+  const publicSchemaFile = path.join(SERVICES_DEPLOY_DIR, 'services_public', 'schema.sql');
+  const publicSchema = await readDeployFile(publicSchemaFile);
+  if (publicSchema) parts.push(publicSchema);
+
+  // Read tables in order (dependencies matter)
+  const tables = ['apis', 'sites', 'domains', 'api_schemas', 'api_modules', 'site_modules', 'site_metadata', 'site_themes', 'apps'];
+  const tablesDir = path.join(SERVICES_DEPLOY_DIR, 'services_public', 'tables');
+
+  for (const table of tables) {
+    const tableFile = path.join(tablesDir, table, 'table.sql');
+    const tableSql = await readDeployFile(tableFile);
+    if (tableSql) parts.push(tableSql);
+  }
+
+  // Read services_private schema if exists
+  const privateSchemaFile = path.join(SERVICES_DEPLOY_DIR, 'services_private', 'schema.sql');
+  const privateSchema = await readDeployFile(privateSchemaFile);
+  if (privateSchema) parts.push(privateSchema);
+
+  return parts.join('\n\n');
+}
+
+// ============================================================================
+// Static SQL content
+// ============================================================================
 
 const SETUP_SQL = `-- Prerequisites
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "citext";
+
+-- Custom domain types from @pgpm/types (required by services_public tables)
+CREATE DOMAIN hostname AS text CHECK (VALUE ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$');
+CREATE DOMAIN attachment AS text CHECK (VALUE ~ '^(https?)://[^\\s/$.?#].[^\\s]*$');
+CREATE DOMAIN image AS jsonb CHECK (
+  jsonb_typeof(VALUE) = 'object' AND
+  VALUE ? 'url' AND
+  VALUE ? 'width' AND
+  VALUE ? 'height'
+);
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'administrator') THEN CREATE ROLE administrator; END IF;
@@ -31,284 +156,7 @@ BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
-`;
-
-const METASCHEMA_SQL = `-- Minimal metaschema schema for tests
-CREATE SCHEMA IF NOT EXISTS metaschema_public;
-
-CREATE TYPE metaschema_public.object_category AS ENUM ('core', 'module', 'app');
-
-CREATE TABLE metaschema_public.database (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  owner_id uuid,
-  schema_hash text,
-  schema_name text,
-  private_schema_name text,
-  name text,
-  label text,
-  hash uuid,
-  UNIQUE(schema_hash),
-  UNIQUE(schema_name),
-  UNIQUE(private_schema_name)
-);
-
-ALTER TABLE metaschema_public.database
-  ADD CONSTRAINT db_namechk CHECK (char_length(name) > 2);
-
-CREATE TABLE metaschema_public.schema (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  name text NOT NULL,
-  schema_name text NOT NULL,
-  label text,
-  description text,
-  smart_tags jsonb,
-  category metaschema_public.object_category NOT NULL DEFAULT 'app',
-  module text NULL,
-  scope int NULL,
-  tags citext[] NOT NULL DEFAULT '{}',
-  is_public boolean NOT NULL DEFAULT TRUE,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  UNIQUE (database_id, name),
-  UNIQUE (schema_name)
-);
-
-ALTER TABLE metaschema_public.schema
-  ADD CONSTRAINT schema_namechk CHECK (char_length(name) > 2);
-
-CREATE TABLE metaschema_public.table (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL DEFAULT uuid_nil(),
-  schema_id uuid NOT NULL,
-  name text NOT NULL,
-  label text,
-  description text,
-  smart_tags jsonb,
-  category metaschema_public.object_category NOT NULL DEFAULT 'app',
-  module text NULL,
-  scope int NULL,
-  use_rls boolean NOT NULL DEFAULT FALSE,
-  timestamps boolean NOT NULL DEFAULT FALSE,
-  peoplestamps boolean NOT NULL DEFAULT FALSE,
-  plural_name text,
-  singular_name text,
-  tags citext[] NOT NULL DEFAULT '{}',
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
-  UNIQUE (database_id, name)
-);
-
-ALTER TABLE metaschema_public.table
-  ADD COLUMN inherits_id uuid NULL REFERENCES metaschema_public.table(id);
-
-CREATE TABLE metaschema_public.field (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL DEFAULT uuid_nil(),
-  table_id uuid NOT NULL,
-  name text NOT NULL,
-  label text,
-  description text,
-  smart_tags jsonb,
-  is_required boolean NOT NULL DEFAULT FALSE,
-  default_value text NULL DEFAULT NULL,
-  default_value_ast jsonb NULL DEFAULT NULL,
-  is_hidden boolean NOT NULL DEFAULT FALSE,
-  type citext NOT NULL,
-  field_order int NOT NULL DEFAULT 0,
-  regexp text DEFAULT NULL,
-  chk jsonb DEFAULT NULL,
-  chk_expr jsonb DEFAULT NULL,
-  min float DEFAULT NULL,
-  max float DEFAULT NULL,
-  tags citext[] NOT NULL DEFAULT '{}',
-  category metaschema_public.object_category NOT NULL DEFAULT 'app',
-  module text NULL,
-  scope int NULL,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
-  UNIQUE (table_id, name)
-);
-
-CREATE TABLE metaschema_public.primary_key_constraint (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL DEFAULT uuid_nil(),
-  table_id uuid NOT NULL,
-  name text,
-  type text,
-  field_ids uuid[] NOT NULL,
-  smart_tags jsonb,
-  category metaschema_public.object_category NOT NULL DEFAULT 'app',
-  module text NULL,
-  scope int NULL,
-  tags citext[] NOT NULL DEFAULT '{}',
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
-  UNIQUE (table_id, name),
-  CHECK (field_ids <> '{}')
-);
-
-CREATE TABLE metaschema_public.check_constraint (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL DEFAULT uuid_nil(),
-  table_id uuid NOT NULL,
-  name text,
-  type text,
-  field_ids uuid[] NOT NULL,
-  expr jsonb,
-  smart_tags jsonb,
-  category metaschema_public.object_category NOT NULL DEFAULT 'app',
-  module text NULL,
-  scope int NULL,
-  tags citext[] NOT NULL DEFAULT '{}',
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT table_fkey FOREIGN KEY (table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
-  UNIQUE (table_id, name),
-  CHECK (field_ids <> '{}')
-);
-`;
-
-const SERVICES_SCHEMA_SQL = `-- Minimal services schema for tests
-CREATE DOMAIN hostname AS text CHECK (
-  VALUE ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$'
-);
-
-CREATE DOMAIN attachment AS text CHECK (
-  VALUE ~ '^(https?)://[^\\s/$.?#].[^\\s]*$'
-);
-COMMENT ON DOMAIN attachment IS E'@name pgpmInternalTypeAttachment';
-
-CREATE DOMAIN image AS jsonb CHECK (
-  value ?& ARRAY['url', 'mime']
-  AND
-  value->>'url' ~ '^(https?)://[^\\s/$.?#].[^\\s]*$'
-);
-COMMENT ON DOMAIN image IS E'@name pgpmInternalTypeImage';
-
-CREATE SCHEMA IF NOT EXISTS services_public;
-
-GRANT USAGE ON SCHEMA services_public TO authenticated;
-GRANT USAGE ON SCHEMA services_public TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON TABLES TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON SEQUENCES TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA services_public GRANT ALL ON FUNCTIONS TO administrator;
-
-CREATE TABLE services_public.apis (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  name text NOT NULL,
-  dbname text NOT NULL DEFAULT current_database(),
-  role_name text NOT NULL DEFAULT 'authenticated',
-  anon_role text NOT NULL DEFAULT 'anonymous',
-  is_public boolean NOT NULL DEFAULT true,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  UNIQUE(database_id, name)
-);
-
-CREATE TABLE services_public.sites (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  title text,
-  description text,
-  og_image image,
-  favicon attachment,
-  apple_touch_icon image,
-  logo image,
-  dbname text NOT NULL DEFAULT current_database(),
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT max_title CHECK (char_length(title) <= 120),
-  CONSTRAINT max_descr CHECK (char_length(description) <= 120)
-);
-
-CREATE INDEX sites_database_id_idx ON services_public.sites (database_id);
-
-CREATE TABLE services_public.domains (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  api_id uuid,
-  site_id uuid,
-  subdomain hostname,
-  domain hostname,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
-  CONSTRAINT site_fkey FOREIGN KEY (site_id) REFERENCES services_public.sites (id) ON DELETE CASCADE,
-  CONSTRAINT one_route_chk CHECK (
-    (api_id IS NULL AND site_id IS NULL) OR
-    (api_id IS NULL AND site_id IS NOT NULL) OR
-    (api_id IS NOT NULL AND site_id IS NULL)
-  ),
-  UNIQUE (subdomain, domain)
-);
-
-CREATE INDEX domains_database_id_idx ON services_public.domains (database_id);
-CREATE INDEX domains_api_id_idx ON services_public.domains (api_id);
-CREATE INDEX domains_site_id_idx ON services_public.domains (site_id);
-
-CREATE TABLE services_public.api_schemas (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  schema_id uuid NOT NULL,
-  api_id uuid NOT NULL,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
-  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
-  UNIQUE(api_id, schema_id)
-);
-
-CREATE TABLE services_public.api_extensions (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  schema_name text,
-  database_id uuid NOT NULL,
-  api_id uuid NOT NULL,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
-  UNIQUE (schema_name, api_id)
-);
-
-CREATE TABLE services_public.api_modules (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  api_id uuid NOT NULL,
-  name text NOT NULL,
-  data json NOT NULL,
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT api_modules_api_id_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id)
-);
-`;
-
-const MODULES_SCHEMA_SQL = `-- Minimal metaschema modules schema for tests
-CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-
-GRANT USAGE ON SCHEMA metaschema_modules_public TO authenticated;
-GRANT USAGE ON SCHEMA metaschema_modules_public TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON TABLES TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON SEQUENCES TO administrator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA metaschema_modules_public GRANT ALL ON FUNCTIONS TO administrator;
-
-CREATE TABLE metaschema_modules_public.rls_module (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4 (),
-  database_id uuid NOT NULL,
-  api_id uuid NOT NULL DEFAULT uuid_nil(),
-  schema_id uuid NOT NULL DEFAULT uuid_nil(),
-  private_schema_id uuid NOT NULL DEFAULT uuid_nil(),
-  tokens_table_id uuid NOT NULL DEFAULT uuid_nil(),
-  users_table_id uuid NOT NULL DEFAULT uuid_nil(),
-  authenticate text NOT NULL DEFAULT 'authenticate',
-  authenticate_strict text NOT NULL DEFAULT 'authenticate_strict',
-  "current_role" text NOT NULL DEFAULT 'current_user',
-  current_role_id text NOT NULL DEFAULT 'current_user_id',
-  CONSTRAINT db_fkey FOREIGN KEY (database_id) REFERENCES metaschema_public.database (id) ON DELETE CASCADE,
-  CONSTRAINT api_fkey FOREIGN KEY (api_id) REFERENCES services_public.apis (id) ON DELETE CASCADE,
-  CONSTRAINT tokens_table_fkey FOREIGN KEY (tokens_table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
-  CONSTRAINT users_table_fkey FOREIGN KEY (users_table_id) REFERENCES metaschema_public.table (id) ON DELETE CASCADE,
-  CONSTRAINT schema_fkey FOREIGN KEY (schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
-  CONSTRAINT pschema_fkey FOREIGN KEY (private_schema_id) REFERENCES metaschema_public.schema (id) ON DELETE CASCADE,
-  CONSTRAINT api_id_uniq UNIQUE(api_id)
-);
-`;
+$$ LANGUAGE plpgsql;`;
 
 const TEST_DATA_SQL = `-- Test data
 INSERT INTO "simple-pets-pets-public".animals (name, species) VALUES
@@ -317,17 +165,24 @@ INSERT INTO "simple-pets-pets-public".animals (name, species) VALUES
 -- Explicit grants (ALTER DEFAULT PRIVILEGES doesn't apply in test context)
 GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-pets-public".animals TO administrator, authenticated, anonymous;
 
+
 -- Admin access for meta schemas
 GRANT USAGE ON SCHEMA metaschema_public TO administrator;
 GRANT SELECT ON ALL TABLES IN SCHEMA metaschema_public TO administrator;
 GRANT USAGE ON SCHEMA metaschema_modules_public TO administrator;
 GRANT SELECT ON ALL TABLES IN SCHEMA metaschema_modules_public TO administrator;
 
+-- Admin access for services schema (required for API lookup via GraphQL)
+GRANT USAGE ON SCHEMA services_public TO administrator;
+GRANT SELECT ON ALL TABLES IN SCHEMA services_public TO administrator;
+
+
 -- Services API wiring for integration tests
 UPDATE services_public.apis
 SET dbname = current_database()
-WHERE database_id = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
+WHERE database_id = '${FIXED_IDS.DATABASE_ID}';
 
+-- Domain for public API (app.test.constructive.io)
 INSERT INTO services_public.domains (
   id,
   database_id,
@@ -337,59 +192,107 @@ INSERT INTO services_public.domains (
   subdomain
 ) VALUES (
   uuid_generate_v4(),
-  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  '${FIXED_IDS.DATABASE_ID}',
   NULL,
-  '6c9997a4-591b-4cb3-9313-4ef45d6f134e',
+  '${FIXED_IDS.APP_API_ID}',
   'constructive.io',
   'app.test'
 ) ON CONFLICT (subdomain, domain)
 DO UPDATE SET api_id = EXCLUDED.api_id;
 
+-- Domain for private API (private.test.constructive.io)
+INSERT INTO services_public.domains (
+  id,
+  database_id,
+  site_id,
+  api_id,
+  domain,
+  subdomain
+) VALUES (
+  uuid_generate_v4(),
+  '${FIXED_IDS.DATABASE_ID}',
+  NULL,
+  '${FIXED_IDS.PRIVATE_API_ID}',
+  'constructive.io',
+  'private.test'
+) ON CONFLICT (subdomain, domain)
+DO UPDATE SET api_id = EXCLUDED.api_id;
+
+-- API schemas for public API
 INSERT INTO services_public.api_schemas (
   id,
   database_id,
   schema_id,
   api_id
 ) VALUES
-(
-  uuid_generate_v4(),
-  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-  '6dbae92a-5450-401b-1ed5-d69e7754940d',
-  '6c9997a4-591b-4cb3-9313-4ef45d6f134e'
-),
-(
-  uuid_generate_v4(),
-  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
-  '6dba6f21-0193-43f4-3bdb-61b4b956b6b6',
-  '6c9997a4-591b-4cb3-9313-4ef45d6f134e'
-);
-`;
+(uuid_generate_v4(), '${FIXED_IDS.DATABASE_ID}', '${FIXED_IDS.PUBLIC_SCHEMA_ID}', '${FIXED_IDS.APP_API_ID}'),
+(uuid_generate_v4(), '${FIXED_IDS.DATABASE_ID}', '${FIXED_IDS.PETS_SCHEMA_ID}', '${FIXED_IDS.APP_API_ID}')
+ON CONFLICT (api_id, schema_id) DO NOTHING;
 
-function stripPgpmHeader(sql: string): string {
-  const lines = sql.split(/\r?\n/);
-  const filtered = lines.filter((line) => {
-    if (line.startsWith('\\echo Use "CREATE EXTENSION')) {
-      return false;
-    }
-    if (line.trim() === '\\quit') {
-      return false;
-    }
-    return true;
-  });
-  return filtered.join('\n').trim();
-}
+-- API schemas for private API
+INSERT INTO services_public.api_schemas (
+  id,
+  database_id,
+  schema_id,
+  api_id
+)
+SELECT
+  uuid_generate_v4(),
+  '${FIXED_IDS.DATABASE_ID}',
+  schema_id,
+  '${FIXED_IDS.PRIVATE_API_ID}'
+FROM (VALUES
+  ('${FIXED_IDS.PUBLIC_SCHEMA_ID}'::uuid),
+  ('${FIXED_IDS.PETS_SCHEMA_ID}'::uuid)
+) AS v(schema_id)
+ON CONFLICT (api_id, schema_id) DO NOTHING;`;
+
+// ============================================================================
+// Main
+// ============================================================================
 
 async function writeSeedFiles(): Promise<void> {
-  const baseSql = await fs.readFile(SIMPLE_SEED_SQL, 'utf8');
-  const servicesSql = await fs.readFile(SERVICES_SQL, 'utf8');
+  console.log('Reading bundle files...');
+
+  // Read all bundle files
+  const [simpleSeedSql, servicesSeedSql, metaschemaSchemaSql, metaschemaModulesSql, servicesSchemaSql] = await Promise.all([
+    readBundle(SIMPLE_SEED_BUNDLE),
+    readBundle(SIMPLE_SEED_SERVICES_BUNDLE),
+    readBundle(METASCHEMA_SCHEMA_BUNDLE),
+    readBundle(METASCHEMA_MODULES_BUNDLE),
+    readServicesDeployFiles()
+  ]);
+
+  console.log(`  simple-seed: ${simpleSeedSql.length} bytes`);
+  console.log(`  simple-seed-services: ${servicesSeedSql.length} bytes`);
+  console.log(`  metaschema-schema: ${metaschemaSchemaSql.length} bytes`);
+  console.log(`  metaschema-modules: ${metaschemaModulesSql.length} bytes`);
+  console.log(`  services (from deploy): ${servicesSchemaSql.length} bytes`);
+
+  // Combine all schema DDL in the correct order:
+  // 1. Metaschema-schema (creates metaschema_public tables) - MUST come first
+  // 2. Services schema (creates services_public tables)
+  // 3. Metaschema-modules (creates metaschema_modules_public tables)
+  // 4. Simple seed schemas (creates the actual app tables)
+  // 5. Simple seed services data (inserts into metaschema/services tables)
   const schemaSql = [
-    stripPgpmHeader(baseSql),
-    METASCHEMA_SQL,
-    SERVICES_SCHEMA_SQL,
-    MODULES_SCHEMA_SQL,
-    stripPgpmHeader(servicesSql)
+    '-- Metaschema Schema DDL',
+    metaschemaSchemaSql,
+    '',
+    '-- Services Schema DDL',
+    servicesSchemaSql,
+    '',
+    '-- Metaschema Modules Schema DDL',
+    metaschemaModulesSql,
+    '',
+    '-- Simple Seed Schema DDL',
+    simpleSeedSql,
+    '',
+    '-- Simple Seed Services Data',
+    servicesSeedSql
   ].join('\n\n');
 
+  // Write fixture files
   await fs.mkdir(DEST_DIR, { recursive: true });
   await fs.writeFile(path.join(DEST_DIR, 'setup.sql'), `${SETUP_SQL}\n`, 'utf8');
   await fs.writeFile(path.join(DEST_DIR, 'schema.sql'), `${schemaSql}\n`, 'utf8');

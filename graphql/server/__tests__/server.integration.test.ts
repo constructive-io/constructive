@@ -363,7 +363,7 @@ describe('Error paths', () => {
         .send({ query: '{ __typename }' });
 
       expect(res.status).toBe(404);
-      expect(res.text).toContain('No valid schemas configured for this API');
+      expect(res.text).toContain('No valid schemas found for the supplied X-Schemata header');
     });
   });
 

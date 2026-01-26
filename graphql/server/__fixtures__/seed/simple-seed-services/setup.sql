@@ -2,6 +2,16 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "citext";
 
+-- Custom domain types from @pgpm/types (required by services_public tables)
+CREATE DOMAIN hostname AS text CHECK (VALUE ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$');
+CREATE DOMAIN attachment AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
+CREATE DOMAIN image AS jsonb CHECK (
+  jsonb_typeof(VALUE) = 'object' AND
+  VALUE ? 'url' AND
+  VALUE ? 'width' AND
+  VALUE ? 'height'
+);
+
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'administrator') THEN CREATE ROLE administrator; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN CREATE ROLE authenticated; END IF;
@@ -16,4 +26,3 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-

@@ -184,6 +184,7 @@ const queryServiceByDomainAndSubdomain = async ({
   domain: string;
   subdomain: string | null;
 }): Promise<ApiStructure | null> => {
+  log.debug(`[queryServiceByDomainAndSubdomain] Looking up domain: domain=${domain}, subdomain=${subdomain}`);
   const where = {
     domain: { equalTo: domain },
     subdomain:
@@ -197,14 +198,18 @@ const queryServiceByDomainAndSubdomain = async ({
     .execute();
 
   if (!result.ok) {
-    log.error('GraphQL query errors:', result.errors);
+    log.error('GraphQL query errors:', JSON.stringify(result.errors, null, 2));
     return null;
   }
 
   const domainRecord = result.data.domains.nodes[0] as DomainRecord | undefined;
   const api = domainRecord?.api as ApiRecord | undefined;
   const apiPublic = opts.api?.isPublic;
-  if (!api || api.isPublic !== apiPublic) return null;
+  log.debug(`[queryServiceByDomainAndSubdomain] Result: domainRecord=${domainRecord ? 'found' : 'null'}, api=${api ? `isPublic=${api.isPublic}` : 'null'}, opts.isPublic=${apiPublic}`);
+  if (!api || api.isPublic !== apiPublic) {
+    log.debug(`[queryServiceByDomainAndSubdomain] API not found or isPublic mismatch`);
+    return null;
+  }
 
   const apiStructure = normalizeApiRecord(api);
   svcCache.set(key, apiStructure);
@@ -224,48 +229,57 @@ export const queryServiceByApiName = async ({
   databaseId?: string;
   name: string;
 }): Promise<ApiStructure | null> => {
-  if (!databaseId) return null;
+  if (!databaseId) {
+    log.debug(`[queryServiceByApiName] No databaseId provided`);
+    return null;
+  }
+  log.debug(`[queryServiceByApiName] Looking up API: databaseId=${databaseId}, name=${name}`);
   const result = await queryOps
     .apiByDatabaseIdAndName({ databaseId, name }, { select: apiSelect })
     .execute();
 
   if (!result.ok) {
-    log.error('GraphQL query errors:', result.errors);
+    log.error('GraphQL query errors:', JSON.stringify(result.errors, null, 2));
     return null;
   }
 
   const api = result.data.apiByDatabaseIdAndName as ApiRecord | undefined;
   const apiPublic = opts.api?.isPublic;
+  log.debug(`[queryServiceByApiName] Query result: api=${api ? `isPublic=${api.isPublic}` : 'null'}, opts.isPublic=${apiPublic}`);
   if (api && api.isPublic === apiPublic) {
     const apiStructure = normalizeApiRecord(api);
     svcCache.set(key, apiStructure);
     return apiStructure;
   }
+  log.debug(`[queryServiceByApiName] API not found or isPublic mismatch: api.isPublic=${api?.isPublic}, opts.isPublic=${apiPublic}`);
   return null;
 };
 
 export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   const { domain, subdomains } = getUrlDomains(req);
-  const key = subdomains
+  const baseKey = subdomains
     .filter((name: string) => !['www'].includes(name))
     .concat(domain)
     .join('.');
 
   const apiPublic = opts.api?.isPublic;
+  // Include isPublic in cache key to avoid cross-contamination between public and private API lookups
+  const publicSuffix = apiPublic === false ? ':private' : ':public';
+
   if (apiPublic === false) {
     if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
+      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name') + publicSuffix;
     }
     if (req.get('X-Schemata')) {
       return (
-        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
+        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata') + publicSuffix
       );
     }
     if (req.get('X-Meta-Schema')) {
-      return 'metaschema:api:' + req.get('X-Database-Id');
+      return 'metaschema:api:' + req.get('X-Database-Id') + publicSuffix;
     }
   }
-  return key;
+  return baseKey + publicSuffix;
 };
 
 const validateSchemata = async (
@@ -311,10 +325,12 @@ export const getApiConfig = async (
             new Set([...(apiOpts.metaSchemas || []), ...headerSchemata])
           )
         : apiOpts.metaSchemas || [];
+    log.debug(`[getApiConfig] Candidate schemas: ${candidateSchemata.join(', ')}`);
     const validatedSchemata = await validateSchemata(
       rootPgPool,
       candidateSchemata
     );
+    log.debug(`[getApiConfig] Validated schemas: ${validatedSchemata.join(', ')}`);
 
     if (validatedSchemata.length === 0) {
       const schemaSource = headerSchemata.length
