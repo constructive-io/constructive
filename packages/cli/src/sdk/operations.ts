@@ -1,7 +1,11 @@
 /**
  * GraphQL operation builders for common SDK operations
- * These mirror the patterns from @constructive-io/sdk
+ * Uses gql-ast for proper AST-based document building
  */
+
+import * as t from 'gql-ast';
+import { print, parseType } from '@0no-co/graphql.web';
+import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 
 /**
  * Build a findMany query document
@@ -20,71 +24,79 @@ export function buildFindManyQuery(
     offset?: number;
   }
 ): { document: string; variables: Record<string, unknown> } {
-  const selectFields = buildSelectFields(select);
+  const selections = buildSelections(select);
   const filterType = `${modelName}Filter`;
   const orderByType = `${capitalize(pluralName)}OrderBy`;
 
+  const variableDefinitions: VariableDefinitionNode[] = [];
+  const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
-  const args: string[] = [];
 
-  if (options?.where) {
-    variables.where = options.where;
-    args.push(`filter: $where`);
-  }
-  if (options?.orderBy) {
-    variables.orderBy = options.orderBy;
-    args.push(`orderBy: $orderBy`);
-  }
-  if (options?.first !== undefined) {
-    variables.first = options.first;
-    args.push(`first: $first`);
-  }
-  if (options?.last !== undefined) {
-    variables.last = options.last;
-    args.push(`last: $last`);
-  }
-  if (options?.after) {
-    variables.after = options.after;
-    args.push(`after: $after`);
-  }
-  if (options?.before) {
-    variables.before = options.before;
-    args.push(`before: $before`);
-  }
-  if (options?.offset !== undefined) {
-    variables.offset = options.offset;
-    args.push(`offset: $offset`);
-  }
+  addVariable(
+    { varName: 'where', argName: 'filter', typeName: filterType, value: options?.where },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'orderBy', typeName: `[${orderByType}!]`, value: options?.orderBy?.length ? options.orderBy : undefined },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'first', typeName: 'Int', value: options?.first },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'last', typeName: 'Int', value: options?.last },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'after', typeName: 'Cursor', value: options?.after },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'before', typeName: 'Cursor', value: options?.before },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'offset', typeName: 'Int', value: options?.offset },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
 
-  const variablesDef = buildVariablesDef({
-    where: filterType,
-    orderBy: `[${orderByType}!]`,
-    first: 'Int',
-    last: 'Int',
-    after: 'Cursor',
-    before: 'Cursor',
-    offset: 'Int',
-  }, variables);
+  const doc = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'query',
+        name: `${modelName}FindMany`,
+        variableDefinitions: variableDefinitions.length ? variableDefinitions : undefined,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: pluralName,
+              args: queryArgs.length ? queryArgs : undefined,
+              selectionSet: t.selectionSet({
+                selections: buildConnectionSelections(selections),
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
 
-  const argsStr = args.length > 0 ? `(${args.join(', ')})` : '';
-
-  const document = `
-query ${modelName}FindMany${variablesDef} {
-  ${pluralName}${argsStr} {
-    nodes {
-      ${selectFields}
-    }
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    totalCount
-  }
-}`.trim();
-
-  return { document, variables };
+  return { document: print(doc), variables };
 }
 
 /**
@@ -98,30 +110,53 @@ export function buildFindFirstQuery(
     where?: Record<string, unknown>;
   }
 ): { document: string; variables: Record<string, unknown> } {
-  const selectFields = buildSelectFields(select);
+  const selections = buildSelections(select);
   const filterType = `${modelName}Filter`;
 
+  const variableDefinitions: VariableDefinitionNode[] = [];
+  const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
-  const args: string[] = ['first: 1'];
 
-  if (options?.where) {
-    variables.where = options.where;
-    args.push(`filter: $where`);
-  }
+  addVariable(
+    { varName: 'first', typeName: 'Int', value: 1 },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    { varName: 'where', argName: 'filter', typeName: filterType, value: options?.where },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
 
-  const variablesDef = buildVariablesDef({ where: filterType }, variables);
-  const argsStr = `(${args.join(', ')})`;
+  const doc = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'query',
+        name: `${modelName}FindFirst`,
+        variableDefinitions,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: pluralName,
+              args: queryArgs,
+              selectionSet: t.selectionSet({
+                selections: [
+                  t.field({
+                    name: 'nodes',
+                    selectionSet: t.selectionSet({ selections }),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
 
-  const document = `
-query ${modelName}FindFirst${variablesDef} {
-  ${pluralName}${argsStr} {
-    nodes {
-      ${selectFields}
-    }
-  }
-}`.trim();
-
-  return { document, variables };
+  return { document: print(doc), variables };
 }
 
 /**
@@ -135,24 +170,52 @@ export function buildCreateMutation(
   data: Record<string, unknown>,
   inputType: string
 ): { document: string; variables: Record<string, unknown> } {
-  const selectFields = buildSelectFields(select);
+  const selections = buildSelections(select);
 
-  const variables = {
-    input: {
-      [fieldName]: data,
+  const doc = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'mutation',
+        name: `${modelName}Create`,
+        variableDefinitions: [
+          t.variableDefinition({
+            variable: t.variable({ name: 'input' }),
+            type: parseType(`${inputType}!`),
+          }),
+        ],
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: mutationName,
+              args: [
+                t.argument({
+                  name: 'input',
+                  value: t.variable({ name: 'input' }),
+                }),
+              ],
+              selectionSet: t.selectionSet({
+                selections: [
+                  t.field({
+                    name: fieldName,
+                    selectionSet: t.selectionSet({ selections }),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return {
+    document: print(doc),
+    variables: {
+      input: {
+        [fieldName]: data,
+      },
     },
   };
-
-  const document = `
-mutation ${modelName}Create($input: ${inputType}!) {
-  ${mutationName}(input: $input) {
-    ${fieldName} {
-      ${selectFields}
-    }
-  }
-}`.trim();
-
-  return { document, variables };
 }
 
 /**
@@ -167,25 +230,53 @@ export function buildUpdateMutation(
   data: Record<string, unknown>,
   inputType: string
 ): { document: string; variables: Record<string, unknown> } {
-  const selectFields = buildSelectFields(select);
+  const selections = buildSelections(select);
 
-  const variables = {
-    input: {
-      id: where.id,
-      patch: data,
+  const doc = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'mutation',
+        name: `${modelName}Update`,
+        variableDefinitions: [
+          t.variableDefinition({
+            variable: t.variable({ name: 'input' }),
+            type: parseType(`${inputType}!`),
+          }),
+        ],
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: mutationName,
+              args: [
+                t.argument({
+                  name: 'input',
+                  value: t.variable({ name: 'input' }),
+                }),
+              ],
+              selectionSet: t.selectionSet({
+                selections: [
+                  t.field({
+                    name: fieldName,
+                    selectionSet: t.selectionSet({ selections }),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return {
+    document: print(doc),
+    variables: {
+      input: {
+        id: where.id,
+        patch: data,
+      },
     },
   };
-
-  const document = `
-mutation ${modelName}Update($input: ${inputType}!) {
-  ${mutationName}(input: $input) {
-    ${fieldName} {
-      ${selectFields}
-    }
-  }
-}`.trim();
-
-  return { document, variables };
 }
 
 /**
@@ -198,84 +289,154 @@ export function buildDeleteMutation(
   where: { id: string },
   inputType: string
 ): { document: string; variables: Record<string, unknown> } {
-  const variables = {
-    input: {
-      id: where.id,
+  const doc = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: 'mutation',
+        name: `${modelName}Delete`,
+        variableDefinitions: [
+          t.variableDefinition({
+            variable: t.variable({ name: 'input' }),
+            type: parseType(`${inputType}!`),
+          }),
+        ],
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: mutationName,
+              args: [
+                t.argument({
+                  name: 'input',
+                  value: t.variable({ name: 'input' }),
+                }),
+              ],
+              selectionSet: t.selectionSet({
+                selections: [
+                  t.field({
+                    name: fieldName,
+                    selectionSet: t.selectionSet({
+                      selections: [t.field({ name: 'id' })],
+                    }),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return {
+    document: print(doc),
+    variables: {
+      input: {
+        id: where.id,
+      },
     },
   };
-
-  const document = `
-mutation ${modelName}Delete($input: ${inputType}!) {
-  ${mutationName}(input: $input) {
-    ${fieldName} {
-      id
-    }
-  }
-}`.trim();
-
-  return { document, variables };
 }
 
-/**
- * Build select fields from a select object
- */
-function buildSelectFields(
-  select: Record<string, unknown>,
-  indent = 0
-): string {
-  const spaces = '  '.repeat(indent);
-  const lines: string[] = [];
+interface VariableSpec {
+  varName: string;
+  argName?: string;
+  typeName: string;
+  value: unknown;
+}
+
+function addVariable(
+  spec: VariableSpec,
+  definitions: VariableDefinitionNode[],
+  args: ArgumentNode[],
+  variables: Record<string, unknown>
+): void {
+  if (spec.value === undefined) return;
+
+  definitions.push(
+    t.variableDefinition({
+      variable: t.variable({ name: spec.varName }),
+      type: parseType(spec.typeName),
+    })
+  );
+  args.push(
+    t.argument({
+      name: spec.argName ?? spec.varName,
+      value: t.variable({ name: spec.varName }),
+    })
+  );
+  variables[spec.varName] = spec.value;
+}
+
+function buildSelections(select: Record<string, unknown>): FieldNode[] {
+  const fields: FieldNode[] = [];
 
   for (const [key, value] of Object.entries(select)) {
+    if (value === false || value === undefined) {
+      continue;
+    }
+
     if (value === true) {
-      lines.push(`${spaces}${key}`);
-    } else if (typeof value === 'object' && value !== null) {
+      fields.push(t.field({ name: key }));
+      continue;
+    }
+
+    if (typeof value === 'object' && value !== null) {
       const nested = value as Record<string, unknown>;
       if (nested.nodes) {
-        // Connection type
-        const nodeFields = buildSelectFields(
-          nested.nodes as Record<string, unknown>,
-          indent + 2
+        fields.push(
+          t.field({
+            name: key,
+            selectionSet: t.selectionSet({
+              selections: [
+                t.field({
+                  name: 'nodes',
+                  selectionSet: t.selectionSet({
+                    selections: buildSelections(nested.nodes as Record<string, unknown>),
+                  }),
+                }),
+              ],
+            }),
+          })
         );
-        lines.push(`${spaces}${key} {`);
-        lines.push(`${spaces}  nodes {`);
-        lines.push(nodeFields);
-        lines.push(`${spaces}  }`);
-        lines.push(`${spaces}}`);
       } else {
-        // Nested object
-        const nestedFields = buildSelectFields(nested, indent + 1);
-        lines.push(`${spaces}${key} {`);
-        lines.push(nestedFields);
-        lines.push(`${spaces}}`);
+        fields.push(
+          t.field({
+            name: key,
+            selectionSet: t.selectionSet({
+              selections: buildSelections(nested),
+            }),
+          })
+        );
       }
     }
   }
 
-  return lines.join('\n');
+  return fields;
 }
 
-/**
- * Build GraphQL variables definition
- */
-function buildVariablesDef(
-  types: Record<string, string>,
-  variables: Record<string, unknown>
-): string {
-  const defs: string[] = [];
-
-  for (const [name, type] of Object.entries(types)) {
-    if (variables[name] !== undefined) {
-      defs.push(`$${name}: ${type}`);
-    }
-  }
-
-  return defs.length > 0 ? `(${defs.join(', ')})` : '';
+function buildPageInfoSelections(): FieldNode[] {
+  return [
+    t.field({ name: 'hasNextPage' }),
+    t.field({ name: 'hasPreviousPage' }),
+    t.field({ name: 'startCursor' }),
+    t.field({ name: 'endCursor' }),
+  ];
 }
 
-/**
- * Capitalize first letter
- */
+function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
+  return [
+    t.field({
+      name: 'nodes',
+      selectionSet: t.selectionSet({ selections: nodeSelections }),
+    }),
+    t.field({ name: 'totalCount' }),
+    t.field({
+      name: 'pageInfo',
+      selectionSet: t.selectionSet({ selections: buildPageInfoSelections() }),
+    }),
+  ];
+}
+
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }

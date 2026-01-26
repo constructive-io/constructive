@@ -33,18 +33,20 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
-  "devDependencies": {
-    "@inquirerer/test": "^1.3.0",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.12.7",
-    "@types/pg": "^8.16.0",
-    "@types/shelljs": "^0.8.16",
-    "glob": "^13.0.0",
-    "makage": "^0.1.10",
-    "pg": "^8.17.1",
-    "ts-node": "^10.9.2"
-  },
+    "devDependencies": {
+      "@inquirerer/test": "^1.3.0",
+      "@types/js-yaml": "^4.0.9",
+      "@types/node": "^20.12.7",
+      "@types/pg": "^8.16.0",
+      "@types/shelljs": "^0.8.16",
+      "glob": "^13.0.0",
+      "graphql": "15.10.1",
+      "makage": "^0.1.10",
+      "pg": "^8.17.1",
+      "ts-node": "^10.9.2"
+    },
   "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-explorer": "workspace:^",
@@ -56,6 +58,7 @@
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.3.0",
+    "gql-ast": "workspace:^",
     "find-and-require-package-json": "^0.9.0",
     "inquirerer": "^4.5.0",
     "js-yaml": "^4.1.0",

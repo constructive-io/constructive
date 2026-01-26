@@ -1537,6 +1537,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@0no-co/graphql.web':
+        specifier: ^1.1.2
+        version: 1.2.0(graphql@15.10.1)
       '@constructive-io/graphql-codegen':
         specifier: workspace:^
         version: link:../../graphql/codegen/dist
@@ -1573,6 +1576,9 @@ importers:
       find-and-require-package-json:
         specifier: ^0.9.0
         version: 0.9.0
+      gql-ast:
+        specifier: workspace:^
+        version: link:../../graphql/gql-ast/dist
       inquirerer:
         specifier: ^4.5.0
         version: 4.5.0
@@ -1613,6 +1619,9 @@ importers:
       glob:
         specifier: ^13.0.0
         version: 13.0.0
+      graphql:
+        specifier: 15.10.1
+        version: 15.10.1
       makage:
         specifier: ^0.1.10
         version: 0.1.10
