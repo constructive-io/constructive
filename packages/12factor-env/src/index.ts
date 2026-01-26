@@ -140,7 +140,7 @@ const env = <S extends Specs, V extends Specs>(
   const varEnv = cleanEnv(inputEnv, vars);
 
   // Read secrets from files
-  const _secrets = secretEnv(varEnv as unknown as Record<string, string | undefined>, secrets);
+  const _secrets = secretEnv(inputEnv, secrets);
 
   // Second pass: validate secrets with file values merged in
   // Include inputEnv first so env vars (e.g., Kubernetes secretKeyRef) are available,
