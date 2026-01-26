@@ -1,139 +1,54 @@
-CREATE SCHEMA "simple-pets-public";
+-- Schema creation for simple-seed test scenario
+-- Creates the simple-pets schemas and animals table
 
-GRANT USAGE ON SCHEMA "simple-pets-public" TO administrator;
+-- Create schemas
+CREATE SCHEMA IF NOT EXISTS "simple-pets-public";
+CREATE SCHEMA IF NOT EXISTS "simple-pets-pets-public";
 
+-- Grant schema usage
+GRANT USAGE ON SCHEMA "simple-pets-public" TO administrator, authenticated, anonymous;
+GRANT USAGE ON SCHEMA "simple-pets-pets-public" TO administrator, authenticated, anonymous;
+
+-- Set default privileges
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
   GRANT ALL ON TABLES TO administrator;
-
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
-  GRANT USAGE ON SEQUENCES TO administrator;
-
+  GRANT USAGE ON SEQUENCES TO administrator, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
-  GRANT ALL ON FUNCTIONS TO administrator;
-
-GRANT USAGE ON SCHEMA "simple-pets-public" TO authenticated;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
-  GRANT ALL ON FUNCTIONS TO authenticated;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
-  GRANT USAGE ON SEQUENCES TO authenticated;
-
-GRANT USAGE ON SCHEMA "simple-pets-public" TO anonymous;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-public"
-  GRANT ALL ON FUNCTIONS TO anonymous;
-
-CREATE SCHEMA "simple-pets-private";
-
-GRANT USAGE ON SCHEMA "simple-pets-private" TO administrator;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT ALL ON TABLES TO administrator;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT USAGE ON SEQUENCES TO administrator;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT ALL ON FUNCTIONS TO administrator;
-
-GRANT USAGE ON SCHEMA "simple-pets-private" TO authenticated;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT ALL ON FUNCTIONS TO authenticated;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT USAGE ON SEQUENCES TO authenticated;
-
-GRANT USAGE ON SCHEMA "simple-pets-private" TO anonymous;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-private"
-  GRANT ALL ON FUNCTIONS TO anonymous;
-
-CREATE SCHEMA "simple-pets-pets-public";
-
-GRANT USAGE ON SCHEMA "simple-pets-pets-public" TO administrator;
+  GRANT ALL ON FUNCTIONS TO administrator, authenticated, anonymous;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
   GRANT ALL ON TABLES TO administrator;
-
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
-  GRANT USAGE ON SEQUENCES TO administrator;
-
+  GRANT USAGE ON SEQUENCES TO administrator, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
-  GRANT ALL ON FUNCTIONS TO administrator;
+  GRANT ALL ON FUNCTIONS TO administrator, authenticated, anonymous;
 
-GRANT USAGE ON SCHEMA "simple-pets-pets-public" TO authenticated;
+-- Create animals table
+CREATE TABLE IF NOT EXISTS "simple-pets-pets-public".animals (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name text NOT NULL,
+  species text NOT NULL,
+  owner_id uuid,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT animals_name_chk CHECK (character_length(name) <= 256),
+  CONSTRAINT animals_species_chk CHECK (character_length(species) <= 100)
+);
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
-  GRANT ALL ON FUNCTIONS TO authenticated;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
-  GRANT USAGE ON SEQUENCES TO authenticated;
-
-GRANT USAGE ON SCHEMA "simple-pets-pets-public" TO anonymous;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA "simple-pets-pets-public"
-  GRANT ALL ON FUNCTIONS TO anonymous;
-
-CREATE TABLE "simple-pets-pets-public".animals ();
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  DISABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN id uuid;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN id SET NOT NULL;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN id SET DEFAULT uuid_generate_v4();
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD CONSTRAINT animals_pkey PRIMARY KEY (id);
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN name text;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN name SET NOT NULL;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD CONSTRAINT animals_name_chk 
-    CHECK (character_length(name) <= 256);
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN species text;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN species SET NOT NULL;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD CONSTRAINT animals_species_chk 
-    CHECK (character_length(species) <= 100);
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN owner_id uuid;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN created_at timestamptz;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN created_at SET DEFAULT now();
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ADD COLUMN updated_at timestamptz;
-
-ALTER TABLE "simple-pets-pets-public".animals 
-  ALTER COLUMN updated_at SET DEFAULT now();
-
+-- Create timestamp trigger
+DROP TRIGGER IF EXISTS timestamps_tg ON "simple-pets-pets-public".animals;
 CREATE TRIGGER timestamps_tg
   BEFORE INSERT OR UPDATE
   ON "simple-pets-pets-public".animals
   FOR EACH ROW
   EXECUTE PROCEDURE stamps.timestamps();
 
-CREATE INDEX animals_created_at_idx ON "simple-pets-pets-public".animals (created_at);
+-- Create indexes
+CREATE INDEX IF NOT EXISTS animals_created_at_idx ON "simple-pets-pets-public".animals (created_at);
+CREATE INDEX IF NOT EXISTS animals_updated_at_idx ON "simple-pets-pets-public".animals (updated_at);
 
-CREATE INDEX animals_updated_at_idx ON "simple-pets-pets-public".animals (updated_at);
+-- Grant table permissions (allow anonymous to do CRUD for tests)
+GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-pets-public".animals TO administrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-pets-public".animals TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-pets-public".animals TO anonymous;
