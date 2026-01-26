@@ -47,7 +47,7 @@ const scenarios: Scenario[] = [
     api: { enableServicesApi: false, isPublic: true },
   },
   {
-    name: 'services enabled + private via X-Schemata (Q3 Sub-A)',
+    name: 'services enabled + private via X-Schemata',
     seedDir: 'simple-seed-services',
     api: {
       enableServicesApi: true,
@@ -60,7 +60,7 @@ const scenarios: Scenario[] = [
     },
   },
   {
-    name: 'services enabled + public via domain (Q4)',
+    name: 'services enabled + public via domain',
     seedDir: 'simple-seed-services',
     api: {
       enableServicesApi: true,
@@ -72,7 +72,7 @@ const scenarios: Scenario[] = [
     },
   },
   {
-    name: 'services enabled + private via X-Api-Name (Q3 Sub-B)',
+    name: 'services enabled + private via X-Api-Name',
     seedDir: 'simple-seed-services',
     api: {
       enableServicesApi: true,
@@ -85,7 +85,7 @@ const scenarios: Scenario[] = [
     },
   },
   {
-    name: 'services enabled + private via domain fallback (Q3 Sub-D)',
+    name: 'services enabled + private via domain fallback',
     seedDir: 'simple-seed-services',
     api: {
       enableServicesApi: true,
@@ -221,13 +221,13 @@ describe.each(scenarios)('$name', (scenario) => {
 });
 
 /**
- * Scenario 6: X-Meta-Schema (Q3 Sub-C)
+ * X-Meta-Schema test
  *
  * enableServicesApi: true, isPublic: false
  * Headers: X-Database-Id + X-Meta-Schema: true
  * Queries target meta-schema tables (databases, schemas, tables, fields)
  */
-describe('services enabled + private via X-Meta-Schema (Q3 Sub-C)', () => {
+describe('services enabled + private via X-Meta-Schema', () => {
   let server: ServerInfo;
   let request: supertest.Agent;
   let teardown: () => Promise<void>;
@@ -434,7 +434,7 @@ describe('Error paths', () => {
     });
 
     it('should return 404 when configured metaSchemas do not exist in the DB', async () => {
-      // Use a unique databaseId to avoid svcCache hit from Q3 Sub-C
+      // Use a unique databaseId to avoid svcCache hit from X-Meta-Schema test
       // (svcCache is a process-global singleton)
       const res = await noSchemasRequest
         .post('/graphql')
@@ -481,7 +481,7 @@ describe('Error paths', () => {
     });
   });
 
-  describe('Dev fallback (Q4)', () => {
+  describe('Dev fallback', () => {
     // The dev fallback only triggers when NODE_ENV=development.
     // This is documented as out-of-scope for standard CI testing since
     // changing NODE_ENV mid-process can have side effects.
