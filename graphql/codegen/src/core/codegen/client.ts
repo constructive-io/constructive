@@ -9,6 +9,52 @@ import { getGeneratedFileHeader } from './utils';
 export function generateClientFile(): string {
   return `${getGeneratedFileHeader('GraphQL client configuration and execution')}
 
+import dns from 'node:dns';
+import { Agent, fetch } from 'undici';
+
+// ============================================================================
+// Localhost DNS Resolution Fix
+// ============================================================================
+
+/**
+ * Check if a hostname is localhost or a localhost subdomain
+ */
+function isLocalhostHostname(hostname: string): boolean {
+  return hostname === 'localhost' || hostname.endsWith('.localhost');
+}
+
+/**
+ * Create an undici Agent that resolves *.localhost to 127.0.0.1
+ * This fixes DNS resolution issues on macOS where subdomains like api.localhost
+ * don't resolve automatically (unlike browsers which handle *.localhost).
+ */
+function createLocalhostAgent(): Agent {
+  return new Agent({
+    connect: {
+      lookup(hostname, opts, cb) {
+        if (isLocalhostHostname(hostname)) {
+          // When opts.all is true, callback expects an array of {address, family} objects
+          // Otherwise it expects (err, address, family)
+          if (opts.all) {
+            return cb(null, [{ address: '127.0.0.1', family: 4 }]);
+          }
+          return cb(null, '127.0.0.1', 4);
+        }
+        dns.lookup(hostname, opts, cb);
+      },
+    },
+  });
+}
+
+let localhostAgent: Agent | null = null;
+
+function getLocalhostAgent(): Agent {
+  if (!localhostAgent) {
+    localhostAgent = createLocalhostAgent();
+  }
+  return localhostAgent;
+}
+
 // ============================================================================
 // Configuration
 // ============================================================================
@@ -138,7 +184,12 @@ export async function execute<TData = unknown, TVariables = Record<string, unkno
 ): Promise<TData> {
   const config = getConfig();
 
-  const response = await fetch(config.endpoint, {
+  // Parse endpoint URL to check if it's a localhost domain
+  const url = new URL(config.endpoint);
+  const useLocalhostAgent = isLocalhostHostname(url.hostname);
+
+  // Build fetch options with undici-specific dispatcher for localhost
+  const fetchOptions: any = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -150,15 +201,22 @@ export async function execute<TData = unknown, TVariables = Record<string, unkno
       variables,
     }),
     signal: options?.signal,
-  });
+  };
 
-  const json = await response.json();
+  // Use custom agent for localhost to fix DNS resolution on macOS
+  if (useLocalhostAgent) {
+    fetchOptions.dispatcher = getLocalhostAgent();
+  }
+
+  const response = await fetch(config.endpoint, fetchOptions);
+
+  const json = await response.json() as { data?: TData; errors?: GraphQLError[] };
 
   if (json.errors && json.errors.length > 0) {
     throw new GraphQLClientError(
       json.errors[0].message || 'GraphQL request failed',
       json.errors,
-      response
+      response as any
     );
   }
 
@@ -176,7 +234,12 @@ export async function executeWithErrors<TData = unknown, TVariables = Record<str
 ): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
   const config = getConfig();
 
-  const response = await fetch(config.endpoint, {
+  // Parse endpoint URL to check if it's a localhost domain
+  const url = new URL(config.endpoint);
+  const useLocalhostAgent = isLocalhostHostname(url.hostname);
+
+  // Build fetch options with undici-specific dispatcher for localhost
+  const fetchOptions: any = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -188,9 +251,16 @@ export async function executeWithErrors<TData = unknown, TVariables = Record<str
       variables,
     }),
     signal: options?.signal,
-  });
+  };
 
-  const json = await response.json();
+  // Use custom agent for localhost to fix DNS resolution on macOS
+  if (useLocalhostAgent) {
+    fetchOptions.dispatcher = getLocalhostAgent();
+  }
+
+  const response = await fetch(config.endpoint, fetchOptions);
+
+  const json = await response.json() as { data?: TData; errors?: GraphQLError[] };
 
   return {
     data: json.data ?? null,
