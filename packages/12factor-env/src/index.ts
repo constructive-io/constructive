@@ -146,7 +146,7 @@ const env = <S extends Specs, V extends Specs>(
   // Include inputEnv first so env vars (e.g., Kubernetes secretKeyRef) are available,
   // then varEnv overrides, then file-based secrets have highest priority
   const mergedEnv = { ...inputEnv, ...varEnv, ..._secrets } as unknown as Record<string, string | undefined>;
-  return cleanEnv(mergedEnv, secrets) as unknown as CleanedEnv<S & V>;
+  return cleanEnv(mergedEnv, { ...secrets, ...vars }) as unknown as CleanedEnv<S & V>;
 };
 
 export {
