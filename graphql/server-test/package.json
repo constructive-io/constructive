@@ -28,7 +28,11 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
+  "peerDependencies": {
+    "@constructive-io/graphql-server": "workspace:^"
+  },
   "devDependencies": {
+    "@constructive-io/graphql-server": "workspace:^",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^6.0.2",
@@ -36,7 +40,6 @@
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
