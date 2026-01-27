@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.0.1...@pgpmjs/core@5.1.0) (2026-01-27)
+
+### Bug Fixes
+
+- **pgpm:** create nested directories for SQL files in integration test ([5ad1fda](https://github.com/constructive-io/constructive/commit/5ad1fdaaf0baff16f78d99bcabdfa49569032f78))
+
+### Features
+
+- **pgpm:** add pattern-based slicing strategy alongside folder-based ([869cf89](https://github.com/constructive-io/constructive/commit/869cf895e1a48a1f140a227407b9a39fc257a774))
+- **pgpm:** add slice command for modularizing migration plans ([85b1104](https://github.com/constructive-io/constructive/commit/85b1104190cab4ff144a5d9fecebbc446d8e20ab))
+
 ## [5.0.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.0.0...@pgpmjs/core@5.0.1) (2026-01-24)
 
 **Note:** Version bump only for package @pgpmjs/core
