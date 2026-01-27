@@ -31,6 +31,7 @@ export interface SliceConfig {
  */
 export type GroupingStrategy =
   | FolderStrategy
+  | PatternStrategy
   | ExplicitStrategy;
 
 export interface FolderStrategy {
@@ -39,6 +40,27 @@ export interface FolderStrategy {
   depth?: number;
   /** Prefix to strip from paths (default: 'schemas') */
   prefixToStrip?: string;
+}
+
+/**
+ * Pattern-based strategy using glob patterns to match changes to packages.
+ * Each slice defines a package name and an array of glob patterns.
+ * Changes matching any pattern in a slice are assigned to that package.
+ */
+export interface PatternStrategy {
+  type: 'pattern';
+  /** Array of slice definitions with package names and patterns */
+  slices: PatternSlice[];
+}
+
+/**
+ * A single slice definition for pattern-based grouping
+ */
+export interface PatternSlice {
+  /** Name of the output package */
+  packageName: string;
+  /** Glob patterns to match change paths (e.g., "schemas/auth/**") */
+  patterns: string[];
 }
 
 export interface ExplicitStrategy {

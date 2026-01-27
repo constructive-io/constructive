@@ -5,12 +5,14 @@ import {
   buildDependencyGraph,
   validateDAG,
   extractPackageFromPath,
+  findMatchingPattern,
   assignChangesToPackages,
   buildPackageDependencies,
   detectPackageCycle,
   computeDeployOrder,
   topologicalSortWithinPackage,
-  slicePlan
+  slicePlan,
+  PatternStrategy
 } from '../../src/slice';
 import { ExtendedPlanFile } from '../../src/files/types';
 
@@ -51,6 +53,47 @@ describe('Slice Module', () => {
 
     it('should return core for paths without schema prefix', () => {
       expect(extractPackageFromPath('init')).toBe('init');
+    });
+  });
+
+  describe('findMatchingPattern', () => {
+    it('should match patterns to package names', () => {
+      const strategy: PatternStrategy = {
+        type: 'pattern',
+        slices: [
+          { packageName: 'auth', patterns: ['schemas/*_auth_*/**', 'schemas/auth/**'] },
+          { packageName: 'users', patterns: ['schemas/*_users_*/**', 'schemas/users/**'] }
+        ]
+      };
+
+      expect(findMatchingPattern('schemas/auth/tables/users', strategy)).toBe('auth');
+      expect(findMatchingPattern('schemas/app_auth_public/procedures/sign_in', strategy)).toBe('auth');
+      expect(findMatchingPattern('schemas/users/tables/profiles', strategy)).toBe('users');
+      expect(findMatchingPattern('schemas/app_users_private/functions/get_user', strategy)).toBe('users');
+    });
+
+    it('should return undefined for non-matching paths', () => {
+      const strategy: PatternStrategy = {
+        type: 'pattern',
+        slices: [
+          { packageName: 'auth', patterns: ['schemas/*_auth_*/**'] }
+        ]
+      };
+
+      expect(findMatchingPattern('schemas/public/tables/posts', strategy)).toBeUndefined();
+      expect(findMatchingPattern('extensions/uuid-ossp', strategy)).toBeUndefined();
+    });
+
+    it('should match first pattern in order', () => {
+      const strategy: PatternStrategy = {
+        type: 'pattern',
+        slices: [
+          { packageName: 'first', patterns: ['schemas/**'] },
+          { packageName: 'second', patterns: ['schemas/auth/**'] }
+        ]
+      };
+
+      expect(findMatchingPattern('schemas/auth/tables/users', strategy)).toBe('first');
     });
   });
 
@@ -297,6 +340,82 @@ schemas/public/functions/get_user [schemas/auth/tables/users] 2024-01-02T00:00:0
 
       // Check that the plan content has cross-package reference
       expect(publicPkg!.planContent).toContain('auth:schemas/auth/tables/users');
+    });
+
+    it('should slice using pattern strategy', () => {
+      const planContent = `%syntax-version=1.0.0
+%project=test-project
+
+schemas/app_auth_public/tables/users 2024-01-01T00:00:00Z Developer <dev@example.com>
+schemas/app_auth_public/tables/sessions [schemas/app_auth_public/tables/users] 2024-01-02T00:00:00Z Developer <dev@example.com>
+schemas/app_users_public/tables/profiles [schemas/app_auth_public/tables/users] 2024-01-03T00:00:00Z Developer <dev@example.com>
+schemas/app_public/functions/get_data 2024-01-04T00:00:00Z Developer <dev@example.com>
+`;
+      const planPath = join(testDir, 'pattern-test.plan');
+      writeFileSync(planPath, planContent);
+
+      const result = slicePlan({
+        sourcePlan: planPath,
+        outputDir: join(testDir, 'output-pattern'),
+        strategy: {
+          type: 'pattern',
+          slices: [
+            { packageName: 'auth', patterns: ['schemas/*_auth_*/**'] },
+            { packageName: 'users', patterns: ['schemas/*_users_*/**'] }
+          ]
+        },
+        defaultPackage: 'core'
+      });
+
+      expect(result.stats.totalChanges).toBe(4);
+
+      const packageNames = result.packages.map(p => p.name);
+      expect(packageNames).toContain('auth');
+      expect(packageNames).toContain('users');
+      expect(packageNames).toContain('core');
+
+      const authPkg = result.packages.find(p => p.name === 'auth');
+      expect(authPkg!.changes.length).toBe(2);
+
+      const usersPkg = result.packages.find(p => p.name === 'users');
+      expect(usersPkg!.changes.length).toBe(1);
+      expect(usersPkg!.packageDependencies).toContain('auth');
+
+      const corePkg = result.packages.find(p => p.name === 'core');
+      expect(corePkg!.changes.length).toBe(1);
+    });
+
+    it('should handle pattern strategy with overlapping patterns', () => {
+      const planContent = `%syntax-version=1.0.0
+%project=test-project
+
+schemas/auth_tokens_public/tables/tokens 2024-01-01T00:00:00Z Developer <dev@example.com>
+schemas/auth_sessions_public/tables/sessions 2024-01-02T00:00:00Z Developer <dev@example.com>
+`;
+      const planPath = join(testDir, 'overlap-test.plan');
+      writeFileSync(planPath, planContent);
+
+      const result = slicePlan({
+        sourcePlan: planPath,
+        outputDir: join(testDir, 'output-overlap'),
+        strategy: {
+          type: 'pattern',
+          slices: [
+            { packageName: 'tokens', patterns: ['schemas/*_tokens_*/**'] },
+            { packageName: 'sessions', patterns: ['schemas/*_sessions_*/**'] }
+          ]
+        }
+      });
+
+      const packageNames = result.packages.map(p => p.name);
+      expect(packageNames).toContain('tokens');
+      expect(packageNames).toContain('sessions');
+
+      const tokensPkg = result.packages.find(p => p.name === 'tokens');
+      expect(tokensPkg!.changes.length).toBe(1);
+
+      const sessionsPkg = result.packages.find(p => p.name === 'sessions');
+      expect(sessionsPkg!.changes.length).toBe(1);
     });
   });
 });

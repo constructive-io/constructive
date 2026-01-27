@@ -8,8 +8,10 @@ import {
   WorkspaceManifest,
   SliceWarning,
   SliceStats,
-  GroupingStrategy
+  GroupingStrategy,
+  PatternStrategy
 } from './types';
+import { minimatch } from 'minimatch';
 
 /**
  * Build a dependency graph from a parsed plan file
@@ -113,6 +115,24 @@ export function extractPackageFromPath(
 }
 
 /**
+ * Find the matching package for a change using pattern-based strategy.
+ * Returns the first matching slice's package name, or undefined if no match.
+ */
+export function findMatchingPattern(
+  changeName: string,
+  strategy: PatternStrategy
+): string | undefined {
+  for (const slice of strategy.slices) {
+    for (const pattern of slice.patterns) {
+      if (minimatch(changeName, pattern, { dot: true })) {
+        return slice.packageName;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * Assign changes to packages based on grouping strategy
  */
 export function assignChangesToPackages(
@@ -130,6 +150,11 @@ export function assignChangesToPackages(
         const depth = strategy.depth ?? 1;
         const prefix = strategy.prefixToStrip ?? 'schemas';
         packageName = extractPackageFromPath(changeName, depth, prefix);
+        break;
+      }
+      case 'pattern': {
+        const matched = findMatchingPattern(changeName, strategy);
+        packageName = matched || defaultPackage;
         break;
       }
       case 'explicit': {
