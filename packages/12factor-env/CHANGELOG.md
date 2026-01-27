@@ -1,0 +1,14 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.0.0 (2026-01-24)
+
+### Bug Fixes
+
+- use throwing reporter in 12factor-env to prevent process.exit on validation errors ([cc5f689](https://github.com/constructive-io/constructive/commit/cc5f6890d53db901470ad8a839fbe3f980c0a41d))
+
+### Features
+
+- add @constructive-io/12factor-env package and update postmaster to use it ([ad57401](https://github.com/constructive-io/constructive/commit/ad574017c7b5017abc5a589b5332fbc943829e31))

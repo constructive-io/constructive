@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "2.19.11",
+  "version": "3.0.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -78,7 +78,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.971.0",
-    "@constructive-io/graphql-codegen": "workspace:*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/graphql-upload": "^8.0.12",

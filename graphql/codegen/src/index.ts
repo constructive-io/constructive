@@ -1,7 +1,7 @@
 /**
  * @constructive-io/graphql-codegen
  *
- * CLI-based GraphQL SDK generator for PostGraphile endpoints.
+ * GraphQL SDK generator for Constructive databases.
  * Introspects via _meta query and generates typed queries, mutations,
  * and React Query v5 hooks.
  */
@@ -21,21 +21,23 @@ export * from './client';
 // Config definition helper
 export { defineConfig } from './types/config';
 
-// CLI command exports (for packages/cli consumption)
-export {
-  generateReactQuery,
-  generateOrm,
-  findConfigFile,
-  loadConfigFile,
-} from './cli/commands';
+// Main generate function (orchestrates the entire pipeline)
+export { generate } from './core/generate';
+export type { GenerateOptions, GenerateResult } from './core/generate';
 
+// Config utilities
+export { findConfigFile, loadConfigFile } from './core/config';
+
+// CLI shared utilities (for packages/cli to import)
+export { codegenQuestions, splitCommas, printResult } from './cli/shared';
+export type { CodegenAnswers } from './cli/shared';
+
+// Database schema utilities (re-exported from core for convenience)
+export {
+  buildSchemaFromDatabase,
+  buildSchemaSDLFromDatabase,
+} from './core/database';
 export type {
-  GenerateOptions,
-  GenerateResult,
-  GenerateTargetResult,
-  GenerateOrmOptions,
-  GenerateOrmResult,
-  GenerateOrmTargetResult,
-  InitOptions,
-  InitResult,
-} from './cli/commands';
+  BuildSchemaFromDatabaseOptions,
+  BuildSchemaFromDatabaseResult,
+} from './core/database';

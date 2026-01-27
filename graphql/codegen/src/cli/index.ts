@@ -1,697 +1,158 @@
 #!/usr/bin/env node
 /**
  * CLI entry point for graphql-codegen
+ *
+ * This is a thin wrapper around the core generate() function.
+ * All business logic is in the core modules.
  */
+import { CLI, CLIOptions, Inquirerer, getPackageJson } from 'inquirerer';
 
-import { CLI, CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
+import { generate } from '../core/generate';
+import { findConfigFile, loadConfigFile } from '../core/config';
+import type { GraphQLSDKConfigTarget } from '../types/config';
+import { codegenQuestions, printResult, type CodegenAnswers } from './shared';
 
-import { initCommand, findConfigFile, loadConfigFile } from './commands/init';
-import { generateReactQuery } from './commands/generate';
-import { generateOrm } from './commands/generate-orm';
-import { startWatch } from './watch';
-import {
-  isMultiConfig,
-  mergeConfig,
-  resolveConfig,
-  type GraphQLSDKConfig,
-  type GraphQLSDKConfigTarget,
-  type ResolvedConfig,
-} from '../types/config';
-
-const usageText = `
-graphql-codegen - CLI for generating GraphQL SDK from PostGraphile endpoints or schema files
+const usage = `
+graphql-codegen - GraphQL SDK generator for Constructive databases
 
 Usage:
-  graphql-codegen <command> [options]
+  graphql-codegen [options]
 
-Commands:
-  init           Initialize a new graphql-codegen configuration file
-  generate       Generate SDK from GraphQL endpoint or schema file
-  generate-orm   Generate Prisma-like ORM client from GraphQL endpoint or schema file
-  introspect     Introspect a GraphQL endpoint or schema file and print table info
+Source Options (choose one):
+  -c, --config <path>           Path to config file
+  -e, --endpoint <url>          GraphQL endpoint URL
+  -s, --schema-file <path>      Path to GraphQL schema file
 
-Options:
-  --help, -h     Show this help message
-  --version, -v  Show version number
+Database Options:
+  --schemas <list>              Comma-separated PostgreSQL schemas
+  --api-names <list>            Comma-separated API names (mutually exclusive with --schemas)
 
-Run 'graphql-codegen <command> --help' for more information on a command.
+Generator Options:
+  --react-query                 Generate React Query hooks
+  --orm                         Generate ORM client
+  -o, --output <dir>            Output directory
+  -t, --target <name>           Target name (for multi-target configs)
+  -a, --authorization <token>   Authorization header value
+  --dry-run                     Preview without writing files
+  -v, --verbose                 Show detailed output
+
+  -h, --help                    Show this help message
+  --version                     Show version number
 `;
-
-const initUsageText = `
-graphql-codegen init - Initialize a new graphql-codegen configuration file
-
-Usage:
-  graphql-codegen init [options]
-
-Options:
-  --directory, -d <dir>   Target directory for the config file (default: .)
-  --force, -f             Force overwrite existing config
-  --endpoint, -e <url>    GraphQL endpoint URL to pre-populate
-  --output, -o <dir>      Output directory to pre-populate (default: ./generated)
-  --help, -h              Show this help message
-`;
-
-const generateUsageText = `
-graphql-codegen generate - Generate SDK from GraphQL endpoint or schema file
-
-Usage:
-  graphql-codegen generate [options]
-
-Options:
-  --config, -c <path>         Path to config file
-  --target, -t <name>         Target name in config file
-  --endpoint, -e <url>        GraphQL endpoint URL (overrides config)
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
-  --output, -o <dir>          Output directory (overrides config)
-  --authorization, -a <header> Authorization header value
-  --verbose, -v               Verbose output
-  --dry-run                   Dry run - show what would be generated without writing files
-  --watch, -w                 Watch mode - poll endpoint for schema changes (in-memory)
-  --poll-interval <ms>        Polling interval in milliseconds (default: 3000)
-  --debounce <ms>             Debounce delay before regenerating (default: 800)
-  --touch <file>              File to touch on schema change
-  --no-clear                  Do not clear terminal on regeneration
-  --help, -h                  Show this help message
-`;
-
-const generateOrmUsageText = `
-graphql-codegen generate-orm - Generate Prisma-like ORM client from GraphQL endpoint or schema file
-
-Usage:
-  graphql-codegen generate-orm [options]
-
-Options:
-  --config, -c <path>         Path to config file
-  --target, -t <name>         Target name in config file
-  --endpoint, -e <url>        GraphQL endpoint URL (overrides config)
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
-  --output, -o <dir>          Output directory (overrides config)
-  --authorization, -a <header> Authorization header value
-  --verbose, -v               Verbose output
-  --dry-run                   Dry run - show what would be generated without writing files
-  --skip-custom-operations    Skip custom operations (only generate table CRUD)
-  --watch, -w                 Watch mode - poll endpoint for schema changes (in-memory)
-  --poll-interval <ms>        Polling interval in milliseconds (default: 3000)
-  --debounce <ms>             Debounce delay before regenerating (default: 800)
-  --touch <file>              File to touch on schema change
-  --no-clear                  Do not clear terminal on regeneration
-  --help, -h                  Show this help message
-`;
-
-const introspectUsageText = `
-graphql-codegen introspect - Introspect a GraphQL endpoint or schema file and print table info
-
-Usage:
-  graphql-codegen introspect [options]
-
-Options:
-  --endpoint, -e <url>        GraphQL endpoint URL
-  --schema, -s <path>         Path to GraphQL schema file (.graphql)
-  --authorization, -a <header> Authorization header value
-  --json                      Output as JSON
-  --help, -h                  Show this help message
-`;
-
-/**
- * Format duration in a human-readable way
- * - Under 1 second: show milliseconds (e.g., "123ms")
- * - Over 1 second: show seconds with 2 decimal places (e.g., "1.23s")
- */
-function formatDuration(ms: number): string {
-  if (ms < 1000) {
-    return `${Math.round(ms)}ms`;
-  }
-  return `${(ms / 1000).toFixed(2)}s`;
-}
-
-/**
- * Load configuration for watch mode, merging CLI options with config file
- */
-async function loadWatchConfig(options: {
-  config?: string;
-  target?: string;
-  endpoint?: string;
-  output?: string;
-  pollInterval?: number;
-  debounce?: number;
-  touch?: string;
-  clear?: boolean;
-}): Promise<ResolvedConfig | null> {
-  let configPath = options.config;
-  if (!configPath) {
-    configPath = findConfigFile() ?? undefined;
-  }
-
-  let baseConfig: GraphQLSDKConfig = {};
-
-  if (configPath) {
-    const loadResult = await loadConfigFile(configPath);
-    if (!loadResult.success) {
-      console.error('x', loadResult.error);
-      return null;
-    }
-    baseConfig = loadResult.config;
-  }
-
-  if (isMultiConfig(baseConfig)) {
-    if (!options.target) {
-      console.error(
-        'x Watch mode requires --target when using multiple targets.'
-      );
-      return null;
-    }
-
-    if (!baseConfig.targets[options.target]) {
-      console.error(`x Target "${options.target}" not found in config file.`);
-      return null;
-    }
-  } else if (options.target) {
-    console.error('x Config file does not define targets. Remove --target.');
-    return null;
-  }
-
-  const sourceOverrides: GraphQLSDKConfigTarget = {};
-  if (options.endpoint) {
-    sourceOverrides.endpoint = options.endpoint;
-    sourceOverrides.schema = undefined;
-  }
-
-  const watchOverrides: GraphQLSDKConfigTarget = {
-    watch: {
-      ...(options.pollInterval !== undefined && {
-        pollInterval: options.pollInterval,
-      }),
-      ...(options.debounce !== undefined && { debounce: options.debounce }),
-      ...(options.touch !== undefined && { touchFile: options.touch }),
-      ...(options.clear !== undefined && { clearScreen: options.clear }),
-    },
-  };
-
-  let mergedTarget: GraphQLSDKConfigTarget;
-
-  if (isMultiConfig(baseConfig)) {
-    const defaults = baseConfig.defaults ?? {};
-    const targetConfig = baseConfig.targets[options.target!];
-    mergedTarget = mergeConfig(defaults, targetConfig);
-  } else {
-    mergedTarget = baseConfig;
-  }
-
-  mergedTarget = mergeConfig(mergedTarget, sourceOverrides);
-  mergedTarget = mergeConfig(mergedTarget, watchOverrides);
-
-  if (!mergedTarget.endpoint) {
-    console.error(
-      'x No endpoint specified. Watch mode only supports live endpoints.'
-    );
-    return null;
-  }
-
-  if (mergedTarget.schema) {
-    console.error(
-      'x Watch mode is only supported with an endpoint, not schema.'
-    );
-    return null;
-  }
-
-  return resolveConfig(mergedTarget);
-}
-
-/**
- * Init command handler
- */
-async function handleInit(argv: Partial<ParsedArgs>): Promise<void> {
-  if (argv.help || argv.h) {
-    console.log(initUsageText);
-    process.exit(0);
-  }
-
-  const startTime = performance.now();
-  const result = await initCommand({
-    directory: (argv.directory as string) || (argv.d as string) || '.',
-    force: !!(argv.force || argv.f),
-    endpoint: (argv.endpoint as string) || (argv.e as string),
-    output: (argv.output as string) || (argv.o as string) || './generated',
-  });
-  const duration = formatDuration(performance.now() - startTime);
-
-  if (result.success) {
-    console.log('[ok]', result.message, `(${duration})`);
-  } else {
-    console.error('x', result.message, `(${duration})`);
-    process.exit(1);
-  }
-}
-
-/**
- * Generate command handler
- */
-async function handleGenerate(argv: Partial<ParsedArgs>): Promise<void> {
-  if (argv.help || argv.h) {
-    console.log(generateUsageText);
-    process.exit(0);
-  }
-
-  const startTime = performance.now();
-
-  const config = (argv.config as string) || (argv.c as string);
-  const target = (argv.target as string) || (argv.t as string);
-  const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
-  const output = (argv.output as string) || (argv.o as string);
-  const authorization = (argv.authorization as string) || (argv.a as string);
-  const verbose = !!(argv.verbose || argv.v);
-  const dryRun = !!(argv['dry-run'] || argv.dryRun);
-  const watch = !!(argv.watch || argv.w);
-  const pollInterval = argv['poll-interval'] !== undefined
-    ? parseInt(argv['poll-interval'] as string, 10)
-    : undefined;
-  const debounce = argv.debounce !== undefined
-    ? parseInt(argv.debounce as string, 10)
-    : undefined;
-  const touch = argv.touch as string | undefined;
-  const clear = argv.clear !== false;
-
-  if (endpoint && schema) {
-    console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
-    );
-    process.exit(1);
-  }
-
-  if (watch) {
-    if (schema) {
-      console.error(
-        'x Watch mode is only supported with --endpoint, not --schema.'
-      );
-      process.exit(1);
-    }
-    const watchConfig = await loadWatchConfig({
-      config,
-      target,
-      endpoint,
-      output,
-      pollInterval,
-      debounce,
-      touch,
-      clear,
-    });
-    if (!watchConfig) {
-      process.exit(1);
-    }
-
-    await startWatch({
-      config: watchConfig,
-      generatorType: 'generate',
-      verbose,
-      authorization,
-      configPath: config,
-      target,
-      outputDir: output,
-    });
-    return;
-  }
-
-  const result = await generateReactQuery({
-    config,
-    target,
-    endpoint,
-    schema,
-    output,
-    authorization,
-    verbose,
-    dryRun,
-  });
-  const duration = formatDuration(performance.now() - startTime);
-
-  const targetResults = result.targets ?? [];
-  const hasNamedTargets =
-    targetResults.length > 0 &&
-    (targetResults.length > 1 || targetResults[0]?.name !== 'default');
-
-  if (hasNamedTargets) {
-    console.log(result.success ? '[ok]' : 'x', result.message);
-    targetResults.forEach((t) => {
-      const status = t.success ? '[ok]' : 'x';
-      console.log(`\n${status} ${t.message}`);
-
-      if (t.tables && t.tables.length > 0) {
-        console.log('  Tables:');
-        t.tables.forEach((table) => console.log(`    - ${table}`));
-      }
-      if (t.filesWritten && t.filesWritten.length > 0) {
-        console.log('  Files written:');
-        t.filesWritten.forEach((file) => console.log(`    - ${file}`));
-      }
-      if (!t.success && t.errors) {
-        t.errors.forEach((error) => console.error(`  - ${error}`));
-      }
-    });
-
-    if (!result.success) {
-      process.exit(1);
-    }
-    return;
-  }
-
-  if (result.success) {
-    console.log('[ok]', result.message, `(${duration})`);
-    if (result.tables && result.tables.length > 0) {
-      console.log('\nTables:');
-      result.tables.forEach((t) => console.log(`  - ${t}`));
-    }
-    if (result.filesWritten && result.filesWritten.length > 0) {
-      console.log('\nFiles written:');
-      result.filesWritten.forEach((f) => console.log(`  - ${f}`));
-    }
-  } else {
-    console.error('x', result.message, `(${duration})`);
-    if (result.errors) {
-      result.errors.forEach((e) => console.error('  -', e));
-    }
-    process.exit(1);
-  }
-}
-
-/**
- * Generate ORM command handler
- */
-async function handleGenerateOrm(argv: Partial<ParsedArgs>): Promise<void> {
-  if (argv.help || argv.h) {
-    console.log(generateOrmUsageText);
-    process.exit(0);
-  }
-
-  const startTime = performance.now();
-
-  const config = (argv.config as string) || (argv.c as string);
-  const target = (argv.target as string) || (argv.t as string);
-  const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
-  const output = (argv.output as string) || (argv.o as string);
-  const authorization = (argv.authorization as string) || (argv.a as string);
-  const verbose = !!(argv.verbose || argv.v);
-  const dryRun = !!(argv['dry-run'] || argv.dryRun);
-  const skipCustomOperations = !!(argv['skip-custom-operations'] || argv.skipCustomOperations);
-  const watch = !!(argv.watch || argv.w);
-  const pollInterval = argv['poll-interval'] !== undefined
-    ? parseInt(argv['poll-interval'] as string, 10)
-    : undefined;
-  const debounce = argv.debounce !== undefined
-    ? parseInt(argv.debounce as string, 10)
-    : undefined;
-  const touch = argv.touch as string | undefined;
-  const clear = argv.clear !== false;
-
-  if (endpoint && schema) {
-    console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
-    );
-    process.exit(1);
-  }
-
-  if (watch) {
-    if (schema) {
-      console.error(
-        'x Watch mode is only supported with --endpoint, not --schema.'
-      );
-      process.exit(1);
-    }
-    const watchConfig = await loadWatchConfig({
-      config,
-      target,
-      endpoint,
-      output,
-      pollInterval,
-      debounce,
-      touch,
-      clear,
-    });
-    if (!watchConfig) {
-      process.exit(1);
-    }
-
-    await startWatch({
-      config: watchConfig,
-      generatorType: 'generate-orm',
-      verbose,
-      authorization,
-      configPath: config,
-      target,
-      outputDir: output,
-      skipCustomOperations,
-    });
-    return;
-  }
-
-  const result = await generateOrm({
-    config,
-    target,
-    endpoint,
-    schema,
-    output,
-    authorization,
-    verbose,
-    dryRun,
-    skipCustomOperations,
-  });
-  const duration = formatDuration(performance.now() - startTime);
-
-  const targetResults = result.targets ?? [];
-  const hasNamedTargets =
-    targetResults.length > 0 &&
-    (targetResults.length > 1 || targetResults[0]?.name !== 'default');
-
-  if (hasNamedTargets) {
-    console.log(result.success ? '[ok]' : 'x', result.message);
-    targetResults.forEach((t) => {
-      const status = t.success ? '[ok]' : 'x';
-      console.log(`\n${status} ${t.message}`);
-
-      if (t.tables && t.tables.length > 0) {
-        console.log('  Tables:');
-        t.tables.forEach((table) => console.log(`    - ${table}`));
-      }
-      if (t.customQueries && t.customQueries.length > 0) {
-        console.log('  Custom Queries:');
-        t.customQueries.forEach((query) => console.log(`    - ${query}`));
-      }
-      if (t.customMutations && t.customMutations.length > 0) {
-        console.log('  Custom Mutations:');
-        t.customMutations.forEach((mutation) => console.log(`    - ${mutation}`));
-      }
-      if (t.filesWritten && t.filesWritten.length > 0) {
-        console.log('  Files written:');
-        t.filesWritten.forEach((file) => console.log(`    - ${file}`));
-      }
-      if (!t.success && t.errors) {
-        t.errors.forEach((error) => console.error(`  - ${error}`));
-      }
-    });
-
-    if (!result.success) {
-      process.exit(1);
-    }
-    return;
-  }
-
-  if (result.success) {
-    console.log('[ok]', result.message, `(${duration})`);
-    if (result.tables && result.tables.length > 0) {
-      console.log('\nTables:');
-      result.tables.forEach((t) => console.log(`  - ${t}`));
-    }
-    if (result.customQueries && result.customQueries.length > 0) {
-      console.log('\nCustom Queries:');
-      result.customQueries.forEach((q) => console.log(`  - ${q}`));
-    }
-    if (result.customMutations && result.customMutations.length > 0) {
-      console.log('\nCustom Mutations:');
-      result.customMutations.forEach((m) => console.log(`  - ${m}`));
-    }
-    if (result.filesWritten && result.filesWritten.length > 0) {
-      console.log('\nFiles written:');
-      result.filesWritten.forEach((f) => console.log(`  - ${f}`));
-    }
-  } else {
-    console.error('x', result.message, `(${duration})`);
-    if (result.errors) {
-      result.errors.forEach((e) => console.error('  -', e));
-    }
-    process.exit(1);
-  }
-}
-
-/**
- * Introspect command handler
- */
-async function handleIntrospect(argv: Partial<ParsedArgs>): Promise<void> {
-  if (argv.help || argv.h) {
-    console.log(introspectUsageText);
-    process.exit(0);
-  }
-
-  const startTime = performance.now();
-
-  const endpoint = (argv.endpoint as string) || (argv.e as string);
-  const schema = (argv.schema as string) || (argv.s as string);
-  const authorization = (argv.authorization as string) || (argv.a as string);
-  const json = !!argv.json;
-
-  if (!endpoint && !schema) {
-    console.error('x Either --endpoint or --schema must be provided.');
-    process.exit(1);
-  }
-  if (endpoint && schema) {
-    console.error(
-      'x Cannot use both --endpoint and --schema. Choose one source.'
-    );
-    process.exit(1);
-  }
-
-  const { createSchemaSource } = await import('./introspect/source');
-  const { inferTablesFromIntrospection } = await import('./introspect/infer-tables');
-
-  try {
-    const source = createSchemaSource({
-      endpoint,
-      schema,
-      authorization,
-    });
-
-    console.log('Fetching schema from', source.describe(), '...');
-
-    const { introspection } = await source.fetch();
-    const tables = inferTablesFromIntrospection(introspection);
-    const duration = formatDuration(performance.now() - startTime);
-
-    if (json) {
-      console.log(JSON.stringify(tables, null, 2));
-    } else {
-      console.log(`\n[ok] Found ${tables.length} tables (${duration}):\n`);
-      tables.forEach((table) => {
-        const fieldCount = table.fields.length;
-        const relationCount =
-          table.relations.belongsTo.length +
-          table.relations.hasOne.length +
-          table.relations.hasMany.length +
-          table.relations.manyToMany.length;
-        console.log(
-          `  ${table.name} (${fieldCount} fields, ${relationCount} relations)`
-        );
-      });
-    }
-  } catch (err) {
-    const duration = formatDuration(performance.now() - startTime);
-    console.error(
-      'x Failed to introspect schema:',
-      err instanceof Error ? err.message : err,
-      `(${duration})`
-    );
-    process.exit(1);
-  }
-}
-
-const createCommandMap = (): Record<string, (argv: Partial<ParsedArgs>) => Promise<void>> => {
-  return {
-    init: handleInit,
-    generate: handleGenerate,
-    'generate-orm': handleGenerateOrm,
-    introspect: handleIntrospect,
-  };
-};
 
 export const commands = async (
-  argv: Partial<ParsedArgs>,
+  argv: Record<string, unknown>,
   prompter: Inquirerer,
   _options: CLIOptions
-): Promise<Partial<ParsedArgs>> => {
-  if (argv.version || argv.v) {
+): Promise<Record<string, unknown>> => {
+  if (argv.version) {
     const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }
 
-  const { first: command, newArgv } = extractFirst(argv);
-
-  if ((argv.help || argv.h) && !command) {
-    console.log(usageText);
+  if (argv.help || argv.h) {
+    console.log(usage);
     process.exit(0);
   }
 
-  if (command === 'help') {
-    console.log(usageText);
-    process.exit(0);
-  }
+  const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
+  const targetName = (argv.target || argv.t) as string | undefined;
 
-  const commandMap = createCommandMap();
-
-  if (!command) {
-    const answer = await prompter.prompt(argv, [
-      {
-        type: 'autocomplete',
-        name: 'command',
-        message: 'What do you want to do?',
-        options: Object.keys(commandMap),
-      },
-    ]);
-    const selectedCommand = answer.command as string;
-    const commandFn = commandMap[selectedCommand];
-    if (commandFn) {
-      await commandFn(newArgv);
+  // If config file exists, load and run
+  if (configPath) {
+    const loaded = await loadConfigFile(configPath);
+    if (!loaded.success) {
+      console.error('x', loaded.error);
+      process.exit(1);
     }
+
+    const config = loaded.config as Record<string, unknown>;
+
+    // Check if it's a multi-target config (no source fields at top level)
+    const isMulti = !('endpoint' in config || 'schemaFile' in config || 'db' in config);
+
+    if (isMulti) {
+      // Multi-target: simple for loop over targets
+      const targets = config as Record<string, GraphQLSDKConfigTarget>;
+      const names = targetName ? [targetName] : Object.keys(targets);
+
+      if (targetName && !targets[targetName]) {
+        console.error('x', `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`);
+        process.exit(1);
+      }
+
+      let hasError = false;
+      for (const name of names) {
+        console.log(`\n[${name}]`);
+        const result = await generate(targets[name]);
+        printResult(result);
+        if (!result.success) hasError = true;
+      }
+
+      prompter.close();
+      if (hasError) process.exit(1);
+      return argv;
+    }
+
+    // Single config
+    const result = await generate(config as GraphQLSDKConfigTarget);
+    printResult(result);
+    if (!result.success) process.exit(1);
     prompter.close();
     return argv;
   }
 
-  const commandFn = commandMap[command];
+  // No config file - prompt for options using shared questions
+  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
 
-  if (!commandFn) {
-    console.log(usageText);
-    await cliExitWithError(`Unknown command: ${command}`);
-  }
+  // Build db config if schemas or apiNames provided
+  const db = (answers.schemas || answers.apiNames) ? {
+    schemas: answers.schemas,
+    apiNames: answers.apiNames,
+  } : undefined;
 
-  await commandFn(newArgv);
+  const result = await generate({
+    endpoint: answers.endpoint,
+    schemaFile: answers.schemaFile,
+    db,
+    output: answers.output,
+    authorization: answers.authorization,
+    reactQuery: answers.reactQuery,
+    orm: answers.orm,
+    dryRun: answers.dryRun,
+    verbose: answers.verbose,
+  });
+
+  printResult(result);
   prompter.close();
-
   return argv;
 };
 
 export const options: Partial<CLIOptions> = {
   minimistOpts: {
     alias: {
-      v: 'version',
       h: 'help',
       c: 'config',
-      t: 'target',
       e: 'endpoint',
-      s: 'schema',
+      s: 'schema-file',
       o: 'output',
+      t: 'target',
       a: 'authorization',
-      d: 'directory',
-      f: 'force',
-      w: 'watch',
+      v: 'verbose',
     },
-    boolean: ['help', 'version', 'force', 'verbose', 'dry-run', 'watch', 'json', 'skip-custom-operations', 'clear'],
-    string: ['config', 'target', 'endpoint', 'schema', 'output', 'authorization', 'directory', 'touch', 'poll-interval', 'debounce'],
-    default: {
-      clear: true,
-    },
+    boolean: [
+      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db',
+    ],
+    string: [
+      'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
+      'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
+      'schemas', 'api-names',
+    ],
   },
 };
 
 if (require.main === module) {
-  if (process.argv.includes('--version') || process.argv.includes('-v')) {
-    const pkg = getPackageJson(__dirname);
-    console.log(pkg.version);
-    process.exit(0);
-  }
-
-  const app = new CLI(commands, options);
-
-  app.run().then(() => {
-  }).catch((error) => {
-    console.error('Unexpected error:', error);
-    process.exit(1);
-  });
+  const cli = new CLI(commands, options);
+  cli.run();
 }

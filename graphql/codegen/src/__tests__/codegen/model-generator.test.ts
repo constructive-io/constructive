@@ -3,7 +3,7 @@
  *
  * Tests the generated model classes with findMany, findFirst, create, update, delete methods.
  */
-import { generateModelFile } from '../../cli/codegen/orm/model-generator';
+import { generateModelFile } from '../../core/codegen/orm/model-generator';
 import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
 
 // ============================================================================

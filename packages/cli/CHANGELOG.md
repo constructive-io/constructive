@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.3...@constructive-io/cli@6.0.4) (2026-01-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.2...@constructive-io/cli@6.0.3) (2026-01-25)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.1...@constructive-io/cli@6.0.2) (2026-01-24)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.0...@constructive-io/cli@6.0.1) (2026-01-24)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [6.0.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.11.1...@constructive-io/cli@6.0.0) (2026-01-24)
+
+### Bug Fixes
+
+- **cli:** remove hardcoded defaultSchemas from get-graphql-schema command ([cd32a2b](https://github.com/constructive-io/constructive/commit/cd32a2bfd5816328bda06bf091cb99427d828f15))
+- **cli:** set reactQuery default to false to match agreed defaults ([e0f4571](https://github.com/constructive-io/constructive/commit/e0f45717261a63a7f559a19cdf557338d932c1bc))
+- **cli:** use enableReactQuery/enableOrm instead of reactQuery/orm in codegen command ([e33f555](https://github.com/constructive-io/constructive/commit/e33f55505bf46f133ab3d2e041412fe9dae9608b))
+
+### Features
+
+- **graphql-codegen:** add shared types pipeline and make generateReactQuery/generateOrm private ([b219348](https://github.com/constructive-io/constructive/commit/b219348cc15fdff8c30cd19f21054601e14b7acd))
+
 ## [5.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.11.0...@constructive-io/cli@5.11.1) (2026-01-22)
 
 ### Bug Fixes

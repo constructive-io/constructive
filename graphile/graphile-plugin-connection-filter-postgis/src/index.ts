@@ -28,7 +28,7 @@ const PostGraphileConnectionFilterPostgisPlugin: Plugin = (
     };
 
     depends("graphile-build-pg", "^4.5.0");
-    depends("graphile-plugin-connection-filter", "^2.0.0");
+    depends("graphile-plugin-connection-filter", "^3.0.0");
 
     build.versions = build.extend(build.versions, { [pkg.name]: pkg.version });
 
