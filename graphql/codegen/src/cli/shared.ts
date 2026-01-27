@@ -26,6 +26,7 @@ export interface CodegenAnswers {
   apiNames?: string[];
   reactQuery?: boolean;
   orm?: boolean;
+  browserCompatible?: boolean;
   authorization?: string;
   dryRun?: boolean;
   verbose?: boolean;
@@ -83,6 +84,14 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
+    useDefault: true,
+  },
+  {
+    name: 'browserCompatible',
+    message: 'Generate browser-compatible code?',
+    type: 'confirm',
+    required: false,
+    default: true,
     useDefault: true,
   },
   {
