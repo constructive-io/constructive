@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.1...@constructive-io/graphql-codegen@3.1.2) (2026-01-27)
+
+### Bug Fixes
+
+- **graphql-codegen:** improve error messages and use programmatic oxfmt API ([6922023](https://github.com/constructive-io/constructive/commit/6922023e217d4244e767791ae2aac5426811c6e0))
+
+## [3.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.0...@constructive-io/graphql-codegen@3.1.1) (2026-01-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [3.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.0.4...@constructive-io/graphql-codegen@3.1.0) (2026-01-27)
+
+### Bug Fixes
+
+- **graphql-codegen:** use undici fetch and fix DNS lookup callback ([05f76b2](https://github.com/constructive-io/constructive/commit/05f76b28cc45c6c1ae821d8c00e2a891dadbe0e9))
+
+### Features
+
+- **graphql-codegen:** add browserCompatible option for runtime fetch ([3d87204](https://github.com/constructive-io/constructive/commit/3d8720422f476edf6d4b92e6063675459a31c94b))
+
 ## [3.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.0.3...@constructive-io/graphql-codegen@3.0.4) (2026-01-26)
 
 ### Bug Fixes

@@ -1,50 +1,55 @@
 /**
  * Fetch GraphQL schema introspection from an endpoint
+ * Uses native Node.js http/https modules
  */
-import dns from 'node:dns';
-import { Agent, fetch, type RequestInit } from 'undici';
+import http from 'node:http';
+import https from 'node:https';
 import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 
-/**
- * Check if a hostname is localhost or a localhost subdomain
- */
-function isLocalhostHostname(hostname: string): boolean {
-  return hostname === 'localhost' || hostname.endsWith('.localhost');
+interface HttpResponse {
+  statusCode: number;
+  statusMessage: string;
+  data: string;
 }
 
 /**
- * Create an undici Agent that resolves *.localhost to 127.0.0.1
- * This fixes DNS resolution issues on macOS where subdomains like api.localhost
- * don't resolve automatically (unlike browsers which handle *.localhost).
+ * Make an HTTP/HTTPS request using native Node modules
  */
-function createLocalhostAgent(): Agent {
-  return new Agent({
-    connect: {
-      lookup(hostname, opts, cb) {
-        if (isLocalhostHostname(hostname)) {
-          // When opts.all is true, callback expects an array of {address, family} objects
-          // When opts.all is false/undefined, callback expects (err, address, family)
-          if (opts.all) {
-            cb(null, [{ address: '127.0.0.1', family: 4 }]);
-          } else {
-            cb(null, '127.0.0.1', 4);
-          }
-          return;
-        }
-        dns.lookup(hostname, opts, cb);
-      },
-    },
+function makeRequest(
+  url: URL,
+  options: http.RequestOptions,
+  body: string,
+  timeout: number
+): Promise<HttpResponse> {
+  return new Promise((resolve, reject) => {
+    const protocol = url.protocol === 'https:' ? https : http;
+
+    const req = protocol.request(url, options, (res) => {
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk: string) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        resolve({
+          statusCode: res.statusCode || 0,
+          statusMessage: res.statusMessage || '',
+          data,
+        });
+      });
+    });
+
+    req.on('error', reject);
+
+    req.setTimeout(timeout, () => {
+      req.destroy();
+      reject(new Error(`Request timeout after ${timeout}ms`));
+    });
+
+    req.write(body);
+    req.end();
   });
-}
-
-let localhostAgent: Agent | null = null;
-
-function getLocalhostAgent(): Agent {
-  if (!localhostAgent) {
-    localhostAgent = createLocalhostAgent();
-  }
-  return localhostAgent;
 }
 
 export interface FetchSchemaOptions {
@@ -73,98 +78,96 @@ export async function fetchSchema(
 ): Promise<FetchSchemaResult> {
   const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
 
-  // Parse the endpoint URL to check for localhost
   const url = new URL(endpoint);
-  const useLocalhostAgent = isLocalhostHostname(url.hostname);
 
-  // Build headers
   const requestHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     ...headers,
   };
 
-  // Set Host header for localhost subdomains to preserve routing
-  if (useLocalhostAgent && url.hostname !== 'localhost') {
-    requestHeaders['Host'] = url.hostname;
-  }
-
   if (authorization) {
     requestHeaders['Authorization'] = authorization;
   }
 
-  // Create abort controller for timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const body = JSON.stringify({
+    query: SCHEMA_INTROSPECTION_QUERY,
+    variables: {},
+  });
 
-  // Build fetch options using undici's RequestInit type
-  const fetchOptions: RequestInit = {
+  const requestOptions: http.RequestOptions = {
     method: 'POST',
     headers: requestHeaders,
-    body: JSON.stringify({
-      query: SCHEMA_INTROSPECTION_QUERY,
-      variables: {},
-    }),
-    signal: controller.signal,
   };
 
-  // Use custom agent for localhost to fix DNS resolution on macOS
-  if (useLocalhostAgent) {
-    fetchOptions.dispatcher = getLocalhostAgent();
-  }
-
   try {
-    const response = await fetch(endpoint, fetchOptions);
+    const response = await makeRequest(url, requestOptions, body, timeout);
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
       return {
         success: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        statusCode: response.status,
+        error: `HTTP ${response.statusCode}: ${response.statusMessage}`,
+        statusCode: response.statusCode,
       };
     }
 
-    const json = (await response.json()) as {
+    const json = JSON.parse(response.data) as {
       data?: IntrospectionQueryResponse;
       errors?: Array<{ message: string }>;
     };
 
-    // Check for GraphQL errors
     if (json.errors && json.errors.length > 0) {
       const errorMessages = json.errors.map((e) => e.message).join('; ');
       return {
         success: false,
         error: `GraphQL errors: ${errorMessages}`,
-        statusCode: response.status,
+        statusCode: response.statusCode,
       };
     }
 
-    // Check if __schema is present
     if (!json.data?.__schema) {
       return {
         success: false,
-        error: 'No __schema field in response. Introspection may be disabled on this endpoint.',
-        statusCode: response.status,
+        error:
+          'No __schema field in response. Introspection may be disabled on this endpoint.',
+        statusCode: response.statusCode,
       };
     }
 
     return {
       success: true,
       data: json.data,
-      statusCode: response.status,
+      statusCode: response.statusCode,
     };
   } catch (err) {
-    clearTimeout(timeoutId);
-
     if (err instanceof Error) {
-      if (err.name === 'AbortError') {
+      if (err.message.includes('timeout')) {
         return {
           success: false,
           error: `Request timeout after ${timeout}ms`,
         };
       }
+
+      const errorCode = (err as NodeJS.ErrnoException).code;
+      if (errorCode === 'ECONNREFUSED') {
+        return {
+          success: false,
+          error: `Connection refused - is the server running at ${endpoint}?`,
+        };
+      }
+      if (errorCode === 'ENOTFOUND') {
+        return {
+          success: false,
+          error: `DNS lookup failed for ${url.hostname} - check the endpoint URL`,
+        };
+      }
+      if (errorCode === 'ECONNRESET') {
+        return {
+          success: false,
+          error: `Connection reset by server at ${endpoint}`,
+        };
+      }
+
       return {
         success: false,
         error: err.message,

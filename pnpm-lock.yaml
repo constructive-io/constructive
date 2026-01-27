@@ -1576,12 +1576,15 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      appstash:
+        specifier: ^0.3.0
+        version: 0.3.0
       find-and-require-package-json:
         specifier: ^0.9.0
         version: 0.9.0
       inquirerer:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.5.0
+        version: 4.5.0
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -6148,6 +6151,12 @@ packages:
 
   inquirerer@4.4.0:
     resolution: {integrity: sha512-zra0M4Oh+rzgr7PMJy9cNi/LbkJbtB6QRABou65nN6NTwb368/lMJ8ACHXozM7bw3+t5SOI0TP3gxKAyT0BCRw==}
+
+  inquirerer@4.5.0:
+    resolution:
+      {
+        integrity: sha512-ULWscyMV6Y/OH1XRODvunrQH1EO4r7q+UV/boWFiVIt9h2UZ7wa/Qc+ZpAqUaWynKUhDtY3UqZV4MVrRcEkmNg==,
+      }
 
   ip-address@10.1.0:
     resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
@@ -13454,6 +13463,13 @@ snapshots:
       - '@types/node'
 
   inquirerer@4.4.0:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.9.0
+      minimist: 1.2.8
+      yanse: 0.2.0
+
+  inquirerer@4.5.0:
     dependencies:
       deepmerge: 4.3.1
       find-and-require-package-json: 0.9.0

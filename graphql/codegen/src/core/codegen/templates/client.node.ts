@@ -1,84 +1,56 @@
 /**
- * GraphQL client configuration and execution (Node.js with undici)
+ * GraphQL client configuration and execution (Node.js with native http/https)
  *
  * This is the RUNTIME code that gets copied to generated output.
- * Uses undici fetch with dispatcher support for localhost DNS resolution.
+ * Uses native Node.js http/https modules.
  *
  * NOTE: This file is read at codegen time and written to output.
  * Any changes here will affect all generated clients.
  */
 
-import dns from 'node:dns';
-import { Agent, fetch, type RequestInit } from 'undici';
+import http from 'node:http';
+import https from 'node:https';
 
 // ============================================================================
-// Localhost DNS Resolution
+// HTTP Request Helper
 // ============================================================================
 
-/**
- * Check if a hostname is localhost or a localhost subdomain
- */
-function isLocalhostHostname(hostname: string): boolean {
-  return hostname === 'localhost' || hostname.endsWith('.localhost');
+interface HttpResponse {
+  statusCode: number;
+  statusMessage: string;
+  data: string;
 }
 
 /**
- * Create an undici Agent that resolves *.localhost to 127.0.0.1
- * This fixes DNS resolution issues on macOS where subdomains like api.localhost
- * don't resolve automatically (unlike browsers which handle *.localhost).
+ * Make an HTTP/HTTPS request using native Node modules
  */
-function createLocalhostAgent(): Agent {
-  return new Agent({
-    connect: {
-      lookup(hostname, opts, cb) {
-        if (isLocalhostHostname(hostname)) {
-          // When opts.all is true, callback expects an array of {address, family} objects
-          // When opts.all is false/undefined, callback expects (err, address, family)
-          if (opts.all) {
-            cb(null, [{ address: '127.0.0.1', family: 4 }]);
-          } else {
-            cb(null, '127.0.0.1', 4);
-          }
-          return;
-        }
-        dns.lookup(hostname, opts, cb);
-      },
-    },
+function makeRequest(
+  url: URL,
+  options: http.RequestOptions,
+  body: string
+): Promise<HttpResponse> {
+  return new Promise((resolve, reject) => {
+    const protocol = url.protocol === 'https:' ? https : http;
+
+    const req = protocol.request(url, options, (res) => {
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk: string) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        resolve({
+          statusCode: res.statusCode || 0,
+          statusMessage: res.statusMessage || '',
+          data,
+        });
+      });
+    });
+
+    req.on('error', reject);
+    req.write(body);
+    req.end();
   });
-}
-
-let localhostAgent: Agent | null = null;
-
-function getLocalhostAgent(): Agent {
-  if (!localhostAgent) {
-    localhostAgent = createLocalhostAgent();
-  }
-  return localhostAgent;
-}
-
-/**
- * Get fetch options with localhost agent if needed
- */
-function getFetchOptions(
-  endpoint: string,
-  baseOptions: RequestInit
-): RequestInit {
-  const url = new URL(endpoint);
-  if (isLocalhostHostname(url.hostname)) {
-    const options: RequestInit = {
-      ...baseOptions,
-      dispatcher: getLocalhostAgent(),
-    };
-    // Set Host header for localhost subdomains to preserve routing
-    if (url.hostname !== 'localhost') {
-      options.headers = {
-        ...(baseOptions.headers as Record<string, string>),
-        Host: url.hostname,
-      };
-    }
-    return options;
-  }
-  return baseOptions;
 }
 
 // ============================================================================
@@ -174,7 +146,7 @@ export class GraphQLClientError extends Error {
   constructor(
     message: string,
     public errors: GraphQLError[],
-    public response?: Response
+    public statusCode?: number
   ) {
     super(message);
     this.name = 'GraphQLClientError';
@@ -188,8 +160,6 @@ export class GraphQLClientError extends Error {
 export interface ExecuteOptions {
   /** Override headers for this request */
   headers?: Record<string, string>;
-  /** AbortSignal for request cancellation */
-  signal?: AbortSignal;
 }
 
 /**
@@ -212,25 +182,29 @@ export async function execute<
   options?: ExecuteOptions
 ): Promise<TData> {
   const config = getConfig();
+  const url = new URL(config.endpoint);
 
-  const baseOptions: RequestInit = {
+  const body = JSON.stringify({
+    query: document,
+    variables,
+  });
+
+  const requestOptions: http.RequestOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...config.headers,
       ...options?.headers,
     },
-    body: JSON.stringify({
-      query: document,
-      variables,
-    }),
-    signal: options?.signal,
   };
 
-  const fetchOptions = getFetchOptions(config.endpoint, baseOptions);
-  const response = await fetch(config.endpoint, fetchOptions);
+  const response = await makeRequest(url, requestOptions, body);
 
-  const json = (await response.json()) as {
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    throw new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`);
+  }
+
+  const json = JSON.parse(response.data) as {
     data?: TData;
     errors?: GraphQLError[];
   };
@@ -239,7 +213,7 @@ export async function execute<
     throw new GraphQLClientError(
       json.errors[0].message || 'GraphQL request failed',
       json.errors,
-      response as unknown as Response
+      response.statusCode
     );
   }
 
@@ -259,25 +233,32 @@ export async function executeWithErrors<
   options?: ExecuteOptions
 ): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
   const config = getConfig();
+  const url = new URL(config.endpoint);
 
-  const baseOptions: RequestInit = {
+  const body = JSON.stringify({
+    query: document,
+    variables,
+  });
+
+  const requestOptions: http.RequestOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...config.headers,
       ...options?.headers,
     },
-    body: JSON.stringify({
-      query: document,
-      variables,
-    }),
-    signal: options?.signal,
   };
 
-  const fetchOptions = getFetchOptions(config.endpoint, baseOptions);
-  const response = await fetch(config.endpoint, fetchOptions);
+  const response = await makeRequest(url, requestOptions, body);
 
-  const json = (await response.json()) as {
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    return {
+      data: null,
+      errors: [{ message: `HTTP ${response.statusCode}: ${response.statusMessage}` }],
+    };
+  }
+
+  const json = JSON.parse(response.data) as {
     data?: TData;
     errors?: GraphQLError[];
   };

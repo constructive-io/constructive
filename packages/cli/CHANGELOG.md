@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.1.0...@constructive-io/cli@6.1.1) (2026-01-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [6.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.5...@constructive-io/cli@6.1.0) (2026-01-27)
+
+### Features
+
+- **cli:** add execution engine with project, auth, and execute commands ([d353661](https://github.com/constructive-io/constructive/commit/d353661649ef0a95c863b98b16da5a8eb3c33275))
+- **cli:** use password type for token input in auth command ([28ec0fd](https://github.com/constructive-io/constructive/commit/28ec0fd9e4744d6a0f5b8eb0b234e5e56d5b9a33)), closes [#58](https://github.com/constructive-io/constructive/issues/58)
+
+## [6.0.5](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.4...@constructive-io/cli@6.0.5) (2026-01-27)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [6.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.3...@constructive-io/cli@6.0.4) (2026-01-26)
 
 **Note:** Version bump only for package @constructive-io/cli
