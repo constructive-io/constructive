@@ -3,6 +3,7 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
+import cookieParser from 'cookie-parser';
 import { randomUUID } from 'crypto';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
@@ -111,6 +112,7 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
+    app.use(cookieParser());
     app.use(graphqlUpload.graphqlUploadExpress());
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());

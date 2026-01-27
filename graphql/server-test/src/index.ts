@@ -7,6 +7,9 @@ export { createTestServer } from './server';
 // Export SuperTest utilities
 export { createSuperTestAgent } from './supertest';
 
+// Export adapters
+export { SuperTestAdapter } from './adapter';
+
 // Export connection functions
 export { getConnections } from './get-connections';
 
