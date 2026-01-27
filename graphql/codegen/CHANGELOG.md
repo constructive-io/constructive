@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.1...@constructive-io/graphql-codegen@3.1.2) (2026-01-27)
+
+### Bug Fixes
+
+- **graphql-codegen:** improve error messages and use programmatic oxfmt API ([6922023](https://github.com/constructive-io/constructive/commit/6922023e217d4244e767791ae2aac5426811c6e0))
+
 ## [3.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.0...@constructive-io/graphql-codegen@3.1.1) (2026-01-27)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
