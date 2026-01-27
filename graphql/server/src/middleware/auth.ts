@@ -19,9 +19,20 @@ const SESSION_COOKIE_NAME = 'session';
 
 /**
  * Auth settings loaded from the database.
+ * Maps to the app_auth_settings table columns.
  */
 interface AuthSettings {
   enableCookieAuth: boolean;
+  requireCsrfForAuth: boolean;
+  allowAnonymousSessions: boolean;
+  allowMultipleSessions: boolean;
+  defaultSessionDuration: string | null;
+  rememberMeDuration: string | null;
+  defaultCredentialDuration: string | null;
+  defaultFingerprintMode: string | null;
+  minPasswordLength: number | null;
+  maxFailedLoginAttempts: number | null;
+  lockoutDuration: string | null;
 }
 
 /**
@@ -35,12 +46,30 @@ const authSettingsCache = new LRUCache<string, AuthSettings>({
 });
 
 /**
+ * Default auth settings used when query fails or settings don't exist.
+ */
+const DEFAULT_AUTH_SETTINGS: AuthSettings = {
+  enableCookieAuth: false,
+  requireCsrfForAuth: true,
+  allowAnonymousSessions: false,
+  allowMultipleSessions: true,
+  defaultSessionDuration: null,
+  rememberMeDuration: null,
+  defaultCredentialDuration: null,
+  defaultFingerprintMode: null,
+  minPasswordLength: null,
+  maxFailedLoginAttempts: null,
+  lockoutDuration: null,
+};
+
+/**
  * Query auth settings from the database.
- * Uses the auth_settings() function from constructive_auth_private schema.
+ * Uses the auth_settings() function from the RLS module's private schema.
  */
 async function loadAuthSettings(
   pool: ReturnType<typeof getPgPool>,
-  svcKey: string
+  svcKey: string,
+  privateSchemaName: string
 ): Promise<AuthSettings> {
   const cached = authSettingsCache.get(svcKey);
   if (cached) {
@@ -52,22 +81,38 @@ async function loadAuthSettings(
 
   try {
     const result = await pool.query(
-      `SELECT enable_cookie_auth FROM constructive_auth_private.auth_settings()`
+      `SELECT * FROM "${privateSchemaName}".auth_settings()`
     );
 
+    const row = result.rows[0];
+    if (!row) {
+      if (isDev()) log.debug('Auth settings query returned no rows, using defaults');
+      authSettingsCache.set(svcKey, DEFAULT_AUTH_SETTINGS);
+      return DEFAULT_AUTH_SETTINGS;
+    }
+
     const settings: AuthSettings = {
-      enableCookieAuth: result.rows[0]?.enable_cookie_auth ?? false,
+      enableCookieAuth: row.enable_cookie_auth ?? false,
+      requireCsrfForAuth: row.require_csrf_for_auth ?? true,
+      allowAnonymousSessions: row.allow_anonymous_sessions ?? false,
+      allowMultipleSessions: row.allow_multiple_sessions ?? true,
+      defaultSessionDuration: row.default_session_duration ?? null,
+      rememberMeDuration: row.remember_me_duration ?? null,
+      defaultCredentialDuration: row.default_credential_duration ?? null,
+      defaultFingerprintMode: row.default_fingerprint_mode ?? null,
+      minPasswordLength: row.min_password_length ?? null,
+      maxFailedLoginAttempts: row.max_failed_login_attempts ?? null,
+      lockoutDuration: row.lockout_duration ?? null,
     };
 
     authSettingsCache.set(svcKey, settings);
-    if (isDev()) log.debug(`Auth settings loaded: enableCookieAuth=${settings.enableCookieAuth}`);
+    if (isDev()) log.debug(`Auth settings loaded: enableCookieAuth=${settings.enableCookieAuth}, requireCsrfForAuth=${settings.requireCsrfForAuth}`);
     return settings;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     if (isDev()) log.debug(`Auth settings query failed (using defaults): ${message}`);
-    const defaults: AuthSettings = { enableCookieAuth: false };
-    authSettingsCache.set(svcKey, defaults);
-    return defaults;
+    authSettingsCache.set(svcKey, DEFAULT_AUTH_SETTINGS);
+    return DEFAULT_AUTH_SETTINGS;
   }
 }
 
@@ -223,7 +268,7 @@ export const createAuthenticateMiddleware = (
       let token: ConstructiveAPIToken | undefined;
 
       // Load auth settings from database (cached per svc_key)
-      const authSettings = await loadAuthSettings(pool, svcKey);
+      const authSettings = await loadAuthSettings(pool, svcKey, privateSchemaName);
 
       // Try cookie auth first if enabled in database settings
       if (authSettings.enableCookieAuth) {
