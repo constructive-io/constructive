@@ -165,6 +165,28 @@ export async function fetchSchema(
           error: `Request timeout after ${timeout}ms`,
         };
       }
+
+      // Provide more helpful error messages for common network errors
+      const errorCode = (err as NodeJS.ErrnoException).code;
+      if (errorCode === 'ECONNREFUSED') {
+        return {
+          success: false,
+          error: `Connection refused - is the server running at ${endpoint}?`,
+        };
+      }
+      if (errorCode === 'ENOTFOUND') {
+        return {
+          success: false,
+          error: `DNS lookup failed for ${url.hostname} - check the endpoint URL`,
+        };
+      }
+      if (errorCode === 'ECONNRESET') {
+        return {
+          success: false,
+          error: `Connection reset by server at ${endpoint}`,
+        };
+      }
+
       return {
         success: false,
         error: err.message,
