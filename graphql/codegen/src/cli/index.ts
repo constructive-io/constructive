@@ -33,6 +33,8 @@ Generator Options:
   -o, --output <dir>            Output directory
   -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
+  --browser-compatible          Generate browser-compatible code (default: true)
+                                Set to false for Node.js with localhost DNS fix
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
@@ -120,6 +122,7 @@ export const commands = async (
     authorization: answers.authorization,
     reactQuery: answers.reactQuery,
     orm: answers.orm,
+    browserCompatible: answers.browserCompatible,
     dryRun: answers.dryRun,
     verbose: answers.verbose,
   });
@@ -142,7 +145,7 @@ export const options: Partial<CLIOptions> = {
       v: 'verbose',
     },
     boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db',
+      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible',
     ],
     string: [
       'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
