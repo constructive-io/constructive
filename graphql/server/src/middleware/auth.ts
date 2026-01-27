@@ -2,6 +2,7 @@ import { getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { LRUCache } from 'lru-cache';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 import './types'; // for Request type
@@ -15,6 +16,71 @@ const isDev = () => getNodeEnv() === 'development';
  * This cookie contains the session credential secret.
  */
 const SESSION_COOKIE_NAME = 'session';
+
+/**
+ * Auth settings loaded from the database.
+ */
+interface AuthSettings {
+  enableCookieAuth: boolean;
+}
+
+/**
+ * Cache for auth settings per service key.
+ * Settings are loaded once per database/API and cached.
+ */
+const ONE_HOUR_IN_MS = 1000 * 60 * 60;
+const authSettingsCache = new LRUCache<string, AuthSettings>({
+  max: 100,
+  ttl: ONE_HOUR_IN_MS,
+});
+
+/**
+ * Query auth settings from the database.
+ * Uses the auth_settings() function from constructive_auth_private schema.
+ */
+async function loadAuthSettings(
+  pool: ReturnType<typeof getPgPool>,
+  svcKey: string
+): Promise<AuthSettings> {
+  const cached = authSettingsCache.get(svcKey);
+  if (cached) {
+    if (isDev()) log.debug(`Auth settings cache hit for key=${svcKey}`);
+    return cached;
+  }
+
+  if (isDev()) log.debug(`Auth settings cache miss for key=${svcKey}, querying database`);
+
+  try {
+    const result = await pool.query(
+      `SELECT enable_cookie_auth FROM constructive_auth_private.auth_settings()`
+    );
+
+    const settings: AuthSettings = {
+      enableCookieAuth: result.rows[0]?.enable_cookie_auth ?? false,
+    };
+
+    authSettingsCache.set(svcKey, settings);
+    if (isDev()) log.debug(`Auth settings loaded: enableCookieAuth=${settings.enableCookieAuth}`);
+    return settings;
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    if (isDev()) log.debug(`Auth settings query failed (using defaults): ${message}`);
+    const defaults: AuthSettings = { enableCookieAuth: false };
+    authSettingsCache.set(svcKey, defaults);
+    return defaults;
+  }
+}
+
+/**
+ * Clear the auth settings cache for a specific key or all keys.
+ */
+export function clearAuthSettingsCache(svcKey?: string): void {
+  if (svcKey) {
+    authSettingsCache.delete(svcKey);
+  } else {
+    authSettingsCache.clear();
+  }
+}
 
 /**
  * Build the context object for pg-query-context.
@@ -120,8 +186,6 @@ async function authenticateWithBearer(
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
 ): RequestHandler => {
-  const enableCookieAuth = (opts as { api?: { enableCookieAuth?: boolean } }).api?.enableCookieAuth ?? false;
-
   return async (
     req: Request,
     res: Response,
@@ -130,6 +194,12 @@ export const createAuthenticateMiddleware = (
     const api = req.api;
     if (!api) {
       res.status(500).send('Missing API info');
+      return;
+    }
+
+    const svcKey = req.svc_key;
+    if (!svcKey) {
+      res.status(500).send('Missing service cache key');
       return;
     }
 
@@ -152,8 +222,11 @@ export const createAuthenticateMiddleware = (
       const privateSchemaName = rlsModule.privateSchema.schemaName;
       let token: ConstructiveAPIToken | undefined;
 
-      // Try cookie auth first if enabled
-      if (enableCookieAuth) {
+      // Load auth settings from database (cached per svc_key)
+      const authSettings = await loadAuthSettings(pool, svcKey);
+
+      // Try cookie auth first if enabled in database settings
+      if (authSettings.enableCookieAuth) {
         const cookieResult = await authenticateWithCookie(
           req,
           pool,
