@@ -15,6 +15,11 @@ export const usageText = `
   Jobs:
     jobs up            Start combined server (jobs runtime)
 
+  Execution Engine:
+    context            Manage contexts (create, list, use, current, delete)
+    auth               Manage authentication (set-token, status, logout)
+    execute            Execute GraphQL queries against configured endpoints
+
   Global Options:
     -h, --help         Display this help information
     -v, --version      Display version information
@@ -31,6 +36,11 @@ export const usageText = `
     cnc codegen --schema schema.graphql  Generate types from schema
     cnc get-graphql-schema --out schema.graphql  Export schema SDL
     cnc jobs up                       Start combined server (jobs runtime)
+
+    # Execution Engine
+    cnc context create my-api --endpoint https://api.example.com/graphql
+    cnc auth set-token
+    cnc execute --query 'query { __typename }'
 
   Database Operations:
     For database migrations, packages, and deployment, use pgpm:
