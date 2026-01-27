@@ -130,7 +130,9 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 1. Generate client.ts
   files.push({
     path: 'client.ts',
-    content: generateClientFile(),
+    content: generateClientFile({
+      browserCompatible: config.browserCompatible ?? true,
+    }),
   });
 
   // Collect table type names for import path resolution

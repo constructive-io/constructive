@@ -2,7 +2,7 @@
  * Fetch GraphQL schema introspection from an endpoint
  */
 import dns from 'node:dns';
-import { Agent } from 'undici';
+import { Agent, fetch, type RequestInit } from 'undici';
 import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 
@@ -23,7 +23,13 @@ function createLocalhostAgent(): Agent {
     connect: {
       lookup(hostname, opts, cb) {
         if (isLocalhostHostname(hostname)) {
-          cb(null, '127.0.0.1', 4);
+          // When opts.all is true, callback expects an array of {address, family} objects
+          // When opts.all is false/undefined, callback expects (err, address, family)
+          if (opts.all) {
+            cb(null, [{ address: '127.0.0.1', family: 4 }]);
+          } else {
+            cb(null, '127.0.0.1', 4);
+          }
           return;
         }
         dns.lookup(hostname, opts, cb);
@@ -91,8 +97,8 @@ export async function fetchSchema(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  // Build fetch options
-  const fetchOptions: RequestInit & { dispatcher?: Agent } = {
+  // Build fetch options using undici's RequestInit type
+  const fetchOptions: RequestInit = {
     method: 'POST',
     headers: requestHeaders,
     body: JSON.stringify({
