@@ -45,6 +45,13 @@ export interface ApiOptions {
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
+  /**
+   * Enable cookie-based authentication.
+   * When enabled, the server will check for session cookies in addition to Bearer tokens.
+   * Cookies are validated against the session_credentials table with kind='cookie'.
+   * Defaults to false for backward compatibility.
+   */
+  enableCookieAuth?: boolean;
 }
 
 /**
@@ -81,4 +88,5 @@ export const apiDefaults: ApiOptions = {
     'metaschema_public',
     'metaschema_modules_public',
   ],
+  enableCookieAuth: false,
 };
