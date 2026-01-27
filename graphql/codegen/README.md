@@ -183,6 +183,8 @@ interface GraphQLSDKConfigTarget {
   // Generator flags
   reactQuery?: boolean;                 // Generate React Query hooks (output: {output}/hooks)
   orm?: boolean;                        // Generate ORM client (output: {output}/orm)
+  browserCompatible?: boolean;          // Generate browser-compatible code (default: true)
+                                        // Set to false for Node.js with localhost DNS fix
 
   // Table filtering (for CRUD operations from _meta)
   tables?: {
@@ -683,6 +685,8 @@ Generator Options:
   -t, --target <name>              Target name in config file
   -o, --output <dir>               Output directory
   -a, --authorization <token>      Authorization header value
+  --browser-compatible             Generate browser-compatible code (default: true)
+                                   Set to false for Node.js with localhost DNS fix
   --skip-custom-operations         Only generate table CRUD operations
   --dry-run                        Preview without writing files
   --keep-db                        Keep ephemeral database after generation (pgpm modes)

@@ -1,7 +1,10 @@
 import { checkForUpdates } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
+import auth from './commands/auth';
 import codegen from './commands/codegen';
+import context from './commands/context';
+import execute from './commands/execute';
 import explorer from './commands/explorer';
 import getGraphqlSchema from './commands/get-graphql-schema';
 import jobs from './commands/jobs';
@@ -15,6 +18,9 @@ const createCommandMap = (): Record<string, Function> => {
     'get-graphql-schema': getGraphqlSchema,
     codegen,
     jobs,
+    context,
+    auth,
+    execute,
   };
 };
 
