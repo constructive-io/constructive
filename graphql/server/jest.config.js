@@ -1,9 +1,4 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-
-// Set environment variables for tests
-// simpleInflection is required because ORM code was generated with this feature enabled
-process.env.FEATURES_SIMPLE_INFLECTION = 'true';
-
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
