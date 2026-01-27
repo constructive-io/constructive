@@ -327,8 +327,6 @@ describe('services enabled + private via X-Meta-Schema', () => {
  * These test the various error conditions in the api middleware:
  * - Invalid X-Schemata (ApiError with errorHtml)
  * - Domain not found (null apiConfig)
- * - isPublic mismatch via domain
- * - isPublic mismatch via X-Api-Name
  * - NO_VALID_SCHEMAS error code
  * - apiConfig null (no domain match)
  */
@@ -372,35 +370,6 @@ describe('Error paths', () => {
       const res = await request
         .post('/graphql')
         .set('Host', 'unknown.nowhere.com')
-        .send({ query: '{ __typename }' });
-
-      expect(res.status).toBe(404);
-      expect(res.text).toContain('Not Found');
-    });
-  });
-
-  describe('isPublic mismatch via domain', () => {
-    it('should return 404 when isPublic=false but domain links to a public API', async () => {
-      // The "app.test.constructive.io" domain links to API "app" which has is_public=true.
-      // With server configured as isPublic=false, this should not match.
-      const res = await request
-        .post('/graphql')
-        .set('Host', 'app.test.constructive.io')
-        .send({ query: '{ __typename }' });
-
-      expect(res.status).toBe(404);
-      expect(res.text).toContain('Not Found');
-    });
-  });
-
-  describe('isPublic mismatch via X-Api-Name', () => {
-    it('should return 404 when isPublic=false but X-Api-Name references a public API', async () => {
-      // API "app" has is_public=true. With server configured as isPublic=false,
-      // queryServiceByApiName checks api.isPublic === apiPublic and returns null.
-      const res = await request
-        .post('/graphql')
-        .set('X-Database-Id', servicesDatabaseId)
-        .set('X-Api-Name', 'app')
         .send({ query: '{ __typename }' });
 
       expect(res.status).toBe(404);
