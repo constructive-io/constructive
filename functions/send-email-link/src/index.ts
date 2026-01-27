@@ -7,8 +7,10 @@ import { send as sendSmtp } from 'simple-smtp-server';
 import { parseEnvBoolean } from '@pgpmjs/env';
 import { createLogger } from '@pgpmjs/logger';
 
-const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false;
-const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
+const isDryRun = parseEnvBoolean(process.env.SEND_EMAIL_LINK_DRY_RUN) ?? false; // skip actual email sending, log only
+const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false; // use SMTP instead of Mailgun
+const allowLocalhost = parseEnvBoolean(process.env.ALLOW_LOCALHOST) ?? false; // enable http:// and custom port for localhost URLs
+const localAppPort = process.env.LOCAL_APP_PORT; // port for local dev URLs (e.g., 3001)
 const logger = createLogger('send-email-link');
 const app = createJobApp();
 
@@ -212,15 +214,15 @@ export const sendEmailLink = async (
 
   // Optional: LOCAL_APP_PORT lets you attach a port for local dashboards
   // e.g. LOCAL_APP_PORT=3000 -> http://localhost:3000
-  // It is ignored for non-local hostnames. Only allow on DRY RUNs
+  // It is ignored for non-local hostnames. Only allow when ALLOW_LOCALHOST=true
   const localPort =
-    isLocalHost && isDryRun && process.env.LOCAL_APP_PORT
-      ? `:${process.env.LOCAL_APP_PORT}`
+    isLocalHost && allowLocalhost && localAppPort
+      ? `:${localAppPort}`
       : '';
 
-  // Use http only for local dry-run to avoid browser TLS warnings
-  // in dev; production stays https.
-  const protocol = isLocalHost && isDryRun ? 'http' : 'https';
+  // Use http only for local dev (when ALLOW_LOCALHOST=true) to avoid browser
+  // TLS warnings; production stays https.
+  const protocol = isLocalHost && allowLocalhost ? 'http' : 'https';
   const url = new URL(`${protocol}://${hostname}${localPort}`);
 
   let subject: string;
@@ -403,9 +405,10 @@ if (require.main === module) {
     defaultDatabaseId: process.env.DEFAULT_DATABASE_ID || 'not set',
     dryRun: isDryRun,
     useSmtp,
+    allowLocalhost,
     mailgunDomain: process.env.MAILGUN_DOMAIN || 'not set',
     mailgunFrom: process.env.MAILGUN_FROM || 'not set',
-    localAppPort: process.env.LOCAL_APP_PORT || 'not set',
+    localAppPort: localAppPort || 'not set',
     hasAuthToken: !!process.env.GRAPHQL_AUTH_TOKEN
   });
 
