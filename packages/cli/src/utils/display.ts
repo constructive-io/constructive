@@ -16,9 +16,9 @@ export const usageText = `
     jobs up            Start combined server (jobs runtime)
 
   Execution Engine:
-    project            Manage Constructive projects (init, list, use, info, delete)
+    context            Manage contexts (create, list, use, current, delete)
     auth               Manage authentication (set-token, status, logout)
-    execute            Execute JSON protocol operations against Constructive APIs
+    execute            Execute GraphQL queries against configured endpoints
 
   Global Options:
     -h, --help         Display this help information
@@ -38,9 +38,9 @@ export const usageText = `
     cnc jobs up                       Start combined server (jobs runtime)
 
     # Execution Engine
-    cnc project init my-app --domain constructive.io
-    cnc auth set-token <token>
-    cnc execute --model database --action findMany --first 10
+    cnc context create my-api --endpoint https://api.example.com/graphql
+    cnc auth set-token
+    cnc execute --query 'query { __typename }'
 
   Database Operations:
     For database migrations, packages, and deployment, use pgpm:
