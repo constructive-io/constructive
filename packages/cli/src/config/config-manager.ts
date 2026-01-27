@@ -11,9 +11,8 @@ import type {
   GlobalSettings,
   Credentials,
   ProjectCredentials,
-  ApiType,
 } from './types';
-import { DEFAULT_SETTINGS, generateEndpoints } from './types';
+import { DEFAULT_SETTINGS } from './types';
 
 const TOOL_NAME = 'cnc';
 
@@ -193,30 +192,13 @@ export function setCurrentProject(projectName: string): boolean {
  */
 export function createProject(
   name: string,
-  subdomain: string,
-  domain: string,
-  options?: {
-    databaseId?: string;
-    ownerId?: string;
-    defaultApi?: ApiType;
-  }
+  endpoint: string
 ): ProjectConfig {
-  const settings = loadSettings();
   const now = new Date().toISOString();
 
   const project: ProjectConfig = {
     name,
-    domain,
-    subdomain,
-    endpoints: generateEndpoints(
-      subdomain,
-      domain,
-      settings.useHttps,
-      settings.graphqlPath
-    ),
-    defaultApi: options?.defaultApi || 'public',
-    databaseId: options?.databaseId,
-    ownerId: options?.ownerId,
+    endpoint,
     createdAt: now,
     updatedAt: now,
   };

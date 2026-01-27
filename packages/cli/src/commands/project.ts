@@ -16,7 +16,6 @@ import {
   getProjectCredentials,
   hasValidCredentials,
 } from '../config';
-import type { ApiType } from '../config';
 
 const usage = `
 Constructive Project Management:
@@ -31,12 +30,10 @@ Commands:
   delete <name>         Delete a project configuration
 
 Init Options:
-  --domain <domain>     Domain for the project (e.g., constructive.io)
-  --subdomain <sub>     Subdomain prefix (defaults to project name)
-  --default-api <api>   Default API type (public, admin, auth, private, app)
+  --endpoint <url>      GraphQL endpoint URL
 
 Examples:
-  cnc project init my-app --domain constructive.io
+  cnc project init my-app --endpoint https://api.example.com/graphql
   cnc project list
   cnc project use my-app
   cnc project info
@@ -113,35 +110,17 @@ async function handleInit(
       },
       {
         type: 'text',
-        name: 'domain',
-        message: 'Domain',
-        default: settings.defaultDomain || 'constructive.io',
+        name: 'endpoint',
+        message: 'GraphQL endpoint URL',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'subdomain',
-        message: 'Subdomain prefix',
-        required: false,
-      },
-      {
-        type: 'autocomplete',
-        name: 'defaultApi',
-        message: 'Default API',
-        options: ['public', 'admin', 'auth', 'private', 'app'],
-        default: 'public',
-        required: false,
       },
     ]
   );
 
   const answersRecord = answers as Record<string, unknown>;
   const projectName = answersRecord.name as string;
-  const domain = answersRecord.domain as string;
-  const subdomain = (answersRecord.subdomain as string) || projectName;
-  const defaultApi = (answersRecord.defaultApi as ApiType) || 'public';
+  const endpoint = answersRecord.endpoint as string;
 
-  // Check if project already exists
   const existing = loadProject(projectName);
   if (existing) {
     console.error(chalk.red(`Project "${projectName}" already exists.`));
@@ -149,15 +128,8 @@ async function handleInit(
     process.exit(1);
   }
 
-  const project = createProject(projectName, subdomain, domain, { defaultApi });
+  const project = createProject(projectName, endpoint);
 
-  // Update default domain if this is the first project
-  if (!settings.defaultDomain) {
-    settings.defaultDomain = domain;
-    saveSettings(settings);
-  }
-
-  // Set as current project if no current project
   if (!settings.currentProject) {
     setCurrentProject(projectName);
     console.log(chalk.green(`Created and activated project: ${projectName}`));
@@ -166,11 +138,7 @@ async function handleInit(
   }
 
   console.log();
-  console.log(chalk.bold('Endpoints:'));
-  for (const [api, endpoint] of Object.entries(project.endpoints)) {
-    const isDefault = api === project.defaultApi;
-    console.log(`  ${api}: ${endpoint}${isDefault ? chalk.gray(' (default)') : ''}`);
-  }
+  console.log(`  Endpoint: ${project.endpoint}`);
   console.log();
   console.log(chalk.gray(`Next: Run "cnc auth set-token <token>" to configure authentication.`));
 }
@@ -195,8 +163,7 @@ function handleList() {
     const authStatus = hasAuth ? chalk.green('[authenticated]') : chalk.yellow('[no token]');
 
     console.log(`${marker} ${chalk.bold(project.name)} ${authStatus}`);
-    console.log(`    Domain: ${project.subdomain}.${project.domain}`);
-    console.log(`    Default API: ${project.defaultApi}`);
+    console.log(`    Endpoint: ${project.endpoint}`);
     console.log();
   }
 }
@@ -279,23 +246,9 @@ async function handleInfo(
   console.log();
   console.log(chalk.bold(`Project: ${project.name}`) + (isCurrent ? chalk.green(' (active)') : ''));
   console.log();
-  console.log(`  Domain:     ${project.domain}`);
-  console.log(`  Subdomain:  ${project.subdomain}`);
-  console.log(`  Default API: ${project.defaultApi}`);
-  if (project.databaseId) {
-    console.log(`  Database ID: ${project.databaseId}`);
-  }
-  if (project.ownerId) {
-    console.log(`  Owner ID:   ${project.ownerId}`);
-  }
+  console.log(`  Endpoint:   ${project.endpoint}`);
   console.log(`  Created:    ${project.createdAt}`);
   console.log(`  Updated:    ${project.updatedAt}`);
-  console.log();
-  console.log(chalk.bold('Endpoints:'));
-  for (const [api, endpoint] of Object.entries(project.endpoints)) {
-    const isDefault = api === project.defaultApi;
-    console.log(`  ${api}: ${endpoint}${isDefault ? chalk.gray(' (default)') : ''}`);
-  }
   console.log();
   console.log(chalk.bold('Authentication:'));
   if (hasAuth) {
