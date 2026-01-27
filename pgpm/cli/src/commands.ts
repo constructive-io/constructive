@@ -24,6 +24,7 @@ import upgrade from './commands/upgrade';
 import remove from './commands/remove';
 import renameCmd from './commands/rename';
 import revert from './commands/revert';
+import slice from './commands/slice';
 import tag from './commands/tag';
 import testPackages from './commands/test-packages';
 import verify from './commands/verify';
@@ -62,12 +63,13 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
     install: pgt(install),
     migrate: pgt(migrate),
     analyze: pgt(analyze),
-    rename: pgt(renameCmd),
-    'test-packages': pgt(testPackages),
-    upgrade: pgt(upgrade),
-    up: pgt(upgrade),
-    cache,
-    update: updateCmd
+        rename: pgt(renameCmd),
+        slice,
+        'test-packages': pgt(testPackages),
+        upgrade: pgt(upgrade),
+        up: pgt(upgrade),
+        cache,
+        update: updateCmd
   };
 };
 

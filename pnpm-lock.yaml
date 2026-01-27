@@ -1921,6 +1921,9 @@ importers:
       komoji:
         specifier: ^0.8.0
         version: 0.8.0
+      minimatch:
+        specifier: ^10.1.1
+        version: 10.1.1
       parse-package-name:
         specifier: ^1.0.0
         version: 1.0.0

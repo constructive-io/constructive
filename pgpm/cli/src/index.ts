@@ -24,6 +24,7 @@ export { default as plan } from './commands/plan';
 export { default as remove } from './commands/remove';
 export { default as renameCmd } from './commands/rename';
 export { default as revert } from './commands/revert';
+export { default as slice } from './commands/slice';
 export { default as tag } from './commands/tag';
 export { default as testPackages } from './commands/test-packages';
 export { default as verify } from './commands/verify';
