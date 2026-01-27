@@ -46,15 +46,16 @@ const cleanEnv = <S extends Record<string, ValidatorSpec<unknown>>>(
 };
 
 /**
- * Default path for secret files (Docker/Kubernetes secrets)
+ * Get the secrets path lazily to allow ENV_SECRETS_PATH changes at runtime
  */
-const ENV_SECRETS_PATH = process.env.ENV_SECRETS_PATH ?? '/run/secrets/';
+const getSecretsPath = (): string =>
+  process.env.ENV_SECRETS_PATH ?? '/run/secrets/';
 
 /**
  * Resolve the full path to a secret file
  */
 const secretPath = (name: string): string =>
-  name.startsWith('/') ? name : resolve(join(ENV_SECRETS_PATH, name));
+  name.startsWith('/') ? name : resolve(join(getSecretsPath(), name));
 
 /**
  * Read a secret from a file
@@ -140,13 +141,13 @@ const env = <S extends Specs, V extends Specs>(
   const varEnv = cleanEnv(inputEnv, vars);
 
   // Read secrets from files
-  const _secrets = secretEnv(varEnv as unknown as Record<string, string | undefined>, secrets);
+  const _secrets = secretEnv(inputEnv, secrets);
 
   // Second pass: validate secrets with file values merged in
   // Include inputEnv first so env vars (e.g., Kubernetes secretKeyRef) are available,
   // then varEnv overrides, then file-based secrets have highest priority
   const mergedEnv = { ...inputEnv, ...varEnv, ..._secrets } as unknown as Record<string, string | undefined>;
-  return cleanEnv(mergedEnv, secrets) as unknown as CleanedEnv<S & V>;
+  return cleanEnv(mergedEnv, { ...secrets, ...vars }) as unknown as CleanedEnv<S & V>;
 };
 
 export {
@@ -155,6 +156,7 @@ export {
   secret,
   getSecret,
   secretPath,
+  getSecretsPath,
   // Re-export from envalid
   cleanEnv,
   makeValidator,
