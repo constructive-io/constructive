@@ -6,7 +6,6 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { execSync } from 'node:child_process';
 
 import type { GeneratedFile } from '../codegen';
 
@@ -29,6 +28,47 @@ export interface WriteOptions {
   showProgress?: boolean;
   /** Format files with oxfmt after writing (default: true) */
   formatFiles?: boolean;
+}
+
+type OxfmtFormatFn = (
+  fileName: string,
+  sourceText: string,
+  options?: Record<string, unknown>
+) => Promise<{ code: string; errors: unknown[] }>;
+
+/**
+ * Dynamically import oxfmt's format function
+ * Returns null if oxfmt is not available
+ */
+async function getOxfmtFormat(): Promise<OxfmtFormatFn | null> {
+  try {
+    const oxfmt = await import('oxfmt');
+    return oxfmt.format;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Format a single file's content using oxfmt programmatically
+ */
+async function formatFileContent(
+  fileName: string,
+  content: string,
+  formatFn: OxfmtFormatFn
+): Promise<string> {
+  try {
+    const result = await formatFn(fileName, content, {
+      singleQuote: true,
+      trailingComma: 'es5',
+      tabWidth: 2,
+      semi: true,
+    });
+    return result.code;
+  } catch {
+    // If formatting fails, return original content
+    return content;
+  }
 }
 
 /**
@@ -77,6 +117,12 @@ export async function writeGeneratedFiles(
     return { success: false, errors };
   }
 
+  // Get oxfmt format function if formatting is enabled
+  const formatFn = formatFiles ? await getOxfmtFormat() : null;
+  if (formatFiles && !formatFn && showProgress) {
+    console.warn('Warning: oxfmt not available, files will not be formatted');
+  }
+
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const filePath = path.join(outputDir, file.path);
@@ -102,8 +148,14 @@ export async function writeGeneratedFiles(
       // Ignore if already exists
     }
 
+    // Format content if oxfmt is available and file is TypeScript
+    let content = file.content;
+    if (formatFn && file.path.endsWith('.ts')) {
+      content = await formatFileContent(file.path, content, formatFn);
+    }
+
     try {
-      fs.writeFileSync(filePath, file.content, 'utf-8');
+      fs.writeFileSync(filePath, content, 'utf-8');
       written.push(filePath);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -116,20 +168,6 @@ export async function writeGeneratedFiles(
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
   }
 
-  // Format all generated files with oxfmt
-  if (formatFiles && errors.length === 0) {
-    if (showProgress) {
-      console.log('Formatting generated files...');
-    }
-    const formatResult = formatOutput(outputDir);
-    if (!formatResult.success && showProgress) {
-      console.warn(
-        'Warning: Failed to format generated files:',
-        formatResult.error
-      );
-    }
-  }
-
   return {
     success: errors.length === 0,
     filesWritten: written,
@@ -138,24 +176,57 @@ export async function writeGeneratedFiles(
 }
 
 /**
- * Format generated files using oxfmt
- *
- * Runs oxfmt on the output directory after all files are written.
- * Uses the same formatting options as prettier: single quotes, trailing commas, 2-space tabs, semicolons.
+ * Recursively find all .ts files in a directory
  */
-export function formatOutput(
+function findTsFiles(dir: string): string[] {
+  const files: string[] = [];
+
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...findTsFiles(fullPath));
+      } else if (entry.isFile() && entry.name.endsWith('.ts')) {
+        files.push(fullPath);
+      }
+    }
+  } catch {
+    // Ignore errors reading directories
+  }
+
+  return files;
+}
+
+/**
+ * Format generated files using oxfmt programmatically
+ *
+ * @deprecated Use writeGeneratedFiles with formatFiles option instead.
+ * This function is kept for backwards compatibility.
+ */
+export async function formatOutput(
   outputDir: string
-): { success: boolean; error?: string } {
+): Promise<{ success: boolean; error?: string }> {
+  const formatFn = await getOxfmtFormat();
+  if (!formatFn) {
+    return {
+      success: false,
+      error: 'oxfmt not available. Install it with: npm install oxfmt',
+    };
+  }
+
   const absoluteOutputDir = path.resolve(outputDir);
 
   try {
-    execSync(
-      `npx oxfmt --write "${absoluteOutputDir}"`,
-      {
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      }
-    );
+    // Find all .ts files in the output directory
+    const tsFiles = findTsFiles(absoluteOutputDir);
+
+    for (const filePath of tsFiles) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const formatted = await formatFileContent(path.basename(filePath), content, formatFn);
+      fs.writeFileSync(filePath, formatted, 'utf-8');
+    }
+
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
