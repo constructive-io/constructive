@@ -6,8 +6,8 @@
  */
 
 import path from 'path';
-import { getConnections, seed } from 'graphql-server-test';
-import type { ServerInfo } from 'graphql-server-test';
+import { getConnections, seed } from '../src';
+import type { ServerInfo } from '../src/types';
 import type supertest from 'supertest';
 
 jest.setTimeout(30000);
