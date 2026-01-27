@@ -21,7 +21,7 @@ Options:
   --simpleInflection      Use simple inflection (default: true)
   --oppositeBaseNames     Use opposite base names (default: false)
   --postgis               Enable PostGIS extension (default: true)
-  --metaApi               Enable Meta API (default: true)
+  --servicesApi           Enable Services API (default: true)
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
@@ -57,8 +57,8 @@ const questions: Question[] = [
     useDefault: true
   },
   {
-    name: 'metaApi',
-    message: 'Enable Meta API?',
+    name: 'servicesApi',
+    message: 'Enable Services API?',
     type: 'confirm',
     required: false,
     default: true,
@@ -125,7 +125,7 @@ export default async (
     port,
     postgis,
     simpleInflection,
-    metaApi,
+    servicesApi,
     origin
   } = await prompter.prompt(argv, questions);
 
@@ -144,7 +144,7 @@ export default async (
   let selectedSchemas: string[] = [];
   let authRole: string | undefined;
   let roleName: string | undefined;
-  if (!metaApi) {
+  if (!servicesApi) {
     const db = await getPgPool({ database: selectedDb });
     const result = await db.query(`
       SELECT nspname 
@@ -197,8 +197,8 @@ export default async (
       postgis
     },
     api: {
-      enableMetaApi: metaApi,
-      ...(metaApi === false && { exposedSchemas: selectedSchemas, authRole, roleName })
+      enableServicesApi: servicesApi,
+      ...(servicesApi === false && { exposedSchemas: selectedSchemas, authRole, roleName })
     },
     server: {
       port,
@@ -209,6 +209,16 @@ export default async (
   log.success('✅ Selected Configuration:');
   for (const [key, value] of Object.entries(options)) {
     log.debug(`${key}: ${JSON.stringify(value)}`);
+  }
+
+  // Debug: Log API routing configuration
+  const apiOpts = (options as any).api || {};
+  log.debug(`📡 API Routing: isPublic=${apiOpts.isPublic}, enableServicesApi=${apiOpts.enableServicesApi}`);
+  if (apiOpts.isPublic === false) {
+    log.debug(`   Header-based routing enabled (X-Api-Name, X-Database-Id, X-Meta-Schema)`);
+  }
+  if (apiOpts.metaSchemas?.length) {
+    log.debug(`   Meta schemas: ${apiOpts.metaSchemas.join(', ')}`);
   }
 
   log.success('🚀 Launching Server...\n');

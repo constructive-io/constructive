@@ -20,7 +20,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     FEATURES_OPPOSITE_BASE_NAMES,
     FEATURES_POSTGIS,
 
-    API_ENABLE_META,
+    API_ENABLE_SERVICES,
     API_IS_PUBLIC,
     API_EXPOSED_SCHEMAS,
     API_META_SCHEMAS,
@@ -31,10 +31,10 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
 
   return {
     graphile: {
-      ...(GRAPHILE_SCHEMA && { 
-        schema: GRAPHILE_SCHEMA.includes(',') 
+      ...(GRAPHILE_SCHEMA && {
+        schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
-          : GRAPHILE_SCHEMA 
+          : GRAPHILE_SCHEMA
       }),
     },
     features: {
@@ -43,7 +43,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(FEATURES_POSTGIS && { postgis: parseEnvBoolean(FEATURES_POSTGIS) }),
     },
     api: {
-      ...(API_ENABLE_META && { enableMetaApi: parseEnvBoolean(API_ENABLE_META) }),
+      ...(API_ENABLE_SERVICES && { enableServicesApi: parseEnvBoolean(API_ENABLE_SERVICES) }),
       ...(API_IS_PUBLIC && { isPublic: parseEnvBoolean(API_IS_PUBLIC) }),
       ...(API_EXPOSED_SCHEMAS && { exposedSchemas: API_EXPOSED_SCHEMAS.split(',').map(s => s.trim()) }),
       ...(API_META_SCHEMAS && { metaSchemas: API_META_SCHEMAS.split(',').map(s => s.trim()) }),

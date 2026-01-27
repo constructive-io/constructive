@@ -2,6 +2,11 @@ import { Logger } from '@pgpmjs/logger';
 import { extractPgErrorFields, formatPgErrorFields } from '@pgpmjs/types';
 import { Pool, PoolClient } from 'pg';
 
+import { formatQueryHistory, truncateErrorOutput } from './errors';
+
+// Re-export error formatting functions for backward compatibility
+export { formatQueryHistory, truncateErrorOutput } from './errors';
+
 const log = new Logger('migrate:transaction');
 
 export interface TransactionOptions {
@@ -98,16 +103,11 @@ export async function withTransaction<T>(
       }
     }
     
-    // Log query history for debugging
+    // Log query history for debugging (with smart collapsing and limiting)
     if (queryHistory.length > 0) {
       errorLines.push('Query history for this transaction:');
-      queryHistory.forEach((entry, index) => {
-        const duration = entry.duration ? ` (${entry.duration}ms)` : '';
-        const params = entry.params && entry.params.length > 0 
-          ? ` with params: ${JSON.stringify(entry.params.slice(0, 2))}${entry.params.length > 2 ? '...' : ''}`
-          : '';
-        errorLines.push(`  ${index + 1}. ${entry.query.split('\n')[0].trim()}${params}${duration}`);
-      });
+      const historyLines = formatQueryHistory(queryHistory);
+      errorLines.push(...historyLines);
     }
     
     // For transaction aborted errors, provide additional context
@@ -117,8 +117,9 @@ export async function withTransaction<T>(
       errorLines.push('   Check the query history above to identify the failing command.');
     }
     
-    // Log the consolidated error message
-    log.error(errorLines.join('\n'));
+    // Apply total output length limit and log the consolidated error message
+    const finalLines = truncateErrorOutput(errorLines);
+    log.error(finalLines.join('\n'));
     
     throw error;
   } finally {

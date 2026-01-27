@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { CLI, CLIOptions } from 'inquirerer';
+import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
 
 import { commands, createPgpmCommandMap } from './commands';
 export { createInitUsageText } from './commands/init';
@@ -44,7 +43,7 @@ export const options: Partial<CLIOptions> = {
 
 if (require.main === module) {
   if (process.argv.includes('--version') || process.argv.includes('-v')) {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }

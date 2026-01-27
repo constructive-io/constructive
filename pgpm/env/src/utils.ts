@@ -26,11 +26,14 @@ export const walkUp = (startDir: string, filename: string): string => {
   throw new Error(`File "${filename}" not found in any parent directories.`);
 };
 
-export const mergeArraysUnique = <T>(
-  target: T[],
+/**
+ * Array merge strategy that replaces target array with source array.
+ * This allows later configuration sources to completely override earlier ones.
+ */
+export const replaceArrays = <T>(
+  _target: T[],
   source: T[],
   _options?: unknown
 ): T[] => {
-  const merged = [...target, ...source];
-  return [...new Set(merged)];
+  return source;
 };

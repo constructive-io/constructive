@@ -1,6 +1,8 @@
-import app from '@constructive-io/knative-job-fn';
+import { createJobApp } from '@constructive-io/knative-job-fn';
+import { send as sendSmtp } from 'simple-smtp-server';
+import { send as sendPostmaster } from '@constructive-io/postmaster';
 import { parseEnvBoolean } from '@pgpmjs/env';
-import { send as sendEmail } from '@launchql/postmaster';
+import { createLogger } from '@pgpmjs/logger';
 
 type SimpleEmailPayload = {
   to: string;
@@ -26,6 +28,9 @@ const getRequiredField = (
 };
 
 const isDryRun = parseEnvBoolean(process.env.SIMPLE_EMAIL_DRY_RUN) ?? false;
+const useSmtp = parseEnvBoolean(process.env.EMAIL_SEND_USE_SMTP) ?? false;
+const logger = createLogger('simple-email');
+const app = createJobApp();
 
 app.post('/', async (req: any, res: any, next: any) => {
   try {
@@ -41,7 +46,7 @@ app.post('/', async (req: any, res: any, next: any) => {
       throw new Error("Either 'html' or 'text' must be provided");
     }
 
-    const fromEnv = process.env.MAILGUN_FROM;
+    const fromEnv = useSmtp ? process.env.SMTP_FROM : process.env.MAILGUN_FROM;
     const from = isNonEmptyString(payload.from)
       ? payload.from
       : isNonEmptyString(fromEnv)
@@ -62,10 +67,10 @@ app.post('/', async (req: any, res: any, next: any) => {
     };
 
     if (isDryRun) {
-      // eslint-disable-next-line no-console
-      console.log('[simple-email] DRY RUN email (no send)', logContext);
+      logger.info('DRY RUN email (no send)', logContext);
     } else {
       // Send via the Postmaster package (Mailgun or configured provider)
+      const sendEmail = useSmtp ? sendSmtp : sendPostmaster;
       await sendEmail({
         to,
         subject,
@@ -75,8 +80,7 @@ app.post('/', async (req: any, res: any, next: any) => {
         ...(replyTo && { replyTo })
       });
 
-      // eslint-disable-next-line no-console
-      console.log('[simple-email] Sent email', logContext);
+      logger.info('Sent email', logContext);
     }
 
     res.status(200).json({ complete: true });
@@ -93,7 +97,6 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 8080);
   // @constructive-io/knative-job-fn exposes a .listen method that delegates to the underlying Express app
   (app as any).listen(port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`[simple-email] listening on port ${port}`);
+    logger.info(`listening on port ${port}`);
   });
 }

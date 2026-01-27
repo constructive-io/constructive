@@ -3,8 +3,7 @@
 This guide covers a local development workflow for the jobs stack:
 
 - Postgres + `pgpm-database-jobs`
-- Constructive GraphQL API server
-- `simple-email` function
+- Constructive Admin GraphQL API server (header-based routing)
 - `send-email-link` function
 - `knative-job-service`
 
@@ -38,7 +37,7 @@ pgenv() {
   export PGPORT=5432
   export PGUSER=postgres
   export PGPASSWORD=password
-  export PGDATABASE=launchql
+  export PGDATABASE=constructive
   echo "PostgreSQL environment variables set"
 }
 ```
@@ -62,21 +61,20 @@ From the `constructive-db/` directory (with `pgenv` applied):
 1. Create the `constructive` database (if it does not already exist):
 
    ```sh
-   createdb launchql
+   createdb constructive
    ```
 
 2. Bootstrap admin users:
 
    ```sh
    pgpm admin-users bootstrap --yes
-   pgpm admin-users add --test --yes
+   pgpm admin-users add --test --yes ## NOTE: not to be run in production
    ```
 
 3. Deploy the main app and jobs packages into DB:
 
    ```sh
-   pgpm deploy --yes --database "$PGDATABASE" --package app-svc-local
-   pgpm deploy --yes --database "$PGDATABASE" --package metaschema
+   pgpm deploy --yes --database "$PGDATABASE" --package constructive-local
    pgpm deploy --yes --database "$PGDATABASE" --package pgpm-database-jobs
    ```
 
@@ -96,21 +94,20 @@ docker compose -f docker-compose.jobs.yml up
 Or run detached:
 
 ```sh
-docker compose -f docker-compose.jobs.yml up -d --build
+docker compose -f docker-compose.jobs.yml up --build
 ```
 
 This starts:
 
-- `constructive-server` – GraphQL API server
-- `simple-email` – Knative-style HTTP function
-- `send-email-link` – Knative-style HTTP function
-- `knative-job-service` – jobs runtime (callback server + worker + scheduler)
+- `constructive-admin-server` – GraphQL API server with `API_IS_PUBLIC=false` (port 3001)
+- `send-email-link` – Knative-style HTTP function (port 8082)
+- `knative-job-service` – jobs runtime (callback server + worker + scheduler) (port 8080)
 
 ---
 
 ### Switching dry run vs real Mailgun sending
 
-By default, `docker-compose.jobs.yml` runs both email functions in dry-run mode (no real email is sent), and it uses placeholder Mailgun credentials.
+By default, `docker-compose.jobs.yml` runs `send-email-link` in dry-run mode (no real email is sent), and it uses placeholder Mailgun credentials.
 
 Dry run (recommended for local development):
 
@@ -120,89 +117,135 @@ docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
 
 In dry-run mode:
 
-- The `simple-email` and `send-email-link` containers log the payload they would send instead of hitting Mailgun.
-- You should see log lines like `[simple-email] DRY RUN email (skipping send) ...` and `[send-email-link] DRY RUN email (skipping send) ...`.
+- The `send-email-link` container logs the payload it would send instead of hitting Mailgun.
+- You should see log lines like `[send-email-link] DRY RUN email (skipping send) ...`.
 ---
 
 ## 5. Ensure GraphQL host routing works for `send-email-link`
 
-Constructive selects the API by the HTTP `Host` header using rows in `services_public.domains`.
+The `send-email-link` function uses host-based routing via the `Host: private.localhost` header to access the private API.
 
-For local development, `app-svc-local` seeds `admin.localhost` as the admin API domain. `docker-compose.jobs.yml` adds a Docker network alias so other containers can resolve `admin.localhost` to the `constructive-server` container, and `send-email-link` uses:
+For local development, `docker-compose.jobs.yml` configures `send-email-link` with:
 
-- `GRAPHQL_URL=http://admin.localhost:3000/graphql`
+- `GRAPHQL_URL=http://constructive-admin-server:3000/graphql`
+- `GRAPHQL_HOST_HEADER=private.localhost`
 
-Quick check from your host (should return JSON, not HTML):
+Quick check from your host (should return JSON with schema info):
 
 ```sh
-curl -s -H 'Host: admin.localhost' \
+# Test private API access via host header routing
+curl -s -H 'Host: private.localhost' \
   -H 'Content-Type: application/json' \
-  -X POST http://localhost:3000/graphql \
-  --data '{"query":"query { __typename }"}'
+  -X POST http://localhost:3001/graphql \
+  --data '{"query":"{ __schema { queryType { fields { name } } } }"}'
+
+# List databases
+curl -s -H 'Host: private.localhost' \
+  -H 'Content-Type: application/json' \
+  -X POST http://localhost:3001/graphql \
+  --data '{"query":"{ databases { nodes { id name } } }"}'
+
+# List users
+curl -s -H 'Host: private.localhost' \
+  -H 'Content-Type: application/json' \
+  -X POST http://localhost:3001/graphql \
+  --data '{"query":"{ users { nodes { id username displayName } } }"}'
 ```
+
+You can also access GraphiQL at: http://private.localhost:3001/graphiql
 
 If your GraphQL server requires auth, set `GRAPHQL_AUTH_TOKEN` before starting the jobs stack (it is passed through to the `send-email-link` container).
 
 ---
 
-## 6. Enqueue a test job (simple-email)
-
-With the jobs stack running, you can enqueue a test job from your host into the Postgres container:
-
-First, grab a real `database_id` (required by `send-email-link`, optional for `simple-email`):
-
-```sh
-DBID="$(docker exec -i postgres psql -U postgres -d launchql -Atc 'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
-echo "$DBID"
-```
-
-```sh
-docker exec -it postgres \
-  psql -U postgres -d launchql -c "
-    SELECT app_jobs.add_job(
-      '$DBID'::uuid,
-      'simple-email',
-      json_build_object(
-        'to',      'user@example.com',
-        'subject', 'Hello from Constructive jobs',
-        'html',    '<p>Hi from simple-email (dry run)</p>'
-      )::json
-    );
-  "
-```
-
-You should then see the job picked up by `knative-job-service` and the email payload logged by the `simple-email` container in `docker compose -f docker-compose.jobs.yml logs -f`.
-
----
-
-## 7. Enqueue a test job (`send-email-link`)
+## 6. Enqueue a test job (`send-email-link`)
 
 `send-email-link` queries GraphQL for site/database metadata, so it requires:
 
 - The app/meta packages deployed in step 3 (`app-svc-local`, `metaschema-schema`, `services`, `metaschema-modules`)
-- A real `database_id` (use `$DBID` above)
+- A real `database_id`
 - A GraphQL hostname that matches a seeded domain route (step 5)
 - For localhost development, the site/domain metadata usually resolves to `localhost`.
   In that case, the function will honor the `LOCAL_APP_PORT` env (default `3000` in
   `docker-compose.jobs.yml`) and generate links like `http://localhost:3000/...`
   when `SEND_EMAIL_LINK_DRY_RUN=true`.
 
-With `SEND_EMAIL_LINK_DRY_RUN=true` (default in `docker-compose.jobs.yml`), enqueue a job:
+### Get required IDs
+
+```sh
+# Get Database ID
+DBID="$(docker exec -i postgres psql -U postgres -d constructive -Atc \
+  'SELECT id FROM metaschema_public.database ORDER BY created_at LIMIT 1;')"
+echo "Database ID: $DBID"
+
+# Get User ID (for sender_id in invite emails)
+SENDER_ID="$(docker exec -i postgres psql -U postgres -d constructive -Atc \
+  'SELECT id FROM constructive_users_public.users ORDER BY created_at LIMIT 1;')"
+echo "Sender ID: $SENDER_ID"
+```
+
+### Enqueue invite_email job
 
 ```sh
 docker exec -it postgres \
-  psql -U postgres -d launchql -c "
+  psql -U postgres -d constructive -c "
     SELECT app_jobs.add_job(
       '$DBID'::uuid,
       'send-email-link',
       json_build_object(
         'email_type',   'invite_email',
         'email',        'user@example.com',
-        'invite_token', 'invite123',
-        'sender_id',    '00000000-0000-0000-0000-000000000000'
+        'invite_token', 'invite-token-123',
+        'sender_id',    '$SENDER_ID'
       )::json
     );
   "
+```
+
+### Enqueue forgot_password job
+
+```sh
+docker exec -it postgres \
+  psql -U postgres -d constructive -c "
+    SELECT app_jobs.add_job(
+      '$DBID'::uuid,
+      'send-email-link',
+      json_build_object(
+        'email_type',   'forgot_password',
+        'email',        'user@example.com',
+        'user_id',      '$SENDER_ID',
+        'reset_token',  'reset-token-123'
+      )::json
+    );
+  "
+```
+
+### Enqueue email_verification job
+
+```sh
+docker exec -it postgres \
+  psql -U postgres -d constructive -c "
+    SELECT app_jobs.add_job(
+      '$DBID'::uuid,
+      'send-email-link',
+      json_build_object(
+        'email_type',   'email_verification',
+        'email',        'user@example.com',
+        'email_id',     '$(uuidgen)',
+        'verification_token', 'verify-token-123'
+      )::json
+    );
+  "
+```
+
+### Watch the logs
+
+```sh
+# Watch send-email-link function logs
+docker logs -f send-email-link
+
+# Watch job service logs
+docker logs -f knative-job-service
 ```
 
 You should see a log like:
@@ -211,7 +254,7 @@ You should see a log like:
 
 ---
 
-## 8. Inspect logs and iterate
+## 7. Inspect logs and iterate
 
 To watch logs while you develop:
 
@@ -221,8 +264,8 @@ docker compose -f docker-compose.jobs.yml logs -f
 
 Useful containers:
 
-- `constructive-server`
-- `simple-email`
+- `constructive-admin-server`
+- `send-email-link`
 - `knative-job-service`
 - `postgres` (from `docker-compose.yml`)
 
@@ -235,7 +278,7 @@ docker compose -f docker-compose.jobs.yml up --build
 
 ---
 
-## 9. Stopping services
+## 8. Stopping services
 
 To stop only the jobs stack:
 
@@ -251,14 +294,14 @@ docker compose down
 
 ---
 
-## 10. Optional Mailgun secrets for real sending
+## 9. Optional Mailgun secrets for real sending
 
 Real Mailgun credentials are **not required** to run the jobs stack locally; they are only needed if you want to send real email in development instead of using dry-run logging.
 
 To start the stack with real sending from the command line:
 
 ```sh
-MAILGUN_API_KEY="your-mailgun-key" MAILGUN_KEY="your-mailgun-key" SIMPLE_EMAIL_DRY_RUN=false SEND_EMAIL_LINK_DRY_RUN=false docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
+MAILGUN_API_KEY="your-mailgun-key" MAILGUN_KEY="your-mailgun-key" SEND_EMAIL_LINK_DRY_RUN=false docker compose -f docker-compose.jobs.yml up -d --build --force-recreate
 ```
 
 Alternatively, you can set the secrets in your shell or a local `.env` file (do not commit this file) in the `constructive/` directory:
@@ -270,10 +313,9 @@ export MAILGUN_KEY="your-mailgun-key"
 
 If you're not using `mg.constructive.io`, also override `MAILGUN_DOMAIN`, `MAILGUN_FROM`, and `MAILGUN_REPLY` (for example in an override file) to match your Mailgun setup.
 
-To have the containers send real email instead of dry-run, set:
+To have the container send real email instead of dry-run, set:
 
 ```sh
-export SIMPLE_EMAIL_DRY_RUN=false
 export SEND_EMAIL_LINK_DRY_RUN=false
 ```
 
@@ -287,10 +329,6 @@ If you prefer not to export env vars, create a local override file (don't commit
 
 ```yml
 services:
-  simple-email:
-    environment:
-      SIMPLE_EMAIL_DRY_RUN: "false"
-
   send-email-link:
     environment:
       SEND_EMAIL_LINK_DRY_RUN: "false"
@@ -302,4 +340,27 @@ Start the stack with both files:
 docker compose -f docker-compose.jobs.yml -f docker-compose.jobs.override.yml up -d --build --force-recreate
 ```
 
-To switch back to dry-run, set `SIMPLE_EMAIL_DRY_RUN=true` and `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
+To switch back to dry-run, set `SEND_EMAIL_LINK_DRY_RUN=true` (or delete the override file) and recreate again.
+
+
+## NOTES:
+- change all launchql names to constructive, including the DB-name and more.
+- run bootstrap command for test user, 
+- need to run some manual migrations like:
+```sql
+ BEGIN;
+   UPDATE services_public.domains SET domain = 'localhost';
+   UPDATE services_public.apis SET dbname = 'constructive';
+ COMMIT;
+
+------ Some more
+ALTER TABLE metaschema_public.database
+ADD CONSTRAINT database_owner_id_fkey
+FOREIGN KEY (owner_id)
+REFERENCES constructive_public.users(id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE;
+```
+
+> NOTE: please make similar changes to the devnet as well please
+

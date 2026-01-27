@@ -38,18 +38,18 @@ export class api_modules implements api_modules {
     this.data = data.data;
   }
 }
-export interface api_schemata {
+export interface api_schemas {
   id: UUID;
   database_id: UUID;
   schema_id: UUID;
   api_id: UUID;
 }
-export class api_schemata implements api_schemata {
+export class api_schemas implements api_schemas {
   id: UUID;
   database_id: UUID;
   schema_id: UUID;
   api_id: UUID;
-  constructor(data: api_schemata) {
+  constructor(data: api_schemas) {
     this.id = data.id;
     this.database_id = data.database_id;
     this.schema_id = data.schema_id;

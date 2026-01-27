@@ -3,6 +3,185 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.3...@constructive-io/cli@6.0.4) (2026-01-26)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.2...@constructive-io/cli@6.0.3) (2026-01-25)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.1...@constructive-io/cli@6.0.2) (2026-01-24)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [6.0.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@6.0.0...@constructive-io/cli@6.0.1) (2026-01-24)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [6.0.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.11.1...@constructive-io/cli@6.0.0) (2026-01-24)
+
+### Bug Fixes
+
+- **cli:** remove hardcoded defaultSchemas from get-graphql-schema command ([cd32a2b](https://github.com/constructive-io/constructive/commit/cd32a2bfd5816328bda06bf091cb99427d828f15))
+- **cli:** set reactQuery default to false to match agreed defaults ([e0f4571](https://github.com/constructive-io/constructive/commit/e0f45717261a63a7f559a19cdf557338d932c1bc))
+- **cli:** use enableReactQuery/enableOrm instead of reactQuery/orm in codegen command ([e33f555](https://github.com/constructive-io/constructive/commit/e33f55505bf46f133ab3d2e041412fe9dae9608b))
+
+### Features
+
+- **graphql-codegen:** add shared types pipeline and make generateReactQuery/generateOrm private ([b219348](https://github.com/constructive-io/constructive/commit/b219348cc15fdff8c30cd19f21054601e14b7acd))
+
+## [5.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.11.0...@constructive-io/cli@5.11.1) (2026-01-22)
+
+### Bug Fixes
+
+- **cli:** update imports to use renamed codegen functions ([2036ac2](https://github.com/constructive-io/constructive/commit/2036ac28cc4944fef5838825ff7f85a2ff611c63))
+- **cli:** update test to use renamed generateReactQuery function ([d58e53e](https://github.com/constructive-io/constructive/commit/d58e53e70a212369538c1764bb37692812a8dc78))
+
+# [5.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.9...@constructive-io/cli@5.11.0) (2026-01-22)
+
+### Features
+
+- **cli:** improve codegen command with ORM mode and config file support ([8726489](https://github.com/constructive-io/constructive/commit/872648970e0994a82b170b3f969cbcf365e65679))
+
+## [5.10.9](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.8...@constructive-io/cli@5.10.9) (2026-01-22)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.8](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.7...@constructive-io/cli@5.10.8) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.7](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.6...@constructive-io/cli@5.10.7) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.6](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.5...@constructive-io/cli@5.10.6) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.5](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.4...@constructive-io/cli@5.10.5) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.4](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.3...@constructive-io/cli@5.10.4) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.2...@constructive-io/cli@5.10.3) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.1...@constructive-io/cli@5.10.2) (2026-01-20)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.10.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.10.0...@constructive-io/cli@5.10.1) (2026-01-20)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.9.3...@constructive-io/cli@5.10.0) (2026-01-20)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.9.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.9.2...@constructive-io/cli@5.9.3) (2026-01-20)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.9.2](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.9.1...@constructive-io/cli@5.9.2) (2026-01-19)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.9.1](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.9.0...@constructive-io/cli@5.9.1) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.8.0...@constructive-io/cli@5.9.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.7.0...@constructive-io/cli@5.8.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+# [5.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.26...@constructive-io/cli@5.7.0) (2026-01-18)
+
+### Features
+
+- **codegen:** add multi-target config support ([5cd0ef3](https://github.com/constructive-io/constructive/commit/5cd0ef31207382763657203b638aa006b8785050))
+
+## [5.6.26](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.25...@constructive-io/cli@5.6.26) (2026-01-15)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.25](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.24...@constructive-io/cli@5.6.25) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.24](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.23...@constructive-io/cli@5.6.24) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.23](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.22...@constructive-io/cli@5.6.23) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.22](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.21...@constructive-io/cli@5.6.22) (2026-01-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.21](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.20...@constructive-io/cli@5.6.21) (2026-01-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.19...@constructive-io/cli@5.6.20) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.19](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.18...@constructive-io/cli@5.6.19) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.18](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.17...@constructive-io/cli@5.6.18) (2026-01-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.17](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.16...@constructive-io/cli@5.6.17) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.16](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.15...@constructive-io/cli@5.6.16) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.15](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.14...@constructive-io/cli@5.6.15) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.14](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.13...@constructive-io/cli@5.6.14) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.13](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.12...@constructive-io/cli@5.6.13) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.12](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.11...@constructive-io/cli@5.6.12) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.11](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.10...@constructive-io/cli@5.6.11) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.10](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.9...@constructive-io/cli@5.6.10) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [5.6.9](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.8...@constructive-io/cli@5.6.9) (2026-01-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [5.6.8](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@5.6.7...@constructive-io/cli@5.6.8) (2026-01-07)
 
 **Note:** Version bump only for package @constructive-io/cli

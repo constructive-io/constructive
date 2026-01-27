@@ -26,6 +26,58 @@ exports[`test case image/attachment 1`] = `
 );"
 `;
 
+exports[`test case interval type 1`] = `
+"INSERT INTO metaschema_modules_public.tokens_module (
+  id,
+  database_id,
+  tokens_default_expiration,
+  tokens_table
+) VALUES
+(
+  '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+  '8e739194-ced7-479b-b46c-e6b06146ac11',
+  '24:00:00',
+  'api_tokens'
+);
+
+INSERT INTO metaschema_modules_public.tokens_module (
+  id,
+  database_id,
+  tokens_default_expiration,
+  tokens_table
+) VALUES
+(
+  '550e8400-e29b-41d4-a716-446655440000',
+  '8e739194-ced7-479b-b46c-e6b06146ac11',
+  '7 days 12:30:00',
+  'refresh_tokens'
+);
+
+INSERT INTO metaschema_modules_public.tokens_module (
+  id,
+  database_id,
+  tokens_default_expiration,
+  tokens_table
+) VALUES
+(
+  '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+  '8e739194-ced7-479b-b46c-e6b06146ac11',
+  '1 year 6 mons',
+  'long_lived_tokens'
+);"
+`;
+
+exports[`test case interval type with string value 1`] = `
+"INSERT INTO metaschema_modules_public.tokens_module (
+  id,
+  tokens_default_expiration
+) VALUES
+(
+  '42aaba39-de20-4be0-95a1-4873d7d4b6d4',
+  '1 day 02:30:00'
+);"
+`;
+
 exports[`test case jsonb/json 1`] = `
 "INSERT INTO metaschema_public.field (
   id,
@@ -55,5 +107,37 @@ exports[`test case test case parser 1`] = `
   '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
   'name here',
   'description'
+);"
+`;
+
+exports[`test case uuid[] arrays 1`] = `
+"INSERT INTO metaschema_public.primary_key_constraint (
+  id,
+  database_id,
+  table_id,
+  name,
+  field_ids
+) VALUES
+(
+  'cdc96a32-572c-4f69-8bce-4c7bd4024a4e',
+  '8e739194-ced7-479b-b46c-e6b06146ac11',
+  '6616358d-8da8-45e4-834f-d735a0f02acc',
+  'object_pkey',
+  '{f853daae-f563-447d-ac09-901ddd68586e,a4257181-147d-4558-a51f-4b43246527a2}'
+);
+
+INSERT INTO metaschema_public.primary_key_constraint (
+  id,
+  database_id,
+  table_id,
+  name,
+  field_ids
+) VALUES
+(
+  '03d7007c-5262-4250-9ce1-efcabc5bedea',
+  '8e739194-ced7-479b-b46c-e6b06146ac11',
+  '535d5894-679a-4a7b-aa5a-bd07cce8a505',
+  'ref_pkey',
+  '{8cc2da93-a8e0-4565-9d14-f814c3a1432d,40a34889-eb4c-4833-8daf-b99441962971}'
 );"
 `;

@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.5.1...@constructive-io/job-scheduler@1.0.0) (2026-01-24)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+## [0.5.1](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.5.0...@constructive-io/job-scheduler@0.5.1) (2026-01-22)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+# [0.5.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.4.1...@constructive-io/job-scheduler@0.5.0) (2026-01-20)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+## [0.4.1](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.4.0...@constructive-io/job-scheduler@0.4.1) (2026-01-19)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+# [0.4.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.3.23...@constructive-io/job-scheduler@0.4.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+## [0.3.23](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.3.22...@constructive-io/job-scheduler@0.3.23) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
+## [0.3.22](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.3.21...@constructive-io/job-scheduler@0.3.22) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/job-scheduler
+
 ## [0.3.21](https://github.com/constructive-io/jobs/compare/@constructive-io/job-scheduler@0.3.20...@constructive-io/job-scheduler@0.3.21) (2026-01-07)
 
 **Note:** Version bump only for package @constructive-io/job-scheduler

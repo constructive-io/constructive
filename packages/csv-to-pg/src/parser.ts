@@ -8,6 +8,7 @@ interface ParserConfig {
   table: string;
   singleStmts?: boolean;
   conflict?: string[];
+  conflictDoNothing?: boolean;
   headers?: string[];
   delimeter?: string;
   json?: boolean;
@@ -30,7 +31,7 @@ export class Parser {
 
   async parse(data?: Record<string, unknown>[]): Promise<string | void> {
     const config = this.config;
-    const { schema, table, singleStmts, conflict, headers, delimeter } = config;
+    const { schema, table, singleStmts, conflict, conflictDoNothing, headers, delimeter } = config;
 
     const opts: CsvOptions = {};
     if (headers) opts.headers = headers;
@@ -67,7 +68,8 @@ export class Parser {
           table,
           types,
           record,
-          conflict
+          conflict,
+          conflictDoNothing
         })
       );
       return deparse(stmts);
@@ -77,7 +79,8 @@ export class Parser {
         table,
         types,
         records,
-        conflict
+        conflict,
+        conflictDoNothing
       });
       return deparse([stmt]);
     }

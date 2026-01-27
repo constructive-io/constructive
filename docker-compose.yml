@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres
-    image: pyramation/pgvector:13.3-alpine
+    image: ghcr.io/constructive-io/docker/postgres-plus:17
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password

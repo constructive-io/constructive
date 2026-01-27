@@ -33,6 +33,8 @@ jobs:
             env: {}
           - package: packages/cli
             env: {}
+          - package: jobs/knative-job-service
+            env: {}
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
@@ -94,6 +96,38 @@ jobs:
             env: {}
           - package: graphile/graphile-sql-expression-validator
             env: {}
+          - package: graphql/server-test
+            env: {}
+          - package: graphql/env
+            env: {}
+          - package: graphql/server
+            env: {}
+          - package: graphql/test
+            env: {}
+          - package: graphql/playwright-test
+            env: {}
+          # - package: jobs/knative-job-worker
+          #   env: {}
+          - package: packages/csv-to-pg
+            env: {}
+          - package: packages/smtppostmaster
+            env: {}
+          - package: postgres/drizzle-orm-test
+            env: {}
+          - package: uploads/etag-hash
+            env: {}
+          - package: uploads/etag-stream
+            env: {}
+          - package: uploads/stream-to-etag
+            env: {}
+          - package: packages/oauth
+            env: {}
+          - package: packages/csrf
+            env: {}
+          - package: packages/12factor-env
+            env: {}
+          - package: packages/postmaster
+            env: {}
 
     env:
       PGHOST: localhost
@@ -107,7 +141,7 @@ jobs:
 
     services:
       pg_db:
-        image: pyramation/pgvector:13.3-alpine
+        image: pyramation/postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password

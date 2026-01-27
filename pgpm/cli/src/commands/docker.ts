@@ -1,6 +1,5 @@
 import { spawn } from 'child_process';
-import { cliExitWithError, extractFirst } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Inquirerer, cliExitWithError, extractFirst } from 'inquirerer';
 
 const dockerUsageText = `
 Docker Command:
@@ -16,7 +15,7 @@ Subcommands:
 Options:
   --help, -h         Show this help message
   --name <name>      Container name (default: postgres)
-  --image <image>    Docker image (default: pyramation/pgvector:13.3-alpine)
+  --image <image>    Docker image (default: pyramation/postgres:17)
   --port <port>      Host port mapping (default: 5432)
   --user <user>      PostgreSQL user (default: postgres)
   --password <pass>  PostgreSQL password (default: password)
@@ -211,9 +210,8 @@ export default async (
     await cliExitWithError('No subcommand provided. Use "start" or "stop".');
     return;
   }
-
   const name = (args.name as string) || 'postgres';
-  const image = (args.image as string) || 'pyramation/pgvector:13.3-alpine';
+  const image = (args.image as string) || 'pyramation/postgres:17';
   const port = typeof args.port === 'number' ? args.port : 5432;
   const user = (args.user as string) || 'postgres';
   const password = (args.password as string) || 'password';

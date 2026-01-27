@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-react",
-  "version": "2.16.5",
+  "version": "3.0.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL React",
   "main": "index.js",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "5.11.10",
     "@testing-library/react": "11.2.5",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.8",
     "makage": "^0.1.10"
   }
 }

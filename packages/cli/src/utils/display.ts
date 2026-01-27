@@ -12,6 +12,9 @@ export const usageText = `
     codegen            Generate TypeScript types and SDK from GraphQL schema
     get-graphql-schema Fetch or build GraphQL schema SDL
 
+  Jobs:
+    jobs up            Start combined server (jobs runtime)
+
   Global Options:
     -h, --help         Display this help information
     -v, --version      Display version information
@@ -27,6 +30,7 @@ export const usageText = `
     cnc explorer                      Launch GraphiQL explorer
     cnc codegen --schema schema.graphql  Generate types from schema
     cnc get-graphql-schema --out schema.graphql  Export schema SDL
+    cnc jobs up                       Start combined server (jobs runtime)
 
   Database Operations:
     For database migrations, packages, and deployment, use pgpm:

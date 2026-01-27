@@ -2,21 +2,165 @@
  * SDK Configuration types
  */
 
+import deepmerge from 'deepmerge';
+import type { PgConfig } from 'pg-env';
+
 /**
- * Main configuration for graphql-codegen
+ * Array merge strategy that replaces arrays (source wins over target).
+ * This ensures that when a user specifies include: ['users'], it replaces
+ * the default ['*'] rather than merging to ['*', 'users'].
  */
-export interface GraphQLSDKConfig {
+const replaceArrays = <T>(_target: T[], source: T[]): T[] => source;
+
+/**
+ * Entity relationship definition for cascade invalidation
+ */
+export interface EntityRelationship {
+  /** Parent entity name (e.g., 'database' for a table) */
+  parent: string;
+  /** Foreign key field name that references the parent (e.g., 'databaseId') */
+  foreignKey: string;
+  /** Optional transitive ancestors for deep invalidation (e.g., ['database', 'organization']) */
+  ancestors?: string[];
+}
+
+/**
+ * Query key generation configuration
+ */
+export interface QueryKeyConfig {
+  /**
+   * Key structure style
+   * - 'flat': Simple ['entity', 'scope', data] structure
+   * - 'hierarchical': Nested factory pattern with scope support (lukemorales-style)
+   * @default 'hierarchical'
+   */
+  style?: 'flat' | 'hierarchical';
+
+  /**
+   * Define entity relationships for cascade invalidation and scoped keys
+   * Key: child entity name (lowercase), Value: relationship definition
+   *
+   * @example
+   * ```ts
+   * relationships: {
+   *   database: { parent: 'organization', foreignKey: 'organizationId' },
+   *   table: { parent: 'database', foreignKey: 'databaseId', ancestors: ['organization'] },
+   *   field: { parent: 'table', foreignKey: 'tableId', ancestors: ['database', 'organization'] },
+   * }
+   * ```
+   */
+  relationships?: Record<string, EntityRelationship>;
+
+  /**
+   * Generate scope-aware query keys for entities with relationships
+   * When true, keys include optional scope parameters for hierarchical invalidation
+   * @default true
+   */
+  generateScopedKeys?: boolean;
+
+  /**
+   * Generate cascade invalidation helpers
+   * Creates helpers that invalidate parent entities and all their children
+   * @default true
+   */
+  generateCascadeHelpers?: boolean;
+
+  /**
+   * Generate mutation keys for tracking in-flight mutations
+   * Useful for optimistic updates and mutation deduplication
+   * @default true
+   */
+  generateMutationKeys?: boolean;
+}
+
+/**
+ * PGPM module configuration for ephemeral database creation
+ */
+export interface PgpmConfig {
+  /**
+   * Path to a PGPM module directory
+   * Creates an ephemeral database, deploys the module, and introspects
+   */
+  modulePath?: string;
+
+  /**
+   * Path to a PGPM workspace directory
+   * Must be used together with `moduleName`
+   */
+  workspacePath?: string;
+
+  /**
+   * Name of the module within the PGPM workspace
+   * Must be used together with `workspacePath`
+   */
+  moduleName?: string;
+}
+
+/**
+ * Database configuration for direct database introspection
+ */
+export interface DbConfig {
+  /**
+   * PostgreSQL connection configuration
+   * Falls back to environment variables (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
+   * via @pgpmjs/env when not specified
+   */
+  config?: Partial<PgConfig>;
+
+  /**
+   * PGPM module configuration for ephemeral database creation
+   * When specified, creates an ephemeral database from the module
+   */
+  pgpm?: PgpmConfig;
+
+  /**
+   * PostgreSQL schemas to introspect
+   * Mutually exclusive with `apiNames`
+   * @example ['public', 'app_public']
+   */
+  schemas?: string[];
+
+  /**
+   * API names to resolve schemas from
+   * Queries services_public.api_schemas to automatically determine schemas
+   * Mutually exclusive with `schemas`
+   * @example ['my_api']
+   */
+  apiNames?: string[];
+
+  /**
+   * Keep the ephemeral database after introspection (for debugging)
+   * Only applies when using pgpm
+   * @default false
+   */
+  keepDb?: boolean;
+}
+
+/**
+ * Target configuration for graphql-codegen
+ * Represents a single schema source and output destination.
+ *
+ * Source options (choose one):
+ * - endpoint: GraphQL endpoint URL for live introspection
+ * - schemaFile: Path to GraphQL schema file (.graphql)
+ * - db: Database configuration for direct introspection or PGPM module
+ */
+export interface GraphQLSDKConfigTarget {
   /**
    * GraphQL endpoint URL for live introspection
-   * Either endpoint or schema must be provided
    */
   endpoint?: string;
 
   /**
    * Path to GraphQL schema file (.graphql) for file-based generation
-   * Either endpoint or schema must be provided
    */
-  schema?: string;
+  schemaFile?: string;
+
+  /**
+   * Database configuration for direct database introspection or PGPM module
+   * Use db.schemas or db.apiNames to specify which schemas to introspect
+   */
+  db?: DbConfig;
 
   /**
    * Headers to include in introspection requests
@@ -37,6 +181,8 @@ export interface GraphQLSDKConfig {
     include?: string[];
     /** Tables to exclude (glob patterns supported) */
     exclude?: string[];
+    /** System-level tables to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -46,8 +192,10 @@ export interface GraphQLSDKConfig {
   queries?: {
     /** Query names to include - defaults to ['*'] */
     include?: string[];
-    /** Query names to exclude - defaults to ['_meta', 'query'] */
+    /** Query names to exclude */
     exclude?: string[];
+    /** System-level queries to always exclude (defaults to ['_meta', 'query'], can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -59,6 +207,8 @@ export interface GraphQLSDKConfig {
     include?: string[];
     /** Mutation names to exclude */
     exclude?: string[];
+    /** System-level mutations to always exclude (can be overridden to [] to disable) */
+    systemExclude?: string[];
   };
 
   /**
@@ -97,42 +247,74 @@ export interface GraphQLSDKConfig {
   };
 
   /**
-   * ORM client generation options
-   * When set, generates a Prisma-like ORM client in addition to or instead of React Query hooks
+   * Whether to generate ORM client
+   * When enabled, generates a Prisma-like ORM client to {output}/orm
+   * @default false
    */
-  orm?: {
-    /**
-     * Output directory for generated ORM client
-     * @default './generated/orm'
-     */
-    output?: string;
-    /**
-     * Whether to import shared types from hooks output or generate standalone
-     * When true, ORM types.ts will re-export from ../graphql/types
-     * @default true
-     */
-    useSharedTypes?: boolean;
-  };
+  orm?: boolean;
 
   /**
-   * React Query integration options
-   * Controls whether React Query hooks are generated
+   * Whether to generate React Query hooks
+   * When enabled, generates React Query hooks to {output}/hooks
+   * When false, only standalone fetch functions are generated (no React dependency)
+   * @default false
    */
-  reactQuery?: {
-    /**
-     * Whether to generate React Query hooks (useQuery, useMutation)
-     * When false, only standalone fetch functions are generated (no React dependency)
-     * @default false
-     */
-    enabled?: boolean;
-  };
+  reactQuery?: boolean;
+
+  /**
+   * Generate browser-compatible code using native fetch
+   * When true (default), uses native W3C fetch API (works in browsers and Node.js)
+   * When false, uses undici fetch with dispatcher support for localhost DNS resolution
+   * (Node.js only - enables proper *.localhost subdomain resolution on macOS)
+   * @default true
+   */
+  browserCompatible?: boolean;
+
+  /**
+   * Query key generation configuration
+   * Controls how query keys are structured for cache management
+   */
+  queryKeys?: QueryKeyConfig;
 
   /**
    * Watch mode configuration (dev-only feature)
    * When enabled via CLI --watch flag, the CLI will poll the endpoint for schema changes
    */
   watch?: WatchConfig;
+
+  // ============================================================================
+  // Runtime options (used when calling generate() programmatically)
+  // ============================================================================
+
+  /**
+   * Authorization header value (convenience option, also available in headers)
+   */
+  authorization?: string;
+
+  /**
+   * Enable verbose output
+   * @default false
+   */
+  verbose?: boolean;
+
+  /**
+   * Dry run - don't write files, just show what would be generated
+   * @default false
+   */
+  dryRun?: boolean;
+
+  /**
+   * Skip custom operations (only generate table CRUD)
+   * @default false
+   */
+  skipCustomOperations?: boolean;
 }
+
+/**
+ * Main configuration type for graphql-codegen
+ * This is the same as GraphQLSDKConfigTarget - we keep the alias for clarity.
+ */
+export type GraphQLSDKConfig = GraphQLSDKConfigTarget;
 
 /**
  * Watch mode configuration options
@@ -168,91 +350,47 @@ export interface WatchConfig {
 }
 
 /**
- * Resolved watch configuration with defaults applied
- */
-export interface ResolvedWatchConfig {
-  pollInterval: number;
-  debounce: number;
-  touchFile: string | null;
-  clearScreen: boolean;
-}
-
-/**
- * Resolved configuration with defaults applied
- */
-export interface ResolvedConfig {
-  /**
-   * GraphQL endpoint URL (empty string if using schema file)
-   */
-  endpoint: string;
-  /**
-   * Path to GraphQL schema file (null if using endpoint)
-   */
-  schema: string | null;
-  headers: Record<string, string>;
-  output: string;
-  tables: {
-    include: string[];
-    exclude: string[];
-  };
-  queries: {
-    include: string[];
-    exclude: string[];
-  };
-  mutations: {
-    include: string[];
-    exclude: string[];
-  };
-  excludeFields: string[];
-  hooks: {
-    queries: boolean;
-    mutations: boolean;
-    queryKeyPrefix: string;
-  };
-  postgraphile: {
-    schema: string;
-  };
-  codegen: {
-    maxFieldDepth: number;
-    skipQueryField: boolean;
-  };
-  orm: {
-    output: string;
-    useSharedTypes: boolean;
-  } | null;
-  reactQuery: {
-    enabled: boolean;
-  };
-  watch: ResolvedWatchConfig;
-}
-
-/**
  * Default watch configuration values
  */
-export const DEFAULT_WATCH_CONFIG: ResolvedWatchConfig = {
+export const DEFAULT_WATCH_CONFIG: WatchConfig = {
   pollInterval: 3000,
   debounce: 800,
-  touchFile: null,
+  touchFile: undefined,
   clearScreen: true,
+};
+
+/**
+ * Default query key configuration values
+ */
+export const DEFAULT_QUERY_KEY_CONFIG: QueryKeyConfig = {
+  style: 'hierarchical',
+  relationships: {},
+  generateScopedKeys: true,
+  generateCascadeHelpers: true,
+  generateMutationKeys: true,
 };
 
 /**
  * Default configuration values
  */
-export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
+export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
+  endpoint: '',
   headers: {},
   output: './generated/graphql',
   tables: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   queries: {
     include: ['*'],
-    exclude: ['_meta', 'query'], // Internal PostGraphile queries
+    exclude: [],
+    systemExclude: ['_meta', 'query'], // Internal PostGraphile queries
   },
   mutations: {
     include: ['*'],
     exclude: [],
+    systemExclude: [],
   },
   excludeFields: [],
   hooks: {
@@ -267,20 +405,13 @@ export const DEFAULT_CONFIG: Omit<ResolvedConfig, 'endpoint' | 'schema'> = {
     maxFieldDepth: 2,
     skipQueryField: true,
   },
-  orm: null, // ORM generation disabled by default
-  reactQuery: {
-    enabled: false, // React Query hooks disabled by default
-  },
+  orm: false,
+  reactQuery: false,
+  browserCompatible: true,
+  queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
 
-/**
- * Default ORM configuration values
- */
-export const DEFAULT_ORM_CONFIG = {
-  output: './generated/orm',
-  useSharedTypes: true,
-};
 
 /**
  * Helper function to define configuration with type checking
@@ -290,59 +421,23 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
 }
 
 /**
- * Resolve configuration by applying defaults
+ * Merge two configs (base + overrides).
+ * Uses deepmerge with array replacement strategy - when a user specifies
+ * an array like include: ['users'], it replaces the default ['*'] entirely.
  */
-export function resolveConfig(config: GraphQLSDKConfig): ResolvedConfig {
-  return {
-    endpoint: config.endpoint ?? '',
-    schema: config.schema ?? null,
-    headers: config.headers ?? DEFAULT_CONFIG.headers,
-    output: config.output ?? DEFAULT_CONFIG.output,
-    tables: {
-      include: config.tables?.include ?? DEFAULT_CONFIG.tables.include,
-      exclude: config.tables?.exclude ?? DEFAULT_CONFIG.tables.exclude,
-    },
-    queries: {
-      include: config.queries?.include ?? DEFAULT_CONFIG.queries.include,
-      exclude: config.queries?.exclude ?? DEFAULT_CONFIG.queries.exclude,
-    },
-    mutations: {
-      include: config.mutations?.include ?? DEFAULT_CONFIG.mutations.include,
-      exclude: config.mutations?.exclude ?? DEFAULT_CONFIG.mutations.exclude,
-    },
-    excludeFields: config.excludeFields ?? DEFAULT_CONFIG.excludeFields,
-    hooks: {
-      queries: config.hooks?.queries ?? DEFAULT_CONFIG.hooks.queries,
-      mutations: config.hooks?.mutations ?? DEFAULT_CONFIG.hooks.mutations,
-      queryKeyPrefix:
-        config.hooks?.queryKeyPrefix ?? DEFAULT_CONFIG.hooks.queryKeyPrefix,
-    },
-    postgraphile: {
-      schema: config.postgraphile?.schema ?? DEFAULT_CONFIG.postgraphile.schema,
-    },
-    codegen: {
-      maxFieldDepth:
-        config.codegen?.maxFieldDepth ?? DEFAULT_CONFIG.codegen.maxFieldDepth,
-      skipQueryField:
-        config.codegen?.skipQueryField ?? DEFAULT_CONFIG.codegen.skipQueryField,
-    },
-    orm: config.orm
-      ? {
-          output: config.orm.output ?? DEFAULT_ORM_CONFIG.output,
-          useSharedTypes:
-            config.orm.useSharedTypes ?? DEFAULT_ORM_CONFIG.useSharedTypes,
-        }
-      : null,
-    reactQuery: {
-      enabled: config.reactQuery?.enabled ?? DEFAULT_CONFIG.reactQuery.enabled,
-    },
-    watch: {
-      pollInterval:
-        config.watch?.pollInterval ?? DEFAULT_WATCH_CONFIG.pollInterval,
-      debounce: config.watch?.debounce ?? DEFAULT_WATCH_CONFIG.debounce,
-      touchFile: config.watch?.touchFile ?? DEFAULT_WATCH_CONFIG.touchFile,
-      clearScreen:
-        config.watch?.clearScreen ?? DEFAULT_WATCH_CONFIG.clearScreen,
-    },
-  };
+export function mergeConfig(
+  base: GraphQLSDKConfigTarget,
+  overrides: GraphQLSDKConfigTarget
+): GraphQLSDKConfigTarget {
+  return deepmerge(base, overrides, { arrayMerge: replaceArrays });
+}
+
+/**
+ * Get configuration options by merging defaults with user config.
+ * Similar to getEnvOptions pattern from @pgpmjs/env.
+ */
+export function getConfigOptions(
+  overrides: GraphQLSDKConfigTarget = {}
+): GraphQLSDKConfigTarget {
+  return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
 }

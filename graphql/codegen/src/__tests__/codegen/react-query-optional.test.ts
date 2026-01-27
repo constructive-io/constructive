@@ -6,10 +6,10 @@
  * - Mutation generators return null (since they require React Query)
  * - Standalone fetch functions are still generated for queries
  */
-import { generateListQueryHook, generateSingleQueryHook, generateAllQueryHooks } from '../../cli/codegen/queries';
-import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook, generateAllMutationHooks } from '../../cli/codegen/mutations';
-import { generateCustomQueryHook, generateAllCustomQueryHooks } from '../../cli/codegen/custom-queries';
-import { generateCustomMutationHook, generateAllCustomMutationHooks } from '../../cli/codegen/custom-mutations';
+import { generateListQueryHook, generateSingleQueryHook, generateAllQueryHooks } from '../../core/codegen/queries';
+import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook, generateAllMutationHooks } from '../../core/codegen/mutations';
+import { generateCustomQueryHook, generateAllCustomQueryHooks } from '../../core/codegen/custom-queries';
+import { generateCustomMutationHook, generateAllCustomMutationHooks } from '../../core/codegen/custom-mutations';
 import type { CleanTable, CleanFieldType, CleanRelations, CleanOperation, CleanTypeRef, TypeRegistry } from '../../types/schema';
 
 // ============================================================================

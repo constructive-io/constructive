@@ -2,8 +2,7 @@ import { PgpmMigrate } from '@pgpmjs/core';
 import { parsePlanFile } from '@pgpmjs/core';
 import { Logger } from '@pgpmjs/logger';
 import { existsSync } from 'fs';
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { join } from 'path';
 import { getPgEnvOptions } from 'pg-env';
 

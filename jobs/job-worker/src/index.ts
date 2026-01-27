@@ -2,6 +2,7 @@ import pg from 'pg';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@constructive-io/job-utils';
 import type { PgClientLike } from '@constructive-io/job-utils';
+import { createLogger } from '@pgpmjs/logger';
 
 const pgPoolConfig = {
   connectionString: jobs.getJobConnectionString()
@@ -37,7 +38,7 @@ export type TaskHandler = (
   job: JobRow
 ) => Promise<void> | void;
 
-/* eslint-disable no-console */
+const logger = createLogger('job-worker');
 
 export default class Worker {
   tasks: Record<string, TaskHandler>;
@@ -75,7 +76,7 @@ export default class Worker {
     this.doNextTimer = undefined;
     this.pgPool = pgPool;
     const close = () => {
-      console.log('closing connection...');
+      logger.info('closing connection...');
       this.close();
     };
     process.once('SIGTERM', close);
@@ -97,21 +98,21 @@ export default class Worker {
     jobId: JobRow['id'];
   }) {
     const when = err ? `after failure '${err.message}'` : 'after success';
-    console.error(
+    logger.error(
       `Failed to release job '${jobId}' ${when}; committing seppuku`
     );
-    console.error(fatalError);
+    logger.error(fatalError);
     process.exit(1);
   }
   async handleError(
     client: PgClientLike,
     { err, job, duration }: { err: Error; job: JobRow; duration: string }
   ) {
-    console.error(
+    logger.error(
       `Failed task ${job.id} (${job.task_identifier}) with error ${err.message} (${duration}ms)`,
       { err, stack: err.stack }
     );
-    console.error(err.stack);
+    logger.error(err.stack);
     await jobs.failJob(client, {
       workerId: this.workerId,
       jobId: job.id,
@@ -122,7 +123,7 @@ export default class Worker {
     client: PgClientLike,
     { job, duration }: { job: JobRow; duration: string }
   ) {
-    console.log(
+    logger.info(
       `Completed task ${job.id} (${job.task_identifier}) with success (${duration}ms)`
     );
     await jobs.completeJob(client, { workerId: this.workerId, jobId: job.id });
@@ -192,7 +193,7 @@ export default class Worker {
       release: () => void
     ) => {
       if (err) {
-        console.error('Error connecting with notify listener', err);
+        logger.error('Error connecting with notify listener', err);
         // Try again in 5 seconds
         // should this really be done in the node process?
         setTimeout(this.listen, 5000);
@@ -206,11 +207,11 @@ export default class Worker {
       });
       client.query('LISTEN "jobs:insert"');
       client.on('error', (e: unknown) => {
-        console.error('Error with database notify listener', e);
+        logger.error('Error with database notify listener', e);
         release();
         this.listen();
       });
-      console.log(`${this.workerId} connected and looking for jobs...`);
+      logger.info(`${this.workerId} connected and looking for jobs...`);
       this.doNext(client);
     };
     this.pgPool.connect(listenForChanges);

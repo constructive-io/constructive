@@ -25,6 +25,9 @@ export default class Scheduler {
   pgPool: Pool;
   jobs: Record<ScheduledJobRow['id'], SchedulerJobHandle>;
   _initialized?: boolean;
+  listenClient?: PoolClient;
+  listenRelease?: () => void;
+  stopped?: boolean;
 
   constructor({
     tasks,
@@ -135,6 +138,7 @@ export default class Scheduler {
     this.jobs[id] = j as SchedulerJobHandle;
   }
   async doNext(client: PgClientLike): Promise<void> {
+    if (this.stopped) return;
     if (!this._initialized) {
       return await this.initialize(client);
     }
@@ -151,10 +155,12 @@ export default class Scheduler {
           : this.supportedTaskNames
       });
       if (!job || !job.id) {
-        this.doNextTimer = setTimeout(
-          () => this.doNext(client),
-          this.idleDelay
-        );
+        if (!this.stopped) {
+          this.doNextTimer = setTimeout(
+            () => this.doNext(client),
+            this.idleDelay
+          );
+        }
         return;
       }
       const start = process.hrtime();
@@ -180,12 +186,21 @@ export default class Scheduler {
       } catch (fatalError: unknown) {
         await this.handleFatalError(client, { err, fatalError, jobId });
       }
-      return this.doNext(client);
+      if (!this.stopped) {
+        return this.doNext(client);
+      }
+      return;
     } catch (err: unknown) {
-      this.doNextTimer = setTimeout(() => this.doNext(client), this.idleDelay);
+      if (!this.stopped) {
+        this.doNextTimer = setTimeout(
+          () => this.doNext(client),
+          this.idleDelay
+        );
+      }
     }
   }
   listen() {
+    if (this.stopped) return;
     const listenForChanges = (
       err: Error | null,
       client: PoolClient,
@@ -198,9 +213,17 @@ export default class Scheduler {
         }
         // Try again in 5 seconds
         // should this really be done in the node process?
-        setTimeout(this.listen, 5000);
+        if (!this.stopped) {
+          setTimeout(this.listen, 5000);
+        }
         return;
       }
+      if (this.stopped) {
+        release();
+        return;
+      }
+      this.listenClient = client;
+      this.listenRelease = release;
       client.on('notification', () => {
         log.info('a NEW scheduled JOB!');
         if (this.doNextTimer) {
@@ -210,12 +233,18 @@ export default class Scheduler {
       });
       client.query('LISTEN "scheduled_jobs:insert"');
       client.on('error', (e: unknown) => {
+        if (this.stopped) {
+          release();
+          return;
+        }
         log.error('Error with database notify listener', e);
         if (e instanceof Error && e.stack) {
           log.debug(e.stack);
         }
         release();
-        this.listen();
+        if (!this.stopped) {
+          this.listen();
+        }
       });
       log.info(
         `${this.workerId} connected and looking for scheduled jobs...`
@@ -223,6 +252,32 @@ export default class Scheduler {
       this.doNext(client);
     };
     this.pgPool.connect(listenForChanges);
+  }
+
+  async stop(): Promise<void> {
+    this.stopped = true;
+    if (this.doNextTimer) {
+      clearTimeout(this.doNextTimer);
+      this.doNextTimer = undefined;
+    }
+    Object.values(this.jobs).forEach((job) => job.cancel());
+    this.jobs = {};
+
+    const client = this.listenClient;
+    const release = this.listenRelease;
+    this.listenClient = undefined;
+    this.listenRelease = undefined;
+
+    if (client && release) {
+      client.removeAllListeners('notification');
+      client.removeAllListeners('error');
+      try {
+        await client.query('UNLISTEN "scheduled_jobs:insert"');
+      } catch {
+        // Ignore listener cleanup errors during shutdown.
+      }
+      release();
+    }
   }
 }
 

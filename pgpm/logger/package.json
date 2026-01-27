@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/logger",
-  "version": "1.3.7",
+  "version": "2.0.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Simple logger utility",
   "main": "index.js",
@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "yanse": "^0.1.11"
+    "yanse": "^0.2.0"
   },
   "keywords": [
     "logger",

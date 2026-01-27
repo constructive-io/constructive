@@ -1,7 +1,5 @@
-import { findAndRequirePackageJson } from 'find-and-require-package-json';
-import { cliExitWithError, checkForUpdates, extractFirst } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import { ParsedArgs } from 'minimist';
+import { checkForUpdates } from '@inquirerer/utils';
+import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 import { teardownPgPools } from 'pg-cache';
 
 import add from './commands/add';
@@ -77,7 +75,7 @@ export const createPgpmCommandMap = (skipPgTeardown: boolean = false): Record<st
 
 export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, options: CLIOptions & { skipPgTeardown?: boolean }) => {
   if (argv.version || argv.v) {
-    const pkg = findAndRequirePackageJson(__dirname);
+    const pkg = getPackageJson(__dirname);
     console.log(pkg.version);
     process.exit(0);
   }
@@ -112,7 +110,7 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
   // (checkForUpdates auto-skips in CI or when INQUIRERER_SKIP_UPDATE_CHECK / PGPM_SKIP_UPDATE_CHECK is set)
   if (command !== 'update') {
     try {
-      const pkg = findAndRequirePackageJson(__dirname);
+      const pkg = getPackageJson(__dirname);
       const updateResult = await checkForUpdates({
         pkgName: pkg.name,
         pkgVersion: pkg.version,

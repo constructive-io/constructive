@@ -1,20 +1,23 @@
 {
   "name": "@constructive-io/knative-job-server",
-  "version": "0.3.23",
+  "version": "1.0.0",
   "description": "knative job server",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-server#readme",
   "license": "SEE LICENSE IN LICENSE",
-  "main": "dist/index.js",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
   "directories": {
     "lib": "src",
     "test": "__tests__"
   },
   "bin": {
-    "faas-job-server": "src/run.ts"
+    "faas-job-server": "run.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
   "repository": {
     "type": "git",
@@ -24,17 +27,23 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
-    "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w"
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev"
   },
   "bugs": {
     "url": "https://github.com/constructive-io/jobs/issues"
   },
+  "devDependencies": {
+    "makage": "^0.1.10"
+  },
   "dependencies": {
     "@constructive-io/job-pg": "workspace:^",
     "@constructive-io/job-utils": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
     "body-parser": "1.19.0",
     "express": "5.2.1",
-    "pg": "8.16.3"
+    "pg": "8.17.1"
   }
 }

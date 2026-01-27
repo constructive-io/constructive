@@ -1,5 +1,4 @@
-import { cliExitWithError } from '@inquirerer/utils';
-import { CLIOptions, Inquirerer } from 'inquirerer';
+import { CLIOptions, Inquirerer, cliExitWithError } from 'inquirerer';
 import { CacheManager } from 'genomic';
 
 const cacheUsageText = `

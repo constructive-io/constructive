@@ -1,51 +1,76 @@
-import { CLIOptions, Inquirerer } from 'inquirerer'
-import { ParsedArgs } from 'minimist'
-import { spawnSync } from 'child_process'
-import { join } from 'path'
+import { CLIOptions, Inquirerer } from 'inquirerer';
+import {
+  generate,
+  findConfigFile,
+  codegenQuestions,
+  printResult,
+  type CodegenAnswers,
+} from '@constructive-io/graphql-codegen';
 
 const usage = `
 Constructive GraphQL Codegen:
 
   cnc codegen [OPTIONS]
 
-Options:
-  --help, -h                 Show this help message
+Source Options (choose one):
   --config <path>            Path to graphql-codegen config file
   --endpoint <url>           GraphQL endpoint URL
-  --auth <token>             Authorization header value (e.g., "Bearer 123")
-  --out <dir>                Output directory (default: graphql/codegen/dist)
-  --dry-run                  Preview without writing files
-  -v, --verbose              Verbose output
-`
+  --schemaFile <path>        Path to GraphQL schema file
+
+Database Options:
+  --schemas <list>           Comma-separated PostgreSQL schemas
+  --apiNames <list>          Comma-separated API names
+
+Generator Options:
+  --reactQuery               Generate React Query hooks (default)
+  --orm                      Generate ORM client
+  --output <dir>             Output directory (default: codegen)
+  --authorization <token>    Authorization header value
+  --dryRun                   Preview without writing files
+  --verbose                  Verbose output
+
+  --help, -h                 Show this help message
+`;
 
 export default async (
-  argv: Partial<ParsedArgs>,
-  _prompter: Inquirerer,
+  argv: Partial<Record<string, unknown>>,
+  prompter: Inquirerer,
   _options: CLIOptions
 ) => {
   if (argv.help || argv.h) {
-    console.log(usage)
-    process.exit(0)
+    console.log(usage);
+    process.exit(0);
   }
 
-  const cwd = (argv.cwd as string) || process.cwd()
-  const endpoint = (argv.endpoint as string) || ''
-  const outDir = (argv.out as string) || 'graphql/codegen/dist'
-  const auth = (argv.auth as string) || ''
-  const configPath = (argv.config as string) || ''
-  const dryRun = !!(argv['dry-run'] || argv.dryRun)
-  const verbose = !!(argv.verbose || argv.v)
+  // Auto-detect config file if not provided
+  const config = argv.config || findConfigFile();
+  if (config) {
+    // If config file exists, just run generate with it (config file handles everything)
+    const result = await generate({});
+    printResult(result);
+    return;
+  }
 
-  const envBin = process.env.CONSTRUCTIVE_CODEGEN_BIN
-  const bin = envBin || require.resolve('@constructive-io/graphql-codegen/bin/graphql-codegen.js')
-  const args: string[] = ['generate']
-  if (configPath) args.push('-c', configPath)
-  if (endpoint) args.push('-e', endpoint)
-  if (outDir) args.push('-o', outDir)
-  if (auth) args.push('-a', auth)
-  if (dryRun) args.push('--dry-run')
-  if (verbose) args.push('-v')
+  // No config file - prompt for options using shared questions
+  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
 
-  const res = spawnSync(process.execPath, [bin, ...args], { cwd, stdio: 'inherit' })
-  if ((res.status ?? 0) !== 0) process.exit(res.status ?? 1)
-}
+  // Build db config if schemas or apiNames provided
+  const db = (answers.schemas || answers.apiNames) ? {
+    schemas: answers.schemas,
+    apiNames: answers.apiNames,
+  } : undefined;
+
+  const result = await generate({
+    endpoint: answers.endpoint,
+    schemaFile: answers.schemaFile,
+    db,
+    output: answers.output,
+    authorization: answers.authorization,
+    reactQuery: answers.reactQuery,
+    orm: answers.orm,
+    dryRun: answers.dryRun,
+    verbose: answers.verbose,
+  });
+
+  printResult(result);
+};

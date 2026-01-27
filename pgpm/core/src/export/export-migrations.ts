@@ -294,13 +294,11 @@ const exportMigrationsToDisk = async ({
     writePgpmPlan(results.rows, opts);
     writePgpmFiles(results.rows, opts);
 
-    let meta = await exportMeta({
+    const metaResult = await exportMeta({
       opts: options,
       dbname: database,
       database_id: databaseId
     });
-
-    meta = replacer(meta);
 
     // Build description for the meta/service extension package
     const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
@@ -336,11 +334,11 @@ const exportMigrationsToDisk = async ({
       name: metaExtensionName
     });
 
-    const metaPackage: PgpmRow[] = [
-      {
-        deps: [],
-        deploy: 'migrate/meta',
-        content: `SET session_replication_role TO replica;
+    // Create separate files for each table type
+    const metaPackage: PgpmRow[] = [];
+
+    // Common header for all meta files
+    const commonHeader = `SET session_replication_role TO replica;
 -- using replica in case we are deploying triggers to metaschema_public
 
 -- unaccent, postgis affected and require grants
@@ -354,24 +352,101 @@ DO $LQLMIGRATION$
     EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
 
   END;
-$LQLMIGRATION$;
+$LQLMIGRATION$;`;
 
-${meta}
+    const commonFooter = `
+SET session_replication_role TO DEFAULT;`;
 
--- TODO: Research needed - These UPDATE statements may be a security leak.
--- They appear to rebind exported metadata to the target database after import,
--- but exposing dbname in services_public tables could leak internal database names.
--- Consider removing entirely or gating behind an explicit flag.
--- UPDATE services_public.apis
---       SET dbname = current_database() WHERE TRUE;
-
--- UPDATE services_public.sites
---       SET dbname = current_database() WHERE TRUE;
-
-SET session_replication_role TO DEFAULT;
-`
-      }
+    // Define table ordering with dependencies
+    // Tables that depend on 'database' being inserted first
+    const tableOrder = [
+      'database',
+      'schema',
+      'table',
+      'field',
+      'policy',
+      'index',
+      'trigger',
+      'trigger_function',
+      'rls_function',
+      'limit_function',
+      'procedure',
+      'foreign_key_constraint',
+      'primary_key_constraint',
+      'unique_constraint',
+      'check_constraint',
+      'full_text_search',
+      'schema_grant',
+      'table_grant',
+      'domains',
+      'sites',
+      'apis',
+      'apps',
+      'site_modules',
+      'site_themes',
+      'site_metadata',
+      'api_modules',
+      'api_schemas',
+      'rls_module',
+      'user_auth_module',
+      'memberships_module',
+      'permissions_module',
+      'limits_module',
+      'levels_module',
+      'users_module',
+      'hierarchy_module',
+      'membership_types_module',
+      'invites_module',
+      'emails_module',
+      'tokens_module',
+      'secrets_module',
+      'profiles_module',
+      'encrypted_secrets_module',
+      'connected_accounts_module',
+      'phone_numbers_module',
+      'crypto_addresses_module',
+      'crypto_auth_module',
+      'field_module',
+      'table_module',
+      'user_profiles_module',
+      'user_settings_module',
+      'organization_settings_module',
+      'uuid_module',
+      'default_ids_module',
+      'denormalized_table_field'
     ];
+
+    // Track which tables have content for dependency resolution
+    const tablesWithContent: string[] = [];
+
+    // Create a file for each table type that has content
+    for (const tableName of tableOrder) {
+      const tableSql = metaResult[tableName];
+      if (tableSql) {
+        const replacedSql = metaReplacer.replacer(tableSql);
+        
+        // Determine dependencies - each table depends on the previous tables that have content
+        // This ensures proper ordering during deployment
+        const deps = tableName === 'database' 
+          ? [] 
+          : tablesWithContent.length > 0 
+            ? [`migrate/${tablesWithContent[tablesWithContent.length - 1]}`]
+            : [];
+
+        metaPackage.push({
+          deps,
+          deploy: `migrate/${tableName}`,
+          content: `${commonHeader}
+
+${replacedSql}
+
+${commonFooter}
+`
+        });
+
+        tablesWithContent.push(tableName);
+      }
+    }
 
     opts.replacer = metaReplacer.replacer;
     opts.name = metaExtensionName;

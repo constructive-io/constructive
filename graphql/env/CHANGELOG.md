@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.9.3...@constructive-io/graphql-env@2.9.4) (2026-01-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.9.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.9.2...@constructive-io/graphql-env@2.9.3) (2026-01-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.9.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.9.1...@constructive-io/graphql-env@2.9.2) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.9.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.9.0...@constructive-io/graphql-env@2.9.1) (2026-01-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+# [2.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.8.20...@constructive-io/graphql-env@2.9.0) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.8.20](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.8.19...@constructive-io/graphql-env@2.8.20) (2026-01-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.8.19](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.8.18...@constructive-io/graphql-env@2.8.19) (2026-01-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
+## [2.8.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.8.17...@constructive-io/graphql-env@2.8.18) (2026-01-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-env
+
 ## [2.8.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@2.8.16...@constructive-io/graphql-env@2.8.17) (2026-01-07)
 
 **Note:** Version bump only for package @constructive-io/graphql-env

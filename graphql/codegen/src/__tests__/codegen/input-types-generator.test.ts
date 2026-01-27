@@ -6,7 +6,7 @@
  * used to validate the AST-based migration produces equivalent results.
  */
 // Jest globals - no import needed
-import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../cli/codegen/orm/input-types-generator';
+import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../core/codegen/orm/input-types-generator';
 import type {
   CleanTable,
   CleanFieldType,
@@ -482,7 +482,9 @@ describe('entity select types', () => {
     const result = generateInputTypesFile(new Map(), new Set(), [postTable, userTable]);
 
     expect(result.content).toContain('export type PostSelect = {');
-    expect(result.content).toContain('author?: boolean | { select?: UserSelect };');
+    // Babel generates multi-line format for object types
+    expect(result.content).toContain('author?: boolean | {');
+    expect(result.content).toContain('select?: UserSelect;');
   });
 
   it('generates select type with hasMany relation options', () => {
@@ -536,13 +538,14 @@ describe('orderBy types', () => {
     const result = generateInputTypesFile(new Map(), new Set(), [userTable]);
 
     expect(result.content).toContain('export type UsersOrderBy =');
-    expect(result.content).toContain("'PRIMARY_KEY_ASC'");
-    expect(result.content).toContain("'PRIMARY_KEY_DESC'");
-    expect(result.content).toContain("'NATURAL'");
-    expect(result.content).toContain("'ID_ASC'");
-    expect(result.content).toContain("'ID_DESC'");
-    expect(result.content).toContain("'EMAIL_ASC'");
-    expect(result.content).toContain("'NAME_DESC'");
+    // Babel generates double quotes for string literals
+    expect(result.content).toContain('"PRIMARY_KEY_ASC"');
+    expect(result.content).toContain('"PRIMARY_KEY_DESC"');
+    expect(result.content).toContain('"NATURAL"');
+    expect(result.content).toContain('"ID_ASC"');
+    expect(result.content).toContain('"ID_DESC"');
+    expect(result.content).toContain('"EMAIL_ASC"');
+    expect(result.content).toContain('"NAME_DESC"');
   });
 });
 
@@ -603,7 +606,8 @@ describe('custom input types', () => {
     const usedInputTypes = new Set(['UserRole']);
     const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, []);
 
-    expect(result.content).toContain("export type UserRole = 'ADMIN' | 'USER' | 'GUEST';");
+    // Babel generates double quotes for string literals
+    expect(result.content).toContain('export type UserRole = "ADMIN" | "USER" | "GUEST";');
   });
 });
 
@@ -736,7 +740,8 @@ describe('edge cases', () => {
     const result = generateInputTypesFile(new Map(), usedInputTypes, []);
 
     // Should generate a fallback type
-    expect(result.content).toContain("// Type 'UnknownType' not found in schema");
+    // Babel comment format may have slight differences
+    expect(result.content).toContain("Type 'UnknownType' not found in schema");
     expect(result.content).toContain('export type UnknownType = Record<string, unknown>;');
   });
 });

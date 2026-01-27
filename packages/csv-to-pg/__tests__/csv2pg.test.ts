@@ -15,6 +15,78 @@ const testCase = resolve(__dirname + '/../__fixtures__/test-case.csv');
 it('noop', () => {
   expect(true).toBe(true);
 });
+
+describe('conflictDoNothing', () => {
+  it('InsertOne with conflictDoNothing generates ON CONFLICT DO NOTHING AST', () => {
+    const config = {
+      schema: 'my-schema',
+      table: 'my-table',
+      fields: {
+        name: 'text'
+      }
+    };
+    const types = parseTypes(config);
+    const stmt = InsertOne({
+      schema: config.schema,
+      table: config.table,
+      types,
+      record: { name: 'test' },
+      conflictDoNothing: true
+    });
+
+    // Verify the AST contains the ON CONFLICT DO NOTHING clause
+    expect(stmt.RawStmt.stmt.InsertStmt.onConflictClause).toEqual({
+      action: 'ONCONFLICT_NOTHING'
+    });
+  });
+
+  it('InsertMany with conflictDoNothing generates ON CONFLICT DO NOTHING AST', () => {
+    const config = {
+      schema: 'my-schema',
+      table: 'my-table',
+      fields: {
+        name: 'text'
+      }
+    };
+    const types = parseTypes(config);
+    const stmt = InsertMany({
+      schema: config.schema,
+      table: config.table,
+      types,
+      records: [
+        { name: 'test1' },
+        { name: 'test2' }
+      ],
+      conflictDoNothing: true
+    });
+
+    // Verify the AST contains the ON CONFLICT DO NOTHING clause
+    expect(stmt.RawStmt.stmt.InsertStmt.onConflictClause).toEqual({
+      action: 'ONCONFLICT_NOTHING'
+    });
+  });
+
+  it('InsertOne without conflictDoNothing has no conflict clause', () => {
+    const config = {
+      schema: 'my-schema',
+      table: 'my-table',
+      fields: {
+        name: 'text'
+      }
+    };
+    const types = parseTypes(config);
+    const stmt = InsertOne({
+      schema: config.schema,
+      table: config.table,
+      types,
+      record: { name: 'test' }
+    });
+
+    // Verify no conflict clause when conflictDoNothing is not set
+    expect(stmt.RawStmt.stmt.InsertStmt.onConflictClause).toBeUndefined();
+  });
+});
+
 xdescribe('Insert Many', () => {
   it('Insert Many', async () => {
     const config = {

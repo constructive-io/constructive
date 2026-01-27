@@ -3,6 +3,102 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@3.0.1...graphile-plugin-fulltext-filter@3.0.2) (2026-01-25)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [3.0.1](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@3.0.0...graphile-plugin-fulltext-filter@3.0.1) (2026-01-24)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+# [3.0.0](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.5.4...graphile-plugin-fulltext-filter@3.0.0) (2026-01-24)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.5.4](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.5.3...graphile-plugin-fulltext-filter@2.5.4) (2026-01-22)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.5.3](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.5.2...graphile-plugin-fulltext-filter@2.5.3) (2026-01-22)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.5.2](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.5.1...graphile-plugin-fulltext-filter@2.5.2) (2026-01-21)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.5.1](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.5.0...graphile-plugin-fulltext-filter@2.5.1) (2026-01-21)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+# [2.5.0](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.4.1...graphile-plugin-fulltext-filter@2.5.0) (2026-01-20)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.4.1](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.4.0...graphile-plugin-fulltext-filter@2.4.1) (2026-01-19)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+# [2.4.0](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.17...graphile-plugin-fulltext-filter@2.4.0) (2026-01-18)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.17](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.16...graphile-plugin-fulltext-filter@2.3.17) (2026-01-18)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.16](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.15...graphile-plugin-fulltext-filter@2.3.16) (2026-01-14)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.15](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.14...graphile-plugin-fulltext-filter@2.3.15) (2026-01-14)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.14](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.13...graphile-plugin-fulltext-filter@2.3.14) (2026-01-11)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.13](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.12...graphile-plugin-fulltext-filter@2.3.13) (2026-01-10)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.12](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.11...graphile-plugin-fulltext-filter@2.3.12) (2026-01-09)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.11](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.10...graphile-plugin-fulltext-filter@2.3.11) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.10](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.9...graphile-plugin-fulltext-filter@2.3.10) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.9](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.8...graphile-plugin-fulltext-filter@2.3.9) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.8](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.7...graphile-plugin-fulltext-filter@2.3.8) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.7](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.6...graphile-plugin-fulltext-filter@2.3.7) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.6](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.5...graphile-plugin-fulltext-filter@2.3.6) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.5](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.4...graphile-plugin-fulltext-filter@2.3.5) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
+## [2.3.4](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.3...graphile-plugin-fulltext-filter@2.3.4) (2026-01-08)
+
+**Note:** Version bump only for package graphile-plugin-fulltext-filter
+
 ## [2.3.3](https://github.com/constructive-io/constructive/compare/graphile-plugin-fulltext-filter@2.3.2...graphile-plugin-fulltext-filter@2.3.3) (2026-01-07)
 
 **Note:** Version bump only for package graphile-plugin-fulltext-filter

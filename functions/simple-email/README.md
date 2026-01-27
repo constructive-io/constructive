@@ -3,9 +3,9 @@
 Simple Knative-compatible email function used with the Constructive jobs system.
 
 This function is intentionally minimal: it reads an email payload from the job
-body and **logs it only** (dry‑run mode). It does **not** send any email. This
-is useful while wiring up jobs and Knative without needing a real mail
-provider configured.
+body and **logs it only** in dry‑run mode. When not in dry‑run, it sends via
+the configured email provider. This is useful while wiring up jobs and Knative
+without needing a real mail provider configured.
 
 ## Expected job payload
 
@@ -62,10 +62,26 @@ callback for the worker.
 
 ## Environment variables
 
-This function does **not** depend on any GraphQL or email provider
-configuration. There are currently **no required environment variables** for
-its core behavior; it will simply log the email payload and return a successful
-response.
+Email provider configuration is only required when not running in dry‑run mode.
+
+Optional:
+
+- `SIMPLE_EMAIL_DRY_RUN` (`true`/`false`): log only, skip send.
+- `EMAIL_SEND_USE_SMTP` (`true`/`false`): use SMTP (`simple-smtp-server`).
+
+Mailgun (`@launchql/postmaster`) env vars when `EMAIL_SEND_USE_SMTP` is false:
+
+- `MAILGUN_API_KEY`
+- `MAILGUN_DOMAIN`
+- `MAILGUN_FROM`
+
+SMTP env vars when `EMAIL_SEND_USE_SMTP` is true:
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
 
 ## Building locally
 

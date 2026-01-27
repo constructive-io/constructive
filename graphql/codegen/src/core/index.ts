@@ -1,6 +1,13 @@
 /**
- * Core query building exports
+ * Core module exports
+ *
+ * This module contains all the core business logic for graphql-codegen.
+ * The CLI is a thin wrapper around these core functions.
  */
+
+// Main generate function (orchestrates the entire pipeline)
+export { generate } from './generate';
+export type { GenerateOptions, GenerateResult } from './generate';
 
 // Types
 export * from './types';
@@ -14,3 +21,24 @@ export { QueryBuilder, MetaObject } from './query-builder';
 
 // Meta object utilities
 export { validateMetaObject, convertFromMetaSchema } from './meta-object';
+
+// Configuration loading and resolution
+export * from './config';
+
+// Code generation
+export * from './codegen';
+
+// Schema introspection
+export * from './introspect';
+
+// Codegen pipeline
+export * from './pipeline';
+
+// File output
+export * from './output';
+
+// Watch mode
+export * from './watch';
+
+// Database schema utilities
+export * from './database';

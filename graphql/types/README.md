@@ -28,7 +28,7 @@ const config: ConstructiveOptions = {
     appendPlugins: [],
   },
   api: {
-    enableMetaApi: true,
+    enableServicesApi: true,
     exposedSchemas: ['public'],
   },
   features: {

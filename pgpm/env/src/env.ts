@@ -1,6 +1,6 @@
 import { PgpmOptions, BucketProvider } from '@pgpmjs/types';
 
-const parseEnvNumber = (val?: string): number | undefined => {
+export const parseEnvNumber = (val?: string): number | undefined => {
   const num = Number(val);
   return !isNaN(num) ? num : undefined;
 };
@@ -75,7 +75,29 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     JOBS_SUPPORTED,
     INTERNAL_GATEWAY_URL,
     INTERNAL_JOBS_CALLBACK_URL,
-    INTERNAL_JOBS_CALLBACK_PORT
+    INTERNAL_JOBS_CALLBACK_PORT,
+
+    // Error output formatting env vars
+    PGPM_ERROR_QUERY_HISTORY_LIMIT,
+    PGPM_ERROR_MAX_LENGTH,
+    PGPM_ERROR_VERBOSE,
+
+    // SMTP email env vars
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_SECURE,
+    SMTP_USER,
+    SMTP_PASS,
+    SMTP_FROM,
+    SMTP_REPLY_TO,
+    SMTP_REQUIRE_TLS,
+    SMTP_TLS_REJECT_UNAUTHORIZED,
+    SMTP_POOL,
+    SMTP_MAX_CONNECTIONS,
+    SMTP_MAX_MESSAGES,
+    SMTP_NAME,
+    SMTP_LOGGER,
+    SMTP_DEBUG
   } = env;
 
   return {
@@ -184,6 +206,28 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
           })
         }
       })
+    },
+    errorOutput: {
+      ...(PGPM_ERROR_QUERY_HISTORY_LIMIT && { queryHistoryLimit: parseEnvNumber(PGPM_ERROR_QUERY_HISTORY_LIMIT) }),
+      ...(PGPM_ERROR_MAX_LENGTH && { maxLength: parseEnvNumber(PGPM_ERROR_MAX_LENGTH) }),
+      ...(PGPM_ERROR_VERBOSE && { verbose: parseEnvBoolean(PGPM_ERROR_VERBOSE) }),
+    },
+    smtp: {
+      ...(SMTP_HOST && { host: SMTP_HOST }),
+      ...(SMTP_PORT && { port: parseEnvNumber(SMTP_PORT) }),
+      ...(SMTP_SECURE && { secure: parseEnvBoolean(SMTP_SECURE) }),
+      ...(SMTP_USER && { user: SMTP_USER }),
+      ...(SMTP_PASS && { pass: SMTP_PASS }),
+      ...(SMTP_FROM && { from: SMTP_FROM }),
+      ...(SMTP_REPLY_TO && { replyTo: SMTP_REPLY_TO }),
+      ...(SMTP_REQUIRE_TLS && { requireTLS: parseEnvBoolean(SMTP_REQUIRE_TLS) }),
+      ...(SMTP_TLS_REJECT_UNAUTHORIZED && { tlsRejectUnauthorized: parseEnvBoolean(SMTP_TLS_REJECT_UNAUTHORIZED) }),
+      ...(SMTP_POOL && { pool: parseEnvBoolean(SMTP_POOL) }),
+      ...(SMTP_MAX_CONNECTIONS && { maxConnections: parseEnvNumber(SMTP_MAX_CONNECTIONS) }),
+      ...(SMTP_MAX_MESSAGES && { maxMessages: parseEnvNumber(SMTP_MAX_MESSAGES) }),
+      ...(SMTP_NAME && { name: SMTP_NAME }),
+      ...(SMTP_LOGGER && { logger: parseEnvBoolean(SMTP_LOGGER) }),
+      ...(SMTP_DEBUG && { debug: parseEnvBoolean(SMTP_DEBUG) }),
     }
   };
 };

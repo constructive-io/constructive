@@ -85,12 +85,21 @@ Recommended / optional:
 - `LOCAL_APP_PORT`  
   Optional port suffix for localhost-style hosts (e.g. `3000`). When the resolved hostname is `localhost` / `*.localhost` and `SEND_EMAIL_LINK_DRY_RUN=true`, links are generated as `http://localhost:LOCAL_APP_PORT/...`. Ignored for non-local hostnames and in production.
 
-Email delivery (used by `@launchql/postmaster`):
+Email delivery (default: `@launchql/postmaster`):
 
-- Typically Mailgun or another provider; consult `@launchql/postmaster` docs. A common pattern is:
+- Set `EMAIL_SEND_USE_SMTP=true` to switch to `simple-smtp-server` (SMTP). Otherwise it uses `@launchql/postmaster`.
+
+- Mailgun or another provider; consult `@launchql/postmaster` docs. A common pattern is:
   - `MAILGUN_API_KEY`
   - `MAILGUN_DOMAIN`
   - `MAILGUN_FROM`
+
+- SMTP variables when `EMAIL_SEND_USE_SMTP=true`:
+  - `SMTP_HOST`
+  - `SMTP_PORT`
+  - `SMTP_USER`
+  - `SMTP_PASS`
+  - `SMTP_FROM`
 
 ## Building locally
 

@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/constructive-io/constructive/compare/pg-cache@1.8.0...pg-cache@2.0.0) (2026-01-24)
+
+**Note:** Version bump only for package pg-cache
+
+# [1.8.0](https://github.com/constructive-io/constructive/compare/pg-cache@1.7.1...pg-cache@1.8.0) (2026-01-20)
+
+**Note:** Version bump only for package pg-cache
+
+## [1.7.1](https://github.com/constructive-io/constructive/compare/pg-cache@1.7.0...pg-cache@1.7.1) (2026-01-19)
+
+**Note:** Version bump only for package pg-cache
+
+# [1.7.0](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.16...pg-cache@1.7.0) (2026-01-18)
+
+**Note:** Version bump only for package pg-cache
+
+## [1.6.16](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.15...pg-cache@1.6.16) (2026-01-18)
+
+**Note:** Version bump only for package pg-cache
+
+## [1.6.15](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.14...pg-cache@1.6.15) (2026-01-09)
+
+**Note:** Version bump only for package pg-cache
+
 ## [1.6.14](https://github.com/constructive-io/constructive/compare/pg-cache@1.6.13...pg-cache@1.6.14) (2026-01-02)
 
 **Note:** Version bump only for package pg-cache

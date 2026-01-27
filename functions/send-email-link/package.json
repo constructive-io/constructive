@@ -1,25 +1,46 @@
 {
   "name": "@constructive-io/send-email-link-fn",
-  "version": "0.2.19",
+  "version": "1.0.1",
   "description": "Knative function to send email links (invite, password reset, email verification) using Constructive jobs",
-  "author": "Constructive",
-  "private": true,
-  "main": "dist/index.js",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
   "directories": {
     "lib": "src",
     "test": "__tests__"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json -w"
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev"
+  },
+  "devDependencies": {
+    "makage": "^0.1.10"
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",
+    "@constructive-io/postmaster": "workspace:^",
     "@launchql/mjml": "0.1.1",
-    "@launchql/postmaster": "0.1.4",
     "@launchql/styled-email": "0.1.0",
     "@pgpmjs/env": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
     "graphql-request": "^7.1.2",
-    "graphql-tag": "^2.12.6"
+    "graphql-tag": "^2.12.6",
+    "simple-smtp-server": "workspace:^"
   }
 }

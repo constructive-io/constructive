@@ -51,7 +51,12 @@ export type {
 // Config types
 export type {
   GraphQLSDKConfig,
-  ResolvedConfig,
+  GraphQLSDKConfigTarget,
 } from './config';
 
-export { defineConfig, resolveConfig, DEFAULT_CONFIG } from './config';
+export {
+  defineConfig,
+  getConfigOptions,
+  mergeConfig,
+  DEFAULT_CONFIG,
+} from './config';

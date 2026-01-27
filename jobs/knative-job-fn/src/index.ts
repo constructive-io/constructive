@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 import http from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
+import type { Server as HttpServer } from 'http';
+import { createLogger } from '@pgpmjs/logger';
 
 type JobCallbackStatus = 'success' | 'error';
 
@@ -21,51 +23,6 @@ function getHeaders(req: any) {
     'x-callback-url': req.get('X-Callback-Url')
   };
 }
-
-const app: any = express();
-
-app.use(bodyParser.json());
-
-// Basic request logging for all incoming job invocations.
-app.use((req: any, res: any, next: any) => {
-  try {
-    // Log only the headers we care about plus a shallow body snapshot
-    const headers = getHeaders(req);
-
-    let body: any;
-    if (req.body && typeof req.body === 'object') {
-      // Only log top-level keys to avoid exposing sensitive body contents.
-      body = { keys: Object.keys(req.body) };
-    } else if (typeof req.body === 'string') {
-      // For string bodies, log only the length.
-      body = { length: req.body.length };
-    } else {
-      body = undefined;
-    }
-
-    // eslint-disable-next-line no-console
-    console.log('[knative-job-fn] Incoming job request', {
-      method: req.method,
-      path: req.originalUrl || req.url,
-      headers,
-      body
-    });
-  } catch {
-    // best-effort logging; never block the request
-  }
-  next();
-});
-
-// Echo job headers back on responses for debugging/traceability.
-app.use((req: any, res: any, next: any) => {
-  res.set({
-    'Content-Type': 'application/json',
-    'X-Worker-Id': req.get('X-Worker-Id'),
-    'X-Database-Id': req.get('X-Database-Id'),
-    'X-Job-Id': req.get('X-Job-Id')
-  });
-  next();
-});
 
 // Normalize callback URL so it always points at the /callback endpoint.
 const normalizeCallbackUrl = (rawUrl: string): string => {
@@ -152,8 +109,7 @@ const sendJobCallback = async (
   }
 
   try {
-    // eslint-disable-next-line no-console
-    console.log('[knative-job-fn] Sending job callback', {
+    logger.info('Sending job callback', {
       status,
       target: normalizeCallbackUrl(callbackUrl),
       workerId,
@@ -162,8 +118,7 @@ const sendJobCallback = async (
     });
     await postJson(target, headers, body);
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('[knative-job-fn] Failed to POST job callback', {
+    logger.error('Failed to POST job callback', {
       target,
       status,
       err
@@ -171,98 +126,171 @@ const sendJobCallback = async (
   }
 };
 
-// Attach per-request context and a finish hook to send success callbacks.
-app.use((req: any, res: any, next: any) => {
-  const ctx: JobContext = {
-    callbackUrl: req.get('X-Callback-Url'),
-    workerId: req.get('X-Worker-Id'),
-    jobId: req.get('X-Job-Id'),
-    databaseId: req.get('X-Database-Id')
-  };
+const logger = createLogger('knative-job-fn');
 
-  // Store on res.locals so the error middleware can also mark callbacks as sent.
-  res.locals = res.locals || {};
-  res.locals.jobContext = ctx;
-  res.locals.jobCallbackSent = false;
+const createJobApp = () => {
+  const app: any = express();
 
-  if (ctx.callbackUrl && ctx.workerId && ctx.jobId) {
-    res.on('finish', () => {
-      // If an error handler already sent a callback, skip.
-      if (res.locals.jobCallbackSent) return;
-      res.locals.jobCallbackSent = true;
-      // eslint-disable-next-line no-console
-      console.log('[knative-job-fn] Function completed', {
-        workerId: ctx.workerId,
-        jobId: ctx.jobId,
-        databaseId: ctx.databaseId,
-        statusCode: res.statusCode
-      });
-      void sendJobCallback(ctx, 'success');
-    });
-  }
+  app.use(bodyParser.json());
 
-  next();
-});
+  // Basic request logging for all incoming job invocations.
+  app.use((req: any, res: any, next: any) => {
+    try {
+      // Log only the headers we care about plus a shallow body snapshot
+      const headers = getHeaders(req);
 
-export default {
-  post: function (...args: any[]) {
-    return app.post.apply(app, args as any);
-  },
-  listen: (port: any, cb: () => void = () => {}) => {
-    // NOTE Remember that Express middleware executes in order.
-    // You should define error handlers last, after all other middleware.
-    // Otherwise, your error handler won't get called
-    // eslint-disable-next-line no-unused-vars
-    app.use(async (error: any, req: any, res: any, next: any) => {
-      res.set({
-        'Content-Type': 'application/json',
-        'X-Job-Error': true
-      });
-
-      // Mark job as having errored via callback, if available.
-      try {
-        const ctx: JobContext | undefined = res.locals?.jobContext;
-        if (ctx && !res.locals.jobCallbackSent) {
-          res.locals.jobCallbackSent = true;
-          await sendJobCallback(ctx, 'error', error?.message);
-        }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('[knative-job-fn] Failed to send error callback', err);
+      let body: any;
+      if (req.body && typeof req.body === 'object') {
+        // Only log top-level keys to avoid exposing sensitive body contents.
+        body = { keys: Object.keys(req.body) };
+      } else if (typeof req.body === 'string') {
+        // For string bodies, log only the length.
+        body = { length: req.body.length };
+      } else {
+        body = undefined;
       }
 
-      // Log the full error context for debugging.
-      try {
-        const headers = getHeaders(req);
+      logger.info('Incoming job request', {
+        method: req.method,
+        path: req.originalUrl || req.url,
+        headers,
+        body
+      });
+    } catch {
+      // best-effort logging; never block the request
+    }
+    next();
+  });
 
-        // Some error types (e.g. GraphQL ClientError) expose response info.
-        const errorDetails: any = {
-          message: error?.message,
-          name: error?.name,
-          stack: error?.stack
-        };
+  // Echo job headers back on responses for debugging/traceability.
+  app.use((req: any, res: any, next: any) => {
+    res.set({
+      'Content-Type': 'application/json',
+      'X-Worker-Id': req.get('X-Worker-Id'),
+      'X-Database-Id': req.get('X-Database-Id'),
+      'X-Job-Id': req.get('X-Job-Id')
+    });
+    next();
+  });
 
-        if (error?.response) {
-          errorDetails.response = {
-            status: error.response.status,
-            statusText: error.response.statusText,
-            errors: error.response.errors,
-            data: error.response.data
-          };
-        }
+  // Attach per-request context and a finish hook to send success callbacks.
+  app.use((req: any, res: any, next: any) => {
+    const ctx: JobContext = {
+      callbackUrl: req.get('X-Callback-Url'),
+      workerId: req.get('X-Worker-Id'),
+      jobId: req.get('X-Job-Id'),
+      databaseId: req.get('X-Database-Id')
+    };
 
-        // eslint-disable-next-line no-console
-        console.error('[knative-job-fn] Function error', {
-          headers,
-          path: req.originalUrl || req.url,
-          error: errorDetails
+    // Store on res.locals so the error middleware can also mark callbacks as sent.
+    res.locals = res.locals || {};
+    res.locals.jobContext = ctx;
+    res.locals.jobCallbackSent = false;
+
+    if (ctx.callbackUrl && ctx.workerId && ctx.jobId) {
+      res.on('finish', () => {
+        // If an error handler already sent a callback, skip.
+        if (res.locals.jobCallbackSent) return;
+        res.locals.jobCallbackSent = true;
+
+        // Treat 4xx/5xx status codes as errors
+        const isError = res.statusCode >= 400;
+
+        logger.info('Function completed', {
+          workerId: ctx.workerId,
+          jobId: ctx.jobId,
+          databaseId: ctx.databaseId,
+          statusCode: res.statusCode
         });
-      } catch {
-        // never throw from the error logger
-      }
 
-      res.status(200).json({ message: error.message });
-    });
-    app.listen(port, cb);
-  }
+        if (isError) {
+          void sendJobCallback(ctx, 'error', `HTTP ${res.statusCode}`);
+        } else {
+          void sendJobCallback(ctx, 'success');
+        }
+      });
+    }
+
+    next();
+  });
+
+  return {
+    post: function (...args: any[]) {
+      return app.post.apply(app, args as any);
+    },
+    listen: (
+      port: any,
+      hostOrCb?: string | (() => void),
+      cb: () => void = () => {}
+    ): HttpServer => {
+      // NOTE Remember that Express middleware executes in order.
+      // You should define error handlers last, after all other middleware.
+      // Otherwise, your error handler won't get called
+      // eslint-disable-next-line no-unused-vars
+      app.use(async (error: any, req: any, res: any, next: any) => {
+        res.set({
+          'Content-Type': 'application/json',
+          'X-Job-Error': true
+        });
+
+        // Mark job as having errored via callback, if available.
+        try {
+          const ctx: JobContext | undefined = res.locals?.jobContext;
+          if (ctx && !res.locals.jobCallbackSent) {
+            res.locals.jobCallbackSent = true;
+            await sendJobCallback(ctx, 'error', error?.message);
+          }
+        } catch (err) {
+          logger.error('Failed to send error callback', err);
+        }
+
+        // Log the full error context for debugging.
+        try {
+          const headers = getHeaders(req);
+
+          // Some error types (e.g. GraphQL ClientError) expose response info.
+          const errorDetails: any = {
+            message: error?.message,
+            name: error?.name,
+            stack: error?.stack
+          };
+
+          if (error?.response) {
+            errorDetails.response = {
+              status: error.response.status,
+              statusText: error.response.statusText,
+              errors: error.response.errors,
+              data: error.response.data
+            };
+          }
+
+          logger.error('Function error', {
+            headers,
+            path: req.originalUrl || req.url,
+            error: errorDetails
+          });
+        } catch {
+          // never throw from the error logger
+        }
+
+        res.status(200).json({ message: error.message });
+      });
+
+      const host = typeof hostOrCb === 'string' ? hostOrCb : undefined;
+      const callback = typeof hostOrCb === 'function' ? hostOrCb : cb;
+      const onListen = () => {
+        callback();
+      };
+      const server = host
+        ? app.listen(port, host, onListen)
+        : app.listen(port, onListen);
+
+      return server;
+    }
+  };
 };
+
+const defaultApp = createJobApp();
+
+export { createJobApp };
+export default defaultApp;

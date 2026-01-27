@@ -3,6 +3,115 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.0.0...@pgpmjs/core@5.0.1) (2026-01-24)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [5.0.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.17.1...@pgpmjs/core@5.0.0) (2026-01-24)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.17.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.17.0...@pgpmjs/core@4.17.1) (2026-01-22)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.16.1...@pgpmjs/core@4.17.0) (2026-01-20)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.16.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.16.0...@pgpmjs/core@4.16.1) (2026-01-19)
+
+### Bug Fixes
+
+- **export:** add missing is_public field to schema export config ([17a2d2a](https://github.com/constructive-io/constructive/commit/17a2d2aa443b63865e82ae174039801062ce2fae))
+
+# [4.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.15.2...@pgpmjs/core@4.16.0) (2026-01-18)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.15.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.15.1...@pgpmjs/core@4.15.2) (2026-01-18)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [4.15.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.15.0...@pgpmjs/core@4.15.1) (2026-01-14)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.15.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.14.0...@pgpmjs/core@4.15.0) (2026-01-14)
+
+### Bug Fixes
+
+- update export-meta.ts to use 'policy_type' instead of 'template' ([b30ddae](https://github.com/constructive-io/constructive/commit/b30ddae617228619b6500af304fa37a0c90ed436))
+
+### Features
+
+- update export flow for new metaschema tables and columns ([1de4ae5](https://github.com/constructive-io/constructive/commit/1de4ae52429391ac120d326d850cb273ee02fd55))
+
+# [4.14.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.3...@pgpmjs/core@4.14.0) (2026-01-09)
+
+### Bug Fixes
+
+- update tests to match actual error output formatting behavior ([06fa326](https://github.com/constructive-io/constructive/commit/06fa3269c0b0cdbd3936ebc7da4101413959655d))
+
+### Features
+
+- **pgpm/core:** add smart error output collapsing and limiting ([ad02849](https://github.com/constructive-io/constructive/commit/ad02849f4482a0d409923b69d446f8daf06b04d0))
+
+## [4.13.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.2...@pgpmjs/core@4.13.3) (2026-01-08)
+
+### Bug Fixes
+
+- **pgpm/core:** update export-meta.ts config to match actual metaschema table definitions ([e1addd0](https://github.com/constructive-io/constructive/commit/e1addd012d7d7ee755df6680b767e0e60542823a))
+
+## [4.13.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.1...@pgpmjs/core@4.13.2) (2026-01-08)
+
+### Bug Fixes
+
+- **pgpm/core:** dynamically query table columns for export instead of hardcoded config ([e0c59b2](https://github.com/constructive-io/constructive/commit/e0c59b20130a9e6d4a8a5ebd0dff8fea703ed60f))
+
+## [4.13.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.13.0...@pgpmjs/core@4.13.1) (2026-01-08)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.2...@pgpmjs/core@4.13.0) (2026-01-08)
+
+### Bug Fixes
+
+- **export:** generate separate meta.sql files per table type ([10ba703](https://github.com/constructive-io/constructive/commit/10ba703f203a33c64b1f13c1bac9e73e14a8b029))
+
+### Features
+
+- **export:** generate separate meta.sql files for each schema type ([e3a65da](https://github.com/constructive-io/constructive/commit/e3a65dacb922a54f2b3747591d0ff3836c6717ff))
+
+## [4.12.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.1...@pgpmjs/core@4.12.2) (2026-01-08)
+
+### Bug Fixes
+
+- remove extension table export (not scoped to database_id) ([3e80509](https://github.com/constructive-io/constructive/commit/3e805096794d108c4231b524de9cf03f1ab5fc07))
+
+## [4.12.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.12.0...@pgpmjs/core@4.12.1) (2026-01-08)
+
+### Bug Fixes
+
+- scope extension export query by database_id via database_extension join ([e4ad67c](https://github.com/constructive-io/constructive/commit/e4ad67ce8c592536f804049876c8e5c78be636eb))
+- use simple WHERE database_id clause for extension export ([295238e](https://github.com/constructive-io/constructive/commit/295238e7efad54801e4bb656f9748c7c44c0ec31))
+
+# [4.12.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.11.0...@pgpmjs/core@4.12.0) (2026-01-08)
+
+### Features
+
+- **csv-to-pg:** add conflictDoNothing option for ON CONFLICT DO NOTHING ([735bfeb](https://github.com/constructive-io/constructive/commit/735bfebc5c4dfb2ee41460a920f2b0560b77a0c6))
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.1...@pgpmjs/core@4.11.0) (2026-01-08)
+
+### Bug Fixes
+
+- **core:** gracefully handle missing tables in exportMeta ([42cce5a](https://github.com/constructive-io/constructive/commit/42cce5adad29c5e45baa5bed7bcc0cc57fd87220))
+
+### Features
+
+- **core:** export all tables from metaschema_public, services_public, and metaschema_modules_public ([0fa6a1f](https://github.com/constructive-io/constructive/commit/0fa6a1f09766e4762f59a382e66efd32b59584e3))
+
 ## [4.10.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@4.10.0...@pgpmjs/core@4.10.1) (2026-01-07)
 
 **Note:** Version bump only for package @pgpmjs/core

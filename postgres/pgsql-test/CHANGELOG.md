@@ -3,6 +3,88 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/constructive-io/constructive/compare/pgsql-test@3.0.1...pgsql-test@3.0.2) (2026-01-25)
+
+**Note:** Version bump only for package pgsql-test
+
+## [3.0.1](https://github.com/constructive-io/constructive/compare/pgsql-test@3.0.0...pgsql-test@3.0.1) (2026-01-24)
+
+**Note:** Version bump only for package pgsql-test
+
+# [3.0.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.26.1...pgsql-test@3.0.0) (2026-01-24)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.26.1](https://github.com/constructive-io/constructive/compare/pgsql-test@2.26.0...pgsql-test@2.26.1) (2026-01-22)
+
+**Note:** Version bump only for package pgsql-test
+
+# [2.26.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.25.1...pgsql-test@2.26.0) (2026-01-20)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.25.1](https://github.com/constructive-io/constructive/compare/pgsql-test@2.25.0...pgsql-test@2.25.1) (2026-01-19)
+
+**Note:** Version bump only for package pgsql-test
+
+# [2.25.0](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.16...pgsql-test@2.25.0) (2026-01-18)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.16](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.15...pgsql-test@2.24.16) (2026-01-18)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.15](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.14...pgsql-test@2.24.15) (2026-01-14)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.14](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.13...pgsql-test@2.24.14) (2026-01-14)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.13](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.12...pgsql-test@2.24.13) (2026-01-10)
+
+### Bug Fixes
+
+- update snapshot for PG17 error message format ([29add38](https://github.com/constructive-io/constructive/commit/29add384c25fadff12291bd72f0d390e53787425))
+
+## [2.24.12](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.11...pgsql-test@2.24.12) (2026-01-09)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.11](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.10...pgsql-test@2.24.11) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.10](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.9...pgsql-test@2.24.10) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.9](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.8...pgsql-test@2.24.9) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.8](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.7...pgsql-test@2.24.8) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.7](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.6...pgsql-test@2.24.7) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.6](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.5...pgsql-test@2.24.6) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.5](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.4...pgsql-test@2.24.5) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
+## [2.24.4](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.3...pgsql-test@2.24.4) (2026-01-08)
+
+**Note:** Version bump only for package pgsql-test
+
 ## [2.24.3](https://github.com/constructive-io/constructive/compare/pgsql-test@2.24.2...pgsql-test@2.24.3) (2026-01-07)
 
 **Note:** Version bump only for package pgsql-test

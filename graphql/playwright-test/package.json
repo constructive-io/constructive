@@ -1,0 +1,58 @@
+{
+  "name": "@constructive-io/playwright-test",
+  "version": "1.0.3",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive Playwright Testing with HTTP server support",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "playwright test",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.16.0",
+    "makage": "^0.1.10"
+  },
+  "dependencies": {
+    "@constructive-io/graphql-env": "workspace:^",
+    "@constructive-io/graphql-server": "workspace:^",
+    "@constructive-io/graphql-test": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
+    "@pgpmjs/types": "workspace:^",
+    "express": "^5.2.1",
+    "graphile-test": "workspace:^",
+    "pg": "^8.17.1",
+    "pg-cache": "workspace:^",
+    "pgsql-test": "workspace:^"
+  },
+  "keywords": [
+    "testing",
+    "playwright",
+    "graphql",
+    "graphile",
+    "constructive",
+    "e2e",
+    "integration"
+  ]
+}

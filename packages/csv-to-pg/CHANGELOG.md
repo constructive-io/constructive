@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.6.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.5.0...csv-to-pg@3.6.0) (2026-01-20)
+
+**Note:** Version bump only for package csv-to-pg
+
+# [3.5.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.4.1...csv-to-pg@3.5.0) (2026-01-18)
+
+**Note:** Version bump only for package csv-to-pg
+
+## [3.4.1](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.4.0...csv-to-pg@3.4.1) (2026-01-08)
+
+### Bug Fixes
+
+- **csv-to-pg:** add interval type support for proper PostgreSQL interval formatting ([809c23d](https://github.com/constructive-io/constructive/commit/809c23dd9611046bdb6106f3de186b303d66496d))
+- **csv-to-pg:** add uuid[] type support for proper PostgreSQL array formatting ([45f9cae](https://github.com/constructive-io/constructive/commit/45f9caead0db9513c47eb61f863f6aa19b63ab91))
+
+# [3.4.0](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.3.4...csv-to-pg@3.4.0) (2026-01-08)
+
+### Features
+
+- **csv-to-pg:** add conflictDoNothing option for ON CONFLICT DO NOTHING ([735bfeb](https://github.com/constructive-io/constructive/commit/735bfebc5c4dfb2ee41460a920f2b0560b77a0c6))
+
 ## [3.3.4](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.3.3...csv-to-pg@3.3.4) (2026-01-07)
 
 **Note:** Version bump only for package csv-to-pg

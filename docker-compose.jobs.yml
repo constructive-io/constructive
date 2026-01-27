@@ -1,64 +1,76 @@
 services:
-  # Constructive GraphQL API server
-  constructive-server:
-    container_name: constructive-server
+  # Constructive Admin GraphQL API server (internal, header-based routing)
+  constructive-admin-server:
+    container_name: constructive-admin-server
     image: constructive:dev
     build:
       context: .
       dockerfile: ./Dockerfile
-    # The image entrypoint already runs the Constructive CLI (`constructive`).
-    # We only need to provide the subcommand and flags here.
-    entrypoint: ["constructive", "server", "--port", "3000", "--origin", "*", "--strictAuth", "false"]
+    entrypoint: ["constructive", "server", "--host", "0.0.0.0", "--port", "3000", "--origin", "*"]
     environment:
       NODE_ENV: development
       # Server
       PORT: "3000"
       SERVER_HOST: "0.0.0.0"
       SERVER_TRUST_PROXY: "true"
-      SERVER_ORIGIN: "*"          # allow all origins in dev
+      SERVER_ORIGIN: "*"
       SERVER_STRICT_AUTH: "false"
       # Postgres connection (matches postgres service)
       PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: password
-      PGDATABASE: launchql
-      # API meta configuration (static mode for dev)
-      API_ENABLE_META: "true"
-      API_EXPOSED_SCHEMAS: "metaschema_public,services_public"
+      PGDATABASE: constructive
+      # Api configuration
+      API_ENABLE_SERVICES: "true"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      # API_IS_PUBLIC=false enables header-based routing (X-Api-Name, X-Database-Id, X-Meta-Schema)
+      API_IS_PUBLIC: "false"
+      # Meta schemas used for schema validation and X-Meta-Schema routing
+      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
       API_ANON_ROLE: "administrator"
       API_ROLE_NAME: "administrator"
-      API_DEFAULT_DATABASE_ID: "dbe"
+    ports:
+      - "3002:3000"
+    networks:
+      constructive-net:
+        aliases:
+          - constructive-admin-server
+
+  # Constructive Public GraphQL API server (external, domain-based routing)
+  constructive-server:
+    container_name: constructive-server
+    image: constructive:dev
+    entrypoint: ["constructive", "server", "--host", "0.0.0.0", "--port", "3000", "--origin", "*"]
+    environment:
+      NODE_ENV: development
+      # Server
+      PORT: "3000"
+      SERVER_HOST: "0.0.0.0"
+      SERVER_TRUST_PROXY: "true"
+      SERVER_ORIGIN: "*"
+      SERVER_STRICT_AUTH: "false"
+      # Postgres connection (matches postgres service)
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGDATABASE: constructive
+      # Api configuration
+      API_ENABLE_SERVICES: "false"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      # Public-facing server
+      API_IS_PUBLIC: "true"
+      # Meta schemas used for schema validation
+      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_ANON_ROLE: "anonymous"
+      API_ROLE_NAME: "authenticated"
     ports:
       - "3000:3000"
     networks:
       constructive-net:
         aliases:
-          # Let other containers call the admin API using the seeded domain route.
-          - admin.localhost
-
-  # Simple email function (Knative-style HTTP function)
-  simple-email:
-    container_name: simple-email
-    image: constructive:dev
-    # Override the image entrypoint (Constructive CLI) and run the Node function directly.
-    entrypoint: ["node", "functions/simple-email/dist/index.js"]
-    environment:
-      NODE_ENV: development
-      LOG_LEVEL: info
-      SIMPLE_EMAIL_DRY_RUN: "${SIMPLE_EMAIL_DRY_RUN:-true}"
-      # Mailgun / email provider configuration for the Postmaster package
-      # Replace with real credentials for local testing.
-      MAILGUN_API_KEY: "${MAILGUN_API_KEY:-change-me-mailgun-api-key}"
-      MAILGUN_KEY: "${MAILGUN_KEY:-change-me-mailgun-api-key}"
-      MAILGUN_DOMAIN: "mg.constructive.io"
-      MAILGUN_FROM: "no-reply@mg.constructive.io"
-      MAILGUN_REPLY: "info@mg.constructive.io"
-    ports:
-      # Expose function locally (optional)
-      - "8081:8080"
-    networks:
-      - constructive-net
+          - constructive-server
 
   # Send email link function (invite, password reset, verification)
   send-email-link:
@@ -69,9 +81,11 @@ services:
       NODE_ENV: development
       LOG_LEVEL: info
       DEFAULT_DATABASE_ID: "dbe"
-      # Constructive selects the API by Host header; use a seeded domain route.
-      GRAPHQL_URL: "http://admin.localhost:3000/graphql"
-      META_GRAPHQL_URL: "http://admin.localhost:3000/graphql"
+      # Point to admin server (uses X-Api-Name header routing when API_IS_PUBLIC=false)
+      GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+      META_GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+      # API name for header-based routing (X-Api-Name header) - kept for future use
+      GRAPHQL_API_NAME: "private"
       # Optional: provide an existing API token (Bearer) if your server requires it.
       GRAPHQL_AUTH_TOKEN: "${GRAPHQL_AUTH_TOKEN:-}"
       # Mailgun / email provider configuration for the Postmaster package
@@ -86,7 +100,6 @@ services:
       LOCAL_APP_PORT: "3000"
       SEND_EMAIL_LINK_DRY_RUN: "${SEND_EMAIL_LINK_DRY_RUN:-true}"
     ports:
-      # Expose function locally (optional)
       - "8082:8080"
     networks:
       - constructive-net
@@ -95,10 +108,8 @@ services:
   knative-job-service:
     container_name: knative-job-service
     image: constructive:dev
-    # Override the image entrypoint and run the jobs runtime directly.
     entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
     depends_on:
-      - simple-email
       - send-email-link
     environment:
       NODE_ENV: development
@@ -108,12 +119,12 @@ services:
       PGHOST: postgres
       PGPASSWORD: password
       PGPORT: "5432"
-      PGDATABASE: launchql
+      PGDATABASE: constructive
       JOBS_SCHEMA: app_jobs
 
       # Worker configuration
       JOBS_SUPPORT_ANY: "false"
-      JOBS_SUPPORTED: "simple-email,send-email-link"
+      JOBS_SUPPORTED: "send-email-link"
       HOSTNAME: "knative-job-service-1"
 
       # Callback HTTP server (job completion callbacks)
@@ -123,12 +134,10 @@ services:
       JOBS_CALLBACK_HOST: "knative-job-service"
 
       # Function gateway base URL (used by worker when no dev map is present)
-      INTERNAL_GATEWAY_URL: "http://simple-email:8080"
+      INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
 
       # Development-only map from task identifier -> function URL
-      # Used by @constructive-io/knative-job-worker when NODE_ENV !== 'production'.
-      # This lets the worker call the function containers directly in docker-compose.
-      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"simple-email":"http://simple-email:8080","send-email-link":"http://send-email-link:8080"}'
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080"}'
 
     ports:
       - "8080:8080"

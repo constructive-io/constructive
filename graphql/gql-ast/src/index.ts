@@ -5,12 +5,12 @@ import {
   DirectiveNode,
   DocumentNode,
   FieldNode,
+  FloatValueNode,
   FragmentDefinitionNode,
   IntValueNode,
   ListTypeNode,
   ListValueNode,
   NamedTypeNode,
-  // NameNode,
   NullValueNode,
   ObjectFieldNode,
   ObjectValueNode,
@@ -19,6 +19,7 @@ import {
   SelectionSetNode,
   StringValueNode,
   TypeNode,
+  ValueNode,
   VariableDefinitionNode,
   VariableNode
 } from 'graphql';
@@ -118,7 +119,12 @@ export const booleanValue = ({ value }: { value: boolean }): BooleanValueNode =>
   value
 });
 
-export const listValue = ({ values }: { values: any[] }): ListValueNode => ({
+export const floatValue = ({ value }: { value: string }): FloatValueNode => ({
+  kind: 'FloatValue',
+  value
+});
+
+export const listValue = ({ values }: { values: ValueNode[] }): ListValueNode => ({
   kind: 'ListValue',
   values
 });
@@ -148,7 +154,7 @@ export const fragmentDefinition = ({
   selectionSet
 });
 
-export const objectField = ({ name, value }: { name: string; value: any }): ObjectFieldNode => ({
+export const objectField = ({ name, value }: { name: string; value: ValueNode }): ObjectFieldNode => ({
   kind: 'ObjectField',
   name: {
     kind: 'Name',
@@ -178,7 +184,7 @@ export const field = ({
   selectionSet
 });
 
-export const argument = ({ name, value }: { name: string; value: any }): ArgumentNode => ({
+export const argument = ({ name, value }: { name: string; value: ValueNode }): ArgumentNode => ({
   kind: 'Argument',
   name: {
     kind: 'Name',
