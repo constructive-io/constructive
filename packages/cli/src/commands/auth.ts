@@ -5,12 +5,12 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import chalk from 'yanse';
 import {
-  getCurrentProject,
-  loadProject,
-  listProjects,
-  getProjectCredentials,
-  setProjectCredentials,
-  removeProjectCredentials,
+  getCurrentContext,
+  loadContext,
+  listContexts,
+  getContextCredentials,
+  setContextCredentials,
+  removeContextCredentials,
   hasValidCredentials,
   loadSettings,
 } from '../config';
@@ -21,19 +21,19 @@ Constructive Authentication:
   cnc auth <command> [OPTIONS]
 
 Commands:
-  set-token <token>     Set API token for the current project
+  set-token <token>     Set API token for the current context
   status                Show authentication status
-  logout                Remove credentials for the current project
+  logout                Remove credentials for the current context
 
 Options:
-  --project <name>      Specify project (defaults to current project)
+  --context <name>      Specify context (defaults to current context)
   --expires <date>      Token expiration date (ISO format)
 
 Examples:
   cnc auth set-token eyJhbGciOiJIUzI1NiIs...
   cnc auth status
   cnc auth logout
-  cnc auth set-token <token> --project my-app
+  cnc auth set-token <token> --context my-api
 
   --help, -h            Show this help message
 `;
@@ -84,51 +84,48 @@ async function handleSubcommand(
   }
 }
 
-async function getTargetProject(
+async function getTargetContext(
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer
 ): Promise<string> {
-  // Check if project was specified via --project flag
-  if (argv.project && typeof argv.project === 'string') {
-    const project = loadProject(argv.project);
-    if (!project) {
-      console.error(chalk.red(`Project "${argv.project}" not found.`));
+  if (argv.context && typeof argv.context === 'string') {
+    const context = loadContext(argv.context);
+    if (!context) {
+      console.error(chalk.red(`Context "${argv.context}" not found.`));
       process.exit(1);
     }
-    return argv.project;
+    return argv.context;
   }
 
-  // Try to use current project
-  const current = getCurrentProject();
+  const current = getCurrentContext();
   if (current) {
     return current.name;
   }
 
-  // No current project, prompt user to select
-  const projects = listProjects();
-  if (projects.length === 0) {
-    console.error(chalk.red('No projects configured.'));
-    console.log(chalk.gray('Run "cnc project init <name>" to create one first.'));
+  const contexts = listContexts();
+  if (contexts.length === 0) {
+    console.error(chalk.red('No contexts configured.'));
+    console.log(chalk.gray('Run "cnc context create <name>" to create one first.'));
     process.exit(1);
   }
 
   const answer = await prompter.prompt(argv, [
     {
       type: 'autocomplete',
-      name: 'project',
-      message: 'Select project',
-      options: projects.map(p => p.name),
+      name: 'context',
+      message: 'Select context',
+      options: contexts.map(c => c.name),
     },
   ]);
 
-  return answer.project as string;
+  return answer.context as string;
 }
 
 async function handleSetToken(
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer
 ) {
-  const projectName = await getTargetProject(argv, prompter);
+  const contextName = await getTargetContext(argv, prompter);
   const { first: token, newArgv } = extractFirst(argv);
 
   let tokenValue = token as string;
@@ -152,9 +149,9 @@ async function handleSetToken(
 
   const expiresAt = argv.expires as string | undefined;
 
-  setProjectCredentials(projectName, tokenValue.trim(), { expiresAt });
+  setContextCredentials(contextName, tokenValue.trim(), { expiresAt });
 
-  console.log(chalk.green(`Token saved for project: ${projectName}`));
+  console.log(chalk.green(`Token saved for context: ${contextName}`));
   if (expiresAt) {
     console.log(chalk.gray(`Expires: ${expiresAt}`));
   }
@@ -162,40 +159,38 @@ async function handleSetToken(
 
 function handleStatus(argv: Partial<Record<string, unknown>>) {
   const settings = loadSettings();
-  const projects = listProjects();
+  const contexts = listContexts();
 
-  if (projects.length === 0) {
-    console.log(chalk.gray('No projects configured.'));
+  if (contexts.length === 0) {
+    console.log(chalk.gray('No contexts configured.'));
     return;
   }
 
-  // If --project specified, show only that project
-  if (argv.project && typeof argv.project === 'string') {
-    const project = loadProject(argv.project);
-    if (!project) {
-      console.error(chalk.red(`Project "${argv.project}" not found.`));
+  if (argv.context && typeof argv.context === 'string') {
+    const context = loadContext(argv.context);
+    if (!context) {
+      console.error(chalk.red(`Context "${argv.context}" not found.`));
       process.exit(1);
     }
-    showProjectAuthStatus(project.name, settings.currentProject === project.name);
+    showContextAuthStatus(context.name, settings.currentContext === context.name);
     return;
   }
 
-  // Show all projects
   console.log(chalk.bold('Authentication Status:'));
   console.log();
 
-  for (const project of projects) {
-    const isCurrent = project.name === settings.currentProject;
-    showProjectAuthStatus(project.name, isCurrent);
+  for (const context of contexts) {
+    const isCurrent = context.name === settings.currentContext;
+    showContextAuthStatus(context.name, isCurrent);
   }
 }
 
-function showProjectAuthStatus(projectName: string, isCurrent: boolean) {
-  const creds = getProjectCredentials(projectName);
-  const hasAuth = hasValidCredentials(projectName);
+function showContextAuthStatus(contextName: string, isCurrent: boolean) {
+  const creds = getContextCredentials(contextName);
+  const hasAuth = hasValidCredentials(contextName);
   const marker = isCurrent ? chalk.green('*') : ' ';
 
-  console.log(`${marker} ${chalk.bold(projectName)}`);
+  console.log(`${marker} ${chalk.bold(contextName)}`);
 
   if (hasAuth && creds) {
     console.log(`    Status: ${chalk.green('Authenticated')}`);
@@ -232,11 +227,11 @@ async function handleLogout(
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer
 ) {
-  const projectName = await getTargetProject(argv, prompter);
+  const contextName = await getTargetContext(argv, prompter);
 
-  const creds = getProjectCredentials(projectName);
+  const creds = getContextCredentials(contextName);
   if (!creds) {
-    console.log(chalk.gray(`No credentials found for project: ${projectName}`));
+    console.log(chalk.gray(`No credentials found for context: ${contextName}`));
     return;
   }
 
@@ -244,7 +239,7 @@ async function handleLogout(
     {
       type: 'confirm',
       name: 'confirm',
-      message: `Remove credentials for project "${projectName}"?`,
+      message: `Remove credentials for context "${contextName}"?`,
       default: false,
     },
   ]);
@@ -254,9 +249,9 @@ async function handleLogout(
     return;
   }
 
-  if (removeProjectCredentials(projectName)) {
-    console.log(chalk.green(`Credentials removed for project: ${projectName}`));
+  if (removeContextCredentials(contextName)) {
+    console.log(chalk.green(`Credentials removed for context: ${contextName}`));
   } else {
-    console.log(chalk.gray(`No credentials found for project: ${projectName}`));
+    console.log(chalk.gray(`No credentials found for context: ${contextName}`));
   }
 }

@@ -7,10 +7,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { appstash, resolve } from 'appstash';
 import type {
-  ProjectConfig,
+  ContextConfig,
   GlobalSettings,
   Credentials,
-  ProjectCredentials,
+  ContextCredentials,
 } from './types';
 import { DEFAULT_SETTINGS } from './types';
 
@@ -32,15 +32,15 @@ function getConfigPath(filename: string): string {
 }
 
 /**
- * Get path to a project config file
+ * Get path to a context config file
  */
-function getProjectConfigPath(projectName: string): string {
+function getContextConfigPath(contextName: string): string {
   const dirs = getAppDirs();
-  const projectsDir = resolve(dirs, 'config', 'projects');
-  if (!fs.existsSync(projectsDir)) {
-    fs.mkdirSync(projectsDir, { recursive: true });
+  const contextsDir = resolve(dirs, 'config', 'contexts');
+  if (!fs.existsSync(contextsDir)) {
+    fs.mkdirSync(contextsDir, { recursive: true });
   }
-  return path.join(projectsDir, `${projectName}.json`);
+  return path.join(contextsDir, `${contextName}.json`);
 }
 
 /**
@@ -102,13 +102,13 @@ export function saveCredentials(credentials: Credentials): void {
 }
 
 /**
- * Load a project configuration
+ * Load a context configuration
  */
-export function loadProject(projectName: string): ProjectConfig | null {
-  const projectPath = getProjectConfigPath(projectName);
-  if (fs.existsSync(projectPath)) {
+export function loadContext(contextName: string): ContextConfig | null {
+  const contextPath = getContextConfigPath(contextName);
+  if (fs.existsSync(contextPath)) {
     try {
-      const content = fs.readFileSync(projectPath, 'utf8');
+      const content = fs.readFileSync(contextPath, 'utf8');
       return JSON.parse(content);
     } catch {
       return null;
@@ -118,110 +118,110 @@ export function loadProject(projectName: string): ProjectConfig | null {
 }
 
 /**
- * Save a project configuration
+ * Save a context configuration
  */
-export function saveProject(project: ProjectConfig): void {
-  const projectPath = getProjectConfigPath(project.name);
-  fs.writeFileSync(projectPath, JSON.stringify(project, null, 2));
+export function saveContext(context: ContextConfig): void {
+  const contextPath = getContextConfigPath(context.name);
+  fs.writeFileSync(contextPath, JSON.stringify(context, null, 2));
 }
 
 /**
- * Delete a project configuration
+ * Delete a context configuration
  */
-export function deleteProject(projectName: string): boolean {
-  const projectPath = getProjectConfigPath(projectName);
-  if (fs.existsSync(projectPath)) {
-    fs.unlinkSync(projectPath);
+export function deleteContext(contextName: string): boolean {
+  const contextPath = getContextConfigPath(contextName);
+  if (fs.existsSync(contextPath)) {
+    fs.unlinkSync(contextPath);
     return true;
   }
   return false;
 }
 
 /**
- * List all project configurations
+ * List all context configurations
  */
-export function listProjects(): ProjectConfig[] {
+export function listContexts(): ContextConfig[] {
   const dirs = getAppDirs();
-  const projectsDir = resolve(dirs, 'config', 'projects');
-  if (!fs.existsSync(projectsDir)) {
+  const contextsDir = resolve(dirs, 'config', 'contexts');
+  if (!fs.existsSync(contextsDir)) {
     return [];
   }
 
-  const files = fs.readdirSync(projectsDir).filter(f => f.endsWith('.json'));
-  const projects: ProjectConfig[] = [];
+  const files = fs.readdirSync(contextsDir).filter(f => f.endsWith('.json'));
+  const contexts: ContextConfig[] = [];
 
   for (const file of files) {
     try {
-      const content = fs.readFileSync(path.join(projectsDir, file), 'utf8');
-      projects.push(JSON.parse(content));
+      const content = fs.readFileSync(path.join(contextsDir, file), 'utf8');
+      contexts.push(JSON.parse(content));
     } catch {
       // Skip invalid files
     }
   }
 
-  return projects;
+  return contexts;
 }
 
 /**
- * Get the current active project
+ * Get the current active context
  */
-export function getCurrentProject(): ProjectConfig | null {
+export function getCurrentContext(): ContextConfig | null {
   const settings = loadSettings();
-  if (settings.currentProject) {
-    return loadProject(settings.currentProject);
+  if (settings.currentContext) {
+    return loadContext(settings.currentContext);
   }
   return null;
 }
 
 /**
- * Set the current active project
+ * Set the current active context
  */
-export function setCurrentProject(projectName: string): boolean {
-  const project = loadProject(projectName);
-  if (!project) {
+export function setCurrentContext(contextName: string): boolean {
+  const context = loadContext(contextName);
+  if (!context) {
     return false;
   }
   const settings = loadSettings();
-  settings.currentProject = projectName;
+  settings.currentContext = contextName;
   saveSettings(settings);
   return true;
 }
 
 /**
- * Create a new project configuration
+ * Create a new context configuration
  */
-export function createProject(
+export function createContext(
   name: string,
   endpoint: string
-): ProjectConfig {
+): ContextConfig {
   const now = new Date().toISOString();
 
-  const project: ProjectConfig = {
+  const context: ContextConfig = {
     name,
     endpoint,
     createdAt: now,
     updatedAt: now,
   };
 
-  saveProject(project);
-  return project;
+  saveContext(context);
+  return context;
 }
 
 /**
- * Get credentials for a project
+ * Get credentials for a context
  */
-export function getProjectCredentials(
-  projectName: string
-): ProjectCredentials | null {
+export function getContextCredentials(
+  contextName: string
+): ContextCredentials | null {
   const credentials = loadCredentials();
-  return credentials.tokens[projectName] || null;
+  return credentials.tokens[contextName] || null;
 }
 
 /**
- * Set credentials for a project
+ * Set credentials for a context
  */
-export function setProjectCredentials(
-  projectName: string,
+export function setContextCredentials(
+  contextName: string,
   token: string,
   options?: {
     expiresAt?: string;
@@ -229,7 +229,7 @@ export function setProjectCredentials(
   }
 ): void {
   const credentials = loadCredentials();
-  credentials.tokens[projectName] = {
+  credentials.tokens[contextName] = {
     token,
     expiresAt: options?.expiresAt,
     refreshToken: options?.refreshToken,
@@ -238,12 +238,12 @@ export function setProjectCredentials(
 }
 
 /**
- * Remove credentials for a project
+ * Remove credentials for a context
  */
-export function removeProjectCredentials(projectName: string): boolean {
+export function removeContextCredentials(contextName: string): boolean {
   const credentials = loadCredentials();
-  if (credentials.tokens[projectName]) {
-    delete credentials.tokens[projectName];
+  if (credentials.tokens[contextName]) {
+    delete credentials.tokens[contextName];
     saveCredentials(credentials);
     return true;
   }
@@ -251,10 +251,10 @@ export function removeProjectCredentials(projectName: string): boolean {
 }
 
 /**
- * Check if a project has valid credentials
+ * Check if a context has valid credentials
  */
-export function hasValidCredentials(projectName: string): boolean {
-  const creds = getProjectCredentials(projectName);
+export function hasValidCredentials(contextName: string): boolean {
+  const creds = getContextCredentials(contextName);
   if (!creds || !creds.token) {
     return false;
   }

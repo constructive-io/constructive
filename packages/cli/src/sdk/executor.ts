@@ -5,58 +5,58 @@
 
 import { executeGraphQL, QueryResult } from './client';
 import {
-  getCurrentProject,
-  loadProject,
-  getProjectCredentials,
+  getCurrentContext,
+  loadContext,
+  getContextCredentials,
   hasValidCredentials,
 } from '../config';
-import type { ProjectConfig } from '../config';
+import type { ContextConfig } from '../config';
 
 /**
- * Execution context
+ * Execution context - bundles context config with credentials
  */
 export interface ExecutionContext {
-  project: ProjectConfig;
+  context: ContextConfig;
   token: string;
 }
 
 /**
- * Get execution context for the current or specified project
+ * Get execution context for the current or specified context
  */
 export async function getExecutionContext(
-  projectName?: string
+  contextName?: string
 ): Promise<ExecutionContext> {
-  let project: ProjectConfig | null;
+  let context: ContextConfig | null;
 
-  if (projectName) {
-    project = loadProject(projectName);
-    if (!project) {
-      throw new Error(`Project "${projectName}" not found.`);
+  if (contextName) {
+    context = loadContext(contextName);
+    if (!context) {
+      throw new Error(`Context "${contextName}" not found.`);
     }
   } else {
-    project = getCurrentProject();
-    if (!project) {
+    context = getCurrentContext();
+    if (!context) {
       throw new Error(
-        'No active project. Run "cnc project init" or "cnc project use" first.'
+        'No active context. Run "cnc context create" or "cnc context use" first.'
       );
     }
   }
 
-  if (!hasValidCredentials(project.name)) {
+  if (!hasValidCredentials(context.name)) {
     throw new Error(
-      `No valid credentials for project "${project.name}". Run "cnc auth set-token" first.`
+      `No valid credentials for context "${context.name}". Run "cnc auth set-token" first.`
     );
   }
 
-  const creds = getProjectCredentials(project.name);
+  const creds = getContextCredentials(context.name);
   if (!creds || !creds.token) {
     throw new Error(
-      `No token found for project "${project.name}". Run "cnc auth set-token" first.`
+      `No token found for context "${context.name}". Run "cnc auth set-token" first.`
     );
   }
 
   return {
-    project,
+    context,
     token: creds.token,
   };
 }
@@ -67,11 +67,11 @@ export async function getExecutionContext(
 export async function execute<T = unknown>(
   query: string,
   variables?: Record<string, unknown>,
-  context?: ExecutionContext
+  execContext?: ExecutionContext
 ): Promise<QueryResult<T>> {
-  const ctx = context || (await getExecutionContext());
+  const ctx = execContext || (await getExecutionContext());
 
-  return executeGraphQL<T>(ctx.project.endpoint, query, variables, {
+  return executeGraphQL<T>(ctx.context.endpoint, query, variables, {
     Authorization: `Bearer ${ctx.token}`,
   });
 }

@@ -3,10 +3,11 @@
  */
 
 /**
- * Project configuration stored in ~/.cnc/config/projects/{name}.json
+ * Context configuration stored in ~/.cnc/config/contexts/{name}.json
+ * Similar to kubectl contexts - bundles endpoint + credentials
  */
-export interface ProjectConfig {
-  /** Project name (used as identifier) */
+export interface ContextConfig {
+  /** Context name (used as identifier) */
   name: string;
   /** GraphQL endpoint URL */
   endpoint: string;
@@ -20,22 +21,22 @@ export interface ProjectConfig {
  * Global settings stored in ~/.cnc/config/settings.json
  */
 export interface GlobalSettings {
-  /** Currently active project name */
-  currentProject?: string;
+  /** Currently active context name */
+  currentContext?: string;
 }
 
 /**
  * Credentials stored in ~/.cnc/config/credentials.json
  */
 export interface Credentials {
-  /** API tokens per project */
-  tokens: Record<string, ProjectCredentials>;
+  /** API tokens per context */
+  tokens: Record<string, ContextCredentials>;
 }
 
 /**
- * Per-project credentials
+ * Per-context credentials
  */
-export interface ProjectCredentials {
+export interface ContextCredentials {
   /** Bearer token for API authentication */
   token: string;
   /** Token expiration timestamp (ISO string) */

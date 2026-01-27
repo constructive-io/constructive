@@ -16,7 +16,7 @@ Options:
   --query <graphql>     GraphQL query/mutation string
   --file <path>         Path to file containing GraphQL query
   --variables <json>    Variables as JSON string
-  --project <name>      Project to use (defaults to current)
+  --context <name>      Context to use (defaults to current)
 
 Examples:
   # Execute inline query
@@ -74,9 +74,9 @@ export default async (
     }
   }
 
-  let context;
+  let execContext;
   try {
-    context = await getExecutionContext(argv.project as string | undefined);
+    execContext = await getExecutionContext(argv.context as string | undefined);
   } catch (error) {
     console.error(
       chalk.red(
@@ -86,11 +86,11 @@ export default async (
     process.exit(1);
   }
 
-  console.log(chalk.gray(`Project: ${context.project.name}`));
-  console.log(chalk.gray(`Endpoint: ${context.project.endpoint}`));
+  console.log(chalk.gray(`Context: ${execContext.context.name}`));
+  console.log(chalk.gray(`Endpoint: ${execContext.context.endpoint}`));
   console.log();
 
-  const result = await execute(query, variables, context);
+  const result = await execute(query, variables, execContext);
 
   if (result.ok) {
     console.log(chalk.green('Success!'));
