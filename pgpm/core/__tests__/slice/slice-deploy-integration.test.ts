@@ -39,8 +39,10 @@ describe('Slice Deploy Integration', () => {
     const outputDir = join(tempDir, 'sliced');
 
     mkdirSync(sourceDir, { recursive: true });
-    mkdirSync(join(sourceDir, 'deploy'), { recursive: true });
-    mkdirSync(join(sourceDir, 'revert'), { recursive: true });
+    mkdirSync(join(sourceDir, 'deploy', 'schemas', 'auth', 'tables'), { recursive: true });
+    mkdirSync(join(sourceDir, 'deploy', 'schemas', 'public', 'functions'), { recursive: true });
+    mkdirSync(join(sourceDir, 'revert', 'schemas', 'auth', 'tables'), { recursive: true });
+    mkdirSync(join(sourceDir, 'revert', 'schemas', 'public', 'functions'), { recursive: true });
 
     const planContent = `%syntax-version=1.0.0
 %project=test-monolith
@@ -55,44 +57,44 @@ schemas/public/functions/get_user [schemas/auth/tables/users schemas/public/sche
     writeFileSync(sourcePlanPath, planContent);
 
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/auth/schema.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'auth', 'schema.sql'),
       'CREATE SCHEMA auth;'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/auth/tables/users.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'auth', 'tables', 'users.sql'),
       'CREATE TABLE auth.users (id SERIAL PRIMARY KEY, email TEXT NOT NULL);'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/auth/tables/sessions.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'auth', 'tables', 'sessions.sql'),
       'CREATE TABLE auth.sessions (id SERIAL PRIMARY KEY, user_id INT REFERENCES auth.users(id));'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/public/schema.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'public', 'schema.sql'),
       'SELECT 1;'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/public/functions/get_user.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'public', 'functions', 'get_user.sql'),
       'CREATE FUNCTION public.get_user(uid INT) RETURNS auth.users AS $$ SELECT * FROM auth.users WHERE id = uid $$ LANGUAGE sql;'
     );
 
     writeFileSync(
-      join(sourceDir, 'revert', 'schemas/auth/schema.sql'),
+      join(sourceDir, 'revert', 'schemas', 'auth', 'schema.sql'),
       'DROP SCHEMA auth CASCADE;'
     );
     writeFileSync(
-      join(sourceDir, 'revert', 'schemas/auth/tables/users.sql'),
+      join(sourceDir, 'revert', 'schemas', 'auth', 'tables', 'users.sql'),
       'DROP TABLE auth.users;'
     );
     writeFileSync(
-      join(sourceDir, 'revert', 'schemas/auth/tables/sessions.sql'),
+      join(sourceDir, 'revert', 'schemas', 'auth', 'tables', 'sessions.sql'),
       'DROP TABLE auth.sessions;'
     );
     writeFileSync(
-      join(sourceDir, 'revert', 'schemas/public/schema.sql'),
+      join(sourceDir, 'revert', 'schemas', 'public', 'schema.sql'),
       'SELECT 1;'
     );
     writeFileSync(
-      join(sourceDir, 'revert', 'schemas/public/functions/get_user.sql'),
+      join(sourceDir, 'revert', 'schemas', 'public', 'functions', 'get_user.sql'),
       'DROP FUNCTION public.get_user(INT);'
     );
 
@@ -142,8 +144,10 @@ schemas/public/functions/get_user [schemas/auth/tables/users schemas/public/sche
     const outputDir = join(tempDir, 'sliced2');
 
     mkdirSync(sourceDir, { recursive: true });
-    mkdirSync(join(sourceDir, 'deploy'), { recursive: true });
-    mkdirSync(join(sourceDir, 'revert'), { recursive: true });
+    mkdirSync(join(sourceDir, 'deploy', 'schemas', 'app_auth_public', 'tables'), { recursive: true });
+    mkdirSync(join(sourceDir, 'deploy', 'schemas', 'app_users_public', 'tables'), { recursive: true });
+    mkdirSync(join(sourceDir, 'revert', 'schemas', 'app_auth_public', 'tables'), { recursive: true });
+    mkdirSync(join(sourceDir, 'revert', 'schemas', 'app_users_public', 'tables'), { recursive: true });
 
     const planContent = `%syntax-version=1.0.0
 %project=test-pattern
@@ -157,26 +161,26 @@ schemas/app_users_public/tables/profiles [schemas/app_users_public/schema schema
     writeFileSync(sourcePlanPath, planContent);
 
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/app_auth_public/schema.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'app_auth_public', 'schema.sql'),
       'CREATE SCHEMA app_auth_public;'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/app_auth_public/tables/users.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'app_auth_public', 'tables', 'users.sql'),
       'CREATE TABLE app_auth_public.users (id SERIAL PRIMARY KEY);'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/app_users_public/schema.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'app_users_public', 'schema.sql'),
       'CREATE SCHEMA app_users_public;'
     );
     writeFileSync(
-      join(sourceDir, 'deploy', 'schemas/app_users_public/tables/profiles.sql'),
+      join(sourceDir, 'deploy', 'schemas', 'app_users_public', 'tables', 'profiles.sql'),
       'CREATE TABLE app_users_public.profiles (id SERIAL PRIMARY KEY, user_id INT REFERENCES app_auth_public.users(id));'
     );
 
-    writeFileSync(join(sourceDir, 'revert', 'schemas/app_auth_public/schema.sql'), 'DROP SCHEMA app_auth_public CASCADE;');
-    writeFileSync(join(sourceDir, 'revert', 'schemas/app_auth_public/tables/users.sql'), 'DROP TABLE app_auth_public.users;');
-    writeFileSync(join(sourceDir, 'revert', 'schemas/app_users_public/schema.sql'), 'DROP SCHEMA app_users_public CASCADE;');
-    writeFileSync(join(sourceDir, 'revert', 'schemas/app_users_public/tables/profiles.sql'), 'DROP TABLE app_users_public.profiles;');
+    writeFileSync(join(sourceDir, 'revert', 'schemas', 'app_auth_public', 'schema.sql'), 'DROP SCHEMA app_auth_public CASCADE;');
+    writeFileSync(join(sourceDir, 'revert', 'schemas', 'app_auth_public', 'tables', 'users.sql'), 'DROP TABLE app_auth_public.users;');
+    writeFileSync(join(sourceDir, 'revert', 'schemas', 'app_users_public', 'schema.sql'), 'DROP SCHEMA app_users_public CASCADE;');
+    writeFileSync(join(sourceDir, 'revert', 'schemas', 'app_users_public', 'tables', 'profiles.sql'), 'DROP TABLE app_users_public.profiles;');
 
     const result = slicePlan({
       sourcePlan: sourcePlanPath,
