@@ -320,20 +320,21 @@ async function handleModuleInit(
 
   const project = new PgpmPackage(ctx.cwd);
 
+  // Track resolved workspace path for both pgpm and non-pgpm workspace types
+  let resolvedWorkspacePath: string | undefined;
+  let workspaceTypeName = '';
+
   // Check workspace requirement based on type (skip if workspaceType is false)
   if (workspaceType !== false) {
-    let workspacePath: string | undefined;
-    let workspaceTypeName = '';
-
     if (workspaceType === 'pgpm') {
-      workspacePath = project.workspacePath;
+      resolvedWorkspacePath = project.workspacePath;
       workspaceTypeName = 'PGPM';
     } else {
-      workspacePath = resolveWorkspaceByType(ctx.cwd, workspaceType);
+      resolvedWorkspacePath = resolveWorkspaceByType(ctx.cwd, workspaceType);
       workspaceTypeName = workspaceType.toUpperCase();
     }
 
-    if (!workspacePath) {
+    if (!resolvedWorkspacePath) {
       const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
 
       // If user explicitly requested module init or we're in non-interactive mode,
@@ -343,8 +344,9 @@ async function handleModuleInit(
         throw errors.NOT_IN_WORKSPACE({});
       }
 
-      // Only offer to create a workspace for pgpm templates
-      if (workspaceType === 'pgpm') {
+      // Offer to create a workspace for pgpm templates or when --dir is specified
+      // (when --dir is specified, we know which workspace variant to use)
+      if (workspaceType === 'pgpm' || ctx.dir) {
         const recoveryQuestion: Question[] = [
           {
             name: 'workspace',
@@ -369,7 +371,7 @@ async function handleModuleInit(
         }
       }
 
-      // User declined or non-pgpm workspace type, show the error
+      // User declined or non-pgpm workspace type without --dir, show the error
       process.stderr.write(`Not inside a ${workspaceTypeName} workspace.\n`);
       throw errors.NOT_IN_WORKSPACE({});
     }
@@ -426,7 +428,7 @@ async function handleModuleInit(
   // Determine output path based on whether we're in a workspace
   let modulePath: string;
   if (project.workspacePath) {
-    // Use workspace-aware initModule
+    // PGPM workspace - use workspace-aware initModule
     await project.initModule({
       name: modName,
       description: answers.description || modName,
@@ -446,8 +448,28 @@ async function handleModuleInit(
     modulePath = isRoot
       ? path.join(ctx.cwd, 'packages', modName)
       : path.join(ctx.cwd, modName);
+  } else if (resolvedWorkspacePath && workspaceType !== false) {
+    // Non-pgpm workspace (pnpm, lerna, npm) - scaffold to packages/ directory
+    const isRoot = path.resolve(resolvedWorkspacePath) === path.resolve(ctx.cwd);
+    modulePath = isRoot
+      ? path.join(ctx.cwd, 'packages', modName)
+      : path.join(ctx.cwd, modName);
+    fs.mkdirSync(modulePath, { recursive: true });
+
+    await scaffoldTemplate({
+      fromPath: ctx.fromPath,
+      outputDir: modulePath,
+      templateRepo: ctx.templateRepo,
+      branch: ctx.branch,
+      dir: ctx.dir,
+      answers: templateAnswers,
+      noTty: ctx.noTty,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd: ctx.cwd,
+      prompter
+    });
   } else {
-    // Not in a workspace - scaffold directly to current directory
+    // Not in any workspace (requiresWorkspace: false) - scaffold to current directory
     modulePath = path.join(ctx.cwd, modName);
     fs.mkdirSync(modulePath, { recursive: true });
 
