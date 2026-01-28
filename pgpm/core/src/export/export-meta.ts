@@ -467,7 +467,6 @@ const config: Record<string, TableConfig> = {
       api_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
-      tokens_table_id: 'uuid',
       users_table_id: 'uuid',
       authenticate: 'text',
       authenticate_strict: 'text',
@@ -486,7 +485,6 @@ const config: Record<string, TableConfig> = {
       users_table_id: 'uuid',
       secrets_table_id: 'uuid',
       encrypted_table_id: 'uuid',
-      tokens_table_id: 'uuid',
       sign_in_function: 'text',
       sign_up_function: 'text',
       sign_out_function: 'text',
@@ -701,17 +699,21 @@ const config: Record<string, TableConfig> = {
       table_name: 'text'
     }
   },
-  tokens_module: {
+  sessions_module: {
     schema: 'metaschema_modules_public',
-    table: 'tokens_module',
+    table: 'sessions_module',
     fields: {
       id: 'uuid',
       database_id: 'uuid',
       schema_id: 'uuid',
-      table_id: 'uuid',
-      owned_table_id: 'uuid',
-      tokens_default_expiration: 'interval',
-      tokens_table: 'text'
+      sessions_table_id: 'uuid',
+      session_credentials_table_id: 'uuid',
+      auth_settings_table_id: 'uuid',
+      users_table_id: 'uuid',
+      sessions_default_expiration: 'interval',
+      sessions_table: 'text',
+      session_credentials_table: 'text',
+      auth_settings_table: 'text'
     }
   },
   secrets_module: {
@@ -809,7 +811,8 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       schema_id: 'uuid',
       users_table_id: 'uuid',
-      tokens_table_id: 'uuid',
+      sessions_table_id: 'uuid',
+      session_credentials_table_id: 'uuid',
       secrets_table_id: 'uuid',
       addresses_table_id: 'uuid',
       user_field: 'text',
@@ -1024,7 +1027,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('membership_types_module', `SELECT * FROM metaschema_modules_public.membership_types_module WHERE database_id = $1`);
   await queryAndParse('invites_module', `SELECT * FROM metaschema_modules_public.invites_module WHERE database_id = $1`);
   await queryAndParse('emails_module', `SELECT * FROM metaschema_modules_public.emails_module WHERE database_id = $1`);
-  await queryAndParse('tokens_module', `SELECT * FROM metaschema_modules_public.tokens_module WHERE database_id = $1`);
+  await queryAndParse('sessions_module', `SELECT * FROM metaschema_modules_public.sessions_module WHERE database_id = $1`);
   await queryAndParse('secrets_module', `SELECT * FROM metaschema_modules_public.secrets_module WHERE database_id = $1`);
   await queryAndParse('profiles_module', `SELECT * FROM metaschema_modules_public.profiles_module WHERE database_id = $1`);
   await queryAndParse('encrypted_secrets_module', `SELECT * FROM metaschema_modules_public.encrypted_secrets_module WHERE database_id = $1`);
