@@ -51,8 +51,9 @@ jobs:
             env: {}
           - package: uploads/uuid-stream
             env: {}
-          - package: postgres/introspectron
-            env: {}
+          # DISABLED during v5 migration - has test that imports graphql-test:
+          # - package: postgres/introspectron
+          #   env: {}
           - package: packages/query-builder
             env: {}
           # DISABLED during v5 migration:
