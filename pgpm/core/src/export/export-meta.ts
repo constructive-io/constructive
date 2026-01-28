@@ -467,6 +467,8 @@ const config: Record<string, TableConfig> = {
       api_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
+      session_credentials_table_id: 'uuid',
+      sessions_table_id: 'uuid',
       users_table_id: 'uuid',
       authenticate: 'text',
       authenticate_strict: 'text',
@@ -485,6 +487,10 @@ const config: Record<string, TableConfig> = {
       users_table_id: 'uuid',
       secrets_table_id: 'uuid',
       encrypted_table_id: 'uuid',
+      sessions_table_id: 'uuid',
+      session_credentials_table_id: 'uuid',
+      audits_table_id: 'uuid',
+      audits_table_name: 'text',
       sign_in_function: 'text',
       sign_up_function: 'text',
       sign_out_function: 'text',
@@ -497,7 +503,9 @@ const config: Record<string, TableConfig> = {
       reset_password_function: 'text',
       forgot_password_function: 'text',
       send_verification_email_function: 'text',
-      verify_email_function: 'text'
+      verify_email_function: 'text',
+      verify_password_function: 'text',
+      check_password_function: 'text'
     }
   },
   memberships_module: {
