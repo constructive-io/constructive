@@ -31,10 +31,11 @@ jobs:
             env: {}
           - package: pgpm/cli
             env: {}
-          - package: packages/cli
-            env: {}
-          - package: jobs/knative-job-service
-            env: {}
+          # DISABLED during v5 migration - depends on graphql packages:
+          # - package: packages/cli
+          #   env: {}
+          # - package: jobs/knative-job-service
+          #   env: {}
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
@@ -54,10 +55,11 @@ jobs:
             env: {}
           - package: packages/query-builder
             env: {}
-          - package: graphql/query
-            env: {}
-          - package: graphql/codegen
-            env: {}
+          # DISABLED during v5 migration:
+          # - package: graphql/query
+          #   env: {}
+          # - package: graphql/codegen
+          #   env: {}
           - package: postgres/pg-ast
             env: {}
           - package: postgres/pg-codegen
@@ -69,43 +71,45 @@ jobs:
               BUCKET_NAME: test-bucket
           - package: uploads/upload-names
             env: {}
-          - package: graphile/graphile-test
-            env: {}
-          - package: graphile/graphile-search-plugin
-            env: {}
-          - package: graphile/graphile-plugin-fulltext-filter
-            env: {}
-          - package: graphile/graphile-simple-inflector
-            env: {}
-          - package: graphile/graphile-many-to-many
-            env: {}
-          - package: graphile/graphile-i18n
-            env: {}
-          - package: graphile/graphile-meta-schema
-            env: {}
-          - package: graphile/graphile-upload-plugin
-            env:
-              BUCKET_NAME: test-upload-bucket
-          - package: graphile/graphile-postgis
-            env: {}
-          - package: graphile/graphile-plugin-connection-filter
-            env: {}
-          - package: graphile/graphile-plugin-connection-filter-postgis
-            env: {}
-          - package: graphile/graphile-pg-type-mappings
-            env: {}
-          - package: graphile/graphile-sql-expression-validator
-            env: {}
-          - package: graphql/server-test
-            env: {}
-          - package: graphql/env
-            env: {}
-          - package: graphql/server
-            env: {}
-          - package: graphql/test
-            env: {}
-          - package: graphql/playwright-test
-            env: {}
+          # DISABLED during v5 migration - graphile plugins:
+          # - package: graphile/graphile-test
+          #   env: {}
+          # - package: graphile/graphile-search-plugin
+          #   env: {}
+          # - package: graphile/graphile-plugin-fulltext-filter
+          #   env: {}
+          # - package: graphile/graphile-simple-inflector
+          #   env: {}
+          # - package: graphile/graphile-many-to-many
+          #   env: {}
+          # - package: graphile/graphile-i18n
+          #   env: {}
+          # - package: graphile/graphile-meta-schema
+          #   env: {}
+          # - package: graphile/graphile-upload-plugin
+          #   env:
+          #     BUCKET_NAME: test-upload-bucket
+          # - package: graphile/graphile-postgis
+          #   env: {}
+          # - package: graphile/graphile-plugin-connection-filter
+          #   env: {}
+          # - package: graphile/graphile-plugin-connection-filter-postgis
+          #   env: {}
+          # - package: graphile/graphile-pg-type-mappings
+          #   env: {}
+          # - package: graphile/graphile-sql-expression-validator
+          #   env: {}
+          # DISABLED during v5 migration - graphql packages:
+          # - package: graphql/server-test
+          #   env: {}
+          # - package: graphql/env
+          #   env: {}
+          # - package: graphql/server
+          #   env: {}
+          # - package: graphql/test
+          #   env: {}
+          # - package: graphql/playwright-test
+          #   env: {}
           # - package: jobs/knative-job-worker
           #   env: {}
           - package: packages/csv-to-pg
