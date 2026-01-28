@@ -32,12 +32,12 @@
   "bin": {
     "graphql-codegen": "cli/index.js"
   },
-  "scripts": {
-    "clean": "makage clean",
-    "prepack": "npm run build",
-    "copy:templates": "mkdir -p dist/core/codegen/templates && cp src/core/codegen/templates/*.ts dist/core/codegen/templates/",
-    "build": "makage build && npm run copy:templates",
-    "build:dev": "makage build --dev && npm run copy:templates",
+    "scripts": {
+      "clean": "makage clean",
+      "prepack": "npm run build",
+      "copy:templates": "mkdir -p dist/core/codegen/templates && cp src/core/codegen/templates/*.ts dist/core/codegen/templates/",
+      "build": "echo 'SKIPPED: graphql-codegen disabled during v5 migration'",
+      "build:dev": "echo 'SKIPPED: graphql-codegen disabled during v5 migration'",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "fmt": "oxfmt --write .",

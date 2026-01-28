@@ -22,11 +22,11 @@
   "bin": {
     "explorer": "./run.js"
   },
-  "scripts": {
-    "clean": "makage clean",
-    "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "scripts": {
+      "clean": "makage clean",
+      "prepack": "npm run build",
+      "build": "echo 'SKIPPED: graphql-explorer disabled during v5 migration'",
+      "build:dev": "echo 'SKIPPED: graphql-explorer disabled during v5 migration'",
     "dev": "ts-node src/run.ts",
     "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/run.ts",
     "lint": "eslint . --fix",

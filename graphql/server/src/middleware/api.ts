@@ -3,51 +3,19 @@ import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { parseUrl } from '@constructive-io/url-domains';
 import { NextFunction, Request, Response } from 'express';
-import { getSchema, GraphileQuery } from 'graphile-query';
-import { getGraphileSettings } from 'graphile-settings';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
-/**
- * Normalizes API records into ApiStructure
- */
-import {
-  apiListSelect,
-  apiSelect,
-  connectionFirst,
-  createGraphileOrm,
-  domainSelect,
-  normalizeApiRecord,
-  type ApiListRecord,
-  type ApiQueryOps,
-  type ApiRecord,
-  type DomainLookupModel,
-  type DomainRecord,
-} from './gql';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
 import './types'; // for Request type
-
-export { normalizeApiRecord } from './gql';
 
 const log = new Logger('api');
 const isDev = () => getNodeEnv() === 'development';
 
-type GraphileQuerySettings = ReturnType<typeof getGraphileSettings> & {
-  schema: string[] | string;
-};
-
 const isApiError = (svc: ApiConfigResult): svc is ApiError =>
   !!svc && typeof (svc as ApiError).errorHtml === 'string';
-
-const getPortFromRequest = (req: Request): string | null => {
-  const host = req.headers.host;
-  if (!host) return null;
-
-  const parts = host.split(':');
-  return parts.length === 2 ? `:${parts[1]}` : null;
-};
 
 const parseCommaSeparatedHeader = (value: string): string[] =>
   value
@@ -171,77 +139,150 @@ const createAdminApiStructure = ({
   return api;
 };
 
+/**
+ * Query API by domain and subdomain using direct SQL
+ * 
+ * TODO: This is a simplified v5 implementation that uses direct SQL queries
+ * instead of the v4 graphile-query. Once graphile-query is ported to v5,
+ * we can restore the GraphQL-based lookup.
+ */
 const queryServiceByDomainAndSubdomain = async ({
   opts,
   key,
-  domainModel,
+  pool,
   domain,
   subdomain,
 }: {
   opts: ApiOptions;
   key: string;
-  domainModel: DomainLookupModel;
+  pool: Pool;
   domain: string;
   subdomain: string | null;
 }): Promise<ApiStructure | null> => {
-  const where = {
-    domain: { equalTo: domain },
-    subdomain:
-      subdomain === null || subdomain === undefined
-        ? { isNull: true }
-        : { equalTo: subdomain },
-  };
-
-  const result = await domainModel
-    .findFirst({ select: domainSelect, where })
-    .execute();
-
-  if (!result.ok) {
-    log.error('GraphQL query errors:', result.errors);
-    return null;
-  }
-
-  const domainRecord = result.data.domains.nodes[0] as DomainRecord | undefined;
-  const api = domainRecord?.api as ApiRecord | undefined;
   const apiPublic = opts.api?.isPublic;
-  if (!api || api.isPublic !== apiPublic) return null;
-
-  const apiStructure = normalizeApiRecord(api);
-  svcCache.set(key, apiStructure);
-  return apiStructure;
+  
+  try {
+    const query = `
+      SELECT 
+        a.id,
+        a.name,
+        a.database_id,
+        a.is_public,
+        a.anon_role,
+        a.role_name,
+        d.database_name as dbname,
+        COALESCE(
+          (SELECT array_agg(s.schema_name) 
+           FROM services_public.api_schemas s 
+           WHERE s.api_id = a.id),
+          ARRAY[]::text[]
+        ) as schemas
+      FROM services_public.domains dom
+      JOIN services_public.apis a ON a.id = dom.api_id
+      LEFT JOIN services_public.databases d ON d.id = a.database_id
+      WHERE dom.domain = $1 
+        AND ($2::text IS NULL AND dom.subdomain IS NULL OR dom.subdomain = $2)
+        AND a.is_public = $3
+    `;
+    
+    const result = await pool.query(query, [domain, subdomain, apiPublic]);
+    
+    if (result.rows.length === 0) {
+      return null;
+    }
+    
+    const row = result.rows[0];
+    const apiStructure: ApiStructure = {
+      dbname: row.dbname || opts.pg?.database || '',
+      anonRole: row.anon_role || 'anon',
+      roleName: row.role_name || 'authenticated',
+      schema: row.schemas || [],
+      apiModules: [],
+      domains: [],
+      databaseId: row.database_id,
+      isPublic: row.is_public,
+    };
+    
+    svcCache.set(key, apiStructure);
+    return apiStructure;
+  } catch (err: any) {
+    if (err.message?.includes('does not exist')) {
+      log.debug(`services_public schema not found, skipping domain lookup`);
+      return null;
+    }
+    throw err;
+  }
 };
 
+/**
+ * Query API by name using direct SQL
+ */
 export const queryServiceByApiName = async ({
   opts,
   key,
-  queryOps,
+  pool,
   databaseId,
   name,
 }: {
   opts: ApiOptions;
   key: string;
-  queryOps: ApiQueryOps;
+  pool: Pool;
   databaseId?: string;
   name: string;
 }): Promise<ApiStructure | null> => {
   if (!databaseId) return null;
-  const result = await queryOps
-    .apiByDatabaseIdAndName({ databaseId, name }, { select: apiSelect })
-    .execute();
-
-  if (!result.ok) {
-    log.error('GraphQL query errors:', result.errors);
-    return null;
-  }
-
-  const api = result.data.apiByDatabaseIdAndName as ApiRecord | undefined;
   const apiPublic = opts.api?.isPublic;
-  if (api && api.isPublic === apiPublic) {
-    const apiStructure = normalizeApiRecord(api);
+  
+  try {
+    const query = `
+      SELECT 
+        a.id,
+        a.name,
+        a.database_id,
+        a.is_public,
+        a.anon_role,
+        a.role_name,
+        d.database_name as dbname,
+        COALESCE(
+          (SELECT array_agg(s.schema_name) 
+           FROM services_public.api_schemas s 
+           WHERE s.api_id = a.id),
+          ARRAY[]::text[]
+        ) as schemas
+      FROM services_public.apis a
+      LEFT JOIN services_public.databases d ON d.id = a.database_id
+      WHERE a.database_id = $1 
+        AND a.name = $2
+        AND a.is_public = $3
+    `;
+    
+    const result = await pool.query(query, [databaseId, name, apiPublic]);
+    
+    if (result.rows.length === 0) {
+      return null;
+    }
+    
+    const row = result.rows[0];
+    const apiStructure: ApiStructure = {
+      dbname: row.dbname || opts.pg?.database || '',
+      anonRole: row.anon_role || 'anon',
+      roleName: row.role_name || 'authenticated',
+      schema: row.schemas || [],
+      apiModules: [],
+      domains: [],
+      databaseId: row.database_id,
+      isPublic: row.is_public,
+    };
+    
     svcCache.set(key, apiStructure);
     return apiStructure;
+  } catch (err: any) {
+    if (err.message?.includes('does not exist')) {
+      log.debug(`services_public schema not found, skipping API name lookup`);
+      return null;
+    }
+    throw err;
   }
-  return null;
 };
 
 export const getSvcKey = (opts: ApiOptions, req: Request): string => {
@@ -333,24 +374,6 @@ export const getApiConfig = async (
       validSchemaSet.has(schemaName)
     );
 
-    const settings = getGraphileSettings({
-      graphile: {
-        schema: validatedSchemata,
-      },
-    });
-    const graphileSettings: GraphileQuerySettings = {
-      ...settings,
-      schema: validatedSchemata,
-    };
-
-    const schema = await getSchema(rootPgPool, graphileSettings);
-    const graphileClient = new GraphileQuery({
-      schema,
-      pool: rootPgPool,
-      settings: graphileSettings,
-    });
-    const orm = createGraphileOrm(graphileClient);
-
     if (apiPublic === false) {
       if (schemataHeader) {
         if (validatedHeaderSchemata.length === 0) {
@@ -369,7 +392,7 @@ export const getApiConfig = async (
         apiConfig = await queryServiceByApiName({
           opts,
           key,
-          queryOps: orm.query,
+          pool: rootPgPool,
           name: apiNameHeader,
           databaseId: databaseIdHeader,
         });
@@ -384,7 +407,7 @@ export const getApiConfig = async (
         apiConfig = await queryServiceByDomainAndSubdomain({
           opts,
           key,
-          domainModel: orm.domain,
+          pool: rootPgPool,
           domain,
           subdomain,
         });
@@ -393,55 +416,10 @@ export const getApiConfig = async (
       apiConfig = await queryServiceByDomainAndSubdomain({
         opts,
         key,
-        domainModel: orm.domain,
+        pool: rootPgPool,
         domain,
         subdomain,
       });
-
-      if (!apiConfig) {
-        // IMPORTANT NOTE: ONLY DO THIS IN DEV MODE
-        if (getNodeEnv() === 'development') {
-          const fallbackResult = await orm.api
-            .findMany({ select: apiListSelect, first: connectionFirst })
-            .execute();
-
-          if (fallbackResult.ok && fallbackResult.data.apis.nodes.length) {
-            const port = getPortFromRequest(req);
-
-            const allDomains = fallbackResult.data.apis.nodes.flatMap(
-              (api: ApiListRecord) =>
-                api.domains.nodes.map((d) => ({
-                  domain: d.domain,
-                  subdomain: d.subdomain,
-                  href: d.subdomain
-                    ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
-                    : `http://${d.domain}${port}/graphiql`,
-                }))
-            );
-            type DomainLink = (typeof allDomains)[number];
-
-            const linksHtml = allDomains.length
-              ? `<ul class="mt-4 pl-5 list-disc space-y-1">` +
-                allDomains
-                  .map(
-                    (domainLink: DomainLink) =>
-                      `<li><a href="${domainLink.href}" class="text-brand hover:underline">${domainLink.href}</a></li>`
-                  )
-                  .join('') +
-                `</ul>`
-              : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
-
-            const errorHtml = `
-          <p class="text-sm text-gray-700">Try some of these:</p>
-          <div class="mt-4">
-            ${linksHtml}
-          </div>
-        `.trim();
-
-            return { errorHtml };
-          }
-        }
-      }
     }
   }
   return apiConfig;
