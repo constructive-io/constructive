@@ -1,120 +1,93 @@
-import PgManyToMany from '@graphile-contrib/pg-many-to-many';
+import type { GraphileConfig } from 'graphile-config';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import PgPostgis from 'graphile-postgis';
-import FulltextFilterPlugin from 'graphile-plugin-fulltext-filter';
-import { NodePlugin, Plugin } from 'graphile-build';
-import {
-  additionalGraphQLContextFromRequest as langAdditional,
-  LangPlugin
-} from 'graphile-i18n';
-import PgMetaschema from 'graphile-meta-schema';
-import PgSearch from 'graphile-search-plugin';
-import PgSimpleInflector from 'graphile-simple-inflector';
-import { PostGraphileOptions } from 'postgraphile';
-import ConnectionFilterPlugin from 'graphile-plugin-connection-filter';
-import PgPostgisFilter from 'graphile-plugin-connection-filter-postgis';
+import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
+import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
+import { makePgService } from 'postgraphile/adaptors/pg';
 
-import CustomPgTypeMappingsPlugin from 'graphile-pg-type-mappings';
-import UploadPostGraphilePlugin, { Uploader } from 'graphile-upload-plugin';
+/**
+ * Minimal Preset - Disables Node/Relay features
+ * 
+ * This keeps `id` as `id` instead of converting to global Node IDs.
+ * Removes nodeId, node(), and Relay-style pagination.
+ */
+export const MinimalPreset: GraphileConfig.Preset = {
+  disablePlugins: ['NodePlugin'],
+};
 
-export const getGraphileSettings = (
-  rawOpts: ConstructiveOptions
-): PostGraphileOptions => {
-  const opts = getEnvOptions(rawOpts);
-
-  const { server, graphile, features, cdn } = opts;
-
-  // Instantiate uploader with merged cdn opts
-  const uploader = new Uploader({
-    bucketName: cdn.bucketName!,
-    awsRegion: cdn.awsRegion!,
-    awsAccessKey: cdn.awsAccessKey!,
-    awsSecretKey: cdn.awsSecretKey!,
-    minioEndpoint: cdn.minioEndpoint,
-    provider: cdn.provider,
-  });
-
-  const resolveUpload = uploader.resolveUpload.bind(uploader);
-
-  const plugins: Plugin[] = [
-    ConnectionFilterPlugin,
-    FulltextFilterPlugin,
-    CustomPgTypeMappingsPlugin,
-    UploadPostGraphilePlugin,
-    PgMetaschema,
-    PgManyToMany,
-    PgSearch,
-  ];
-
-  if (features?.postgis) {
-    plugins.push(PgPostgis, PgPostgisFilter);
-  }
-
-  if (features?.simpleInflection) {
-    plugins.push(PgSimpleInflector);
-  }
-
-  plugins.push(LangPlugin);
+/**
+ * Get the base Graphile v5 preset for Constructive
+ * 
+ * This is a minimal preset that:
+ * - Uses PostGraphile Amber preset as base
+ * - Disables Node/Relay features
+ * - Enables connection filter plugin
+ * - Disables relation filters to keep API clean
+ * 
+ * TODO: Port additional plugins:
+ * - graphile-simple-inflector -> custom inflector preset
+ * - graphile-meta-schema -> meta schema preset
+ * - graphile-i18n -> i18n preset
+ * - graphile-upload-plugin -> upload preset
+ * - graphile-postgis -> postgis preset
+ * - graphile-search-plugin -> search preset
+ */
+export const getGraphilePreset = (
+  opts: ConstructiveOptions
+): GraphileConfig.Preset => {
+  const envOpts = getEnvOptions(opts);
 
   return {
-    graphileBuildOptions: {
-      uploadFieldDefinitions: [
-        {
-          name: 'upload',
-          namespaceName: 'public',
-          type: 'JSON',
-          resolve: resolveUpload,
-        },
-        {
-          name: 'attachment',
-          namespaceName: 'public',
-          type: 'String',
-          resolve: resolveUpload,
-        },
-        {
-          name: 'image',
-          namespaceName: 'public',
-          type: 'JSON',
-          resolve: resolveUpload,
-        },
-        {
-          tag: 'upload',
-          resolve: resolveUpload,
-        },
-      ],
-      pgSimplifyOppositeBaseNames: features?.oppositeBaseNames,
+    extends: [
+      PostGraphileAmberPreset,
+      MinimalPreset,
+      PostGraphileConnectionFilterPreset,
+    ],
+    disablePlugins: [
+      'PgConnectionArgFilterBackwardRelationsPlugin',
+      'PgConnectionArgFilterForwardRelationsPlugin',
+    ],
+    grafserv: {
+      graphqlPath: '/graphql',
+      graphiqlPath: '/graphiql',
+      websockets: false,
+    },
+    grafast: {
+      explain: process.env.NODE_ENV === 'development',
+    },
+    schema: {
+      connectionFilterRelations: false,
       connectionFilterComputedColumns: false,
-    },
-    appendPlugins: plugins,
-    skipPlugins: [NodePlugin],
-    dynamicJson: true,
-    disableGraphiql: false,
-    enhanceGraphiql: true,
-    enableQueryBatching: true,
-    graphiql: true,
-    watch: false,
-    port: server?.port,
-    host: server?.host,
-    schema: graphile?.schema,
-    ignoreRBAC: false,
-    legacyRelations: 'omit',
-    showErrorStack: false,
-    // @ts-ignore
-    extendedErrors: false,
-    disableQueryLog: false,
-    includeExtensionResources: true,
-    setofFunctionsContainNulls: false,
-    retryOnInitFail: async (_error: Error) => {
-      return false;
-    },
-    additionalGraphQLContextFromRequest: async (req, res) => {
-      const langContext = await langAdditional(req, res);
-      return {
-        ...langContext,
-        req,
-        res,
-      };
+      connectionFilterSetofFunctions: false,
+      connectionFilterLogicalOperators: true,
+      connectionFilterArrays: true,
     },
   };
 };
+
+/**
+ * Create a complete preset with pgServices configured
+ * 
+ * This is the main entry point for creating a PostGraphile v5 preset
+ * with database connection configured.
+ */
+export const createGraphilePreset = (
+  opts: ConstructiveOptions,
+  connectionString: string,
+  schemas: string[]
+): GraphileConfig.Preset => {
+  const basePreset = getGraphilePreset(opts);
+
+  return {
+    extends: [basePreset],
+    pgServices: [
+      makePgService({
+        connectionString,
+        schemas,
+      }),
+    ],
+  };
+};
+
+export { getGraphilePreset as getGraphileSettings };
+export { makePgService };

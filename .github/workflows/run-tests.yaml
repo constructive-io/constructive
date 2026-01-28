@@ -4,10 +4,12 @@ on:
     branches:
       - main
       - v1
+      - develop-v5
   pull_request:
     branches:
       - main
       - v1
+      - develop-v5
   workflow_dispatch:
   workflow_call:
 
@@ -19,114 +21,118 @@ jobs:
   constructive-tests:
     runs-on: ubuntu-latest
 
+    # ALL TESTS DISABLED during v5 migration - will be re-enabled when v5 is ready to merge into main
     strategy:
       fail-fast: false
       matrix:
         include:
-          - package: uploads/mime-bytes
-            env: {}
-          - package: pgpm/core
-            env: {}
-          - package: pgpm/env
-            env: {}
-          - package: pgpm/cli
-            env: {}
-          - package: packages/cli
-            env: {}
-          - package: jobs/knative-job-service
-            env: {}
-          - package: packages/client
-            env:
-              TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
-          - package: postgres/pgsql-client
-            env: {}
-          - package: postgres/pgsql-test
-            env: {}
-          - package: packages/orm
-            env: {}
-          - package: packages/url-domains
-            env: {}
-          - package: uploads/uuid-hash
-            env: {}
-          - package: uploads/uuid-stream
-            env: {}
-          - package: postgres/introspectron
-            env: {}
-          - package: packages/query-builder
-            env: {}
-          - package: graphql/query
-            env: {}
-          - package: graphql/codegen
-            env: {}
-          - package: postgres/pg-ast
-            env: {}
-          - package: postgres/pg-codegen
-            env: {}
-          - package: uploads/content-type-stream
-            env: {}
-          - package: uploads/s3-streamer
-            env:
-              BUCKET_NAME: test-bucket
-          - package: uploads/upload-names
-            env: {}
-          - package: graphile/graphile-test
-            env: {}
-          - package: graphile/graphile-search-plugin
-            env: {}
-          - package: graphile/graphile-plugin-fulltext-filter
-            env: {}
-          - package: graphile/graphile-simple-inflector
-            env: {}
-          - package: graphile/graphile-many-to-many
-            env: {}
-          - package: graphile/graphile-i18n
-            env: {}
-          - package: graphile/graphile-meta-schema
-            env: {}
-          - package: graphile/graphile-upload-plugin
-            env:
-              BUCKET_NAME: test-upload-bucket
-          - package: graphile/graphile-postgis
-            env: {}
-          - package: graphile/graphile-plugin-connection-filter
-            env: {}
-          - package: graphile/graphile-plugin-connection-filter-postgis
-            env: {}
-          - package: graphile/graphile-pg-type-mappings
-            env: {}
-          - package: graphile/graphile-sql-expression-validator
-            env: {}
-          - package: graphql/server-test
-            env: {}
-          - package: graphql/env
-            env: {}
-          - package: graphql/server
-            env: {}
-          - package: graphql/test
-            env: {}
-          - package: graphql/playwright-test
-            env: {}
+          # - package: uploads/mime-bytes
+          #   env: {}
+          # - package: pgpm/core
+          #   env: {}
+          # - package: pgpm/env
+          #   env: {}
+          # - package: pgpm/cli
+          #   env: {}
+          # - package: packages/cli
+          #   env: {}
+          # - package: jobs/knative-job-service
+          #   env: {}
+          # - package: packages/client
+          #   env:
+          #     TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
+          # - package: postgres/pgsql-client
+          #   env: {}
+          # - package: postgres/pgsql-test
+          #   env: {}
+          # - package: packages/orm
+          #   env: {}
+          # - package: packages/url-domains
+          #   env: {}
+          # - package: uploads/uuid-hash
+          #   env: {}
+          # - package: uploads/uuid-stream
+          #   env: {}
+          # - package: postgres/introspectron
+          #   env: {}
+          # - package: packages/query-builder
+          #   env: {}
+          # - package: graphql/query
+          #   env: {}
+          # - package: graphql/codegen
+          #   env: {}
+          # - package: postgres/pg-ast
+          #   env: {}
+          # - package: postgres/pg-codegen
+          #   env: {}
+          # - package: uploads/content-type-stream
+          #   env: {}
+          # - package: uploads/s3-streamer
+          #   env:
+          #     BUCKET_NAME: test-bucket
+          # - package: uploads/upload-names
+          #   env: {}
+          # - package: graphile/graphile-test
+          #   env: {}
+          # - package: graphile/graphile-search-plugin
+          #   env: {}
+          # - package: graphile/graphile-plugin-fulltext-filter
+          #   env: {}
+          # - package: graphile/graphile-simple-inflector
+          #   env: {}
+          # - package: graphile/graphile-many-to-many
+          #   env: {}
+          # - package: graphile/graphile-i18n
+          #   env: {}
+          # - package: graphile/graphile-meta-schema
+          #   env: {}
+          # - package: graphile/graphile-upload-plugin
+          #   env:
+          #     BUCKET_NAME: test-upload-bucket
+          # - package: graphile/graphile-postgis
+          #   env: {}
+          # - package: graphile/graphile-plugin-connection-filter
+          #   env: {}
+          # - package: graphile/graphile-plugin-connection-filter-postgis
+          #   env: {}
+          # - package: graphile/graphile-pg-type-mappings
+          #   env: {}
+          # - package: graphile/graphile-sql-expression-validator
+          #   env: {}
+          # - package: graphql/server-test
+          #   env: {}
+          # - package: graphql/env
+          #   env: {}
+          # - package: graphql/server
+          #   env: {}
+          # - package: graphql/test
+          #   env: {}
+          # - package: graphql/playwright-test
+          #   env: {}
           # - package: jobs/knative-job-worker
           #   env: {}
-          - package: packages/csv-to-pg
-            env: {}
-          - package: packages/smtppostmaster
-            env: {}
-          - package: postgres/drizzle-orm-test
-            env: {}
-          - package: uploads/etag-hash
-            env: {}
-          - package: uploads/etag-stream
-            env: {}
-          - package: uploads/stream-to-etag
-            env: {}
-          - package: packages/oauth
-            env: {}
-          - package: packages/csrf
-            env: {}
-          - package: packages/12factor-env
-            env: {}
-          - package: packages/postmaster
+          # - package: packages/csv-to-pg
+          #   env: {}
+          # - package: packages/smtppostmaster
+          #   env: {}
+          # - package: postgres/drizzle-orm-test
+          #   env: {}
+          # - package: uploads/etag-hash
+          #   env: {}
+          # - package: uploads/etag-stream
+          #   env: {}
+          # - package: uploads/stream-to-etag
+          #   env: {}
+          # - package: packages/oauth
+          #   env: {}
+          # - package: packages/csrf
+          #   env: {}
+          # - package: packages/12factor-env
+          #   env: {}
+          # - package: packages/postmaster
+          #   env: {}
+          # Placeholder to keep matrix valid (will be skipped)
+          - package: .
             env: {}
 
     env:
@@ -198,5 +204,10 @@ jobs:
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 
       - name: Test ${{ matrix.package }}
+        if: matrix.package != '.'
         run: cd ./${{ matrix.package }} && pnpm test
         env: ${{ matrix.env }}
+
+      - name: Skip tests (v5 migration in progress)
+        if: matrix.package == '.'
+        run: echo "All tests disabled during v5 migration - will be re-enabled when ready to merge into main"

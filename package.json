@@ -44,8 +44,7 @@
     "typescript": "^5.1.6"
   },
   "overrides": {
-    "graphql": "15.10.1",
-    "graphql-upload": "^13.0.0"
+    "graphql": "^16.9.0"
   },
   "pnpm": {
     "publicHoistPattern": [

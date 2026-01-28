@@ -1,5 +1,5 @@
 export * from './server';
-export * from './schema';
+// TODO: Re-enable after v5 migration - export * from './schema';
 
 // Export middleware for use in testing packages
 export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/api';

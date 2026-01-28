@@ -1,20 +1,110 @@
+import { createServer, Server as HttpServer } from 'node:http';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
-import { getGraphileSettings as getSettings } from 'graphile-settings';
-import type { IncomingMessage } from 'http';
-import { getPgPool } from 'pg-cache';
-import { postgraphile, PostGraphileOptions } from 'postgraphile';
+import express, { NextFunction, Request, RequestHandler, Response } from 'express';
+import { graphileCache, GraphileCacheEntry } from 'graphile-cache';
+import { getGraphilePreset, makePgService } from 'graphile-settings';
+import type { GraphileConfig } from 'graphile-config';
+import { postgraphile } from 'postgraphile';
+import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
+import { grafserv } from 'grafserv/express/v4';
+import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
-
-import PublicKeySignature, {
-  PublicKeyChallengeConfig,
-} from '../plugins/PublicKeySignature';
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string =>
   req.requestId ? `[${req.requestId}]` : '[req]';
+
+/**
+ * Build connection string from pg config
+ */
+const buildConnectionString = (
+  user: string,
+  password: string,
+  host: string,
+  port: string | number,
+  database: string
+): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
+
+/**
+ * Create a PostGraphile v5 instance for a tenant
+ */
+const createGraphileInstance = async (
+  opts: ConstructiveOptions,
+  connectionString: string,
+  schemas: string[],
+  anonRole: string,
+  roleName: string,
+  cacheKey: string
+): Promise<GraphileCacheEntry> => {
+  const basePreset = getGraphilePreset(opts);
+
+  const preset: GraphileConfig.Preset = {
+    extends: [basePreset],
+    pgServices: [
+      makePgService({
+        connectionString,
+        schemas,
+      }),
+    ],
+    grafast: {
+      explain: process.env.NODE_ENV === 'development',
+      context: (ctx: unknown) => {
+        const req = (ctx as { node?: { req?: Request } } | undefined)?.node?.req;
+        const context: Record<string, string> = {};
+
+        if (req) {
+          if (req.databaseId) {
+            context['jwt.claims.database_id'] = req.databaseId;
+          }
+          if (req.clientIp) {
+            context['jwt.claims.ip_address'] = req.clientIp;
+          }
+          if (req.get('origin')) {
+            context['jwt.claims.origin'] = req.get('origin') as string;
+          }
+          if (req.get('User-Agent')) {
+            context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
+          }
+
+          if (req.token?.user_id) {
+            return {
+              pgSettings: {
+                role: roleName,
+                'jwt.claims.token_id': req.token.id,
+                'jwt.claims.user_id': req.token.user_id,
+                ...context,
+              },
+            };
+          }
+        }
+
+        return {
+          pgSettings: {
+            role: anonRole,
+            ...context,
+          },
+        };
+      },
+    },
+  };
+
+  const pgl = postgraphile(preset);
+  const serv = pgl.createServ(grafserv);
+
+  const handler = express();
+  const httpServer = createServer(handler);
+  await serv.addTo(handler, httpServer);
+
+  return {
+    pgl,
+    serv,
+    handler,
+    httpServer,
+    cacheKey,
+    createdAt: Date.now(),
+  };
+};
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -45,95 +135,36 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`
       );
 
-      const options = getSettings({
-        ...opts,
-        graphile: {
-          ...opts.graphile,
-          schema: schema,
-        },
-      });
-
-      const pubkey_challenge = api.apiModules.find(
-        (mod: any) => mod.name === 'pubkey_challenge'
-      );
-
-      if (pubkey_challenge && pubkey_challenge.data) {
-        log.info(`${label} Enabling PublicKeySignature plugin for ${dbname}`);
-        options.appendPlugins.push(
-          PublicKeySignature(pubkey_challenge.data as PublicKeyChallengeConfig)
-        );
-      }
-
-      options.appendPlugins = options.appendPlugins ?? [];
-      if (opts.graphile?.appendPlugins) {
-        options.appendPlugins.push(...opts.graphile.appendPlugins);
-      }
-
-      options.pgSettings = async function pgSettings(request: IncomingMessage) {
-        const gqlReq = request as Request;
-        const settingsLabel = reqLabel(gqlReq);
-        const context: Record<string, any> = {
-          [`jwt.claims.database_id`]: gqlReq.databaseId,
-          [`jwt.claims.ip_address`]: gqlReq.clientIp,
-        };
-
-        if (gqlReq.get('origin')) {
-          context['jwt.claims.origin'] = gqlReq.get('origin');
-        }
-        if (gqlReq.get('User-Agent')) {
-          context['jwt.claims.user_agent'] = gqlReq.get('User-Agent');
-        }
-
-        if (gqlReq?.token?.user_id) {
-          log.debug(
-            `${settingsLabel} pgSettings role=${roleName} db=${gqlReq.databaseId} ip=${gqlReq.clientIp}`
-          );
-          return {
-            role: roleName,
-            [`jwt.claims.token_id`]: gqlReq.token.id,
-            [`jwt.claims.user_id`]: gqlReq.token.user_id,
-            ...context,
-          };
-        }
-
-        log.debug(
-          `${settingsLabel} pgSettings role=${anonRole} db=${gqlReq.databaseId} ip=${gqlReq.clientIp}`
-        );
-        return { role: anonRole, ...context };
-      };
-
-      options.graphqlRoute = '/graphql';
-      options.graphiqlRoute = '/graphiql';
-
-      options.graphileBuildOptions = {
-        ...options.graphileBuildOptions,
-        ...opts.graphile?.graphileBuildOptions,
-      };
-
-      const graphileOpts: PostGraphileOptions = {
-        ...options,
-        ...opts.graphile?.overrideSettings,
-      };
-
       log.info(
-        `${label} Building PostGraphile handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
+        `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgPool = getPgPool({
+      const pgConfig = getPgEnvOptions({
         ...opts.pg,
         database: dbname,
       });
-      const handler = postgraphile(pgPool, schema, graphileOpts);
+      const connectionString = buildConnectionString(
+        pgConfig.user,
+        pgConfig.password,
+        pgConfig.host,
+        pgConfig.port,
+        pgConfig.database
+      );
 
-      graphileCache.set(key, {
-        pgPool,
-        pgPoolKey: dbname,
-        handler,
-      });
+      const instance = await createGraphileInstance(
+        opts,
+        connectionString,
+        schema || [],
+        anonRole,
+        roleName,
+        key
+      );
 
-      log.info(`${label} Cached PostGraphile handler key=${key} db=${dbname}`);
+      graphileCache.set(key, instance);
 
-      return handler(req, res, next);
+      log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
+
+      return instance.handler(req, res, next);
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
       return res.status(500).send(e.message);
