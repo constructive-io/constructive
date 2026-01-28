@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/constructive-io/constructive/compare/pgpm@3.1.1...pgpm@3.2.0) (2026-01-28)
+
+### Bug Fixes
+
+- **pgpm:** add -w alias for --create-workspace and update README docs ([16efbdb](https://github.com/constructive-io/constructive/commit/16efbdbd3031f5a70972a4e9234d59730ed5b3eb))
+
+### Features
+
+- **pgpm:** add --create-workspace / -w flag to create workspace then module ([654eaa2](https://github.com/constructive-io/constructive/commit/654eaa2d395c284de1d148aa0bf7df0f009a9443))
+- **pgpm:** rename --template-path to --template flag ([2888381](https://github.com/constructive-io/constructive/commit/28883815709d212166599260b98accc0e50a987e))
+
 ## [3.1.1](https://github.com/constructive-io/constructive/compare/pgpm@3.1.0...pgpm@3.1.1) (2026-01-28)
 
 ### Bug Fixes
