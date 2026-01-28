@@ -4,10 +4,12 @@ on:
     branches:
       - main
       - v1
+      - develop-v5
   pull_request:
     branches:
       - main
       - v1
+      - develop-v5
   workflow_dispatch:
   workflow_call:
 
