@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.1.0...@pgpmjs/core@5.1.1) (2026-01-28)
+
+### Bug Fixes
+
+- add sessions_table_id and session_credentials_table_id to rls_module and user_auth_module configs ([be04a68](https://github.com/constructive-io/constructive/commit/be04a68117420d57f5cb01a34414ca88f169ad60))
+
 # [5.1.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.0.1...@pgpmjs/core@5.1.0) (2026-01-27)
 
 ### Bug Fixes
