@@ -38,7 +38,10 @@ export const options: Partial<CLIOptions> = {
       'from-branch': 'fromBranch',
       // Support both --template and --template-path (deprecated) for backward compatibility
       'template-path': 'template',
-      t: 'template'
+      t: 'template',
+      // -w for --create-workspace flag
+      w: 'createWorkspace',
+      'create-workspace': 'createWorkspace'
     }
   }
 };
