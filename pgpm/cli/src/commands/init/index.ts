@@ -41,6 +41,7 @@ Options:
   --dir <variant>         Template variant directory (e.g., supabase, drizzle)
   --template, -t <path>   Full template path (e.g., pnpm/module) - combines dir and fromPath
   --boilerplate           Prompt to select from available boilerplates
+  --create-workspace, -w  Create a workspace first, then create the module inside it
 
 Examples:
   ${binaryName} init                                   Initialize new module (default)
@@ -51,6 +52,7 @@ Examples:
   ${binaryName} init --boilerplate                     Select from available boilerplates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
+  ${binaryName} init --dir pnpm -w                     Create pnpm workspace + module in one command
 `;
 };
 
@@ -74,6 +76,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const branch = argv.fromBranch as string | undefined;
   const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
+  const createWorkspace = Boolean(argv.createWorkspace || argv['create-workspace'] || argv.w);
 
   // Get fromPath from first positional arg
   const positionalFromPath = argv._?.[0] as string | undefined;
@@ -146,6 +149,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     noTty,
     cwd,
     requiresWorkspace: inspection.config?.requiresWorkspace,
+    createWorkspace,
   }, wasExplicitModuleRequest);
 }
 
@@ -265,6 +269,10 @@ interface InitContext {
    * 'pgpm' also indicates pgpm files should be created.
    */
   requiresWorkspace?: 'pgpm' | 'pnpm' | 'lerna' | 'npm' | false;
+  /**
+   * If true, create a workspace first, then create the module inside it.
+   */
+  createWorkspace?: boolean;
 }
 
 async function handleWorkspaceInit(
@@ -326,6 +334,57 @@ async function handleWorkspaceInit(
   return { ...argv, ...answers, cwd: targetPath };
 }
 
+interface WorkspaceTemplateConfig {
+  repo: string;
+  branch?: string;
+  dir?: string;
+}
+
+function resolveWorkspaceTemplateRepo(options: {
+  templateRepo: string;
+  branch?: string;
+  dir?: string;
+  workspaceType: 'pgpm' | 'pnpm';
+  cwd: string;
+}): WorkspaceTemplateConfig {
+  const { templateRepo, branch, dir, workspaceType, cwd } = options;
+
+  // Determine the dir to use for workspace template
+  // If dir is specified, use it; otherwise use the workspaceType as the dir variant
+  const workspaceDir = dir || workspaceType;
+
+  // Try to find workspace template in the specified repo
+  try {
+    const inspection = inspectTemplate({
+      fromPath: 'workspace',
+      templateRepo,
+      branch,
+      dir: workspaceDir,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd,
+    });
+
+    // If we found a valid workspace template, use the specified repo
+    if (inspection.config?.type === 'workspace') {
+      return {
+        repo: templateRepo,
+        branch,
+        dir: workspaceDir,
+      };
+    }
+  } catch {
+    // Template not found in specified repo, fall through to default
+  }
+
+  // Fall back to default template repo
+  // Use the workspaceType as the dir variant (pgpm or pnpm)
+  return {
+    repo: DEFAULT_TEMPLATE_REPO,
+    branch: undefined, // Use default branch for default repo
+    dir: workspaceType,
+  };
+}
+
 async function handleModuleInit(
   argv: Partial<Record<string, any>>,
   prompter: Inquirerer,
@@ -337,7 +396,7 @@ async function handleModuleInit(
   // Whether this is a pgpm-managed template (creates pgpm.plan, .control files)
   const isPgpmTemplate = workspaceType === 'pgpm';
 
-  const project = new PgpmPackage(ctx.cwd);
+  let project = new PgpmPackage(ctx.cwd);
 
   // Track resolved workspace path for both pgpm and non-pgpm workspace types
   let resolvedWorkspacePath: string | undefined;
@@ -356,43 +415,81 @@ async function handleModuleInit(
     if (!resolvedWorkspacePath) {
       const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
 
-      // If user explicitly requested module init or we're in non-interactive mode,
-      // just show the error with helpful guidance
-      if (wasExplicitModuleRequest || noTty) {
+      // Handle --create-workspace flag: create workspace first, then module
+      if (ctx.createWorkspace && (workspaceType === 'pgpm' || workspaceType === 'pnpm')) {
+        // Resolve workspace template repo with fallback to default
+        const workspaceTemplateConfig = resolveWorkspaceTemplateRepo({
+          templateRepo: ctx.templateRepo,
+          branch: ctx.branch,
+          dir: ctx.dir,
+          workspaceType,
+          cwd: ctx.cwd,
+        });
+
+        // Create workspace first
+        const workspaceResult = await handleWorkspaceInit(argv, prompter, {
+          fromPath: 'workspace',
+          templateRepo: workspaceTemplateConfig.repo,
+          branch: workspaceTemplateConfig.branch,
+          dir: workspaceTemplateConfig.dir,
+          noTty: ctx.noTty,
+          cwd: ctx.cwd,
+        });
+
+        // Update context to point to new workspace and continue with module creation
+        const newCwd = workspaceResult.cwd as string;
+        project = new PgpmPackage(newCwd);
+        
+        // Re-resolve workspace path with new cwd
+        if (workspaceType === 'pgpm') {
+          resolvedWorkspacePath = project.workspacePath;
+        } else {
+          resolvedWorkspacePath = resolveWorkspaceByType(newCwd, workspaceType);
+        }
+
+        // Update ctx for module creation
+        ctx.cwd = newCwd;
+        
+        // Continue to module creation below (don't return here)
+      } else {
+        // If user explicitly requested module init or we're in non-interactive mode,
+        // just show the error with helpful guidance
+        if (wasExplicitModuleRequest || noTty) {
+          process.stderr.write(`Not inside a ${workspaceTypeName} workspace.\n`);
+          throw errors.NOT_IN_WORKSPACE({});
+        }
+
+        // Offer to create a workspace for pgpm templates or when --dir is specified
+        // (when --dir is specified, we know which workspace variant to use)
+        if (workspaceType === 'pgpm' || ctx.dir) {
+          const recoveryQuestion: Question[] = [
+            {
+              name: 'workspace',
+              alias: 'W',
+              message: `You are not inside a ${workspaceTypeName} workspace. Would you like to create a new workspace instead?`,
+              type: 'confirm',
+              required: true,
+            },
+          ];
+
+          const { workspace } = await prompter.prompt(argv, recoveryQuestion);
+
+          if (workspace) {
+            return handleWorkspaceInit(argv, prompter, {
+              fromPath: 'workspace',
+              templateRepo: ctx.templateRepo,
+              branch: ctx.branch,
+              dir: ctx.dir,
+              noTty: ctx.noTty,
+              cwd: ctx.cwd,
+            });
+          }
+        }
+
+        // User declined or non-pgpm workspace type without --dir, show the error
         process.stderr.write(`Not inside a ${workspaceTypeName} workspace.\n`);
         throw errors.NOT_IN_WORKSPACE({});
       }
-
-      // Offer to create a workspace for pgpm templates or when --dir is specified
-      // (when --dir is specified, we know which workspace variant to use)
-      if (workspaceType === 'pgpm' || ctx.dir) {
-        const recoveryQuestion: Question[] = [
-          {
-            name: 'workspace',
-            alias: 'w',
-            message: `You are not inside a ${workspaceTypeName} workspace. Would you like to create a new workspace instead?`,
-            type: 'confirm',
-            required: true,
-          },
-        ];
-
-        const { workspace } = await prompter.prompt(argv, recoveryQuestion);
-
-        if (workspace) {
-          return handleWorkspaceInit(argv, prompter, {
-            fromPath: 'workspace',
-            templateRepo: ctx.templateRepo,
-            branch: ctx.branch,
-            dir: ctx.dir,
-            noTty: ctx.noTty,
-            cwd: ctx.cwd,
-          });
-        }
-      }
-
-      // User declined or non-pgpm workspace type without --dir, show the error
-      process.stderr.write(`Not inside a ${workspaceTypeName} workspace.\n`);
-      throw errors.NOT_IN_WORKSPACE({});
     }
   }
 

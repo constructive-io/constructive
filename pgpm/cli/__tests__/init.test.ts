@@ -486,4 +486,147 @@ describe('cmds:init', () => {
       expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);
     });
   });
+
+  describe('--create-workspace flag', () => {
+    const shouldSkipGitHubTests = process.env.CI === 'true' && !process.env.ALLOW_NETWORK_TESTS;
+
+    (shouldSkipGitHubTests ? it.skip : it)(
+      'creates workspace then module with --create-workspace flag (pgpm)',
+      async () => {
+        const { mockInput, mockOutput } = environment;
+        const prompter = new Inquirerer({
+          input: mockInput,
+          output: mockOutput,
+          noTty: true
+        });
+
+        const wsName = 'ws-create-workspace-pgpm';
+
+        // Run init with --create-workspace flag outside any workspace
+        await commands(withInitDefaults({
+          _: ['init'],
+          cwd: fixture.tempDir,
+          name: wsName,
+          moduleName: 'my-module',
+          createWorkspace: true,
+          extensions: ['plpgsql']
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        // Workspace should be created
+        const wsRoot = path.join(fixture.tempDir, wsName);
+        expect(existsSync(wsRoot)).toBe(true);
+        expect(existsSync(path.join(wsRoot, 'pgpm.json'))).toBe(true);
+
+        // Module should be created inside workspace
+        const modDir = path.join(wsRoot, 'packages', 'my-module');
+        expect(existsSync(modDir)).toBe(true);
+        expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
+        expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);
+      },
+      120000
+    );
+
+    (shouldSkipGitHubTests ? it.skip : it)(
+      'creates workspace then module with --create-workspace flag and --dir pnpm',
+      async () => {
+        const { mockInput, mockOutput } = environment;
+        const prompter = new Inquirerer({
+          input: mockInput,
+          output: mockOutput,
+          noTty: true
+        });
+
+        const wsName = 'ws-create-workspace-pnpm';
+
+        // Run init with --create-workspace flag and --dir pnpm outside any workspace
+        await commands(withInitDefaults({
+          _: ['init'],
+          cwd: fixture.tempDir,
+          name: wsName,
+          moduleName: 'my-pnpm-module',
+          createWorkspace: true,
+          dir: 'pnpm'
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        // Workspace should be created
+        const wsRoot = path.join(fixture.tempDir, wsName);
+        expect(existsSync(wsRoot)).toBe(true);
+        expect(existsSync(path.join(wsRoot, 'package.json'))).toBe(true);
+        expect(existsSync(path.join(wsRoot, 'pnpm-workspace.yaml'))).toBe(true);
+
+        // Module should be created inside workspace
+        const modDir = path.join(wsRoot, 'packages', 'my-pnpm-module');
+        expect(existsSync(modDir)).toBe(true);
+        expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);
+      },
+      120000
+    );
+
+    (shouldSkipGitHubTests ? it.skip : it)(
+      '--create-workspace is ignored when already inside a workspace',
+      async () => {
+        const { mockInput, mockOutput } = environment;
+        const prompter = new Inquirerer({
+          input: mockInput,
+          output: mockOutput,
+          noTty: true
+        });
+
+        // First create a workspace
+        const wsName = 'ws-already-exists';
+        await commands(withInitDefaults({
+          _: ['init', 'workspace'],
+          cwd: fixture.tempDir,
+          name: wsName,
+          workspace: true
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        const wsRoot = path.join(fixture.tempDir, wsName);
+
+        // Now run init with --create-workspace inside the workspace
+        // It should just create the module without creating another workspace
+        await commands(withInitDefaults({
+          _: ['init'],
+          cwd: wsRoot,
+          moduleName: 'module-in-existing-ws',
+          createWorkspace: true,
+          extensions: ['plpgsql']
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+
+        // Module should be created in the existing workspace
+        const modDir = path.join(wsRoot, 'packages', 'module-in-existing-ws');
+        expect(existsSync(modDir)).toBe(true);
+        expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
+
+        // No nested workspace should be created
+        const nestedWs = path.join(wsRoot, 'packages', 'module-in-existing-ws', 'pgpm.json');
+        expect(existsSync(nestedWs)).toBe(false);
+      },
+      120000
+    );
+  });
 });
