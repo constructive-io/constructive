@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/constructive-io/constructive/compare/pgpm@3.1.0...pgpm@3.1.1) (2026-01-28)
+
+### Bug Fixes
+
+- **pgpm:** fix --dir flag handling for workspace prompt and module placement ([62c9b6d](https://github.com/constructive-io/constructive/commit/62c9b6dfa268547c3f23c48aaf60de4195f5a932))
+
 # [3.1.0](https://github.com/constructive-io/constructive/compare/pgpm@3.0.1...pgpm@3.1.0) (2026-01-27)
 
 ### Features
