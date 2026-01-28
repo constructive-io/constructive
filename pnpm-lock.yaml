@@ -151,7 +151,7 @@ importers:
         version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
     devDependencies:
       '@types/express':
-        specifier: ^5.0.0
+        specifier: ^5.0.6
         version: 5.0.6
       '@types/pg':
         specifier: ^8.16.0

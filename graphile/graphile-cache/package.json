@@ -38,7 +38,7 @@
     "postgraphile": "^5.0.0-rc.4"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "makage": "^0.1.10",
     "nodemon": "^3.1.10",
