@@ -36,7 +36,9 @@ export const options: Partial<CLIOptions> = {
       v: 'version',
       h: 'help',
       'from-branch': 'fromBranch',
-      'template-path': 'templatePath'
+      // Support both --template and --template-path (deprecated) for backward compatibility
+      'template-path': 'template',
+      t: 'template'
     }
   }
 };

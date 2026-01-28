@@ -39,6 +39,7 @@ Options:
   --repo <repo>           Template repo (default: https://github.com/constructive-io/pgpm-boilerplates.git)
   --from-branch <branch>  Branch/tag to use when cloning repo
   --dir <variant>         Template variant directory (e.g., supabase, drizzle)
+  --template, -t <path>   Full template path (e.g., pnpm/module) - combines dir and fromPath
   --boilerplate           Prompt to select from available boilerplates
 
 Examples:
@@ -46,6 +47,7 @@ Examples:
   ${binaryName} init workspace                         Initialize new workspace
   ${binaryName} init module                            Initialize new module explicitly
   ${binaryName} init workspace --dir <variant>         Use variant templates
+  ${binaryName} init --template pnpm/module            Use full template path (dir + type)
   ${binaryName} init --boilerplate                     Select from available boilerplates
   ${binaryName} init --repo owner/repo                 Use templates from GitHub repository
   ${binaryName} init --repo owner/repo --from-branch develop  Use specific branch
@@ -70,12 +72,29 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const { cwd = process.cwd() } = argv;
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   const branch = argv.fromBranch as string | undefined;
-  const dir = argv.dir as string | undefined;
   const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
 
   // Get fromPath from first positional arg
   const positionalFromPath = argv._?.[0] as string | undefined;
+
+  // Handle --template flag: parses "dir/fromPath" format and extracts both components
+  // When --template is provided, it takes precedence over --dir and positional fromPath
+  const templateArg = argv.template as string | undefined;
+  let dir = argv.dir as string | undefined;
+  let templateFromPath: string | undefined;
+
+  if (templateArg) {
+    // Parse template path like "pnpm/module" into dir="pnpm" and fromPath="module"
+    const slashIndex = templateArg.indexOf('/');
+    if (slashIndex > 0) {
+      dir = templateArg.substring(0, slashIndex);
+      templateFromPath = templateArg.substring(slashIndex + 1);
+    } else {
+      // No slash - treat the whole thing as fromPath (e.g., --template workspace)
+      templateFromPath = templateArg;
+    }
+  }
 
   // Handle --boilerplate flag: separate path from regular init
   if (useBoilerplatePrompt) {
@@ -89,10 +108,10 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     });
   }
 
-  // Regular init path: default to 'module' if no fromPath provided
-  const fromPath = positionalFromPath || 'module';
-  // Track if user explicitly requested module (e.g., `pgpm init module`)
-  const wasExplicitModuleRequest = positionalFromPath === 'module';
+  // Regular init path: --template takes precedence, then positional arg, then default to 'module'
+  const fromPath = templateFromPath || positionalFromPath || 'module';
+  // Track if user explicitly requested module (e.g., `pgpm init module` or `--template pnpm/module`)
+  const wasExplicitModuleRequest = positionalFromPath === 'module' || templateFromPath === 'module';
 
   // Inspect the template to get its type
   const inspection = inspectTemplate({
