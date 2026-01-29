@@ -16,47 +16,42 @@ export const splitCommas = (input: string | undefined): string[] | undefined => 
 };
 
 /**
- * Interface for codegen CLI answers (supports both kebab-case and camelCase)
- * CLI uses kebab-case, internal code uses camelCase
+ * Interface for codegen CLI answers
+ * CLI accepts kebab-case arguments, converted to camelCase for internal use
  */
 export interface CodegenAnswers {
   endpoint?: string;
-  'schema-file'?: string;
   schemaFile?: string;
   output?: string;
   schemas?: string[];
-  'api-names'?: string[];
   apiNames?: string[];
-  'react-query'?: boolean;
   reactQuery?: boolean;
   orm?: boolean;
-  'browser-compatible'?: boolean;
   browserCompatible?: boolean;
   authorization?: string;
-  'dry-run'?: boolean;
   dryRun?: boolean;
   verbose?: boolean;
 }
 
 /**
  * Converts kebab-case CLI arguments to camelCase for internal use.
- * Supports both kebab-case (preferred) and camelCase (backward compatibility).
- * 
- * @param argv - Parsed CLI arguments from minimist
+ * This is the single conversion point between CLI interface and internal code.
+ *
+ * @param argv - Parsed CLI arguments from minimist (with kebab-case properties)
  * @returns Normalized object with camelCase properties
  */
-export function convertArgvToInternal(argv: CodegenAnswers): CodegenAnswers {
+export function convertArgvToInternal(argv: any): CodegenAnswers {
   return {
     endpoint: argv.endpoint,
-    schemaFile: argv['schema-file'] || argv.schemaFile,
+    schemaFile: argv['schema-file'],
     output: argv.output,
     schemas: argv.schemas,
-    apiNames: argv['api-names'] || argv.apiNames,
-    reactQuery: argv['react-query'] || argv.reactQuery || false,
+    apiNames: argv['api-names'],
+    reactQuery: argv['react-query'] || false,
     orm: argv.orm || false,
-    browserCompatible: argv['browser-compatible'] || argv.browserCompatible || false,
+    browserCompatible: argv['browser-compatible'] !== undefined ? argv['browser-compatible'] : true,
     authorization: argv.authorization,
-    dryRun: argv['dry-run'] || argv.dryRun || false,
+    dryRun: argv['dry-run'] || false,
     verbose: argv.verbose || false,
   };
 }
