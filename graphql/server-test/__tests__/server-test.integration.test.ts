@@ -46,35 +46,38 @@ describe('graphql-server-test', () => {
     });
 
     it('should query users via HTTP', async () => {
-      const res = await query<{ users: { nodes: Array<{ id: number; username: string }> } }>(
-        `query { users { nodes { id username } } }`
+      // PostGraphile v5 uses allUsers, and MinimalPreset exposes rowId instead of id
+      const res = await query<{ allUsers: { nodes: Array<{ rowId: number; username: string }> } }>(
+        `query { allUsers { nodes { rowId username } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.users.nodes).toHaveLength(2);
-      expect(res.data?.users.nodes[0].username).toBe('alice');
+      expect(res.data?.allUsers.nodes).toHaveLength(2);
+      expect(res.data?.allUsers.nodes[0].username).toBe('alice');
     });
 
     it('should query posts via HTTP', async () => {
-      const res = await query<{ posts: { nodes: Array<{ id: number; title: string }> } }>(
-        `query { posts { nodes { id title } } }`
+      // PostGraphile v5 uses allPosts, and MinimalPreset exposes rowId instead of id
+      const res = await query<{ allPosts: { nodes: Array<{ rowId: number; title: string }> } }>(
+        `query { allPosts { nodes { rowId title } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.posts.nodes).toHaveLength(3);
+      expect(res.data?.allPosts.nodes).toHaveLength(3);
     });
 
     it('should support variables', async () => {
+      // userByUsername is available via unique constraint on username
       const res = await query<
-        { userByUsername: { id: number; username: string; email: string } | null },
+        { userByUsername: { rowId: number; username: string; email: string } | null },
         { username: string }
       >(
-        `query GetUser($username: String!) { 
-          userByUsername(username: $username) { 
-            id 
-            username 
-            email 
-          } 
+        `query GetUser($username: String!) {
+          userByUsername(username: $username) {
+            rowId
+            username
+            email
+          }
         }`,
         { username: 'alice' }
       );
@@ -85,17 +88,19 @@ describe('graphql-server-test', () => {
     });
 
     it('should use SuperTest directly for custom requests', async () => {
+      // PostGraphile v5 uses allUsers, MinimalPreset exposes rowId instead of id
       const res = await request
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send({ query: '{ users { nodes { id } } }' });
+        .send({ query: '{ allUsers { nodes { rowId } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.users.nodes).toHaveLength(2);
+      expect(res.body.data.allUsers.nodes).toHaveLength(2);
     });
 
     it('should snapshot query results', async () => {
-      const res = await query(`query { users { nodes { username email } } }`);
+      // PostGraphile v5 uses allUsers
+      const res = await query(`query { allUsers { nodes { username email } } }`);
       expect(snapshot(res.data)).toMatchSnapshot();
     });
   });

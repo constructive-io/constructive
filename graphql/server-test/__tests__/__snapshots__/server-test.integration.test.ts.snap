@@ -2,7 +2,7 @@
 
 exports[`graphql-server-test getConnections should snapshot query results 1`] = `
 {
-  "users": {
+  "allUsers": {
     "nodes": [
       {
         "email": "alice@example.com",

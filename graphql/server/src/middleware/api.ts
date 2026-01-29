@@ -158,33 +158,33 @@ const queryServiceByDomainAndSubdomain = async ({
   subdomain: string | null;
 }): Promise<ApiStructure | null> => {
   const apiPublic = opts.api?.isPublic;
-  
+
   try {
     const query = `
-      SELECT 
+      SELECT
         a.id,
         a.name,
         a.database_id,
         a.is_public,
         a.anon_role,
         a.role_name,
-        d.database_name as dbname,
+        a.dbname,
         COALESCE(
-          (SELECT array_agg(s.schema_name) 
-           FROM services_public.api_schemas s 
+          (SELECT array_agg(ms.schema_name)
+           FROM services_public.api_schemas s
+           JOIN metaschema_public.schema ms ON ms.id = s.schema_id
            WHERE s.api_id = a.id),
           ARRAY[]::text[]
         ) as schemas
       FROM services_public.domains dom
       JOIN services_public.apis a ON a.id = dom.api_id
-      LEFT JOIN services_public.databases d ON d.id = a.database_id
-      WHERE dom.domain = $1 
+      WHERE dom.domain = $1
         AND ($2::text IS NULL AND dom.subdomain IS NULL OR dom.subdomain = $2)
         AND a.is_public = $3
     `;
-    
+
     const result = await pool.query(query, [domain, subdomain, apiPublic]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
@@ -233,23 +233,23 @@ export const queryServiceByApiName = async ({
   
   try {
     const query = `
-      SELECT 
+      SELECT
         a.id,
         a.name,
         a.database_id,
         a.is_public,
         a.anon_role,
         a.role_name,
-        d.database_name as dbname,
+        a.dbname,
         COALESCE(
-          (SELECT array_agg(s.schema_name) 
-           FROM services_public.api_schemas s 
+          (SELECT array_agg(ms.schema_name)
+           FROM services_public.api_schemas s
+           JOIN metaschema_public.schema ms ON ms.id = s.schema_id
            WHERE s.api_id = a.id),
           ARRAY[]::text[]
         ) as schemas
       FROM services_public.apis a
-      LEFT JOIN services_public.databases d ON d.id = a.database_id
-      WHERE a.database_id = $1 
+      WHERE a.database_id = $1
         AND a.name = $2
         AND a.is_public = $3
     `;
