@@ -4,6 +4,7 @@ import {
   findConfigFile,
   codegenQuestions,
   printResult,
+  camelizeArgv,
   type CodegenAnswers,
 } from '@constructive-io/graphql-codegen';
 
@@ -15,20 +16,20 @@ Constructive GraphQL Codegen:
 Source Options (choose one):
   --config <path>            Path to graphql-codegen config file
   --endpoint <url>           GraphQL endpoint URL
-  --schemaFile <path>        Path to GraphQL schema file
+  --schema-file <path>       Path to GraphQL schema file
 
 Database Options:
   --schemas <list>           Comma-separated PostgreSQL schemas
-  --apiNames <list>          Comma-separated API names
+  --api-names <list>         Comma-separated API names
 
 Generator Options:
-  --reactQuery               Generate React Query hooks (default)
+  --react-query              Generate React Query hooks (default)
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --authorization <token>    Authorization header value
-  --browserCompatible        Generate browser-compatible code (default: true)
+  --browser-compatible       Generate browser-compatible code (default: true)
                              Set to false for Node.js with localhost DNS fix
-  --dryRun                   Preview without writing files
+  --dry-run                  Preview without writing files
   --verbose                  Verbose output
 
   --help, -h                 Show this help message
@@ -55,24 +56,26 @@ export default async (
 
   // No config file - prompt for options using shared questions
   const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
+  // Convert kebab-case CLI args to camelCase for internal use
+  const camelized = camelizeArgv(answers);
 
   // Build db config if schemas or apiNames provided
-  const db = (answers.schemas || answers.apiNames) ? {
-    schemas: answers.schemas,
-    apiNames: answers.apiNames,
+  const db = (camelized.schemas || camelized.apiNames) ? {
+    schemas: camelized.schemas,
+    apiNames: camelized.apiNames,
   } : undefined;
 
   const result = await generate({
-    endpoint: answers.endpoint,
-    schemaFile: answers.schemaFile,
+    endpoint: camelized.endpoint,
+    schemaFile: camelized.schemaFile,
     db,
-    output: answers.output,
-    authorization: answers.authorization,
-    reactQuery: answers.reactQuery,
-    orm: answers.orm,
-    browserCompatible: answers.browserCompatible,
-    dryRun: answers.dryRun,
-    verbose: answers.verbose,
+    output: camelized.output,
+    authorization: camelized.authorization,
+    reactQuery: camelized.reactQuery,
+    orm: camelized.orm,
+    browserCompatible: camelized.browserCompatible,
+    dryRun: camelized.dryRun,
+    verbose: camelized.verbose,
   });
 
   printResult(result);

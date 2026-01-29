@@ -6,6 +6,8 @@
  */
 import type { Question } from 'inquirerer';
 import type { GenerateResult } from '../core/generate';
+import { camelize } from 'inflekt';
+import { inflektTree } from 'inflekt/transform-keys';
 
 /**
  * Sanitize function that splits comma-separated strings into arrays
@@ -17,6 +19,7 @@ export const splitCommas = (input: string | undefined): string[] | undefined => 
 
 /**
  * Interface for codegen CLI answers
+ * CLI accepts kebab-case arguments, converted to camelCase for internal use
  */
 export interface CodegenAnswers {
   endpoint?: string;
@@ -43,7 +46,7 @@ export const codegenQuestions: Question[] = [
     required: false,
   },
   {
-    name: 'schemaFile',
+    name: 'schema-file',
     message: 'Path to GraphQL schema file',
     type: 'text',
     required: false,
@@ -64,14 +67,14 @@ export const codegenQuestions: Question[] = [
     sanitize: splitCommas,
   },
   {
-    name: 'apiNames',
+    name: 'api-names',
     message: 'API names (comma-separated)',
     type: 'text',
     required: false,
     sanitize: splitCommas,
   },
   {
-    name: 'reactQuery',
+    name: 'react-query',
     message: 'Generate React Query hooks?',
     type: 'confirm',
     required: false,
@@ -87,7 +90,7 @@ export const codegenQuestions: Question[] = [
     useDefault: true,
   },
   {
-    name: 'browserCompatible',
+    name: 'browser-compatible',
     message: 'Generate browser-compatible code?',
     type: 'confirm',
     required: false,
@@ -101,7 +104,7 @@ export const codegenQuestions: Question[] = [
     required: false,
   },
   {
-    name: 'dryRun',
+    name: 'dry-run',
     message: 'Preview without writing files?',
     type: 'confirm',
     required: false,
@@ -133,3 +136,12 @@ export function printResult(result: GenerateResult): void {
     process.exit(1);
   }
 }
+
+const isTopLevel = (_key: string, path: string[]) => path.length === 0;
+export const camelizeArgv = (argv: Record<string, any>) =>
+  inflektTree(argv, (key) => camelize(key, true), {
+    skip: (key, path) =>
+      !isTopLevel(key, path) ||
+      key === '_' ||
+      key.startsWith('_')
+  });
