@@ -17,6 +17,7 @@ export const splitCommas = (input: string | undefined): string[] | undefined => 
 
 /**
  * Interface for codegen CLI answers
+ * CLI accepts kebab-case arguments, converted to camelCase for internal use
  */
 export interface CodegenAnswers {
   endpoint?: string;
@@ -33,6 +34,29 @@ export interface CodegenAnswers {
 }
 
 /**
+ * Converts kebab-case CLI arguments to camelCase for internal use.
+ * This is the single conversion point between CLI interface and internal code.
+ *
+ * @param argv - Parsed CLI arguments from minimist (with kebab-case properties)
+ * @returns Normalized object with camelCase properties
+ */
+export function convertArgvToInternal(argv: any): CodegenAnswers {
+  return {
+    endpoint: argv.endpoint,
+    schemaFile: argv['schema-file'],
+    output: argv.output,
+    schemas: argv.schemas,
+    apiNames: argv['api-names'],
+    reactQuery: argv['react-query'] || false,
+    orm: argv.orm || false,
+    browserCompatible: argv['browser-compatible'] !== undefined ? argv['browser-compatible'] : true,
+    authorization: argv.authorization,
+    dryRun: argv['dry-run'] || false,
+    verbose: argv.verbose || false,
+  };
+}
+
+/**
  * Questions for the codegen CLI
  */
 export const codegenQuestions: Question[] = [
@@ -43,7 +67,7 @@ export const codegenQuestions: Question[] = [
     required: false,
   },
   {
-    name: 'schemaFile',
+    name: 'schema-file',
     message: 'Path to GraphQL schema file',
     type: 'text',
     required: false,
@@ -64,14 +88,14 @@ export const codegenQuestions: Question[] = [
     sanitize: splitCommas,
   },
   {
-    name: 'apiNames',
+    name: 'api-names',
     message: 'API names (comma-separated)',
     type: 'text',
     required: false,
     sanitize: splitCommas,
   },
   {
-    name: 'reactQuery',
+    name: 'react-query',
     message: 'Generate React Query hooks?',
     type: 'confirm',
     required: false,
@@ -87,7 +111,7 @@ export const codegenQuestions: Question[] = [
     useDefault: true,
   },
   {
-    name: 'browserCompatible',
+    name: 'browser-compatible',
     message: 'Generate browser-compatible code?',
     type: 'confirm',
     required: false,
@@ -101,7 +125,7 @@ export const codegenQuestions: Question[] = [
     required: false,
   },
   {
-    name: 'dryRun',
+    name: 'dry-run',
     message: 'Preview without writing files?',
     type: 'confirm',
     required: false,

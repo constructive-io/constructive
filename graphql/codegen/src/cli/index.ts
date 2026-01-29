@@ -10,7 +10,7 @@ import { CLI, CLIOptions, Inquirerer, getPackageJson } from 'inquirerer';
 import { generate } from '../core/generate';
 import { findConfigFile, loadConfigFile } from '../core/config';
 import type { GraphQLSDKConfigTarget } from '../types/config';
-import { codegenQuestions, printResult, type CodegenAnswers } from './shared';
+import { codegenQuestions, printResult, type CodegenAnswers, convertArgvToInternal } from './shared';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -108,23 +108,26 @@ export const commands = async (
   // No config file - prompt for options using shared questions
   const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
 
+  // Convert kebab-case CLI args to camelCase for internal use
+  const normalized = convertArgvToInternal(answers);
+
   // Build db config if schemas or apiNames provided
-  const db = (answers.schemas || answers.apiNames) ? {
-    schemas: answers.schemas,
-    apiNames: answers.apiNames,
+  const db = (normalized.schemas || normalized.apiNames) ? {
+    schemas: normalized.schemas,
+    apiNames: normalized.apiNames,
   } : undefined;
 
   const result = await generate({
-    endpoint: answers.endpoint,
-    schemaFile: answers.schemaFile,
+    endpoint: normalized.endpoint,
+    schemaFile: normalized.schemaFile,
     db,
-    output: answers.output,
-    authorization: answers.authorization,
-    reactQuery: answers.reactQuery,
-    orm: answers.orm,
-    browserCompatible: answers.browserCompatible,
-    dryRun: answers.dryRun,
-    verbose: answers.verbose,
+    output: normalized.output,
+    authorization: normalized.authorization,
+    reactQuery: normalized.reactQuery,
+    orm: normalized.orm,
+    browserCompatible: normalized.browserCompatible,
+    dryRun: normalized.dryRun,
+    verbose: normalized.verbose,
   });
 
   printResult(result);
