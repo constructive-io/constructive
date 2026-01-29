@@ -31,8 +31,9 @@ export default async function runWorkspaceSetup(
   prompter.close();
 
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
-  // Don't set default templatePath - let scaffoldTemplate use metadata-driven resolution
-  const templatePath = argv.templatePath as string | undefined;
+  // Don't set default template - let scaffoldTemplate use metadata-driven resolution
+  // Support both --template (new) and --template-path (deprecated) for backward compatibility
+  const template = (argv.template || argv.templatePath) as string | undefined;
 
   // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
   // This provides the intended workspace directory name before the folder is created
@@ -42,7 +43,7 @@ export default async function runWorkspaceSetup(
   const dir = argv.dir as string | undefined;
 
   await scaffoldTemplate({
-    fromPath: templatePath ?? 'workspace',
+    fromPath: template ?? 'workspace',
     outputDir: targetPath,
     templateRepo,
     branch: argv.fromBranch as string | undefined,

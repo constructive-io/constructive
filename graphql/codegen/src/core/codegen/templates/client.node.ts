@@ -62,6 +62,8 @@ export interface GraphQLClientConfig {
   endpoint: string;
   /** Default headers to include in all requests */
   headers?: Record<string, string>;
+  /** Dynamic headers callback called on every request */
+  getHeaders?: () => Record<string, string>;
 }
 
 let globalConfig: GraphQLClientConfig | null = null;
@@ -183,6 +185,7 @@ export async function execute<
 ): Promise<TData> {
   const config = getConfig();
   const url = new URL(config.endpoint);
+  const dynamicHeaders = config.getHeaders?.() ?? {};
 
   const body = JSON.stringify({
     query: document,
@@ -194,6 +197,7 @@ export async function execute<
     headers: {
       'Content-Type': 'application/json',
       ...config.headers,
+      ...dynamicHeaders,
       ...options?.headers,
     },
   };
@@ -234,6 +238,7 @@ export async function executeWithErrors<
 ): Promise<{ data: TData | null; errors: GraphQLError[] | null }> {
   const config = getConfig();
   const url = new URL(config.endpoint);
+  const dynamicHeaders = config.getHeaders?.() ?? {};
 
   const body = JSON.stringify({
     query: document,
@@ -245,6 +250,7 @@ export async function executeWithErrors<
     headers: {
       'Content-Type': 'application/json',
       ...config.headers,
+      ...dynamicHeaders,
       ...options?.headers,
     },
   };

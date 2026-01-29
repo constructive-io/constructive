@@ -398,7 +398,7 @@ SET session_replication_role TO DEFAULT;`;
       'membership_types_module',
       'invites_module',
       'emails_module',
-      'tokens_module',
+      'sessions_module',
       'secrets_module',
       'profiles_module',
       'encrypted_secrets_module',

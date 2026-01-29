@@ -156,7 +156,11 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
 }
 
 // Re-export generators for direct use
-export { generateOrmClientFile, generateQueryBuilderFile, generateSelectTypesFile } from './client-generator';
+export {
+  generateOrmClientFile,
+  generateQueryBuilderFile,
+  generateSelectTypesFile,
+} from './client-generator';
 export { generateModelFile, generateAllModelFiles } from './model-generator';
 export { generateCustomQueryOpsFile, generateCustomMutationOpsFile } from './custom-ops-generator';
 export { generateModelsBarrel, generateTypesBarrel } from './barrel';

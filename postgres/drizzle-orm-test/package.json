@@ -1,6 +1,6 @@
 {
   "name": "drizzle-orm-test",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "Drop-in replacement for pgsql-test that enables Drizzle ORM to work seamlessly with context management and RLS testing",
   "main": "index.js",

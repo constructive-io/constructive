@@ -109,7 +109,7 @@ describe('cmds:init', () => {
   });
 
   describe('with custom templates', () => {
-    it('initializes workspace with --template-path', async () => {
+    it('initializes workspace with --template', async () => {
       const { mockInput, mockOutput } = environment;
       const prompter = new Inquirerer({
         input: mockInput,
@@ -122,7 +122,7 @@ describe('cmds:init', () => {
         cwd: fixture.tempDir,
         name: 'test-workspace-template',
         workspace: true,
-        templatePath: 'pgpm/workspace'
+        template: 'pgpm/workspace'
       });
 
       await commands(argv, prompter, {
@@ -139,7 +139,7 @@ describe('cmds:init', () => {
       expect(existsSync(path.join(workspaceDir, 'pgpm.json'))).toBe(true);
     });
 
-    it('initializes module with --template-path', async () => {
+    it('initializes module with --template', async () => {
       // First create a workspace
       const workspaceDir = path.join(fixture.tempDir, 'test-workspace-for-module');
       const { mockInput, mockOutput } = environment;
@@ -170,7 +170,7 @@ describe('cmds:init', () => {
         name: 'test-module-template',
         moduleName: 'test-module-template',
         extensions: ['plpgsql'],
-        templatePath: 'pgpm/module'
+        template: 'pgpm/module'
       }), prompter, {
         noTty: true,
         input: mockInput,
