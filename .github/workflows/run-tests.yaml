@@ -103,8 +103,8 @@ jobs:
           #   env: {}
           # - package: graphql/env
           #   env: {}
-          # - package: graphql/server
-          #   env: {}
+          - package: graphql/server
+            env: {}
           # - package: graphql/test
           #   env: {}
           # - package: graphql/playwright-test
