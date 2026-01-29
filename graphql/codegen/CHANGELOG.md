@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.4...@constructive-io/graphql-codegen@3.2.0) (2026-01-29)
+
+### Features
+
+- **codegen:** add getHeaders callback for dynamic request headers ([374a91d](https://github.com/constructive-io/constructive/commit/374a91d4b4413c290ee7cd9cb433f7f14d38e4be))
+
 ## [3.1.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.1.3...@constructive-io/graphql-codegen@3.1.4) (2026-01-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
