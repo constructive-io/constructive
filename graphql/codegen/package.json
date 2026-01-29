@@ -55,6 +55,7 @@
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
     "@babel/generator": "^7.28.6",
+    "@babel/parser": "^7.28.6",
     "@babel/types": "^7.28.6",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
