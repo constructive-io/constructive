@@ -1,6 +1,9 @@
 // Main exports from graphile-cache package
-export { 
+export {
+  clearMatchingEntries,
   closeAllCaches,
+  getCacheStats,
   GraphileCache,
   GraphileCacheEntry,
-  graphileCache} from './graphile-cache';
+  graphileCache,
+} from './graphile-cache';

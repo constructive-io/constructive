@@ -7,3 +7,6 @@ export { createAuthenticateMiddleware } from './middleware/auth';
 export { cors } from './middleware/cors';
 export { graphile } from './middleware/graphile';
 export { flush, flushService } from './middleware/flush';
+
+// Export error classes and utilities
+export * from './errors';

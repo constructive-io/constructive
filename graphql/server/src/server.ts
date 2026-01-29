@@ -16,17 +16,32 @@ import requestIp from 'request-ip';
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import { GraphqlServerOptions, normalizeServerOptions, ConstructiveOptions } from './options';
 
 const log = new Logger('server');
 const isDev = () => getNodeEnv() === 'development';
 
-export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
-  const envOptions = getEnvOptions(rawOpts);
+/**
+ * Creates and starts the GraphQL server.
+ *
+ * Accepts either GraphqlServerOptions or ConstructiveOptions (legacy) for backward compatibility.
+ * Options are normalized and merged with defaults before server creation.
+ *
+ * @param rawOpts - Server configuration options
+ * @returns The Server instance
+ */
+export const GraphQLServer = (rawOpts: GraphqlServerOptions | ConstructiveOptions | PgpmOptions = {}) => {
+  // Normalize to GraphqlServerOptions for type consistency
+  const serverOpts = normalizeServerOptions(rawOpts as GraphqlServerOptions | ConstructiveOptions);
+  // Apply environment overrides
+  const envOptions = getEnvOptions(serverOpts as PgpmOptions);
   const app = new Server(envOptions);
   app.addEventListener();
   app.listen();
+  return app;
 };
 
 class Server {
@@ -119,6 +134,10 @@ class Server {
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
     app.use(flush);
+
+    // Error handling middleware - must be LAST in the chain
+    app.use(notFoundHandler);
+    app.use(errorHandler);
 
     this.app = app;
   }

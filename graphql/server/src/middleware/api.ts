@@ -6,8 +6,11 @@ import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 
-import errorPage50x from '../errors/50x';
-import errorPage404Message from '../errors/404-message';
+import {
+  DomainNotFoundError,
+  ApiNotFoundError,
+  NoValidSchemasError,
+} from '../errors/api-errors';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
 import './types'; // for Request type
 
@@ -69,23 +72,19 @@ export const createApiMiddleware = (opts: ApiOptions) => {
       req.svc_key = 'meta-api-off';
       return next();
     }
+    // Get the service key for error context
+    const key = getSvcKey(opts, req);
+
     try {
       const apiConfig = await getApiConfig(opts, req);
 
       if (isApiError(apiConfig)) {
-        res
-          .status(404)
-          .send(errorPage404Message('API not found', apiConfig.errorHtml));
-        return;
+        // ApiError from getApiConfig contains errorHtml - throw ApiNotFoundError
+        throw new ApiNotFoundError(apiConfig.errorHtml || 'unknown');
       } else if (!apiConfig) {
-        res
-          .status(404)
-          .send(
-            errorPage404Message(
-              'API service not found for the given domain/subdomain.'
-            )
-          );
-        return;
+        const { domain, subdomains } = getUrlDomains(req);
+        const subdomain = getSubdomain(subdomains);
+        throw new DomainNotFoundError(domain, subdomain);
       }
       req.api = apiConfig;
       req.databaseId = apiConfig.databaseId;
@@ -97,18 +96,17 @@ export const createApiMiddleware = (opts: ApiOptions) => {
     } catch (error: unknown) {
       const err = error as Error & { code?: string };
       if (err.code === 'NO_VALID_SCHEMAS') {
-        res.status(404).send(errorPage404Message(err.message));
+        // Convert internal NO_VALID_SCHEMAS error to typed error
+        throw new NoValidSchemasError(key);
       } else if (err.message?.match(/does not exist/)) {
-        res
-          .status(404)
-          .send(
-            errorPage404Message(
-              "The resource you're looking for does not exist."
-            )
-          );
+        // Resource not found - throw DomainNotFoundError
+        const { domain, subdomains } = getUrlDomains(req);
+        const subdomain = getSubdomain(subdomains);
+        throw new DomainNotFoundError(domain, subdomain);
       } else {
+        // Re-throw unknown errors for the error handler to process
         log.error('API middleware error:', err);
-        res.status(500).send(errorPage50x);
+        throw err;
       }
     }
   };
