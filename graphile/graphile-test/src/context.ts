@@ -1,106 +1,93 @@
-import { DocumentNode,ExecutionResult, graphql, print } from 'graphql';
-// @ts-ignore
-import MockReq from 'mock-req';
-import type { Client, Pool } from 'pg';
-import { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { PostGraphileOptions, withPostGraphileContext } from 'postgraphile';
-
-import { GetConnectionsInput } from './types';
+import type { DocumentNode, ExecutionResult } from 'graphql';
+import { print } from 'graphql';
+import type { Pool, PoolClient } from 'pg';
+import { grafast } from 'grafast';
+import type { GraphQLSchema } from 'graphql';
+import type { GraphileConfig } from 'graphile-config';
+import type { GetConnectionsInput } from './types.js';
 
 interface PgSettings {
-    [key: string]: string;
+  [key: string]: string;
 }
 
-type WithContextOptions = PostGraphileOptions & {
+export interface RunGraphQLOptions {
+  input: GetConnectionsInput;
+  schema: GraphQLSchema;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
   pgPool: Pool;
-  pgSettings?: PgSettings;
-  req?: MockReq;
-  res?: unknown;
+  pgClient: PoolClient;
+  authRole: string;
+  query: string | DocumentNode;
+  variables?: Record<string, unknown>;
+  reqOptions?: Record<string, unknown>;
+}
+
+/**
+ * Creates a withPgClient function for the grafast context.
+ * In PostGraphile v5, this function is used by resolvers to execute database queries.
+ * For testing, we use the test's pgClient to maintain transaction isolation.
+ */
+const createWithPgClient = (pgClient: PoolClient, pgPool: Pool) => {
+  // withPgClient signature: (pgSettings, callback) => Promise<result>
+  // The callback receives the pgClient and should return the result
+  return async <T>(
+    pgSettings: Record<string, string> | null,
+    callback: (client: PoolClient) => Promise<T>
+  ): Promise<T> => {
+    // For test context, we use the provided test client
+    // Settings are already applied via setContextOnClient
+    return callback(pgClient);
+  };
 };
 
-export const runGraphQLInContext = async <T = ExecutionResult>({
-  input,
-  conn,
-  pgPool,
-  schema,
-  options,
-  authRole,
-  query,
-  variables,
-  reqOptions = {}
-}: {
-    input: GetConnectionsInput & GetConnectionOpts,
-    conn: GetConnectionResult;
-    pgPool: Pool;
-    schema: any;
-    options: PostGraphileOptions;
-    authRole: string;
-    query: string | DocumentNode;
-    variables?: Record<string, any>;
-    reqOptions?: Record<string, any>;
-}): Promise<T> => {
-  if (!conn.pg.client) {
-    throw new Error('pgClient is required and must be provided externally.');
-  }
+export const runGraphQLInContext = async <T = ExecutionResult>(
+  options: RunGraphQLOptions
+): Promise<T> => {
+  const {
+    schema,
+    resolvedPreset,
+    pgPool,
+    pgClient,
+    query,
+    variables,
+  } = options;
 
-  const { res: reqRes, ...restReqOptions } = reqOptions ?? {};
+  // Note: We no longer set context here - it's the test's responsibility
+  // to set context via db.setContext() before running queries.
+  // This allows tests to dynamically change roles and settings between queries.
 
-  const req = new MockReq({
-    url: options.graphqlRoute || '/graphql',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
+  const printed = typeof query === 'string' ? query : print(query);
+
+  // Create the withPgClient function that grafast resolvers need
+  const withPgClient = createWithPgClient(pgClient, pgPool);
+
+  const result = await grafast({
+    schema,
+    source: printed,
+    variableValues: variables ?? undefined,
+    resolvedPreset,
+    contextValue: {
+      pgClient,
+      withPgClient,
+      // Also provide pgPool for any resolvers that need it
+      pgPool,
     },
-    ...restReqOptions
   });
-  const res = reqRes ?? {};
 
-  const pgSettingsGenerator = options.pgSettings;
-  // @ts-ignore
-  const pgSettings: PgSettings =
-        typeof pgSettingsGenerator === 'function'
-          ? await pgSettingsGenerator(req)
-          : pgSettingsGenerator || {};
-
-  const contextOptions: WithContextOptions = { ...options, pgPool, pgSettings, req, res };
-
-  // @ts-ignore
-  return await withPostGraphileContext(
-    contextOptions,
-    async context => {
-
-      const pgConn = input.useRoot ? conn.pg : conn.db;
-      const pgClient = pgConn.client;
-      // IS THIS BAD TO HAVE ROLE HERE 
-      await setContextOnClient(pgClient, pgSettings, authRole);
-      await pgConn.ctxQuery();
-
-      const additionalContext = typeof options.additionalGraphQLContextFromRequest === 'function'
-        ? await options.additionalGraphQLContextFromRequest(req, res)
-        : {};
-
-      const printed = typeof query === 'string' ? query : print(query);
-      const result = await graphql({
-        schema,
-        source: printed,
-        contextValue: { ...context, ...additionalContext, pgClient },
-        variableValues: variables ?? null
-      });
-      return result as T;
-    }
-  );
+  return result as T;
 };
 
-// IS THIS BAD TO HAVE ROLE HERE 
 export async function setContextOnClient(
-  pgClient: Client,
+  pgClient: PoolClient,
   pgSettings: Record<string, string>,
   role: string
 ): Promise<void> {
-  await pgClient.query(`select set_config('role', $1, true)`, [role]);
+  await pgClient.query(`SELECT set_config('role', $1, true)`, [role]);
 
   for (const [key, value] of Object.entries(pgSettings)) {
-    await pgClient.query(`select set_config($1, $2, true)`, [key, String(value)]);
+    await pgClient.query(`SELECT set_config($1, $2, true)`, [
+      key,
+      String(value),
+    ]);
   }
 }

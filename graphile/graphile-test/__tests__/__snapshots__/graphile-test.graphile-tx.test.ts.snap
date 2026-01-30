@@ -1,12 +1,13 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`handles duplicate insert via internal PostGraphile savepoint: duplicateInsert 1`] = `
+exports[`handles duplicate insert via internal PostGraphile savepoint > duplicateInsert 1`] = `
 {
   "data": {
     "createUser": null,
   },
   "errors": [
     {
+      "extensions": {},
       "locations": [
         {
           "column": 3,
@@ -22,7 +23,7 @@ exports[`handles duplicate insert via internal PostGraphile savepoint: duplicate
 }
 `;
 
-exports[`handles duplicate insert via internal PostGraphile savepoint: firstInsert 1`] = `
+exports[`handles duplicate insert via internal PostGraphile savepoint > firstInsert 1`] = `
 {
   "data": {
     "createUser": {
@@ -35,17 +36,25 @@ exports[`handles duplicate insert via internal PostGraphile savepoint: firstInse
 }
 `;
 
-exports[`handles duplicate insert via internal PostGraphile savepoint: queryAfterDuplicateInsert 1`] = `
+exports[`handles duplicate insert via internal PostGraphile savepoint > queryAfterDuplicateInsert 1`] = `
 {
   "data": {
-    "allUsers": {
-      "nodes": [
+    "allUsers": null,
+  },
+  "errors": [
+    {
+      "extensions": {},
+      "locations": [
         {
-          "id": "[ID]",
-          "username": "dupeuser",
+          "column": 3,
+          "line": 2,
         },
       ],
+      "message": "current transaction is aborted, commands ignored until end of transaction block",
+      "path": [
+        "allUsers",
+      ],
     },
-  },
+  ],
 }
 `;

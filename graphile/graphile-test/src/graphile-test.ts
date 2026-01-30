@@ -1,64 +1,69 @@
 import type { GraphQLSchema } from 'graphql';
-import { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile';
+import type { Pool, PoolClient } from 'pg';
+import type { GraphileConfig } from 'graphile-config';
+import { makeSchema } from 'postgraphile';
+import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
+import { makePgService } from 'postgraphile/adaptors/pg';
 
-import { runGraphQLInContext } from './context';
-import type { GraphQLQueryOptions,GraphQLTestContext } from './types';
-import { GetConnectionsInput } from './types';
+import { runGraphQLInContext } from './context.js';
+import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput } from './types.js';
 
-export const GraphQLTest = (
-  input: GetConnectionsInput & GetConnectionOpts,
-  conn: GetConnectionResult
-): GraphQLTestContext => {
-  const {
-    schemas,
-    authRole,
-    graphile
-  } = input;
+export interface GraphQLTestInput {
+  input: GetConnectionsInput;
+  pgPool: Pool;
+  pgClient: PoolClient;
+}
+
+export const GraphQLTest = (testInput: GraphQLTestInput): GraphQLTestContext => {
+  const { input, pgPool, pgClient } = testInput;
+  const { schemas, authRole = 'postgres', preset: userPreset } = input;
 
   let schema: GraphQLSchema;
-  let options: PostGraphileOptions;
-
-  const pgPool = conn.manager.getPool(conn.pg.config);
+  let resolvedPreset: GraphileConfig.ResolvedPreset;
 
   const setup = async () => {
-    // Bare-bones configuration - no defaults, only use what's explicitly provided
-    // This gives full control over PostGraphile configuration
-    options = {
-      schema: schemas,
-      // Only apply graphile options if explicitly provided
-      ...(graphile?.appendPlugins && {
-        appendPlugins: graphile.appendPlugins
-      }),
-      ...(graphile?.graphileBuildOptions && {
-        graphileBuildOptions: graphile.graphileBuildOptions
-      }),
-      // Apply any overrideSettings if provided
-      ...(graphile?.overrideSettings || {})
-    } as PostGraphileOptions;
+    const basePreset: GraphileConfig.Preset = {
+      extends: [PostGraphileAmberPreset],
+      pgServices: [
+        makePgService({
+          pool: pgPool,
+          schemas,
+        }),
+      ],
+    };
 
-    schema = await createPostGraphileSchema(pgPool, schemas, options);
+    const preset: GraphileConfig.Preset = userPreset
+      ? { extends: [userPreset, basePreset] }
+      : basePreset;
+
+    const schemaResult = await makeSchema(preset);
+    schema = schemaResult.schema;
+    resolvedPreset = schemaResult.resolvedPreset;
   };
 
-  const teardown = async () => { /* optional cleanup */ };
+  const teardown = async () => {
+    /* optional cleanup */
+  };
 
-  const query = async <TResult = any, TVariables = Record<string, any>>(
+  const query = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
     opts: GraphQLQueryOptions<TVariables>
   ): Promise<TResult> => {
     return await runGraphQLInContext<TResult>({
       input,
       schema,
-      options,
-      authRole,
+      resolvedPreset,
       pgPool,
-      conn,
-      ...opts
+      pgClient,
+      authRole,
+      query: opts.query,
+      variables: opts.variables as Record<string, unknown> | undefined,
+      reqOptions: opts.reqOptions,
     });
   };
 
   return {
     setup,
     teardown,
-    query
+    query,
   };
 };

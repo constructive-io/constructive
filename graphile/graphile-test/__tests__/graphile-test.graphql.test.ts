@@ -2,11 +2,9 @@ process.env.LOG_SCOPE = 'graphile-test';
 
 import gql from 'graphql-tag';
 import { join } from 'path';
-import { seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
 
 import { snapshot } from '../src/utils';
-import { getConnections } from '../src/get-connections';
+import { getConnections, seed, PgTestClient } from '../src/get-connections';
 import type { GraphQLQueryFn } from '../src/types';
 import { logDbSessionInfo } from '../test-utils/utils';
 
@@ -45,10 +43,10 @@ beforeEach(async () => {
 afterEach(() => db.afterEach());
 
 afterAll(async () => {
-  await teardown();
+  await teardown?.();
 });
 
-// ✅ Basic mutation and query test
+// Basic mutation and query test
 it('creates a user and fetches it', async () => {
   await logDbSessionInfo(db);
   const CREATE_USER = gql`
@@ -92,4 +90,3 @@ it('creates a user and fetches it', async () => {
     fetchRes.data.allUsers.nodes.some((u: any) => u.username === newUsername)
   ).toBe(true);
 });
-

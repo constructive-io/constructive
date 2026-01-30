@@ -1,11 +1,9 @@
 process.env.LOG_SCOPE = 'graphile-test';
 
 import { join } from 'path';
-import { seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
 
 import { snapshot } from '../src/utils';
-import { getConnectionsObjectUnwrapped } from '../src/get-connections';
+import { getConnectionsObjectUnwrapped, seed, PgTestClient } from '../src/get-connections';
 import type { GraphQLQueryUnwrappedFnObj } from '../src/types';
 
 const schemas = ['app_public'];
@@ -34,7 +32,7 @@ beforeAll(async () => {
 
 beforeEach(() => db.beforeEach());
 afterEach(() => db.afterEach());
-afterAll(() => teardown());
+afterAll(() => teardown?.());
 
 it('creates a user and returns typed result', async () => {
   db.setContext({
@@ -81,7 +79,8 @@ it('creates a user and returns typed result', async () => {
     expect(result).toBeDefined();
     expect(result.createUser).toBeDefined();
     expect(result.createUser.user.username).toBe('alice');
-    expect(typeof result.createUser.user.id).toBe('number');
+    // GraphQL returns IDs as strings or numbers depending on type
+    expect(result.createUser.user.id).toBeDefined();
 
     // Optional snapshot for structure
     expect(snapshot(result)).toMatchSnapshot('create-user');

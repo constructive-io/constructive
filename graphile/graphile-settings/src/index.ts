@@ -1,6 +1,6 @@
 import type { GraphileConfig } from 'graphile-config';
 import { getEnvOptions } from '@constructive-io/graphql-env';
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
+import { ConstructiveOptions, grafservDefaults } from '@constructive-io/graphql-types';
 import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
@@ -58,12 +58,16 @@ export const getGraphilePreset = (
 ): GraphileConfig.Preset => {
   const envOpts = getEnvOptions(opts);
 
+  // Get grafserv config from options, falling back to defaults
+  const grafservConfig = envOpts.graphile?.grafserv ?? grafservDefaults;
+  const websocketConfig = grafservConfig.websockets ?? grafservDefaults.websockets;
+
   return {
     extends: [ConstructivePreset],
     grafserv: {
-      graphqlPath: '/graphql',
-      graphiqlPath: '/graphiql',
-      websockets: false,
+      graphqlPath: grafservConfig.graphqlPath ?? grafservDefaults.graphqlPath,
+      graphiqlPath: grafservConfig.graphiqlPath ?? grafservDefaults.graphiqlPath,
+      websockets: websocketConfig?.enabled ?? false,
     },
     grafast: {
       explain: process.env.NODE_ENV === 'development',

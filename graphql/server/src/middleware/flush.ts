@@ -2,7 +2,11 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
+import {
+  graphileCache,
+  invalidateCacheKey,
+  invalidateCachePattern,
+} from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
 
@@ -101,8 +105,8 @@ export const flush = async (
       return;
     }
 
-    // Perform the flush operation
-    graphileCache.delete(svcKey);
+    // Perform the flush operation with cross-node invalidation
+    await invalidateCacheKey(svcKey);
     svcCache.delete(svcKey);
 
     log.info(`Cache flushed successfully - IP: ${clientIp}, svc_key: ${svcKey || 'none'}`);
@@ -119,14 +123,24 @@ export const flushService = async (
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
 
-  const api = new RegExp(`^api:${databaseId}:.*`);
-  const schemata = new RegExp(`^schemata:${databaseId}:.*`);
-  const meta = new RegExp(`^metaschema:api:${databaseId}`);
+  // Use pattern-based invalidation for cross-node coordination
+  // This broadcasts patterns to all nodes for consistent cache clearing
+  const apiPattern = `^api:${databaseId}:.*`;
+  const schemataPattern = `^schemata:${databaseId}:.*`;
+  const metaPattern = `^metaschema:api:${databaseId}`;
 
   if (!opts.api.isPublic) {
-    graphileCache.forEach((_, k: string) => {
+    // Invalidate by pattern across all nodes
+    await invalidateCachePattern(apiPattern);
+    await invalidateCachePattern(schemataPattern);
+    await invalidateCachePattern(metaPattern);
+
+    // Also clear svcCache locally (svcCache doesn't have cross-node invalidation)
+    svcCache.forEach((_, k: string) => {
+      const api = new RegExp(apiPattern);
+      const schemata = new RegExp(schemataPattern);
+      const meta = new RegExp(metaPattern);
       if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
         svcCache.delete(k);
       }
     });
@@ -149,7 +163,8 @@ export const flushService = async (
       key = `${row.subdomain}.${row.domain}`;
     }
     if (key) {
-      graphileCache.delete(key);
+      // Use cross-node invalidation for domain keys
+      await invalidateCacheKey(key);
       svcCache.delete(key);
     }
   }

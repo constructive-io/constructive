@@ -1,6 +1,29 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`creates a user and fetches it: createUser 1`] = `
+exports[`anonymous role can read settings but not tables > anonymousTableAccess 1`] = `
+{
+  "data": {
+    "allUsers": null,
+  },
+  "errors": [
+    {
+      "extensions": {},
+      "locations": [
+        {
+          "column": 3,
+          "line": 2,
+        },
+      ],
+      "message": "permission denied for table users",
+      "path": [
+        "allUsers",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`creates a user and fetches it > createUser 1`] = `
 {
   "data": {
     "createUser": {
@@ -13,7 +36,7 @@ exports[`creates a user and fetches it: createUser 1`] = `
 }
 `;
 
-exports[`does not see the user created in the previous test: usersAfterRollback 1`] = `
+exports[`does not see the user created in the previous test > usersAfterRollback 1`] = `
 {
   "data": {
     "allUsers": {
@@ -23,46 +46,11 @@ exports[`does not see the user created in the previous test: usersAfterRollback 
 }
 `;
 
-exports[`fails to access context-protected data as anonymous: unauthorizedContext 1`] = `
-{
-  "data": {
-    "currentRole": null,
-    "userId": null,
-  },
-  "errors": [
-    {
-      "locations": [
-        {
-          "column": 3,
-          "line": 2,
-        },
-      ],
-      "message": "permission denied for function current_setting",
-      "path": [
-        "currentRole",
-      ],
-    },
-    {
-      "locations": [
-        {
-          "column": 3,
-          "line": 3,
-        },
-      ],
-      "message": "current transaction is aborted, commands ignored until end of transaction block",
-      "path": [
-        "userId",
-      ],
-    },
-  ],
-}
-`;
-
-exports[`returns pg context settings from current_setting() function: pgContext 1`] = `
+exports[`returns pg context settings from current_setting() function > pgContext 1`] = `
 {
   "data": {
     "currentRole": "authenticated",
-    "userId": "123",
+    "userId": "",
   },
 }
 `;

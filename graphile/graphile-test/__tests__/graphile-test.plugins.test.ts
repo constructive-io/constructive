@@ -2,63 +2,76 @@ process.env.LOG_SCOPE = 'graphile-test';
 
 import gql from 'graphql-tag';
 import { join } from 'path';
-import { seed } from 'pgsql-test';
-import type { PgTestClient } from 'pgsql-test/test-client';
+import type { GraphileConfig } from 'graphile-config';
 
-import { getConnections } from '../src/get-connections';
+import { getConnections, seed, PgTestClient } from '../src/get-connections';
 import type { GraphQLQueryFn } from '../src/types';
 import { IntrospectionQuery } from '../test-utils/queries';
 
 const schemas = ['app_public'];
 const sql = (f: string) => join(__dirname, '/../sql', f);
 
-// Test plugin that adds a custom field to the root query
-const TestPlugin = (builder: any) => {
-  builder.hook('GraphQLObjectType:fields', (fields: any, build: any, context: any) => {
-    const { scope } = context;
-    if (scope.isRootQuery) {
-      return build.extend(fields, {
-        testPluginField: {
-          type: build.graphql.GraphQLString,
-          resolve: () => 'test-plugin-value'
+// PostGraphile v5 plugin that adds a custom field to the root query
+// Important: Use build.graphql.GraphQLString, not the imported one,
+// to avoid "Schema must contain uniquely named types" error
+const TestPlugin: GraphileConfig.Plugin = {
+  name: 'TestPlugin',
+  version: '1.0.0',
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields(fields, build, context) {
+        if (context.scope.isRootQuery) {
+          return build.extend(fields, {
+            testPluginField: {
+              type: build.graphql.GraphQLString,
+              resolve: () => 'test-plugin-value'
+            }
+          });
         }
-      });
+        return fields;
+      }
     }
-    return fields;
-  });
+  }
 };
 
 // Another test plugin that adds a different field
-const AnotherTestPlugin = (builder: any) => {
-  builder.hook('GraphQLObjectType:fields', (fields: any, build: any, context: any) => {
-    const { scope } = context;
-    if (scope.isRootQuery) {
-      return build.extend(fields, {
-        anotherTestField: {
-          type: build.graphql.GraphQLString,
-          resolve: () => 'another-test-value'
+const AnotherTestPlugin: GraphileConfig.Plugin = {
+  name: 'AnotherTestPlugin',
+  version: '1.0.0',
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields(fields, build, context) {
+        if (context.scope.isRootQuery) {
+          return build.extend(fields, {
+            anotherTestField: {
+              type: build.graphql.GraphQLString,
+              resolve: () => 'another-test-value'
+            }
+          });
         }
-      });
+        return fields;
+      }
     }
-    return fields;
-  });
+  }
 };
 
 describe('graphile-test with plugins', () => {
-  describe('appendPlugins', () => {
+  describe('single plugin via preset', () => {
     let teardown: () => Promise<void>;
     let query: GraphQLQueryFn;
     let db: PgTestClient;
 
     beforeAll(async () => {
+      const testPreset: GraphileConfig.Preset = {
+        plugins: [TestPlugin]
+      };
+
       const connections = await getConnections(
         {
           useRoot: true,
           schemas,
           authRole: 'postgres',
-          graphile: {
-            appendPlugins: [TestPlugin]
-          }
+          preset: testPreset
         },
         [
           seed.sqlfile([
@@ -72,7 +85,7 @@ describe('graphile-test with plugins', () => {
 
     beforeEach(() => db.beforeEach());
     afterEach(() => db.afterEach());
-    afterAll(() => teardown());
+    afterAll(() => teardown?.());
 
     it('should add custom field from plugin to root query', async () => {
       const TEST_QUERY = gql`
@@ -91,10 +104,10 @@ describe('graphile-test with plugins', () => {
       expect(res.data).not.toBeNull();
       expect(res.data).not.toBeUndefined();
       expect(res.errors).toBeUndefined();
-      
+
       const queryTypeName = res.data?.__schema?.queryType?.name;
       expect(queryTypeName).toBe('Query');
-      
+
       // Find the Query type in the types array
       const types = res.data?.__schema?.types || [];
       const queryType = types.find((t: any) => t.name === queryTypeName);
@@ -102,35 +115,37 @@ describe('graphile-test with plugins', () => {
       expect(queryType).not.toBeUndefined();
       expect(queryType?.name).toBe('Query');
       expect(Array.isArray(queryType?.fields)).toBe(true);
-      
+
       const fields = queryType?.fields || [];
       const testField = fields.find((f: any) => f.name === 'testPluginField');
       expect(testField).not.toBeNull();
       expect(testField).not.toBeUndefined();
       expect(testField?.name).toBe('testPluginField');
-      
+
       // Handle nested type references
-      const typeName = testField.type?.name || 
-                      testField.type?.ofType?.name || 
+      const typeName = testField.type?.name ||
+                      testField.type?.ofType?.name ||
                       testField.type?.ofType?.ofType?.name;
       expect(typeName).toBe('String');
     });
   });
 
-  describe('multiple appendPlugins', () => {
+  describe('multiple plugins via preset', () => {
     let teardown: () => Promise<void>;
     let query: GraphQLQueryFn;
     let db: PgTestClient;
 
     beforeAll(async () => {
+      const testPreset: GraphileConfig.Preset = {
+        plugins: [TestPlugin, AnotherTestPlugin]
+      };
+
       const connections = await getConnections(
         {
           useRoot: true,
           schemas,
           authRole: 'postgres',
-          graphile: {
-            appendPlugins: [TestPlugin, AnotherTestPlugin]
-          }
+          preset: testPreset
         },
         [
           seed.sqlfile([
@@ -144,7 +159,7 @@ describe('graphile-test with plugins', () => {
 
     beforeEach(() => db.beforeEach());
     afterEach(() => db.afterEach());
-    afterAll(() => teardown());
+    afterAll(() => teardown?.());
 
     it('should add multiple custom fields from multiple plugins', async () => {
       const TEST_QUERY = gql`
@@ -160,148 +175,4 @@ describe('graphile-test with plugins', () => {
       expect(res.errors).toBeUndefined();
     });
   });
-
-  describe('graphileBuildOptions', () => {
-    let teardown: () => Promise<void>;
-    let query: GraphQLQueryFn;
-    let db: PgTestClient;
-
-    beforeAll(async () => {
-      const connections = await getConnections(
-        {
-          useRoot: true,
-          schemas,
-          authRole: 'postgres',
-          graphile: {
-            appendPlugins: [TestPlugin],
-            graphileBuildOptions: {
-              // Test that we can pass build options
-              pgOmitListSuffix: false
-            }
-          }
-        },
-        [
-          seed.sqlfile([
-            sql('test.sql')
-          ])
-        ]
-      );
-
-      ({ query, db, teardown } = connections);
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-    afterAll(() => teardown());
-
-    it('should work with graphileBuildOptions', async () => {
-      const TEST_QUERY = gql`
-        query {
-          testPluginField
-        }
-      `;
-
-      const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
-      expect(res.errors).toBeUndefined();
-    });
-  });
-
-  describe('overrideSettings', () => {
-    let teardown: () => Promise<void>;
-    let query: GraphQLQueryFn;
-    let db: PgTestClient;
-
-    beforeAll(async () => {
-      const connections = await getConnections(
-        {
-          useRoot: true,
-          schemas,
-          authRole: 'postgres',
-          graphile: {
-            appendPlugins: [TestPlugin],
-            overrideSettings: {
-              // Test that we can override settings
-              // Using a valid PostGraphile option
-              classicIds: true
-            }
-          }
-        },
-        [
-          seed.sqlfile([
-            sql('test.sql')
-          ])
-        ]
-      );
-
-      ({ query, db, teardown } = connections);
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-    afterAll(() => teardown());
-
-    it('should work with overrideSettings', async () => {
-      const TEST_QUERY = gql`
-        query {
-          testPluginField
-        }
-      `;
-
-      const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
-      expect(res.errors).toBeUndefined();
-    });
-  });
-
-  describe('combined graphile options', () => {
-    let teardown: () => Promise<void>;
-    let query: GraphQLQueryFn;
-    let db: PgTestClient;
-
-    beforeAll(async () => {
-      const connections = await getConnections(
-        {
-          useRoot: true,
-          schemas,
-          authRole: 'postgres',
-          graphile: {
-            appendPlugins: [TestPlugin, AnotherTestPlugin],
-            graphileBuildOptions: {
-              pgOmitListSuffix: false
-            },
-            overrideSettings: {
-              classicIds: true
-            }
-          }
-        },
-        [
-          seed.sqlfile([
-            sql('test.sql')
-          ])
-        ]
-      );
-
-      ({ query, db, teardown } = connections);
-    });
-
-    beforeEach(() => db.beforeEach());
-    afterEach(() => db.afterEach());
-    afterAll(() => teardown());
-
-    it('should work with all graphile options combined', async () => {
-      const TEST_QUERY = gql`
-        query {
-          testPluginField
-          anotherTestField
-        }
-      `;
-
-      const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
-      expect(res.data?.anotherTestField).toBe('another-test-value');
-      expect(res.errors).toBeUndefined();
-    });
-  });
 });
-

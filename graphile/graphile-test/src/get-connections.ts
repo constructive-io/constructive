@@ -1,20 +1,18 @@
-import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { getConnections as getPgConnections } from 'pgsql-test';
-import type { SeedAdapter } from 'pgsql-test/seed/types';
-import type { PgTestClient } from 'pgsql-test/test-client';
+import type { Pool, PoolClient } from 'pg';
+import type { DocumentNode } from 'graphql';
+import pgModule from 'pg';
 
-import { GraphQLTest } from './graphile-test';
+import { GraphQLTest } from './graphile-test.js';
 import type {
   GetConnectionsInput,
-  GraphQLQueryFn,
-  GraphQLQueryFnObj,
   GraphQLQueryOptions,
-  GraphQLQueryUnwrappedFn,
-  GraphQLQueryUnwrappedFnObj,
   GraphQLResponse,
-  GraphQLTestContext} from './types';
+  GraphQLTestContext,
+} from './types.js';
 
-// Core unwrapping utility
+// Re-export seed adapters
+export * from './seed/index.js';
+
 const unwrap = <T>(res: GraphQLResponse<T>): T => {
   if (res.errors?.length) {
     throw new Error(JSON.stringify(res.errors, null, 2));
@@ -25,25 +23,131 @@ const unwrap = <T>(res: GraphQLResponse<T>): T => {
   return res.data;
 };
 
-// Base connection setup - shared across all variants
-const createConnectionsBase = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
-) => {
-  const conn: GetConnectionResult = await getPgConnections(input, seedAdapters);
-  const { pg, db, teardown: dbTeardown } = conn;
+export interface PgTestClient {
+  pool: Pool;
+  client: PoolClient;
+  beforeEach: () => Promise<void>;
+  afterEach: () => Promise<void>;
+  query: <T = unknown>(sql: string, params?: unknown[]) => Promise<T>;
+  setContext: (settings: Record<string, string>) => Promise<void>;
+}
 
-  const gqlContext = GraphQLTest(input, conn);
+const createPgTestClient = (pool: Pool, client: PoolClient): PgTestClient => {
+  let transactionStarted = false;
+
+  return {
+    pool,
+    client,
+    beforeEach: async () => {
+      if (!transactionStarted) {
+        await client.query('BEGIN');
+        transactionStarted = true;
+      }
+      await client.query('SAVEPOINT test_savepoint');
+    },
+    afterEach: async () => {
+      await client.query('ROLLBACK TO SAVEPOINT test_savepoint');
+    },
+    query: async <T = unknown>(sql: string, params?: unknown[]): Promise<T> => {
+      const result = await client.query(sql, params);
+      return result.rows as T;
+    },
+    setContext: async (settings: Record<string, string>) => {
+      for (const [key, value] of Object.entries(settings)) {
+        if (key === 'role') {
+          await client.query(`SET ROLE ${value}`);
+        } else {
+          await client.query(`SELECT set_config($1, $2, true)`, [key, String(value)]);
+        }
+      }
+    },
+  };
+};
+
+export interface ConnectionResult {
+  pg: PgTestClient;
+  db: PgTestClient;
+  teardown: () => Promise<void>;
+  gqlContext: GraphQLTestContext;
+}
+
+type QueryFn = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  opts: GraphQLQueryOptions<TVariables>
+) => Promise<GraphQLResponse<TResult>>;
+
+type QueryFnPositional = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  query: string | DocumentNode,
+  variables?: TVariables,
+  commit?: boolean,
+  reqOptions?: Record<string, unknown>
+) => Promise<GraphQLResponse<TResult>>;
+
+type QueryFnUnwrapped = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  opts: GraphQLQueryOptions<TVariables>
+) => Promise<TResult>;
+
+type QueryFnPositionalUnwrapped = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  query: string | DocumentNode,
+  variables?: TVariables,
+  commit?: boolean,
+  reqOptions?: Record<string, unknown>
+) => Promise<TResult>;
+
+// Import seed types and adapters
+import { seed } from './seed/index.js';
+import type { SeedAdapter } from './seed/types.js';
+
+const createConnectionsBase = async (
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
+): Promise<ConnectionResult & { baseQuery: QueryFn; baseQueryPositional: QueryFnPositional }> => {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    `postgres://${process.env.PGUSER || 'postgres'}:${process.env.PGPASSWORD || ''}@${process.env.PGHOST || 'localhost'}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || 'postgres'}`;
+
+  const pool = new pgModule.Pool({ connectionString });
+  const rootClient = await pool.connect();
+  const userClient = await pool.connect();
+
+  const pg = createPgTestClient(pool, rootClient);
+  const db = createPgTestClient(pool, userClient);
+
+  // Run seed adapters BEFORE building the GraphQL schema
+  // This allows creating extensions, tables, etc. that the schema needs to introspect
+  if (seedAdapters.length > 0) {
+    await seed.compose(seedAdapters).seed({ pool, client: rootClient });
+  }
+
+  const gqlContext = GraphQLTest({
+    input,
+    pgPool: pool,
+    pgClient: input.useRoot ? rootClient : userClient,
+  });
   await gqlContext.setup();
 
   const teardown = async () => {
     await gqlContext.teardown();
-    await dbTeardown();
+    rootClient.release();
+    userClient.release();
+    await pool.end();
   };
 
-  const baseQuery = (opts: GraphQLQueryOptions) => gqlContext.query(opts);
-  const baseQueryPositional = (query: any, variables?: any, commit?: boolean, reqOptions?: any) =>
-    gqlContext.query({ query, variables, commit, reqOptions });
+  const baseQuery: QueryFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    opts: GraphQLQueryOptions<TVariables>
+  ): Promise<GraphQLResponse<TResult>> => {
+    const result = await gqlContext.query<TResult, TVariables>(opts);
+    return result as GraphQLResponse<TResult>;
+  };
+
+  const baseQueryPositional: QueryFnPositional = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    query: string | DocumentNode,
+    variables?: TVariables,
+    commit?: boolean,
+    reqOptions?: Record<string, unknown>
+  ): Promise<GraphQLResponse<TResult>> => {
+    const result = await gqlContext.query<TResult, TVariables>({ query, variables, commit, reqOptions });
+    return result as GraphQLResponse<TResult>;
+  };
 
   return {
     pg,
@@ -51,25 +155,18 @@ const createConnectionsBase = async (
     teardown,
     baseQuery,
     baseQueryPositional,
-    gqlContext
+    gqlContext,
   };
 };
 
-// ============================================================================
-// REGULAR QUERY VERSIONS
-// ============================================================================
-
-/**
- * Creates connections with raw GraphQL responses
- */
 export const getConnectionsObject = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFnObj;
+  query: QueryFn;
   gqlContext: GraphQLTestContext;
 }> => {
   const { pg, db, teardown, baseQuery, gqlContext } = await createConnectionsBase(input, seedAdapters);
@@ -79,51 +176,52 @@ export const getConnectionsObject = async (
     db,
     teardown,
     query: baseQuery,
-    gqlContext
+    gqlContext,
   };
 };
 
-/**
- * Creates connections with unwrapped GraphQL responses (throws on errors)
- */
 export const getConnectionsObjectUnwrapped = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryUnwrappedFnObj;
+  query: QueryFnUnwrapped;
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryUnwrappedFnObj = async (opts) => unwrap(await baseQuery(opts));
+  const query: QueryFnUnwrapped = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    opts: GraphQLQueryOptions<TVariables>
+  ): Promise<TResult> => {
+    const result = await baseQuery<TResult, TVariables>(opts);
+    return unwrap(result);
+  };
 
   return {
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };
 
-/**
- * Creates connections with logging for GraphQL queries
- */
 export const getConnectionsObjectWithLogging = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFnObj;
+  query: QueryFn;
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFnObj = async (opts) => {
+  const query: QueryFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    opts: GraphQLQueryOptions<TVariables>
+  ): Promise<GraphQLResponse<TResult>> => {
     console.log('Executing GraphQL query:', opts.query);
-    const result = await baseQuery(opts);
+    const result = await baseQuery<TResult, TVariables>(opts);
     console.log('GraphQL result:', result);
     return result;
   };
@@ -132,27 +230,26 @@ export const getConnectionsObjectWithLogging = async (
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };
 
-/**
- * Creates connections with timing for GraphQL queries
- */
 export const getConnectionsObjectWithTiming = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFnObj;
+  query: QueryFn;
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFnObj = async (opts) => {
+  const query: QueryFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    opts: GraphQLQueryOptions<TVariables>
+  ): Promise<GraphQLResponse<TResult>> => {
     const start = Date.now();
-    const result = await baseQuery(opts);
+    const result = await baseQuery<TResult, TVariables>(opts);
     const duration = Date.now() - start;
     console.log(`GraphQL query took ${duration}ms`);
     return result;
@@ -162,25 +259,18 @@ export const getConnectionsObjectWithTiming = async (
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };
 
-// ============================================================================
-// POSITIONAL QUERY VERSIONS
-// ============================================================================
-
-/**
- * Creates connections with raw GraphQL responses (positional API)
- */
 export const getConnections = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFn;
+  query: QueryFnPositional;
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
@@ -188,52 +278,58 @@ export const getConnections = async (
     pg,
     db,
     teardown,
-    query: baseQueryPositional
+    query: baseQueryPositional,
   };
 };
 
-/**
- * Creates connections with unwrapped GraphQL responses (positional API, throws on errors)
- */
 export const getConnectionsUnwrapped = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryUnwrappedFn;
+  query: QueryFnPositionalUnwrapped;
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryUnwrappedFn = async (query, variables, commit, reqOptions) =>
-    unwrap(await baseQueryPositional(query, variables, commit, reqOptions));
+  const query: QueryFnPositionalUnwrapped = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    q: string | DocumentNode,
+    variables?: TVariables,
+    commit?: boolean,
+    reqOptions?: Record<string, unknown>
+  ): Promise<TResult> => {
+    const result = await baseQueryPositional<TResult, TVariables>(q, variables, commit, reqOptions);
+    return unwrap(result);
+  };
 
   return {
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };
 
-/**
- * Creates connections with logging for GraphQL queries (positional API)
- */
 export const getConnectionsWithLogging = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFn;
+  query: QueryFnPositional;
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFn = async (query, variables, commit, reqOptions) => {
-    console.log('Executing positional GraphQL query:', query);
-    const result = await baseQueryPositional(query, variables, commit, reqOptions);
+  const query: QueryFnPositional = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    q: string | DocumentNode,
+    variables?: TVariables,
+    commit?: boolean,
+    reqOptions?: Record<string, unknown>
+  ): Promise<GraphQLResponse<TResult>> => {
+    console.log('Executing positional GraphQL query:', q);
+    const result = await baseQueryPositional<TResult, TVariables>(q, variables, commit, reqOptions);
     console.log('GraphQL result:', result);
     return result;
   };
@@ -242,27 +338,29 @@ export const getConnectionsWithLogging = async (
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };
 
-/**
- * Creates connections with timing for GraphQL queries (positional API)
- */
 export const getConnectionsWithTiming = async (
-  input: GetConnectionsInput & GetConnectionOpts,
-  seedAdapters?: SeedAdapter[]
+  input: GetConnectionsInput,
+  seedAdapters: SeedAdapter[] = []
 ): Promise<{
   pg: PgTestClient;
   db: PgTestClient;
   teardown: () => Promise<void>;
-  query: GraphQLQueryFn;
+  query: QueryFnPositional;
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFn = async (query, variables, commit, reqOptions) => {
+  const query: QueryFnPositional = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    q: string | DocumentNode,
+    variables?: TVariables,
+    commit?: boolean,
+    reqOptions?: Record<string, unknown>
+  ): Promise<GraphQLResponse<TResult>> => {
     const start = Date.now();
-    const result = await baseQueryPositional(query, variables, commit, reqOptions);
+    const result = await baseQueryPositional<TResult, TVariables>(q, variables, commit, reqOptions);
     const duration = Date.now() - start;
     console.log(`Positional GraphQL query took ${duration}ms`);
     return result;
@@ -272,6 +370,6 @@ export const getConnectionsWithTiming = async (
     pg,
     db,
     teardown,
-    query
+    query,
   };
 };

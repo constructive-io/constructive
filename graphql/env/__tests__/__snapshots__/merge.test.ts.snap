@@ -67,9 +67,15 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "simpleInflection": true,
   },
   "graphile": {
-    "appendPlugins": [],
-    "graphileBuildOptions": {},
-    "overrideSettings": {},
+    "extends": [],
+    "grafserv": {
+      "graphiqlPath": "/graphiql",
+      "graphqlPath": "/graphql",
+      "websockets": {
+        "enabled": false,
+      },
+    },
+    "preset": {},
     "schema": [
       "override_schema",
     ],
@@ -103,7 +109,7 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
   "pg": {
     "database": "config-db",
     "host": "override-host",
-    "password": "password",
+    "password": "",
     "port": 5432,
     "user": "env-user",
   },

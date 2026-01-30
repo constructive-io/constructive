@@ -3,13 +3,16 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import { randomUUID } from 'crypto';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
-import { graphileCache } from 'graphile-cache';
+import {
+  graphileCache,
+  initCrossNodeInvalidation,
+  stopCrossNodeInvalidation,
+} from 'graphile-cache';
 import { getPgPool, pgCache } from 'pg-cache';
 import requestIp from 'request-ip';
 
@@ -19,6 +22,8 @@ import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import { metricsRouter, requestMetricsMiddleware, initMetricsEventListeners } from './middleware/metrics';
+import { structuredLogger } from './middleware/structured-logger';
 import { GraphqlServerOptions, normalizeServerOptions, ConstructiveOptions } from './options';
 
 const log = new Logger('server');
@@ -52,6 +57,7 @@ class Server {
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
+  private cacheInvalidationInitialized = false;
 
   constructor(opts: PgpmOptions) {
     this.opts = getEnvOptions(opts);
@@ -60,37 +66,6 @@ class Server {
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
-    const requestLogger: RequestHandler = (req, res, next) => {
-      const headerRequestId = req.header('x-request-id');
-      const reqId = headerRequestId || randomUUID();
-      const start = process.hrtime.bigint();
-
-      req.requestId = reqId;
-
-      const host = req.hostname || req.headers.host || 'unknown';
-      const ip = req.clientIp || req.ip;
-
-      log.debug(
-        `[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`
-      );
-
-      res.on('finish', () => {
-        const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
-        const apiInfo = req.api
-          ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
-          : 'api=unresolved';
-        const authInfo = req.token ? 'auth=token' : 'auth=anon';
-        const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
-
-        log.debug(
-          `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
-            1
-          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`
-        );
-      });
-
-      next();
-    };
 
     // Log startup configuration (non-sensitive values only)
     const apiOpts = (effectiveOpts as any).api || {};
@@ -109,6 +84,7 @@ class Server {
     });
 
     healthz(app);
+    app.use(metricsRouter()); // Prometheus metrics endpoint at /metrics
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
@@ -126,10 +102,12 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
+    app.use(requestMetricsMiddleware()); // Request metrics tracking
+    app.use(express.json()); // Parse JSON body for GraphQL operation extraction
     app.use(graphqlUpload.graphqlUploadExpress());
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
-    app.use(requestLogger);
+    app.use(structuredLogger()); // Structured JSON logging middleware
     app.use(api);
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
@@ -138,6 +116,9 @@ class Server {
     // Error handling middleware - must be LAST in the chain
     app.use(notFoundHandler);
     app.use(errorHandler);
+
+    // Initialize metrics event listeners for cache eviction tracking
+    initMetricsEventListeners();
 
     this.app = app;
   }
@@ -173,6 +154,14 @@ class Server {
     if (this.shuttingDown) return;
     const pgPool = this.getPool();
     pgPool.connect(this.listenForChanges.bind(this));
+
+    // Initialize cross-node cache invalidation (if not already done)
+    if (!this.cacheInvalidationInitialized) {
+      this.cacheInvalidationInitialized = true;
+      initCrossNodeInvalidation(pgPool).catch((err) => {
+        this.error('Failed to initialize cross-node cache invalidation', err);
+      });
+    }
   }
 
   listenForChanges(
@@ -265,6 +254,8 @@ class Server {
     opts: { closePools?: boolean } = {}
   ): Promise<void> {
     const { closePools = false } = opts;
+    // Stop cross-node cache invalidation first
+    await stopCrossNodeInvalidation();
     svcCache.clear();
     graphileCache.clear();
     if (closePools) {

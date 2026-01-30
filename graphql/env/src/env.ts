@@ -96,6 +96,12 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
+
+    // Grafserv/WebSocket configuration
+    GRAPHQL_PATH,
+    GRAPHIQL_PATH,
+    WEBSOCKETS_ENABLED,
+    WEBSOCKETS_PATH,
   } = env;
 
   return {
@@ -105,6 +111,14 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
       }),
+      grafserv: {
+        ...(GRAPHQL_PATH && { graphqlPath: GRAPHQL_PATH }),
+        ...(GRAPHIQL_PATH && { graphiqlPath: GRAPHIQL_PATH }),
+        websockets: {
+          ...(WEBSOCKETS_ENABLED !== undefined && { enabled: parseEnvBoolean(WEBSOCKETS_ENABLED) }),
+          ...(WEBSOCKETS_PATH && { path: WEBSOCKETS_PATH }),
+        },
+      },
     },
     features: {
       ...(FEATURES_SIMPLE_INFLECTION && { simpleInflection: parseEnvBoolean(FEATURES_SIMPLE_INFLECTION) }),

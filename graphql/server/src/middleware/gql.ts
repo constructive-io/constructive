@@ -81,6 +81,12 @@ export type ApiListRecord = InferSelectResult<
   typeof apiListSelect
 >;
 
+/**
+ * GraphileOrmClient v5 - Wraps GraphileQuery for use with the ORM client
+ *
+ * This adapter allows the generated ORM models to execute queries via
+ * a PostGraphile v5 GraphileQuery instance instead of HTTP fetch.
+ */
 class GraphileOrmClient extends OrmClient {
   constructor(private readonly graphile: GraphileQuery) {
     super({ endpoint: 'http://localhost/graphql' });
@@ -91,9 +97,9 @@ class GraphileOrmClient extends OrmClient {
     variables?: Record<string, unknown>
   ): Promise<QueryResult<T>> {
     const result = await this.graphile.query({
-      role: 'administrator',
       query: document,
       variables,
+      role: 'administrator',
     });
 
     if (result.errors?.length) {
@@ -132,6 +138,25 @@ export type ApiListModel = {
   };
 };
 
+/**
+ * Create a GraphQL ORM client from a GraphileQuery v5 instance
+ *
+ * @example
+ * ```typescript
+ * const { schema, resolvedPreset, release } = await createGraphileSchema({
+ *   connectionString: 'postgres://...',
+ *   schemas: ['services_public', 'metaschema_public'],
+ * });
+ * const graphile = new GraphileQuery({ schema, resolvedPreset });
+ * const orm = createGraphileOrm(graphile);
+ *
+ * // Query APIs
+ * const result = await orm.domain.findFirst({
+ *   select: domainSelect,
+ *   where: { domain: { equalTo: 'example.com' } },
+ * }).execute();
+ * ```
+ */
 export const createGraphileOrm = (graphile: GraphileQuery) => {
   const client = new GraphileOrmClient(graphile);
   return {
@@ -141,6 +166,9 @@ export const createGraphileOrm = (graphile: GraphileQuery) => {
   };
 };
 
+/**
+ * Normalize an API record from GraphQL to the ApiStructure format
+ */
 export const normalizeApiRecord = (api: ApiRecord): ApiStructure => {
   const schemaNames = (
     api.schemasByApiSchemaApiIdAndSchemaId?.nodes ?? []

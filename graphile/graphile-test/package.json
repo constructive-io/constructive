@@ -1,17 +1,23 @@
 {
   "name": "graphile-test",
-  "version": "3.0.3",
-  "author": "Constructive <developers@constructive.io>",
-  "description": "PostGraphile Testing",
-  "main": "index.js",
-  "module": "esm/index.js",
-  "types": "index.d.ts",
-  "homepage": "https://github.com/constructive-io/constructive",
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public",
-    "directory": "dist"
+  "version": "4.0.0",
+  "description": "PostGraphile v5 Testing Utilities - GraphQL integration testing with isolated databases",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.js",
+      "require": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
+    }
   },
+  "homepage": "https://github.com/constructive-io/constructive",
   "repository": {
     "type": "git",
     "url": "https://github.com/constructive-io/constructive"
@@ -19,36 +25,47 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "build": "echo 'SKIPPED: graphile-test disabled during v5 migration'",
-      "build:dev": "echo 'SKIPPED: graphile-test disabled during v5 migration'",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.16.0",
-    "graphql-tag": "2.12.6",
-    "makage": "^0.1.10"
-  },
-  "dependencies": {
-    "@constructive-io/graphql-env": "workspace:^",
-    "@constructive-io/graphql-types": "workspace:^",
-    "@pgpmjs/types": "workspace:^",
-    "graphql": "15.10.1",
-    "mock-req": "^0.2.0",
-    "pg": "^8.17.1",
-    "pgsql-test": "workspace:^",
-    "postgraphile": "^4.14.1"
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "testing",
     "graphql",
     "graphile",
-    "constructive",
-    "pgpm",
+    "postgraphile",
+    "v5",
+    "postgresql",
     "test"
-  ]
+  ],
+  "author": "Constructive <developers@constructive.io>",
+  "license": "MIT",
+  "dependencies": {
+    "grafast": "^1.0.0-rc.4",
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "pg": "^8.17.1",
+    "postgraphile": "^5.0.0-rc.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "@types/pg": "^8.16.0",
+    "graphql-tag": "^2.12.6",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "graphql": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

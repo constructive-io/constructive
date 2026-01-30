@@ -1,4 +1,5 @@
 import * as t from 'gql-ast';
+import { OperationTypeNode } from 'graphql';
 import type {
   ArgumentNode,
   DocumentNode,
@@ -79,7 +80,7 @@ const createGqlMutation = ({
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: mutationName,
         variableDefinitions,
         selectionSet: t.selectionSet({ selections: opSel }),
@@ -116,7 +117,7 @@ export const getAll = ({
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: queryName,
         selectionSet: t.selectionSet({ selections: opSel }),
       }),
@@ -169,7 +170,7 @@ export const getCount = ({
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: queryName,
         variableDefinitions,
         selectionSet: t.selectionSet({ selections: opSel }),
@@ -279,7 +280,7 @@ export const getMany = ({
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: queryName,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -353,7 +354,7 @@ export const getOne = ({
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: queryName,
         variableDefinitions,
         selectionSet: t.selectionSet({ selections: opSel }),

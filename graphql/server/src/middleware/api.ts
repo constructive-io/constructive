@@ -11,8 +11,15 @@ import {
   ApiNotFoundError,
   NoValidSchemasError,
   SchemaAccessDeniedError,
+  AmbiguousTenantError,
+  AdminAuthRequiredError,
 } from '../errors/api-errors';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
+import {
+  isApiLookupServiceAvailable,
+  queryApiByDomainGraphQL,
+  queryApiByNameGraphQL,
+} from './api-graphql';
 import './types'; // for Request type
 
 const log = new Logger('api');
@@ -113,17 +120,99 @@ export const createApiMiddleware = (opts: ApiOptions) => {
   };
 };
 
+/**
+ * Validates admin authentication for private API access.
+ *
+ * Security: Admin access requires explicit authentication beyond just isPublic=false.
+ * Supported authentication methods:
+ * 1. X-Admin-Key header matching configured adminApiKey
+ * 2. Request IP in configured adminAllowedIps list
+ *
+ * @throws AdminAuthRequiredError if admin authentication fails
+ */
+const validateAdminAuth = (
+  req: Request,
+  opts: ApiOptions
+): void => {
+  const adminApiKey = opts.api?.adminApiKey;
+  const adminAllowedIps = opts.api?.adminAllowedIps || [];
+
+  // If no admin auth is configured, log warning but allow (backward compatibility)
+  // In production, adminApiKey should always be set for private APIs
+  if (!adminApiKey && adminAllowedIps.length === 0) {
+    log.warn(
+      `[SECURITY] Admin API access without explicit authentication configured. ` +
+      `Configure adminApiKey or adminAllowedIps for enhanced security.`
+    );
+    return;
+  }
+
+  // Check X-Admin-Key header
+  const providedKey = req.get('X-Admin-Key');
+  if (adminApiKey && providedKey) {
+    // Constant-time comparison to prevent timing attacks
+    if (providedKey.length === adminApiKey.length) {
+      let match = true;
+      for (let i = 0; i < adminApiKey.length; i++) {
+        if (providedKey.charCodeAt(i) !== adminApiKey.charCodeAt(i)) {
+          match = false;
+        }
+      }
+      if (match) {
+        log.debug(`[SECURITY] Admin access granted via X-Admin-Key`);
+        return;
+      }
+    }
+    log.warn(
+      `[SECURITY] Invalid X-Admin-Key provided from IP: ${req.ip}`
+    );
+  }
+
+  // Check IP allowlist
+  if (adminAllowedIps.length > 0) {
+    const clientIp = req.ip || req.socket?.remoteAddress || '';
+    // Normalize IPv6 localhost
+    const normalizedIp = clientIp === '::1' ? '127.0.0.1' : clientIp;
+
+    if (adminAllowedIps.includes(normalizedIp) || adminAllowedIps.includes(clientIp)) {
+      log.debug(`[SECURITY] Admin access granted via IP allowlist: ${clientIp}`);
+      return;
+    }
+  }
+
+  // If adminApiKey is configured but not provided/matched, require it
+  if (adminApiKey) {
+    log.warn(
+      `[SECURITY] Admin authentication failed: missing or invalid X-Admin-Key from IP: ${req.ip}`
+    );
+    throw new AdminAuthRequiredError('valid X-Admin-Key header required');
+  }
+
+  // If only IP allowlist is configured but IP not in list
+  if (adminAllowedIps.length > 0) {
+    log.warn(
+      `[SECURITY] Admin authentication failed: IP ${req.ip} not in allowlist`
+    );
+    throw new AdminAuthRequiredError('request IP not in admin allowlist');
+  }
+};
+
 const createAdminApiStructure = ({
   opts,
+  req,
   schemata,
   key,
   databaseId,
 }: {
   opts: ApiOptions;
+  req: Request;
   schemata: string[];
   key: string;
   databaseId?: string;
 }): ApiStructure => {
+  // Security: Validate admin authentication before granting admin role
+  validateAdminAuth(req, opts);
+
   const api: ApiStructure = {
     dbname: opts.pg?.database ?? '',
     anonRole: 'administrator',
@@ -139,11 +228,15 @@ const createAdminApiStructure = ({
 };
 
 /**
- * Query API by domain and subdomain using direct SQL
- * 
- * TODO: This is a simplified v5 implementation that uses direct SQL queries
- * instead of the v4 graphile-query. Once graphile-query is ported to v5,
- * we can restore the GraphQL-based lookup.
+ * Query API by domain and subdomain
+ *
+ * This function first attempts to use GraphQL-based lookup via the API lookup
+ * service. If the service is not available or the lookup fails, it falls back
+ * to direct SQL queries.
+ *
+ * Security: This function explicitly handles ambiguous tenant resolution.
+ * If multiple APIs match a domain/subdomain combination, it logs a security
+ * warning and returns an error rather than silently picking one.
  */
 const queryServiceByDomainAndSubdomain = async ({
   opts,
@@ -160,7 +253,53 @@ const queryServiceByDomainAndSubdomain = async ({
 }): Promise<ApiStructure | null> => {
   const apiPublic = opts.api?.isPublic;
 
+  // Try GraphQL-based lookup first if available
+  if (isApiLookupServiceAvailable()) {
+    const graphqlResult = await queryApiByDomainGraphQL({
+      opts,
+      key,
+      domain,
+      subdomain,
+    });
+    if (graphqlResult) {
+      log.debug(`Domain lookup via GraphQL successful: ${domain}/${subdomain}`);
+      return graphqlResult;
+    }
+    // Fall through to SQL if GraphQL returns null (not found or error)
+  }
+
+  // Fallback to direct SQL queries
   try {
+    // First, check for ambiguous resolution by counting matches
+    // This is a security measure to detect misconfiguration
+    const countQuery = `
+      SELECT COUNT(*) as match_count
+      FROM services_public.domains dom
+      JOIN services_public.apis a ON a.id = dom.api_id
+      WHERE dom.domain = $1
+        AND ($2::text IS NULL AND dom.subdomain IS NULL OR dom.subdomain = $2)
+        AND a.is_public = $3
+    `;
+
+    const countResult = await pool.query(countQuery, [domain, subdomain, apiPublic]);
+    const matchCount = parseInt(countResult.rows[0]?.match_count || '0', 10);
+
+    if (matchCount === 0) {
+      return null;
+    }
+
+    // Security: Reject ambiguous tenant resolution
+    if (matchCount > 1) {
+      const fullDomain = subdomain ? `${subdomain}.${domain}` : domain;
+      log.warn(
+        `[SECURITY] Ambiguous tenant resolution detected: ${matchCount} APIs match domain "${fullDomain}". ` +
+        `This indicates a configuration error that could lead to unpredictable routing. ` +
+        `isPublic=${apiPublic}`
+      );
+      throw new AmbiguousTenantError(domain, subdomain, matchCount);
+    }
+
+    // Single match found - fetch the API details with LIMIT 1 for safety
     const query = `
       SELECT
         a.id,
@@ -182,6 +321,7 @@ const queryServiceByDomainAndSubdomain = async ({
       WHERE dom.domain = $1
         AND ($2::text IS NULL AND dom.subdomain IS NULL OR dom.subdomain = $2)
         AND a.is_public = $3
+      LIMIT 1
     `;
 
     const result = await pool.query(query, [domain, subdomain, apiPublic]);
@@ -189,7 +329,7 @@ const queryServiceByDomainAndSubdomain = async ({
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     const row = result.rows[0];
     const apiStructure: ApiStructure = {
       dbname: row.dbname || opts.pg?.database || '',
@@ -201,10 +341,14 @@ const queryServiceByDomainAndSubdomain = async ({
       databaseId: row.database_id,
       isPublic: row.is_public,
     };
-    
+
     svcCache.set(key, apiStructure);
     return apiStructure;
   } catch (err: any) {
+    // Re-throw security errors
+    if (err.name === 'AmbiguousTenantError') {
+      throw err;
+    }
     if (err.message?.includes('does not exist')) {
       log.debug(`services_public schema not found, skipping domain lookup`);
       return null;
@@ -214,7 +358,14 @@ const queryServiceByDomainAndSubdomain = async ({
 };
 
 /**
- * Query API by name using direct SQL
+ * Query API by name
+ *
+ * This function first attempts to use GraphQL-based lookup via the API lookup
+ * service. If the service is not available or the lookup fails, it falls back
+ * to direct SQL queries.
+ *
+ * Security: Includes LIMIT 1 to ensure deterministic results and logs
+ * if multiple APIs would match (though database_id + name should be unique).
  */
 export const queryServiceByApiName = async ({
   opts,
@@ -231,8 +382,48 @@ export const queryServiceByApiName = async ({
 }): Promise<ApiStructure | null> => {
   if (!databaseId) return null;
   const apiPublic = opts.api?.isPublic;
-  
+
+  // Try GraphQL-based lookup first if available
+  if (isApiLookupServiceAvailable()) {
+    const graphqlResult = await queryApiByNameGraphQL({
+      opts,
+      key,
+      databaseId,
+      name,
+    });
+    if (graphqlResult) {
+      log.debug(`API name lookup via GraphQL successful: ${databaseId}/${name}`);
+      return graphqlResult;
+    }
+    // Fall through to SQL if GraphQL returns null (not found or error)
+  }
+
+  // Fallback to direct SQL queries
   try {
+    // Check for duplicate API names (should not happen with proper constraints)
+    const countQuery = `
+      SELECT COUNT(*) as match_count
+      FROM services_public.apis a
+      WHERE a.database_id = $1
+        AND a.name = $2
+        AND a.is_public = $3
+    `;
+
+    const countResult = await pool.query(countQuery, [databaseId, name, apiPublic]);
+    const matchCount = parseInt(countResult.rows[0]?.match_count || '0', 10);
+
+    if (matchCount === 0) {
+      return null;
+    }
+
+    // Log warning if multiple APIs match (indicates missing unique constraint)
+    if (matchCount > 1) {
+      log.warn(
+        `[SECURITY] Multiple APIs (${matchCount}) found for database_id="${databaseId}", name="${name}". ` +
+        `This indicates a missing unique constraint. Using first match.`
+      );
+    }
+
     const query = `
       SELECT
         a.id,
@@ -253,14 +444,15 @@ export const queryServiceByApiName = async ({
       WHERE a.database_id = $1
         AND a.name = $2
         AND a.is_public = $3
+      LIMIT 1
     `;
-    
+
     const result = await pool.query(query, [databaseId, name, apiPublic]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     const row = result.rows[0];
     const apiStructure: ApiStructure = {
       dbname: row.dbname || opts.pg?.database || '',
@@ -272,7 +464,7 @@ export const queryServiceByApiName = async ({
       databaseId: row.database_id,
       isPublic: row.is_public,
     };
-    
+
     svcCache.set(key, apiStructure);
     return apiStructure;
   } catch (err: any) {
@@ -458,6 +650,7 @@ export const getApiConfig = async (
         }
         apiConfig = createAdminApiStructure({
           opts,
+          req,
           schemata: validatedHeaderSchemata,
           key,
           databaseId: databaseIdHeader,
@@ -473,6 +666,7 @@ export const getApiConfig = async (
       } else if (metaSchemaHeader) {
         apiConfig = createAdminApiStructure({
           opts,
+          req,
           schemata: validatedSchemata,
           key,
           databaseId: databaseIdHeader,

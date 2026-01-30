@@ -3,9 +3,13 @@ export * from '@pgpmjs/types';
 
 // Export GraphQL/Graphile specific types
 export {
+  WebsocketConfig,
+  GrafservConfig,
   GraphileOptions,
   GraphileFeatureOptions,
   ApiOptions,
+  websocketDefaults,
+  grafservDefaults,
   graphileDefaults,
   graphileFeatureDefaults,
   apiDefaults

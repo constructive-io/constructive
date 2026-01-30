@@ -129,6 +129,31 @@ export class PgPoolCacheManager {
     const task = managedPool.dispose();
     this.cleanupTasks.push(task);
   }
+
+  /**
+   * Get aggregate pool statistics across all cached pools.
+   * Returns total, idle, waiting, and active connection counts.
+   */
+  getPoolStats(): { totalCount: number; idleCount: number; waitingCount: number; activeCount: number } {
+    let totalCount = 0;
+    let idleCount = 0;
+    let waitingCount = 0;
+
+    // Iterate over all cached pools and aggregate stats
+    for (const [, managedPool] of this.pgCache.entries()) {
+      if (!managedPool.isDisposed) {
+        const pool = managedPool.pool;
+        totalCount += pool.totalCount;
+        idleCount += pool.idleCount;
+        waitingCount += pool.waitingCount;
+      }
+    }
+
+    // Active = Total - Idle
+    const activeCount = totalCount - idleCount;
+
+    return { totalCount, idleCount, waitingCount, activeCount };
+  }
 }
 
 // Create the singleton instance

@@ -20,6 +20,8 @@ export const ErrorCodes = {
   SCHEMA_ACCESS_DENIED: 'SCHEMA_ACCESS_DENIED',
   HANDLER_ERROR: 'HANDLER_ERROR',
   DATABASE_CONNECTION_ERROR: 'DATABASE_CONNECTION_ERROR',
+  AMBIGUOUS_TENANT: 'AMBIGUOUS_TENANT',
+  ADMIN_AUTH_REQUIRED: 'ADMIN_AUTH_REQUIRED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -153,6 +155,40 @@ export class DatabaseConnectionError extends ApiError {
   constructor(message: string, context?: Record<string, unknown>) {
     super(ErrorCodes.DATABASE_CONNECTION_ERROR, 503, message, context);
     this.name = 'DatabaseConnectionError';
+  }
+}
+
+/**
+ * Thrown when domain resolution is ambiguous (multiple APIs match).
+ * This is a security concern as it indicates potential misconfiguration
+ * that could lead to unpredictable tenant routing.
+ */
+export class AmbiguousTenantError extends ApiError {
+  constructor(domain: string, subdomain: string | null, matchCount: number) {
+    const fullDomain = subdomain ? `${subdomain}.${domain}` : domain;
+    super(
+      ErrorCodes.AMBIGUOUS_TENANT,
+      500,
+      `Ambiguous tenant resolution: multiple APIs (${matchCount}) match domain ${fullDomain}`,
+      { domain, subdomain, fullDomain, matchCount }
+    );
+    this.name = 'AmbiguousTenantError';
+  }
+}
+
+/**
+ * Thrown when admin authentication is required but not provided or invalid.
+ * Used for private API endpoints that require explicit admin credentials.
+ */
+export class AdminAuthRequiredError extends ApiError {
+  constructor(reason: string) {
+    super(
+      ErrorCodes.ADMIN_AUTH_REQUIRED,
+      401,
+      `Admin authentication required: ${reason}`,
+      { reason }
+    );
+    this.name = 'AdminAuthRequiredError';
   }
 }
 

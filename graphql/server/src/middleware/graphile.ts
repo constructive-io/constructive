@@ -9,6 +9,7 @@ import { postgraphile } from 'postgraphile';
 import { grafserv } from 'grafserv/express/v4';
 import { getPgEnvOptions } from 'pg-env';
 import { HandlerCreationError } from '../errors/api-errors';
+import { metrics } from './metrics';
 import './types'; // for Request type
 
 const log = new Logger('graphile');
@@ -159,12 +160,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.debug(
           `${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`
         );
+        metrics.recordCacheHit();
         return cached.handler(req, res, next);
       }
 
       log.debug(
         `${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`
       );
+      metrics.recordCacheMiss();
 
       // Single-flight: Check if creation is already in progress for this key
       const inFlight = creating.get(key);
@@ -199,6 +202,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       );
 
       // Create promise and store in in-flight map
+      // Start timing the instance creation
+      const stopCreationTimer = metrics.startCreationTimer();
       const creationPromise = createGraphileInstance(
         opts,
         connectionString,
@@ -211,6 +216,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       try {
         const instance = await creationPromise;
+        stopCreationTimer(); // Record creation duration
         graphileCache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
         return instance.handler(req, res, next);

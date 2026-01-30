@@ -1,6 +1,7 @@
 import {
   ArgumentNode,
   BooleanValueNode,
+  ConstDirectiveNode,
   DefinitionNode,
   DirectiveNode,
   DocumentNode,
@@ -8,6 +9,7 @@ import {
   FloatValueNode,
   FragmentDefinitionNode,
   IntValueNode,
+  Kind,
   ListTypeNode,
   ListValueNode,
   NamedTypeNode,
@@ -25,7 +27,7 @@ import {
 } from 'graphql';
 
 export const document = ({ definitions }: { definitions: DefinitionNode[] }): DocumentNode => ({
-  kind: 'Document',
+  kind: Kind.DOCUMENT,
   definitions
 });
 
@@ -42,10 +44,10 @@ export const operationDefinition = ({
   directives?: DirectiveNode[];
   selectionSet: SelectionSetNode;
 }): OperationDefinitionNode => ({
-  kind: 'OperationDefinition',
+  kind: Kind.OPERATION_DEFINITION,
   operation,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   },
   variableDefinitions,
@@ -60,77 +62,77 @@ export const variableDefinition = ({
 }: {
   variable: VariableNode;
   type: TypeNode;
-  directives?: DirectiveNode[];
+  directives?: ConstDirectiveNode[];
 }): VariableDefinitionNode => ({
-  kind: 'VariableDefinition',
+  kind: Kind.VARIABLE_DEFINITION,
   variable,
   type,
-  directives: directives || []
+  directives: directives || undefined
 });
 
 export const selectionSet = ({ selections }: { selections: readonly FieldNode[] }): SelectionSetNode => ({
-  kind: 'SelectionSet',
+  kind: Kind.SELECTION_SET,
   selections
 });
 
 export const listType = ({ type }: { type: TypeNode }): ListTypeNode => ({
-  kind: 'ListType',
+  kind: Kind.LIST_TYPE,
   type
 });
 
 export const nonNullType = ({ type }: { type: NamedTypeNode | ListTypeNode }): TypeNode => ({
-  kind: 'NonNullType',
+  kind: Kind.NON_NULL_TYPE,
   type
 });
 
 export const namedType = ({ type }: { type: string }): NamedTypeNode => ({
-  kind: 'NamedType',
+  kind: Kind.NAMED_TYPE,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: type
   }
 });
 
 export const variable = ({ name }: { name: string }): VariableNode => ({
-  kind: 'Variable',
+  kind: Kind.VARIABLE,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   }
 });
 
 export const objectValue = ({ fields }: { fields: ObjectFieldNode[] }): ObjectValueNode => ({
-  kind: 'ObjectValue',
+  kind: Kind.OBJECT,
   fields
 });
 
 export const stringValue = ({ value }: { value: string }): StringValueNode => ({
-  kind: 'StringValue',
+  kind: Kind.STRING,
   value
 });
 
 export const intValue = ({ value }: { value: string }): IntValueNode => ({
-  kind: 'IntValue',
+  kind: Kind.INT,
   value
 });
 
 export const booleanValue = ({ value }: { value: boolean }): BooleanValueNode => ({
-  kind: 'BooleanValue',
+  kind: Kind.BOOLEAN,
   value
 });
 
 export const floatValue = ({ value }: { value: string }): FloatValueNode => ({
-  kind: 'FloatValue',
+  kind: Kind.FLOAT,
   value
 });
 
 export const listValue = ({ values }: { values: ValueNode[] }): ListValueNode => ({
-  kind: 'ListValue',
+  kind: Kind.LIST,
   values
 });
 
 export const nullValue = (): NullValueNode => ({
-  kind: 'NullValue'
+  kind: Kind.NULL
 });
 
 export const fragmentDefinition = ({
@@ -144,9 +146,9 @@ export const fragmentDefinition = ({
   directives?: DirectiveNode[];
   selectionSet: SelectionSetNode;
 }): FragmentDefinitionNode => ({
-  kind: 'FragmentDefinition',
+  kind: Kind.FRAGMENT_DEFINITION,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   },
   typeCondition,
@@ -155,9 +157,9 @@ export const fragmentDefinition = ({
 });
 
 export const objectField = ({ name, value }: { name: string; value: ValueNode }): ObjectFieldNode => ({
-  kind: 'ObjectField',
+  kind: Kind.OBJECT_FIELD,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   },
   value
@@ -174,9 +176,9 @@ export const field = ({
   directives?: DirectiveNode[];
   selectionSet?: SelectionSetNode;
 }): FieldNode => ({
-  kind: 'Field',
+  kind: Kind.FIELD,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   },
   arguments: args,
@@ -185,9 +187,9 @@ export const field = ({
 });
 
 export const argument = ({ name, value }: { name: string; value: ValueNode }): ArgumentNode => ({
-  kind: 'Argument',
+  kind: Kind.ARGUMENT,
   name: {
-    kind: 'Name',
+    kind: Kind.NAME,
     value: name
   },
   value

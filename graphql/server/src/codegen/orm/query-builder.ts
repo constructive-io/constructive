@@ -5,7 +5,7 @@
  */
 
 import * as t from 'gql-ast';
-import { parseType, print } from 'graphql';
+import { Kind, OperationTypeNode, parseType, print } from 'graphql';
 import type {
   ArgumentNode,
   FieldNode,
@@ -244,7 +244,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: operationName + 'Query',
         variableDefinitions: variableDefinitions.length
           ? variableDefinitions
@@ -304,7 +304,7 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: operationName + 'Query',
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -430,7 +430,7 @@ export function buildDeleteDocument<TWhere extends { id: string }>(
 }
 
 export function buildCustomDocument<TSelect, TArgs>(
-  operationType: 'query' | 'mutation',
+  operationType: OperationTypeNode,
   operationName: string,
   fieldName: string,
   select: TSelect,
@@ -535,7 +535,7 @@ function buildEnumListArg(
 
 function buildEnumValue(value: string): EnumValueNode {
   return {
-    kind: 'EnumValue',
+    kind: Kind.ENUM,
     value,
   };
 }
@@ -581,7 +581,7 @@ function buildInputMutationDocument(config: InputMutationConfig): string {
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: config.operationName + 'Mutation',
         variableDefinitions: [
           t.variableDefinition({

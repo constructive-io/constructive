@@ -1,6 +1,28 @@
 import type { GraphileConfig } from 'graphile-config';
 
 /**
+ * WebSocket configuration for GraphQL subscriptions
+ */
+export interface WebsocketConfig {
+  /** Whether websockets are enabled (default: false) */
+  enabled?: boolean;
+  /** WebSocket path (defaults to graphqlPath if not specified) */
+  path?: string;
+}
+
+/**
+ * Grafserv configuration options
+ */
+export interface GrafservConfig {
+  /** Path for GraphQL endpoint (default: '/graphql') */
+  graphqlPath?: string;
+  /** Path for GraphiQL IDE (default: '/graphiql') */
+  graphiqlPath?: string;
+  /** WebSocket configuration */
+  websockets?: WebsocketConfig;
+}
+
+/**
  * PostGraphile/Graphile v5 configuration
  */
 export interface GraphileOptions {
@@ -10,6 +32,8 @@ export interface GraphileOptions {
   extends?: GraphileConfig.Preset[];
   /** Preset overrides */
   preset?: Partial<GraphileConfig.Preset>;
+  /** Grafserv configuration (paths, websockets) */
+  grafserv?: GrafservConfig;
 }
 
 /**
@@ -45,12 +69,29 @@ export interface ApiOptions {
 }
 
 /**
+ * Default websocket configuration
+ */
+export const websocketDefaults: WebsocketConfig = {
+  enabled: false,
+};
+
+/**
+ * Default grafserv configuration
+ */
+export const grafservDefaults: GrafservConfig = {
+  graphqlPath: '/graphql',
+  graphiqlPath: '/graphiql',
+  websockets: websocketDefaults,
+};
+
+/**
  * Default GraphQL/Graphile configuration values
  */
 export const graphileDefaults: GraphileOptions = {
   schema: [],
   extends: [],
   preset: {},
+  grafserv: grafservDefaults,
 };
 
 /**

@@ -1,16 +1,17 @@
 import { ClientBase, Pool, PoolClient, QueryResult } from 'pg';
 
-function setContext(ctx: Record<string, string>): string[] {
-  return Object.keys(ctx || {}).reduce<string[]>((m, el) => {
-    m.push(`SELECT set_config('${el}', '${ctx[el]}', true);`);
-    return m;
-  }, []);
-}
-
+/**
+ * Execute set_config calls using parameterized queries to prevent SQL injection.
+ * Each config key-value pair is set using a parameterized query rather than
+ * string interpolation for security hardening.
+ */
 async function execContext(client: ClientBase, ctx: Record<string, string>): Promise<void> {
-  const local = setContext(ctx);
-  for (const query of local) {
-    await client.query(query);
+  const keys = Object.keys(ctx || {});
+  for (const key of keys) {
+    const value = ctx[key];
+    // Use parameterized query to prevent SQL injection via context values
+    // The set_config function accepts: (setting_name, new_value, is_local)
+    await client.query('SELECT set_config($1, $2, true)', [key, value]);
   }
 }
 

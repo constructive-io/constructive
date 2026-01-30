@@ -54,5 +54,17 @@ export type ApiOptions = PgpmOptions & {
     defaultDatabaseId?: string;
     metaSchemas?: string[];
     isPublic?: boolean;
+    /**
+     * Admin API key for authenticating private API access.
+     * When set, requests must include X-Admin-Key header with this value.
+     * Should be a strong, randomly generated secret.
+     */
+    adminApiKey?: string;
+    /**
+     * List of IP addresses allowed to access private admin APIs.
+     * Supports IPv4 and IPv6 addresses. IPv6 ::1 is normalized to 127.0.0.1.
+     * Example: ['127.0.0.1', '10.0.0.0/8']
+     */
+    adminAllowedIps?: string[];
   };
 };

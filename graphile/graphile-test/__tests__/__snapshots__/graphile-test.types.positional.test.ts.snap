@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`creates a user and returns typed result: create-user 1`] = `
+exports[`creates a user and returns typed result > create-user 1`] = `
 {
   "createUser": {
     "user": {
