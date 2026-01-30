@@ -21,30 +21,30 @@ jobs:
   constructive-tests:
     runs-on: ubuntu-latest
 
-    # ALL TESTS DISABLED during v5 migration - will be re-enabled when v5 is ready to merge into main
+    # Tests being re-enabled as v5 migration progresses - remaining tests will be enabled when ready
     strategy:
       fail-fast: false
       matrix:
         include:
           # - package: uploads/mime-bytes
           #   env: {}
-          # - package: pgpm/core
-          #   env: {}
+          - package: pgpm/core
+            env: {}
           # - package: pgpm/env
           #   env: {}
-          # - package: pgpm/cli
-          #   env: {}
-          # - package: packages/cli
-          #   env: {}
+          - package: pgpm/cli
+            env: {}
+          - package: packages/cli
+            env: {}
           # - package: jobs/knative-job-service
           #   env: {}
           # - package: packages/client
           #   env:
           #     TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
-          # - package: postgres/pgsql-client
-          #   env: {}
-          # - package: postgres/pgsql-test
-          #   env: {}
+          - package: postgres/pgsql-client
+            env: {}
+          - package: postgres/pgsql-test
+            env: {}
           # - package: packages/orm
           #   env: {}
           # - package: packages/url-domains
@@ -57,10 +57,10 @@ jobs:
           #   env: {}
           # - package: packages/query-builder
           #   env: {}
-          # - package: graphql/query
-          #   env: {}
-          # - package: graphql/codegen
-          #   env: {}
+          - package: graphql/query
+            env: {}
+          - package: graphql/codegen
+            env: {}
           # - package: postgres/pg-ast
           #   env: {}
           # - package: postgres/pg-codegen
@@ -72,8 +72,8 @@ jobs:
           #     BUCKET_NAME: test-bucket
           # - package: uploads/upload-names
           #   env: {}
-          # - package: graphile/graphile-test
-          #   env: {}
+          - package: graphile/graphile-test
+            env: {}
           # - package: graphile/graphile-search-plugin
           #   env: {}
           # - package: graphile/graphile-plugin-fulltext-filter
@@ -99,10 +99,10 @@ jobs:
           #   env: {}
           # - package: graphile/graphile-sql-expression-validator
           #   env: {}
-          # - package: graphql/server-test
-          #   env: {}
-          # - package: graphql/env
-          #   env: {}
+          - package: graphql/server-test
+            env: {}
+          - package: graphql/env
+            env: {}
           - package: graphql/server
             env: {}
           # - package: graphql/test
