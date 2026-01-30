@@ -687,9 +687,10 @@ Generator Options:
   -a, --authorization <token>      Authorization header value
   --browser-compatible             Generate browser-compatible code (default: true)
                                    Set to false for Node.js with localhost DNS fix
+  --skip-custom-operations         Only generate table CRUD operations
   --dry-run                        Preview without writing files
   -v, --verbose                    Show detailed output
-
+  --keep-db                        Keep ephemeral database after generation (pgpm modes)
   -h, --help                       Show help message
   --version                        Show version number
 ```
