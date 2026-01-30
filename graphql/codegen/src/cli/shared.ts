@@ -139,7 +139,11 @@ export function printResult(result: GenerateResult): void {
 
 const isTopLevel = (_key: string, path: string[]) => path.length === 0;
 export const camelizeArgv = (argv: Record<string, any>) =>
-  inflektTree(argv, (key) => camelize(key, true), {
+  inflektTree(argv, (key) => {
+    // inflection.camelize expects underscores, so replace hyphens first
+    const underscored = key.replace(/-/g, '_');
+    return camelize(underscored, true);
+  }, {
     skip: (key, path) =>
       !isTopLevel(key, path) ||
       key === '_' ||
