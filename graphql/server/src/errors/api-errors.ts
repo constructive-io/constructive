@@ -17,6 +17,7 @@ export const ErrorCodes = {
   API_NOT_FOUND: 'API_NOT_FOUND',
   NO_VALID_SCHEMAS: 'NO_VALID_SCHEMAS',
   SCHEMA_INVALID: 'SCHEMA_INVALID',
+  SCHEMA_ACCESS_DENIED: 'SCHEMA_ACCESS_DENIED',
   HANDLER_ERROR: 'HANDLER_ERROR',
   DATABASE_CONNECTION_ERROR: 'DATABASE_CONNECTION_ERROR',
 } as const;
@@ -116,6 +117,22 @@ export class SchemaValidationError extends ApiError {
   constructor(message: string, context?: Record<string, unknown>) {
     super(ErrorCodes.SCHEMA_INVALID, 400, message, context);
     this.name = 'SchemaValidationError';
+  }
+}
+
+/**
+ * Thrown when a tenant attempts to access schemas they do not own.
+ * Returns 403 Forbidden to indicate the schemas exist but access is denied.
+ */
+export class SchemaAccessDeniedError extends ApiError {
+  constructor(schemas: string[], databaseId: string) {
+    super(
+      ErrorCodes.SCHEMA_ACCESS_DENIED,
+      403,
+      `Access denied: requested schemas are not associated with tenant`,
+      { schemas, databaseId }
+    );
+    this.name = 'SchemaAccessDeniedError';
   }
 }
 

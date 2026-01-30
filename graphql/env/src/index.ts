@@ -11,7 +11,8 @@ export {
 
 // Export Constructive-specific env functions
 export { getEnvOptions, getConstructiveEnvOptions } from './merge';
-export { getGraphQLEnvVars } from './env';
+export { getGraphQLEnvVars, getCoreEnvVars, coreEnvDefaults, DEFAULT_SCHEMA_LIST } from './env';
+export type { CoreEnvConfig } from './env';
 
 // Re-export types for convenience
 export type { ConstructiveOptions, ConstructiveGraphQLOptions } from '@constructive-io/graphql-types';

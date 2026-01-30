@@ -10,6 +10,7 @@ import {
   DomainNotFoundError,
   ApiNotFoundError,
   NoValidSchemasError,
+  SchemaAccessDeniedError,
 } from '../errors/api-errors';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
 import './types'; // for Request type
@@ -291,26 +292,97 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
     .join('.');
 
   const apiPublic = opts.api?.isPublic;
+  // Include isPublic state in cache key to prevent cache poisoning
+  // where public/private API responses could be incorrectly served
+  const publicPrefix = apiPublic ? 'public:' : 'private:';
+
   if (apiPublic === false) {
     if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
+      return publicPrefix + 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
     }
     if (req.get('X-Schemata')) {
       return (
-        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
+        publicPrefix + 'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
       );
     }
     if (req.get('X-Meta-Schema')) {
-      return 'metaschema:api:' + req.get('X-Database-Id');
+      return publicPrefix + 'metaschema:api:' + req.get('X-Database-Id');
     }
   }
-  return key;
+  return publicPrefix + key;
 };
 
+/**
+ * Validate that schemas exist and optionally verify tenant ownership.
+ *
+ * When isPublic is false (private API), this function validates that the
+ * requested schemas are associated with the tenant's database_id via the
+ * metaschema_public.schema table. This prevents tenant isolation bypass
+ * where a malicious tenant could access schemas belonging to other tenants.
+ *
+ * @param pool - Database connection pool
+ * @param schemata - Array of schema names to validate
+ * @param options - Optional validation options
+ * @param options.isPublic - Whether this is a public API (skips ownership check)
+ * @param options.databaseId - The tenant's database ID for ownership validation
+ * @returns Array of valid schema names the tenant is authorized to access
+ * @throws SchemaAccessDeniedError if tenant attempts to access unauthorized schemas
+ */
 const validateSchemata = async (
   pool: Pool,
-  schemata: string[]
+  schemata: string[],
+  options?: { isPublic?: boolean; databaseId?: string }
 ): Promise<string[]> => {
+  const { isPublic, databaseId } = options || {};
+
+  // For private APIs with a database_id, validate schema ownership
+  // This prevents tenant isolation bypass via X-Schemata header manipulation
+  if (isPublic === false && databaseId) {
+    try {
+      // Query metaschema_public.schema to verify schemas belong to this tenant
+      const ownershipResult = await pool.query(
+        `SELECT schema_name
+         FROM metaschema_public.schema
+         WHERE database_id = $1::uuid
+           AND schema_name = ANY($2::text[])`,
+        [databaseId, schemata]
+      );
+
+      const ownedSchemas = new Set(
+        ownershipResult.rows.map((row: { schema_name: string }) => row.schema_name)
+      );
+
+      // Check if any requested schemas are not owned by this tenant
+      const unauthorizedSchemas = schemata.filter(
+        (schema) => !ownedSchemas.has(schema)
+      );
+
+      if (unauthorizedSchemas.length > 0) {
+        // Log the unauthorized access attempt for security monitoring
+        log.warn(
+          `Schema access denied: tenant ${databaseId} attempted to access unauthorized schemas: [${unauthorizedSchemas.join(', ')}]`
+        );
+        throw new SchemaAccessDeniedError(unauthorizedSchemas, databaseId);
+      }
+
+      return Array.from(ownedSchemas);
+    } catch (err: any) {
+      // Re-throw SchemaAccessDeniedError as-is
+      if (err.name === 'SchemaAccessDeniedError') {
+        throw err;
+      }
+      // If metaschema_public.schema table doesn't exist, fall back to basic validation
+      if (err.message?.includes('does not exist')) {
+        log.debug(
+          'metaschema_public.schema not found, falling back to basic schema validation'
+        );
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  // Fallback: basic schema existence check (for public APIs or when metaschema table unavailable)
   const result = await pool.query(
     `SELECT schema_name FROM information_schema.schemata WHERE schema_name = ANY($1::text[])`,
     [schemata]
@@ -352,7 +424,11 @@ export const getApiConfig = async (
         : apiOpts.metaSchemas || [];
     const validatedSchemata = await validateSchemata(
       rootPgPool,
-      candidateSchemata
+      candidateSchemata,
+      {
+        isPublic: apiPublic,
+        databaseId: databaseIdHeader,
+      }
     );
 
     if (validatedSchemata.length === 0) {

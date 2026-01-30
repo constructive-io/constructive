@@ -6,7 +6,6 @@ import { graphileCache, GraphileCacheEntry } from 'graphile-cache';
 import { getGraphilePreset, makePgService } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
 import { postgraphile } from 'postgraphile';
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
 import { grafserv } from 'grafserv/express/v4';
 import { getPgEnvOptions } from 'pg-env';
 import { HandlerCreationError } from '../errors/api-errors';

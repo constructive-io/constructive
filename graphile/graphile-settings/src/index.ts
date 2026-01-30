@@ -1,18 +1,39 @@
 import type { GraphileConfig } from 'graphile-config';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
 import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
+// Import grafserv and graphile-build to trigger module augmentation for GraphileConfig.Preset
+import 'grafserv';
+import 'graphile-build';
+
 /**
  * Minimal Preset - Disables Node/Relay features
- * 
+ *
  * This keeps `id` as `id` instead of converting to global Node IDs.
  * Removes nodeId, node(), and Relay-style pagination.
  */
 export const MinimalPreset: GraphileConfig.Preset = {
   disablePlugins: ['NodePlugin'],
+};
+
+/**
+ * Constructive PostGraphile v5 Preset
+ *
+ * This is a simplified preset combining:
+ * - MinimalPreset (no Node/Relay features)
+ * - PostGraphileConnectionFilterPreset (filtering on connections)
+ */
+export const ConstructivePreset: GraphileConfig.Preset = {
+  extends: [
+    MinimalPreset,
+    PostGraphileConnectionFilterPreset,
+  ],
+  disablePlugins: [
+    'PgConnectionArgFilterBackwardRelationsPlugin',
+    'PgConnectionArgFilterForwardRelationsPlugin',
+  ],
 };
 
 /**
@@ -38,15 +59,7 @@ export const getGraphilePreset = (
   const envOpts = getEnvOptions(opts);
 
   return {
-    extends: [
-      PostGraphileAmberPreset,
-      MinimalPreset,
-      PostGraphileConnectionFilterPreset,
-    ],
-    disablePlugins: [
-      'PgConnectionArgFilterBackwardRelationsPlugin',
-      'PgConnectionArgFilterForwardRelationsPlugin',
-    ],
+    extends: [ConstructivePreset],
     grafserv: {
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',

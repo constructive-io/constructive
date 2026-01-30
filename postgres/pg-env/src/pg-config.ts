@@ -10,6 +10,6 @@ export const defaultPgConfig: PgConfig = {
   host: 'localhost',
   port: 5432,
   user: 'postgres',
-  password: 'password',
+  password: '',
   database: 'postgres'
 };

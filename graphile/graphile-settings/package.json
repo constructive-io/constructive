@@ -36,6 +36,7 @@
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "grafast": "^1.0.0-rc.4",
+    "grafserv": "^1.0.0-rc.4",
     "graphile-build": "^5.0.0-rc.3",
     "graphile-build-pg": "^5.0.0-rc.3",
     "graphile-config": "1.0.0-rc.3",

@@ -10,6 +10,75 @@ const parseEnvBoolean = (val?: string): boolean | undefined => {
 };
 
 /**
+ * Default schema list used when SCHEMAS environment variable is not provided.
+ * This provides a sensible fallback for most PostgreSQL applications.
+ */
+export const DEFAULT_SCHEMA_LIST: readonly string[] = ['public'] as const;
+
+/**
+ * Core environment variable configuration with defaults.
+ * These defaults are used when constructing DATABASE_URL from individual PG* variables.
+ */
+export interface CoreEnvConfig {
+  PORT: number;
+  PGHOST: string;
+  PGPORT: string;
+  PGUSER: string;
+  PGPASSWORD: string;
+  PGDATABASE: string;
+  DATABASE_URL: string;
+  SCHEMAS: string[];
+}
+
+/**
+ * Default values for core environment variables.
+ */
+export const coreEnvDefaults = {
+  PORT: 5433,
+  PGHOST: 'localhost',
+  PGPORT: '5432',
+  PGUSER: process.env.USER || 'postgres',
+  PGPASSWORD: '',
+  PGDATABASE: 'postgres',
+};
+
+/**
+ * Parse core environment variables (PORT, PG*, DATABASE_URL, SCHEMAS).
+ * DATABASE_URL is constructed from individual PG* variables if not explicitly set.
+ *
+ * @param env - Environment object to read from (defaults to process.env)
+ * @returns Parsed core environment configuration
+ */
+export const getCoreEnvVars = (env: NodeJS.ProcessEnv = process.env): CoreEnvConfig => {
+  const PORT = env.PORT ? parseInt(env.PORT, 10) : coreEnvDefaults.PORT;
+  const PGHOST = env.PGHOST || coreEnvDefaults.PGHOST;
+  const PGPORT = env.PGPORT || coreEnvDefaults.PGPORT;
+  const PGUSER = env.PGUSER || coreEnvDefaults.PGUSER;
+  const PGPASSWORD = env.PGPASSWORD ?? coreEnvDefaults.PGPASSWORD;
+  const PGDATABASE = env.PGDATABASE || coreEnvDefaults.PGDATABASE;
+
+  // Construct DATABASE_URL from individual variables if not explicitly set
+  const DATABASE_URL = env.DATABASE_URL ||
+    `postgres://${PGUSER}${PGPASSWORD ? ':' + PGPASSWORD : ''}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+
+  // Parse SCHEMAS as comma-separated list, with DEFAULT_SCHEMA_LIST fallback
+  const SCHEMAS = env.SCHEMAS
+    ? env.SCHEMAS.split(',').map(s => s.trim()).filter(Boolean)
+    : [...DEFAULT_SCHEMA_LIST];
+
+  return {
+    PORT,
+    PGHOST,
+    PGPORT,
+    PGUSER,
+    PGPASSWORD,
+    PGDATABASE,
+    DATABASE_URL,
+    SCHEMAS,
+  };
+};
+
+/**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
