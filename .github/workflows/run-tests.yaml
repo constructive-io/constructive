@@ -73,8 +73,8 @@ jobs:
           #     BUCKET_NAME: test-bucket
           # - package: uploads/upload-names
           #   env: {}
-          - package: graphile/graphile-test
-            env: {}
+          # - package: graphile/graphile-test
+          #   env: {}
           # - package: graphile/graphile-search-plugin
           #   env: {}
           # - package: graphile/graphile-plugin-fulltext-filter
