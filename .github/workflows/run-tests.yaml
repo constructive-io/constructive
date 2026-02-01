@@ -34,8 +34,8 @@ jobs:
           #   env: {}
           - package: pgpm/cli
             env: {}
-          - package: packages/cli
-            env: {}
+          # - package: packages/cli
+          #   env: {}
 
           # - package: jobs/knative-job-service
           #   env: {}
