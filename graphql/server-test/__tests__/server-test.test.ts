@@ -46,22 +46,22 @@ describe('graphql-server-test', () => {
     });
 
     it('should query users via HTTP', async () => {
-      const res = await query<{ users: { nodes: Array<{ id: number; username: string }> } }>(
-        `query { users { nodes { id username } } }`
+      const res = await query<{ allUsers: { nodes: Array<{ id: number; username: string }> } }>(
+        `query { allUsers { nodes { id username } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.users.nodes).toHaveLength(2);
-      expect(res.data?.users.nodes[0].username).toBe('alice');
+      expect(res.data?.allUsers.nodes).toHaveLength(2);
+      expect(res.data?.allUsers.nodes[0].username).toBe('alice');
     });
 
     it('should query posts via HTTP', async () => {
-      const res = await query<{ posts: { nodes: Array<{ id: number; title: string }> } }>(
-        `query { posts { nodes { id title } } }`
+      const res = await query<{ allPosts: { nodes: Array<{ id: number; title: string }> } }>(
+        `query { allPosts { nodes { id title } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.posts.nodes).toHaveLength(3);
+      expect(res.data?.allPosts.nodes).toHaveLength(3);
     });
 
     it('should support variables', async () => {
@@ -88,14 +88,14 @@ describe('graphql-server-test', () => {
       const res = await request
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send({ query: '{ users { nodes { id } } }' });
+        .send({ query: '{ allUsers { nodes { id } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.users.nodes).toHaveLength(2);
+      expect(res.body.data.allUsers.nodes).toHaveLength(2);
     });
 
     it('should snapshot query results', async () => {
-      const res = await query(`query { users { nodes { username email } } }`);
+      const res = await query(`query { allUsers { nodes { username email } } }`);
       expect(snapshot(res.data)).toMatchSnapshot();
     });
   });
