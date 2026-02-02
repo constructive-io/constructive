@@ -35,6 +35,7 @@ jest.mock('@constructive-io/graphql-codegen', () => {
         process.exit(1);
       }
     }),
+    camelizeArgv: jest.fn((argv: Record<string, any>) => argv),
   };
 })
 

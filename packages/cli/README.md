@@ -61,23 +61,39 @@ cnc explorer --origin http://localhost:3000
 Generate TypeScript types, operations, and SDK from a GraphQL schema or endpoint.
 
 ```bash
-# From endpoint
-cnc codegen --endpoint http://localhost:5555/graphql --out ./codegen
+# Generate React Query hooks from endpoint
+cnc codegen --endpoint http://localhost:5555/graphql --output ./codegen --react-query
 
-# From database
-cnc codegen --database constructive_db --out ./codegen --verbose
+# Generate ORM client from endpoint
+cnc codegen --endpoint http://localhost:5555/graphql --output ./codegen --orm
+
+# Generate both React Query hooks and ORM client
+cnc codegen --endpoint http://localhost:5555/graphql --output ./codegen --react-query --orm
+
+# From schema file
+cnc codegen --schema-file ./schema.graphql --output ./codegen --react-query
+
+# From database with schemas
+cnc codegen --schemas public,app_public --output ./codegen --react-query
+
+# From database with API names
+cnc codegen --api-names my_api --output ./codegen --orm
 ```
 
 **Options:**
 
+- `--config <path>` - Path to config file
 - `--endpoint <url>` - GraphQL endpoint URL
-- `--auth <token>` - Authorization header value (e.g., "Bearer 123")
-- `--out <dir>` - Output directory (default: graphql/codegen/dist)
+- `--schema-file <path>` - Path to GraphQL schema file
+- `--schemas <list>` - Comma-separated PostgreSQL schemas
+- `--api-names <list>` - Comma-separated API names
+- `--react-query` - Generate React Query hooks
+- `--orm` - Generate ORM client
+- `--output <dir>` - Output directory (default: ./codegen)
+- `--authorization <token>` - Authorization header value
+- `--browser-compatible` - Generate browser-compatible code (default: true)
 - `--dry-run` - Preview without writing files
 - `--verbose` - Verbose output
-
-- `--database <name>` - Database override for DB mode (defaults to PGDATABASE)
-- `--schemas <list>` - Comma-separated schemas (required unless using --endpoint)
 
 ### `cnc get-graphql-schema`
 
