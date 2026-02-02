@@ -504,6 +504,9 @@ importers:
       '@graphile-contrib/pg-many-to-many':
         specifier: 2.0.0-rc.1
         version: 2.0.0-rc.1
+      '@graphile/simplify-inflection':
+        specifier: 8.0.0-rc.3
+        version: 8.0.0-rc.3
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
@@ -3186,6 +3189,9 @@ packages:
   '@graphile/lru@5.0.0-rc.3':
     resolution: {integrity: sha512-t2NSim3CRdaiA4/bv/p6Pg9c0DsXPJUptBMCHc+JP6LdHJfEbN1VP6RL9YhgVZ4PnVHINgsD7zagGsuJwZVmhQ==}
     engines: {node: '>=22'}
+
+  '@graphile/simplify-inflection@8.0.0-rc.3':
+    resolution: {integrity: sha512-2ujrwI5P7tNDUfr0NegXmU6M9cwyBPoGGy+sykQne5jf2PUgdwJz4HxLsyFT/ykukwZt5Kcrm7Thik2f7reiJA==}
 
   '@graphiql/plugin-doc-explorer@0.4.1':
     resolution: {integrity: sha512-+ram1dDDGMqJn/f9n5I8E6grTvxcM9JZYt/HhtYLuCvkN8kERI6/E3zBHBshhIUnQZoXioZ03fAzXg7JOn0Kyg==}
@@ -11184,6 +11190,8 @@ snapshots:
   '@graphile/lru@5.0.0-rc.3':
     dependencies:
       tslib: 2.8.1
+
+  '@graphile/simplify-inflection@8.0.0-rc.3': {}
 
   '@graphiql/plugin-doc-explorer@0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.7)(@types/react@19.2.8)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/react@19.2.8)(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
     dependencies:

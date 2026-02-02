@@ -3,6 +3,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
 import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
+import { PgSimplifyInflectionPreset } from '@graphile/simplify-inflection';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
 /**
@@ -25,7 +26,6 @@ export const MinimalPreset: GraphileConfig.Preset = {
  * - Disables relation filters to keep API clean
  * 
  * TODO: Port additional plugins:
- * - graphile-simple-inflector -> custom inflector preset
  * - graphile-meta-schema -> meta schema preset
  * - graphile-i18n -> i18n preset
  * - graphile-upload-plugin -> upload preset
@@ -42,6 +42,7 @@ export const getGraphilePreset = (
       PostGraphileAmberPreset,
       MinimalPreset,
       PostGraphileConnectionFilterPreset,
+      PgSimplifyInflectionPreset,
     ],
     disablePlugins: [
       'PgConnectionArgFilterBackwardRelationsPlugin',

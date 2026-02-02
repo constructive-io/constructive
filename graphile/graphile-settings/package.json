@@ -32,6 +32,7 @@
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
+    "@graphile/simplify-inflection": "8.0.0-rc.3",
     "@pgpmjs/types": "workspace:^",
     "cors": "^2.8.5",
     "express": "^5.2.1",
