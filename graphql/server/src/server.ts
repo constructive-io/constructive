@@ -17,6 +17,7 @@ import requestIp from 'request-ip';
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { normalizeServerOptions } from './options';
@@ -150,6 +151,10 @@ class Server {
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
     app.use(flush);
+
+    // Error handling - MUST be LAST
+    app.use(notFoundHandler); // Catches unmatched routes (404)
+    app.use(errorHandler); // Catches all thrown errors
 
     this.app = app;
   }
