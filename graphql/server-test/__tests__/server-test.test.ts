@@ -46,8 +46,8 @@ describe('graphql-server-test', () => {
     });
 
     it('should query users via HTTP', async () => {
-      const res = await query<{ allUsers: { nodes: Array<{ id: number; username: string }> } }>(
-        `query { allUsers { nodes { id username } } }`
+      const res = await query<{ allUsers: { nodes: Array<{ rowId: number; username: string }> } }>(
+        `query { allUsers { nodes { rowId username } } }`
       );
 
       expect(res.data).toBeDefined();
@@ -56,8 +56,8 @@ describe('graphql-server-test', () => {
     });
 
     it('should query posts via HTTP', async () => {
-      const res = await query<{ allPosts: { nodes: Array<{ id: number; title: string }> } }>(
-        `query { allPosts { nodes { id title } } }`
+      const res = await query<{ allPosts: { nodes: Array<{ rowId: number; title: string }> } }>(
+        `query { allPosts { nodes { rowId title } } }`
       );
 
       expect(res.data).toBeDefined();
@@ -66,15 +66,15 @@ describe('graphql-server-test', () => {
 
     it('should support variables', async () => {
       const res = await query<
-        { userByUsername: { id: number; username: string; email: string } | null },
+        { userByUsername: { rowId: number; username: string; email: string } | null },
         { username: string }
       >(
-        `query GetUser($username: String!) { 
-          userByUsername(username: $username) { 
-            id 
-            username 
-            email 
-          } 
+        `query GetUser($username: String!) {
+          userByUsername(username: $username) {
+            rowId
+            username
+            email
+          }
         }`,
         { username: 'alice' }
       );
@@ -88,7 +88,7 @@ describe('graphql-server-test', () => {
       const res = await request
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send({ query: '{ allUsers { nodes { id } } }' });
+        .send({ query: '{ allUsers { nodes { rowId } } }' });
 
       expect(res.status).toBe(200);
       expect(res.body.data.allUsers.nodes).toHaveLength(2);

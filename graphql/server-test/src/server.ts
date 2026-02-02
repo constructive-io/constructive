@@ -1,5 +1,5 @@
 import { Server } from '@constructive-io/graphql-server';
-import { PgpmOptions } from '@pgpmjs/types';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Server as HttpServer, createServer } from 'http';
 
 import type { ServerInfo, ServerOptions } from './types';
@@ -33,7 +33,7 @@ const findAvailablePort = async (startPort: number, host: string = '127.0.0.1'):
  * which includes all the standard middleware (CORS, authentication, GraphQL, etc.)
  */
 export const createTestServer = async (
-  opts: PgpmOptions,
+  opts: ConstructiveOptions,
   serverOpts: ServerOptions = {}
 ): Promise<ServerInfo> => {
   // Use 127.0.0.1 by default to avoid IPv6/IPv4 mismatch issues with supertest
@@ -42,8 +42,8 @@ export const createTestServer = async (
   const requestedPort = serverOpts.port ?? 0;
   const port = requestedPort === 0 ? await findAvailablePort(5555, host) : requestedPort;
 
-  // Merge server options into the PgpmOptions
-  const serverConfig: PgpmOptions = {
+  // Merge server options into the ConstructiveOptions
+  const serverConfig: ConstructiveOptions = {
     ...opts,
     server: {
       ...opts.server,

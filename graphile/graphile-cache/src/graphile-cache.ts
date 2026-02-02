@@ -12,7 +12,7 @@ const ONE_YEAR = ONE_DAY * 366;
 
 /**
  * PostGraphile v5 cached instance
- * 
+ *
  * In v5, we cache the entire PostGraphile instance along with its
  * grafserv handler and Express app.
  */
@@ -23,6 +23,8 @@ export interface GraphileCacheEntry {
   httpServer: HttpServer;
   cacheKey: string;
   createdAt: number;
+  /** Flag to track if this entry has been released to prevent double-release */
+  released?: boolean;
 }
 
 // --- Graphile Cache ---
@@ -31,8 +33,14 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
   ttl: ONE_YEAR,
   updateAgeOnGet: true,
   dispose: async (entry, key) => {
+    // Skip if already released (prevents double-release during closeAllCaches)
+    if (entry.released) {
+      log.debug(`PostGraphile[${key}] already released, skipping dispose`);
+      return;
+    }
     log.debug(`Disposing PostGraphile[${key}]`);
     try {
+      entry.released = true;
       await entry.pgl.release();
     } catch (err) {
       log.error(`Error releasing PostGraphile[${key}]:`, err);
@@ -59,17 +67,20 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
 
   closePromise.promise = (async () => {
     if (verbose) log.info('Closing all server caches...');
-    
-    // Release all PostGraphile instances
+
+    // Release all PostGraphile instances and mark them as released
     for (const [key, entry] of graphileCache.entries()) {
+      if (entry.released) continue;
       log.debug(`Releasing PostGraphile[${key}]`);
       try {
+        entry.released = true;
         await entry.pgl.release();
       } catch (err) {
         log.error(`Error releasing PostGraphile[${key}]:`, err);
       }
     }
-    
+
+    // Clear the cache (dispose callbacks will skip already-released entries)
     graphileCache.clear();
     await pgCache.close();
     if (verbose) log.success('All caches disposed.');

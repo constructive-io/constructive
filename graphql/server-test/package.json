@@ -19,11 +19,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "build": "echo 'SKIPPED: server-test disabled during v5 migration'",
-      "build:dev": "echo 'SKIPPED: server-test disabled during v5 migration'",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"

@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { GraphQLExplorer as explorer } from '@constructive-io/graphql-explorer';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { PgpmOptions } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, Question } from 'inquirerer';
 
 const log = new Logger('explorer');
@@ -91,7 +91,7 @@ export default async (
     simpleInflection
   } = await prompter.prompt(argv, questions);
 
-  const options: PgpmOptions = getEnvOptions({
+  const options: ConstructiveOptions = getEnvOptions({
     features: {
       oppositeBaseNames,
       simpleInflection,

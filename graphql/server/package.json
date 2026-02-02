@@ -44,6 +44,7 @@
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "deepmerge": "^4.3.1",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
