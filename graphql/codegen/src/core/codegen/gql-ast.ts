@@ -5,7 +5,7 @@
  * instead of string concatenation.
  */
 import * as t from 'gql-ast';
-import { print } from 'graphql';
+import { print, OperationTypeNode } from 'graphql';
 import type {
   DocumentNode,
   FieldNode,
@@ -143,7 +143,7 @@ export function buildListQueryAST(config: ListQueryConfig): DocumentNode {
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: `${ucFirst(queryName)}Query`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -200,7 +200,7 @@ export function buildSingleQueryAST(config: SingleQueryConfig): DocumentNode {
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: `${ucFirst(queryName)}Query`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -254,7 +254,7 @@ export function buildCreateMutationAST(config: CreateMutationConfig): DocumentNo
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${ucFirst(mutationName)}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -315,7 +315,7 @@ export function buildUpdateMutationAST(config: UpdateMutationConfig): DocumentNo
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${ucFirst(mutationName)}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -372,7 +372,7 @@ export function buildDeleteMutationAST(config: DeleteMutationConfig): DocumentNo
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${ucFirst(mutationName)}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({

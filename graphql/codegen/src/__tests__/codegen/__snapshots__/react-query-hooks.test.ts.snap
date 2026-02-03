@@ -203,8 +203,7 @@ mutation LoginMutation($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     token
   }
-}
-\`;
+}\`;
 export interface LoginMutationVariables {
   email: string;
   password: string;
@@ -239,8 +238,7 @@ mutation RegisterMutation($input: RegisterInput!) {
   register(input: $input) {
     token
   }
-}
-\`;
+}\`;
 export interface RegisterMutationVariables {
   input: RegisterInput;
 }
@@ -274,8 +272,7 @@ mutation LogoutMutation {
   logout {
     success
   }
-}
-\`;
+}\`;
 export interface LogoutMutationResult {
   logout: LogoutPayload;
 }
@@ -305,8 +302,7 @@ mutation LoginMutation($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     token
   }
-}
-\`;
+}\`;
 export interface LoginMutationVariables {
   email: string;
   password: string;
@@ -339,8 +335,7 @@ import { customQueryKeys } from "../query-keys";
 export const searchUsersQueryDocument = \`
 query SearchUsersQuery($query: String!, $limit: Int) {
   searchUsers(query: $query, limit: $limit)
-}
-\`;
+}\`;
 export interface SearchUsersQueryVariables {
   query: string;
   limit?: number;
@@ -414,8 +409,7 @@ import { customQueryKeys } from "../query-keys";
 export const currentUserQueryDocument = \`
 query CurrentUserQuery {
   currentUser
-}
-\`;
+}\`;
 export interface CurrentUserQueryResult {
   currentUser: User;
 }
@@ -483,8 +477,7 @@ import type { User } from "../schema-types";
 export const currentUserQueryDocument = \`
 query CurrentUserQuery {
   currentUser
-}
-\`;
+}\`;
 export interface CurrentUserQueryResult {
   currentUser: User;
 }
@@ -560,8 +553,7 @@ mutation CreateUserMutation($input: CreateUserInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Input type for creating a User */
 interface UserCreateInput {
   email?: string | null;
@@ -635,8 +627,7 @@ mutation CreatePostMutation($input: CreatePostInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Input type for creating a Post */
 interface PostCreateInput {
   title?: string | null;
@@ -707,8 +698,7 @@ mutation CreateUserMutation($input: CreateUserInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Input type for creating a User */
 interface UserCreateInput {
   email?: string | null;
@@ -771,8 +761,7 @@ mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
   }
-}
-\`;
+}\`;
 export interface DeleteUserMutationVariables {
   input: {
     id: string;
@@ -833,8 +822,7 @@ mutation DeletePostMutation($input: DeletePostInput!) {
   deletePost(input: $input) {
     clientMutationId
   }
-}
-\`;
+}\`;
 export interface DeletePostMutationVariables {
   input: {
     id: string;
@@ -892,8 +880,7 @@ mutation DeleteUserMutation($input: DeleteUserInput!) {
   deleteUser(input: $input) {
     clientMutationId
   }
-}
-\`;
+}\`;
 export interface DeleteUserMutationVariables {
   input: {
     id: string;
@@ -959,8 +946,7 @@ mutation UpdateUserMutation($input: UpdateUserInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Patch type for updating a User - all fields optional */
 interface UserPatch {
   email?: string | null;
@@ -1040,8 +1026,7 @@ mutation UpdatePostMutation($input: UpdatePostInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Patch type for updating a Post - all fields optional */
 interface PostPatch {
   title?: string | null;
@@ -1118,8 +1103,7 @@ mutation UpdateUserMutation($input: UpdateUserInput!) {
       createdAt
     }
   }
-}
-\`;
+}\`;
 /** Patch type for updating a User - all fields optional */
 interface UserPatch {
   email?: string | null;
@@ -1211,8 +1195,7 @@ query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after:
       endCursor
     }
   }
-}
-\`;
+}\`;
 interface UserFilter {
   id?: UUIDFilter;
   email?: StringFilter;
@@ -1349,8 +1332,7 @@ query PostsQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after:
       endCursor
     }
   }
-}
-\`;
+}\`;
 interface PostFilter {
   id?: UUIDFilter;
   title?: StringFilter;
@@ -1499,8 +1481,7 @@ query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after:
       endCursor
     }
   }
-}
-\`;
+}\`;
 interface UserFilter {
   id?: UUIDFilter;
   email?: StringFilter;
@@ -1615,8 +1596,7 @@ query UserQuery($id: UUID!) {
     name
     createdAt
   }
-}
-\`;
+}\`;
 export interface UserQueryVariables {
   id: string;
 }
@@ -1692,8 +1672,7 @@ query PostQuery($id: UUID!) {
     published
     createdAt
   }
-}
-\`;
+}\`;
 export interface PostQueryVariables {
   id: string;
 }
@@ -1777,8 +1756,7 @@ query UserQuery($id: UUID!) {
     name
     createdAt
   }
-}
-\`;
+}\`;
 export interface UserQueryVariables {
   id: string;
 }

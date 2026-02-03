@@ -339,7 +339,7 @@ importers:
     dependencies:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
-        version: 1.2.0(graphql@15.10.1)
+        version: 1.2.0(graphql@16.12.0)
       '@babel/generator':
         specifier: ^7.28.6
         version: 7.28.6
@@ -371,8 +371,8 @@ importers:
         specifier: workspace:^
         version: link:../gql-ast/dist
       graphql:
-        specifier: 15.10.1
-        version: 15.10.1
+        specifier: ^16.9.0
+        version: 16.12.0
       inflekt:
         specifier: ^0.3.0
         version: 0.3.0
@@ -9507,9 +9507,9 @@ packages:
 
 snapshots:
 
-  '@0no-co/graphql.web@1.2.0(graphql@15.10.1)':
+  '@0no-co/graphql.web@1.2.0(graphql@16.12.0)':
     optionalDependencies:
-      graphql: 15.10.1
+      graphql: 16.12.0
 
   '@antfu/install-pkg@1.1.0':
     dependencies:
