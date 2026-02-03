@@ -130,6 +130,10 @@ const createGraphileInstance = async (
   const httpServer = createServer(handler);
   await serv.addTo(handler, httpServer);
 
+  // Wait for the schema to be built and dynamicOptions to be populated
+  // This ensures the handler is fully initialized before use
+  await serv.ready();
+
   return {
     pgl,
     serv,
