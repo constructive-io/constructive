@@ -654,9 +654,6 @@ importers:
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist
-      '@constructive-io/graphql-query':
-        specifier: workspace:^
-        version: link:../query/dist
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
