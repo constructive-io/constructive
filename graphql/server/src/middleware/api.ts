@@ -293,8 +293,8 @@ const transformApiNodeToStructure = (
 ): ApiStructure => {
   // Extract schemas from junction table
   const schemas = apiData.apiSchemasByApiId?.nodes?.map(
-    (n) => n.metaschemaPublicSchemaBySchemaId?.schemaName
-  ).filter((s): s is string => !!s) || [];
+    (n: ApiSchemaNodeData) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+  ).filter((s: string | undefined): s is string => !!s) || [];
 
   return {
     dbname: apiData.dbname || opts.pg?.database || '',
@@ -501,7 +501,7 @@ const queryServiceByDomainAndSubdomain = async ({
     }
 
     // Filter results in code based on domain, subdomain, and api.isPublic
-    const matchingNode = result.data?.allDomains?.nodes?.find((node) => {
+    const matchingNode = result.data?.allDomains?.nodes?.find((node: DomainNodeData) => {
       if (node.domain !== domain) return false;
       if (subdomain === null) {
         if (node.subdomain !== null && node.subdomain !== undefined)
@@ -605,8 +605,8 @@ export const queryServiceByApiName = async ({
 
     // Extract schemas from junction table with v5 default relation names
     const schemas = apiData.apiSchemasByApiId?.nodes?.map(
-      (n) => n.metaschemaPublicSchemaBySchemaId?.schemaName
-    ).filter((s): s is string => !!s) || [];
+      (n: ApiSchemaNodeData) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+    ).filter((s: string | undefined): s is string => !!s) || [];
 
     if (isDev()) {
       log.debug(`[api-name-lookup] resolved schemas: [${schemas.join(', ')}]`);

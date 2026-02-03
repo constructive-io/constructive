@@ -521,8 +521,8 @@ importers:
   graphql/gql-ast:
     dependencies:
       graphql:
-        specifier: 15.10.1
-        version: 15.10.1
+        specifier: ^16.9.0
+        version: 16.12.0
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -584,12 +584,30 @@ importers:
       gql-ast:
         specifier: workspace:^
         version: link:../gql-ast/dist
+      grafast:
+        specifier: ^1.0.0-rc.4
+        version: 1.0.0-rc.4(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
+      graphile-settings:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-settings/dist
       graphql:
-        specifier: 15.10.1
-        version: 15.10.1
+        specifier: ^16.9.0
+        version: 16.12.0
       inflection:
-        specifier: ^3.0.2
+        specifier: ^3.0.0
         version: 3.0.2
+      lru-cache:
+        specifier: ^10.4.3
+        version: 10.4.3
+      postgraphile:
+        specifier: ^5.0.0-rc.4
+        version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -636,6 +654,9 @@ importers:
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist
+      '@constructive-io/graphql-query':
+        specifier: workspace:^
+        version: link:../query/dist
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
