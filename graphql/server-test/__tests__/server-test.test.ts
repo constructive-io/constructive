@@ -46,32 +46,31 @@ describe('graphql-server-test', () => {
     });
 
     it('should query users via HTTP', async () => {
-      const res = await query<{ users: { nodes: Array<{ rowId: number; username: string }> } }>(
-        `query { users { nodes { rowId username } } }`
+      const res = await query<{ allUsers: { nodes: Array<{ username: string }> } }>(
+        `query { allUsers { nodes { username } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.users.nodes).toHaveLength(2);
-      expect(res.data?.users.nodes[0].username).toBe('alice');
+      expect(res.data?.allUsers.nodes).toHaveLength(2);
+      expect(res.data?.allUsers.nodes[0].username).toBe('alice');
     });
 
     it('should query posts via HTTP', async () => {
-      const res = await query<{ posts: { nodes: Array<{ rowId: number; title: string }> } }>(
-        `query { posts { nodes { rowId title } } }`
+      const res = await query<{ allPosts: { nodes: Array<{ title: string }> } }>(
+        `query { allPosts { nodes { title } } }`
       );
 
       expect(res.data).toBeDefined();
-      expect(res.data?.posts.nodes).toHaveLength(3);
+      expect(res.data?.allPosts.nodes).toHaveLength(3);
     });
 
     it('should support variables', async () => {
       const res = await query<
-        { userByUsername: { rowId: number; username: string; email: string } | null },
+        { userByUsername: { username: string; email: string } | null },
         { username: string }
       >(
         `query GetUser($username: String!) {
           userByUsername(username: $username) {
-            rowId
             username
             email
           }
@@ -88,14 +87,14 @@ describe('graphql-server-test', () => {
       const res = await request
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send({ query: '{ users { nodes { rowId } } }' });
+        .send({ query: '{ allUsers { nodes { username } } }' });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.users.nodes).toHaveLength(2);
+      expect(res.body.data.allUsers.nodes).toHaveLength(2);
     });
 
     it('should snapshot query results', async () => {
-      const res = await query(`query { users { nodes { username email } } }`);
+      const res = await query(`query { allUsers { nodes { username email } } }`);
       expect(snapshot(res.data)).toMatchSnapshot();
     });
   });

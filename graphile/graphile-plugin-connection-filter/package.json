@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter",
-  "version": "3.0.3",
+  "version": "4.0.0",
   "description": "Filtering on PostGraphile connections",
   "author": "Matt Bretl",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -40,20 +40,24 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "find-and-require-package-json": "^0.9.0",
-    "graphile-build": "^4.14.1",
-    "graphile-build-pg": "^4.14.1",
-    "graphql": "15.10.1"
+    "@dataplan/pg": "^1.0.0-rc.1",
+    "grafast": "^1.0.0-rc.4",
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "graphql": "^16.9.0",
+    "pg-sql2": "^5.0.0-rc.3"
   },
   "peerDependencies": {
-    "postgraphile": "^4.14.1"
+    "postgraphile": "^5.0.0-rc.4"
   },
   "devDependencies": {
-    "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
+    "@graphile/simplify-inflection": "8.0.0-rc.3",
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
     "pg": "^8.17.1",
-    "pgsql-test": "workspace:^"
+    "pgsql-test": "workspace:^",
+    "postgraphile": "^5.0.0-rc.4"
   }
 }

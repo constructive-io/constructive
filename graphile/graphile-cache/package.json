@@ -1,12 +1,12 @@
 {
   "name": "graphile-cache",
   "version": "2.0.0",
-  "author": "Constructive <developers@constructive.io>",
-  "description": "PostGraphile LRU cache with automatic pool cleanup integration",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "description": "PostGraphile v5 LRU cache with automatic pool cleanup integration",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
-  "homepage": "https://github.com/constructive-io/constructive",
+  "homepage": "https://github.com/launchql/launchql",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -14,10 +14,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/constructive-io/constructive"
+    "url": "https://github.com/launchql/launchql"
   },
   "bugs": {
-    "url": "https://github.com/constructive-io/constructive/issues"
+    "url": "https://github.com/launchql/launchql/issues"
   },
   "scripts": {
     "clean": "makage clean",
@@ -30,16 +30,13 @@
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
-    "express": "^5.2.1",
-    "grafserv": "^1.0.0-rc.4",
     "lru-cache": "^11.2.4",
-    "pg": "^8.17.1",
     "pg-cache": "workspace:^",
+    "grafserv": "^1.0.0-rc.4",
     "postgraphile": "^5.0.0-rc.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.16.0",
     "makage": "^0.1.10",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2"
@@ -50,6 +47,7 @@
     "cache",
     "lru",
     "postgresql",
-    "constructive"
+    "launchql",
+    "v5"
   ]
 }

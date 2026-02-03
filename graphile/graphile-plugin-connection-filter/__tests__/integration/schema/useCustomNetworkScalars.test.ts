@@ -1,15 +1,15 @@
 import '../../../test-utils/env';
 import { join } from 'path';
+import type { GraphileConfig } from 'graphile-config';
 import { Pool } from 'pg';
-import { PgConnectionArgCondition } from 'graphile-build-pg';
-import {
-  createPostGraphileSchema,
-  type PostGraphileOptions,
-} from 'postgraphile';
+import { makeSchema } from 'graphile-build';
+import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
+import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
+import { makePgService } from 'postgraphile/adaptors/pg';
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
 
-import ConnectionFilterPlugin from '../../../src/index';
+import { PostGraphileConnectionFilterPreset } from '../../../src/index';
 import { printSchemaOrdered } from '../../../test-utils/printSchema';
 
 const SCHEMA = process.env.SCHEMA ?? 'p';
@@ -19,10 +19,41 @@ let db!: PgTestClient;
 let teardown!: () => Promise<void>;
 let pool!: Pool;
 
+/**
+ * Base preset for schema tests - combines graphile-build defaults with
+ * connection filter plugin, disabling Node/Relay and mutations.
+ *
+ * Note: In v5, pgUseCustomNetworkScalars is enabled by default in graphile-build-pg.
+ * The InternetAddress, CidrAddress, and MacAddress types are standard.
+ */
+const BaseTestPreset: GraphileConfig.Preset = {
+  extends: [
+    graphileBuildDefaultPreset,
+    graphileBuildPgDefaultPreset,
+    PostGraphileConnectionFilterPreset,
+  ],
+  disablePlugins: [
+    'NodePlugin',
+    'PgConditionArgumentPlugin',
+    'PgMutationCreatePlugin',
+    'PgMutationUpdateDeletePlugin',
+  ],
+};
+
 const createSchemaSnapshot = async (
-  options: PostGraphileOptions
+  schemaOptions?: GraphileBuild.SchemaOptions
 ): Promise<string> => {
-  const schema = await createPostGraphileSchema(pool, [SCHEMA], options);
+  const preset: GraphileConfig.Preset = {
+    extends: [BaseTestPreset],
+    ...(schemaOptions && { schema: schemaOptions }),
+    pgServices: [
+      makePgService({
+        pool,
+        schemas: [SCHEMA],
+      }),
+    ],
+  };
+  const { schema } = await makeSchema(preset);
   return printSchemaOrdered(schema);
 };
 
@@ -43,17 +74,11 @@ afterAll(async () => {
 });
 
 it(
-  'prints a schema with the filter plugin and the `pgUseCustomNetworkScalars: true` option',
+  'prints a schema with the filter plugin and custom network scalars',
   async () => {
-    const schema = await createSchemaSnapshot({
-      skipPlugins: [PgConnectionArgCondition],
-      appendPlugins: [ConnectionFilterPlugin],
-      disableDefaultMutations: true,
-      legacyRelations: 'omit',
-      graphileBuildOptions: {
-        pgUseCustomNetworkScalars: true,
-      },
-    });
+    // In v5, custom network scalars (InternetAddress, CidrAddress, MacAddress)
+    // are enabled by default in graphile-build-pg. No special option needed.
+    const schema = await createSchemaSnapshot();
 
     expect(schema).toMatchSnapshot();
   }

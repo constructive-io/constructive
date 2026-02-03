@@ -140,22 +140,22 @@ describe.each(scenarios)('$name', (scenario) => {
   describe('Query Tests', () => {
     it('should query all animals', async () => {
       const res = await postGraphQL({
-        query: '{ simplePetsPetsPublicAnimals { nodes { rowId name species } } }',
+        query: '{ allSimplePetsPetsPublicAnimals { nodes { name species } } }',
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.simplePetsPetsPublicAnimals.nodes).toHaveLength(5);
+      expect(res.body.data.allSimplePetsPetsPublicAnimals.nodes).toHaveLength(5);
     });
 
     it('should query animals with filter', async () => {
       // Note: postgraphile-plugin-connection-filter only generates filters for indexed columns by default
       // The 'species' column is not indexed, so we query all and filter client-side for the test
       const res = await postGraphQL({
-        query: `{ simplePetsPetsPublicAnimals { nodes { name species } } }`,
+        query: `{ allSimplePetsPetsPublicAnimals { nodes { name species } } }`,
       });
 
       expect(res.status).toBe(200);
-      const dogs = res.body.data.simplePetsPetsPublicAnimals.nodes.filter(
+      const dogs = res.body.data.allSimplePetsPetsPublicAnimals.nodes.filter(
         (n: { species: string }) => n.species === 'Dog'
       );
       expect(dogs).toHaveLength(2);
@@ -165,18 +165,19 @@ describe.each(scenarios)('$name', (scenario) => {
       // Note: Using 'first' variable since text column filters are not available by default
       const res = await postGraphQL({
         query: `query GetAnimals($first: Int!) {
-          simplePetsPetsPublicAnimals(first: $first) { nodes { name species } }
+          allSimplePetsPetsPublicAnimals(first: $first) { nodes { name species } }
         }`,
         variables: { first: 3 },
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.simplePetsPetsPublicAnimals.nodes).toHaveLength(3);
+      expect(res.body.data.allSimplePetsPetsPublicAnimals.nodes).toHaveLength(3);
     });
   });
 
   describe('Mutation Tests', () => {
     it('should create and delete an animal', async () => {
+      // v5 default naming: uses rowId for primary key, mutations use ByRowId suffix
       const createRes = await postGraphQL({
         query: `mutation($input: CreateSimplePetsPetsPublicAnimalInput!) {
           createSimplePetsPetsPublicAnimal(input: $input) { simplePetsPetsPublicAnimal { rowId name species } }
@@ -187,42 +188,45 @@ describe.each(scenarios)('$name', (scenario) => {
       expect(createRes.status).toBe(200);
       expect(createRes.body.data.createSimplePetsPetsPublicAnimal.simplePetsPetsPublicAnimal.name).toBe('TestHamster');
 
-      // Note: NodePlugin is disabled, so there's no deletedXxxNodeId field
-      // Instead we return the deleted record itself
+      // v5 default naming: delete mutation uses ByRowId suffix
       const deleteRes = await postGraphQL({
-        query: `mutation($input: DeleteSimplePetsPetsPublicAnimalInput!) {
-          deleteSimplePetsPetsPublicAnimal(input: $input) { simplePetsPetsPublicAnimal { rowId } }
+        query: `mutation($input: DeleteSimplePetsPetsPublicAnimalByRowIdInput!) {
+          deleteSimplePetsPetsPublicAnimalByRowId(input: $input) { simplePetsPetsPublicAnimal { rowId } }
         }`,
         variables: { input: { rowId: createRes.body.data.createSimplePetsPetsPublicAnimal.simplePetsPetsPublicAnimal.rowId } },
       });
 
       expect(deleteRes.status).toBe(200);
-      expect(deleteRes.body.data.deleteSimplePetsPetsPublicAnimal.simplePetsPetsPublicAnimal.rowId).toBeDefined();
+      expect(deleteRes.body.data.deleteSimplePetsPetsPublicAnimalByRowId.simplePetsPetsPublicAnimal.rowId).toBeDefined();
     });
 
     it('should update an animal', async () => {
+      // v5 default naming: uses rowId for primary key
       const queryRes = await postGraphQL({
-        query: '{ simplePetsPetsPublicAnimals(first: 1) { nodes { rowId name } } }',
+        query: '{ allSimplePetsPetsPublicAnimals(first: 1) { nodes { rowId name } } }',
       });
 
-      const animal = queryRes.body.data.simplePetsPetsPublicAnimals.nodes[0];
+      expect(queryRes.status).toBe(200);
+      const animal = queryRes.body.data.allSimplePetsPetsPublicAnimals.nodes[0];
       const originalName = animal.name;
 
+      // v5 default naming: update mutation uses ByRowId suffix, patch field is simplePetsPetsPublicAnimalPatch
       const updateRes = await postGraphQL({
-        query: `mutation($input: UpdateSimplePetsPetsPublicAnimalInput!) {
-          updateSimplePetsPetsPublicAnimal(input: $input) { simplePetsPetsPublicAnimal { rowId name } }
+        query: `mutation($input: UpdateSimplePetsPetsPublicAnimalByRowIdInput!) {
+          updateSimplePetsPetsPublicAnimalByRowId(input: $input) { simplePetsPetsPublicAnimal { rowId name } }
         }`,
-        variables: { input: { rowId: animal.rowId, patch: { name: 'TempName' } } },
+        variables: { input: { rowId: animal.rowId, simplePetsPetsPublicAnimalPatch: { name: 'TempName' } } },
       });
 
       expect(updateRes.status).toBe(200);
-      expect(updateRes.body.data.updateSimplePetsPetsPublicAnimal.simplePetsPetsPublicAnimal.name).toBe('TempName');
+      expect(updateRes.body.data.updateSimplePetsPetsPublicAnimalByRowId.simplePetsPetsPublicAnimal.name).toBe('TempName');
 
+      // Restore original name
       await postGraphQL({
-        query: `mutation($input: UpdateSimplePetsPetsPublicAnimalInput!) {
-          updateSimplePetsPetsPublicAnimal(input: $input) { simplePetsPetsPublicAnimal { rowId } }
+        query: `mutation($input: UpdateSimplePetsPetsPublicAnimalByRowIdInput!) {
+          updateSimplePetsPetsPublicAnimalByRowId(input: $input) { simplePetsPetsPublicAnimal { rowId } }
         }`,
-        variables: { input: { rowId: animal.rowId, patch: { name: originalName } } },
+        variables: { input: { rowId: animal.rowId, simplePetsPetsPublicAnimalPatch: { name: originalName } } },
       });
     });
   });
@@ -275,62 +279,61 @@ describe('services enabled + private via X-Meta-Schema', () => {
   });
 
   it('should query all databases', async () => {
-    // PostGraphile v5 uses schema-prefixed names: metaschemaPublicDatabases
+    // PostGraphile v5 uses schema-prefixed names: allMetaschemaPublicDatabases
     const res = await postGraphQL({
-      query: '{ metaschemaPublicDatabases { nodes { rowId name } } }',
+      query: '{ allMetaschemaPublicDatabases { nodes { name } } }',
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.metaschemaPublicDatabases.nodes).toBeInstanceOf(Array);
-    expect(res.body.data.metaschemaPublicDatabases.nodes.length).toBeGreaterThanOrEqual(1);
-    expect(res.body.data.metaschemaPublicDatabases.nodes[0]).toHaveProperty('rowId');
-    expect(res.body.data.metaschemaPublicDatabases.nodes[0]).toHaveProperty('name');
+    expect(res.body.data.allMetaschemaPublicDatabases.nodes).toBeInstanceOf(Array);
+    expect(res.body.data.allMetaschemaPublicDatabases.nodes.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.data.allMetaschemaPublicDatabases.nodes[0]).toHaveProperty('name');
   });
 
   it('should query schemas', async () => {
-    // PostGraphile v5 uses schema-prefixed names: metaschemaPublicSchemata
+    // PostGraphile v5 uses schema-prefixed names: allMetaschemaPublicSchemas
     const res = await postGraphQL({
-      query: '{ metaschemaPublicSchemata { nodes { rowId name schemaName isPublic } } }',
+      query: '{ allMetaschemaPublicSchemas { nodes { name schemaName isPublic } } }',
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.metaschemaPublicSchemata.nodes).toBeInstanceOf(Array);
-    expect(res.body.data.metaschemaPublicSchemata.nodes.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.data.allMetaschemaPublicSchemas.nodes).toBeInstanceOf(Array);
+    expect(res.body.data.allMetaschemaPublicSchemas.nodes.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should query tables', async () => {
-    // PostGraphile v5 uses schema-prefixed names: metaschemaPublicTables
+    // PostGraphile v5 uses schema-prefixed names: allMetaschemaPublicTables
     const res = await postGraphQL({
-      query: '{ metaschemaPublicTables { nodes { rowId name } } }',
+      query: '{ allMetaschemaPublicTables { nodes { name } } }',
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.metaschemaPublicTables.nodes).toBeInstanceOf(Array);
-    expect(res.body.data.metaschemaPublicTables.nodes.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.data.allMetaschemaPublicTables.nodes).toBeInstanceOf(Array);
+    expect(res.body.data.allMetaschemaPublicTables.nodes.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should query fields with variables', async () => {
-    // PostGraphile v5 uses schema-prefixed names: metaschemaPublicFields
+    // PostGraphile v5 uses schema-prefixed names: allMetaschemaPublicFields
     const res = await postGraphQL({
       query: `query GetFields($first: Int!) {
-        metaschemaPublicFields(first: $first) { nodes { rowId name type } }
+        allMetaschemaPublicFields(first: $first) { nodes { name type } }
       }`,
       variables: { first: 10 },
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.metaschemaPublicFields.nodes).toBeInstanceOf(Array);
+    expect(res.body.data.allMetaschemaPublicFields.nodes).toBeInstanceOf(Array);
   });
 
   it('should query apis', async () => {
-    // 'apis' is in services_public schema which doesn't have the 'metaschemaPublic' prefix
+    // 'apis' is in services_public schema - v5 default naming: services_public tables don't get schema prefix
     const res = await postGraphQL({
-      query: '{ apis { nodes { rowId name isPublic databaseId } } }',
+      query: '{ allApis { nodes { name isPublic databaseId } } }',
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.apis.nodes).toBeInstanceOf(Array);
-    expect(res.body.data.apis.nodes.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.data.allApis.nodes).toBeInstanceOf(Array);
+    expect(res.body.data.allApis.nodes.length).toBeGreaterThanOrEqual(1);
   });
 });
 

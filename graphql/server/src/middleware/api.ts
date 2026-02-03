@@ -5,6 +5,19 @@ import { parseUrl } from '@constructive-io/url-domains';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
+import { getPgEnvOptions } from 'pg-env';
+import { execute } from 'grafast';
+import { postgraphile, type PostGraphileInstance } from 'postgraphile';
+import { getGraphilePreset, makePgService } from 'graphile-settings';
+import { withPgClientFromPgService } from 'graphile-build-pg';
+import {
+  parse,
+  type GraphQLSchema,
+  type DocumentNode,
+  type ExecutionResult,
+  type GraphQLError,
+} from 'graphql';
+import type { GraphileConfig } from 'graphile-config';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
@@ -13,6 +26,287 @@ import './types'; // for Request type
 
 const log = new Logger('api');
 const isDev = () => getNodeEnv() === 'development';
+
+// =============================================================================
+// Services GraphQL Executor - Grafast-based queries for services_public
+// =============================================================================
+
+/**
+ * Cache entry for services PostGraphile instance
+ */
+interface ServicesExecutorEntry {
+  pgl: PostGraphileInstance;
+  schema: GraphQLSchema;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  pgService: ReturnType<typeof makePgService>;
+}
+
+/**
+ * Cache for services PostGraphile instances, keyed by connection string
+ * This allows different databases to have their own executor
+ */
+const servicesExecutorCache = new Map<string, ServicesExecutorEntry>();
+
+/**
+ * Build connection string from pg config components
+ */
+const buildConnectionString = (
+  user: string,
+  password: string,
+  host: string,
+  port: string | number,
+  database: string
+): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
+
+/**
+ * Get or create the services GraphQL executor for a specific database
+ *
+ * This creates a dedicated PostGraphile instance for querying the services_public
+ * and metaschema_public schemas with administrator role. The instance is cached
+ * per connection string for reuse across requests to the same database.
+ */
+const getServicesExecutor = async (opts: ApiOptions): Promise<{
+  schema: GraphQLSchema;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  pgService: ReturnType<typeof makePgService>;
+}> => {
+  const pgConfig = getPgEnvOptions(opts.pg);
+  const connectionString = buildConnectionString(
+    pgConfig.user,
+    pgConfig.password,
+    pgConfig.host,
+    pgConfig.port,
+    pgConfig.database
+  );
+
+  const cached = servicesExecutorCache.get(connectionString);
+  if (cached) {
+    return {
+      schema: cached.schema,
+      resolvedPreset: cached.resolvedPreset,
+      pgService: cached.pgService,
+    };
+  }
+
+  const pgService = makePgService({
+    connectionString,
+    schemas: ['services_public', 'metaschema_public'],
+  });
+
+  const basePreset = getGraphilePreset({});
+
+  const preset: GraphileConfig.Preset = {
+    extends: [basePreset],
+    pgServices: [pgService],
+    grafast: {
+      context: () => ({
+        pgSettings: { role: 'administrator' },
+      }),
+    },
+  };
+
+  const pgl = postgraphile(preset);
+  const schema = await pgl.getSchema();
+  const resolvedPreset = pgl.getResolvedPreset();
+
+  servicesExecutorCache.set(connectionString, {
+    pgl,
+    schema,
+    resolvedPreset,
+    pgService,
+  });
+  log.debug(`Services GraphQL executor initialized for ${pgConfig.database}`);
+
+  return { schema, resolvedPreset, pgService };
+};
+
+// =============================================================================
+// GraphQL Query Definitions
+// =============================================================================
+
+/**
+ * GraphQL query for looking up API by domain and subdomain (with subdomain value)
+ * Note: We fetch all domains and filter in code to avoid filter type issues
+ * Uses v5 default naming with proper relation names:
+ * - apiByApiId for domain -> api relation (services_public tables don't get schema prefix)
+ * - apiSchemasByApiId for api -> api_schemas relation
+ * - metaschemaPublicSchemaBySchemaId for api_schema -> schema relation (cross-schema relation)
+ */
+const DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN = `
+  query QueryServiceByDomainAndSubdomain {
+    allDomains(first: 100) {
+      nodes {
+        domain
+        subdomain
+        apiByApiId {
+          databaseId
+          dbname
+          roleName
+          anonRole
+          isPublic
+          apiSchemasByApiId(first: 1000) {
+            nodes {
+              metaschemaPublicSchemaBySchemaId {
+                schemaName
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * GraphQL query for looking up API by domain with null subdomain
+ * Note: We use the same query for both cases and filter in code
+ * Uses v5 default naming with proper relation names
+ */
+const DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN = `
+  query QueryServiceByDomainNullSubdomain {
+    allDomains(first: 100) {
+      nodes {
+        domain
+        subdomain
+        apiByApiId {
+          databaseId
+          dbname
+          roleName
+          anonRole
+          isPublic
+          apiSchemasByApiId(first: 1000) {
+            nodes {
+              metaschemaPublicSchemaBySchemaId {
+                schemaName
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * GraphQL query for looking up API by database ID and name
+ * Uses junction table approach with v5 default relation names:
+ * - apiSchemasByApiId for api -> api_schemas relation (services_public tables don't get schema prefix)
+ * - metaschemaPublicSchemaBySchemaId for api_schema -> schema relation (cross-schema relation)
+ */
+const API_NAME_LOOKUP_QUERY = `
+  query QueryServiceByApiName($databaseId: UUID!, $name: String!, $isPublic: Boolean!) {
+    allApis(first: 1, filter: {
+      databaseId: { equalTo: $databaseId }
+      name: { equalTo: $name }
+      isPublic: { equalTo: $isPublic }
+    }) {
+      nodes {
+        databaseId
+        dbname
+        roleName
+        anonRole
+        isPublic
+        apiSchemasByApiId(first: 1000) {
+          nodes {
+            metaschemaPublicSchemaBySchemaId {
+              schemaName
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Cache parsed documents for performance
+let domainLookupWithSubdomainDocument: DocumentNode | null = null;
+let domainLookupNullSubdomainDocument: DocumentNode | null = null;
+let apiNameLookupDocument: DocumentNode | null = null;
+
+const getDomainLookupDocument = (hasSubdomain: boolean): DocumentNode => {
+  if (hasSubdomain) {
+    if (!domainLookupWithSubdomainDocument) {
+      domainLookupWithSubdomainDocument = parse(DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN);
+    }
+    return domainLookupWithSubdomainDocument;
+  } else {
+    if (!domainLookupNullSubdomainDocument) {
+      domainLookupNullSubdomainDocument = parse(DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN);
+    }
+    return domainLookupNullSubdomainDocument;
+  }
+};
+
+const getApiNameLookupDocument = (): DocumentNode => {
+  if (!apiNameLookupDocument) {
+    apiNameLookupDocument = parse(API_NAME_LOOKUP_QUERY);
+  }
+  return apiNameLookupDocument;
+};
+
+// Type definitions for GraphQL response
+interface ApiSchemaNodeData {
+  metaschemaPublicSchemaBySchemaId?: { schemaName?: string };
+}
+
+interface ApiNodeData {
+  databaseId?: string;
+  dbname?: string;
+  roleName?: string;
+  anonRole?: string;
+  isPublic?: boolean;
+  // Junction table approach with v5 default relation names:
+  // apiSchemasByApiId -> metaschemaPublicSchemaBySchemaId -> schemaName
+  // (services_public tables don't get schema prefix in v5 default naming)
+  apiSchemasByApiId?: {
+    nodes?: ApiSchemaNodeData[];
+  };
+}
+
+interface DomainNodeData {
+  domain?: string;
+  subdomain?: string | null;
+  apiByApiId?: ApiNodeData;
+}
+
+interface DomainLookupResult {
+  allDomains?: {
+    nodes?: DomainNodeData[];
+  };
+}
+
+interface ApiNameLookupResult {
+  allApis?: {
+    nodes?: ApiNodeData[];
+  };
+}
+
+/**
+ * Transform API node data to ApiStructure
+ * Uses junction table approach with v5 default relation names:
+ * apiSchemasByApiId -> metaschemaPublicSchemaBySchemaId -> schemaName
+ * (services_public tables don't get schema prefix in v5 default naming)
+ */
+const transformApiNodeToStructure = (
+  apiData: ApiNodeData,
+  opts: ApiOptions
+): ApiStructure => {
+  // Extract schemas from junction table
+  const schemas = apiData.apiSchemasByApiId?.nodes?.map(
+    (n) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+  ).filter((s): s is string => !!s) || [];
+
+  return {
+    dbname: apiData.dbname || opts.pg?.database || '',
+    anonRole: apiData.anonRole || 'anon',
+    roleName: apiData.roleName || 'authenticated',
+    schema: schemas,
+    apiModules: [],
+    domains: [],
+    databaseId: apiData.databaseId,
+    isPublic: apiData.isPublic,
+  };
+};
 
 const isApiError = (svc: ApiConfigResult): svc is ApiError =>
   !!svc && typeof (svc as ApiError).errorHtml === 'string';
@@ -140,11 +434,10 @@ const createAdminApiStructure = ({
 };
 
 /**
- * Query API by domain and subdomain using direct SQL
- * 
- * TODO: This is a simplified v5 implementation that uses direct SQL queries
- * instead of the v4 graphile-query. Once graphile-query is ported to v5,
- * we can restore the GraphQL-based lookup.
+ * Query API by domain and subdomain using Grafast GraphQL execution
+ *
+ * Uses the services GraphQL executor to query the services_public schema
+ * for API configuration based on domain and subdomain.
  */
 const queryServiceByDomainAndSubdomain = async ({
   opts,
@@ -159,50 +452,76 @@ const queryServiceByDomainAndSubdomain = async ({
   domain: string;
   subdomain: string | null;
 }): Promise<ApiStructure | null> => {
-  const apiPublic = opts.api?.isPublic;
-  
+  const apiPublic = opts.api?.isPublic ?? false;
+
   try {
-    const query = `
-      SELECT
-        a.id,
-        a.name,
-        a.database_id,
-        a.is_public,
-        a.anon_role,
-        a.role_name,
-        a.dbname,
-        COALESCE(
-          (SELECT array_agg(ms.schema_name)
-           FROM services_public.api_schemas as_
-           JOIN metaschema_public.schema ms ON ms.id = as_.schema_id
-           WHERE as_.api_id = a.id),
-          ARRAY[]::text[]
-        ) as schemas
-      FROM services_public.domains dom
-      JOIN services_public.apis a ON a.id = dom.api_id
-      WHERE dom.domain = $1
-        AND ($2::text IS NULL AND dom.subdomain IS NULL OR dom.subdomain = $2)
-        AND a.is_public = $3
-    `;
-    
-    const result = await pool.query(query, [domain, subdomain, apiPublic]);
-    
-    if (result.rows.length === 0) {
+    const { schema, resolvedPreset, pgService } = await getServicesExecutor(opts);
+
+    log.debug(
+      `[domain-lookup] domain=${domain} subdomain=${subdomain} isPublic=${apiPublic}`
+    );
+
+    // Build context with withPgClient from the pgService
+    const contextValue: Record<string, unknown> = {
+      pgSettings: { role: 'administrator' },
+    };
+    // Add withPgClient using the pgService's key (default is 'withPgClient')
+    const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
+    contextValue[withPgClientKey] = withPgClientFromPgService.bind(
+      null,
+      pgService
+    );
+
+    // Fetch all domains and filter in code to avoid filter type issues with hostname domain
+    const document = getDomainLookupDocument(subdomain !== null);
+
+    const result = (await execute({
+      schema,
+      document,
+      contextValue,
+      resolvedPreset,
+    })) as ExecutionResult<DomainLookupResult>;
+
+    if (isDev()) {
+      log.debug(
+        `[domain-lookup] result nodes: ${result.data?.allDomains?.nodes?.length ?? 0}`
+      );
+    }
+
+    if (result.errors?.length) {
+      const errorMessages = result.errors
+        .map((e: GraphQLError) => e.message)
+        .join(', ');
+      log.debug(`GraphQL errors in domain lookup: ${errorMessages}`);
+      // Check if it's a "does not exist" error (schema not present)
+      if (errorMessages.includes('does not exist')) {
+        log.debug(`services_public schema not found, skipping domain lookup`);
+        return null;
+      }
+    }
+
+    // Filter results in code based on domain, subdomain, and api.isPublic
+    const matchingNode = result.data?.allDomains?.nodes?.find((node) => {
+      if (node.domain !== domain) return false;
+      if (subdomain === null) {
+        if (node.subdomain !== null && node.subdomain !== undefined)
+          return false;
+      } else {
+        if (node.subdomain !== subdomain) return false;
+      }
+      if (node.apiByApiId?.isPublic !== apiPublic) return false;
+      return true;
+    });
+
+    const apiData = matchingNode?.apiByApiId;
+    if (!apiData) {
+      log.debug(
+        `[domain-lookup] No API found for domain=${domain} subdomain=${subdomain} isPublic=${apiPublic}`
+      );
       return null;
     }
-    
-    const row = result.rows[0];
-    const apiStructure: ApiStructure = {
-      dbname: row.dbname || opts.pg?.database || '',
-      anonRole: row.anon_role || 'anon',
-      roleName: row.role_name || 'authenticated',
-      schema: row.schemas || [],
-      apiModules: [],
-      domains: [],
-      databaseId: row.database_id,
-      isPublic: row.is_public,
-    };
-    
+
+    const apiStructure = transformApiNodeToStructure(apiData, opts);
     svcCache.set(key, apiStructure);
     return apiStructure;
   } catch (err: any) {
@@ -215,7 +534,10 @@ const queryServiceByDomainAndSubdomain = async ({
 };
 
 /**
- * Query API by name using direct SQL
+ * Query API by name using Grafast GraphQL execution
+ *
+ * Uses the services GraphQL executor to query the services_public schema
+ * for API configuration based on database ID and API name.
  */
 export const queryServiceByApiName = async ({
   opts,
@@ -231,49 +553,76 @@ export const queryServiceByApiName = async ({
   name: string;
 }): Promise<ApiStructure | null> => {
   if (!databaseId) return null;
-  const apiPublic = opts.api?.isPublic;
-  
+  const apiPublic = opts.api?.isPublic ?? false;
+
   try {
-    const query = `
-      SELECT
-        a.id,
-        a.name,
-        a.database_id,
-        a.is_public,
-        a.anon_role,
-        a.role_name,
-        a.dbname,
-        COALESCE(
-          (SELECT array_agg(ms.schema_name)
-           FROM services_public.api_schemas as_
-           JOIN metaschema_public.schema ms ON ms.id = as_.schema_id
-           WHERE as_.api_id = a.id),
-          ARRAY[]::text[]
-        ) as schemas
-      FROM services_public.apis a
-      WHERE a.database_id = $1
-        AND a.name = $2
-        AND a.is_public = $3
-    `;
-    
-    const result = await pool.query(query, [databaseId, name, apiPublic]);
-    
-    if (result.rows.length === 0) {
+    const { schema, resolvedPreset, pgService } = await getServicesExecutor(opts);
+
+    log.debug(
+      `[api-name-lookup] databaseId=${databaseId} name=${name} isPublic=${apiPublic}`
+    );
+
+    // Build context with withPgClient from the pgService
+    const contextValue: Record<string, unknown> = {
+      pgSettings: { role: 'administrator' },
+    };
+    // Add withPgClient using the pgService's key (default is 'withPgClient')
+    const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
+    contextValue[withPgClientKey] = withPgClientFromPgService.bind(
+      null,
+      pgService
+    );
+
+    const result = (await execute({
+      schema,
+      document: getApiNameLookupDocument(),
+      variableValues: { databaseId, name, isPublic: apiPublic },
+      contextValue,
+      resolvedPreset,
+    })) as ExecutionResult<ApiNameLookupResult>;
+
+    if (isDev()) {
+      log.debug(`[api-name-lookup] found: ${result.data?.allApis?.nodes?.length ?? 0}`);
+    }
+
+    if (result.errors?.length) {
+      const errorMessages = result.errors
+        .map((e: GraphQLError) => e.message)
+        .join(', ');
+      log.debug(`GraphQL errors in API name lookup: ${errorMessages}`);
+      // Check if it's a "does not exist" error (schema not present)
+      if (errorMessages.includes('does not exist')) {
+        log.debug(`services_public schema not found, skipping API name lookup`);
+        return null;
+      }
+    }
+
+    const apiData = result.data?.allApis?.nodes?.[0];
+    if (!apiData) {
+      log.debug(`[api-name-lookup] No API found for databaseId=${databaseId} name=${name}`);
       return null;
     }
-    
-    const row = result.rows[0];
+
+    // Extract schemas from junction table with v5 default relation names
+    const schemas = apiData.apiSchemasByApiId?.nodes?.map(
+      (n) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+    ).filter((s): s is string => !!s) || [];
+
+    if (isDev()) {
+      log.debug(`[api-name-lookup] resolved schemas: [${schemas.join(', ')}]`);
+    }
+
     const apiStructure: ApiStructure = {
-      dbname: row.dbname || opts.pg?.database || '',
-      anonRole: row.anon_role || 'anon',
-      roleName: row.role_name || 'authenticated',
-      schema: row.schemas || [],
+      dbname: apiData.dbname || opts.pg?.database || '',
+      anonRole: apiData.anonRole || 'anon',
+      roleName: apiData.roleName || 'authenticated',
+      schema: schemas,
       apiModules: [],
       domains: [],
-      databaseId: row.database_id,
-      isPublic: row.is_public,
+      databaseId: apiData.databaseId,
+      isPublic: apiData.isPublic,
     };
-    
+
     svcCache.set(key, apiStructure);
     return apiStructure;
   } catch (err: any) {
