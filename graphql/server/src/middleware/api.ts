@@ -146,13 +146,6 @@ export const getSubdomain = (subdomains: string[]): string | null => {
   return filtered.length ? filtered.join('.') : null;
 };
 
-const getPortFromRequest = (req: Request): string => {
-  const host = req.headers.host;
-  if (!host) return '';
-  const parts = host.split(':');
-  return parts.length === 2 ? `:${parts[1]}` : '';
-};
-
 export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   const { domain, subdomains } = getUrlDomains(req);
   const baseKey = subdomains.filter((n) => n !== 'www').concat(domain).join('.');
@@ -336,8 +329,7 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
 };
 
 const buildDevFallbackError = async (
-  ctx: ResolveContext,
-  req: Request
+  ctx: ResolveContext
 ): Promise<ApiError | null> => {
   if (getNodeEnv() !== 'development') return null;
 
@@ -345,23 +337,36 @@ const buildDevFallbackError = async (
   const apis = await queryApiList(ctx.pool, isPublic);
   if (!apis.length) return null;
 
-  const port = getPortFromRequest(req);
-  const allDomains = apis.flatMap((api) =>
-    api.domains.map((d) => ({
-      href: d.subdomain
-        ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
-        : `http://${d.domain}${port}/graphiql`,
-    }))
-  );
+  const apiCards = apis.map((api) => {
+    const domainList = api.domains.length
+      ? api.domains.map((d) => {
+          const host = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
+          return `<li class="font-mono text-sm text-brand">${host}</li>`;
+        }).join('')
+      : '<li class="text-gray-400 italic">No domains configured</li>';
 
-  const linksHtml = allDomains.length
-    ? `<ul class="mt-4 pl-5 list-disc space-y-1">${allDomains
-        .map((d) => `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`)
-        .join('')}</ul>`
-    : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
+    return `
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-semibold text-gray-800">${api.name}</span>
+          <span class="text-xs px-2 py-0.5 rounded ${api.is_public ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+            ${api.is_public ? 'public' : 'private'}
+          </span>
+        </div>
+        <p class="text-xs text-gray-500 mb-3">db: ${api.dbname}</p>
+        <ul class="space-y-1">${domainList}</ul>
+      </div>`;
+  }).join('');
 
   return {
-    errorHtml: `<p class="text-sm text-gray-700">Try some of these:</p><div class="mt-4">${linksHtml}</div>`,
+    errorHtml: `
+      <div class="text-left max-w-md mx-auto">
+        <p class="text-sm text-gray-600 mb-4">Available APIs:</p>
+        <div class="space-y-3">${apiCards}</div>
+        <p class="text-xs text-gray-400 mt-4">
+          Add domains to /etc/hosts pointing to 127.0.0.1
+        </p>
+      </div>`,
   };
 };
 
@@ -444,7 +449,7 @@ export const getApiConfig = async (
     case 'domain-lookup':
       result = await resolveDomainLookup(ctx);
       if (!result && apiOpts.isPublic) {
-        const fallback = await buildDevFallbackError(ctx, req);
+        const fallback = await buildDevFallbackError(ctx);
         if (fallback) return fallback;
       }
       break;
