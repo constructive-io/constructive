@@ -29,7 +29,7 @@ const DOMAIN_LOOKUP_SQL = `
   FROM services_public.domains d
   JOIN services_public.apis a ON d.api_id = a.id
   LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
-  LEFT JOIN metaschema_public.schemas s ON aps.schema_id = s.id
+  LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
   WHERE d.domain = $1 
     AND (($2::text IS NULL AND d.subdomain IS NULL) OR d.subdomain = $2)
     AND a.is_public = $3
@@ -47,7 +47,7 @@ const API_NAME_LOOKUP_SQL = `
     COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
   FROM services_public.apis a
   LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
-  LEFT JOIN metaschema_public.schemas s ON aps.schema_id = s.id
+  LEFT JOIN metaschema_public.schema s ON aps.schema_id = s.id
   WHERE a.database_id = $1 
     AND a.name = $2
     AND a.is_public = $3

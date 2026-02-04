@@ -79,6 +79,11 @@ const createGraphileInstance = async (
         schemas,
       }),
     ],
+    grafserv: {
+      graphqlPath: '/graphql',
+      graphiqlPath: '/graphiql',
+      graphiql: true,
+    },
     grafast: {
       explain: process.env.NODE_ENV === 'development',
       context: (ctx: unknown) => {
