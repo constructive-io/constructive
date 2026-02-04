@@ -18,6 +18,7 @@ import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { favicon } from './middleware/favicon';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { normalizeServerOptions } from './options';
@@ -126,6 +127,7 @@ class Server {
     });
 
     healthz(app);
+    app.use(favicon);
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
