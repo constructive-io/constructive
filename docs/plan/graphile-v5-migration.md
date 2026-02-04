@@ -302,6 +302,48 @@ The codegen package uses PostGraphile introspection to generate types. This need
 
 **Reference:** `graphile repo's packages/codegen`
 
+### 7.2 Codegen Migration Details
+
+The current codegen (`graphql/codegen`) uses v4-based schema building via `buildSchemaSDLFromDatabase`. This needs to be updated to use v5's `makeSchema()` with `ConstructivePreset`.
+
+**Current v4 approach (graphql/codegen/src/core/introspect/source/database.ts):**
+```typescript
+import { buildSchemaSDLFromDatabase } from '../../database';
+
+// Uses PostGraphile v4 to build schema
+const sdl = await buildSchemaSDLFromDatabase({ database, schemas });
+const schema = buildSchema(sdl);
+const introspection = introspectionFromSchema(schema);
+```
+
+**Target v5 approach (from constructive-io/graphile/packages/codegen):**
+```typescript
+import { makeSchema } from 'postgraphile';
+import { makePgService } from 'postgraphile/adaptors/pg';
+import { ConstructivePreset } from 'graphile-settings';
+
+const preset: GraphileConfig.Preset = {
+  extends: [ConstructivePreset],
+  pgServices: [makePgService({ pool, schemas })],
+};
+
+const { schema } = await makeSchema(preset);
+const introspection = introspectionFromSchema(schema);
+```
+
+**Benefits of v5 approach:**
+1. Eliminates hardcoded exclusion patterns
+2. Generated SDKs match server schema exactly (same preset)
+3. Cleaner code generation
+4. Access to `_meta` schema for index information
+
+**Migration tasks:**
+1. Update `graphql/codegen/src/core/database/index.ts` to use v5's `makeSchema()`
+2. Update `DatabaseSchemaSource` to use the new schema builder
+3. Remove v4-specific exclusion patterns from introspection pipeline
+4. Update tests to work with v5 schema output
+5. Ensure generated types match v5 server schema
+
 ## Implementation Checklist
 
 ### Phase 1: Setup
