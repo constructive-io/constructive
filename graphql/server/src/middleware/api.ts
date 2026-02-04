@@ -329,7 +329,8 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
 };
 
 const buildDevFallbackError = async (
-  ctx: ResolveContext
+  ctx: ResolveContext,
+  req: Request
 ): Promise<ApiError | null> => {
   if (getNodeEnv() !== 'development') return null;
 
@@ -337,35 +338,46 @@ const buildDevFallbackError = async (
   const apis = await queryApiList(ctx.pool, isPublic);
   if (!apis.length) return null;
 
-  const apiCards = apis.map((api) => {
-    const domainList = api.domains.length
-      ? api.domains.map((d) => {
-          const host = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
-          return `<li class="font-mono text-sm text-brand">${host}</li>`;
-        }).join('')
-      : '<li class="text-gray-400 italic">No domains configured</li>';
+  const host = req.get('host') || '';
+  const portMatch = host.match(/:(\d+)$/);
+  const port = portMatch ? portMatch[1] : '';
 
-    return `
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-semibold text-gray-800">${api.name}</span>
-          <span class="text-xs px-2 py-0.5 rounded ${api.is_public ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
-            ${api.is_public ? 'public' : 'private'}
-          </span>
-        </div>
-        <p class="text-xs text-gray-500 mb-3">db: ${api.dbname}</p>
-        <ul class="space-y-1">${domainList}</ul>
-      </div>`;
+  const apiRows = apis.map((api) => {
+    const domains = api.domains.length
+      ? api.domains.map((d) => {
+          const hostname = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
+          const url = port ? `http://${hostname}:${port}/graphiql` : `http://${hostname}/graphiql`;
+          return `<a href="${url}" class="text-brand hover:underline">${hostname}</a>`;
+        }).join(', ')
+      : '<span style="color:#8E9398;font-style:italic">no domains</span>';
+
+    const badge = api.is_public
+      ? '<span style="background:#F5F8FF;color:#01A1FF;padding:1px 6px;border-radius:4px;font-size:10px">public</span>'
+      : '<span style="background:#F3F6FA;color:#8E9398;padding:1px 6px;border-radius:4px;font-size:10px">private</span>';
+
+    return `<tr style="border-bottom:1px solid #D4DCEA">
+      <td style="padding:6px 8px;font-weight:500;color:#232323">${api.name}</td>
+      <td style="padding:6px 8px;color:#8E9398;font-size:12px">${api.dbname}</td>
+      <td style="padding:6px 8px">${badge}</td>
+      <td style="padding:6px 8px;font-family:monospace;font-size:12px">${domains}</td>
+    </tr>`;
   }).join('');
 
   return {
     errorHtml: `
-      <div class="text-left max-w-md mx-auto">
-        <p class="text-sm text-gray-600 mb-4">Available APIs:</p>
-        <div class="space-y-3">${apiCards}</div>
-        <p class="text-xs text-gray-400 mt-4">
-          Add domains to /etc/hosts pointing to 127.0.0.1
-        </p>
+      <div style="text-align:left;max-width:700px;margin:0 auto">
+        <p style="color:#8E9398;font-size:14px;margin-bottom:12px">Available APIs:</p>
+        <table style="width:100%;border-collapse:collapse;background:#F3F6FA;border-radius:8px;overflow:hidden">
+          <thead>
+            <tr style="background:#D4DCEA">
+              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Name</th>
+              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Database</th>
+              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Type</th>
+              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Domains</th>
+            </tr>
+          </thead>
+          <tbody>${apiRows}</tbody>
+        </table>
       </div>`,
   };
 };
@@ -449,7 +461,7 @@ export const getApiConfig = async (
     case 'domain-lookup':
       result = await resolveDomainLookup(ctx);
       if (!result && apiOpts.isPublic) {
-        const fallback = await buildDevFallbackError(ctx);
+        const fallback = await buildDevFallbackError(ctx, req);
         if (fallback) return fallback;
       }
       break;
