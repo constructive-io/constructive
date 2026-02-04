@@ -47,9 +47,6 @@ const categorizeError = (err: Error): ErrorResponse => {
   if (err.message?.includes('timeout') || err.message?.includes('ETIMEDOUT')) {
     return { statusCode: 504, code: 'GATEWAY_TIMEOUT', message: sanitizeMessage(err), logLevel: 'error' };
   }
-  if (err.name === 'GraphQLError') {
-    return { statusCode: 400, code: 'GRAPHQL_ERROR', message: sanitizeMessage(err), logLevel: 'warn' };
-  }
   return { statusCode: 500, code: 'INTERNAL_ERROR', message: sanitizeMessage(err), logLevel: 'error' };
 };
 
