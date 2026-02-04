@@ -338,6 +338,66 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       },
 
       /**
+       * Simplify many-to-many relation field names with conflict detection.
+       *
+       * Default pg-many-to-many naming: tagsByPostTagPostIdAndTagId
+       * Our simplified naming: tags
+       *
+       * Falls back to verbose naming if:
+       * - Smart tag override exists (manyToManyFieldName)
+       * - There's a direct relation to the same target table (would conflict)
+       * - There are multiple many-to-many relations to the same target table
+       */
+      _manyToManyRelation(previous, _options, details) {
+        const { leftTable, rightTable, junctionTable, rightRelationName } =
+          details;
+
+        const junctionRightRelation = junctionTable.getRelation(rightRelationName);
+        const baseOverride =
+          junctionRightRelation.extensions?.tags?.manyToManyFieldName;
+        if (typeof baseOverride === 'string') {
+          return baseOverride;
+        }
+
+        const simpleName = camelize(
+          distinctPluralize(this._singularizedCodecName(rightTable.codec)),
+          true
+        );
+
+        const leftRelations = leftTable.getRelations();
+        let hasDirectRelation = false;
+        let manyToManyCount = 0;
+
+        for (const [_relName, rel] of Object.entries(leftRelations)) {
+          if (rel.remoteResource?.codec?.name === rightTable.codec.name) {
+            if (!rel.isReferencee) {
+              hasDirectRelation = true;
+            }
+          }
+          if (
+            rel.isReferencee &&
+            rel.remoteResource?.codec?.name !== rightTable.codec.name
+          ) {
+            const junctionRelations = rel.remoteResource?.getRelations?.() || {};
+            for (const [_jRelName, jRel] of Object.entries(junctionRelations)) {
+              if (
+                !jRel.isReferencee &&
+                jRel.remoteResource?.codec?.name === rightTable.codec.name
+              ) {
+                manyToManyCount++;
+              }
+            }
+          }
+        }
+
+        if (hasDirectRelation || manyToManyCount > 1) {
+          return previous!(details);
+        }
+
+        return simpleName;
+      },
+
+      /**
        * Shorten primary key lookups (userById -> user)
        */
       rowByUnique(previous, _options, details) {

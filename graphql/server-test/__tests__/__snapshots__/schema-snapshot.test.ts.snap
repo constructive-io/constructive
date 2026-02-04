@@ -237,7 +237,7 @@ type Post {
   updatedAt: Datetime
 
   """Reads and enables pagination through a set of \`Tag\`."""
-  tagsByPostTagPostIdAndTagId(
+  tags(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -268,7 +268,7 @@ type Post {
 
     """The method to use when ordering \`Tag\`."""
     orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostTagsByPostTagPostIdAndTagIdManyToManyConnection!
+  ): PostTagsManyToManyConnection!
 
   """Reads a single \`User\` that is related to this \`Post\`."""
   author: User
@@ -343,14 +343,14 @@ type Post {
 }
 
 """A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
-type PostTagsByPostTagPostIdAndTagIdManyToManyConnection {
+type PostTagsManyToManyConnection {
   """A list of \`Tag\` objects."""
   nodes: [Tag]!
 
   """
   A list of edges which contains the \`Tag\`, info from the \`PostTag\`, and the cursor to aid in pagination.
   """
-  edges: [PostTagsByPostTagPostIdAndTagIdManyToManyEdge!]!
+  edges: [PostTagsManyToManyEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -368,7 +368,7 @@ type Tag {
   createdAt: Datetime
 
   """Reads and enables pagination through a set of \`Post\`."""
-  postsByPostTagTagIdAndPostId(
+  posts(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -399,7 +399,7 @@ type Tag {
 
     """The method to use when ordering \`Post\`."""
     orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TagPostsByPostTagTagIdAndPostIdManyToManyConnection!
+  ): TagPostsManyToManyConnection!
 
   """Reads and enables pagination through a set of \`PostTag\`."""
   postTags(
@@ -437,14 +437,14 @@ type Tag {
 }
 
 """A connection to a list of \`Post\` values, with data from \`PostTag\`."""
-type TagPostsByPostTagTagIdAndPostIdManyToManyConnection {
+type TagPostsManyToManyConnection {
   """A list of \`Post\` objects."""
   nodes: [Post]!
 
   """
   A list of edges which contains the \`Post\`, info from the \`PostTag\`, and the cursor to aid in pagination.
   """
-  edges: [TagPostsByPostTagTagIdAndPostIdManyToManyEdge!]!
+  edges: [TagPostsManyToManyEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -454,7 +454,7 @@ type TagPostsByPostTagTagIdAndPostIdManyToManyConnection {
 }
 
 """A \`Post\` edge in the connection, with data from \`PostTag\`."""
-type TagPostsByPostTagTagIdAndPostIdManyToManyEdge {
+type TagPostsManyToManyEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
@@ -941,7 +941,7 @@ enum PostTagOrderBy {
 }
 
 """A \`Tag\` edge in the connection, with data from \`PostTag\`."""
-type PostTagsByPostTagPostIdAndTagIdManyToManyEdge {
+type PostTagsManyToManyEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
