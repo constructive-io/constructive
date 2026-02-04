@@ -127,26 +127,26 @@ const getServicesExecutor = async (opts: ApiOptions): Promise<{
 /**
  * GraphQL query for looking up API by domain and subdomain (with subdomain value)
  * Note: We fetch all domains and filter in code to avoid filter type issues
- * Uses v5 default naming with proper relation names:
- * - apiByApiId for domain -> api relation (services_public tables don't get schema prefix)
- * - apiSchemasByApiId for api -> api_schemas relation
- * - metaschemaPublicSchemaBySchemaId for api_schema -> schema relation (cross-schema relation)
+ * Uses inflector naming with proper relation names:
+ * - api for domain -> api relation
+ * - apiSchemas for api -> api_schemas relation
+ * - schema for api_schema -> schema relation (cross-schema relation)
  */
 const DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN = `
   query QueryServiceByDomainAndSubdomain {
-    allDomains(first: 100) {
+    domains(first: 100) {
       nodes {
         domain
         subdomain
-        apiByApiId {
+        api {
           databaseId
           dbname
           roleName
           anonRole
           isPublic
-          apiSchemasByApiId(first: 1000) {
+          apiSchemas(first: 1000) {
             nodes {
-              metaschemaPublicSchemaBySchemaId {
+              schema {
                 schemaName
               }
             }
@@ -160,23 +160,23 @@ const DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN = `
 /**
  * GraphQL query for looking up API by domain with null subdomain
  * Note: We use the same query for both cases and filter in code
- * Uses v5 default naming with proper relation names
+ * Uses inflector naming with proper relation names
  */
 const DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN = `
   query QueryServiceByDomainNullSubdomain {
-    allDomains(first: 100) {
+    domains(first: 100) {
       nodes {
         domain
         subdomain
-        apiByApiId {
+        api {
           databaseId
           dbname
           roleName
           anonRole
           isPublic
-          apiSchemasByApiId(first: 1000) {
+          apiSchemas(first: 1000) {
             nodes {
-              metaschemaPublicSchemaBySchemaId {
+              schema {
                 schemaName
               }
             }
@@ -189,13 +189,13 @@ const DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN = `
 
 /**
  * GraphQL query for looking up API by database ID and name
- * Uses junction table approach with v5 default relation names:
- * - apiSchemasByApiId for api -> api_schemas relation (services_public tables don't get schema prefix)
- * - metaschemaPublicSchemaBySchemaId for api_schema -> schema relation (cross-schema relation)
+ * Uses junction table approach with inflector relation names:
+ * - apiSchemas for api -> api_schemas relation
+ * - schema for api_schema -> schema relation (cross-schema relation)
  */
 const API_NAME_LOOKUP_QUERY = `
   query QueryServiceByApiName($databaseId: UUID!, $name: String!, $isPublic: Boolean!) {
-    allApis(first: 1, filter: {
+    apis(first: 1, filter: {
       databaseId: { equalTo: $databaseId }
       name: { equalTo: $name }
       isPublic: { equalTo: $isPublic }
@@ -206,9 +206,9 @@ const API_NAME_LOOKUP_QUERY = `
         roleName
         anonRole
         isPublic
-        apiSchemasByApiId(first: 1000) {
+        apiSchemas(first: 1000) {
           nodes {
-            metaschemaPublicSchemaBySchemaId {
+            schema {
               schemaName
             }
           }
@@ -246,7 +246,7 @@ const getApiNameLookupDocument = (): DocumentNode => {
 
 // Type definitions for GraphQL response
 interface ApiSchemaNodeData {
-  metaschemaPublicSchemaBySchemaId?: { schemaName?: string };
+  schema?: { schemaName?: string };
 }
 
 interface ApiNodeData {
@@ -255,10 +255,9 @@ interface ApiNodeData {
   roleName?: string;
   anonRole?: string;
   isPublic?: boolean;
-  // Junction table approach with v5 default relation names:
-  // apiSchemasByApiId -> metaschemaPublicSchemaBySchemaId -> schemaName
-  // (services_public tables don't get schema prefix in v5 default naming)
-  apiSchemasByApiId?: {
+  // Junction table approach with inflector relation names:
+  // apiSchemas -> schema -> schemaName
+  apiSchemas?: {
     nodes?: ApiSchemaNodeData[];
   };
 }
@@ -266,34 +265,33 @@ interface ApiNodeData {
 interface DomainNodeData {
   domain?: string;
   subdomain?: string | null;
-  apiByApiId?: ApiNodeData;
+  api?: ApiNodeData;
 }
 
 interface DomainLookupResult {
-  allDomains?: {
+  domains?: {
     nodes?: DomainNodeData[];
   };
 }
 
 interface ApiNameLookupResult {
-  allApis?: {
+  apis?: {
     nodes?: ApiNodeData[];
   };
 }
 
 /**
  * Transform API node data to ApiStructure
- * Uses junction table approach with v5 default relation names:
- * apiSchemasByApiId -> metaschemaPublicSchemaBySchemaId -> schemaName
- * (services_public tables don't get schema prefix in v5 default naming)
+ * Uses junction table approach with inflector relation names:
+ * apiSchemas -> schema -> schemaName
  */
 const transformApiNodeToStructure = (
   apiData: ApiNodeData,
   opts: ApiOptions
 ): ApiStructure => {
   // Extract schemas from junction table
-  const schemas = apiData.apiSchemasByApiId?.nodes?.map(
-    (n: ApiSchemaNodeData) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+  const schemas = apiData.apiSchemas?.nodes?.map(
+    (n: ApiSchemaNodeData) => n.schema?.schemaName
   ).filter((s: string | undefined): s is string => !!s) || [];
 
   return {
@@ -484,7 +482,7 @@ const queryServiceByDomainAndSubdomain = async ({
 
     if (isDev()) {
       log.debug(
-        `[domain-lookup] result nodes: ${result.data?.allDomains?.nodes?.length ?? 0}`
+        `[domain-lookup] result nodes: ${result.data?.domains?.nodes?.length ?? 0}`
       );
     }
 
@@ -501,7 +499,7 @@ const queryServiceByDomainAndSubdomain = async ({
     }
 
     // Filter results in code based on domain, subdomain, and api.isPublic
-    const matchingNode = result.data?.allDomains?.nodes?.find((node: DomainNodeData) => {
+    const matchingNode = result.data?.domains?.nodes?.find((node: DomainNodeData) => {
       if (node.domain !== domain) return false;
       if (subdomain === null) {
         if (node.subdomain !== null && node.subdomain !== undefined)
@@ -509,11 +507,11 @@ const queryServiceByDomainAndSubdomain = async ({
       } else {
         if (node.subdomain !== subdomain) return false;
       }
-      if (node.apiByApiId?.isPublic !== apiPublic) return false;
+      if (node.api?.isPublic !== apiPublic) return false;
       return true;
     });
 
-    const apiData = matchingNode?.apiByApiId;
+    const apiData = matchingNode?.api;
     if (!apiData) {
       log.debug(
         `[domain-lookup] No API found for domain=${domain} subdomain=${subdomain} isPublic=${apiPublic}`
@@ -582,7 +580,7 @@ export const queryServiceByApiName = async ({
     })) as ExecutionResult<ApiNameLookupResult>;
 
     if (isDev()) {
-      log.debug(`[api-name-lookup] found: ${result.data?.allApis?.nodes?.length ?? 0}`);
+      log.debug(`[api-name-lookup] found: ${result.data?.apis?.nodes?.length ?? 0}`);
     }
 
     if (result.errors?.length) {
@@ -597,15 +595,15 @@ export const queryServiceByApiName = async ({
       }
     }
 
-    const apiData = result.data?.allApis?.nodes?.[0];
+    const apiData = result.data?.apis?.nodes?.[0];
     if (!apiData) {
       log.debug(`[api-name-lookup] No API found for databaseId=${databaseId} name=${name}`);
       return null;
     }
 
-    // Extract schemas from junction table with v5 default relation names
-    const schemas = apiData.apiSchemasByApiId?.nodes?.map(
-      (n: ApiSchemaNodeData) => n.metaschemaPublicSchemaBySchemaId?.schemaName
+    // Extract schemas from junction table with inflector relation names
+    const schemas = apiData.apiSchemas?.nodes?.map(
+      (n: ApiSchemaNodeData) => n.schema?.schemaName
     ).filter((s: string | undefined): s is string => !!s) || [];
 
     if (isDev()) {

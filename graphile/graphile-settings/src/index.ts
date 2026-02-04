@@ -3,6 +3,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
 import { makePgService } from 'postgraphile/adaptors/pg';
+import { InflektPreset } from 'graphile-simple-inflector';
 
 // Import default presets from graphile-build and graphile-build-pg
 // The defaultPreset from each package includes all the standard plugins
@@ -27,14 +28,15 @@ import 'graphile-build';
  * This provides the core functionality using the default presets from
  * graphile-build and graphile-build-pg, which include all standard plugins.
  *
- * Note: We do NOT include SimplifyInflection, so field names use v5 defaults:
- * - Tables: allUsers, allPosts (with 'all' prefix)
- * - Schema-prefixed: allAppPublicUsers, allServicesPublicApis
+ * Includes InflektPreset for simplified field names:
+ * - Tables: users, posts (without 'all' prefix)
+ * - No schema prefixes for cleaner naming
+ * - id columns stay as 'id' (not renamed to 'rowId')
  *
  * We disable NodePlugin to keep `id` as `id` instead of converting to global Node IDs.
  */
 export const MinimalPreset: GraphileConfig.Preset = {
-  extends: [graphileBuildDefaultPreset, graphileBuildPgDefaultPreset],
+  extends: [graphileBuildDefaultPreset, graphileBuildPgDefaultPreset, InflektPreset],
   disablePlugins: ['NodePlugin'],
 };
 

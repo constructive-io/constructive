@@ -58,19 +58,22 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
 
   // Execute using grafast - the v5 execution engine
   // grafast provides the context including withPgClient for database access
+  // Note: pgSettings should only be passed in requestContext, NOT contextValue,
+  // to avoid "Key 'pgSettings' already set on the context" error from PgContextPlugin
   const result = await grafast({
     schema,
     source,
     variableValues: variables ?? undefined,
     resolvedPreset,
     requestContext: {
-      // Provide the pg client for direct database access
+      // Provide the pg settings for database context
       pgSettings,
-      // Additional context from request options
-      ...reqOptions,
+      // Additional context from request options (excluding pgSettings to avoid duplication)
+      ...Object.fromEntries(
+        Object.entries(reqOptions).filter(([key]) => key !== 'pgSettings')
+      ),
     },
     contextValue: {
-      pgSettings,
       // withPgClient is handled by grafast/grafserv automatically
       // but for testing we can provide direct access
       pgClient,

@@ -216,9 +216,6 @@ importers:
       '@graphile-contrib/pg-many-to-many':
         specifier: 2.0.0-rc.1
         version: 2.0.0-rc.1
-      '@graphile/simplify-inflection':
-        specifier: 8.0.0-rc.3
-        version: 8.0.0-rc.3
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
@@ -240,6 +237,9 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
+      graphile-simple-inflector:
+        specifier: workspace:^
+        version: link:../graphile-simple-inflector/dist
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
@@ -283,6 +283,35 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.7)(typescript@5.9.3)
+    publishDirectory: dist
+
+  graphile/graphile-simple-inflector:
+    dependencies:
+      graphile-build:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
+      inflekt:
+        specifier: ^0.3.0
+        version: 0.3.0
+    devDependencies:
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      graphql-tag:
+        specifier: 2.12.6
+        version: 2.12.6(graphql@16.12.0)
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   graphile/graphile-test:
