@@ -5,317 +5,134 @@ import { parseUrl } from '@constructive-io/url-domains';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
-import { getPgEnvOptions } from 'pg-env';
-import { execute } from 'grafast';
-import { postgraphile, type PostGraphileInstance } from 'postgraphile';
-import { ConstructivePreset, makePgService } from 'graphile-settings';
-import { withPgClientFromPgService } from 'graphile-build-pg';
-import {
-  parse,
-  type GraphQLSchema,
-  type DocumentNode,
-  type ExecutionResult,
-  type GraphQLError,
-} from 'graphql';
-import type { GraphileConfig } from 'graphile-config';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
-import './types'; // for Request type
+import './types';
 
 const log = new Logger('api');
 const isDev = () => getNodeEnv() === 'development';
 
 // =============================================================================
-// Services GraphQL Executor - Grafast-based queries for services_public
+// SQL Queries
 // =============================================================================
 
-/**
- * Cache entry for services PostGraphile instance
- */
-interface ServicesExecutorEntry {
-  pgl: PostGraphileInstance;
-  schema: GraphQLSchema;
-  resolvedPreset: GraphileConfig.ResolvedPreset;
-  pgService: ReturnType<typeof makePgService>;
-}
+const DOMAIN_LOOKUP_SQL = `
+  SELECT 
+    a.database_id,
+    a.dbname,
+    a.role_name,
+    a.anon_role,
+    a.is_public,
+    COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
+  FROM services_public.domains d
+  JOIN services_public.apis a ON d.api_id = a.id
+  LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
+  LEFT JOIN metaschema_public.schemas s ON aps.schema_id = s.id
+  WHERE d.domain = $1 
+    AND (($2::text IS NULL AND d.subdomain IS NULL) OR d.subdomain = $2)
+    AND a.is_public = $3
+  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_public
+  LIMIT 1
+`;
 
-/**
- * Cache for services PostGraphile instances, keyed by connection string
- * This allows different databases to have their own executor
- */
-const servicesExecutorCache = new Map<string, ServicesExecutorEntry>();
+const API_NAME_LOOKUP_SQL = `
+  SELECT 
+    a.database_id,
+    a.dbname,
+    a.role_name,
+    a.anon_role,
+    a.is_public,
+    COALESCE(array_agg(s.schema_name) FILTER (WHERE s.schema_name IS NOT NULL), '{}') as schemas
+  FROM services_public.apis a
+  LEFT JOIN services_public.api_schemas aps ON a.id = aps.api_id
+  LEFT JOIN metaschema_public.schemas s ON aps.schema_id = s.id
+  WHERE a.database_id = $1 
+    AND a.name = $2
+    AND a.is_public = $3
+  GROUP BY a.id, a.database_id, a.dbname, a.role_name, a.anon_role, a.is_public
+  LIMIT 1
+`;
 
-/**
- * Build connection string from pg config components
- */
-const buildConnectionString = (
-  user: string,
-  password: string,
-  host: string,
-  port: string | number,
-  database: string
-): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
-
-/**
- * Get or create the services GraphQL executor for a specific database
- *
- * This creates a dedicated PostGraphile instance for querying the services_public
- * and metaschema_public schemas with administrator role. The instance is cached
- * per connection string for reuse across requests to the same database.
- */
-const getServicesExecutor = async (opts: ApiOptions): Promise<{
-  schema: GraphQLSchema;
-  resolvedPreset: GraphileConfig.ResolvedPreset;
-  pgService: ReturnType<typeof makePgService>;
-}> => {
-  const pgConfig = getPgEnvOptions(opts.pg);
-  const connectionString = buildConnectionString(
-    pgConfig.user,
-    pgConfig.password,
-    pgConfig.host,
-    pgConfig.port,
-    pgConfig.database
-  );
-
-  const cached = servicesExecutorCache.get(connectionString);
-  if (cached) {
-    return {
-      schema: cached.schema,
-      resolvedPreset: cached.resolvedPreset,
-      pgService: cached.pgService,
-    };
-  }
-
-  const pgService = makePgService({
-    connectionString,
-    schemas: ['services_public', 'metaschema_public'],
-  });
-
-  const preset: GraphileConfig.Preset = {
-    extends: [ConstructivePreset],
-    pgServices: [pgService],
-    grafast: {
-      context: () => ({
-        pgSettings: { role: 'administrator' },
-      }),
-    },
-  };
-
-  const pgl = postgraphile(preset);
-  const schema = await pgl.getSchema();
-  const resolvedPreset = pgl.getResolvedPreset();
-
-  servicesExecutorCache.set(connectionString, {
-    pgl,
-    schema,
-    resolvedPreset,
-    pgService,
-  });
-  log.debug(`Services GraphQL executor initialized for ${pgConfig.database}`);
-
-  return { schema, resolvedPreset, pgService };
-};
+const API_LIST_SQL = `
+  SELECT 
+    a.id,
+    a.database_id,
+    a.name,
+    a.dbname,
+    a.role_name,
+    a.anon_role,
+    a.is_public,
+    COALESCE(
+      json_agg(
+        json_build_object('domain', d.domain, 'subdomain', d.subdomain)
+      ) FILTER (WHERE d.domain IS NOT NULL),
+      '[]'
+    ) as domains
+  FROM services_public.apis a
+  LEFT JOIN services_public.domains d ON a.id = d.api_id
+  WHERE a.is_public = $1
+  GROUP BY a.id, a.database_id, a.name, a.dbname, a.role_name, a.anon_role, a.is_public
+  LIMIT 100
+`;
 
 // =============================================================================
-// GraphQL Query Definitions
+// Types
 // =============================================================================
 
-/**
- * GraphQL query for looking up API by domain and subdomain (with subdomain value)
- * Note: We fetch all domains and filter in code to avoid filter type issues
- * Uses inflector naming with proper relation names:
- * - api for domain -> api relation
- * - apiSchemas for api -> api_schemas relation
- * - schema for api_schema -> schema relation (cross-schema relation)
- */
-const DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN = `
-  query QueryServiceByDomainAndSubdomain {
-    domains(first: 100) {
-      nodes {
-        domain
-        subdomain
-        api {
-          databaseId
-          dbname
-          roleName
-          anonRole
-          isPublic
-          apiSchemas(first: 1000) {
-            nodes {
-              schema {
-                schemaName
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * GraphQL query for looking up API by domain with null subdomain
- * Note: We use the same query for both cases and filter in code
- * Uses inflector naming with proper relation names
- */
-const DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN = `
-  query QueryServiceByDomainNullSubdomain {
-    domains(first: 100) {
-      nodes {
-        domain
-        subdomain
-        api {
-          databaseId
-          dbname
-          roleName
-          anonRole
-          isPublic
-          apiSchemas(first: 1000) {
-            nodes {
-              schema {
-                schemaName
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * GraphQL query for looking up API by database ID and name
- * Uses junction table approach with inflector relation names:
- * - apiSchemas for api -> api_schemas relation
- * - schema for api_schema -> schema relation (cross-schema relation)
- */
-const API_NAME_LOOKUP_QUERY = `
-  query QueryServiceByApiName($databaseId: UUID!, $name: String!, $isPublic: Boolean!) {
-    apis(first: 1, filter: {
-      databaseId: { equalTo: $databaseId }
-      name: { equalTo: $name }
-      isPublic: { equalTo: $isPublic }
-    }) {
-      nodes {
-        databaseId
-        dbname
-        roleName
-        anonRole
-        isPublic
-        apiSchemas(first: 1000) {
-          nodes {
-            schema {
-              schemaName
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-// Cache parsed documents for performance
-let domainLookupWithSubdomainDocument: DocumentNode | null = null;
-let domainLookupNullSubdomainDocument: DocumentNode | null = null;
-let apiNameLookupDocument: DocumentNode | null = null;
-
-const getDomainLookupDocument = (hasSubdomain: boolean): DocumentNode => {
-  if (hasSubdomain) {
-    if (!domainLookupWithSubdomainDocument) {
-      domainLookupWithSubdomainDocument = parse(DOMAIN_LOOKUP_QUERY_WITH_SUBDOMAIN);
-    }
-    return domainLookupWithSubdomainDocument;
-  } else {
-    if (!domainLookupNullSubdomainDocument) {
-      domainLookupNullSubdomainDocument = parse(DOMAIN_LOOKUP_QUERY_NULL_SUBDOMAIN);
-    }
-    return domainLookupNullSubdomainDocument;
-  }
-};
-
-const getApiNameLookupDocument = (): DocumentNode => {
-  if (!apiNameLookupDocument) {
-    apiNameLookupDocument = parse(API_NAME_LOOKUP_QUERY);
-  }
-  return apiNameLookupDocument;
-};
-
-// Type definitions for GraphQL response
-interface ApiSchemaNodeData {
-  schema?: { schemaName?: string };
+interface ApiRow {
+  database_id: string;
+  dbname: string;
+  role_name: string;
+  anon_role: string;
+  is_public: boolean;
+  schemas: string[];
 }
 
-interface ApiNodeData {
-  databaseId?: string;
-  dbname?: string;
-  roleName?: string;
-  anonRole?: string;
-  isPublic?: boolean;
-  // Junction table approach with inflector relation names:
-  // apiSchemas -> schema -> schemaName
-  apiSchemas?: {
-    nodes?: ApiSchemaNodeData[];
+interface ApiListRow {
+  id: string;
+  database_id: string;
+  name: string;
+  dbname: string;
+  role_name: string;
+  anon_role: string;
+  is_public: boolean;
+  domains: Array<{ domain: string; subdomain: string | null }>;
+}
+
+interface ResolveContext {
+  opts: ApiOptions;
+  pool: Pool;
+  domain: string;
+  subdomain: string | null;
+  cacheKey: string;
+  headers: {
+    schemata?: string;
+    apiName?: string;
+    metaSchema?: string;
+    databaseId?: string;
   };
 }
 
-interface DomainNodeData {
-  domain?: string;
-  subdomain?: string | null;
-  api?: ApiNodeData;
-}
+type ResolutionMode = 
+  | 'services-disabled'
+  | 'schemata-header'
+  | 'api-name-header'
+  | 'meta-schema-header'
+  | 'domain-lookup';
 
-interface DomainLookupResult {
-  domains?: {
-    nodes?: DomainNodeData[];
-  };
-}
+// =============================================================================
+// Helpers
+// =============================================================================
 
-interface ApiNameLookupResult {
-  apis?: {
-    nodes?: ApiNodeData[];
-  };
-}
-
-/**
- * Transform API node data to ApiStructure
- * Uses junction table approach with inflector relation names:
- * apiSchemas -> schema -> schemaName
- */
-const transformApiNodeToStructure = (
-  apiData: ApiNodeData,
-  opts: ApiOptions
-): ApiStructure => {
-  // Extract schemas from junction table
-  const schemas = apiData.apiSchemas?.nodes?.map(
-    (n: ApiSchemaNodeData) => n.schema?.schemaName
-  ).filter((s: string | undefined): s is string => !!s) || [];
-
-  return {
-    dbname: apiData.dbname || opts.pg?.database || '',
-    anonRole: apiData.anonRole || 'anon',
-    roleName: apiData.roleName || 'authenticated',
-    schema: schemas,
-    apiModules: [],
-    domains: [],
-    databaseId: apiData.databaseId,
-    isPublic: apiData.isPublic,
-  };
-};
-
-const isApiError = (svc: ApiConfigResult): svc is ApiError =>
-  !!svc && typeof (svc as ApiError).errorHtml === 'string';
+const isApiError = (result: ApiConfigResult): result is ApiError =>
+  !!result && typeof (result as ApiError).errorHtml === 'string';
 
 const parseCommaSeparatedHeader = (value: string): string[] =>
-  value
-    .split(',')
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
+  value.split(',').map((s) => s.trim()).filter(Boolean);
 
-const getUrlDomains = (
-  req: Request
-): { domain: string; subdomains: string[] } => {
+const getUrlDomains = (req: Request): { domain: string; subdomains: string[] } => {
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const parsed = parseUrl(fullUrl);
   return {
@@ -324,448 +141,378 @@ const getUrlDomains = (
   };
 };
 
-export const getSubdomain = (reqDomains: string[]): string | null => {
-  const names = reqDomains.filter((name) => !['www'].includes(name));
-  return !names.length ? null : names.join('.');
+export const getSubdomain = (subdomains: string[]): string | null => {
+  const filtered = subdomains.filter((name) => name !== 'www');
+  return filtered.length ? filtered.join('.') : null;
 };
 
-export const createApiMiddleware = (opts: ApiOptions) => {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    // Log incoming request details at debug level to avoid excessive info logs in production
-    log.debug(`[api-middleware] Request: ${req.method} ${req.path}`);
-    log.debug(`[api-middleware] Headers: X-Api-Name=${req.get('X-Api-Name')}, X-Database-Id=${req.get('X-Database-Id')}, X-Meta-Schema=${req.get('X-Meta-Schema')}, Host=${req.get('Host')}`);
-
-    if (opts.api?.enableServicesApi === false) {
-      const schemas = opts.api.exposedSchemas ?? [];
-      const anonRole = opts.api.anonRole ?? '';
-      const roleName = opts.api.roleName ?? '';
-      const databaseId = opts.api.defaultDatabaseId;
-      const api: ApiStructure = {
-        dbname: opts.pg?.database ?? '',
-        anonRole,
-        roleName,
-        schema: schemas,
-        apiModules: [],
-        domains: [],
-        databaseId,
-        isPublic: false,
-      };
-      req.api = api;
-      req.databaseId = databaseId;
-      req.svc_key = 'meta-api-off';
-      return next();
-    }
-    try {
-      const apiConfig = await getApiConfig(opts, req);
-
-      if (isApiError(apiConfig)) {
-        res
-          .status(404)
-          .send(errorPage404Message('API not found', apiConfig.errorHtml));
-        return;
-      } else if (!apiConfig) {
-        res
-          .status(404)
-          .send(
-            errorPage404Message(
-              'API service not found for the given domain/subdomain.'
-            )
-          );
-        return;
-      }
-      req.api = apiConfig;
-      req.databaseId = apiConfig.databaseId;
-      if (isDev())
-        log.debug(
-          `Resolved API: db=${apiConfig.dbname}, schemas=[${apiConfig.schema?.join(', ')}]`
-        );
-      next();
-    } catch (error: unknown) {
-      const err = error as Error & { code?: string };
-      if (err.code === 'NO_VALID_SCHEMAS') {
-        res.status(404).send(errorPage404Message(err.message));
-      } else if (err.message?.match(/does not exist/)) {
-        res
-          .status(404)
-          .send(
-            errorPage404Message(
-              "The resource you're looking for does not exist."
-            )
-          );
-      } else {
-        log.error('API middleware error:', err);
-        res.status(500).send(errorPage50x);
-      }
-    }
-  };
-};
-
-const createAdminApiStructure = ({
-  opts,
-  schemata,
-  key,
-  databaseId,
-}: {
-  opts: ApiOptions;
-  schemata: string[];
-  key: string;
-  databaseId?: string;
-}): ApiStructure => {
-  const api: ApiStructure = {
-    dbname: opts.pg?.database ?? '',
-    anonRole: 'administrator',
-    roleName: 'administrator',
-    schema: schemata,
-    apiModules: [],
-    domains: [],
-    databaseId,
-    isPublic: false,
-  };
-  svcCache.set(key, api);
-  return api;
-};
-
-/**
- * Query API by domain and subdomain using Grafast GraphQL execution
- *
- * Uses the services GraphQL executor to query the services_public schema
- * for API configuration based on domain and subdomain.
- */
-const queryServiceByDomainAndSubdomain = async ({
-  opts,
-  key,
-  pool,
-  domain,
-  subdomain,
-}: {
-  opts: ApiOptions;
-  key: string;
-  pool: Pool;
-  domain: string;
-  subdomain: string | null;
-}): Promise<ApiStructure | null> => {
-  const apiPublic = opts.api?.isPublic ?? false;
-
-  try {
-    const { schema, resolvedPreset, pgService } = await getServicesExecutor(opts);
-
-    log.debug(
-      `[domain-lookup] domain=${domain} subdomain=${subdomain} isPublic=${apiPublic}`
-    );
-
-    // Build context with withPgClient from the pgService
-    const contextValue: Record<string, unknown> = {
-      pgSettings: { role: 'administrator' },
-    };
-    // Add withPgClient using the pgService's key (default is 'withPgClient')
-    const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
-    contextValue[withPgClientKey] = withPgClientFromPgService.bind(
-      null,
-      pgService
-    );
-
-    // Fetch all domains and filter in code to avoid filter type issues with hostname domain
-    const document = getDomainLookupDocument(subdomain !== null);
-
-    const result = (await execute({
-      schema,
-      document,
-      contextValue,
-      resolvedPreset,
-    })) as ExecutionResult<DomainLookupResult>;
-
-    if (isDev()) {
-      log.debug(
-        `[domain-lookup] result nodes: ${result.data?.domains?.nodes?.length ?? 0}`
-      );
-    }
-
-    if (result.errors?.length) {
-      const errorMessages = result.errors
-        .map((e: GraphQLError) => e.message)
-        .join(', ');
-      log.debug(`GraphQL errors in domain lookup: ${errorMessages}`);
-      // Check if it's a "does not exist" error (schema not present)
-      if (errorMessages.includes('does not exist')) {
-        log.debug(`services_public schema not found, skipping domain lookup`);
-        return null;
-      }
-    }
-
-    // Filter results in code based on domain, subdomain, and api.isPublic
-    const matchingNode = result.data?.domains?.nodes?.find((node: DomainNodeData) => {
-      if (node.domain !== domain) return false;
-      if (subdomain === null) {
-        if (node.subdomain !== null && node.subdomain !== undefined)
-          return false;
-      } else {
-        if (node.subdomain !== subdomain) return false;
-      }
-      if (node.api?.isPublic !== apiPublic) return false;
-      return true;
-    });
-
-    const apiData = matchingNode?.api;
-    if (!apiData) {
-      log.debug(
-        `[domain-lookup] No API found for domain=${domain} subdomain=${subdomain} isPublic=${apiPublic}`
-      );
-      return null;
-    }
-
-    const apiStructure = transformApiNodeToStructure(apiData, opts);
-    svcCache.set(key, apiStructure);
-    return apiStructure;
-  } catch (err: any) {
-    if (err.message?.includes('does not exist')) {
-      log.debug(`services_public schema not found, skipping domain lookup`);
-      return null;
-    }
-    throw err;
-  }
-};
-
-/**
- * Query API by name using Grafast GraphQL execution
- *
- * Uses the services GraphQL executor to query the services_public schema
- * for API configuration based on database ID and API name.
- */
-export const queryServiceByApiName = async ({
-  opts,
-  key,
-  pool,
-  databaseId,
-  name,
-}: {
-  opts: ApiOptions;
-  key: string;
-  pool: Pool;
-  databaseId?: string;
-  name: string;
-}): Promise<ApiStructure | null> => {
-  if (!databaseId) return null;
-  const apiPublic = opts.api?.isPublic ?? false;
-
-  try {
-    const { schema, resolvedPreset, pgService } = await getServicesExecutor(opts);
-
-    log.debug(
-      `[api-name-lookup] databaseId=${databaseId} name=${name} isPublic=${apiPublic}`
-    );
-
-    // Build context with withPgClient from the pgService
-    const contextValue: Record<string, unknown> = {
-      pgSettings: { role: 'administrator' },
-    };
-    // Add withPgClient using the pgService's key (default is 'withPgClient')
-    const withPgClientKey = pgService.withPgClientKey ?? 'withPgClient';
-    contextValue[withPgClientKey] = withPgClientFromPgService.bind(
-      null,
-      pgService
-    );
-
-    const result = (await execute({
-      schema,
-      document: getApiNameLookupDocument(),
-      variableValues: { databaseId, name, isPublic: apiPublic },
-      contextValue,
-      resolvedPreset,
-    })) as ExecutionResult<ApiNameLookupResult>;
-
-    if (isDev()) {
-      log.debug(`[api-name-lookup] found: ${result.data?.apis?.nodes?.length ?? 0}`);
-    }
-
-    if (result.errors?.length) {
-      const errorMessages = result.errors
-        .map((e: GraphQLError) => e.message)
-        .join(', ');
-      log.debug(`GraphQL errors in API name lookup: ${errorMessages}`);
-      // Check if it's a "does not exist" error (schema not present)
-      if (errorMessages.includes('does not exist')) {
-        log.debug(`services_public schema not found, skipping API name lookup`);
-        return null;
-      }
-    }
-
-    const apiData = result.data?.apis?.nodes?.[0];
-    if (!apiData) {
-      log.debug(`[api-name-lookup] No API found for databaseId=${databaseId} name=${name}`);
-      return null;
-    }
-
-    // Extract schemas from junction table with inflector relation names
-    const schemas = apiData.apiSchemas?.nodes?.map(
-      (n: ApiSchemaNodeData) => n.schema?.schemaName
-    ).filter((s: string | undefined): s is string => !!s) || [];
-
-    if (isDev()) {
-      log.debug(`[api-name-lookup] resolved schemas: [${schemas.join(', ')}]`);
-    }
-
-    const apiStructure: ApiStructure = {
-      dbname: apiData.dbname || opts.pg?.database || '',
-      anonRole: apiData.anonRole || 'anon',
-      roleName: apiData.roleName || 'authenticated',
-      schema: schemas,
-      apiModules: [],
-      domains: [],
-      databaseId: apiData.databaseId,
-      isPublic: apiData.isPublic,
-    };
-
-    svcCache.set(key, apiStructure);
-    return apiStructure;
-  } catch (err: any) {
-    if (err.message?.includes('does not exist')) {
-      log.debug(`services_public schema not found, skipping API name lookup`);
-      return null;
-    }
-    throw err;
-  }
+const getPortFromRequest = (req: Request): string => {
+  const host = req.headers.host;
+  if (!host) return '';
+  const parts = host.split(':');
+  return parts.length === 2 ? `:${parts[1]}` : '';
 };
 
 export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   const { domain, subdomains } = getUrlDomains(req);
-  const key = subdomains
-    .filter((name: string) => !['www'].includes(name))
-    .concat(domain)
-    .join('.');
+  const baseKey = subdomains.filter((n) => n !== 'www').concat(domain).join('.');
 
-  const apiPublic = opts.api?.isPublic;
-  if (apiPublic === false) {
+  if (opts.api?.isPublic === false) {
     if (req.get('X-Api-Name')) {
-      return 'api:' + req.get('X-Database-Id') + ':' + req.get('X-Api-Name');
+      return `api:${req.get('X-Database-Id')}:${req.get('X-Api-Name')}`;
     }
     if (req.get('X-Schemata')) {
-      return (
-        'schemata:' + req.get('X-Database-Id') + ':' + req.get('X-Schemata')
-      );
+      return `schemata:${req.get('X-Database-Id')}:${req.get('X-Schemata')}`;
     }
     if (req.get('X-Meta-Schema')) {
-      return 'metaschema:api:' + req.get('X-Database-Id');
+      return `metaschema:api:${req.get('X-Database-Id')}`;
     }
   }
-  return key;
+  return baseKey;
 };
 
-const validateSchemata = async (
-  pool: Pool,
-  schemata: string[]
-): Promise<string[]> => {
+const toApiStructure = (row: ApiRow, opts: ApiOptions): ApiStructure => ({
+  dbname: row.dbname || opts.pg?.database || '',
+  anonRole: row.anon_role || 'anon',
+  roleName: row.role_name || 'authenticated',
+  schema: row.schemas || [],
+  apiModules: [],
+  domains: [],
+  databaseId: row.database_id,
+  isPublic: row.is_public,
+});
+
+const createAdminStructure = (
+  opts: ApiOptions,
+  schemas: string[],
+  databaseId?: string
+): ApiStructure => ({
+  dbname: opts.pg?.database ?? '',
+  anonRole: 'administrator',
+  roleName: 'administrator',
+  schema: schemas,
+  apiModules: [],
+  domains: [],
+  databaseId,
+  isPublic: false,
+});
+
+// =============================================================================
+// Database Queries
+// =============================================================================
+
+const validateSchemata = async (pool: Pool, schemas: string[]): Promise<string[]> => {
   const result = await pool.query(
     `SELECT schema_name FROM information_schema.schemata WHERE schema_name = ANY($1::text[])`,
-    [schemata]
+    [schemas]
   );
   return result.rows.map((row: { schema_name: string }) => row.schema_name);
 };
+
+const queryByDomain = async (
+  pool: Pool,
+  domain: string,
+  subdomain: string | null,
+  isPublic: boolean
+): Promise<ApiRow | null> => {
+  try {
+    const result = await pool.query<ApiRow>(DOMAIN_LOOKUP_SQL, [domain, subdomain, isPublic]);
+    return result.rows[0] ?? null;
+  } catch (err: unknown) {
+    if ((err as Error).message?.includes('does not exist')) return null;
+    throw err;
+  }
+};
+
+const queryByApiName = async (
+  pool: Pool,
+  databaseId: string,
+  name: string,
+  isPublic: boolean
+): Promise<ApiRow | null> => {
+  try {
+    const result = await pool.query<ApiRow>(API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
+    return result.rows[0] ?? null;
+  } catch (err: unknown) {
+    if ((err as Error).message?.includes('does not exist')) return null;
+    throw err;
+  }
+};
+
+const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]> => {
+  try {
+    const result = await pool.query<ApiListRow>(API_LIST_SQL, [isPublic]);
+    return result.rows;
+  } catch (err: unknown) {
+    if ((err as Error).message?.includes('does not exist')) return [];
+    throw err;
+  }
+};
+
+// =============================================================================
+// Resolution Logic
+// =============================================================================
+
+const determineMode = (ctx: ResolveContext): ResolutionMode => {
+  const { opts, headers } = ctx;
+  
+  if (opts.api?.enableServicesApi === false) return 'services-disabled';
+  if (opts.api?.isPublic === false) {
+    if (headers.schemata) return 'schemata-header';
+    if (headers.apiName) return 'api-name-header';
+    if (headers.metaSchema) return 'meta-schema-header';
+  }
+  return 'domain-lookup';
+};
+
+const resolveServicesDisabled = (ctx: ResolveContext): ApiStructure => {
+  const { opts } = ctx;
+  return {
+    dbname: opts.pg?.database ?? '',
+    anonRole: opts.api?.anonRole ?? '',
+    roleName: opts.api?.roleName ?? '',
+    schema: opts.api?.exposedSchemas ?? [],
+    apiModules: [],
+    domains: [],
+    databaseId: opts.api?.defaultDatabaseId,
+    isPublic: false,
+  };
+};
+
+const resolveSchemataHeader = async (
+  ctx: ResolveContext,
+  validatedSchemas: string[]
+): Promise<ApiConfigResult> => {
+  const { opts, headers } = ctx;
+  const headerSchemas = parseCommaSeparatedHeader(headers.schemata!);
+  const validSet = new Set(validatedSchemas);
+  const validHeaderSchemas = headerSchemas.filter((s) => validSet.has(s));
+
+  if (validHeaderSchemas.length === 0) {
+    return { errorHtml: 'No valid schemas found for the supplied X-Schemata header.' };
+  }
+
+  return createAdminStructure(opts, validHeaderSchemas, headers.databaseId);
+};
+
+const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
+  const { opts, pool, headers } = ctx;
+  if (!headers.databaseId) return null;
+
+  const isPublic = opts.api?.isPublic ?? false;
+  const row = await queryByApiName(pool, headers.databaseId, headers.apiName!, isPublic);
+  
+  if (!row) {
+    log.debug(`[api-name-lookup] No API found for databaseId=${headers.databaseId} name=${headers.apiName}`);
+    return null;
+  }
+
+  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
+  return toApiStructure(row, opts);
+};
+
+const resolveMetaSchemaHeader = (
+  ctx: ResolveContext,
+  validatedSchemas: string[]
+): ApiStructure => {
+  return createAdminStructure(ctx.opts, validatedSchemas, ctx.headers.databaseId);
+};
+
+const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | null> => {
+  const { opts, pool, domain, subdomain } = ctx;
+  const isPublic = opts.api?.isPublic ?? false;
+
+  log.debug(`[domain-lookup] domain=${domain} subdomain=${subdomain} isPublic=${isPublic}`);
+  
+  const row = await queryByDomain(pool, domain, subdomain, isPublic);
+  
+  if (!row) {
+    log.debug(`[domain-lookup] No API found for domain=${domain} subdomain=${subdomain}`);
+    return null;
+  }
+
+  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
+  return toApiStructure(row, opts);
+};
+
+const buildDevFallbackError = async (
+  ctx: ResolveContext,
+  req: Request
+): Promise<ApiError | null> => {
+  if (getNodeEnv() !== 'development') return null;
+
+  const isPublic = ctx.opts.api?.isPublic ?? false;
+  const apis = await queryApiList(ctx.pool, isPublic);
+  if (!apis.length) return null;
+
+  const port = getPortFromRequest(req);
+  const allDomains = apis.flatMap((api) =>
+    api.domains.map((d) => ({
+      href: d.subdomain
+        ? `http://${d.subdomain}.${d.domain}${port}/graphiql`
+        : `http://${d.domain}${port}/graphiql`,
+    }))
+  );
+
+  const linksHtml = allDomains.length
+    ? `<ul class="mt-4 pl-5 list-disc space-y-1">${allDomains
+        .map((d) => `<li><a href="${d.href}" class="text-brand hover:underline">${d.href}</a></li>`)
+        .join('')}</ul>`
+    : `<p class="text-gray-600">No APIs are currently registered for this database.</p>`;
+
+  return {
+    errorHtml: `<p class="text-sm text-gray-700">Try some of these:</p><div class="mt-4">${linksHtml}</div>`,
+  };
+};
+
+// =============================================================================
+// Main Resolution Function
+// =============================================================================
 
 export const getApiConfig = async (
   opts: ApiOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
-  const rootPgPool = getPgPool(opts.pg);
+  const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
   const subdomain = getSubdomain(subdomains);
+  const cacheKey = getSvcKey(opts, req);
 
-  const key = getSvcKey(opts, req);
-  req.svc_key = key;
+  req.svc_key = cacheKey;
 
-  let apiConfig: ApiConfigResult;
-  if (svcCache.has(key)) {
-    if (isDev()) log.debug(`Cache HIT for key=${key}`);
-    apiConfig = svcCache.get(key) as ApiStructure;
-  } else {
-    if (isDev()) log.debug(`Cache MISS for key=${key}, looking up API`);
-    const apiOpts = opts.api || {};
-    const apiPublic = apiOpts.isPublic;
-    const schemataHeader = req.get('X-Schemata');
-    const apiNameHeader = req.get('X-Api-Name');
-    const metaSchemaHeader = req.get('X-Meta-Schema');
-    const databaseIdHeader = req.get('X-Database-Id');
-    const headerSchemata = schemataHeader
-      ? parseCommaSeparatedHeader(schemataHeader)
-      : [];
-    const candidateSchemata =
-      apiPublic === false && headerSchemata.length
-        ? Array.from(
-            new Set([...(apiOpts.metaSchemas || []), ...headerSchemata])
-          )
-        : apiOpts.metaSchemas || [];
-    const validatedSchemata = await validateSchemata(
-      rootPgPool,
-      candidateSchemata
-    );
-
-    if (validatedSchemata.length === 0) {
-      const schemaSource = headerSchemata.length
-        ? headerSchemata
-        : apiOpts.metaSchemas || [];
-      const label = headerSchemata.length ? 'X-Schemata' : 'metaSchemas';
-      const message = `No valid schemas found. Configured ${label}: [${schemaSource.join(', ')}]`;
-      if (isDev()) log.debug(message);
-      const error = new Error(message) as Error & { code?: string };
-      error.code = 'NO_VALID_SCHEMAS';
-      throw error;
-    }
-
-    const validSchemaSet = new Set(validatedSchemata);
-    const validatedHeaderSchemata = headerSchemata.filter((schemaName) =>
-      validSchemaSet.has(schemaName)
-    );
-
-    if (apiPublic === false) {
-      if (schemataHeader) {
-        if (validatedHeaderSchemata.length === 0) {
-          return {
-            errorHtml:
-              'No valid schemas found for the supplied X-Schemata header.',
-          };
-        }
-        apiConfig = createAdminApiStructure({
-          opts,
-          schemata: validatedHeaderSchemata,
-          key,
-          databaseId: databaseIdHeader,
-        });
-      } else if (apiNameHeader) {
-        apiConfig = await queryServiceByApiName({
-          opts,
-          key,
-          pool: rootPgPool,
-          name: apiNameHeader,
-          databaseId: databaseIdHeader,
-        });
-      } else if (metaSchemaHeader) {
-        apiConfig = createAdminApiStructure({
-          opts,
-          schemata: validatedSchemata,
-          key,
-          databaseId: databaseIdHeader,
-        });
-      } else {
-        apiConfig = await queryServiceByDomainAndSubdomain({
-          opts,
-          key,
-          pool: rootPgPool,
-          domain,
-          subdomain,
-        });
-      }
-    } else {
-      apiConfig = await queryServiceByDomainAndSubdomain({
-        opts,
-        key,
-        pool: rootPgPool,
-        domain,
-        subdomain,
-      });
-    }
+  // Check cache first
+  if (svcCache.has(cacheKey)) {
+    log.debug(`Cache HIT for key=${cacheKey}`);
+    return svcCache.get(cacheKey) as ApiStructure;
   }
-  return apiConfig;
+
+  log.debug(`Cache MISS for key=${cacheKey}, resolving API`);
+
+  const ctx: ResolveContext = {
+    opts,
+    pool,
+    domain,
+    subdomain,
+    cacheKey,
+    headers: {
+      schemata: req.get('X-Schemata'),
+      apiName: req.get('X-Api-Name'),
+      metaSchema: req.get('X-Meta-Schema'),
+      databaseId: req.get('X-Database-Id'),
+    },
+  };
+
+  // Validate schemas upfront for modes that need them
+  const apiOpts = opts.api || {};
+  const headerSchemas = ctx.headers.schemata ? parseCommaSeparatedHeader(ctx.headers.schemata) : [];
+  const candidateSchemas =
+    apiOpts.isPublic === false && headerSchemas.length
+      ? [...new Set([...(apiOpts.metaSchemas || []), ...headerSchemas])]
+      : apiOpts.metaSchemas || [];
+  
+  const validatedSchemas = await validateSchemata(pool, candidateSchemas);
+
+  if (validatedSchemas.length === 0) {
+    const source = headerSchemas.length ? headerSchemas : apiOpts.metaSchemas || [];
+    const label = headerSchemas.length ? 'X-Schemata' : 'metaSchemas';
+    const error = new Error(`No valid schemas found. Configured ${label}: [${source.join(', ')}]`) as Error & { code?: string };
+    error.code = 'NO_VALID_SCHEMAS';
+    throw error;
+  }
+
+  // Route to appropriate resolver based on mode
+  const mode = determineMode(ctx);
+  let result: ApiConfigResult;
+
+  switch (mode) {
+    case 'services-disabled':
+      result = resolveServicesDisabled(ctx);
+      break;
+
+    case 'schemata-header':
+      result = await resolveSchemataHeader(ctx, validatedSchemas);
+      break;
+
+    case 'api-name-header':
+      result = await resolveApiNameHeader(ctx);
+      break;
+
+    case 'meta-schema-header':
+      result = resolveMetaSchemaHeader(ctx, validatedSchemas);
+      break;
+
+    case 'domain-lookup':
+      result = await resolveDomainLookup(ctx);
+      if (!result && apiOpts.isPublic) {
+        const fallback = await buildDevFallbackError(ctx, req);
+        if (fallback) return fallback;
+      }
+      break;
+  }
+
+  // Cache successful results
+  if (result && !isApiError(result)) {
+    svcCache.set(cacheKey, result);
+  }
+
+  return result;
+};
+
+// =============================================================================
+// Express Middleware
+// =============================================================================
+
+export const createApiMiddleware = (opts: ApiOptions) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    log.debug(`[api-middleware] ${req.method} ${req.path}`);
+
+    // Fast path: services disabled
+    if (opts.api?.enableServicesApi === false) {
+      req.api = resolveServicesDisabled({
+        opts,
+        pool: null as unknown as Pool,
+        domain: '',
+        subdomain: null,
+        cacheKey: 'meta-api-off',
+        headers: {},
+      });
+      req.databaseId = req.api.databaseId;
+      req.svc_key = 'meta-api-off';
+      return next();
+    }
+
+    try {
+      const apiConfig = await getApiConfig(opts, req);
+
+      if (isApiError(apiConfig)) {
+        res.status(404).send(errorPage404Message('API not found', apiConfig.errorHtml));
+        return;
+      }
+
+      if (!apiConfig) {
+        res.status(404).send(errorPage404Message('API service not found for the given domain/subdomain.'));
+        return;
+      }
+
+      req.api = apiConfig;
+      req.databaseId = apiConfig.databaseId;
+      log.debug(`Resolved API: db=${apiConfig.dbname}, schemas=[${apiConfig.schema?.join(', ')}]`);
+      next();
+    } catch (error: unknown) {
+      const err = error as Error & { code?: string };
+
+      if (err.code === 'NO_VALID_SCHEMAS') {
+        res.status(404).send(errorPage404Message(err.message));
+        return;
+      }
+
+      if (err.message?.includes('does not exist')) {
+        res.status(404).send(errorPage404Message("The resource you're looking for does not exist."));
+        return;
+      }
+
+      log.error('API middleware error:', err);
+      res.status(500).send(errorPage50x);
+    }
+  };
 };
