@@ -26,6 +26,9 @@ import {
   VariableNode
 } from 'graphql';
 
+// Re-export Kind and OperationTypeNode for consumers
+export { Kind, OperationTypeNode } from 'graphql';
+
 export const document = ({ definitions }: { definitions: DefinitionNode[] }): DocumentNode => ({
   kind: Kind.DOCUMENT,
   definitions
