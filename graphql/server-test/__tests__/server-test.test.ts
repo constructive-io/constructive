@@ -66,21 +66,23 @@ describe('graphql-server-test', () => {
 
     it('should support variables', async () => {
       const res = await query<
-        { userByUsername: { username: string; email: string } | null },
+        { users: { nodes: Array<{ username: string; email: string }> } },
         { username: string }
       >(
         `query GetUser($username: String!) {
-          userByUsername(username: $username) {
-            username
-            email
+          users(condition: { username: $username }) {
+            nodes {
+              username
+              email
+            }
           }
         }`,
         { username: 'alice' }
       );
 
-      expect(res.data?.userByUsername).toBeDefined();
-      expect(res.data?.userByUsername?.username).toBe('alice');
-      expect(res.data?.userByUsername?.email).toBe('alice@example.com');
+      expect(res.data?.users.nodes).toHaveLength(1);
+      expect(res.data?.users.nodes[0].username).toBe('alice');
+      expect(res.data?.users.nodes[0].email).toBe('alice@example.com');
     });
 
     it('should use SuperTest directly for custom requests', async () => {

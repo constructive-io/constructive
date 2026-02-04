@@ -26,20 +26,61 @@ export interface GraphQLTestContext {
 }
 
 /**
- * V5 Preset-based input for GraphQL test connections.
+ * Legacy v4-style GraphQL options for backward compatibility.
  *
- * Instead of the v4 pattern with appendPlugins and graphileBuildOptions,
- * v5 uses presets that can be extended and composed.
+ * @deprecated Use `preset` instead for v5 configuration.
+ */
+export interface LegacyGraphileOptions {
+  /**
+   * V4-style plugins to append.
+   * These plugins use the builder.hook() API which is NOT compatible with v5.
+   * For v5, convert these to proper v5 plugins and use the `preset` option instead.
+   *
+   * @deprecated Use preset.plugins for v5 plugins
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  appendPlugins?: any[];
+  /**
+   * V4-style graphile build options.
+   *
+   * @deprecated Use preset.schema for v5 schema options
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  graphileBuildOptions?: Record<string, any>;
+  /**
+   * V4-style PostGraphile options override.
+   *
+   * @deprecated Use preset for v5 configuration
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  overrideSettings?: Record<string, any>;
+}
+
+/**
+ * Input for GraphQL test connections.
+ *
+ * Supports both v5 preset-based configuration (recommended) and
+ * legacy v4-style configuration (deprecated, for backward compatibility).
  */
 export interface GetConnectionsInput {
   useRoot?: boolean;
   schemas: string[];
   authRole?: string;
   /**
-   * V5 preset configuration.
+   * V5 preset configuration (recommended).
    * Can include extends, plugins, schema options, etc.
    */
   preset?: GraphileConfig.Preset;
+  /**
+   * Legacy v4-style graphile options for backward compatibility.
+   *
+   * NOTE: v4-style plugins (using builder.hook()) are NOT compatible with v5.
+   * If you use appendPlugins with v4 plugins, they will be ignored.
+   * Convert your plugins to v5 format and use the `preset` option instead.
+   *
+   * @deprecated Use preset for v5 configuration
+   */
+  graphile?: LegacyGraphileOptions;
 }
 
 export interface GraphQLResponse<T> {

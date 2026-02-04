@@ -1,4 +1,4 @@
-import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from 'graphile-test';
+import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables, LegacyGraphileOptions } from 'graphile-test';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { makeSchema } from 'graphile-build';
 import type { GraphQLSchema } from 'graphql';
@@ -12,6 +12,65 @@ import '@dataplan/pg/adaptors/pg'; // Augments PgAdaptors interface with pg adap
 import 'postgraphile/grafserv';
 import 'graphile-build';
 
+/**
+ * Check if a v4 plugin has the v4-style signature (function that takes builder)
+ * vs v5-style plugin (object with provides, name, etc.)
+ */
+function isV4Plugin(plugin: unknown): boolean {
+  if (typeof plugin === 'function') {
+    // V4 plugins are functions that take a builder
+    // V5 plugins are objects with specific properties
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Convert legacy v4 graphile options to v5 preset configuration where possible.
+ *
+ * NOTE: v4-style plugins (using builder.hook()) cannot be converted to v5 format.
+ * They use fundamentally different APIs.
+ */
+function convertLegacyOptionsToPreset(graphile: LegacyGraphileOptions): GraphileConfig.Preset {
+  const preset: GraphileConfig.Preset = {};
+
+  // Check for v4-style appendPlugins
+  if (graphile.appendPlugins && graphile.appendPlugins.length > 0) {
+    const v4Plugins = graphile.appendPlugins.filter(isV4Plugin);
+    if (v4Plugins.length > 0) {
+      console.warn(
+        `[graphile-test] Warning: ${v4Plugins.length} v4-style plugin(s) detected in graphile.appendPlugins. ` +
+        `V4 plugins using builder.hook() are NOT compatible with PostGraphile v5. ` +
+        `Please convert to v5 plugins and use the 'preset' option instead.`
+      );
+    }
+
+    // V5-style plugins can be added
+    const v5Plugins = graphile.appendPlugins.filter(p => !isV4Plugin(p));
+    if (v5Plugins.length > 0) {
+      preset.plugins = v5Plugins;
+    }
+  }
+
+  // Convert graphileBuildOptions to schema options where possible
+  if (graphile.graphileBuildOptions) {
+    preset.schema = {
+      ...graphile.graphileBuildOptions,
+    };
+  }
+
+  // overrideSettings may contain various v4 PostGraphile options
+  // Most of these don't have direct v5 equivalents
+  if (graphile.overrideSettings) {
+    console.warn(
+      `[graphile-test] Warning: graphile.overrideSettings is deprecated. ` +
+      `PostGraphile v5 uses presets instead. Some options may not be supported.`
+    );
+  }
+
+  return preset;
+}
+
 export const GraphQLTest = (
   input: GetConnectionsInput & GetConnectionOpts,
   conn: GetConnectionResult
@@ -19,7 +78,8 @@ export const GraphQLTest = (
   const {
     schemas,
     authRole,
-    preset: userPreset
+    preset: userPreset,
+    graphile: legacyGraphile
   } = input;
 
   let schema: GraphQLSchema;
@@ -35,16 +95,25 @@ export const GraphQLTest = (
       schemas,
     });
 
+    // Convert legacy graphile options to preset if provided
+    const legacyPreset = legacyGraphile ? convertLegacyOptionsToPreset(legacyGraphile) : {};
+
     // Build the complete preset by extending ConstructivePreset
-    // with user-provided preset configuration
+    // with user-provided preset configuration and legacy options
     const completePreset: GraphileConfig.Preset = {
       extends: [
         ConstructivePreset,
+        ...(legacyPreset?.extends ?? []),
         ...(userPreset?.extends ?? []),
       ],
+      ...(legacyPreset?.disablePlugins && { disablePlugins: legacyPreset.disablePlugins }),
       ...(userPreset?.disablePlugins && { disablePlugins: userPreset.disablePlugins }),
+      ...(legacyPreset?.plugins && { plugins: legacyPreset.plugins }),
       ...(userPreset?.plugins && { plugins: userPreset.plugins }),
-      ...(userPreset?.schema && { schema: userPreset.schema }),
+      schema: {
+        ...(legacyPreset?.schema ?? {}),
+        ...(userPreset?.schema ?? {}),
+      },
       ...(userPreset?.grafast && { grafast: userPreset.grafast }),
       pgServices: [pgService],
     };

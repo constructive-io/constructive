@@ -48,7 +48,7 @@ const AnotherTestPlugin = (builder: any) => {
   });
 };
 
-// TODO: Migrate to v5 plugin patterns - currently uses legacy v4 'graphile' API
+// Skipped: Tests v4-style builder.hook() plugins which are incompatible with PostGraphile v5
 describe.skip('graphile-test with plugins', () => {
   describe('appendPlugins', () => {
     let teardown: () => Promise<void>;
@@ -96,10 +96,10 @@ describe.skip('graphile-test with plugins', () => {
       expect(res.data).not.toBeNull();
       expect(res.data).not.toBeUndefined();
       expect(res.errors).toBeUndefined();
-      
+
       const queryTypeName = res.data?.__schema?.queryType?.name;
       expect(queryTypeName).toBe('Query');
-      
+
       // Find the Query type in the types array
       const types = res.data?.__schema?.types || [];
       const queryType = types.find((t: any) => t.name === queryTypeName);
@@ -107,16 +107,16 @@ describe.skip('graphile-test with plugins', () => {
       expect(queryType).not.toBeUndefined();
       expect(queryType?.name).toBe('Query');
       expect(Array.isArray(queryType?.fields)).toBe(true);
-      
+
       const fields = queryType?.fields || [];
       const testField = fields.find((f: any) => f.name === 'testPluginField');
       expect(testField).not.toBeNull();
       expect(testField).not.toBeUndefined();
       expect(testField?.name).toBe('testPluginField');
-      
+
       // Handle nested type references
-      const typeName = testField.type?.name || 
-                      testField.type?.ofType?.name || 
+      const typeName = testField.type?.name ||
+                      testField.type?.ofType?.name ||
                       testField.type?.ofType?.ofType?.name;
       expect(typeName).toBe('String');
     });
@@ -309,4 +309,3 @@ describe.skip('graphile-test with plugins', () => {
     });
   });
 });
-

@@ -21,17 +21,25 @@ exports[`fails to access context-protected data as anonymous: unauthorizedContex
   },
   "errors": [
     {
-      "extensions": {},
-      "locations": undefined,
+      "locations": [
+        {
+          "column": 3,
+          "line": 2,
+        },
+      ],
       "message": "permission denied for function current_setting",
       "path": [
         "currentRole",
       ],
     },
     {
-      "extensions": {},
-      "locations": undefined,
-      "message": "permission denied for function current_setting",
+      "locations": [
+        {
+          "column": 3,
+          "line": 3,
+        },
+      ],
+      "message": "current transaction is aborted, commands ignored until end of transaction block",
       "path": [
         "userId",
       ],

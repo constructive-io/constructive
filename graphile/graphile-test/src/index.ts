@@ -19,6 +19,7 @@ export type {
   GraphQLQueryUnwrappedFnObj,
   GraphQLResponse,
   GraphQLTestContext,
+  LegacyGraphileOptions,
   Variables,
 } from './types.js';
 export { seed, snapshot } from 'pgsql-test';

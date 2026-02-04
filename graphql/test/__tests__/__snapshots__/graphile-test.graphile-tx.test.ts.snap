@@ -7,8 +7,12 @@ exports[`handles duplicate insert via internal PostGraphile savepoint: duplicate
   },
   "errors": [
     {
-      "extensions": {},
-      "locations": undefined,
+      "locations": [
+        {
+          "column": 3,
+          "line": 2,
+        },
+      ],
       "message": "duplicate key value violates unique constraint "users_username_key"",
       "path": [
         "createUser",
