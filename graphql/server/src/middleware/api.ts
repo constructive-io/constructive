@@ -342,42 +342,38 @@ const buildDevFallbackError = async (
   const portMatch = host.match(/:(\d+)$/);
   const port = portMatch ? portMatch[1] : '';
 
-  const apiRows = apis.map((api) => {
+  const apiCards = apis.map((api) => {
     const domains = api.domains.length
       ? api.domains.map((d) => {
           const hostname = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
           const url = port ? `http://${hostname}:${port}/graphiql` : `http://${hostname}/graphiql`;
-          return `<a href="${url}" class="text-brand hover:underline">${hostname}</a>`;
-        }).join(', ')
-      : '<span style="color:#8E9398;font-style:italic">no domains</span>';
+          return `<a href="${url}" style="color:#01A1FF;text-decoration:none;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">${hostname}</a>`;
+        }).join('<span style="color:#D4DCEA;margin:0 6px">|</span>')
+      : '<span style="color:#8E9398;font-style:italic">no domains configured</span>';
 
     const badge = api.is_public
-      ? '<span style="background:#F5F8FF;color:#01A1FF;padding:1px 6px;border-radius:4px;font-size:10px">public</span>'
-      : '<span style="background:#F3F6FA;color:#8E9398;padding:1px 6px;border-radius:4px;font-size:10px">private</span>';
+      ? '<span style="background:linear-gradient(135deg,#F5F8FF,#E8F4FF);color:#01A1FF;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;letter-spacing:0.3px">public</span>'
+      : '<span style="background:linear-gradient(135deg,#F3F6FA,#E8ECF0);color:#8E9398;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;letter-spacing:0.3px">private</span>';
 
-    return `<tr style="border-bottom:1px solid #D4DCEA">
-      <td style="padding:6px 8px;font-weight:500;color:#232323">${api.name}</td>
-      <td style="padding:6px 8px;color:#8E9398;font-size:12px">${api.dbname}</td>
-      <td style="padding:6px 8px">${badge}</td>
-      <td style="padding:6px 8px;font-family:monospace;font-size:12px">${domains}</td>
-    </tr>`;
+    return `
+      <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06);border:1px solid #E8ECF0;transition:box-shadow 0.2s,transform 0.2s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-weight:600;color:#232323;font-size:15px">${api.name}</span>
+          ${badge}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="color:#8E9398;font-size:12px">Database:</span>
+          <span style="color:#232323;font-size:13px;font-family:'SF Mono',Monaco,monospace;background:#F3F6FA;padding:2px 8px;border-radius:6px">${api.dbname}</span>
+        </div>
+        <div style="font-size:13px">${domains}</div>
+      </div>`;
   }).join('');
 
   return {
     errorHtml: `
-      <div style="text-align:left;max-width:700px;margin:0 auto">
-        <p style="color:#8E9398;font-size:14px;margin-bottom:12px">Available APIs:</p>
-        <table style="width:100%;border-collapse:collapse;background:#F3F6FA;border-radius:8px;overflow:hidden">
-          <thead>
-            <tr style="background:#D4DCEA">
-              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Name</th>
-              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Database</th>
-              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Type</th>
-              <th style="padding:8px;text-align:left;color:#232323;font-size:12px">Domains</th>
-            </tr>
-          </thead>
-          <tbody>${apiRows}</tbody>
-        </table>
+      <div style="text-align:left;max-width:520px;margin:0 auto">
+        <p style="color:#8E9398;font-size:13px;margin-bottom:16px;font-weight:500;letter-spacing:0.3px">Available APIs</p>
+        ${apiCards}
       </div>`,
   };
 };
