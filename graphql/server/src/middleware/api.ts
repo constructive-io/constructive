@@ -347,32 +347,32 @@ const buildDevFallbackError = async (
       ? api.domains.map((d) => {
           const hostname = d.subdomain ? `${d.subdomain}.${d.domain}` : d.domain;
           const url = port ? `http://${hostname}:${port}/graphiql` : `http://${hostname}/graphiql`;
-          return `<a href="${url}" style="color:#01A1FF;text-decoration:none;transition:opacity 0.2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">${hostname}</a>`;
-        }).join('<span style="color:#D4DCEA;margin:0 6px">|</span>')
-      : '<span style="color:#8E9398;font-style:italic">no domains configured</span>';
+          return `<a href="${url}" style="color:#01A1FF;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${hostname}</a>`;
+        }).join('<span style="color:#D4DCEA;margin:0 4px">·</span>')
+      : '<span style="color:#8E9398;font-style:italic;font-size:11px">no domains</span>';
 
     const badge = api.is_public
-      ? '<span style="background:linear-gradient(135deg,#F5F8FF,#E8F4FF);color:#01A1FF;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;letter-spacing:0.3px">public</span>'
-      : '<span style="background:linear-gradient(135deg,#F3F6FA,#E8ECF0);color:#8E9398;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;letter-spacing:0.3px">private</span>';
+      ? '<span style="color:#01A1FF;font-size:10px;font-weight:500">public</span>'
+      : '<span style="color:#8E9398;font-size:10px">private</span>';
 
     return `
-      <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06);border:1px solid #E8ECF0;transition:box-shadow 0.2s,transform 0.2s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06)';this.style.transform='translateY(0)'">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-weight:600;color:#232323;font-size:15px">${api.name}</span>
+      <div style="background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04);border:1px solid #E8ECF0;display:flex;align-items:center;gap:12px;transition:background 0.15s" onmouseover="this.style.background='#FAFBFC'" onmouseout="this.style.background='#fff'">
+        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:13px">
+          <span style="font-weight:600;color:#232323;white-space:nowrap">${api.name}</span>
+          <span style="color:#D4DCEA">→</span>
+          ${domains}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="color:#8E9398;font-size:11px;font-family:'SF Mono',Monaco,monospace">${api.dbname}</span>
           ${badge}
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="color:#8E9398;font-size:12px">Database:</span>
-          <span style="color:#232323;font-size:13px;font-family:'SF Mono',Monaco,monospace;background:#F3F6FA;padding:2px 8px;border-radius:6px">${api.dbname}</span>
-        </div>
-        <div style="font-size:13px">${domains}</div>
       </div>`;
   }).join('');
 
   return {
     errorHtml: `
-      <div style="text-align:left;max-width:520px;margin:0 auto">
-        <p style="color:#8E9398;font-size:13px;margin-bottom:16px;font-weight:500;letter-spacing:0.3px">Available APIs</p>
+      <div style="text-align:left;max-width:600px;margin:0 auto">
+        <p style="color:#8E9398;font-size:11px;margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px">Available APIs</p>
         ${apiCards}
       </div>`,
   };
