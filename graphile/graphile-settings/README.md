@@ -42,43 +42,60 @@ npm install graphile-settings
 
 ## 📦 Usage
 
+### PostGraphile v5 with ConstructivePreset
+
 ```ts
-import { getGraphileSettings } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { postgraphile } from 'postgraphile';
+import { grafserv } from 'grafserv/express/v4';
 import express from 'express';
 
 const app = express();
 
-const settings = getGraphileSettings({
-  server: {
-    port: 5000,
-    host: '0.0.0.0',
-    strictAuth: true,
+// Create a v5 preset with ConstructivePreset
+const preset = {
+  extends: [ConstructivePreset],
+  pgServices: [
+    makePgService({
+      connectionString: 'postgres://user:pass@localhost/mydb',
+      schemas: ['app_public'],
+    }),
+  ],
+  grafast: {
+    explain: process.env.NODE_ENV === 'development',
   },
-  graphile: {
-    schema: ['app_public'],
-    metaSchemas: ['metaschema_public', 'services_public', 'metaschema_modules_public'],
-  },
-  features: {
-    postgis: true,
-    simpleInflection: true,
-    oppositeBaseNames: true,
-  },
-  cdn: {
-    bucketName: 'media-bucket',
-    awsRegion: 'us-west-1',
-    awsAccessKey: 'AKIA...',
-    awsSecretKey: 'secret',
-    minioEndpoint: 'http://localhost:9000'
-  }
-});
+};
 
-app.use(postgraphile({
-  ...settings,
-  pgPool: myPool // your initialized pg.Pool
-}));
+// Create PostGraphile instance
+const pgl = postgraphile(preset);
+const serv = pgl.createServ(grafserv);
 
-app.listen(settings.port);
+// Add to Express
+const httpServer = require('http').createServer(app);
+serv.addTo(app, httpServer);
+
+httpServer.listen(5000);
+```
+
+### Building Schema Directly (for codegen, testing, etc.)
+
+```ts
+import { ConstructivePreset, makePgService } from 'graphile-settings';
+import { makeSchema } from 'graphile-build';
+import { printSchema } from 'graphql';
+
+const preset = {
+  extends: [ConstructivePreset],
+  pgServices: [
+    makePgService({
+      connectionString: 'postgres://user:pass@localhost/mydb',
+      schemas: ['app_public'],
+    }),
+  ],
+};
+
+const { schema } = await makeSchema(preset);
+const sdl = printSchema(schema);
 ```
 
 ## 🧰 Configuration Options

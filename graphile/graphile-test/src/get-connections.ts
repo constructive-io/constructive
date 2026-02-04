@@ -14,6 +14,7 @@ import type {
   GraphQLQueryUnwrappedFnObj,
   GraphQLResponse,
   GraphQLTestContext,
+  Variables,
 } from './types.js';
 
 // Core unwrapping utility
@@ -43,11 +44,11 @@ const createConnectionsBase = async (
     await dbTeardown();
   };
 
-  const baseQuery = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const baseQuery = <TResult = unknown, TVariables extends Variables = Variables>(
     opts: GraphQLQueryOptions<TVariables>
   ): Promise<GraphQLResponse<TResult>> => gqlContext.query<GraphQLResponse<TResult>, TVariables>(opts);
 
-  const baseQueryPositional = <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const baseQueryPositional = <TResult = unknown, TVariables extends Variables = Variables>(
     query: string | DocumentNode,
     variables?: TVariables,
     commit?: boolean,
@@ -106,7 +107,7 @@ export const getConnectionsObjectUnwrapped = async (
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryUnwrappedFnObj = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryUnwrappedFnObj = async <TResult = unknown, TVariables extends Variables = Variables>(
     opts: GraphQLQueryOptions<TVariables>
   ) => unwrap<TResult>(await baseQuery<TResult, TVariables>(opts));
 
@@ -132,7 +133,7 @@ export const getConnectionsObjectWithLogging = async (
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFnObj = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryFnObj = async <TResult = unknown, TVariables extends Variables = Variables>(
     opts: GraphQLQueryOptions<TVariables>
   ) => {
     console.log('Executing GraphQL query:', opts.query);
@@ -163,7 +164,7 @@ export const getConnectionsObjectWithTiming = async (
 }> => {
   const { pg, db, teardown, baseQuery } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFnObj = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryFnObj = async <TResult = unknown, TVariables extends Variables = Variables>(
     opts: GraphQLQueryOptions<TVariables>
   ) => {
     const start = Date.now();
@@ -221,7 +222,7 @@ export const getConnectionsUnwrapped = async (
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryUnwrappedFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryUnwrappedFn = async <TResult = unknown, TVariables extends Variables = Variables>(
     queryDoc: string | DocumentNode,
     variables?: TVariables,
     commit?: boolean,
@@ -250,7 +251,7 @@ export const getConnectionsWithLogging = async (
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryFn = async <TResult = unknown, TVariables extends Variables = Variables>(
     queryDoc: string | DocumentNode,
     variables?: TVariables,
     commit?: boolean,
@@ -284,7 +285,7 @@ export const getConnectionsWithTiming = async (
 }> => {
   const { pg, db, teardown, baseQueryPositional } = await createConnectionsBase(input, seedAdapters);
 
-  const query: GraphQLQueryFn = async <TResult = unknown, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+  const query: GraphQLQueryFn = async <TResult = unknown, TVariables extends Variables = Variables>(
     queryDoc: string | DocumentNode,
     variables?: TVariables,
     commit?: boolean,

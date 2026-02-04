@@ -7,7 +7,7 @@
 
 import { execute } from 'grafast';
 import { postgraphile, type PostGraphileInstance } from 'postgraphile';
-import { getGraphilePreset, makePgService } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { withPgClientFromPgService } from 'graphile-build-pg';
 import type {
   DocumentNode,
@@ -111,13 +111,11 @@ export class QueryExecutor {
       schemas: this.options.schemas,
     });
 
-    const basePreset = getGraphilePreset({});
-
     // Note: Using 'as unknown as' to bypass strict type checking
     // because GraphileConfig.Preset doesn't include pgServices in its type definition
     // but postgraphile() accepts it at runtime
     const preset = {
-      extends: [basePreset],
+      extends: [ConstructivePreset],
       pgServices: [pgService],
       grafast: {
         context: () => ({

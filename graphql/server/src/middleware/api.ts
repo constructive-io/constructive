@@ -8,7 +8,7 @@ import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import { execute } from 'grafast';
 import { postgraphile, type PostGraphileInstance } from 'postgraphile';
-import { getGraphilePreset, makePgService } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { withPgClientFromPgService } from 'graphile-build-pg';
 import {
   parse,
@@ -93,10 +93,8 @@ const getServicesExecutor = async (opts: ApiOptions): Promise<{
     schemas: ['services_public', 'metaschema_public'],
   });
 
-  const basePreset = getGraphilePreset({});
-
   const preset: GraphileConfig.Preset = {
-    extends: [basePreset],
+    extends: [ConstructivePreset],
     pgServices: [pgService],
     grafast: {
       context: () => ({

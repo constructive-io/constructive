@@ -1,30 +1,45 @@
-import { printSchema, GraphQLSchema, getIntrospectionQuery, buildClientSchema } from 'graphql'
-import { getGraphileSettings } from 'graphile-settings'
+import { printSchema, getIntrospectionQuery, buildClientSchema } from 'graphql'
+import { ConstructivePreset, makePgService } from 'graphile-settings'
+import { makeSchema } from 'graphile-build'
 import { getPgPool } from 'pg-cache'
-import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile'
+import type { GraphileConfig } from 'graphile-config'
 import * as http from 'node:http'
 import * as https from 'node:https'
 
 export type BuildSchemaOptions = {
   database?: string;
   schemas: string[];
-  graphile?: Partial<PostGraphileOptions>;
+  graphile?: Partial<GraphileConfig.Preset>;
 };
 
-// Build GraphQL Schema SDL directly from Postgres using PostGraphile, without HTTP.
+// Build GraphQL Schema SDL directly from Postgres using PostGraphile v5, without HTTP.
 export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> {
   const database = opts.database ?? 'constructive'
   const schemas = Array.isArray(opts.schemas) ? opts.schemas : []
 
-  const settings = getGraphileSettings({
-    graphile: {
-      schema: schemas,
-      ...(opts.graphile ?? {})
-    }
-  })
+  // Get pool config for connection string
+  const pool = getPgPool({ database })
+  const poolConfig = (pool as any).options || {}
+  const connectionString = `postgres://${poolConfig.user || 'postgres'}:${poolConfig.password || ''}@${poolConfig.host || 'localhost'}:${poolConfig.port || 5432}/${database}`
 
-  const pgPool = getPgPool({ database })
-  const schema: GraphQLSchema = await createPostGraphileSchema(pgPool, schemas, settings)
+  // Build v5 preset
+  const preset: GraphileConfig.Preset = {
+    extends: [
+      ConstructivePreset,
+      ...(opts.graphile?.extends ?? []),
+    ],
+    ...(opts.graphile?.disablePlugins && { disablePlugins: opts.graphile.disablePlugins }),
+    ...(opts.graphile?.plugins && { plugins: opts.graphile.plugins }),
+    ...(opts.graphile?.schema && { schema: opts.graphile.schema }),
+    pgServices: [
+      makePgService({
+        connectionString,
+        schemas,
+      }),
+    ],
+  }
+
+  const { schema } = await makeSchema(preset)
   return printSchema(schema)
 }
 

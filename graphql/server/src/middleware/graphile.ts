@@ -3,7 +3,7 @@ import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import express, { NextFunction, Request, RequestHandler, Response } from 'express';
 import { graphileCache, GraphileCacheEntry } from 'graphile-cache';
-import { getGraphilePreset, makePgService } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
 import { postgraphile } from 'postgraphile';
 import { grafserv } from 'grafserv/express/v4';
@@ -64,17 +64,15 @@ const buildConnectionString = (
  * Create a PostGraphile v5 instance for a tenant
  */
 const createGraphileInstance = async (
-  opts: ConstructiveOptions,
+  _opts: ConstructiveOptions,
   connectionString: string,
   schemas: string[],
   anonRole: string,
   roleName: string,
   cacheKey: string
 ): Promise<GraphileCacheEntry> => {
-  const basePreset = getGraphilePreset(opts);
-
   const preset: GraphileConfig.Preset = {
-    extends: [basePreset],
+    extends: [ConstructivePreset],
     pgServices: [
       makePgService({
         connectionString,

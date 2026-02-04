@@ -237,12 +237,12 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
-      graphile-simple-inflector:
-        specifier: workspace:^
-        version: link:../graphile-simple-inflector/dist
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
+      inflekt:
+        specifier: ^0.3.0
+        version: 0.3.0
       lru-cache:
         specifier: ^11.2.4
         version: 11.2.4
@@ -864,9 +864,21 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
+      '@dataplan/pg':
+        specifier: ^1.0.0-rc.3
+        version: 1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      graphile-build:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -874,8 +886,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphile/graphile-test/dist
       graphql:
-        specifier: 15.10.1
-        version: 15.10.1
+        specifier: ^16.9.0
+        version: 16.12.0
       mock-req:
         specifier: ^0.2.0
         version: 0.2.0
@@ -886,15 +898,15 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
-        specifier: ^4.14.1
-        version: 4.14.1
+        specifier: ^5.0.0-rc.4
+        version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
     devDependencies:
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
       graphql-tag:
         specifier: 2.12.6
-        version: 2.12.6(graphql@15.10.1)
+        version: 2.12.6(graphql@16.12.0)
       makage:
         specifier: ^0.1.10
         version: 0.1.10
