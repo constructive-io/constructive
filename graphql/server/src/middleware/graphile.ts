@@ -1,6 +1,5 @@
 import { createServer, Server as HttpServer } from 'node:http';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { getNodeEnv } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import express, { NextFunction, Request, RequestHandler, Response } from 'express';
 import { graphileCache, GraphileCacheEntry } from 'graphile-cache';
@@ -13,30 +12,24 @@ import { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import './types'; // for Request type
 import { HandlerCreationError } from '../errors/api-errors';
 
-const isDev = () => getNodeEnv() === 'development';
-
+/**
+ * Custom maskError function that always returns the original error.
+ *
+ * By default, grafserv masks errors for security (hiding sensitive database errors
+ * from clients). We disable this masking to show full error messages.
+ *
+ * Upstream reference:
+ * - grafserv defaultMaskError: node_modules/grafserv/dist/options.js
+ * - SafeError interface: grafast isSafeError() - errors implementing SafeError
+ *   are shown as-is even with default masking
+ *
+ * If you need to restore masking behavior, see the upstream implementation which:
+ * 1. Returns GraphQLError instances as-is
+ * 2. Returns SafeError instances with their message exposed
+ * 3. Masks other errors with a hash/ID and logs the original
+ */
 const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
-  if (isDev()) {
-    return error;
-  }
-  if (!error.originalError) {
-    return error;
-  }
-  if (error.originalError instanceof GraphQLError) {
-    return error;
-  }
-  const hash = require('node:crypto').createHash('sha1').update(String(error)).digest('base64url');
-  const errorId = Math.random().toString(36).substring(2, 12).toUpperCase();
-  console.error("Masked GraphQL error (hash: '%s', id: '%s')\n%s\n%O", hash, errorId, error, error.originalError);
-  return new GraphQLError(
-    `An error occurred (logged with hash: '${hash}', id: '${errorId}')`,
-    error.nodes,
-    error.source,
-    error.positions,
-    error.path,
-    error.originalError,
-    { errorId }
-  );
+  return error;
 };
 
 // =============================================================================
