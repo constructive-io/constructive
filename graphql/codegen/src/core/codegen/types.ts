@@ -1,10 +1,11 @@
 /**
  * Types generator - generates types.ts with entity interfaces using Babel AST
  */
-import type { CleanTable } from '../../types/schema';
 import * as t from '@babel/types';
+
+import type { CleanTable } from '../../types/schema';
 import { generateCode } from './babel-ast';
-import { getScalarFields, fieldTypeToTs, getGeneratedFileHeader } from './utils';
+import { fieldTypeToTs, getGeneratedFileHeader,getScalarFields } from './utils';
 
 interface InterfaceProperty {
   name: string;
@@ -37,7 +38,7 @@ const FILTER_CONFIGS: Array<{ name: string; tsType: string; operators: FilterOps
   // List filters
   { name: 'StringListFilter', tsType: 'string[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
   { name: 'IntListFilter', tsType: 'number[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
-  { name: 'UUIDListFilter', tsType: 'string[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
+  { name: 'UUIDListFilter', tsType: 'string[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] }
 ];
 
 /** Build filter properties based on operator sets */
@@ -49,7 +50,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
     props.push(
       { name: 'isNull', type: 'boolean', optional: true },
       { name: 'equalTo', type: tsType, optional: true },
-      { name: 'notEqualTo', type: tsType, optional: true },
+      { name: 'notEqualTo', type: tsType, optional: true }
     );
   }
 
@@ -57,7 +58,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
   if (operators.includes('distinct')) {
     props.push(
       { name: 'distinctFrom', type: tsType, optional: true },
-      { name: 'notDistinctFrom', type: tsType, optional: true },
+      { name: 'notDistinctFrom', type: tsType, optional: true }
     );
   }
 
@@ -65,7 +66,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
   if (operators.includes('inArray')) {
     props.push(
       { name: 'in', type: `${tsType}[]`, optional: true },
-      { name: 'notIn', type: `${tsType}[]`, optional: true },
+      { name: 'notIn', type: `${tsType}[]`, optional: true }
     );
   }
 
@@ -75,7 +76,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
       { name: 'lessThan', type: tsType, optional: true },
       { name: 'lessThanOrEqualTo', type: tsType, optional: true },
       { name: 'greaterThan', type: tsType, optional: true },
-      { name: 'greaterThanOrEqualTo', type: tsType, optional: true },
+      { name: 'greaterThanOrEqualTo', type: tsType, optional: true }
     );
   }
 
@@ -97,7 +98,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
       { name: 'like', type: 'string', optional: true },
       { name: 'notLike', type: 'string', optional: true },
       { name: 'likeInsensitive', type: 'string', optional: true },
-      { name: 'notLikeInsensitive', type: 'string', optional: true },
+      { name: 'notLikeInsensitive', type: 'string', optional: true }
     );
   }
 
@@ -108,7 +109,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
       { name: 'containedBy', type: 'unknown', optional: true },
       { name: 'containsKey', type: 'string', optional: true },
       { name: 'containsAllKeys', type: 'string[]', optional: true },
-      { name: 'containsAnyKeys', type: 'string[]', optional: true },
+      { name: 'containsAnyKeys', type: 'string[]', optional: true }
     );
   }
 
@@ -117,7 +118,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
     props.push(
       { name: 'contains', type: 'string', optional: true },
       { name: 'containedBy', type: 'string', optional: true },
-      { name: 'containsOrContainedBy', type: 'string', optional: true },
+      { name: 'containsOrContainedBy', type: 'string', optional: true }
     );
   }
 
@@ -139,7 +140,7 @@ function buildFilterProperties(tsType: string, operators: FilterOps[]): Interfac
       { name: 'anyLessThan', type: baseType, optional: true },
       { name: 'anyLessThanOrEqualTo', type: baseType, optional: true },
       { name: 'anyGreaterThan', type: baseType, optional: true },
-      { name: 'anyGreaterThanOrEqualTo', type: baseType, optional: true },
+      { name: 'anyGreaterThanOrEqualTo', type: baseType, optional: true }
     );
   }
 
@@ -237,7 +238,7 @@ export function generateTypesFile(
 
     const properties: InterfaceProperty[] = scalarFields.map((field) => ({
       name: field.name,
-      type: `${fieldTypeToTs(field.type)} | null`,
+      type: `${fieldTypeToTs(field.type)} | null`
     }));
 
     statements.push(createInterfaceDeclaration(table.name, properties));

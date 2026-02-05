@@ -48,8 +48,17 @@ export interface UpdateArgs<TSelect, TWhere, TData> {
   select?: TSelect;
 }
 
-export interface DeleteArgs<TWhere> {
+export type FindOneArgs<
+  TSelect,
+  TIdName extends string = 'id',
+  TId = string
+> = {
+  select?: TSelect;
+} & Record<TIdName, TId>;
+
+export interface DeleteArgs<TWhere, TSelect = undefined> {
   where: TWhere;
+  select?: TSelect;
 }
 
 /**

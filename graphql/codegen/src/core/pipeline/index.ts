@@ -10,18 +10,18 @@
  */
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
-  CleanTable,
   CleanOperation,
-  TypeRegistry,
+  CleanTable,
+  TypeRegistry
 } from '../../types/schema';
-import type { SchemaSource } from '../introspect/source';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
+import type { SchemaSource } from '../introspect/source';
 import { filterTables } from '../introspect/transform';
 import {
-  transformSchemaToOperations,
   filterOperations,
-  getTableOperationNames,
   getCustomOperations,
+  getTableOperationNames,
+  transformSchemaToOperations
 } from '../introspect/transform-schema';
 
 // Re-export for convenience
@@ -103,7 +103,7 @@ export async function runCodegenPipeline(
     source,
     config,
     verbose = false,
-    skipCustomOperations = false,
+    skipCustomOperations = false
   } = options;
   const log = verbose ? console.log : () => {};
 
@@ -120,7 +120,7 @@ export async function runCodegenPipeline(
   // 3. Filter tables by config (combine exclude and systemExclude)
   tables = filterTables(tables, config.tables.include, [
     ...config.tables.exclude,
-    ...config.tables.systemExclude,
+    ...config.tables.systemExclude
   ]);
   const filteredTables = tables.length;
   log(`  After filtering: ${filteredTables} tables`);
@@ -130,7 +130,7 @@ export async function runCodegenPipeline(
   const {
     queries: allQueries,
     mutations: allMutations,
-    typeRegistry,
+    typeRegistry
   } = transformSchemaToOperations(introspection);
 
   const totalQueries = allQueries.length;
@@ -178,7 +178,7 @@ export async function runCodegenPipeline(
     customOperations: {
       queries: customQueries,
       mutations: customMutations,
-      typeRegistry,
+      typeRegistry
     },
     stats: {
       totalTables,
@@ -186,8 +186,8 @@ export async function runCodegenPipeline(
       totalQueries,
       totalMutations,
       customQueries: customQueries.length,
-      customMutations: customMutations.length,
-    },
+      customMutations: customMutations.length
+    }
   };
 }
 
@@ -206,7 +206,7 @@ export function validateTablesFound(tables: CleanTable[]): {
     return {
       valid: false,
       error:
-        'No tables found after filtering. Check your include/exclude patterns.',
+        'No tables found after filtering. Check your include/exclude patterns.'
     };
   }
   return { valid: true };

@@ -4,17 +4,18 @@
  * Generates type-safe cache invalidation utilities with cascade support
  * for parent-child entity relationships.
  */
-import type { CleanTable } from '../../types/schema';
-import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
-import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
 import * as t from '@babel/types';
+
+import type { EntityRelationship,QueryKeyConfig } from '../../types/config';
+import type { CleanTable } from '../../types/schema';
 import {
-  generateCode,
   addJSDocComment,
-  asConst,
-  typedParam,
   addLineComment,
+  asConst,
+  generateCode,
+  typedParam
 } from './babel-ast';
+import { getGeneratedFileHeader, getTableNames, lcFirst,ucFirst } from './utils';
 
 export interface InvalidationGeneratorOptions {
   tables: CleanTable[];
@@ -247,7 +248,7 @@ function buildEntityInvalidateProperty(
     const withChildrenProp = t.objectProperty(t.identifier('withChildren'), withChildrenArrowFn);
     addJSDocComment(withChildrenProp, [
       `Invalidate ${singularName} and all child entities`,
-      `Cascades to: ${descendants.join(', ')}`,
+      `Cascades to: ${descendants.join(', ')}`
     ]);
     innerProperties.push(withChildrenProp);
   }
@@ -397,7 +398,7 @@ export function generateInvalidationFile(
     'invalidate.user.lists(queryClient);',
     '',
     '// Invalidate specific user',
-    'invalidate.user.detail(queryClient, userId);',
+    'invalidate.user.detail(queryClient, userId);'
   ];
   if (generateCascadeHelpers && Object.keys(relationships).length > 0) {
     invalidateDocLines.push('');
@@ -426,7 +427,7 @@ export function generateInvalidationFile(
     'Remove queries from cache (for delete operations)',
     '',
     'Use these when an entity is deleted to remove it from cache',
-    'instead of just invalidating (which would trigger a refetch).',
+    'instead of just invalidating (which would trigger a refetch).'
   ]);
   statements.push(removeDecl);
 
@@ -484,6 +485,6 @@ ${description}
 
   return {
     fileName: 'invalidation.ts',
-    content,
+    content
   };
 }

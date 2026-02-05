@@ -22,22 +22,22 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
-export { generate } from './core/generate';
 export type { GenerateOptions, GenerateResult } from './core/generate';
+export { generate } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
 
 // CLI shared utilities (for packages/cli to import)
-export { codegenQuestions, splitCommas, printResult, camelizeArgv } from './cli/shared';
 export type { CodegenAnswers } from './cli/shared';
+export { camelizeArgv,codegenQuestions, printResult, splitCommas } from './cli/shared';
 
 // Database schema utilities (re-exported from core for convenience)
-export {
-  buildSchemaFromDatabase,
-  buildSchemaSDLFromDatabase,
-} from './core/database';
 export type {
   BuildSchemaFromDatabaseOptions,
-  BuildSchemaFromDatabaseResult,
+  BuildSchemaFromDatabaseResult
+} from './core/database';
+export {
+  buildSchemaFromDatabase,
+  buildSchemaSDLFromDatabase
 } from './core/database';

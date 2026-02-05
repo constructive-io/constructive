@@ -22,7 +22,7 @@ export function getCustomAst(fieldDefn?: MetaField): FieldNode | null {
   }
 
   return t.field({
-    name: fieldDefn.name,
+    name: fieldDefn.name
   });
 }
 
@@ -57,7 +57,7 @@ export function getCustomAstForCleanField(field: CleanField): FieldNode {
 
   // Return simple field for scalar types
   return t.field({
-    name,
+    name
   });
 }
 
@@ -72,7 +72,7 @@ export function requiresSubfieldSelection(field: CleanField): boolean {
     'GeometryPoint',
     'Interval',
     'GeometryGeometryCollection',
-    'GeoJSON',
+    'GeoJSON'
   ];
 
   return complexTypes.includes(gqlType);
@@ -85,8 +85,8 @@ export function geometryPointAst(name: string): FieldNode {
   return t.field({
     name,
     selectionSet: t.selectionSet({
-      selections: toFieldArray(['x', 'y']),
-    }),
+      selections: toFieldArray(['x', 'y'])
+    })
   });
 }
 
@@ -101,8 +101,8 @@ export function geometryCollectionAst(name: string): FieldNode {
       kind: 'NamedType',
       name: {
         kind: 'Name',
-        value: 'GeometryPoint',
-      },
+        value: 'GeometryPoint'
+      }
     },
     selectionSet: {
       kind: 'SelectionSet',
@@ -111,18 +111,18 @@ export function geometryCollectionAst(name: string): FieldNode {
           kind: 'Field',
           name: {
             kind: 'Name',
-            value: 'x',
-          },
+            value: 'x'
+          }
         },
         {
           kind: 'Field',
           name: {
             kind: 'Name',
-            value: 'y',
-          },
-        },
-      ],
-    },
+            value: 'y'
+          }
+        }
+      ]
+    }
   };
 
   return t.field({
@@ -133,11 +133,11 @@ export function geometryCollectionAst(name: string): FieldNode {
           name: 'geometries',
           selectionSet: t.selectionSet({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            selections: [inlineFragment as any], // gql-ast limitation with inline fragments
-          }),
-        }),
-      ],
-    }),
+            selections: [inlineFragment as any] // gql-ast limitation with inline fragments
+          })
+        })
+      ]
+    })
   });
 }
 
@@ -148,8 +148,8 @@ export function geometryAst(name: string): FieldNode {
   return t.field({
     name,
     selectionSet: t.selectionSet({
-      selections: toFieldArray(['geojson']),
-    }),
+      selections: toFieldArray(['geojson'])
+    })
   });
 }
 
@@ -166,9 +166,9 @@ export function intervalAst(name: string): FieldNode {
         'minutes',
         'months',
         'seconds',
-        'years',
-      ]),
-    }),
+        'years'
+      ])
+    })
   });
 }
 

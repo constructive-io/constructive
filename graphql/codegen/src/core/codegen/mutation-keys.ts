@@ -7,17 +7,18 @@
  * - Mutation deduplication
  * - Tracking mutation state with useIsMutating
  */
-import type { CleanTable, CleanOperation } from '../../types/schema';
-import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
-import { getTableNames, getGeneratedFileHeader, lcFirst } from './utils';
 import * as t from '@babel/types';
+
+import type { EntityRelationship,QueryKeyConfig } from '../../types/config';
+import type { CleanOperation,CleanTable } from '../../types/schema';
 import {
-  generateCode,
   addJSDocComment,
   asConst,
   constArray,
-  typedParam,
+  generateCode,
+  typedParam
 } from './babel-ast';
+import { getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
 
 export interface MutationKeyGeneratorOptions {
   tables: CleanTable[];
@@ -75,12 +76,12 @@ function generateEntityMutationKeysDeclaration(
               false,
               true
             )
-          ]),
+          ])
         ]),
         constArray([
           t.stringLiteral('mutation'),
           t.stringLiteral(entityKey),
-          t.stringLiteral('create'),
+          t.stringLiteral('create')
         ])
       )
     );
@@ -92,7 +93,7 @@ function generateEntityMutationKeysDeclaration(
       constArray([
         t.stringLiteral('mutation'),
         t.stringLiteral(entityKey),
-        t.stringLiteral('create'),
+        t.stringLiteral('create')
       ])
     );
 
@@ -108,7 +109,7 @@ function generateEntityMutationKeysDeclaration(
       t.stringLiteral('mutation'),
       t.stringLiteral(entityKey),
       t.stringLiteral('update'),
-      t.identifier('id'),
+      t.identifier('id')
     ])
   );
   const updateProp = t.objectProperty(t.identifier('update'), updateArrowFn);
@@ -122,7 +123,7 @@ function generateEntityMutationKeysDeclaration(
       t.stringLiteral('mutation'),
       t.stringLiteral(entityKey),
       t.stringLiteral('delete'),
-      t.identifier('id'),
+      t.identifier('id')
     ])
   );
   const deleteProp = t.objectProperty(t.identifier('delete'), deleteArrowFn);
@@ -166,7 +167,7 @@ function generateCustomMutationKeysDeclaration(
           constArray([
             t.stringLiteral('mutation'),
             t.stringLiteral(op.name),
-            t.identifier('identifier'),
+            t.identifier('identifier')
           ]),
           constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
         )
@@ -243,7 +244,7 @@ function generateUnifiedMutationStoreDeclaration(
     '',
     '// Check if a specific user is being updated',
     'const isUpdating = useIsMutating({ mutationKey: mutationKeys.user.update(userId) });',
-    '```',
+    '```'
   ]);
 
   return decl;
@@ -335,6 +336,6 @@ ${description}
 
   return {
     fileName: 'mutation-keys.ts',
-    content,
+    content
   };
 }

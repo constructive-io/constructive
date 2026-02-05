@@ -4,7 +4,7 @@
  * Tests the generated model classes with findMany, findFirst, create, update, delete methods.
  */
 import { generateModelFile } from '../../core/codegen/orm/model-generator';
-import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
+import type { CleanFieldType, CleanRelations,CleanTable } from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -15,14 +15,14 @@ const fieldTypes = {
   string: { gqlType: 'String', isArray: false } as CleanFieldType,
   int: { gqlType: 'Int', isArray: false } as CleanFieldType,
   boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType
 };
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: [],
+  manyToMany: []
 };
 
 function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
@@ -32,7 +32,7 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
     relations: partial.relations ?? emptyRelations,
     query: partial.query,
     inflection: partial.inflection,
-    constraints: partial.constraints,
+    constraints: partial.constraints
   };
 }
 
@@ -49,15 +49,15 @@ describe('model-generator', () => {
         { name: 'email', type: fieldTypes.string },
         { name: 'name', type: fieldTypes.string },
         { name: 'isActive', type: fieldTypes.boolean },
-        { name: 'createdAt', type: fieldTypes.datetime },
+        { name: 'createdAt', type: fieldTypes.datetime }
       ],
       query: {
         all: 'users',
         one: 'user',
         create: 'createUser',
         update: 'updateUser',
-        delete: 'deleteUser',
-      },
+        delete: 'deleteUser'
+      }
     });
 
     const result = generateModelFile(table, false);
@@ -73,15 +73,15 @@ describe('model-generator', () => {
       fields: [
         { name: 'id', type: fieldTypes.uuid },
         { name: 'action', type: fieldTypes.string },
-        { name: 'timestamp', type: fieldTypes.datetime },
+        { name: 'timestamp', type: fieldTypes.datetime }
       ],
       query: {
         all: 'auditLogs',
         one: 'auditLog',
         create: 'createAuditLog',
         update: undefined,
-        delete: undefined,
-      },
+        delete: undefined
+      }
     });
 
     const result = generateModelFile(table, false);
@@ -99,15 +99,15 @@ describe('model-generator', () => {
       name: 'Organization',
       fields: [
         { name: 'id', type: fieldTypes.uuid },
-        { name: 'name', type: fieldTypes.string },
+        { name: 'name', type: fieldTypes.string }
       ],
       query: {
         all: 'allOrganizations',
         one: 'organizationById',
         create: 'registerOrganization',
         update: 'modifyOrganization',
-        delete: 'removeOrganization',
-      },
+        delete: 'removeOrganization'
+      }
     });
 
     const result = generateModelFile(table, false);
@@ -125,15 +125,15 @@ describe('model-generator', () => {
       fields: [
         { name: 'id', type: fieldTypes.uuid },
         { name: 'name', type: fieldTypes.string },
-        { name: 'price', type: fieldTypes.int },
+        { name: 'price', type: fieldTypes.int }
       ],
       query: {
         all: 'products',
         one: 'product',
         create: 'createProduct',
         update: 'updateProduct',
-        delete: 'deleteProduct',
-      },
+        delete: 'deleteProduct'
+      }
     });
 
     const result = generateModelFile(table, false);

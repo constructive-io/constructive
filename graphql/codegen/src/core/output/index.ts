@@ -3,9 +3,9 @@
  */
 
 export {
-  writeGeneratedFiles,
   formatOutput,
   type GeneratedFile,
-  type WriteResult,
+  writeGeneratedFiles,
   type WriteOptions,
+  type WriteResult
 } from './writer';

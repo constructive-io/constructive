@@ -356,7 +356,7 @@ export const DEFAULT_WATCH_CONFIG: WatchConfig = {
   pollInterval: 3000,
   debounce: 800,
   touchFile: undefined,
-  clearScreen: true,
+  clearScreen: true
 };
 
 /**
@@ -367,7 +367,7 @@ export const DEFAULT_QUERY_KEY_CONFIG: QueryKeyConfig = {
   relationships: {},
   generateScopedKeys: true,
   generateCascadeHelpers: true,
-  generateMutationKeys: true,
+  generateMutationKeys: true
 };
 
 /**
@@ -380,36 +380,36 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   tables: {
     include: ['*'],
     exclude: [],
-    systemExclude: [],
+    systemExclude: []
   },
   queries: {
     include: ['*'],
     exclude: [],
-    systemExclude: ['_meta', 'query'], // Internal PostGraphile queries
+    systemExclude: ['_meta', 'query'] // Internal PostGraphile queries
   },
   mutations: {
     include: ['*'],
     exclude: [],
-    systemExclude: [],
+    systemExclude: []
   },
   excludeFields: [],
   hooks: {
     queries: true,
     mutations: true,
-    queryKeyPrefix: 'graphql',
+    queryKeyPrefix: 'graphql'
   },
   postgraphile: {
-    schema: 'public',
+    schema: 'public'
   },
   codegen: {
     maxFieldDepth: 2,
-    skipQueryField: true,
+    skipQueryField: true
   },
   orm: false,
   reactQuery: false,
   browserCompatible: true,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
-  watch: DEFAULT_WATCH_CONFIG,
+  watch: DEFAULT_WATCH_CONFIG
 };
 
 

@@ -54,19 +54,19 @@ export class FetchAdapter implements GraphQLAdapter {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        ...this.headers,
+        ...this.headers
       },
       body: JSON.stringify({
         query: document,
-        variables: variables ?? {},
-      }),
+        variables: variables ?? {}
+      })
     });
 
     if (!response.ok) {
       return {
         ok: false,
         data: null,
-        errors: [{ message: `HTTP ${response.status}: ${response.statusText}` }],
+        errors: [{ message: `HTTP ${response.status}: ${response.statusText}` }]
       };
     }
 
@@ -79,14 +79,14 @@ export class FetchAdapter implements GraphQLAdapter {
       return {
         ok: false,
         data: null,
-        errors: json.errors,
+        errors: json.errors
       };
     }
 
     return {
       ok: true,
       data: json.data as T,
-      errors: undefined,
+      errors: undefined
     };
   }
 

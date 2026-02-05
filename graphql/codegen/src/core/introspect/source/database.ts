@@ -5,11 +5,12 @@
  * introspection and converts it to introspection format.
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
-import type { SchemaSource, SchemaSourceResult } from './types';
-import { SchemaSourceError } from './types';
+
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
 import { createDatabasePool, resolveApiSchemas, validateServicesSchemas } from './api-schemas';
+import type { SchemaSource, SchemaSourceResult } from './types';
+import { SchemaSourceError } from './types';
 
 export interface DatabaseSchemaSourceOptions {
   /**
@@ -77,7 +78,7 @@ export class DatabaseSchemaSource implements SchemaSource {
     try {
       sdl = await buildSchemaSDLFromDatabase({
         database,
-        schemas,
+        schemas
       });
     } catch (err) {
       throw new SchemaSourceError(

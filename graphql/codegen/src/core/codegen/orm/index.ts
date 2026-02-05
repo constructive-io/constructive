@@ -4,21 +4,21 @@
  * Main entry point for ORM code generation. Coordinates all generators
  * and produces the complete ORM client output.
  */
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
 import type { GraphQLSDKConfigTarget } from '../../../types/config';
+import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
+import { generateModelsBarrel, generateTypesBarrel } from './barrel';
 import {
+  generateCreateClientFile,
   generateOrmClientFile,
   generateQueryBuilderFile,
-  generateSelectTypesFile,
-  generateCreateClientFile,
+  generateSelectTypesFile
 } from './client-generator';
-import { generateAllModelFiles } from './model-generator';
 import {
-  generateCustomQueryOpsFile,
   generateCustomMutationOpsFile,
+  generateCustomQueryOpsFile
 } from './custom-ops-generator';
-import { generateModelsBarrel, generateTypesBarrel } from './barrel';
-import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from './input-types-generator';
+import { collectInputTypeNames, collectPayloadTypeNames,generateInputTypesFile } from './input-types-generator';
+import { generateAllModelFiles } from './model-generator';
 
 export interface GeneratedFile {
   path: string;
@@ -80,7 +80,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   for (const modelFile of modelFiles) {
     files.push({
       path: `models/${modelFile.fileName}`,
-      content: modelFile.content,
+      content: modelFile.content
     });
   }
 
@@ -93,7 +93,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   if (tables.length > 0 || (typeRegistry && (hasCustomQueries || hasCustomMutations))) {
     const allOps = [
       ...(customOperations?.queries ?? []),
-      ...(customOperations?.mutations ?? []),
+      ...(customOperations?.mutations ?? [])
     ];
     const usedInputTypes = collectInputTypeNames(allOps);
     const usedPayloadTypes = collectPayloadTypeNames(allOps);
@@ -106,7 +106,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
         const crudPayloadTypes = [
           `Create${typeName}Payload`,
           `Update${typeName}Payload`,
-          `Delete${typeName}Payload`,
+          `Delete${typeName}Payload`
         ];
         for (const payloadType of crudPayloadTypes) {
           if (typeRegistry.has(payloadType)) {
@@ -127,12 +127,18 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
 
   // 5. Generate custom operations (if any)
   if (hasCustomQueries && customOperations?.queries) {
-    const queryOpsFile = generateCustomQueryOpsFile(customOperations.queries);
+    const queryOpsFile = generateCustomQueryOpsFile(
+      customOperations.queries,
+      typeRegistry ?? new Map()
+    );
     files.push({ path: queryOpsFile.fileName, content: queryOpsFile.content });
   }
 
   if (hasCustomMutations && customOperations?.mutations) {
-    const mutationOpsFile = generateCustomMutationOpsFile(customOperations.mutations);
+    const mutationOpsFile = generateCustomMutationOpsFile(
+      customOperations.mutations,
+      typeRegistry ?? new Map()
+    );
     files.push({ path: mutationOpsFile.fileName, content: mutationOpsFile.content });
   }
 
@@ -150,17 +156,17 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
       tables: tables.length,
       customQueries: customOperations?.queries.length ?? 0,
       customMutations: customOperations?.mutations.length ?? 0,
-      totalFiles: files.length,
-    },
+      totalFiles: files.length
+    }
   };
 }
 
 // Re-export generators for direct use
+export { generateModelsBarrel, generateTypesBarrel } from './barrel';
 export {
   generateOrmClientFile,
   generateQueryBuilderFile,
-  generateSelectTypesFile,
+  generateSelectTypesFile
 } from './client-generator';
-export { generateModelFile, generateAllModelFiles } from './model-generator';
-export { generateCustomQueryOpsFile, generateCustomMutationOpsFile } from './custom-ops-generator';
-export { generateModelsBarrel, generateTypesBarrel } from './barrel';
+export { generateCustomMutationOpsFile,generateCustomQueryOpsFile } from './custom-ops-generator';
+export { generateAllModelFiles,generateModelFile } from './model-generator';

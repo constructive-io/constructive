@@ -6,16 +6,17 @@
  */
 
 import { EventEmitter } from 'node:events';
+
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 import { fetchSchema } from '../introspect/fetch-schema';
 import { SchemaCache, touchFile } from './cache';
+import { hashObject } from './hash';
 import type {
-  PollResult,
   PollEvent,
   PollEventType,
-  WatchOptions,
+  PollResult,
+  WatchOptions
 } from './types';
-import { hashObject } from './hash';
 
 /**
  * Schema poller that periodically introspects a GraphQL endpoint
@@ -73,7 +74,7 @@ export class SchemaPoller extends EventEmitter {
       return {
         success: false,
         changed: false,
-        error: 'Poll already in progress',
+        error: 'Poll already in progress'
       };
     }
 
@@ -87,7 +88,7 @@ export class SchemaPoller extends EventEmitter {
         endpoint: this.options.endpoint,
         authorization: this.options.authorization,
         headers: this.options.headers,
-        timeout: 30000,
+        timeout: 30000
       });
 
       const duration = Date.now() - startTime;
@@ -156,7 +157,7 @@ export class SchemaPoller extends EventEmitter {
         endpoint: this.options.endpoint,
         authorization: this.options.authorization,
         headers: this.options.headers,
-        timeout: 30000,
+        timeout: 30000
       });
 
       if (schemaResult.success) {
@@ -218,7 +219,7 @@ export class SchemaPoller extends EventEmitter {
     return {
       type,
       timestamp: Date.now(),
-      ...extra,
+      ...extra
     };
   }
 }

@@ -5,24 +5,24 @@
  * format used by code generators.
  */
 import type {
+  IntrospectionField,
+  IntrospectionInputValue,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionField,
-  IntrospectionTypeRef,
-  IntrospectionInputValue,
+  IntrospectionTypeRef
 } from '../../types/introspection';
 import {
-  unwrapType,
   getBaseTypeName,
   isNonNull,
+  unwrapType
 } from '../../types/introspection';
 import type {
-  CleanOperation,
   CleanArgument,
-  CleanTypeRef,
   CleanObjectField,
-  TypeRegistry,
+  CleanOperation,
+  CleanTypeRef,
   ResolvedType,
+  TypeRegistry
 } from '../../types/schema';
 
 // ============================================================================
@@ -48,7 +48,7 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
     const resolvedType: ResolvedType = {
       kind: type.kind as ResolvedType['kind'],
       name: type.name,
-      description: type.description ?? undefined,
+      description: type.description ?? undefined
     };
 
     // Resolve enum values for ENUM types (no circular refs possible)
@@ -99,7 +99,7 @@ function transformFieldToCleanObjectFieldShallow(
   return {
     name: field.name,
     type: transformTypeRefShallow(field.type),
-    description: field.description ?? undefined,
+    description: field.description ?? undefined
   };
 }
 
@@ -113,7 +113,7 @@ function transformInputValueToCleanArgumentShallow(
     name: inputValue.name,
     type: transformTypeRefShallow(inputValue.type),
     defaultValue: inputValue.defaultValue ?? undefined,
-    description: inputValue.description ?? undefined,
+    description: inputValue.description ?? undefined
   };
 }
 
@@ -124,7 +124,7 @@ function transformInputValueToCleanArgumentShallow(
 function transformTypeRefShallow(typeRef: IntrospectionTypeRef): CleanTypeRef {
   const cleanRef: CleanTypeRef = {
     kind: typeRef.kind as CleanTypeRef['kind'],
-    name: typeRef.name,
+    name: typeRef.name
   };
 
   if (typeRef.ofType) {
@@ -165,15 +165,15 @@ export function transformSchemaToOperations(
   // Transform queries
   const queries: CleanOperation[] = queryTypeDef?.fields
     ? queryTypeDef.fields.map((field) =>
-        transformFieldToCleanOperation(field, 'query', types)
-      )
+      transformFieldToCleanOperation(field, 'query', types)
+    )
     : [];
 
   // Transform mutations
   const mutations: CleanOperation[] = mutationTypeDef?.fields
     ? mutationTypeDef.fields.map((field) =>
-        transformFieldToCleanOperation(field, 'mutation', types)
-      )
+      transformFieldToCleanOperation(field, 'mutation', types)
+    )
     : [];
 
   return { queries, mutations, typeRegistry };
@@ -200,7 +200,7 @@ function transformFieldToCleanOperation(
     returnType: transformTypeRefToCleanTypeRef(field.type, types),
     description: field.description ?? undefined,
     isDeprecated: field.isDeprecated,
-    deprecationReason: field.deprecationReason ?? undefined,
+    deprecationReason: field.deprecationReason ?? undefined
   };
 }
 
@@ -215,7 +215,7 @@ function transformInputValueToCleanArgument(
     name: inputValue.name,
     type: transformTypeRefToCleanTypeRef(inputValue.type, types),
     defaultValue: inputValue.defaultValue ?? undefined,
-    description: inputValue.description ?? undefined,
+    description: inputValue.description ?? undefined
   };
 }
 
@@ -237,7 +237,7 @@ function transformTypeRefToCleanTypeRef(
 ): CleanTypeRef {
   const cleanRef: CleanTypeRef = {
     kind: typeRef.kind as CleanTypeRef['kind'],
-    name: typeRef.name,
+    name: typeRef.name
   };
 
   // Recursively transform ofType for wrappers (LIST, NON_NULL)
@@ -400,4 +400,4 @@ export function getCustomOperations(
 }
 
 // Re-export utility functions from introspection types
-export { unwrapType, getBaseTypeName, isNonNull };
+export { getBaseTypeName, isNonNull,unwrapType };

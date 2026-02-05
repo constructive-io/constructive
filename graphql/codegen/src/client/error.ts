@@ -43,7 +43,7 @@ export const DataErrorType = {
   EXCLUSION_VIOLATION: 'EXCLUSION_VIOLATION',
 
   // Generic errors
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 } as const;
 
 export type DataErrorType = (typeof DataErrorType)[keyof typeof DataErrorType];
@@ -91,36 +91,36 @@ export class DataError extends Error {
 
   getUserMessage(): string {
     switch (this.type) {
-      case DataErrorType.NETWORK_ERROR:
-        return 'Network error. Please check your connection and try again.';
-      case DataErrorType.TIMEOUT_ERROR:
-        return 'Request timed out. Please try again.';
-      case DataErrorType.UNAUTHORIZED:
-        return 'You are not authorized. Please log in and try again.';
-      case DataErrorType.FORBIDDEN:
-        return 'You do not have permission to access this resource.';
-      case DataErrorType.VALIDATION_FAILED:
-        return 'Validation failed. Please check your input and try again.';
-      case DataErrorType.REQUIRED_FIELD_MISSING:
-        return this.fieldName
-          ? `The field "${this.fieldName}" is required.`
-          : 'A required field is missing.';
-      case DataErrorType.UNIQUE_VIOLATION:
-        return this.fieldName
-          ? `A record with this ${this.fieldName} already exists.`
-          : 'A record with this value already exists.';
-      case DataErrorType.FOREIGN_KEY_VIOLATION:
-        return 'This record references a record that does not exist.';
-      case DataErrorType.NOT_NULL_VIOLATION:
-        return this.fieldName
-          ? `The field "${this.fieldName}" cannot be empty.`
-          : 'A required field cannot be empty.';
-      case DataErrorType.CHECK_VIOLATION:
-        return this.fieldName
-          ? `The value for "${this.fieldName}" is not valid.`
-          : 'The value does not meet the required constraints.';
-      default:
-        return this.message || 'An unexpected error occurred.';
+    case DataErrorType.NETWORK_ERROR:
+      return 'Network error. Please check your connection and try again.';
+    case DataErrorType.TIMEOUT_ERROR:
+      return 'Request timed out. Please try again.';
+    case DataErrorType.UNAUTHORIZED:
+      return 'You are not authorized. Please log in and try again.';
+    case DataErrorType.FORBIDDEN:
+      return 'You do not have permission to access this resource.';
+    case DataErrorType.VALIDATION_FAILED:
+      return 'Validation failed. Please check your input and try again.';
+    case DataErrorType.REQUIRED_FIELD_MISSING:
+      return this.fieldName
+        ? `The field "${this.fieldName}" is required.`
+        : 'A required field is missing.';
+    case DataErrorType.UNIQUE_VIOLATION:
+      return this.fieldName
+        ? `A record with this ${this.fieldName} already exists.`
+        : 'A record with this value already exists.';
+    case DataErrorType.FOREIGN_KEY_VIOLATION:
+      return 'This record references a record that does not exist.';
+    case DataErrorType.NOT_NULL_VIOLATION:
+      return this.fieldName
+        ? `The field "${this.fieldName}" cannot be empty.`
+        : 'A required field cannot be empty.';
+    case DataErrorType.CHECK_VIOLATION:
+      return this.fieldName
+        ? `The value for "${this.fieldName}" is not valid.`
+        : 'The value does not meet the required constraints.';
+    default:
+      return this.message || 'An unexpected error occurred.';
     }
   }
 
@@ -148,7 +148,7 @@ export const PG_ERROR_CODES = {
   DATETIME_FIELD_OVERFLOW: '22008',
   UNDEFINED_TABLE: '42P01',
   UNDEFINED_COLUMN: '42703',
-  INSUFFICIENT_PRIVILEGE: '42501',
+  INSUFFICIENT_PRIVILEGE: '42501'
 } as const;
 
 // ============================================================================
@@ -187,7 +187,7 @@ export const createError = {
     new DataError(DataErrorType.NOT_NULL_VIOLATION, message, { fieldName, constraint, code: '23502' }),
 
   unknown: (originalError: Error) =>
-    new DataError(DataErrorType.UNKNOWN_ERROR, originalError.message, { originalError }),
+    new DataError(DataErrorType.UNKNOWN_ERROR, originalError.message, { originalError })
 };
 
 // ============================================================================
@@ -293,7 +293,7 @@ export function parseGraphQLError(error: unknown): DataError {
         code: extCode,
         fieldName,
         constraint,
-        context: gqlError.extensions,
+        context: gqlError.extensions
       });
     }
 
@@ -303,7 +303,7 @@ export function parseGraphQLError(error: unknown): DataError {
       code: extCode,
       fieldName,
       constraint,
-      context: gqlError.extensions,
+      context: gqlError.extensions
     });
   }
 

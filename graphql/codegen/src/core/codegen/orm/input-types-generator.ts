@@ -10,24 +10,26 @@
  *
  * Uses Babel AST for robust code generation.
  */
+import * as t from '@babel/types';
+import { pluralize } from 'inflekt';
+
 import type {
-  TypeRegistry,
   CleanArgument,
   CleanTable,
+  TypeRegistry
 } from '../../../types/schema';
-import * as t from '@babel/types';
-import { generateCode, addLineComment } from '../babel-ast';
-import {
-  getTableNames,
-  getFilterTypeName,
-  getConditionTypeName,
-  getOrderByTypeName,
-  isRelationField,
-  getGeneratedFileHeader,
-} from '../utils';
-import { pluralize } from 'inflekt';
+import { addLineComment,generateCode } from '../babel-ast';
+import { scalarToFilterType,scalarToTsType } from '../scalars';
 import { getTypeBaseName } from '../type-resolver';
-import { scalarToTsType, scalarToFilterType } from '../scalars';
+import {
+  getConditionTypeName,
+  getFilterTypeName,
+  getGeneratedFileHeader,
+  getOrderByTypeName,
+  getPrimaryKeyInfo,
+  getTableNames,
+  isRelationField
+} from '../utils';
 
 export interface GeneratedInputTypesFile {
   fileName: string;
@@ -43,7 +45,7 @@ const EXCLUDED_MUTATION_FIELDS = [
   'id',
   'createdAt',
   'updatedAt',
-  'nodeId',
+  'nodeId'
 ] as const;
 
 // ============================================================================
@@ -54,7 +56,7 @@ const EXCLUDED_MUTATION_FIELDS = [
  * Overrides for input-type generation
  */
 const INPUT_SCALAR_OVERRIDES: Record<string, string> = {
-  JSON: 'Record<string, unknown>',
+  JSON: 'Record<string, unknown>'
 };
 
 /**
@@ -63,7 +65,7 @@ const INPUT_SCALAR_OVERRIDES: Record<string, string> = {
 function scalarToInputTs(scalar: string): string {
   return scalarToTsType(scalar, {
     unknownScalar: 'name',
-    overrides: INPUT_SCALAR_OVERRIDES,
+    overrides: INPUT_SCALAR_OVERRIDES
   });
 }
 
@@ -132,18 +134,18 @@ function parseTypeString(typeStr: string): t.TSType {
 
   // Handle primitive types
   switch (typeStr) {
-    case 'string':
-      return t.tsStringKeyword();
-    case 'number':
-      return t.tsNumberKeyword();
-    case 'boolean':
-      return t.tsBooleanKeyword();
-    case 'null':
-      return t.tsNullKeyword();
-    case 'unknown':
-      return t.tsUnknownKeyword();
-    default:
-      return t.tsTypeReference(t.identifier(typeStr));
+  case 'string':
+    return t.tsStringKeyword();
+  case 'number':
+    return t.tsNumberKeyword();
+  case 'boolean':
+    return t.tsBooleanKeyword();
+  case 'null':
+    return t.tsNullKeyword();
+  case 'unknown':
+    return t.tsUnknownKeyword();
+  default:
+    return t.tsTypeReference(t.identifier(typeStr));
   }
 }
 
@@ -256,72 +258,72 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
   {
     name: 'StringFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string']
   },
   {
     name: 'IntFilter',
     tsType: 'number',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   {
     name: 'FloatFilter',
     tsType: 'number',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   { name: 'BooleanFilter', tsType: 'boolean', operators: ['equality'] },
   {
     name: 'UUIDFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray'],
+    operators: ['equality', 'distinct', 'inArray']
   },
   {
     name: 'DatetimeFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   {
     name: 'DateFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   {
     name: 'JSONFilter',
     tsType: 'Record<string, unknown>',
-    operators: ['equality', 'distinct', 'json'],
+    operators: ['equality', 'distinct', 'json']
   },
   {
     name: 'BigIntFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   {
     name: 'BigFloatFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison']
   },
   { name: 'BitStringFilter', tsType: 'string', operators: ['equality'] },
   {
     name: 'InternetAddressFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet']
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
   // List filters (for array fields like string[], int[], uuid[])
   {
     name: 'StringListFilter',
     tsType: 'string[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+    operators: ['equality', 'distinct', 'comparison', 'listArray']
   },
   {
     name: 'IntListFilter',
     tsType: 'number[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+    operators: ['equality', 'distinct', 'comparison', 'listArray']
   },
   {
     name: 'UUIDListFilter',
     tsType: 'string[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray'],
-  },
+    operators: ['equality', 'distinct', 'comparison', 'listArray']
+  }
 ];
 
 /**
@@ -542,7 +544,7 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: isNullable ? `${tsType} | null` : tsType,
-      optional: isNullable,
+      optional: isNullable
     });
   }
 
@@ -582,13 +584,13 @@ function generateRelationHelperTypes(): t.Statement[] {
   const connectionResultProps: t.TSPropertySignature[] = [
     createPropertySignature('nodes', 'T[]', false),
     createPropertySignature('totalCount', 'number', false),
-    createPropertySignature('pageInfo', 'PageInfo', false),
+    createPropertySignature('pageInfo', 'PageInfo', false)
   ];
   const connectionResultBody = t.tsInterfaceBody(connectionResultProps);
   const connectionResultDecl = t.tsInterfaceDeclaration(
     t.identifier('ConnectionResult'),
     t.tsTypeParameterDeclaration([
-      t.tsTypeParameter(null, null, 'T'),
+      t.tsTypeParameter(null, null, 'T')
     ]),
     null,
     connectionResultBody
@@ -601,7 +603,7 @@ function generateRelationHelperTypes(): t.Statement[] {
       { name: 'hasNextPage', type: 'boolean', optional: false },
       { name: 'hasPreviousPage', type: 'boolean', optional: false },
       { name: 'startCursor', type: 'string | null', optional: true },
-      { name: 'endCursor', type: 'string | null', optional: true },
+      { name: 'endCursor', type: 'string | null', optional: true }
     ])
   );
 
@@ -663,7 +665,7 @@ function buildEntityRelationProperties(
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -676,7 +678,7 @@ function buildEntityRelationProperties(
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -689,7 +691,7 @@ function buildEntityRelationProperties(
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -702,7 +704,7 @@ function buildEntityRelationProperties(
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -803,8 +805,8 @@ function buildSelectTypeLiteral(
                 );
                 selectProp.optional = true;
                 return selectProp;
-              })(),
-            ]),
+              })()
+            ])
           ])
         )
       );
@@ -869,8 +871,8 @@ function buildSelectTypeLiteral(
                 );
                 p.optional = true;
                 return p;
-              })(),
-            ]),
+              })()
+            ])
           ])
         )
       );
@@ -932,8 +934,8 @@ function buildSelectTypeLiteral(
                 );
                 p.optional = true;
                 return p;
-              })(),
-            ]),
+              })()
+            ])
           ])
         )
       );
@@ -964,8 +966,8 @@ function buildSelectTypeLiteral(
                 );
                 selectProp.optional = true;
                 return selectProp;
-              })(),
-            ]),
+              })()
+            ])
           ])
         )
       );
@@ -1077,7 +1079,7 @@ function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: `${tsType} | null`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -1214,7 +1216,7 @@ function buildCreateInputInterface(table: CleanTable): t.ExportNamedDeclaration 
     t.tsPropertySignature(
       t.identifier(singularName),
       t.tsTypeAnnotation(nestedObjectType)
-    ),
+    )
   ];
 
   const body = t.tsInterfaceBody(mainProps);
@@ -1249,7 +1251,7 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: `${tsType} | null`,
-      optional: true,
+      optional: true
     });
   }
 
@@ -1264,6 +1266,11 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
   const { typeName } = getTableNames(table);
   const patchName = `${typeName}Patch`;
 
+  const pkFields = getPrimaryKeyInfo(table);
+  const pkField = pkFields[0];
+  const pkFieldName = pkField?.name ?? 'id';
+  const pkFieldTsType = pkField?.tsType ?? 'string';
+
   // Create input
   statements.push(buildCreateInputInterface(table));
 
@@ -1276,8 +1283,8 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
   statements.push(
     createExportedInterface(`Update${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
-      { name: 'id', type: 'string', optional: false },
-      { name: 'patch', type: patchName, optional: false },
+      { name: pkFieldName, type: pkFieldTsType, optional: false },
+      { name: 'patch', type: patchName, optional: false }
     ])
   );
 
@@ -1285,7 +1292,7 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
   statements.push(
     createExportedInterface(`Delete${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
-      { name: 'id', type: 'string', optional: false },
+      { name: pkFieldName, type: pkFieldTsType, optional: false }
     ])
   );
 
@@ -1456,10 +1463,7 @@ export function collectPayloadTypeNames(
 
   for (const op of operations) {
     const baseName = getTypeBaseName(op.returnType);
-    if (
-      baseName &&
-      (baseName.endsWith('Payload') || !baseName.endsWith('Connection'))
-    ) {
+    if (baseName) {
       payloadTypes.add(baseName);
     }
   }
@@ -1494,7 +1498,7 @@ function generatePayloadTypes(
     'BigFloat',
     'Cursor',
     'Query',
-    'Mutation',
+    'Mutation'
   ]);
 
   // Process all types - no artificial limit
@@ -1524,7 +1528,7 @@ function generatePayloadTypes(
       interfaceProps.push({
         name: field.name,
         type: isNullable ? `${tsType} | null` : tsType,
-        optional: isNullable,
+        optional: isNullable
       });
 
       // Follow nested OBJECT types
@@ -1563,8 +1567,8 @@ function generatePayloadTypes(
               );
               p.optional = true;
               return p;
-            })(),
-          ]),
+            })()
+          ])
         ]);
       } else {
         propType = t.tsBooleanKeyword();
@@ -1669,6 +1673,6 @@ export function generateInputTypesFile(
 
   return {
     fileName: 'input-types.ts',
-    content: header + '\n' + code,
+    content: header + '\n' + code
   };
 }

@@ -5,8 +5,8 @@
  * Functions are re-implemented here to avoid ./client import issues.
  */
 import * as t from 'gql-ast';
-import { parseType, print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
+import { parseType, print } from 'graphql';
 
 // ============================================================================
 // Core functions from query-builder.ts (re-implemented for testing)
@@ -16,7 +16,7 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
   return [
     t.field({
       name: 'nodes',
-      selectionSet: t.selectionSet({ selections: nodeSelections }),
+      selectionSet: t.selectionSet({ selections: nodeSelections })
     }),
     t.field({ name: 'totalCount' }),
     t.field({
@@ -26,10 +26,10 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
           t.field({ name: 'hasNextPage' }),
           t.field({ name: 'hasPreviousPage' }),
           t.field({ name: 'startCursor' }),
-          t.field({ name: 'endCursor' }),
-        ],
-      }),
-    }),
+          t.field({ name: 'endCursor' })
+        ]
+      })
+    })
   ];
 }
 
@@ -43,13 +43,13 @@ function addVariable(
   definitions.push(
     t.variableDefinition({
       variable: t.variable({ name: spec.varName }),
-      type: parseType(spec.typeName),
+      type: parseType(spec.typeName)
     })
   );
   args.push(
     t.argument({
       name: spec.argName ?? spec.varName,
-      value: t.variable({ name: spec.varName }),
+      value: t.variable({ name: spec.varName })
     })
   );
   variables[spec.varName] = spec.value;
@@ -66,7 +66,7 @@ function buildSelections(select: Record<string, unknown> | undefined): FieldNode
       fields.push(
         t.field({
           name: key,
-          selectionSet: t.selectionSet({ selections: buildSelections(nested.select) }),
+          selectionSet: t.selectionSet({ selections: buildSelections(nested.select) })
         })
       );
     }
@@ -104,12 +104,12 @@ function buildFindManyDocument<TSelect, TWhere>(
             t.field({
               name: queryField,
               args: queryArgs.length ? queryArgs : undefined,
-              selectionSet: t.selectionSet({ selections: buildConnectionSelections(selections) }),
-            }),
-          ],
-        }),
-      }),
-    ],
+              selectionSet: t.selectionSet({ selections: buildConnectionSelections(selections) })
+            })
+          ]
+        })
+      })
+    ]
   });
   return { document: print(document), variables };
 }
@@ -130,8 +130,8 @@ function buildMutationDocument(
           variableDefinitions: [
             t.variableDefinition({
               variable: t.variable({ name: 'input' }),
-              type: parseType(inputTypeName + '!'),
-            }),
+              type: parseType(inputTypeName + '!')
+            })
           ],
           selectionSet: t.selectionSet({
             selections: [
@@ -142,15 +142,15 @@ function buildMutationDocument(
                   selections: [
                     t.field({
                       name: entityField,
-                      selectionSet: t.selectionSet({ selections }),
-                    }),
-                  ],
-                }),
-              }),
-            ],
-          }),
-        }),
-      ],
+                      selectionSet: t.selectionSet({ selections })
+                    })
+                  ]
+                })
+              })
+            ]
+          })
+        })
+      ]
     })
   );
 }
@@ -166,7 +166,7 @@ describe('query-builder', () => {
         id: true,
         name: true,
         ignored: false,
-        profile: { select: { bio: true } },
+        profile: { select: { bio: true } }
       });
 
       expect(result).toHaveLength(3);
@@ -199,7 +199,7 @@ describe('query-builder', () => {
       expect(variables).toEqual({
         where: { status: { equalTo: 'active' } },
         first: 10,
-        orderBy: ['NAME_ASC'],
+        orderBy: ['NAME_ASC']
       });
     });
   });

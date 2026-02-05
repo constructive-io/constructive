@@ -6,11 +6,11 @@
  * - Mutation generators return null (since they require React Query)
  * - Standalone fetch functions are still generated for queries
  */
-import { generateListQueryHook, generateSingleQueryHook, generateAllQueryHooks } from '../../core/codegen/queries';
-import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook, generateAllMutationHooks } from '../../core/codegen/mutations';
-import { generateCustomQueryHook, generateAllCustomQueryHooks } from '../../core/codegen/custom-queries';
-import { generateCustomMutationHook, generateAllCustomMutationHooks } from '../../core/codegen/custom-mutations';
-import type { CleanTable, CleanFieldType, CleanRelations, CleanOperation, CleanTypeRef, TypeRegistry } from '../../types/schema';
+import { generateAllCustomMutationHooks,generateCustomMutationHook } from '../../core/codegen/custom-mutations';
+import { generateAllCustomQueryHooks,generateCustomQueryHook } from '../../core/codegen/custom-queries';
+import { generateAllMutationHooks,generateCreateMutationHook, generateDeleteMutationHook, generateUpdateMutationHook } from '../../core/codegen/mutations';
+import { generateAllQueryHooks,generateListQueryHook, generateSingleQueryHook } from '../../core/codegen/queries';
+import type { CleanFieldType, CleanOperation, CleanRelations, CleanTable, CleanTypeRef, TypeRegistry } from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -20,14 +20,14 @@ const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
   string: { gqlType: 'String', isArray: false } as CleanFieldType,
   int: { gqlType: 'Int', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType
 };
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: [],
+  manyToMany: []
 };
 
 function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
@@ -37,7 +37,7 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
     relations: partial.relations ?? emptyRelations,
     query: partial.query,
     inflection: partial.inflection,
-    constraints: partial.constraints,
+    constraints: partial.constraints
   };
 }
 
@@ -47,15 +47,15 @@ const userTable = createTable({
     { name: 'id', type: fieldTypes.uuid },
     { name: 'email', type: fieldTypes.string },
     { name: 'name', type: fieldTypes.string },
-    { name: 'createdAt', type: fieldTypes.datetime },
+    { name: 'createdAt', type: fieldTypes.datetime }
   ],
   query: {
     all: 'users',
     one: 'user',
     create: 'createUser',
     update: 'updateUser',
-    delete: 'deleteUser',
-  },
+    delete: 'deleteUser'
+  }
 });
 
 function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
@@ -67,7 +67,7 @@ const sampleQueryOperation: CleanOperation = {
   kind: 'query',
   args: [],
   returnType: createTypeRef('OBJECT', 'User'),
-  description: 'Get the current authenticated user',
+  description: 'Get the current authenticated user'
 };
 
 const sampleMutationOperation: CleanOperation = {
@@ -75,10 +75,10 @@ const sampleMutationOperation: CleanOperation = {
   kind: 'mutation',
   args: [
     { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-    { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+    { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) }
   ],
   returnType: createTypeRef('OBJECT', 'LoginPayload'),
-  description: 'Authenticate user',
+  description: 'Authenticate user'
 };
 
 const emptyTypeRegistry: TypeRegistry = new Map();
@@ -111,9 +111,9 @@ describe('Query generators with reactQueryEnabled: false', () => {
       expect(result.content).toContain('export async function fetchUsersQuery');
     });
 
-    it('should still include GraphQL document when disabled', () => {
+    it('should still include ORM client imports when disabled', () => {
       const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
-      expect(result.content).toContain('usersQueryDocument');
+      expect(result.content).toContain('getClient');
     });
 
     it('should still include query key factory when disabled', () => {
@@ -251,7 +251,7 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
       const result = generateCustomQueryHook({
         operation: sampleQueryOperation,
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(result.content).not.toContain('@tanstack/react-query');
       expect(result.content).not.toContain('useQuery');
@@ -261,7 +261,7 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
       const result = generateCustomQueryHook({
         operation: sampleQueryOperation,
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(result.content).not.toContain('export function useCurrentUserQuery');
     });
@@ -270,7 +270,7 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
       const result = generateCustomQueryHook({
         operation: sampleQueryOperation,
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(result.content).toContain('export async function fetchCurrentUserQuery');
     });
@@ -281,7 +281,7 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
       const results = generateAllCustomQueryHooks({
         operations: [sampleQueryOperation],
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(results.length).toBe(1);
       expect(results[0].content).not.toContain('@tanstack/react-query');
@@ -299,7 +299,7 @@ describe('Custom mutation generators with reactQueryEnabled: false', () => {
       const result = generateCustomMutationHook({
         operation: sampleMutationOperation,
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(result).toBeNull();
     });
@@ -310,7 +310,7 @@ describe('Custom mutation generators with reactQueryEnabled: false', () => {
       const results = generateAllCustomMutationHooks({
         operations: [sampleMutationOperation],
         typeRegistry: emptyTypeRegistry,
-        reactQueryEnabled: false,
+        reactQueryEnabled: false
       });
       expect(results).toEqual([]);
     });
@@ -326,7 +326,7 @@ describe('Custom mutation generators with reactQueryEnabled: true (default)', ()
     it('should return mutation file by default', () => {
       const result = generateCustomMutationHook({
         operation: sampleMutationOperation,
-        typeRegistry: emptyTypeRegistry,
+        typeRegistry: emptyTypeRegistry
       });
       expect(result).not.toBeNull();
       expect(result!.content).toContain('useMutation');

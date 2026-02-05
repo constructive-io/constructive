@@ -4,10 +4,11 @@
  * These are exported so that packages/cli can use the same questions
  * and types, ensuring consistency between the two CLIs.
  */
-import type { Question } from 'inquirerer';
-import type { GenerateResult } from '../core/generate';
 import { camelize } from 'inflekt';
 import { inflektTree } from 'inflekt/transform-keys';
+import type { Question } from 'inquirerer';
+
+import type { GenerateResult } from '../core/generate';
 
 /**
  * Sanitize function that splits comma-separated strings into arrays
@@ -43,13 +44,13 @@ export const codegenQuestions: Question[] = [
     name: 'endpoint',
     message: 'GraphQL endpoint URL',
     type: 'text',
-    required: false,
+    required: false
   },
   {
     name: 'schema-file',
     message: 'Path to GraphQL schema file',
     type: 'text',
-    required: false,
+    required: false
   },
   {
     name: 'output',
@@ -57,21 +58,21 @@ export const codegenQuestions: Question[] = [
     type: 'text',
     required: false,
     default: 'codegen',
-    useDefault: true,
+    useDefault: true
   },
   {
     name: 'schemas',
     message: 'PostgreSQL schemas (comma-separated)',
     type: 'text',
     required: false,
-    sanitize: splitCommas,
+    sanitize: splitCommas
   },
   {
     name: 'api-names',
     message: 'API names (comma-separated)',
     type: 'text',
     required: false,
-    sanitize: splitCommas,
+    sanitize: splitCommas
   },
   {
     name: 'react-query',
@@ -79,7 +80,7 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true,
+    useDefault: true
   },
   {
     name: 'orm',
@@ -87,7 +88,7 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true,
+    useDefault: true
   },
   {
     name: 'browser-compatible',
@@ -95,13 +96,13 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: true,
-    useDefault: true,
+    useDefault: true
   },
   {
     name: 'authorization',
     message: 'Authorization header value',
     type: 'text',
-    required: false,
+    required: false
   },
   {
     name: 'dry-run',
@@ -109,7 +110,7 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true,
+    useDefault: true
   },
   {
     name: 'verbose',
@@ -117,8 +118,8 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true,
-  },
+    useDefault: true
+  }
 ];
 
 /**

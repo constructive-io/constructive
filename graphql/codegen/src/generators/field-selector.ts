@@ -7,7 +7,7 @@ import type { CleanTable } from '../types/schema';
 import type {
   FieldSelection,
   FieldSelectionPreset,
-  SimpleFieldSelection,
+  SimpleFieldSelection
 } from '../types/selection';
 
 /**
@@ -39,47 +39,47 @@ function convertPresetToSelection(
   const options: QuerySelectionOptions = {};
 
   switch (preset) {
-    case 'minimal': {
-      // Just id and first display field
-      const minimalFields = getMinimalFields(table);
-      minimalFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'minimal': {
+    // Just id and first display field
+    const minimalFields = getMinimalFields(table);
+    minimalFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'display': {
-      // Common display fields
-      const displayFields = getDisplayFields(table);
-      displayFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'display': {
+    // Common display fields
+    const displayFields = getDisplayFields(table);
+    displayFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'all': {
-      // All non-relational fields (includes complex fields like JSON, geometry, etc.)
-      const allFields = getNonRelationalFields(table);
-      allFields.forEach((field) => {
-        options[field] = true;
-      });
-      break;
-    }
+  case 'all': {
+    // All non-relational fields (includes complex fields like JSON, geometry, etc.)
+    const allFields = getNonRelationalFields(table);
+    allFields.forEach((field) => {
+      options[field] = true;
+    });
+    break;
+  }
 
-    case 'full':
-      // All fields including basic relations
-      table.fields.forEach((field) => {
-        options[field.name] = true;
-      });
-      break;
+  case 'full':
+    // All fields including basic relations
+    table.fields.forEach((field) => {
+      options[field.name] = true;
+    });
+    break;
 
-    default: {
-      // Default to display
-      const defaultFields = getDisplayFields(table);
-      defaultFields.forEach((field) => {
-        options[field] = true;
-      });
-    }
+  default: {
+    // Default to display
+    const defaultFields = getDisplayFields(table);
+    defaultFields.forEach((field) => {
+      options[field] = true;
+    });
+  }
   }
 
   return options;
@@ -118,7 +118,7 @@ function convertCustomSelectionToOptions(
         // Include with dynamically determined scalar fields from the related table
         options[relationField] = {
           select: getRelatedTableScalarFields(relationField, table, allTables),
-          variables: {},
+          variables: {}
         };
       }
     });
@@ -137,7 +137,7 @@ function convertCustomSelectionToOptions(
                 table,
                 allTables
               ),
-              variables: {},
+              variables: {}
             };
           } else if (Array.isArray(relationSelection)) {
             // Include with specific fields
@@ -147,7 +147,7 @@ function convertCustomSelectionToOptions(
             });
             options[relationField] = {
               select: selectObj,
-              variables: {},
+              variables: {}
             };
           }
         }
@@ -305,7 +305,7 @@ function getRelatedTableScalarFields(
     'slug',
     'code',
     'createdAt',
-    'updatedAt',
+    'updatedAt'
   ];
 
   const included: string[] = [];
@@ -351,7 +351,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'belongsTo',
-        referencedTable: rel.referencesTable || undefined,
+        referencedTable: rel.referencesTable || undefined
       });
     }
   });
@@ -362,7 +362,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'hasOne',
-        referencedTable: rel.referencedByTable || undefined,
+        referencedTable: rel.referencedByTable || undefined
       });
     }
   });
@@ -373,7 +373,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'hasMany',
-        referencedTable: rel.referencedByTable || undefined,
+        referencedTable: rel.referencedByTable || undefined
       });
     }
   });
@@ -384,7 +384,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'manyToMany',
-        referencedTable: rel.rightTable || undefined,
+        referencedTable: rel.rightTable || undefined
       });
     }
   });
@@ -465,6 +465,6 @@ export function validateFieldSelection(
 
   return {
     isValid: errors.length === 0,
-    errors,
+    errors
   };
 }

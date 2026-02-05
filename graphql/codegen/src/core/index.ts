@@ -6,8 +6,8 @@
  */
 
 // Main generate function (orchestrates the entire pipeline)
-export { generate } from './generate';
 export type { GenerateOptions, GenerateResult } from './generate';
+export { generate } from './generate';
 
 // Types
 export * from './types';
@@ -17,10 +17,10 @@ export * from './ast';
 export * from './custom-ast';
 
 // Query builder
-export { QueryBuilder, MetaObject } from './query-builder';
+export { MetaObject,QueryBuilder } from './query-builder';
 
 // Meta object utilities
-export { validateMetaObject, convertFromMetaSchema } from './meta-object';
+export { convertFromMetaSchema,validateMetaObject } from './meta-object';
 
 // Configuration loading and resolution
 export * from './config';

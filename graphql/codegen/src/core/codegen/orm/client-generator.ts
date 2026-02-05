@@ -3,12 +3,13 @@
  *
  * Generates the createClient() factory function and main client file.
  */
-import type { CleanTable } from '../../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, commentBlock } from '../babel-ast';
-import { getTableNames, lcFirst, getGeneratedFileHeader } from '../utils';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import type { CleanTable } from '../../../types/schema';
+import { commentBlock,generateCode } from '../babel-ast';
+import { getGeneratedFileHeader,getTableNames, lcFirst } from '../utils';
 
 export interface GeneratedClientFile {
   fileName: string;
@@ -61,7 +62,7 @@ function readTemplateFile(templateName: string, description: string): string {
 export function generateOrmClientFile(): GeneratedClientFile {
   return {
     fileName: 'client.ts',
-    content: readTemplateFile('orm-client.ts', 'ORM Client - Runtime GraphQL executor'),
+    content: readTemplateFile('orm-client.ts', 'ORM Client - Runtime GraphQL executor')
   };
 }
 
@@ -76,7 +77,7 @@ export function generateQueryBuilderFile(): GeneratedClientFile {
     content: readTemplateFile(
       'query-builder.ts',
       'Query Builder - Builds and executes GraphQL operations'
-    ),
+    )
   };
 }
 
@@ -88,7 +89,7 @@ export function generateQueryBuilderFile(): GeneratedClientFile {
 export function generateSelectTypesFile(): GeneratedClientFile {
   return {
     fileName: 'select-types.ts',
-    content: readTemplateFile('select-types.ts', 'Type utilities for select inference'),
+    content: readTemplateFile('select-types.ts', 'Type utilities for select inference')
   };
 }
 
@@ -167,7 +168,7 @@ export function generateCreateClientFile(
       t.exportSpecifier(
         t.identifier('GraphQLAdapter'),
         t.identifier('GraphQLAdapter')
-      ),
+      )
     ],
     t.stringLiteral('./client')
   );
@@ -182,7 +183,7 @@ export function generateCreateClientFile(
         t.exportSpecifier(
           t.identifier('GraphQLRequestError'),
           t.identifier('GraphQLRequestError')
-        ),
+        )
       ],
       t.stringLiteral('./client')
     )
@@ -196,7 +197,7 @@ export function generateCreateClientFile(
         t.exportSpecifier(
           t.identifier('QueryBuilder'),
           t.identifier('QueryBuilder')
-        ),
+        )
       ],
       t.stringLiteral('./query-builder')
     )
@@ -217,7 +218,7 @@ export function generateCreateClientFile(
           t.exportSpecifier(
             t.identifier('createQueryOperations'),
             t.identifier('createQueryOperations')
-          ),
+          )
         ],
         t.stringLiteral('./query')
       )
@@ -231,7 +232,7 @@ export function generateCreateClientFile(
           t.exportSpecifier(
             t.identifier('createMutationOperations'),
             t.identifier('createMutationOperations')
-          ),
+          )
         ],
         t.stringLiteral('./mutation')
       )
@@ -257,7 +258,7 @@ export function generateCreateClientFile(
       t.objectProperty(
         t.identifier('query'),
         t.callExpression(t.identifier('createQueryOperations'), [
-          t.identifier('client'),
+          t.identifier('client')
         ])
       )
     );
@@ -268,7 +269,7 @@ export function generateCreateClientFile(
       t.objectProperty(
         t.identifier('mutation'),
         t.callExpression(t.identifier('createMutationOperations'), [
-          t.identifier('client'),
+          t.identifier('client')
         ])
       )
     );
@@ -279,7 +280,7 @@ export function generateCreateClientFile(
     t.variableDeclarator(
       t.identifier('client'),
       t.newExpression(t.identifier('OrmClient'), [t.identifier('config')])
-    ),
+    )
   ]);
 
   const returnStmt = t.returnStatement(t.objectExpression(returnProperties));
@@ -329,6 +330,6 @@ export function generateCreateClientFile(
 
   return {
     fileName: 'index.ts',
-    content: header + '\n' + code,
+    content: header + '\n' + code
   };
 }

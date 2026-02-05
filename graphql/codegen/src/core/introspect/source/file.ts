@@ -6,10 +6,12 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import { buildSchema, introspectionFromSchema } from 'graphql';
+
+import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
-import type { IntrospectionQueryResponse } from '../../../types/introspection';
 
 export interface FileSchemaSourceOptions {
   /**

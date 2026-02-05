@@ -78,11 +78,11 @@ export function convertFromMetaSchema(
   metaSchema: MetaSchemaInput
 ): ConvertedMetaObject {
   const {
-    _meta: { tables },
+    _meta: { tables }
   } = metaSchema;
 
   const result: ConvertedMetaObject = {
-    tables: [],
+    tables: []
   };
 
   for (const table of tables) {
@@ -94,7 +94,7 @@ export function convertFromMetaSchema(
       foreignConstraints: pickForeignConstraint(
         table.foreignKeyConstraints,
         table.relations
-      ),
+      )
     });
   }
 
@@ -136,7 +136,7 @@ function pickForeignConstraint(
     return {
       refTable: refTable.name,
       fromKey,
-      toKey,
+      toKey
     };
   });
 }
@@ -144,13 +144,13 @@ function pickForeignConstraint(
 function pickField(field: MetaSchemaField): ConvertedField {
   return {
     name: field.name,
-    type: field.type,
+    type: field.type
   };
 }
 
 function pickConstraintField(field: MetaSchemaField): ConvertedConstraint {
   return {
     name: field.name,
-    type: field.type,
+    type: field.type
   };
 }

@@ -7,17 +7,17 @@
  * 3. Introspecting the database with PostGraphile
  * 4. Cleaning up the ephemeral database (unless keepDb is true)
  */
-import { buildSchema, introspectionFromSchema } from 'graphql';
 import { PgpmPackage } from '@pgpmjs/core';
+import { buildSchema, introspectionFromSchema } from 'graphql';
+import { getPgPool } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
-import { getPgPool } from 'pg-cache';
 
-import type { SchemaSource, SchemaSourceResult } from './types';
-import { SchemaSourceError } from './types';
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
 import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
+import type { SchemaSource, SchemaSourceResult } from './types';
+import { SchemaSourceError } from './types';
 
 /**
  * Options for PGPM module schema source using direct module path
@@ -147,7 +147,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
     try {
       this.ephemeralDb = createEphemeralDb({
         prefix: 'codegen_pgpm_',
-        verbose: false,
+        verbose: false
       });
     } catch (err) {
       throw new SchemaSourceError(
@@ -199,7 +199,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       try {
         sdl = await buildSchemaSDLFromDatabase({
           database: dbConfig.database,
-          schemas,
+          schemas
         });
       } catch (err) {
         throw new SchemaSourceError(

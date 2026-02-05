@@ -5,12 +5,12 @@
  * This is a thin wrapper around the core generate() function.
  * All business logic is in the core modules.
  */
-import { CLI, CLIOptions, Inquirerer, getPackageJson } from 'inquirerer';
+import { CLI, CLIOptions, getPackageJson,Inquirerer } from 'inquirerer';
 
-import { generate } from '../core/generate';
 import { findConfigFile, loadConfigFile } from '../core/config';
+import { generate } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
-import { camelizeArgv, codegenQuestions, printResult, type CodegenAnswers } from './shared';
+import { camelizeArgv, type CodegenAnswers,codegenQuestions, printResult } from './shared';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -61,6 +61,15 @@ export const commands = async (
   const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
   const targetName = (argv.target || argv.t) as string | undefined;
 
+  // Collect CLI flags that should override config file settings
+  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
+  if (argv['react-query'] === true) cliOverrides.reactQuery = true;
+  if (argv.orm === true) cliOverrides.orm = true;
+  if (argv.verbose === true || argv.v === true) cliOverrides.verbose = true;
+  if (argv['dry-run'] === true) cliOverrides.dryRun = true;
+  if (argv.output || argv.o) cliOverrides.output = (argv.output || argv.o) as string;
+  if (argv.authorization || argv.a) cliOverrides.authorization = (argv.authorization || argv.a) as string;
+
   // If config file exists, load and run
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
@@ -87,7 +96,7 @@ export const commands = async (
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const result = await generate(targets[name]);
+        const result = await generate({ ...targets[name], ...cliOverrides });
         printResult(result);
         if (!result.success) hasError = true;
       }
@@ -97,8 +106,8 @@ export const commands = async (
       return argv;
     }
 
-    // Single config
-    const result = await generate(config as GraphQLSDKConfigTarget);
+    // Single config — merge CLI overrides
+    const result = await generate({ ...(config as GraphQLSDKConfigTarget), ...cliOverrides });
     printResult(result);
     if (!result.success) process.exit(1);
     prompter.close();
@@ -114,7 +123,7 @@ export const commands = async (
   // Build db config if schemas or apiNames provided
   const db = (camelized.schemas || camelized.apiNames) ? {
     schemas: camelized.schemas,
-    apiNames: camelized.apiNames,
+    apiNames: camelized.apiNames
   } : undefined;
 
   const result = await generate({
@@ -127,7 +136,7 @@ export const commands = async (
     orm: camelized.orm,
     browserCompatible: camelized.browserCompatible,
     dryRun: camelized.dryRun,
-    verbose: camelized.verbose,
+    verbose: camelized.verbose
   });
 
   printResult(result);
@@ -145,17 +154,17 @@ export const options: Partial<CLIOptions> = {
       o: 'output',
       t: 'target',
       a: 'authorization',
-      v: 'verbose',
+      v: 'verbose'
     },
     boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible',
+      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible'
     ],
     string: [
       'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
       'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
-      'schemas', 'api-names',
-    ],
-  },
+      'schemas', 'api-names'
+    ]
+  }
 };
 
 if (require.main === module) {
