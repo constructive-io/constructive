@@ -1,0 +1,53 @@
+{
+  "name": "graphile-search-plugin",
+  "version": "1.0.4",
+  "description": "generate search conditions for your tsvector columns",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "copy": "makage assets",
+    "prepack": "pnpm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "pgpm",
+    "plugin",
+    "postgres",
+    "graphql"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "devDependencies": {
+    "graphile-plugin-connection-filter": "workspace:^",
+    "graphile-plugin-fulltext-filter": "workspace:^",
+    "graphile-simple-inflector": "workspace:^",
+    "graphile-test": "workspace:^",
+    "makage": "^0.1.10",
+    "pgsql-test": "workspace:^"
+  },
+  "dependencies": {
+    "graphile-build": "^4.14.1",
+    "graphql-tag": "2.12.6"
+  }
+}
