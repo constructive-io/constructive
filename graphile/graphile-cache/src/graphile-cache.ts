@@ -114,17 +114,13 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
 
   log.debug(`Disposing PostGraphile[${key}]`);
   try {
-    // Release grafserv first
-    if (entry.serv) {
-      await entry.serv.release();
-    }
     // Close HTTP server if it's listening
     if (entry.httpServer?.listening) {
       await new Promise<void>((resolve) => {
         entry.httpServer.close(() => resolve());
       });
     }
-    // Release PostGraphile instance
+    // Release PostGraphile instance (this also releases grafserv internally)
     if (entry.pgl) {
       await entry.pgl.release();
     }
