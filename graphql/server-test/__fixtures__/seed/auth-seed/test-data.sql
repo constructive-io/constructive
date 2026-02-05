@@ -78,19 +78,20 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Insert test users
+-- Note: UUIDs must use valid hex characters (0-9, a-f only)
 INSERT INTO "auth-test-private".users (id, email, role)
 VALUES
-  ('f1111111-1111-1111-1111-111111111111', 'admin@test.com', 'administrator'),
-  ('f2222222-2222-2222-2222-222222222222', 'user@test.com', 'authenticated'),
-  ('f3333333-3333-3333-3333-333333333333', 'guest@test.com', 'anonymous')
+  ('01111111-1111-1111-1111-111111111111', 'admin@test.com', 'administrator'),
+  ('02222222-2222-2222-2222-222222222222', 'user@test.com', 'authenticated'),
+  ('03333333-3333-3333-3333-333333333333', 'guest@test.com', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert test tokens
 -- valid-admin-token: Valid token for admin user
 INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
 VALUES (
-  'g1111111-1111-1111-1111-111111111111',
-  'f1111111-1111-1111-1111-111111111111',
+  '04111111-1111-1111-1111-111111111111',
+  '01111111-1111-1111-1111-111111111111',
   'valid-admin-token',
   now() + interval '1 day'
 ) ON CONFLICT (id) DO NOTHING;
@@ -98,8 +99,8 @@ VALUES (
 -- valid-user-token: Valid token for regular user
 INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
 VALUES (
-  'g2222222-2222-2222-2222-222222222222',
-  'f2222222-2222-2222-2222-222222222222',
+  '04222222-2222-2222-2222-222222222222',
+  '02222222-2222-2222-2222-222222222222',
   'valid-user-token',
   now() + interval '1 day'
 ) ON CONFLICT (id) DO NOTHING;
@@ -107,8 +108,8 @@ VALUES (
 -- expired-token: Expired token
 INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
 VALUES (
-  'g3333333-3333-3333-3333-333333333333',
-  'f2222222-2222-2222-2222-222222222222',
+  '04333333-3333-3333-3333-333333333333',
+  '02222222-2222-2222-2222-222222222222',
   'expired-token',
   now() - interval '1 day'
 ) ON CONFLICT (id) DO NOTHING;
@@ -116,9 +117,9 @@ VALUES (
 -- Insert test items
 INSERT INTO "auth-test-public".items (id, name, owner_id)
 VALUES
-  ('h1111111-1111-1111-1111-111111111111', 'Admin Item', 'f1111111-1111-1111-1111-111111111111'),
-  ('h2222222-2222-2222-2222-222222222222', 'User Item', 'f2222222-2222-2222-2222-222222222222'),
-  ('h3333333-3333-3333-3333-333333333333', 'Public Item', NULL)
+  ('05111111-1111-1111-1111-111111111111', 'Admin Item', '01111111-1111-1111-1111-111111111111'),
+  ('05222222-2222-2222-2222-222222222222', 'User Item', '02222222-2222-2222-2222-222222222222'),
+  ('05333333-3333-3333-3333-333333333333', 'Public Item', NULL)
 ON CONFLICT (id) DO NOTHING;
 
 -- Reset replication role
