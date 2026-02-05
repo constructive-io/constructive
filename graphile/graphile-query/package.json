@@ -1,0 +1,55 @@
+{
+  "name": "graphile-query",
+  "version": "3.0.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Execute GraphQL queries against PostGraphile v5 schemas",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "grafast": "^1.0.0-rc.4",
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "graphql": "^16.9.0",
+    "pg": "^8.17.1",
+    "postgraphile": "^5.0.0-rc.4"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "makage": "^0.1.10",
+    "pgsql-test": "workspace:^"
+  },
+  "keywords": [
+    "graphql",
+    "query",
+    "builder",
+    "graphile",
+    "postgraphile",
+    "v5",
+    "constructive",
+    "pgpm"
+  ]
+}
