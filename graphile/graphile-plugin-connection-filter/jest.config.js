@@ -7,7 +7,7 @@ module.exports = {
       'ts-jest',
       {
         babelConfig: false,
-        tsconfig: 'tsconfig.json',
+        tsconfig: 'tsconfig.test.json',
       },
     ],
   },

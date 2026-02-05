@@ -139,7 +139,7 @@ export default (message = "We’re really sorry about that. The service you were
         }
 
         body {
-            background-color: #dde7e9;
+            background-color: #F3F6FA;
             color: #01A1FF;
             font-family: 'Fjalla One', sans-serif;
             position: relative;

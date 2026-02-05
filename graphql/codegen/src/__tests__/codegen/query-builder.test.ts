@@ -5,7 +5,7 @@
  * Functions are re-implemented here to avoid ./client import issues.
  */
 import * as t from 'gql-ast';
-import { parseType, print } from 'graphql';
+import { parseType, print, OperationTypeNode } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 
 // ============================================================================
@@ -96,7 +96,7 @@ function buildFindManyDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: operationName + 'Query',
         variableDefinitions: variableDefinitions.length ? variableDefinitions : undefined,
         selectionSet: t.selectionSet({
@@ -125,7 +125,7 @@ function buildMutationDocument(
     t.document({
       definitions: [
         t.operationDefinition({
-          operation: 'mutation',
+          operation: OperationTypeNode.MUTATION,
           name: operationName + 'Mutation',
           variableDefinitions: [
             t.variableDefinition({

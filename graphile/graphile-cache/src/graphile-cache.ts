@@ -1,51 +1,235 @@
+import { EventEmitter } from 'events';
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { Express } from 'express';
 import type { Server as HttpServer } from 'http';
+import type { PostGraphileInstance } from 'postgraphile';
+import type { GrafservBase } from 'grafserv';
 
 const log = new Logger('graphile-cache');
 
-const ONE_HOUR_IN_MS = 1000 * 60 * 60;
-const ONE_DAY = ONE_HOUR_IN_MS * 24;
+// --- Time Constants ---
+export const ONE_HOUR_MS = 1000 * 60 * 60;
+export const FIVE_MINUTES_MS = 1000 * 60 * 5;
+const ONE_DAY = ONE_HOUR_MS * 24;
 const ONE_YEAR = ONE_DAY * 366;
 
+// --- Eviction Types ---
+export type EvictionReason = 'lru' | 'ttl' | 'manual';
+
+// --- Cache Event Emitter ---
+export interface CacheEvictionEvent {
+  key: string;
+  reason: EvictionReason;
+  entry: GraphileCacheEntry;
+}
+
+export class CacheEventEmitter extends EventEmitter {
+  emitEviction(event: CacheEvictionEvent): void {
+    this.emit('eviction', event);
+  }
+
+  onEviction(handler: (event: CacheEvictionEvent) => void): void {
+    this.on('eviction', handler);
+  }
+}
+
+export const cacheEvents = new CacheEventEmitter();
+
+// --- Cache Configuration ---
+export interface CacheConfig {
+  max: number;
+  ttl: number;
+}
+
 /**
- * PostGraphile v5 cached instance
- * 
- * In v5, we cache the entire PostGraphile instance along with its
- * grafserv handler and Express app.
+ * Get cache configuration from environment variables
+ *
+ * Supports:
+ * - GRAPHILE_CACHE_MAX: Maximum number of entries (default: 15)
+ * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
+ *   - Production default: ONE_YEAR
+ *   - Development default: FIVE_MINUTES_MS
+ */
+export function getCacheConfig(): CacheConfig {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const max = process.env.GRAPHILE_CACHE_MAX
+    ? parseInt(process.env.GRAPHILE_CACHE_MAX, 10)
+    : 15;
+
+  const ttl = process.env.GRAPHILE_CACHE_TTL_MS
+    ? parseInt(process.env.GRAPHILE_CACHE_TTL_MS, 10)
+    : isDevelopment
+      ? FIVE_MINUTES_MS
+      : ONE_YEAR;
+
+  return { max, ttl };
+}
+
+/**
+ * Cache entry for PostGraphile v5 instances
+ *
+ * Each entry contains:
+ * - pgl: The PostGraphile instance (manages schema, plugins, etc.)
+ * - serv: The Grafserv server instance (handles HTTP/WS)
+ * - handler: Express app for routing requests
+ * - httpServer: Node HTTP server (required by grafserv)
+ * - cacheKey: Unique identifier for this entry
+ * - createdAt: Timestamp when this entry was created
  */
 export interface GraphileCacheEntry {
-  pgl: { release: () => void | PromiseLike<void> };
-  serv: unknown;
+  pgl: PostGraphileInstance;
+  serv: GrafservBase;
   handler: Express;
   httpServer: HttpServer;
   cacheKey: string;
   createdAt: number;
 }
 
+// Track disposed entries to prevent double-disposal
+const disposedKeys = new Set<string>();
+
+// Track keys that are being manually evicted for accurate eviction reason
+const manualEvictionKeys = new Set<string>();
+
+/**
+ * Dispose a PostGraphile v5 cache entry
+ *
+ * Properly releases resources by:
+ * 1. Releasing the grafserv instance
+ * 2. Closing the HTTP server if listening
+ * 3. Releasing the PostGraphile instance
+ *
+ * Uses disposedKeys set to prevent double-disposal when closeAllCaches()
+ * explicitly disposes entries and then clear() triggers the dispose callback.
+ */
+const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
+  // Prevent double-disposal
+  if (disposedKeys.has(key)) {
+    return;
+  }
+  disposedKeys.add(key);
+
+  log.debug(`Disposing PostGraphile[${key}]`);
+  try {
+    // Release grafserv first
+    if (entry.serv) {
+      await entry.serv.release();
+    }
+    // Close HTTP server if it's listening
+    if (entry.httpServer?.listening) {
+      await new Promise<void>((resolve) => {
+        entry.httpServer.close(() => resolve());
+      });
+    }
+    // Release PostGraphile instance
+    if (entry.pgl) {
+      await entry.pgl.release();
+    }
+  } catch (err) {
+    log.error(`Error disposing PostGraphile[${key}]:`, err);
+  }
+};
+
+/**
+ * Determine the eviction reason for a cache entry
+ */
+const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
+  if (manualEvictionKeys.has(key)) {
+    manualEvictionKeys.delete(key);
+    return 'manual';
+  }
+
+  // Check if TTL expired
+  const age = Date.now() - entry.createdAt;
+  const config = getCacheConfig();
+  if (age >= config.ttl) {
+    return 'ttl';
+  }
+
+  return 'lru';
+};
+
+// Get initial cache configuration
+const initialConfig = getCacheConfig();
+
 // --- Graphile Cache ---
 export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
-  max: 15,
-  ttl: ONE_YEAR,
+  max: initialConfig.max,
+  ttl: initialConfig.ttl,
   updateAgeOnGet: true,
-  dispose: async (entry, key) => {
-    log.debug(`Disposing PostGraphile[${key}]`);
-    try {
-      await entry.pgl.release();
-    } catch (err) {
-      log.error(`Error releasing PostGraphile[${key}]:`, err);
-    }
+  dispose: (entry, key) => {
+    // Determine eviction reason before disposal
+    const reason = getEvictionReason(key, entry);
+
+    // Emit eviction event
+    cacheEvents.emitEviction({ key, reason, entry });
+
+    log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
+
+    // LRU dispose is synchronous, but v5 disposal is async
+    // Fire and forget the async cleanup
+    disposeEntry(entry, key).catch((err) => {
+      log.error(`Failed to dispose PostGraphile[${key}]:`, err);
+    });
   }
 });
+
+// --- Cache Stats ---
+export interface CacheStats {
+  size: number;
+  max: number;
+  ttl: number;
+  keys: string[];
+}
+
+/**
+ * Get current cache statistics
+ */
+export function getCacheStats(): CacheStats {
+  const config = getCacheConfig();
+  return {
+    size: graphileCache.size,
+    max: config.max,
+    ttl: config.ttl,
+    keys: [...graphileCache.keys()]
+  };
+}
+
+// --- Clear Matching Entries ---
+/**
+ * Clear cache entries matching a regex pattern
+ *
+ * @param pattern - RegExp to match against cache keys
+ * @returns Number of entries cleared
+ */
+export function clearMatchingEntries(pattern: RegExp): number {
+  let cleared = 0;
+
+  for (const key of graphileCache.keys()) {
+    if (pattern.test(key)) {
+      // Mark as manual eviction before deleting
+      manualEvictionKeys.add(key);
+      graphileCache.delete(key);
+      cleared++;
+    }
+  }
+
+  return cleared;
+}
 
 // Register cleanup callback with pgCache
 // When a pg pool is disposed, clean up any graphile instances using it
 const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
+  log.debug(`pgPool[${pgPoolKey}] disposed - checking graphile entries`);
+
+  // Remove graphile entries that reference this pool key
   graphileCache.forEach((entry, k) => {
     if (entry.cacheKey.includes(pgPoolKey)) {
-      log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}]`);
+      log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
+      manualEvictionKeys.add(k);
       graphileCache.delete(k);
     }
   });
@@ -54,29 +238,50 @@ const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
 // Enhanced close function that handles all caches
 const closePromise: { promise: Promise<void> | null } = { promise: null };
 
+/**
+ * Close all caches and release resources
+ *
+ * This function:
+ * 1. Disposes all PostGraphile v5 instances (async)
+ * 2. Clears the graphile cache
+ * 3. Closes all pg pools via pgCache
+ *
+ * The function is idempotent - calling it multiple times
+ * returns the same promise.
+ */
 export const closeAllCaches = async (verbose = false): Promise<void> => {
   if (closePromise.promise) return closePromise.promise;
 
   closePromise.promise = (async () => {
     if (verbose) log.info('Closing all server caches...');
-    
-    // Release all PostGraphile instances
-    for (const [key, entry] of graphileCache.entries()) {
-      log.debug(`Releasing PostGraphile[${key}]`);
-      try {
-        await entry.pgl.release();
-      } catch (err) {
-        log.error(`Error releasing PostGraphile[${key}]:`, err);
-      }
+
+    // Collect all entries and dispose them properly
+    const entries = [...graphileCache.entries()];
+
+    // Mark all as manual evictions
+    for (const [key] of entries) {
+      manualEvictionKeys.add(key);
     }
-    
+
+    const disposePromises = entries.map(([key, entry]) =>
+      disposeEntry(entry, key)
+    );
+
+    // Wait for all disposals to complete
+    await Promise.allSettled(disposePromises);
+
+    // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
     graphileCache.clear();
+
+    // Clear disposed keys tracking after full cleanup
+    disposedKeys.clear();
+    manualEvictionKeys.clear();
+
+    // Close pg pools
     await pgCache.close();
+
     if (verbose) log.success('All caches disposed.');
   })();
 
   return closePromise.promise;
 };
-
-// Re-export for backward compatibility
-export type GraphileCache = GraphileCacheEntry;

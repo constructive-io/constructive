@@ -67,9 +67,8 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "simpleInflection": true,
   },
   "graphile": {
-    "appendPlugins": [],
-    "graphileBuildOptions": {},
-    "overrideSettings": {},
+    "extends": [],
+    "preset": {},
     "schema": [
       "override_schema",
     ],

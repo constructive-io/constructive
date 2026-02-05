@@ -1,3 +1,15 @@
+/**
+ * @deprecated This file is for Graphile v4. Use PgConnectionArgFilterAttributesPlugin.ts for v5.
+ *
+ * In Graphile v5:
+ * - "Columns" renamed to "Attributes"
+ * - Use PgCodec instead of PgType
+ * - Use resource.codec.attributes to access attributes
+ * - Use GraphQLInputObjectType_fields hook
+ * - Use EXPORTABLE() wrapper for tree-shaking
+ *
+ * @see PgConnectionArgFilterAttributesPlugin.ts
+ */
 import type { Plugin } from 'graphile-build';
 import type { PgAttribute } from 'graphile-build-pg';
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';

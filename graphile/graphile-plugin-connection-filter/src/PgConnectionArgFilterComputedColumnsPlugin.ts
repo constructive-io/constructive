@@ -1,9 +1,18 @@
+/**
+ * @deprecated This file is for Graphile v4. Use PgConnectionArgFilterComputedAttributesPlugin.ts for v5.
+ *
+ * This v4 plugin will be removed once the v5 migration is complete.
+ */
+
 import type { Plugin } from 'graphile-build';
 import type { PgClass, PgProc, PgType } from 'graphile-build-pg';
 
 import { ConnectionFilterResolver } from './PgConnectionArgFilterPlugin';
 import type { ConnectionFilterConfig } from './types';
 
+/**
+ * @deprecated Use PgConnectionArgFilterComputedAttributesPlugin for Graphile v5
+ */
 const PgConnectionArgFilterComputedColumnsPlugin: Plugin = (
   builder,
   rawOptions

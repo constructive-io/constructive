@@ -5,7 +5,7 @@
  * using gql-ast library for proper AST construction.
  */
 import * as t from 'gql-ast';
-import { print } from 'graphql';
+import { print, OperationTypeNode } from 'graphql';
 import type {
   DocumentNode,
   FieldNode,
@@ -390,7 +390,7 @@ export function buildCustomQueryAST(config: CustomQueryConfig): DocumentNode {
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: operationName,
         variableDefinitions:
           variableDefinitions.length > 0 ? variableDefinitions : undefined,
@@ -467,7 +467,7 @@ export function buildCustomMutationAST(
   return t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: operationName,
         variableDefinitions:
           variableDefinitions.length > 0 ? variableDefinitions : undefined,

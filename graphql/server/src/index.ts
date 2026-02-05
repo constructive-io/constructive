@@ -1,5 +1,8 @@
 export * from './server';
-// TODO: Re-enable after v5 migration - export * from './schema';
+export * from './schema';
+
+// Export options module - types, defaults, type guards, and utility functions
+export * from './options';
 
 // Export middleware for use in testing packages
 export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/api';

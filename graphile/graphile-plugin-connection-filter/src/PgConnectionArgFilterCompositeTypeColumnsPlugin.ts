@@ -1,3 +1,10 @@
+/**
+ * @deprecated This file is for Graphile v4. Use PgConnectionArgFilterCompositeTypeAttributesPlugin.ts for v5.
+ *
+ * This file is kept for reference during migration but should not be used in v5 builds.
+ * The v5 equivalent is: PgConnectionArgFilterCompositeTypeAttributesPlugin.ts
+ */
+
 import type { Plugin } from 'graphile-build';
 import type { PgAttribute } from 'graphile-build-pg';
 

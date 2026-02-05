@@ -1,93 +1,64 @@
-import type { GraphileConfig } from 'graphile-config';
-import { getEnvOptions } from '@constructive-io/graphql-env';
-import { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber';
-import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
+/**
+ * graphile-settings
+ *
+ * Shared PostGraphile v5 settings, presets, and plugins for Constructive.
+ *
+ * This package provides:
+ * - Custom plugins for PostGraphile v5
+ * - Pre-configured presets combining multiple plugins
+ *
+ * USAGE:
+ *
+ * 1. Use the main preset:
+ * ```typescript
+ * import { ConstructivePreset, makePgService } from 'graphile-settings';
+ * import { makeSchema } from 'graphile-build';
+ *
+ * const preset = {
+ *   extends: [ConstructivePreset],
+ *   pgServices: [makePgService({ connectionString, schemas })],
+ * };
+ * const { schema } = await makeSchema(preset);
+ * ```
+ *
+ * 2. Use individual plugins:
+ * ```typescript
+ * import { MinimalPreset, InflektPreset } from 'graphile-settings/plugins';
+ * ```
+ */
+
 import { makePgService } from 'postgraphile/adaptors/pg';
 
-/**
- * Minimal Preset - Disables Node/Relay features
- * 
- * This keeps `id` as `id` instead of converting to global Node IDs.
- * Removes nodeId, node(), and Relay-style pagination.
- */
-export const MinimalPreset: GraphileConfig.Preset = {
-  disablePlugins: ['NodePlugin'],
-};
+// Import modules for type augmentation
+// These add properties to the GraphileConfig.Preset interface:
+// - grafserv: adds 'grafserv' property
+// - graphile-build: adds 'schema' property (typed as GraphileBuild.SchemaOptions)
+// - postgraphile-plugin-connection-filter: augments SchemaOptions with connectionFilter* options
+import 'postgraphile/grafserv';
+import 'graphile-build';
 
-/**
- * Get the base Graphile v5 preset for Constructive
- * 
- * This is a minimal preset that:
- * - Uses PostGraphile Amber preset as base
- * - Disables Node/Relay features
- * - Enables connection filter plugin
- * - Disables relation filters to keep API clean
- * 
- * TODO: Port additional plugins:
- * - graphile-simple-inflector -> custom inflector preset
- * - graphile-meta-schema -> meta schema preset
- * - graphile-i18n -> i18n preset
- * - graphile-upload-plugin -> upload preset
- * - graphile-postgis -> postgis preset
- * - graphile-search-plugin -> search preset
- */
-export const getGraphilePreset = (
-  opts: ConstructiveOptions
-): GraphileConfig.Preset => {
-  const envOpts = getEnvOptions(opts);
+// ============================================================================
+// Re-export all plugins and presets
+// ============================================================================
 
-  return {
-    extends: [
-      PostGraphileAmberPreset,
-      MinimalPreset,
-      PostGraphileConnectionFilterPreset,
-    ],
-    disablePlugins: [
-      'PgConnectionArgFilterBackwardRelationsPlugin',
-      'PgConnectionArgFilterForwardRelationsPlugin',
-    ],
-    grafserv: {
-      graphqlPath: '/graphql',
-      graphiqlPath: '/graphiql',
-      websockets: false,
-    },
-    grafast: {
-      explain: process.env.NODE_ENV === 'development',
-    },
-    schema: {
-      connectionFilterRelations: false,
-      connectionFilterComputedColumns: false,
-      connectionFilterSetofFunctions: false,
-      connectionFilterLogicalOperators: true,
-      connectionFilterArrays: true,
-    },
-  };
-};
+// Main preset
+export { ConstructivePreset } from './presets/constructive-preset';
 
-/**
- * Create a complete preset with pgServices configured
- * 
- * This is the main entry point for creating a PostGraphile v5 preset
- * with database connection configured.
- */
-export const createGraphilePreset = (
-  opts: ConstructiveOptions,
-  connectionString: string,
-  schemas: string[]
-): GraphileConfig.Preset => {
-  const basePreset = getGraphilePreset(opts);
+// Re-export all plugins for convenience
+export * from './plugins/index';
 
-  return {
-    extends: [basePreset],
-    pgServices: [
-      makePgService({
-        connectionString,
-        schemas,
-      }),
-    ],
-  };
-};
+// Re-export presets
+export * from './presets/index';
 
-export { getGraphilePreset as getGraphileSettings };
+// ============================================================================
+// Utilities
+// ============================================================================
+
+// Import the new MinimalPreset from plugins
+import { MinimalPreset } from './plugins/minimal-preset';
+
+// Re-export MinimalPreset for backward compatibility
+export { MinimalPreset };
+
+// Re-export makePgService for convenience
 export { makePgService };

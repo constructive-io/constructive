@@ -86,7 +86,8 @@ it('handles duplicate insert via internal PostGraphile savepoint', async () => {
   const first = await query(CREATE_USER, input);
   expect(snapshot(first)).toMatchSnapshot('firstInsert');
   expect(first.errors).toBeUndefined();
-  expect(first.data?.createUser?.user?.username).toBe('dupeuser');
+  const firstData = first.data as { createUser?: { user?: { username?: string } } };
+  expect(firstData?.createUser?.user?.username).toBe('dupeuser');
 
   // ✅ Step 2: Second insert triggers UNIQUE constraint violation
   // However: PostGraphile *wraps each mutation in a SAVEPOINT*.
@@ -95,11 +96,13 @@ it('handles duplicate insert via internal PostGraphile savepoint', async () => {
   const second = await query(CREATE_USER, input);
   expect(snapshot(second)).toMatchSnapshot('duplicateInsert');
   expect(second.errors?.[0]?.message).toMatch(/duplicate key value/i);
-  expect(second.data?.createUser).toBeNull();
+  const secondData = second.data as { createUser?: unknown };
+  expect(secondData?.createUser).toBeNull();
 
   // ✅ Step 3: Query still works — transaction was not aborted
   const followup = await query(GET_USERS);
   expect(snapshot(followup)).toMatchSnapshot('queryAfterDuplicateInsert');
   expect(followup.errors).toBeUndefined();
-  expect(followup.data?.users?.nodes.some((u: any) => u.username === 'dupeuser')).toBe(true);
+  const followupData = followup.data as { users?: { nodes: Array<{ username: string }> } };
+  expect(followupData?.users?.nodes.some((u) => u.username === 'dupeuser')).toBe(true);
 });

@@ -3,6 +3,7 @@
  * Uses AST-based approach for all query generation
  */
 import * as t from 'gql-ast';
+import { OperationTypeNode } from 'gql-ast';
 import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 import { camelize, pluralize } from 'inflekt';
@@ -499,7 +500,7 @@ function generateSelectQueryAST(
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: `${pluralName}Query`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -743,7 +744,7 @@ function generateFindOneQueryAST(table: CleanTable): string {
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: `${singularName}Query`,
         variableDefinitions: [
           t.variableDefinition({
@@ -785,7 +786,7 @@ function generateCountQueryAST(table: CleanTable): string {
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OperationTypeNode.QUERY,
         name: `${pluralName}CountQuery`,
         variableDefinitions: [
           t.variableDefinition({

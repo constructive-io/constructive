@@ -3,14 +3,14 @@ import '../../test-utils/env';
 import { readdirSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import type { Plugin } from 'graphile-build';
-import { PgConnectionArgCondition } from 'graphile-build-pg';
+import type { GraphileConfig } from 'graphile-config';
+import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
+import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
 import type { GraphQLQueryFnObj } from 'graphile-test';
 import { getConnectionsObject, seed, snapshot } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test/test-client';
-import type { PostGraphileOptions } from 'postgraphile';
 
-import ConnectionFilterPlugin from '../../src';
+import { PostGraphileConnectionFilterPreset } from '../../src';
 import CustomOperatorsPlugin from '../../test-utils/customOperatorsPlugin';
 
 jest.setTimeout(60000);
@@ -36,12 +36,21 @@ const sql = (file: string) => join(__dirname, '../../sql', file);
 const queriesDir = join(__dirname, '../fixtures/queries');
 const queryFileNames = readdirSync(queriesDir);
 
-const baseOverrides: Pick<
-  PostGraphileOptions,
-  'appendPlugins' | 'skipPlugins'
-> = {
-  appendPlugins: [ConnectionFilterPlugin],
-  skipPlugins: [PgConnectionArgCondition],
+/**
+ * Base preset for v5 testing.
+ * Extends graphile-build defaults and the connection filter preset.
+ * Disables NodePlugin and PgConditionArgumentPlugin to match v4 test setup.
+ */
+const BaseTestPreset: GraphileConfig.Preset = {
+  extends: [
+    graphileBuildDefaultPreset,
+    graphileBuildPgDefaultPreset,
+    PostGraphileConnectionFilterPreset,
+  ],
+  disablePlugins: [
+    'NodePlugin',
+    'PgConditionArgumentPlugin',
+  ],
 };
 
 const seeds = [
@@ -49,31 +58,28 @@ const seeds = [
 ];
 
 const createContext = async (
-  overrideSettings: Partial<PostGraphileOptions> = {},
-  graphileBuildOptions?: Record<string, unknown>
+  variantPreset?: GraphileConfig.Preset
 ): Promise<ConnectionContext> => {
-  const { appendPlugins = [], ...rest } = overrideSettings;
-  const appendPluginsMerged = [
-    ...baseOverrides.appendPlugins,
-    ...appendPlugins.filter(
-      (plugin: Plugin) => plugin !== ConnectionFilterPlugin
-    ),
-  ] as Plugin[];
-
   const useRoot = true;
+
+  // Build the complete preset by merging base with variant-specific options
+  const preset: GraphileConfig.Preset = {
+    extends: [
+      BaseTestPreset,
+      ...(variantPreset?.extends ?? []),
+    ],
+    ...(variantPreset?.plugins && { plugins: variantPreset.plugins }),
+    ...(variantPreset?.disablePlugins && { disablePlugins: variantPreset.disablePlugins }),
+    ...(variantPreset?.schema && { schema: variantPreset.schema }),
+    ...(variantPreset?.grafast && { grafast: variantPreset.grafast }),
+  };
+
   const connections = await getConnectionsObject(
     {
       useRoot,
       schemas: [SCHEMA],
       authRole: AUTH_ROLE,
-      graphile: {
-        overrideSettings: {
-          ...baseOverrides,
-          ...rest,
-          appendPlugins: appendPluginsMerged,
-        },
-        ...(graphileBuildOptions ? { graphileBuildOptions } : {}),
-      },
+      preset,
     },
     seeds
   );
@@ -87,38 +93,57 @@ const createContext = async (
   };
 };
 
-const variantConfigs: Record<
-  ConnectionVariant,
-  {
-    overrideSettings?: Partial<PostGraphileOptions>;
-    graphileBuildOptions?: Record<string, unknown>;
-  }
-> = {
-  normal: {},
+/**
+ * Variant configurations using v5 preset format.
+ *
+ * V4 to V5 mapping:
+ * - graphileBuildOptions -> schema options in preset
+ * - dynamicJson: true -> grafast.context with jsonDynamic setting
+ * - simpleCollections: 'only' -> schema.simpleCollections = 'only'
+ * - pgUseCustomNetworkScalars: true -> Default in v5, no change needed
+ * - appendPlugins: [Plugin] -> plugins: [Plugin] in preset
+ */
+const variantConfigs: Record<ConnectionVariant, GraphileConfig.Preset | undefined> = {
+  normal: undefined,
+
   dynamicJson: {
-    overrideSettings: { dynamicJson: true },
-  },
-  networkScalars: {
-    graphileBuildOptions: {
-      pgUseCustomNetworkScalars: true,
+    // In v5, dynamic JSON behavior is controlled differently.
+    // The grafast execution handles JSON dynamically by default.
+    // This config enables JSON as a GraphQL scalar type.
+    schema: {
+      jsonScalarAsString: false,
     },
   },
+
+  networkScalars: {
+    // pgUseCustomNetworkScalars is the default in v5
+    // No additional configuration needed
+    schema: {},
+  },
+
   relations: {
-    graphileBuildOptions: {
+    schema: {
       connectionFilterRelations: true,
     },
   },
+
   simpleCollections: {
-    overrideSettings: { simpleCollections: 'only' },
+    // In v5, simpleCollections is achieved via behavior settings.
+    // 'only' means: disable connections, enable lists
+    schema: {
+      defaultBehavior: '-connection -resource:connection list resource:list',
+    },
   },
+
   nullAndEmptyAllowed: {
-    graphileBuildOptions: {
+    schema: {
       connectionFilterAllowNullInput: true,
       connectionFilterAllowEmptyObjectInput: true,
     },
   },
+
   addConnectionFilterOperator: {
-    overrideSettings: { appendPlugins: [CustomOperatorsPlugin] },
+    plugins: [CustomOperatorsPlugin],
   },
 };
 
@@ -139,10 +164,7 @@ const contexts: Partial<Record<ConnectionVariant, ConnectionContext>> = {};
 beforeAll(async () => {
   for (const variant of Object.keys(variantConfigs) as ConnectionVariant[]) {
     const config = variantConfigs[variant];
-    contexts[variant] = await createContext(
-      config.overrideSettings,
-      config.graphileBuildOptions
-    );
+    contexts[variant] = await createContext(config);
   }
 });
 

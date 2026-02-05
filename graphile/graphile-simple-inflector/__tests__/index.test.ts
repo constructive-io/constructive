@@ -18,10 +18,8 @@ beforeAll(async () => {
     {
       schemas: [SCHEMA],
       authRole: 'authenticated',
-      graphile: {
-        overrideSettings: {
-          appendPlugins: [PgSimpleInflector]
-        }
+      preset: {
+        plugins: [PgSimpleInflector]
       }
     },
     [

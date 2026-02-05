@@ -13,4 +13,7 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
   coverageDirectory: 'coverage',
   verbose: true,
+  // Force exit after tests complete - PostGraphile v5's internal pools
+  // may not fully release before Jest's timeout
+  forceExit: true,
 };

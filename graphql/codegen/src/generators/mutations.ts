@@ -3,6 +3,7 @@
  * Uses AST-based approach for PostGraphile-compatible mutations
  */
 import * as t from 'gql-ast';
+import { OperationTypeNode } from 'gql-ast';
 import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 import { camelize } from 'inflekt';
@@ -75,7 +76,7 @@ export function buildPostGraphileCreate(
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${mutationName}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -151,7 +152,7 @@ export function buildPostGraphileUpdate(
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${mutationName}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -226,7 +227,7 @@ export function buildPostGraphileDelete(
   const ast = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OperationTypeNode.MUTATION,
         name: `${mutationName}Mutation`,
         variableDefinitions,
         selectionSet: t.selectionSet({
