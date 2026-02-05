@@ -2,7 +2,7 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN hostname AS text CHECK (VALUE ~ '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$');
-COMMENT ON DOMAIN hostname IS E'@name pgpmInternalTypeHostname';
+CREATE DOMAIN hostname AS text;
+COMMENT ON DOMAIN hostname IS E'@name constructiveInternalTypeHostname';
 COMMIT;
 

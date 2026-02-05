@@ -9,6 +9,7 @@ import { EnableAllFilterColumnsPreset } from '../plugins/enable-all-filter-colum
 import { ManyToManyOptInPreset } from '../plugins/many-to-many-preset';
 import { MetaSchemaPreset } from '../plugins/meta-schema';
 import { TsvectorCodecPreset } from '../plugins/tsvector-codec';
+import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
 
 /**
  * Constructive PostGraphile v5 Preset
@@ -25,6 +26,7 @@ import { TsvectorCodecPreset } from '../plugins/tsvector-codec';
  * - Connection filter plugin with all columns filterable
  * - Many-to-many relationships (opt-in via @behavior +manyToMany)
  * - Meta schema plugin (_meta query for introspection of tables, fields, indexes)
+ * - PG type mappings (maps custom types like email, url to GraphQL scalars)
  *
  * DISABLED PLUGINS:
  * - PgConnectionArgFilterBackwardRelationsPlugin (relation filters bloat the API)
@@ -58,6 +60,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     ManyToManyOptInPreset,
     MetaSchemaPreset,
     TsvectorCodecPreset,
+    PgTypeMappingsPreset,
   ],
   /**
    * Disable relation filter plugins from postgraphile-plugin-connection-filter.
