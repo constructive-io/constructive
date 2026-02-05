@@ -106,8 +106,8 @@ jobs:
             env: {}
           - package: graphql/server
             env: {}
-          # - package: graphql/test
-          #   env: {}
+          - package: graphql/test
+            env: {}
           # - package: graphql/playwright-test
           #   env: {}
           # - package: jobs/knative-job-worker
