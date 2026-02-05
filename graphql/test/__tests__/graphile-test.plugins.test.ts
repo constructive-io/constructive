@@ -100,7 +100,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
+      expect((res.data as { testPluginField?: string })?.testPluginField).toBe('test-plugin-value');
       expect(res.errors).toBeUndefined();
     });
 
@@ -110,10 +110,11 @@ describe('graphile-test with plugins', () => {
       expect(res.data).not.toBeUndefined();
       expect(res.errors).toBeUndefined();
 
-      const queryTypeName = res.data?.__schema?.queryType?.name;
+      const data = res.data as { __schema?: { queryType?: { name?: string }; types?: Array<{ name: string; fields?: Array<{ name: string; type?: { name?: string; ofType?: { name?: string; ofType?: { name?: string } } } }> }> } };
+      const queryTypeName = data?.__schema?.queryType?.name;
       expect(queryTypeName).toBe('Query');
 
-      const types = res.data?.__schema?.types || [];
+      const types = data?.__schema?.types || [];
       const queryType = types.find((t: { name: string }) => t.name === queryTypeName);
       expect(queryType).not.toBeNull();
       expect(queryType).not.toBeUndefined();
@@ -166,8 +167,9 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
-      expect(res.data?.anotherTestField).toBe('another-test-value');
+      const data = res.data as { testPluginField?: string; anotherTestField?: string };
+      expect(data?.testPluginField).toBe('test-plugin-value');
+      expect(data?.anotherTestField).toBe('another-test-value');
       expect(res.errors).toBeUndefined();
     });
   });
@@ -185,9 +187,6 @@ describe('graphile-test with plugins', () => {
           authRole: 'postgres',
           preset: {
             plugins: [TestPlugin],
-            schema: {
-              pgOmitListSuffix: false,
-            },
           },
         },
         [seed.sqlfile([sql('test.sql')])]
@@ -208,7 +207,7 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
+      expect((res.data as { testPluginField?: string })?.testPluginField).toBe('test-plugin-value');
       expect(res.errors).toBeUndefined();
     });
   });
@@ -226,9 +225,6 @@ describe('graphile-test with plugins', () => {
           authRole: 'postgres',
           preset: {
             plugins: [TestPlugin, AnotherTestPlugin],
-            schema: {
-              pgOmitListSuffix: false,
-            },
           },
         },
         [seed.sqlfile([sql('test.sql')])]
@@ -250,8 +246,9 @@ describe('graphile-test with plugins', () => {
       `;
 
       const res = await query(TEST_QUERY);
-      expect(res.data?.testPluginField).toBe('test-plugin-value');
-      expect(res.data?.anotherTestField).toBe('another-test-value');
+      const data = res.data as { testPluginField?: string; anotherTestField?: string };
+      expect(data?.testPluginField).toBe('test-plugin-value');
+      expect(data?.anotherTestField).toBe('another-test-value');
       expect(res.errors).toBeUndefined();
     });
   });
