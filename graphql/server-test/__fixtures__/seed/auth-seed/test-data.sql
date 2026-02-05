@@ -1,0 +1,113 @@
+-- Test data for auth-seed test scenario
+-- Creates test users, tokens, and configures the RLS module
+
+-- Fixed UUIDs for test data
+-- Using fixed UUIDs makes tests deterministic and easier to debug
+
+-- Database ID (same as simple-seed-services)
+-- 80a2eaaf-f77e-4bfe-8506-df929ef1b8d9
+
+-- Insert test database
+INSERT INTO metaschema_public.database (id, name, label, schema_name, private_schema_name)
+VALUES (
+  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  'auth-test-db',
+  'Auth Test Database',
+  'auth-test-public',
+  'auth-test-private'
+);
+
+-- Insert schemas into metaschema
+INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, label, is_public)
+VALUES
+  ('a1111111-1111-1111-1111-111111111111', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'auth-test-public', 'auth-test-public', 'Auth Test Public', true),
+  ('a2222222-2222-2222-2222-222222222222', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'auth-test-private', 'auth-test-private', 'Auth Test Private', false);
+
+-- Insert API
+INSERT INTO services_public.apis (id, database_id, name, role_name, anon_role, is_public)
+VALUES (
+  'b1111111-1111-1111-1111-111111111111',
+  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  'auth-test-api',
+  'authenticated',
+  'anonymous',
+  true
+);
+
+-- Insert domain for the API
+INSERT INTO services_public.domains (id, database_id, api_id, subdomain, domain)
+VALUES (
+  'c1111111-1111-1111-1111-111111111111',
+  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  'b1111111-1111-1111-1111-111111111111',
+  'auth',
+  'test.constructive.io'
+);
+
+-- Insert API schemas
+INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+VALUES
+  ('d1111111-1111-1111-1111-111111111111', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'a1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111');
+
+-- Insert RLS module configuration
+-- This links the API to the authenticate functions in auth-test-private schema
+INSERT INTO metaschema_modules_public.rls_module (
+  id,
+  database_id,
+  api_id,
+  schema_id,
+  private_schema_id,
+  authenticate,
+  authenticate_strict
+)
+VALUES (
+  'e1111111-1111-1111-1111-111111111111',
+  '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9',
+  'b1111111-1111-1111-1111-111111111111',
+  'a1111111-1111-1111-1111-111111111111',
+  'a2222222-2222-2222-2222-222222222222',
+  'authenticate',
+  'authenticate_strict'
+);
+
+-- Insert test users
+INSERT INTO "auth-test-private".users (id, email, role)
+VALUES
+  ('f1111111-1111-1111-1111-111111111111', 'admin@test.com', 'administrator'),
+  ('f2222222-2222-2222-2222-222222222222', 'user@test.com', 'authenticated'),
+  ('f3333333-3333-3333-3333-333333333333', 'guest@test.com', 'anonymous');
+
+-- Insert test tokens
+-- valid-admin-token: Valid token for admin user
+INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
+VALUES (
+  'g1111111-1111-1111-1111-111111111111',
+  'f1111111-1111-1111-1111-111111111111',
+  'valid-admin-token',
+  now() + interval '1 day'
+);
+
+-- valid-user-token: Valid token for regular user
+INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
+VALUES (
+  'g2222222-2222-2222-2222-222222222222',
+  'f2222222-2222-2222-2222-222222222222',
+  'valid-user-token',
+  now() + interval '1 day'
+);
+
+-- expired-token: Expired token
+INSERT INTO "auth-test-private".tokens (id, user_id, token, expires_at)
+VALUES (
+  'g3333333-3333-3333-3333-333333333333',
+  'f2222222-2222-2222-2222-222222222222',
+  'expired-token',
+  now() - interval '1 day'
+);
+
+-- Insert test items
+INSERT INTO "auth-test-public".items (id, name, owner_id)
+VALUES
+  ('h1111111-1111-1111-1111-111111111111', 'Admin Item', 'f1111111-1111-1111-1111-111111111111'),
+  ('h2222222-2222-2222-2222-222222222222', 'User Item', 'f2222222-2222-2222-2222-222222222222'),
+  ('h3333333-3333-3333-3333-333333333333', 'Public Item', NULL);
