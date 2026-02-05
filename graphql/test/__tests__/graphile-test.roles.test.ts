@@ -93,11 +93,8 @@ it('creates a user and fetches it', async () => {
   ).toBe(true);
 });
 
-// NOTE: With v5 pool-based execution, transaction rollback between tests
-// does NOT work for GraphQL queries because they use pool connections,
-// not the test client's transaction. This test is skipped until we
-// implement a way to force pool connections to use the test transaction.
-it.skip('does not see the user created in the previous test', async () => {
+// ✅ Verifies rollback between tests
+it('does not see the user created in the previous test', async () => {
   const GET_USERS = gql`
     query {
       users {

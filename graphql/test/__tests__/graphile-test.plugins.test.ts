@@ -1,7 +1,3 @@
-// @ts-nocheck
-// This file uses legacy v4 PostGraphile API patterns that need migration to v5
-// The 'graphile' option in GetConnectionsInput was removed in v5 migration
-// See: memo_20260204_remove_getGraphilePreset.md for migration details
 process.env.LOG_SCOPE = 'graphile-test';
 
 import gql from 'graphql-tag';
@@ -48,8 +44,7 @@ const AnotherTestPlugin = (builder: any) => {
   });
 };
 
-// Skipped: Tests v4-style builder.hook() plugins which are incompatible with PostGraphile v5
-describe.skip('graphile-test with plugins', () => {
+describe('graphile-test with plugins', () => {
   describe('appendPlugins', () => {
     let teardown: () => Promise<void>;
     let query: GraphQLQueryFn;
@@ -96,10 +91,10 @@ describe.skip('graphile-test with plugins', () => {
       expect(res.data).not.toBeNull();
       expect(res.data).not.toBeUndefined();
       expect(res.errors).toBeUndefined();
-
+      
       const queryTypeName = res.data?.__schema?.queryType?.name;
       expect(queryTypeName).toBe('Query');
-
+      
       // Find the Query type in the types array
       const types = res.data?.__schema?.types || [];
       const queryType = types.find((t: any) => t.name === queryTypeName);
@@ -107,16 +102,16 @@ describe.skip('graphile-test with plugins', () => {
       expect(queryType).not.toBeUndefined();
       expect(queryType?.name).toBe('Query');
       expect(Array.isArray(queryType?.fields)).toBe(true);
-
+      
       const fields = queryType?.fields || [];
       const testField = fields.find((f: any) => f.name === 'testPluginField');
       expect(testField).not.toBeNull();
       expect(testField).not.toBeUndefined();
       expect(testField?.name).toBe('testPluginField');
-
+      
       // Handle nested type references
-      const typeName = testField.type?.name ||
-                      testField.type?.ofType?.name ||
+      const typeName = testField.type?.name || 
+                      testField.type?.ofType?.name || 
                       testField.type?.ofType?.ofType?.name;
       expect(typeName).toBe('String');
     });
@@ -309,3 +304,4 @@ describe.skip('graphile-test with plugins', () => {
     });
   });
 });
+
