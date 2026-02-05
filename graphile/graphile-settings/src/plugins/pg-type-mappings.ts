@@ -10,8 +10,8 @@ export interface TypeMapping {
   name: string;
   /** PostgreSQL schema/namespace name */
   namespaceName: string;
-  /** GraphQL type to map to ('String' or 'JSON') */
-  type: 'String' | 'JSON';
+  /** GraphQL type to map to */
+  type: 'String';
 }
 
 /**
@@ -22,8 +22,6 @@ export interface TypeMapping {
 const DEFAULT_MAPPINGS: TypeMapping[] = [
   { name: 'email', namespaceName: 'public', type: 'String' },
   { name: 'hostname', namespaceName: 'public', type: 'String' },
-  { name: 'multiple_select', namespaceName: 'public', type: 'JSON' },
-  { name: 'single_select', namespaceName: 'public', type: 'JSON' },
   { name: 'origin', namespaceName: 'public', type: 'String' },
   { name: 'url', namespaceName: 'public', type: 'String' },
 ];
@@ -97,10 +95,6 @@ export const PgTypeMappingsPlugin: GraphileConfig.Plugin = {
             if (keys.length > 0) {
               return obj[keys[0]];
             }
-            // For JSON types, return the whole object
-            if (mapping.type === 'JSON') {
-              return value;
-            }
             return value;
           },
           toPg: (value: unknown) => value as string,
@@ -132,7 +126,7 @@ export const PgTypeMappingsPlugin: GraphileConfig.Plugin = {
         for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
           const mappingType = codec.extensions?.tags?.pgTypeMappings as string | undefined;
           if (mappingType) {
-            const gqlTypeName = mappingType === 'JSON' ? 'JSON' : GraphQLString.name;
+            const gqlTypeName = GraphQLString.name;
             setGraphQLTypeForPgCodec(codec, 'input', gqlTypeName);
             setGraphQLTypeForPgCodec(codec, 'output', gqlTypeName);
           }
@@ -152,8 +146,6 @@ export const PgTypeMappingsPlugin: GraphileConfig.Plugin = {
  * - hostname -> String
  * - url -> String
  * - origin -> String
- * - multiple_select -> JSON
- * - single_select -> JSON
  */
 export const PgTypeMappingsPreset: GraphileConfig.Preset = {
   plugins: [PgTypeMappingsPlugin],
