@@ -126,6 +126,26 @@ importers:
         version: 0.1.10
     publishDirectory: dist
 
+  graphile/graphile-authz:
+    dependencies:
+      graphile-build:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.1
+        version: 22.19.7
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+    publishDirectory: dist
+
   graphile/graphile-cache:
     dependencies:
       '@pgpmjs/logger':
@@ -156,53 +176,6 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.19.7)(typescript@5.9.3)
-    publishDirectory: dist
-
-  graphile/graphile-plugin-connection-filter:
-    dependencies:
-      '@dataplan/pg':
-        specifier: ^1.0.0-rc.1
-        version: 1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)
-      grafast:
-        specifier: ^1.0.0-rc.4
-        version: 1.0.0-rc.4(graphql@16.12.0)
-      graphile-build:
-        specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
-      graphile-build-pg:
-        specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
-      graphile-config:
-        specifier: 1.0.0-rc.3
-        version: 1.0.0-rc.3
-      graphql:
-        specifier: ^16.9.0
-        version: 16.12.0
-      pg-sql2:
-        specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3
-    devDependencies:
-      '@graphile/simplify-inflection':
-        specifier: 8.0.0-rc.3
-        version: 8.0.0-rc.3
-      '@types/pg':
-        specifier: ^8.16.0
-        version: 8.16.0
-      graphile-test:
-        specifier: workspace:^
-        version: link:../graphile-test/dist
-      makage:
-        specifier: ^0.1.10
-        version: 0.1.10
-      pg:
-        specifier: ^8.17.1
-        version: 8.17.1
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-      postgraphile:
-        specifier: ^5.0.0-rc.4
-        version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
     publishDirectory: dist
 
   graphile/graphile-query:
@@ -320,35 +293,6 @@ importers:
         version: 10.9.2(@types/node@22.19.7)(typescript@5.9.3)
     publishDirectory: dist
 
-  graphile/graphile-simple-inflector:
-    dependencies:
-      graphile-build:
-        specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
-      graphile-build-pg:
-        specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
-      graphile-config:
-        specifier: 1.0.0-rc.3
-        version: 1.0.0-rc.3
-      inflekt:
-        specifier: ^0.3.0
-        version: 0.3.0
-    devDependencies:
-      graphile-test:
-        specifier: workspace:^
-        version: link:../graphile-test/dist
-      graphql-tag:
-        specifier: 2.12.6
-        version: 2.12.6(graphql@16.12.0)
-      makage:
-        specifier: ^0.1.10
-        version: 0.1.10
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-    publishDirectory: dist
-
   graphile/graphile-test:
     dependencies:
       '@constructive-io/graphql-env':
@@ -397,6 +341,53 @@ importers:
       makage:
         specifier: ^0.1.10
         version: 0.1.10
+    publishDirectory: dist
+
+  graphile/postgraphile-plugin-pgvector:
+    dependencies:
+      grafast:
+        specifier: ^1.0.0-rc.4
+        version: 1.0.0-rc.4(graphql@16.12.0)
+      graphile-build:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3(@dataplan/pg@1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-build@5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)(tamedevil@0.1.0-rc.3)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
+      graphql:
+        specifier: ^16.9.0
+        version: 16.12.0
+      pg-sql2:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3
+      postgraphile:
+        specifier: ^5.0.0-rc.4
+        version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.1
+        version: 22.19.7
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      graphile-settings:
+        specifier: workspace:^
+        version: link:../graphile-settings/dist
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.10
+      pg:
+        specifier: ^8.17.1
+        version: 8.17.1
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   graphql/codegen:
