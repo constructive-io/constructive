@@ -3,6 +3,6 @@
 
 BEGIN;
 CREATE DOMAIN url AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
-COMMENT ON DOMAIN url IS E'@name pgpmInternalTypeUrl';
+COMMENT ON DOMAIN url IS E'@name constructiveInternalTypeUrl';
 COMMIT;
 
