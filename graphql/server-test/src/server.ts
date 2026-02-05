@@ -5,28 +5,6 @@ import { Server as HttpServer, createServer } from 'http';
 import type { ServerInfo, ServerOptions } from './types';
 
 /**
- * Find an available port starting from the given port
- * Uses 127.0.0.1 explicitly to avoid IPv6/IPv4 mismatch issues with supertest
- */
-const findAvailablePort = async (startPort: number, host: string = '127.0.0.1'): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.listen(startPort, host, () => {
-      const address = server.address();
-      const port = typeof address === 'object' && address ? address.port : startPort;
-      server.close(() => resolve(port));
-    });
-    server.on('error', (err: NodeJS.ErrnoException) => {
-      if (err.code === 'EADDRINUSE') {
-        resolve(findAvailablePort(startPort + 1));
-      } else {
-        reject(err);
-      }
-    });
-  });
-};
-
-/**
  * Create a test server for SuperTest testing
  * 
  * This uses the Server class from @constructive-io/graphql-server directly,
@@ -39,8 +17,9 @@ export const createTestServer = async (
   // Use 127.0.0.1 by default to avoid IPv6/IPv4 mismatch issues with supertest
   // On some systems, 'localhost' resolves to ::1 (IPv6) but supertest connects to 127.0.0.1 (IPv4)
   const host = serverOpts.host ?? '127.0.0.1';
-  const requestedPort = serverOpts.port ?? 0;
-  const port = requestedPort === 0 ? await findAvailablePort(5555, host) : requestedPort;
+  // Use port 0 to let the OS assign an available port atomically
+  // This avoids race conditions that can occur with manual port scanning
+  const port = serverOpts.port ?? 0;
 
   // Merge server options into the ConstructiveOptions
   const serverConfig: ConstructiveOptions = {
