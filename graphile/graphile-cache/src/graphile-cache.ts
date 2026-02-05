@@ -98,9 +98,8 @@ const manualEvictionKeys = new Set<string>();
  * Dispose a PostGraphile v5 cache entry
  *
  * Properly releases resources by:
- * 1. Releasing the grafserv instance
- * 2. Closing the HTTP server if listening
- * 3. Releasing the PostGraphile instance
+ * 1. Closing the HTTP server if listening
+ * 2. Releasing the PostGraphile instance (which internally releases grafserv)
  *
  * Uses disposedKeys set to prevent double-disposal when closeAllCaches()
  * explicitly disposes entries and then clear() triggers the dispose callback.
