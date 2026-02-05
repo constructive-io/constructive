@@ -61,3 +61,10 @@ export {
   TsvectorCodecPlugin,
   TsvectorCodecPreset,
 } from './tsvector-codec';
+
+// PG type mappings for custom PostgreSQL types (email, url, etc.)
+export {
+  PgTypeMappingsPlugin,
+  PgTypeMappingsPreset,
+} from './pg-type-mappings';
+export type { TypeMapping } from './pg-type-mappings';
