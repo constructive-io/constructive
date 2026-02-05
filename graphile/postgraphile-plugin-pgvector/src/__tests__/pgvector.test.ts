@@ -1,12 +1,9 @@
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { getConnections, seed, type PgTestClient } from 'graphile-test';
+import { join } from 'path';
+import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
+import type { PgTestClient } from 'pgsql-test';
 import { PgVectorPreset } from '../preset';
 import { ConstructivePreset } from 'graphile-settings';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 interface VectorSearchResult {
   vectorSearchDocument: Array<{
@@ -49,7 +46,7 @@ describe('PgVectorPlugin', () => {
       preset: testPreset,
       useRoot: true,
     }, [
-      seed.sqlfile([join(__dirname, 'setup.sql')])
+      seed.sqlfile([join(__dirname, './setup.sql')])
     ]);
 
     db = connections.db;

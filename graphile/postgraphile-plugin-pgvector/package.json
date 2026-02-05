@@ -33,6 +33,7 @@
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
     "graphile-settings": "workspace:^",
+    "pgsql-test": "workspace:^",
     "makage": "^0.1.10",
     "pg": "^8.17.1"
   },
