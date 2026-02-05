@@ -8,7 +8,7 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
-import { ApiConfigResult, ApiError, ApiOptions, ApiStructure } from '../types';
+import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, RlsModule } from '../types';
 import './types';
 
 const log = new Logger('api');
@@ -20,6 +20,7 @@ const isDev = () => getNodeEnv() === 'development';
 
 const DOMAIN_LOOKUP_SQL = `
   SELECT 
+    a.id as api_id,
     a.database_id,
     a.dbname,
     a.role_name,
@@ -39,6 +40,7 @@ const DOMAIN_LOOKUP_SQL = `
 
 const API_NAME_LOOKUP_SQL = `
   SELECT 
+    a.id as api_id,
     a.database_id,
     a.dbname,
     a.role_name,
@@ -77,17 +79,35 @@ const API_LIST_SQL = `
   LIMIT 100
 `;
 
+const RLS_MODULE_SQL = `
+  SELECT 
+    rm.authenticate,
+    rm.authenticate_strict,
+    ps.schema_name as private_schema_name
+  FROM services_public.rls_module rm
+  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
+  WHERE rm.api_id = $1
+  LIMIT 1
+`;
+
 // =============================================================================
 // Types
 // =============================================================================
 
 interface ApiRow {
+  api_id: string;
   database_id: string;
   dbname: string;
   role_name: string;
   anon_role: string;
   is_public: boolean;
   schemas: string[];
+}
+
+interface RlsModuleRow {
+  authenticate: string | null;
+  authenticate_strict: string | null;
+  private_schema_name: string | null;
 }
 
 interface ApiListRow {
@@ -164,12 +184,24 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
   return baseKey;
 };
 
-const toApiStructure = (row: ApiRow, opts: ApiOptions): ApiStructure => ({
+const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
+  if (!row || !row.private_schema_name) return undefined;
+  return {
+    authenticate: row.authenticate ?? undefined,
+    authenticateStrict: row.authenticate_strict ?? undefined,
+    privateSchema: {
+      schemaName: row.private_schema_name,
+    },
+  };
+};
+
+const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null): ApiStructure => ({
   dbname: row.dbname || opts.pg?.database || '',
   anonRole: row.anon_role || 'anon',
   roleName: row.role_name || 'authenticated',
   schema: row.schemas || [],
   apiModules: [],
+  rlsModule: toRlsModule(rlsModuleRow ?? null),
   domains: [],
   databaseId: row.database_id,
   isPublic: row.is_public,
@@ -242,6 +274,16 @@ const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]
   }
 };
 
+const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow | null> => {
+  try {
+    const result = await pool.query<RlsModuleRow>(RLS_MODULE_SQL, [apiId]);
+    return result.rows[0] ?? null;
+  } catch (err: unknown) {
+    if ((err as Error).message?.includes('does not exist')) return null;
+    throw err;
+  }
+};
+
 // =============================================================================
 // Resolution Logic
 // =============================================================================
@@ -300,8 +342,9 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
     return null;
   }
 
-  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
-  return toApiStructure(row, opts);
+  const rlsModule = await queryRlsModule(pool, row.api_id);
+  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}`);
+  return toApiStructure(row, opts, rlsModule);
 };
 
 const resolveMetaSchemaHeader = (
@@ -324,8 +367,9 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
     return null;
   }
 
-  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}]`);
-  return toApiStructure(row, opts);
+  const rlsModule = await queryRlsModule(pool, row.api_id);
+  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}`);
+  return toApiStructure(row, opts, rlsModule);
 };
 
 const buildDevFallbackError = async (
