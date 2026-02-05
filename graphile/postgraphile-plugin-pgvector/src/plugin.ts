@@ -3,6 +3,7 @@
  *
  * Adds vector similarity search capabilities to PostGraphile using pgvector.
  * Uses the graphile-build hooks API to extend the schema with vector search fields.
+ * Uses Grafast's step-based API for proper v5 compatibility.
  */
 
 import 'graphile-build';
@@ -17,6 +18,7 @@ import {
   GraphQLEnumType,
   GraphQLBoolean,
 } from 'grafast/graphql';
+import { lambda, context as grafastContext, object, type Step } from 'grafast';
 import type { PgVectorPluginOptions, VectorCollectionConfig, VectorMetric } from './types';
 import {
   buildVectorSearchQuery,
@@ -167,6 +169,8 @@ export function createPgVectorPlugin(options: PgVectorPluginOptions): GraphileCo
               },
             });
 
+            const vectorSearchExecutor = createVectorSearchExecutor(collection, defaultMetric, maxLimit);
+
             newFields[fieldName] = {
               type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(VectorSearchResultType))),
               description: `Search ${tableType} by vector similarity using pgvector`,
@@ -188,7 +192,25 @@ export function createPgVectorPlugin(options: PgVectorPluginOptions): GraphileCo
                   description: `Similarity metric to use (default: ${defaultMetric})`,
                 },
               },
-              resolve: createVectorSearchResolver(collection, defaultMetric, maxLimit),
+              extensions: {
+                grafast: {
+                  plan(_$root: Step, fieldArgs: any) {
+                    const $query = fieldArgs.getRaw('query');
+                    const $limit = fieldArgs.getRaw('limit');
+                    const $offset = fieldArgs.getRaw('offset');
+                    const $metric = fieldArgs.getRaw('metric');
+                    const $withPgClient = (grafastContext() as any).get('withPgClient');
+                    const $combined = object({
+                      query: $query,
+                      limit: $limit,
+                      offset: $offset,
+                      metric: $metric,
+                      withPgClient: $withPgClient,
+                    });
+                    return lambda($combined, vectorSearchExecutor as any);
+                  },
+                },
+              },
             };
           }
 
@@ -199,22 +221,19 @@ export function createPgVectorPlugin(options: PgVectorPluginOptions): GraphileCo
   };
 }
 
-function createVectorSearchResolver(
+function createVectorSearchExecutor(
   collection: VectorCollectionConfig,
   defaultMetric: VectorMetric,
   maxLimit: number
 ) {
-  return async (
-    _parent: unknown,
-    args: {
-      query: number[];
-      limit?: number;
-      offset?: number;
-      metric?: VectorMetric;
-    },
-    context: { pgClient?: any; withPgClient?: (callback: (client: any) => Promise<any>) => Promise<any> }
-  ): Promise<VectorSearchResultRow[]> => {
-    const { query, limit = 10, offset = 0, metric = defaultMetric } = args;
+  return async (args: {
+    query: number[];
+    limit?: number;
+    offset?: number;
+    metric?: VectorMetric;
+    withPgClient?: (pgSettings: any, callback: (client: any) => Promise<any>) => Promise<any>;
+  }): Promise<VectorSearchResultRow[]> => {
+    const { query, limit = 10, offset = 0, metric = defaultMetric, withPgClient } = args;
 
     validateQueryVector(query, collection.maxQueryDim);
 
@@ -234,12 +253,10 @@ function createVectorSearchResolver(
 
     let result;
 
-    if (context.withPgClient) {
-      result = await context.withPgClient(async (client) => {
+    if (withPgClient) {
+      result = await withPgClient(null, async (client: any) => {
         return client.query(queryText, queryValues);
       });
-    } else if (context.pgClient) {
-      result = await context.pgClient.query(queryText, queryValues);
     } else {
       throw new Error(
         '[PgVectorPlugin] No database client available in context. ' +
