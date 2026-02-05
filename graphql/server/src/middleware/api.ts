@@ -84,7 +84,7 @@ const RLS_MODULE_SQL = `
     rm.authenticate,
     rm.authenticate_strict,
     ps.schema_name as private_schema_name
-  FROM services_public.rls_module rm
+  FROM metaschema_modules_public.rls_module rm
   LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
   WHERE rm.api_id = $1
   LIMIT 1
