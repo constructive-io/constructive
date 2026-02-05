@@ -240,13 +240,8 @@ const queryByDomain = async (
   subdomain: string | null,
   isPublic: boolean
 ): Promise<ApiRow | null> => {
-  try {
-    const result = await pool.query<ApiRow>(DOMAIN_LOOKUP_SQL, [domain, subdomain, isPublic]);
-    return result.rows[0] ?? null;
-  } catch (err: unknown) {
-    if ((err as Error).message?.includes('does not exist')) return null;
-    throw err;
-  }
+  const result = await pool.query<ApiRow>(DOMAIN_LOOKUP_SQL, [domain, subdomain, isPublic]);
+  return result.rows[0] ?? null;
 };
 
 const queryByApiName = async (
@@ -255,33 +250,18 @@ const queryByApiName = async (
   name: string,
   isPublic: boolean
 ): Promise<ApiRow | null> => {
-  try {
-    const result = await pool.query<ApiRow>(API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
-    return result.rows[0] ?? null;
-  } catch (err: unknown) {
-    if ((err as Error).message?.includes('does not exist')) return null;
-    throw err;
-  }
+  const result = await pool.query<ApiRow>(API_NAME_LOOKUP_SQL, [databaseId, name, isPublic]);
+  return result.rows[0] ?? null;
 };
 
 const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]> => {
-  try {
-    const result = await pool.query<ApiListRow>(API_LIST_SQL, [isPublic]);
-    return result.rows;
-  } catch (err: unknown) {
-    if ((err as Error).message?.includes('does not exist')) return [];
-    throw err;
-  }
+  const result = await pool.query<ApiListRow>(API_LIST_SQL, [isPublic]);
+  return result.rows;
 };
 
 const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow | null> => {
-  try {
-    const result = await pool.query<RlsModuleRow>(RLS_MODULE_SQL, [apiId]);
-    return result.rows[0] ?? null;
-  } catch (err: unknown) {
-    if ((err as Error).message?.includes('does not exist')) return null;
-    throw err;
-  }
+  const result = await pool.query<RlsModuleRow>(RLS_MODULE_SQL, [apiId]);
+  return result.rows[0] ?? null;
 };
 
 // =============================================================================
