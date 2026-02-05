@@ -277,7 +277,32 @@ These can be copied/adapted from the v5 spike:
 
 ## Phase 6: Test Migration
 
-### 6.1 Tests to Skip Initially
+### 6.1 Restore `@constructive-io/graphql-test` Package
+
+The `graphql/test` package (`@constructive-io/graphql-test`) was removed during the v5 migration but needs to be restored. This package provides testing infrastructure that pre-loads `ConstructivePreset` from graphile-settings.
+
+**Package structure:**
+- `graphile-test` (at `graphile/graphile-test/`) - Generic PostGraphile v5 testing, no preset
+- `@constructive-io/graphql-test` (at `graphql/test/`) - Wraps graphile-test with ConstructivePreset
+
+**Restoration plan:**
+1. Restore `graphql/test/` from main branch using `git checkout main -- graphql/test/` to preserve history
+2. Update for PostGraphile v5:
+   - Replace `createPostGraphileSchema` with `makeSchema` from graphile-build
+   - Replace `getGraphileSettings()` with extending `ConstructivePreset`
+   - Update dependencies (graphql 16, postgraphile v5)
+3. Add plugin tests:
+   - Add tsvector test schema with `search_tsv` column
+   - Test that tsvector fields appear as String type
+   - Test other plugins (many-to-many, filters, meta schema, etc.)
+4. Enable in CI:
+   - Add `graphql/test` to the test matrix in `.github/workflows/run-tests.yaml`
+
+**Key difference from graphile-test:**
+- `graphile-test` is simple/generic - tests plugins in isolation without any preset
+- `@constructive-io/graphql-test` wraps graphile-test and pre-loads `ConstructivePreset` - tests with full Constructive configuration
+
+### 6.2 Tests to Skip Initially
 
 Skip tests that depend on the GraphQL server during initial migration:
 
@@ -288,11 +313,12 @@ describe.skip('Server integration tests', () => {
 });
 ```
 
-### 6.2 Test Categories
+### 6.3 Test Categories
 
 1. **Unit tests** - Should mostly work after type updates
 2. **Integration tests** - May need updates for v5 API changes
 3. **Server tests** - Skip initially, re-enable incrementally
+4. **Plugin tests** - Use `@constructive-io/graphql-test` with ConstructivePreset
 
 ## Phase 7: Codegen Updates
 
@@ -368,19 +394,33 @@ const introspection = introspectionFromSchema(schema);
 - [ ] Ensure build passes
 - [ ] Ensure remaining tests pass
 
-### Phase 5: Plugins (incremental)
-- [ ] Port inflection
-- [ ] Enable connection filter
-- [ ] Port meta schema
-- [ ] Enable many-to-many
+### Phase 5: Testing Infrastructure
+- [ ] Restore `graphql/test` from main branch with git history
+- [ ] Update `graphql/test` for PostGraphile v5 (preset API)
+- [ ] Add tsvector plugin test with search_tsv column
+- [ ] Add many-to-many plugin test
+- [ ] Add connection filter plugin test
+- [ ] Add meta schema plugin test
+- [ ] Enable `graphql/test` in CI workflow
+
+### Phase 6: Plugins (incremental)
+- [x] Port inflection (InflektPreset)
+- [x] Enable connection filter (PostGraphileConnectionFilterPreset)
+- [x] Port meta schema (MetaSchemaPreset)
+- [x] Enable many-to-many (ManyToManyOptInPreset)
+- [x] Add tsvector codec (TsvectorCodecPreset)
+- [x] Add conflict detector (ConflictDetectorPreset)
+- [x] Add inflector logger (InflectorLoggerPreset)
+- [x] Add enable all filter columns (EnableAllFilterColumnsPreset)
+- [x] Add primary key only lookups (NoUniqueLookupPreset)
 - [ ] Port PostGIS
 - [ ] Port i18n
 - [ ] Port upload
 - [ ] Port search
 
-### Phase 6: Re-enable
-- [ ] Re-enable middleware
-- [ ] Re-enable tests
+### Phase 7: Re-enable
+- [x] Re-enable middleware (api.ts refactored to use direct SQL)
+- [x] Re-enable tests (server-test passing)
 - [ ] Full integration testing
 
 ## Key API Differences (v4 vs v5)
