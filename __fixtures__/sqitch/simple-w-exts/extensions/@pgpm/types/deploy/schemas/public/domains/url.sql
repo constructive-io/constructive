@@ -2,7 +2,7 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN url AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
+CREATE DOMAIN url AS text;
 COMMENT ON DOMAIN url IS E'@name constructiveInternalTypeUrl';
 COMMIT;
 
