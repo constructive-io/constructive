@@ -108,8 +108,9 @@ const createGraphileInstance = async (
     },
     grafast: {
       explain: process.env.NODE_ENV === 'development',
-      context: (ctx: unknown) => {
-        const req = (ctx as { node?: { req?: Request } } | undefined)?.node?.req;
+      context: (requestContext: Partial<Grafast.RequestContext>) => {
+        // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
         const context: Record<string, string> = {};
 
         if (req) {
