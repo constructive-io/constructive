@@ -241,39 +241,83 @@ Use existing patterns from the codebase:
 
 ## Phase 5: Plugin Migration
 
-### 5.1 Plugins Already Ported in v5 Spike
+### 5.1 Complete Plugin Inventory
 
-These can be copied/adapted from the v5 spike:
+This section tracks all plugins from the `main` branch and their migration status on `develop-v5`.
 
-| v4 Plugin | v5 Equivalent | Status |
-|-----------|---------------|--------|
-| `graphile-simple-inflector` | `InflektPreset` | Ready |
-| `graphile-meta-schema` | `MetaSchemaPreset` | Ready |
-| Connection filter | Official v5 plugin | Ready |
-| Many-to-many | Official v5 plugin + `ManyToManyOptInPreset` | Ready |
+#### Plugins Inlined into `graphile-settings`
 
-### 5.2 Plugins Requiring Port
+These plugins have been converted to v5 presets and inlined into `graphile/graphile-settings/src/plugins/`:
 
-| Plugin | Complexity | Notes |
-|--------|------------|-------|
-| `graphile-postgis` | High | PostGIS types and filters |
-| `graphile-i18n` | Medium | Language/locale support |
-| `graphile-upload-plugin` | Medium | File upload handling |
-| `graphile-search-plugin` | Medium | Search functionality |
-| `graphile-plugin-connection-filter-postgis` | High | PostGIS filter operators |
-| `graphile-plugin-fulltext-filter` | Medium | Full-text search filters |
+| Original Package | v5 Preset | Location | Tests |
+|-----------------|-----------|----------|-------|
+| `graphile-simple-inflector` | `InflektPreset` | `plugins/custom-inflector.ts` | Yes (schema snapshot) |
+| `graphile-meta-schema` | `MetaSchemaPreset` | `plugins/meta-schema.ts` | Yes (schema snapshot) |
+| (new) | `MinimalPreset` | `plugins/minimal-preset.ts` | Yes |
+| (new) | `ConflictDetectorPreset` | `plugins/conflict-detector.ts` | Yes |
+| (new) | `InflectorLoggerPreset` | `plugins/inflector-logger.ts` | Yes |
+| (new) | `NoUniqueLookupPreset` | `plugins/primary-key-only.ts` | Yes |
+| (new) | `EnableAllFilterColumnsPreset` | `plugins/enable-all-filter-columns.ts` | Yes |
+| (new) | `ManyToManyOptInPreset` | `plugins/many-to-many-preset.ts` | Yes |
+| (new) | `TsvectorCodecPreset` | `plugins/tsvector-codec.ts` | Yes |
 
-### 5.3 Plugin Migration Order
+#### Plugins Using Community Packages
 
-1. **Phase 5a:** Core functionality (no plugins)
-2. **Phase 5b:** Inflection (`InflektPreset`)
-3. **Phase 5c:** Connection filter (official v5 plugin)
-4. **Phase 5d:** Meta schema (`MetaSchemaPreset`)
-5. **Phase 5e:** Many-to-many (official v5 plugin)
-6. **Phase 5f:** PostGIS (requires full port)
-7. **Phase 5g:** i18n (requires full port)
-8. **Phase 5h:** Upload (requires full port)
-9. **Phase 5i:** Search (requires full port)
+These plugins are now using official community v5 packages:
+
+| Original Package | Community Package | Version |
+|-----------------|-------------------|---------|
+| `graphile-plugin-connection-filter` | `postgraphile-plugin-connection-filter` | `^3.0.0-rc.1` |
+| `graphile-many-to-many` | `@graphile-contrib/pg-many-to-many` | `2.0.0-rc.1` |
+
+#### Standalone Packages (Upgraded to v5)
+
+These packages exist as separate packages and have been upgraded to v5:
+
+| Package | Location | Status | Tests |
+|---------|----------|--------|-------|
+| `graphile-settings` | `graphile/graphile-settings` | **Complete** | Yes |
+| `graphile-test` | `graphile/graphile-test` | **Complete** | Yes |
+| `graphile-query` | `graphile/graphile-query` | **Complete** | Yes |
+| `graphile-cache` | `graphile/graphile-cache` | **Complete** | Yes |
+| `graphile-authz` | `graphile/graphile-authz` | **Complete** (new from graphile repo) | Yes (66 tests) |
+| `postgraphile-plugin-pgvector` | `graphile/postgraphile-plugin-pgvector` | **Complete** (new from graphile repo) | Yes (9 tests) |
+
+#### Packages Deleted (No Longer Needed)
+
+| Package | Reason |
+|---------|--------|
+| `graphile-simple-inflector` | Inlined as `InflektPreset` in graphile-settings |
+| `graphile-plugin-connection-filter` | Using community package instead |
+
+#### Packages Requiring v5 Port
+
+These packages exist on `develop-v5` but have no source code (only `dist/` and `node_modules/`):
+
+| Package | Complexity | Notes | Priority |
+|---------|------------|-------|----------|
+| `graphile-pg-type-mappings` | Low | Maps custom PG types (email, url, etc.) to GraphQL scalars | High - should inline into settings |
+| `graphile-postgis` | High | PostGIS types and filters | Medium |
+| `graphile-i18n` | Medium | Language/locale support | Low |
+| `graphile-upload-plugin` | Medium | File upload handling | Low |
+| `graphile-search-plugin` | Medium | Search functionality | Low |
+| `graphile-plugin-connection-filter-postgis` | High | PostGIS filter operators (depends on graphile-postgis) | Medium |
+| `graphile-plugin-fulltext-filter` | Medium | Full-text search filters | Low |
+| `graphile-sql-expression-validator` | Low | SQL expression validation | Low |
+
+### 5.2 Migration Priority Order
+
+1. **Phase 5a:** Core functionality (no plugins) - **DONE**
+2. **Phase 5b:** Inflection (`InflektPreset`) - **DONE**
+3. **Phase 5c:** Connection filter (community v5 plugin) - **DONE**
+4. **Phase 5d:** Meta schema (`MetaSchemaPreset`) - **DONE**
+5. **Phase 5e:** Many-to-many (community v5 plugin) - **DONE**
+6. **Phase 5f:** Tsvector codec (`TsvectorCodecPreset`) - **DONE**
+7. **Phase 5g:** PG type mappings (inline into settings) - **TODO**
+8. **Phase 5h:** PostGIS (requires full port) - **TODO**
+9. **Phase 5i:** i18n (requires full port) - **TODO**
+10. **Phase 5j:** Upload (requires full port) - **TODO**
+11. **Phase 5k:** Search (requires full port) - **TODO**
 
 ## Phase 6: Test Migration
 
@@ -404,19 +448,43 @@ const introspection = introspectionFromSchema(schema);
 - [ ] Enable `graphql/test` in CI workflow
 
 ### Phase 6: Plugins (incremental)
+
+#### Inlined into graphile-settings
 - [x] Port inflection (InflektPreset)
-- [x] Enable connection filter (PostGraphileConnectionFilterPreset)
 - [x] Port meta schema (MetaSchemaPreset)
-- [x] Enable many-to-many (ManyToManyOptInPreset)
 - [x] Add tsvector codec (TsvectorCodecPreset)
 - [x] Add conflict detector (ConflictDetectorPreset)
 - [x] Add inflector logger (InflectorLoggerPreset)
 - [x] Add enable all filter columns (EnableAllFilterColumnsPreset)
 - [x] Add primary key only lookups (NoUniqueLookupPreset)
-- [ ] Port PostGIS
-- [ ] Port i18n
-- [ ] Port upload
-- [ ] Port search
+- [x] Add many-to-many opt-in (ManyToManyOptInPreset)
+- [ ] Port pg-type-mappings (inline into settings)
+
+#### Using community packages
+- [x] Enable connection filter (postgraphile-plugin-connection-filter@^3.0.0-rc.1)
+- [x] Enable many-to-many (@graphile-contrib/pg-many-to-many@2.0.0-rc.1)
+
+#### Standalone packages upgraded
+- [x] graphile-settings
+- [x] graphile-test
+- [x] graphile-query
+- [x] graphile-cache
+- [x] graphile-authz (new from graphile repo, 66 tests)
+- [x] postgraphile-plugin-pgvector (new from graphile repo, 9 tests)
+
+#### Packages deleted
+- [x] graphile-simple-inflector (inlined as InflektPreset)
+- [x] graphile-plugin-connection-filter (using community package)
+
+#### Packages requiring v5 port
+- [ ] graphile-pg-type-mappings (high priority - inline into settings)
+- [ ] graphile-postgis
+- [ ] graphile-i18n
+- [ ] graphile-upload-plugin
+- [ ] graphile-search-plugin
+- [ ] graphile-plugin-connection-filter-postgis
+- [ ] graphile-plugin-fulltext-filter
+- [ ] graphile-sql-expression-validator
 
 ### Phase 7: Re-enable
 - [x] Re-enable middleware (api.ts refactored to use direct SQL)
