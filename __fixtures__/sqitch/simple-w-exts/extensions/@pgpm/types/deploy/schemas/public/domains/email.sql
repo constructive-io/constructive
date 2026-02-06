@@ -2,7 +2,7 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN email AS citext;
+CREATE DOMAIN email AS citext CHECK (value ~ '@');
 COMMENT ON DOMAIN email IS E'@name constructiveInternalTypeEmail';
 COMMIT;
 
