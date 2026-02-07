@@ -5,17 +5,18 @@
  * This is a thin wrapper around the core generate() function.
  * All business logic is in the core modules.
  */
-import { CLI, CLIOptions, getPackageJson,Inquirerer } from 'inquirerer';
+import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
 import { generate } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
+  buildDbConfig,
+  buildGenerateOptions,
   camelizeArgv,
-  type CodegenAnswers,
   codegenQuestions,
   printResult,
-  splitCommas
+  seedArgvFromConfig
 } from './shared';
 
 const usage = `
@@ -39,7 +40,6 @@ Generator Options:
   -o, --output <dir>            Output directory
   -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
-  --browser-compatible          Deprecated no-op (retained for compatibility)
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
@@ -63,50 +63,16 @@ export const commands = async (
     process.exit(0);
   }
 
-  const hasSourceCliFlags = Boolean(
-    argv.endpoint ||
-      argv.e ||
-      argv['schema-file'] ||
-      argv.s ||
-      argv.schemas ||
-      argv['api-names']
+  const hasSourceFlags = Boolean(
+    argv.endpoint || argv.e || argv['schema-file'] || argv.s ||
+    argv.schemas || argv['api-names']
   );
   const explicitConfigPath = (argv.config || argv.c) as string | undefined;
-  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
-    ? findConfigFile()
-    : undefined;
-  const configPath = (explicitConfigPath || autoConfigPath) as string | undefined;
+  const configPath = explicitConfigPath || (!hasSourceFlags ? findConfigFile() : undefined);
   const targetName = (argv.target || argv.t) as string | undefined;
 
-  // Collect CLI flags that should override config file settings
-  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
-  const endpoint = (argv.endpoint || argv.e) as string | undefined;
-  const schemaFile = (argv['schema-file'] || argv.s) as string | undefined;
-  const schemas = splitCommas(argv.schemas as string | undefined);
-  const apiNames = splitCommas(argv['api-names'] as string | undefined);
-  if (endpoint) {
-    cliOverrides.endpoint = endpoint;
-    cliOverrides.schemaFile = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemaFile) {
-    cliOverrides.schemaFile = schemaFile;
-    cliOverrides.endpoint = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemas || apiNames) {
-    cliOverrides.db = { schemas, apiNames };
-    cliOverrides.endpoint = undefined;
-    cliOverrides.schemaFile = undefined;
-  }
-  if (argv['react-query'] === true || argv.reactQuery === true) cliOverrides.reactQuery = true;
-  if (argv.orm === true) cliOverrides.orm = true;
-  if (argv.verbose === true || argv.v === true) cliOverrides.verbose = true;
-  if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
-  if (argv.output || argv.o) cliOverrides.output = (argv.output || argv.o) as string;
-  if (argv.authorization || argv.a) cliOverrides.authorization = (argv.authorization || argv.a) as string;
+  let fileConfig: GraphQLSDKConfigTarget = {};
 
-  // If config file exists, load and run
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
     if (!loaded.success) {
@@ -115,12 +81,9 @@ export const commands = async (
     }
 
     const config = loaded.config as Record<string, unknown>;
-
-    // Check if it's a multi-target config (no source fields at top level)
     const isMulti = !('endpoint' in config || 'schemaFile' in config || 'db' in config);
 
     if (isMulti) {
-      // Multi-target: simple for loop over targets
       const targets = config as Record<string, GraphQLSDKConfigTarget>;
       const names = targetName ? [targetName] : Object.keys(targets);
 
@@ -129,10 +92,11 @@ export const commands = async (
         process.exit(1);
       }
 
+      const cliOptions = buildDbConfig(camelizeArgv(argv as Record<string, any>));
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const result = await generate({ ...targets[name], ...cliOverrides });
+        const result = await generate({ ...targets[name], ...cliOptions } as GraphQLSDKConfigTarget);
         printResult(result);
         if (!result.success) hasError = true;
       }
@@ -142,68 +106,13 @@ export const commands = async (
       return argv;
     }
 
-    // Single config — merge CLI overrides
-    const result = await generate({ ...(config as GraphQLSDKConfigTarget), ...cliOverrides });
-    printResult(result);
-    if (!result.success) process.exit(1);
-    prompter.close();
-    return argv;
+    fileConfig = config as GraphQLSDKConfigTarget;
   }
 
-  const hasNonInteractiveArgs = Boolean(
-    endpoint ||
-      schemaFile ||
-      schemas ||
-      apiNames ||
-      argv['react-query'] === true ||
-      argv.reactQuery === true ||
-      argv.orm === true ||
-      argv.output ||
-      argv.o ||
-      argv.authorization ||
-      argv.a ||
-      argv['dry-run'] === true ||
-      argv.dryRun === true ||
-      argv.verbose === true ||
-      argv.v === true ||
-      argv['browser-compatible'] !== undefined ||
-      argv.browserCompatible !== undefined
-  );
-
-  if (hasNonInteractiveArgs) {
-    const result = await generate({
-      ...cliOverrides
-    });
-    printResult(result);
-    prompter.close();
-    return argv;
-  }
-
-  // No config file - prompt for options using shared questions
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
-
-  // Convert kebab-case CLI args to camelCase for internal use
-  const camelized = camelizeArgv(answers) as CodegenAnswers;
-
-  // Build db config if schemas or apiNames provided
-  const db = (camelized.schemas || camelized.apiNames) ? {
-    schemas: camelized.schemas,
-    apiNames: camelized.apiNames
-  } : undefined;
-
-  const result = await generate({
-    endpoint: camelized.endpoint,
-    schemaFile: camelized.schemaFile,
-    db,
-    output: camelized.output,
-    authorization: camelized.authorization,
-    reactQuery: camelized.reactQuery,
-    orm: camelized.orm,
-    browserCompatible: camelized.browserCompatible,
-    dryRun: camelized.dryRun,
-    verbose: camelized.verbose
-  });
-
+  const seeded = seedArgvFromConfig(argv, fileConfig);
+  const answers = await prompter.prompt(seeded, codegenQuestions);
+  const options = buildGenerateOptions(answers, fileConfig);
+  const result = await generate(options);
   printResult(result);
   prompter.close();
   return argv;
@@ -222,7 +131,7 @@ export const options: Partial<CLIOptions> = {
       v: 'verbose'
     },
     boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible'
+      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db'
     ],
     string: [
       'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
