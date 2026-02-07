@@ -1,87 +1,39 @@
 /**
  * Selection helper generator for React Query hooks
  *
- * Generates selection.ts as a shared adapter layer between hook-facing
- * `selection` params and ORM-facing args (`select`, `where`, `orderBy`, etc.).
+ * Uses template-copy pattern: reads hooks-selection.ts from templates/
+ * and writes it to the output directory with a generated file header.
  */
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { getGeneratedFileHeader } from './utils';
+
+function findTemplateFile(templateName: string): string {
+  const templatePath = path.join(__dirname, 'templates', templateName);
+  if (fs.existsSync(templatePath)) {
+    return templatePath;
+  }
+  throw new Error(
+    `Could not find template file: ${templateName}. Searched in: ${templatePath}`
+  );
+}
+
+function readTemplateFile(templateName: string, description: string): string {
+  const templatePath = findTemplateFile(templateName);
+  let content = fs.readFileSync(templatePath, 'utf-8');
+  const headerPattern =
+    /\/\*\*[\s\S]*?\* NOTE: This file is read at codegen time and written to output\.[\s\S]*?\*\/\n*/;
+  content = content.replace(
+    headerPattern,
+    getGeneratedFileHeader(description) + '\n'
+  );
+  return content;
+}
 
 /**
  * Generate selection.ts content - shared selection types + runtime mappers
  */
 export function generateSelectionFile(): string {
-  const header = getGeneratedFileHeader('Selection helpers for React Query hooks');
-
-  const code = `
-export interface SelectionConfig<TFields> {
-  fields?: TFields;
-}
-
-export interface ListSelectionConfig<TFields, TWhere, TOrderBy>
-  extends SelectionConfig<TFields> {
-  where?: TWhere;
-  orderBy?: TOrderBy[];
-  first?: number;
-  last?: number;
-  after?: string;
-  before?: string;
-  offset?: number;
-}
-
-export function buildSelectionArgs<TFields>(
-  selection?: SelectionConfig<TFields>
-): { select?: TFields } | undefined {
-  if (!selection || selection.fields === undefined) {
-    return undefined;
-  }
-
-  return { select: selection.fields };
-}
-
-export function buildListSelectionArgs<TFields, TWhere, TOrderBy>(
-  selection?: ListSelectionConfig<TFields, TWhere, TOrderBy>
-):
-  | {
-      select?: TFields;
-      where?: TWhere;
-      orderBy?: TOrderBy[];
-      first?: number;
-      last?: number;
-      after?: string;
-      before?: string;
-      offset?: number;
-    }
-  | undefined {
-  if (!selection) {
-    return undefined;
-  }
-
-  const hasAnyValues =
-    selection.fields !== undefined ||
-    selection.where !== undefined ||
-    selection.orderBy !== undefined ||
-    selection.first !== undefined ||
-    selection.last !== undefined ||
-    selection.after !== undefined ||
-    selection.before !== undefined ||
-    selection.offset !== undefined;
-
-  if (!hasAnyValues) {
-    return undefined;
-  }
-
-  return {
-    select: selection.fields,
-    where: selection.where,
-    orderBy: selection.orderBy,
-    first: selection.first,
-    last: selection.last,
-    after: selection.after,
-    before: selection.before,
-    offset: selection.offset
-  };
-}
-`;
-
-  return header + '\n\n' + code.trim() + '\n';
+  return readTemplateFile('hooks-selection.ts', 'Selection helpers for React Query hooks');
 }

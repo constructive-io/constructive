@@ -1,5 +1,5 @@
 /**
- * Mutation hook generators - delegates to ORM model methods
+ * Mutation hook generators - delegates to ORM model methods (Babel AST-based)
  *
  * Output structure:
  * mutations/
@@ -7,7 +7,39 @@
  *   useUpdateCarMutation.ts  -> ORM update
  *   useDeleteCarMutation.ts  -> ORM delete
  */
+import * as t from '@babel/types';
+
 import type { CleanTable } from '../../types/schema';
+import { asConst } from './babel-ast';
+import {
+  addJSDocComment,
+  buildSelectionArgsCall,
+  callExpr,
+  constDecl,
+  createFunctionParam,
+  createImportDeclaration,
+  createSTypeParam,
+  createTypeReExport,
+  destructureParamsWithSelection,
+  exportDeclareFunction,
+  exportFunction,
+  generateHookFileCode,
+  getClientCallUnwrap,
+  inferSelectResultType,
+  objectProp,
+  omitType,
+  returnUseMutation,
+  selectionConfigType,
+  shorthandProp,
+  spreadObj,
+  sRef,
+  typeofRef,
+  typeRef,
+  typeLiteralWithProps,
+  useMutationOptionsType,
+  useMutationResultType,
+  voidStatement
+} from './hooks-ast';
 import {
   getCreateMutationFileName,
   getCreateMutationHookName,
@@ -16,7 +48,6 @@ import {
   getDeleteMutationFileName,
   getDeleteMutationHookName,
   getDeleteMutationName,
-  getGeneratedFileHeader,
   getPrimaryKeyInfo,
   getTableNames,
   getUpdateMutationFileName,
@@ -36,6 +67,49 @@ export interface MutationGeneratorOptions {
   useCentralizedKeys?: boolean;
 }
 
+function buildMutationResultType(
+  mutationName: string,
+  singularName: string,
+  relationTypeName: string,
+  selectType: t.TSType
+): t.TSTypeLiteral {
+  return typeLiteralWithProps([{
+    name: mutationName,
+    type: typeLiteralWithProps([{
+      name: singularName,
+      type: inferSelectResultType(relationTypeName, selectType)
+    }])
+  }]);
+}
+
+function buildSelectFallback(selectTypeName: string): t.TSAsExpression {
+  return t.tsAsExpression(
+    t.parenthesizedExpression(
+      t.logicalExpression(
+        '??',
+        t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
+        t.identifier('defaultSelect')
+      )
+    ),
+    typeRef(selectTypeName)
+  );
+}
+
+function buildFieldsSelectionType(s: t.TSType, selectTypeName: string): t.TSParenthesizedType {
+  return t.tsParenthesizedType(
+    t.tsIntersectionType([
+      t.tsTypeLiteral([t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(s))]),
+      typeRef('StrictSelect', [s, typeRef(selectTypeName)])
+    ])
+  );
+}
+
+function buildNoFieldsType(): t.TSParenthesizedType {
+  const fp = t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(t.tsUndefinedKeyword()));
+  fp.optional = true;
+  return t.tsParenthesizedType(t.tsTypeLiteral([fp]));
+}
+
 export function generateCreateMutationHook(
   table: CleanTable,
   options: MutationGeneratorOptions = {}
@@ -45,9 +119,7 @@ export function generateCreateMutationHook(
     useCentralizedKeys = true
   } = options;
 
-  if (!reactQueryEnabled) {
-    return null;
-  }
+  if (!reactQueryEnabled) return null;
 
   const { typeName, singularName } = getTableNames(table);
   const hookName = getCreateMutationHookName(table);
@@ -57,93 +129,143 @@ export function generateCreateMutationHook(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const createInputTypeName = `Create${typeName}Input`;
-
   const defaultFieldName = getDefaultSelectFieldName(table);
 
-  const lines: string[] = [];
+  const statements: t.Statement[] = [];
 
   // Imports
-  lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
-  lines.push(`import { getClient } from '../client';`);
-  lines.push(`import { buildSelectionArgs } from '../selection';`);
-  lines.push(`import type { SelectionConfig } from '../selection';`);
+  statements.push(createImportDeclaration('@tanstack/react-query', ['useMutation', 'useQueryClient']));
+  statements.push(createImportDeclaration('@tanstack/react-query', ['UseMutationOptions', 'UseMutationResult'], true));
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
+  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
 
   if (useCentralizedKeys) {
-    lines.push(`import { ${keysName} } from '../query-keys';`);
-    lines.push(`import { ${mutationKeysName} } from '../mutation-keys';`);
+    statements.push(createImportDeclaration('../query-keys', [keysName]));
+    statements.push(createImportDeclaration('../mutation-keys', [mutationKeysName]));
   }
 
-  lines.push(`import type {`);
-  lines.push(`  ${selectTypeName},`);
-  lines.push(`  ${relationTypeName},`);
-  lines.push(`  ${createInputTypeName},`);
-  lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
-  lines.push('');
+  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName, createInputTypeName], true));
+  statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
 
-  // Re-export types
-  lines.push(`export type { ${selectTypeName}, ${relationTypeName}, ${createInputTypeName} } from '../../orm/input-types';`);
-  lines.push('');
+  // Re-exports
+  statements.push(createTypeReExport([selectTypeName, relationTypeName, createInputTypeName], '../../orm/input-types'));
 
-  lines.push(`const defaultSelect = { ${defaultFieldName}: true } as const;`);
-  lines.push('');
+  // Default select
+  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
-  // Hook
-  lines.push(`/**`);
-  lines.push(` * Mutation hook for creating a ${typeName}`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`tsx`);
-  lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   selection: { fields: { id: true, name: true } },`);
-  lines.push(` * });`);
-  lines.push(` *`);
-  lines.push(` * mutate({ name: 'New item' });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  const createResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
-  const createVarType = `${createInputTypeName}['${singularName}']`;
-  const createOptionsType = (s: string) => `Omit<UseMutationOptions<${createResultType(s)}, Error, ${createVarType}>, 'mutationFn'>`;
-  const selectionWithFieldsType = (s: string) =>
-    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
-  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
-  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
-  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${createOptionsType('S')}`);
-  lines.push(`): UseMutationResult<${createResultType('S')}, Error, ${createVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${createOptionsType('typeof defaultSelect')}`);
-  lines.push(`): UseMutationResult<${createResultType('typeof defaultSelect')}, Error, ${createVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${createVarType}>, 'mutationFn'>`);
-  lines.push(`) {`);
-  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
-  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
-  lines.push(`  void _selection;`);
-  lines.push(`  const queryClient = useQueryClient();`);
-  lines.push(`  return useMutation({`);
+  // Variable type: CreateTypeName['singularName']
+  const createVarType = t.tsIndexedAccessType(
+    typeRef(createInputTypeName),
+    t.tsLiteralType(t.stringLiteral(singularName))
+  );
 
-  if (useCentralizedKeys) {
-    lines.push(`    mutationKey: ${mutationKeysName}.create(),`);
-  }
+  const resultType = (sel: t.TSType) => buildMutationResultType(mutationName, singularName, relationTypeName, sel);
 
-  lines.push(`    mutationFn: (data: ${createInputTypeName}['${singularName}']) => getClient().${singularName}.create({ data, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+  // Overload 1: with fields
+  const o1ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([
+      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildFieldsSelectionType(sRef(), selectTypeName)))
+    ]),
+    useMutationOptionsType(resultType(sRef()), createVarType)
+  ]);
+  const o1 = exportDeclareFunction(
+    hookName,
+    createSTypeParam(selectTypeName),
+    [createFunctionParam('params', o1ParamType)],
+    useMutationResultType(resultType(sRef()), createVarType)
+  );
+  addJSDocComment(o1, [
+    `Mutation hook for creating a ${typeName}`,
+    '',
+    '@example',
+    '```tsx',
+    `const { mutate, isPending } = ${hookName}({`,
+    '  selection: { fields: { id: true, name: true } },',
+    '});',
+    '',
+    "mutate({ name: 'New item' });",
+    '```'
+  ]);
+  statements.push(o1);
 
-  const listKey = useCentralizedKeys
-    ? `${keysName}.lists()`
-    : `['${typeName.toLowerCase()}', 'list']`;
-  lines.push(`    onSuccess: () => {`);
-  lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
-  lines.push(`    },`);
-  lines.push(`    ...mutationOptions,`);
-  lines.push(`  });`);
-  lines.push(`}`);
+  // Overload 2: without fields
+  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
+  o2SelProp.optional = true;
+  const o2ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([o2SelProp]),
+    useMutationOptionsType(resultType(typeofRef('defaultSelect')), createVarType)
+  ]);
+  statements.push(
+    exportDeclareFunction(
+      hookName,
+      null,
+      [createFunctionParam('params', o2ParamType, true)],
+      useMutationResultType(resultType(typeofRef('defaultSelect')), createVarType)
+    )
+  );
 
-  const content = getGeneratedFileHeader(`Create mutation hook for ${typeName}`) + '\n\n' + lines.join('\n') + '\n';
+  // Implementation
+  const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
+  implSelProp.optional = true;
+  const implParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([implSelProp]),
+    omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), createVarType]), ['mutationFn'])
+  ]);
+
+  const body: t.Statement[] = [];
+  body.push(buildSelectionArgsCall(selectTypeName));
+  body.push(destructureParamsWithSelection('mutationOptions'));
+  body.push(voidStatement('_selection'));
+  body.push(constDecl('queryClient', callExpr('useQueryClient', [])));
+
+  const mutationKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(mutationKeysName), t.identifier('create')), [])
+    : undefined;
+
+  // mutationFn: (data: CreateInput['singular']) => getClient().singular.create({ data, select: ... }).unwrap()
+  const dataParam = createFunctionParam('data', createVarType);
+  const mutationFnExpr = t.arrowFunctionExpression(
+    [dataParam],
+    getClientCallUnwrap(singularName, 'create', t.objectExpression([
+      shorthandProp('data'),
+      objectProp('select', buildSelectFallback(selectTypeName))
+    ]))
+  );
+
+  // onSuccess: invalidate lists
+  const listKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(keysName), t.identifier('lists')), [])
+    : t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('list')]);
+
+  const onSuccessFn = t.arrowFunctionExpression(
+    [],
+    t.blockStatement([
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([objectProp('queryKey', listKeyExpr)])]
+        )
+      )
+    ])
+  );
+
+  body.push(
+    returnUseMutation(
+      mutationFnExpr,
+      [
+        objectProp('onSuccess', onSuccessFn),
+        spreadObj(t.identifier('mutationOptions'))
+      ],
+      mutationKeyExpr
+    )
+  );
+
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
 
   return {
     fileName: getCreateMutationFileName(table),
-    content
+    content: generateHookFileCode(`Create mutation hook for ${typeName}`, statements)
   };
 }
 
@@ -156,17 +278,9 @@ export function generateUpdateMutationHook(
     useCentralizedKeys = true
   } = options;
 
-  if (!reactQueryEnabled) {
-    return null;
-  }
-
-  if (table.query?.update === null) {
-    return null;
-  }
-
-  if (!hasValidPrimaryKey(table)) {
-    return null;
-  }
+  if (!reactQueryEnabled) return null;
+  if (table.query?.update === null) return null;
+  if (!hasValidPrimaryKey(table)) return null;
 
   const { typeName, singularName } = getTableNames(table);
   const hookName = getUpdateMutationHookName(table);
@@ -180,95 +294,162 @@ export function generateUpdateMutationHook(
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
 
-  const lines: string[] = [];
+  const pkTsType = pkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+
+  const statements: t.Statement[] = [];
 
   // Imports
-  lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
-  lines.push(`import { getClient } from '../client';`);
-  lines.push(`import { buildSelectionArgs } from '../selection';`);
-  lines.push(`import type { SelectionConfig } from '../selection';`);
+  statements.push(createImportDeclaration('@tanstack/react-query', ['useMutation', 'useQueryClient']));
+  statements.push(createImportDeclaration('@tanstack/react-query', ['UseMutationOptions', 'UseMutationResult'], true));
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
+  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
 
   if (useCentralizedKeys) {
-    lines.push(`import { ${keysName} } from '../query-keys';`);
-    lines.push(`import { ${mutationKeysName} } from '../mutation-keys';`);
+    statements.push(createImportDeclaration('../query-keys', [keysName]));
+    statements.push(createImportDeclaration('../mutation-keys', [mutationKeysName]));
   }
 
-  lines.push(`import type {`);
-  lines.push(`  ${selectTypeName},`);
-  lines.push(`  ${relationTypeName},`);
-  lines.push(`  ${patchTypeName},`);
-  lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
-  lines.push('');
+  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName, patchTypeName], true));
+  statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
 
-  // Re-export types
-  lines.push(`export type { ${selectTypeName}, ${relationTypeName}, ${patchTypeName} } from '../../orm/input-types';`);
-  lines.push('');
+  // Re-exports
+  statements.push(createTypeReExport([selectTypeName, relationTypeName, patchTypeName], '../../orm/input-types'));
 
-  lines.push(`const defaultSelect = { ${pkField.name}: true } as const;`);
-  lines.push('');
+  // Default select
+  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(pkField.name, t.booleanLiteral(true))]))));
 
-  // Hook
-  lines.push(`/**`);
-  lines.push(` * Mutation hook for updating a ${typeName}`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`tsx`);
-  lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   selection: { fields: { id: true, name: true } },`);
-  lines.push(` * });`);
-  lines.push(` *`);
-  lines.push(` * mutate({ ${pkField.name}: 'value-here', patch: { name: 'Updated' } });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  const updateResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
-  const updateVarType = `{ ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }`;
-  const updateOptionsType = (s: string) => `Omit<UseMutationOptions<${updateResultType(s)}, Error, ${updateVarType}>, 'mutationFn'>`;
-  const selectionWithFieldsType = (s: string) =>
-    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
-  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
-  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
-  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${updateOptionsType('S')}`);
-  lines.push(`): UseMutationResult<${updateResultType('S')}, Error, ${updateVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${updateOptionsType('typeof defaultSelect')}`);
-  lines.push(`): UseMutationResult<${updateResultType('typeof defaultSelect')}, Error, ${updateVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${updateVarType}>, 'mutationFn'>`);
-  lines.push(`) {`);
-  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
-  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
-  lines.push(`  void _selection;`);
-  lines.push(`  const queryClient = useQueryClient();`);
-  lines.push(`  return useMutation({`);
+  // Variable type: { pkField: type; patch: PatchType }
+  const updateVarType = t.tsTypeLiteral([
+    t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType)),
+    t.tsPropertySignature(t.identifier('patch'), t.tsTypeAnnotation(typeRef(patchTypeName)))
+  ]);
 
-  if (useCentralizedKeys) {
-    lines.push(`    mutationKey: ${mutationKeysName}.all,`);
-  }
+  const resultType = (sel: t.TSType) => buildMutationResultType(mutationName, singularName, relationTypeName, sel);
 
-  lines.push(`    mutationFn: ({ ${pkField.name}, patch }: { ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }) => getClient().${singularName}.update({ where: { ${pkField.name} }, data: patch, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+  // Overload 1: with fields
+  const o1ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([
+      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildFieldsSelectionType(sRef(), selectTypeName)))
+    ]),
+    useMutationOptionsType(resultType(sRef()), updateVarType)
+  ]);
+  const o1 = exportDeclareFunction(
+    hookName,
+    createSTypeParam(selectTypeName),
+    [createFunctionParam('params', o1ParamType)],
+    useMutationResultType(resultType(sRef()), updateVarType)
+  );
+  addJSDocComment(o1, [
+    `Mutation hook for updating a ${typeName}`,
+    '',
+    '@example',
+    '```tsx',
+    `const { mutate, isPending } = ${hookName}({`,
+    '  selection: { fields: { id: true, name: true } },',
+    '});',
+    '',
+    `mutate({ ${pkField.name}: 'value-here', patch: { name: 'Updated' } });`,
+    '```'
+  ]);
+  statements.push(o1);
 
-  const detailKey = useCentralizedKeys
-    ? `${keysName}.detail(variables.${pkField.name})`
-    : `['${typeName.toLowerCase()}', 'detail', variables.${pkField.name}]`;
-  const listKey = useCentralizedKeys
-    ? `${keysName}.lists()`
-    : `['${typeName.toLowerCase()}', 'list']`;
+  // Overload 2: without fields
+  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
+  o2SelProp.optional = true;
+  const o2ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([o2SelProp]),
+    useMutationOptionsType(resultType(typeofRef('defaultSelect')), updateVarType)
+  ]);
+  statements.push(
+    exportDeclareFunction(
+      hookName,
+      null,
+      [createFunctionParam('params', o2ParamType, true)],
+      useMutationResultType(resultType(typeofRef('defaultSelect')), updateVarType)
+    )
+  );
 
-  lines.push(`    onSuccess: (_, variables) => {`);
-  lines.push(`      queryClient.invalidateQueries({ queryKey: ${detailKey} });`);
-  lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
-  lines.push(`    },`);
-  lines.push(`    ...mutationOptions,`);
-  lines.push(`  });`);
-  lines.push(`}`);
+  // Implementation
+  const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
+  implSelProp.optional = true;
+  const implParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([implSelProp]),
+    omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), updateVarType]), ['mutationFn'])
+  ]);
 
-  const content = getGeneratedFileHeader(`Update mutation hook for ${typeName}`) + '\n\n' + lines.join('\n') + '\n';
+  const body: t.Statement[] = [];
+  body.push(buildSelectionArgsCall(selectTypeName));
+  body.push(destructureParamsWithSelection('mutationOptions'));
+  body.push(voidStatement('_selection'));
+  body.push(constDecl('queryClient', callExpr('useQueryClient', [])));
+
+  const mutationKeyExpr = useCentralizedKeys
+    ? t.memberExpression(t.identifier(mutationKeysName), t.identifier('all'))
+    : undefined;
+
+  // mutationFn: ({ pkField, patch }: { pkField: type; patch: PatchType }) =>
+  //   getClient().singular.update({ where: { pkField }, data: patch, select: ... }).unwrap()
+  const destructParam = t.objectPattern([
+    shorthandProp(pkField.name),
+    shorthandProp('patch')
+  ]);
+  destructParam.typeAnnotation = t.tsTypeAnnotation(updateVarType);
+  const mutationFnExpr = t.arrowFunctionExpression(
+    [destructParam],
+    getClientCallUnwrap(singularName, 'update', t.objectExpression([
+      objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
+      objectProp('data', t.identifier('patch')),
+      objectProp('select', buildSelectFallback(selectTypeName))
+    ]))
+  );
+
+  // onSuccess: invalidate detail and lists
+  const detailKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(keysName), t.identifier('detail')), [
+      t.memberExpression(t.identifier('variables'), t.identifier(pkField.name))
+    ])
+    : t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('detail'), t.memberExpression(t.identifier('variables'), t.identifier(pkField.name))]);
+  const listKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(keysName), t.identifier('lists')), [])
+    : t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('list')]);
+
+  const onSuccessParam = t.identifier('_');
+  const variablesParam = t.identifier('variables');
+  const onSuccessFn = t.arrowFunctionExpression(
+    [onSuccessParam, variablesParam],
+    t.blockStatement([
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([objectProp('queryKey', detailKeyExpr)])]
+        )
+      ),
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([objectProp('queryKey', listKeyExpr)])]
+        )
+      )
+    ])
+  );
+
+  body.push(
+    returnUseMutation(
+      mutationFnExpr,
+      [
+        objectProp('onSuccess', onSuccessFn),
+        spreadObj(t.identifier('mutationOptions'))
+      ],
+      mutationKeyExpr
+    )
+  );
+
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
 
   return {
     fileName: getUpdateMutationFileName(table),
-    content
+    content: generateHookFileCode(`Update mutation hook for ${typeName}`, statements)
   };
 }
 
@@ -281,17 +462,9 @@ export function generateDeleteMutationHook(
     useCentralizedKeys = true
   } = options;
 
-  if (!reactQueryEnabled) {
-    return null;
-  }
-
-  if (table.query?.delete === null) {
-    return null;
-  }
-
-  if (!hasValidPrimaryKey(table)) {
-    return null;
-  }
+  if (!reactQueryEnabled) return null;
+  if (table.query?.delete === null) return null;
+  if (!hasValidPrimaryKey(table)) return null;
 
   const { typeName, singularName } = getTableNames(table);
   const hookName = getDeleteMutationHookName(table);
@@ -304,94 +477,155 @@ export function generateDeleteMutationHook(
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
 
-  const lines: string[] = [];
+  const pkTsType = pkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+
+  const statements: t.Statement[] = [];
 
   // Imports
-  lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
-  lines.push(`import { getClient } from '../client';`);
-  lines.push(`import { buildSelectionArgs } from '../selection';`);
-  lines.push(`import type { SelectionConfig } from '../selection';`);
+  statements.push(createImportDeclaration('@tanstack/react-query', ['useMutation', 'useQueryClient']));
+  statements.push(createImportDeclaration('@tanstack/react-query', ['UseMutationOptions', 'UseMutationResult'], true));
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
+  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
 
   if (useCentralizedKeys) {
-    lines.push(`import { ${keysName} } from '../query-keys';`);
-    lines.push(`import { ${mutationKeysName} } from '../mutation-keys';`);
+    statements.push(createImportDeclaration('../query-keys', [keysName]));
+    statements.push(createImportDeclaration('../mutation-keys', [mutationKeysName]));
   }
 
-  lines.push(`import type {`);
-  lines.push(`  ${selectTypeName},`);
-  lines.push(`  ${relationTypeName},`);
-  lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
-  lines.push('');
+  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName], true));
+  statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
 
-  // Re-export types
-  lines.push(`export type { ${selectTypeName}, ${relationTypeName} } from '../../orm/input-types';`);
-  lines.push('');
+  // Re-exports
+  statements.push(createTypeReExport([selectTypeName, relationTypeName], '../../orm/input-types'));
 
-  lines.push(`const defaultSelect = { ${pkField.name}: true } as const;`);
-  lines.push('');
+  // Default select
+  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(pkField.name, t.booleanLiteral(true))]))));
 
-  // Hook
-  lines.push(`/**`);
-  lines.push(` * Mutation hook for deleting a ${typeName}`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`tsx`);
-  lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   selection: { fields: { id: true } },`);
-  lines.push(` * });`);
-  lines.push(` *`);
-  lines.push(` * mutate({ ${pkField.name}: ${pkField.tsType === 'string' ? "'value-to-delete'" : '123'} });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  const deleteResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
-  const deleteVarType = `{ ${pkField.name}: ${pkField.tsType} }`;
-  const deleteOptionsType = (s: string) => `Omit<UseMutationOptions<${deleteResultType(s)}, Error, ${deleteVarType}>, 'mutationFn'>`;
-  const selectionWithFieldsType = (s: string) =>
-    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
-  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
-  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
-  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${deleteOptionsType('S')}`);
-  lines.push(`): UseMutationResult<${deleteResultType('S')}, Error, ${deleteVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${deleteOptionsType('typeof defaultSelect')}`);
-  lines.push(`): UseMutationResult<${deleteResultType('typeof defaultSelect')}, Error, ${deleteVarType}>;`);
-  lines.push(`export function ${hookName}(`);
-  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${deleteVarType}>, 'mutationFn'>`);
-  lines.push(`) {`);
-  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
-  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
-  lines.push(`  void _selection;`);
-  lines.push(`  const queryClient = useQueryClient();`);
-  lines.push(`  return useMutation({`);
+  // Variable type: { pkField: type }
+  const deleteVarType = t.tsTypeLiteral([
+    t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType))
+  ]);
 
-  if (useCentralizedKeys) {
-    lines.push(`    mutationKey: ${mutationKeysName}.all,`);
-  }
+  const resultType = (sel: t.TSType) => buildMutationResultType(mutationName, singularName, relationTypeName, sel);
 
-  lines.push(`    mutationFn: ({ ${pkField.name} }: { ${pkField.name}: ${pkField.tsType} }) => getClient().${singularName}.delete({ where: { ${pkField.name} }, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+  // Overload 1: with fields
+  const o1ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([
+      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildFieldsSelectionType(sRef(), selectTypeName)))
+    ]),
+    useMutationOptionsType(resultType(sRef()), deleteVarType)
+  ]);
+  const o1 = exportDeclareFunction(
+    hookName,
+    createSTypeParam(selectTypeName),
+    [createFunctionParam('params', o1ParamType)],
+    useMutationResultType(resultType(sRef()), deleteVarType)
+  );
+  addJSDocComment(o1, [
+    `Mutation hook for deleting a ${typeName}`,
+    '',
+    '@example',
+    '```tsx',
+    `const { mutate, isPending } = ${hookName}({`,
+    '  selection: { fields: { id: true } },',
+    '});',
+    '',
+    `mutate({ ${pkField.name}: ${pkField.tsType === 'string' ? "'value-to-delete'" : '123'} });`,
+    '```'
+  ]);
+  statements.push(o1);
 
-  const detailKey = useCentralizedKeys
-    ? `${keysName}.detail(variables.${pkField.name})`
-    : `['${typeName.toLowerCase()}', 'detail', variables.${pkField.name}]`;
-  const listKey = useCentralizedKeys
-    ? `${keysName}.lists()`
-    : `['${typeName.toLowerCase()}', 'list']`;
+  // Overload 2: without fields
+  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
+  o2SelProp.optional = true;
+  const o2ParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([o2SelProp]),
+    useMutationOptionsType(resultType(typeofRef('defaultSelect')), deleteVarType)
+  ]);
+  statements.push(
+    exportDeclareFunction(
+      hookName,
+      null,
+      [createFunctionParam('params', o2ParamType, true)],
+      useMutationResultType(resultType(typeofRef('defaultSelect')), deleteVarType)
+    )
+  );
 
-  lines.push(`    onSuccess: (_, variables) => {`);
-  lines.push(`      queryClient.removeQueries({ queryKey: ${detailKey} });`);
-  lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
-  lines.push(`    },`);
-  lines.push(`    ...mutationOptions,`);
-  lines.push(`  });`);
-  lines.push(`}`);
+  // Implementation
+  const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
+  implSelProp.optional = true;
+  const implParamType = t.tsIntersectionType([
+    t.tsTypeLiteral([implSelProp]),
+    omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), deleteVarType]), ['mutationFn'])
+  ]);
 
-  const content = getGeneratedFileHeader(`Delete mutation hook for ${typeName}`) + '\n\n' + lines.join('\n') + '\n';
+  const body: t.Statement[] = [];
+  body.push(buildSelectionArgsCall(selectTypeName));
+  body.push(destructureParamsWithSelection('mutationOptions'));
+  body.push(voidStatement('_selection'));
+  body.push(constDecl('queryClient', callExpr('useQueryClient', [])));
+
+  const mutationKeyExpr = useCentralizedKeys
+    ? t.memberExpression(t.identifier(mutationKeysName), t.identifier('all'))
+    : undefined;
+
+  // mutationFn: ({ pkField }: { pkField: type }) =>
+  //   getClient().singular.delete({ where: { pkField }, select: ... }).unwrap()
+  const destructParam = t.objectPattern([shorthandProp(pkField.name)]);
+  destructParam.typeAnnotation = t.tsTypeAnnotation(deleteVarType);
+  const mutationFnExpr = t.arrowFunctionExpression(
+    [destructParam],
+    getClientCallUnwrap(singularName, 'delete', t.objectExpression([
+      objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
+      objectProp('select', buildSelectFallback(selectTypeName))
+    ]))
+  );
+
+  // onSuccess: remove detail, invalidate lists
+  const detailKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(keysName), t.identifier('detail')), [
+      t.memberExpression(t.identifier('variables'), t.identifier(pkField.name))
+    ])
+    : t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('detail'), t.memberExpression(t.identifier('variables'), t.identifier(pkField.name))]);
+  const listKeyExpr = useCentralizedKeys
+    ? callExpr(t.memberExpression(t.identifier(keysName), t.identifier('lists')), [])
+    : t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('list')]);
+
+  const onSuccessFn = t.arrowFunctionExpression(
+    [t.identifier('_'), t.identifier('variables')],
+    t.blockStatement([
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('removeQueries')),
+          [t.objectExpression([objectProp('queryKey', detailKeyExpr)])]
+        )
+      ),
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([objectProp('queryKey', listKeyExpr)])]
+        )
+      )
+    ])
+  );
+
+  body.push(
+    returnUseMutation(
+      mutationFnExpr,
+      [
+        objectProp('onSuccess', onSuccessFn),
+        spreadObj(t.identifier('mutationOptions'))
+      ],
+      mutationKeyExpr
+    )
+  );
+
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
 
   return {
     fileName: getDeleteMutationFileName(table),
-    content
+    content: generateHookFileCode(`Delete mutation hook for ${typeName}`, statements)
   };
 }
 

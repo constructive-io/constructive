@@ -1,17 +1,64 @@
 /**
- * Query hook generators - delegates to ORM model methods
+ * Query hook generators - delegates to ORM model methods (Babel AST-based)
  *
  * Output structure:
  * queries/
  *   useCarsQuery.ts    - List query hook -> ORM findMany
  *   useCarQuery.ts     - Single item query hook -> ORM findOne
  */
+import * as t from '@babel/types';
+
 import type { CleanTable } from '../../types/schema';
+import { asConst } from './babel-ast';
+import {
+  addJSDocComment,
+  buildFindManyCallExpr,
+  buildFindOneCallExpr,
+  buildListSelectionArgsCall,
+  buildSelectionArgsCall,
+  buildSelectFallbackExpr,
+  callExpr,
+  connectionResultType,
+  constDecl,
+  createFunctionParam,
+  createImportDeclaration,
+  createSAndTDataTypeParams,
+  createSTypeParam,
+  createTDataTypeParam,
+  createTypeReExport,
+  destructureParamsWithSelection,
+  destructureParamsWithSelectionAndScope,
+  exportAsyncDeclareFunction,
+  exportAsyncFunction,
+  exportDeclareFunction,
+  exportFunction,
+  generateHookFileCode,
+  inferSelectResultType,
+  listQueryResultType,
+  listSelectionConfigType,
+  objectProp,
+  omitType,
+  returnUseQuery,
+  scopeTypeLiteral,
+  selectionConfigType,
+  singleQueryResultType,
+  spreadObj,
+  sRef,
+  typeofRef,
+  typeRef,
+  typeLiteralWithProps,
+  useQueryOptionsType,
+  useQueryOptionsImplType,
+  voidStatement,
+  withFieldsListSelectionType,
+  withFieldsSelectionType,
+  withoutFieldsListSelectionType,
+  withoutFieldsSelectionType
+} from './hooks-ast';
 import {
   getAllRowsQueryName,
   getDefaultSelectFieldName,
   getFilterTypeName,
-  getGeneratedFileHeader,
   getListQueryFileName,
   getListQueryHookName,
   getOrderByTypeName,
@@ -54,229 +101,346 @@ export function generateListQueryHook(
   const scopeTypeName = `${typeName}Scope`;
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
-
   const defaultFieldName = getDefaultSelectFieldName(table);
-  const listResultType = (s: string) => `{ ${queryName}: ConnectionResult<InferSelectResult<${relationTypeName}, ${s}>> }`;
-  const selectionType = (s: string) => `ListSelectionConfig<${s}, ${filterTypeName}, ${orderByTypeName}>`;
-  const selectionWithFieldsType = (s: string) =>
-    `({ fields: ${s} } & Omit<${selectionType(s)}, 'fields'> & StrictSelect<${s}, ${selectTypeName}>)`;
-  const selectionWithoutFieldsType = () =>
-    `(Omit<${selectionType(selectTypeName)}, 'fields'> & { fields?: undefined })`;
 
-  const lines: string[] = [];
+  const listResultTypeAST = (sel: t.TSType) => listQueryResultType(queryName, relationTypeName, sel);
+
+  const statements: t.Statement[] = [];
 
   // Imports
   if (reactQueryEnabled) {
-    lines.push(`import { useQuery } from '@tanstack/react-query';`);
-    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
+    statements.push(createImportDeclaration('@tanstack/react-query', ['useQuery']));
+    statements.push(createImportDeclaration('@tanstack/react-query', ['UseQueryOptions', 'UseQueryResult', 'QueryClient'], true));
   }
-  lines.push(`import { getClient } from '../client';`);
-  lines.push(`import { buildListSelectionArgs } from '../selection';`);
-  lines.push(`import type { ListSelectionConfig } from '../selection';`);
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(createImportDeclaration('../selection', ['buildListSelectionArgs']));
+  statements.push(createImportDeclaration('../selection', ['ListSelectionConfig'], true));
 
   if (useCentralizedKeys) {
-    lines.push(`import { ${keysName} } from '../query-keys';`);
+    statements.push(createImportDeclaration('../query-keys', [keysName]));
     if (hasRelationships) {
-      lines.push(`import type { ${scopeTypeName} } from '../query-keys';`);
+      statements.push(createImportDeclaration('../query-keys', [scopeTypeName], true));
     }
   }
 
-  lines.push(`import type {`);
-  lines.push(`  ${selectTypeName},`);
-  lines.push(`  ${relationTypeName},`);
-  lines.push(`  ${filterTypeName},`);
-  lines.push(`  ${orderByTypeName},`);
-  lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type {`);
-  lines.push(`  FindManyArgs,`);
-  lines.push(`  InferSelectResult,`);
-  lines.push(`  ConnectionResult,`);
-  lines.push(`  StrictSelect,`);
-  lines.push(`} from '../../orm/select-types';`);
-  lines.push('');
+  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName, filterTypeName, orderByTypeName], true));
+  statements.push(createImportDeclaration('../../orm/select-types', ['FindManyArgs', 'InferSelectResult', 'ConnectionResult', 'StrictSelect'], true));
 
-  // Re-export types for backwards compat
-  lines.push(`export type { ${selectTypeName}, ${relationTypeName}, ${filterTypeName}, ${orderByTypeName} } from '../../orm/input-types';`);
-  lines.push('');
+  // Re-exports
+  statements.push(createTypeReExport([selectTypeName, relationTypeName, filterTypeName, orderByTypeName], '../../orm/input-types'));
 
-  lines.push(`const defaultSelect = { ${defaultFieldName}: true } as const;`);
-  lines.push('');
+  // Default select
+  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
   // Query key
   if (useCentralizedKeys) {
-    lines.push(`/** Query key factory - re-exported from query-keys.ts */`);
-    lines.push(`export const ${queryName}QueryKey = ${keysName}.list;`);
+    const keyDecl = t.exportNamedDeclaration(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier(`${queryName}QueryKey`),
+          t.memberExpression(t.identifier(keysName), t.identifier('list'))
+        )
+      ])
+    );
+    addJSDocComment(keyDecl, ['Query key factory - re-exported from query-keys.ts']);
+    statements.push(keyDecl);
   } else {
-    lines.push(`export const ${queryName}QueryKey = (variables?: FindManyArgs<unknown, ${filterTypeName}, ${orderByTypeName}>) => ['${typeName.toLowerCase()}', 'list', variables] as const;`);
+    const keyFn = t.arrowFunctionExpression(
+      [createFunctionParam('variables', typeRef('FindManyArgs', [t.tsUnknownKeyword(), typeRef(filterTypeName), typeRef(orderByTypeName)]), true)],
+      asConst(t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('list'), t.identifier('variables')]))
+    );
+    statements.push(t.exportNamedDeclaration(
+      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn)])
+    ));
   }
-  lines.push('');
+
+  // Helper for query key call
+  const buildListQueryKey = (argsExpr: t.Expression, scopeExpr?: t.Expression) => {
+    if (useCentralizedKeys) {
+      const args = [argsExpr];
+      if (scopeExpr) args.push(scopeExpr);
+      return callExpr(t.memberExpression(t.identifier(keysName), t.identifier('list')), args);
+    }
+    return callExpr(t.identifier(`${queryName}QueryKey`), [argsExpr]);
+  };
+
+  // Helper for findMany queryFn
+  const buildFindManyFn = () => t.arrowFunctionExpression(
+    [],
+    buildFindManyCallExpr(singularName, 'args', selectTypeName)
+  );
+
+  // Options type builder with optional scope
+  const buildOptionsType = (queryDataType: t.TSType, dataType: t.TSType) => {
+    const base = omitType(
+      typeRef('UseQueryOptions', [queryDataType, typeRef('Error'), dataType]),
+      ['queryKey', 'queryFn']
+    );
+    if (hasRelationships && useCentralizedKeys) {
+      return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
+    }
+    return base;
+  };
 
   // Hook
   if (reactQueryEnabled) {
     const docLines = [
-      `/**`,
-      ` * Query hook for fetching ${typeName} list`,
-      ` *`,
-      ` * @example`,
-      ` * \`\`\`tsx`,
-      ` * const { data, isLoading } = ${hookName}({`,
-      ` *   selection: {`,
-      ` *     fields: { id: true, name: true },`,
-      ` *     where: { name: { equalTo: "example" } },`,
-      ` *     orderBy: ['CREATED_AT_DESC'],`,
-      ` *     first: 10,`,
-      ` *   },`,
-      ` * });`,
-      ` * \`\`\``
+      `Query hook for fetching ${typeName} list`,
+      '',
+      '@example',
+      '```tsx',
+      `const { data, isLoading } = ${hookName}({`,
+      '  selection: {',
+      '    fields: { id: true, name: true },',
+      '    where: { name: { equalTo: "example" } },',
+      "    orderBy: ['CREATED_AT_DESC'],",
+      '    first: 10,',
+      '  },',
+      '});',
+      '```'
     ];
     if (hasRelationships && useCentralizedKeys) {
-      docLines.push(` *`);
-      docLines.push(` * @example With scope for hierarchical cache invalidation`);
-      docLines.push(` * \`\`\`tsx`);
-      docLines.push(` * const { data } = ${hookName}({`);
-      docLines.push(` *   selection: { first: 10 },`);
-      docLines.push(` *   scope: { parentId: 'parent-id' },`);
-      docLines.push(` * });`);
-      docLines.push(` * \`\`\``);
+      docLines.push('');
+      docLines.push('@example With scope for hierarchical cache invalidation');
+      docLines.push('```tsx');
+      docLines.push(`const { data } = ${hookName}({`);
+      docLines.push('  selection: { first: 10 },');
+      docLines.push("  scope: { parentId: 'parent-id' },");
+      docLines.push('});');
+      docLines.push('```');
     }
-    docLines.push(` */`);
-    lines.push(...docLines);
 
-    const optionsType = (queryData: string, data: string) =>
-      hasRelationships && useCentralizedKeys
-        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
-        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
-    const implOptionsType = hasRelationships && useCentralizedKeys
-      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
-      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
+    // Overload 1: with fields
+    const o1ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
+        )
+      ]),
+      buildOptionsType(listResultTypeAST(sRef()), typeRef('TData'))
+    ]);
+    const o1 = exportDeclareFunction(
+      hookName,
+      createSAndTDataTypeParams(selectTypeName, listResultTypeAST(sRef())),
+      [createFunctionParam('params', o1ParamType)],
+      typeRef('UseQueryResult', [typeRef('TData')])
+    );
+    addJSDocComment(o1, docLines);
+    statements.push(o1);
 
-    // Overload 1: with selection.fields (autocompletion)
-    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${listResultType('S')}>(`);
-    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${optionsType(listResultType('S'), 'TData')}`);
-    lines.push(`): UseQueryResult<TData>;`);
-
-    // Overload 2: no fields (default select)
-    lines.push(`export function ${hookName}<TData = ${listResultType('typeof defaultSelect')}>(`);
-    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${optionsType(listResultType('typeof defaultSelect'), 'TData')}`);
-    lines.push(`): UseQueryResult<TData>;`);
+    // Overload 2: without fields
+    const o2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
+    );
+    o2SelProp.optional = true;
+    const o2ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([o2SelProp]),
+      buildOptionsType(listResultTypeAST(typeofRef('defaultSelect')), typeRef('TData'))
+    ]);
+    statements.push(
+      exportDeclareFunction(
+        hookName,
+        createTDataTypeParam(listResultTypeAST(typeofRef('defaultSelect'))),
+        [createFunctionParam('params', o2ParamType, true)],
+        typeRef('UseQueryResult', [typeRef('TData')])
+      )
+    );
 
     // Implementation
-    lines.push(`export function ${hookName}(`);
-    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} } & ${implOptionsType}`);
-    lines.push(`) {`);
-    lines.push(`  const selection = params?.selection;`);
-    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(selection);`);
+    const implSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+    );
+    implSelProp.optional = true;
+    const implOptionsType = (() => {
+      const base = useQueryOptionsImplType();
+      if (hasRelationships && useCentralizedKeys) {
+        return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
+      }
+      return base;
+    })();
+    const implParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([implSelProp]),
+      implOptionsType
+    ]);
+
+    const body: t.Statement[] = [];
+    body.push(constDecl('selection', t.optionalMemberExpression(t.identifier('params'), t.identifier('selection'), false, true)));
+    body.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
 
     if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.list(args, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
-    } else if (useCentralizedKeys) {
-      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.list(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
+      body.push(destructureParamsWithSelectionAndScope('queryOptions'));
+      body.push(voidStatement('_selection'));
+      body.push(returnUseQuery(
+        buildListQueryKey(t.identifier('args'), t.identifier('scope')),
+        buildFindManyFn(),
+        [spreadObj(t.identifier('queryOptions'))]
+      ));
     } else {
-      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
+      body.push(destructureParamsWithSelection('queryOptions'));
+      body.push(voidStatement('_selection'));
+      body.push(returnUseQuery(
+        buildListQueryKey(t.identifier('args')),
+        buildFindManyFn(),
+        [spreadObj(t.identifier('queryOptions'))]
+      ));
     }
 
-    lines.push(`}`);
-    lines.push('');
+    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
   }
 
-  // Fetch function (non-hook)
-  lines.push(`/**`);
-  lines.push(` * Fetch ${typeName} list without React hooks`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`ts`);
-  lines.push(` * const data = await fetch${ucFirst(pluralName)}Query({`);
-  lines.push(` *   selection: {`);
-  lines.push(` *     fields: { id: true },`);
-  lines.push(` *     first: 10,`);
-  lines.push(` *   },`);
-  lines.push(` * });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  lines.push(`export async function fetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
-  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }`);
-  lines.push(`): Promise<${listResultType('S')}>;`);
-  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
-  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }`);
-  lines.push(`): Promise<${listResultType('typeof defaultSelect')}>;`);
-  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
-  lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }`);
-  lines.push(`) {`);
-  lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
-  lines.push(`  return getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
-  lines.push(`}`);
-  lines.push('');
+  // Fetch function
+  const fetchFnName = `fetch${ucFirst(pluralName)}Query`;
+  {
+    // Overload 1: with fields
+    const f1ParamType = t.tsTypeLiteral([
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
+      )
+    ]);
+    const f1Decl = exportAsyncDeclareFunction(
+      fetchFnName,
+      createSTypeParam(selectTypeName),
+      [createFunctionParam('params', f1ParamType)],
+      typeRef('Promise', [listResultTypeAST(sRef())])
+    );
+    addJSDocComment(f1Decl, [
+      `Fetch ${typeName} list without React hooks`,
+      '',
+      '@example',
+      '```ts',
+      `const data = await ${fetchFnName}({`,
+      '  selection: {',
+      '    fields: { id: true },',
+      '    first: 10,',
+      '  },',
+      '});',
+      '```'
+    ]);
+    statements.push(f1Decl);
+
+    // Overload 2: without fields
+    const f2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
+    );
+    f2SelProp.optional = true;
+    statements.push(
+      exportAsyncDeclareFunction(
+        fetchFnName,
+        null,
+        [createFunctionParam('params', t.tsTypeLiteral([f2SelProp]), true)],
+        typeRef('Promise', [listResultTypeAST(typeofRef('defaultSelect'))])
+      )
+    );
+
+    // Implementation
+    const fImplSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+    );
+    fImplSelProp.optional = true;
+    const fBody: t.Statement[] = [];
+    fBody.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
+    fBody.push(t.returnStatement(buildFindManyCallExpr(singularName, 'args', selectTypeName)));
+    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]), true)], fBody));
+  }
 
   // Prefetch function
   if (reactQueryEnabled) {
-    lines.push(`/**`);
-    lines.push(` * Prefetch ${typeName} list for SSR or cache warming`);
-    lines.push(` *`);
-    lines.push(` * @example`);
-    lines.push(` * \`\`\`ts`);
-    lines.push(` * await prefetch${ucFirst(pluralName)}Query(queryClient, { selection: { first: 10 } });`);
-    lines.push(` * \`\`\``);
-    lines.push(` */`);
-    lines.push(`export async function prefetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
-    lines.push(`): Promise<void>;`);
-    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
-    lines.push(`): Promise<void>;`);
-    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
-    lines.push(`): Promise<void> {`);
-    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
+    const prefetchFnName = `prefetch${ucFirst(pluralName)}Query`;
 
-    if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.list(args, params?.scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    } else if (useCentralizedKeys) {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.list(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    } else {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    }
+    // Overload 1: with fields
+    const p1Params: t.TSPropertySignature[] = [
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
+      )
+    ];
+    const p1ParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral(p1Params), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral(p1Params);
+    const p1Decl = exportAsyncDeclareFunction(
+      prefetchFnName,
+      createSTypeParam(selectTypeName),
+      [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p1ParamType)],
+      typeRef('Promise', [t.tsVoidKeyword()])
+    );
+    addJSDocComment(p1Decl, [
+      `Prefetch ${typeName} list for SSR or cache warming`,
+      '',
+      '@example',
+      '```ts',
+      `await ${prefetchFnName}(queryClient, { selection: { first: 10 } });`,
+      '```'
+    ]);
+    statements.push(p1Decl);
 
-    lines.push(`}`);
+    // Overload 2: without fields
+    const p2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
+    );
+    p2SelProp.optional = true;
+    const p2ParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral([p2SelProp]), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral([p2SelProp]);
+    statements.push(
+      exportAsyncDeclareFunction(
+        prefetchFnName,
+        null,
+        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p2ParamType, true)],
+        typeRef('Promise', [t.tsVoidKeyword()])
+      )
+    );
+
+    // Implementation
+    const pImplSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+    );
+    pImplSelProp.optional = true;
+    const pImplParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral([pImplSelProp]), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral([pImplSelProp]);
+
+    const pBody: t.Statement[] = [];
+    pBody.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
+
+    const queryKeyExpr = hasRelationships && useCentralizedKeys
+      ? buildListQueryKey(t.identifier('args'), t.optionalMemberExpression(t.identifier('params'), t.identifier('scope'), false, true))
+      : buildListQueryKey(t.identifier('args'));
+
+    const prefetchCall = callExpr(
+      t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
+      [t.objectExpression([
+        objectProp('queryKey', queryKeyExpr),
+        objectProp('queryFn', buildFindManyFn())
+      ])]
+    );
+    pBody.push(t.expressionStatement(t.awaitExpression(prefetchCall)));
+
+    statements.push(
+      exportAsyncFunction(
+        prefetchFnName,
+        null,
+        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType, true)],
+        pBody,
+        t.tsVoidKeyword()
+      )
+    );
   }
 
   const headerText = reactQueryEnabled
     ? `List query hook for ${typeName}`
     : `List query functions for ${typeName}`;
-  const content = getGeneratedFileHeader(headerText) + '\n\n' + lines.join('\n') + '\n';
 
   return {
     fileName: getListQueryFileName(table),
-    content
+    content: generateHookFileCode(headerText, statements)
   };
 }
 
@@ -284,9 +448,7 @@ export function generateSingleQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile | null {
-  if (!hasValidPrimaryKey(table)) {
-    return null;
-  }
+  if (!hasValidPrimaryKey(table)) return null;
 
   const {
     reactQueryEnabled = true,
@@ -306,217 +468,382 @@ export function generateSingleQueryHook(
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
   const defaultFieldName = getDefaultSelectFieldName(table);
-  const singleResultType = (s: string) => `{ ${queryName}: InferSelectResult<${relationTypeName}, ${s}> | null }`;
-  const selectionWithFieldsType = (s: string) =>
-    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
-  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
 
-  const lines: string[] = [];
+  const pkTsType: t.TSType = pkFieldTsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+  const singleResultTypeAST = (sel: t.TSType) => singleQueryResultType(queryName, relationTypeName, sel);
+
+  const statements: t.Statement[] = [];
 
   // Imports
   if (reactQueryEnabled) {
-    lines.push(`import { useQuery } from '@tanstack/react-query';`);
-    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
+    statements.push(createImportDeclaration('@tanstack/react-query', ['useQuery']));
+    statements.push(createImportDeclaration('@tanstack/react-query', ['UseQueryOptions', 'UseQueryResult', 'QueryClient'], true));
   }
-  lines.push(`import { getClient } from '../client';`);
-  lines.push(`import { buildSelectionArgs } from '../selection';`);
-  lines.push(`import type { SelectionConfig } from '../selection';`);
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
+  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
 
   if (useCentralizedKeys) {
-    lines.push(`import { ${keysName} } from '../query-keys';`);
+    statements.push(createImportDeclaration('../query-keys', [keysName]));
     if (hasRelationships) {
-      lines.push(`import type { ${scopeTypeName} } from '../query-keys';`);
+      statements.push(createImportDeclaration('../query-keys', [scopeTypeName], true));
     }
   }
 
-  lines.push(`import type {`);
-  lines.push(`  ${selectTypeName},`);
-  lines.push(`  ${relationTypeName},`);
-  lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type {`);
-  lines.push(`  InferSelectResult,`);
-  lines.push(`  StrictSelect,`);
-  lines.push(`} from '../../orm/select-types';`);
-  lines.push('');
+  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName], true));
+  statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
 
-  // Re-export types
-  lines.push(`export type { ${selectTypeName}, ${relationTypeName} } from '../../orm/input-types';`);
-  lines.push('');
+  // Re-exports
+  statements.push(createTypeReExport([selectTypeName, relationTypeName], '../../orm/input-types'));
 
-  lines.push(`const defaultSelect = { ${defaultFieldName}: true } as const;`);
-  lines.push('');
+  // Default select
+  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
   // Query key
   if (useCentralizedKeys) {
-    lines.push(`/** Query key factory - re-exported from query-keys.ts */`);
-    lines.push(`export const ${queryName}QueryKey = ${keysName}.detail;`);
+    const keyDecl = t.exportNamedDeclaration(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier(`${queryName}QueryKey`),
+          t.memberExpression(t.identifier(keysName), t.identifier('detail'))
+        )
+      ])
+    );
+    addJSDocComment(keyDecl, ['Query key factory - re-exported from query-keys.ts']);
+    statements.push(keyDecl);
   } else {
-    lines.push(`export const ${queryName}QueryKey = (id: ${pkFieldTsType}) => ['${typeName.toLowerCase()}', 'detail', id] as const;`);
+    const keyFn = t.arrowFunctionExpression(
+      [createFunctionParam('id', pkTsType)],
+      asConst(t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('detail'), t.identifier('id')]))
+    );
+    statements.push(t.exportNamedDeclaration(
+      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn)])
+    ));
   }
-  lines.push('');
+
+  // Helper for query key call
+  const buildDetailQueryKey = (pkExpr: t.Expression, scopeExpr?: t.Expression) => {
+    if (useCentralizedKeys) {
+      const args = [pkExpr];
+      if (scopeExpr) args.push(scopeExpr);
+      return callExpr(t.memberExpression(t.identifier(keysName), t.identifier('detail')), args);
+    }
+    return callExpr(t.identifier(`${queryName}QueryKey`), [pkExpr]);
+  };
+
+  // Helper for findOne queryFn
+  const buildFindOneFn = () => t.arrowFunctionExpression(
+    [],
+    buildFindOneCallExpr(singularName, pkFieldName, 'args', selectTypeName)
+  );
+
+  // Options type builder with optional scope
+  const buildSingleOptionsType = (queryDataType: t.TSType, dataType: t.TSType) => {
+    const base = omitType(
+      typeRef('UseQueryOptions', [queryDataType, typeRef('Error'), dataType]),
+      ['queryKey', 'queryFn']
+    );
+    if (hasRelationships && useCentralizedKeys) {
+      return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
+    }
+    return base;
+  };
 
   // Hook
   if (reactQueryEnabled) {
     const docLines = [
-      `/**`,
-      ` * Query hook for fetching a single ${typeName}`,
-      ` *`,
-      ` * @example`,
-      ` * \`\`\`tsx`,
-      ` * const { data, isLoading } = ${hookName}({`,
-      ` *   ${pkFieldName}: 'some-id',`,
-      ` *   selection: { fields: { id: true, name: true } },`,
-      ` * });`,
-      ` * \`\`\``
+      `Query hook for fetching a single ${typeName}`,
+      '',
+      '@example',
+      '```tsx',
+      `const { data, isLoading } = ${hookName}({`,
+      `  ${pkFieldName}: 'some-id',`,
+      '  selection: { fields: { id: true, name: true } },',
+      '});',
+      '```'
     ];
     if (hasRelationships && useCentralizedKeys) {
-      docLines.push(` *`);
-      docLines.push(` * @example With scope for hierarchical cache invalidation`);
-      docLines.push(` * \`\`\`tsx`);
-      docLines.push(` * const { data } = ${hookName}({`);
-      docLines.push(` *   ${pkFieldName}: 'some-id',`);
-      docLines.push(` *   scope: { parentId: 'parent-id' },`);
-      docLines.push(` * });`);
-      docLines.push(` * \`\`\``);
+      docLines.push('');
+      docLines.push('@example With scope for hierarchical cache invalidation');
+      docLines.push('```tsx');
+      docLines.push(`const { data } = ${hookName}({`);
+      docLines.push(`  ${pkFieldName}: 'some-id',`);
+      docLines.push("  scope: { parentId: 'parent-id' },");
+      docLines.push('});');
+      docLines.push('```');
     }
-    docLines.push(` */`);
-    lines.push(...docLines);
 
-    const singleOptionsType = (queryData: string, data: string) =>
-      hasRelationships && useCentralizedKeys
-        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
-        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
-    const singleImplOptionsType = hasRelationships && useCentralizedKeys
-      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
-      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
+    // Overload 1: with fields
+    const o1Props = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName))
+      )
+    ];
+    const o1ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral(o1Props),
+      buildSingleOptionsType(singleResultTypeAST(sRef()), typeRef('TData'))
+    ]);
+    const o1 = exportDeclareFunction(
+      hookName,
+      createSAndTDataTypeParams(selectTypeName, singleResultTypeAST(sRef())),
+      [createFunctionParam('params', o1ParamType)],
+      typeRef('UseQueryResult', [typeRef('TData')])
+    );
+    addJSDocComment(o1, docLines);
+    statements.push(o1);
 
-    // Overload 1: with selection.fields (provides contextual typing for autocompletion)
-    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${singleResultType('S')}>(`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} } & ${singleOptionsType(singleResultType('S'), 'TData')}`);
-    lines.push(`): UseQueryResult<TData>;`);
-
-    // Overload 2: without fields (uses default select)
-    lines.push(`export function ${hookName}<TData = ${singleResultType('typeof defaultSelect')}>(`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} } & ${singleOptionsType(singleResultType('typeof defaultSelect'), 'TData')}`);
-    lines.push(`): UseQueryResult<TData>;`);
+    // Overload 2: without fields
+    const o2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsSelectionType())
+    );
+    o2SelProp.optional = true;
+    const o2Props = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      o2SelProp
+    ];
+    const o2ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral(o2Props),
+      buildSingleOptionsType(singleResultTypeAST(typeofRef('defaultSelect')), typeRef('TData'))
+    ]);
+    statements.push(
+      exportDeclareFunction(
+        hookName,
+        createTDataTypeParam(singleResultTypeAST(typeofRef('defaultSelect'))),
+        [createFunctionParam('params', o2ParamType)],
+        typeRef('UseQueryResult', [typeRef('TData')])
+      )
+    );
 
     // Implementation
-    lines.push(`export function ${hookName}(`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> } & ${singleImplOptionsType}`);
-    lines.push(`) {`);
-    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+    const implSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+    );
+    implSelProp.optional = true;
+    const implProps = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      implSelProp
+    ];
+    const implOptionsType = (() => {
+      const base = useQueryOptionsImplType();
+      if (hasRelationships && useCentralizedKeys) {
+        return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
+      }
+      return base;
+    })();
+    const implParamType = t.tsIntersectionType([
+      t.tsTypeLiteral(implProps),
+      implOptionsType
+    ]);
+
+    const body: t.Statement[] = [];
+    // const args = buildSelectionArgs<SelectType>(params.selection);
+    const argsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
+      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+    ]);
+    // @ts-ignore
+    argsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    body.push(constDecl('args', argsCall));
+
+    const pkMemberExpr = t.memberExpression(t.identifier('params'), t.identifier(pkFieldName));
 
     if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
-    } else if (useCentralizedKeys) {
-      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
+      body.push(destructureParamsWithSelectionAndScope('queryOptions'));
+      body.push(voidStatement('_selection'));
+      body.push(returnUseQuery(
+        buildDetailQueryKey(pkMemberExpr, t.identifier('scope')),
+        buildFindOneFn(),
+        [spreadObj(t.identifier('queryOptions'))]
+      ));
     } else {
-      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
-      lines.push(`  void _selection;`);
-      lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`    ...queryOptions,`);
-      lines.push(`  });`);
+      body.push(destructureParamsWithSelection('queryOptions'));
+      body.push(voidStatement('_selection'));
+      body.push(returnUseQuery(
+        buildDetailQueryKey(pkMemberExpr),
+        buildFindOneFn(),
+        [spreadObj(t.identifier('queryOptions'))]
+      ));
     }
 
-    lines.push(`}`);
-    lines.push('');
+    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
   }
 
   // Fetch function
-  lines.push(`/**`);
-  lines.push(` * Fetch a single ${typeName} without React hooks`);
-  lines.push(` *`);
-  lines.push(` * @example`);
-  lines.push(` * \`\`\`ts`);
-  lines.push(` * const data = await fetch${ucFirst(singularName)}Query({`);
-  lines.push(` *   ${pkFieldName}: 'some-id',`);
-  lines.push(` *   selection: { fields: { id: true } },`);
-  lines.push(` * });`);
-  lines.push(` * \`\`\``);
-  lines.push(` */`);
-  lines.push(`export async function fetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
-  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }`);
-  lines.push(`): Promise<${singleResultType('S')}>;`);
-  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
-  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} },`);
-  lines.push(`): Promise<${singleResultType('typeof defaultSelect')}>;`);
-  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
-  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> },`);
-  lines.push(`) {`);
-  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
-  lines.push(`  return getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
-  lines.push(`}`);
-  lines.push('');
+  const fetchFnName = `fetch${ucFirst(singularName)}Query`;
+  {
+    // Overload 1: with fields
+    const f1Props = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)))
+    ];
+    const f1Decl = exportAsyncDeclareFunction(
+      fetchFnName,
+      createSTypeParam(selectTypeName),
+      [createFunctionParam('params', t.tsTypeLiteral(f1Props))],
+      typeRef('Promise', [singleResultTypeAST(sRef())])
+    );
+    addJSDocComment(f1Decl, [
+      `Fetch a single ${typeName} without React hooks`,
+      '',
+      '@example',
+      '```ts',
+      `const data = await ${fetchFnName}({`,
+      `  ${pkFieldName}: 'some-id',`,
+      '  selection: { fields: { id: true } },',
+      '});',
+      '```'
+    ]);
+    statements.push(f1Decl);
+
+    // Overload 2: without fields
+    const f2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsSelectionType())
+    );
+    f2SelProp.optional = true;
+    const f2Props = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      f2SelProp
+    ];
+    statements.push(
+      exportAsyncDeclareFunction(
+        fetchFnName,
+        null,
+        [createFunctionParam('params', t.tsTypeLiteral(f2Props))],
+        typeRef('Promise', [singleResultTypeAST(typeofRef('defaultSelect'))])
+      )
+    );
+
+    // Implementation
+    const fImplSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+    );
+    fImplSelProp.optional = true;
+    const fImplProps = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      fImplSelProp
+    ];
+    const fBody: t.Statement[] = [];
+    const fArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
+      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+    ]);
+    // @ts-ignore
+    fArgsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    fBody.push(constDecl('args', fArgsCall));
+    fBody.push(t.returnStatement(buildFindOneCallExpr(singularName, pkFieldName, 'args', selectTypeName)));
+    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps))], fBody));
+  }
 
   // Prefetch function
   if (reactQueryEnabled) {
-    lines.push(`/**`);
-    lines.push(` * Prefetch a single ${typeName} for SSR or cache warming`);
-    lines.push(` *`);
-    lines.push(` * @example`);
-    lines.push(` * \`\`\`ts`);
-    lines.push(` * await prefetch${ucFirst(singularName)}Query(queryClient, { ${pkFieldName}: 'some-id' });`);
-    lines.push(` * \`\`\``);
-    lines.push(` */`);
-    lines.push(`export async function prefetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
-    if (hasRelationships && useCentralizedKeys) {
-      // scope is included in params above
-    }
-    lines.push(`): Promise<void>;`);
-    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
-    lines.push(`): Promise<void>;`);
-    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
-    lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
-    lines.push(`): Promise<void> {`);
-    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+    const prefetchFnName = `prefetch${ucFirst(singularName)}Query`;
 
-    if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, params.scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    } else if (useCentralizedKeys) {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    } else {
-      lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
-      lines.push(`  });`);
-    }
+    // Overload 1: with fields
+    const p1Props: t.TSPropertySignature[] = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)))
+    ];
+    const p1ParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral(p1Props), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral(p1Props);
+    const p1Decl = exportAsyncDeclareFunction(
+      prefetchFnName,
+      createSTypeParam(selectTypeName),
+      [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p1ParamType)],
+      typeRef('Promise', [t.tsVoidKeyword()])
+    );
+    addJSDocComment(p1Decl, [
+      `Prefetch a single ${typeName} for SSR or cache warming`,
+      '',
+      '@example',
+      '```ts',
+      `await ${prefetchFnName}(queryClient, { ${pkFieldName}: 'some-id' });`,
+      '```'
+    ]);
+    statements.push(p1Decl);
 
-    lines.push(`}`);
+    // Overload 2: without fields
+    const p2SelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(withoutFieldsSelectionType())
+    );
+    p2SelProp.optional = true;
+    const p2Props: t.TSPropertySignature[] = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      p2SelProp
+    ];
+    const p2ParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral(p2Props), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral(p2Props);
+    statements.push(
+      exportAsyncDeclareFunction(
+        prefetchFnName,
+        null,
+        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p2ParamType)],
+        typeRef('Promise', [t.tsVoidKeyword()])
+      )
+    );
+
+    // Implementation
+    const pImplSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+    );
+    pImplSelProp.optional = true;
+    const pImplProps: t.TSPropertySignature[] = [
+      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      pImplSelProp
+    ];
+    const pImplParamType = hasRelationships && useCentralizedKeys
+      ? t.tsIntersectionType([t.tsTypeLiteral(pImplProps), scopeTypeLiteral(scopeTypeName)])
+      : t.tsTypeLiteral(pImplProps);
+
+    const pBody: t.Statement[] = [];
+    const pArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
+      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+    ]);
+    // @ts-ignore
+    pArgsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    pBody.push(constDecl('args', pArgsCall));
+
+    const queryKeyExpr = hasRelationships && useCentralizedKeys
+      ? buildDetailQueryKey(
+        t.memberExpression(t.identifier('params'), t.identifier(pkFieldName)),
+        t.optionalMemberExpression(t.identifier('params'), t.identifier('scope'), false, true)
+      )
+      : buildDetailQueryKey(t.memberExpression(t.identifier('params'), t.identifier(pkFieldName)));
+
+    const prefetchCall = callExpr(
+      t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
+      [t.objectExpression([
+        objectProp('queryKey', queryKeyExpr),
+        objectProp('queryFn', buildFindOneFn())
+      ])]
+    );
+    pBody.push(t.expressionStatement(t.awaitExpression(prefetchCall)));
+
+    statements.push(
+      exportAsyncFunction(
+        prefetchFnName,
+        null,
+        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType)],
+        pBody,
+        t.tsVoidKeyword()
+      )
+    );
   }
 
   const headerText = reactQueryEnabled
     ? `Single item query hook for ${typeName}`
     : `Single item query functions for ${typeName}`;
-  const content = getGeneratedFileHeader(headerText) + '\n\n' + lines.join('\n') + '\n';
 
   return {
     fileName: getSingleQueryFileName(table),
-    content
+    content: generateHookFileCode(headerText, statements)
   };
 }
 
