@@ -1597,6 +1597,90 @@ function generatePayloadTypes(
 }
 
 // ============================================================================
+// Connection Fields Map Generator
+// ============================================================================
+
+/**
+ * Generate a runtime map of entity type → { fieldName: relatedTypeName }
+ * for all hasMany and manyToMany relations. Used by buildSelections()
+ * to detect connection fields that need `nodes { ... }` wrapping.
+ */
+function generateConnectionFieldsMap(
+  tables: CleanTable[],
+  tableByName: Map<string, CleanTable>
+): t.Statement[] {
+  const properties: t.ObjectProperty[] = [];
+
+  for (const table of tables) {
+    const { typeName } = getTableNames(table);
+    const fieldEntries: t.ObjectProperty[] = [];
+
+    for (const relation of table.relations.hasMany) {
+      if (!relation.fieldName) continue;
+      const relatedTypeName = getRelatedTypeName(
+        relation.referencedByTable,
+        tableByName
+      );
+      fieldEntries.push(
+        t.objectProperty(
+          t.stringLiteral(relation.fieldName),
+          t.stringLiteral(relatedTypeName)
+        )
+      );
+    }
+
+    for (const relation of table.relations.manyToMany) {
+      if (!relation.fieldName) continue;
+      const relatedTypeName = getRelatedTypeName(
+        relation.rightTable,
+        tableByName
+      );
+      fieldEntries.push(
+        t.objectProperty(
+          t.stringLiteral(relation.fieldName),
+          t.stringLiteral(relatedTypeName)
+        )
+      );
+    }
+
+    if (fieldEntries.length > 0) {
+      properties.push(
+        t.objectProperty(
+          t.stringLiteral(typeName),
+          t.objectExpression(fieldEntries)
+        )
+      );
+    }
+  }
+
+  const decl = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier('connectionFieldsMap'),
+      t.tsAsExpression(
+        t.objectExpression(properties),
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsTypeReference(
+              t.identifier('Record'),
+              t.tsTypeParameterInstantiation([
+                t.tsStringKeyword(),
+                t.tsStringKeyword()
+              ])
+            )
+          ])
+        )
+      )
+    )
+  ]);
+
+  const statements: t.Statement[] = [t.exportNamedDeclaration(decl)];
+  addSectionComment(statements, 'Connection Fields Map');
+  return statements;
+}
+
+// ============================================================================
 // Main Generator (AST-based)
 // ============================================================================
 
@@ -1610,38 +1694,43 @@ export function generateInputTypesFile(
   usedPayloadTypes?: Set<string>
 ): GeneratedInputTypesFile {
   const statements: t.Statement[] = [];
+  const tablesList = tables ?? [];
+  const hasTables = tablesList.length > 0;
+  const tableByName = new Map(tablesList.map((table) => [table.name, table]));
 
   // 1. Scalar filter types
   statements.push(...generateScalarFilterTypes());
 
   // 2. Enum types used by table fields
-  if (tables && tables.length > 0) {
-    const enumTypes = collectEnumTypesFromTables(tables, typeRegistry);
+  if (hasTables) {
+    const enumTypes = collectEnumTypesFromTables(tablesList, typeRegistry);
     statements.push(...generateEnumTypes(typeRegistry, enumTypes));
   }
 
   // 3. Entity and relation types (if tables provided)
-  if (tables && tables.length > 0) {
-    const tableByName = new Map(tables.map((table) => [table.name, table]));
-
-    statements.push(...generateEntityTypes(tables));
+  if (hasTables) {
+    statements.push(...generateEntityTypes(tablesList));
     statements.push(...generateRelationHelperTypes());
-    statements.push(...generateEntityRelationTypes(tables, tableByName));
-    statements.push(...generateEntityWithRelations(tables));
-    statements.push(...generateEntitySelectTypes(tables, tableByName));
+    statements.push(...generateEntityRelationTypes(tablesList, tableByName));
+    statements.push(...generateEntityWithRelations(tablesList));
+    statements.push(...generateEntitySelectTypes(tablesList, tableByName));
 
     // 4. Table filter types
-    statements.push(...generateTableFilterTypes(tables));
+    statements.push(...generateTableFilterTypes(tablesList));
 
     // 4b. Table condition types (simple equality filter)
-    statements.push(...generateTableConditionTypes(tables));
+    statements.push(...generateTableConditionTypes(tablesList));
 
     // 5. OrderBy types
-    statements.push(...generateOrderByTypes(tables));
+    statements.push(...generateOrderByTypes(tablesList));
 
     // 6. CRUD input types
-    statements.push(...generateAllCrudInputTypes(tables));
+    statements.push(...generateAllCrudInputTypes(tablesList));
   }
+
+  // 6b. Connection fields map (runtime metadata for buildSelections)
+  // Always emit this export so generated model/custom-op imports stay valid.
+  statements.push(...generateConnectionFieldsMap(tablesList, tableByName));
 
   // 7. Custom input types from TypeRegistry
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;

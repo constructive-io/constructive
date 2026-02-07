@@ -64,8 +64,10 @@ export function generateCreateMutationHook(
 
   // Imports
   lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions } from '@tanstack/react-query';`);
+  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { ${keysName} } from '../query-keys';`);
@@ -77,10 +79,7 @@ export function generateCreateMutationHook(
   lines.push(`  ${relationTypeName},`);
   lines.push(`  ${createInputTypeName},`);
   lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type {`);
-  lines.push(`  DeepExact,`);
-  lines.push(`  InferSelectResult,`);
-  lines.push(`} from '../../orm/select-types';`);
+  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
   lines.push('');
 
   // Re-export types
@@ -97,16 +96,30 @@ export function generateCreateMutationHook(
   lines.push(` * @example`);
   lines.push(` * \`\`\`tsx`);
   lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   select: { id: true, name: true },`);
+  lines.push(` *   selection: { fields: { id: true, name: true } },`);
   lines.push(` * });`);
   lines.push(` *`);
   lines.push(` * mutate({ name: 'New item' });`);
   lines.push(` * \`\`\``);
   lines.push(` */`);
-  lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-  lines.push(`  args?: { select?: DeepExact<S, ${selectTypeName}> },`);
-  lines.push(`  options?: Omit<UseMutationOptions<{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, S> } }, Error, ${createInputTypeName}['${singularName}']>, 'mutationFn'>`);
+  const createResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
+  const createVarType = `${createInputTypeName}['${singularName}']`;
+  const createOptionsType = (s: string) => `Omit<UseMutationOptions<${createResultType(s)}, Error, ${createVarType}>, 'mutationFn'>`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
+  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${createOptionsType('S')}`);
+  lines.push(`): UseMutationResult<${createResultType('S')}, Error, ${createVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${createOptionsType('typeof defaultSelect')}`);
+  lines.push(`): UseMutationResult<${createResultType('typeof defaultSelect')}, Error, ${createVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${createVarType}>, 'mutationFn'>`);
   lines.push(`) {`);
+  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
+  lines.push(`  void _selection;`);
   lines.push(`  const queryClient = useQueryClient();`);
   lines.push(`  return useMutation({`);
 
@@ -114,7 +127,7 @@ export function generateCreateMutationHook(
     lines.push(`    mutationKey: ${mutationKeysName}.create(),`);
   }
 
-  lines.push(`    mutationFn: (data: ${createInputTypeName}['${singularName}']) => getClient().${singularName}.create({ data, select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+  lines.push(`    mutationFn: (data: ${createInputTypeName}['${singularName}']) => getClient().${singularName}.create({ data, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
 
   const listKey = useCentralizedKeys
     ? `${keysName}.lists()`
@@ -122,7 +135,7 @@ export function generateCreateMutationHook(
   lines.push(`    onSuccess: () => {`);
   lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
   lines.push(`    },`);
-  lines.push(`    ...options,`);
+  lines.push(`    ...mutationOptions,`);
   lines.push(`  });`);
   lines.push(`}`);
 
@@ -171,8 +184,10 @@ export function generateUpdateMutationHook(
 
   // Imports
   lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions } from '@tanstack/react-query';`);
+  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { ${keysName} } from '../query-keys';`);
@@ -184,10 +199,7 @@ export function generateUpdateMutationHook(
   lines.push(`  ${relationTypeName},`);
   lines.push(`  ${patchTypeName},`);
   lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type {`);
-  lines.push(`  DeepExact,`);
-  lines.push(`  InferSelectResult,`);
-  lines.push(`} from '../../orm/select-types';`);
+  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
   lines.push('');
 
   // Re-export types
@@ -204,16 +216,30 @@ export function generateUpdateMutationHook(
   lines.push(` * @example`);
   lines.push(` * \`\`\`tsx`);
   lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   select: { id: true, name: true },`);
+  lines.push(` *   selection: { fields: { id: true, name: true } },`);
   lines.push(` * });`);
   lines.push(` *`);
   lines.push(` * mutate({ ${pkField.name}: 'value-here', patch: { name: 'Updated' } });`);
   lines.push(` * \`\`\``);
   lines.push(` */`);
-  lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-  lines.push(`  args?: { select?: DeepExact<S, ${selectTypeName}> },`);
-  lines.push(`  options?: Omit<UseMutationOptions<{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, S> } }, Error, { ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }>, 'mutationFn'>`);
+  const updateResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
+  const updateVarType = `{ ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }`;
+  const updateOptionsType = (s: string) => `Omit<UseMutationOptions<${updateResultType(s)}, Error, ${updateVarType}>, 'mutationFn'>`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
+  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${updateOptionsType('S')}`);
+  lines.push(`): UseMutationResult<${updateResultType('S')}, Error, ${updateVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${updateOptionsType('typeof defaultSelect')}`);
+  lines.push(`): UseMutationResult<${updateResultType('typeof defaultSelect')}, Error, ${updateVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${updateVarType}>, 'mutationFn'>`);
   lines.push(`) {`);
+  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
+  lines.push(`  void _selection;`);
   lines.push(`  const queryClient = useQueryClient();`);
   lines.push(`  return useMutation({`);
 
@@ -221,7 +247,7 @@ export function generateUpdateMutationHook(
     lines.push(`    mutationKey: ${mutationKeysName}.all,`);
   }
 
-  lines.push(`    mutationFn: ({ ${pkField.name}, patch }: { ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }) => getClient().${singularName}.update({ where: { ${pkField.name} }, data: patch, select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+  lines.push(`    mutationFn: ({ ${pkField.name}, patch }: { ${pkField.name}: ${pkField.tsType}; patch: ${patchTypeName} }) => getClient().${singularName}.update({ where: { ${pkField.name} }, data: patch, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
 
   const detailKey = useCentralizedKeys
     ? `${keysName}.detail(variables.${pkField.name})`
@@ -234,7 +260,7 @@ export function generateUpdateMutationHook(
   lines.push(`      queryClient.invalidateQueries({ queryKey: ${detailKey} });`);
   lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
   lines.push(`    },`);
-  lines.push(`    ...options,`);
+  lines.push(`    ...mutationOptions,`);
   lines.push(`  });`);
   lines.push(`}`);
 
@@ -282,8 +308,10 @@ export function generateDeleteMutationHook(
 
   // Imports
   lines.push(`import { useMutation, useQueryClient } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions } from '@tanstack/react-query';`);
+  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { ${keysName} } from '../query-keys';`);
@@ -294,10 +322,7 @@ export function generateDeleteMutationHook(
   lines.push(`  ${selectTypeName},`);
   lines.push(`  ${relationTypeName},`);
   lines.push(`} from '../../orm/input-types';`);
-  lines.push(`import type {`);
-  lines.push(`  DeepExact,`);
-  lines.push(`  InferSelectResult,`);
-  lines.push(`} from '../../orm/select-types';`);
+  lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
   lines.push('');
 
   // Re-export types
@@ -314,16 +339,30 @@ export function generateDeleteMutationHook(
   lines.push(` * @example`);
   lines.push(` * \`\`\`tsx`);
   lines.push(` * const { mutate, isPending } = ${hookName}({`);
-  lines.push(` *   select: { id: true },`);
+  lines.push(` *   selection: { fields: { id: true } },`);
   lines.push(` * });`);
   lines.push(` *`);
   lines.push(` * mutate({ ${pkField.name}: ${pkField.tsType === 'string' ? "'value-to-delete'" : '123'} });`);
   lines.push(` * \`\`\``);
   lines.push(` */`);
-  lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-  lines.push(`  args?: { select?: DeepExact<S, ${selectTypeName}> },`);
-  lines.push(`  options?: Omit<UseMutationOptions<{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, S> } }, Error, { ${pkField.name}: ${pkField.tsType} }>, 'mutationFn'>`);
+  const deleteResultType = (s: string) => `{ ${mutationName}: { ${singularName}: InferSelectResult<${relationTypeName}, ${s}> } }`;
+  const deleteVarType = `{ ${pkField.name}: ${pkField.tsType} }`;
+  const deleteOptionsType = (s: string) => `Omit<UseMutationOptions<${deleteResultType(s)}, Error, ${deleteVarType}>, 'mutationFn'>`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
+  lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${deleteOptionsType('S')}`);
+  lines.push(`): UseMutationResult<${deleteResultType('S')}, Error, ${deleteVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${deleteOptionsType('typeof defaultSelect')}`);
+  lines.push(`): UseMutationResult<${deleteResultType('typeof defaultSelect')}, Error, ${deleteVarType}>;`);
+  lines.push(`export function ${hookName}(`);
+  lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${deleteVarType}>, 'mutationFn'>`);
   lines.push(`) {`);
+  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+  lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
+  lines.push(`  void _selection;`);
   lines.push(`  const queryClient = useQueryClient();`);
   lines.push(`  return useMutation({`);
 
@@ -331,7 +370,7 @@ export function generateDeleteMutationHook(
     lines.push(`    mutationKey: ${mutationKeysName}.all,`);
   }
 
-  lines.push(`    mutationFn: ({ ${pkField.name} }: { ${pkField.name}: ${pkField.tsType} }) => getClient().${singularName}.delete({ where: { ${pkField.name} }, select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+  lines.push(`    mutationFn: ({ ${pkField.name} }: { ${pkField.name}: ${pkField.tsType} }) => getClient().${singularName}.delete({ where: { ${pkField.name} }, select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
 
   const detailKey = useCentralizedKeys
     ? `${keysName}.detail(variables.${pkField.name})`
@@ -344,7 +383,7 @@ export function generateDeleteMutationHook(
   lines.push(`      queryClient.removeQueries({ queryKey: ${detailKey} });`);
   lines.push(`      queryClient.invalidateQueries({ queryKey: ${listKey} });`);
   lines.push(`    },`);
-  lines.push(`    ...options,`);
+  lines.push(`    ...mutationOptions,`);
   lines.push(`  });`);
   lines.push(`}`);
 

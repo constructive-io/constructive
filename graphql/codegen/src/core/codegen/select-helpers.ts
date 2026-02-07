@@ -37,17 +37,18 @@ export function getSelectTypeName(returnType: CleanArgument['type']): string | n
  */
 export function wrapInferSelectResult(
   typeRef: CleanArgument['type'],
-  payloadTypeName: string
+  payloadTypeName: string,
+  selectType: string = 'S'
 ): string {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
-    return wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName);
+    return wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName, selectType);
   }
 
   if (typeRef.kind === 'LIST' && typeRef.ofType) {
-    return `${wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName)}[]`;
+    return `${wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName, selectType)}[]`;
   }
 
-  return `InferSelectResult<${payloadTypeName}, S>`;
+  return `InferSelectResult<${payloadTypeName}, ${selectType}>`;
 }
 
 /**

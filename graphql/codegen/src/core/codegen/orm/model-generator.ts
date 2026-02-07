@@ -2,6 +2,7 @@
  * Model class generator for ORM client (Babel AST-based)
  *
  * Generates per-table model classes with findMany, findFirst, create, update, delete methods.
+ * Each method uses function overloads for IDE autocompletion of select objects.
  */
 import * as t from '@babel/types';
 
@@ -84,7 +85,23 @@ function createClassMethod(
   return method;
 }
 
-function createConstTypeParam(
+function createDeclareMethod(
+  name: string,
+  typeParameters: t.TSTypeParameterDeclaration | null,
+  params: (t.Identifier | t.TSParameterProperty)[],
+  returnType: t.TSTypeAnnotation
+): t.TSDeclareMethod {
+  const method = t.tsDeclareMethod(
+    null,
+    t.identifier(name),
+    typeParameters,
+    params,
+    returnType
+  );
+  return method;
+}
+
+function createTypeParam(
   constraintTypeName: string,
   defaultType?: t.TSType
 ): t.TSTypeParameterDeclaration {
@@ -93,7 +110,6 @@ function createConstTypeParam(
     defaultType ?? null,
     'S'
   );
-  (param as any).const = true;
   return t.tsTypeParameterDeclaration([param]);
 }
 
@@ -102,6 +118,51 @@ function tsTypeFromPrimitive(typeName: string): t.TSType {
   if (typeName === 'number') return t.tsNumberKeyword();
   if (typeName === 'boolean') return t.tsBooleanKeyword();
   return t.tsTypeReference(t.identifier(typeName));
+}
+
+/** Build a required `select: S` property for overload signatures */
+function requiredSelectProp(): t.TSPropertySignature {
+  const prop = t.tsPropertySignature(
+    t.identifier('select'),
+    t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S')))
+  );
+  prop.optional = false;
+  return prop;
+}
+
+/** Build an optional `select?: undefined` prop to forbid select in fallback overloads */
+function optionalUndefinedSelectProp(): t.TSPropertySignature {
+  const prop = t.tsPropertySignature(
+    t.identifier('select'),
+    t.tsTypeAnnotation(t.tsUndefinedKeyword())
+  );
+  prop.optional = true;
+  return prop;
+}
+
+/** Build `StrictSelect<S, XxxSelect>` type reference for overload intersections */
+function strictSelectGuard(selectTypeName: string): t.TSType {
+  return t.tsTypeReference(
+    t.identifier('StrictSelect'),
+    t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier('S')),
+      t.tsTypeReference(t.identifier(selectTypeName))
+    ])
+  );
+}
+
+/** Build `Omit<TArgs, 'select'> & { select?: undefined }` for fallback overloads */
+function withoutSelect(argsType: t.TSType): t.TSType {
+  return t.tsIntersectionType([
+    t.tsTypeReference(
+      t.identifier('Omit'),
+      t.tsTypeParameterInstantiation([
+        argsType,
+        t.tsLiteralType(t.stringLiteral('select'))
+      ])
+    ),
+    t.tsTypeLiteral([optionalUndefinedSelectProp()])
+  ]);
 }
 
 export function generateModelFile(
@@ -125,7 +186,6 @@ export function generateModelFile(
 
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
-  const pkFieldTsType = tsTypeFromPrimitive(pkField.tsType);
   const defaultSelectIdent = t.identifier('defaultSelect');
   const defaultSelectFieldName = getDefaultSelectFieldName(table);
 
@@ -143,12 +203,13 @@ export function generateModelFile(
   ]));
   statements.push(createImportDeclaration('../select-types', [
     'ConnectionResult', 'FindManyArgs', 'FindFirstArgs', 'CreateArgs',
-    'UpdateArgs', 'DeleteArgs', 'InferSelectResult', 'DeepExact'
+    'UpdateArgs', 'DeleteArgs', 'InferSelectResult', 'StrictSelect'
   ], true));
   statements.push(createImportDeclaration('../input-types', [
     typeName, relationTypeName, selectTypeName, whereTypeName, orderByTypeName,
     createInputTypeName, updateInputTypeName, patchTypeName
   ], true));
+  statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
 
   // Default select (ensures valid GraphQL selection + sound TS return types)
   statements.push(
@@ -173,309 +234,407 @@ export function generateModelFile(
   paramProp.accessibility = 'private';
   classBody.push(t.classMethod('constructor', t.identifier('constructor'), [paramProp], t.blockStatement([])));
 
-  // findMany method
-  // Use DeepExact<S, SelectType> to enforce strict field validation
-  const findManyParam = t.identifier('args');
-  findManyParam.optional = true;
-  findManyParam.typeAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('FindManyArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier('S')),
-        t.tsTypeReference(t.identifier(selectTypeName))
-      ])),
-      t.tsTypeReference(t.identifier(whereTypeName)),
-      t.tsTypeReference(t.identifier(orderByTypeName))
-    ]))
-  );
-  const findManyReturnType = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-      t.tsTypeLiteral([
-        t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
-          t.tsTypeReference(t.identifier('ConnectionResult'), t.tsTypeParameterInstantiation([
-            t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-              t.tsTypeReference(t.identifier(relationTypeName)),
-              t.tsTypeReference(t.identifier('S'))
-            ]))
-          ]))
-        ))
-      ])
-    ]))
-  );
-  const findManySelectExpr = t.logicalExpression(
-    '??',
-    t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-    defaultSelectIdent
-  );
-  const findManyArgs = [
-    t.stringLiteral(typeName),
-    t.stringLiteral(pluralQueryName),
-    findManySelectExpr,
-    t.objectExpression([
-      t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true)),
-      t.objectProperty(t.identifier('orderBy'), t.tsAsExpression(
-        t.optionalMemberExpression(t.identifier('args'), t.identifier('orderBy'), false, true),
-        t.tsUnionType([t.tsArrayType(t.tsStringKeyword()), t.tsUndefinedKeyword()])
-      )),
-      t.objectProperty(t.identifier('first'), t.optionalMemberExpression(t.identifier('args'), t.identifier('first'), false, true)),
-      t.objectProperty(t.identifier('last'), t.optionalMemberExpression(t.identifier('args'), t.identifier('last'), false, true)),
-      t.objectProperty(t.identifier('after'), t.optionalMemberExpression(t.identifier('args'), t.identifier('after'), false, true)),
-      t.objectProperty(t.identifier('before'), t.optionalMemberExpression(t.identifier('args'), t.identifier('before'), false, true)),
-      t.objectProperty(t.identifier('offset'), t.optionalMemberExpression(t.identifier('args'), t.identifier('offset'), false, true))
-    ]),
-    t.stringLiteral(whereTypeName),
-    t.stringLiteral(orderByTypeName)
-  ];
-  classBody.push(createClassMethod('findMany', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [findManyParam], findManyReturnType,
-    buildMethodBody('buildFindManyDocument', findManyArgs, 'query', typeName, pluralQueryName)));
+  // Reusable type reference factories
+  const sRef = () => t.tsTypeReference(t.identifier('S'));
+  const defaultRef = () => t.tsTypeQuery(defaultSelectIdent);
+  const selectRef = () => t.tsTypeReference(t.identifier(selectTypeName));
+  const pkTsType = () => tsTypeFromPrimitive(pkField.tsType);
 
-  // findFirst method
-  const findFirstParam = t.identifier('args');
-  findFirstParam.optional = true;
-  findFirstParam.typeAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('FindFirstArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier('S')),
-        t.tsTypeReference(t.identifier(selectTypeName))
-      ])),
-      t.tsTypeReference(t.identifier(whereTypeName))
-    ]))
-  );
-  const findFirstReturnType = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-      t.tsTypeLiteral([
-        t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
+  // ── findMany ───────────────────────────────────────────────────────────
+  {
+    const argsType = (sel: t.TSType) =>
+      t.tsTypeReference(t.identifier('FindManyArgs'), t.tsTypeParameterInstantiation([
+        sel,
+        t.tsTypeReference(t.identifier(whereTypeName)),
+        t.tsTypeReference(t.identifier(orderByTypeName))
+      ]));
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
           t.tsTypeLiteral([
-            t.tsPropertySignature(t.identifier('nodes'), t.tsTypeAnnotation(
-              t.tsArrayType(t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-                t.tsTypeReference(t.identifier(relationTypeName)),
-                t.tsTypeReference(t.identifier('S'))
-              ])))
+            t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
+              t.tsTypeReference(t.identifier('ConnectionResult'), t.tsTypeParameterInstantiation([
+                t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                  t.tsTypeReference(t.identifier(relationTypeName)),
+                  sel
+                ]))
+              ]))
             ))
           ])
-        ))
-      ])
-    ]))
-  );
-  const findFirstSelectExpr = t.logicalExpression(
-    '??',
-    t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-    defaultSelectIdent
-  );
-  const findFirstArgs = [
-    t.stringLiteral(typeName),
-    t.stringLiteral(pluralQueryName),
-    findFirstSelectExpr,
-    t.objectExpression([
-      t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true))
-    ]),
-    t.stringLiteral(whereTypeName)
-  ];
-  classBody.push(createClassMethod('findFirst', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [findFirstParam], findFirstReturnType,
-    buildMethodBody('buildFindFirstDocument', findFirstArgs, 'query', typeName, pluralQueryName)));
+        ]))
+      );
 
-  // findOne method (only if table has valid PK and singular query)
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        argsType(sRef()),
+        t.tsTypeLiteral([requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
+    );
+    classBody.push(createDeclareMethod('findMany', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.optional = true;
+    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
+    classBody.push(createDeclareMethod('findMany', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.optional = true;
+    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
+    const selectExpr = t.logicalExpression('??',
+      t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
+      defaultSelectIdent);
+    const bodyArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(pluralQueryName),
+      selectExpr,
+      t.objectExpression([
+        t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true)),
+        t.objectProperty(t.identifier('orderBy'), t.tsAsExpression(
+          t.optionalMemberExpression(t.identifier('args'), t.identifier('orderBy'), false, true),
+          t.tsUnionType([t.tsArrayType(t.tsStringKeyword()), t.tsUndefinedKeyword()])
+        )),
+        t.objectProperty(t.identifier('first'), t.optionalMemberExpression(t.identifier('args'), t.identifier('first'), false, true)),
+        t.objectProperty(t.identifier('last'), t.optionalMemberExpression(t.identifier('args'), t.identifier('last'), false, true)),
+        t.objectProperty(t.identifier('after'), t.optionalMemberExpression(t.identifier('args'), t.identifier('after'), false, true)),
+        t.objectProperty(t.identifier('before'), t.optionalMemberExpression(t.identifier('args'), t.identifier('before'), false, true)),
+        t.objectProperty(t.identifier('offset'), t.optionalMemberExpression(t.identifier('args'), t.identifier('offset'), false, true))
+      ]),
+      t.stringLiteral(whereTypeName),
+      t.stringLiteral(orderByTypeName),
+      t.identifier('connectionFieldsMap')
+    ];
+    classBody.push(createClassMethod('findMany', null, [implParam], null,
+      buildMethodBody('buildFindManyDocument', bodyArgs, 'query', typeName, pluralQueryName)));
+  }
+
+  // ── findFirst ──────────────────────────────────────────────────────────
+  {
+    const argsType = (sel: t.TSType) =>
+      t.tsTypeReference(t.identifier('FindFirstArgs'), t.tsTypeParameterInstantiation([
+        sel,
+        t.tsTypeReference(t.identifier(whereTypeName))
+      ]));
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier(pluralQueryName), t.tsTypeAnnotation(
+              t.tsTypeLiteral([
+                t.tsPropertySignature(t.identifier('nodes'), t.tsTypeAnnotation(
+                  t.tsArrayType(t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                    t.tsTypeReference(t.identifier(relationTypeName)),
+                    sel
+                  ])))
+                ))
+              ])
+            ))
+          ])
+        ]))
+      );
+
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        argsType(sRef()),
+        t.tsTypeLiteral([requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
+    );
+    classBody.push(createDeclareMethod('findFirst', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.optional = true;
+    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
+    classBody.push(createDeclareMethod('findFirst', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.optional = true;
+    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
+    const selectExpr = t.logicalExpression('??',
+      t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
+      defaultSelectIdent);
+    const bodyArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(pluralQueryName),
+      selectExpr,
+      t.objectExpression([
+        t.objectProperty(t.identifier('where'), t.optionalMemberExpression(t.identifier('args'), t.identifier('where'), false, true))
+      ]),
+      t.stringLiteral(whereTypeName),
+      t.identifier('connectionFieldsMap')
+    ];
+    classBody.push(createClassMethod('findFirst', null, [implParam], null,
+      buildMethodBody('buildFindFirstDocument', bodyArgs, 'query', typeName, pluralQueryName)));
+  }
+
+  // ── findOne ────────────────────────────────────────────────────────────
   const singleQueryName = table.query?.one;
   if (singleQueryName && hasValidPrimaryKey(table)) {
     const pkGqlType = pkField.gqlType.replace(/!/g, '') + '!';
 
-    const findOneParam = t.identifier('args');
-    findOneParam.typeAnnotation = t.tsTypeAnnotation(
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier(singleQueryName), t.tsTypeAnnotation(
+              t.tsUnionType([
+                t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                  t.tsTypeReference(t.identifier(relationTypeName)),
+                  sel
+                ])),
+                t.tsNullKeyword()
+              ])
+            ))
+          ])
+        ]))
+      );
+
+    const pkProp = () => {
+      const prop = t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType()));
+      prop.optional = false;
+      return prop;
+    };
+
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        t.tsTypeLiteral([pkProp(), requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
+    );
+    classBody.push(createDeclareMethod('findOne', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeLiteral([pkProp()])
+    );
+    classBody.push(createDeclareMethod('findOne', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsTypeLiteral([
-        (() => {
-          const prop = t.tsPropertySignature(
-            t.identifier(pkField.name),
-            t.tsTypeAnnotation(pkFieldTsType)
-          );
-          prop.optional = false;
-          return prop;
-        })(),
+        pkProp(),
         (() => {
           const prop = t.tsPropertySignature(
             t.identifier('select'),
-            t.tsTypeAnnotation(
-              t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-                t.tsTypeReference(t.identifier('S')),
-                t.tsTypeReference(t.identifier(selectTypeName))
-              ]))
-            )
+            t.tsTypeAnnotation(t.tsTypeReference(t.identifier(selectTypeName)))
           );
           prop.optional = true;
           return prop;
         })()
       ])
     );
-    const findOneReturnType = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-        t.tsTypeLiteral([
-          t.tsPropertySignature(t.identifier(singleQueryName), t.tsTypeAnnotation(
-            t.tsUnionType([
-              t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-                t.tsTypeReference(t.identifier(relationTypeName)),
-                t.tsTypeReference(t.identifier('S'))
-              ])),
-              t.tsNullKeyword()
-            ])
-          ))
-        ])
-      ]))
-    );
-    const findOneSelectExpr = t.logicalExpression(
-      '??',
+    const selectExpr = t.logicalExpression('??',
       t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent
-    );
-    const findOneArgs = [
+      defaultSelectIdent);
+    const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(singleQueryName),
       t.memberExpression(t.identifier('args'), t.identifier(pkField.name)),
-      findOneSelectExpr,
+      selectExpr,
       t.stringLiteral(pkField.name),
-      t.stringLiteral(pkGqlType)
+      t.stringLiteral(pkGqlType),
+      t.identifier('connectionFieldsMap')
     ];
-    classBody.push(createClassMethod('findOne', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [findOneParam], findOneReturnType,
-      buildMethodBody('buildFindOneDocument', findOneArgs, 'query', typeName, singleQueryName)));
+    classBody.push(createClassMethod('findOne', null, [implParam], null,
+      buildMethodBody('buildFindOneDocument', bodyArgs, 'query', typeName, singleQueryName)));
   }
 
-  // create method
-  const createParam = t.identifier('args');
-  createParam.typeAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('CreateArgs'), t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier('S')),
-        t.tsTypeReference(t.identifier(selectTypeName))
-      ])),
-      t.tsIndexedAccessType(t.tsTypeReference(t.identifier(createInputTypeName)), t.tsLiteralType(t.stringLiteral(singularName)))
-    ]))
-  );
-  const createReturnType = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-      t.tsTypeLiteral([
-        t.tsPropertySignature(t.identifier(createMutationName), t.tsTypeAnnotation(
+  // ── create ─────────────────────────────────────────────────────────────
+  {
+    const dataType = () => t.tsIndexedAccessType(
+      t.tsTypeReference(t.identifier(createInputTypeName)),
+      t.tsLiteralType(t.stringLiteral(singularName))
+    );
+    const argsType = (sel: t.TSType) =>
+      t.tsTypeReference(t.identifier('CreateArgs'), t.tsTypeParameterInstantiation([sel, dataType()]));
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
           t.tsTypeLiteral([
-            t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
-              t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-                t.tsTypeReference(t.identifier(relationTypeName)),
-                t.tsTypeReference(t.identifier('S'))
-              ]))
+            t.tsPropertySignature(t.identifier(createMutationName), t.tsTypeAnnotation(
+              t.tsTypeLiteral([
+                t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                    t.tsTypeReference(t.identifier(relationTypeName)),
+                    sel
+                  ]))
+                ))
+              ])
             ))
           ])
-        ))
-      ])
-    ]))
-  );
-  const createSelectExpr = t.logicalExpression(
-    '??',
-    t.memberExpression(t.identifier('args'), t.identifier('select')),
-    defaultSelectIdent
-  );
-  const createArgs = [
-    t.stringLiteral(typeName),
-    t.stringLiteral(createMutationName),
-    t.stringLiteral(entityLower),
-    createSelectExpr,
-    t.memberExpression(t.identifier('args'), t.identifier('data')),
-    t.stringLiteral(createInputTypeName)
-  ];
-  classBody.push(createClassMethod('create', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [createParam], createReturnType,
-    buildMethodBody('buildCreateDocument', createArgs, 'mutation', typeName, createMutationName)));
+        ]))
+      );
 
-  // update method (if available)
-  if (updateMutationName) {
-    const updateParam = t.identifier('args');
-    updateParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier('UpdateArgs'), t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-          t.tsTypeReference(t.identifier('S')),
-          t.tsTypeReference(t.identifier(selectTypeName))
-        ])),
-        t.tsTypeLiteral([
-          (() => {
-            const prop = t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkFieldTsType));
-            prop.optional = false;
-            return prop;
-          })()
-        ]),
-        t.tsTypeReference(t.identifier(patchTypeName))
-      ]))
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        argsType(sRef()),
+        t.tsTypeLiteral([requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
     );
-    const updateReturnType = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-        t.tsTypeLiteral([
-          t.tsPropertySignature(t.identifier(updateMutationName), t.tsTypeAnnotation(
-            t.tsTypeLiteral([
-              t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
-                t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-                  t.tsTypeReference(t.identifier(relationTypeName)),
-                  t.tsTypeReference(t.identifier('S'))
-                ]))
-              ))
-            ])
-          ))
-        ])
-      ]))
-    );
-    const updateSelectExpr = t.logicalExpression(
-      '??',
+    classBody.push(createDeclareMethod('create', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
+    classBody.push(createDeclareMethod('create', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
+    const selectExpr = t.logicalExpression('??',
       t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent
+      defaultSelectIdent);
+    const bodyArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(createMutationName),
+      t.stringLiteral(entityLower),
+      selectExpr,
+      t.memberExpression(t.identifier('args'), t.identifier('data')),
+      t.stringLiteral(createInputTypeName),
+      t.identifier('connectionFieldsMap')
+    ];
+    classBody.push(createClassMethod('create', null, [implParam], null,
+      buildMethodBody('buildCreateDocument', bodyArgs, 'mutation', typeName, createMutationName)));
+  }
+
+  // ── update ─────────────────────────────────────────────────────────────
+  if (updateMutationName) {
+    const whereLiteral = () => t.tsTypeLiteral([
+      (() => {
+        const prop = t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType()));
+        prop.optional = false;
+        return prop;
+      })()
+    ]);
+    const argsType = (sel: t.TSType) =>
+      t.tsTypeReference(t.identifier('UpdateArgs'), t.tsTypeParameterInstantiation([
+        sel, whereLiteral(), t.tsTypeReference(t.identifier(patchTypeName))
+      ]));
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier(updateMutationName), t.tsTypeAnnotation(
+              t.tsTypeLiteral([
+                t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                    t.tsTypeReference(t.identifier(relationTypeName)),
+                    sel
+                  ]))
+                ))
+              ])
+            ))
+          ])
+        ]))
+      );
+
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        argsType(sRef()),
+        t.tsTypeLiteral([requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
     );
-    const updateArgs = [
+    classBody.push(createDeclareMethod('update', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
+    classBody.push(createDeclareMethod('update', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
+    const selectExpr = t.logicalExpression('??',
+      t.memberExpression(t.identifier('args'), t.identifier('select')),
+      defaultSelectIdent);
+    const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(updateMutationName),
       t.stringLiteral(entityLower),
-      updateSelectExpr,
+      selectExpr,
       t.memberExpression(
         t.memberExpression(t.identifier('args'), t.identifier('where')),
         t.identifier(pkField.name)
       ),
       t.memberExpression(t.identifier('args'), t.identifier('data')),
       t.stringLiteral(updateInputTypeName),
-      t.stringLiteral(pkField.name)
+      t.stringLiteral(pkField.name),
+      t.identifier('connectionFieldsMap')
     ];
-    classBody.push(createClassMethod('update', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [updateParam], updateReturnType,
-      buildMethodBody('buildUpdateByPkDocument', updateArgs, 'mutation', typeName, updateMutationName)));
+    classBody.push(createClassMethod('update', null, [implParam], null,
+      buildMethodBody('buildUpdateByPkDocument', bodyArgs, 'mutation', typeName, updateMutationName)));
   }
 
-  // delete method (if available) - supports optional select for returning entity fields
+  // ── delete ─────────────────────────────────────────────────────────────
   if (deleteMutationName) {
-    const deleteParam = t.identifier('args');
-    deleteParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier('DeleteArgs'), t.tsTypeParameterInstantiation([
-        t.tsTypeLiteral([
-          (() => {
-            const prop = t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkFieldTsType));
-            prop.optional = false;
-            return prop;
-          })()
-        ]),
-        t.tsTypeReference(t.identifier('DeepExact'), t.tsTypeParameterInstantiation([
-          t.tsTypeReference(t.identifier('S')),
-          t.tsTypeReference(t.identifier(selectTypeName))
+    const whereLiteral = () => t.tsTypeLiteral([
+      (() => {
+        const prop = t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType()));
+        prop.optional = false;
+        return prop;
+      })()
+    ]);
+    const argsType = (sel: t.TSType) =>
+      t.tsTypeReference(t.identifier('DeleteArgs'), t.tsTypeParameterInstantiation([whereLiteral(), sel]));
+    const retType = (sel: t.TSType) =>
+      t.tsTypeAnnotation(
+        t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
+          t.tsTypeLiteral([
+            t.tsPropertySignature(t.identifier(deleteMutationName), t.tsTypeAnnotation(
+              t.tsTypeLiteral([
+                t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
+                    t.tsTypeReference(t.identifier(relationTypeName)),
+                    sel
+                  ]))
+                ))
+              ])
+            ))
+          ])
         ]))
-      ]))
+      );
+
+    // Overload 1: with select (autocompletion)
+    const o1Param = t.identifier('args');
+    o1Param.typeAnnotation = t.tsTypeAnnotation(
+      t.tsIntersectionType([
+        argsType(sRef()),
+        t.tsTypeLiteral([requiredSelectProp()]),
+        strictSelectGuard(selectTypeName)
+      ])
     );
-    const deleteReturnType = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier('QueryBuilder'), t.tsTypeParameterInstantiation([
-        t.tsTypeLiteral([
-          t.tsPropertySignature(t.identifier(deleteMutationName), t.tsTypeAnnotation(
-            t.tsTypeLiteral([
-              t.tsPropertySignature(t.identifier(entityLower), t.tsTypeAnnotation(
-                t.tsTypeReference(t.identifier('InferSelectResult'), t.tsTypeParameterInstantiation([
-                  t.tsTypeReference(t.identifier(relationTypeName)),
-                  t.tsTypeReference(t.identifier('S'))
-                ]))
-              ))
-            ])
-          ))
-        ])
-      ]))
-    );
-    const deleteSelectExpr = t.logicalExpression(
-      '??',
+    classBody.push(createDeclareMethod('delete', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
+
+    // Overload 2: without select (default)
+    const o2Param = t.identifier('args');
+    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
+    classBody.push(createDeclareMethod('delete', null, [o2Param], retType(defaultRef())));
+
+    // Implementation
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
+    const selectExpr = t.logicalExpression('??',
       t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent
-    );
-    const deleteArgs = [
+      defaultSelectIdent);
+    const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(deleteMutationName),
       t.stringLiteral(entityLower),
@@ -485,10 +644,11 @@ export function generateModelFile(
       ),
       t.stringLiteral(deleteInputTypeName),
       t.stringLiteral(pkField.name),
-      deleteSelectExpr
+      selectExpr,
+      t.identifier('connectionFieldsMap')
     ];
-    classBody.push(createClassMethod('delete', createConstTypeParam(selectTypeName, t.tsTypeQuery(defaultSelectIdent)), [deleteParam], deleteReturnType,
-      buildMethodBody('buildDeleteByPkDocument', deleteArgs, 'mutation', typeName, deleteMutationName)));
+    classBody.push(createClassMethod('delete', null, [implParam], null,
+      buildMethodBody('buildDeleteByPkDocument', bodyArgs, 'mutation', typeName, deleteMutationName)));
   }
 
   const classDecl = t.classDeclaration(t.identifier(modelName), null, t.classBody(classBody));

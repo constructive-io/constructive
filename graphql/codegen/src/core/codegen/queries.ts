@@ -56,15 +56,23 @@ export function generateListQueryHook(
   const relationTypeName = `${typeName}WithRelations`;
 
   const defaultFieldName = getDefaultSelectFieldName(table);
+  const listResultType = (s: string) => `{ ${queryName}: ConnectionResult<InferSelectResult<${relationTypeName}, ${s}>> }`;
+  const selectionType = (s: string) => `ListSelectionConfig<${s}, ${filterTypeName}, ${orderByTypeName}>`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & Omit<${selectionType(s)}, 'fields'> & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () =>
+    `(Omit<${selectionType(selectTypeName)}, 'fields'> & { fields?: undefined })`;
 
   const lines: string[] = [];
 
   // Imports
   if (reactQueryEnabled) {
     lines.push(`import { useQuery } from '@tanstack/react-query';`);
-    lines.push(`import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';`);
+    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
   }
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildListSelectionArgs } from '../selection';`);
+  lines.push(`import type { ListSelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { ${keysName} } from '../query-keys';`);
@@ -81,9 +89,9 @@ export function generateListQueryHook(
   lines.push(`} from '../../orm/input-types';`);
   lines.push(`import type {`);
   lines.push(`  FindManyArgs,`);
-  lines.push(`  DeepExact,`);
   lines.push(`  InferSelectResult,`);
   lines.push(`  ConnectionResult,`);
+  lines.push(`  StrictSelect,`);
   lines.push(`} from '../../orm/select-types';`);
   lines.push('');
 
@@ -99,7 +107,7 @@ export function generateListQueryHook(
     lines.push(`/** Query key factory - re-exported from query-keys.ts */`);
     lines.push(`export const ${queryName}QueryKey = ${keysName}.list;`);
   } else {
-    lines.push(`export const ${queryName}QueryKey = (variables?: FindManyArgs<any, ${filterTypeName}, ${orderByTypeName}>) => ['${typeName.toLowerCase()}', 'list', variables] as const;`);
+    lines.push(`export const ${queryName}QueryKey = (variables?: FindManyArgs<unknown, ${filterTypeName}, ${orderByTypeName}>) => ['${typeName.toLowerCase()}', 'list', variables] as const;`);
   }
   lines.push('');
 
@@ -112,10 +120,12 @@ export function generateListQueryHook(
       ` * @example`,
       ` * \`\`\`tsx`,
       ` * const { data, isLoading } = ${hookName}({`,
-      ` *   select: { id: true, name: true },`,
-      ` *   first: 10,`,
-      ` *   where: { name: { equalTo: "example" } },`,
-      ` *   orderBy: ['CREATED_AT_DESC'],`,
+      ` *   selection: {`,
+      ` *     fields: { id: true, name: true },`,
+      ` *     where: { name: { equalTo: "example" } },`,
+      ` *     orderBy: ['CREATED_AT_DESC'],`,
+      ` *     first: 10,`,
+      ` *   },`,
       ` * });`,
       ` * \`\`\``
     ];
@@ -123,45 +133,63 @@ export function generateListQueryHook(
       docLines.push(` *`);
       docLines.push(` * @example With scope for hierarchical cache invalidation`);
       docLines.push(` * \`\`\`tsx`);
-      docLines.push(` * const { data } = ${hookName}(`);
-      docLines.push(` *   { first: 10 },`);
-      docLines.push(` *   { scope: { parentId: 'parent-id' } }`);
-      docLines.push(` * );`);
+      docLines.push(` * const { data } = ${hookName}({`);
+      docLines.push(` *   selection: { first: 10 },`);
+      docLines.push(` *   scope: { parentId: 'parent-id' },`);
+      docLines.push(` * });`);
       docLines.push(` * \`\`\``);
     }
     docLines.push(` */`);
     lines.push(...docLines);
 
-    let optionsType: string;
-    if (hasRelationships && useCentralizedKeys) {
-      optionsType = `Omit<UseQueryOptions<{ ${queryName}: ConnectionResult<InferSelectResult<${relationTypeName}, S>> }, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
-    } else {
-      optionsType = `Omit<UseQueryOptions<{ ${queryName}: ConnectionResult<InferSelectResult<${relationTypeName}, S>> }, Error>, 'queryKey' | 'queryFn'>`;
-    }
+    const optionsType = (queryData: string, data: string) =>
+      hasRelationships && useCentralizedKeys
+        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
+    const implOptionsType = hasRelationships && useCentralizedKeys
+      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
 
-    lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-    lines.push(`  args?: FindManyArgs<DeepExact<S, ${selectTypeName}>, ${filterTypeName}, ${orderByTypeName}>,`);
-    lines.push(`  options?: ${optionsType}`);
+    // Overload 1: with selection.fields (autocompletion)
+    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${listResultType('S')}>(`);
+    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${optionsType(listResultType('S'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Overload 2: no fields (default select)
+    lines.push(`export function ${hookName}<TData = ${listResultType('typeof defaultSelect')}>(`);
+    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${optionsType(listResultType('typeof defaultSelect'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Implementation
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} } & ${implOptionsType}`);
     lines.push(`) {`);
+    lines.push(`  const selection = params?.selection;`);
+    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(selection);`);
 
     if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  const { scope, ...queryOptions } = options ?? {};`);
+      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
       lines.push(`    queryKey: ${keysName}.list(args, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     } else if (useCentralizedKeys) {
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
       lines.push(`    queryKey: ${keysName}.list(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
-      lines.push(`    ...options,`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     } else {
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
       lines.push(`    queryKey: ${queryName}QueryKey(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
-      lines.push(`    ...options,`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     }
 
@@ -175,13 +203,25 @@ export function generateListQueryHook(
   lines.push(` *`);
   lines.push(` * @example`);
   lines.push(` * \`\`\`ts`);
-  lines.push(` * const data = await fetch${ucFirst(pluralName)}Query({ first: 10, select: { id: true } });`);
+  lines.push(` * const data = await fetch${ucFirst(pluralName)}Query({`);
+  lines.push(` *   selection: {`);
+  lines.push(` *     fields: { id: true },`);
+  lines.push(` *     first: 10,`);
+  lines.push(` *   },`);
+  lines.push(` * });`);
   lines.push(` * \`\`\``);
   lines.push(` */`);
-  lines.push(`export async function fetch${ucFirst(pluralName)}Query<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-  lines.push(`  args?: FindManyArgs<DeepExact<S, ${selectTypeName}>, ${filterTypeName}, ${orderByTypeName}>,`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }`);
+  lines.push(`): Promise<${listResultType('S')}>;`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
+  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }`);
+  lines.push(`): Promise<${listResultType('typeof defaultSelect')}>;`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
+  lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }`);
   lines.push(`) {`);
-  lines.push(`  return getClient().${singularName}.findMany(args).unwrap();`);
+  lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
+  lines.push(`  return getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
   lines.push(`}`);
   lines.push('');
 
@@ -192,31 +232,37 @@ export function generateListQueryHook(
     lines.push(` *`);
     lines.push(` * @example`);
     lines.push(` * \`\`\`ts`);
-    lines.push(` * await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });`);
+    lines.push(` * await prefetch${ucFirst(pluralName)}Query(queryClient, { selection: { first: 10 } });`);
     lines.push(` * \`\`\``);
     lines.push(` */`);
-    lines.push(`export async function prefetch${ucFirst(pluralName)}Query<const S extends ${selectTypeName} = typeof defaultSelect>(`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
     lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  args?: FindManyArgs<DeepExact<S, ${selectTypeName}>, ${filterTypeName}, ${orderByTypeName}>,`);
-    if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  scope?: ${scopeTypeName},`);
-    }
+    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
     lines.push(`): Promise<void> {`);
+    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
 
     if (hasRelationships && useCentralizedKeys) {
       lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.list(args, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
+      lines.push(`    queryKey: ${keysName}.list(args, params?.scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     } else if (useCentralizedKeys) {
       lines.push(`  await queryClient.prefetchQuery({`);
       lines.push(`    queryKey: ${keysName}.list(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     } else {
       lines.push(`  await queryClient.prefetchQuery({`);
       lines.push(`    queryKey: ${queryName}QueryKey(args),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findMany(args).unwrap(),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     }
 
@@ -260,15 +306,21 @@ export function generateSingleQueryHook(
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
   const defaultFieldName = getDefaultSelectFieldName(table);
+  const singleResultType = (s: string) => `{ ${queryName}: InferSelectResult<${relationTypeName}, ${s}> | null }`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
 
   const lines: string[] = [];
 
   // Imports
   if (reactQueryEnabled) {
     lines.push(`import { useQuery } from '@tanstack/react-query';`);
-    lines.push(`import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';`);
+    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
   }
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { ${keysName} } from '../query-keys';`);
@@ -282,8 +334,8 @@ export function generateSingleQueryHook(
   lines.push(`  ${relationTypeName},`);
   lines.push(`} from '../../orm/input-types';`);
   lines.push(`import type {`);
-  lines.push(`  DeepExact,`);
   lines.push(`  InferSelectResult,`);
+  lines.push(`  StrictSelect,`);
   lines.push(`} from '../../orm/select-types';`);
   lines.push('');
 
@@ -313,7 +365,7 @@ export function generateSingleQueryHook(
       ` * \`\`\`tsx`,
       ` * const { data, isLoading } = ${hookName}({`,
       ` *   ${pkFieldName}: 'some-id',`,
-      ` *   select: { id: true, name: true },`,
+      ` *   selection: { fields: { id: true, name: true } },`,
       ` * });`,
       ` * \`\`\``
     ];
@@ -321,45 +373,62 @@ export function generateSingleQueryHook(
       docLines.push(` *`);
       docLines.push(` * @example With scope for hierarchical cache invalidation`);
       docLines.push(` * \`\`\`tsx`);
-      docLines.push(` * const { data } = ${hookName}(`);
-      docLines.push(` *   { ${pkFieldName}: 'some-id' },`);
-      docLines.push(` *   { scope: { parentId: 'parent-id' } }`);
-      docLines.push(` * );`);
+      docLines.push(` * const { data } = ${hookName}({`);
+      docLines.push(` *   ${pkFieldName}: 'some-id',`);
+      docLines.push(` *   scope: { parentId: 'parent-id' },`);
+      docLines.push(` * });`);
       docLines.push(` * \`\`\``);
     }
     docLines.push(` */`);
     lines.push(...docLines);
 
-    let optionsType: string;
-    if (hasRelationships && useCentralizedKeys) {
-      optionsType = `Omit<UseQueryOptions<{ ${queryName}: InferSelectResult<${relationTypeName}, S> | null }, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
-    } else {
-      optionsType = `Omit<UseQueryOptions<{ ${queryName}: InferSelectResult<${relationTypeName}, S> | null }, Error>, 'queryKey' | 'queryFn'>`;
-    }
+    const singleOptionsType = (queryData: string, data: string) =>
+      hasRelationships && useCentralizedKeys
+        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
+    const singleImplOptionsType = hasRelationships && useCentralizedKeys
+      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
 
-    lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-    lines.push(`  args: { ${pkFieldName}: ${pkFieldTsType}; select?: DeepExact<S, ${selectTypeName}> },`);
-    lines.push(`  options?: ${optionsType}`);
+    // Overload 1: with selection.fields (provides contextual typing for autocompletion)
+    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${singleResultType('S')}>(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} } & ${singleOptionsType(singleResultType('S'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Overload 2: without fields (uses default select)
+    lines.push(`export function ${hookName}<TData = ${singleResultType('typeof defaultSelect')}>(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} } & ${singleOptionsType(singleResultType('typeof defaultSelect'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Implementation
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> } & ${singleImplOptionsType}`);
     lines.push(`) {`);
+    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
 
     if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  const { scope, ...queryOptions } = options ?? {};`);
+      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(args.${pkFieldName}, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     } else if (useCentralizedKeys) {
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(args.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
-      lines.push(`    ...options,`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     } else {
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
       lines.push(`  return useQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(args.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
-      lines.push(`    ...options,`);
+      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
     }
 
@@ -373,13 +442,23 @@ export function generateSingleQueryHook(
   lines.push(` *`);
   lines.push(` * @example`);
   lines.push(` * \`\`\`ts`);
-  lines.push(` * const data = await fetch${ucFirst(singularName)}Query({ ${pkFieldName}: 'some-id', select: { id: true } });`);
+  lines.push(` * const data = await fetch${ucFirst(singularName)}Query({`);
+  lines.push(` *   ${pkFieldName}: 'some-id',`);
+  lines.push(` *   selection: { fields: { id: true } },`);
+  lines.push(` * });`);
   lines.push(` * \`\`\``);
   lines.push(` */`);
-  lines.push(`export async function fetch${ucFirst(singularName)}Query<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-  lines.push(`  args: { ${pkFieldName}: ${pkFieldTsType}; select?: DeepExact<S, ${selectTypeName}> },`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }`);
+  lines.push(`): Promise<${singleResultType('S')}>;`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} },`);
+  lines.push(`): Promise<${singleResultType('typeof defaultSelect')}>;`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> },`);
   lines.push(`) {`);
-  lines.push(`  return getClient().${singularName}.findOne(args).unwrap();`);
+  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+  lines.push(`  return getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
   lines.push(`}`);
   lines.push('');
 
@@ -393,28 +472,37 @@ export function generateSingleQueryHook(
     lines.push(` * await prefetch${ucFirst(singularName)}Query(queryClient, { ${pkFieldName}: 'some-id' });`);
     lines.push(` * \`\`\``);
     lines.push(` */`);
-    lines.push(`export async function prefetch${ucFirst(singularName)}Query<const S extends ${selectTypeName} = typeof defaultSelect>(`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
     lines.push(`  queryClient: QueryClient,`);
-    lines.push(`  args: { ${pkFieldName}: ${pkFieldTsType}; select?: DeepExact<S, ${selectTypeName}> },`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
     if (hasRelationships && useCentralizedKeys) {
-      lines.push(`  scope?: ${scopeTypeName},`);
+      // scope is included in params above
     }
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
     lines.push(`): Promise<void> {`);
+    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
 
     if (hasRelationships && useCentralizedKeys) {
       lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(args.${pkFieldName}, scope),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, params.scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     } else if (useCentralizedKeys) {
       lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${keysName}.detail(args.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     } else {
       lines.push(`  await queryClient.prefetchQuery({`);
-      lines.push(`    queryKey: ${queryName}QueryKey(args.${pkFieldName}),`);
-      lines.push(`    queryFn: () => getClient().${singularName}.findOne(args).unwrap(),`);
+      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
       lines.push(`  });`);
     }
 

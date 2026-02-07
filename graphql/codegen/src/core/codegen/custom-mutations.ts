@@ -101,8 +101,10 @@ function generateCustomMutationHookInternal(
 
   // Imports
   lines.push(`import { useMutation } from '@tanstack/react-query';`);
-  lines.push(`import type { UseMutationOptions } from '@tanstack/react-query';`);
+  lines.push(`import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';`);
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { customMutationKeys } from '../mutation-keys';`);
@@ -130,7 +132,7 @@ function generateCustomMutationHookInternal(
   }
 
   if (hasSelect) {
-    lines.push(`import type { DeepExact, InferSelectResult } from '../../orm/select-types';`);
+    lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
   }
 
   lines.push('');
@@ -153,17 +155,28 @@ function generateCustomMutationHookInternal(
 
   // Hook
   if (hasSelect) {
-    // With select: generic hook
-    const selectedResult = wrapInferSelectResult(operation.returnType, payloadTypeName);
-    const resultTypeStr = `{ ${operation.name}: ${selectedResult} }`;
+    // With selection.fields: overloaded hook for autocompletion + typed options/result
     const mutationVarType = hasArgs ? varTypeName : 'void';
+    const selectedResultType = (s: string) =>
+      `{ ${operation.name}: ${wrapInferSelectResult(operation.returnType, payloadTypeName!, s)} }`;
+    const mutationOptionsType = (s: string) =>
+      `Omit<UseMutationOptions<${selectedResultType(s)}, Error, ${mutationVarType}>, 'mutationFn'>`;
+    const selectionWithFieldsType = (s: string) =>
+      `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+    const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
 
-    const optionsType = `Omit<UseMutationOptions<${resultTypeStr}, Error, ${mutationVarType}>, 'mutationFn'>`;
-
-    lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-    lines.push(`  args?: { select?: DeepExact<S, ${selectTypeName}> },`);
-    lines.push(`  options?: ${optionsType}`);
+    lines.push(`export function ${hookName}<S extends ${selectTypeName}>(`);
+    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${mutationOptionsType('S')}`);
+    lines.push(`): UseMutationResult<${selectedResultType('S')}, Error, ${mutationVarType}>;`);
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${mutationOptionsType('typeof defaultSelect')}`);
+    lines.push(`): UseMutationResult<${selectedResultType('typeof defaultSelect')}, Error, ${mutationVarType}>;`);
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseMutationOptions<any, Error, ${mutationVarType}>, 'mutationFn'>`);
     lines.push(`) {`);
+    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+    lines.push(`  const { selection: _selection, ...mutationOptions } = params ?? {};`);
+    lines.push(`  void _selection;`);
     lines.push(`  return useMutation({`);
 
     if (useCentralizedKeys) {
@@ -171,12 +184,12 @@ function generateCustomMutationHookInternal(
     }
 
     if (hasArgs) {
-      lines.push(`    mutationFn: (variables: ${varTypeName}) => getClient().mutation.${operation.name}(variables, { select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+      lines.push(`    mutationFn: (variables: ${varTypeName}) => getClient().mutation.${operation.name}(variables, { select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
     } else {
-      lines.push(`    mutationFn: () => getClient().mutation.${operation.name}({ select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+      lines.push(`    mutationFn: () => getClient().mutation.${operation.name}({ select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
     }
 
-    lines.push(`    ...options,`);
+    lines.push(`    ...mutationOptions,`);
     lines.push(`  });`);
     lines.push(`}`);
   } else {
@@ -186,9 +199,15 @@ function generateCustomMutationHookInternal(
 
     const optionsType = `Omit<UseMutationOptions<${resultTypeStr}, Error, ${mutationVarType}>, 'mutationFn'>`;
 
-    lines.push(`export function ${hookName}(`);
-    lines.push(`  options?: ${optionsType}`);
+    if (hasArgs) {
+      lines.push(`export function ${hookName}(`);
+      lines.push(`  params?: ${optionsType}`);
+    } else {
+      lines.push(`export function ${hookName}(`);
+      lines.push(`  params?: ${optionsType}`);
+    }
     lines.push(`) {`);
+    lines.push(`  const mutationOptions = params ?? {};`);
     lines.push(`  return useMutation({`);
 
     if (useCentralizedKeys) {
@@ -201,7 +220,7 @@ function generateCustomMutationHookInternal(
       lines.push(`    mutationFn: () => getClient().mutation.${operation.name}().unwrap(),`);
     }
 
-    lines.push(`    ...options,`);
+    lines.push(`    ...mutationOptions,`);
     lines.push(`  });`);
     lines.push(`}`);
   }

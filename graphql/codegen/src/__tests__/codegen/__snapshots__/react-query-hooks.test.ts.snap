@@ -188,26 +188,36 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { customMutationKeys } from '../mutation-keys';
 import type { LoginVariables } from '../../orm/mutation';
 import type { LoginPayloadSelect, LoginPayload } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { LoginVariables } from '../../orm/mutation';
 export type { LoginPayloadSelect } from '../../orm/input-types';
 
 const defaultSelect = { token: true } as const;
 
-export function useLoginMutation<const S extends LoginPayloadSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, LoginPayloadSelect> },
-  options?: Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>, 'mutationFn'>
+export function useLoginMutation<S extends LoginPayloadSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, LoginPayloadSelect>) } & Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>, 'mutationFn'>
+): UseMutationResult<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>;
+export function useLoginMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, typeof defaultSelect> }, Error, LoginVariables>, 'mutationFn'>
+): UseMutationResult<{ login: InferSelectResult<LoginPayload, typeof defaultSelect> }, Error, LoginVariables>;
+export function useLoginMutation(
+  params?: { selection?: SelectionConfig<LoginPayloadSelect> } & Omit<UseMutationOptions<any, Error, LoginVariables>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<LoginPayloadSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.login(),
-    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, { select: (args?.select ?? defaultSelect) as DeepExact<S, LoginPayloadSelect> }).unwrap(),
-    ...options,
+    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, { select: (args?.select ?? defaultSelect) as LoginPayloadSelect }).unwrap(),
+    ...mutationOptions,
   });
 }
 "
@@ -221,26 +231,36 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { customMutationKeys } from '../mutation-keys';
 import type { RegisterVariables } from '../../orm/mutation';
 import type { RegisterPayloadSelect, RegisterPayload } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { RegisterVariables } from '../../orm/mutation';
 export type { RegisterPayloadSelect } from '../../orm/input-types';
 
 const defaultSelect = { token: true } as const;
 
-export function useRegisterMutation<const S extends RegisterPayloadSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, RegisterPayloadSelect> },
-  options?: Omit<UseMutationOptions<{ register: InferSelectResult<RegisterPayload, S> }, Error, RegisterVariables>, 'mutationFn'>
+export function useRegisterMutation<S extends RegisterPayloadSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, RegisterPayloadSelect>) } & Omit<UseMutationOptions<{ register: InferSelectResult<RegisterPayload, S> }, Error, RegisterVariables>, 'mutationFn'>
+): UseMutationResult<{ register: InferSelectResult<RegisterPayload, S> }, Error, RegisterVariables>;
+export function useRegisterMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ register: InferSelectResult<RegisterPayload, typeof defaultSelect> }, Error, RegisterVariables>, 'mutationFn'>
+): UseMutationResult<{ register: InferSelectResult<RegisterPayload, typeof defaultSelect> }, Error, RegisterVariables>;
+export function useRegisterMutation(
+  params?: { selection?: SelectionConfig<RegisterPayloadSelect> } & Omit<UseMutationOptions<any, Error, RegisterVariables>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<RegisterPayloadSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.register(),
-    mutationFn: (variables: RegisterVariables) => getClient().mutation.register(variables, { select: (args?.select ?? defaultSelect) as DeepExact<S, RegisterPayloadSelect> }).unwrap(),
-    ...options,
+    mutationFn: (variables: RegisterVariables) => getClient().mutation.register(variables, { select: (args?.select ?? defaultSelect) as RegisterPayloadSelect }).unwrap(),
+    ...mutationOptions,
   });
 }
 "
@@ -254,24 +274,34 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { customMutationKeys } from '../mutation-keys';
 import type { LogoutPayloadSelect, LogoutPayload } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { LogoutPayloadSelect } from '../../orm/input-types';
 
 const defaultSelect = { success: true } as const;
 
-export function useLogoutMutation<const S extends LogoutPayloadSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, LogoutPayloadSelect> },
-  options?: Omit<UseMutationOptions<{ logout: InferSelectResult<LogoutPayload, S> }, Error, void>, 'mutationFn'>
+export function useLogoutMutation<S extends LogoutPayloadSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, LogoutPayloadSelect>) } & Omit<UseMutationOptions<{ logout: InferSelectResult<LogoutPayload, S> }, Error, void>, 'mutationFn'>
+): UseMutationResult<{ logout: InferSelectResult<LogoutPayload, S> }, Error, void>;
+export function useLogoutMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ logout: InferSelectResult<LogoutPayload, typeof defaultSelect> }, Error, void>, 'mutationFn'>
+): UseMutationResult<{ logout: InferSelectResult<LogoutPayload, typeof defaultSelect> }, Error, void>;
+export function useLogoutMutation(
+  params?: { selection?: SelectionConfig<LogoutPayloadSelect> } & Omit<UseMutationOptions<any, Error, void>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<LogoutPayloadSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.logout(),
-    mutationFn: () => getClient().mutation.logout({ select: (args?.select ?? defaultSelect) as DeepExact<S, LogoutPayloadSelect> }).unwrap(),
-    ...options,
+    mutationFn: () => getClient().mutation.logout({ select: (args?.select ?? defaultSelect) as LogoutPayloadSelect }).unwrap(),
+    ...mutationOptions,
   });
 }
 "
@@ -285,24 +315,34 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type { LoginVariables } from '../../orm/mutation';
 import type { LoginPayloadSelect, LoginPayload } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { LoginVariables } from '../../orm/mutation';
 export type { LoginPayloadSelect } from '../../orm/input-types';
 
 const defaultSelect = { token: true } as const;
 
-export function useLoginMutation<const S extends LoginPayloadSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, LoginPayloadSelect> },
-  options?: Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>, 'mutationFn'>
+export function useLoginMutation<S extends LoginPayloadSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, LoginPayloadSelect>) } & Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>, 'mutationFn'>
+): UseMutationResult<{ login: InferSelectResult<LoginPayload, S> }, Error, LoginVariables>;
+export function useLoginMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ login: InferSelectResult<LoginPayload, typeof defaultSelect> }, Error, LoginVariables>, 'mutationFn'>
+): UseMutationResult<{ login: InferSelectResult<LoginPayload, typeof defaultSelect> }, Error, LoginVariables>;
+export function useLoginMutation(
+  params?: { selection?: SelectionConfig<LoginPayloadSelect> } & Omit<UseMutationOptions<any, Error, LoginVariables>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<LoginPayloadSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   return useMutation({
-    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, { select: (args?.select ?? defaultSelect) as DeepExact<S, LoginPayloadSelect> }).unwrap(),
-    ...options,
+    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, { select: (args?.select ?? defaultSelect) as LoginPayloadSelect }).unwrap(),
+    ...mutationOptions,
   });
 }
 "
@@ -316,12 +356,14 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { customQueryKeys } from '../query-keys';
 import type { SearchUsersVariables } from '../../orm/query';
 import type { UserSelect, User } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { SearchUsersVariables } from '../../orm/query';
 export type { UserSelect } from '../../orm/input-types';
@@ -343,16 +385,25 @@ export const searchUsersQueryKey = customQueryKeys.searchUsers;
  * }
  * \`\`\`
  */
-export function useSearchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  variables: SearchUsersVariables,
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseQueryOptions<{ searchUsers: InferSelectResult<User, S>[] }, Error>, 'queryKey' | 'queryFn'>
+export function useSearchUsersQuery<S extends UserSelect, TData = { searchUsers: InferSelectResult<User, S>[] }>(
+  params: { variables: SearchUsersVariables; selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ searchUsers: InferSelectResult<User, S>[] }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useSearchUsersQuery<TData = { searchUsers: InferSelectResult<User, typeof defaultSelect>[] }>(
+  params: { variables: SearchUsersVariables; selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ searchUsers: InferSelectResult<User, typeof defaultSelect>[] }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useSearchUsersQuery(
+  params: { variables: SearchUsersVariables; selection?: SelectionConfig<UserSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const variables = params?.variables;
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { variables: _variables, selection: _selection, ...queryOptions } = params ?? {};
+  void _variables;
+  void _selection;
   return useQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
-    enabled: !!variables && options?.enabled !== false,
-    ...options,
+    queryFn: () => getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    enabled: !!variables && params?.enabled !== false,
+    ...queryOptions,
   });
 }
 
@@ -364,11 +415,18 @@ export function useSearchUsersQuery<const S extends UserSelect = typeof defaultS
  * const data = await fetchSearchUsersQuery({ query, limit });
  * \`\`\`
  */
-export async function fetchSearchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  variables: SearchUsersVariables,
-  args?: { select?: DeepExact<S, UserSelect> }
+export async function fetchSearchUsersQuery<S extends UserSelect>(
+  params: { variables: SearchUsersVariables; selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<{ searchUsers: InferSelectResult<User, S>[] }>;
+export async function fetchSearchUsersQuery(
+  params: { variables: SearchUsersVariables; selection?: ({ fields?: undefined }) }
+): Promise<{ searchUsers: InferSelectResult<User, typeof defaultSelect>[] }>;
+export async function fetchSearchUsersQuery(
+  params: { variables: SearchUsersVariables; selection?: SelectionConfig<UserSelect> },
 ) {
-  return getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap();
+  const variables = params?.variables;
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  return getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -379,14 +437,23 @@ export async function fetchSearchUsersQuery<const S extends UserSelect = typeof 
  * await prefetchSearchUsersQuery(queryClient, { query, limit });
  * \`\`\`
  */
-export async function prefetchSearchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchSearchUsersQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  variables: SearchUsersVariables,
-  args?: { select?: DeepExact<S, UserSelect> }
+  params: { variables: SearchUsersVariables; selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<void>;
+export async function prefetchSearchUsersQuery(
+  queryClient: QueryClient,
+  params: { variables: SearchUsersVariables; selection?: ({ fields?: undefined }) }
+): Promise<void>;
+export async function prefetchSearchUsersQuery(
+  queryClient: QueryClient,
+  params: { variables: SearchUsersVariables; selection?: SelectionConfig<UserSelect> }
 ): Promise<void> {
+  const variables = params?.variables;
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
   await queryClient.prefetchQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    queryFn: () => getClient().query.searchUsers(variables!, { select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -400,11 +467,13 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { customQueryKeys } from '../query-keys';
 import type { UserSelect, User } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect } from '../../orm/input-types';
 
@@ -425,14 +494,22 @@ export const currentUserQueryKey = customQueryKeys.currentUser;
  * }
  * \`\`\`
  */
-export function useCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, S> }, Error>, 'queryKey' | 'queryFn'>
+export function useCurrentUserQuery<S extends UserSelect, TData = { currentUser: InferSelectResult<User, S> }>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, S> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useCurrentUserQuery<TData = { currentUser: InferSelectResult<User, typeof defaultSelect> }>(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, typeof defaultSelect> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useCurrentUserQuery(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
-    ...options,
+    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -444,10 +521,17 @@ export function useCurrentUserQuery<const S extends UserSelect = typeof defaultS
  * const data = await fetchCurrentUserQuery();
  * \`\`\`
  */
-export async function fetchCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> }
+export async function fetchCurrentUserQuery<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<{ currentUser: InferSelectResult<User, S> }>;
+export async function fetchCurrentUserQuery(
+  params?: { selection?: ({ fields?: undefined }) },
+): Promise<{ currentUser: InferSelectResult<User, typeof defaultSelect> }>;
+export async function fetchCurrentUserQuery(
+  params?: { selection?: SelectionConfig<UserSelect> },
 ) {
-  return getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap();
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  return getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -458,13 +542,22 @@ export async function fetchCurrentUserQuery<const S extends UserSelect = typeof 
  * await prefetchCurrentUserQuery(queryClient);
  * \`\`\`
  */
-export async function prefetchCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchCurrentUserQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args?: { select?: DeepExact<S, UserSelect> }
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<void>;
+export async function prefetchCurrentUserQuery(
+  queryClient: QueryClient,
+  params?: { selection?: ({ fields?: undefined }) }
+): Promise<void>;
+export async function prefetchCurrentUserQuery(
+  queryClient: QueryClient,
+  params?: { selection?: SelectionConfig<UserSelect> }
 ): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -478,10 +571,12 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type { UserSelect, User } from '../../orm/input-types';
-import type { DeepExact, InferSelectResult } from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect } from '../../orm/input-types';
 
@@ -502,14 +597,22 @@ export const currentUserQueryKey = () => ['currentUser'] as const;
  * }
  * \`\`\`
  */
-export function useCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, S> }, Error>, 'queryKey' | 'queryFn'>
+export function useCurrentUserQuery<S extends UserSelect, TData = { currentUser: InferSelectResult<User, S> }>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, S> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useCurrentUserQuery<TData = { currentUser: InferSelectResult<User, typeof defaultSelect> }>(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ currentUser: InferSelectResult<User, typeof defaultSelect> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useCurrentUserQuery(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
-    ...options,
+    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -521,10 +624,17 @@ export function useCurrentUserQuery<const S extends UserSelect = typeof defaultS
  * const data = await fetchCurrentUserQuery();
  * \`\`\`
  */
-export async function fetchCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> }
+export async function fetchCurrentUserQuery<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<{ currentUser: InferSelectResult<User, S> }>;
+export async function fetchCurrentUserQuery(
+  params?: { selection?: ({ fields?: undefined }) },
+): Promise<{ currentUser: InferSelectResult<User, typeof defaultSelect> }>;
+export async function fetchCurrentUserQuery(
+  params?: { selection?: SelectionConfig<UserSelect> },
 ) {
-  return getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap();
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  return getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -535,13 +645,22 @@ export async function fetchCurrentUserQuery<const S extends UserSelect = typeof 
  * await prefetchCurrentUserQuery(queryClient);
  * \`\`\`
  */
-export async function prefetchCurrentUserQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchCurrentUserQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args?: { select?: DeepExact<S, UserSelect> }
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<void>;
+export async function prefetchCurrentUserQuery(
+  queryClient: QueryClient,
+  params?: { selection?: ({ fields?: undefined }) }
+): Promise<void>;
+export async function prefetchCurrentUserQuery(
+  queryClient: QueryClient,
+  params?: { selection?: SelectionConfig<UserSelect> }
 ): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    queryFn: () => getClient().query.currentUser({ select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -555,8 +674,10 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { userKeys } from '../query-keys';
 import { userMutationKeys } from '../mutation-keys';
 import type {
@@ -564,10 +685,7 @@ import type {
   UserWithRelations,
   CreateUserInput,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, CreateUserInput } from '../../orm/input-types';
 
@@ -579,24 +697,32 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useCreateUserMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreateUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+export function useCreateUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+): UseMutationResult<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>;
+export function useCreateUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+): UseMutationResult<{ createUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, CreateUserInput['user']>;
+export function useCreateUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, CreateUserInput['user']>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.create(),
-    mutationFn: (data: CreateUserInput['user']) => getClient().user.create({ data, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: (data: CreateUserInput['user']) => getClient().user.create({ data, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -610,8 +736,10 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { postKeys } from '../query-keys';
 import { postMutationKeys } from '../mutation-keys';
 import type {
@@ -619,10 +747,7 @@ import type {
   PostWithRelations,
   CreatePostInput,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { PostSelect, PostWithRelations, CreatePostInput } from '../../orm/input-types';
 
@@ -634,24 +759,32 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useCreatePostMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreatePostMutation<const S extends PostSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, PostSelect> },
-  options?: Omit<UseMutationOptions<{ createPost: { post: InferSelectResult<PostWithRelations, S> } }, Error, CreatePostInput['post']>, 'mutationFn'>
+export function useCreatePostMutation<S extends PostSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, PostSelect>) } & Omit<UseMutationOptions<{ createPost: { post: InferSelectResult<PostWithRelations, S> } }, Error, CreatePostInput['post']>, 'mutationFn'>
+): UseMutationResult<{ createPost: { post: InferSelectResult<PostWithRelations, S> } }, Error, CreatePostInput['post']>;
+export function useCreatePostMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ createPost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, CreatePostInput['post']>, 'mutationFn'>
+): UseMutationResult<{ createPost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, CreatePostInput['post']>;
+export function useCreatePostMutation(
+  params?: { selection?: SelectionConfig<PostSelect> } & Omit<UseMutationOptions<any, Error, CreatePostInput['post']>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.create(),
-    mutationFn: (data: CreatePostInput['post']) => getClient().post.create({ data, select: (args?.select ?? defaultSelect) as DeepExact<S, PostSelect> }).unwrap(),
+    mutationFn: (data: CreatePostInput['post']) => getClient().post.create({ data, select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -665,17 +798,16 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type {
   UserSelect,
   UserWithRelations,
   CreateUserInput,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, CreateUserInput } from '../../orm/input-types';
 
@@ -687,23 +819,31 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useCreateUserMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreateUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+export function useCreateUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+): UseMutationResult<{ createUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, CreateUserInput['user']>;
+export function useCreateUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ createUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, CreateUserInput['user']>, 'mutationFn'>
+): UseMutationResult<{ createUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, CreateUserInput['user']>;
+export function useCreateUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, CreateUserInput['user']>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateUserInput['user']) => getClient().user.create({ data, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: (data: CreateUserInput['user']) => getClient().user.create({ data, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', 'list'] });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -717,18 +857,17 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { userKeys } from '../query-keys';
 import { userMutationKeys } from '../mutation-keys';
 import type {
   UserSelect,
   UserWithRelations,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations } from '../../orm/input-types';
 
@@ -740,25 +879,33 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useDeleteUserMutation({
- *   select: { id: true },
+ *   selection: { fields: { id: true } },
  * });
  *
  * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeleteUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+export function useDeleteUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>;
+export function useDeleteUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deleteUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string }>;
+export function useDeleteUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, { id: string }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) => getClient().user.delete({ where: { id }, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: ({ id }: { id: string }) => getClient().user.delete({ where: { id }, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({ queryKey: userKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -772,18 +919,17 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { postKeys } from '../query-keys';
 import { postMutationKeys } from '../mutation-keys';
 import type {
   PostSelect,
   PostWithRelations,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { PostSelect, PostWithRelations } from '../../orm/input-types';
 
@@ -795,25 +941,33 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useDeletePostMutation({
- *   select: { id: true },
+ *   selection: { fields: { id: true } },
  * });
  *
  * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeletePostMutation<const S extends PostSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, PostSelect> },
-  options?: Omit<UseMutationOptions<{ deletePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+export function useDeletePostMutation<S extends PostSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, PostSelect>) } & Omit<UseMutationOptions<{ deletePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deletePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string }>;
+export function useDeletePostMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ deletePost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deletePost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, { id: string }>;
+export function useDeletePostMutation(
+  params?: { selection?: SelectionConfig<PostSelect> } & Omit<UseMutationOptions<any, Error, { id: string }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: ({ id }: { id: string }) => getClient().post.delete({ where: { id }, select: (args?.select ?? defaultSelect) as DeepExact<S, PostSelect> }).unwrap(),
+    mutationFn: ({ id }: { id: string }) => getClient().post.delete({ where: { id }, select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({ queryKey: postKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -827,16 +981,15 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type {
   UserSelect,
   UserWithRelations,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations } from '../../orm/input-types';
 
@@ -848,24 +1001,32 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useDeleteUserMutation({
- *   select: { id: true },
+ *   selection: { fields: { id: true } },
  * });
  *
  * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeleteUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+export function useDeleteUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deleteUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string }>;
+export function useDeleteUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ deleteUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string }>, 'mutationFn'>
+): UseMutationResult<{ deleteUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string }>;
+export function useDeleteUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, { id: string }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id }: { id: string }) => getClient().user.delete({ where: { id }, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: ({ id }: { id: string }) => getClient().user.delete({ where: { id }, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({ queryKey: ['user', 'detail', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['user', 'list'] });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -879,8 +1040,10 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { userKeys } from '../query-keys';
 import { userMutationKeys } from '../mutation-keys';
 import type {
@@ -888,10 +1051,7 @@ import type {
   UserWithRelations,
   UserPatch,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, UserPatch } from '../../orm/input-types';
 
@@ -903,25 +1063,33 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useUpdateUserMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ id: 'value-here', patch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdateUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+export function useUpdateUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+): UseMutationResult<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>;
+export function useUpdateUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+): UseMutationResult<{ updateUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: UserPatch }>;
+export function useUpdateUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: ({ id, patch }: { id: string; patch: UserPatch }) => getClient().user.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: ({ id, patch }: { id: string; patch: UserPatch }) => getClient().user.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -935,8 +1103,10 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { postKeys } from '../query-keys';
 import { postMutationKeys } from '../mutation-keys';
 import type {
@@ -944,10 +1114,7 @@ import type {
   PostWithRelations,
   PostPatch,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { PostSelect, PostWithRelations, PostPatch } from '../../orm/input-types';
 
@@ -959,25 +1126,33 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useUpdatePostMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ id: 'value-here', patch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdatePostMutation<const S extends PostSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, PostSelect> },
-  options?: Omit<UseMutationOptions<{ updatePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string; patch: PostPatch }>, 'mutationFn'>
+export function useUpdatePostMutation<S extends PostSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, PostSelect>) } & Omit<UseMutationOptions<{ updatePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string; patch: PostPatch }>, 'mutationFn'>
+): UseMutationResult<{ updatePost: { post: InferSelectResult<PostWithRelations, S> } }, Error, { id: string; patch: PostPatch }>;
+export function useUpdatePostMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ updatePost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: PostPatch }>, 'mutationFn'>
+): UseMutationResult<{ updatePost: { post: InferSelectResult<PostWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: PostPatch }>;
+export function useUpdatePostMutation(
+  params?: { selection?: SelectionConfig<PostSelect> } & Omit<UseMutationOptions<any, Error, { id: string; patch: PostPatch }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: ({ id, patch }: { id: string; patch: PostPatch }) => getClient().post.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as DeepExact<S, PostSelect> }).unwrap(),
+    mutationFn: ({ id, patch }: { id: string; patch: PostPatch }) => getClient().post.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -991,17 +1166,16 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationOptions } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type {
   UserSelect,
   UserWithRelations,
   UserPatch,
 } from '../../orm/input-types';
-import type {
-  DeepExact,
-  InferSelectResult,
-} from '../../orm/select-types';
+import type { InferSelectResult, StrictSelect } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, UserPatch } from '../../orm/input-types';
 
@@ -1013,24 +1187,32 @@ const defaultSelect = { id: true } as const;
  * @example
  * \`\`\`tsx
  * const { mutate, isPending } = useUpdateUserMutation({
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  *
  * mutate({ id: 'value-here', patch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdateUserMutation<const S extends UserSelect = typeof defaultSelect>(
-  args?: { select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+export function useUpdateUserMutation<S extends UserSelect>(
+  params: { selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+): UseMutationResult<{ updateUser: { user: InferSelectResult<UserWithRelations, S> } }, Error, { id: string; patch: UserPatch }>;
+export function useUpdateUserMutation(
+  params?: { selection?: ({ fields?: undefined }) } & Omit<UseMutationOptions<{ updateUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
+): UseMutationResult<{ updateUser: { user: InferSelectResult<UserWithRelations, typeof defaultSelect> } }, Error, { id: string; patch: UserPatch }>;
+export function useUpdateUserMutation(
+  params?: { selection?: SelectionConfig<UserSelect> } & Omit<UseMutationOptions<any, Error, { id: string; patch: UserPatch }>, 'mutationFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const { selection: _selection, ...mutationOptions } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: UserPatch }) => getClient().user.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as DeepExact<S, UserSelect> }).unwrap(),
+    mutationFn: ({ id, patch }: { id: string; patch: UserPatch }) => getClient().user.update({ where: { id }, data: patch, select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['user', 'detail', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['user', 'list'] });
     },
-    ...options,
+    ...mutationOptions,
   });
 }
 "
@@ -1044,8 +1226,10 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook f
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
 import { userKeys } from '../query-keys';
 import type {
   UserSelect,
@@ -1055,9 +1239,9 @@ import type {
 } from '../../orm/input-types';
 import type {
   FindManyArgs,
-  DeepExact,
   InferSelectResult,
   ConnectionResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from '../../orm/input-types';
@@ -1073,21 +1257,32 @@ export const usersQueryKey = userKeys.list;
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = useUsersQuery({
- *   select: { id: true, name: true },
- *   first: 10,
- *   where: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export function useUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
-  options?: Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }, Error>, 'queryKey' | 'queryFn'>
+export function useUsersQuery<S extends UserSelect, TData = { users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUsersQuery<TData = { users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }>(
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) } & Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUsersQuery(
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const selection = params?.selection;
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: userKeys.list(args),
-    queryFn: () => getClient().user.findMany(args).unwrap(),
-    ...options,
+    queryFn: () => getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -1096,13 +1291,25 @@ export function useUsersQuery<const S extends UserSelect = typeof defaultSelect>
  *
  * @example
  * \`\`\`ts
- * const data = await fetchUsersQuery({ first: 10, select: { id: true } });
+ * const data = await fetchUsersQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
+ * });
  * \`\`\`
  */
-export async function fetchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
+export async function fetchUsersQuery<S extends UserSelect>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) }
+): Promise<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }>;
+export async function fetchUsersQuery(
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) }
+): Promise<{ users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }>;
+export async function fetchUsersQuery(
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> }
 ) {
-  return getClient().user.findMany(args).unwrap();
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params?.selection);
+  return getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -1110,16 +1317,25 @@ export async function fetchUsersQuery<const S extends UserSelect = typeof defaul
  *
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { first: 10 });
+ * await prefetchUsersQuery(queryClient, { selection: { first: 10 } });
  * \`\`\`
  */
-export async function prefetchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchUsersQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) }
+): Promise<void>;
+export async function prefetchUsersQuery(
+  queryClient: QueryClient,
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) }
+): Promise<void>;
+export async function prefetchUsersQuery(
+  queryClient: QueryClient,
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> }
 ): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params?.selection);
   await queryClient.prefetchQuery({
     queryKey: userKeys.list(args),
-    queryFn: () => getClient().user.findMany(args).unwrap(),
+    queryFn: () => getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -1133,8 +1349,10 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook f
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
 import { postKeys } from '../query-keys';
 import type { PostScope } from '../query-keys';
 import type {
@@ -1145,9 +1363,9 @@ import type {
 } from '../../orm/input-types';
 import type {
   FindManyArgs,
-  DeepExact,
   InferSelectResult,
   ConnectionResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { PostSelect, PostWithRelations, PostFilter, PostsOrderBy } from '../../orm/input-types';
@@ -1163,29 +1381,39 @@ export const postsQueryKey = postKeys.list;
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = usePostsQuery({
- *   select: { id: true, name: true },
- *   first: 10,
- *   where: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  *
  * @example With scope for hierarchical cache invalidation
  * \`\`\`tsx
- * const { data } = usePostsQuery(
- *   { first: 10 },
- *   { scope: { parentId: 'parent-id' } }
- * );
+ * const { data } = usePostsQuery({
+ *   selection: { first: 10 },
+ *   scope: { parentId: 'parent-id' },
+ * });
  * \`\`\`
  */
-export function usePostsQuery<const S extends PostSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, PostSelect>, PostFilter, PostsOrderBy>,
-  options?: Omit<UseQueryOptions<{ posts: ConnectionResult<InferSelectResult<PostWithRelations, S>> }, Error>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+export function usePostsQuery<S extends PostSelect, TData = { posts: ConnectionResult<InferSelectResult<PostWithRelations, S>> }>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, 'fields'> & StrictSelect<S, PostSelect>) } & Omit<UseQueryOptions<{ posts: ConnectionResult<InferSelectResult<PostWithRelations, S>> }, Error, TData>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+): UseQueryResult<TData>;
+export function usePostsQuery<TData = { posts: ConnectionResult<InferSelectResult<PostWithRelations, typeof defaultSelect>> }>(
+  params?: { selection?: (Omit<ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>, 'fields'> & { fields?: undefined }) } & Omit<UseQueryOptions<{ posts: ConnectionResult<InferSelectResult<PostWithRelations, typeof defaultSelect>> }, Error, TData>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+): UseQueryResult<TData>;
+export function usePostsQuery(
+  params?: { selection?: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
 ) {
-  const { scope, ...queryOptions } = options ?? {};
+  const selection = params?.selection;
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(selection);
+  const { scope, selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: postKeys.list(args, scope),
-    queryFn: () => getClient().post.findMany(args).unwrap(),
+    queryFn: () => getClient().post.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
     ...queryOptions,
   });
 }
@@ -1195,13 +1423,25 @@ export function usePostsQuery<const S extends PostSelect = typeof defaultSelect>
  *
  * @example
  * \`\`\`ts
- * const data = await fetchPostsQuery({ first: 10, select: { id: true } });
+ * const data = await fetchPostsQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
+ * });
  * \`\`\`
  */
-export async function fetchPostsQuery<const S extends PostSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, PostSelect>, PostFilter, PostsOrderBy>,
+export async function fetchPostsQuery<S extends PostSelect>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, 'fields'> & StrictSelect<S, PostSelect>) }
+): Promise<{ posts: ConnectionResult<InferSelectResult<PostWithRelations, S>> }>;
+export async function fetchPostsQuery(
+  params?: { selection?: (Omit<ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>, 'fields'> & { fields?: undefined }) }
+): Promise<{ posts: ConnectionResult<InferSelectResult<PostWithRelations, typeof defaultSelect>> }>;
+export async function fetchPostsQuery(
+  params?: { selection?: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy> }
 ) {
-  return getClient().post.findMany(args).unwrap();
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params?.selection);
+  return getClient().post.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap();
 }
 
 /**
@@ -1209,17 +1449,25 @@ export async function fetchPostsQuery<const S extends PostSelect = typeof defaul
  *
  * @example
  * \`\`\`ts
- * await prefetchPostsQuery(queryClient, { first: 10 });
+ * await prefetchPostsQuery(queryClient, { selection: { first: 10 } });
  * \`\`\`
  */
-export async function prefetchPostsQuery<const S extends PostSelect = typeof defaultSelect>(
+export async function prefetchPostsQuery<S extends PostSelect>(
   queryClient: QueryClient,
-  args?: FindManyArgs<DeepExact<S, PostSelect>, PostFilter, PostsOrderBy>,
-  scope?: PostScope,
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, 'fields'> & StrictSelect<S, PostSelect>) } & { scope?: PostScope }
+): Promise<void>;
+export async function prefetchPostsQuery(
+  queryClient: QueryClient,
+  params?: { selection?: (Omit<ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>, 'fields'> & { fields?: undefined }) } & { scope?: PostScope }
+): Promise<void>;
+export async function prefetchPostsQuery(
+  queryClient: QueryClient,
+  params?: { selection?: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy> } & { scope?: PostScope }
 ): Promise<void> {
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params?.selection);
   await queryClient.prefetchQuery({
-    queryKey: postKeys.list(args, scope),
-    queryFn: () => getClient().post.findMany(args).unwrap(),
+    queryKey: postKeys.list(args, params?.scope),
+    queryFn: () => getClient().post.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
   });
 }
 "
@@ -1233,8 +1481,10 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook w
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildListSelectionArgs } from '../selection';
+import type { ListSelectionConfig } from '../selection';
 import type {
   UserSelect,
   UserWithRelations,
@@ -1243,16 +1493,16 @@ import type {
 } from '../../orm/input-types';
 import type {
   FindManyArgs,
-  DeepExact,
   InferSelectResult,
   ConnectionResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from '../../orm/input-types';
 
 const defaultSelect = { id: true } as const;
 
-export const usersQueryKey = (variables?: FindManyArgs<any, UserFilter, UsersOrderBy>) => ['user', 'list', variables] as const;
+export const usersQueryKey = (variables?: FindManyArgs<unknown, UserFilter, UsersOrderBy>) => ['user', 'list', variables] as const;
 
 /**
  * Query hook for fetching User list
@@ -1260,21 +1510,32 @@ export const usersQueryKey = (variables?: FindManyArgs<any, UserFilter, UsersOrd
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = useUsersQuery({
- *   select: { id: true, name: true },
- *   first: 10,
- *   where: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export function useUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
-  options?: Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }, Error>, 'queryKey' | 'queryFn'>
+export function useUsersQuery<S extends UserSelect, TData = { users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUsersQuery<TData = { users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }>(
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) } & Omit<UseQueryOptions<{ users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUsersQuery(
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const selection = params?.selection;
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: usersQueryKey(args),
-    queryFn: () => getClient().user.findMany(args).unwrap(),
-    ...options,
+    queryFn: () => getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -1283,13 +1544,25 @@ export function useUsersQuery<const S extends UserSelect = typeof defaultSelect>
  *
  * @example
  * \`\`\`ts
- * const data = await fetchUsersQuery({ first: 10, select: { id: true } });
+ * const data = await fetchUsersQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
+ * });
  * \`\`\`
  */
-export async function fetchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
+export async function fetchUsersQuery<S extends UserSelect>(
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) }
+): Promise<{ users: ConnectionResult<InferSelectResult<UserWithRelations, S>> }>;
+export async function fetchUsersQuery(
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) }
+): Promise<{ users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>> }>;
+export async function fetchUsersQuery(
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> }
 ) {
-  return getClient().user.findMany(args).unwrap();
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params?.selection);
+  return getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -1297,16 +1570,25 @@ export async function fetchUsersQuery<const S extends UserSelect = typeof defaul
  *
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { first: 10 });
+ * await prefetchUsersQuery(queryClient, { selection: { first: 10 } });
  * \`\`\`
  */
-export async function prefetchUsersQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchUsersQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args?: FindManyArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>,
+  params: { selection: ({ fields: S } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, 'fields'> & StrictSelect<S, UserSelect>) }
+): Promise<void>;
+export async function prefetchUsersQuery(
+  queryClient: QueryClient,
+  params?: { selection?: (Omit<ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>, 'fields'> & { fields?: undefined }) }
+): Promise<void>;
+export async function prefetchUsersQuery(
+  queryClient: QueryClient,
+  params?: { selection?: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy> }
 ): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params?.selection);
   await queryClient.prefetchQuery({
     queryKey: usersQueryKey(args),
-    queryFn: () => getClient().user.findMany(args).unwrap(),
+    queryFn: () => getClient().user.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -1320,16 +1602,18 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { userKeys } from '../query-keys';
 import type {
   UserSelect,
   UserWithRelations,
 } from '../../orm/input-types';
 import type {
-  DeepExact,
   InferSelectResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations } from '../../orm/input-types';
@@ -1346,18 +1630,26 @@ export const userQueryKey = userKeys.detail;
  * \`\`\`tsx
  * const { data, isLoading } = useUserQuery({
  *   id: 'some-id',
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  * \`\`\`
  */
-export function useUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, S> | null }, Error>, 'queryKey' | 'queryFn'>
+export function useUserQuery<S extends UserSelect, TData = { user: InferSelectResult<UserWithRelations, S> | null }>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, S> | null }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUserQuery<TData = { user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }>(
+  params: { id: string; selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUserQuery(
+  params: { id: string; selection?: SelectionConfig<UserSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: userKeys.detail(args.id),
-    queryFn: () => getClient().user.findOne(args).unwrap(),
-    ...options,
+    queryKey: userKeys.detail(params.id),
+    queryFn: () => getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -1366,13 +1658,23 @@ export function useUserQuery<const S extends UserSelect = typeof defaultSelect>(
  *
  * @example
  * \`\`\`ts
- * const data = await fetchUserQuery({ id: 'some-id', select: { id: true } });
+ * const data = await fetchUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, UserSelect> },
+export async function fetchUserQuery<S extends UserSelect>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<{ user: InferSelectResult<UserWithRelations, S> | null }>;
+export async function fetchUserQuery(
+  params: { id: string; selection?: ({ fields?: undefined }) },
+): Promise<{ user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }>;
+export async function fetchUserQuery(
+  params: { id: string; selection?: SelectionConfig<UserSelect> },
 ) {
-  return getClient().user.findOne(args).unwrap();
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -1383,13 +1685,22 @@ export async function fetchUserQuery<const S extends UserSelect = typeof default
  * await prefetchUserQuery(queryClient, { id: 'some-id' });
  * \`\`\`
  */
-export async function prefetchUserQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchUserQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args: { id: string; select?: DeepExact<S, UserSelect> },
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) },
+): Promise<void>;
+export async function prefetchUserQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: ({ fields?: undefined }) },
+): Promise<void>;
+export async function prefetchUserQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: SelectionConfig<UserSelect> },
 ): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: userKeys.detail(args.id),
-    queryFn: () => getClient().user.findOne(args).unwrap(),
+    queryKey: userKeys.detail(params.id),
+    queryFn: () => getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "
@@ -1403,8 +1714,10 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import { postKeys } from '../query-keys';
 import type { PostScope } from '../query-keys';
 import type {
@@ -1412,8 +1725,8 @@ import type {
   PostWithRelations,
 } from '../../orm/input-types';
 import type {
-  DeepExact,
   InferSelectResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { PostSelect, PostWithRelations } from '../../orm/input-types';
@@ -1430,26 +1743,33 @@ export const postQueryKey = postKeys.detail;
  * \`\`\`tsx
  * const { data, isLoading } = usePostQuery({
  *   id: 'some-id',
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  * \`\`\`
  *
  * @example With scope for hierarchical cache invalidation
  * \`\`\`tsx
- * const { data } = usePostQuery(
- *   { id: 'some-id' },
- *   { scope: { parentId: 'parent-id' } }
- * );
+ * const { data } = usePostQuery({
+ *   id: 'some-id',
+ *   scope: { parentId: 'parent-id' },
+ * });
  * \`\`\`
  */
-export function usePostQuery<const S extends PostSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, PostSelect> },
-  options?: Omit<UseQueryOptions<{ post: InferSelectResult<PostWithRelations, S> | null }, Error>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+export function usePostQuery<S extends PostSelect, TData = { post: InferSelectResult<PostWithRelations, S> | null }>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, PostSelect>) } & Omit<UseQueryOptions<{ post: InferSelectResult<PostWithRelations, S> | null }, Error, TData>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+): UseQueryResult<TData>;
+export function usePostQuery<TData = { post: InferSelectResult<PostWithRelations, typeof defaultSelect> | null }>(
+  params: { id: string; selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ post: InferSelectResult<PostWithRelations, typeof defaultSelect> | null }, Error, TData>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
+): UseQueryResult<TData>;
+export function usePostQuery(
+  params: { id: string; selection?: SelectionConfig<PostSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: PostScope }
 ) {
-  const { scope, ...queryOptions } = options ?? {};
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  const { scope, selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: postKeys.detail(args.id, scope),
-    queryFn: () => getClient().post.findOne(args).unwrap(),
+    queryKey: postKeys.detail(params.id, scope),
+    queryFn: () => getClient().post.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
     ...queryOptions,
   });
 }
@@ -1459,13 +1779,23 @@ export function usePostQuery<const S extends PostSelect = typeof defaultSelect>(
  *
  * @example
  * \`\`\`ts
- * const data = await fetchPostQuery({ id: 'some-id', select: { id: true } });
+ * const data = await fetchPostQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchPostQuery<const S extends PostSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, PostSelect> },
+export async function fetchPostQuery<S extends PostSelect>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, PostSelect>) }
+): Promise<{ post: InferSelectResult<PostWithRelations, S> | null }>;
+export async function fetchPostQuery(
+  params: { id: string; selection?: ({ fields?: undefined }) },
+): Promise<{ post: InferSelectResult<PostWithRelations, typeof defaultSelect> | null }>;
+export async function fetchPostQuery(
+  params: { id: string; selection?: SelectionConfig<PostSelect> },
 ) {
-  return getClient().post.findOne(args).unwrap();
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  return getClient().post.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap();
 }
 
 /**
@@ -1476,14 +1806,22 @@ export async function fetchPostQuery<const S extends PostSelect = typeof default
  * await prefetchPostQuery(queryClient, { id: 'some-id' });
  * \`\`\`
  */
-export async function prefetchPostQuery<const S extends PostSelect = typeof defaultSelect>(
+export async function prefetchPostQuery<S extends PostSelect>(
   queryClient: QueryClient,
-  args: { id: string; select?: DeepExact<S, PostSelect> },
-  scope?: PostScope,
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, PostSelect>) } & { scope?: PostScope },
+): Promise<void>;
+export async function prefetchPostQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: ({ fields?: undefined }) } & { scope?: PostScope },
+): Promise<void>;
+export async function prefetchPostQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: SelectionConfig<PostSelect> } & { scope?: PostScope },
 ): Promise<void> {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: postKeys.detail(args.id, scope),
-    queryFn: () => getClient().post.findOne(args).unwrap(),
+    queryKey: postKeys.detail(params.id, params.scope),
+    queryFn: () => getClient().post.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as PostSelect }).unwrap(),
   });
 }
 "
@@ -1497,15 +1835,17 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';
 import { getClient } from '../client';
+import { buildSelectionArgs } from '../selection';
+import type { SelectionConfig } from '../selection';
 import type {
   UserSelect,
   UserWithRelations,
 } from '../../orm/input-types';
 import type {
-  DeepExact,
   InferSelectResult,
+  StrictSelect,
 } from '../../orm/select-types';
 
 export type { UserSelect, UserWithRelations } from '../../orm/input-types';
@@ -1521,18 +1861,26 @@ export const userQueryKey = (id: string) => ['user', 'detail', id] as const;
  * \`\`\`tsx
  * const { data, isLoading } = useUserQuery({
  *   id: 'some-id',
- *   select: { id: true, name: true },
+ *   selection: { fields: { id: true, name: true } },
  * });
  * \`\`\`
  */
-export function useUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, UserSelect> },
-  options?: Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, S> | null }, Error>, 'queryKey' | 'queryFn'>
+export function useUserQuery<S extends UserSelect, TData = { user: InferSelectResult<UserWithRelations, S> | null }>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) } & Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, S> | null }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUserQuery<TData = { user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }>(
+  params: { id: string; selection?: ({ fields?: undefined }) } & Omit<UseQueryOptions<{ user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }, Error, TData>, 'queryKey' | 'queryFn'>
+): UseQueryResult<TData>;
+export function useUserQuery(
+  params: { id: string; selection?: SelectionConfig<UserSelect> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>
 ) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const { selection: _selection, ...queryOptions } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: userQueryKey(args.id),
-    queryFn: () => getClient().user.findOne(args).unwrap(),
-    ...options,
+    queryKey: userQueryKey(params.id),
+    queryFn: () => getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
+    ...queryOptions,
   });
 }
 
@@ -1541,13 +1889,23 @@ export function useUserQuery<const S extends UserSelect = typeof defaultSelect>(
  *
  * @example
  * \`\`\`ts
- * const data = await fetchUserQuery({ id: 'some-id', select: { id: true } });
+ * const data = await fetchUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchUserQuery<const S extends UserSelect = typeof defaultSelect>(
-  args: { id: string; select?: DeepExact<S, UserSelect> },
+export async function fetchUserQuery<S extends UserSelect>(
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) }
+): Promise<{ user: InferSelectResult<UserWithRelations, S> | null }>;
+export async function fetchUserQuery(
+  params: { id: string; selection?: ({ fields?: undefined }) },
+): Promise<{ user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null }>;
+export async function fetchUserQuery(
+  params: { id: string; selection?: SelectionConfig<UserSelect> },
 ) {
-  return getClient().user.findOne(args).unwrap();
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap();
 }
 
 /**
@@ -1558,13 +1916,22 @@ export async function fetchUserQuery<const S extends UserSelect = typeof default
  * await prefetchUserQuery(queryClient, { id: 'some-id' });
  * \`\`\`
  */
-export async function prefetchUserQuery<const S extends UserSelect = typeof defaultSelect>(
+export async function prefetchUserQuery<S extends UserSelect>(
   queryClient: QueryClient,
-  args: { id: string; select?: DeepExact<S, UserSelect> },
+  params: { id: string; selection: ({ fields: S } & StrictSelect<S, UserSelect>) },
+): Promise<void>;
+export async function prefetchUserQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: ({ fields?: undefined }) },
+): Promise<void>;
+export async function prefetchUserQuery(
+  queryClient: QueryClient,
+  params: { id: string; selection?: SelectionConfig<UserSelect> },
 ): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: userQueryKey(args.id),
-    queryFn: () => getClient().user.findOne(args).unwrap(),
+    queryKey: userQueryKey(params.id),
+    queryFn: () => getClient().user.findOne({ id: params.id, ...(args ?? {}), select: (args?.select ?? defaultSelect) as UserSelect }).unwrap(),
   });
 }
 "

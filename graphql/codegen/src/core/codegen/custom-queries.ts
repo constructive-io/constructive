@@ -89,10 +89,12 @@ export function generateCustomQueryHook(
   // Imports
   if (reactQueryEnabled) {
     lines.push(`import { useQuery } from '@tanstack/react-query';`);
-    lines.push(`import type { UseQueryOptions, QueryClient } from '@tanstack/react-query';`);
+    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
   }
 
   lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
     lines.push(`import { customQueryKeys } from '../query-keys';`);
@@ -124,7 +126,7 @@ export function generateCustomQueryHook(
   }
 
   if (hasSelect) {
-    lines.push(`import type { DeepExact, InferSelectResult } from '../../orm/select-types';`);
+    lines.push(`import type { InferSelectResult, StrictSelect } from '../../orm/select-types';`);
   }
 
   lines.push('');
@@ -178,54 +180,91 @@ export function generateCustomQueryHook(
     lines.push(` */`);
 
     if (hasSelect) {
-      // With select: generic hook
-      const selectedResult = wrapInferSelectResult(operation.returnType, payloadTypeName);
-      const resultTypeStr = `{ ${operation.name}: ${selectedResult} }`;
-      const paramsArr: string[] = [];
+      // With selection.fields: overloaded hook for autocompletion
+      const customSelectResultType = (s: string) =>
+        `{ ${operation.name}: ${wrapInferSelectResult(operation.returnType, payloadTypeName!, s)} }`;
+      const optionsType = (queryData: string, data: string) =>
+        `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
 
+      const withFieldsSelectionType = (s: string) =>
+        `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+      const withoutFieldsSelectionType = () => `({ fields?: undefined })`;
+
+      // Overload 1: with selection.fields
       if (hasArgs) {
-        paramsArr.push(`  variables${hasRequiredArgs ? '' : '?'}: ${varTypeName},`);
-      }
-      paramsArr.push(`  args?: { select?: DeepExact<S, ${selectTypeName}> },`);
-
-      const optionsType = `Omit<UseQueryOptions<${resultTypeStr}, Error>, 'queryKey' | 'queryFn'>`;
-      paramsArr.push(`  options?: ${optionsType}`);
-
-      lines.push(`export function ${hookName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-      lines.push(paramsArr.join('\n'));
-      lines.push(`) {`);
-      lines.push(`  return useQuery({`);
-
-      if (hasArgs) {
-        lines.push(`    queryKey: ${queryKeyName}(variables),`);
-        lines.push(`    queryFn: () => getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+        const varTypeStr = hasRequiredArgs ? varTypeName : `${varTypeName} | undefined`;
+        lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${customSelectResultType('S')}>(`);
+        lines.push(`  params: { variables: ${varTypeStr}; selection: ${withFieldsSelectionType('S')} } & ${optionsType(customSelectResultType('S'), 'TData')}`);
+        lines.push(`): UseQueryResult<TData>;`);
       } else {
+        lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${customSelectResultType('S')}>(`);
+        lines.push(`  params: { selection: ${withFieldsSelectionType('S')} } & ${optionsType(customSelectResultType('S'), 'TData')}`);
+        lines.push(`): UseQueryResult<TData>;`);
+      }
+
+      // Overload 2: without selection.fields (uses default)
+      if (hasArgs) {
+        lines.push(`export function ${hookName}<TData = ${customSelectResultType('typeof defaultSelect')}>(`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: ${withoutFieldsSelectionType()} } & ${optionsType(customSelectResultType('typeof defaultSelect'), 'TData')}`);
+        lines.push(`): UseQueryResult<TData>;`);
+      } else {
+        lines.push(`export function ${hookName}<TData = ${customSelectResultType('typeof defaultSelect')}>(`);
+        lines.push(`  params?: { selection?: ${withoutFieldsSelectionType()} } & ${optionsType(customSelectResultType('typeof defaultSelect'), 'TData')}`);
+        lines.push(`): UseQueryResult<TData>;`);
+      }
+
+      // Implementation
+      if (hasArgs) {
+        lines.push(`export function ${hookName}(`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: SelectionConfig<${selectTypeName}> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`);
+        lines.push(`) {`);
+        lines.push(`  const variables = params?.variables;`);
+        lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+        lines.push(`  const { variables: _variables, selection: _selection, ...queryOptions } = params ?? {};`);
+        lines.push(`  void _variables;`);
+        lines.push(`  void _selection;`);
+        lines.push(`  return useQuery({`);
+        lines.push(`    queryKey: ${queryKeyName}(variables),`);
+        lines.push(`    queryFn: () => getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+        if (hasRequiredArgs) {
+          lines.push(`    enabled: !!variables && params?.enabled !== false,`);
+        }
+        lines.push(`    ...queryOptions,`);
+        lines.push(`  });`);
+        lines.push(`}`);
+      } else {
+        lines.push(`export function ${hookName}(`);
+        lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> } & Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`);
+        lines.push(`) {`);
+        lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+        lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+        lines.push(`  void _selection;`);
+        lines.push(`  return useQuery({`);
         lines.push(`    queryKey: ${queryKeyName}(),`);
-        lines.push(`    queryFn: () => getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+        lines.push(`    queryFn: () => getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+        lines.push(`    ...queryOptions,`);
+        lines.push(`  });`);
+        lines.push(`}`);
       }
-
-      if (hasRequiredArgs) {
-        lines.push(`    enabled: !!variables && options?.enabled !== false,`);
-      }
-
-      lines.push(`    ...options,`);
-      lines.push(`  });`);
-      lines.push(`}`);
     } else {
       // Without select: simple hook (scalar return type)
       const resultTypeStr = `{ ${operation.name}: ${resultType} }`;
-      const paramsArr: string[] = [];
+      const optionsType = `Omit<UseQueryOptions<${resultTypeStr}, Error, TData>, 'queryKey' | 'queryFn'>`;
 
+      lines.push(`export function ${hookName}<TData = ${resultTypeStr}>(`);
       if (hasArgs) {
-        paramsArr.push(`  variables${hasRequiredArgs ? '' : '?'}: ${varTypeName},`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName} } & ${optionsType}`);
+      } else {
+        lines.push(`  params?: ${optionsType}`);
       }
-
-      const optionsType = `Omit<UseQueryOptions<${resultTypeStr}, Error>, 'queryKey' | 'queryFn'>`;
-      paramsArr.push(`  options?: ${optionsType}`);
-
-      lines.push(`export function ${hookName}(`);
-      lines.push(paramsArr.join('\n'));
-      lines.push(`) {`);
+      lines.push(`): UseQueryResult<TData> {`);
+      if (hasArgs) {
+        lines.push(`  const variables = params?.variables;`);
+        lines.push(`  const { variables: _variables, ...queryOptions } = params ?? {};`);
+        lines.push(`  void _variables;`);
+      } else {
+        lines.push(`  const queryOptions = params ?? {};`);
+      }
       lines.push(`  return useQuery({`);
 
       if (hasArgs) {
@@ -237,10 +276,10 @@ export function generateCustomQueryHook(
       }
 
       if (hasRequiredArgs) {
-        lines.push(`    enabled: !!variables && options?.enabled !== false,`);
+        lines.push(`    enabled: !!variables && params?.enabled !== false,`);
       }
 
-      lines.push(`    ...options,`);
+      lines.push(`    ...queryOptions,`);
       lines.push(`  });`);
       lines.push(`}`);
     }
@@ -263,36 +302,55 @@ export function generateCustomQueryHook(
   lines.push(` */`);
 
   if (hasSelect) {
-    const fetchParamsArr: string[] = [];
-    if (hasArgs) {
-      fetchParamsArr.push(`variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}`);
-    }
-    fetchParamsArr.push(`args?: { select?: DeepExact<S, ${selectTypeName}> }`);
+    const customSelectResultType = (s: string) =>
+      `{ ${operation.name}: ${wrapInferSelectResult(operation.returnType, payloadTypeName!, s)} }`;
+    const withFieldsSelectionType = (s: string) =>
+      `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+    const withoutFieldsSelectionType = () => `({ fields?: undefined })`;
 
-    lines.push(`export async function ${fetchFnName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-    lines.push(`  ${fetchParamsArr.join(',\n  ')}`);
-    lines.push(`) {`);
     if (hasArgs) {
-      lines.push(`  return getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap();`);
+      const requiredVarType = hasRequiredArgs ? varTypeName : `${varTypeName} | undefined`;
+
+      lines.push(`export async function ${fetchFnName}<S extends ${selectTypeName}>(`);
+      lines.push(`  params: { variables: ${requiredVarType}; selection: ${withFieldsSelectionType('S')} }`);
+      lines.push(`): Promise<${customSelectResultType('S')}>;`);
+      lines.push(`export async function ${fetchFnName}(`);
+      lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: ${withoutFieldsSelectionType()} }`);
+      lines.push(`): Promise<${customSelectResultType('typeof defaultSelect')}>;`);
+      lines.push(`export async function ${fetchFnName}(`);
+      lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: SelectionConfig<${selectTypeName}> },`);
+      lines.push(`) {`);
+      lines.push(`  const variables = params?.variables;`);
+      lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+      lines.push(`  return getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
+      lines.push(`}`);
     } else {
-      lines.push(`  return getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap();`);
+      lines.push(`export async function ${fetchFnName}<S extends ${selectTypeName}>(`);
+      lines.push(`  params: { selection: ${withFieldsSelectionType('S')} }`);
+      lines.push(`): Promise<${customSelectResultType('S')}>;`);
+      lines.push(`export async function ${fetchFnName}(`);
+      lines.push(`  params?: { selection?: ${withoutFieldsSelectionType()} },`);
+      lines.push(`): Promise<${customSelectResultType('typeof defaultSelect')}>;`);
+      lines.push(`export async function ${fetchFnName}(`);
+      lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> },`);
+      lines.push(`) {`);
+      lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
+      lines.push(`  return getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
+      lines.push(`}`);
     }
-    lines.push(`}`);
   } else {
-    const fetchParamsArr: string[] = [];
     if (hasArgs) {
-      fetchParamsArr.push(`variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}`);
-    }
-
-    lines.push(`export async function ${fetchFnName}(`);
-    lines.push(`  ${fetchParamsArr.join(',\n  ')}`);
-    lines.push(`) {`);
-    if (hasArgs) {
+      lines.push(`export async function ${fetchFnName}(`);
+      lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName} }`);
+      lines.push(`) {`);
+      lines.push(`  const variables = params?.variables;`);
       lines.push(`  return getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}).unwrap();`);
+      lines.push(`}`);
     } else {
+      lines.push(`export async function ${fetchFnName}() {`);
       lines.push(`  return getClient().query.${operation.name}().unwrap();`);
+      lines.push(`}`);
     }
-    lines.push(`}`);
   }
 
   // Prefetch function
@@ -315,52 +373,72 @@ export function generateCustomQueryHook(
     lines.push(` */`);
 
     if (hasSelect) {
-      const prefetchParamsArr: string[] = ['queryClient: QueryClient'];
-      if (hasArgs) {
-        prefetchParamsArr.push(`variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}`);
-      }
-      prefetchParamsArr.push(`args?: { select?: DeepExact<S, ${selectTypeName}> }`);
-
-      lines.push(`export async function ${prefetchFnName}<const S extends ${selectTypeName} = typeof defaultSelect>(`);
-      lines.push(`  ${prefetchParamsArr.join(',\n  ')}`);
-      lines.push(`): Promise<void> {`);
+      const withFieldsSelectionType = (s: string) =>
+        `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+      const withoutFieldsSelectionType = () => `({ fields?: undefined })`;
 
       if (hasArgs) {
+        const requiredVarType = hasRequiredArgs ? varTypeName : `${varTypeName} | undefined`;
+
+        lines.push(`export async function ${prefetchFnName}<S extends ${selectTypeName}>(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params: { variables: ${requiredVarType}; selection: ${withFieldsSelectionType('S')} }`);
+        lines.push(`): Promise<void>;`);
+        lines.push(`export async function ${prefetchFnName}(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: ${withoutFieldsSelectionType()} }`);
+        lines.push(`): Promise<void>;`);
+        lines.push(`export async function ${prefetchFnName}(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}; selection?: SelectionConfig<${selectTypeName}> }`);
+        lines.push(`): Promise<void> {`);
+        lines.push(`  const variables = params?.variables;`);
+        lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
         lines.push(`  await queryClient.prefetchQuery({`);
         lines.push(`    queryKey: ${queryKeyName}(variables),`);
-        lines.push(`    queryFn: () => getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+        lines.push(`    queryFn: () => getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}, { select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
         lines.push(`  });`);
+        lines.push(`}`);
       } else {
+        lines.push(`export async function ${prefetchFnName}<S extends ${selectTypeName}>(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params: { selection: ${withFieldsSelectionType('S')} }`);
+        lines.push(`): Promise<void>;`);
+        lines.push(`export async function ${prefetchFnName}(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params?: { selection?: ${withoutFieldsSelectionType()} }`);
+        lines.push(`): Promise<void>;`);
+        lines.push(`export async function ${prefetchFnName}(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params?: { selection?: SelectionConfig<${selectTypeName}> }`);
+        lines.push(`): Promise<void> {`);
+        lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params?.selection);`);
         lines.push(`  await queryClient.prefetchQuery({`);
         lines.push(`    queryKey: ${queryKeyName}(),`);
-        lines.push(`    queryFn: () => getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as DeepExact<S, ${selectTypeName}> }).unwrap(),`);
+        lines.push(`    queryFn: () => getClient().query.${operation.name}({ select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
         lines.push(`  });`);
+        lines.push(`}`);
       }
-
-      lines.push(`}`);
     } else {
-      const prefetchParamsArr: string[] = ['queryClient: QueryClient'];
       if (hasArgs) {
-        prefetchParamsArr.push(`variables${hasRequiredArgs ? '' : '?'}: ${varTypeName}`);
-      }
-
-      lines.push(`export async function ${prefetchFnName}(`);
-      lines.push(`  ${prefetchParamsArr.join(',\n  ')}`);
-      lines.push(`): Promise<void> {`);
-
-      if (hasArgs) {
+        lines.push(`export async function ${prefetchFnName}(`);
+        lines.push(`  queryClient: QueryClient,`);
+        lines.push(`  params${hasRequiredArgs ? '' : '?'}: { variables${hasRequiredArgs ? '' : '?'}: ${varTypeName} }`);
+        lines.push(`): Promise<void> {`);
+        lines.push(`  const variables = params?.variables;`);
         lines.push(`  await queryClient.prefetchQuery({`);
         lines.push(`    queryKey: ${queryKeyName}(variables),`);
         lines.push(`    queryFn: () => getClient().query.${operation.name}(${hasRequiredArgs ? 'variables!' : 'variables'}).unwrap(),`);
         lines.push(`  });`);
+        lines.push(`}`);
       } else {
+        lines.push(`export async function ${prefetchFnName}(queryClient: QueryClient): Promise<void> {`);
         lines.push(`  await queryClient.prefetchQuery({`);
         lines.push(`    queryKey: ${queryKeyName}(),`);
         lines.push(`    queryFn: () => getClient().query.${operation.name}().unwrap(),`);
         lines.push(`  });`);
+        lines.push(`}`);
       }
-
-      lines.push(`}`);
     }
   }
 

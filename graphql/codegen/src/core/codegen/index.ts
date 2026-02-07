@@ -44,6 +44,7 @@ import { generateMutationKeysFile } from './mutation-keys';
 import { generateAllMutationHooks } from './mutations';
 import { generateAllQueryHooks } from './queries';
 import { generateQueryKeysFile } from './query-keys';
+import { generateSelectionFile } from './selection';
 import { getTableNames } from './utils';
 
 // ============================================================================
@@ -127,6 +128,12 @@ export function generate(options: GenerateOptions): GenerateResult {
   files.push({
     path: 'client.ts',
     content: generateClientFile()
+  });
+
+  // 1b. Generate selection.ts (shared selection adapters for hooks)
+  files.push({
+    path: 'selection.ts',
+    content: generateSelectionFile()
   });
 
   // Collect table type names for import path resolution

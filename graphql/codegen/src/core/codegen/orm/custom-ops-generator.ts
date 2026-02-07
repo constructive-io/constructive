@@ -267,26 +267,21 @@ function buildOperationMethod(
   const optionsParam = t.identifier('options');
   optionsParam.optional = true;
   if (selectTypeName) {
-    // Use DeepExact<S, SelectType> to enforce strict field validation
-    // This catches invalid fields even when mixed with valid ones
+    const selectProp = t.tsPropertySignature(
+      t.identifier('select'),
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S')))
+    );
+    selectProp.optional = false;
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeLiteral([
-        (() => {
-          const prop = t.tsPropertySignature(
-            t.identifier('select'),
-            t.tsTypeAnnotation(
-              t.tsTypeReference(
-                t.identifier('DeepExact'),
-                t.tsTypeParameterInstantiation([
-                  t.tsTypeReference(t.identifier('S')),
-                  t.tsTypeReference(t.identifier(selectTypeName))
-                ])
-              )
-            )
-          );
-          prop.optional = true;
-          return prop;
-        })()
+      t.tsIntersectionType([
+        t.tsTypeLiteral([selectProp]),
+        t.tsTypeReference(
+          t.identifier('StrictSelect'),
+          t.tsTypeParameterInstantiation([
+            t.tsTypeReference(t.identifier('S')),
+            t.tsTypeReference(t.identifier(selectTypeName))
+          ])
+        )
       ])
     );
   } else {
@@ -318,6 +313,9 @@ function buildOperationMethod(
       defaultSelectIdent
     )
     : t.optionalMemberExpression(t.identifier('options'), t.identifier('select'), false, true);
+  const entityTypeExpr = selectTypeName && payloadTypeName
+    ? t.stringLiteral(payloadTypeName)
+    : t.identifier('undefined');
 
   const queryBuilderArgs = t.objectExpression([
     t.objectProperty(t.identifier('client'), t.identifier('client'), false, true),
@@ -338,7 +336,9 @@ function buildOperationMethod(
               t.objectProperty(t.identifier('type'), t.stringLiteral(v.type))
             ])
           )
-        )
+        ),
+        t.identifier('connectionFieldsMap'),
+        entityTypeExpr
       ])
     )
   ]);
@@ -383,7 +383,6 @@ function buildOperationMethod(
       defaultType,
       'S'
     );
-    (typeParam as any).const = true;
     arrowFunc.typeParameters = t.tsTypeParameterDeclaration([typeParam]);
   }
 
@@ -409,11 +408,12 @@ export function generateCustomQueryOpsFile(
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
   statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
+  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'StrictSelect'], true));
 
   if (allTypeImports.length > 0) {
     statements.push(createImportDeclaration('../input-types', allTypeImports, true));
   }
+  statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
 
   // Generate variable interfaces
   for (const op of operations) {
@@ -486,11 +486,12 @@ export function generateCustomMutationOpsFile(
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
   statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
+  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'StrictSelect'], true));
 
   if (allTypeImports.length > 0) {
     statements.push(createImportDeclaration('../input-types', allTypeImports, true));
   }
+  statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
 
   // Generate variable interfaces
   for (const op of operations) {
