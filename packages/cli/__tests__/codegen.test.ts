@@ -19,14 +19,14 @@ jest.mock('@constructive-io/graphql-codegen', () => {
     splitCommas: splitCommasMock,
     codegenQuestions: [
       { name: 'endpoint', message: 'GraphQL endpoint URL', type: 'text', required: false },
-      { name: 'schemaFile', message: 'Path to GraphQL schema file', type: 'text', required: false },
+      { name: 'schema-file', message: 'Path to GraphQL schema file', type: 'text', required: false },
       { name: 'output', message: 'Output directory', type: 'text', required: false, default: 'codegen', useDefault: true },
       { name: 'schemas', message: 'PostgreSQL schemas', type: 'text', required: false, sanitize: splitCommasMock },
-      { name: 'apiNames', message: 'API names', type: 'text', required: false, sanitize: splitCommasMock },
-      { name: 'reactQuery', message: 'Generate React Query hooks?', type: 'confirm', required: false, default: false, useDefault: true },
+      { name: 'api-names', message: 'API names', type: 'text', required: false, sanitize: splitCommasMock },
+      { name: 'react-query', message: 'Generate React Query hooks?', type: 'confirm', required: false, default: false, useDefault: true },
       { name: 'orm', message: 'Generate ORM client?', type: 'confirm', required: false, default: false, useDefault: true },
       { name: 'authorization', message: 'Authorization header value', type: 'text', required: false },
-      { name: 'dryRun', message: 'Preview without writing files?', type: 'confirm', required: false, default: false, useDefault: true },
+      { name: 'dry-run', message: 'Preview without writing files?', type: 'confirm', required: false, default: false, useDefault: true },
       { name: 'verbose', message: 'Verbose output?', type: 'confirm', required: false, default: false, useDefault: true },
     ],
     printResult: jest.fn((result: any) => {
@@ -38,6 +38,14 @@ jest.mock('@constructive-io/graphql-codegen', () => {
       }
     }),
     camelizeArgv: jest.fn((argv: Record<string, any>) => argv),
+    seedArgvFromConfig: jest.fn((argv: Record<string, unknown>, _fileConfig: any) => argv),
+    buildGenerateOptions: jest.fn((answers: Record<string, unknown>, _fileConfig: any) => {
+      const { schemas, apiNames, ...rest } = answers;
+      if (schemas || apiNames) {
+        return { ...rest, db: { schemas, apiNames } };
+      }
+      return rest;
+    }),
   };
 })
 

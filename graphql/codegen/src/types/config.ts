@@ -262,14 +262,6 @@ export interface GraphQLSDKConfigTarget {
   reactQuery?: boolean;
 
   /**
-   * @deprecated Currently a no-op.
-   * Generated clients always use native fetch. This flag is retained for
-   * backward compatibility and will be removed in a future major version.
-   * @default true
-   */
-  browserCompatible?: boolean;
-
-  /**
    * Query key generation configuration
    * Controls how query keys are structured for cache management
    */
@@ -406,7 +398,6 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   },
   orm: false,
   reactQuery: false,
-  browserCompatible: true,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG
 };
