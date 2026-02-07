@@ -401,36 +401,6 @@ export function hasValidPrimaryKey(table: CleanTable): boolean {
   return false;
 }
 
-/**
- * Get the best field name for a defaultSelect literal.
- * Prefers PK field if valid, then 'id'/'nodeId', then first scalar field.
- * Unlike getPrimaryKeyInfo(), never returns a fictional 'id' fallback.
- */
-export function getDefaultSelectFieldName(table: CleanTable): string {
-  // 1. Try the actual primary key
-  const pk = table.constraints?.primaryKey?.[0];
-  if (pk && pk.fields.length >= 1) {
-    return pk.fields[0].name;
-  }
-  // 2. Try id / nodeId fields
-  const idField = table.fields.find((f) => f.name === 'id' || f.name === 'nodeId');
-  if (idField) {
-    return idField.name;
-  }
-  // 3. First non-array scalar field
-  const scalarField = table.fields.find(
-    (f) => !f.type.isArray && scalarToTsType(f.type.gqlType) !== f.type.gqlType
-  );
-  if (scalarField) {
-    return scalarField.name;
-  }
-  // 4. First field of any kind
-  if (table.fields.length > 0) {
-    return table.fields[0].name;
-  }
-  return 'id';
-}
-
 // ============================================================================
 // Query key generation
 // ============================================================================

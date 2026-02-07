@@ -9,7 +9,6 @@ import * as t from '@babel/types';
 import type { CleanTable } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
-  getDefaultSelectFieldName,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
@@ -130,16 +129,6 @@ function requiredSelectProp(): t.TSPropertySignature {
   return prop;
 }
 
-/** Build an optional `select?: undefined` prop to forbid select in fallback overloads */
-function optionalUndefinedSelectProp(): t.TSPropertySignature {
-  const prop = t.tsPropertySignature(
-    t.identifier('select'),
-    t.tsTypeAnnotation(t.tsUndefinedKeyword())
-  );
-  prop.optional = true;
-  return prop;
-}
-
 /** Build `StrictSelect<S, XxxSelect>` type reference for overload intersections */
 function strictSelectGuard(selectTypeName: string): t.TSType {
   return t.tsTypeReference(
@@ -149,20 +138,6 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
       t.tsTypeReference(t.identifier(selectTypeName))
     ])
   );
-}
-
-/** Build `Omit<TArgs, 'select'> & { select?: undefined }` for fallback overloads */
-function withoutSelect(argsType: t.TSType): t.TSType {
-  return t.tsIntersectionType([
-    t.tsTypeReference(
-      t.identifier('Omit'),
-      t.tsTypeParameterInstantiation([
-        argsType,
-        t.tsLiteralType(t.stringLiteral('select'))
-      ])
-    ),
-    t.tsTypeLiteral([optionalUndefinedSelectProp()])
-  ]);
 }
 
 export function generateModelFile(
@@ -186,10 +161,7 @@ export function generateModelFile(
 
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
-  const defaultSelectIdent = t.identifier('defaultSelect');
-  const defaultSelectFieldName = getDefaultSelectFieldName(table);
-
-  const pluralQueryName = table.query?.all ?? pluralName;
+  const pluralQueryName= table.query?.all ?? pluralName;
   const createMutationName = table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
@@ -211,20 +183,6 @@ export function generateModelFile(
   ], true));
   statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
 
-  // Default select (ensures valid GraphQL selection + sound TS return types)
-  statements.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        defaultSelectIdent,
-        asConst(
-          t.objectExpression([
-            t.objectProperty(t.identifier(defaultSelectFieldName), t.booleanLiteral(true))
-          ])
-        )
-      )
-    ])
-  );
-
   const classBody: t.ClassBody['body'] = [];
 
   // Constructor
@@ -236,7 +194,6 @@ export function generateModelFile(
 
   // Reusable type reference factories
   const sRef = () => t.tsTypeReference(t.identifier('S'));
-  const defaultRef = () => t.tsTypeQuery(defaultSelectIdent);
   const selectRef = () => t.tsTypeReference(t.identifier(selectTypeName));
   const pkTsType = () => tsTypeFromPrimitive(pkField.tsType);
 
@@ -275,19 +232,10 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('findMany', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.optional = true;
-    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
-    classBody.push(createDeclareMethod('findMany', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
-    implParam.optional = true;
     implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
-    const selectExpr = t.logicalExpression('??',
-      t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(pluralQueryName),
@@ -348,19 +296,10 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('findFirst', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.optional = true;
-    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
-    classBody.push(createDeclareMethod('findFirst', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
-    implParam.optional = true;
     implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
-    const selectExpr = t.logicalExpression('??',
-      t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(pluralQueryName),
@@ -413,13 +352,6 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('findOne', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeLiteral([pkProp()])
-    );
-    classBody.push(createDeclareMethod('findOne', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
     implParam.typeAnnotation = t.tsTypeAnnotation(
@@ -430,14 +362,11 @@ export function generateModelFile(
             t.identifier('select'),
             t.tsTypeAnnotation(t.tsTypeReference(t.identifier(selectTypeName)))
           );
-          prop.optional = true;
           return prop;
         })()
       ])
     );
-    const selectExpr = t.logicalExpression('??',
-      t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(singleQueryName),
@@ -488,17 +417,10 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('create', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
-    classBody.push(createDeclareMethod('create', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
     implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
-    const selectExpr = t.logicalExpression('??',
-      t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(createMutationName),
@@ -554,17 +476,10 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('update', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
-    classBody.push(createDeclareMethod('update', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
     implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
-    const selectExpr = t.logicalExpression('??',
-      t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(updateMutationName),
@@ -623,17 +538,10 @@ export function generateModelFile(
     );
     classBody.push(createDeclareMethod('delete', createTypeParam(selectTypeName), [o1Param], retType(sRef())));
 
-    // Overload 2: without select (default)
-    const o2Param = t.identifier('args');
-    o2Param.typeAnnotation = t.tsTypeAnnotation(withoutSelect(argsType(selectRef())));
-    classBody.push(createDeclareMethod('delete', null, [o2Param], retType(defaultRef())));
-
     // Implementation
     const implParam = t.identifier('args');
     implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
-    const selectExpr = t.logicalExpression('??',
-      t.memberExpression(t.identifier('args'), t.identifier('select')),
-      defaultSelectIdent);
+    const selectExpr = t.memberExpression(t.identifier('args'), t.identifier('select'));
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(deleteMutationName),

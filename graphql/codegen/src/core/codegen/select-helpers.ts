@@ -3,7 +3,7 @@
  *
  * Used by custom-queries.ts, custom-mutations.ts, and orm/custom-ops-generator.ts
  */
-import type { CleanArgument, TypeRegistry } from '../../types/schema';
+import type { CleanArgument } from '../../types/schema';
 import { SCALAR_NAMES } from './scalars';
 import { getTypeBaseName } from './type-resolver';
 
@@ -49,43 +49,4 @@ export function wrapInferSelectResult(
   }
 
   return `InferSelectResult<${payloadTypeName}, ${selectType}>`;
-}
-
-/**
- * Build a default select literal string for a given type.
- * Finds an 'id' or 'nodeId' field, or falls back to first scalar field.
- */
-export function buildDefaultSelectLiteral(
-  typeName: string,
-  typeRegistry: TypeRegistry,
-  depth: number = 0
-): string {
-  const resolved = typeRegistry.get(typeName);
-  const fields = resolved?.fields ?? [];
-
-  if (depth > 3 || fields.length === 0) {
-    // Use first field if available, otherwise fallback to 'id'
-    return fields.length > 0 ? `{ ${fields[0].name}: true }` : `{ id: true }`;
-  }
-
-  const idLike = fields.find((f) => f.name === 'id' || f.name === 'nodeId');
-  if (idLike) return `{ ${idLike.name}: true }`;
-
-  const scalarField = fields.find((f) => {
-    const baseName = getTypeBaseName(f.type);
-    if (!baseName) return false;
-    if (NON_SELECT_TYPES.has(baseName)) return true;
-    return typeRegistry.get(baseName)?.kind === 'ENUM';
-  });
-  if (scalarField) return `{ ${scalarField.name}: true }`;
-
-  const first = fields[0];
-
-  const firstBase = getTypeBaseName(first.type);
-  if (!firstBase || NON_SELECT_TYPES.has(firstBase) || typeRegistry.get(firstBase)?.kind === 'ENUM') {
-    return `{ ${first.name}: true }`;
-  }
-
-  const nested = buildDefaultSelectLiteral(firstBase, typeRegistry, depth + 1);
-  return `{ ${first.name}: { select: ${nested} } }`;
 }

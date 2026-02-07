@@ -10,7 +10,6 @@
 import * as t from '@babel/types';
 
 import type { CleanTable } from '../../types/schema';
-import { asConst } from './babel-ast';
 import {
   addJSDocComment,
   buildSelectionArgsCall,
@@ -33,7 +32,6 @@ import {
   shorthandProp,
   spreadObj,
   sRef,
-  typeofRef,
   typeRef,
   typeLiteralWithProps,
   useMutationOptionsType,
@@ -44,7 +42,6 @@ import {
   getCreateMutationFileName,
   getCreateMutationHookName,
   getCreateMutationName,
-  getDefaultSelectFieldName,
   getDeleteMutationFileName,
   getDeleteMutationHookName,
   getDeleteMutationName,
@@ -82,19 +79,6 @@ function buildMutationResultType(
   }]);
 }
 
-function buildSelectFallback(selectTypeName: string): t.TSAsExpression {
-  return t.tsAsExpression(
-    t.parenthesizedExpression(
-      t.logicalExpression(
-        '??',
-        t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-        t.identifier('defaultSelect')
-      )
-    ),
-    typeRef(selectTypeName)
-  );
-}
-
 function buildFieldsSelectionType(s: t.TSType, selectTypeName: string): t.TSParenthesizedType {
   return t.tsParenthesizedType(
     t.tsIntersectionType([
@@ -102,12 +86,6 @@ function buildFieldsSelectionType(s: t.TSType, selectTypeName: string): t.TSPare
       typeRef('StrictSelect', [s, typeRef(selectTypeName)])
     ])
   );
-}
-
-function buildNoFieldsType(): t.TSParenthesizedType {
-  const fp = t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(t.tsUndefinedKeyword()));
-  fp.optional = true;
-  return t.tsParenthesizedType(t.tsTypeLiteral([fp]));
 }
 
 export function generateCreateMutationHook(
@@ -129,7 +107,6 @@ export function generateCreateMutationHook(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const createInputTypeName = `Create${typeName}Input`;
-  const defaultFieldName = getDefaultSelectFieldName(table);
 
   const statements: t.Statement[] = [];
 
@@ -150,9 +127,6 @@ export function generateCreateMutationHook(
 
   // Re-exports
   statements.push(createTypeReExport([selectTypeName, relationTypeName, createInputTypeName], '../../orm/input-types'));
-
-  // Default select
-  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
   // Variable type: CreateTypeName['singularName']
   const createVarType = t.tsIndexedAccessType(
@@ -189,25 +163,8 @@ export function generateCreateMutationHook(
   ]);
   statements.push(o1);
 
-  // Overload 2: without fields
-  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
-  o2SelProp.optional = true;
-  const o2ParamType = t.tsIntersectionType([
-    t.tsTypeLiteral([o2SelProp]),
-    useMutationOptionsType(resultType(typeofRef('defaultSelect')), createVarType)
-  ]);
-  statements.push(
-    exportDeclareFunction(
-      hookName,
-      null,
-      [createFunctionParam('params', o2ParamType, true)],
-      useMutationResultType(resultType(typeofRef('defaultSelect')), createVarType)
-    )
-  );
-
   // Implementation
   const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
-  implSelProp.optional = true;
   const implParamType = t.tsIntersectionType([
     t.tsTypeLiteral([implSelProp]),
     omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), createVarType]), ['mutationFn'])
@@ -229,7 +186,7 @@ export function generateCreateMutationHook(
     [dataParam],
     getClientCallUnwrap(singularName, 'create', t.objectExpression([
       shorthandProp('data'),
-      objectProp('select', buildSelectFallback(selectTypeName))
+      objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))
     ]))
   );
 
@@ -261,7 +218,7 @@ export function generateCreateMutationHook(
     )
   );
 
-  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
 
   return {
     fileName: getCreateMutationFileName(table),
@@ -316,9 +273,6 @@ export function generateUpdateMutationHook(
   // Re-exports
   statements.push(createTypeReExport([selectTypeName, relationTypeName, patchTypeName], '../../orm/input-types'));
 
-  // Default select
-  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(pkField.name, t.booleanLiteral(true))]))));
-
   // Variable type: { pkField: type; patch: PatchType }
   const updateVarType = t.tsTypeLiteral([
     t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType)),
@@ -354,25 +308,8 @@ export function generateUpdateMutationHook(
   ]);
   statements.push(o1);
 
-  // Overload 2: without fields
-  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
-  o2SelProp.optional = true;
-  const o2ParamType = t.tsIntersectionType([
-    t.tsTypeLiteral([o2SelProp]),
-    useMutationOptionsType(resultType(typeofRef('defaultSelect')), updateVarType)
-  ]);
-  statements.push(
-    exportDeclareFunction(
-      hookName,
-      null,
-      [createFunctionParam('params', o2ParamType, true)],
-      useMutationResultType(resultType(typeofRef('defaultSelect')), updateVarType)
-    )
-  );
-
   // Implementation
   const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
-  implSelProp.optional = true;
   const implParamType = t.tsIntersectionType([
     t.tsTypeLiteral([implSelProp]),
     omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), updateVarType]), ['mutationFn'])
@@ -400,7 +337,7 @@ export function generateUpdateMutationHook(
     getClientCallUnwrap(singularName, 'update', t.objectExpression([
       objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
       objectProp('data', t.identifier('patch')),
-      objectProp('select', buildSelectFallback(selectTypeName))
+      objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))
     ]))
   );
 
@@ -445,7 +382,7 @@ export function generateUpdateMutationHook(
     )
   );
 
-  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
 
   return {
     fileName: getUpdateMutationFileName(table),
@@ -499,9 +436,6 @@ export function generateDeleteMutationHook(
   // Re-exports
   statements.push(createTypeReExport([selectTypeName, relationTypeName], '../../orm/input-types'));
 
-  // Default select
-  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(pkField.name, t.booleanLiteral(true))]))));
-
   // Variable type: { pkField: type }
   const deleteVarType = t.tsTypeLiteral([
     t.tsPropertySignature(t.identifier(pkField.name), t.tsTypeAnnotation(pkTsType))
@@ -536,25 +470,8 @@ export function generateDeleteMutationHook(
   ]);
   statements.push(o1);
 
-  // Overload 2: without fields
-  const o2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(buildNoFieldsType()));
-  o2SelProp.optional = true;
-  const o2ParamType = t.tsIntersectionType([
-    t.tsTypeLiteral([o2SelProp]),
-    useMutationOptionsType(resultType(typeofRef('defaultSelect')), deleteVarType)
-  ]);
-  statements.push(
-    exportDeclareFunction(
-      hookName,
-      null,
-      [createFunctionParam('params', o2ParamType, true)],
-      useMutationResultType(resultType(typeofRef('defaultSelect')), deleteVarType)
-    )
-  );
-
   // Implementation
   const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))));
-  implSelProp.optional = true;
   const implParamType = t.tsIntersectionType([
     t.tsTypeLiteral([implSelProp]),
     omitType(typeRef('UseMutationOptions', [t.tsAnyKeyword(), typeRef('Error'), deleteVarType]), ['mutationFn'])
@@ -578,7 +495,7 @@ export function generateDeleteMutationHook(
     [destructParam],
     getClientCallUnwrap(singularName, 'delete', t.objectExpression([
       objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
-      objectProp('select', buildSelectFallback(selectTypeName))
+      objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))
     ]))
   );
 
@@ -621,7 +538,7 @@ export function generateDeleteMutationHook(
     )
   );
 
-  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
+  statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
 
   return {
     fileName: getDeleteMutationFileName(table),

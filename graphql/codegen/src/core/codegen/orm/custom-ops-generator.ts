@@ -6,8 +6,8 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanArgument, CleanOperation, TypeRegistry } from '../../../types/schema';
-import { asConst, generateCode } from '../babel-ast';
+import type { CleanArgument, CleanOperation } from '../../../types/schema';
+import { generateCode } from '../babel-ast';
 import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
   getTypeBaseName,
@@ -173,77 +173,9 @@ function buildSelectedResultTsType(
   );
 }
 
-function buildDefaultSelectExpression(
-  typeName: string,
-  typeRegistry: TypeRegistry,
-  depth: number = 0
-): t.Expression {
-  const resolved = typeRegistry.get(typeName);
-  const fields = resolved?.fields ?? [];
-
-  if (depth > 3 || fields.length === 0) {
-    // Use first field if available, otherwise fallback to 'id'
-    const fallbackName = fields.length > 0 ? fields[0].name : 'id';
-    return t.objectExpression([t.objectProperty(t.identifier(fallbackName), t.booleanLiteral(true))]);
-  }
-
-  // Prefer id-like fields
-  const idLike = fields.find((f) => f.name === 'id' || f.name === 'nodeId');
-  if (idLike) {
-    return t.objectExpression([
-      t.objectProperty(t.identifier(idLike.name), t.booleanLiteral(true))
-    ]);
-  }
-
-  // Prefer scalar/enum fields
-  const scalarField = fields.find((f) => {
-    const baseName = getTypeBaseName(f.type);
-    if (!baseName) return false;
-    if (NON_SELECT_TYPES.has(baseName)) return true;
-    const baseResolved = typeRegistry.get(baseName);
-    return baseResolved?.kind === 'ENUM';
-  });
-
-  if (scalarField) {
-    return t.objectExpression([
-      t.objectProperty(t.identifier(scalarField.name), t.booleanLiteral(true))
-    ]);
-  }
-
-  // Fallback: first field (ensure valid selection for object fields)
-  const first = fields[0];
-
-  const firstBaseName = getTypeBaseName(first.type);
-  if (!firstBaseName || NON_SELECT_TYPES.has(firstBaseName)) {
-    return t.objectExpression([
-      t.objectProperty(t.identifier(first.name), t.booleanLiteral(true))
-    ]);
-  }
-
-  const nestedResolved = typeRegistry.get(firstBaseName);
-  if (nestedResolved?.kind === 'ENUM') {
-    return t.objectExpression([
-      t.objectProperty(t.identifier(first.name), t.booleanLiteral(true))
-    ]);
-  }
-
-  return t.objectExpression([
-    t.objectProperty(
-      t.identifier(first.name),
-      t.objectExpression([
-        t.objectProperty(
-          t.identifier('select'),
-          buildDefaultSelectExpression(firstBaseName, typeRegistry, depth + 1)
-        )
-      ])
-    )
-  ]);
-}
-
 function buildOperationMethod(
   op: CleanOperation,
-  operationType: 'query' | 'mutation',
-  defaultSelectIdent?: t.Identifier
+  operationType: 'query' | 'mutation'
 ): t.ObjectProperty {
   const hasArgs = op.args.length > 0;
   const varTypeName = `${ucFirst(op.name)}Variables`;
@@ -265,7 +197,7 @@ function buildOperationMethod(
   }
 
   const optionsParam = t.identifier('options');
-  optionsParam.optional = true;
+  optionsParam.optional = !selectTypeName;
   if (selectTypeName) {
     const selectProp = t.tsPropertySignature(
       t.identifier('select'),
@@ -306,12 +238,8 @@ function buildOperationMethod(
   params.push(optionsParam);
 
   // Build the QueryBuilder call
-  const selectExpr = defaultSelectIdent
-    ? t.logicalExpression(
-      '??',
-      t.optionalMemberExpression(t.identifier('options'), t.identifier('select'), false, true),
-      defaultSelectIdent
-    )
+  const selectExpr = selectTypeName
+    ? t.memberExpression(t.identifier('options'), t.identifier('select'))
     : t.optionalMemberExpression(t.identifier('options'), t.identifier('select'), false, true);
   const entityTypeExpr = selectTypeName && payloadTypeName
     ? t.stringLiteral(payloadTypeName)
@@ -375,12 +303,9 @@ function buildOperationMethod(
 
   // Add type parameters to arrow function if we have a select type
   if (selectTypeName) {
-    const defaultType = defaultSelectIdent
-      ? t.tsTypeQuery(defaultSelectIdent)
-      : null;
     const typeParam = t.tsTypeParameter(
       t.tsTypeReference(t.identifier(selectTypeName)),
-      defaultType,
+      null,
       'S'
     );
     arrowFunc.typeParameters = t.tsTypeParameterDeclaration([typeParam]);
@@ -393,8 +318,7 @@ function buildOperationMethod(
  * Generate the query/index.ts file for custom query operations
  */
 export function generateCustomQueryOpsFile(
-  operations: CleanOperation[],
-  typeRegistry: TypeRegistry
+  operations: CleanOperation[]
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -421,28 +345,9 @@ export function generateCustomQueryOpsFile(
     if (varInterface) statements.push(varInterface);
   }
 
-  // Default selects (avoid invalid documents when select is omitted)
-  const defaultSelectIdentsByOpName = new Map<string, t.Identifier>();
-  for (const op of operations) {
-    const selectTypeName = getSelectTypeName(op.returnType);
-    const payloadTypeName = getTypeBaseName(op.returnType);
-    if (!selectTypeName || !payloadTypeName) continue;
-
-    const ident = t.identifier(`${op.name}DefaultSelect`);
-    defaultSelectIdentsByOpName.set(op.name, ident);
-    statements.push(
-      t.variableDeclaration('const', [
-        t.variableDeclarator(
-          ident,
-          asConst(buildDefaultSelectExpression(payloadTypeName, typeRegistry))
-        )
-      ])
-    );
-  }
-
   // Generate factory function
   const operationProperties = operations.map((op) =>
-    buildOperationMethod(op, 'query', defaultSelectIdentsByOpName.get(op.name))
+    buildOperationMethod(op, 'query')
   );
 
   const returnObj = t.objectExpression(operationProperties);
@@ -471,8 +376,7 @@ export function generateCustomQueryOpsFile(
  * Generate the mutation/index.ts file for custom mutation operations
  */
 export function generateCustomMutationOpsFile(
-  operations: CleanOperation[],
-  typeRegistry: TypeRegistry
+  operations: CleanOperation[]
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -499,28 +403,9 @@ export function generateCustomMutationOpsFile(
     if (varInterface) statements.push(varInterface);
   }
 
-  // Default selects (avoid invalid documents when select is omitted)
-  const defaultSelectIdentsByOpName = new Map<string, t.Identifier>();
-  for (const op of operations) {
-    const selectTypeName = getSelectTypeName(op.returnType);
-    const payloadTypeName = getTypeBaseName(op.returnType);
-    if (!selectTypeName || !payloadTypeName) continue;
-
-    const ident = t.identifier(`${op.name}DefaultSelect`);
-    defaultSelectIdentsByOpName.set(op.name, ident);
-    statements.push(
-      t.variableDeclaration('const', [
-        t.variableDeclarator(
-          ident,
-          asConst(buildDefaultSelectExpression(payloadTypeName, typeRegistry))
-        )
-      ])
-    );
-  }
-
   // Generate factory function
   const operationProperties = operations.map((op) =>
-    buildOperationMethod(op, 'mutation', defaultSelectIdentsByOpName.get(op.name))
+    buildOperationMethod(op, 'mutation')
   );
 
   const returnObj = t.objectExpression(operationProperties);

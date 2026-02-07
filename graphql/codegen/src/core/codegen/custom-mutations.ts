@@ -19,9 +19,7 @@ import type {
   CleanOperation,
   TypeRegistry
 } from '../../types/schema';
-import { asConst } from './babel-ast';
 import {
-  buildDefaultSelectExpr,
   buildSelectionArgsCall,
   callExpr,
   constDecl,
@@ -41,7 +39,6 @@ import {
   selectionConfigType,
   spreadObj,
   sRef,
-  typeofRef,
   typeRef,
   useMutationOptionsType,
   useMutationResultType,
@@ -164,11 +161,6 @@ function generateCustomMutationHookInternal(
     statements.push(createTypeReExport([selectTypeName!], '../../orm/input-types'));
   }
 
-  // Default select
-  if (hasSelect) {
-    statements.push(constDecl('defaultSelect', asConst(buildDefaultSelectExpr(payloadTypeName!, typeRegistry))));
-  }
-
   // Hook
   if (hasSelect) {
     const mutationVarType: t.TSType = hasArgs ? typeRef(varTypeName) : t.tsVoidKeyword();
@@ -204,39 +196,11 @@ function generateCustomMutationHookInternal(
       )
     );
 
-    // Overload 2: without selection.fields
-    const o2SelectionProp = (() => {
-      const innerFieldsProp = t.tsPropertySignature(
-        t.identifier('fields'),
-        t.tsTypeAnnotation(t.tsUndefinedKeyword())
-      );
-      innerFieldsProp.optional = true;
-      const selProp = t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(t.tsParenthesizedType(t.tsTypeLiteral([innerFieldsProp])))
-      );
-      selProp.optional = true;
-      return selProp;
-    })();
-    const o2ParamType = t.tsIntersectionType([
-      t.tsTypeLiteral([o2SelectionProp]),
-      useMutationOptionsType(selectedResultType(typeofRef('defaultSelect')), mutationVarType)
-    ]);
-    statements.push(
-      exportDeclareFunction(
-        hookName,
-        null,
-        [createFunctionParam('params', o2ParamType, true)],
-        useMutationResultType(selectedResultType(typeofRef('defaultSelect')), mutationVarType)
-      )
-    );
-
     // Implementation
     const implSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!)))
     );
-    implSelProp.optional = true;
     const implParamType = t.tsIntersectionType([
       t.tsTypeLiteral([implSelProp]),
       omitType(
@@ -257,17 +221,7 @@ function generateCustomMutationHookInternal(
       )
       : undefined;
 
-    const selectExpr = t.tsAsExpression(
-      t.parenthesizedExpression(
-        t.logicalExpression(
-          '??',
-          t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-          t.identifier('defaultSelect')
-        )
-      ),
-      typeRef(selectTypeName!)
-    );
-    const selectObj = t.objectExpression([objectProp('select', selectExpr)]);
+    const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
 
     let mutationFnExpr: t.Expression;
     if (hasArgs) {

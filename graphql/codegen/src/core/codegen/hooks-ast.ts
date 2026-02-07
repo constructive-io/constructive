@@ -6,9 +6,9 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanArgument, TypeRegistry } from '../../types/schema';
+import type { CleanArgument } from '../../types/schema';
 import { commentBlock, generateCode } from './babel-ast';
-import { getTypeBaseName, scalarToTsType } from './type-resolver';
+import { scalarToTsType } from './type-resolver';
 import { getGeneratedFileHeader } from './utils';
 
 // ============================================================================
@@ -194,28 +194,6 @@ export function withFieldsListSelectionType(
       ['fields']
     ),
     strictSelectType(selectType, selectTypeName)
-  ]);
-}
-
-export function withoutFieldsSelectionType(): t.TSTypeLiteral {
-  return typeLiteralWithProps([{
-    name: 'fields',
-    type: t.tsUndefinedKeyword(),
-    optional: true
-  }]);
-}
-
-export function withoutFieldsListSelectionType(
-  selectTypeName: string,
-  filterTypeName: string,
-  orderByTypeName: string
-): t.TSIntersectionType {
-  return t.tsIntersectionType([
-    omitType(
-      listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName),
-      ['fields']
-    ),
-    withoutFieldsSelectionType()
   ]);
 }
 
@@ -642,33 +620,18 @@ export function getClientCustomCallUnwrap(
 // Select/args expression builders
 // ============================================================================
 
-export function buildSelectFallbackExpr(
-  argsIdent: string,
-  defaultSelectIdent: string,
-  selectTypeName: string
-): t.TSAsExpression {
-  return t.tsAsExpression(
-    t.parenthesizedExpression(
-      t.logicalExpression(
-        '??',
-        t.optionalMemberExpression(
-          t.identifier(argsIdent),
-          t.identifier('select'),
-          false,
-          true
-        ),
-        t.identifier(defaultSelectIdent)
-      )
-    ),
-    typeRef(selectTypeName)
+export function buildSelectExpr(
+  argsIdent: string
+): t.MemberExpression {
+  return t.memberExpression(
+    t.identifier(argsIdent),
+    t.identifier('select')
   );
 }
 
 export function buildFindManyCallExpr(
   singularName: string,
-  argsIdent: string,
-  selectTypeName: string,
-  defaultSelectIdent: string = 'defaultSelect'
+  argsIdent: string
 ): t.CallExpression {
   const spreadArgs = t.parenthesizedExpression(
     t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([]))
@@ -678,7 +641,7 @@ export function buildFindManyCallExpr(
     'findMany',
     t.objectExpression([
       t.spreadElement(spreadArgs),
-      objectProp('select', buildSelectFallbackExpr(argsIdent, defaultSelectIdent, selectTypeName))
+      objectProp('select', buildSelectExpr(argsIdent))
     ])
   );
 }
@@ -687,9 +650,7 @@ export function buildFindOneCallExpr(
   singularName: string,
   pkFieldName: string,
   argsIdent: string,
-  selectTypeName: string,
-  paramsIdent: string = 'params',
-  defaultSelectIdent: string = 'defaultSelect'
+  paramsIdent: string = 'params'
 ): t.CallExpression {
   return getClientCallUnwrap(
     singularName,
@@ -704,7 +665,7 @@ export function buildFindOneCallExpr(
           t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([]))
         )
       ),
-      objectProp('select', buildSelectFallbackExpr(argsIdent, defaultSelectIdent, selectTypeName))
+      objectProp('select', buildSelectExpr(argsIdent))
     ])
   );
 }
@@ -737,13 +698,6 @@ export function scopeTypeLiteral(scopeTypeName: string): t.TSTypeLiteral {
 // ============================================================================
 // Type conversion helpers (GraphQL -> AST)
 // ============================================================================
-
-const NON_SELECT_TYPES_AST = new Set([
-  'String', 'Int', 'Float', 'Boolean', 'ID',
-  'BigFloat', 'BigInt', 'Cursor', 'Date', 'Datetime',
-  'JSON', 'UUID', 'Uuid', 'Time',
-  'Query', 'Mutation'
-]);
 
 export function wrapInferSelectResultType(
   typeRefNode: CleanArgument['type'],
@@ -786,46 +740,6 @@ export function typeRefToTsTypeAST(
     return t.tsUnknownKeyword();
   }
   return typeRef(typeRefNode.name ?? 'unknown');
-}
-
-export function buildDefaultSelectExpr(
-  typeName: string,
-  typeRegistry: TypeRegistry,
-  depth: number = 0
-): t.ObjectExpression {
-  const resolved = typeRegistry.get(typeName);
-  const fields = resolved?.fields ?? [];
-
-  if (depth > 3 || fields.length === 0) {
-    const fieldName = fields.length > 0 ? fields[0].name : 'id';
-    return t.objectExpression([objectProp(fieldName, t.booleanLiteral(true))]);
-  }
-
-  const idLike = fields.find((f) => f.name === 'id' || f.name === 'nodeId');
-  if (idLike) return t.objectExpression([objectProp(idLike.name, t.booleanLiteral(true))]);
-
-  const scalarField = fields.find((f) => {
-    const baseName = getTypeBaseName(f.type);
-    if (!baseName) return false;
-    if (NON_SELECT_TYPES_AST.has(baseName)) return true;
-    return typeRegistry.get(baseName)?.kind === 'ENUM';
-  });
-  if (scalarField) return t.objectExpression([objectProp(scalarField.name, t.booleanLiteral(true))]);
-
-  const first = fields[0];
-  const firstBase = getTypeBaseName(first.type);
-  if (
-    !firstBase ||
-    NON_SELECT_TYPES_AST.has(firstBase) ||
-    typeRegistry.get(firstBase)?.kind === 'ENUM'
-  ) {
-    return t.objectExpression([objectProp(first.name, t.booleanLiteral(true))]);
-  }
-
-  const nested = buildDefaultSelectExpr(firstBase, typeRegistry, depth + 1);
-  return t.objectExpression([
-    objectProp(first.name, t.objectExpression([objectProp('select', nested)]))
-  ]);
 }
 
 export function buildSelectionArgsCall(

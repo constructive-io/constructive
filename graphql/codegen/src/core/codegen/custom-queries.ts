@@ -22,7 +22,6 @@ import type {
 import { asConst } from './babel-ast';
 import {
   addJSDocComment,
-  buildDefaultSelectExpr,
   buildSelectionArgsCall,
   callExpr,
   constDecl,
@@ -46,7 +45,6 @@ import {
   selectionConfigType,
   spreadObj,
   sRef,
-  typeofRef,
   typeRef,
   useQueryOptionsImplType,
   useQueryOptionsType,
@@ -163,11 +161,6 @@ export function generateCustomQueryHook(
     statements.push(createTypeReExport([selectTypeName!], '../../orm/input-types'));
   }
 
-  // Default select
-  if (hasSelect) {
-    statements.push(constDecl('defaultSelect', asConst(buildDefaultSelectExpr(payloadTypeName!, typeRegistry))));
-  }
-
   // Query key
   if (useCentralizedKeys) {
     const keyDecl = t.exportNamedDeclaration(
@@ -202,18 +195,6 @@ export function generateCustomQueryHook(
     statements.push(keyDecl);
   }
 
-  // Helper to build select fallback expression
-  const buildSelectFallback = () => t.tsAsExpression(
-    t.parenthesizedExpression(
-      t.logicalExpression(
-        '??',
-        t.optionalMemberExpression(t.identifier('args'), t.identifier('select'), false, true),
-        t.identifier('defaultSelect')
-      )
-    ),
-    typeRef(selectTypeName!)
-  );
-
   // Helper to build query key call expression
   const buildQueryKeyCall = (withVars: boolean) => {
     if (useCentralizedKeys) {
@@ -234,14 +215,7 @@ export function generateCustomQueryHook(
     ])
   );
 
-  // Helper for { fields?: undefined }
-  const noFieldsType = () => {
-    const fp = t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(t.tsUndefinedKeyword()));
-    fp.optional = true;
-    return t.tsParenthesizedType(t.tsTypeLiteral([fp]));
-  };
-
-  const selectedResultType = (sel: t.TSType) =>
+  const selectedResultType= (sel: t.TSType) =>
     customSelectResultTypeLiteral(operation.name, operation.returnType, payloadTypeName!, sel);
 
   // Hook
@@ -284,30 +258,6 @@ export function generateCustomQueryHook(
       ]);
       statements.push(o1);
 
-      // Overload 2: without fields
-      const o2Props: t.TSPropertySignature[] = [];
-      if (hasArgs) {
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
-        if (!hasRequiredArgs) varProp.optional = true;
-        o2Props.push(varProp);
-      }
-      const selProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(noFieldsType()));
-      selProp.optional = true;
-      o2Props.push(selProp);
-      const o2ParamType = t.tsIntersectionType([
-        t.tsTypeLiteral(o2Props),
-        omitType(typeRef('UseQueryOptions', [selectedResultType(typeofRef('defaultSelect')), typeRef('Error'), typeRef('TData')]), ['queryKey', 'queryFn'])
-      ]);
-      const o2Param = createFunctionParam('params', o2ParamType, !hasRequiredArgs);
-      statements.push(
-        exportDeclareFunction(
-          hookName,
-          createTDataTypeParam(selectedResultType(typeofRef('defaultSelect'))),
-          [o2Param],
-          typeRef('UseQueryResult', [typeRef('TData')])
-        )
-      );
-
       // Implementation
       const implProps: t.TSPropertySignature[] = [];
       if (hasArgs) {
@@ -316,7 +266,6 @@ export function generateCustomQueryHook(
         implProps.push(varProp);
       }
       const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
-      implSelProp.optional = true;
       implProps.push(implSelProp);
       const implParamType = t.tsIntersectionType([
         t.tsTypeLiteral(implProps),
@@ -346,7 +295,7 @@ export function generateCustomQueryHook(
         body.push(voidStatement('_selection'));
       }
 
-      const selectObj = t.objectExpression([objectProp('select', buildSelectFallback())]);
+      const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
       const queryFnArgs = hasArgs
         ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
         : [selectObj];
@@ -479,25 +428,6 @@ export function generateCustomQueryHook(
     ]);
     statements.push(f1Decl);
 
-    // Overload 2: without fields
-    const f2Props: t.TSPropertySignature[] = [];
-    if (hasArgs) {
-      const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
-      if (!hasRequiredArgs) varProp.optional = true;
-      f2Props.push(varProp);
-    }
-    const f2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(noFieldsType()));
-    f2SelProp.optional = true;
-    f2Props.push(f2SelProp);
-    statements.push(
-      exportAsyncDeclareFunction(
-        fetchFnName,
-        null,
-        [createFunctionParam('params', t.tsTypeLiteral(f2Props), !hasRequiredArgs)],
-        typeRef('Promise', [selectedResultType(typeofRef('defaultSelect'))])
-      )
-    );
-
     // Implementation
     const fImplProps: t.TSPropertySignature[] = [];
     if (hasArgs) {
@@ -506,7 +436,6 @@ export function generateCustomQueryHook(
       fImplProps.push(varProp);
     }
     const fImplSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
-    fImplSelProp.optional = true;
     fImplProps.push(fImplSelProp);
 
     const fBody: t.Statement[] = [];
@@ -514,12 +443,12 @@ export function generateCustomQueryHook(
       fBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
     }
     fBody.push(buildSelectionArgsCall(selectTypeName!));
-    const selectObj = t.objectExpression([objectProp('select', buildSelectFallback())]);
+    const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
     const fCallArgs = hasArgs
       ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
       : [selectObj];
     fBody.push(t.returnStatement(getClientCustomCallUnwrap('query', operation.name, fCallArgs as t.Expression[])));
-    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps), !hasRequiredArgs)], fBody));
+    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps))], fBody));
   } else {
     const fBody: t.Statement[] = [];
     if (hasArgs) {
@@ -587,25 +516,6 @@ export function generateCustomQueryHook(
       ]);
       statements.push(p1Decl);
 
-      // Overload 2: without fields
-      const p2Props: t.TSPropertySignature[] = [];
-      if (hasArgs) {
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
-        if (!hasRequiredArgs) varProp.optional = true;
-        p2Props.push(varProp);
-      }
-      const p2SelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(noFieldsType()));
-      p2SelProp.optional = true;
-      p2Props.push(p2SelProp);
-      statements.push(
-        exportAsyncDeclareFunction(
-          prefetchFnName,
-          null,
-          [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', t.tsTypeLiteral(p2Props), !hasRequiredArgs)],
-          typeRef('Promise', [t.tsVoidKeyword()])
-        )
-      );
-
       // Implementation
       const pImplProps: t.TSPropertySignature[] = [];
       if (hasArgs) {
@@ -614,7 +524,6 @@ export function generateCustomQueryHook(
         pImplProps.push(varProp);
       }
       const pImplSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
-      pImplSelProp.optional = true;
       pImplProps.push(pImplSelProp);
 
       const pBody: t.Statement[] = [];
@@ -622,7 +531,7 @@ export function generateCustomQueryHook(
         pBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
       }
       pBody.push(buildSelectionArgsCall(selectTypeName!));
-      const selectObj = t.objectExpression([objectProp('select', buildSelectFallback())]);
+      const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
       const pCallArgs = hasArgs
         ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
         : [selectObj];
@@ -638,7 +547,7 @@ export function generateCustomQueryHook(
         exportAsyncFunction(
           prefetchFnName,
           null,
-          [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', t.tsTypeLiteral(pImplProps), !hasRequiredArgs)],
+          [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', t.tsTypeLiteral(pImplProps))],
           pBody,
           t.tsVoidKeyword()
         )

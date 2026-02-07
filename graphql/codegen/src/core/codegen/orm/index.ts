@@ -128,16 +128,14 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   // 5. Generate custom operations (if any)
   if (hasCustomQueries && customOperations?.queries) {
     const queryOpsFile = generateCustomQueryOpsFile(
-      customOperations.queries,
-      typeRegistry ?? new Map()
+      customOperations.queries
     );
     files.push({ path: queryOpsFile.fileName, content: queryOpsFile.content });
   }
 
   if (hasCustomMutations && customOperations?.mutations) {
     const mutationOpsFile = generateCustomMutationOpsFile(
-      customOperations.mutations,
-      typeRegistry ?? new Map()
+      customOperations.mutations
     );
     files.push({ path: mutationOpsFile.fileName, content: mutationOpsFile.content });
   }

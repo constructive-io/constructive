@@ -11,9 +11,6 @@ import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindO
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
 import type { User, UserWithRelations, UserSelect, UserFilter, UsersOrderBy, CreateUserInput, UpdateUserInput, UserPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
-const defaultSelect = {
-  id: true
-} as const;
 export class UserModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UserSelect>(args: FindManyArgs<S, UserFilter, UsersOrderBy> & {
@@ -21,16 +18,11 @@ export class UserModel {
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
   }>;
-  findMany(args?: Omit<FindManyArgs<UserSelect, UserFilter, UsersOrderBy>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    users: ConnectionResult<InferSelectResult<UserWithRelations, typeof defaultSelect>>;
-  }>;
-  findMany(args?: FindManyArgs<UserSelect, UserFilter, UsersOrderBy>) {
+  findMany(args: FindManyArgs<UserSelect, UserFilter, UsersOrderBy>) {
     const {
       document,
       variables
-    } = buildFindManyDocument("User", "users", args?.select ?? defaultSelect, {
+    } = buildFindManyDocument("User", "users", args.select, {
       where: args?.where,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
@@ -55,18 +47,11 @@ export class UserModel {
       nodes: InferSelectResult<UserWithRelations, S>[];
     };
   }>;
-  findFirst(args?: Omit<FindFirstArgs<UserSelect, UserFilter>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    users: {
-      nodes: InferSelectResult<UserWithRelations, typeof defaultSelect>[];
-    };
-  }>;
-  findFirst(args?: FindFirstArgs<UserSelect, UserFilter>) {
+  findFirst(args: FindFirstArgs<UserSelect, UserFilter>) {
     const {
       document,
       variables
-    } = buildFindFirstDocument("User", "users", args?.select ?? defaultSelect, {
+    } = buildFindFirstDocument("User", "users", args.select, {
       where: args?.where
     }, "UserFilter", connectionFieldsMap);
     return new QueryBuilder({
@@ -86,17 +71,12 @@ export class UserModel {
   }>;
   findOne(args: {
     id: string;
-  }): QueryBuilder<{
-    user: InferSelectResult<UserWithRelations, typeof defaultSelect> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select?: UserSelect;
+    select: UserSelect;
   }) {
     const {
       document,
       variables
-    } = buildFindOneDocument("User", "user", args.id, args.select ?? defaultSelect, "id", "UUID!", connectionFieldsMap);
+    } = buildFindOneDocument("User", "user", args.id, args.select, "id", "UUID!", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -113,18 +93,11 @@ export class UserModel {
       user: InferSelectResult<UserWithRelations, S>;
     };
   }>;
-  create(args: Omit<CreateArgs<UserSelect, CreateUserInput["user"]>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    createUser: {
-      user: InferSelectResult<UserWithRelations, typeof defaultSelect>;
-    };
-  }>;
   create(args: CreateArgs<UserSelect, CreateUserInput["user"]>) {
     const {
       document,
       variables
-    } = buildCreateDocument("User", "createUser", "user", args.select ?? defaultSelect, args.data, "CreateUserInput", connectionFieldsMap);
+    } = buildCreateDocument("User", "createUser", "user", args.select, args.data, "CreateUserInput", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -143,22 +116,13 @@ export class UserModel {
       user: InferSelectResult<UserWithRelations, S>;
     };
   }>;
-  update(args: Omit<UpdateArgs<UserSelect, {
-    id: string;
-  }, UserPatch>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    updateUser: {
-      user: InferSelectResult<UserWithRelations, typeof defaultSelect>;
-    };
-  }>;
   update(args: UpdateArgs<UserSelect, {
     id: string;
   }, UserPatch>) {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select ?? defaultSelect, args.where.id, args.data, "UpdateUserInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -177,22 +141,13 @@ export class UserModel {
       user: InferSelectResult<UserWithRelations, S>;
     };
   }>;
-  delete(args: Omit<DeleteArgs<{
-    id: string;
-  }, UserSelect>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    deleteUser: {
-      user: InferSelectResult<UserWithRelations, typeof defaultSelect>;
-    };
-  }>;
   delete(args: DeleteArgs<{
     id: string;
   }, UserSelect>) {
     const {
       document,
       variables
-    } = buildDeleteByPkDocument("User", "deleteUser", "user", args.where.id, "DeleteUserInput", "id", args.select ?? defaultSelect, connectionFieldsMap);
+    } = buildDeleteByPkDocument("User", "deleteUser", "user", args.where.id, "DeleteUserInput", "id", args.select, connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -216,9 +171,6 @@ import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindO
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
 import type { AuditLog, AuditLogWithRelations, AuditLogSelect, AuditLogFilter, AuditLogsOrderBy, CreateAuditLogInput, UpdateAuditLogInput, AuditLogPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
-const defaultSelect = {
-  id: true
-} as const;
 export class AuditLogModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AuditLogSelect>(args: FindManyArgs<S, AuditLogFilter, AuditLogsOrderBy> & {
@@ -226,16 +178,11 @@ export class AuditLogModel {
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLogs: ConnectionResult<InferSelectResult<AuditLogWithRelations, S>>;
   }>;
-  findMany(args?: Omit<FindManyArgs<AuditLogSelect, AuditLogFilter, AuditLogsOrderBy>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    auditLogs: ConnectionResult<InferSelectResult<AuditLogWithRelations, typeof defaultSelect>>;
-  }>;
-  findMany(args?: FindManyArgs<AuditLogSelect, AuditLogFilter, AuditLogsOrderBy>) {
+  findMany(args: FindManyArgs<AuditLogSelect, AuditLogFilter, AuditLogsOrderBy>) {
     const {
       document,
       variables
-    } = buildFindManyDocument("AuditLog", "auditLogs", args?.select ?? defaultSelect, {
+    } = buildFindManyDocument("AuditLog", "auditLogs", args.select, {
       where: args?.where,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
@@ -260,18 +207,11 @@ export class AuditLogModel {
       nodes: InferSelectResult<AuditLogWithRelations, S>[];
     };
   }>;
-  findFirst(args?: Omit<FindFirstArgs<AuditLogSelect, AuditLogFilter>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    auditLogs: {
-      nodes: InferSelectResult<AuditLogWithRelations, typeof defaultSelect>[];
-    };
-  }>;
-  findFirst(args?: FindFirstArgs<AuditLogSelect, AuditLogFilter>) {
+  findFirst(args: FindFirstArgs<AuditLogSelect, AuditLogFilter>) {
     const {
       document,
       variables
-    } = buildFindFirstDocument("AuditLog", "auditLogs", args?.select ?? defaultSelect, {
+    } = buildFindFirstDocument("AuditLog", "auditLogs", args.select, {
       where: args?.where
     }, "AuditLogFilter", connectionFieldsMap);
     return new QueryBuilder({
@@ -291,17 +231,12 @@ export class AuditLogModel {
   }>;
   findOne(args: {
     id: string;
-  }): QueryBuilder<{
-    auditLog: InferSelectResult<AuditLogWithRelations, typeof defaultSelect> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select?: AuditLogSelect;
+    select: AuditLogSelect;
   }) {
     const {
       document,
       variables
-    } = buildFindOneDocument("AuditLog", "auditLog", args.id, args.select ?? defaultSelect, "id", "UUID!", connectionFieldsMap);
+    } = buildFindOneDocument("AuditLog", "auditLog", args.id, args.select, "id", "UUID!", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -318,18 +253,11 @@ export class AuditLogModel {
       auditLog: InferSelectResult<AuditLogWithRelations, S>;
     };
   }>;
-  create(args: Omit<CreateArgs<AuditLogSelect, CreateAuditLogInput["auditLog"]>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    createAuditLog: {
-      auditLog: InferSelectResult<AuditLogWithRelations, typeof defaultSelect>;
-    };
-  }>;
   create(args: CreateArgs<AuditLogSelect, CreateAuditLogInput["auditLog"]>) {
     const {
       document,
       variables
-    } = buildCreateDocument("AuditLog", "createAuditLog", "auditLog", args.select ?? defaultSelect, args.data, "CreateAuditLogInput", connectionFieldsMap);
+    } = buildCreateDocument("AuditLog", "createAuditLog", "auditLog", args.select, args.data, "CreateAuditLogInput", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -353,9 +281,6 @@ import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindO
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
 import type { Organization, OrganizationWithRelations, OrganizationSelect, OrganizationFilter, OrganizationsOrderBy, CreateOrganizationInput, UpdateOrganizationInput, OrganizationPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
-const defaultSelect = {
-  id: true
-} as const;
 export class OrganizationModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrganizationSelect>(args: FindManyArgs<S, OrganizationFilter, OrganizationsOrderBy> & {
@@ -363,16 +288,11 @@ export class OrganizationModel {
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     allOrganizations: ConnectionResult<InferSelectResult<OrganizationWithRelations, S>>;
   }>;
-  findMany(args?: Omit<FindManyArgs<OrganizationSelect, OrganizationFilter, OrganizationsOrderBy>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    allOrganizations: ConnectionResult<InferSelectResult<OrganizationWithRelations, typeof defaultSelect>>;
-  }>;
-  findMany(args?: FindManyArgs<OrganizationSelect, OrganizationFilter, OrganizationsOrderBy>) {
+  findMany(args: FindManyArgs<OrganizationSelect, OrganizationFilter, OrganizationsOrderBy>) {
     const {
       document,
       variables
-    } = buildFindManyDocument("Organization", "allOrganizations", args?.select ?? defaultSelect, {
+    } = buildFindManyDocument("Organization", "allOrganizations", args.select, {
       where: args?.where,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
@@ -397,18 +317,11 @@ export class OrganizationModel {
       nodes: InferSelectResult<OrganizationWithRelations, S>[];
     };
   }>;
-  findFirst(args?: Omit<FindFirstArgs<OrganizationSelect, OrganizationFilter>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    allOrganizations: {
-      nodes: InferSelectResult<OrganizationWithRelations, typeof defaultSelect>[];
-    };
-  }>;
-  findFirst(args?: FindFirstArgs<OrganizationSelect, OrganizationFilter>) {
+  findFirst(args: FindFirstArgs<OrganizationSelect, OrganizationFilter>) {
     const {
       document,
       variables
-    } = buildFindFirstDocument("Organization", "allOrganizations", args?.select ?? defaultSelect, {
+    } = buildFindFirstDocument("Organization", "allOrganizations", args.select, {
       where: args?.where
     }, "OrganizationFilter", connectionFieldsMap);
     return new QueryBuilder({
@@ -428,17 +341,12 @@ export class OrganizationModel {
   }>;
   findOne(args: {
     id: string;
-  }): QueryBuilder<{
-    organizationById: InferSelectResult<OrganizationWithRelations, typeof defaultSelect> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select?: OrganizationSelect;
+    select: OrganizationSelect;
   }) {
     const {
       document,
       variables
-    } = buildFindOneDocument("Organization", "organizationById", args.id, args.select ?? defaultSelect, "id", "UUID!", connectionFieldsMap);
+    } = buildFindOneDocument("Organization", "organizationById", args.id, args.select, "id", "UUID!", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -455,18 +363,11 @@ export class OrganizationModel {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
   }>;
-  create(args: Omit<CreateArgs<OrganizationSelect, CreateOrganizationInput["organization"]>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    registerOrganization: {
-      organization: InferSelectResult<OrganizationWithRelations, typeof defaultSelect>;
-    };
-  }>;
   create(args: CreateArgs<OrganizationSelect, CreateOrganizationInput["organization"]>) {
     const {
       document,
       variables
-    } = buildCreateDocument("Organization", "registerOrganization", "organization", args.select ?? defaultSelect, args.data, "CreateOrganizationInput", connectionFieldsMap);
+    } = buildCreateDocument("Organization", "registerOrganization", "organization", args.select, args.data, "CreateOrganizationInput", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -485,22 +386,13 @@ export class OrganizationModel {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
   }>;
-  update(args: Omit<UpdateArgs<OrganizationSelect, {
-    id: string;
-  }, OrganizationPatch>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    modifyOrganization: {
-      organization: InferSelectResult<OrganizationWithRelations, typeof defaultSelect>;
-    };
-  }>;
   update(args: UpdateArgs<OrganizationSelect, {
     id: string;
   }, OrganizationPatch>) {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select ?? defaultSelect, args.where.id, args.data, "UpdateOrganizationInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -519,22 +411,13 @@ export class OrganizationModel {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
   }>;
-  delete(args: Omit<DeleteArgs<{
-    id: string;
-  }, OrganizationSelect>, "select"> & {
-    select?: undefined;
-  }): QueryBuilder<{
-    removeOrganization: {
-      organization: InferSelectResult<OrganizationWithRelations, typeof defaultSelect>;
-    };
-  }>;
   delete(args: DeleteArgs<{
     id: string;
   }, OrganizationSelect>) {
     const {
       document,
       variables
-    } = buildDeleteByPkDocument("Organization", "removeOrganization", "organization", args.where.id, "DeleteOrganizationInput", "id", args.select ?? defaultSelect, connectionFieldsMap);
+    } = buildDeleteByPkDocument("Organization", "removeOrganization", "organization", args.where.id, "DeleteOrganizationInput", "id", args.select, connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",

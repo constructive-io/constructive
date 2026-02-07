@@ -16,7 +16,6 @@ import {
   buildFindOneCallExpr,
   buildListSelectionArgsCall,
   buildSelectionArgsCall,
-  buildSelectFallbackExpr,
   callExpr,
   connectionResultType,
   constDecl,
@@ -24,7 +23,6 @@ import {
   createImportDeclaration,
   createSAndTDataTypeParams,
   createSTypeParam,
-  createTDataTypeParam,
   createTypeReExport,
   destructureParamsWithSelection,
   destructureParamsWithSelectionAndScope,
@@ -44,20 +42,16 @@ import {
   singleQueryResultType,
   spreadObj,
   sRef,
-  typeofRef,
   typeRef,
   typeLiteralWithProps,
   useQueryOptionsType,
   useQueryOptionsImplType,
   voidStatement,
   withFieldsListSelectionType,
-  withFieldsSelectionType,
-  withoutFieldsListSelectionType,
-  withoutFieldsSelectionType
+  withFieldsSelectionType
 } from './hooks-ast';
 import {
   getAllRowsQueryName,
-  getDefaultSelectFieldName,
   getFilterTypeName,
   getListQueryFileName,
   getListQueryHookName,
@@ -101,7 +95,6 @@ export function generateListQueryHook(
   const scopeTypeName = `${typeName}Scope`;
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
-  const defaultFieldName = getDefaultSelectFieldName(table);
 
   const listResultTypeAST = (sel: t.TSType) => listQueryResultType(queryName, relationTypeName, sel);
 
@@ -128,9 +121,6 @@ export function generateListQueryHook(
 
   // Re-exports
   statements.push(createTypeReExport([selectTypeName, relationTypeName, filterTypeName, orderByTypeName], '../../orm/input-types'));
-
-  // Default select
-  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
   // Query key
   if (useCentralizedKeys) {
@@ -167,7 +157,7 @@ export function generateListQueryHook(
   // Helper for findMany queryFn
   const buildFindManyFn = () => t.arrowFunctionExpression(
     [],
-    buildFindManyCallExpr(singularName, 'args', selectTypeName)
+    buildFindManyCallExpr(singularName, 'args')
   );
 
   // Options type builder with optional scope
@@ -229,32 +219,12 @@ export function generateListQueryHook(
     addJSDocComment(o1, docLines);
     statements.push(o1);
 
-    // Overload 2: without fields
-    const o2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
-    );
-    o2SelProp.optional = true;
-    const o2ParamType = t.tsIntersectionType([
-      t.tsTypeLiteral([o2SelProp]),
-      buildOptionsType(listResultTypeAST(typeofRef('defaultSelect')), typeRef('TData'))
-    ]);
-    statements.push(
-      exportDeclareFunction(
-        hookName,
-        createTDataTypeParam(listResultTypeAST(typeofRef('defaultSelect'))),
-        [createFunctionParam('params', o2ParamType, true)],
-        typeRef('UseQueryResult', [typeRef('TData')])
-      )
-    );
-
     // Implementation
     const implSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
     );
-    implSelProp.optional = true;
-    const implOptionsType = (() => {
+    const implOptionsType= (() => {
       const base = useQueryOptionsImplType();
       if (hasRelationships && useCentralizedKeys) {
         return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
@@ -267,7 +237,7 @@ export function generateListQueryHook(
     ]);
 
     const body: t.Statement[] = [];
-    body.push(constDecl('selection', t.optionalMemberExpression(t.identifier('params'), t.identifier('selection'), false, true)));
+    body.push(constDecl('selection', t.memberExpression(t.identifier('params'), t.identifier('selection'))));
     body.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
 
     if (hasRelationships && useCentralizedKeys) {
@@ -288,7 +258,7 @@ export function generateListQueryHook(
       ));
     }
 
-    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType, true)], body));
+    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
   }
 
   // Fetch function
@@ -322,31 +292,15 @@ export function generateListQueryHook(
     ]);
     statements.push(f1Decl);
 
-    // Overload 2: without fields
-    const f2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
-    );
-    f2SelProp.optional = true;
-    statements.push(
-      exportAsyncDeclareFunction(
-        fetchFnName,
-        null,
-        [createFunctionParam('params', t.tsTypeLiteral([f2SelProp]), true)],
-        typeRef('Promise', [listResultTypeAST(typeofRef('defaultSelect'))])
-      )
-    );
-
     // Implementation
     const fImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
     );
-    fImplSelProp.optional = true;
     const fBody: t.Statement[] = [];
     fBody.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
-    fBody.push(t.returnStatement(buildFindManyCallExpr(singularName, 'args', selectTypeName)));
-    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]), true)], fBody));
+    fBody.push(t.returnStatement(buildFindManyCallExpr(singularName, 'args')));
+    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]))], fBody));
   }
 
   // Prefetch function
@@ -379,30 +333,11 @@ export function generateListQueryHook(
     ]);
     statements.push(p1Decl);
 
-    // Overload 2: without fields
-    const p2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsListSelectionType(selectTypeName, filterTypeName, orderByTypeName))
-    );
-    p2SelProp.optional = true;
-    const p2ParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral([p2SelProp]), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral([p2SelProp]);
-    statements.push(
-      exportAsyncDeclareFunction(
-        prefetchFnName,
-        null,
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p2ParamType, true)],
-        typeRef('Promise', [t.tsVoidKeyword()])
-      )
-    );
-
     // Implementation
     const pImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
     );
-    pImplSelProp.optional = true;
     const pImplParamType = hasRelationships && useCentralizedKeys
       ? t.tsIntersectionType([t.tsTypeLiteral([pImplSelProp]), scopeTypeLiteral(scopeTypeName)])
       : t.tsTypeLiteral([pImplSelProp]);
@@ -427,7 +362,7 @@ export function generateListQueryHook(
       exportAsyncFunction(
         prefetchFnName,
         null,
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType, true)],
+        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType)],
         pBody,
         t.tsVoidKeyword()
       )
@@ -467,7 +402,6 @@ export function generateSingleQueryHook(
   const pkField = pkFields[0];
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
-  const defaultFieldName = getDefaultSelectFieldName(table);
 
   const pkTsType: t.TSType = pkFieldTsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
   const singleResultTypeAST = (sel: t.TSType) => singleQueryResultType(queryName, relationTypeName, sel);
@@ -495,9 +429,6 @@ export function generateSingleQueryHook(
 
   // Re-exports
   statements.push(createTypeReExport([selectTypeName, relationTypeName], '../../orm/input-types'));
-
-  // Default select
-  statements.push(constDecl('defaultSelect', asConst(t.objectExpression([objectProp(defaultFieldName, t.booleanLiteral(true))]))));
 
   // Query key
   if (useCentralizedKeys) {
@@ -534,7 +465,7 @@ export function generateSingleQueryHook(
   // Helper for findOne queryFn
   const buildFindOneFn = () => t.arrowFunctionExpression(
     [],
-    buildFindOneCallExpr(singularName, pkFieldName, 'args', selectTypeName)
+    buildFindOneCallExpr(singularName, pkFieldName, 'args')
   );
 
   // Options type builder with optional scope
@@ -594,35 +525,11 @@ export function generateSingleQueryHook(
     addJSDocComment(o1, docLines);
     statements.push(o1);
 
-    // Overload 2: without fields
-    const o2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsSelectionType())
-    );
-    o2SelProp.optional = true;
-    const o2Props = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      o2SelProp
-    ];
-    const o2ParamType = t.tsIntersectionType([
-      t.tsTypeLiteral(o2Props),
-      buildSingleOptionsType(singleResultTypeAST(typeofRef('defaultSelect')), typeRef('TData'))
-    ]);
-    statements.push(
-      exportDeclareFunction(
-        hookName,
-        createTDataTypeParam(singleResultTypeAST(typeofRef('defaultSelect'))),
-        [createFunctionParam('params', o2ParamType)],
-        typeRef('UseQueryResult', [typeRef('TData')])
-      )
-    );
-
     // Implementation
     const implSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
     );
-    implSelProp.optional = true;
     const implProps = [
       t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
       implSelProp
@@ -698,31 +605,11 @@ export function generateSingleQueryHook(
     ]);
     statements.push(f1Decl);
 
-    // Overload 2: without fields
-    const f2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsSelectionType())
-    );
-    f2SelProp.optional = true;
-    const f2Props = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      f2SelProp
-    ];
-    statements.push(
-      exportAsyncDeclareFunction(
-        fetchFnName,
-        null,
-        [createFunctionParam('params', t.tsTypeLiteral(f2Props))],
-        typeRef('Promise', [singleResultTypeAST(typeofRef('defaultSelect'))])
-      )
-    );
-
     // Implementation
     const fImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
     );
-    fImplSelProp.optional = true;
     const fImplProps = [
       t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
       fImplSelProp
@@ -734,7 +621,7 @@ export function generateSingleQueryHook(
     // @ts-ignore
     fArgsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
     fBody.push(constDecl('args', fArgsCall));
-    fBody.push(t.returnStatement(buildFindOneCallExpr(singularName, pkFieldName, 'args', selectTypeName)));
+    fBody.push(t.returnStatement(buildFindOneCallExpr(singularName, pkFieldName, 'args')));
     statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps))], fBody));
   }
 
@@ -766,34 +653,11 @@ export function generateSingleQueryHook(
     ]);
     statements.push(p1Decl);
 
-    // Overload 2: without fields
-    const p2SelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(withoutFieldsSelectionType())
-    );
-    p2SelProp.optional = true;
-    const p2Props: t.TSPropertySignature[] = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      p2SelProp
-    ];
-    const p2ParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral(p2Props), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral(p2Props);
-    statements.push(
-      exportAsyncDeclareFunction(
-        prefetchFnName,
-        null,
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p2ParamType)],
-        typeRef('Promise', [t.tsVoidKeyword()])
-      )
-    );
-
     // Implementation
     const pImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
       t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
     );
-    pImplSelProp.optional = true;
     const pImplProps: t.TSPropertySignature[] = [
       t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
       pImplSelProp
