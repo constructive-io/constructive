@@ -2,10 +2,13 @@ import { CLIOptions, Inquirerer } from 'inquirerer';
 import {
   generate,
   findConfigFile,
+  loadConfigFile,
   codegenQuestions,
   printResult,
   camelizeArgv,
+  splitCommas,
   type CodegenAnswers,
+  type GraphQLSDKConfigTarget,
 } from '@constructive-io/graphql-codegen';
 
 const usage = `
@@ -27,8 +30,7 @@ Generator Options:
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --authorization <token>    Authorization header value
-  --browser-compatible       Generate browser-compatible code (default: true)
-                             Set to false for Node.js with localhost DNS fix
+  --browser-compatible       Deprecated no-op (retained for compatibility)
   --dry-run                  Preview without writing files
   --verbose                  Verbose output
 
@@ -45,11 +47,86 @@ export default async (
     process.exit(0);
   }
 
-  // Auto-detect config file if not provided
-  const config = argv.config || findConfigFile();
-  if (config) {
-    // If config file exists, just run generate with it (config file handles everything)
-    const result = await generate({});
+  const hasSourceCliFlags = Boolean(
+    argv.endpoint ||
+      argv['schema-file'] ||
+      argv.schemaFile ||
+      argv.schemas ||
+      argv['api-names'] ||
+      argv.apiNames
+  );
+  const explicitConfigPath = argv.config as string | undefined;
+  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
+    ? findConfigFile()
+    : undefined;
+  const configPath = explicitConfigPath || autoConfigPath;
+
+  const endpoint = argv.endpoint as string | undefined;
+  const schemaFile = (argv['schema-file'] || argv.schemaFile) as string | undefined;
+  const schemas = splitCommas(argv.schemas as string | undefined);
+  const apiNames = splitCommas((argv['api-names'] || argv.apiNames) as string | undefined);
+
+  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
+  if (endpoint) {
+    cliOverrides.endpoint = endpoint;
+    cliOverrides.schemaFile = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemaFile) {
+    cliOverrides.schemaFile = schemaFile;
+    cliOverrides.endpoint = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemas || apiNames) {
+    cliOverrides.db = { schemas, apiNames };
+    cliOverrides.endpoint = undefined;
+    cliOverrides.schemaFile = undefined;
+  }
+  if (argv['react-query'] === true || argv.reactQuery === true) cliOverrides.reactQuery = true;
+  if (argv.orm === true) cliOverrides.orm = true;
+  if (argv.verbose === true) cliOverrides.verbose = true;
+  if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
+  if (argv.output) cliOverrides.output = argv.output as string;
+  if (argv.authorization) cliOverrides.authorization = argv.authorization as string;
+  if (argv['browser-compatible'] !== undefined) {
+    cliOverrides.browserCompatible = argv['browser-compatible'] as boolean;
+  } else if (argv.browserCompatible !== undefined) {
+    cliOverrides.browserCompatible = argv.browserCompatible as boolean;
+  }
+
+  if (configPath) {
+    const loaded = await loadConfigFile(configPath);
+    if (!loaded.success) {
+      console.error('x', loaded.error);
+      process.exit(1);
+    }
+    const result = await generate({
+      ...(loaded.config as GraphQLSDKConfigTarget),
+      ...cliOverrides,
+    });
+    printResult(result);
+    return;
+  }
+
+  const hasNonInteractiveArgs = Boolean(
+    endpoint ||
+      schemaFile ||
+      schemas ||
+      apiNames ||
+      argv['react-query'] === true ||
+      argv.reactQuery === true ||
+      argv.orm === true ||
+      argv.output ||
+      argv.authorization ||
+      argv['dry-run'] === true ||
+      argv.dryRun === true ||
+      argv.verbose === true ||
+      argv['browser-compatible'] !== undefined ||
+      argv.browserCompatible !== undefined
+  );
+
+  if (hasNonInteractiveArgs) {
+    const result = await generate({ ...cliOverrides });
     printResult(result);
     return;
   }

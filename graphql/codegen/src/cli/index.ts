@@ -10,7 +10,13 @@ import { CLI, CLIOptions, getPackageJson,Inquirerer } from 'inquirerer';
 import { findConfigFile, loadConfigFile } from '../core/config';
 import { generate } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
-import { camelizeArgv, type CodegenAnswers,codegenQuestions, printResult } from './shared';
+import {
+  camelizeArgv,
+  type CodegenAnswers,
+  codegenQuestions,
+  printResult,
+  splitCommas
+} from './shared';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -33,8 +39,7 @@ Generator Options:
   -o, --output <dir>            Output directory
   -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
-  --browser-compatible          Generate browser-compatible code (default: true)
-                                Set to false for Node.js with localhost DNS fix
+  --browser-compatible          Deprecated no-op (retained for compatibility)
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
@@ -58,15 +63,46 @@ export const commands = async (
     process.exit(0);
   }
 
-  const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
+  const hasSourceCliFlags = Boolean(
+    argv.endpoint ||
+      argv.e ||
+      argv['schema-file'] ||
+      argv.s ||
+      argv.schemas ||
+      argv['api-names']
+  );
+  const explicitConfigPath = (argv.config || argv.c) as string | undefined;
+  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
+    ? findConfigFile()
+    : undefined;
+  const configPath = (explicitConfigPath || autoConfigPath) as string | undefined;
   const targetName = (argv.target || argv.t) as string | undefined;
 
   // Collect CLI flags that should override config file settings
   const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
-  if (argv['react-query'] === true) cliOverrides.reactQuery = true;
+  const endpoint = (argv.endpoint || argv.e) as string | undefined;
+  const schemaFile = (argv['schema-file'] || argv.s) as string | undefined;
+  const schemas = splitCommas(argv.schemas as string | undefined);
+  const apiNames = splitCommas(argv['api-names'] as string | undefined);
+  if (endpoint) {
+    cliOverrides.endpoint = endpoint;
+    cliOverrides.schemaFile = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemaFile) {
+    cliOverrides.schemaFile = schemaFile;
+    cliOverrides.endpoint = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemas || apiNames) {
+    cliOverrides.db = { schemas, apiNames };
+    cliOverrides.endpoint = undefined;
+    cliOverrides.schemaFile = undefined;
+  }
+  if (argv['react-query'] === true || argv.reactQuery === true) cliOverrides.reactQuery = true;
   if (argv.orm === true) cliOverrides.orm = true;
   if (argv.verbose === true || argv.v === true) cliOverrides.verbose = true;
-  if (argv['dry-run'] === true) cliOverrides.dryRun = true;
+  if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
   if (argv.output || argv.o) cliOverrides.output = (argv.output || argv.o) as string;
   if (argv.authorization || argv.a) cliOverrides.authorization = (argv.authorization || argv.a) as string;
 
@@ -110,6 +146,35 @@ export const commands = async (
     const result = await generate({ ...(config as GraphQLSDKConfigTarget), ...cliOverrides });
     printResult(result);
     if (!result.success) process.exit(1);
+    prompter.close();
+    return argv;
+  }
+
+  const hasNonInteractiveArgs = Boolean(
+    endpoint ||
+      schemaFile ||
+      schemas ||
+      apiNames ||
+      argv['react-query'] === true ||
+      argv.reactQuery === true ||
+      argv.orm === true ||
+      argv.output ||
+      argv.o ||
+      argv.authorization ||
+      argv.a ||
+      argv['dry-run'] === true ||
+      argv.dryRun === true ||
+      argv.verbose === true ||
+      argv.v === true ||
+      argv['browser-compatible'] !== undefined ||
+      argv.browserCompatible !== undefined
+  );
+
+  if (hasNonInteractiveArgs) {
+    const result = await generate({
+      ...cliOverrides
+    });
+    printResult(result);
     prompter.close();
     return argv;
   }

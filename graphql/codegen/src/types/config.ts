@@ -262,10 +262,9 @@ export interface GraphQLSDKConfigTarget {
   reactQuery?: boolean;
 
   /**
-   * Generate browser-compatible code using native fetch
-   * When true (default), uses native W3C fetch API (works in browsers and Node.js)
-   * When false, uses undici fetch with dispatcher support for localhost DNS resolution
-   * (Node.js only - enables proper *.localhost subdomain resolution on macOS)
+   * @deprecated Currently a no-op.
+   * Generated clients always use native fetch. This flag is retained for
+   * backward compatibility and will be removed in a future major version.
    * @default true
    */
   browserCompatible?: boolean;

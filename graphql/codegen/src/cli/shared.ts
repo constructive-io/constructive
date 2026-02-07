@@ -92,7 +92,7 @@ export const codegenQuestions: Question[] = [
   },
   {
     name: 'browser-compatible',
-    message: 'Generate browser-compatible code?',
+    message: 'Browser-compatible mode (deprecated no-op)?',
     type: 'confirm',
     required: false,
     default: true,

@@ -15,6 +15,8 @@ jest.mock('@constructive-io/graphql-codegen', () => {
   return {
     generate: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
     findConfigFile: jest.fn((): string | undefined => undefined),
+    loadConfigFile: jest.fn(async () => ({ success: false, error: 'not found' })),
+    splitCommas: splitCommasMock,
     codegenQuestions: [
       { name: 'endpoint', message: 'GraphQL endpoint URL', type: 'text', required: false },
       { name: 'schemaFile', message: 'Path to GraphQL schema file', type: 'text', required: false },
