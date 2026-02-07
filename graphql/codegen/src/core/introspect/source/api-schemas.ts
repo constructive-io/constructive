@@ -39,7 +39,7 @@ export async function validateServicesSchemas(
     if (apisCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'services_public.apis table not found. The database must have the services schema deployed.',
+        error: 'services_public.apis table not found. The database must have the services schema deployed.'
       };
     }
 
@@ -52,7 +52,7 @@ export async function validateServicesSchemas(
     if (apiSchemasCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'services_public.api_schemas table not found. The database must have the services schema deployed.',
+        error: 'services_public.api_schemas table not found. The database must have the services schema deployed.'
       };
     }
 
@@ -65,7 +65,7 @@ export async function validateServicesSchemas(
     if (metaschemaCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'metaschema_public.schema table not found. The database must have the metaschema deployed.',
+        error: 'metaschema_public.schema table not found. The database must have the metaschema deployed.'
       };
     }
 
@@ -73,7 +73,7 @@ export async function validateServicesSchemas(
   } catch (err) {
     return {
       valid: false,
-      error: `Failed to validate services schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      error: `Failed to validate services schemas: ${err instanceof Error ? err.message : 'Unknown error'}`
     };
   }
 }
@@ -142,7 +142,7 @@ export function createDatabasePool(database: string): Pool {
       port: parseInt(url.port || '5432', 10),
       user: url.username,
       password: url.password,
-      database: dbName,
+      database: dbName
     });
   }
   

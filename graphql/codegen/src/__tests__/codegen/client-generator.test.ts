@@ -4,12 +4,12 @@
  * Tests the generated ORM client files: client.ts, query-builder.ts, select-types.ts, index.ts
  */
 import {
+  generateCreateClientFile,
   generateOrmClientFile,
   generateQueryBuilderFile,
-  generateSelectTypesFile,
-  generateCreateClientFile,
+  generateSelectTypesFile
 } from '../../core/codegen/orm/client-generator';
-import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
+import type { CleanFieldType, CleanRelations,CleanTable } from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -17,14 +17,14 @@ import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/sch
 
 const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
+  string: { gqlType: 'String', isArray: false } as CleanFieldType
 };
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: [],
+  manyToMany: []
 };
 
 function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
@@ -34,7 +34,7 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
     relations: partial.relations ?? emptyRelations,
     query: partial.query,
     inflection: partial.inflection,
-    constraints: partial.constraints,
+    constraints: partial.constraints
   };
 }
 
@@ -91,13 +91,13 @@ describe('client-generator', () => {
         createTable({
           name: 'User',
           fields: [{ name: 'id', type: fieldTypes.uuid }],
-          query: { all: 'users', one: 'user', create: 'createUser', update: 'updateUser', delete: 'deleteUser' },
+          query: { all: 'users', one: 'user', create: 'createUser', update: 'updateUser', delete: 'deleteUser' }
         }),
         createTable({
           name: 'Post',
           fields: [{ name: 'id', type: fieldTypes.uuid }],
-          query: { all: 'posts', one: 'post', create: 'createPost', update: 'updatePost', delete: 'deletePost' },
-        }),
+          query: { all: 'posts', one: 'post', create: 'createPost', update: 'updatePost', delete: 'deletePost' }
+        })
       ];
 
       const result = generateCreateClientFile(tables, false, false);
@@ -114,8 +114,8 @@ describe('client-generator', () => {
         createTable({
           name: 'User',
           fields: [{ name: 'id', type: fieldTypes.uuid }],
-          query: { all: 'users', one: 'user', create: 'createUser', update: 'updateUser', delete: 'deleteUser' },
-        }),
+          query: { all: 'users', one: 'user', create: 'createUser', update: 'updateUser', delete: 'deleteUser' }
+        })
       ];
 
       const result = generateCreateClientFile(tables, true, true);
@@ -123,8 +123,8 @@ describe('client-generator', () => {
       expect(result.content).toMatchSnapshot();
       expect(result.content).toContain('createQueryOperations');
       expect(result.content).toContain('createMutationOperations');
-      expect(result.content).toContain("query: createQueryOperations(client)");
-      expect(result.content).toContain("mutation: createMutationOperations(client)");
+      expect(result.content).toContain('query: createQueryOperations(client)');
+      expect(result.content).toContain('mutation: createMutationOperations(client)');
     });
   });
 });

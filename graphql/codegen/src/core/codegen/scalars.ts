@@ -40,7 +40,7 @@ export const SCALAR_TS_MAP: Record<string, string> = {
   TsQuery: 'string',
 
   // File upload
-  Upload: 'File',
+  Upload: 'File'
 };
 
 export const SCALAR_FILTER_MAP: Record<string, string> = {
@@ -59,7 +59,7 @@ export const SCALAR_FILTER_MAP: Record<string, string> = {
   BitString: 'BitStringFilter',
   InternetAddress: 'InternetAddressFilter',
   FullText: 'FullTextFilter',
-  Interval: 'StringFilter',
+  Interval: 'StringFilter'
 };
 
 export const SCALAR_NAMES = new Set(Object.keys(SCALAR_TS_MAP));
@@ -70,7 +70,7 @@ const LIST_FILTER_SCALARS = new Set(['String', 'Int', 'UUID']);
 /** All base filter type names - skip these in schema-types.ts to avoid duplicates */
 export const BASE_FILTER_TYPE_NAMES = new Set([
   ...new Set(Object.values(SCALAR_FILTER_MAP)),
-  ...Array.from(LIST_FILTER_SCALARS).map((s) => `${s}ListFilter`),
+  ...Array.from(LIST_FILTER_SCALARS).map((s) => `${s}ListFilter`)
 ]);
 
 export function scalarToTsType(

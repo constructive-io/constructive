@@ -1,0 +1,39 @@
+{
+  "name": "@constructive-io/test-codegen-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "codegen": "tsx ../codegen/src/cli/index.ts --config codegen.config.ts",
+    "codegen:orm": "tsx ../codegen/src/cli/index.ts --endpoint http://api.localhost:3000/graphql --output src/generated --orm",
+    "typecheck": "tsc --noEmit",
+    "test:types": "tsc --noEmit",
+    "test:integration": "node --import tsx --test \"tests/**/*.test.ts\"",
+    "test:integration:live": "GRAPHQL_TEST_LIVE_REQUIRED=1 node --import tsx --test \"tests/**/*.test.ts\"",
+    "analyze": "tsx scripts/analyze-bundle.ts",
+    "analyze:visual": "vite build && echo '\nBundle report: dist/bundle-stats.html'"
+  },
+  "dependencies": {
+    "@0no-co/graphql.web": "^1.2.0",
+    "@constructive-io/graphql-types": "workspace:^",
+    "@tanstack/react-query": "^5.90.20",
+    "gql-ast": "workspace:^",
+    "graphql": "15.10.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.5.2",
+    "react-test-renderer": "^19.2.3",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

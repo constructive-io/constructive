@@ -2,25 +2,25 @@
  * Tests for codegen utility functions
  */
 import {
+  getFilterTypeName,
+  getGeneratedFileHeader,
+  getOrderByTypeName,
+  getPrimaryKeyInfo,
+  getTableNames,
+  gqlTypeToTs,
   lcFirst,
-  ucFirst,
   toCamelCase,
   toPascalCase,
   toScreamingSnake,
-  getTableNames,
-  getFilterTypeName,
-  getOrderByTypeName,
-  gqlTypeToTs,
-  getPrimaryKeyInfo,
-  getGeneratedFileHeader,
+  ucFirst
 } from '../../core/codegen/utils';
-import type { CleanTable, CleanRelations } from '../../types/schema';
+import type { CleanRelations,CleanTable } from '../../types/schema';
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: [],
+  manyToMany: []
 };
 
 // Use any for test fixture overrides to avoid strict type requirements
@@ -29,7 +29,7 @@ function createTable(name: string, overrides: Record<string, unknown> = {}): Cle
     name,
     fields: [],
     relations: emptyRelations,
-    ...overrides,
+    ...overrides
   } as CleanTable;
 }
 
@@ -78,7 +78,7 @@ describe('utils', () => {
     it('uses inflection overrides when provided', () => {
       const result = getTableNames(
         createTable('Person', {
-          inflection: { tableFieldName: 'individual', allRows: 'people' },
+          inflection: { tableFieldName: 'individual', allRows: 'people' }
         })
       );
       expect(result.singularName).toBe('individual');
@@ -88,7 +88,7 @@ describe('utils', () => {
     it('uses query.all for plural name', () => {
       const result = getTableNames(
         createTable('Child', {
-          query: { all: 'children', one: 'child', create: 'createChild', update: 'updateChild', delete: 'deleteChild' },
+          query: { all: 'children', one: 'child', create: 'createChild', update: 'updateChild', delete: 'deleteChild' }
         })
       );
       expect(result.pluralName).toBe('children');
@@ -138,8 +138,8 @@ describe('utils', () => {
     it('extracts PK from constraints', () => {
       const table = createTable('User', {
         constraints: {
-          primaryKey: [{ name: 'users_pkey', fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }] }],
-        },
+          primaryKey: [{ name: 'users_pkey', fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }] }]
+        }
       });
       const result = getPrimaryKeyInfo(table);
       expect(result).toEqual([{ name: 'id', gqlType: 'UUID', tsType: 'string' }]);
@@ -147,7 +147,7 @@ describe('utils', () => {
 
     it('falls back to id field', () => {
       const table = createTable('User', {
-        fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }],
+        fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }]
       });
       const result = getPrimaryKeyInfo(table);
       expect(result).toEqual([{ name: 'id', gqlType: 'UUID', tsType: 'string' }]);
@@ -161,11 +161,11 @@ describe('utils', () => {
               name: 'user_roles_pkey',
               fields: [
                 { name: 'userId', type: { gqlType: 'UUID', isArray: false } },
-                { name: 'roleId', type: { gqlType: 'UUID', isArray: false } },
-              ],
-            },
-          ],
-        },
+                { name: 'roleId', type: { gqlType: 'UUID', isArray: false } }
+              ]
+            }
+          ]
+        }
       });
       const result = getPrimaryKeyInfo(table);
       expect(result).toHaveLength(2);

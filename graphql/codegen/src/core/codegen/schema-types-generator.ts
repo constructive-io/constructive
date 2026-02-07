@@ -11,19 +11,20 @@
  *
  * Uses Babel AST for robust code generation.
  */
+import * as t from '@babel/types';
+
 import type {
-  TypeRegistry,
   CleanArgument,
   ResolvedType,
+  TypeRegistry
 } from '../../types/schema';
-import * as t from '@babel/types';
 import { generateCode } from './babel-ast';
-import { getTypeBaseName } from './type-resolver';
 import {
-  scalarToTsType,
-  SCALAR_NAMES,
   BASE_FILTER_TYPE_NAMES,
+  SCALAR_NAMES,
+  scalarToTsType
 } from './scalars';
+import { getTypeBaseName } from './type-resolver';
 import { getGeneratedFileHeader } from './utils';
 
 export interface GeneratedSchemaTypesFile {
@@ -49,7 +50,7 @@ const SKIP_TYPES = new Set([
   '__InputValue',
   '__EnumValue',
   '__Directive',
-  ...BASE_FILTER_TYPE_NAMES,
+  ...BASE_FILTER_TYPE_NAMES
 ]);
 
 const SKIP_TYPE_PATTERNS: RegExp[] = [];
@@ -390,6 +391,6 @@ export function generateSchemaTypesFile(
     fileName: 'schema-types.ts',
     content,
     generatedEnums: Array.from(enumResult.generatedTypes).sort(),
-    referencedTableTypes,
+    referencedTableTypes
   };
 }

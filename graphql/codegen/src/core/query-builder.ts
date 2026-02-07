@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { camelize, underscore, pluralize } from 'inflekt';
+import { camelize, pluralize,underscore } from 'inflekt';
 
 import {
   createOne,
@@ -8,11 +8,10 @@ import {
   getCount,
   getMany,
   getOne,
-  patchOne,
+  patchOne
 } from './ast';
 import { validateMetaObject } from './meta-object';
 import type {
-  QueryFieldSelection,
   IntrospectionSchema,
   MetaObject,
   MetaTable,
@@ -20,7 +19,8 @@ import type {
   QueryBuilderOptions,
   QueryBuilderResult,
   QueryDefinition,
-  QuerySelectionOptions,
+  QueryFieldSelection,
+  QuerySelectionOptions
 } from './types';
 
 export * as MetaObject from './meta-object';
@@ -46,7 +46,7 @@ export class QueryBuilder {
 
   constructor({
     meta = {} as MetaObject,
-    introspection,
+    introspection
   }: QueryBuilderOptions) {
     this._introspection = introspection;
     this._meta = meta;
@@ -144,17 +144,17 @@ export class QueryBuilder {
     // We only need deleteAction from all of [deleteAction, deleteActionBySlug, deleteActionByName]
     const getInputName = (mutationType: string): string => {
       switch (mutationType) {
-        case 'delete': {
-          return `Delete${camelize(this._model)}Input`;
-        }
-        case 'create': {
-          return `Create${camelize(this._model)}Input`;
-        }
-        case 'patch': {
-          return `Update${camelize(this._model)}Input`;
-        }
-        default:
-          throw new Error('Unhandled mutation type' + mutationType);
+      case 'delete': {
+        return `Delete${camelize(this._model)}Input`;
+      }
+      case 'create': {
+        return `Create${camelize(this._model)}Input`;
+      }
+      case 'patch': {
+        return `Update${camelize(this._model)}Input`;
+      }
+      default:
+        throw new Error('Unhandled mutation type' + mutationType);
       }
     };
 
@@ -208,7 +208,7 @@ export class QueryBuilder {
       queryName: this._queryName,
       operationName: this._key,
       query: defn,
-      selection: this._select,
+      selection: this._select
     });
 
     return this;
@@ -232,7 +232,7 @@ export class QueryBuilder {
       queryName: this._queryName,
       operationName: this._key,
       query: defn,
-      selection: this._select,
+      selection: this._select
     });
 
     return this;
@@ -254,7 +254,7 @@ export class QueryBuilder {
     this._ast = getCount({
       queryName: this._queryName,
       operationName: this._key,
-      query: defn,
+      query: defn
     });
 
     return this;
@@ -278,7 +278,7 @@ export class QueryBuilder {
       queryName: this._queryName,
       operationName: this._key,
       query: defn,
-      selection: this._select,
+      selection: this._select
     });
 
     return this;
@@ -302,7 +302,7 @@ export class QueryBuilder {
       operationName: this._key,
       mutationName: this._queryName,
       mutation: defn,
-      selection: this._select,
+      selection: this._select
     });
 
     return this;
@@ -326,7 +326,7 @@ export class QueryBuilder {
     this._ast = deleteOne({
       operationName: this._key,
       mutationName: this._queryName,
-      mutation: defn,
+      mutation: defn
     });
 
     return this;
@@ -351,7 +351,7 @@ export class QueryBuilder {
       operationName: this._key,
       mutationName: this._queryName,
       mutation: defn,
-      selection: this._select,
+      selection: this._select
     });
 
     return this;
@@ -370,7 +370,7 @@ export class QueryBuilder {
     return {
       _hash,
       _queryName: this._queryName,
-      _ast: this._ast,
+      _ast: this._ast
     };
   }
 
@@ -421,7 +421,7 @@ function pickScalarFields(
       .map((fieldName) => ({
         name: fieldName,
         isObject: false,
-        fieldDefn: modelMeta.fields.find((f) => f.name === fieldName),
+        fieldDefn: modelMeta.fields.find((f) => f.name === fieldName)
       }));
 
   // This is for inferring the sub-selection of a mutation query
@@ -498,7 +498,7 @@ function pickAllFields(
         isObject: true,
         isBelongTo,
         selection: subFields.map((name) => ({ name, isObject: false })),
-        variables: selectOptions.variables as QueryFieldSelection['variables'],
+        variables: selectOptions.variables as QueryFieldSelection['variables']
       };
 
       // Need to further expand selection of object fields,
@@ -529,8 +529,8 @@ function pickAllFields(
           {
             name: fieldName,
             isObject: false,
-            fieldDefn: modelMeta.fields.find((f) => f.name === fieldName),
-          },
+            fieldDefn: modelMeta.fields.find((f) => f.name === fieldName)
+          }
         ];
       }
     }

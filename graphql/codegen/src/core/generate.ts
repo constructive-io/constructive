@@ -6,15 +6,15 @@
  */
 import path from 'path';
 
-import { createSchemaSource, validateSourceOptions } from './introspect';
-import { runCodegenPipeline, validateTablesFound } from './pipeline';
+import type { GraphQLSDKConfigTarget } from '../types/config';
+import { getConfigOptions } from '../types/config';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import { generateSharedTypes } from './codegen/shared';
+import { createSchemaSource, validateSourceOptions } from './introspect';
 import { writeGeneratedFiles } from './output';
-import type { GraphQLSDKConfigTarget } from '../types/config';
-import { getConfigOptions } from '../types/config';
+import { runCodegenPipeline, validateTablesFound } from './pipeline';
 
 export interface GenerateOptions extends GraphQLSDKConfigTarget {
   authorization?: string;
@@ -44,14 +44,16 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
   const outputRoot = config.output;
 
   // Determine which generators to run
+  // ORM is always required when React Query is enabled (hooks delegate to ORM)
+  // This handles minimist setting orm=false when --orm flag is absent
   const runReactQuery = config.reactQuery ?? false;
-  const runOrm = config.orm ?? false;
+  const runOrm = runReactQuery || (options.orm !== undefined ? !!options.orm : false);
 
   if (!runReactQuery && !runOrm) {
     return {
       success: false,
       message: 'No generators enabled. Use reactQuery: true or orm: true in your config.',
-      output: outputRoot,
+      output: outputRoot
     };
   }
 
@@ -59,13 +61,13 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
   const sourceValidation = validateSourceOptions({
     endpoint: config.endpoint || undefined,
     schemaFile: config.schemaFile || undefined,
-    db: config.db,
+    db: config.db
   });
   if (!sourceValidation.valid) {
     return {
       success: false,
       message: sourceValidation.error!,
-      output: outputRoot,
+      output: outputRoot
     };
   }
 
@@ -74,7 +76,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
     schemaFile: config.schemaFile || undefined,
     db: config.db,
     authorization: options.authorization || config.headers?.['Authorization'],
-    headers: config.headers,
+    headers: config.headers
   });
 
   // Run pipeline
@@ -85,13 +87,13 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       source,
       config,
       verbose: options.verbose,
-      skipCustomOperations: options.skipCustomOperations,
+      skipCustomOperations: options.skipCustomOperations
     });
   } catch (err) {
     return {
       success: false,
       message: `Failed to fetch schema: ${err instanceof Error ? err.message : 'Unknown error'}`,
-      output: outputRoot,
+      output: outputRoot
     };
   }
 
@@ -103,7 +105,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
     return {
       success: false,
       message: tablesValidation.error!,
-      output: outputRoot,
+      output: outputRoot
     };
   }
 
@@ -118,9 +120,9 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       customOperations: {
         queries: customOperations.queries,
         mutations: customOperations.mutations,
-        typeRegistry: customOperations.typeRegistry,
+        typeRegistry: customOperations.typeRegistry
       },
-      config,
+      config
     });
 
     if (!options.dryRun) {
@@ -130,7 +132,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
           success: false,
           message: `Failed to write shared types: ${writeResult.errors?.join(', ')}`,
           output: outputRoot,
-          errors: writeResult.errors,
+          errors: writeResult.errors
         };
       }
       allFilesWritten.push(...(writeResult.filesWritten ?? []));
@@ -146,10 +148,10 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       customOperations: {
         queries: customOperations.queries,
         mutations: customOperations.mutations,
-        typeRegistry: customOperations.typeRegistry,
+        typeRegistry: customOperations.typeRegistry
       },
       config,
-      sharedTypesPath: bothEnabled ? '..' : undefined,
+      sharedTypesPath: bothEnabled ? '..' : undefined
     });
 
     if (!options.dryRun) {
@@ -159,7 +161,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
           success: false,
           message: `Failed to write React Query hooks: ${writeResult.errors?.join(', ')}`,
           output: outputRoot,
-          errors: writeResult.errors,
+          errors: writeResult.errors
         };
       }
       allFilesWritten.push(...(writeResult.filesWritten ?? []));
@@ -175,10 +177,10 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       customOperations: {
         queries: customOperations.queries,
         mutations: customOperations.mutations,
-        typeRegistry: customOperations.typeRegistry,
+        typeRegistry: customOperations.typeRegistry
       },
       config,
-      sharedTypesPath: bothEnabled ? '..' : undefined,
+      sharedTypesPath: bothEnabled ? '..' : undefined
     });
 
     if (!options.dryRun) {
@@ -188,7 +190,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
           success: false,
           message: `Failed to write ORM client: ${writeResult.errors?.join(', ')}`,
           output: outputRoot,
-          errors: writeResult.errors,
+          errors: writeResult.errors
         };
       }
       allFilesWritten.push(...(writeResult.filesWritten ?? []));
@@ -201,7 +203,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
     const barrelContent = generateRootBarrel({
       hasTypes: bothEnabled,
       hasHooks: runReactQuery,
-      hasOrm: runOrm,
+      hasOrm: runOrm
     });
     await writeGeneratedFiles([{ path: 'index.ts', content: barrelContent }], outputRoot, []);
   }
@@ -215,6 +217,6 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       : `Generated ${generators} for ${tables.length} tables. Files written to ${outputRoot}`,
     output: outputRoot,
     tables: tables.map((t) => t.name),
-    filesWritten: allFilesWritten,
+    filesWritten: allFilesWritten
   };
 }

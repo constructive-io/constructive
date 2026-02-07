@@ -10,17 +10,17 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable, CleanOperation } from '../../types/schema';
-import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
-import { getTableNames, getGeneratedFileHeader, ucFirst, lcFirst } from './utils';
+import type { EntityRelationship,QueryKeyConfig } from '../../types/config';
+import type { CleanOperation,CleanTable } from '../../types/schema';
 import {
-  generateCode,
   addJSDocComment,
   asConst,
   constArray,
-  typedParam,
+  generateCode,
   keyofTypeof,
+  typedParam
 } from './babel-ast';
+import { getGeneratedFileHeader, getTableNames, lcFirst,ucFirst } from './utils';
 
 export interface QueryKeyGeneratorOptions {
   tables: CleanTable[];
@@ -558,7 +558,7 @@ function generateUnifiedStoreDeclaration(
     '',
     '// Invalidate specific user',
     'queryClient.invalidateQueries({ queryKey: queryKeys.user.detail(userId) });',
-    '```',
+    '```'
   ]);
 
   return decl;
@@ -714,6 +714,6 @@ ${description}
 
   return {
     fileName: 'query-keys.ts',
-    content,
+    content
   };
 }

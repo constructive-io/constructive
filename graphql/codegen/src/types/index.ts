@@ -4,59 +4,58 @@
 
 // Schema types
 export type {
-  CleanTable,
+  CleanBelongsToRelation,
   CleanField,
   CleanFieldType,
-  CleanRelations,
-  CleanBelongsToRelation,
-  CleanHasOneRelation,
   CleanHasManyRelation,
+  CleanHasOneRelation,
   CleanManyToManyRelation,
-  TableInflection,
-  TableQueryNames,
-  TableConstraints,
+  CleanRelations,
+  CleanTable,
   ConstraintInfo,
   ForeignKeyConstraint,
+  TableConstraints,
+  TableInflection,
+  TableQueryNames
 } from './schema';
 
 // Query types
 export type {
-  PageInfo,
   ConnectionResult,
-  QueryOptions,
-  OrderByItem,
-  FilterOperator,
   FieldFilter,
-  RelationalFilter,
   Filter,
+  FilterOperator,
+  OrderByItem,
+  PageInfo,
+  QueryOptions,
+  RelationalFilter
 } from './query';
 
 // Mutation types
 export type {
-  MutationOptions,
   CreateInput,
-  UpdateInput,
   DeleteInput,
+  MutationOptions,
   MutationResult,
+  UpdateInput
 } from './mutation';
 
 // Selection types
 export type {
-  SimpleFieldSelection,
-  FieldSelectionPreset,
   FieldSelection,
+  FieldSelectionPreset,
   SelectionOptions,
+  SimpleFieldSelection
 } from './selection';
 
 // Config types
 export type {
   GraphQLSDKConfig,
-  GraphQLSDKConfigTarget,
+  GraphQLSDKConfigTarget
 } from './config';
-
 export {
+  DEFAULT_CONFIG,
   defineConfig,
   getConfigOptions,
-  mergeConfig,
-  DEFAULT_CONFIG,
+  mergeConfig
 } from './config';

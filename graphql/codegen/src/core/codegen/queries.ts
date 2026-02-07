@@ -1,39 +1,28 @@
 /**
- * Query hook generators using Babel AST-based code generation
+ * Query hook generators - delegates to ORM model methods
  *
  * Output structure:
  * queries/
- *   useCarsQuery.ts    - List query hook
- *   useCarQuery.ts     - Single item query hook
+ *   useCarsQuery.ts    - List query hook -> ORM findMany
+ *   useCarQuery.ts     - Single item query hook -> ORM findOne
  */
 import type { CleanTable } from '../../types/schema';
-import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
 import {
-  buildListQueryAST,
-  buildSingleQueryAST,
-  printGraphQL,
-} from './gql-ast';
-import {
-  getTableNames,
-  getListQueryHookName,
-  getSingleQueryHookName,
-  getListQueryFileName,
-  getSingleQueryFileName,
   getAllRowsQueryName,
-  getSingleRowQueryName,
+  getDefaultSelectFieldName,
   getFilterTypeName,
-  getConditionTypeName,
-  getOrderByTypeName,
-  getScalarFields,
-  getScalarFilterType,
-  getPrimaryKeyInfo,
-  hasValidPrimaryKey,
-  fieldTypeToTs,
-  toScreamingSnake,
-  ucFirst,
-  lcFirst,
   getGeneratedFileHeader,
+  getListQueryFileName,
+  getListQueryHookName,
+  getOrderByTypeName,
+  getPrimaryKeyInfo,
+  getSingleQueryFileName,
+  getSingleQueryHookName,
+  getSingleRowQueryName,
+  getTableNames,
+  hasValidPrimaryKey,
+  lcFirst,
+  ucFirst
 } from './utils';
 
 export interface GeneratedQueryFile {
@@ -47,55 +36,6 @@ export interface QueryGeneratorOptions {
   hasRelationships?: boolean;
 }
 
-function createUnionType(values: string[]): t.TSUnionType {
-  return t.tsUnionType(values.map((v) => t.tsLiteralType(t.stringLiteral(v))));
-}
-
-function createFilterInterfaceDeclaration(
-  name: string,
-  fieldFilters: Array<{ fieldName: string; filterType: string }>,
-  isExported: boolean = true
-): t.Statement {
-  const properties: t.TSPropertySignature[] = [];
-  for (const filter of fieldFilters) {
-    const prop = t.tsPropertySignature(
-      t.identifier(filter.fieldName),
-      t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filter.filterType)))
-    );
-    prop.optional = true;
-    properties.push(prop);
-  }
-  const andProp = t.tsPropertySignature(
-    t.identifier('and'),
-    t.tsTypeAnnotation(t.tsArrayType(t.tsTypeReference(t.identifier(name))))
-  );
-  andProp.optional = true;
-  properties.push(andProp);
-  const orProp = t.tsPropertySignature(
-    t.identifier('or'),
-    t.tsTypeAnnotation(t.tsArrayType(t.tsTypeReference(t.identifier(name))))
-  );
-  orProp.optional = true;
-  properties.push(orProp);
-  const notProp = t.tsPropertySignature(
-    t.identifier('not'),
-    t.tsTypeAnnotation(t.tsTypeReference(t.identifier(name)))
-  );
-  notProp.optional = true;
-  properties.push(notProp);
-  const body = t.tsInterfaceBody(properties);
-  const interfaceDecl = t.tsInterfaceDeclaration(
-    t.identifier(name),
-    null,
-    null,
-    body
-  );
-  if (isExported) {
-    return t.exportNamedDeclaration(interfaceDecl);
-  }
-  return interfaceDecl;
-}
-
 export function generateListQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
@@ -103,742 +43,240 @@ export function generateListQueryHook(
   const {
     reactQueryEnabled = true,
     useCentralizedKeys = true,
-    hasRelationships = false,
+    hasRelationships = false
   } = options;
-  const { typeName, pluralName } = getTableNames(table);
+  const { typeName, pluralName, singularName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
   const queryName = getAllRowsQueryName(table);
   const filterTypeName = getFilterTypeName(table);
-  const conditionTypeName = getConditionTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
-  const scalarFields = getScalarFields(table);
   const keysName = `${lcFirst(typeName)}Keys`;
   const scopeTypeName = `${typeName}Scope`;
+  const selectTypeName = `${typeName}Select`;
+  const relationTypeName = `${typeName}WithRelations`;
 
-  const queryAST = buildListQueryAST({ table });
-  const queryDocument = printGraphQL(queryAST);
+  const defaultFieldName = getDefaultSelectFieldName(table);
+  const listResultType = (s: string) => `{ ${queryName}: ConnectionResult<InferSelectResult<${relationTypeName}, ${s}>> }`;
+  const selectionType = (s: string) => `ListSelectionConfig<${s}, ${filterTypeName}, ${orderByTypeName}>`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & Omit<${selectionType(s)}, 'fields'> & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () =>
+    `(Omit<${selectionType(selectTypeName)}, 'fields'> & { fields?: undefined })`;
 
-  const statements: t.Statement[] = [];
+  const lines: string[] = [];
 
-  const filterTypesUsed = new Set<string>();
-  for (const field of scalarFields) {
-    const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
-    if (filterType) {
-      filterTypesUsed.add(filterType);
-    }
-  }
-
+  // Imports
   if (reactQueryEnabled) {
-    const reactQueryImport = t.importDeclaration(
-      [t.importSpecifier(t.identifier('useQuery'), t.identifier('useQuery'))],
-      t.stringLiteral('@tanstack/react-query')
-    );
-    statements.push(reactQueryImport);
-    const reactQueryTypeImport = t.importDeclaration(
-      [
-        t.importSpecifier(
-          t.identifier('UseQueryOptions'),
-          t.identifier('UseQueryOptions')
-        ),
-        t.importSpecifier(
-          t.identifier('QueryClient'),
-          t.identifier('QueryClient')
-        ),
-      ],
-      t.stringLiteral('@tanstack/react-query')
-    );
-    reactQueryTypeImport.importKind = 'type';
-    statements.push(reactQueryTypeImport);
+    lines.push(`import { useQuery } from '@tanstack/react-query';`);
+    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
   }
-
-  const clientImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
-    t.stringLiteral('../client')
-  );
-  statements.push(clientImport);
-  const clientTypeImport = t.importDeclaration(
-    [
-      t.importSpecifier(
-        t.identifier('ExecuteOptions'),
-        t.identifier('ExecuteOptions')
-      ),
-    ],
-    t.stringLiteral('../client')
-  );
-  clientTypeImport.importKind = 'type';
-  statements.push(clientTypeImport);
-
-  const typesImport = t.importDeclaration(
-    [
-      t.importSpecifier(t.identifier(typeName), t.identifier(typeName)),
-      ...Array.from(filterTypesUsed).map((ft) =>
-        t.importSpecifier(t.identifier(ft), t.identifier(ft))
-      ),
-    ],
-    t.stringLiteral('../types')
-  );
-  typesImport.importKind = 'type';
-  statements.push(typesImport);
+  lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildListSelectionArgs } from '../selection';`);
+  lines.push(`import type { ListSelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
-    const queryKeyImport = t.importDeclaration(
-      [t.importSpecifier(t.identifier(keysName), t.identifier(keysName))],
-      t.stringLiteral('../query-keys')
-    );
-    statements.push(queryKeyImport);
+    lines.push(`import { ${keysName} } from '../query-keys';`);
     if (hasRelationships) {
-      const scopeTypeImport = t.importDeclaration(
-        [
-          t.importSpecifier(
-            t.identifier(scopeTypeName),
-            t.identifier(scopeTypeName)
-          ),
-        ],
-        t.stringLiteral('../query-keys')
-      );
-      scopeTypeImport.importKind = 'type';
-      statements.push(scopeTypeImport);
+      lines.push(`import type { ${scopeTypeName} } from '../query-keys';`);
     }
   }
 
-  const reExportDecl = t.exportNamedDeclaration(
-    null,
-    [t.exportSpecifier(t.identifier(typeName), t.identifier(typeName))],
-    t.stringLiteral('../types')
-  );
-  reExportDecl.exportKind = 'type';
-  statements.push(reExportDecl);
+  lines.push(`import type {`);
+  lines.push(`  ${selectTypeName},`);
+  lines.push(`  ${relationTypeName},`);
+  lines.push(`  ${filterTypeName},`);
+  lines.push(`  ${orderByTypeName},`);
+  lines.push(`} from '../../orm/input-types';`);
+  lines.push(`import type {`);
+  lines.push(`  FindManyArgs,`);
+  lines.push(`  InferSelectResult,`);
+  lines.push(`  ConnectionResult,`);
+  lines.push(`  StrictSelect,`);
+  lines.push(`} from '../../orm/select-types';`);
+  lines.push('');
 
-  const queryDocConst = t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(`${queryName}QueryDocument`),
-      t.templateLiteral(
-        [
-          t.templateElement(
-            { raw: '\n' + queryDocument, cooked: '\n' + queryDocument },
-            true
-          ),
-        ],
-        []
-      )
-    ),
-  ]);
-  statements.push(t.exportNamedDeclaration(queryDocConst));
+  // Re-export types for backwards compat
+  lines.push(`export type { ${selectTypeName}, ${relationTypeName}, ${filterTypeName}, ${orderByTypeName} } from '../../orm/input-types';`);
+  lines.push('');
 
-  const fieldFilters = scalarFields
-    .map((field) => {
-      const filterType = getScalarFilterType(field.type.gqlType, field.type.isArray);
-      return filterType ? { fieldName: field.name, filterType } : null;
-    })
-    .filter((f): f is { fieldName: string; filterType: string } => f !== null);
+  lines.push(`const defaultSelect = { ${defaultFieldName}: true } as const;`);
+  lines.push('');
 
-  statements.push(
-    createFilterInterfaceDeclaration(filterTypeName, fieldFilters, false)
-  );
-
-  // Generate Condition interface (simple equality filter with scalar types)
-  // Track non-primitive types (enums) that need to be imported
-  const enumTypesUsed = new Set<string>();
-  const conditionProperties: t.TSPropertySignature[] = scalarFields.map(
-    (field) => {
-      const tsType = fieldTypeToTs(field.type);
-      const isPrimitive =
-        tsType === 'string' ||
-        tsType === 'number' ||
-        tsType === 'boolean' ||
-        tsType === 'unknown' ||
-        tsType.endsWith('[]');
-      let typeAnnotation: t.TSType;
-      if (field.type.isArray) {
-        const baseType = tsType.replace('[]', '');
-        const isBasePrimitive =
-          baseType === 'string' ||
-          baseType === 'number' ||
-          baseType === 'boolean' ||
-          baseType === 'unknown';
-        if (!isBasePrimitive) {
-          enumTypesUsed.add(baseType);
-        }
-        typeAnnotation = t.tsArrayType(
-          baseType === 'string'
-            ? t.tsStringKeyword()
-            : baseType === 'number'
-              ? t.tsNumberKeyword()
-              : baseType === 'boolean'
-                ? t.tsBooleanKeyword()
-                : t.tsTypeReference(t.identifier(baseType))
-        );
-      } else {
-        if (!isPrimitive) {
-          enumTypesUsed.add(tsType);
-        }
-        typeAnnotation =
-          tsType === 'string'
-            ? t.tsStringKeyword()
-            : tsType === 'number'
-              ? t.tsNumberKeyword()
-              : tsType === 'boolean'
-                ? t.tsBooleanKeyword()
-                : t.tsTypeReference(t.identifier(tsType));
-      }
-      const prop = t.tsPropertySignature(
-        t.identifier(field.name),
-        t.tsTypeAnnotation(typeAnnotation)
-      );
-      prop.optional = true;
-      return prop;
-    }
-  );
-
-  // Add import for enum types if any are used
-  if (enumTypesUsed.size > 0) {
-    const schemaTypesImport = t.importDeclaration(
-      Array.from(enumTypesUsed).map((et) =>
-        t.importSpecifier(t.identifier(et), t.identifier(et))
-      ),
-      t.stringLiteral('../schema-types')
-    );
-    schemaTypesImport.importKind = 'type';
-    statements.push(schemaTypesImport);
-  }
-
-  const conditionInterface = t.tsInterfaceDeclaration(
-    t.identifier(conditionTypeName),
-    null,
-    null,
-    t.tsInterfaceBody(conditionProperties)
-  );
-  statements.push(conditionInterface);
-
-  const orderByValues = [
-    ...scalarFields.flatMap((f) => [
-      `${toScreamingSnake(f.name)}_ASC`,
-      `${toScreamingSnake(f.name)}_DESC`,
-    ]),
-    'NATURAL',
-    'PRIMARY_KEY_ASC',
-    'PRIMARY_KEY_DESC',
-  ];
-  const orderByTypeAlias = t.tsTypeAliasDeclaration(
-    t.identifier(orderByTypeName),
-    null,
-    createUnionType(orderByValues)
-  );
-  statements.push(orderByTypeAlias);
-
-  const variablesInterfaceBody = t.tsInterfaceBody([
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('first'),
-        t.tsTypeAnnotation(t.tsNumberKeyword())
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('last'),
-        t.tsTypeAnnotation(t.tsNumberKeyword())
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('offset'),
-        t.tsTypeAnnotation(t.tsNumberKeyword())
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('before'),
-        t.tsTypeAnnotation(t.tsStringKeyword())
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('after'),
-        t.tsTypeAnnotation(t.tsStringKeyword())
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('filter'),
-        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterTypeName)))
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('condition'),
-        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(conditionTypeName)))
-      );
-      p.optional = true;
-      return p;
-    })(),
-    (() => {
-      const p = t.tsPropertySignature(
-        t.identifier('orderBy'),
-        t.tsTypeAnnotation(
-          t.tsArrayType(t.tsTypeReference(t.identifier(orderByTypeName)))
-        )
-      );
-      p.optional = true;
-      return p;
-    })(),
-  ]);
-  const variablesInterface = t.tsInterfaceDeclaration(
-    t.identifier(`${ucFirst(pluralName)}QueryVariables`),
-    null,
-    null,
-    variablesInterfaceBody
-  );
-  statements.push(t.exportNamedDeclaration(variablesInterface));
-
-  const pageInfoType = t.tsTypeLiteral([
-    t.tsPropertySignature(
-      t.identifier('hasNextPage'),
-      t.tsTypeAnnotation(t.tsBooleanKeyword())
-    ),
-    t.tsPropertySignature(
-      t.identifier('hasPreviousPage'),
-      t.tsTypeAnnotation(t.tsBooleanKeyword())
-    ),
-    t.tsPropertySignature(
-      t.identifier('startCursor'),
-      t.tsTypeAnnotation(
-        t.tsUnionType([t.tsStringKeyword(), t.tsNullKeyword()])
-      )
-    ),
-    t.tsPropertySignature(
-      t.identifier('endCursor'),
-      t.tsTypeAnnotation(
-        t.tsUnionType([t.tsStringKeyword(), t.tsNullKeyword()])
-      )
-    ),
-  ]);
-  const resultType = t.tsTypeLiteral([
-    t.tsPropertySignature(
-      t.identifier('totalCount'),
-      t.tsTypeAnnotation(t.tsNumberKeyword())
-    ),
-    t.tsPropertySignature(
-      t.identifier('nodes'),
-      t.tsTypeAnnotation(
-        t.tsArrayType(t.tsTypeReference(t.identifier(typeName)))
-      )
-    ),
-    t.tsPropertySignature(
-      t.identifier('pageInfo'),
-      t.tsTypeAnnotation(pageInfoType)
-    ),
-  ]);
-  const resultInterfaceBody = t.tsInterfaceBody([
-    t.tsPropertySignature(
-      t.identifier(queryName),
-      t.tsTypeAnnotation(resultType)
-    ),
-  ]);
-  const resultInterface = t.tsInterfaceDeclaration(
-    t.identifier(`${ucFirst(pluralName)}QueryResult`),
-    null,
-    null,
-    resultInterfaceBody
-  );
-  statements.push(t.exportNamedDeclaration(resultInterface));
-
+  // Query key
   if (useCentralizedKeys) {
-    const queryKeyConst = t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier(`${queryName}QueryKey`),
-        t.memberExpression(t.identifier(keysName), t.identifier('list'))
-      ),
-    ]);
-    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
-    addJSDocComment(queryKeyExport, [
-      'Query key factory - re-exported from query-keys.ts',
-    ]);
-    statements.push(queryKeyExport);
+    lines.push(`/** Query key factory - re-exported from query-keys.ts */`);
+    lines.push(`export const ${queryName}QueryKey = ${keysName}.list;`);
   } else {
-    const queryKeyArrow = t.arrowFunctionExpression(
-      [
-        typedParam(
-          'variables',
-          t.tsTypeReference(
-            t.identifier(`${ucFirst(pluralName)}QueryVariables`)
-          ),
-          true
-        ),
-      ],
-      t.tsAsExpression(
-        t.arrayExpression([
-          t.stringLiteral(typeName.toLowerCase()),
-          t.stringLiteral('list'),
-          t.identifier('variables'),
-        ]),
-        t.tsTypeReference(t.identifier('const'))
-      )
-    );
-    const queryKeyConst = t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier(`${queryName}QueryKey`),
-        queryKeyArrow
-      ),
-    ]);
-    statements.push(t.exportNamedDeclaration(queryKeyConst));
+    lines.push(`export const ${queryName}QueryKey = (variables?: FindManyArgs<unknown, ${filterTypeName}, ${orderByTypeName}>) => ['${typeName.toLowerCase()}', 'list', variables] as const;`);
   }
+  lines.push('');
 
+  // Hook
   if (reactQueryEnabled) {
-    const hookBodyStatements: t.Statement[] = [];
-    if (hasRelationships && useCentralizedKeys) {
-      hookBodyStatements.push(
-        t.variableDeclaration('const', [
-          t.variableDeclarator(
-            t.objectPattern([
-              t.objectProperty(
-                t.identifier('scope'),
-                t.identifier('scope'),
-                false,
-                true
-              ),
-              t.restElement(t.identifier('queryOptions')),
-            ]),
-            t.logicalExpression(
-              '??',
-              t.identifier('options'),
-              t.objectExpression([])
-            )
-          ),
-        ])
-      );
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(
-                  t.memberExpression(
-                    t.identifier(keysName),
-                    t.identifier('list')
-                  ),
-                  [t.identifier('variables'), t.identifier('scope')]
-                )
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('queryOptions')),
-            ]),
-          ])
-        )
-      );
-    } else if (useCentralizedKeys) {
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(
-                  t.memberExpression(
-                    t.identifier(keysName),
-                    t.identifier('list')
-                  ),
-                  [t.identifier('variables')]
-                )
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('options')),
-            ]),
-          ])
-        )
-      );
-    } else {
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(t.identifier(`${queryName}QueryKey`), [
-                  t.identifier('variables'),
-                ])
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('options')),
-            ]),
-          ])
-        )
-      );
-    }
-
-    const hookParams: t.Identifier[] = [
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-        true
-      ),
-    ];
-    let optionsTypeStr: string;
-    if (hasRelationships && useCentralizedKeys) {
-      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
-    } else {
-      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(pluralName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
-    }
-    const optionsParam = t.identifier('options');
-    optionsParam.optional = true;
-    optionsParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier(optionsTypeStr))
-    );
-    hookParams.push(optionsParam);
-
-    const hookFunc = t.functionDeclaration(
-      t.identifier(hookName),
-      hookParams,
-      t.blockStatement(hookBodyStatements)
-    );
-    const hookExport = t.exportNamedDeclaration(hookFunc);
     const docLines = [
-      `Query hook for fetching ${typeName} list`,
-      '',
-      '@example',
-      '```tsx',
-      `const { data, isLoading } = ${hookName}({`,
-      '  first: 10,',
-      '  filter: { name: { equalTo: "example" } },',
-      "  orderBy: ['CREATED_AT_DESC'],",
-      '});',
-      '```',
+      `/**`,
+      ` * Query hook for fetching ${typeName} list`,
+      ` *`,
+      ` * @example`,
+      ` * \`\`\`tsx`,
+      ` * const { data, isLoading } = ${hookName}({`,
+      ` *   selection: {`,
+      ` *     fields: { id: true, name: true },`,
+      ` *     where: { name: { equalTo: "example" } },`,
+      ` *     orderBy: ['CREATED_AT_DESC'],`,
+      ` *     first: 10,`,
+      ` *   },`,
+      ` * });`,
+      ` * \`\`\``
     ];
     if (hasRelationships && useCentralizedKeys) {
-      docLines.push('');
-      docLines.push('@example With scope for hierarchical cache invalidation');
-      docLines.push('```tsx');
-      docLines.push(`const { data } = ${hookName}(`);
-      docLines.push('  { first: 10 },');
-      docLines.push("  { scope: { parentId: 'parent-id' } }");
-      docLines.push(');');
-      docLines.push('```');
+      docLines.push(` *`);
+      docLines.push(` * @example With scope for hierarchical cache invalidation`);
+      docLines.push(` * \`\`\`tsx`);
+      docLines.push(` * const { data } = ${hookName}({`);
+      docLines.push(` *   selection: { first: 10 },`);
+      docLines.push(` *   scope: { parentId: 'parent-id' },`);
+      docLines.push(` * });`);
+      docLines.push(` * \`\`\``);
     }
-    addJSDocComment(hookExport, docLines);
-    statements.push(hookExport);
-  }
+    docLines.push(` */`);
+    lines.push(...docLines);
 
-  const fetchFuncBody = t.blockStatement([
-    t.returnStatement(
-      createTypedCallExpression(
-        t.identifier('execute'),
-        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
-        [
-          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-          t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-        ]
-      )
-    ),
-  ]);
-  const fetchFunc = t.functionDeclaration(
-    t.identifier(`fetch${ucFirst(pluralName)}Query`),
-    [
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-        true
-      ),
-      typedParam(
-        'options',
-        t.tsTypeReference(t.identifier('ExecuteOptions')),
-        true
-      ),
-    ],
-    fetchFuncBody
-  );
-  fetchFunc.async = true;
-  fetchFunc.returnType = t.tsTypeAnnotation(
-    t.tsTypeReference(
-      t.identifier('Promise'),
-      t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-      ])
-    )
-  );
-  const fetchExport = t.exportNamedDeclaration(fetchFunc);
-  addJSDocComment(fetchExport, [
-    `Fetch ${typeName} list without React hooks`,
-    '',
-    '@example',
-    '```ts',
-    '// Direct fetch',
-    `const data = await fetch${ucFirst(pluralName)}Query({ first: 10 });`,
-    '',
-    '// With QueryClient',
-    'const data = await queryClient.fetchQuery({',
-    `  queryKey: ${queryName}QueryKey(variables),`,
-    `  queryFn: () => fetch${ucFirst(pluralName)}Query(variables),`,
-    '});',
-    '```',
-  ]);
-  statements.push(fetchExport);
+    const optionsType = (queryData: string, data: string) =>
+      hasRelationships && useCentralizedKeys
+        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
+    const implOptionsType = hasRelationships && useCentralizedKeys
+      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
 
-  if (reactQueryEnabled) {
-    const prefetchParams: t.Identifier[] = [
-      typedParam(
-        'queryClient',
-        t.tsTypeReference(t.identifier('QueryClient'))
-      ),
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-        true
-      ),
-    ];
+    // Overload 1: with selection.fields (autocompletion)
+    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${listResultType('S')}>(`);
+    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} } & ${optionsType(listResultType('S'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Overload 2: no fields (default select)
+    lines.push(`export function ${hookName}<TData = ${listResultType('typeof defaultSelect')}>(`);
+    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} } & ${optionsType(listResultType('typeof defaultSelect'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Implementation
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} } & ${implOptionsType}`);
+    lines.push(`) {`);
+    lines.push(`  const selection = params?.selection;`);
+    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(selection);`);
+
     if (hasRelationships && useCentralizedKeys) {
-      prefetchParams.push(
-        typedParam(
-          'scope',
-          t.tsTypeReference(t.identifier(scopeTypeName)),
-          true
-        )
-      );
-    }
-    prefetchParams.push(
-      typedParam(
-        'options',
-        t.tsTypeReference(t.identifier('ExecuteOptions')),
-        true
-      )
-    );
-
-    let prefetchQueryKeyExpr: t.Expression;
-    if (hasRelationships && useCentralizedKeys) {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.memberExpression(t.identifier(keysName), t.identifier('list')),
-        [t.identifier('variables'), t.identifier('scope')]
-      );
+      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${keysName}.list(args, scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     } else if (useCentralizedKeys) {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.memberExpression(t.identifier(keysName), t.identifier('list')),
-        [t.identifier('variables')]
-      );
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${keysName}.list(args),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     } else {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.identifier(`${queryName}QueryKey`),
-        [t.identifier('variables')]
-      );
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${queryName}QueryKey(args),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     }
 
-    const prefetchFuncBody = t.blockStatement([
-      t.expressionStatement(
-        t.awaitExpression(
-          t.callExpression(
-            t.memberExpression(
-              t.identifier('queryClient'),
-              t.identifier('prefetchQuery')
-            ),
-            [
-              t.objectExpression([
-                t.objectProperty(
-                  t.identifier('queryKey'),
-                  prefetchQueryKeyExpr
-                ),
-                t.objectProperty(
-                  t.identifier('queryFn'),
-                  t.arrowFunctionExpression(
-                    [],
-                    createTypedCallExpression(
-                      t.identifier('execute'),
-                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
-                      [
-                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryResult`)),
-                        t.tsTypeReference(t.identifier(`${ucFirst(pluralName)}QueryVariables`)),
-                      ]
-                    )
-                  )
-                ),
-              ]),
-            ]
-          )
-        )
-      ),
-    ]);
-
-    const prefetchFunc = t.functionDeclaration(
-      t.identifier(`prefetch${ucFirst(pluralName)}Query`),
-      prefetchParams,
-      prefetchFuncBody
-    );
-    prefetchFunc.async = true;
-    prefetchFunc.returnType = t.tsTypeAnnotation(
-      t.tsTypeReference(
-        t.identifier('Promise'),
-        t.tsTypeParameterInstantiation([t.tsVoidKeyword()])
-      )
-    );
-    const prefetchExport = t.exportNamedDeclaration(prefetchFunc);
-    addJSDocComment(prefetchExport, [
-      `Prefetch ${typeName} list for SSR or cache warming`,
-      '',
-      '@example',
-      '```ts',
-      `await prefetch${ucFirst(pluralName)}Query(queryClient, { first: 10 });`,
-      '```',
-    ]);
-    statements.push(prefetchExport);
+    lines.push(`}`);
+    lines.push('');
   }
 
-  const code = generateCode(statements);
+  // Fetch function (non-hook)
+  lines.push(`/**`);
+  lines.push(` * Fetch ${typeName} list without React hooks`);
+  lines.push(` *`);
+  lines.push(` * @example`);
+  lines.push(` * \`\`\`ts`);
+  lines.push(` * const data = await fetch${ucFirst(pluralName)}Query({`);
+  lines.push(` *   selection: {`);
+  lines.push(` *     fields: { id: true },`);
+  lines.push(` *     first: 10,`);
+  lines.push(` *   },`);
+  lines.push(` * });`);
+  lines.push(` * \`\`\``);
+  lines.push(` */`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }`);
+  lines.push(`): Promise<${listResultType('S')}>;`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
+  lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }`);
+  lines.push(`): Promise<${listResultType('typeof defaultSelect')}>;`);
+  lines.push(`export async function fetch${ucFirst(pluralName)}Query(`);
+  lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }`);
+  lines.push(`) {`);
+  lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
+  lines.push(`  return getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
+  lines.push(`}`);
+  lines.push('');
+
+  // Prefetch function
+  if (reactQueryEnabled) {
+    lines.push(`/**`);
+    lines.push(` * Prefetch ${typeName} list for SSR or cache warming`);
+    lines.push(` *`);
+    lines.push(` * @example`);
+    lines.push(` * \`\`\`ts`);
+    lines.push(` * await prefetch${ucFirst(pluralName)}Query(queryClient, { selection: { first: 10 } });`);
+    lines.push(` * \`\`\``);
+    lines.push(` */`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query<S extends ${selectTypeName}>(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params?: { selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(pluralName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params?: { selection?: ${selectionType(selectTypeName)} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''}`);
+    lines.push(`): Promise<void> {`);
+    lines.push(`  const args = buildListSelectionArgs<${selectTypeName}, ${filterTypeName}, ${orderByTypeName}>(params?.selection);`);
+
+    if (hasRelationships && useCentralizedKeys) {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${keysName}.list(args, params?.scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    } else if (useCentralizedKeys) {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${keysName}.list(args),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    } else {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${queryName}QueryKey(args),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findMany({ ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    }
+
+    lines.push(`}`);
+  }
+
   const headerText = reactQueryEnabled
     ? `List query hook for ${typeName}`
     : `List query functions for ${typeName}`;
-  const content = getGeneratedFileHeader(headerText) + '\n\n' + code;
+  const content = getGeneratedFileHeader(headerText) + '\n\n' + lines.join('\n') + '\n';
 
   return {
     fileName: getListQueryFileName(table),
-    content,
+    content
   };
 }
 
@@ -846,7 +284,6 @@ export function generateSingleQueryHook(
   table: CleanTable,
   options: QueryGeneratorOptions = {}
 ): GeneratedQueryFile | null {
-  // Skip tables with composite keys - they are handled as custom queries
   if (!hasValidPrimaryKey(table)) {
     return null;
   }
@@ -854,536 +291,232 @@ export function generateSingleQueryHook(
   const {
     reactQueryEnabled = true,
     useCentralizedKeys = true,
-    hasRelationships = false,
+    hasRelationships = false
   } = options;
   const { typeName, singularName } = getTableNames(table);
   const hookName = getSingleQueryHookName(table);
   const queryName = getSingleRowQueryName(table);
   const keysName = `${lcFirst(typeName)}Keys`;
   const scopeTypeName = `${typeName}Scope`;
+  const selectTypeName = `${typeName}Select`;
+  const relationTypeName = `${typeName}WithRelations`;
 
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
-  const pkName = pkField.name;
-  const pkTsType = pkField.tsType;
+  const pkFieldName = pkField?.name ?? 'id';
+  const pkFieldTsType = pkField?.tsType ?? 'string';
+  const defaultFieldName = getDefaultSelectFieldName(table);
+  const singleResultType = (s: string) => `{ ${queryName}: InferSelectResult<${relationTypeName}, ${s}> | null }`;
+  const selectionWithFieldsType = (s: string) =>
+    `({ fields: ${s} } & StrictSelect<${s}, ${selectTypeName}>)`;
+  const selectionWithoutFieldsType = () => `({ fields?: undefined })`;
 
-  const queryAST = buildSingleQueryAST({ table });
-  const queryDocument = printGraphQL(queryAST);
+  const lines: string[] = [];
 
-  const statements: t.Statement[] = [];
-
+  // Imports
   if (reactQueryEnabled) {
-    const reactQueryImport = t.importDeclaration(
-      [t.importSpecifier(t.identifier('useQuery'), t.identifier('useQuery'))],
-      t.stringLiteral('@tanstack/react-query')
-    );
-    statements.push(reactQueryImport);
-    const reactQueryTypeImport = t.importDeclaration(
-      [
-        t.importSpecifier(
-          t.identifier('UseQueryOptions'),
-          t.identifier('UseQueryOptions')
-        ),
-        t.importSpecifier(
-          t.identifier('QueryClient'),
-          t.identifier('QueryClient')
-        ),
-      ],
-      t.stringLiteral('@tanstack/react-query')
-    );
-    reactQueryTypeImport.importKind = 'type';
-    statements.push(reactQueryTypeImport);
+    lines.push(`import { useQuery } from '@tanstack/react-query';`);
+    lines.push(`import type { UseQueryOptions, UseQueryResult, QueryClient } from '@tanstack/react-query';`);
   }
-
-  const clientImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
-    t.stringLiteral('../client')
-  );
-  statements.push(clientImport);
-  const clientTypeImport = t.importDeclaration(
-    [
-      t.importSpecifier(
-        t.identifier('ExecuteOptions'),
-        t.identifier('ExecuteOptions')
-      ),
-    ],
-    t.stringLiteral('../client')
-  );
-  clientTypeImport.importKind = 'type';
-  statements.push(clientTypeImport);
-
-  const typesImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier(typeName), t.identifier(typeName))],
-    t.stringLiteral('../types')
-  );
-  typesImport.importKind = 'type';
-  statements.push(typesImport);
+  lines.push(`import { getClient } from '../client';`);
+  lines.push(`import { buildSelectionArgs } from '../selection';`);
+  lines.push(`import type { SelectionConfig } from '../selection';`);
 
   if (useCentralizedKeys) {
-    const queryKeyImport = t.importDeclaration(
-      [t.importSpecifier(t.identifier(keysName), t.identifier(keysName))],
-      t.stringLiteral('../query-keys')
-    );
-    statements.push(queryKeyImport);
+    lines.push(`import { ${keysName} } from '../query-keys';`);
     if (hasRelationships) {
-      const scopeTypeImport = t.importDeclaration(
-        [
-          t.importSpecifier(
-            t.identifier(scopeTypeName),
-            t.identifier(scopeTypeName)
-          ),
-        ],
-        t.stringLiteral('../query-keys')
-      );
-      scopeTypeImport.importKind = 'type';
-      statements.push(scopeTypeImport);
+      lines.push(`import type { ${scopeTypeName} } from '../query-keys';`);
     }
   }
 
-  const reExportDecl = t.exportNamedDeclaration(
-    null,
-    [t.exportSpecifier(t.identifier(typeName), t.identifier(typeName))],
-    t.stringLiteral('../types')
-  );
-  reExportDecl.exportKind = 'type';
-  statements.push(reExportDecl);
+  lines.push(`import type {`);
+  lines.push(`  ${selectTypeName},`);
+  lines.push(`  ${relationTypeName},`);
+  lines.push(`} from '../../orm/input-types';`);
+  lines.push(`import type {`);
+  lines.push(`  InferSelectResult,`);
+  lines.push(`  StrictSelect,`);
+  lines.push(`} from '../../orm/select-types';`);
+  lines.push('');
 
-  const queryDocConst = t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(`${queryName}QueryDocument`),
-      t.templateLiteral(
-        [
-          t.templateElement(
-            { raw: '\n' + queryDocument, cooked: '\n' + queryDocument },
-            true
-          ),
-        ],
-        []
-      )
-    ),
-  ]);
-  statements.push(t.exportNamedDeclaration(queryDocConst));
+  // Re-export types
+  lines.push(`export type { ${selectTypeName}, ${relationTypeName} } from '../../orm/input-types';`);
+  lines.push('');
 
-  const pkTypeAnnotation =
-    pkTsType === 'string'
-      ? t.tsStringKeyword()
-      : pkTsType === 'number'
-        ? t.tsNumberKeyword()
-        : t.tsTypeReference(t.identifier(pkTsType));
+  lines.push(`const defaultSelect = { ${defaultFieldName}: true } as const;`);
+  lines.push('');
 
-  const variablesInterfaceBody = t.tsInterfaceBody([
-    t.tsPropertySignature(
-      t.identifier(pkName),
-      t.tsTypeAnnotation(pkTypeAnnotation)
-    ),
-  ]);
-  const variablesInterface = t.tsInterfaceDeclaration(
-    t.identifier(`${ucFirst(singularName)}QueryVariables`),
-    null,
-    null,
-    variablesInterfaceBody
-  );
-  statements.push(t.exportNamedDeclaration(variablesInterface));
-
-  const resultInterfaceBody = t.tsInterfaceBody([
-    t.tsPropertySignature(
-      t.identifier(queryName),
-      t.tsTypeAnnotation(
-        t.tsUnionType([
-          t.tsTypeReference(t.identifier(typeName)),
-          t.tsNullKeyword(),
-        ])
-      )
-    ),
-  ]);
-  const resultInterface = t.tsInterfaceDeclaration(
-    t.identifier(`${ucFirst(singularName)}QueryResult`),
-    null,
-    null,
-    resultInterfaceBody
-  );
-  statements.push(t.exportNamedDeclaration(resultInterface));
-
+  // Query key
   if (useCentralizedKeys) {
-    const queryKeyConst = t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier(`${queryName}QueryKey`),
-        t.memberExpression(t.identifier(keysName), t.identifier('detail'))
-      ),
-    ]);
-    const queryKeyExport = t.exportNamedDeclaration(queryKeyConst);
-    addJSDocComment(queryKeyExport, [
-      'Query key factory - re-exported from query-keys.ts',
-    ]);
-    statements.push(queryKeyExport);
+    lines.push(`/** Query key factory - re-exported from query-keys.ts */`);
+    lines.push(`export const ${queryName}QueryKey = ${keysName}.detail;`);
   } else {
-    const queryKeyArrow = t.arrowFunctionExpression(
-      [typedParam(pkName, pkTypeAnnotation)],
-      t.tsAsExpression(
-        t.arrayExpression([
-          t.stringLiteral(typeName.toLowerCase()),
-          t.stringLiteral('detail'),
-          t.identifier(pkName),
-        ]),
-        t.tsTypeReference(t.identifier('const'))
-      )
-    );
-    const queryKeyConst = t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier(`${queryName}QueryKey`),
-        queryKeyArrow
-      ),
-    ]);
-    statements.push(t.exportNamedDeclaration(queryKeyConst));
+    lines.push(`export const ${queryName}QueryKey = (id: ${pkFieldTsType}) => ['${typeName.toLowerCase()}', 'detail', id] as const;`);
   }
+  lines.push('');
 
+  // Hook
   if (reactQueryEnabled) {
-    const hookBodyStatements: t.Statement[] = [];
-    if (hasRelationships && useCentralizedKeys) {
-      hookBodyStatements.push(
-        t.variableDeclaration('const', [
-          t.variableDeclarator(
-            t.objectPattern([
-              t.objectProperty(
-                t.identifier('scope'),
-                t.identifier('scope'),
-                false,
-                true
-              ),
-              t.restElement(t.identifier('queryOptions')),
-            ]),
-            t.logicalExpression(
-              '??',
-              t.identifier('options'),
-              t.objectExpression([])
-            )
-          ),
-        ])
-      );
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(
-                  t.memberExpression(
-                    t.identifier(keysName),
-                    t.identifier('detail')
-                  ),
-                  [
-                    t.memberExpression(
-                      t.identifier('variables'),
-                      t.identifier(pkName)
-                    ),
-                    t.identifier('scope'),
-                  ]
-                )
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('queryOptions')),
-            ]),
-          ])
-        )
-      );
-    } else if (useCentralizedKeys) {
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(
-                  t.memberExpression(
-                    t.identifier(keysName),
-                    t.identifier('detail')
-                  ),
-                  [
-                    t.memberExpression(
-                      t.identifier('variables'),
-                      t.identifier(pkName)
-                    ),
-                  ]
-                )
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('options')),
-            ]),
-          ])
-        )
-      );
-    } else {
-      hookBodyStatements.push(
-        t.returnStatement(
-          t.callExpression(t.identifier('useQuery'), [
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier('queryKey'),
-                t.callExpression(t.identifier(`${queryName}QueryKey`), [
-                  t.memberExpression(
-                    t.identifier('variables'),
-                    t.identifier(pkName)
-                  ),
-                ])
-              ),
-              t.objectProperty(
-                t.identifier('queryFn'),
-                t.arrowFunctionExpression(
-                  [],
-                  createTypedCallExpression(
-                    t.identifier('execute'),
-                    [t.identifier(`${queryName}QueryDocument`), t.identifier('variables')],
-                    [
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-                      t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
-                    ]
-                  )
-                )
-              ),
-              t.spreadElement(t.identifier('options')),
-            ]),
-          ])
-        )
-      );
-    }
-
-    const hookParams: t.Identifier[] = [
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
-      ),
-    ];
-    let optionsTypeStr: string;
-    if (hasRelationships && useCentralizedKeys) {
-      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`;
-    } else {
-      optionsTypeStr = `Omit<UseQueryOptions<${ucFirst(singularName)}QueryResult, Error>, 'queryKey' | 'queryFn'>`;
-    }
-    const optionsParam = t.identifier('options');
-    optionsParam.optional = true;
-    optionsParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeReference(t.identifier(optionsTypeStr))
-    );
-    hookParams.push(optionsParam);
-
-    const hookFunc = t.functionDeclaration(
-      t.identifier(hookName),
-      hookParams,
-      t.blockStatement(hookBodyStatements)
-    );
-    const hookExport = t.exportNamedDeclaration(hookFunc);
     const docLines = [
-      `Query hook for fetching a single ${typeName}`,
-      '',
-      '@example',
-      '```tsx',
-      `const { data, isLoading } = ${hookName}({ ${pkName}: 'some-id' });`,
-      '```',
+      `/**`,
+      ` * Query hook for fetching a single ${typeName}`,
+      ` *`,
+      ` * @example`,
+      ` * \`\`\`tsx`,
+      ` * const { data, isLoading } = ${hookName}({`,
+      ` *   ${pkFieldName}: 'some-id',`,
+      ` *   selection: { fields: { id: true, name: true } },`,
+      ` * });`,
+      ` * \`\`\``
     ];
     if (hasRelationships && useCentralizedKeys) {
-      docLines.push('');
-      docLines.push('@example With scope for hierarchical cache invalidation');
-      docLines.push('```tsx');
-      docLines.push(`const { data } = ${hookName}(`);
-      docLines.push(`  { ${pkName}: 'some-id' },`);
-      docLines.push("  { scope: { parentId: 'parent-id' } }");
-      docLines.push(');');
-      docLines.push('```');
+      docLines.push(` *`);
+      docLines.push(` * @example With scope for hierarchical cache invalidation`);
+      docLines.push(` * \`\`\`tsx`);
+      docLines.push(` * const { data } = ${hookName}({`);
+      docLines.push(` *   ${pkFieldName}: 'some-id',`);
+      docLines.push(` *   scope: { parentId: 'parent-id' },`);
+      docLines.push(` * });`);
+      docLines.push(` * \`\`\``);
     }
-    addJSDocComment(hookExport, docLines);
-    statements.push(hookExport);
-  }
+    docLines.push(` */`);
+    lines.push(...docLines);
 
-  const fetchFuncBody = t.blockStatement([
-    t.returnStatement(
-      createTypedCallExpression(
-        t.identifier('execute'),
-        [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
-        [
-          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-          t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
-        ]
-      )
-    ),
-  ]);
-  const fetchFunc = t.functionDeclaration(
-    t.identifier(`fetch${ucFirst(singularName)}Query`),
-    [
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
-      ),
-      typedParam(
-        'options',
-        t.tsTypeReference(t.identifier('ExecuteOptions')),
-        true
-      ),
-    ],
-    fetchFuncBody
-  );
-  fetchFunc.async = true;
-  fetchFunc.returnType = t.tsTypeAnnotation(
-    t.tsTypeReference(
-      t.identifier('Promise'),
-      t.tsTypeParameterInstantiation([
-        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-      ])
-    )
-  );
-  const fetchExport = t.exportNamedDeclaration(fetchFunc);
-  addJSDocComment(fetchExport, [
-    `Fetch a single ${typeName} without React hooks`,
-    '',
-    '@example',
-    '```ts',
-    `const data = await fetch${ucFirst(singularName)}Query({ ${pkName}: 'some-id' });`,
-    '```',
-  ]);
-  statements.push(fetchExport);
+    const singleOptionsType = (queryData: string, data: string) =>
+      hasRelationships && useCentralizedKeys
+        ? `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+        : `Omit<UseQueryOptions<${queryData}, Error, ${data}>, 'queryKey' | 'queryFn'>`;
+    const singleImplOptionsType = hasRelationships && useCentralizedKeys
+      ? `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'> & { scope?: ${scopeTypeName} }`
+      : `Omit<UseQueryOptions<any, Error, any, any>, 'queryKey' | 'queryFn'>`;
 
-  if (reactQueryEnabled) {
-    const prefetchParams: t.Identifier[] = [
-      typedParam(
-        'queryClient',
-        t.tsTypeReference(t.identifier('QueryClient'))
-      ),
-      typedParam(
-        'variables',
-        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`))
-      ),
-    ];
+    // Overload 1: with selection.fields (provides contextual typing for autocompletion)
+    lines.push(`export function ${hookName}<S extends ${selectTypeName}, TData = ${singleResultType('S')}>(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} } & ${singleOptionsType(singleResultType('S'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Overload 2: without fields (uses default select)
+    lines.push(`export function ${hookName}<TData = ${singleResultType('typeof defaultSelect')}>(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} } & ${singleOptionsType(singleResultType('typeof defaultSelect'), 'TData')}`);
+    lines.push(`): UseQueryResult<TData>;`);
+
+    // Implementation
+    lines.push(`export function ${hookName}(`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> } & ${singleImplOptionsType}`);
+    lines.push(`) {`);
+    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+
     if (hasRelationships && useCentralizedKeys) {
-      prefetchParams.push(
-        typedParam(
-          'scope',
-          t.tsTypeReference(t.identifier(scopeTypeName)),
-          true
-        )
-      );
-    }
-    prefetchParams.push(
-      typedParam(
-        'options',
-        t.tsTypeReference(t.identifier('ExecuteOptions')),
-        true
-      )
-    );
-
-    let prefetchQueryKeyExpr: t.Expression;
-    if (hasRelationships && useCentralizedKeys) {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
-        [
-          t.memberExpression(t.identifier('variables'), t.identifier(pkName)),
-          t.identifier('scope'),
-        ]
-      );
+      lines.push(`  const { scope, selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     } else if (useCentralizedKeys) {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
-        [t.memberExpression(t.identifier('variables'), t.identifier(pkName))]
-      );
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     } else {
-      prefetchQueryKeyExpr = t.callExpression(
-        t.identifier(`${queryName}QueryKey`),
-        [t.memberExpression(t.identifier('variables'), t.identifier(pkName))]
-      );
+      lines.push(`  const { selection: _selection, ...queryOptions } = params ?? {};`);
+      lines.push(`  void _selection;`);
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`    ...queryOptions,`);
+      lines.push(`  });`);
     }
 
-    const prefetchFuncBody = t.blockStatement([
-      t.expressionStatement(
-        t.awaitExpression(
-          t.callExpression(
-            t.memberExpression(
-              t.identifier('queryClient'),
-              t.identifier('prefetchQuery')
-            ),
-            [
-              t.objectExpression([
-                t.objectProperty(
-                  t.identifier('queryKey'),
-                  prefetchQueryKeyExpr
-                ),
-                t.objectProperty(
-                  t.identifier('queryFn'),
-                  t.arrowFunctionExpression(
-                    [],
-                    createTypedCallExpression(
-                      t.identifier('execute'),
-                      [t.identifier(`${queryName}QueryDocument`), t.identifier('variables'), t.identifier('options')],
-                      [
-                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryResult`)),
-                        t.tsTypeReference(t.identifier(`${ucFirst(singularName)}QueryVariables`)),
-                      ]
-                    )
-                  )
-                ),
-              ]),
-            ]
-          )
-        )
-      ),
-    ]);
-
-    const prefetchFunc = t.functionDeclaration(
-      t.identifier(`prefetch${ucFirst(singularName)}Query`),
-      prefetchParams,
-      prefetchFuncBody
-    );
-    prefetchFunc.async = true;
-    prefetchFunc.returnType = t.tsTypeAnnotation(
-      t.tsTypeReference(
-        t.identifier('Promise'),
-        t.tsTypeParameterInstantiation([t.tsVoidKeyword()])
-      )
-    );
-    const prefetchExport = t.exportNamedDeclaration(prefetchFunc);
-    addJSDocComment(prefetchExport, [
-      `Prefetch a single ${typeName} for SSR or cache warming`,
-      '',
-      '@example',
-      '```ts',
-      `await prefetch${ucFirst(singularName)}Query(queryClient, { ${pkName}: 'some-id' });`,
-      '```',
-    ]);
-    statements.push(prefetchExport);
+    lines.push(`}`);
+    lines.push('');
   }
 
-  const code = generateCode(statements);
+  // Fetch function
+  lines.push(`/**`);
+  lines.push(` * Fetch a single ${typeName} without React hooks`);
+  lines.push(` *`);
+  lines.push(` * @example`);
+  lines.push(` * \`\`\`ts`);
+  lines.push(` * const data = await fetch${ucFirst(singularName)}Query({`);
+  lines.push(` *   ${pkFieldName}: 'some-id',`);
+  lines.push(` *   selection: { fields: { id: true } },`);
+  lines.push(` * });`);
+  lines.push(` * \`\`\``);
+  lines.push(` */`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }`);
+  lines.push(`): Promise<${singleResultType('S')}>;`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} },`);
+  lines.push(`): Promise<${singleResultType('typeof defaultSelect')}>;`);
+  lines.push(`export async function fetch${ucFirst(singularName)}Query(`);
+  lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> },`);
+  lines.push(`) {`);
+  lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+  lines.push(`  return getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap();`);
+  lines.push(`}`);
+  lines.push('');
+
+  // Prefetch function
+  if (reactQueryEnabled) {
+    lines.push(`/**`);
+    lines.push(` * Prefetch a single ${typeName} for SSR or cache warming`);
+    lines.push(` *`);
+    lines.push(` * @example`);
+    lines.push(` * \`\`\`ts`);
+    lines.push(` * await prefetch${ucFirst(singularName)}Query(queryClient, { ${pkFieldName}: 'some-id' });`);
+    lines.push(` * \`\`\``);
+    lines.push(` */`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query<S extends ${selectTypeName}>(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection: ${selectionWithFieldsType('S')} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
+    if (hasRelationships && useCentralizedKeys) {
+      // scope is included in params above
+    }
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: ${selectionWithoutFieldsType()} }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
+    lines.push(`): Promise<void>;`);
+    lines.push(`export async function prefetch${ucFirst(singularName)}Query(`);
+    lines.push(`  queryClient: QueryClient,`);
+    lines.push(`  params: { ${pkFieldName}: ${pkFieldTsType}; selection?: SelectionConfig<${selectTypeName}> }${hasRelationships && useCentralizedKeys ? ` & { scope?: ${scopeTypeName} }` : ''},`);
+    lines.push(`): Promise<void> {`);
+    lines.push(`  const args = buildSelectionArgs<${selectTypeName}>(params.selection);`);
+
+    if (hasRelationships && useCentralizedKeys) {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}, params.scope),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    } else if (useCentralizedKeys) {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${keysName}.detail(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    } else {
+      lines.push(`  await queryClient.prefetchQuery({`);
+      lines.push(`    queryKey: ${queryName}QueryKey(params.${pkFieldName}),`);
+      lines.push(`    queryFn: () => getClient().${singularName}.findOne({ ${pkFieldName}: params.${pkFieldName}, ...(args ?? {}), select: (args?.select ?? defaultSelect) as ${selectTypeName} }).unwrap(),`);
+      lines.push(`  });`);
+    }
+
+    lines.push(`}`);
+  }
+
   const headerText = reactQueryEnabled
     ? `Single item query hook for ${typeName}`
     : `Single item query functions for ${typeName}`;
-  const content = getGeneratedFileHeader(headerText) + '\n\n' + code;
+  const content = getGeneratedFileHeader(headerText) + '\n\n' + lines.join('\n') + '\n';
 
   return {
     fileName: getSingleQueryFileName(table),
-    content,
+    content
   };
 }
 

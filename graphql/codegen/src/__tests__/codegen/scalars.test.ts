@@ -2,12 +2,12 @@
  * Tests for scalar mappings
  */
 import {
-  SCALAR_TS_MAP,
+  BASE_FILTER_TYPE_NAMES,
   SCALAR_FILTER_MAP,
   SCALAR_NAMES,
-  BASE_FILTER_TYPE_NAMES,
-  scalarToTsType,
+  SCALAR_TS_MAP,
   scalarToFilterType,
+  scalarToTsType
 } from '../../core/codegen/scalars';
 
 describe('scalars', () => {

@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import { buildSchemaSDL } from '@constructive-io/graphql-server';
 
 export interface BuildSchemaFromDatabaseOptions {
@@ -47,7 +48,7 @@ export async function buildSchemaFromDatabase(
   const sdl = await buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
+    graphile: { pgSettings: async () => ({ role: 'administrator' }) }
   });
 
   // Write schema to file
@@ -74,6 +75,6 @@ export async function buildSchemaSDLFromDatabase(options: {
   return buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
+    graphile: { pgSettings: async () => ({ role: 'administrator' }) }
   });
 }

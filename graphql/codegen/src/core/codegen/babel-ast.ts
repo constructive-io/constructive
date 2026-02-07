@@ -9,7 +9,7 @@ import generate from '@babel/generator';
 import * as t from '@babel/types';
 
 // Re-export for convenience
-export { t, generate };
+export { generate,t };
 
 /**
  * Generate code from an array of statements
@@ -29,7 +29,7 @@ export const commentBlock = (value: string): t.CommentBlock => {
     value,
     start: null,
     end: null,
-    loc: null,
+    loc: null
   };
 };
 
@@ -42,7 +42,7 @@ export const commentLine = (value: string): t.CommentLine => {
     value,
     start: null,
     end: null,
-    loc: null,
+    loc: null
   };
 };
 

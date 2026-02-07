@@ -18,7 +18,7 @@ function getValidator() {
 
   return {
     ajv: cachedAjv,
-    validator: cachedValidator!,
+    validator: cachedValidator!
   };
 }
 
@@ -36,6 +36,6 @@ export function validateMetaObject(
 
   return {
     errors: validator.errors,
-    message: ajv.errorsText(validator.errors, { separator: '\n' }),
+    message: ajv.errorsText(validator.errors, { separator: '\n' })
   };
 }

@@ -62,7 +62,7 @@ async function formatFileContent(
       singleQuote: true,
       trailingComma: 'es5',
       tabWidth: 2,
-      semi: true,
+      semi: true
     });
     return result.code;
   } catch {
@@ -98,7 +98,7 @@ export async function writeGeneratedFiles(
     const message = err instanceof Error ? err.message : 'Unknown error';
     return {
       success: false,
-      errors: [`Failed to create output directory: ${message}`],
+      errors: [`Failed to create output directory: ${message}`]
     };
   }
 
@@ -171,7 +171,7 @@ export async function writeGeneratedFiles(
   return {
     success: errors.length === 0,
     filesWritten: written,
-    errors: errors.length > 0 ? errors : undefined,
+    errors: errors.length > 0 ? errors : undefined
   };
 }
 
@@ -211,7 +211,7 @@ export async function formatOutput(
   if (!formatFn) {
     return {
       success: false,
-      error: 'oxfmt not available. Install it with: npm install oxfmt',
+      error: 'oxfmt not available. Install it with: npm install oxfmt'
     };
   }
 

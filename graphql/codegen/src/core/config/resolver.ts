@@ -6,9 +6,9 @@
  */
 import type {
   GraphQLSDKConfig,
-  GraphQLSDKConfigTarget,
+  GraphQLSDKConfigTarget
 } from '../../types/config';
-import { mergeConfig, getConfigOptions } from '../../types/config';
+import { getConfigOptions,mergeConfig } from '../../types/config';
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
@@ -47,13 +47,13 @@ export async function loadAndResolveConfig(
   const sources = [
     overrides.endpoint,
     overrides.schemaFile,
-    overrides.db,
+    overrides.db
   ].filter(Boolean);
   if (sources.length > 1) {
     return {
       success: false,
       error:
-        'Multiple sources specified. Use only one of: endpoint, schemaFile, or db.',
+        'Multiple sources specified. Use only one of: endpoint, schemaFile, or db.'
     };
   }
 
@@ -85,13 +85,13 @@ export async function loadAndResolveConfig(
     return {
       success: false,
       error:
-        'No source specified. Use --endpoint, --schema-file, or --db, or create a config file with "graphql-codegen init".',
+        'No source specified. Use --endpoint, --schema-file, or --db, or create a config file with "graphql-codegen init".'
     };
   }
 
   return {
     success: true,
-    config: getConfigOptions(mergedConfig),
+    config: getConfigOptions(mergedConfig)
   };
 }
 
@@ -134,12 +134,12 @@ export async function loadWatchConfig(options: {
   const watchOverrides: GraphQLSDKConfigTarget = {
     watch: {
       ...(options.pollInterval !== undefined && {
-        pollInterval: options.pollInterval,
+        pollInterval: options.pollInterval
       }),
       ...(options.debounce !== undefined && { debounce: options.debounce }),
       ...(options.touch !== undefined && { touchFile: options.touch }),
-      ...(options.clear !== undefined && { clearScreen: options.clear }),
-    },
+      ...(options.clear !== undefined && { clearScreen: options.clear })
+    }
   };
 
   let mergedConfig = mergeConfig(baseConfig, sourceOverrides);

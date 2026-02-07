@@ -12,27 +12,28 @@
  * - Query operations: {pluralName} (list), {singularName} (single)
  * - Mutation operations: create{Name}, update{Name}, delete{Name}
  */
+import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
+
 import type {
+  IntrospectionField,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionField,
-  IntrospectionTypeRef,
+  IntrospectionTypeRef
 } from '../../types/introspection';
-import { unwrapType, getBaseTypeName, isList } from '../../types/introspection';
+import { getBaseTypeName, isList,unwrapType } from '../../types/introspection';
 import type {
-  CleanTable,
+  CleanBelongsToRelation,
   CleanField,
   CleanFieldType,
-  CleanRelations,
-  CleanBelongsToRelation,
   CleanHasManyRelation,
   CleanManyToManyRelation,
-  TableInflection,
-  TableQueryNames,
-  TableConstraints,
+  CleanRelations,
+  CleanTable,
   ConstraintInfo,
+  TableConstraints,
+  TableInflection,
+  TableQueryNames
 } from '../../types/schema';
-import { singularize, pluralize, lcFirst, ucFirst } from 'inflekt';
 
 // ============================================================================
 // Pattern Matching Constants
@@ -63,7 +64,7 @@ const PATTERNS = {
   // Mutation name patterns (camelCase)
   createMutation: /^create([A-Z][a-zA-Z0-9]*)$/,
   updateMutation: /^update([A-Z][a-zA-Z0-9]*)$/,
-  deleteMutation: /^delete([A-Z][a-zA-Z0-9]*)$/,
+  deleteMutation: /^delete([A-Z][a-zA-Z0-9]*)$/
 };
 
 /**
@@ -88,7 +89,7 @@ const BUILTIN_TYPES = new Set([
   'Time',
   'JSON',
   'BigInt',
-  'BigFloat',
+  'BigFloat'
 ]);
 
 /**
@@ -244,7 +245,7 @@ function buildCleanTable(
     one: queryOps.one ?? lcFirst(entityName),
     create: mutationOps.create ?? `create${entityName}`,
     update: mutationOps.update,
-    delete: mutationOps.delete,
+    delete: mutationOps.delete
   };
 
   return {
@@ -254,9 +255,9 @@ function buildCleanTable(
       relations,
       inflection,
       query,
-      constraints,
+      constraints
     },
-    hasRealOperation,
+    hasRealOperation
   };
 }
 
@@ -295,7 +296,7 @@ function extractEntityFields(
     // Include scalar, enum, and other non-relation fields
     fields.push({
       name: field.name,
-      type: convertToCleanFieldType(field.type),
+      type: convertToCleanFieldType(field.type)
     });
   }
 
@@ -324,7 +325,7 @@ function convertToCleanFieldType(
 
   return {
     gqlType: baseType.name ?? 'Unknown',
-    isArray,
+    isArray
     // PostgreSQL-specific fields are not available from introspection
     // They were optional anyway and not used by generators
   };
@@ -371,7 +372,7 @@ function inferRelations(
         isUnique: false, // Can't determine from introspection alone
         referencesTable: baseTypeName,
         type: baseTypeName,
-        keys: [], // Would need FK info to populate
+        keys: [] // Would need FK info to populate
       });
     }
   }
@@ -425,8 +426,8 @@ function inferHasManyOrManyToMany(
         fieldName: field.name,
         rightTable: actualEntityName,
         junctionTable,
-        type: connectionTypeName,
-      },
+        type: connectionTypeName
+      }
     };
   }
 
@@ -437,8 +438,8 @@ function inferHasManyOrManyToMany(
       isUnique: false,
       referencedByTable: relatedEntityName,
       type: connectionTypeName,
-      keys: [],
-    },
+      keys: []
+    }
   };
 }
 
@@ -596,9 +597,9 @@ function inferConstraints(
         fields: [
           {
             name: idField.name,
-            type: convertToCleanFieldType(idField.type),
-          },
-        ],
+            type: convertToCleanFieldType(idField.type)
+          }
+        ]
       });
     }
   }
@@ -617,9 +618,9 @@ function inferConstraints(
           fields: [
             {
               name: idField.name,
-              type: convertToCleanFieldType(idField.type),
-            },
-          ],
+              type: convertToCleanFieldType(idField.type)
+            }
+          ]
         });
       }
     }
@@ -628,7 +629,7 @@ function inferConstraints(
   return {
     primaryKey,
     foreignKey: [], // Would need FK info to populate
-    unique: [], // Would need constraint info to populate
+    unique: [] // Would need constraint info to populate
   };
 }
 
@@ -681,7 +682,7 @@ function buildInflection(
     tableType: entityName,
     typeName: entityName,
     updateByPrimaryKey: `update${entityName}`,
-    updatePayloadType: hasUpdatePayload ? `Update${entityName}Payload` : null,
+    updatePayloadType: hasUpdatePayload ? `Update${entityName}Payload` : null
   };
 }
 
@@ -710,7 +711,7 @@ function findOrderByType(
   const candidates = [
     `${entityName}sOrderBy`, // Simple 's' plural: User -> UsersOrderBy
     `${entityName}esOrderBy`, // 'es' plural: Address -> AddressesOrderBy
-    `${entityName}OrderBy`, // No change (already plural or singular OK)
+    `${entityName}OrderBy` // No change (already plural or singular OK)
   ];
 
   // Check each candidate

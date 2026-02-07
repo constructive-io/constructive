@@ -2,24 +2,22 @@
  * Client exports
  */
 
-export { TypedDocumentString, type DocumentTypeDecoration } from './typed-document';
-
 export {
-  DataError,
-  DataErrorType,
   createError,
-  parseGraphQLError,
-  isDataError,
-  PG_ERROR_CODES,
+  DataError,
   type DataErrorOptions,
+  DataErrorType,
   type GraphQLError,
+  isDataError,
+  parseGraphQLError,
+  PG_ERROR_CODES
 } from './error';
-
 export {
-  execute,
   createGraphQLClient,
+  execute,
   type ExecuteOptions,
-  type GraphQLClientOptions,
   type GraphQLClient,
-  type GraphQLResponse,
+  type GraphQLClientOptions,
+  type GraphQLResponse
 } from './execute';
+export { type DocumentTypeDecoration,TypedDocumentString } from './typed-document';

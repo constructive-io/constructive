@@ -3,10 +3,11 @@
  *
  * Generates index.ts files that re-export all models and operations.
  */
-import type { CleanTable } from '../../../types/schema';
 import * as t from '@babel/types';
+
+import type { CleanTable } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
-import { getTableNames, lcFirst, getGeneratedFileHeader } from '../utils';
+import { getGeneratedFileHeader,getTableNames, lcFirst } from '../utils';
 
 export interface GeneratedBarrelFile {
   fileName: string;
@@ -41,7 +42,7 @@ export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile 
 
   return {
     fileName: 'models/index.ts',
-    content: header + '\n' + code,
+    content: header + '\n' + code
   };
 }
 
@@ -62,6 +63,6 @@ export * from './input-types';
 
   return {
     fileName: 'types.ts',
-    content,
+    content
   };
 }

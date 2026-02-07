@@ -5,33 +5,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Development Commands
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Build all packages (dev mode - faster, no optimizations)
-pnpm build:dev
-
-# Lint all packages (auto-fix enabled)
-pnpm lint
-
-# Clean build artifacts
-pnpm clean
-
-# Update dependencies interactively
-pnpm deps
+pnpm install          # Install dependencies
+pnpm build            # Build all packages
+pnpm build:dev        # Build all packages (dev mode - faster, no optimizations)
+pnpm lint             # Lint all packages (auto-fix enabled)
+pnpm clean            # Clean build artifacts
+pnpm deps             # Update dependencies interactively (pnpm up -r -i -L)
 ```
 
 ### Per-Package Commands
 
-Navigate to any package directory (e.g., `cd pgpm/cli`) and run:
+From any package directory (e.g., `cd pgpm/cli`):
 
 ```bash
-pnpm build        # Build the package
+pnpm build        # Build the package (uses makage)
 pnpm lint         # Lint with auto-fix
-pnpm test         # Run tests
+pnpm test         # Run tests (Jest)
 pnpm test:watch   # Run tests in watch mode
 pnpm dev          # Run in development mode (where available)
 ```
@@ -41,54 +30,74 @@ pnpm dev          # Run in development mode (where available)
 ```bash
 cd packages/cli
 pnpm test -- path/to/test.test.ts
-# or with pattern matching:
 pnpm test -- --testNamePattern="test name pattern"
+```
+
+### Publishing
+
+Lerna with independent versioning and conventional commits. Publishing only from `main` branch:
+
+```bash
+npx lerna version    # Bump versions
+npx lerna publish    # Publish to npm
 ```
 
 ## Project Architecture
 
-This is a **pnpm monorepo** using Lerna for versioning/publishing. The workspace is organized into domain-specific directories:
+A **pnpm monorepo** with Lerna for versioning. PostgreSQL-first framework: design your database schema, manage it with pgpm, and get a production-ready GraphQL API automatically via PostGraphile.
 
-### Core Package Groups
+### Data Flow
+
+```
+PostgreSQL (schema + RLS policies, managed by pgpm migrations)
+    ↓
+PostGraphile (graphql/server + graphile/* plugins)
+    ↓
+GraphQL Schema (auto-generated from database)
+    ↓
+graphql/codegen (--react-query mode OR --orm mode)
+    ↓
+React Query Hooks or Prisma-like ORM Client
+```
+
+### Workspace Groups
 
 | Directory | Purpose |
 |-----------|---------|
-| `pgpm/` | PostgreSQL Package Manager - CLI, core engine, types |
-| `graphql/` | GraphQL layer - server, codegen, React hooks, testing |
-| `graphile/` | PostGraphile plugins - filters, i18n, meta-schema, PostGIS |
-| `postgres/` | PostgreSQL utilities - introspection, testing, seeding, AST |
-| `packages/` | Shared utilities - CLI, ORM, query builder |
-| `uploads/` | File streaming - S3, ETags, content-type detection |
-| `jobs/` | Job scheduling and worker infrastructure |
+| `pgpm/` | PostgreSQL Package Manager - CLI (`pgpm`), core engine, types, env, logger |
+| `graphql/` | GraphQL layer - server, codegen, query builder, explorer, AST utilities |
+| `graphile/` | PostGraphile plugins - filters, i18n, meta-schema, PostGIS, search, uploads, settings |
+| `postgres/` | PostgreSQL utilities - introspection, testing (pgsql-test), seeding, AST, query context |
+| `packages/` | Shared utilities - CLI (`cnc`), ORM base, query builder, server utils, client |
+| `uploads/` | File streaming - S3/MinIO, ETags, content-type detection, UUID hashing |
+| `jobs/` | Knative job scheduling - worker, scheduler, service, functions |
+| `functions/` | Knative cloud functions (e.g., send-email-link) |
 
-### Key Packages
+### Key Packages & CLIs
 
-**pgpm (PostgreSQL Package Manager)**
-- `pgpm/cli` - Main CLI tool (`pgpm` command)
-- `pgpm/core` - Migration engine, dependency resolution, deployment
+**`pgpm` CLI** (`pgpm/cli`) - PostgreSQL Package Manager. Commands: `init`, `add`, `deploy`, `revert`, `verify`, `plan`, `install`, `export`, `docker`, `dump`, `tag`. Manages SQL migrations in Sqitch-compatible format with dependency resolution.
 
-**GraphQL Stack**
-- `graphql/server` - Express + PostGraphile API server
-- `graphql/codegen` - SDK generator (React Query hooks or Prisma-like ORM)
-- `graphql/query` - Fluent GraphQL query builder
+**`cnc` CLI** (`packages/cli`, binary: `cnc` or `constructive`) - Full dev toolkit. Commands: `server` (start PostGraphile), `explorer` (GraphiQL UI), `codegen` (generate SDK), `get-graphql-schema`, `jobs`, `context`, `auth`, `execute`.
 
-**Testing Infrastructure**
-- `postgres/pgsql-test` - Isolated PostgreSQL test environments with transaction rollback
-- `graphile/graphile-test` - GraphQL testing utilities
+**`graphql/codegen`** - Generates type-safe clients from GraphQL schema or endpoint:
+- `--react-query` mode: TanStack Query v5 hooks with query key factories
+- `--orm` mode: Prisma-like fluent API with `InferSelectResult<T, S>` type inference, discriminated union error handling (`.unwrap()`, `.unwrapOr()`)
+- Sources: GraphQL endpoint URL, .graphql schema file, or direct database introspection
 
-### Testing Pattern
+**`graphql/server`** - Express + PostGraphile. Supports multi-endpoint routing via subdomain/host detection (schema builder with app-public/auth/admin sub-endpoints). Uses `LISTEN/NOTIFY` for schema cache invalidation.
 
-Tests use `pgsql-test` for database testing with per-test transaction rollback:
+**`graphile/graphile-settings`** - Centralizes all PostGraphile plugin config: connection filters, full-text search, PostGIS, i18n, meta-schema, many-to-many, search, upload plugin. Single `getGraphileSettings(opts)` entry point.
+
+**`packages/query-builder`** - Fluent SQL query builder for SELECT/INSERT/UPDATE/DELETE with JOINs, WHERE, GROUP BY. Schema-qualified tables.
+
+### Testing Infrastructure
+
+**`postgres/pgsql-test`** - Isolated PostgreSQL test environments with per-test transaction rollback:
 
 ```typescript
 import { getConnections } from 'pgsql-test';
-
 let db, teardown;
-
-beforeAll(async () => {
-  ({ db, teardown } = await getConnections());
-});
-
+beforeAll(async () => ({ db, teardown } = await getConnections()));
 beforeEach(() => db.beforeEach());
 afterEach(() => db.afterEach());
 afterAll(() => teardown());
@@ -100,26 +109,35 @@ test('example', async () => {
 });
 ```
 
+**`graphile/graphile-test`** - GraphQL testing with PostGraphile snapshot support.
+
+### Job System
+
+Background jobs use Knative: jobs are added to `app_jobs.jobs` table → `knative-job-worker` polls and picks up → POSTs to Knative function URL → function executes (e.g., send email) → returns status.
+
 ### Database Configuration
 
-Tests require PostgreSQL. Standard PG environment variables:
-- `PGHOST` (default: localhost)
-- `PGPORT` (default: 5432)
-- `PGUSER` (default: postgres)
-- `PGPASSWORD` (default: password)
+Tests require PostgreSQL. Standard PG env vars:
+- `PGHOST` (default: localhost), `PGPORT` (default: 5432)
+- `PGUSER` (default: postgres), `PGPASSWORD` (default: password)
 
 For S3/MinIO tests: `MINIO_ENDPOINT`, `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`, `AWS_REGION`
 
-### Build System
+## Build System
 
-- Uses `makage` for TypeScript compilation (handles both CJS and ESM output)
-- Jest with ts-jest for testing
-- ESLint with TypeScript support
-- Each package has its own `tsconfig.json` extending root config
+- **makage** compiles TypeScript to both CJS and ESM, outputs to `dist/`
+- `makage build --dev` for faster dev builds
+- Some packages use `copyfiles` for non-TS assets (SQL files, templates)
+- Jest with `ts-jest` preset per-package (`jest.config.js` in each package)
 
-### Code Conventions
+## Code Conventions
 
-- TypeScript with `strict: true` (but `strictNullChecks: false`)
-- Target: ES2022, Module: CommonJS
-- Packages publish to npm from `dist/` directory
+- TypeScript with `strict: true` but `strictNullChecks: false`
+- Target: ES2022, Module: CommonJS, ModuleResolution: node
+- 2-space indent, single quotes, semicolons required, no trailing commas
+- Imports auto-sorted by `simple-import-sort`, unused imports auto-removed
+- `@typescript-eslint/no-explicit-any`: allowed (turned off)
+- Unused var pattern: prefix with `_` (e.g., `_unused`)
 - Workspace dependencies use `workspace:^` protocol
+- Packages publish from `dist/` directory
+- GraphQL pinned to `15.10.1` via overrides

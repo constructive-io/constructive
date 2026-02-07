@@ -3,18 +3,17 @@
  * Uses AST-based approach for PostGraphile-compatible mutations
  */
 import * as t from 'gql-ast';
-import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
+import { print } from 'graphql';
 import { camelize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
   getCustomAstForCleanField,
-  requiresSubfieldSelection,
+  requiresSubfieldSelection
 } from '../core/custom-ast';
-import type { CleanTable } from '../types/schema';
 import type { MutationOptions } from '../types/mutation';
-
+import type { CleanTable } from '../types/schema';
 import { isRelationalField } from './field-selector';
 
 /**
@@ -55,17 +54,17 @@ export function buildPostGraphileCreate(
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Create${table.name}Input` }),
-      }),
-    }),
+        type: t.namedType({ type: `Create${table.name}Input` })
+      })
+    })
   ];
 
   // Create the mutation arguments
   const mutationArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
-      value: t.variable({ name: 'input' }),
-    }),
+      value: t.variable({ name: 'input' })
+    })
   ];
 
   // Get the field selections for the return value using custom AST logic
@@ -88,23 +87,23 @@ export function buildPostGraphileCreate(
                   t.field({
                     name: singularName,
                     selectionSet: t.selectionSet({
-                      selections: fieldSelections,
-                    }),
-                  }),
-                ],
-              }),
-            }),
-          ],
-        }),
-      }),
-    ],
+                      selections: fieldSelections
+                    })
+                  })
+                ]
+              })
+            })
+          ]
+        })
+      })
+    ]
   });
 
   // Print the AST to get the query string
   const queryString = print(ast);
 
   return new TypedDocumentString(queryString, {
-    __ast: ast,
+    __ast: ast
   }) as TypedDocumentString<
     Record<string, unknown>,
     { input: { [key: string]: Record<string, unknown> } }
@@ -131,17 +130,17 @@ export function buildPostGraphileUpdate(
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Update${table.name}Input` }),
-      }),
-    }),
+        type: t.namedType({ type: `Update${table.name}Input` })
+      })
+    })
   ];
 
   // Create the mutation arguments
   const mutationArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
-      value: t.variable({ name: 'input' }),
-    }),
+      value: t.variable({ name: 'input' })
+    })
   ];
 
   // Get the field selections for the return value using custom AST logic
@@ -164,23 +163,23 @@ export function buildPostGraphileUpdate(
                   t.field({
                     name: singularName,
                     selectionSet: t.selectionSet({
-                      selections: fieldSelections,
-                    }),
-                  }),
-                ],
-              }),
-            }),
-          ],
-        }),
-      }),
-    ],
+                      selections: fieldSelections
+                    })
+                  })
+                ]
+              })
+            })
+          ]
+        })
+      })
+    ]
   });
 
   // Print the AST to get the query string
   const queryString = print(ast);
 
   return new TypedDocumentString(queryString, {
-    __ast: ast,
+    __ast: ast
   }) as TypedDocumentString<
     Record<string, unknown>,
     { input: { id: string | number; patch: Record<string, unknown> } }
@@ -206,17 +205,17 @@ export function buildPostGraphileDelete(
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Delete${table.name}Input` }),
-      }),
-    }),
+        type: t.namedType({ type: `Delete${table.name}Input` })
+      })
+    })
   ];
 
   // Create the mutation arguments
   const mutationArgs: ArgumentNode[] = [
     t.argument({
       name: 'input',
-      value: t.variable({ name: 'input' }),
-    }),
+      value: t.variable({ name: 'input' })
+    })
   ];
 
   // PostGraphile delete mutations typically return clientMutationId
@@ -235,20 +234,20 @@ export function buildPostGraphileDelete(
               name: mutationName,
               args: mutationArgs,
               selectionSet: t.selectionSet({
-                selections: fieldSelections,
-              }),
-            }),
-          ],
-        }),
-      }),
-    ],
+                selections: fieldSelections
+              })
+            })
+          ]
+        })
+      })
+    ]
   });
 
   // Print the AST to get the query string
   const queryString = print(ast);
 
   return new TypedDocumentString(queryString, {
-    __ast: ast,
+    __ast: ast
   }) as TypedDocumentString<
     Record<string, unknown>,
     { input: { id: string | number } }

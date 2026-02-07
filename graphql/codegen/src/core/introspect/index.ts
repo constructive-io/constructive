@@ -3,29 +3,29 @@
  */
 
 // Table inference from introspection
-export { inferTablesFromIntrospection } from './infer-tables';
 export type { InferTablesOptions } from './infer-tables';
+export { inferTablesFromIntrospection } from './infer-tables';
 
 // Pluralization utilities (from inflekt)
-export { singularize, pluralize } from 'inflekt';
+export { pluralize,singularize } from 'inflekt';
 
 // Schema sources
+export type {
+  CreateSchemaSourceOptions,
+  SchemaSource,
+  SchemaSourceResult
+} from './source';
 export {
   createSchemaSource,
-  validateSourceOptions,
   EndpointSchemaSource,
   FileSchemaSource,
   SchemaSourceError,
-} from './source';
-export type {
-  SchemaSource,
-  SchemaSourceResult,
-  CreateSchemaSourceOptions,
+  validateSourceOptions
 } from './source';
 
 // Schema fetching (still used by watch mode)
-export { fetchSchema } from './fetch-schema';
 export type { FetchSchemaOptions, FetchSchemaResult } from './fetch-schema';
+export { fetchSchema } from './fetch-schema';
 
 // Transform utilities (only filterTables, getTableNames, findTable are still useful)
-export { getTableNames, findTable, filterTables } from './transform';
+export { filterTables,findTable, getTableNames } from './transform';

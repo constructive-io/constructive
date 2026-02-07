@@ -5,8 +5,8 @@
 import type { DocumentNode } from 'graphql';
 import { print } from 'graphql';
 
+import { createError, type DataError,parseGraphQLError } from './error';
 import { TypedDocumentString } from './typed-document';
-import { createError, parseGraphQLError, type DataError } from './error';
 
 // ============================================================================
 // Types
@@ -69,7 +69,7 @@ export async function execute<TDocument extends ExecutableDocument>(
   endpoint: string,
   document: TDocument,
   variables?: VariablesOf<TDocument>,
-  options: ExecuteOptions = {},
+  options: ExecuteOptions = {}
 ): Promise<ResultOf<TDocument>> {
   const { headers = {}, timeout = 30000, signal } = options;
 
@@ -88,13 +88,13 @@ export async function execute<TDocument extends ExecutableDocument>(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/graphql-response+json, application/json',
-        ...headers,
+        ...headers
       },
       body: JSON.stringify({
         query: documentToString(document),
-        ...(variables !== undefined && { variables }),
+        ...(variables !== undefined && { variables })
       }),
-      signal: combinedSignal,
+      signal: combinedSignal
     });
 
     clearTimeout(timeoutId);
@@ -182,12 +182,12 @@ export function createGraphQLClient(options: GraphQLClientOptions) {
     async execute<TDocument extends ExecutableDocument>(
       document: TDocument,
       variables?: VariablesOf<TDocument>,
-      options: ExecuteOptions = {},
+      options: ExecuteOptions = {}
     ): Promise<ResultOf<TDocument>> {
       return execute(endpoint, document, variables, {
         headers: { ...defaultHeaders, ...options.headers },
         timeout: options.timeout ?? defaultTimeout,
-        signal: options.signal,
+        signal: options.signal
       });
     },
 
@@ -196,7 +196,7 @@ export function createGraphQLClient(options: GraphQLClientOptions) {
      */
     getEndpoint(): string {
       return endpoint;
-    },
+    }
   };
 }
 

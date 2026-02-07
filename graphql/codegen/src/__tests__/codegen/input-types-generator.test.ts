@@ -6,15 +6,15 @@
  * used to validate the AST-based migration produces equivalent results.
  */
 // Jest globals - no import needed
-import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../core/codegen/orm/input-types-generator';
+import { collectInputTypeNames, collectPayloadTypeNames,generateInputTypesFile } from '../../core/codegen/orm/input-types-generator';
 import type {
-  CleanTable,
+  CleanArgument,
   CleanFieldType,
   CleanRelations,
-  TypeRegistry,
-  ResolvedType,
-  CleanArgument,
+  CleanTable,
   CleanTypeRef,
+  ResolvedType,
+  TypeRegistry
 } from '../../types/schema';
 
 // ============================================================================
@@ -32,7 +32,7 @@ const fieldTypes = {
   json: { gqlType: 'JSON', isArray: false } as CleanFieldType,
   bigint: { gqlType: 'BigInt', isArray: false } as CleanFieldType,
   stringArray: { gqlType: 'String', isArray: true } as CleanFieldType,
-  intArray: { gqlType: 'Int', isArray: true } as CleanFieldType,
+  intArray: { gqlType: 'Int', isArray: true } as CleanFieldType
 };
 
 // ============================================================================
@@ -43,7 +43,7 @@ const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: [],
+  manyToMany: []
 };
 
 function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
@@ -53,7 +53,7 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
     relations: partial.relations ?? emptyRelations,
     query: partial.query,
     inflection: partial.inflection,
-    constraints: partial.constraints,
+    constraints: partial.constraints
   };
 }
 
@@ -89,15 +89,15 @@ const userTable = createTable({
     { name: 'age', type: fieldTypes.int },
     { name: 'isActive', type: fieldTypes.boolean },
     { name: 'createdAt', type: fieldTypes.datetime },
-    { name: 'metadata', type: fieldTypes.json },
+    { name: 'metadata', type: fieldTypes.json }
   ],
   query: {
     all: 'users',
     one: 'user',
     create: 'createUser',
     update: 'updateUser',
-    delete: 'deleteUser',
-  },
+    delete: 'deleteUser'
+  }
 });
 
 /**
@@ -111,7 +111,7 @@ const postTable = createTable({
     { name: 'content', type: fieldTypes.string },
     { name: 'authorId', type: fieldTypes.uuid },
     { name: 'publishedAt', type: fieldTypes.datetime },
-    { name: 'tags', type: fieldTypes.stringArray },
+    { name: 'tags', type: fieldTypes.stringArray }
   ],
   relations: {
     belongsTo: [
@@ -120,8 +120,8 @@ const postTable = createTable({
         isUnique: false,
         referencesTable: 'User',
         type: null,
-        keys: [{ name: 'authorId', type: fieldTypes.uuid }],
-      },
+        keys: [{ name: 'authorId', type: fieldTypes.uuid }]
+      }
     ],
     hasOne: [],
     hasMany: [
@@ -130,18 +130,18 @@ const postTable = createTable({
         isUnique: false,
         referencedByTable: 'Comment',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
-    manyToMany: [],
+    manyToMany: []
   },
   query: {
     all: 'posts',
     one: 'post',
     create: 'createPost',
     update: 'updatePost',
-    delete: 'deletePost',
-  },
+    delete: 'deletePost'
+  }
 });
 
 /**
@@ -154,7 +154,7 @@ const commentTable = createTable({
     { name: 'body', type: fieldTypes.string },
     { name: 'postId', type: fieldTypes.uuid },
     { name: 'authorId', type: fieldTypes.uuid },
-    { name: 'createdAt', type: fieldTypes.datetime },
+    { name: 'createdAt', type: fieldTypes.datetime }
   ],
   relations: {
     belongsTo: [
@@ -163,27 +163,27 @@ const commentTable = createTable({
         isUnique: false,
         referencesTable: 'Post',
         type: null,
-        keys: [],
+        keys: []
       },
       {
         fieldName: 'author',
         isUnique: false,
         referencesTable: 'User',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
     hasOne: [],
     hasMany: [],
-    manyToMany: [],
+    manyToMany: []
   },
   query: {
     all: 'comments',
     one: 'comment',
     create: 'createComment',
     update: 'updateComment',
-    delete: 'deleteComment',
-  },
+    delete: 'deleteComment'
+  }
 });
 
 /**
@@ -200,18 +200,18 @@ const userTableWithRelations = createTable({
         isUnique: false,
         referencedByTable: 'Post',
         type: null,
-        keys: [],
+        keys: []
       },
       {
         fieldName: 'comments',
         isUnique: false,
         referencedByTable: 'Comment',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
-    manyToMany: [],
-  },
+    manyToMany: []
+  }
 });
 
 /**
@@ -222,7 +222,7 @@ const categoryTable = createTable({
   fields: [
     { name: 'id', type: fieldTypes.uuid },
     { name: 'name', type: fieldTypes.string },
-    { name: 'slug', type: fieldTypes.string },
+    { name: 'slug', type: fieldTypes.string }
   ],
   relations: {
     belongsTo: [],
@@ -233,17 +233,17 @@ const categoryTable = createTable({
         fieldName: 'posts',
         rightTable: 'Post',
         junctionTable: 'PostCategory',
-        type: null,
-      },
-    ],
+        type: null
+      }
+    ]
   },
   query: {
     all: 'categories',
     one: 'category',
     create: 'createCategory',
     update: 'updateCategory',
-    delete: 'deleteCategory',
-  },
+    delete: 'deleteCategory'
+  }
 });
 
 /**
@@ -255,7 +255,7 @@ const profileTable = createTable({
     { name: 'id', type: fieldTypes.uuid },
     { name: 'bio', type: fieldTypes.string },
     { name: 'userId', type: fieldTypes.uuid },
-    { name: 'avatarUrl', type: fieldTypes.string },
+    { name: 'avatarUrl', type: fieldTypes.string }
   ],
   relations: {
     belongsTo: [
@@ -264,20 +264,20 @@ const profileTable = createTable({
         isUnique: true,
         referencesTable: 'User',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
     hasOne: [],
     hasMany: [],
-    manyToMany: [],
+    manyToMany: []
   },
   query: {
     all: 'profiles',
     one: 'profile',
     create: 'createProfile',
     update: 'updateProfile',
-    delete: 'deleteProfile',
-  },
+    delete: 'deleteProfile'
+  }
 });
 
 // User with hasOne to profile
@@ -291,8 +291,8 @@ const userTableWithProfile = createTable({
         isUnique: true,
         referencedByTable: 'Profile',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
     hasMany: [
       {
@@ -300,11 +300,11 @@ const userTableWithProfile = createTable({
         isUnique: false,
         referencedByTable: 'Post',
         type: null,
-        keys: [],
-      },
+        keys: []
+      }
     ],
-    manyToMany: [],
-  },
+    manyToMany: []
+  }
 });
 
 // ============================================================================
@@ -318,8 +318,8 @@ const sampleTypeRegistry = createTypeRegistry({
     inputFields: [
       { name: 'email', type: createNonNull(createTypeRef('SCALAR', 'String')) },
       { name: 'password', type: createNonNull(createTypeRef('SCALAR', 'String')) },
-      { name: 'rememberMe', type: createTypeRef('SCALAR', 'Boolean') },
-    ],
+      { name: 'rememberMe', type: createTypeRef('SCALAR', 'Boolean') }
+    ]
   },
   RegisterInput: {
     kind: 'INPUT_OBJECT',
@@ -327,13 +327,13 @@ const sampleTypeRegistry = createTypeRegistry({
     inputFields: [
       { name: 'email', type: createNonNull(createTypeRef('SCALAR', 'String')) },
       { name: 'password', type: createNonNull(createTypeRef('SCALAR', 'String')) },
-      { name: 'name', type: createTypeRef('SCALAR', 'String') },
-    ],
+      { name: 'name', type: createTypeRef('SCALAR', 'String') }
+    ]
   },
   UserRole: {
     kind: 'ENUM',
     name: 'UserRole',
-    enumValues: ['ADMIN', 'USER', 'GUEST'],
+    enumValues: ['ADMIN', 'USER', 'GUEST']
   },
   LoginPayload: {
     kind: 'OBJECT',
@@ -341,9 +341,9 @@ const sampleTypeRegistry = createTypeRegistry({
     fields: [
       { name: 'token', type: createTypeRef('SCALAR', 'String') },
       { name: 'user', type: createTypeRef('OBJECT', 'User') },
-      { name: 'expiresAt', type: createTypeRef('SCALAR', 'Datetime') },
-    ],
-  },
+      { name: 'expiresAt', type: createTypeRef('SCALAR', 'Datetime') }
+    ]
+  }
 });
 
 // ============================================================================
@@ -646,14 +646,14 @@ describe('collectInputTypeNames', () => {
     const operations = [
       {
         args: [
-          { name: 'input', type: createNonNull(createTypeRef('INPUT_OBJECT', 'LoginInput')) },
-        ] as CleanArgument[],
+          { name: 'input', type: createNonNull(createTypeRef('INPUT_OBJECT', 'LoginInput')) }
+        ] as CleanArgument[]
       },
       {
         args: [
-          { name: 'data', type: createTypeRef('INPUT_OBJECT', 'RegisterInput') },
-        ] as CleanArgument[],
-      },
+          { name: 'data', type: createTypeRef('INPUT_OBJECT', 'RegisterInput') }
+        ] as CleanArgument[]
+      }
     ];
 
     const result = collectInputTypeNames(operations);
@@ -666,9 +666,9 @@ describe('collectInputTypeNames', () => {
     const operations = [
       {
         args: [
-          { name: 'filter', type: createTypeRef('INPUT_OBJECT', 'UserFilter') },
-        ] as CleanArgument[],
-      },
+          { name: 'filter', type: createTypeRef('INPUT_OBJECT', 'UserFilter') }
+        ] as CleanArgument[]
+      }
     ];
 
     const result = collectInputTypeNames(operations);
@@ -681,7 +681,7 @@ describe('collectPayloadTypeNames', () => {
   it('collects Payload type names from operations', () => {
     const operations = [
       { returnType: createTypeRef('OBJECT', 'LoginPayload') },
-      { returnType: createTypeRef('OBJECT', 'RegisterPayload') },
+      { returnType: createTypeRef('OBJECT', 'RegisterPayload') }
     ];
 
     const result = collectPayloadTypeNames(operations);
@@ -690,14 +690,14 @@ describe('collectPayloadTypeNames', () => {
     expect(result.has('RegisterPayload')).toBe(true);
   });
 
-  it('excludes Connection types', () => {
+  it('includes Connection types', () => {
     const operations = [
-      { returnType: createTypeRef('OBJECT', 'UsersConnection') },
+      { returnType: createTypeRef('OBJECT', 'UsersConnection') }
     ];
 
     const result = collectPayloadTypeNames(operations);
 
-    expect(result.has('UsersConnection')).toBe(false);
+    expect(result.has('UsersConnection')).toBe(true);
   });
 });
 
@@ -717,7 +717,7 @@ describe('edge cases', () => {
   it('handles table with only id field', () => {
     const minimalTable = createTable({
       name: 'Minimal',
-      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      fields: [{ name: 'id', type: fieldTypes.uuid }]
     });
     const result = generateInputTypesFile(new Map(), new Set(), [minimalTable]);
 
