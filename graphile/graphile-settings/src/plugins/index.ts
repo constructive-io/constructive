@@ -68,3 +68,7 @@ export {
   PgTypeMappingsPreset,
 } from './pg-type-mappings';
 export type { TypeMapping } from './pg-type-mappings';
+
+// Search plugin for tsvector full-text search conditions
+export { PgSearchPlugin, PgSearchPreset, createPgSearchPlugin } from 'graphile-search-plugin';
+export type { PgSearchPluginOptions } from 'graphile-search-plugin';

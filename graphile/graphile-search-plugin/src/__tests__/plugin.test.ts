@@ -2,7 +2,6 @@ import { join } from 'path';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
-import { PgSearchPreset } from '../preset';
 import { ConstructivePreset } from 'graphile-settings';
 
 const SCHEMA = 'app_public';
@@ -29,10 +28,10 @@ describe('PgSearchPlugin', () => {
   let query: QueryFn;
 
   beforeAll(async () => {
+    // ConstructivePreset already includes PgSearchPreset({ pgSearchPrefix: 'fullText' })
     const testPreset = {
       extends: [
         ConstructivePreset,
-        PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
     };
 

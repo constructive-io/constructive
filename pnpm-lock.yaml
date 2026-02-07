@@ -280,6 +280,9 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
+      graphile-search-plugin:
+        specifier: workspace:^
+        version: link:../graphile-search-plugin/dist
       graphql:
         specifier: ^16.9.0
         version: 16.12.0

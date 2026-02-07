@@ -40,6 +40,7 @@
     "graphile-build": "^5.0.0-rc.3",
     "graphile-build-pg": "^5.0.0-rc.3",
     "graphile-config": "1.0.0-rc.3",
+    "graphile-search-plugin": "workspace:^",
     "graphql": "^16.9.0",
     "lru-cache": "^11.2.4",
     "pg": "^8.17.1",
