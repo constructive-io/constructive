@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'graphql/test-app/**'
+      - 'graphql/test-codegen-app/**'
 
 jobs:
   trigger-tests:

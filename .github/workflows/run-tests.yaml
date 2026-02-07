@@ -6,12 +6,14 @@ on:
       - v1
     paths-ignore:
       - 'graphql/test-app/**'
+      - 'graphql/test-codegen-app/**'
   pull_request:
     branches:
       - main
       - v1
     paths-ignore:
       - 'graphql/test-app/**'
+      - 'graphql/test-codegen-app/**'
   workflow_dispatch:
   workflow_call:
 
