@@ -6,6 +6,8 @@ name: Notify E2E Tests
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'graphql/test-app/**'
 
 jobs:
   trigger-tests:

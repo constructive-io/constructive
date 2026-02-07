@@ -6,11 +6,15 @@ on:
       - main
       - v1
       - release/*
+    paths-ignore:
+      - 'graphql/test-app/**'
   pull_request:
     branches:
       - main
       - v1
     types: [opened, reopened, synchronize, ready_for_review]
+    paths-ignore:
+      - 'graphql/test-app/**'
   workflow_dispatch: {}
 
 concurrency:
