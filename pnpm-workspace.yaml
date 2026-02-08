@@ -2,6 +2,7 @@ packages:
   - 'packages/*'
   - 'pgpm/*'
   - 'graphql/*'
+  - 'examples/*'
   - 'uploads/*'
   - 'postgres/*'
   - 'graphile/*'

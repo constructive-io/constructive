@@ -4,16 +4,10 @@ on:
     branches:
       - main
       - v1
-    paths-ignore:
-      - 'graphql/test-app/**'
-      - 'graphql/test-codegen-app/**'
   pull_request:
     branches:
       - main
       - v1
-    paths-ignore:
-      - 'graphql/test-app/**'
-      - 'graphql/test-codegen-app/**'
   workflow_dispatch:
   workflow_call:
 
@@ -197,7 +191,7 @@ jobs:
 
       - name: build
         run: |
-          pnpm -r --filter '!@constructive-io/test-codegen-app' run build
+          pnpm -r --filter '!./examples/**' run build
 
       - name: seed app_user
         run: |
