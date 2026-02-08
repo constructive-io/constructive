@@ -30,7 +30,6 @@ Generator Options:
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --authorization <token>    Authorization header value
-  --browser-compatible       Deprecated no-op (retained for compatibility)
   --dry-run                  Preview without writing files
   --verbose                  Verbose output
 
@@ -88,11 +87,6 @@ export default async (
   if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
   if (argv.output) cliOverrides.output = argv.output as string;
   if (argv.authorization) cliOverrides.authorization = argv.authorization as string;
-  if (argv['browser-compatible'] !== undefined) {
-    cliOverrides.browserCompatible = argv['browser-compatible'] as boolean;
-  } else if (argv.browserCompatible !== undefined) {
-    cliOverrides.browserCompatible = argv.browserCompatible as boolean;
-  }
 
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
@@ -120,9 +114,7 @@ export default async (
       argv.authorization ||
       argv['dry-run'] === true ||
       argv.dryRun === true ||
-      argv.verbose === true ||
-      argv['browser-compatible'] !== undefined ||
-      argv.browserCompatible !== undefined
+      argv.verbose === true
   );
 
   if (hasNonInteractiveArgs) {
@@ -150,7 +142,6 @@ export default async (
     authorization: camelized.authorization,
     reactQuery: camelized.reactQuery,
     orm: camelized.orm,
-    browserCompatible: camelized.browserCompatible,
     dryRun: camelized.dryRun,
     verbose: camelized.verbose,
   });

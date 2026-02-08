@@ -91,7 +91,6 @@ cnc codegen --api-names my_api --output ./codegen --orm
 - `--orm` - Generate ORM client
 - `--output <dir>` - Output directory (default: ./codegen)
 - `--authorization <token>` - Authorization header value
-- `--browser-compatible` - Generate browser-compatible code (default: true)
 - `--dry-run` - Preview without writing files
 - `--verbose` - Verbose output
 

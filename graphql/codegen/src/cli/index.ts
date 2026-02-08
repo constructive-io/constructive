@@ -39,7 +39,6 @@ Generator Options:
   -o, --output <dir>            Output directory
   -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
-  --browser-compatible          Deprecated no-op (retained for compatibility)
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
@@ -165,9 +164,7 @@ export const commands = async (
       argv['dry-run'] === true ||
       argv.dryRun === true ||
       argv.verbose === true ||
-      argv.v === true ||
-      argv['browser-compatible'] !== undefined ||
-      argv.browserCompatible !== undefined
+      argv.v === true
   );
 
   if (hasNonInteractiveArgs) {
@@ -199,7 +196,6 @@ export const commands = async (
     authorization: camelized.authorization,
     reactQuery: camelized.reactQuery,
     orm: camelized.orm,
-    browserCompatible: camelized.browserCompatible,
     dryRun: camelized.dryRun,
     verbose: camelized.verbose
   });
@@ -222,7 +218,7 @@ export const options: Partial<CLIOptions> = {
       v: 'verbose'
     },
     boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible'
+      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db'
     ],
     string: [
       'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',

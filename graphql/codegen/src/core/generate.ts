@@ -43,13 +43,6 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
   const config = getConfigOptions(options);
   const outputRoot = config.output;
 
-  // Keep backward compatibility for deprecated config fields.
-  if (options.browserCompatible === false) {
-    console.warn(
-      '[graphql-codegen] "browserCompatible" is deprecated and currently a no-op.'
-    );
-  }
-
   // Determine which generators to run
   // ORM is always required when React Query is enabled (hooks delegate to ORM)
   // This handles minimist setting orm=false when --orm flag is absent
