@@ -917,7 +917,7 @@ import type { UserSelect, UserWithRelations } from "../../orm/input-types";
 import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a User
+ * Mutation hook for deleting a User with typed selection
  * 
  * @example
  * \`\`\`tsx
@@ -945,8 +945,32 @@ export function useDeleteUserMutation<S extends UserSelect>(params: {
 }, Error, {
   id: string;
 }>;
+/**
+ * Fire-and-forget mutation hook for deleting a User
+ * Returns only clientMutationId (no entity data selected)
+ * 
+ * @example
+ * \`\`\`tsx
+ * const { mutate, isPending } = useDeleteUserMutation();
+ * 
+ * mutate({ id: 'value-to-delete' });
+ * \`\`\`
+ */
+export function useDeleteUserMutation(params?: Omit<UseMutationOptions<{
+  deleteUser: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteUser: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>;
 export function useDeleteUserMutation(params: {
-  selection: SelectionConfig<UserSelect>;
+  selection?: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
@@ -1001,7 +1025,7 @@ import type { PostSelect, PostWithRelations } from "../../orm/input-types";
 import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a Post
+ * Mutation hook for deleting a Post with typed selection
  * 
  * @example
  * \`\`\`tsx
@@ -1029,8 +1053,32 @@ export function useDeletePostMutation<S extends PostSelect>(params: {
 }, Error, {
   id: string;
 }>;
+/**
+ * Fire-and-forget mutation hook for deleting a Post
+ * Returns only clientMutationId (no entity data selected)
+ * 
+ * @example
+ * \`\`\`tsx
+ * const { mutate, isPending } = useDeletePostMutation();
+ * 
+ * mutate({ id: 'value-to-delete' });
+ * \`\`\`
+ */
+export function useDeletePostMutation(params?: Omit<UseMutationOptions<{
+  deletePost: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deletePost: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>;
 export function useDeletePostMutation(params: {
-  selection: SelectionConfig<PostSelect>;
+  selection?: SelectionConfig<PostSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
@@ -1083,7 +1131,7 @@ import type { UserSelect, UserWithRelations } from "../../orm/input-types";
 import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a User
+ * Mutation hook for deleting a User with typed selection
  * 
  * @example
  * \`\`\`tsx
@@ -1111,8 +1159,32 @@ export function useDeleteUserMutation<S extends UserSelect>(params: {
 }, Error, {
   id: string;
 }>;
+/**
+ * Fire-and-forget mutation hook for deleting a User
+ * Returns only clientMutationId (no entity data selected)
+ * 
+ * @example
+ * \`\`\`tsx
+ * const { mutate, isPending } = useDeleteUserMutation();
+ * 
+ * mutate({ id: 'value-to-delete' });
+ * \`\`\`
+ */
+export function useDeleteUserMutation(params?: Omit<UseMutationOptions<{
+  deleteUser: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteUser: {
+    clientMutationId: string;
+  };
+}, Error, {
+  id: string;
+}>;
 export function useDeleteUserMutation(params: {
-  selection: SelectionConfig<UserSelect>;
+  selection?: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
