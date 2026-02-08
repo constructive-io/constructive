@@ -8,11 +8,7 @@ async function run() {
     schemaFile: path.resolve(root, '../../graphql/codegen/examples/example.schema.graphql'),
     output: path.resolve(root, 'src/generated'),
     reactQuery: true,
-    orm: true,
-    codegen: {
-      maxFieldDepth: 2,
-      skipQueryField: true
-    }
+    orm: true
   });
 
   if (!result.success) {
