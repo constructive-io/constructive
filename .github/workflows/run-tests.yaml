@@ -190,8 +190,7 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: |
-          pnpm -r --filter '!./examples/**' --filter '!@constructive-io/test-codegen-app' run build
+        run: pnpm run build
 
       - name: seed app_user
         run: |

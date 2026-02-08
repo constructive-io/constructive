@@ -6,17 +6,11 @@ on:
       - main
       - v1
       - release/*
-    paths-ignore:
-      - 'graphql/test-app/**'
-      - 'graphql/test-codegen-app/**'
   pull_request:
     branches:
       - main
       - v1
     types: [opened, reopened, synchronize, ready_for_review]
-    paths-ignore:
-      - 'graphql/test-app/**'
-      - 'graphql/test-codegen-app/**'
   workflow_dispatch: {}
 
 concurrency:
