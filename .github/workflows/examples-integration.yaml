@@ -19,4 +19,4 @@ jobs:
         with:
           version: 10
       - run: pnpm install
-      - run: pnpm -r --filter @constructive-io/examples-codegen-integration run test:types
+      - run: pnpm -r --filter @constructive-io/examples-codegen-integration run test:codegen
