@@ -4,10 +4,8 @@ import {
   findConfigFile,
   loadConfigFile,
   codegenQuestions,
+  parseCodegenCliArgs,
   printResult,
-  camelizeArgv,
-  splitCommas,
-  type CodegenAnswers,
   type GraphQLSDKConfigTarget,
 } from '@constructive-io/graphql-codegen';
 
@@ -46,47 +44,10 @@ export default async (
     process.exit(0);
   }
 
-  const hasSourceCliFlags = Boolean(
-    argv.endpoint ||
-      argv['schema-file'] ||
-      argv.schemaFile ||
-      argv.schemas ||
-      argv['api-names'] ||
-      argv.apiNames
-  );
-  const explicitConfigPath = argv.config as string | undefined;
-  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
-    ? findConfigFile()
-    : undefined;
-  const configPath = explicitConfigPath || autoConfigPath;
-
-  const endpoint = argv.endpoint as string | undefined;
-  const schemaFile = (argv['schema-file'] || argv.schemaFile) as string | undefined;
-  const schemas = splitCommas(argv.schemas as string | undefined);
-  const apiNames = splitCommas((argv['api-names'] || argv.apiNames) as string | undefined);
-
-  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
-  if (endpoint) {
-    cliOverrides.endpoint = endpoint;
-    cliOverrides.schemaFile = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemaFile) {
-    cliOverrides.schemaFile = schemaFile;
-    cliOverrides.endpoint = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemas || apiNames) {
-    cliOverrides.db = { schemas, apiNames };
-    cliOverrides.endpoint = undefined;
-    cliOverrides.schemaFile = undefined;
-  }
-  if (argv['react-query'] === true || argv.reactQuery === true) cliOverrides.reactQuery = true;
-  if (argv.orm === true) cliOverrides.orm = true;
-  if (argv.verbose === true) cliOverrides.verbose = true;
-  if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
-  if (argv.output) cliOverrides.output = argv.output as string;
-  if (argv.authorization) cliOverrides.authorization = argv.authorization as string;
+  const parsedCliArgs = parseCodegenCliArgs(argv as Record<string, unknown>, {
+    resolveConfigFile: findConfigFile
+  });
+  const { configPath, cliOverrides, hasNonInteractiveArgs } = parsedCliArgs;
 
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
@@ -102,21 +63,6 @@ export default async (
     return;
   }
 
-  const hasNonInteractiveArgs = Boolean(
-    endpoint ||
-      schemaFile ||
-      schemas ||
-      apiNames ||
-      argv['react-query'] === true ||
-      argv.reactQuery === true ||
-      argv.orm === true ||
-      argv.output ||
-      argv.authorization ||
-      argv['dry-run'] === true ||
-      argv.dryRun === true ||
-      argv.verbose === true
-  );
-
   if (hasNonInteractiveArgs) {
     const result = await generate({ ...cliOverrides });
     printResult(result);
@@ -124,26 +70,14 @@ export default async (
   }
 
   // No config file - prompt for options using shared questions
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
-  // Convert kebab-case CLI args to camelCase for internal use
-  const camelized = camelizeArgv(answers);
-
-  // Build db config if schemas or apiNames provided
-  const db = (camelized.schemas || camelized.apiNames) ? {
-    schemas: camelized.schemas,
-    apiNames: camelized.apiNames,
-  } : undefined;
+  const answers = await prompter.prompt<Record<string, unknown>>(
+    argv as Record<string, unknown>,
+    codegenQuestions
+  );
+  const promptArgs = parseCodegenCliArgs(answers);
 
   const result = await generate({
-    endpoint: camelized.endpoint,
-    schemaFile: camelized.schemaFile,
-    db,
-    output: camelized.output,
-    authorization: camelized.authorization,
-    reactQuery: camelized.reactQuery,
-    orm: camelized.orm,
-    dryRun: camelized.dryRun,
-    verbose: camelized.verbose,
+    ...promptArgs.cliOverrides
   });
 
   printResult(result);

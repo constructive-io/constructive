@@ -29,8 +29,18 @@ export { generate } from './core/generate';
 export { findConfigFile, loadConfigFile } from './core/config';
 
 // CLI shared utilities (for packages/cli to import)
-export type { CodegenAnswers } from './cli/shared';
-export { camelizeArgv,codegenQuestions, printResult, splitCommas } from './cli/shared';
+export type {
+  CodegenAnswers,
+  ParseCodegenCliArgsOptions,
+  ParsedCodegenCliArgs
+} from './cli/shared';
+export {
+  camelizeArgv,
+  codegenQuestions,
+  parseCodegenCliArgs,
+  printResult,
+  splitCommas
+} from './cli/shared';
 
 // Database schema utilities (re-exported from core for convenience)
 export type {

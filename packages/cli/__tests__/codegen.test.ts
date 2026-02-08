@@ -37,7 +37,78 @@ jest.mock('@constructive-io/graphql-codegen', () => {
         process.exit(1);
       }
     }),
-    camelizeArgv: jest.fn((argv: Record<string, any>) => argv),
+    parseCodegenCliArgs: jest.fn((argv: Record<string, any>, options?: { resolveConfigFile?: () => string | undefined }) => {
+      const endpoint = typeof argv.endpoint === 'string' ? argv.endpoint : undefined;
+      const schemaFile =
+        (typeof argv['schema-file'] === 'string' && argv['schema-file']) ||
+        (typeof argv.schemaFile === 'string' && argv.schemaFile) ||
+        undefined;
+      const schemas = splitCommasMock(typeof argv.schemas === 'string' ? argv.schemas : undefined);
+      const apiNames = splitCommasMock(
+        typeof argv['api-names'] === 'string'
+          ? argv['api-names']
+          : typeof argv.apiNames === 'string'
+            ? argv.apiNames
+            : undefined
+      );
+      const reactQuery = argv['react-query'] === true || argv.reactQuery === true ? true : undefined;
+      const orm = argv.orm === true ? true : undefined;
+      const verbose = argv.verbose === true ? true : undefined;
+      const dryRun = argv['dry-run'] === true || argv.dryRun === true ? true : undefined;
+      const output = typeof argv.output === 'string' ? argv.output : undefined;
+      const authorization = typeof argv.authorization === 'string' ? argv.authorization : undefined;
+
+      const hasSourceCliFlags = Boolean(endpoint || schemaFile || schemas || apiNames);
+      const explicitConfigPath = typeof argv.config === 'string' ? argv.config : undefined;
+      const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
+        ? options?.resolveConfigFile?.()
+        : undefined;
+      const configPath = explicitConfigPath || autoConfigPath;
+
+      const cliOverrides: Record<string, any> = {};
+      if (endpoint) {
+        cliOverrides.endpoint = endpoint;
+        cliOverrides.schemaFile = undefined;
+        cliOverrides.db = undefined;
+      }
+      if (schemaFile) {
+        cliOverrides.schemaFile = schemaFile;
+        cliOverrides.endpoint = undefined;
+        cliOverrides.db = undefined;
+      }
+      if (schemas || apiNames) {
+        cliOverrides.db = { schemas, apiNames };
+        cliOverrides.endpoint = undefined;
+        cliOverrides.schemaFile = undefined;
+      }
+      if (reactQuery) cliOverrides.reactQuery = true;
+      if (orm) cliOverrides.orm = true;
+      if (verbose) cliOverrides.verbose = true;
+      if (dryRun) cliOverrides.dryRun = true;
+      if (output) cliOverrides.output = output;
+      if (authorization) cliOverrides.authorization = authorization;
+
+      const hasNonInteractiveArgs = Boolean(
+        endpoint || schemaFile || schemas || apiNames || reactQuery || orm || output || authorization || dryRun || verbose
+      );
+
+      return {
+        endpoint,
+        schemaFile,
+        schemas,
+        apiNames,
+        reactQuery,
+        orm,
+        output,
+        authorization,
+        dryRun,
+        verbose,
+        configPath,
+        hasSourceCliFlags,
+        hasNonInteractiveArgs,
+        cliOverrides,
+      };
+    }),
   };
 })
 

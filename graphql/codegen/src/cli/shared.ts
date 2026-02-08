@@ -9,6 +9,7 @@ import { inflektTree } from 'inflekt/transform-keys';
 import type { Question } from 'inquirerer';
 
 import type { GenerateResult } from '../core/generate';
+import type { GraphQLSDKConfigTarget } from '../types/config';
 
 /**
  * Sanitize function that splits comma-separated strings into arrays
@@ -34,6 +35,150 @@ export interface CodegenAnswers {
   dryRun?: boolean;
   verbose?: boolean;
 }
+
+export interface ParseCodegenCliArgsOptions {
+  allowShortAliases?: boolean;
+  resolveConfigFile?: () => string | undefined;
+}
+
+export interface ParsedCodegenCliArgs {
+  endpoint?: string;
+  schemaFile?: string;
+  schemas?: string[];
+  apiNames?: string[];
+  reactQuery?: boolean;
+  orm?: boolean;
+  output?: string;
+  authorization?: string;
+  dryRun?: boolean;
+  verbose?: boolean;
+  configPath?: string;
+  targetName?: string;
+  hasSourceCliFlags: boolean;
+  hasNonInteractiveArgs: boolean;
+  cliOverrides: Partial<GraphQLSDKConfigTarget>;
+}
+
+type CliArgMap = Record<string, unknown>;
+
+const getArgValue = (argv: CliArgMap, keys: string[]): unknown => {
+  for (const key of keys) {
+    if (argv[key] !== undefined) return argv[key];
+  }
+  return undefined;
+};
+
+const getStringArg = (argv: CliArgMap, keys: string[]): string | undefined => {
+  const value = getArgValue(argv, keys);
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+};
+
+const getBooleanArg = (argv: CliArgMap, keys: string[]): boolean | undefined => {
+  const value = getArgValue(argv, keys);
+  return value === true ? true : undefined;
+};
+
+const getListArg = (argv: CliArgMap, keys: string[]): string[] | undefined => {
+  const value = getArgValue(argv, keys);
+  if (Array.isArray(value)) {
+    const normalized = value
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter(Boolean);
+    return normalized.length > 0 ? normalized : undefined;
+  }
+  if (typeof value === 'string') return splitCommas(value);
+  return undefined;
+};
+
+export const parseCodegenCliArgs = (
+  argv: CliArgMap,
+  options: ParseCodegenCliArgsOptions = {}
+): ParsedCodegenCliArgs => {
+  const allowShortAliases = options.allowShortAliases ?? false;
+
+  const endpoint = getStringArg(argv, allowShortAliases ? ['endpoint', 'e'] : ['endpoint']);
+  const schemaFile = getStringArg(
+    argv,
+    allowShortAliases ? ['schema-file', 'schemaFile', 's'] : ['schema-file', 'schemaFile']
+  );
+  const schemas = getListArg(argv, ['schemas']);
+  const apiNames = getListArg(argv, ['api-names', 'apiNames']);
+  const reactQuery = getBooleanArg(argv, ['react-query', 'reactQuery']);
+  const orm = getBooleanArg(argv, ['orm']);
+  const output = getStringArg(argv, allowShortAliases ? ['output', 'o'] : ['output']);
+  const authorization = getStringArg(
+    argv,
+    allowShortAliases ? ['authorization', 'a'] : ['authorization']
+  );
+  const dryRun = getBooleanArg(argv, ['dry-run', 'dryRun']);
+  const verbose = getBooleanArg(argv, allowShortAliases ? ['verbose', 'v'] : ['verbose']);
+
+  const explicitConfigPath = getStringArg(
+    argv,
+    allowShortAliases ? ['config', 'c'] : ['config']
+  );
+  const targetName = getStringArg(argv, allowShortAliases ? ['target', 't'] : ['target']);
+  const hasSourceCliFlags = Boolean(endpoint || schemaFile || schemas || apiNames);
+  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
+    ? options.resolveConfigFile?.()
+    : undefined;
+  const configPath = explicitConfigPath || autoConfigPath;
+
+  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
+  if (endpoint) {
+    cliOverrides.endpoint = endpoint;
+    cliOverrides.schemaFile = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemaFile) {
+    cliOverrides.schemaFile = schemaFile;
+    cliOverrides.endpoint = undefined;
+    cliOverrides.db = undefined;
+  }
+  if (schemas || apiNames) {
+    cliOverrides.db = { schemas, apiNames };
+    cliOverrides.endpoint = undefined;
+    cliOverrides.schemaFile = undefined;
+  }
+  if (reactQuery) cliOverrides.reactQuery = true;
+  if (orm) cliOverrides.orm = true;
+  if (verbose) cliOverrides.verbose = true;
+  if (dryRun) cliOverrides.dryRun = true;
+  if (output) cliOverrides.output = output;
+  if (authorization) cliOverrides.authorization = authorization;
+
+  const hasNonInteractiveArgs = Boolean(
+    endpoint ||
+      schemaFile ||
+      schemas ||
+      apiNames ||
+      reactQuery ||
+      orm ||
+      output ||
+      authorization ||
+      dryRun ||
+      verbose
+  );
+
+  return {
+    endpoint,
+    schemaFile,
+    schemas,
+    apiNames,
+    reactQuery,
+    orm,
+    output,
+    authorization,
+    dryRun,
+    verbose,
+    configPath,
+    targetName,
+    hasSourceCliFlags,
+    hasNonInteractiveArgs,
+    cliOverrides
+  };
+};
 
 /**
  * Questions for the codegen CLI

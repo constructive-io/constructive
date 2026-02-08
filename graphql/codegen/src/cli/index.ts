@@ -11,11 +11,9 @@ import { findConfigFile, loadConfigFile } from '../core/config';
 import { generate } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
-  camelizeArgv,
-  type CodegenAnswers,
   codegenQuestions,
+  parseCodegenCliArgs,
   printResult,
-  splitCommas
 } from './shared';
 
 const usage = `
@@ -62,48 +60,11 @@ export const commands = async (
     process.exit(0);
   }
 
-  const hasSourceCliFlags = Boolean(
-    argv.endpoint ||
-      argv.e ||
-      argv['schema-file'] ||
-      argv.s ||
-      argv.schemas ||
-      argv['api-names']
-  );
-  const explicitConfigPath = (argv.config || argv.c) as string | undefined;
-  const autoConfigPath = !explicitConfigPath && !hasSourceCliFlags
-    ? findConfigFile()
-    : undefined;
-  const configPath = (explicitConfigPath || autoConfigPath) as string | undefined;
-  const targetName = (argv.target || argv.t) as string | undefined;
-
-  // Collect CLI flags that should override config file settings
-  const cliOverrides: Partial<GraphQLSDKConfigTarget> = {};
-  const endpoint = (argv.endpoint || argv.e) as string | undefined;
-  const schemaFile = (argv['schema-file'] || argv.s) as string | undefined;
-  const schemas = splitCommas(argv.schemas as string | undefined);
-  const apiNames = splitCommas(argv['api-names'] as string | undefined);
-  if (endpoint) {
-    cliOverrides.endpoint = endpoint;
-    cliOverrides.schemaFile = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemaFile) {
-    cliOverrides.schemaFile = schemaFile;
-    cliOverrides.endpoint = undefined;
-    cliOverrides.db = undefined;
-  }
-  if (schemas || apiNames) {
-    cliOverrides.db = { schemas, apiNames };
-    cliOverrides.endpoint = undefined;
-    cliOverrides.schemaFile = undefined;
-  }
-  if (argv['react-query'] === true || argv.reactQuery === true) cliOverrides.reactQuery = true;
-  if (argv.orm === true) cliOverrides.orm = true;
-  if (argv.verbose === true || argv.v === true) cliOverrides.verbose = true;
-  if (argv['dry-run'] === true || argv.dryRun === true) cliOverrides.dryRun = true;
-  if (argv.output || argv.o) cliOverrides.output = (argv.output || argv.o) as string;
-  if (argv.authorization || argv.a) cliOverrides.authorization = (argv.authorization || argv.a) as string;
+  const parsedCliArgs = parseCodegenCliArgs(argv, {
+    allowShortAliases: true,
+    resolveConfigFile: findConfigFile
+  });
+  const { configPath, targetName, cliOverrides, hasNonInteractiveArgs } = parsedCliArgs;
 
   // If config file exists, load and run
   if (configPath) {
@@ -149,24 +110,6 @@ export const commands = async (
     return argv;
   }
 
-  const hasNonInteractiveArgs = Boolean(
-    endpoint ||
-      schemaFile ||
-      schemas ||
-      apiNames ||
-      argv['react-query'] === true ||
-      argv.reactQuery === true ||
-      argv.orm === true ||
-      argv.output ||
-      argv.o ||
-      argv.authorization ||
-      argv.a ||
-      argv['dry-run'] === true ||
-      argv.dryRun === true ||
-      argv.verbose === true ||
-      argv.v === true
-  );
-
   if (hasNonInteractiveArgs) {
     const result = await generate({
       ...cliOverrides
@@ -177,27 +120,14 @@ export const commands = async (
   }
 
   // No config file - prompt for options using shared questions
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
-
-  // Convert kebab-case CLI args to camelCase for internal use
-  const camelized = camelizeArgv(answers) as CodegenAnswers;
-
-  // Build db config if schemas or apiNames provided
-  const db = (camelized.schemas || camelized.apiNames) ? {
-    schemas: camelized.schemas,
-    apiNames: camelized.apiNames
-  } : undefined;
+  const answers = await prompter.prompt<Record<string, unknown>>(
+    argv as Record<string, unknown>,
+    codegenQuestions
+  );
+  const promptArgs = parseCodegenCliArgs(answers);
 
   const result = await generate({
-    endpoint: camelized.endpoint,
-    schemaFile: camelized.schemaFile,
-    db,
-    output: camelized.output,
-    authorization: camelized.authorization,
-    reactQuery: camelized.reactQuery,
-    orm: camelized.orm,
-    dryRun: camelized.dryRun,
-    verbose: camelized.verbose
+    ...promptArgs.cliOverrides
   });
 
   printResult(result);
