@@ -48,7 +48,7 @@ import {
   useQueryOptionsImplType,
   voidStatement,
   withFieldsListSelectionType,
-  withFieldsSelectionType
+  withFieldsSelectionType,
 } from './hooks-ast';
 import {
   getAllRowsQueryName,
@@ -63,7 +63,7 @@ import {
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
-  ucFirst
+  ucFirst,
 } from './utils';
 
 export interface GeneratedQueryFile {
@@ -79,12 +79,12 @@ export interface QueryGeneratorOptions {
 
 export function generateListQueryHook(
   table: CleanTable,
-  options: QueryGeneratorOptions = {}
+  options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile {
   const {
     reactQueryEnabled = true,
     useCentralizedKeys = true,
-    hasRelationships = false
+    hasRelationships = false,
   } = options;
   const { typeName, pluralName, singularName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
@@ -96,31 +96,63 @@ export function generateListQueryHook(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
 
-  const listResultTypeAST = (sel: t.TSType) => listQueryResultType(queryName, relationTypeName, sel);
+  const listResultTypeAST = (sel: t.TSType) =>
+    listQueryResultType(queryName, relationTypeName, sel);
 
   const statements: t.Statement[] = [];
 
   // Imports
   if (reactQueryEnabled) {
-    statements.push(createImportDeclaration('@tanstack/react-query', ['useQuery']));
-    statements.push(createImportDeclaration('@tanstack/react-query', ['UseQueryOptions', 'UseQueryResult', 'QueryClient'], true));
+    statements.push(
+      createImportDeclaration('@tanstack/react-query', ['useQuery']),
+    );
+    statements.push(
+      createImportDeclaration(
+        '@tanstack/react-query',
+        ['UseQueryOptions', 'UseQueryResult', 'QueryClient'],
+        true,
+      ),
+    );
   }
   statements.push(createImportDeclaration('../client', ['getClient']));
-  statements.push(createImportDeclaration('../selection', ['buildListSelectionArgs']));
-  statements.push(createImportDeclaration('../selection', ['ListSelectionConfig'], true));
+  statements.push(
+    createImportDeclaration('../selection', ['buildListSelectionArgs']),
+  );
+  statements.push(
+    createImportDeclaration('../selection', ['ListSelectionConfig'], true),
+  );
 
   if (useCentralizedKeys) {
     statements.push(createImportDeclaration('../query-keys', [keysName]));
     if (hasRelationships) {
-      statements.push(createImportDeclaration('../query-keys', [scopeTypeName], true));
+      statements.push(
+        createImportDeclaration('../query-keys', [scopeTypeName], true),
+      );
     }
   }
 
-  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName, filterTypeName, orderByTypeName], true));
-  statements.push(createImportDeclaration('../../orm/select-types', ['FindManyArgs', 'InferSelectResult', 'ConnectionResult', 'StrictSelect'], true));
+  statements.push(
+    createImportDeclaration(
+      '../../orm/input-types',
+      [selectTypeName, relationTypeName, filterTypeName, orderByTypeName],
+      true,
+    ),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../../orm/select-types',
+      ['FindManyArgs', 'InferSelectResult', 'ConnectionResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   // Re-exports
-  statements.push(createTypeReExport([selectTypeName, relationTypeName, filterTypeName, orderByTypeName], '../../orm/input-types'));
+  statements.push(
+    createTypeReExport(
+      [selectTypeName, relationTypeName, filterTypeName, orderByTypeName],
+      '../../orm/input-types',
+    ),
+  );
 
   // Query key
   if (useCentralizedKeys) {
@@ -128,43 +160,69 @@ export function generateListQueryHook(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier(`${queryName}QueryKey`),
-          t.memberExpression(t.identifier(keysName), t.identifier('list'))
-        )
-      ])
+          t.memberExpression(t.identifier(keysName), t.identifier('list')),
+        ),
+      ]),
     );
-    addJSDocComment(keyDecl, ['Query key factory - re-exported from query-keys.ts']);
+    addJSDocComment(keyDecl, [
+      'Query key factory - re-exported from query-keys.ts',
+    ]);
     statements.push(keyDecl);
   } else {
     const keyFn = t.arrowFunctionExpression(
-      [createFunctionParam('variables', typeRef('FindManyArgs', [t.tsUnknownKeyword(), typeRef(filterTypeName), typeRef(orderByTypeName)]), true)],
-      asConst(t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('list'), t.identifier('variables')]))
+      [
+        createFunctionParam(
+          'variables',
+          typeRef('FindManyArgs', [
+            t.tsUnknownKeyword(),
+            typeRef(filterTypeName),
+            typeRef(orderByTypeName),
+          ]),
+          true,
+        ),
+      ],
+      asConst(
+        t.arrayExpression([
+          t.stringLiteral(typeName.toLowerCase()),
+          t.stringLiteral('list'),
+          t.identifier('variables'),
+        ]),
+      ),
     );
-    statements.push(t.exportNamedDeclaration(
-      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn)])
-    ));
+    statements.push(
+      t.exportNamedDeclaration(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn),
+        ]),
+      ),
+    );
   }
 
   // Helper for query key call
-  const buildListQueryKey = (argsExpr: t.Expression, scopeExpr?: t.Expression) => {
+  const buildListQueryKey = (
+    argsExpr: t.Expression,
+    scopeExpr?: t.Expression,
+  ) => {
     if (useCentralizedKeys) {
       const args = [argsExpr];
       if (scopeExpr) args.push(scopeExpr);
-      return callExpr(t.memberExpression(t.identifier(keysName), t.identifier('list')), args);
+      return callExpr(
+        t.memberExpression(t.identifier(keysName), t.identifier('list')),
+        args,
+      );
     }
     return callExpr(t.identifier(`${queryName}QueryKey`), [argsExpr]);
   };
 
   // Helper for findMany queryFn
-  const buildFindManyFn = () => t.arrowFunctionExpression(
-    [],
-    buildFindManyCallExpr(singularName, 'args')
-  );
+  const buildFindManyFn = () =>
+    t.arrowFunctionExpression([], buildFindManyCallExpr(singularName, 'args'));
 
   // Options type builder with optional scope
   const buildOptionsType = (queryDataType: t.TSType, dataType: t.TSType) => {
     const base = omitType(
       typeRef('UseQueryOptions', [queryDataType, typeRef('Error'), dataType]),
-      ['queryKey', 'queryFn']
+      ['queryKey', 'queryFn'],
     );
     if (hasRelationships && useCentralizedKeys) {
       return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
@@ -187,7 +245,7 @@ export function generateListQueryHook(
       '    first: 10,',
       '  },',
       '});',
-      '```'
+      '```',
     ];
     if (hasRelationships && useCentralizedKeys) {
       docLines.push('');
@@ -205,16 +263,23 @@ export function generateListQueryHook(
       t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier('selection'),
-          t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
-        )
+          t.tsTypeAnnotation(
+            withFieldsListSelectionType(
+              sRef(),
+              selectTypeName,
+              filterTypeName,
+              orderByTypeName,
+            ),
+          ),
+        ),
       ]),
-      buildOptionsType(listResultTypeAST(sRef()), typeRef('TData'))
+      buildOptionsType(listResultTypeAST(sRef()), typeRef('TData')),
     ]);
     const o1 = exportDeclareFunction(
       hookName,
       createSAndTDataTypeParams(selectTypeName, listResultTypeAST(sRef())),
       [createFunctionParam('params', o1ParamType)],
-      typeRef('UseQueryResult', [typeRef('TData')])
+      typeRef('UseQueryResult', [typeRef('TData')]),
     );
     addJSDocComment(o1, docLines);
     statements.push(o1);
@@ -222,9 +287,15 @@ export function generateListQueryHook(
     // Implementation
     const implSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+      t.tsTypeAnnotation(
+        listSelectionConfigType(
+          typeRef(selectTypeName),
+          filterTypeName,
+          orderByTypeName,
+        ),
+      ),
     );
-    const implOptionsType= (() => {
+    const implOptionsType = (() => {
       const base = useQueryOptionsImplType();
       if (hasRelationships && useCentralizedKeys) {
         return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
@@ -233,32 +304,54 @@ export function generateListQueryHook(
     })();
     const implParamType = t.tsIntersectionType([
       t.tsTypeLiteral([implSelProp]),
-      implOptionsType
+      implOptionsType,
     ]);
 
     const body: t.Statement[] = [];
-    body.push(constDecl('selection', t.memberExpression(t.identifier('params'), t.identifier('selection'))));
-    body.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
+    body.push(
+      constDecl(
+        'selection',
+        t.memberExpression(t.identifier('params'), t.identifier('selection')),
+      ),
+    );
+    body.push(
+      buildListSelectionArgsCall(
+        selectTypeName,
+        filterTypeName,
+        orderByTypeName,
+      ),
+    );
 
     if (hasRelationships && useCentralizedKeys) {
       body.push(destructureParamsWithSelectionAndScope('queryOptions'));
       body.push(voidStatement('_selection'));
-      body.push(returnUseQuery(
-        buildListQueryKey(t.identifier('args'), t.identifier('scope')),
-        buildFindManyFn(),
-        [spreadObj(t.identifier('queryOptions'))]
-      ));
+      body.push(
+        returnUseQuery(
+          buildListQueryKey(t.identifier('args'), t.identifier('scope')),
+          buildFindManyFn(),
+          [spreadObj(t.identifier('queryOptions'))],
+        ),
+      );
     } else {
       body.push(destructureParamsWithSelection('queryOptions'));
       body.push(voidStatement('_selection'));
-      body.push(returnUseQuery(
-        buildListQueryKey(t.identifier('args')),
-        buildFindManyFn(),
-        [spreadObj(t.identifier('queryOptions'))]
-      ));
+      body.push(
+        returnUseQuery(
+          buildListQueryKey(t.identifier('args')),
+          buildFindManyFn(),
+          [spreadObj(t.identifier('queryOptions'))],
+        ),
+      );
     }
 
-    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
+    statements.push(
+      exportFunction(
+        hookName,
+        null,
+        [createFunctionParam('params', implParamType)],
+        body,
+      ),
+    );
   }
 
   // Fetch function
@@ -268,14 +361,21 @@ export function generateListQueryHook(
     const f1ParamType = t.tsTypeLiteral([
       t.tsPropertySignature(
         t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
-      )
+        t.tsTypeAnnotation(
+          withFieldsListSelectionType(
+            sRef(),
+            selectTypeName,
+            filterTypeName,
+            orderByTypeName,
+          ),
+        ),
+      ),
     ]);
     const f1Decl = exportAsyncDeclareFunction(
       fetchFnName,
       createSTypeParam(selectTypeName),
       [createFunctionParam('params', f1ParamType)],
-      typeRef('Promise', [listResultTypeAST(sRef())])
+      typeRef('Promise', [listResultTypeAST(sRef())]),
     );
     addJSDocComment(f1Decl, [
       `Fetch ${typeName} list without React hooks`,
@@ -288,19 +388,38 @@ export function generateListQueryHook(
       '    first: 10,',
       '  },',
       '});',
-      '```'
+      '```',
     ]);
     statements.push(f1Decl);
 
     // Implementation
     const fImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+      t.tsTypeAnnotation(
+        listSelectionConfigType(
+          typeRef(selectTypeName),
+          filterTypeName,
+          orderByTypeName,
+        ),
+      ),
     );
     const fBody: t.Statement[] = [];
-    fBody.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
+    fBody.push(
+      buildListSelectionArgsCall(
+        selectTypeName,
+        filterTypeName,
+        orderByTypeName,
+      ),
+    );
     fBody.push(t.returnStatement(buildFindManyCallExpr(singularName, 'args')));
-    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]))], fBody));
+    statements.push(
+      exportAsyncFunction(
+        fetchFnName,
+        null,
+        [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]))],
+        fBody,
+      ),
+    );
   }
 
   // Prefetch function
@@ -311,17 +430,31 @@ export function generateListQueryHook(
     const p1Params: t.TSPropertySignature[] = [
       t.tsPropertySignature(
         t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsListSelectionType(sRef(), selectTypeName, filterTypeName, orderByTypeName))
-      )
+        t.tsTypeAnnotation(
+          withFieldsListSelectionType(
+            sRef(),
+            selectTypeName,
+            filterTypeName,
+            orderByTypeName,
+          ),
+        ),
+      ),
     ];
-    const p1ParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral(p1Params), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral(p1Params);
+    const p1ParamType =
+      hasRelationships && useCentralizedKeys
+        ? t.tsIntersectionType([
+            t.tsTypeLiteral(p1Params),
+            scopeTypeLiteral(scopeTypeName),
+          ])
+        : t.tsTypeLiteral(p1Params);
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
       createSTypeParam(selectTypeName),
-      [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p1ParamType)],
-      typeRef('Promise', [t.tsVoidKeyword()])
+      [
+        createFunctionParam('queryClient', typeRef('QueryClient')),
+        createFunctionParam('params', p1ParamType),
+      ],
+      typeRef('Promise', [t.tsVoidKeyword()]),
     );
     addJSDocComment(p1Decl, [
       `Prefetch ${typeName} list for SSR or cache warming`,
@@ -329,32 +462,62 @@ export function generateListQueryHook(
       '@example',
       '```ts',
       `await ${prefetchFnName}(queryClient, { selection: { first: 10 } });`,
-      '```'
+      '```',
     ]);
     statements.push(p1Decl);
 
     // Implementation
     const pImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(listSelectionConfigType(typeRef(selectTypeName), filterTypeName, orderByTypeName))
+      t.tsTypeAnnotation(
+        listSelectionConfigType(
+          typeRef(selectTypeName),
+          filterTypeName,
+          orderByTypeName,
+        ),
+      ),
     );
-    const pImplParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral([pImplSelProp]), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral([pImplSelProp]);
+    const pImplParamType =
+      hasRelationships && useCentralizedKeys
+        ? t.tsIntersectionType([
+            t.tsTypeLiteral([pImplSelProp]),
+            scopeTypeLiteral(scopeTypeName),
+          ])
+        : t.tsTypeLiteral([pImplSelProp]);
 
     const pBody: t.Statement[] = [];
-    pBody.push(buildListSelectionArgsCall(selectTypeName, filterTypeName, orderByTypeName));
+    pBody.push(
+      buildListSelectionArgsCall(
+        selectTypeName,
+        filterTypeName,
+        orderByTypeName,
+      ),
+    );
 
-    const queryKeyExpr = hasRelationships && useCentralizedKeys
-      ? buildListQueryKey(t.identifier('args'), t.optionalMemberExpression(t.identifier('params'), t.identifier('scope'), false, true))
-      : buildListQueryKey(t.identifier('args'));
+    const queryKeyExpr =
+      hasRelationships && useCentralizedKeys
+        ? buildListQueryKey(
+            t.identifier('args'),
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('scope'),
+              false,
+              true,
+            ),
+          )
+        : buildListQueryKey(t.identifier('args'));
 
     const prefetchCall = callExpr(
-      t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
-      [t.objectExpression([
-        objectProp('queryKey', queryKeyExpr),
-        objectProp('queryFn', buildFindManyFn())
-      ])]
+      t.memberExpression(
+        t.identifier('queryClient'),
+        t.identifier('prefetchQuery'),
+      ),
+      [
+        t.objectExpression([
+          objectProp('queryKey', queryKeyExpr),
+          objectProp('queryFn', buildFindManyFn()),
+        ]),
+      ],
     );
     pBody.push(t.expressionStatement(t.awaitExpression(prefetchCall)));
 
@@ -362,10 +525,13 @@ export function generateListQueryHook(
       exportAsyncFunction(
         prefetchFnName,
         null,
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType)],
+        [
+          createFunctionParam('queryClient', typeRef('QueryClient')),
+          createFunctionParam('params', pImplParamType),
+        ],
         pBody,
-        t.tsVoidKeyword()
-      )
+        t.tsVoidKeyword(),
+      ),
     );
   }
 
@@ -375,20 +541,20 @@ export function generateListQueryHook(
 
   return {
     fileName: getListQueryFileName(table),
-    content: generateHookFileCode(headerText, statements)
+    content: generateHookFileCode(headerText, statements),
   };
 }
 
 export function generateSingleQueryHook(
   table: CleanTable,
-  options: QueryGeneratorOptions = {}
+  options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile | null {
   if (!hasValidPrimaryKey(table)) return null;
 
   const {
     reactQueryEnabled = true,
     useCentralizedKeys = true,
-    hasRelationships = false
+    hasRelationships = false,
   } = options;
   const { typeName, singularName } = getTableNames(table);
   const hookName = getSingleQueryHookName(table);
@@ -403,32 +569,65 @@ export function generateSingleQueryHook(
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
 
-  const pkTsType: t.TSType = pkFieldTsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
-  const singleResultTypeAST = (sel: t.TSType) => singleQueryResultType(queryName, relationTypeName, sel);
+  const pkTsType: t.TSType =
+    pkFieldTsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+  const singleResultTypeAST = (sel: t.TSType) =>
+    singleQueryResultType(queryName, relationTypeName, sel);
 
   const statements: t.Statement[] = [];
 
   // Imports
   if (reactQueryEnabled) {
-    statements.push(createImportDeclaration('@tanstack/react-query', ['useQuery']));
-    statements.push(createImportDeclaration('@tanstack/react-query', ['UseQueryOptions', 'UseQueryResult', 'QueryClient'], true));
+    statements.push(
+      createImportDeclaration('@tanstack/react-query', ['useQuery']),
+    );
+    statements.push(
+      createImportDeclaration(
+        '@tanstack/react-query',
+        ['UseQueryOptions', 'UseQueryResult', 'QueryClient'],
+        true,
+      ),
+    );
   }
   statements.push(createImportDeclaration('../client', ['getClient']));
-  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
-  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
+  statements.push(
+    createImportDeclaration('../selection', ['buildSelectionArgs']),
+  );
+  statements.push(
+    createImportDeclaration('../selection', ['SelectionConfig'], true),
+  );
 
   if (useCentralizedKeys) {
     statements.push(createImportDeclaration('../query-keys', [keysName]));
     if (hasRelationships) {
-      statements.push(createImportDeclaration('../query-keys', [scopeTypeName], true));
+      statements.push(
+        createImportDeclaration('../query-keys', [scopeTypeName], true),
+      );
     }
   }
 
-  statements.push(createImportDeclaration('../../orm/input-types', [selectTypeName, relationTypeName], true));
-  statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
+  statements.push(
+    createImportDeclaration(
+      '../../orm/input-types',
+      [selectTypeName, relationTypeName],
+      true,
+    ),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../../orm/select-types',
+      ['InferSelectResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   // Re-exports
-  statements.push(createTypeReExport([selectTypeName, relationTypeName], '../../orm/input-types'));
+  statements.push(
+    createTypeReExport(
+      [selectTypeName, relationTypeName],
+      '../../orm/input-types',
+    ),
+  );
 
   // Query key
   if (useCentralizedKeys) {
@@ -436,43 +635,65 @@ export function generateSingleQueryHook(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier(`${queryName}QueryKey`),
-          t.memberExpression(t.identifier(keysName), t.identifier('detail'))
-        )
-      ])
+          t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+        ),
+      ]),
     );
-    addJSDocComment(keyDecl, ['Query key factory - re-exported from query-keys.ts']);
+    addJSDocComment(keyDecl, [
+      'Query key factory - re-exported from query-keys.ts',
+    ]);
     statements.push(keyDecl);
   } else {
     const keyFn = t.arrowFunctionExpression(
       [createFunctionParam('id', pkTsType)],
-      asConst(t.arrayExpression([t.stringLiteral(typeName.toLowerCase()), t.stringLiteral('detail'), t.identifier('id')]))
+      asConst(
+        t.arrayExpression([
+          t.stringLiteral(typeName.toLowerCase()),
+          t.stringLiteral('detail'),
+          t.identifier('id'),
+        ]),
+      ),
     );
-    statements.push(t.exportNamedDeclaration(
-      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn)])
-    ));
+    statements.push(
+      t.exportNamedDeclaration(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(t.identifier(`${queryName}QueryKey`), keyFn),
+        ]),
+      ),
+    );
   }
 
   // Helper for query key call
-  const buildDetailQueryKey = (pkExpr: t.Expression, scopeExpr?: t.Expression) => {
+  const buildDetailQueryKey = (
+    pkExpr: t.Expression,
+    scopeExpr?: t.Expression,
+  ) => {
     if (useCentralizedKeys) {
       const args = [pkExpr];
       if (scopeExpr) args.push(scopeExpr);
-      return callExpr(t.memberExpression(t.identifier(keysName), t.identifier('detail')), args);
+      return callExpr(
+        t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+        args,
+      );
     }
     return callExpr(t.identifier(`${queryName}QueryKey`), [pkExpr]);
   };
 
   // Helper for findOne queryFn
-  const buildFindOneFn = () => t.arrowFunctionExpression(
-    [],
-    buildFindOneCallExpr(singularName, pkFieldName, 'args')
-  );
+  const buildFindOneFn = () =>
+    t.arrowFunctionExpression(
+      [],
+      buildFindOneCallExpr(singularName, pkFieldName, 'args'),
+    );
 
   // Options type builder with optional scope
-  const buildSingleOptionsType = (queryDataType: t.TSType, dataType: t.TSType) => {
+  const buildSingleOptionsType = (
+    queryDataType: t.TSType,
+    dataType: t.TSType,
+  ) => {
     const base = omitType(
       typeRef('UseQueryOptions', [queryDataType, typeRef('Error'), dataType]),
-      ['queryKey', 'queryFn']
+      ['queryKey', 'queryFn'],
     );
     if (hasRelationships && useCentralizedKeys) {
       return t.tsIntersectionType([base, scopeTypeLiteral(scopeTypeName)]);
@@ -491,7 +712,7 @@ export function generateSingleQueryHook(
       `  ${pkFieldName}: 'some-id',`,
       '  selection: { fields: { id: true, name: true } },',
       '});',
-      '```'
+      '```',
     ];
     if (hasRelationships && useCentralizedKeys) {
       docLines.push('');
@@ -506,21 +727,24 @@ export function generateSingleQueryHook(
 
     // Overload 1: with fields
     const o1Props = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
       t.tsPropertySignature(
         t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName))
-      )
+        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+      ),
     ];
     const o1ParamType = t.tsIntersectionType([
       t.tsTypeLiteral(o1Props),
-      buildSingleOptionsType(singleResultTypeAST(sRef()), typeRef('TData'))
+      buildSingleOptionsType(singleResultTypeAST(sRef()), typeRef('TData')),
     ]);
     const o1 = exportDeclareFunction(
       hookName,
       createSAndTDataTypeParams(selectTypeName, singleResultTypeAST(sRef())),
       [createFunctionParam('params', o1ParamType)],
-      typeRef('UseQueryResult', [typeRef('TData')])
+      typeRef('UseQueryResult', [typeRef('TData')]),
     );
     addJSDocComment(o1, docLines);
     statements.push(o1);
@@ -528,11 +752,14 @@ export function generateSingleQueryHook(
     // Implementation
     const implSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
     );
     const implProps = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      implSelProp
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
+      implSelProp,
     ];
     const implOptionsType = (() => {
       const base = useQueryOptionsImplType();
@@ -543,39 +770,53 @@ export function generateSingleQueryHook(
     })();
     const implParamType = t.tsIntersectionType([
       t.tsTypeLiteral(implProps),
-      implOptionsType
+      implOptionsType,
     ]);
 
     const body: t.Statement[] = [];
     // const args = buildSelectionArgs<SelectType>(params.selection);
     const argsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+      t.memberExpression(t.identifier('params'), t.identifier('selection')),
     ]);
     // @ts-ignore
-    argsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    argsCall.typeParameters = t.tsTypeParameterInstantiation([
+      typeRef(selectTypeName),
+    ]);
     body.push(constDecl('args', argsCall));
 
-    const pkMemberExpr = t.memberExpression(t.identifier('params'), t.identifier(pkFieldName));
+    const pkMemberExpr = t.memberExpression(
+      t.identifier('params'),
+      t.identifier(pkFieldName),
+    );
 
     if (hasRelationships && useCentralizedKeys) {
       body.push(destructureParamsWithSelectionAndScope('queryOptions'));
       body.push(voidStatement('_selection'));
-      body.push(returnUseQuery(
-        buildDetailQueryKey(pkMemberExpr, t.identifier('scope')),
-        buildFindOneFn(),
-        [spreadObj(t.identifier('queryOptions'))]
-      ));
+      body.push(
+        returnUseQuery(
+          buildDetailQueryKey(pkMemberExpr, t.identifier('scope')),
+          buildFindOneFn(),
+          [spreadObj(t.identifier('queryOptions'))],
+        ),
+      );
     } else {
       body.push(destructureParamsWithSelection('queryOptions'));
       body.push(voidStatement('_selection'));
-      body.push(returnUseQuery(
-        buildDetailQueryKey(pkMemberExpr),
-        buildFindOneFn(),
-        [spreadObj(t.identifier('queryOptions'))]
-      ));
+      body.push(
+        returnUseQuery(buildDetailQueryKey(pkMemberExpr), buildFindOneFn(), [
+          spreadObj(t.identifier('queryOptions')),
+        ]),
+      );
     }
 
-    statements.push(exportFunction(hookName, null, [createFunctionParam('params', implParamType)], body));
+    statements.push(
+      exportFunction(
+        hookName,
+        null,
+        [createFunctionParam('params', implParamType)],
+        body,
+      ),
+    );
   }
 
   // Fetch function
@@ -583,14 +824,20 @@ export function generateSingleQueryHook(
   {
     // Overload 1: with fields
     const f1Props = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)))
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+      ),
     ];
     const f1Decl = exportAsyncDeclareFunction(
       fetchFnName,
       createSTypeParam(selectTypeName),
       [createFunctionParam('params', t.tsTypeLiteral(f1Props))],
-      typeRef('Promise', [singleResultTypeAST(sRef())])
+      typeRef('Promise', [singleResultTypeAST(sRef())]),
     );
     addJSDocComment(f1Decl, [
       `Fetch a single ${typeName} without React hooks`,
@@ -601,28 +848,44 @@ export function generateSingleQueryHook(
       `  ${pkFieldName}: 'some-id',`,
       '  selection: { fields: { id: true } },',
       '});',
-      '```'
+      '```',
     ]);
     statements.push(f1Decl);
 
     // Implementation
     const fImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
     );
     const fImplProps = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      fImplSelProp
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
+      fImplSelProp,
     ];
     const fBody: t.Statement[] = [];
     const fArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+      t.memberExpression(t.identifier('params'), t.identifier('selection')),
     ]);
     // @ts-ignore
-    fArgsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    fArgsCall.typeParameters = t.tsTypeParameterInstantiation([
+      typeRef(selectTypeName),
+    ]);
     fBody.push(constDecl('args', fArgsCall));
-    fBody.push(t.returnStatement(buildFindOneCallExpr(singularName, pkFieldName, 'args')));
-    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps))], fBody));
+    fBody.push(
+      t.returnStatement(
+        buildFindOneCallExpr(singularName, pkFieldName, 'args'),
+      ),
+    );
+    statements.push(
+      exportAsyncFunction(
+        fetchFnName,
+        null,
+        [createFunctionParam('params', t.tsTypeLiteral(fImplProps))],
+        fBody,
+      ),
+    );
   }
 
   // Prefetch function
@@ -631,17 +894,30 @@ export function generateSingleQueryHook(
 
     // Overload 1: with fields
     const p1Props: t.TSPropertySignature[] = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)))
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+      ),
     ];
-    const p1ParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral(p1Props), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral(p1Props);
+    const p1ParamType =
+      hasRelationships && useCentralizedKeys
+        ? t.tsIntersectionType([
+            t.tsTypeLiteral(p1Props),
+            scopeTypeLiteral(scopeTypeName),
+          ])
+        : t.tsTypeLiteral(p1Props);
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
       createSTypeParam(selectTypeName),
-      [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', p1ParamType)],
-      typeRef('Promise', [t.tsVoidKeyword()])
+      [
+        createFunctionParam('queryClient', typeRef('QueryClient')),
+        createFunctionParam('params', p1ParamType),
+      ],
+      typeRef('Promise', [t.tsVoidKeyword()]),
     );
     addJSDocComment(p1Decl, [
       `Prefetch a single ${typeName} for SSR or cache warming`,
@@ -649,44 +925,72 @@ export function generateSingleQueryHook(
       '@example',
       '```ts',
       `await ${prefetchFnName}(queryClient, { ${pkFieldName}: 'some-id' });`,
-      '```'
+      '```',
     ]);
     statements.push(p1Decl);
 
     // Implementation
     const pImplSelProp = t.tsPropertySignature(
       t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName)))
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
     );
     const pImplProps: t.TSPropertySignature[] = [
-      t.tsPropertySignature(t.identifier(pkFieldName), t.tsTypeAnnotation(pkTsType)),
-      pImplSelProp
+      t.tsPropertySignature(
+        t.identifier(pkFieldName),
+        t.tsTypeAnnotation(pkTsType),
+      ),
+      pImplSelProp,
     ];
-    const pImplParamType = hasRelationships && useCentralizedKeys
-      ? t.tsIntersectionType([t.tsTypeLiteral(pImplProps), scopeTypeLiteral(scopeTypeName)])
-      : t.tsTypeLiteral(pImplProps);
+    const pImplParamType =
+      hasRelationships && useCentralizedKeys
+        ? t.tsIntersectionType([
+            t.tsTypeLiteral(pImplProps),
+            scopeTypeLiteral(scopeTypeName),
+          ])
+        : t.tsTypeLiteral(pImplProps);
 
     const pBody: t.Statement[] = [];
     const pArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection'))
+      t.memberExpression(t.identifier('params'), t.identifier('selection')),
     ]);
     // @ts-ignore
-    pArgsCall.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+    pArgsCall.typeParameters = t.tsTypeParameterInstantiation([
+      typeRef(selectTypeName),
+    ]);
     pBody.push(constDecl('args', pArgsCall));
 
-    const queryKeyExpr = hasRelationships && useCentralizedKeys
-      ? buildDetailQueryKey(
-        t.memberExpression(t.identifier('params'), t.identifier(pkFieldName)),
-        t.optionalMemberExpression(t.identifier('params'), t.identifier('scope'), false, true)
-      )
-      : buildDetailQueryKey(t.memberExpression(t.identifier('params'), t.identifier(pkFieldName)));
+    const queryKeyExpr =
+      hasRelationships && useCentralizedKeys
+        ? buildDetailQueryKey(
+            t.memberExpression(
+              t.identifier('params'),
+              t.identifier(pkFieldName),
+            ),
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('scope'),
+              false,
+              true,
+            ),
+          )
+        : buildDetailQueryKey(
+            t.memberExpression(
+              t.identifier('params'),
+              t.identifier(pkFieldName),
+            ),
+          );
 
     const prefetchCall = callExpr(
-      t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
-      [t.objectExpression([
-        objectProp('queryKey', queryKeyExpr),
-        objectProp('queryFn', buildFindOneFn())
-      ])]
+      t.memberExpression(
+        t.identifier('queryClient'),
+        t.identifier('prefetchQuery'),
+      ),
+      [
+        t.objectExpression([
+          objectProp('queryKey', queryKeyExpr),
+          objectProp('queryFn', buildFindOneFn()),
+        ]),
+      ],
     );
     pBody.push(t.expressionStatement(t.awaitExpression(prefetchCall)));
 
@@ -694,10 +998,13 @@ export function generateSingleQueryHook(
       exportAsyncFunction(
         prefetchFnName,
         null,
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', pImplParamType)],
+        [
+          createFunctionParam('queryClient', typeRef('QueryClient')),
+          createFunctionParam('params', pImplParamType),
+        ],
         pBody,
-        t.tsVoidKeyword()
-      )
+        t.tsVoidKeyword(),
+      ),
     );
   }
 
@@ -707,13 +1014,13 @@ export function generateSingleQueryHook(
 
   return {
     fileName: getSingleQueryFileName(table),
-    content: generateHookFileCode(headerText, statements)
+    content: generateHookFileCode(headerText, statements),
   };
 }
 
 export function generateAllQueryHooks(
   tables: CleanTable[],
-  options: QueryGeneratorOptions = {}
+  options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile[] {
   const files: GeneratedQueryFile[] = [];
   for (const table of tables) {

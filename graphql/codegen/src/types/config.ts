@@ -240,8 +240,6 @@ export interface GraphQLSDKConfigTarget {
    * Code generation options
    */
   codegen?: {
-    /** Max depth for nested object field selection (default: 2) */
-    maxFieldDepth?: number;
     /** Skip 'query' field on mutation payloads (default: true) */
     skipQueryField?: boolean;
   };
@@ -347,7 +345,7 @@ export const DEFAULT_WATCH_CONFIG: WatchConfig = {
   pollInterval: 3000,
   debounce: 800,
   touchFile: undefined,
-  clearScreen: true
+  clearScreen: true,
 };
 
 /**
@@ -358,7 +356,7 @@ export const DEFAULT_QUERY_KEY_CONFIG: QueryKeyConfig = {
   relationships: {},
   generateScopedKeys: true,
   generateCascadeHelpers: true,
-  generateMutationKeys: true
+  generateMutationKeys: true,
 };
 
 /**
@@ -371,37 +369,35 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   tables: {
     include: ['*'],
     exclude: [],
-    systemExclude: []
+    systemExclude: [],
   },
   queries: {
     include: ['*'],
     exclude: [],
-    systemExclude: ['_meta', 'query'] // Internal PostGraphile queries
+    systemExclude: ['_meta', 'query'], // Internal PostGraphile queries
   },
   mutations: {
     include: ['*'],
     exclude: [],
-    systemExclude: []
+    systemExclude: [],
   },
   excludeFields: [],
   hooks: {
     queries: true,
     mutations: true,
-    queryKeyPrefix: 'graphql'
+    queryKeyPrefix: 'graphql',
   },
   postgraphile: {
-    schema: 'public'
+    schema: 'public',
   },
   codegen: {
-    maxFieldDepth: 2,
-    skipQueryField: true
+    skipQueryField: true,
   },
   orm: false,
   reactQuery: false,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
-  watch: DEFAULT_WATCH_CONFIG
+  watch: DEFAULT_WATCH_CONFIG,
 };
-
 
 /**
  * Helper function to define configuration with type checking
@@ -417,7 +413,7 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
  */
 export function mergeConfig(
   base: GraphQLSDKConfigTarget,
-  overrides: GraphQLSDKConfigTarget
+  overrides: GraphQLSDKConfigTarget,
 ): GraphQLSDKConfigTarget {
   return deepmerge(base, overrides, { arrayMerge: replaceArrays });
 }
@@ -427,7 +423,7 @@ export function mergeConfig(
  * Similar to getEnvOptions pattern from @pgpmjs/env.
  */
 export function getConfigOptions(
-  overrides: GraphQLSDKConfigTarget = {}
+  overrides: GraphQLSDKConfigTarget = {},
 ): GraphQLSDKConfigTarget {
   return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
 }

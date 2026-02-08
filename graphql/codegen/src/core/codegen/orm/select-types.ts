@@ -73,9 +73,13 @@ export type DeepExact<T, Shape> = T extends Shape
     ? {
         [K in keyof T]: K extends keyof Shape
           ? T[K] extends { select: infer NS }
-            ? Extract<Shape[K], { select?: unknown }> extends { select?: infer ShapeNS }
+            ? Extract<Shape[K], { select?: unknown }> extends {
+                select?: infer ShapeNS;
+              }
               ? DeepExact<
-                  Omit<T[K], 'select'> & { select: DeepExact<NS, NonNullable<ShapeNS>> },
+                  Omit<T[K], 'select'> & {
+                    select: DeepExact<NS, NonNullable<ShapeNS>>;
+                  },
                   Extract<Shape[K], { select?: unknown }>
                 >
               : never
@@ -104,7 +108,9 @@ export type StrictSelect<S, Shape> = S extends DeepExact<S, Shape> ? {} : never;
 export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
   ? TEntity
   : {
-      [K in keyof TSelect as TSelect[K] extends false | undefined ? never : K]: TSelect[K] extends true
+      [K in keyof TSelect as TSelect[K] extends false | undefined
+        ? never
+        : K]: TSelect[K] extends true
         ? K extends keyof TEntity
           ? TEntity[K]
           : never
@@ -112,7 +118,9 @@ export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
           ? K extends keyof TEntity
             ? NonNullable<TEntity[K]> extends ConnectionResult<infer NodeType>
               ? ConnectionResult<InferSelectResult<NodeType, NestedSelect>>
-              : InferSelectResult<NonNullable<TEntity[K]>, NestedSelect> | (null extends TEntity[K] ? null : never)
+              :
+                  | InferSelectResult<NonNullable<TEntity[K]>, NestedSelect>
+                  | (null extends TEntity[K] ? null : never)
             : never
           : K extends keyof TEntity
             ? TEntity[K]
@@ -236,7 +244,11 @@ export type ConnectionQueryResult<TEntity, TSelect> = QueryResult<{
 /**
  * Type for mutation that returns a payload with the entity
  */
-export type MutationResult<TEntity, TSelect, TPayloadKey extends string> = QueryResult<{
+export type MutationResult<
+  TEntity,
+  TSelect,
+  TPayloadKey extends string,
+> = QueryResult<{
   [K in TPayloadKey]: {
     [EntityKey: string]: ResolveSelectResult<TEntity, TSelect>;
   };

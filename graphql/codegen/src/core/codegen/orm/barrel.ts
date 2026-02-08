@@ -7,7 +7,7 @@ import * as t from '@babel/types';
 
 import type { CleanTable } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
-import { getGeneratedFileHeader,getTableNames, lcFirst } from '../utils';
+import { getGeneratedFileHeader, getTableNames, lcFirst } from '../utils';
 
 export interface GeneratedBarrelFile {
   fileName: string;
@@ -17,7 +17,9 @@ export interface GeneratedBarrelFile {
 /**
  * Generate the models/index.ts barrel file
  */
-export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile {
+export function generateModelsBarrel(
+  tables: CleanTable[],
+): GeneratedBarrelFile {
   const statements: t.Statement[] = [];
 
   // Export all model classes (Select types are now in input-types.ts)
@@ -26,13 +28,14 @@ export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile 
     const modelName = `${typeName}Model`;
     // Use same naming logic as model-generator to avoid "index.ts" clash with barrel file
     const baseFileName = lcFirst(typeName);
-    const moduleFileName = baseFileName === 'index' ? `${baseFileName}Model` : baseFileName;
+    const moduleFileName =
+      baseFileName === 'index' ? `${baseFileName}Model` : baseFileName;
 
     // Create: export { ModelName } from './moduleName';
     const exportDecl = t.exportNamedDeclaration(
       null,
       [t.exportSpecifier(t.identifier(modelName), t.identifier(modelName))],
-      t.stringLiteral(`./${moduleFileName}`)
+      t.stringLiteral(`./${moduleFileName}`),
     );
     statements.push(exportDecl);
   }
@@ -42,14 +45,16 @@ export function generateModelsBarrel(tables: CleanTable[]): GeneratedBarrelFile 
 
   return {
     fileName: 'models/index.ts',
-    content: header + '\n' + code
+    content: header + '\n' + code,
   };
 }
 
 /**
  * Generate the types.ts file that re-exports all types
  */
-export function generateTypesBarrel(_useSharedTypes: boolean): GeneratedBarrelFile {
+export function generateTypesBarrel(
+  _useSharedTypes: boolean,
+): GeneratedBarrelFile {
   // Always re-export from input-types since that's where all types are generated
   const content = `/**
  * Types re-export
@@ -63,6 +68,6 @@ export * from './input-types';
 
   return {
     fileName: 'types.ts',
-    content
+    content,
   };
 }

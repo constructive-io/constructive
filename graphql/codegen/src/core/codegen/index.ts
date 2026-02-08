@@ -22,19 +22,22 @@
  *     useLoginMutation.ts      - Custom mutation -> ORM mutation.xxx
  *     ...
  */
-import type { GraphQLSDKConfigTarget, QueryKeyConfig } from '../../types/config';
+import type {
+  GraphQLSDKConfigTarget,
+  QueryKeyConfig,
+} from '../../types/config';
 import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
 import type {
   CleanOperation,
   CleanTable,
-  TypeRegistry
+  TypeRegistry,
 } from '../../types/schema';
 import {
   generateCustomMutationsBarrel,
   generateCustomQueriesBarrel,
   generateMainBarrel,
   generateMutationsBarrel,
-  generateQueriesBarrel
+  generateQueriesBarrel,
 } from './barrel';
 import { generateClientFile } from './client';
 import { generateAllCustomMutationHooks } from './custom-mutations';
@@ -99,7 +102,7 @@ export interface GenerateOptions {
  */
 export function generateAllFiles(
   tables: CleanTable[],
-  config: GraphQLSDKConfigTarget
+  config: GraphQLSDKConfigTarget,
 ): GenerateResult {
   return generate({ tables, config });
 }
@@ -115,25 +118,25 @@ export function generate(options: GenerateOptions): GenerateResult {
   const files: GeneratedFile[] = [];
 
   // Extract codegen options
-  const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
   const reactQueryEnabled = config.reactQuery;
 
   // Query key configuration (use defaults if not provided)
-  const queryKeyConfig: QueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
+  const queryKeyConfig: QueryKeyConfig =
+    config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
   const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
   const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
 
   // 1. Generate client.ts (ORM client wrapper)
   files.push({
     path: 'client.ts',
-    content: generateClientFile()
+    content: generateClientFile(),
   });
 
   // 1b. Generate selection.ts (shared selection adapters for hooks)
   files.push({
     path: 'selection.ts',
-    content: generateSelectionFile()
+    content: generateSelectionFile(),
   });
 
   // Collect table type names for import path resolution
@@ -149,11 +152,11 @@ export function generate(options: GenerateOptions): GenerateResult {
     const queryKeysResult = generateQueryKeysFile({
       tables,
       customQueries: customOperations?.queries ?? [],
-      config: queryKeyConfig
+      config: queryKeyConfig,
     });
     files.push({
       path: queryKeysResult.fileName,
-      content: queryKeysResult.content
+      content: queryKeysResult.content,
     });
     hasQueryKeys = true;
   }
@@ -164,11 +167,11 @@ export function generate(options: GenerateOptions): GenerateResult {
     const mutationKeysResult = generateMutationKeysFile({
       tables,
       customMutations: customOperations?.mutations ?? [],
-      config: queryKeyConfig
+      config: queryKeyConfig,
     });
     files.push({
       path: mutationKeysResult.fileName,
-      content: mutationKeysResult.content
+      content: mutationKeysResult.content,
     });
     hasMutationKeys = true;
   }
@@ -178,11 +181,11 @@ export function generate(options: GenerateOptions): GenerateResult {
   if (useCentralizedKeys && queryKeyConfig.generateCascadeHelpers) {
     const invalidationResult = generateInvalidationFile({
       tables,
-      config: queryKeyConfig
+      config: queryKeyConfig,
     });
     files.push({
       path: invalidationResult.fileName,
-      content: invalidationResult.content
+      content: invalidationResult.content,
     });
     hasInvalidation = true;
   }
@@ -191,12 +194,12 @@ export function generate(options: GenerateOptions): GenerateResult {
   const queryHooks = generateAllQueryHooks(tables, {
     reactQueryEnabled,
     useCentralizedKeys,
-    hasRelationships
+    hasRelationships,
   });
   for (const hook of queryHooks) {
     files.push({
       path: `queries/${hook.fileName}`,
-      content: hook.content
+      content: hook.content,
     });
   }
 
@@ -210,17 +213,16 @@ export function generate(options: GenerateOptions): GenerateResult {
     customQueryHooks = generateAllCustomQueryHooks({
       operations: customOperations.queries,
       typeRegistry: customOperations.typeRegistry,
-      maxDepth,
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
-      useCentralizedKeys
+      useCentralizedKeys,
     });
 
     for (const hook of customQueryHooks) {
       files.push({
         path: `queries/${hook.fileName}`,
-        content: hook.content
+        content: hook.content,
       });
     }
   }
@@ -231,21 +233,21 @@ export function generate(options: GenerateOptions): GenerateResult {
     content:
       customQueryHooks.length > 0
         ? generateCustomQueriesBarrel(
-          tables,
-          customQueryHooks.map((h) => h.operationName)
-        )
-        : generateQueriesBarrel(tables)
+            tables,
+            customQueryHooks.map((h) => h.operationName),
+          )
+        : generateQueriesBarrel(tables),
   });
 
   // 6. Generate table-based mutation hooks (mutations/*.ts)
   const mutationHooks = generateAllMutationHooks(tables, {
     reactQueryEnabled,
-    useCentralizedKeys
+    useCentralizedKeys,
   });
   for (const hook of mutationHooks) {
     files.push({
       path: `mutations/${hook.fileName}`,
-      content: hook.content
+      content: hook.content,
     });
   }
 
@@ -259,17 +261,16 @@ export function generate(options: GenerateOptions): GenerateResult {
     customMutationHooks = generateAllCustomMutationHooks({
       operations: customOperations.mutations,
       typeRegistry: customOperations.typeRegistry,
-      maxDepth,
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
-      useCentralizedKeys
+      useCentralizedKeys,
     });
 
     for (const hook of customMutationHooks) {
       files.push({
         path: `mutations/${hook.fileName}`,
-        content: hook.content
+        content: hook.content,
       });
     }
   }
@@ -284,10 +285,10 @@ export function generate(options: GenerateOptions): GenerateResult {
       content:
         customMutationHooks.length > 0
           ? generateCustomMutationsBarrel(
-            tables,
-            customMutationHooks.map((h) => h.operationName)
-          )
-          : generateMutationsBarrel(tables)
+              tables,
+              customMutationHooks.map((h) => h.operationName),
+            )
+          : generateMutationsBarrel(tables),
     });
   }
 
@@ -299,8 +300,8 @@ export function generate(options: GenerateOptions): GenerateResult {
       hasMutations,
       hasQueryKeys,
       hasMutationKeys,
-      hasInvalidation
-    })
+      hasInvalidation,
+    }),
   });
 
   return {
@@ -311,8 +312,8 @@ export function generate(options: GenerateOptions): GenerateResult {
       mutationHooks: mutationHooks.length,
       customQueryHooks: customQueryHooks.length,
       customMutationHooks: customMutationHooks.length,
-      totalFiles: files.length
-    }
+      totalFiles: files.length,
+    },
   };
 }
 
@@ -325,16 +326,16 @@ export {
   generateCustomQueriesBarrel,
   generateMainBarrel,
   generateMutationsBarrel,
-  generateQueriesBarrel
+  generateQueriesBarrel,
 } from './barrel';
 export { generateClientFile } from './client';
 export {
   generateAllCustomMutationHooks,
-  generateCustomMutationHook
+  generateCustomMutationHook,
 } from './custom-mutations';
 export {
   generateAllCustomQueryHooks,
-  generateCustomQueryHook
+  generateCustomQueryHook,
 } from './custom-queries';
 export { generateInvalidationFile } from './invalidation';
 export { generateMutationKeysFile } from './mutation-keys';
@@ -342,11 +343,11 @@ export {
   generateAllMutationHooks,
   generateCreateMutationHook,
   generateDeleteMutationHook,
-  generateUpdateMutationHook
+  generateUpdateMutationHook,
 } from './mutations';
 export {
   generateAllQueryHooks,
   generateListQueryHook,
-  generateSingleQueryHook
+  generateSingleQueryHook,
 } from './queries';
 export { generateQueryKeysFile } from './query-keys';

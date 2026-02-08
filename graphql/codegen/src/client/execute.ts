@@ -5,7 +5,7 @@
 import type { DocumentNode } from 'graphql';
 import { print } from 'graphql';
 
-import { createError, type DataError,parseGraphQLError } from './error';
+import { createError, type DataError, parseGraphQLError } from './error';
 import { TypedDocumentString } from './typed-document';
 
 // ============================================================================
@@ -17,13 +17,15 @@ type ExecutableDocument =
   | DocumentNode
   | string;
 
-type ResultOf<TDocument> = TDocument extends TypedDocumentString<infer TResult, unknown>
-  ? TResult
-  : unknown;
+type ResultOf<TDocument> =
+  TDocument extends TypedDocumentString<infer TResult, unknown>
+    ? TResult
+    : unknown;
 
-type VariablesOf<TDocument> = TDocument extends TypedDocumentString<unknown, infer TVariables>
-  ? TVariables
-  : Record<string, unknown>;
+type VariablesOf<TDocument> =
+  TDocument extends TypedDocumentString<unknown, infer TVariables>
+    ? TVariables
+    : Record<string, unknown>;
 
 export interface ExecuteOptions {
   /** Custom headers to include */
@@ -69,7 +71,7 @@ export async function execute<TDocument extends ExecutableDocument>(
   endpoint: string,
   document: TDocument,
   variables?: VariablesOf<TDocument>,
-  options: ExecuteOptions = {}
+  options: ExecuteOptions = {},
 ): Promise<ResultOf<TDocument>> {
   const { headers = {}, timeout = 30000, signal } = options;
 
@@ -88,13 +90,13 @@ export async function execute<TDocument extends ExecutableDocument>(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/graphql-response+json, application/json',
-        ...headers
+        ...headers,
       },
       body: JSON.stringify({
         query: documentToString(document),
-        ...(variables !== undefined && { variables })
+        ...(variables !== undefined && { variables }),
       }),
-      signal: combinedSignal
+      signal: combinedSignal,
     });
 
     clearTimeout(timeoutId);
@@ -173,7 +175,11 @@ export interface GraphQLClientOptions {
  * Create a GraphQL client instance
  */
 export function createGraphQLClient(options: GraphQLClientOptions) {
-  const { endpoint, headers: defaultHeaders = {}, timeout: defaultTimeout = 30000 } = options;
+  const {
+    endpoint,
+    headers: defaultHeaders = {},
+    timeout: defaultTimeout = 30000,
+  } = options;
 
   return {
     /**
@@ -182,12 +188,12 @@ export function createGraphQLClient(options: GraphQLClientOptions) {
     async execute<TDocument extends ExecutableDocument>(
       document: TDocument,
       variables?: VariablesOf<TDocument>,
-      options: ExecuteOptions = {}
+      options: ExecuteOptions = {},
     ): Promise<ResultOf<TDocument>> {
       return execute(endpoint, document, variables, {
         headers: { ...defaultHeaders, ...options.headers },
         timeout: options.timeout ?? defaultTimeout,
-        signal: options.signal
+        signal: options.signal,
       });
     },
 
@@ -196,7 +202,7 @@ export function createGraphQLClient(options: GraphQLClientOptions) {
      */
     getEndpoint(): string {
       return endpoint;
-    }
+    },
   };
 }
 

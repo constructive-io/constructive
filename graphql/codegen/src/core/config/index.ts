@@ -6,11 +6,11 @@ export {
   CONFIG_FILENAME,
   findConfigFile,
   loadConfigFile,
-  type LoadConfigFileResult
+  type LoadConfigFileResult,
 } from './loader';
 export {
   type ConfigOverrideOptions,
   loadAndResolveConfig,
   type LoadConfigResult,
-  loadWatchConfig
+  loadWatchConfig,
 } from './resolver';

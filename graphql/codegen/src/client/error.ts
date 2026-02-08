@@ -43,7 +43,7 @@ export const DataErrorType = {
   EXCLUSION_VIOLATION: 'EXCLUSION_VIOLATION',
 
   // Generic errors
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
 
 export type DataErrorType = (typeof DataErrorType)[keyof typeof DataErrorType];
@@ -73,7 +73,11 @@ export class DataError extends Error {
   public readonly fieldName?: string;
   public readonly constraint?: string;
 
-  constructor(type: DataErrorType, message: string, options: DataErrorOptions = {}) {
+  constructor(
+    type: DataErrorType,
+    message: string,
+    options: DataErrorOptions = {},
+  ) {
     super(message);
     this.name = 'DataError';
     this.type = type;
@@ -91,36 +95,36 @@ export class DataError extends Error {
 
   getUserMessage(): string {
     switch (this.type) {
-    case DataErrorType.NETWORK_ERROR:
-      return 'Network error. Please check your connection and try again.';
-    case DataErrorType.TIMEOUT_ERROR:
-      return 'Request timed out. Please try again.';
-    case DataErrorType.UNAUTHORIZED:
-      return 'You are not authorized. Please log in and try again.';
-    case DataErrorType.FORBIDDEN:
-      return 'You do not have permission to access this resource.';
-    case DataErrorType.VALIDATION_FAILED:
-      return 'Validation failed. Please check your input and try again.';
-    case DataErrorType.REQUIRED_FIELD_MISSING:
-      return this.fieldName
-        ? `The field "${this.fieldName}" is required.`
-        : 'A required field is missing.';
-    case DataErrorType.UNIQUE_VIOLATION:
-      return this.fieldName
-        ? `A record with this ${this.fieldName} already exists.`
-        : 'A record with this value already exists.';
-    case DataErrorType.FOREIGN_KEY_VIOLATION:
-      return 'This record references a record that does not exist.';
-    case DataErrorType.NOT_NULL_VIOLATION:
-      return this.fieldName
-        ? `The field "${this.fieldName}" cannot be empty.`
-        : 'A required field cannot be empty.';
-    case DataErrorType.CHECK_VIOLATION:
-      return this.fieldName
-        ? `The value for "${this.fieldName}" is not valid.`
-        : 'The value does not meet the required constraints.';
-    default:
-      return this.message || 'An unexpected error occurred.';
+      case DataErrorType.NETWORK_ERROR:
+        return 'Network error. Please check your connection and try again.';
+      case DataErrorType.TIMEOUT_ERROR:
+        return 'Request timed out. Please try again.';
+      case DataErrorType.UNAUTHORIZED:
+        return 'You are not authorized. Please log in and try again.';
+      case DataErrorType.FORBIDDEN:
+        return 'You do not have permission to access this resource.';
+      case DataErrorType.VALIDATION_FAILED:
+        return 'Validation failed. Please check your input and try again.';
+      case DataErrorType.REQUIRED_FIELD_MISSING:
+        return this.fieldName
+          ? `The field "${this.fieldName}" is required.`
+          : 'A required field is missing.';
+      case DataErrorType.UNIQUE_VIOLATION:
+        return this.fieldName
+          ? `A record with this ${this.fieldName} already exists.`
+          : 'A record with this value already exists.';
+      case DataErrorType.FOREIGN_KEY_VIOLATION:
+        return 'This record references a record that does not exist.';
+      case DataErrorType.NOT_NULL_VIOLATION:
+        return this.fieldName
+          ? `The field "${this.fieldName}" cannot be empty.`
+          : 'A required field cannot be empty.';
+      case DataErrorType.CHECK_VIOLATION:
+        return this.fieldName
+          ? `The value for "${this.fieldName}" is not valid.`
+          : 'The value does not meet the required constraints.';
+      default:
+        return this.message || 'An unexpected error occurred.';
     }
   }
 
@@ -148,7 +152,7 @@ export const PG_ERROR_CODES = {
   DATETIME_FIELD_OVERFLOW: '22008',
   UNDEFINED_TABLE: '42P01',
   UNDEFINED_COLUMN: '42703',
-  INSUFFICIENT_PRIVILEGE: '42501'
+  INSUFFICIENT_PRIVILEGE: '42501',
 } as const;
 
 // ============================================================================
@@ -157,10 +161,14 @@ export const PG_ERROR_CODES = {
 
 export const createError = {
   network: (originalError?: Error) =>
-    new DataError(DataErrorType.NETWORK_ERROR, 'Network error occurred', { originalError }),
+    new DataError(DataErrorType.NETWORK_ERROR, 'Network error occurred', {
+      originalError,
+    }),
 
   timeout: (originalError?: Error) =>
-    new DataError(DataErrorType.TIMEOUT_ERROR, 'Request timed out', { originalError }),
+    new DataError(DataErrorType.TIMEOUT_ERROR, 'Request timed out', {
+      originalError,
+    }),
 
   unauthorized: (message = 'Authentication required') =>
     new DataError(DataErrorType.UNAUTHORIZED, message),
@@ -178,16 +186,38 @@ export const createError = {
     new DataError(DataErrorType.GRAPHQL_ERROR, message, { code }),
 
   uniqueViolation: (message: string, fieldName?: string, constraint?: string) =>
-    new DataError(DataErrorType.UNIQUE_VIOLATION, message, { fieldName, constraint, code: '23505' }),
+    new DataError(DataErrorType.UNIQUE_VIOLATION, message, {
+      fieldName,
+      constraint,
+      code: '23505',
+    }),
 
-  foreignKeyViolation: (message: string, fieldName?: string, constraint?: string) =>
-    new DataError(DataErrorType.FOREIGN_KEY_VIOLATION, message, { fieldName, constraint, code: '23503' }),
+  foreignKeyViolation: (
+    message: string,
+    fieldName?: string,
+    constraint?: string,
+  ) =>
+    new DataError(DataErrorType.FOREIGN_KEY_VIOLATION, message, {
+      fieldName,
+      constraint,
+      code: '23503',
+    }),
 
-  notNullViolation: (message: string, fieldName?: string, constraint?: string) =>
-    new DataError(DataErrorType.NOT_NULL_VIOLATION, message, { fieldName, constraint, code: '23502' }),
+  notNullViolation: (
+    message: string,
+    fieldName?: string,
+    constraint?: string,
+  ) =>
+    new DataError(DataErrorType.NOT_NULL_VIOLATION, message, {
+      fieldName,
+      constraint,
+      code: '23502',
+    }),
 
   unknown: (originalError: Error) =>
-    new DataError(DataErrorType.UNKNOWN_ERROR, originalError.message, { originalError })
+    new DataError(DataErrorType.UNKNOWN_ERROR, originalError.message, {
+      originalError,
+    }),
 };
 
 // ============================================================================
@@ -208,28 +238,41 @@ function parseGraphQLErrorCode(code: string | undefined): DataErrorType {
   // GraphQL standard codes
   if (normalized === 'UNAUTHENTICATED') return DataErrorType.UNAUTHORIZED;
   if (normalized === 'FORBIDDEN') return DataErrorType.FORBIDDEN;
-  if (normalized === 'GRAPHQL_VALIDATION_FAILED') return DataErrorType.QUERY_GENERATION_FAILED;
+  if (normalized === 'GRAPHQL_VALIDATION_FAILED')
+    return DataErrorType.QUERY_GENERATION_FAILED;
 
   // PostgreSQL SQLSTATE codes
-  if (code === PG_ERROR_CODES.UNIQUE_VIOLATION) return DataErrorType.UNIQUE_VIOLATION;
-  if (code === PG_ERROR_CODES.FOREIGN_KEY_VIOLATION) return DataErrorType.FOREIGN_KEY_VIOLATION;
-  if (code === PG_ERROR_CODES.NOT_NULL_VIOLATION) return DataErrorType.NOT_NULL_VIOLATION;
-  if (code === PG_ERROR_CODES.CHECK_VIOLATION) return DataErrorType.CHECK_VIOLATION;
-  if (code === PG_ERROR_CODES.EXCLUSION_VIOLATION) return DataErrorType.EXCLUSION_VIOLATION;
+  if (code === PG_ERROR_CODES.UNIQUE_VIOLATION)
+    return DataErrorType.UNIQUE_VIOLATION;
+  if (code === PG_ERROR_CODES.FOREIGN_KEY_VIOLATION)
+    return DataErrorType.FOREIGN_KEY_VIOLATION;
+  if (code === PG_ERROR_CODES.NOT_NULL_VIOLATION)
+    return DataErrorType.NOT_NULL_VIOLATION;
+  if (code === PG_ERROR_CODES.CHECK_VIOLATION)
+    return DataErrorType.CHECK_VIOLATION;
+  if (code === PG_ERROR_CODES.EXCLUSION_VIOLATION)
+    return DataErrorType.EXCLUSION_VIOLATION;
 
   return DataErrorType.UNKNOWN_ERROR;
 }
 
 function classifyByMessage(message: string): DataErrorType {
   const lower = message.toLowerCase();
-  
+
   if (lower.includes('timeout') || lower.includes('timed out')) {
     return DataErrorType.TIMEOUT_ERROR;
   }
-  if (lower.includes('network') || lower.includes('fetch') || lower.includes('failed to fetch')) {
+  if (
+    lower.includes('network') ||
+    lower.includes('fetch') ||
+    lower.includes('failed to fetch')
+  ) {
     return DataErrorType.NETWORK_ERROR;
   }
-  if (lower.includes('unauthorized') || lower.includes('authentication required')) {
+  if (
+    lower.includes('unauthorized') ||
+    lower.includes('authentication required')
+  ) {
     return DataErrorType.UNAUTHORIZED;
   }
   if (lower.includes('forbidden') || lower.includes('permission')) {
@@ -241,21 +284,30 @@ function classifyByMessage(message: string): DataErrorType {
   if (lower.includes('foreign key constraint')) {
     return DataErrorType.FOREIGN_KEY_VIOLATION;
   }
-  if (lower.includes('not-null constraint') || lower.includes('null value in column')) {
+  if (
+    lower.includes('not-null constraint') ||
+    lower.includes('null value in column')
+  ) {
     return DataErrorType.NOT_NULL_VIOLATION;
   }
-  
+
   return DataErrorType.UNKNOWN_ERROR;
 }
 
-function extractFieldFromError(message: string, constraint?: string, column?: string): string | undefined {
+function extractFieldFromError(
+  message: string,
+  constraint?: string,
+  column?: string,
+): string | undefined {
   if (column) return column;
 
   const columnMatch = message.match(/column\s+"?([a-z_][a-z0-9_]*)"?/i);
   if (columnMatch) return columnMatch[1];
 
   if (constraint) {
-    const constraintMatch = constraint.match(/_([a-z_][a-z0-9_]*)_(?:key|fkey|check|pkey)$/i);
+    const constraintMatch = constraint.match(
+      /_([a-z_][a-z0-9_]*)_(?:key|fkey|check|pkey)$/i,
+    );
     if (constraintMatch) return constraintMatch[1];
   }
 
@@ -286,14 +338,18 @@ export function parseGraphQLError(error: unknown): DataError {
 
     const column = gqlError.extensions?.column as string | undefined;
     const constraint = gqlError.extensions?.constraint as string | undefined;
-    const fieldName = extractFieldFromError(gqlError.message, constraint, column);
+    const fieldName = extractFieldFromError(
+      gqlError.message,
+      constraint,
+      column,
+    );
 
     if (mappedType !== DataErrorType.UNKNOWN_ERROR) {
       return new DataError(mappedType, gqlError.message, {
         code: extCode,
         fieldName,
         constraint,
-        context: gqlError.extensions
+        context: gqlError.extensions,
       });
     }
 
@@ -303,7 +359,7 @@ export function parseGraphQLError(error: unknown): DataError {
       code: extCode,
       fieldName,
       constraint,
-      context: gqlError.extensions
+      context: gqlError.extensions,
     });
   }
 

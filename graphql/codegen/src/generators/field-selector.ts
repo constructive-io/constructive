@@ -7,7 +7,7 @@ import type { CleanTable } from '../types/schema';
 import type {
   FieldSelection,
   FieldSelectionPreset,
-  SimpleFieldSelection
+  SimpleFieldSelection,
 } from '../types/selection';
 
 /**
@@ -16,7 +16,7 @@ import type {
 export function convertToSelectionOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  selection?: FieldSelection
+  selection?: FieldSelection,
 ): QuerySelectionOptions | null {
   if (!selection) {
     return convertPresetToSelection(table, 'display');
@@ -34,52 +34,52 @@ export function convertToSelectionOptions(
  */
 function convertPresetToSelection(
   table: CleanTable,
-  preset: FieldSelectionPreset
+  preset: FieldSelectionPreset,
 ): QuerySelectionOptions {
   const options: QuerySelectionOptions = {};
 
   switch (preset) {
-  case 'minimal': {
-    // Just id and first display field
-    const minimalFields = getMinimalFields(table);
-    minimalFields.forEach((field) => {
-      options[field] = true;
-    });
-    break;
-  }
+    case 'minimal': {
+      // Just id and first display field
+      const minimalFields = getMinimalFields(table);
+      minimalFields.forEach((field) => {
+        options[field] = true;
+      });
+      break;
+    }
 
-  case 'display': {
-    // Common display fields
-    const displayFields = getDisplayFields(table);
-    displayFields.forEach((field) => {
-      options[field] = true;
-    });
-    break;
-  }
+    case 'display': {
+      // Common display fields
+      const displayFields = getDisplayFields(table);
+      displayFields.forEach((field) => {
+        options[field] = true;
+      });
+      break;
+    }
 
-  case 'all': {
-    // All non-relational fields (includes complex fields like JSON, geometry, etc.)
-    const allFields = getNonRelationalFields(table);
-    allFields.forEach((field) => {
-      options[field] = true;
-    });
-    break;
-  }
+    case 'all': {
+      // All non-relational fields (includes complex fields like JSON, geometry, etc.)
+      const allFields = getNonRelationalFields(table);
+      allFields.forEach((field) => {
+        options[field] = true;
+      });
+      break;
+    }
 
-  case 'full':
-    // All fields including basic relations
-    table.fields.forEach((field) => {
-      options[field.name] = true;
-    });
-    break;
+    case 'full':
+      // All fields including basic relations
+      table.fields.forEach((field) => {
+        options[field.name] = true;
+      });
+      break;
 
-  default: {
-    // Default to display
-    const defaultFields = getDisplayFields(table);
-    defaultFields.forEach((field) => {
-      options[field] = true;
-    });
-  }
+    default: {
+      // Default to display
+      const defaultFields = getDisplayFields(table);
+      defaultFields.forEach((field) => {
+        options[field] = true;
+      });
+    }
   }
 
   return options;
@@ -91,7 +91,7 @@ function convertPresetToSelection(
 function convertCustomSelectionToOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  selection: SimpleFieldSelection
+  selection: SimpleFieldSelection,
 ): QuerySelectionOptions {
   const options: QuerySelectionOptions = {};
 
@@ -118,7 +118,7 @@ function convertCustomSelectionToOptions(
         // Include with dynamically determined scalar fields from the related table
         options[relationField] = {
           select: getRelatedTableScalarFields(relationField, table, allTables),
-          variables: {}
+          variables: {},
         };
       }
     });
@@ -135,9 +135,9 @@ function convertCustomSelectionToOptions(
               select: getRelatedTableScalarFields(
                 relationField,
                 table,
-                allTables
+                allTables,
               ),
-              variables: {}
+              variables: {},
             };
           } else if (Array.isArray(relationSelection)) {
             // Include with specific fields
@@ -147,11 +147,11 @@ function convertCustomSelectionToOptions(
             });
             options[relationField] = {
               select: selectObj,
-              variables: {}
+              variables: {},
             };
           }
         }
-      }
+      },
     );
   }
 
@@ -188,7 +188,7 @@ function getDisplayFields(table: CleanTable): string[] {
   // This is completely dynamic based on what the schema actually provides
   const maxDisplayFields = Math.max(
     5,
-    Math.floor(nonRelationalFields.length / 2)
+    Math.floor(nonRelationalFields.length / 2),
   );
   return nonRelationalFields.slice(0, maxDisplayFields);
 }
@@ -208,7 +208,7 @@ function getNonRelationalFields(table: CleanTable): string[] {
  */
 export function isRelationalField(
   fieldName: string,
-  table: CleanTable
+  table: CleanTable,
 ): boolean {
   const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
 
@@ -227,14 +227,14 @@ export function isRelationalField(
 function getRelatedTableScalarFields(
   relationField: string,
   table: CleanTable,
-  allTables: CleanTable[]
+  allTables: CleanTable[],
 ): Record<string, boolean> {
   // Find the related table name
   let referencedTableName: string | undefined;
 
   // Check belongsTo relations
   const belongsToRel = table.relations.belongsTo.find(
-    (rel) => rel.fieldName === relationField
+    (rel) => rel.fieldName === relationField,
   );
   if (belongsToRel) {
     referencedTableName = belongsToRel.referencesTable;
@@ -243,7 +243,7 @@ function getRelatedTableScalarFields(
   // Check hasOne relations
   if (!referencedTableName) {
     const hasOneRel = table.relations.hasOne.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasOneRel) {
       referencedTableName = hasOneRel.referencedByTable;
@@ -253,7 +253,7 @@ function getRelatedTableScalarFields(
   // Check hasMany relations
   if (!referencedTableName) {
     const hasManyRel = table.relations.hasMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasManyRel) {
       referencedTableName = hasManyRel.referencedByTable;
@@ -263,7 +263,7 @@ function getRelatedTableScalarFields(
   // Check manyToMany relations
   if (!referencedTableName) {
     const manyToManyRel = table.relations.manyToMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (manyToManyRel) {
       referencedTableName = manyToManyRel.rightTable;
@@ -305,7 +305,7 @@ function getRelatedTableScalarFields(
     'slug',
     'code',
     'createdAt',
-    'updatedAt'
+    'updatedAt',
   ];
 
   const included: string[] = [];
@@ -332,9 +332,7 @@ function getRelatedTableScalarFields(
 /**
  * Get all available relation fields from a table
  */
-export function getAvailableRelations(
-  table: CleanTable
-): Array<{
+export function getAvailableRelations(table: CleanTable): Array<{
   fieldName: string;
   type: 'belongsTo' | 'hasOne' | 'hasMany' | 'manyToMany';
   referencedTable?: string;
@@ -351,7 +349,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'belongsTo',
-        referencedTable: rel.referencesTable || undefined
+        referencedTable: rel.referencesTable || undefined,
       });
     }
   });
@@ -362,7 +360,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'hasOne',
-        referencedTable: rel.referencedByTable || undefined
+        referencedTable: rel.referencedByTable || undefined,
       });
     }
   });
@@ -373,7 +371,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'hasMany',
-        referencedTable: rel.referencedByTable || undefined
+        referencedTable: rel.referencedByTable || undefined,
       });
     }
   });
@@ -384,7 +382,7 @@ export function getAvailableRelations(
       relations.push({
         fieldName: rel.fieldName,
         type: 'manyToMany',
-        referencedTable: rel.rightTable || undefined
+        referencedTable: rel.rightTable || undefined,
       });
     }
   });
@@ -397,7 +395,7 @@ export function getAvailableRelations(
  */
 export function validateFieldSelection(
   selection: FieldSelection,
-  table: CleanTable
+  table: CleanTable,
 ): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -412,9 +410,7 @@ export function validateFieldSelection(
   if (selection.select) {
     selection.select.forEach((field) => {
       if (!tableFieldNames.includes(field)) {
-        errors.push(
-          `Field '${field}' does not exist in table '${table.name}'`
-        );
+        errors.push(`Field '${field}' does not exist in table '${table.name}'`);
       }
     });
   }
@@ -424,7 +420,7 @@ export function validateFieldSelection(
     selection.includeRelations.forEach((field) => {
       if (!isRelationalField(field, table)) {
         errors.push(
-          `Field '${field}' is not a relational field in table '${table.name}'`
+          `Field '${field}' is not a relational field in table '${table.name}'`,
         );
       }
     });
@@ -435,7 +431,7 @@ export function validateFieldSelection(
     Object.keys(selection.include).forEach((field) => {
       if (!isRelationalField(field, table)) {
         errors.push(
-          `Field '${field}' is not a relational field in table '${table.name}'`
+          `Field '${field}' is not a relational field in table '${table.name}'`,
         );
       }
     });
@@ -446,7 +442,7 @@ export function validateFieldSelection(
     selection.exclude.forEach((field) => {
       if (!tableFieldNames.includes(field)) {
         errors.push(
-          `Exclude field '${field}' does not exist in table '${table.name}'`
+          `Exclude field '${field}' does not exist in table '${table.name}'`,
         );
       }
     });
@@ -465,6 +461,6 @@ export function validateFieldSelection(
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }

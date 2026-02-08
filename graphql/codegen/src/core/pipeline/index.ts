@@ -12,7 +12,7 @@ import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
   CleanOperation,
   CleanTable,
-  TypeRegistry
+  TypeRegistry,
 } from '../../types/schema';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
 import type { SchemaSource } from '../introspect/source';
@@ -21,12 +21,15 @@ import {
   filterOperations,
   getCustomOperations,
   getTableOperationNames,
-  transformSchemaToOperations
+  transformSchemaToOperations,
 } from '../introspect/transform-schema';
 
 // Re-export for convenience
 export type { SchemaSource } from '../introspect/source';
-export { createSchemaSource, validateSourceOptions } from '../introspect/source';
+export {
+  createSchemaSource,
+  validateSourceOptions,
+} from '../introspect/source';
 
 // ============================================================================
 // Pipeline Types
@@ -97,13 +100,13 @@ export interface CodegenPipelineResult {
  * 5. Separate table operations from custom operations
  */
 export async function runCodegenPipeline(
-  options: CodegenPipelineOptions
+  options: CodegenPipelineOptions,
 ): Promise<CodegenPipelineResult> {
   const {
     source,
     config,
     verbose = false,
-    skipCustomOperations = false
+    skipCustomOperations = false,
   } = options;
   const log = verbose ? console.log : () => {};
 
@@ -120,7 +123,7 @@ export async function runCodegenPipeline(
   // 3. Filter tables by config (combine exclude and systemExclude)
   tables = filterTables(tables, config.tables.include, [
     ...config.tables.exclude,
-    ...config.tables.systemExclude
+    ...config.tables.systemExclude,
   ]);
   const filteredTables = tables.length;
   log(`  After filtering: ${filteredTables} tables`);
@@ -130,7 +133,7 @@ export async function runCodegenPipeline(
   const {
     queries: allQueries,
     mutations: allMutations,
-    typeRegistry
+    typeRegistry,
   } = transformSchemaToOperations(introspection);
 
   const totalQueries = allQueries.length;
@@ -149,27 +152,27 @@ export async function runCodegenPipeline(
     const filteredQueries = filterOperations(
       allQueries,
       config.queries.include,
-      [...config.queries.exclude, ...config.queries.systemExclude]
+      [...config.queries.exclude, ...config.queries.systemExclude],
     );
     const filteredMutations = filterOperations(
       allMutations,
       config.mutations.include,
-      [...config.mutations.exclude, ...config.mutations.systemExclude]
+      [...config.mutations.exclude, ...config.mutations.systemExclude],
     );
 
     log(
-      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`
+      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`,
     );
 
     // Remove table operations (already handled by table generators)
     customQueries = getCustomOperations(filteredQueries, tableOperationNames);
     customMutations = getCustomOperations(
       filteredMutations,
-      tableOperationNames
+      tableOperationNames,
     );
 
     log(
-      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`
+      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`,
     );
   }
 
@@ -178,7 +181,7 @@ export async function runCodegenPipeline(
     customOperations: {
       queries: customQueries,
       mutations: customMutations,
-      typeRegistry
+      typeRegistry,
     },
     stats: {
       totalTables,
@@ -186,8 +189,8 @@ export async function runCodegenPipeline(
       totalQueries,
       totalMutations,
       customQueries: customQueries.length,
-      customMutations: customMutations.length
-    }
+      customMutations: customMutations.length,
+    },
   };
 }
 
@@ -206,7 +209,7 @@ export function validateTablesFound(tables: CleanTable[]): {
     return {
       valid: false,
       error:
-        'No tables found after filtering. Check your include/exclude patterns.'
+        'No tables found after filtering. Check your include/exclude patterns.',
     };
   }
   return { valid: true };

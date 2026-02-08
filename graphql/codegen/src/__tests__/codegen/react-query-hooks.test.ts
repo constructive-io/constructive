@@ -14,12 +14,19 @@ import {
   generateCustomQueriesBarrel,
   generateMainBarrel,
   generateMutationsBarrel,
-  generateQueriesBarrel
+  generateQueriesBarrel,
 } from '../../core/codegen/barrel';
 import { generateCustomMutationHook } from '../../core/codegen/custom-mutations';
 import { generateCustomQueryHook } from '../../core/codegen/custom-queries';
-import { generateCreateMutationHook, generateDeleteMutationHook,generateUpdateMutationHook } from '../../core/codegen/mutations';
-import { generateListQueryHook, generateSingleQueryHook } from '../../core/codegen/queries';
+import {
+  generateCreateMutationHook,
+  generateDeleteMutationHook,
+  generateUpdateMutationHook,
+} from '../../core/codegen/mutations';
+import {
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from '../../core/codegen/queries';
 import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import type {
   CleanFieldType,
@@ -28,7 +35,7 @@ import type {
   CleanTable,
   CleanTypeRef,
   ResolvedType,
-  TypeRegistry
+  TypeRegistry,
 } from '../../types/schema';
 
 const fieldTypes = {
@@ -36,28 +43,34 @@ const fieldTypes = {
   string: { gqlType: 'String', isArray: false } as CleanFieldType,
   int: { gqlType: 'Int', isArray: false } as CleanFieldType,
   datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
-  boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType
+  boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType,
 };
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
-  manyToMany: []
+  manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
     relations: partial.relations ?? emptyRelations,
     query: partial.query,
     inflection: partial.inflection,
-    constraints: partial.constraints
+    constraints: partial.constraints,
   };
 }
 
-function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
+function createTypeRef(
+  kind: CleanTypeRef['kind'],
+  name: string | null,
+  ofType?: CleanTypeRef,
+): CleanTypeRef {
   return { kind, name, ofType };
 }
 
@@ -67,15 +80,15 @@ const simpleUserTable = createTable({
     { name: 'id', type: fieldTypes.uuid },
     { name: 'email', type: fieldTypes.string },
     { name: 'name', type: fieldTypes.string },
-    { name: 'createdAt', type: fieldTypes.datetime }
+    { name: 'createdAt', type: fieldTypes.datetime },
   ],
   query: {
     all: 'users',
     one: 'user',
     create: 'createUser',
     update: 'updateUser',
-    delete: 'deleteUser'
-  }
+    delete: 'deleteUser',
+  },
 });
 
 const postTable = createTable({
@@ -86,15 +99,15 @@ const postTable = createTable({
     { name: 'content', type: fieldTypes.string },
     { name: 'authorId', type: fieldTypes.uuid },
     { name: 'published', type: fieldTypes.boolean },
-    { name: 'createdAt', type: fieldTypes.datetime }
+    { name: 'createdAt', type: fieldTypes.datetime },
   ],
   query: {
     all: 'posts',
     one: 'post',
     create: 'createPost',
     update: 'updatePost',
-    delete: 'deletePost'
-  }
+    delete: 'deletePost',
+  },
 });
 
 const simpleCustomQueries: CleanOperation[] = [
@@ -103,18 +116,25 @@ const simpleCustomQueries: CleanOperation[] = [
     kind: 'query',
     args: [],
     returnType: createTypeRef('OBJECT', 'User'),
-    description: 'Get the current authenticated user'
+    description: 'Get the current authenticated user',
   },
   {
     name: 'searchUsers',
     kind: 'query',
     args: [
-      { name: 'query', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'limit', type: createTypeRef('SCALAR', 'Int') }
+      {
+        name: 'query',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      { name: 'limit', type: createTypeRef('SCALAR', 'Int') },
     ],
     returnType: createTypeRef('LIST', null, createTypeRef('OBJECT', 'User')),
-    description: 'Search users by name or email'
-  }
+    description: 'Search users by name or email',
+  },
 ];
 
 const simpleCustomMutations: CleanOperation[] = [
@@ -122,28 +142,49 @@ const simpleCustomMutations: CleanOperation[] = [
     name: 'login',
     kind: 'mutation',
     args: [
-      { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) }
+      {
+        name: 'email',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      {
+        name: 'password',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
     ],
     returnType: createTypeRef('OBJECT', 'LoginPayload'),
-    description: 'Authenticate user'
+    description: 'Authenticate user',
   },
   {
     name: 'logout',
     kind: 'mutation',
     args: [],
     returnType: createTypeRef('OBJECT', 'LogoutPayload'),
-    description: 'Log out current user'
+    description: 'Log out current user',
   },
   {
     name: 'register',
     kind: 'mutation',
     args: [
-      { name: 'input', type: createTypeRef('NON_NULL', null, createTypeRef('INPUT_OBJECT', 'RegisterInput')) }
+      {
+        name: 'input',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('INPUT_OBJECT', 'RegisterInput'),
+        ),
+      },
     ],
     returnType: createTypeRef('OBJECT', 'RegisterPayload'),
-    description: 'Register a new user'
-  }
+    description: 'Register a new user',
+  },
 ];
 
 function createTypeRegistry(): TypeRegistry {
@@ -154,16 +195,14 @@ function createTypeRegistry(): TypeRegistry {
     name: 'LoginPayload',
     fields: [
       { name: 'token', type: createTypeRef('SCALAR', 'String') },
-      { name: 'user', type: createTypeRef('OBJECT', 'User') }
-    ]
+      { name: 'user', type: createTypeRef('OBJECT', 'User') },
+    ],
   } as ResolvedType);
 
   registry.set('LogoutPayload', {
     kind: 'OBJECT',
     name: 'LogoutPayload',
-    fields: [
-      { name: 'success', type: createTypeRef('SCALAR', 'Boolean') }
-    ]
+    fields: [{ name: 'success', type: createTypeRef('SCALAR', 'Boolean') }],
   } as ResolvedType);
 
   registry.set('RegisterPayload', {
@@ -171,32 +210,44 @@ function createTypeRegistry(): TypeRegistry {
     name: 'RegisterPayload',
     fields: [
       { name: 'token', type: createTypeRef('SCALAR', 'String') },
-      { name: 'user', type: createTypeRef('OBJECT', 'User') }
-    ]
+      { name: 'user', type: createTypeRef('OBJECT', 'User') },
+    ],
   } as ResolvedType);
 
   registry.set('RegisterInput', {
     kind: 'INPUT_OBJECT',
     name: 'RegisterInput',
     inputFields: [
-      { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'name', type: createTypeRef('SCALAR', 'String') }
-    ]
+      {
+        name: 'email',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      {
+        name: 'password',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      { name: 'name', type: createTypeRef('SCALAR', 'String') },
+    ],
   } as ResolvedType);
 
   registry.set('UserRole', {
     kind: 'ENUM',
     name: 'UserRole',
-    enumValues: ['ADMIN', 'USER', 'GUEST']
+    enumValues: ['ADMIN', 'USER', 'GUEST'],
   } as ResolvedType);
 
   registry.set('Query', {
     kind: 'OBJECT',
     name: 'Query',
-    fields: [
-      { name: 'currentUser', type: createTypeRef('OBJECT', 'User') }
-    ]
+    fields: [{ name: 'currentUser', type: createTypeRef('OBJECT', 'User') }],
   } as ResolvedType);
 
   registry.set('Mutation', {
@@ -205,8 +256,8 @@ function createTypeRegistry(): TypeRegistry {
     fields: [
       { name: 'login', type: createTypeRef('OBJECT', 'LoginPayload') },
       { name: 'logout', type: createTypeRef('OBJECT', 'LogoutPayload') },
-      { name: 'register', type: createTypeRef('OBJECT', 'RegisterPayload') }
-    ]
+      { name: 'register', type: createTypeRef('OBJECT', 'RegisterPayload') },
+    ],
   } as ResolvedType);
 
   return registry;
@@ -217,7 +268,7 @@ describe('Query Hook Generators', () => {
     it('generates list query hook for simple table', () => {
       const result = generateListQueryHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result.fileName).toBe('useUsersQuery.ts');
@@ -227,7 +278,7 @@ describe('Query Hook Generators', () => {
     it('generates list query hook without centralized keys', () => {
       const result = generateListQueryHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result.content).toMatchSnapshot();
@@ -237,7 +288,7 @@ describe('Query Hook Generators', () => {
       const result = generateListQueryHook(postTable, {
         reactQueryEnabled: true,
         useCentralizedKeys: true,
-        hasRelationships: true
+        hasRelationships: true,
       });
       expect(result).not.toBeNull();
       expect(result.content).toMatchSnapshot();
@@ -248,7 +299,7 @@ describe('Query Hook Generators', () => {
     it('generates single query hook for simple table', () => {
       const result = generateSingleQueryHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result.fileName).toBe('useUserQuery.ts');
@@ -258,7 +309,7 @@ describe('Query Hook Generators', () => {
     it('generates single query hook without centralized keys', () => {
       const result = generateSingleQueryHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result.content).toMatchSnapshot();
@@ -268,7 +319,7 @@ describe('Query Hook Generators', () => {
       const result = generateSingleQueryHook(postTable, {
         reactQueryEnabled: true,
         useCentralizedKeys: true,
-        hasRelationships: true
+        hasRelationships: true,
       });
       expect(result).not.toBeNull();
       expect(result.content).toMatchSnapshot();
@@ -281,7 +332,7 @@ describe('Mutation Hook Generators', () => {
     it('generates create mutation hook for simple table', () => {
       const result = generateCreateMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useCreateUserMutation.ts');
@@ -291,7 +342,7 @@ describe('Mutation Hook Generators', () => {
     it('generates create mutation hook without centralized keys', () => {
       const result = generateCreateMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -300,7 +351,7 @@ describe('Mutation Hook Generators', () => {
     it('generates create mutation hook for table with relationships', () => {
       const result = generateCreateMutationHook(postTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -311,7 +362,7 @@ describe('Mutation Hook Generators', () => {
     it('generates update mutation hook for simple table', () => {
       const result = generateUpdateMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useUpdateUserMutation.ts');
@@ -321,7 +372,7 @@ describe('Mutation Hook Generators', () => {
     it('generates update mutation hook without centralized keys', () => {
       const result = generateUpdateMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -330,7 +381,7 @@ describe('Mutation Hook Generators', () => {
     it('generates update mutation hook for table with relationships', () => {
       const result = generateUpdateMutationHook(postTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -341,7 +392,7 @@ describe('Mutation Hook Generators', () => {
     it('generates delete mutation hook for simple table', () => {
       const result = generateDeleteMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useDeleteUserMutation.ts');
@@ -351,7 +402,7 @@ describe('Mutation Hook Generators', () => {
     it('generates delete mutation hook without centralized keys', () => {
       const result = generateDeleteMutationHook(simpleUserTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -360,7 +411,7 @@ describe('Mutation Hook Generators', () => {
     it('generates delete mutation hook for table with relationships', () => {
       const result = generateDeleteMutationHook(postTable, {
         reactQueryEnabled: true,
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -374,7 +425,7 @@ describe('Custom Query Hook Generators', () => {
       const result = generateCustomQueryHook({
         operation: simpleCustomQueries[0],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useCurrentUserQuery.ts');
@@ -385,7 +436,7 @@ describe('Custom Query Hook Generators', () => {
       const result = generateCustomQueryHook({
         operation: simpleCustomQueries[1],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useSearchUsersQuery.ts');
@@ -396,7 +447,7 @@ describe('Custom Query Hook Generators', () => {
       const result = generateCustomQueryHook({
         operation: simpleCustomQueries[0],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -410,7 +461,7 @@ describe('Custom Mutation Hook Generators', () => {
       const result = generateCustomMutationHook({
         operation: simpleCustomMutations[0],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useLoginMutation.ts');
@@ -421,7 +472,7 @@ describe('Custom Mutation Hook Generators', () => {
       const result = generateCustomMutationHook({
         operation: simpleCustomMutations[1],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useLogoutMutation.ts');
@@ -432,7 +483,7 @@ describe('Custom Mutation Hook Generators', () => {
       const result = generateCustomMutationHook({
         operation: simpleCustomMutations[2],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: true
+        useCentralizedKeys: true,
       });
       expect(result).not.toBeNull();
       expect(result!.fileName).toBe('useRegisterMutation.ts');
@@ -443,7 +494,7 @@ describe('Custom Mutation Hook Generators', () => {
       const result = generateCustomMutationHook({
         operation: simpleCustomMutations[0],
         typeRegistry: createTypeRegistry(),
-        useCentralizedKeys: false
+        useCentralizedKeys: false,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -456,7 +507,7 @@ describe('Schema Types Generator', () => {
     it('generates schema types file with enums and input objects', () => {
       const result = generateSchemaTypesFile({
         typeRegistry: createTypeRegistry(),
-        tableTypeNames: new Set(['User', 'Post'])
+        tableTypeNames: new Set(['User', 'Post']),
       });
       expect(result.fileName).toBe('schema-types.ts');
       expect(result.content).toMatchSnapshot();
@@ -465,7 +516,7 @@ describe('Schema Types Generator', () => {
     it('generates schema types file with empty table types', () => {
       const result = generateSchemaTypesFile({
         typeRegistry: createTypeRegistry(),
-        tableTypeNames: new Set()
+        tableTypeNames: new Set(),
       });
       expect(result.content).toMatchSnapshot();
     });
@@ -503,21 +554,21 @@ describe('Barrel File Generators', () => {
         hasMutations: true,
         hasQueryKeys: true,
         hasMutationKeys: true,
-        hasInvalidation: true
+        hasInvalidation: true,
       });
       expect(result).toMatchSnapshot();
     });
 
     it('generates main barrel without custom operations', () => {
       const result = generateMainBarrel([simpleUserTable], {
-        hasMutations: true
+        hasMutations: true,
       });
       expect(result).toMatchSnapshot();
     });
 
     it('generates main barrel without mutations', () => {
       const result = generateMainBarrel([simpleUserTable, postTable], {
-        hasMutations: false
+        hasMutations: false,
       });
       expect(result).toMatchSnapshot();
     });
@@ -526,7 +577,10 @@ describe('Barrel File Generators', () => {
   describe('generateCustomQueriesBarrel', () => {
     it('generates custom queries barrel', () => {
       const customQueryNames = simpleCustomQueries.map((q) => q.name);
-      const result = generateCustomQueriesBarrel([simpleUserTable], customQueryNames);
+      const result = generateCustomQueriesBarrel(
+        [simpleUserTable],
+        customQueryNames,
+      );
       expect(result).toMatchSnapshot();
     });
   });
@@ -534,7 +588,10 @@ describe('Barrel File Generators', () => {
   describe('generateCustomMutationsBarrel', () => {
     it('generates custom mutations barrel', () => {
       const customMutationNames = simpleCustomMutations.map((m) => m.name);
-      const result = generateCustomMutationsBarrel([simpleUserTable], customMutationNames);
+      const result = generateCustomMutationsBarrel(
+        [simpleUserTable],
+        customMutationNames,
+      );
       expect(result).toMatchSnapshot();
     });
   });

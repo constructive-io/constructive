@@ -6,9 +6,9 @@ import { pluralize } from 'inflekt';
 import type {
   CleanField,
   CleanFieldType,
-  CleanTable
+  CleanTable,
 } from '../../types/schema';
-import { scalarToFilterType,scalarToTsType } from './scalars';
+import { scalarToFilterType, scalarToTsType } from './scalars';
 
 // ============================================================================
 // String manipulation
@@ -78,7 +78,7 @@ export function getTableNames(table: CleanTable): TableNames {
     typeName,
     singularName,
     pluralName,
-    pluralTypeName
+    pluralTypeName,
   };
 }
 
@@ -305,7 +305,7 @@ export function fieldTypeToTs(fieldType: CleanFieldType): string {
  */
 export function getScalarFilterType(
   gqlType: string,
-  isArray = false
+  isArray = false,
 ): string | null {
   const cleanType = gqlType.replace(/!/g, '');
   return scalarToFilterType(cleanType, isArray);
@@ -361,8 +361,8 @@ export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
         {
           name: idField.name,
           gqlType: idField.type.gqlType,
-          tsType: fieldTypeToTs(idField.type)
-        }
+          tsType: fieldTypeToTs(idField.type),
+        },
       ];
     }
     // Last resort: assume 'id' of type string (UUID)
@@ -371,7 +371,7 @@ export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
   return pk.fields.map((f) => ({
     name: f.name,
     gqlType: f.type.gqlType,
-    tsType: fieldTypeToTs(f.type)
+    tsType: fieldTypeToTs(f.type),
   }));
 }
 

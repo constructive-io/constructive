@@ -45,25 +45,25 @@ export class EndpointSchemaSource implements SchemaSource {
       endpoint: this.options.endpoint,
       authorization: this.options.authorization,
       headers: this.options.headers,
-      timeout: this.options.timeout
+      timeout: this.options.timeout,
     });
 
     if (!result.success) {
       throw new SchemaSourceError(
         result.error ?? 'Unknown error fetching schema',
-        this.describe()
+        this.describe(),
       );
     }
 
     if (!result.data) {
       throw new SchemaSourceError(
         'No introspection data returned',
-        this.describe()
+        this.describe(),
       );
     }
 
     return {
-      introspection: result.data
+      introspection: result.data,
     };
   }
 

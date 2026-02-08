@@ -13,8 +13,11 @@ export interface SelectionConfig<TFields> {
   fields?: TFields;
 }
 
-export interface ListSelectionConfig<TFields, TWhere, TOrderBy>
-  extends SelectionConfig<TFields> {
+export interface ListSelectionConfig<
+  TFields,
+  TWhere,
+  TOrderBy,
+> extends SelectionConfig<TFields> {
   where?: TWhere;
   orderBy?: TOrderBy[];
   first?: number;
@@ -25,7 +28,7 @@ export interface ListSelectionConfig<TFields, TWhere, TOrderBy>
 }
 
 export function buildSelectionArgs<TFields>(
-  selection?: SelectionConfig<TFields>
+  selection?: SelectionConfig<TFields>,
 ): { select?: TFields } | undefined {
   if (!selection || selection.fields === undefined) {
     return undefined;
@@ -35,7 +38,7 @@ export function buildSelectionArgs<TFields>(
 }
 
 export function buildListSelectionArgs<TFields, TWhere, TOrderBy>(
-  selection?: ListSelectionConfig<TFields, TWhere, TOrderBy>
+  selection?: ListSelectionConfig<TFields, TWhere, TOrderBy>,
 ):
   | {
       select?: TFields;
@@ -74,6 +77,6 @@ export function buildListSelectionArgs<TFields, TWhere, TOrderBy>(
     last: selection.last,
     after: selection.after,
     before: selection.before,
-    offset: selection.offset
+    offset: selection.offset,
   };
 }

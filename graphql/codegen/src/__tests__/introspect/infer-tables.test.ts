@@ -11,7 +11,7 @@ import type {
   IntrospectionInputValue,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionTypeRef
+  IntrospectionTypeRef,
 } from '../../types/introspection';
 
 // ============================================================================
@@ -24,7 +24,7 @@ import type {
 function makeTypeRef(
   kind: 'SCALAR' | 'OBJECT' | 'INPUT_OBJECT' | 'ENUM' | 'LIST' | 'NON_NULL',
   name: string | null,
-  ofType?: IntrospectionTypeRef | null
+  ofType?: IntrospectionTypeRef | null,
 ): IntrospectionTypeRef {
   return { kind, name, ofType: ofType ?? null };
 }
@@ -89,7 +89,7 @@ interface TypeDef {
 function createIntrospection(
   types: TypeDef[],
   queryFields: FieldDef[] = [],
-  mutationFields: FieldDef[] = []
+  mutationFields: FieldDef[] = [],
 ): IntrospectionQueryResponse {
   const makeField = (f: FieldDef): IntrospectionField => ({
     name: f.name,
@@ -99,19 +99,19 @@ function createIntrospection(
         name: a.name,
         type: a.type,
         description: null,
-        defaultValue: null
-      })
+        defaultValue: null,
+      }),
     ),
     deprecationReason: null,
     description: null,
-    isDeprecated: false
+    isDeprecated: false,
   });
 
   const makeInputField = (f: InputFieldDef): IntrospectionInputValue => ({
     name: f.name,
     type: f.type,
     description: null,
-    defaultValue: null
+    defaultValue: null,
   });
 
   // Add Query and Mutation types
@@ -124,21 +124,21 @@ function createIntrospection(
       enumValues: null,
       interfaces: [],
       possibleTypes: null,
-      description: null
+      description: null,
     },
     ...(mutationFields.length > 0
       ? [
-        {
-          name: 'Mutation',
-          kind: 'OBJECT' as const,
-          fields: mutationFields.map(makeField),
-          inputFields: null,
-          enumValues: null,
-          interfaces: [],
-          possibleTypes: null,
-          description: null
-        }
-      ]
+          {
+            name: 'Mutation',
+            kind: 'OBJECT' as const,
+            fields: mutationFields.map(makeField),
+            inputFields: null,
+            enumValues: null,
+            interfaces: [],
+            possibleTypes: null,
+            description: null,
+          },
+        ]
       : []),
     ...types.map(
       (t): IntrospectionType => ({
@@ -152,19 +152,19 @@ function createIntrospection(
         enumValues:
           t.kind === 'ENUM'
             ? (t.enumValues ?? []).map(
-              (v): IntrospectionEnumValue => ({
-                name: v,
-                deprecationReason: null,
-                description: null,
-                isDeprecated: false
-              })
-            )
+                (v): IntrospectionEnumValue => ({
+                  name: v,
+                  deprecationReason: null,
+                  description: null,
+                  isDeprecated: false,
+                }),
+              )
             : null,
         interfaces: [],
         possibleTypes: null,
-        description: null
-      })
-    )
+        description: null,
+      }),
+    ),
   ];
 
   return {
@@ -173,8 +173,8 @@ function createIntrospection(
       mutationType: mutationFields.length > 0 ? { name: 'Mutation' } : null,
       subscriptionType: null,
       types: allTypes,
-      directives: []
-    }
+      directives: [],
+    },
   };
 }
 
@@ -192,8 +192,8 @@ describe('Entity Detection', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'email', type: scalar('String') }
-          ]
+            { name: 'email', type: scalar('String') },
+          ],
         },
         // UsersConnection type (indicates User is an entity)
         {
@@ -201,16 +201,16 @@ describe('Entity Detection', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'nodes', type: list(object('User')) },
-            { name: 'pageInfo', type: nonNull(object('PageInfo')) }
-          ]
+            { name: 'pageInfo', type: nonNull(object('PageInfo')) },
+          ],
         },
         // PageInfo (builtin, should be ignored)
-        { name: 'PageInfo', kind: 'OBJECT', fields: [] }
+        { name: 'PageInfo', kind: 'OBJECT', fields: [] },
       ],
       [
         // Query for users
-        { name: 'users', type: object('UsersConnection') }
-      ]
+        { name: 'users', type: object('UsersConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -225,27 +225,27 @@ describe('Entity Detection', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'Post',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'Comment',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'CommentsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'CommentsConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'users', type: object('UsersConnection') },
         { name: 'posts', type: object('PostsConnection') },
-        { name: 'comments', type: object('CommentsConnection') }
-      ]
+        { name: 'comments', type: object('CommentsConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -261,17 +261,17 @@ describe('Entity Detection', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         // Does not have Connection (should be ignored)
         {
           name: 'AuditLog',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
-        }
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -297,12 +297,12 @@ describe('Field Extraction', () => {
             { name: 'email', type: scalar('String') },
             { name: 'age', type: scalar('Int') },
             { name: 'isActive', type: scalar('Boolean') },
-            { name: 'metadata', type: scalar('JSON') }
-          ]
+            { name: 'metadata', type: scalar('JSON') },
+          ],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -314,7 +314,7 @@ describe('Field Extraction', () => {
       'email',
       'age',
       'isActive',
-      'metadata'
+      'metadata',
     ]);
     expect(fields.find((f) => f.name === 'id')?.type.gqlType).toBe('UUID');
     expect(fields.find((f) => f.name === 'email')?.type.gqlType).toBe('String');
@@ -328,12 +328,12 @@ describe('Field Extraction', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'tags', type: list(scalar('String')) }
-          ]
+            { name: 'tags', type: list(scalar('String')) },
+          ],
         },
-        { name: 'PostsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'posts', type: object('PostsConnection') }]
+      [{ name: 'posts', type: object('PostsConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -354,28 +354,28 @@ describe('Field Extraction', () => {
             { name: 'id', type: nonNull(scalar('UUID')) },
             { name: 'title', type: scalar('String') },
             { name: 'author', type: object('User') }, // belongsTo relation
-            { name: 'comments', type: object('CommentsConnection') } // hasMany relation
-          ]
+            { name: 'comments', type: object('CommentsConnection') }, // hasMany relation
+          ],
         },
         { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'Comment',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'CommentsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'CommentsConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'posts', type: object('PostsConnection') },
         { name: 'users', type: object('UsersConnection') },
-        { name: 'comments', type: object('CommentsConnection') }
-      ]
+        { name: 'comments', type: object('CommentsConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -402,21 +402,21 @@ describe('Relation Inference', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'author', type: object('User') }
-          ]
+            { name: 'author', type: object('User') },
+          ],
         },
         { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'posts', type: object('PostsConnection') },
-        { name: 'users', type: object('UsersConnection') }
-      ]
+        { name: 'users', type: object('UsersConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -435,21 +435,21 @@ describe('Relation Inference', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'posts', type: object('PostsConnection') }
-          ]
+            { name: 'posts', type: object('PostsConnection') },
+          ],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'Post',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'PostsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'users', type: object('UsersConnection') },
-        { name: 'posts', type: object('PostsConnection') }
-      ]
+        { name: 'posts', type: object('PostsConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -471,22 +471,22 @@ describe('Relation Inference', () => {
             // ManyToMany pattern: {entities}By{JunctionTable}{Keys}
             {
               name: 'productsByProductCategoryProductIdAndCategoryId',
-              type: object('ProductsConnection')
-            }
-          ]
+              type: object('ProductsConnection'),
+            },
+          ],
         },
         { name: 'CategoriesConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'Product',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'ProductsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'ProductsConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'categories', type: object('CategoriesConnection') },
-        { name: 'products', type: object('ProductsConnection') }
-      ]
+        { name: 'products', type: object('ProductsConnection') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -495,7 +495,7 @@ describe('Relation Inference', () => {
     expect(categoryTable?.relations.manyToMany).toHaveLength(1);
     expect(categoryTable?.relations.manyToMany[0].rightTable).toBe('Product');
     expect(categoryTable?.relations.manyToMany[0].junctionTable).toBe(
-      'ProductCategory'
+      'ProductCategory',
     );
   });
 });
@@ -511,11 +511,11 @@ describe('Query Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'allUsers', type: object('UsersConnection') }]
+      [{ name: 'allUsers', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -529,18 +529,18 @@ describe('Query Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'users', type: object('UsersConnection') },
         {
           name: 'user',
           type: object('User'),
-          args: [{ name: 'id', type: nonNull(scalar('UUID')) }]
-        }
-      ]
+          args: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -554,14 +554,14 @@ describe('Query Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
       [
-        { name: 'users', type: object('UsersConnection') }
+        { name: 'users', type: object('UsersConnection') },
         // No single user query
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -579,10 +579,10 @@ describe('Mutation Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
-        { name: 'CreateUserPayload', kind: 'OBJECT', fields: [] }
+        { name: 'CreateUserPayload', kind: 'OBJECT', fields: [] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
@@ -590,10 +590,10 @@ describe('Mutation Operation Matching', () => {
           name: 'createUser',
           type: object('CreateUserPayload'),
           args: [
-            { name: 'input', type: nonNull(inputObject('CreateUserInput')) }
-          ]
-        }
-      ]
+            { name: 'input', type: nonNull(inputObject('CreateUserInput')) },
+          ],
+        },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -607,11 +607,11 @@ describe('Mutation Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
-        { name: 'DeleteUserPayload', kind: 'OBJECT', fields: [] }
+        { name: 'DeleteUserPayload', kind: 'OBJECT', fields: [] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
@@ -619,17 +619,17 @@ describe('Mutation Operation Matching', () => {
           name: 'updateUser',
           type: object('UpdateUserPayload'),
           args: [
-            { name: 'input', type: nonNull(inputObject('UpdateUserInput')) }
-          ]
+            { name: 'input', type: nonNull(inputObject('UpdateUserInput')) },
+          ],
         },
         {
           name: 'deleteUser',
           type: object('DeleteUserPayload'),
           args: [
-            { name: 'input', type: nonNull(inputObject('DeleteUserInput')) }
-          ]
-        }
-      ]
+            { name: 'input', type: nonNull(inputObject('DeleteUserInput')) },
+          ],
+        },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -644,16 +644,16 @@ describe('Mutation Operation Matching', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
-        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] }
+        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
       [
         { name: 'updateUserById', type: object('UpdateUserPayload') },
-        { name: 'updateUser', type: object('UpdateUserPayload') }
-      ]
+        { name: 'updateUser', type: object('UpdateUserPayload') },
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -673,11 +673,11 @@ describe('Constraint Inference', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -692,17 +692,17 @@ describe('Constraint Inference', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'userId', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'userId', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'UpdateUserInput',
           kind: 'INPUT_OBJECT',
-          inputFields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
-        }
+          inputFields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
-      [{ name: 'updateUser', type: object('UpdateUserPayload') }]
+      [{ name: 'updateUser', type: object('UpdateUserPayload') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -723,14 +723,14 @@ describe('Inflection Building', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         { name: 'UserFilter', kind: 'INPUT_OBJECT', inputFields: [] },
         { name: 'UserPatch', kind: 'INPUT_OBJECT', inputFields: [] },
-        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] }
+        { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -750,12 +750,12 @@ describe('Inflection Building', () => {
         {
           name: 'User',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'UsersConnection', kind: 'OBJECT', fields: [] }
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         // No UserFilter, UserPatch, or UpdateUserPayload
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -776,9 +776,9 @@ describe('Edge Cases', () => {
     const introspection = createIntrospection(
       [
         // Only built-in types, no entities
-        { name: 'PageInfo', kind: 'OBJECT', fields: [] }
+        { name: 'PageInfo', kind: 'OBJECT', fields: [] },
       ],
-      []
+      [],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -793,11 +793,11 @@ describe('Edge Cases', () => {
         {
           name: 'Orphan',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'OrphansConnection', kind: 'OBJECT', fields: [] }
+        { name: 'OrphansConnection', kind: 'OBJECT', fields: [] },
       ],
-      [] // No query fields
+      [], // No query fields
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -814,8 +814,8 @@ describe('Edge Cases', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'posts', type: object('PostsConnection') }
-          ]
+            { name: 'posts', type: object('PostsConnection') },
+          ],
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         {
@@ -823,15 +823,15 @@ describe('Edge Cases', () => {
           kind: 'OBJECT',
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
-            { name: 'author', type: object('User') }
-          ]
+            { name: 'author', type: object('User') },
+          ],
         },
-        { name: 'PostsConnection', kind: 'OBJECT', fields: [] }
+        { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
       ],
       [
         { name: 'users', type: object('UsersConnection') },
-        { name: 'posts', type: object('PostsConnection') }
-      ]
+        { name: 'posts', type: object('PostsConnection') },
+      ],
     );
 
     // Should not cause infinite loops
@@ -852,11 +852,11 @@ describe('Edge Cases', () => {
         {
           name: 'Person',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-        { name: 'PeopleConnection', kind: 'OBJECT', fields: [] }
+        { name: 'PeopleConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'people', type: object('PeopleConnection') }]
+      [{ name: 'people', type: object('PeopleConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -875,17 +875,17 @@ describe('Edge Cases', () => {
           fields: [
             { name: 'id', type: nonNull(scalar('UUID')) },
             { name: 'street', type: scalar('String') },
-            { name: 'city', type: scalar('String') }
-          ]
+            { name: 'city', type: scalar('String') },
+          ],
         },
         { name: 'AddressesConnection', kind: 'OBJECT', fields: [] },
         {
           name: 'AddressesOrderBy',
           kind: 'ENUM',
-          enumValues: ['ID_ASC', 'ID_DESC']
-        }
+          enumValues: ['ID_ASC', 'ID_DESC'],
+        },
       ],
-      [{ name: 'addresses', type: object('AddressesConnection') }]
+      [{ name: 'addresses', type: object('AddressesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -903,12 +903,12 @@ describe('Edge Cases', () => {
         {
           name: 'Category',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'CategoriesConnection', kind: 'OBJECT', fields: [] },
-        { name: 'CategoriesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] }
+        { name: 'CategoriesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] },
       ],
-      [{ name: 'categories', type: object('CategoriesConnection') }]
+      [{ name: 'categories', type: object('CategoriesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -923,13 +923,13 @@ describe('Edge Cases', () => {
         {
           name: 'Status',
           kind: 'OBJECT',
-          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }]
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
         { name: 'StatusesConnection', kind: 'OBJECT', fields: [] },
         // Schema has the actual OrderBy enum
-        { name: 'StatusesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] }
+        { name: 'StatusesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] },
       ],
-      [{ name: 'statuses', type: object('StatusesConnection') }]
+      [{ name: 'statuses', type: object('StatusesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);

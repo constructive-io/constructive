@@ -18,7 +18,7 @@ function getValidator() {
 
   return {
     ajv: cachedAjv,
-    validator: cachedValidator!
+    validator: cachedValidator!,
   };
 }
 
@@ -26,9 +26,7 @@ function getValidator() {
  * Validate a MetaObject against the JSON schema
  * @returns true if valid, or an object with errors and message if invalid
  */
-export function validateMetaObject(
-  obj: unknown
-): true | ValidationResult {
+export function validateMetaObject(obj: unknown): true | ValidationResult {
   const { ajv, validator } = getValidator();
   const valid = validator(obj);
 
@@ -36,6 +34,6 @@ export function validateMetaObject(
 
   return {
     errors: validator.errors,
-    message: ajv.errorsText(validator.errors, { separator: '\n' })
+    message: ajv.errorsText(validator.errors, { separator: '\n' }),
   };
 }

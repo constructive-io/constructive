@@ -37,7 +37,7 @@ function sortReplacer(_key: string, value: unknown): unknown {
           sorted[key] = (value as Record<string, unknown>)[key];
           return sorted;
         },
-        {} as Record<string, unknown>
+        {} as Record<string, unknown>,
       );
   }
   return value;

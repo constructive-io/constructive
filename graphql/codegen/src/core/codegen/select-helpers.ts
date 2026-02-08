@@ -13,14 +13,16 @@ import { getTypeBaseName } from './type-resolver';
 export const NON_SELECT_TYPES = new Set<string>([
   ...SCALAR_NAMES,
   'Query',
-  'Mutation'
+  'Mutation',
 ]);
 
 /**
  * Get the Select type name for a return type.
  * Returns null for scalar types, Connection types, and root types.
  */
-export function getSelectTypeName(returnType: CleanArgument['type']): string | null {
+export function getSelectTypeName(
+  returnType: CleanArgument['type'],
+): string | null {
   const baseName = getTypeBaseName(returnType);
   if (
     baseName &&
@@ -38,10 +40,14 @@ export function getSelectTypeName(returnType: CleanArgument['type']): string | n
 export function wrapInferSelectResult(
   typeRef: CleanArgument['type'],
   payloadTypeName: string,
-  selectType: string = 'S'
+  selectType: string = 'S',
 ): string {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
-    return wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName, selectType);
+    return wrapInferSelectResult(
+      typeRef.ofType as CleanArgument['type'],
+      payloadTypeName,
+      selectType,
+    );
   }
 
   if (typeRef.kind === 'LIST' && typeRef.ofType) {

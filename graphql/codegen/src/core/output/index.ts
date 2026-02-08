@@ -7,5 +7,5 @@ export {
   type GeneratedFile,
   writeGeneratedFiles,
   type WriteOptions,
-  type WriteResult
+  type WriteResult,
 } from './writer';

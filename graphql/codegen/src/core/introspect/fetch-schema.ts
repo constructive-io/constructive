@@ -21,7 +21,7 @@ function makeRequest(
   url: URL,
   options: http.RequestOptions,
   body: string,
-  timeout: number
+  timeout: number,
 ): Promise<HttpResponse> {
   return new Promise((resolve, reject) => {
     const protocol = url.protocol === 'https:' ? https : http;
@@ -36,7 +36,7 @@ function makeRequest(
         resolve({
           statusCode: res.statusCode || 0,
           statusMessage: res.statusMessage || '',
-          data
+          data,
         });
       });
     });
@@ -75,7 +75,7 @@ export interface FetchSchemaResult {
  * Fetch the full schema introspection from a GraphQL endpoint
  */
 export async function fetchSchema(
-  options: FetchSchemaOptions
+  options: FetchSchemaOptions,
 ): Promise<FetchSchemaResult> {
   const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
 
@@ -84,7 +84,7 @@ export async function fetchSchema(
   const requestHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    ...headers
+    ...headers,
   };
 
   if (authorization) {
@@ -93,12 +93,12 @@ export async function fetchSchema(
 
   const body = JSON.stringify({
     query: SCHEMA_INTROSPECTION_QUERY,
-    variables: {}
+    variables: {},
   });
 
   const requestOptions: http.RequestOptions = {
     method: 'POST',
-    headers: requestHeaders
+    headers: requestHeaders,
   };
 
   try {
@@ -108,7 +108,7 @@ export async function fetchSchema(
       return {
         success: false,
         error: `HTTP ${response.statusCode}: ${response.statusMessage}`,
-        statusCode: response.statusCode
+        statusCode: response.statusCode,
       };
     }
 
@@ -122,7 +122,7 @@ export async function fetchSchema(
       return {
         success: false,
         error: `GraphQL errors: ${errorMessages}`,
-        statusCode: response.statusCode
+        statusCode: response.statusCode,
       };
     }
 
@@ -131,21 +131,21 @@ export async function fetchSchema(
         success: false,
         error:
           'No __schema field in response. Introspection may be disabled on this endpoint.',
-        statusCode: response.statusCode
+        statusCode: response.statusCode,
       };
     }
 
     return {
       success: true,
       data: json.data,
-      statusCode: response.statusCode
+      statusCode: response.statusCode,
     };
   } catch (err) {
     if (err instanceof Error) {
       if (err.message.includes('timeout')) {
         return {
           success: false,
-          error: `Request timeout after ${timeout}ms`
+          error: `Request timeout after ${timeout}ms`,
         };
       }
 
@@ -153,31 +153,31 @@ export async function fetchSchema(
       if (errorCode === 'ECONNREFUSED') {
         return {
           success: false,
-          error: `Connection refused - is the server running at ${endpoint}?`
+          error: `Connection refused - is the server running at ${endpoint}?`,
         };
       }
       if (errorCode === 'ENOTFOUND') {
         return {
           success: false,
-          error: `DNS lookup failed for ${url.hostname} - check the endpoint URL`
+          error: `DNS lookup failed for ${url.hostname} - check the endpoint URL`,
         };
       }
       if (errorCode === 'ECONNRESET') {
         return {
           success: false,
-          error: `Connection reset by server at ${endpoint}`
+          error: `Connection reset by server at ${endpoint}`,
         };
       }
 
       return {
         success: false,
-        error: err.message
+        error: err.message,
       };
     }
 
     return {
       success: false,
-      error: 'Unknown error occurred'
+      error: 'Unknown error occurred',
     };
   }
 }

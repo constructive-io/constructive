@@ -18,24 +18,31 @@ import { getGeneratedFileHeader } from './utils';
 export function createImportDeclaration(
   moduleSpecifier: string,
   namedImports: string[],
-  typeOnly: boolean = false
+  typeOnly: boolean = false,
 ): t.ImportDeclaration {
   const specifiers = namedImports.map((name) =>
-    t.importSpecifier(t.identifier(name), t.identifier(name))
+    t.importSpecifier(t.identifier(name), t.identifier(name)),
   );
-  const decl = t.importDeclaration(specifiers, t.stringLiteral(moduleSpecifier));
+  const decl = t.importDeclaration(
+    specifiers,
+    t.stringLiteral(moduleSpecifier),
+  );
   decl.importKind = typeOnly ? 'type' : 'value';
   return decl;
 }
 
 export function createTypeReExport(
   names: string[],
-  moduleSpecifier: string
+  moduleSpecifier: string,
 ): t.ExportNamedDeclaration {
   const specifiers = names.map((name) =>
-    t.exportSpecifier(t.identifier(name), t.identifier(name))
+    t.exportSpecifier(t.identifier(name), t.identifier(name)),
   );
-  const decl = t.exportNamedDeclaration(null, specifiers, t.stringLiteral(moduleSpecifier));
+  const decl = t.exportNamedDeclaration(
+    null,
+    specifiers,
+    t.stringLiteral(moduleSpecifier),
+  );
   decl.exportKind = 'type';
   return decl;
 }
@@ -47,7 +54,7 @@ export function createTypeReExport(
 export function typeRef(name: string, params?: t.TSType[]): t.TSTypeReference {
   return t.tsTypeReference(
     t.identifier(name),
-    params ? t.tsTypeParameterInstantiation(params) : undefined
+    params ? t.tsTypeParameterInstantiation(params) : undefined,
   );
 }
 
@@ -69,38 +76,40 @@ export function stringLiteralType(value: string): t.TSLiteralType {
 
 export function inferSelectResultType(
   entityTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSTypeReference {
   return typeRef('InferSelectResult', [typeRef(entityTypeName), selectType]);
 }
 
 export function connectionResultType(
   entityTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSTypeReference {
-  return typeRef('ConnectionResult', [inferSelectResultType(entityTypeName, selectType)]);
+  return typeRef('ConnectionResult', [
+    inferSelectResultType(entityTypeName, selectType),
+  ]);
 }
 
 export function typeLiteralWithProps(
-  props: Array<{ name: string; type: t.TSType; optional?: boolean }>
+  props: Array<{ name: string; type: t.TSType; optional?: boolean }>,
 ): t.TSTypeLiteral {
   return t.tsTypeLiteral(
     props.map((p) => {
       const prop = t.tsPropertySignature(
         t.identifier(p.name),
-        t.tsTypeAnnotation(p.type)
+        t.tsTypeAnnotation(p.type),
       );
       if (p.optional) {
         prop.optional = true;
       }
       return prop;
-    })
+    }),
   );
 }
 
 export function queryResultType(
   queryName: string,
-  innerType: t.TSType
+  innerType: t.TSType,
 ): t.TSTypeLiteral {
   return typeLiteralWithProps([{ name: queryName, type: innerType }]);
 }
@@ -108,16 +117,19 @@ export function queryResultType(
 export function listQueryResultType(
   queryName: string,
   entityTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSTypeLiteral {
-  return queryResultType(queryName, connectionResultType(entityTypeName, selectType));
+  return queryResultType(
+    queryName,
+    connectionResultType(entityTypeName, selectType),
+  );
 }
 
 export function singleQueryResultType(
   queryName: string,
   entityTypeName: string,
   selectType: t.TSType,
-  nullable: boolean = true
+  nullable: boolean = true,
 ): t.TSTypeLiteral {
   const resultType = inferSelectResultType(entityTypeName, selectType);
   const innerType = nullable
@@ -130,33 +142,39 @@ export function mutationResultType(
   mutationName: string,
   entityField: string,
   entityTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSTypeLiteral {
   return queryResultType(
     mutationName,
-    typeLiteralWithProps([{
-      name: entityField,
-      type: inferSelectResultType(entityTypeName, selectType)
-    }])
+    typeLiteralWithProps([
+      {
+        name: entityField,
+        type: inferSelectResultType(entityTypeName, selectType),
+      },
+    ]),
   );
 }
 
-export function omitType(baseType: t.TSType, keys: string[]): t.TSTypeReference {
-  const keyType = keys.length === 1
-    ? stringLiteralType(keys[0])
-    : t.tsUnionType(keys.map(stringLiteralType));
+export function omitType(
+  baseType: t.TSType,
+  keys: string[],
+): t.TSTypeReference {
+  const keyType =
+    keys.length === 1
+      ? stringLiteralType(keys[0])
+      : t.tsUnionType(keys.map(stringLiteralType));
   return typeRef('Omit', [baseType, keyType]);
 }
 
 export function listSelectionConfigType(
   selectType: t.TSType,
   filterTypeName: string,
-  orderByTypeName: string
+  orderByTypeName: string,
 ): t.TSTypeReference {
   return typeRef('ListSelectionConfig', [
     selectType,
     typeRef(filterTypeName),
-    typeRef(orderByTypeName)
+    typeRef(orderByTypeName),
   ]);
 }
 
@@ -166,18 +184,18 @@ export function selectionConfigType(selectType: t.TSType): t.TSTypeReference {
 
 export function strictSelectType(
   selectType: t.TSType,
-  shapeTypeName: string
+  shapeTypeName: string,
 ): t.TSTypeReference {
   return typeRef('StrictSelect', [selectType, typeRef(shapeTypeName)]);
 }
 
 export function withFieldsSelectionType(
   selectType: t.TSType,
-  selectTypeName: string
+  selectTypeName: string,
 ): t.TSIntersectionType {
   return t.tsIntersectionType([
     typeLiteralWithProps([{ name: 'fields', type: selectType }]),
-    strictSelectType(selectType, selectTypeName)
+    strictSelectType(selectType, selectTypeName),
   ]);
 }
 
@@ -185,26 +203,26 @@ export function withFieldsListSelectionType(
   selectType: t.TSType,
   selectTypeName: string,
   filterTypeName: string,
-  orderByTypeName: string
+  orderByTypeName: string,
 ): t.TSIntersectionType {
   return t.tsIntersectionType([
     typeLiteralWithProps([{ name: 'fields', type: selectType }]),
     omitType(
       listSelectionConfigType(selectType, filterTypeName, orderByTypeName),
-      ['fields']
+      ['fields'],
     ),
-    strictSelectType(selectType, selectTypeName)
+    strictSelectType(selectType, selectTypeName),
   ]);
 }
 
 export function useQueryOptionsType(
   queryDataType: t.TSType,
   dataType: t.TSType,
-  extraProps?: t.TSType
+  extraProps?: t.TSType,
 ): t.TSType {
   const base = omitType(
     typeRef('UseQueryOptions', [queryDataType, typeRef('Error'), dataType]),
-    ['queryKey', 'queryFn']
+    ['queryKey', 'queryFn'],
   );
   if (extraProps) {
     return t.tsIntersectionType([base, extraProps]);
@@ -218,9 +236,9 @@ export function useQueryOptionsImplType(extraProps?: t.TSType): t.TSType {
       t.tsAnyKeyword(),
       typeRef('Error'),
       t.tsAnyKeyword(),
-      t.tsAnyKeyword()
+      t.tsAnyKeyword(),
     ]),
-    ['queryKey', 'queryFn']
+    ['queryKey', 'queryFn'],
   );
   if (extraProps) {
     return t.tsIntersectionType([base, extraProps]);
@@ -230,17 +248,17 @@ export function useQueryOptionsImplType(extraProps?: t.TSType): t.TSType {
 
 export function useMutationOptionsType(
   resultType: t.TSType,
-  varType: t.TSType
+  varType: t.TSType,
 ): t.TSTypeReference {
   return omitType(
     typeRef('UseMutationOptions', [resultType, typeRef('Error'), varType]),
-    ['mutationFn']
+    ['mutationFn'],
   );
 }
 
 export function useMutationResultType(
   resultType: t.TSType,
-  varType: t.TSType
+  varType: t.TSType,
 ): t.TSTypeReference {
   return typeRef('UseMutationResult', [resultType, typeRef('Error'), varType]);
 }
@@ -249,21 +267,25 @@ export function useMutationResultType(
 // Type parameter helpers
 // ============================================================================
 
-export function createSTypeParam(constraintName: string): t.TSTypeParameterDeclaration {
+export function createSTypeParam(
+  constraintName: string,
+): t.TSTypeParameterDeclaration {
   const param = t.tsTypeParameter(typeRef(constraintName), null, 'S');
   return t.tsTypeParameterDeclaration([param]);
 }
 
 export function createSAndTDataTypeParams(
   constraintName: string,
-  defaultDataType: t.TSType
+  defaultDataType: t.TSType,
 ): t.TSTypeParameterDeclaration {
   const sParam = t.tsTypeParameter(typeRef(constraintName), null, 'S');
   const tDataParam = t.tsTypeParameter(null, defaultDataType, 'TData');
   return t.tsTypeParameterDeclaration([sParam, tDataParam]);
 }
 
-export function createTDataTypeParam(defaultType: t.TSType): t.TSTypeParameterDeclaration {
+export function createTDataTypeParam(
+  defaultType: t.TSType,
+): t.TSTypeParameterDeclaration {
   const param = t.tsTypeParameter(null, defaultType, 'TData');
   return t.tsTypeParameterDeclaration([param]);
 }
@@ -275,7 +297,7 @@ export function createTDataTypeParam(defaultType: t.TSType): t.TSTypeParameterDe
 export function createFunctionParam(
   name: string,
   typeAnnotation: t.TSType,
-  optional: boolean = false
+  optional: boolean = false,
 ): t.Identifier {
   const param = t.identifier(name);
   param.typeAnnotation = t.tsTypeAnnotation(typeAnnotation);
@@ -287,13 +309,13 @@ export function exportDeclareFunction(
   name: string,
   typeParameters: t.TSTypeParameterDeclaration | null,
   params: t.Identifier[],
-  returnType: t.TSType
+  returnType: t.TSType,
 ): t.ExportNamedDeclaration {
   const func = t.tsDeclareFunction(
     t.identifier(name),
     typeParameters,
     params,
-    t.tsTypeAnnotation(returnType)
+    t.tsTypeAnnotation(returnType),
   );
   return t.exportNamedDeclaration(func);
 }
@@ -303,12 +325,12 @@ export function exportFunction(
   typeParameters: t.TSTypeParameterDeclaration | null,
   params: t.Identifier[],
   body: t.Statement[],
-  returnType?: t.TSType
+  returnType?: t.TSType,
 ): t.ExportNamedDeclaration {
   const func = t.functionDeclaration(
     t.identifier(name),
     params,
-    t.blockStatement(body)
+    t.blockStatement(body),
   );
   func.typeParameters = typeParameters;
   if (returnType) {
@@ -322,12 +344,12 @@ export function exportAsyncFunction(
   typeParameters: t.TSTypeParameterDeclaration | null,
   params: t.Identifier[],
   body: t.Statement[],
-  returnType?: t.TSType
+  returnType?: t.TSType,
 ): t.ExportNamedDeclaration {
   const func = t.functionDeclaration(
     t.identifier(name),
     params,
-    t.blockStatement(body)
+    t.blockStatement(body),
   );
   func.async = true;
   func.typeParameters = typeParameters;
@@ -341,13 +363,13 @@ export function exportAsyncDeclareFunction(
   name: string,
   typeParameters: t.TSTypeParameterDeclaration | null,
   params: t.Identifier[],
-  returnType: t.TSType
+  returnType: t.TSType,
 ): t.ExportNamedDeclaration {
   const func = t.tsDeclareFunction(
     t.identifier(name),
     typeParameters,
     params,
-    t.tsTypeAnnotation(returnType)
+    t.tsTypeAnnotation(returnType),
   );
   func.async = true;
   return t.exportNamedDeclaration(func);
@@ -359,7 +381,7 @@ export function exportAsyncDeclareFunction(
 
 export function callExpr(
   callee: string | t.Expression,
-  args: (t.Expression | t.SpreadElement)[]
+  args: (t.Expression | t.SpreadElement)[],
 ): t.CallExpression {
   const calleeExpr = typeof callee === 'string' ? t.identifier(callee) : callee;
   return t.callExpression(calleeExpr, args);
@@ -369,13 +391,21 @@ export function memberExpr(obj: string, prop: string): t.MemberExpression {
   return t.memberExpression(t.identifier(obj), t.identifier(prop));
 }
 
-export function optionalMemberExpr(obj: string, prop: string): t.OptionalMemberExpression {
-  return t.optionalMemberExpression(t.identifier(obj), t.identifier(prop), false, true);
+export function optionalMemberExpr(
+  obj: string,
+  prop: string,
+): t.OptionalMemberExpression {
+  return t.optionalMemberExpression(
+    t.identifier(obj),
+    t.identifier(prop),
+    false,
+    true,
+  );
 }
 
 export function arrowFn(
   params: t.Identifier[],
-  body: t.Expression | t.BlockStatement
+  body: t.Expression | t.BlockStatement,
 ): t.ArrowFunctionExpression {
   return t.arrowFunctionExpression(params, body);
 }
@@ -391,7 +421,7 @@ export function spreadObj(expr: t.Expression): t.SpreadElement {
 export function objectProp(
   key: string,
   value: t.Expression,
-  shorthand: boolean = false
+  shorthand: boolean = false,
 ): t.ObjectProperty {
   return t.objectProperty(t.identifier(key), value, false, shorthand);
 }
@@ -400,9 +430,12 @@ export function shorthandProp(name: string): t.ObjectProperty {
   return t.objectProperty(t.identifier(name), t.identifier(name), false, true);
 }
 
-export function constDecl(name: string, init: t.Expression): t.VariableDeclaration {
+export function constDecl(
+  name: string,
+  init: t.Expression,
+): t.VariableDeclaration {
   return t.variableDeclaration('const', [
-    t.variableDeclarator(t.identifier(name), init)
+    t.variableDeclarator(t.identifier(name), init),
   ]);
 }
 
@@ -410,7 +443,10 @@ export function asConstExpr(expr: t.Expression): t.TSAsExpression {
   return t.tsAsExpression(expr, t.tsTypeReference(t.identifier('const')));
 }
 
-export function asTypeExpr(expr: t.Expression, typeName: string): t.TSAsExpression {
+export function asTypeExpr(
+  expr: t.Expression,
+  typeName: string,
+): t.TSAsExpression {
   return t.tsAsExpression(expr, typeRef(typeName));
 }
 
@@ -426,11 +462,11 @@ export function returnUseQuery(
   queryKeyExpr: t.Expression,
   queryFnExpr: t.Expression,
   extraProps?: Array<t.ObjectProperty | t.SpreadElement>,
-  enabledExpr?: t.Expression
+  enabledExpr?: t.Expression,
 ): t.ReturnStatement {
   const props: Array<t.ObjectProperty | t.SpreadElement> = [
     objectProp('queryKey', queryKeyExpr),
-    objectProp('queryFn', queryFnExpr)
+    objectProp('queryFn', queryFnExpr),
   ];
   if (enabledExpr) {
     props.push(objectProp('enabled', enabledExpr));
@@ -438,15 +474,13 @@ export function returnUseQuery(
   if (extraProps) {
     props.push(...extraProps);
   }
-  return t.returnStatement(
-    callExpr('useQuery', [t.objectExpression(props)])
-  );
+  return t.returnStatement(callExpr('useQuery', [t.objectExpression(props)]));
 }
 
 export function returnUseMutation(
   mutationFnExpr: t.Expression,
   extraProps: Array<t.ObjectProperty | t.SpreadElement>,
-  mutationKeyExpr?: t.Expression
+  mutationKeyExpr?: t.Expression,
 ): t.ReturnStatement {
   const props: Array<t.ObjectProperty | t.SpreadElement> = [];
   if (mutationKeyExpr) {
@@ -455,7 +489,7 @@ export function returnUseMutation(
   props.push(objectProp('mutationFn', mutationFnExpr));
   props.push(...extraProps);
   return t.returnStatement(
-    callExpr('useMutation', [t.objectExpression(props)])
+    callExpr('useMutation', [t.objectExpression(props)]),
   );
 }
 
@@ -466,30 +500,35 @@ export function returnUseMutation(
 export function destructureWithRest(
   source: t.Expression,
   keys: string[],
-  restName: string
+  restName: string,
 ): t.VariableDeclaration {
   const properties = keys.map((key) =>
-    t.objectProperty(t.identifier(key), t.identifier(`_${key}`), false, false)
+    t.objectProperty(t.identifier(key), t.identifier(`_${key}`), false, false),
   );
   const pattern = t.objectPattern([
     ...properties,
-    t.restElement(t.identifier(restName))
+    t.restElement(t.identifier(restName)),
   ]);
   return constDecl(restName, t.identifier('__placeholder__'));
 }
 
 export function destructureParamsWithSelection(
   restName: string,
-  extraKeys: string[] = []
+  extraKeys: string[] = [],
 ): t.VariableDeclaration {
   const properties: (t.ObjectProperty | t.RestElement)[] = [];
   for (const key of extraKeys) {
     properties.push(
-      t.objectProperty(t.identifier(key), t.identifier(key), false, true)
+      t.objectProperty(t.identifier(key), t.identifier(key), false, true),
     );
   }
   properties.push(
-    t.objectProperty(t.identifier('selection'), t.identifier('_selection'), false, false)
+    t.objectProperty(
+      t.identifier('selection'),
+      t.identifier('_selection'),
+      false,
+      false,
+    ),
   );
   properties.push(t.restElement(t.identifier(restName)));
 
@@ -497,24 +536,29 @@ export function destructureParamsWithSelection(
   return t.variableDeclaration('const', [
     t.variableDeclarator(
       pattern,
-      t.logicalExpression('??', t.identifier('params'), t.objectExpression([]))
-    )
+      t.logicalExpression('??', t.identifier('params'), t.objectExpression([])),
+    ),
   ]);
 }
 
 export function destructureParamsWithSelectionAndScope(
-  restName: string
+  restName: string,
 ): t.VariableDeclaration {
   const pattern = t.objectPattern([
     t.objectProperty(t.identifier('scope'), t.identifier('scope'), false, true),
-    t.objectProperty(t.identifier('selection'), t.identifier('_selection'), false, false),
-    t.restElement(t.identifier(restName))
+    t.objectProperty(
+      t.identifier('selection'),
+      t.identifier('_selection'),
+      false,
+      false,
+    ),
+    t.restElement(t.identifier(restName)),
   ]);
   return t.variableDeclaration('const', [
     t.variableDeclarator(
       pattern,
-      t.logicalExpression('??', t.identifier('params'), t.objectExpression([]))
-    )
+      t.logicalExpression('??', t.identifier('params'), t.objectExpression([])),
+    ),
   ]);
 }
 
@@ -523,9 +567,10 @@ export function destructureParamsWithSelectionAndScope(
 // ============================================================================
 
 export function addJSDocComment<T extends t.Node>(node: T, lines: string[]): T {
-  const text = lines.length === 1
-    ? `* ${lines[0]} `
-    : `*\n${lines.map((line) => ` * ${line}`).join('\n')}\n `;
+  const text =
+    lines.length === 1
+      ? `* ${lines[0]} `
+      : `*\n${lines.map((line) => ` * ${line}`).join('\n')}\n `;
   if (!node.leadingComments) {
     node.leadingComments = [];
   }
@@ -542,7 +587,7 @@ export function addLineComment<T extends t.Node>(node: T, text: string): T {
     value: ` ${text}`,
     start: null,
     end: null,
-    loc: null
+    loc: null,
   });
   return node;
 }
@@ -554,31 +599,28 @@ export function addLineComment<T extends t.Node>(node: T, text: string): T {
 export function getClientCall(
   modelName: string,
   method: string,
-  args: t.Expression
+  args: t.Expression,
 ): t.CallExpression {
   return t.callExpression(
     t.memberExpression(
-      t.memberExpression(
-        callExpr('getClient', []),
-        t.identifier(modelName)
-      ),
-      t.identifier(method)
+      t.memberExpression(callExpr('getClient', []), t.identifier(modelName)),
+      t.identifier(method),
     ),
-    [args]
+    [args],
   );
 }
 
 export function getClientCallUnwrap(
   modelName: string,
   method: string,
-  args: t.Expression
+  args: t.Expression,
 ): t.CallExpression {
   return t.callExpression(
     t.memberExpression(
       getClientCall(modelName, method, args),
-      t.identifier('unwrap')
+      t.identifier('unwrap'),
     ),
-    []
+    [],
   );
 }
 
@@ -586,18 +628,18 @@ export function getClientCustomCall(
   operationType: 'query' | 'mutation',
   operationName: string,
   args: t.Expression[],
-  optionsArg?: t.Expression
+  optionsArg?: t.Expression,
 ): t.CallExpression {
   const callArgs = optionsArg ? [...args, optionsArg] : args;
   return t.callExpression(
     t.memberExpression(
       t.memberExpression(
         callExpr('getClient', []),
-        t.identifier(operationType)
+        t.identifier(operationType),
       ),
-      t.identifier(operationName)
+      t.identifier(operationName),
     ),
-    callArgs
+    callArgs,
   );
 }
 
@@ -605,14 +647,14 @@ export function getClientCustomCallUnwrap(
   operationType: 'query' | 'mutation',
   operationName: string,
   args: t.Expression[],
-  optionsArg?: t.Expression
+  optionsArg?: t.Expression,
 ): t.CallExpression {
   return t.callExpression(
     t.memberExpression(
       getClientCustomCall(operationType, operationName, args, optionsArg),
-      t.identifier('unwrap')
+      t.identifier('unwrap'),
     ),
-    []
+    [],
   );
 }
 
@@ -620,29 +662,24 @@ export function getClientCustomCallUnwrap(
 // Select/args expression builders
 // ============================================================================
 
-export function buildSelectExpr(
-  argsIdent: string
-): t.MemberExpression {
-  return t.memberExpression(
-    t.identifier(argsIdent),
-    t.identifier('select')
-  );
+export function buildSelectExpr(argsIdent: string): t.MemberExpression {
+  return t.memberExpression(t.identifier(argsIdent), t.identifier('select'));
 }
 
 export function buildFindManyCallExpr(
   singularName: string,
-  argsIdent: string
+  argsIdent: string,
 ): t.CallExpression {
   const spreadArgs = t.parenthesizedExpression(
-    t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([]))
+    t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([])),
   );
   return getClientCallUnwrap(
     singularName,
     'findMany',
     t.objectExpression([
       t.spreadElement(spreadArgs),
-      objectProp('select', buildSelectExpr(argsIdent))
-    ])
+      objectProp('select', buildSelectExpr(argsIdent)),
+    ]),
   );
 }
 
@@ -650,7 +687,7 @@ export function buildFindOneCallExpr(
   singularName: string,
   pkFieldName: string,
   argsIdent: string,
-  paramsIdent: string = 'params'
+  paramsIdent: string = 'params',
 ): t.CallExpression {
   return getClientCallUnwrap(
     singularName,
@@ -658,15 +695,22 @@ export function buildFindOneCallExpr(
     t.objectExpression([
       objectProp(
         pkFieldName,
-        t.memberExpression(t.identifier(paramsIdent), t.identifier(pkFieldName))
+        t.memberExpression(
+          t.identifier(paramsIdent),
+          t.identifier(pkFieldName),
+        ),
       ),
       t.spreadElement(
         t.parenthesizedExpression(
-          t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([]))
-        )
+          t.logicalExpression(
+            '??',
+            t.identifier(argsIdent),
+            t.objectExpression([]),
+          ),
+        ),
       ),
-      objectProp('select', buildSelectExpr(argsIdent))
-    ])
+      objectProp('select', buildSelectExpr(argsIdent)),
+    ]),
   );
 }
 
@@ -676,7 +720,7 @@ export function buildFindOneCallExpr(
 
 export function generateHookFileCode(
   headerDescription: string,
-  statements: t.Statement[]
+  statements: t.Statement[],
 ): string {
   const header = getGeneratedFileHeader(headerDescription);
   const code = generateCode(statements);
@@ -688,11 +732,13 @@ export function generateHookFileCode(
 // ============================================================================
 
 export function scopeTypeLiteral(scopeTypeName: string): t.TSTypeLiteral {
-  return typeLiteralWithProps([{
-    name: 'scope',
-    type: typeRef(scopeTypeName),
-    optional: true
-  }]);
+  return typeLiteralWithProps([
+    {
+      name: 'scope',
+      type: typeRef(scopeTypeName),
+      optional: true,
+    },
+  ]);
 }
 
 // ============================================================================
@@ -702,13 +748,13 @@ export function scopeTypeLiteral(scopeTypeName: string): t.TSTypeLiteral {
 export function wrapInferSelectResultType(
   typeRefNode: CleanArgument['type'],
   payloadTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
     return wrapInferSelectResultType(
       typeRefNode.ofType as CleanArgument['type'],
       payloadTypeName,
-      selectType
+      selectType,
     );
   }
   if (typeRefNode.kind === 'LIST' && typeRefNode.ofType) {
@@ -716,21 +762,23 @@ export function wrapInferSelectResultType(
       wrapInferSelectResultType(
         typeRefNode.ofType as CleanArgument['type'],
         payloadTypeName,
-        selectType
-      )
+        selectType,
+      ),
     );
   }
   return inferSelectResultType(payloadTypeName, selectType);
 }
 
 export function typeRefToTsTypeAST(
-  typeRefNode: CleanArgument['type']
+  typeRefNode: CleanArgument['type'],
 ): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
     return typeRefToTsTypeAST(typeRefNode.ofType as CleanArgument['type']);
   }
   if (typeRefNode.kind === 'LIST' && typeRefNode.ofType) {
-    return t.tsArrayType(typeRefToTsTypeAST(typeRefNode.ofType as CleanArgument['type']));
+    return t.tsArrayType(
+      typeRefToTsTypeAST(typeRefNode.ofType as CleanArgument['type']),
+    );
   }
   if (typeRefNode.kind === 'SCALAR') {
     const tsType = scalarToTsType(typeRefNode.name ?? 'unknown');
@@ -743,34 +791,36 @@ export function typeRefToTsTypeAST(
 }
 
 export function buildSelectionArgsCall(
-  selectTypeName: string
+  selectTypeName: string,
 ): t.VariableDeclaration {
   const call = t.callExpression(t.identifier('buildSelectionArgs'), [
     t.optionalMemberExpression(
       t.identifier('params'),
       t.identifier('selection'),
       false,
-      true
-    )
+      true,
+    ),
   ]);
   // @ts-ignore - Babel types support typeParameters on CallExpression for TS
-  call.typeParameters = t.tsTypeParameterInstantiation([typeRef(selectTypeName)]);
+  call.typeParameters = t.tsTypeParameterInstantiation([
+    typeRef(selectTypeName),
+  ]);
   return constDecl('args', call);
 }
 
 export function buildListSelectionArgsCall(
   selectTypeName: string,
   filterTypeName: string,
-  orderByTypeName: string
+  orderByTypeName: string,
 ): t.VariableDeclaration {
   const call = t.callExpression(t.identifier('buildListSelectionArgs'), [
-    t.identifier('selection')
+    t.identifier('selection'),
   ]);
   // @ts-ignore - Babel types support typeParameters on CallExpression for TS
   call.typeParameters = t.tsTypeParameterInstantiation([
     typeRef(selectTypeName),
     typeRef(filterTypeName),
-    typeRef(orderByTypeName)
+    typeRef(orderByTypeName),
   ]);
   return constDecl('args', call);
 }
@@ -779,10 +829,12 @@ export function customSelectResultTypeLiteral(
   opName: string,
   returnType: CleanArgument['type'],
   payloadTypeName: string,
-  selectType: t.TSType
+  selectType: t.TSType,
 ): t.TSTypeLiteral {
-  return typeLiteralWithProps([{
-    name: opName,
-    type: wrapInferSelectResultType(returnType, payloadTypeName, selectType)
-  }]);
+  return typeLiteralWithProps([
+    {
+      name: opName,
+      type: wrapInferSelectResultType(returnType, payloadTypeName, selectType),
+    },
+  ]);
 }

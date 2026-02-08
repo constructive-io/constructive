@@ -16,7 +16,7 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
   return [
     t.field({
       name: 'nodes',
-      selectionSet: t.selectionSet({ selections: nodeSelections })
+      selectionSet: t.selectionSet({ selections: nodeSelections }),
     }),
     t.field({ name: 'totalCount' }),
     t.field({
@@ -26,10 +26,10 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
           t.field({ name: 'hasNextPage' }),
           t.field({ name: 'hasPreviousPage' }),
           t.field({ name: 'startCursor' }),
-          t.field({ name: 'endCursor' })
-        ]
-      })
-    })
+          t.field({ name: 'endCursor' }),
+        ],
+      }),
+    }),
   ];
 }
 
@@ -37,20 +37,20 @@ function addVariable(
   spec: { varName: string; argName?: string; typeName: string; value: unknown },
   definitions: VariableDefinitionNode[],
   args: ArgumentNode[],
-  variables: Record<string, unknown>
+  variables: Record<string, unknown>,
 ): void {
   if (spec.value === undefined) return;
   definitions.push(
     t.variableDefinition({
       variable: t.variable({ name: spec.varName }),
-      type: parseType(spec.typeName)
-    })
+      type: parseType(spec.typeName),
+    }),
   );
   args.push(
     t.argument({
       name: spec.argName ?? spec.varName,
-      value: t.variable({ name: spec.varName })
-    })
+      value: t.variable({ name: spec.varName }),
+    }),
   );
   variables[spec.varName] = spec.value;
 }
@@ -58,11 +58,13 @@ function addVariable(
 function buildSelections(
   select: Record<string, unknown> | undefined,
   connectionFieldsMap?: Record<string, Record<string, string>>,
-  entityType?: string
+  entityType?: string,
 ): FieldNode[] {
   if (!select) return [];
   const fields: FieldNode[] = [];
-  const entityConnections = entityType ? connectionFieldsMap?.[entityType] : undefined;
+  const entityConnections = entityType
+    ? connectionFieldsMap?.[entityType]
+    : undefined;
 
   for (const [key, value] of Object.entries(select)) {
     if (value === false || value === undefined) continue;
@@ -79,7 +81,11 @@ function buildSelections(
       };
       if (nested.select) {
         const relatedEntityType = entityConnections?.[key];
-        const nestedSelections = buildSelections(nested.select, connectionFieldsMap, relatedEntityType);
+        const nestedSelections = buildSelections(
+          nested.select,
+          connectionFieldsMap,
+          relatedEntityType,
+        );
         const isConnection =
           nested.connection === true ||
           nested.first !== undefined ||
@@ -91,16 +97,16 @@ function buildSelections(
             t.field({
               name: key,
               selectionSet: t.selectionSet({
-                selections: buildConnectionSelections(nestedSelections)
-              })
-            })
+                selections: buildConnectionSelections(nestedSelections),
+              }),
+            }),
           );
         } else {
           fields.push(
             t.field({
               name: key,
-              selectionSet: t.selectionSet({ selections: nestedSelections })
-            })
+              selectionSet: t.selectionSet({ selections: nestedSelections }),
+            }),
           );
         }
       }
@@ -116,36 +122,68 @@ function buildFindManyDocument<TSelect, TWhere>(
   args: { where?: TWhere; first?: number; orderBy?: string[] },
   filterTypeName: string,
   orderByTypeName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
-    ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
     : [t.field({ name: 'id' })];
   const variableDefinitions: VariableDefinitionNode[] = [];
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
-  addVariable({ varName: 'where', argName: 'filter', typeName: filterTypeName, value: args.where }, variableDefinitions, queryArgs, variables);
-  addVariable({ varName: 'orderBy', typeName: `[${orderByTypeName}!]`, value: args.orderBy?.length ? args.orderBy : undefined }, variableDefinitions, queryArgs, variables);
-  addVariable({ varName: 'first', typeName: 'Int', value: args.first }, variableDefinitions, queryArgs, variables);
+  addVariable(
+    {
+      varName: 'where',
+      argName: 'filter',
+      typeName: filterTypeName,
+      value: args.where,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
+  addVariable(
+    {
+      varName: 'orderBy',
+      typeName: `[${orderByTypeName}!]`,
+      value: args.orderBy?.length ? args.orderBy : undefined,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
+  addVariable(
+    { varName: 'first', typeName: 'Int', value: args.first },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
 
   const document = t.document({
     definitions: [
       t.operationDefinition({
         operation: 'query',
         name: operationName + 'Query',
-        variableDefinitions: variableDefinitions.length ? variableDefinitions : undefined,
+        variableDefinitions: variableDefinitions.length
+          ? variableDefinitions
+          : undefined,
         selectionSet: t.selectionSet({
           selections: [
             t.field({
               name: queryField,
               args: queryArgs.length ? queryArgs : undefined,
-              selectionSet: t.selectionSet({ selections: buildConnectionSelections(selections) })
-            })
-          ]
-        })
-      })
-    ]
+              selectionSet: t.selectionSet({
+                selections: buildConnectionSelections(selections),
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
   });
   return { document: print(document), variables };
 }
@@ -155,7 +193,7 @@ function buildMutationDocument(
   mutationField: string,
   entityField: string,
   selections: FieldNode[],
-  inputTypeName: string
+  inputTypeName: string,
 ): string {
   return print(
     t.document({
@@ -166,28 +204,33 @@ function buildMutationDocument(
           variableDefinitions: [
             t.variableDefinition({
               variable: t.variable({ name: 'input' }),
-              type: parseType(inputTypeName + '!')
-            })
+              type: parseType(inputTypeName + '!'),
+            }),
           ],
           selectionSet: t.selectionSet({
             selections: [
               t.field({
                 name: mutationField,
-                args: [t.argument({ name: 'input', value: t.variable({ name: 'input' }) })],
+                args: [
+                  t.argument({
+                    name: 'input',
+                    value: t.variable({ name: 'input' }),
+                  }),
+                ],
                 selectionSet: t.selectionSet({
                   selections: [
                     t.field({
                       name: entityField,
-                      selectionSet: t.selectionSet({ selections })
-                    })
-                  ]
-                })
-              })
-            ]
-          })
-        })
-      ]
-    })
+                      selectionSet: t.selectionSet({ selections }),
+                    }),
+                  ],
+                }),
+              }),
+            ],
+          }),
+        }),
+      ],
+    }),
   );
 }
 
@@ -202,7 +245,7 @@ describe('query-builder', () => {
         id: true,
         name: true,
         ignored: false,
-        profile: { select: { bio: true } }
+        profile: { select: { bio: true } },
       });
 
       expect(result).toHaveLength(3);
@@ -214,13 +257,13 @@ describe('query-builder', () => {
 
     it('wraps connection fields in nodes when connectionFieldsMap is provided', () => {
       const connectionFieldsMap = {
-        User: { posts: 'Post', comments: 'Comment' }
+        User: { posts: 'Post', comments: 'Comment' },
       };
 
       const result = buildSelections(
         { id: true, posts: { select: { id: true, title: true } } },
         connectionFieldsMap,
-        'User'
+        'User',
       );
 
       expect(result).toHaveLength(2);
@@ -233,7 +276,8 @@ describe('query-builder', () => {
       expect(postsSelections[1].name.value).toBe('totalCount');
       expect(postsSelections[2].name.value).toBe('pageInfo');
       // nodes should contain the actual fields
-      const nodesSelections = postsSelections[0].selectionSet?.selections as FieldNode[];
+      const nodesSelections = postsSelections[0].selectionSet
+        ?.selections as FieldNode[];
       expect(nodesSelections).toHaveLength(2);
       expect(nodesSelections[0].name.value).toBe('id');
       expect(nodesSelections[1].name.value).toBe('title');
@@ -241,19 +285,20 @@ describe('query-builder', () => {
 
     it('does not wrap singular relations in nodes', () => {
       const connectionFieldsMap = {
-        Post: { comments: 'Comment' }
+        Post: { comments: 'Comment' },
       };
 
       const result = buildSelections(
         { id: true, author: { select: { id: true, name: true } } },
         connectionFieldsMap,
-        'Post'
+        'Post',
       );
 
       expect(result).toHaveLength(2);
       expect(result[1].name.value).toBe('author');
       // author is NOT in connectionFieldsMap for Post → should NOT be wrapped
-      const authorSelections = result[1].selectionSet?.selections as FieldNode[];
+      const authorSelections = result[1].selectionSet
+        ?.selections as FieldNode[];
       expect(authorSelections).toHaveLength(2);
       expect(authorSelections[0].name.value).toBe('id');
       expect(authorSelections[1].name.value).toBe('name');
@@ -262,7 +307,7 @@ describe('query-builder', () => {
     it('handles deeply nested connections recursively', () => {
       const connectionFieldsMap = {
         User: { posts: 'Post' },
-        Post: { comments: 'Comment' }
+        Post: { comments: 'Comment' },
       };
 
       const result = buildSelections(
@@ -271,12 +316,12 @@ describe('query-builder', () => {
           posts: {
             select: {
               id: true,
-              comments: { select: { id: true, body: true } }
-            }
-          }
+              comments: { select: { id: true, body: true } },
+            },
+          },
         },
         connectionFieldsMap,
-        'User'
+        'User',
       );
 
       // posts should be wrapped (User.posts is a connection)
@@ -284,9 +329,13 @@ describe('query-builder', () => {
       expect(postsSelections[0].name.value).toBe('nodes');
 
       // Inside nodes, comments should also be wrapped (Post.comments is a connection)
-      const nodesFields = postsSelections[0].selectionSet?.selections as FieldNode[];
-      const commentsField = nodesFields.find((f) => f.name.value === 'comments')!;
-      const commentsSelections = commentsField.selectionSet?.selections as FieldNode[];
+      const nodesFields = postsSelections[0].selectionSet
+        ?.selections as FieldNode[];
+      const commentsField = nodesFields.find(
+        (f) => f.name.value === 'comments',
+      )!;
+      const commentsSelections = commentsField.selectionSet
+        ?.selections as FieldNode[];
       expect(commentsSelections[0].name.value).toBe('nodes');
       expect(commentsSelections[1].name.value).toBe('totalCount');
       expect(commentsSelections[2].name.value).toBe('pageInfo');
@@ -295,7 +344,7 @@ describe('query-builder', () => {
     it('works without connectionFieldsMap (backward compat)', () => {
       const result = buildSelections({
         id: true,
-        posts: { select: { id: true } }
+        posts: { select: { id: true } },
       });
 
       expect(result).toHaveLength(2);
@@ -309,7 +358,7 @@ describe('query-builder', () => {
     it('still wraps when first/filter provided even without connectionFieldsMap', () => {
       const result = buildSelections({
         id: true,
-        posts: { select: { id: true }, first: 10 }
+        posts: { select: { id: true }, first: 10 },
       });
 
       expect(result).toHaveLength(2);
@@ -320,44 +369,47 @@ describe('query-builder', () => {
 
     it('handles mixed connection and singular relations on same entity', () => {
       const connectionFieldsMap = {
-        Post: { comments: 'Comment' }
+        Post: { comments: 'Comment' },
       };
 
       const result = buildSelections(
         {
           id: true,
           author: { select: { id: true } },
-          comments: { select: { id: true, body: true } }
+          comments: { select: { id: true, body: true } },
         },
         connectionFieldsMap,
-        'Post'
+        'Post',
       );
 
       expect(result).toHaveLength(3);
       // author = singular → no wrapping
-      const authorSelections = result[1].selectionSet?.selections as FieldNode[];
+      const authorSelections = result[1].selectionSet
+        ?.selections as FieldNode[];
       expect(authorSelections[0].name.value).toBe('id');
 
       // comments = connection → wrapped
-      const commentsSelections = result[2].selectionSet?.selections as FieldNode[];
+      const commentsSelections = result[2].selectionSet
+        ?.selections as FieldNode[];
       expect(commentsSelections[0].name.value).toBe('nodes');
       expect(commentsSelections[1].name.value).toBe('totalCount');
     });
 
     it('handles entity not in connectionFieldsMap gracefully', () => {
       const connectionFieldsMap = {
-        User: { posts: 'Post' }
+        User: { posts: 'Post' },
       };
 
       // Comment is not in the map — all nested fields should be singular
       const result = buildSelections(
         { id: true, author: { select: { id: true } } },
         connectionFieldsMap,
-        'Comment'
+        'Comment',
       );
 
       expect(result).toHaveLength(2);
-      const authorSelections = result[1].selectionSet?.selections as FieldNode[];
+      const authorSelections = result[1].selectionSet
+        ?.selections as FieldNode[];
       expect(authorSelections[0].name.value).toBe('id');
     });
   });
@@ -368,9 +420,13 @@ describe('query-builder', () => {
         'Users',
         'users',
         { id: true, name: true },
-        { where: { status: { equalTo: 'active' } }, first: 10, orderBy: ['NAME_ASC'] },
+        {
+          where: { status: { equalTo: 'active' } },
+          first: 10,
+          orderBy: ['NAME_ASC'],
+        },
         'UserFilter',
-        'UsersOrderBy'
+        'UsersOrderBy',
       );
 
       expect(document).toContain('query UsersQuery');
@@ -384,7 +440,7 @@ describe('query-builder', () => {
       expect(variables).toEqual({
         where: { status: { equalTo: 'active' } },
         first: 10,
-        orderBy: ['NAME_ASC']
+        orderBy: ['NAME_ASC'],
       });
     });
   });
@@ -396,7 +452,7 @@ describe('query-builder', () => {
         'createUser',
         'user',
         [t.field({ name: 'id' }), t.field({ name: 'name' })],
-        'CreateUserInput'
+        'CreateUserInput',
       );
 
       expect(document).toContain('mutation CreateUserMutation');
@@ -415,13 +471,13 @@ describe('query-builder', () => {
   describe('snapshots', () => {
     const connectionFieldsMap = {
       User: { posts: 'Post', comments: 'Comment' },
-      Post: { comments: 'Comment', tags: 'Tag' }
+      Post: { comments: 'Comment', tags: 'Tag' },
     };
 
     /** Helper: build a query document and print it for snapshotting */
     function buildQuerySnapshot(
       select: Record<string, unknown>,
-      map?: Record<string, Record<string, string>>
+      map?: Record<string, Record<string, string>>,
     ): string {
       const selections = buildSelections(select, map, 'User');
       const doc = t.document({
@@ -434,13 +490,13 @@ describe('query-builder', () => {
                 t.field({
                   name: 'users',
                   selectionSet: t.selectionSet({
-                    selections: buildConnectionSelections(selections)
-                  })
-                })
-              ]
-            })
-          })
-        ]
+                    selections: buildConnectionSelections(selections),
+                  }),
+                }),
+              ],
+            }),
+          }),
+        ],
       });
       return print(doc);
     }
@@ -450,9 +506,9 @@ describe('query-builder', () => {
         {
           id: true,
           name: true,
-          posts: { select: { id: true, title: true, body: true } }
+          posts: { select: { id: true, title: true, body: true } },
         },
-        connectionFieldsMap
+        connectionFieldsMap,
       );
       expect(document).toMatchSnapshot();
     });
@@ -466,12 +522,12 @@ describe('query-builder', () => {
               id: true,
               title: true,
               comments: {
-                select: { id: true, body: true }
-              }
-            }
-          }
+                select: { id: true, body: true },
+              },
+            },
+          },
         },
-        connectionFieldsMap
+        connectionFieldsMap,
       );
       expect(document).toMatchSnapshot();
     });
@@ -483,9 +539,9 @@ describe('query-builder', () => {
           name: true,
           profile: { select: { bio: true, avatar: true } },
           posts: { select: { id: true, title: true } },
-          comments: { select: { id: true, body: true } }
+          comments: { select: { id: true, body: true } },
         },
-        connectionFieldsMap
+        connectionFieldsMap,
       );
       expect(document).toMatchSnapshot();
     });
@@ -495,8 +551,8 @@ describe('query-builder', () => {
         {
           id: true,
           name: true,
-          posts: { select: { id: true, title: true } }
-        }
+          posts: { select: { id: true, title: true } },
+        },
         // no connectionFieldsMap
       );
       expect(document).toMatchSnapshot();
@@ -507,9 +563,13 @@ describe('query-builder', () => {
         'User',
         'users',
         { id: true, name: true, email: true },
-        { where: { name: { equalTo: 'test' } }, first: 25, orderBy: ['NAME_ASC', 'CREATED_AT_DESC'] },
+        {
+          where: { name: { equalTo: 'test' } },
+          first: 25,
+          orderBy: ['NAME_ASC', 'CREATED_AT_DESC'],
+        },
         'UserFilter',
-        'UsersOrderBy'
+        'UsersOrderBy',
       );
       expect(document).toMatchSnapshot();
     });
@@ -519,8 +579,12 @@ describe('query-builder', () => {
         'CreateUser',
         'createUser',
         'user',
-        [t.field({ name: 'id' }), t.field({ name: 'name' }), t.field({ name: 'email' })],
-        'CreateUserInput'
+        [
+          t.field({ name: 'id' }),
+          t.field({ name: 'name' }),
+          t.field({ name: 'email' }),
+        ],
+        'CreateUserInput',
       );
       expect(document).toMatchSnapshot();
     });
@@ -533,12 +597,12 @@ describe('query-builder', () => {
           id: true,
           name: true,
           posts: { select: { id: true, title: true } },
-          comments: { select: { id: true } }
+          comments: { select: { id: true } },
         },
         {},
         'UserFilter',
         'UsersOrderBy',
-        connectionFieldsMap
+        connectionFieldsMap,
       );
       expect(document).toMatchSnapshot();
     });

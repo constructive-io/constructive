@@ -15,7 +15,7 @@ function findTemplateFile(templateName: string): string {
     return templatePath;
   }
   throw new Error(
-    `Could not find template file: ${templateName}. Searched in: ${templatePath}`
+    `Could not find template file: ${templateName}. Searched in: ${templatePath}`,
   );
 }
 
@@ -26,7 +26,7 @@ function readTemplateFile(templateName: string, description: string): string {
     /\/\*\*[\s\S]*?\* NOTE: This file is read at codegen time and written to output\.[\s\S]*?\*\/\n*/;
   content = content.replace(
     headerPattern,
-    getGeneratedFileHeader(description) + '\n'
+    getGeneratedFileHeader(description) + '\n',
   );
   return content;
 }
@@ -35,5 +35,8 @@ function readTemplateFile(templateName: string, description: string): string {
  * Generate client.ts content - ORM client wrapper with configure/getClient
  */
 export function generateClientFile(): string {
-  return readTemplateFile('hooks-client.ts', 'ORM client wrapper for React Query hooks');
+  return readTemplateFile(
+    'hooks-client.ts',
+    'ORM client wrapper for React Query hooks',
+  );
 }

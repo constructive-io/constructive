@@ -1,6 +1,6 @@
 /**
  * Shared CLI utilities for graphql-codegen
- * 
+ *
  * These are exported so that packages/cli can use the same questions,
  * types, and transform utilities, ensuring consistency between the two CLIs.
  */
@@ -11,9 +11,14 @@ import type { Question } from 'inquirerer';
 import type { GenerateResult } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 
-export const splitCommas = (input: string | undefined): string[] | undefined => {
+export const splitCommas = (
+  input: string | undefined,
+): string[] | undefined => {
   if (!input) return undefined;
-  return input.split(',').map((s) => s.trim()).filter(Boolean);
+  return input
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
 };
 
 export interface CodegenAnswers {
@@ -34,13 +39,13 @@ export const codegenQuestions: Question[] = [
     name: 'endpoint',
     message: 'GraphQL endpoint URL',
     type: 'text',
-    required: false
+    required: false,
   },
   {
     name: 'schema-file',
     message: 'Path to GraphQL schema file',
     type: 'text',
-    required: false
+    required: false,
   },
   {
     name: 'output',
@@ -48,21 +53,21 @@ export const codegenQuestions: Question[] = [
     type: 'text',
     required: false,
     default: 'codegen',
-    useDefault: true
+    useDefault: true,
   },
   {
     name: 'schemas',
     message: 'PostgreSQL schemas (comma-separated)',
     type: 'text',
     required: false,
-    sanitize: splitCommas
+    sanitize: splitCommas,
   },
   {
     name: 'api-names',
     message: 'API names (comma-separated)',
     type: 'text',
     required: false,
-    sanitize: splitCommas
+    sanitize: splitCommas,
   },
   {
     name: 'react-query',
@@ -70,7 +75,7 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true
+    useDefault: true,
   },
   {
     name: 'orm',
@@ -78,13 +83,13 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true
+    useDefault: true,
   },
   {
     name: 'authorization',
     message: 'Authorization header value',
     type: 'text',
-    required: false
+    required: false,
   },
   {
     name: 'dry-run',
@@ -92,7 +97,7 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true
+    useDefault: true,
   },
   {
     name: 'verbose',
@@ -100,8 +105,8 @@ export const codegenQuestions: Question[] = [
     type: 'confirm',
     required: false,
     default: false,
-    useDefault: true
-  }
+    useDefault: true,
+  },
 ];
 
 export function printResult(result: GenerateResult): void {
@@ -126,38 +131,56 @@ const skipNonTopLevel = (key: string, path: string[]) =>
   !isTopLevel(key, path) || key === '_' || key.startsWith('_');
 
 export const camelizeArgv = (argv: Record<string, any>): Record<string, any> =>
-  inflektTree(argv, (key) => {
-    const underscored = key.replace(/-/g, '_');
-    return camelize(underscored, true);
-  }, { skip: skipNonTopLevel });
+  inflektTree(
+    argv,
+    (key) => {
+      const underscored = key.replace(/-/g, '_');
+      return camelize(underscored, true);
+    },
+    { skip: skipNonTopLevel },
+  );
 
 export const hyphenateKeys = (obj: Record<string, any>): Record<string, any> =>
-  inflektTree(obj, (key) => key.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()), {
-    skip: skipNonTopLevel
-  });
+  inflektTree(
+    obj,
+    (key) => key.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()),
+    {
+      skip: skipNonTopLevel,
+    },
+  );
 
 // ============================================================================
 // Config <-> CLI shape transforms
 // ============================================================================
 
-export function filterDefined(obj: Record<string, unknown>): Record<string, unknown> {
+export function filterDefined(
+  obj: Record<string, unknown>,
+): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([, v]) => v !== undefined && v !== null)
+    Object.entries(obj).filter(([, v]) => v !== undefined && v !== null),
   );
 }
 
-export function flattenDbFields(config: Record<string, unknown>): Record<string, unknown> {
+export function flattenDbFields(
+  config: Record<string, unknown>,
+): Record<string, unknown> {
   const { db, ...rest } = config;
   if (db && typeof db === 'object') {
     const dbObj = db as Record<string, unknown>;
-    const schemas = Array.isArray(dbObj.schemas) ? dbObj.schemas.join(',') : dbObj.schemas;
-    const apiNames = Array.isArray(dbObj.apiNames) ? dbObj.apiNames.join(',') : dbObj.apiNames;
+    const schemas = Array.isArray(dbObj.schemas)
+      ? dbObj.schemas.join(',')
+      : dbObj.schemas;
+    const apiNames = Array.isArray(dbObj.apiNames)
+      ? dbObj.apiNames.join(',')
+      : dbObj.apiNames;
     return { ...rest, schemas, apiNames };
   }
   return rest;
 }
 
-export function buildDbConfig(options: Record<string, unknown>): Record<string, unknown> {
+export function buildDbConfig(
+  options: Record<string, unknown>,
+): Record<string, unknown> {
   const { schemas, apiNames, ...rest } = options;
   if (schemas || apiNames) {
     return { ...rest, db: { schemas, apiNames } };
@@ -167,7 +190,7 @@ export function buildDbConfig(options: Record<string, unknown>): Record<string, 
 
 export function seedArgvFromConfig(
   argv: Record<string, unknown>,
-  fileConfig: GraphQLSDKConfigTarget
+  fileConfig: GraphQLSDKConfigTarget,
 ): Record<string, unknown> {
   const flat = flattenDbFields(fileConfig as Record<string, unknown>);
   const hyphenated = hyphenateKeys(flat);
@@ -177,7 +200,7 @@ export function seedArgvFromConfig(
 
 export function buildGenerateOptions(
   answers: Record<string, unknown>,
-  fileConfig: GraphQLSDKConfigTarget = {}
+  fileConfig: GraphQLSDKConfigTarget = {},
 ): GraphQLSDKConfigTarget {
   const camelized = camelizeArgv(answers);
   const withDb = buildDbConfig(camelized);

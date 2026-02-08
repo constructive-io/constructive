@@ -33,7 +33,7 @@ export interface WriteOptions {
 type OxfmtFormatFn = (
   fileName: string,
   sourceText: string,
-  options?: Record<string, unknown>
+  options?: Record<string, unknown>,
 ) => Promise<{ code: string; errors: unknown[] }>;
 
 /**
@@ -55,14 +55,14 @@ async function getOxfmtFormat(): Promise<OxfmtFormatFn | null> {
 async function formatFileContent(
   fileName: string,
   content: string,
-  formatFn: OxfmtFormatFn
+  formatFn: OxfmtFormatFn,
 ): Promise<string> {
   try {
     const result = await formatFn(fileName, content, {
       singleQuote: true,
       trailingComma: 'es5',
       tabWidth: 2,
-      semi: true
+      semi: true,
     });
     return result.code;
   } catch {
@@ -83,7 +83,7 @@ export async function writeGeneratedFiles(
   files: GeneratedFile[],
   outputDir: string,
   subdirs: string[],
-  options: WriteOptions = {}
+  options: WriteOptions = {},
 ): Promise<WriteResult> {
   const { showProgress = true, formatFiles = true } = options;
   const errors: string[] = [];
@@ -98,7 +98,7 @@ export async function writeGeneratedFiles(
     const message = err instanceof Error ? err.message : 'Unknown error';
     return {
       success: false,
-      errors: [`Failed to create output directory: ${message}`]
+      errors: [`Failed to create output directory: ${message}`],
     };
   }
 
@@ -132,7 +132,7 @@ export async function writeGeneratedFiles(
       const progress = Math.round(((i + 1) / total) * 100);
       if (isTTY) {
         process.stdout.write(
-          `\rWriting files: ${i + 1}/${total} (${progress}%)`
+          `\rWriting files: ${i + 1}/${total} (${progress}%)`,
         );
       } else if (i % 100 === 0 || i === total - 1) {
         // Non-TTY: periodic updates for CI/CD
@@ -171,7 +171,7 @@ export async function writeGeneratedFiles(
   return {
     success: errors.length === 0,
     filesWritten: written,
-    errors: errors.length > 0 ? errors : undefined
+    errors: errors.length > 0 ? errors : undefined,
   };
 }
 
@@ -205,13 +205,13 @@ function findTsFiles(dir: string): string[] {
  * This function is kept for backwards compatibility.
  */
 export async function formatOutput(
-  outputDir: string
+  outputDir: string,
 ): Promise<{ success: boolean; error?: string }> {
   const formatFn = await getOxfmtFormat();
   if (!formatFn) {
     return {
       success: false,
-      error: 'oxfmt not available. Install it with: npm install oxfmt'
+      error: 'oxfmt not available. Install it with: npm install oxfmt',
     };
   }
 
@@ -223,7 +223,11 @@ export async function formatOutput(
 
     for (const filePath of tsFiles) {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const formatted = await formatFileContent(path.basename(filePath), content, formatFn);
+      const formatted = await formatFileContent(
+        path.basename(filePath),
+        content,
+        formatFn,
+      );
       fs.writeFileSync(filePath, formatted, 'utf-8');
     }
 

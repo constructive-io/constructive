@@ -37,7 +37,7 @@ export interface BuildSchemaFromDatabaseResult {
  * @returns The path to the generated schema file and the SDL content
  */
 export async function buildSchemaFromDatabase(
-  options: BuildSchemaFromDatabaseOptions
+  options: BuildSchemaFromDatabaseOptions,
 ): Promise<BuildSchemaFromDatabaseResult> {
   const { database, schemas, outDir, filename = 'schema.graphql' } = options;
 
@@ -48,7 +48,7 @@ export async function buildSchemaFromDatabase(
   const sdl = await buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) }
+    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
   });
 
   // Write schema to file
@@ -75,6 +75,6 @@ export async function buildSchemaSDLFromDatabase(options: {
   return buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) }
+    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
   });
 }

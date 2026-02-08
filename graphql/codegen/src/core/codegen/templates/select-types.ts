@@ -51,7 +51,7 @@ export interface UpdateArgs<TSelect, TWhere, TData> {
 export type FindOneArgs<
   TSelect,
   TIdName extends string = 'id',
-  TId = string
+  TId = string,
 > = {
   select?: TSelect;
 } & Record<TIdName, TId>;
@@ -84,9 +84,13 @@ export type DeepExact<T, Shape> = T extends Shape
     ? {
         [K in keyof T]: K extends keyof Shape
           ? T[K] extends { select: infer NS }
-            ? Extract<Shape[K], { select?: unknown }> extends { select?: infer ShapeNS }
+            ? Extract<Shape[K], { select?: unknown }> extends {
+                select?: infer ShapeNS;
+              }
               ? DeepExact<
-                  Omit<T[K], 'select'> & { select: DeepExact<NS, NonNullable<ShapeNS>> },
+                  Omit<T[K], 'select'> & {
+                    select: DeepExact<NS, NonNullable<ShapeNS>>;
+                  },
                   Extract<Shape[K], { select?: unknown }>
                 >
               : never

@@ -26,7 +26,7 @@ export type QueryResult<T> =
 export interface GraphQLAdapter {
   execute<T>(
     document: string,
-    variables?: Record<string, unknown>
+    variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>>;
   setHeaders?(headers: Record<string, string>): void;
   getEndpoint?(): string;
@@ -40,33 +40,35 @@ export class FetchAdapter implements GraphQLAdapter {
 
   constructor(
     private endpoint: string,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ) {
     this.headers = headers ?? {};
   }
 
   async execute<T>(
     document: string,
-    variables?: Record<string, unknown>
+    variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>> {
     const response = await fetch(this.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        ...this.headers
+        ...this.headers,
       },
       body: JSON.stringify({
         query: document,
-        variables: variables ?? {}
-      })
+        variables: variables ?? {},
+      }),
     });
 
     if (!response.ok) {
       return {
         ok: false,
         data: null,
-        errors: [{ message: `HTTP ${response.status}: ${response.statusText}` }]
+        errors: [
+          { message: `HTTP ${response.status}: ${response.statusText}` },
+        ],
       };
     }
 
@@ -79,14 +81,14 @@ export class FetchAdapter implements GraphQLAdapter {
       return {
         ok: false,
         data: null,
-        errors: json.errors
+        errors: json.errors,
       };
     }
 
     return {
       ok: true,
       data: json.data as T,
-      errors: undefined
+      errors: undefined,
     };
   }
 
@@ -114,7 +116,7 @@ export interface OrmClientConfig {
 export class GraphQLRequestError extends Error {
   constructor(
     public readonly errors: GraphQLError[],
-    public readonly data: unknown = null
+    public readonly data: unknown = null,
   ) {
     const messages = errors.map((e) => e.message).join('; ');
     super(`GraphQL Error: ${messages}`);
@@ -132,14 +134,14 @@ export class OrmClient {
       this.adapter = new FetchAdapter(config.endpoint, config.headers);
     } else {
       throw new Error(
-        'OrmClientConfig requires either an endpoint or a custom adapter'
+        'OrmClientConfig requires either an endpoint or a custom adapter',
       );
     }
   }
 
   async execute<T>(
     document: string,
-    variables?: Record<string, unknown>
+    variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>> {
     return this.adapter.execute<T>(document, variables);
   }

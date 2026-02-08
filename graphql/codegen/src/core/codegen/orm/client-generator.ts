@@ -8,8 +8,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import type { CleanTable } from '../../../types/schema';
-import { commentBlock,generateCode } from '../babel-ast';
-import { getGeneratedFileHeader,getTableNames, lcFirst } from '../utils';
+import { commentBlock, generateCode } from '../babel-ast';
+import { getGeneratedFileHeader, getTableNames, lcFirst } from '../utils';
 
 export interface GeneratedClientFile {
   fileName: string;
@@ -29,7 +29,7 @@ function findTemplateFile(templateName: string): string {
 
   throw new Error(
     `Could not find template file: ${templateName}. ` +
-      `Searched in: ${templatePath}`
+      `Searched in: ${templatePath}`,
   );
 }
 
@@ -47,7 +47,7 @@ function readTemplateFile(templateName: string, description: string): string {
 
   content = content.replace(
     headerPattern,
-    getGeneratedFileHeader(description) + '\n'
+    getGeneratedFileHeader(description) + '\n',
   );
 
   return content;
@@ -62,7 +62,10 @@ function readTemplateFile(templateName: string, description: string): string {
 export function generateOrmClientFile(): GeneratedClientFile {
   return {
     fileName: 'client.ts',
-    content: readTemplateFile('orm-client.ts', 'ORM Client - Runtime GraphQL executor')
+    content: readTemplateFile(
+      'orm-client.ts',
+      'ORM Client - Runtime GraphQL executor',
+    ),
   };
 }
 
@@ -76,8 +79,8 @@ export function generateQueryBuilderFile(): GeneratedClientFile {
     fileName: 'query-builder.ts',
     content: readTemplateFile(
       'query-builder.ts',
-      'Query Builder - Builds and executes GraphQL operations'
-    )
+      'Query Builder - Builds and executes GraphQL operations',
+    ),
   };
 }
 
@@ -89,21 +92,24 @@ export function generateQueryBuilderFile(): GeneratedClientFile {
 export function generateSelectTypesFile(): GeneratedClientFile {
   return {
     fileName: 'select-types.ts',
-    content: readTemplateFile('select-types.ts', 'Type utilities for select inference')
+    content: readTemplateFile(
+      'select-types.ts',
+      'Type utilities for select inference',
+    ),
   };
 }
 
 function createImportDeclaration(
   moduleSpecifier: string,
   namedImports: string[],
-  typeOnly: boolean = false
+  typeOnly: boolean = false,
 ): t.ImportDeclaration {
   const specifiers = namedImports.map((name) =>
-    t.importSpecifier(t.identifier(name), t.identifier(name))
+    t.importSpecifier(t.identifier(name), t.identifier(name)),
   );
   const decl = t.importDeclaration(
     specifiers,
-    t.stringLiteral(moduleSpecifier)
+    t.stringLiteral(moduleSpecifier),
   );
   decl.importKind = typeOnly ? 'type' : 'value';
   return decl;
@@ -115,7 +121,7 @@ function createImportDeclaration(
 export function generateCreateClientFile(
   tables: CleanTable[],
   hasCustomQueries: boolean,
-  hasCustomMutations: boolean
+  hasCustomMutations: boolean,
 ): GeneratedClientFile {
   const statements: t.Statement[] = [];
 
@@ -123,7 +129,7 @@ export function generateCreateClientFile(
   // Import OrmClient (value) and OrmClientConfig (type) separately
   statements.push(createImportDeclaration('./client', ['OrmClient']));
   statements.push(
-    createImportDeclaration('./client', ['OrmClientConfig'], true)
+    createImportDeclaration('./client', ['OrmClientConfig'], true),
   );
 
   // Import models
@@ -132,19 +138,19 @@ export function generateCreateClientFile(
     const modelName = `${typeName}Model`;
     const fileName = lcFirst(typeName);
     statements.push(
-      createImportDeclaration(`./models/${fileName}`, [modelName])
+      createImportDeclaration(`./models/${fileName}`, [modelName]),
     );
   }
 
   // Import custom operations
   if (hasCustomQueries) {
     statements.push(
-      createImportDeclaration('./query', ['createQueryOperations'])
+      createImportDeclaration('./query', ['createQueryOperations']),
     );
   }
   if (hasCustomMutations) {
     statements.push(
-      createImportDeclaration('./mutation', ['createMutationOperations'])
+      createImportDeclaration('./mutation', ['createMutationOperations']),
     );
   }
 
@@ -155,22 +161,22 @@ export function generateCreateClientFile(
     [
       t.exportSpecifier(
         t.identifier('OrmClientConfig'),
-        t.identifier('OrmClientConfig')
+        t.identifier('OrmClientConfig'),
       ),
       t.exportSpecifier(
         t.identifier('QueryResult'),
-        t.identifier('QueryResult')
+        t.identifier('QueryResult'),
       ),
       t.exportSpecifier(
         t.identifier('GraphQLError'),
-        t.identifier('GraphQLError')
+        t.identifier('GraphQLError'),
       ),
       t.exportSpecifier(
         t.identifier('GraphQLAdapter'),
-        t.identifier('GraphQLAdapter')
-      )
+        t.identifier('GraphQLAdapter'),
+      ),
     ],
-    t.stringLiteral('./client')
+    t.stringLiteral('./client'),
   );
   typeExportDecl.exportKind = 'type';
   statements.push(typeExportDecl);
@@ -182,11 +188,11 @@ export function generateCreateClientFile(
       [
         t.exportSpecifier(
           t.identifier('GraphQLRequestError'),
-          t.identifier('GraphQLRequestError')
-        )
+          t.identifier('GraphQLRequestError'),
+        ),
       ],
-      t.stringLiteral('./client')
-    )
+      t.stringLiteral('./client'),
+    ),
   );
 
   // export { QueryBuilder } from './query-builder';
@@ -196,11 +202,11 @@ export function generateCreateClientFile(
       [
         t.exportSpecifier(
           t.identifier('QueryBuilder'),
-          t.identifier('QueryBuilder')
-        )
+          t.identifier('QueryBuilder'),
+        ),
       ],
-      t.stringLiteral('./query-builder')
-    )
+      t.stringLiteral('./query-builder'),
+    ),
   );
 
   // export * from './select-types';
@@ -217,11 +223,11 @@ export function generateCreateClientFile(
         [
           t.exportSpecifier(
             t.identifier('createQueryOperations'),
-            t.identifier('createQueryOperations')
-          )
+            t.identifier('createQueryOperations'),
+          ),
         ],
-        t.stringLiteral('./query')
-      )
+        t.stringLiteral('./query'),
+      ),
     );
   }
   if (hasCustomMutations) {
@@ -231,11 +237,11 @@ export function generateCreateClientFile(
         [
           t.exportSpecifier(
             t.identifier('createMutationOperations'),
-            t.identifier('createMutationOperations')
-          )
+            t.identifier('createMutationOperations'),
+          ),
         ],
-        t.stringLiteral('./mutation')
-      )
+        t.stringLiteral('./mutation'),
+      ),
     );
   }
 
@@ -248,8 +254,8 @@ export function generateCreateClientFile(
     returnProperties.push(
       t.objectProperty(
         t.identifier(singularName),
-        t.newExpression(t.identifier(modelName), [t.identifier('client')])
-      )
+        t.newExpression(t.identifier(modelName), [t.identifier('client')]),
+      ),
     );
   }
 
@@ -258,9 +264,9 @@ export function generateCreateClientFile(
       t.objectProperty(
         t.identifier('query'),
         t.callExpression(t.identifier('createQueryOperations'), [
-          t.identifier('client')
-        ])
-      )
+          t.identifier('client'),
+        ]),
+      ),
     );
   }
 
@@ -269,9 +275,9 @@ export function generateCreateClientFile(
       t.objectProperty(
         t.identifier('mutation'),
         t.callExpression(t.identifier('createMutationOperations'), [
-          t.identifier('client')
-        ])
-      )
+          t.identifier('client'),
+        ]),
+      ),
     );
   }
 
@@ -279,21 +285,21 @@ export function generateCreateClientFile(
   const clientDecl = t.variableDeclaration('const', [
     t.variableDeclarator(
       t.identifier('client'),
-      t.newExpression(t.identifier('OrmClient'), [t.identifier('config')])
-    )
+      t.newExpression(t.identifier('OrmClient'), [t.identifier('config')]),
+    ),
   ]);
 
   const returnStmt = t.returnStatement(t.objectExpression(returnProperties));
 
   const configParam = t.identifier('config');
   configParam.typeAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('OrmClientConfig'))
+    t.tsTypeReference(t.identifier('OrmClientConfig')),
   );
 
   const createClientFunc = t.functionDeclaration(
     t.identifier('createClient'),
     [configParam],
-    t.blockStatement([clientDecl, returnStmt])
+    t.blockStatement([clientDecl, returnStmt]),
   );
 
   // Add JSDoc comment
@@ -330,6 +336,6 @@ export function generateCreateClientFile(
 
   return {
     fileName: 'index.ts',
-    content: header + '\n' + code
+    content: header + '\n' + code,
   };
 }

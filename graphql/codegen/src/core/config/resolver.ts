@@ -6,9 +6,9 @@
  */
 import type {
   GraphQLSDKConfig,
-  GraphQLSDKConfigTarget
+  GraphQLSDKConfigTarget,
 } from '../../types/config';
-import { getConfigOptions,mergeConfig } from '../../types/config';
+import { getConfigOptions, mergeConfig } from '../../types/config';
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
@@ -38,7 +38,7 @@ export interface LoadConfigResult {
  * 3. Returns fully resolved configuration ready for use
  */
 export async function loadAndResolveConfig(
-  options: ConfigOverrideOptions
+  options: ConfigOverrideOptions,
 ): Promise<LoadConfigResult> {
   // Destructure CLI-only fields, rest is config overrides
   const { config: configPath, ...overrides } = options;
@@ -47,13 +47,13 @@ export async function loadAndResolveConfig(
   const sources = [
     overrides.endpoint,
     overrides.schemaFile,
-    overrides.db
+    overrides.db,
   ].filter(Boolean);
   if (sources.length > 1) {
     return {
       success: false,
       error:
-        'Multiple sources specified. Use only one of: endpoint, schemaFile, or db.'
+        'Multiple sources specified. Use only one of: endpoint, schemaFile, or db.',
     };
   }
 
@@ -77,21 +77,19 @@ export async function loadAndResolveConfig(
 
   // Check if we have a source (endpoint, schemaFile, or db)
   const hasSource =
-    mergedConfig.endpoint ||
-    mergedConfig.schemaFile ||
-    mergedConfig.db;
+    mergedConfig.endpoint || mergedConfig.schemaFile || mergedConfig.db;
 
   if (!hasSource) {
     return {
       success: false,
       error:
-        'No source specified. Use --endpoint, --schema-file, or --db, or create a config file with "graphql-codegen init".'
+        'No source specified. Use --endpoint, --schema-file, or --db, or create a config file with "graphql-codegen init".',
     };
   }
 
   return {
     success: true,
-    config: getConfigOptions(mergedConfig)
+    config: getConfigOptions(mergedConfig),
   };
 }
 
@@ -134,12 +132,12 @@ export async function loadWatchConfig(options: {
   const watchOverrides: GraphQLSDKConfigTarget = {
     watch: {
       ...(options.pollInterval !== undefined && {
-        pollInterval: options.pollInterval
+        pollInterval: options.pollInterval,
       }),
       ...(options.debounce !== undefined && { debounce: options.debounce }),
       ...(options.touch !== undefined && { touchFile: options.touch }),
-      ...(options.clear !== undefined && { clearScreen: options.clear })
-    }
+      ...(options.clear !== undefined && { clearScreen: options.clear }),
+    },
   };
 
   let mergedConfig = mergeConfig(baseConfig, sourceOverrides);
@@ -147,14 +145,14 @@ export async function loadWatchConfig(options: {
 
   if (!mergedConfig.endpoint) {
     console.error(
-      'x No endpoint specified. Watch mode only supports live endpoints.'
+      'x No endpoint specified. Watch mode only supports live endpoints.',
     );
     return null;
   }
 
   if (mergedConfig.schemaFile) {
     console.error(
-      'x Watch mode is only supported with an endpoint, not schemaFile.'
+      'x Watch mode is only supported with an endpoint, not schemaFile.',
     );
     return null;
   }

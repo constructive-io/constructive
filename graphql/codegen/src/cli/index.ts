@@ -16,7 +16,7 @@ import {
   camelizeArgv,
   codegenQuestions,
   printResult,
-  seedArgvFromConfig
+  seedArgvFromConfig,
 } from './shared';
 
 const usage = `
@@ -50,7 +50,7 @@ Generator Options:
 export const commands = async (
   argv: Record<string, unknown>,
   prompter: Inquirerer,
-  _options: CLIOptions
+  _options: CLIOptions,
 ): Promise<Record<string, unknown>> => {
   if (argv.version) {
     const pkg = getPackageJson(__dirname);
@@ -64,11 +64,16 @@ export const commands = async (
   }
 
   const hasSourceFlags = Boolean(
-    argv.endpoint || argv.e || argv['schema-file'] || argv.s ||
-    argv.schemas || argv['api-names']
+    argv.endpoint ||
+    argv.e ||
+    argv['schema-file'] ||
+    argv.s ||
+    argv.schemas ||
+    argv['api-names'],
   );
   const explicitConfigPath = (argv.config || argv.c) as string | undefined;
-  const configPath = explicitConfigPath || (!hasSourceFlags ? findConfigFile() : undefined);
+  const configPath =
+    explicitConfigPath || (!hasSourceFlags ? findConfigFile() : undefined);
   const targetName = (argv.target || argv.t) as string | undefined;
 
   let fileConfig: GraphQLSDKConfigTarget = {};
@@ -81,22 +86,34 @@ export const commands = async (
     }
 
     const config = loaded.config as Record<string, unknown>;
-    const isMulti = !('endpoint' in config || 'schemaFile' in config || 'db' in config);
+    const isMulti = !(
+      'endpoint' in config ||
+      'schemaFile' in config ||
+      'db' in config
+    );
 
     if (isMulti) {
       const targets = config as Record<string, GraphQLSDKConfigTarget>;
       const names = targetName ? [targetName] : Object.keys(targets);
 
       if (targetName && !targets[targetName]) {
-        console.error('x', `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`);
+        console.error(
+          'x',
+          `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`,
+        );
         process.exit(1);
       }
 
-      const cliOptions = buildDbConfig(camelizeArgv(argv as Record<string, any>));
+      const cliOptions = buildDbConfig(
+        camelizeArgv(argv as Record<string, any>),
+      );
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const result = await generate({ ...targets[name], ...cliOptions } as GraphQLSDKConfigTarget);
+        const result = await generate({
+          ...targets[name],
+          ...cliOptions,
+        } as GraphQLSDKConfigTarget);
         printResult(result);
         if (!result.success) hasError = true;
       }
@@ -128,17 +145,31 @@ export const options: Partial<CLIOptions> = {
       o: 'output',
       t: 'target',
       a: 'authorization',
-      v: 'verbose'
+      v: 'verbose',
     },
     boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db'
+      'help',
+      'version',
+      'verbose',
+      'dry-run',
+      'react-query',
+      'orm',
+      'keep-db',
     ],
     string: [
-      'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
-      'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
-      'schemas', 'api-names'
-    ]
-  }
+      'config',
+      'endpoint',
+      'schema-file',
+      'output',
+      'target',
+      'authorization',
+      'pgpm-module-path',
+      'pgpm-workspace-path',
+      'pgpm-module-name',
+      'schemas',
+      'api-names',
+    ],
+  },
 };
 
 if (require.main === module) {

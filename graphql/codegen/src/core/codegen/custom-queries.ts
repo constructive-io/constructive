@@ -15,10 +15,7 @@
  */
 import * as t from '@babel/types';
 
-import type {
-  CleanOperation,
-  TypeRegistry
-} from '../../types/schema';
+import type { CleanOperation, TypeRegistry } from '../../types/schema';
 import { asConst } from './babel-ast';
 import {
   addJSDocComment,
@@ -49,11 +46,9 @@ import {
   useQueryOptionsImplType,
   useQueryOptionsType,
   voidStatement,
-  wrapInferSelectResultType
+  wrapInferSelectResultType,
 } from './hooks-ast';
-import {
-  getSelectTypeName
-} from './select-helpers';
+import { getSelectTypeName } from './select-helpers';
 import {
   createTypeTracker,
   getOperationFileName,
@@ -61,7 +56,7 @@ import {
   getQueryKeyName,
   getTypeBaseName,
   isTypeRequired,
-  typeRefToTsType
+  typeRefToTsType,
 } from './type-resolver';
 import { ucFirst } from './utils';
 
@@ -74,7 +69,6 @@ export interface GeneratedCustomQueryFile {
 export interface GenerateCustomQueryHookOptions {
   operation: CleanOperation;
   typeRegistry: TypeRegistry;
-  maxDepth?: number;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
   tableTypeNames?: Set<string>;
@@ -82,14 +76,14 @@ export interface GenerateCustomQueryHookOptions {
 }
 
 export function generateCustomQueryHook(
-  options: GenerateCustomQueryHookOptions
+  options: GenerateCustomQueryHookOptions,
 ): GeneratedCustomQueryFile {
   const {
     operation,
     typeRegistry,
     reactQueryEnabled = true,
     tableTypeNames,
-    useCentralizedKeys = true
+    useCentralizedKeys = true,
   } = options;
 
   const hookName = getOperationHookName(operation.name, 'query');
@@ -100,7 +94,9 @@ export function generateCustomQueryHook(
   const tracker = createTypeTracker({ tableTypeNames });
 
   const hasArgs = operation.args.length > 0;
-  const hasRequiredArgs = operation.args.some((arg) => isTypeRequired(arg.type));
+  const hasRequiredArgs = operation.args.some((arg) =>
+    isTypeRequired(arg.type),
+  );
 
   const resultType = typeRefToTsType(operation.returnType, tracker);
   for (const arg of operation.args) {
@@ -115,20 +111,36 @@ export function generateCustomQueryHook(
 
   // Imports
   if (reactQueryEnabled) {
-    statements.push(createImportDeclaration('@tanstack/react-query', ['useQuery']));
-    statements.push(createImportDeclaration('@tanstack/react-query', ['UseQueryOptions', 'UseQueryResult', 'QueryClient'], true));
+    statements.push(
+      createImportDeclaration('@tanstack/react-query', ['useQuery']),
+    );
+    statements.push(
+      createImportDeclaration(
+        '@tanstack/react-query',
+        ['UseQueryOptions', 'UseQueryResult', 'QueryClient'],
+        true,
+      ),
+    );
   }
 
   statements.push(createImportDeclaration('../client', ['getClient']));
-  statements.push(createImportDeclaration('../selection', ['buildSelectionArgs']));
-  statements.push(createImportDeclaration('../selection', ['SelectionConfig'], true));
+  statements.push(
+    createImportDeclaration('../selection', ['buildSelectionArgs']),
+  );
+  statements.push(
+    createImportDeclaration('../selection', ['SelectionConfig'], true),
+  );
 
   if (useCentralizedKeys) {
-    statements.push(createImportDeclaration('../query-keys', ['customQueryKeys']));
+    statements.push(
+      createImportDeclaration('../query-keys', ['customQueryKeys']),
+    );
   }
 
   if (hasArgs) {
-    statements.push(createImportDeclaration('../../orm/query', [varTypeName], true));
+    statements.push(
+      createImportDeclaration('../../orm/query', [varTypeName], true),
+    );
   }
 
   const inputTypeImports: string[] = [];
@@ -146,11 +158,19 @@ export function generateCustomQueryHook(
     }
   }
   if (inputTypeImports.length > 0) {
-    statements.push(createImportDeclaration('../../orm/input-types', inputTypeImports, true));
+    statements.push(
+      createImportDeclaration('../../orm/input-types', inputTypeImports, true),
+    );
   }
 
   if (hasSelect) {
-    statements.push(createImportDeclaration('../../orm/select-types', ['InferSelectResult', 'StrictSelect'], true));
+    statements.push(
+      createImportDeclaration(
+        '../../orm/select-types',
+        ['InferSelectResult', 'StrictSelect'],
+        true,
+      ),
+    );
   }
 
   // Re-exports
@@ -158,7 +178,9 @@ export function generateCustomQueryHook(
     statements.push(createTypeReExport([varTypeName], '../../orm/query'));
   }
   if (hasSelect) {
-    statements.push(createTypeReExport([selectTypeName!], '../../orm/input-types'));
+    statements.push(
+      createTypeReExport([selectTypeName!], '../../orm/input-types'),
+    );
   }
 
   // Query key
@@ -167,29 +189,43 @@ export function generateCustomQueryHook(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier(queryKeyName),
-          t.memberExpression(t.identifier('customQueryKeys'), t.identifier(operation.name))
-        )
-      ])
+          t.memberExpression(
+            t.identifier('customQueryKeys'),
+            t.identifier(operation.name),
+          ),
+        ),
+      ]),
     );
-    addJSDocComment(keyDecl, ['Query key factory - re-exported from query-keys.ts']);
+    addJSDocComment(keyDecl, [
+      'Query key factory - re-exported from query-keys.ts',
+    ]);
     statements.push(keyDecl);
   } else if (hasArgs) {
     const keyFn = t.arrowFunctionExpression(
       [createFunctionParam('variables', typeRef(varTypeName), true)],
-      asConst(t.arrayExpression([t.stringLiteral(operation.name), t.identifier('variables')]))
+      asConst(
+        t.arrayExpression([
+          t.stringLiteral(operation.name),
+          t.identifier('variables'),
+        ]),
+      ),
     );
     const keyDecl = t.exportNamedDeclaration(
-      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(queryKeyName), keyFn)])
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier(queryKeyName), keyFn),
+      ]),
     );
     addJSDocComment(keyDecl, ['Query key factory for caching']);
     statements.push(keyDecl);
   } else {
     const keyFn = t.arrowFunctionExpression(
       [],
-      asConst(t.arrayExpression([t.stringLiteral(operation.name)]))
+      asConst(t.arrayExpression([t.stringLiteral(operation.name)])),
     );
     const keyDecl = t.exportNamedDeclaration(
-      t.variableDeclaration('const', [t.variableDeclarator(t.identifier(queryKeyName), keyFn)])
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier(queryKeyName), keyFn),
+      ]),
     );
     addJSDocComment(keyDecl, ['Query key factory for caching']);
     statements.push(keyDecl);
@@ -208,21 +244,32 @@ export function generateCustomQueryHook(
   };
 
   // Helper to build the fields+StrictSelect intersection type
-  const fieldsSelectionType = (s: t.TSType) => t.tsParenthesizedType(
-    t.tsIntersectionType([
-      t.tsTypeLiteral([t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(s))]),
-      typeRef('StrictSelect', [s, typeRef(selectTypeName!)])
-    ])
-  );
+  const fieldsSelectionType = (s: t.TSType) =>
+    t.tsParenthesizedType(
+      t.tsIntersectionType([
+        t.tsTypeLiteral([
+          t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(s)),
+        ]),
+        typeRef('StrictSelect', [s, typeRef(selectTypeName!)]),
+      ]),
+    );
 
-  const selectedResultType= (sel: t.TSType) =>
-    customSelectResultTypeLiteral(operation.name, operation.returnType, payloadTypeName!, sel);
+  const selectedResultType = (sel: t.TSType) =>
+    customSelectResultTypeLiteral(
+      operation.name,
+      operation.returnType,
+      payloadTypeName!,
+      sel,
+    );
 
   // Hook
   if (reactQueryEnabled) {
-    const description = operation.description || `Query hook for ${operation.name}`;
+    const description =
+      operation.description || `Query hook for ${operation.name}`;
     const argNames = operation.args.map((a) => a.name).join(', ');
-    const exampleCall = hasArgs ? `${hookName}({ ${argNames} })` : `${hookName}()`;
+    const exampleCall = hasArgs
+      ? `${hookName}({ ${argNames} })`
+      : `${hookName}()`;
 
     if (hasSelect) {
       // Overload 1: with selection.fields
@@ -231,18 +278,35 @@ export function generateCustomQueryHook(
         const varType = hasRequiredArgs
           ? typeRef(varTypeName)
           : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-        o1Props.push(t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(varType)));
+        o1Props.push(
+          t.tsPropertySignature(
+            t.identifier('variables'),
+            t.tsTypeAnnotation(varType),
+          ),
+        );
       }
-      o1Props.push(t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(fieldsSelectionType(sRef()))));
+      o1Props.push(
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(fieldsSelectionType(sRef())),
+        ),
+      );
       const o1ParamType = t.tsIntersectionType([
         t.tsTypeLiteral(o1Props),
-        omitType(typeRef('UseQueryOptions', [selectedResultType(sRef()), typeRef('Error'), typeRef('TData')]), ['queryKey', 'queryFn'])
+        omitType(
+          typeRef('UseQueryOptions', [
+            selectedResultType(sRef()),
+            typeRef('Error'),
+            typeRef('TData'),
+          ]),
+          ['queryKey', 'queryFn'],
+        ),
       ]);
       const o1 = exportDeclareFunction(
         hookName,
         createSAndTDataTypeParams(selectTypeName!, selectedResultType(sRef())),
         [createFunctionParam('params', o1ParamType)],
-        typeRef('UseQueryResult', [typeRef('TData')])
+        typeRef('UseQueryResult', [typeRef('TData')]),
       );
       addJSDocComment(o1, [
         description,
@@ -254,40 +318,79 @@ export function generateCustomQueryHook(
         `if (data?.${operation.name}) {`,
         `  console.log(data.${operation.name});`,
         '}',
-        '```'
+        '```',
       ]);
       statements.push(o1);
 
       // Implementation
       const implProps: t.TSPropertySignature[] = [];
       if (hasArgs) {
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
+        );
         if (!hasRequiredArgs) varProp.optional = true;
         implProps.push(varProp);
       }
-      const implSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
+      const implSelProp = t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))),
+      );
       implProps.push(implSelProp);
       const implParamType = t.tsIntersectionType([
         t.tsTypeLiteral(implProps),
-        useQueryOptionsImplType()
+        useQueryOptionsImplType(),
       ]);
-      const implParam = createFunctionParam('params', implParamType, !hasRequiredArgs);
+      const implParam = createFunctionParam(
+        'params',
+        implParamType,
+        !hasRequiredArgs,
+      );
 
       const body: t.Statement[] = [];
       if (hasArgs) {
-        body.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
+        body.push(
+          constDecl(
+            'variables',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('variables'),
+              false,
+              true,
+            ),
+          ),
+        );
       }
       body.push(buildSelectionArgsCall(selectTypeName!));
 
       if (hasArgs) {
         const destructPattern = t.objectPattern([
-          t.objectProperty(t.identifier('variables'), t.identifier('_variables'), false, false),
-          t.objectProperty(t.identifier('selection'), t.identifier('_selection'), false, false),
-          t.restElement(t.identifier('queryOptions'))
+          t.objectProperty(
+            t.identifier('variables'),
+            t.identifier('_variables'),
+            false,
+            false,
+          ),
+          t.objectProperty(
+            t.identifier('selection'),
+            t.identifier('_selection'),
+            false,
+            false,
+          ),
+          t.restElement(t.identifier('queryOptions')),
         ]);
-        body.push(t.variableDeclaration('const', [
-          t.variableDeclarator(destructPattern, t.logicalExpression('??', t.identifier('params'), t.objectExpression([])))
-        ]));
+        body.push(
+          t.variableDeclaration('const', [
+            t.variableDeclarator(
+              destructPattern,
+              t.logicalExpression(
+                '??',
+                t.identifier('params'),
+                t.objectExpression([]),
+              ),
+            ),
+          ]),
+        );
         body.push(voidStatement('_variables'));
         body.push(voidStatement('_selection'));
       } else {
@@ -295,57 +398,100 @@ export function generateCustomQueryHook(
         body.push(voidStatement('_selection'));
       }
 
-      const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
+      const selectObj = t.objectExpression([
+        objectProp(
+          'select',
+          t.memberExpression(t.identifier('args'), t.identifier('select')),
+        ),
+      ]);
       const queryFnArgs = hasArgs
-        ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
+        ? [
+            hasRequiredArgs
+              ? t.tsNonNullExpression(t.identifier('variables'))
+              : t.identifier('variables'),
+            selectObj,
+          ]
         : [selectObj];
       const queryFnExpr = t.arrowFunctionExpression(
         [],
-        getClientCustomCallUnwrap('query', operation.name, queryFnArgs as t.Expression[])
+        getClientCustomCallUnwrap(
+          'query',
+          operation.name,
+          queryFnArgs as t.Expression[],
+        ),
       );
 
       const extraProps: (t.ObjectProperty | t.SpreadElement)[] = [];
       const enabledExpr = hasRequiredArgs
         ? t.logicalExpression(
-          '&&',
-          t.unaryExpression('!', t.unaryExpression('!', t.identifier('variables'))),
-          t.binaryExpression(
-            '!==',
-            t.optionalMemberExpression(t.identifier('params'), t.identifier('enabled'), false, true),
-            t.booleanLiteral(false)
+            '&&',
+            t.unaryExpression(
+              '!',
+              t.unaryExpression('!', t.identifier('variables')),
+            ),
+            t.binaryExpression(
+              '!==',
+              t.optionalMemberExpression(
+                t.identifier('params'),
+                t.identifier('enabled'),
+                false,
+                true,
+              ),
+              t.booleanLiteral(false),
+            ),
           )
-        )
         : undefined;
       extraProps.push(spreadObj(t.identifier('queryOptions')));
 
-      body.push(returnUseQuery(buildQueryKeyCall(hasArgs), queryFnExpr, extraProps, enabledExpr));
+      body.push(
+        returnUseQuery(
+          buildQueryKeyCall(hasArgs),
+          queryFnExpr,
+          extraProps,
+          enabledExpr,
+        ),
+      );
       statements.push(exportFunction(hookName, null, [implParam], body));
     } else {
       // Without select: simple hook (scalar return type)
       const resultTypeLiteral = t.tsTypeLiteral([
-        t.tsPropertySignature(t.identifier(operation.name), t.tsTypeAnnotation(typeRef(resultType)))
+        t.tsPropertySignature(
+          t.identifier(operation.name),
+          t.tsTypeAnnotation(typeRef(resultType)),
+        ),
       ]);
 
       const optType = omitType(
-        typeRef('UseQueryOptions', [resultTypeLiteral, typeRef('Error'), typeRef('TData')]),
-        ['queryKey', 'queryFn']
+        typeRef('UseQueryOptions', [
+          resultTypeLiteral,
+          typeRef('Error'),
+          typeRef('TData'),
+        ]),
+        ['queryKey', 'queryFn'],
       );
 
       let paramType: t.TSType;
       if (hasArgs) {
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
+        );
         if (!hasRequiredArgs) varProp.optional = true;
         paramType = t.tsIntersectionType([t.tsTypeLiteral([varProp]), optType]);
       } else {
         paramType = optType;
       }
 
-      const implParam = createFunctionParam('params', paramType, !hasRequiredArgs);
+      const implParam = createFunctionParam(
+        'params',
+        paramType,
+        !hasRequiredArgs,
+      );
       const hookDecl = exportDeclareFunction(
         hookName,
         createTDataTypeParam(resultTypeLiteral),
         [implParam],
-        typeRef('UseQueryResult', [typeRef('TData')])
+        typeRef('UseQueryResult', [typeRef('TData')]),
       );
       addJSDocComment(hookDecl, [
         description,
@@ -357,66 +503,148 @@ export function generateCustomQueryHook(
         `if (data?.${operation.name}) {`,
         `  console.log(data.${operation.name});`,
         '}',
-        '```'
+        '```',
       ]);
 
       const body: t.Statement[] = [];
       if (hasArgs) {
-        body.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
+        body.push(
+          constDecl(
+            'variables',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('variables'),
+              false,
+              true,
+            ),
+          ),
+        );
         const destructPattern = t.objectPattern([
-          t.objectProperty(t.identifier('variables'), t.identifier('_variables'), false, false),
-          t.restElement(t.identifier('queryOptions'))
+          t.objectProperty(
+            t.identifier('variables'),
+            t.identifier('_variables'),
+            false,
+            false,
+          ),
+          t.restElement(t.identifier('queryOptions')),
         ]);
-        body.push(t.variableDeclaration('const', [
-          t.variableDeclarator(destructPattern, t.logicalExpression('??', t.identifier('params'), t.objectExpression([])))
-        ]));
+        body.push(
+          t.variableDeclaration('const', [
+            t.variableDeclarator(
+              destructPattern,
+              t.logicalExpression(
+                '??',
+                t.identifier('params'),
+                t.objectExpression([]),
+              ),
+            ),
+          ]),
+        );
         body.push(voidStatement('_variables'));
       } else {
-        body.push(constDecl('queryOptions', t.logicalExpression('??', t.identifier('params'), t.objectExpression([]))));
+        body.push(
+          constDecl(
+            'queryOptions',
+            t.logicalExpression(
+              '??',
+              t.identifier('params'),
+              t.objectExpression([]),
+            ),
+          ),
+        );
       }
 
       const queryFnArgs = hasArgs
-        ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables')]
+        ? [
+            hasRequiredArgs
+              ? t.tsNonNullExpression(t.identifier('variables'))
+              : t.identifier('variables'),
+          ]
         : [];
       const queryFnExpr = t.arrowFunctionExpression(
         [],
-        getClientCustomCallUnwrap('query', operation.name, queryFnArgs as t.Expression[])
+        getClientCustomCallUnwrap(
+          'query',
+          operation.name,
+          queryFnArgs as t.Expression[],
+        ),
       );
 
       const enabledExpr = hasRequiredArgs
         ? t.logicalExpression(
-          '&&',
-          t.unaryExpression('!', t.unaryExpression('!', t.identifier('variables'))),
-          t.binaryExpression('!==', t.optionalMemberExpression(t.identifier('params'), t.identifier('enabled'), false, true), t.booleanLiteral(false))
-        )
+            '&&',
+            t.unaryExpression(
+              '!',
+              t.unaryExpression('!', t.identifier('variables')),
+            ),
+            t.binaryExpression(
+              '!==',
+              t.optionalMemberExpression(
+                t.identifier('params'),
+                t.identifier('enabled'),
+                false,
+                true,
+              ),
+              t.booleanLiteral(false),
+            ),
+          )
         : undefined;
 
-      body.push(returnUseQuery(buildQueryKeyCall(hasArgs), queryFnExpr, [spreadObj(t.identifier('queryOptions'))], enabledExpr));
+      body.push(
+        returnUseQuery(
+          buildQueryKeyCall(hasArgs),
+          queryFnExpr,
+          [spreadObj(t.identifier('queryOptions'))],
+          enabledExpr,
+        ),
+      );
 
       // We need the implementation version (not declare), with return type
       statements.push(hookDecl);
-      statements.push(exportFunction(hookName, null, [implParam], body, typeRef('UseQueryResult', [typeRef('TData')])));
+      statements.push(
+        exportFunction(
+          hookName,
+          null,
+          [implParam],
+          body,
+          typeRef('UseQueryResult', [typeRef('TData')]),
+        ),
+      );
     }
   }
 
   // Fetch function (non-hook)
   const fetchFnName = `fetch${ucFirst(operation.name)}Query`;
   const fetchArgNames = operation.args.map((a) => a.name).join(', ');
-  const fetchExampleCall = hasArgs ? `${fetchFnName}({ ${fetchArgNames} })` : `${fetchFnName}()`;
+  const fetchExampleCall = hasArgs
+    ? `${fetchFnName}({ ${fetchArgNames} })`
+    : `${fetchFnName}()`;
 
   if (hasSelect) {
     // Overload 1: with fields
     const f1Props: t.TSPropertySignature[] = [];
     if (hasArgs) {
-      const varType = hasRequiredArgs ? typeRef(varTypeName) : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-      f1Props.push(t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(varType)));
+      const varType = hasRequiredArgs
+        ? typeRef(varTypeName)
+        : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
+      f1Props.push(
+        t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(varType),
+        ),
+      );
     }
-    f1Props.push(t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(fieldsSelectionType(sRef()))));
+    f1Props.push(
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(fieldsSelectionType(sRef())),
+      ),
+    );
     const f1Decl = exportAsyncDeclareFunction(
       fetchFnName,
       createSTypeParam(selectTypeName!),
       [createFunctionParam('params', t.tsTypeLiteral(f1Props))],
-      typeRef('Promise', [selectedResultType(sRef())])
+      typeRef('Promise', [selectedResultType(sRef())]),
     );
     addJSDocComment(f1Decl, [
       `Fetch ${operation.name} without React hooks`,
@@ -424,53 +652,132 @@ export function generateCustomQueryHook(
       '@example',
       '```ts',
       `const data = await ${fetchExampleCall};`,
-      '```'
+      '```',
     ]);
     statements.push(f1Decl);
 
     // Implementation
     const fImplProps: t.TSPropertySignature[] = [];
     if (hasArgs) {
-      const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+      const varProp = t.tsPropertySignature(
+        t.identifier('variables'),
+        t.tsTypeAnnotation(typeRef(varTypeName)),
+      );
       if (!hasRequiredArgs) varProp.optional = true;
       fImplProps.push(varProp);
     }
-    const fImplSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
+    const fImplSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))),
+    );
     fImplProps.push(fImplSelProp);
 
     const fBody: t.Statement[] = [];
     if (hasArgs) {
-      fBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
+      fBody.push(
+        constDecl(
+          'variables',
+          t.optionalMemberExpression(
+            t.identifier('params'),
+            t.identifier('variables'),
+            false,
+            true,
+          ),
+        ),
+      );
     }
     fBody.push(buildSelectionArgsCall(selectTypeName!));
-    const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
+    const selectObj = t.objectExpression([
+      objectProp(
+        'select',
+        t.memberExpression(t.identifier('args'), t.identifier('select')),
+      ),
+    ]);
     const fCallArgs = hasArgs
-      ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
+      ? [
+          hasRequiredArgs
+            ? t.tsNonNullExpression(t.identifier('variables'))
+            : t.identifier('variables'),
+          selectObj,
+        ]
       : [selectObj];
-    fBody.push(t.returnStatement(getClientCustomCallUnwrap('query', operation.name, fCallArgs as t.Expression[])));
-    statements.push(exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fImplProps))], fBody));
+    fBody.push(
+      t.returnStatement(
+        getClientCustomCallUnwrap(
+          'query',
+          operation.name,
+          fCallArgs as t.Expression[],
+        ),
+      ),
+    );
+    statements.push(
+      exportAsyncFunction(
+        fetchFnName,
+        null,
+        [createFunctionParam('params', t.tsTypeLiteral(fImplProps))],
+        fBody,
+      ),
+    );
   } else {
     const fBody: t.Statement[] = [];
     if (hasArgs) {
       const fProps: t.TSPropertySignature[] = [];
-      const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+      const varProp = t.tsPropertySignature(
+        t.identifier('variables'),
+        t.tsTypeAnnotation(typeRef(varTypeName)),
+      );
       if (!hasRequiredArgs) varProp.optional = true;
       fProps.push(varProp);
-      fBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
-      const fCallArgs = hasRequiredArgs ? [t.tsNonNullExpression(t.identifier('variables'))] : [t.identifier('variables')];
-      fBody.push(t.returnStatement(getClientCustomCallUnwrap('query', operation.name, fCallArgs as t.Expression[])));
-      const fDecl = exportAsyncFunction(fetchFnName, null, [createFunctionParam('params', t.tsTypeLiteral(fProps), !hasRequiredArgs)], fBody);
+      fBody.push(
+        constDecl(
+          'variables',
+          t.optionalMemberExpression(
+            t.identifier('params'),
+            t.identifier('variables'),
+            false,
+            true,
+          ),
+        ),
+      );
+      const fCallArgs = hasRequiredArgs
+        ? [t.tsNonNullExpression(t.identifier('variables'))]
+        : [t.identifier('variables')];
+      fBody.push(
+        t.returnStatement(
+          getClientCustomCallUnwrap(
+            'query',
+            operation.name,
+            fCallArgs as t.Expression[],
+          ),
+        ),
+      );
+      const fDecl = exportAsyncFunction(
+        fetchFnName,
+        null,
+        [
+          createFunctionParam(
+            'params',
+            t.tsTypeLiteral(fProps),
+            !hasRequiredArgs,
+          ),
+        ],
+        fBody,
+      );
       addJSDocComment(fDecl, [
         `Fetch ${operation.name} without React hooks`,
         '',
         '@example',
         '```ts',
         `const data = await ${fetchExampleCall};`,
-        '```'
+        '```',
       ]);
       statements.push(fDecl);
     } else {
-      fBody.push(t.returnStatement(getClientCustomCallUnwrap('query', operation.name, [])));
+      fBody.push(
+        t.returnStatement(
+          getClientCustomCallUnwrap('query', operation.name, []),
+        ),
+      );
       const fDecl = exportAsyncFunction(fetchFnName, null, [], fBody);
       addJSDocComment(fDecl, [
         `Fetch ${operation.name} without React hooks`,
@@ -478,7 +785,7 @@ export function generateCustomQueryHook(
         '@example',
         '```ts',
         `const data = await ${fetchExampleCall};`,
-        '```'
+        '```',
       ]);
       statements.push(fDecl);
     }
@@ -496,15 +803,30 @@ export function generateCustomQueryHook(
       // Overload 1: with fields
       const p1Props: t.TSPropertySignature[] = [];
       if (hasArgs) {
-        const varType = hasRequiredArgs ? typeRef(varTypeName) : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-        p1Props.push(t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(varType)));
+        const varType = hasRequiredArgs
+          ? typeRef(varTypeName)
+          : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
+        p1Props.push(
+          t.tsPropertySignature(
+            t.identifier('variables'),
+            t.tsTypeAnnotation(varType),
+          ),
+        );
       }
-      p1Props.push(t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(fieldsSelectionType(sRef()))));
+      p1Props.push(
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(fieldsSelectionType(sRef())),
+        ),
+      );
       const p1Decl = exportAsyncDeclareFunction(
         prefetchFnName,
         createSTypeParam(selectTypeName!),
-        [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', t.tsTypeLiteral(p1Props))],
-        typeRef('Promise', [t.tsVoidKeyword()])
+        [
+          createFunctionParam('queryClient', typeRef('QueryClient')),
+          createFunctionParam('params', t.tsTypeLiteral(p1Props)),
+        ],
+        typeRef('Promise', [t.tsVoidKeyword()]),
       );
       addJSDocComment(p1Decl, [
         `Prefetch ${operation.name} for SSR or cache warming`,
@@ -512,86 +834,185 @@ export function generateCustomQueryHook(
         '@example',
         '```ts',
         `await ${prefetchExampleCall};`,
-        '```'
+        '```',
       ]);
       statements.push(p1Decl);
 
       // Implementation
       const pImplProps: t.TSPropertySignature[] = [];
       if (hasArgs) {
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
+        );
         if (!hasRequiredArgs) varProp.optional = true;
         pImplProps.push(varProp);
       }
-      const pImplSelProp = t.tsPropertySignature(t.identifier('selection'), t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))));
+      const pImplSelProp = t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))),
+      );
       pImplProps.push(pImplSelProp);
 
       const pBody: t.Statement[] = [];
       if (hasArgs) {
-        pBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
+        pBody.push(
+          constDecl(
+            'variables',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('variables'),
+              false,
+              true,
+            ),
+          ),
+        );
       }
       pBody.push(buildSelectionArgsCall(selectTypeName!));
-      const selectObj = t.objectExpression([objectProp('select', t.memberExpression(t.identifier('args'), t.identifier('select')))]);
+      const selectObj = t.objectExpression([
+        objectProp(
+          'select',
+          t.memberExpression(t.identifier('args'), t.identifier('select')),
+        ),
+      ]);
       const pCallArgs = hasArgs
-        ? [hasRequiredArgs ? t.tsNonNullExpression(t.identifier('variables')) : t.identifier('variables'), selectObj]
+        ? [
+            hasRequiredArgs
+              ? t.tsNonNullExpression(t.identifier('variables'))
+              : t.identifier('variables'),
+            selectObj,
+          ]
         : [selectObj];
       const prefetchQueryCall = callExpr(
-        t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
-        [t.objectExpression([
-          objectProp('queryKey', buildQueryKeyCall(hasArgs)),
-          objectProp('queryFn', t.arrowFunctionExpression([], getClientCustomCallUnwrap('query', operation.name, pCallArgs as t.Expression[])))
-        ])]
+        t.memberExpression(
+          t.identifier('queryClient'),
+          t.identifier('prefetchQuery'),
+        ),
+        [
+          t.objectExpression([
+            objectProp('queryKey', buildQueryKeyCall(hasArgs)),
+            objectProp(
+              'queryFn',
+              t.arrowFunctionExpression(
+                [],
+                getClientCustomCallUnwrap(
+                  'query',
+                  operation.name,
+                  pCallArgs as t.Expression[],
+                ),
+              ),
+            ),
+          ]),
+        ],
       );
       pBody.push(t.expressionStatement(t.awaitExpression(prefetchQueryCall)));
       statements.push(
         exportAsyncFunction(
           prefetchFnName,
           null,
-          [createFunctionParam('queryClient', typeRef('QueryClient')), createFunctionParam('params', t.tsTypeLiteral(pImplProps))],
+          [
+            createFunctionParam('queryClient', typeRef('QueryClient')),
+            createFunctionParam('params', t.tsTypeLiteral(pImplProps)),
+          ],
           pBody,
-          t.tsVoidKeyword()
-        )
+          t.tsVoidKeyword(),
+        ),
       );
     } else {
       // Without select
       const pBody: t.Statement[] = [];
-      const pParams: t.Identifier[] = [createFunctionParam('queryClient', typeRef('QueryClient'))];
+      const pParams: t.Identifier[] = [
+        createFunctionParam('queryClient', typeRef('QueryClient')),
+      ];
 
       if (hasArgs) {
         const pProps: t.TSPropertySignature[] = [];
-        const varProp = t.tsPropertySignature(t.identifier('variables'), t.tsTypeAnnotation(typeRef(varTypeName)));
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
+        );
         if (!hasRequiredArgs) varProp.optional = true;
         pProps.push(varProp);
-        pParams.push(createFunctionParam('params', t.tsTypeLiteral(pProps), !hasRequiredArgs));
-        pBody.push(constDecl('variables', t.optionalMemberExpression(t.identifier('params'), t.identifier('variables'), false, true)));
-        const pCallArgs = hasRequiredArgs ? [t.tsNonNullExpression(t.identifier('variables'))] : [t.identifier('variables')];
+        pParams.push(
+          createFunctionParam(
+            'params',
+            t.tsTypeLiteral(pProps),
+            !hasRequiredArgs,
+          ),
+        );
+        pBody.push(
+          constDecl(
+            'variables',
+            t.optionalMemberExpression(
+              t.identifier('params'),
+              t.identifier('variables'),
+              false,
+              true,
+            ),
+          ),
+        );
+        const pCallArgs = hasRequiredArgs
+          ? [t.tsNonNullExpression(t.identifier('variables'))]
+          : [t.identifier('variables')];
         const prefetchQueryCall = callExpr(
-          t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
-          [t.objectExpression([
-            objectProp('queryKey', buildQueryKeyCall(true)),
-            objectProp('queryFn', t.arrowFunctionExpression([], getClientCustomCallUnwrap('query', operation.name, pCallArgs as t.Expression[])))
-          ])]
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('prefetchQuery'),
+          ),
+          [
+            t.objectExpression([
+              objectProp('queryKey', buildQueryKeyCall(true)),
+              objectProp(
+                'queryFn',
+                t.arrowFunctionExpression(
+                  [],
+                  getClientCustomCallUnwrap(
+                    'query',
+                    operation.name,
+                    pCallArgs as t.Expression[],
+                  ),
+                ),
+              ),
+            ]),
+          ],
         );
         pBody.push(t.expressionStatement(t.awaitExpression(prefetchQueryCall)));
       } else {
         const prefetchQueryCall = callExpr(
-          t.memberExpression(t.identifier('queryClient'), t.identifier('prefetchQuery')),
-          [t.objectExpression([
-            objectProp('queryKey', buildQueryKeyCall(false)),
-            objectProp('queryFn', t.arrowFunctionExpression([], getClientCustomCallUnwrap('query', operation.name, [])))
-          ])]
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('prefetchQuery'),
+          ),
+          [
+            t.objectExpression([
+              objectProp('queryKey', buildQueryKeyCall(false)),
+              objectProp(
+                'queryFn',
+                t.arrowFunctionExpression(
+                  [],
+                  getClientCustomCallUnwrap('query', operation.name, []),
+                ),
+              ),
+            ]),
+          ],
         );
         pBody.push(t.expressionStatement(t.awaitExpression(prefetchQueryCall)));
       }
 
-      const pDecl = exportAsyncFunction(prefetchFnName, null, pParams, pBody, t.tsVoidKeyword());
+      const pDecl = exportAsyncFunction(
+        prefetchFnName,
+        null,
+        pParams,
+        pBody,
+        t.tsVoidKeyword(),
+      );
       addJSDocComment(pDecl, [
         `Prefetch ${operation.name} for SSR or cache warming`,
         '',
         '@example',
         '```ts',
         `await ${prefetchExampleCall};`,
-        '```'
+        '```',
       ]);
       statements.push(pDecl);
     }
@@ -605,14 +1026,13 @@ export function generateCustomQueryHook(
   return {
     fileName,
     content,
-    operationName: operation.name
+    operationName: operation.name,
   };
 }
 
 export interface GenerateAllCustomQueryHooksOptions {
   operations: CleanOperation[];
   typeRegistry: TypeRegistry;
-  maxDepth?: number;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
   tableTypeNames?: Set<string>;
@@ -620,16 +1040,15 @@ export interface GenerateAllCustomQueryHooksOptions {
 }
 
 export function generateAllCustomQueryHooks(
-  options: GenerateAllCustomQueryHooksOptions
+  options: GenerateAllCustomQueryHooksOptions,
 ): GeneratedCustomQueryFile[] {
   const {
     operations,
     typeRegistry,
-    maxDepth = 2,
     skipQueryField = true,
     reactQueryEnabled = true,
     tableTypeNames,
-    useCentralizedKeys = true
+    useCentralizedKeys = true,
   } = options;
 
   return operations
@@ -638,11 +1057,10 @@ export function generateAllCustomQueryHooks(
       generateCustomQueryHook({
         operation,
         typeRegistry,
-        maxDepth,
         skipQueryField,
         reactQueryEnabled,
         tableTypeNames,
-        useCentralizedKeys
-      })
+        useCentralizedKeys,
+      }),
     );
 }

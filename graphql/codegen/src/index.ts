@@ -40,15 +40,15 @@ export {
   hyphenateKeys,
   printResult,
   seedArgvFromConfig,
-  splitCommas
+  splitCommas,
 } from './cli/shared';
 
 // Database schema utilities (re-exported from core for convenience)
 export type {
   BuildSchemaFromDatabaseOptions,
-  BuildSchemaFromDatabaseResult
+  BuildSchemaFromDatabaseResult,
 } from './core/database';
 export {
   buildSchemaFromDatabase,
-  buildSchemaSDLFromDatabase
+  buildSchemaSDLFromDatabase,
 } from './core/database';

@@ -9,12 +9,12 @@ import type {
   IntrospectionInputValue,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionTypeRef
+  IntrospectionTypeRef,
 } from '../../types/introspection';
 import {
   getBaseTypeName,
   isNonNull,
-  unwrapType
+  unwrapType,
 } from '../../types/introspection';
 import type {
   CleanArgument,
@@ -22,7 +22,7 @@ import type {
   CleanOperation,
   CleanTypeRef,
   ResolvedType,
-  TypeRegistry
+  TypeRegistry,
 } from '../../types/schema';
 
 // ============================================================================
@@ -48,7 +48,7 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
     const resolvedType: ResolvedType = {
       kind: type.kind as ResolvedType['kind'],
       name: type.name,
-      description: type.description ?? undefined
+      description: type.description ?? undefined,
     };
 
     // Resolve enum values for ENUM types (no circular refs possible)
@@ -74,14 +74,14 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
     // Resolve fields for OBJECT types
     if (type.kind === 'OBJECT' && type.fields) {
       resolvedType.fields = type.fields.map((field) =>
-        transformFieldToCleanObjectFieldShallow(field)
+        transformFieldToCleanObjectFieldShallow(field),
       );
     }
 
     // Resolve input fields for INPUT_OBJECT types
     if (type.kind === 'INPUT_OBJECT' && type.inputFields) {
       resolvedType.inputFields = type.inputFields.map((field) =>
-        transformInputValueToCleanArgumentShallow(field)
+        transformInputValueToCleanArgumentShallow(field),
       );
     }
   }
@@ -94,12 +94,12 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
  * (shallow transformation to avoid circular refs)
  */
 function transformFieldToCleanObjectFieldShallow(
-  field: IntrospectionField
+  field: IntrospectionField,
 ): CleanObjectField {
   return {
     name: field.name,
     type: transformTypeRefShallow(field.type),
-    description: field.description ?? undefined
+    description: field.description ?? undefined,
   };
 }
 
@@ -107,13 +107,13 @@ function transformFieldToCleanObjectFieldShallow(
  * Transform input value to CleanArgument without resolving nested types
  */
 function transformInputValueToCleanArgumentShallow(
-  inputValue: IntrospectionInputValue
+  inputValue: IntrospectionInputValue,
 ): CleanArgument {
   return {
     name: inputValue.name,
     type: transformTypeRefShallow(inputValue.type),
     defaultValue: inputValue.defaultValue ?? undefined,
-    description: inputValue.description ?? undefined
+    description: inputValue.description ?? undefined,
   };
 }
 
@@ -124,7 +124,7 @@ function transformInputValueToCleanArgumentShallow(
 function transformTypeRefShallow(typeRef: IntrospectionTypeRef): CleanTypeRef {
   const cleanRef: CleanTypeRef = {
     kind: typeRef.kind as CleanTypeRef['kind'],
-    name: typeRef.name
+    name: typeRef.name,
   };
 
   if (typeRef.ofType) {
@@ -148,7 +148,7 @@ export interface TransformSchemaResult {
  * Transform introspection response to clean operations
  */
 export function transformSchemaToOperations(
-  response: IntrospectionQueryResponse
+  response: IntrospectionQueryResponse,
 ): TransformSchemaResult {
   const { __schema: schema } = response;
   const { types, queryType, mutationType } = schema;
@@ -165,15 +165,15 @@ export function transformSchemaToOperations(
   // Transform queries
   const queries: CleanOperation[] = queryTypeDef?.fields
     ? queryTypeDef.fields.map((field) =>
-      transformFieldToCleanOperation(field, 'query', types)
-    )
+        transformFieldToCleanOperation(field, 'query', types),
+      )
     : [];
 
   // Transform mutations
   const mutations: CleanOperation[] = mutationTypeDef?.fields
     ? mutationTypeDef.fields.map((field) =>
-      transformFieldToCleanOperation(field, 'mutation', types)
-    )
+        transformFieldToCleanOperation(field, 'mutation', types),
+      )
     : [];
 
   return { queries, mutations, typeRegistry };
@@ -189,18 +189,18 @@ export function transformSchemaToOperations(
 function transformFieldToCleanOperation(
   field: IntrospectionField,
   kind: 'query' | 'mutation',
-  types: IntrospectionType[]
+  types: IntrospectionType[],
 ): CleanOperation {
   return {
     name: field.name,
     kind,
     args: field.args.map((arg) =>
-      transformInputValueToCleanArgument(arg, types)
+      transformInputValueToCleanArgument(arg, types),
     ),
     returnType: transformTypeRefToCleanTypeRef(field.type, types),
     description: field.description ?? undefined,
     isDeprecated: field.isDeprecated,
-    deprecationReason: field.deprecationReason ?? undefined
+    deprecationReason: field.deprecationReason ?? undefined,
   };
 }
 
@@ -209,13 +209,13 @@ function transformFieldToCleanOperation(
  */
 function transformInputValueToCleanArgument(
   inputValue: IntrospectionInputValue,
-  types: IntrospectionType[]
+  types: IntrospectionType[],
 ): CleanArgument {
   return {
     name: inputValue.name,
     type: transformTypeRefToCleanTypeRef(inputValue.type, types),
     defaultValue: inputValue.defaultValue ?? undefined,
-    description: inputValue.description ?? undefined
+    description: inputValue.description ?? undefined,
   };
 }
 
@@ -233,11 +233,11 @@ function transformInputValueToCleanArgument(
  */
 function transformTypeRefToCleanTypeRef(
   typeRef: IntrospectionTypeRef,
-  types: IntrospectionType[]
+  types: IntrospectionType[],
 ): CleanTypeRef {
   const cleanRef: CleanTypeRef = {
     kind: typeRef.kind as CleanTypeRef['kind'],
-    name: typeRef.name
+    name: typeRef.name,
   };
 
   // Recursively transform ofType for wrappers (LIST, NON_NULL)
@@ -273,7 +273,7 @@ function transformTypeRefToCleanTypeRef(
 export function filterOperations(
   operations: CleanOperation[],
   include?: string[],
-  exclude?: string[]
+  exclude?: string[],
 ): CleanOperation[] {
   let result = operations;
 
@@ -297,7 +297,7 @@ function matchesPatterns(name: string, patterns: string[]): boolean {
     if (pattern === '*') return true;
     if (pattern.includes('*')) {
       const regex = new RegExp(
-        '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$'
+        '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$',
       );
       return regex.test(name);
     }
@@ -344,7 +344,7 @@ export function getTableOperationNames(
       update: string | null;
       delete: string | null;
     };
-  }>
+  }>,
 ): TableOperationNames {
   const queries = new Set<string>();
   const mutations = new Set<string>();
@@ -375,7 +375,7 @@ export function getTableOperationNames(
  */
 export function isTableOperation(
   operation: CleanOperation,
-  tableOperationNames: TableOperationNames
+  tableOperationNames: TableOperationNames,
 ): boolean {
   if (operation.kind === 'query') {
     return tableOperationNames.queries.has(operation.name);
@@ -394,10 +394,10 @@ export function isTableOperation(
  */
 export function getCustomOperations(
   operations: CleanOperation[],
-  tableOperationNames: TableOperationNames
+  tableOperationNames: TableOperationNames,
 ): CleanOperation[] {
   return operations.filter((op) => !isTableOperation(op, tableOperationNames));
 }
 
 // Re-export utility functions from introspection types
-export { getBaseTypeName, isNonNull,unwrapType };
+export { getBaseTypeName, isNonNull, unwrapType };

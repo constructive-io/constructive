@@ -10,7 +10,7 @@ export {
   type GraphQLError,
   isDataError,
   parseGraphQLError,
-  PG_ERROR_CODES
+  PG_ERROR_CODES,
 } from './error';
 export {
   createGraphQLClient,
@@ -18,6 +18,9 @@ export {
   type ExecuteOptions,
   type GraphQLClient,
   type GraphQLClientOptions,
-  type GraphQLResponse
+  type GraphQLResponse,
 } from './execute';
-export { type DocumentTypeDecoration,TypedDocumentString } from './typed-document';
+export {
+  type DocumentTypeDecoration,
+  TypedDocumentString,
+} from './typed-document';

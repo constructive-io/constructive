@@ -15,7 +15,7 @@ import type {
   PollEvent,
   PollEventType,
   PollResult,
-  WatchOptions
+  WatchOptions,
 } from './types';
 
 /**
@@ -74,7 +74,7 @@ export class SchemaPoller extends EventEmitter {
       return {
         success: false,
         changed: false,
-        error: 'Poll already in progress'
+        error: 'Poll already in progress',
       };
     }
 
@@ -88,7 +88,7 @@ export class SchemaPoller extends EventEmitter {
         endpoint: this.options.endpoint,
         authorization: this.options.authorization,
         headers: this.options.headers,
-        timeout: 30000
+        timeout: 30000,
       });
 
       const duration = Date.now() - startTime;
@@ -97,7 +97,7 @@ export class SchemaPoller extends EventEmitter {
       if (!schemaResult.success) {
         return this.handleError(
           `__schema fetch failed: ${schemaResult.error}`,
-          duration
+          duration,
         );
       }
 
@@ -120,14 +120,14 @@ export class SchemaPoller extends EventEmitter {
 
         this.emit(
           'schema-changed',
-          this.createEvent('schema-changed', { hash: newHash, duration })
+          this.createEvent('schema-changed', { hash: newHash, duration }),
         );
         return { success: true, changed: true, hash: newHash, schema };
       }
 
       this.emit(
         'schema-unchanged',
-        this.createEvent('schema-unchanged', { duration })
+        this.createEvent('schema-unchanged', { duration }),
       );
       this.emit('poll-success', this.createEvent('poll-success', { duration }));
       return { success: true, changed: false, hash: newHash, schema };
@@ -157,7 +157,7 @@ export class SchemaPoller extends EventEmitter {
         endpoint: this.options.endpoint,
         authorization: this.options.authorization,
         headers: this.options.headers,
-        timeout: 30000
+        timeout: 30000,
       });
 
       if (schemaResult.success) {
@@ -194,7 +194,7 @@ export class SchemaPoller extends EventEmitter {
     this.consecutiveErrors++;
     this.emit(
       'poll-error',
-      this.createEvent('poll-error', { error, duration })
+      this.createEvent('poll-error', { error, duration }),
     );
 
     // Slow down polling after multiple consecutive errors
@@ -214,12 +214,12 @@ export class SchemaPoller extends EventEmitter {
 
   private createEvent(
     type: PollEventType,
-    extra?: Partial<PollEvent>
+    extra?: Partial<PollEvent>,
   ): PollEvent {
     return {
       type,
       timestamp: Date.now(),
-      ...extra
+      ...extra,
     };
   }
 }
@@ -228,7 +228,7 @@ export class SchemaPoller extends EventEmitter {
  * Utility to compute schema hash without full poll
  */
 export async function computeSchemaHash(
-  schema: IntrospectionQueryResponse
+  schema: IntrospectionQueryResponse,
 ): Promise<string> {
   return hashObject(schema);
 }

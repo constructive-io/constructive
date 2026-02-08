@@ -8,7 +8,11 @@ import { buildSchema, introspectionFromSchema } from 'graphql';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
-import { createDatabasePool, resolveApiSchemas, validateServicesSchemas } from './api-schemas';
+import {
+  createDatabasePool,
+  resolveApiSchemas,
+  validateServicesSchemas,
+} from './api-schemas';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
@@ -66,7 +70,7 @@ export class DatabaseSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to resolve API schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined
+          err instanceof Error ? err : undefined,
         );
       }
     } else {
@@ -78,13 +82,13 @@ export class DatabaseSchemaSource implements SchemaSource {
     try {
       sdl = await buildSchemaSDLFromDatabase({
         database,
-        schemas
+        schemas,
       });
     } catch (err) {
       throw new SchemaSourceError(
         `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -92,7 +96,7 @@ export class DatabaseSchemaSource implements SchemaSource {
     if (!sdl.trim()) {
       throw new SchemaSourceError(
         'Database introspection returned empty schema',
-        this.describe()
+        this.describe(),
       );
     }
 
@@ -104,7 +108,7 @@ export class DatabaseSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Invalid GraphQL SDL from database: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -116,13 +120,13 @@ export class DatabaseSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to generate introspection: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
     // Convert graphql-js introspection result to our mutable type
     const introspection: IntrospectionQueryResponse = JSON.parse(
-      JSON.stringify(introspectionResult)
+      JSON.stringify(introspectionResult),
     ) as IntrospectionQueryResponse;
 
     return { introspection };

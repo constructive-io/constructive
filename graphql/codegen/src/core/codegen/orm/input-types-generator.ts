@@ -16,10 +16,10 @@ import { pluralize } from 'inflekt';
 import type {
   CleanArgument,
   CleanTable,
-  TypeRegistry
+  TypeRegistry,
 } from '../../../types/schema';
-import { addLineComment,generateCode } from '../babel-ast';
-import { scalarToFilterType,scalarToTsType } from '../scalars';
+import { addLineComment, generateCode } from '../babel-ast';
+import { scalarToFilterType, scalarToTsType } from '../scalars';
 import { getTypeBaseName } from '../type-resolver';
 import {
   getConditionTypeName,
@@ -28,7 +28,7 @@ import {
   getOrderByTypeName,
   getPrimaryKeyInfo,
   getTableNames,
-  isRelationField
+  isRelationField,
 } from '../utils';
 
 export interface GeneratedInputTypesFile {
@@ -45,7 +45,7 @@ const EXCLUDED_MUTATION_FIELDS = [
   'id',
   'createdAt',
   'updatedAt',
-  'nodeId'
+  'nodeId',
 ] as const;
 
 // ============================================================================
@@ -56,7 +56,7 @@ const EXCLUDED_MUTATION_FIELDS = [
  * Overrides for input-type generation
  */
 const INPUT_SCALAR_OVERRIDES: Record<string, string> = {
-  JSON: 'Record<string, unknown>'
+  JSON: 'Record<string, unknown>',
 };
 
 /**
@@ -65,7 +65,7 @@ const INPUT_SCALAR_OVERRIDES: Record<string, string> = {
 function scalarToInputTs(scalar: string): string {
   return scalarToTsType(scalar, {
     unknownScalar: 'name',
-    overrides: INPUT_SCALAR_OVERRIDES
+    overrides: INPUT_SCALAR_OVERRIDES,
   });
 }
 
@@ -124,28 +124,30 @@ function parseTypeString(typeStr: string): t.TSType {
     const match = typeStr.match(/^([^<]+)<(.+)>$/);
     if (match) {
       const [, baseName, params] = match;
-      const typeParams = params.split(',').map((p) => parseTypeString(p.trim()));
+      const typeParams = params
+        .split(',')
+        .map((p) => parseTypeString(p.trim()));
       return t.tsTypeReference(
         t.identifier(baseName),
-        t.tsTypeParameterInstantiation(typeParams)
+        t.tsTypeParameterInstantiation(typeParams),
       );
     }
   }
 
   // Handle primitive types
   switch (typeStr) {
-  case 'string':
-    return t.tsStringKeyword();
-  case 'number':
-    return t.tsNumberKeyword();
-  case 'boolean':
-    return t.tsBooleanKeyword();
-  case 'null':
-    return t.tsNullKeyword();
-  case 'unknown':
-    return t.tsUnknownKeyword();
-  default:
-    return t.tsTypeReference(t.identifier(typeStr));
+    case 'string':
+      return t.tsStringKeyword();
+    case 'number':
+      return t.tsNumberKeyword();
+    case 'boolean':
+      return t.tsBooleanKeyword();
+    case 'null':
+      return t.tsNullKeyword();
+    case 'unknown':
+      return t.tsUnknownKeyword();
+    default:
+      return t.tsTypeReference(t.identifier(typeStr));
   }
 }
 
@@ -155,11 +157,11 @@ function parseTypeString(typeStr: string): t.TSType {
 function createPropertySignature(
   name: string,
   typeStr: string,
-  optional: boolean
+  optional: boolean,
 ): t.TSPropertySignature {
   const prop = t.tsPropertySignature(
     t.identifier(name),
-    t.tsTypeAnnotation(parseTypeString(typeStr))
+    t.tsTypeAnnotation(parseTypeString(typeStr)),
   );
   prop.optional = optional;
   return prop;
@@ -170,17 +172,17 @@ function createPropertySignature(
  */
 function createExportedInterface(
   name: string,
-  properties: Array<{ name: string; type: string; optional: boolean }>
+  properties: Array<{ name: string; type: string; optional: boolean }>,
 ): t.ExportNamedDeclaration {
   const props = properties.map((p) =>
-    createPropertySignature(p.name, p.type, p.optional)
+    createPropertySignature(p.name, p.type, p.optional),
   );
   const body = t.tsInterfaceBody(props);
   const interfaceDecl = t.tsInterfaceDeclaration(
     t.identifier(name),
     null,
     null,
-    body
+    body,
   );
   return t.exportNamedDeclaration(interfaceDecl);
 }
@@ -190,12 +192,12 @@ function createExportedInterface(
  */
 function createExportedTypeAlias(
   name: string,
-  typeStr: string
+  typeStr: string,
 ): t.ExportNamedDeclaration {
   const typeAlias = t.tsTypeAliasDeclaration(
     t.identifier(name),
     null,
-    parseTypeString(typeStr)
+    parseTypeString(typeStr),
   );
   return t.exportNamedDeclaration(typeAlias);
 }
@@ -204,9 +206,7 @@ function createExportedTypeAlias(
  * Create a union type from string literals
  */
 function createStringLiteralUnion(values: string[]): t.TSUnionType {
-  return t.tsUnionType(
-    values.map((v) => t.tsLiteralType(t.stringLiteral(v)))
-  );
+  return t.tsUnionType(values.map((v) => t.tsLiteralType(t.stringLiteral(v))));
 }
 
 /**
@@ -214,7 +214,7 @@ function createStringLiteralUnion(values: string[]): t.TSUnionType {
  */
 function addSectionComment(
   statements: t.Statement[],
-  sectionName: string
+  sectionName: string,
 ): void {
   if (statements.length > 0) {
     addLineComment(statements[0], `============ ${sectionName} ============`);
@@ -258,79 +258,79 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
   {
     name: 'StringFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string']
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'],
   },
   {
     name: 'IntFilter',
     tsType: 'number',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   {
     name: 'FloatFilter',
     tsType: 'number',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   { name: 'BooleanFilter', tsType: 'boolean', operators: ['equality'] },
   {
     name: 'UUIDFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray']
+    operators: ['equality', 'distinct', 'inArray'],
   },
   {
     name: 'DatetimeFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   {
     name: 'DateFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   {
     name: 'JSONFilter',
     tsType: 'Record<string, unknown>',
-    operators: ['equality', 'distinct', 'json']
+    operators: ['equality', 'distinct', 'json'],
   },
   {
     name: 'BigIntFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   {
     name: 'BigFloatFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison']
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
   },
   { name: 'BitStringFilter', tsType: 'string', operators: ['equality'] },
   {
     name: 'InternetAddressFilter',
     tsType: 'string',
-    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet']
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
   // List filters (for array fields like string[], int[], uuid[])
   {
     name: 'StringListFilter',
     tsType: 'string[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray']
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
   },
   {
     name: 'IntListFilter',
     tsType: 'number[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray']
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
   },
   {
     name: 'UUIDListFilter',
     tsType: 'string[]',
-    operators: ['equality', 'distinct', 'comparison', 'listArray']
-  }
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
 ];
 
 /**
  * Build filter properties based on operator sets
  */
 function buildScalarFilterProperties(
-  config: ScalarFilterConfig
+  config: ScalarFilterConfig,
 ): InterfaceProperty[] {
   const { tsType, operators } = config;
   const props: InterfaceProperty[] = [];
@@ -340,7 +340,7 @@ function buildScalarFilterProperties(
     props.push(
       { name: 'isNull', type: 'boolean', optional: true },
       { name: 'equalTo', type: tsType, optional: true },
-      { name: 'notEqualTo', type: tsType, optional: true }
+      { name: 'notEqualTo', type: tsType, optional: true },
     );
   }
 
@@ -348,7 +348,7 @@ function buildScalarFilterProperties(
   if (operators.includes('distinct')) {
     props.push(
       { name: 'distinctFrom', type: tsType, optional: true },
-      { name: 'notDistinctFrom', type: tsType, optional: true }
+      { name: 'notDistinctFrom', type: tsType, optional: true },
     );
   }
 
@@ -356,7 +356,7 @@ function buildScalarFilterProperties(
   if (operators.includes('inArray')) {
     props.push(
       { name: 'in', type: `${tsType}[]`, optional: true },
-      { name: 'notIn', type: `${tsType}[]`, optional: true }
+      { name: 'notIn', type: `${tsType}[]`, optional: true },
     );
   }
 
@@ -366,7 +366,7 @@ function buildScalarFilterProperties(
       { name: 'lessThan', type: tsType, optional: true },
       { name: 'lessThanOrEqualTo', type: tsType, optional: true },
       { name: 'greaterThan', type: tsType, optional: true },
-      { name: 'greaterThanOrEqualTo', type: tsType, optional: true }
+      { name: 'greaterThanOrEqualTo', type: tsType, optional: true },
     );
   }
 
@@ -388,7 +388,7 @@ function buildScalarFilterProperties(
       { name: 'like', type: 'string', optional: true },
       { name: 'notLike', type: 'string', optional: true },
       { name: 'likeInsensitive', type: 'string', optional: true },
-      { name: 'notLikeInsensitive', type: 'string', optional: true }
+      { name: 'notLikeInsensitive', type: 'string', optional: true },
     );
   }
 
@@ -399,7 +399,7 @@ function buildScalarFilterProperties(
       { name: 'containedBy', type: 'Record<string, unknown>', optional: true },
       { name: 'containsKey', type: 'string', optional: true },
       { name: 'containsAllKeys', type: 'string[]', optional: true },
-      { name: 'containsAnyKeys', type: 'string[]', optional: true }
+      { name: 'containsAnyKeys', type: 'string[]', optional: true },
     );
   }
 
@@ -410,7 +410,7 @@ function buildScalarFilterProperties(
       { name: 'containsOrEqualTo', type: 'string', optional: true },
       { name: 'containedBy', type: 'string', optional: true },
       { name: 'containedByOrEqualTo', type: 'string', optional: true },
-      { name: 'containsOrContainedBy', type: 'string', optional: true }
+      { name: 'containsOrContainedBy', type: 'string', optional: true },
     );
   }
 
@@ -432,7 +432,7 @@ function buildScalarFilterProperties(
       { name: 'anyLessThan', type: baseType, optional: true },
       { name: 'anyLessThanOrEqualTo', type: baseType, optional: true },
       { name: 'anyGreaterThan', type: baseType, optional: true },
-      { name: 'anyGreaterThanOrEqualTo', type: baseType, optional: true }
+      { name: 'anyGreaterThanOrEqualTo', type: baseType, optional: true },
     );
   }
 
@@ -447,7 +447,7 @@ function generateScalarFilterTypes(): t.Statement[] {
 
   for (const config of SCALAR_FILTER_CONFIGS) {
     statements.push(
-      createExportedInterface(config.name, buildScalarFilterProperties(config))
+      createExportedInterface(config.name, buildScalarFilterProperties(config)),
     );
   }
 
@@ -464,7 +464,7 @@ function generateScalarFilterTypes(): t.Statement[] {
  */
 function isLikelyEnumType(
   typeName: string,
-  typeRegistry: TypeRegistry
+  typeRegistry: TypeRegistry,
 ): boolean {
   const typeInfo = typeRegistry.get(typeName);
   return typeInfo?.kind === 'ENUM';
@@ -475,7 +475,7 @@ function isLikelyEnumType(
  */
 function collectEnumTypesFromTables(
   tables: CleanTable[],
-  typeRegistry: TypeRegistry
+  typeRegistry: TypeRegistry,
 ): Set<string> {
   const enumTypes = new Set<string>();
 
@@ -498,7 +498,7 @@ function collectEnumTypesFromTables(
  */
 function generateEnumTypes(
   typeRegistry: TypeRegistry,
-  enumTypeNames: Set<string>
+  enumTypeNames: Set<string>,
 ): t.Statement[] {
   if (enumTypeNames.size === 0) return [];
 
@@ -512,7 +512,7 @@ function generateEnumTypes(
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(typeName),
       null,
-      unionType
+      unionType,
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
   }
@@ -544,7 +544,7 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: isNullable ? `${tsType} | null` : tsType,
-      optional: isNullable
+      optional: isNullable,
     });
   }
 
@@ -560,7 +560,7 @@ function generateEntityTypes(tables: CleanTable[]): t.Statement[] {
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     statements.push(
-      createExportedInterface(typeName, buildEntityProperties(table))
+      createExportedInterface(typeName, buildEntityProperties(table)),
     );
   }
 
@@ -584,16 +584,14 @@ function generateRelationHelperTypes(): t.Statement[] {
   const connectionResultProps: t.TSPropertySignature[] = [
     createPropertySignature('nodes', 'T[]', false),
     createPropertySignature('totalCount', 'number', false),
-    createPropertySignature('pageInfo', 'PageInfo', false)
+    createPropertySignature('pageInfo', 'PageInfo', false),
   ];
   const connectionResultBody = t.tsInterfaceBody(connectionResultProps);
   const connectionResultDecl = t.tsInterfaceDeclaration(
     t.identifier('ConnectionResult'),
-    t.tsTypeParameterDeclaration([
-      t.tsTypeParameter(null, null, 'T')
-    ]),
+    t.tsTypeParameterDeclaration([t.tsTypeParameter(null, null, 'T')]),
     null,
-    connectionResultBody
+    connectionResultBody,
   );
   statements.push(t.exportNamedDeclaration(connectionResultDecl));
 
@@ -603,8 +601,8 @@ function generateRelationHelperTypes(): t.Statement[] {
       { name: 'hasNextPage', type: 'boolean', optional: false },
       { name: 'hasPreviousPage', type: 'boolean', optional: false },
       { name: 'startCursor', type: 'string | null', optional: true },
-      { name: 'endCursor', type: 'string | null', optional: true }
-    ])
+      { name: 'endCursor', type: 'string | null', optional: true },
+    ]),
   );
 
   addSectionComment(statements, 'Relation Helper Types');
@@ -617,7 +615,7 @@ function generateRelationHelperTypes(): t.Statement[] {
 
 function getRelatedTypeName(
   tableName: string,
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   return relatedTable ? getTableNames(relatedTable).typeName : tableName;
@@ -625,7 +623,7 @@ function getRelatedTypeName(
 
 function getRelatedOrderByName(
   tableName: string,
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   if (relatedTable) {
@@ -641,7 +639,7 @@ function getRelatedOrderByName(
 
 function getRelatedFilterName(
   tableName: string,
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   return relatedTable ? getFilterTypeName(relatedTable) : `${tableName}Filter`;
@@ -652,7 +650,7 @@ function getRelatedFilterName(
  */
 function buildEntityRelationProperties(
   table: CleanTable,
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
 
@@ -660,12 +658,12 @@ function buildEntityRelationProperties(
     if (!relation.fieldName) continue;
     const relatedTypeName = getRelatedTypeName(
       relation.referencesTable,
-      tableByName
+      tableByName,
     );
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -673,12 +671,12 @@ function buildEntityRelationProperties(
     if (!relation.fieldName) continue;
     const relatedTypeName = getRelatedTypeName(
       relation.referencedByTable,
-      tableByName
+      tableByName,
     );
     properties.push({
       name: relation.fieldName,
       type: `${relatedTypeName} | null`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -686,12 +684,12 @@ function buildEntityRelationProperties(
     if (!relation.fieldName) continue;
     const relatedTypeName = getRelatedTypeName(
       relation.referencedByTable,
-      tableByName
+      tableByName,
     );
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -699,12 +697,12 @@ function buildEntityRelationProperties(
     if (!relation.fieldName) continue;
     const relatedTypeName = getRelatedTypeName(
       relation.rightTable,
-      tableByName
+      tableByName,
     );
     properties.push({
       name: relation.fieldName,
       type: `ConnectionResult<${relatedTypeName}>`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -716,7 +714,7 @@ function buildEntityRelationProperties(
  */
 function generateEntityRelationTypes(
   tables: CleanTable[],
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
 
@@ -725,8 +723,8 @@ function generateEntityRelationTypes(
     statements.push(
       createExportedInterface(
         `${typeName}Relations`,
-        buildEntityRelationProperties(table, tableByName)
-      )
+        buildEntityRelationProperties(table, tableByName),
+      ),
     );
   }
 
@@ -747,8 +745,8 @@ function generateEntityWithRelations(tables: CleanTable[]): t.Statement[] {
     statements.push(
       createExportedTypeAlias(
         `${typeName}WithRelations`,
-        `${typeName} & ${typeName}Relations`
-      )
+        `${typeName} & ${typeName}Relations`,
+      ),
     );
   }
 
@@ -767,7 +765,7 @@ function generateEntityWithRelations(tables: CleanTable[]): t.Statement[] {
  */
 function buildSelectTypeLiteral(
   table: CleanTable,
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): t.TSTypeLiteral {
   const members: t.TSTypeElement[] = [];
 
@@ -776,7 +774,7 @@ function buildSelectTypeLiteral(
     if (!isRelationField(field.name, table)) {
       const prop = t.tsPropertySignature(
         t.identifier(field.name),
-        t.tsTypeAnnotation(t.tsBooleanKeyword())
+        t.tsTypeAnnotation(t.tsBooleanKeyword()),
       );
       prop.optional = true;
       members.push(prop);
@@ -788,7 +786,7 @@ function buildSelectTypeLiteral(
     if (relation.fieldName) {
       const relatedTypeName = getRelatedTypeName(
         relation.referencesTable,
-        tableByName
+        tableByName,
       );
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
@@ -800,15 +798,15 @@ function buildSelectTypeLiteral(
                 const selectProp = t.tsPropertySignature(
                   t.identifier('select'),
                   t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`))
-                  )
+                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                  ),
                 );
                 selectProp.optional = true;
                 return selectProp;
-              })()
-            ])
-          ])
-        )
+              })(),
+            ]),
+          ]),
+        ),
       );
       prop.optional = true;
       members.push(prop);
@@ -820,15 +818,15 @@ function buildSelectTypeLiteral(
     if (relation.fieldName) {
       const relatedTypeName = getRelatedTypeName(
         relation.referencedByTable,
-        tableByName
+        tableByName,
       );
       const filterName = getRelatedFilterName(
         relation.referencedByTable,
-        tableByName
+        tableByName,
       );
       const orderByName = getRelatedOrderByName(
         relation.referencedByTable,
-        tableByName
+        tableByName,
       );
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
@@ -840,8 +838,8 @@ function buildSelectTypeLiteral(
                 const p = t.tsPropertySignature(
                   t.identifier('select'),
                   t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`))
-                  )
+                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                  ),
                 );
                 p.optional = true;
                 return p;
@@ -849,7 +847,7 @@ function buildSelectTypeLiteral(
               (() => {
                 const p = t.tsPropertySignature(
                   t.identifier('first'),
-                  t.tsTypeAnnotation(t.tsNumberKeyword())
+                  t.tsTypeAnnotation(t.tsNumberKeyword()),
                 );
                 p.optional = true;
                 return p;
@@ -857,7 +855,9 @@ function buildSelectTypeLiteral(
               (() => {
                 const p = t.tsPropertySignature(
                   t.identifier('filter'),
-                  t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterName)))
+                  t.tsTypeAnnotation(
+                    t.tsTypeReference(t.identifier(filterName)),
+                  ),
                 );
                 p.optional = true;
                 return p;
@@ -866,15 +866,15 @@ function buildSelectTypeLiteral(
                 const p = t.tsPropertySignature(
                   t.identifier('orderBy'),
                   t.tsTypeAnnotation(
-                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName)))
-                  )
+                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
+                  ),
                 );
                 p.optional = true;
                 return p;
-              })()
-            ])
-          ])
-        )
+              })(),
+            ]),
+          ]),
+        ),
       );
       prop.optional = true;
       members.push(prop);
@@ -886,12 +886,12 @@ function buildSelectTypeLiteral(
     if (relation.fieldName) {
       const relatedTypeName = getRelatedTypeName(
         relation.rightTable,
-        tableByName
+        tableByName,
       );
       const filterName = getRelatedFilterName(relation.rightTable, tableByName);
       const orderByName = getRelatedOrderByName(
         relation.rightTable,
-        tableByName
+        tableByName,
       );
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
@@ -903,8 +903,8 @@ function buildSelectTypeLiteral(
                 const p = t.tsPropertySignature(
                   t.identifier('select'),
                   t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`))
-                  )
+                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                  ),
                 );
                 p.optional = true;
                 return p;
@@ -912,7 +912,7 @@ function buildSelectTypeLiteral(
               (() => {
                 const p = t.tsPropertySignature(
                   t.identifier('first'),
-                  t.tsTypeAnnotation(t.tsNumberKeyword())
+                  t.tsTypeAnnotation(t.tsNumberKeyword()),
                 );
                 p.optional = true;
                 return p;
@@ -920,7 +920,9 @@ function buildSelectTypeLiteral(
               (() => {
                 const p = t.tsPropertySignature(
                   t.identifier('filter'),
-                  t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterName)))
+                  t.tsTypeAnnotation(
+                    t.tsTypeReference(t.identifier(filterName)),
+                  ),
                 );
                 p.optional = true;
                 return p;
@@ -929,15 +931,15 @@ function buildSelectTypeLiteral(
                 const p = t.tsPropertySignature(
                   t.identifier('orderBy'),
                   t.tsTypeAnnotation(
-                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName)))
-                  )
+                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
+                  ),
                 );
                 p.optional = true;
                 return p;
-              })()
-            ])
-          ])
-        )
+              })(),
+            ]),
+          ]),
+        ),
       );
       prop.optional = true;
       members.push(prop);
@@ -949,7 +951,7 @@ function buildSelectTypeLiteral(
     if (relation.fieldName) {
       const relatedTypeName = getRelatedTypeName(
         relation.referencedByTable,
-        tableByName
+        tableByName,
       );
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
@@ -961,15 +963,15 @@ function buildSelectTypeLiteral(
                 const selectProp = t.tsPropertySignature(
                   t.identifier('select'),
                   t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`))
-                  )
+                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                  ),
                 );
                 selectProp.optional = true;
                 return selectProp;
-              })()
-            ])
-          ])
-        )
+              })(),
+            ]),
+          ]),
+        ),
       );
       prop.optional = true;
       members.push(prop);
@@ -984,7 +986,7 @@ function buildSelectTypeLiteral(
  */
 function generateEntitySelectTypes(
   tables: CleanTable[],
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
 
@@ -993,7 +995,7 @@ function generateEntitySelectTypes(
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(`${typeName}Select`),
       null,
-      buildSelectTypeLiteral(table, tableByName)
+      buildSelectTypeLiteral(table, tableByName),
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
   }
@@ -1048,7 +1050,7 @@ function generateTableFilterTypes(tables: CleanTable[]): t.Statement[] {
   for (const table of tables) {
     const filterName = getFilterTypeName(table);
     statements.push(
-      createExportedInterface(filterName, buildTableFilterProperties(table))
+      createExportedInterface(filterName, buildTableFilterProperties(table)),
     );
   }
 
@@ -1079,7 +1081,7 @@ function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: `${tsType} | null`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -1097,8 +1099,8 @@ function generateTableConditionTypes(tables: CleanTable[]): t.Statement[] {
     statements.push(
       createExportedInterface(
         conditionName,
-        buildTableConditionProperties(table)
-      )
+        buildTableConditionProperties(table),
+      ),
     );
   }
 
@@ -1141,7 +1143,7 @@ function generateOrderByTypes(tables: CleanTable[]): t.Statement[] {
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(enumName),
       null,
-      unionType
+      unionType,
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
   }
@@ -1160,14 +1162,14 @@ function generateOrderByTypes(tables: CleanTable[]): t.Statement[] {
  * Build the nested data object fields for Create input
  */
 function buildCreateDataFields(
-  table: CleanTable
+  table: CleanTable,
 ): Array<{ name: string; type: string; optional: boolean }> {
   const fields: Array<{ name: string; type: string; optional: boolean }> = [];
 
   for (const field of table.fields) {
     if (
       EXCLUDED_MUTATION_FIELDS.includes(
-        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number]
+        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number],
       )
     )
       continue;
@@ -1187,7 +1189,9 @@ function buildCreateDataFields(
 /**
  * Build Create input interface as AST
  */
-function buildCreateInputInterface(table: CleanTable): t.ExportNamedDeclaration {
+function buildCreateInputInterface(
+  table: CleanTable,
+): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
   const fields = buildCreateDataFields(table);
 
@@ -1195,7 +1199,7 @@ function buildCreateInputInterface(table: CleanTable): t.ExportNamedDeclaration 
   const nestedProps: t.TSPropertySignature[] = fields.map((field) => {
     const prop = t.tsPropertySignature(
       t.identifier(field.name),
-      t.tsTypeAnnotation(parseTypeString(field.type))
+      t.tsTypeAnnotation(parseTypeString(field.type)),
     );
     prop.optional = field.optional;
     return prop;
@@ -1208,15 +1212,15 @@ function buildCreateInputInterface(table: CleanTable): t.ExportNamedDeclaration 
     (() => {
       const prop = t.tsPropertySignature(
         t.identifier('clientMutationId'),
-        t.tsTypeAnnotation(t.tsStringKeyword())
+        t.tsTypeAnnotation(t.tsStringKeyword()),
       );
       prop.optional = true;
       return prop;
     })(),
     t.tsPropertySignature(
       t.identifier(singularName),
-      t.tsTypeAnnotation(nestedObjectType)
-    )
+      t.tsTypeAnnotation(nestedObjectType),
+    ),
   ];
 
   const body = t.tsInterfaceBody(mainProps);
@@ -1224,7 +1228,7 @@ function buildCreateInputInterface(table: CleanTable): t.ExportNamedDeclaration 
     t.identifier(`Create${typeName}Input`),
     null,
     null,
-    body
+    body,
   );
   return t.exportNamedDeclaration(interfaceDecl);
 }
@@ -1238,7 +1242,7 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
   for (const field of table.fields) {
     if (
       EXCLUDED_MUTATION_FIELDS.includes(
-        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number]
+        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number],
       )
     )
       continue;
@@ -1251,7 +1255,7 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
     properties.push({
       name: field.name,
       type: `${tsType} | null`,
-      optional: true
+      optional: true,
     });
   }
 
@@ -1276,7 +1280,7 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
 
   // Patch interface
   statements.push(
-    createExportedInterface(patchName, buildPatchProperties(table))
+    createExportedInterface(patchName, buildPatchProperties(table)),
   );
 
   // Update input
@@ -1284,16 +1288,16 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
     createExportedInterface(`Update${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
       { name: pkFieldName, type: pkFieldTsType, optional: false },
-      { name: 'patch', type: patchName, optional: false }
-    ])
+      { name: 'patch', type: patchName, optional: false },
+    ]),
   );
 
   // Delete input
   statements.push(
     createExportedInterface(`Delete${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
-      { name: pkFieldName, type: pkFieldTsType, optional: false }
-    ])
+      { name: pkFieldName, type: pkFieldTsType, optional: false },
+    ]),
   );
 
   return statements;
@@ -1323,7 +1327,7 @@ function generateAllCrudInputTypes(tables: CleanTable[]): t.Statement[] {
  * Collect all input type names used by operations
  */
 export function collectInputTypeNames(
-  operations: Array<{ args: CleanArgument[] }>
+  operations: Array<{ args: CleanArgument[] }>,
 ): Set<string> {
   const inputTypes = new Set<string>();
 
@@ -1369,7 +1373,7 @@ function buildTableCrudTypeNames(tables: CleanTable[]): Set<string> {
 function generateCustomInputTypes(
   typeRegistry: TypeRegistry,
   usedInputTypes: Set<string>,
-  tableCrudTypes?: Set<string>
+  tableCrudTypes?: Set<string>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>();
@@ -1401,7 +1405,7 @@ function generateCustomInputTypes(
       addLineComment(commentStmt, ` Type '${typeName}' not found in schema`);
       statements.push(commentStmt);
       statements.push(
-        createExportedTypeAlias(typeName, 'Record<string, unknown>')
+        createExportedTypeAlias(typeName, 'Record<string, unknown>'),
       );
       continue;
     }
@@ -1431,7 +1435,7 @@ function generateCustomInputTypes(
       const typeAlias = t.tsTypeAliasDeclaration(
         t.identifier(typeName),
         null,
-        unionType
+        unionType,
       );
       statements.push(t.exportNamedDeclaration(typeAlias));
     } else {
@@ -1457,7 +1461,7 @@ function generateCustomInputTypes(
  * Collect all payload type names from operation return types
  */
 export function collectPayloadTypeNames(
-  operations: Array<{ returnType: CleanArgument['type'] }>
+  operations: Array<{ returnType: CleanArgument['type'] }>,
 ): Set<string> {
   const payloadTypes = new Set<string>();
 
@@ -1477,7 +1481,7 @@ export function collectPayloadTypeNames(
 function generatePayloadTypes(
   typeRegistry: TypeRegistry,
   usedPayloadTypes: Set<string>,
-  alreadyGeneratedTypes: Set<string>
+  alreadyGeneratedTypes: Set<string>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGeneratedTypes);
@@ -1498,7 +1502,7 @@ function generatePayloadTypes(
     'BigFloat',
     'Cursor',
     'Query',
-    'Mutation'
+    'Mutation',
   ]);
 
   // Process all types - no artificial limit
@@ -1528,7 +1532,7 @@ function generatePayloadTypes(
       interfaceProps.push({
         name: field.name,
         type: isNullable ? `${tsType} | null` : tsType,
-        optional: isNullable
+        optional: isNullable,
       });
 
       // Follow nested OBJECT types
@@ -1562,13 +1566,13 @@ function generatePayloadTypes(
               const p = t.tsPropertySignature(
                 t.identifier('select'),
                 t.tsTypeAnnotation(
-                  t.tsTypeReference(t.identifier(`${baseType}Select`))
-                )
+                  t.tsTypeReference(t.identifier(`${baseType}Select`)),
+                ),
               );
               p.optional = true;
               return p;
-            })()
-          ])
+            })(),
+          ]),
         ]);
       } else {
         propType = t.tsBooleanKeyword();
@@ -1576,7 +1580,7 @@ function generatePayloadTypes(
 
       const prop = t.tsPropertySignature(
         t.identifier(field.name),
-        t.tsTypeAnnotation(propType)
+        t.tsTypeAnnotation(propType),
       );
       prop.optional = true;
       selectMembers.push(prop);
@@ -1585,13 +1589,16 @@ function generatePayloadTypes(
     const selectTypeAlias = t.tsTypeAliasDeclaration(
       t.identifier(`${typeName}Select`),
       null,
-      t.tsTypeLiteral(selectMembers)
+      t.tsTypeLiteral(selectMembers),
     );
     statements.push(t.exportNamedDeclaration(selectTypeAlias));
   }
 
   if (statements.length > 0) {
-    addSectionComment(statements, 'Payload/Return Types (for custom operations)');
+    addSectionComment(
+      statements,
+      'Payload/Return Types (for custom operations)',
+    );
   }
   return statements;
 }
@@ -1607,7 +1614,7 @@ function generatePayloadTypes(
  */
 function generateConnectionFieldsMap(
   tables: CleanTable[],
-  tableByName: Map<string, CleanTable>
+  tableByName: Map<string, CleanTable>,
 ): t.Statement[] {
   const properties: t.ObjectProperty[] = [];
 
@@ -1619,13 +1626,13 @@ function generateConnectionFieldsMap(
       if (!relation.fieldName) continue;
       const relatedTypeName = getRelatedTypeName(
         relation.referencedByTable,
-        tableByName
+        tableByName,
       );
       fieldEntries.push(
         t.objectProperty(
           t.stringLiteral(relation.fieldName),
-          t.stringLiteral(relatedTypeName)
-        )
+          t.stringLiteral(relatedTypeName),
+        ),
       );
     }
 
@@ -1633,13 +1640,13 @@ function generateConnectionFieldsMap(
       if (!relation.fieldName) continue;
       const relatedTypeName = getRelatedTypeName(
         relation.rightTable,
-        tableByName
+        tableByName,
       );
       fieldEntries.push(
         t.objectProperty(
           t.stringLiteral(relation.fieldName),
-          t.stringLiteral(relatedTypeName)
-        )
+          t.stringLiteral(relatedTypeName),
+        ),
       );
     }
 
@@ -1647,8 +1654,8 @@ function generateConnectionFieldsMap(
       properties.push(
         t.objectProperty(
           t.stringLiteral(typeName),
-          t.objectExpression(fieldEntries)
-        )
+          t.objectExpression(fieldEntries),
+        ),
       );
     }
   }
@@ -1666,13 +1673,13 @@ function generateConnectionFieldsMap(
               t.identifier('Record'),
               t.tsTypeParameterInstantiation([
                 t.tsStringKeyword(),
-                t.tsStringKeyword()
-              ])
-            )
-          ])
-        )
-      )
-    )
+                t.tsStringKeyword(),
+              ]),
+            ),
+          ]),
+        ),
+      ),
+    ),
   ]);
 
   const statements: t.Statement[] = [t.exportNamedDeclaration(decl)];
@@ -1691,7 +1698,7 @@ export function generateInputTypesFile(
   typeRegistry: TypeRegistry,
   usedInputTypes: Set<string>,
   tables?: CleanTable[],
-  usedPayloadTypes?: Set<string>
+  usedPayloadTypes?: Set<string>,
 ): GeneratedInputTypesFile {
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
@@ -1735,7 +1742,7 @@ export function generateInputTypesFile(
   // 7. Custom input types from TypeRegistry
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;
   statements.push(
-    ...generateCustomInputTypes(typeRegistry, usedInputTypes, tableCrudTypes)
+    ...generateCustomInputTypes(typeRegistry, usedInputTypes, tableCrudTypes),
   );
 
   // 8. Payload/return types for custom operations
@@ -1751,8 +1758,8 @@ export function generateInputTypesFile(
       ...generatePayloadTypes(
         typeRegistry,
         usedPayloadTypes,
-        alreadyGeneratedTypes
-      )
+        alreadyGeneratedTypes,
+      ),
     );
   }
 
@@ -1762,6 +1769,6 @@ export function generateInputTypesFile(
 
   return {
     fileName: 'input-types.ts',
-    content: header + '\n' + code
+    content: header + '\n' + code,
   };
 }

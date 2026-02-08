@@ -16,13 +16,13 @@ import * as t from '@babel/types';
 import type {
   CleanArgument,
   ResolvedType,
-  TypeRegistry
+  TypeRegistry,
 } from '../../types/schema';
 import { generateCode } from './babel-ast';
 import {
   BASE_FILTER_TYPE_NAMES,
   SCALAR_NAMES,
-  scalarToTsType
+  scalarToTsType,
 } from './scalars';
 import { getTypeBaseName } from './type-resolver';
 import { getGeneratedFileHeader } from './utils';
@@ -50,7 +50,7 @@ const SKIP_TYPES = new Set([
   '__InputValue',
   '__EnumValue',
   '__Directive',
-  ...BASE_FILTER_TYPE_NAMES
+  ...BASE_FILTER_TYPE_NAMES,
 ]);
 
 const SKIP_TYPE_PATTERNS: RegExp[] = [];
@@ -80,7 +80,7 @@ function isRequired(typeRef: CleanArgument['type']): boolean {
 
 function shouldSkipType(
   typeName: string,
-  tableTypeNames: Set<string>
+  tableTypeNames: Set<string>,
 ): boolean {
   if (SKIP_TYPES.has(typeName)) return true;
   if (tableTypeNames.has(typeName)) return true;
@@ -94,7 +94,7 @@ function shouldSkipType(
 
 function generateEnumTypes(
   typeRegistry: TypeRegistry,
-  tableTypeNames: Set<string>
+  tableTypeNames: Set<string>,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>();
@@ -105,12 +105,12 @@ function generateEnumTypes(
     if (!typeInfo.enumValues || typeInfo.enumValues.length === 0) continue;
 
     const unionType = t.tsUnionType(
-      typeInfo.enumValues.map((v) => t.tsLiteralType(t.stringLiteral(v)))
+      typeInfo.enumValues.map((v) => t.tsLiteralType(t.stringLiteral(v))),
     );
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(typeName),
       null,
-      unionType
+      unionType,
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
     generatedTypes.add(typeName);
@@ -122,7 +122,7 @@ function generateEnumTypes(
 function generateInputObjectTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
-  alreadyGenerated: Set<string>
+  alreadyGenerated: Set<string>,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -157,7 +157,7 @@ function generateInputObjectTypes(
 
         const prop = t.tsPropertySignature(
           t.identifier(field.name),
-          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(tsType)))
+          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(tsType))),
         );
         prop.optional = optional;
         properties.push(prop);
@@ -180,7 +180,7 @@ function generateInputObjectTypes(
       t.identifier(typeName),
       null,
       null,
-      t.tsInterfaceBody(properties)
+      t.tsInterfaceBody(properties),
     );
     statements.push(t.exportNamedDeclaration(interfaceDecl));
   }
@@ -191,7 +191,7 @@ function generateInputObjectTypes(
 function generateUnionTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
-  alreadyGenerated: Set<string>
+  alreadyGenerated: Set<string>,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -200,15 +200,16 @@ function generateUnionTypes(
     if (typeInfo.kind !== 'UNION') continue;
     if (shouldSkipType(typeName, tableTypeNames)) continue;
     if (generatedTypes.has(typeName)) continue;
-    if (!typeInfo.possibleTypes || typeInfo.possibleTypes.length === 0) continue;
+    if (!typeInfo.possibleTypes || typeInfo.possibleTypes.length === 0)
+      continue;
 
     const unionType = t.tsUnionType(
-      typeInfo.possibleTypes.map((pt) => t.tsTypeReference(t.identifier(pt)))
+      typeInfo.possibleTypes.map((pt) => t.tsTypeReference(t.identifier(pt))),
     );
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(typeName),
       null,
-      unionType
+      unionType,
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
     generatedTypes.add(typeName);
@@ -225,7 +226,7 @@ export interface PayloadTypesResult {
 
 function collectReturnTypesFromRootTypes(
   typeRegistry: TypeRegistry,
-  tableTypeNames: Set<string>
+  tableTypeNames: Set<string>,
 ): Set<string> {
   const returnTypes = new Set<string>();
 
@@ -254,7 +255,7 @@ function collectReturnTypesFromRootTypes(
 function generatePayloadObjectTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
-  alreadyGenerated: Set<string>
+  alreadyGenerated: Set<string>,
 ): PayloadTypesResult {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -262,7 +263,7 @@ function generatePayloadObjectTypes(
 
   const typesToGenerate = collectReturnTypesFromRootTypes(
     typeRegistry,
-    tableTypeNames
+    tableTypeNames,
   );
 
   for (const typeName of Array.from(typesToGenerate)) {
@@ -299,7 +300,7 @@ function generatePayloadObjectTypes(
 
         const prop = t.tsPropertySignature(
           t.identifier(field.name),
-          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(finalType)))
+          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(finalType))),
         );
         prop.optional = isNullable;
         properties.push(prop);
@@ -325,7 +326,7 @@ function generatePayloadObjectTypes(
       t.identifier(typeName),
       null,
       null,
-      t.tsInterfaceBody(properties)
+      t.tsInterfaceBody(properties),
     );
     statements.push(t.exportNamedDeclaration(interfaceDecl));
   }
@@ -334,7 +335,7 @@ function generatePayloadObjectTypes(
 }
 
 export function generateSchemaTypesFile(
-  options: GenerateSchemaTypesOptions
+  options: GenerateSchemaTypesOptions,
 ): GeneratedSchemaTypesFile {
   const { typeRegistry, tableTypeNames } = options;
 
@@ -347,33 +348,35 @@ export function generateSchemaTypesFile(
   const unionResult = generateUnionTypes(
     typeRegistry,
     tableTypeNames,
-    generatedTypes
+    generatedTypes,
   );
   generatedTypes = new Set([...generatedTypes, ...unionResult.generatedTypes]);
 
   const inputResult = generateInputObjectTypes(
     typeRegistry,
     tableTypeNames,
-    generatedTypes
+    generatedTypes,
   );
   generatedTypes = new Set([...generatedTypes, ...inputResult.generatedTypes]);
 
   const payloadResult = generatePayloadObjectTypes(
     typeRegistry,
     tableTypeNames,
-    generatedTypes
+    generatedTypes,
   );
 
   const referencedTableTypes = Array.from(
-    payloadResult.referencedTableTypes
+    payloadResult.referencedTableTypes,
   ).sort();
   const baseFilterImports = Array.from(BASE_FILTER_TYPE_NAMES).sort();
   const allTypesImports = [...referencedTableTypes, ...baseFilterImports];
 
   if (allTypesImports.length > 0) {
     const typesImport = t.importDeclaration(
-      allTypesImports.map((ti) => t.importSpecifier(t.identifier(ti), t.identifier(ti))),
-      t.stringLiteral('./types')
+      allTypesImports.map((ti) =>
+        t.importSpecifier(t.identifier(ti), t.identifier(ti)),
+      ),
+      t.stringLiteral('./types'),
     );
     typesImport.importKind = 'type';
     allStatements.push(typesImport);
@@ -385,12 +388,15 @@ export function generateSchemaTypesFile(
   allStatements.push(...payloadResult.statements);
 
   const code = generateCode(allStatements);
-  const content = getGeneratedFileHeader('GraphQL schema types for custom operations') + '\n\n' + code;
+  const content =
+    getGeneratedFileHeader('GraphQL schema types for custom operations') +
+    '\n\n' +
+    code;
 
   return {
     fileName: 'schema-types.ts',
     content,
     generatedEnums: Array.from(enumResult.generatedTypes).sort(),
-    referencedTableTypes
+    referencedTableTypes,
   };
 }

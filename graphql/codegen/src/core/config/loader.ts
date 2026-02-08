@@ -15,7 +15,7 @@ export const CONFIG_FILENAME = 'graphql-codegen.config.ts';
  * Find the nearest config file by walking up directories
  */
 export function findConfigFile(
-  startDir: string = process.cwd()
+  startDir: string = process.cwd(),
 ): string | null {
   let currentDir = startDir;
 
@@ -49,14 +49,14 @@ export interface LoadConfigFileResult {
  * tsx or ts-node installed.
  */
 export async function loadConfigFile(
-  configPath: string
+  configPath: string,
 ): Promise<LoadConfigFileResult> {
   const resolvedPath = path.resolve(configPath);
 
   if (!fs.existsSync(resolvedPath)) {
     return {
       success: false,
-      error: `Config file not found: ${resolvedPath}`
+      error: `Config file not found: ${resolvedPath}`,
     };
   }
 
@@ -65,7 +65,7 @@ export async function loadConfigFile(
     // jiti handles .ts, .js, .mjs, .cjs and ESM/CJS interop
     const jiti = createJiti(__filename, {
       interopDefault: true,
-      debug: process.env.JITI_DEBUG === '1'
+      debug: process.env.JITI_DEBUG === '1',
     });
 
     // jiti.import() with { default: true } returns mod?.default ?? mod
@@ -74,19 +74,19 @@ export async function loadConfigFile(
     if (!config || typeof config !== 'object') {
       return {
         success: false,
-        error: 'Config file must export a configuration object'
+        error: 'Config file must export a configuration object',
       };
     }
 
     return {
       success: true,
-      config
+      config,
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return {
       success: false,
-      error: `Failed to load config file: ${message}`
+      error: `Failed to load config file: ${message}`,
     };
   }
 }

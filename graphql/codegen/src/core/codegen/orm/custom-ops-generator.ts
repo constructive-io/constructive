@@ -12,9 +12,9 @@ import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
   getTypeBaseName,
   isTypeRequired,
-  typeRefToTsType
+  typeRefToTsType,
 } from '../type-resolver';
-import { getGeneratedFileHeader,ucFirst } from '../utils';
+import { getGeneratedFileHeader, ucFirst } from '../utils';
 
 export interface GeneratedCustomOpsFile {
   fileName: string;
@@ -51,7 +51,7 @@ function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
  * Filters out scalar types
  */
 function collectPayloadTypeNamesFromOps(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): string[] {
   const payloadTypes = new Set<string>();
 
@@ -73,9 +73,7 @@ function collectPayloadTypeNamesFromOps(
  * Collect Connection and other non-scalar return type names that need importing
  * (for typing QueryBuilder results on scalar/Connection operations)
  */
-function collectRawReturnTypeNames(
-  operations: CleanOperation[]
-): string[] {
+function collectRawReturnTypeNames(operations: CleanOperation[]): string[] {
   const types = new Set<string>();
 
   for (const op of operations) {
@@ -95,18 +93,21 @@ function collectRawReturnTypeNames(
 function createImportDeclaration(
   moduleSpecifier: string,
   namedImports: string[],
-  typeOnly: boolean = false
+  typeOnly: boolean = false,
 ): t.ImportDeclaration {
   const specifiers = namedImports.map((name) =>
-    t.importSpecifier(t.identifier(name), t.identifier(name))
+    t.importSpecifier(t.identifier(name), t.identifier(name)),
   );
-  const decl = t.importDeclaration(specifiers, t.stringLiteral(moduleSpecifier));
+  const decl = t.importDeclaration(
+    specifiers,
+    t.stringLiteral(moduleSpecifier),
+  );
   decl.importKind = typeOnly ? 'type' : 'value';
   return decl;
 }
 
 function createVariablesInterface(
-  op: CleanOperation
+  op: CleanOperation,
 ): t.ExportNamedDeclaration | null {
   if (op.args.length === 0) return null;
 
@@ -115,7 +116,7 @@ function createVariablesInterface(
     const optional = !isTypeRequired(arg.type);
     const prop = t.tsPropertySignature(
       t.identifier(arg.name),
-      t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type)))
+      t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type))),
     );
     prop.optional = optional;
     return prop;
@@ -125,7 +126,7 @@ function createVariablesInterface(
     t.identifier(varTypeName),
     null,
     null,
-    t.tsInterfaceBody(props)
+    t.tsInterfaceBody(props),
   );
   return t.exportNamedDeclaration(interfaceDecl);
 }
@@ -139,7 +140,9 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
   if (typeStr === 'unknown') return t.tsUnknownKeyword();
 
   if (typeStr.includes(' | ')) {
-    const parts = typeStr.split(' | ').map((p) => parseTypeAnnotation(p.trim()));
+    const parts = typeStr
+      .split(' | ')
+      .map((p) => parseTypeAnnotation(p.trim()));
     return t.tsUnionType(parts);
   }
 
@@ -152,15 +155,21 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
 
 function buildSelectedResultTsType(
   typeRef: CleanArgument['type'],
-  payloadTypeName: string
+  payloadTypeName: string,
 ): t.TSType {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
-    return buildSelectedResultTsType(typeRef.ofType as CleanArgument['type'], payloadTypeName);
+    return buildSelectedResultTsType(
+      typeRef.ofType as CleanArgument['type'],
+      payloadTypeName,
+    );
   }
 
   if (typeRef.kind === 'LIST' && typeRef.ofType) {
     return t.tsArrayType(
-      buildSelectedResultTsType(typeRef.ofType as CleanArgument['type'], payloadTypeName)
+      buildSelectedResultTsType(
+        typeRef.ofType as CleanArgument['type'],
+        payloadTypeName,
+      ),
     );
   }
 
@@ -168,20 +177,20 @@ function buildSelectedResultTsType(
     t.identifier('InferSelectResult'),
     t.tsTypeParameterInstantiation([
       t.tsTypeReference(t.identifier(payloadTypeName)),
-      t.tsTypeReference(t.identifier('S'))
-    ])
+      t.tsTypeReference(t.identifier('S')),
+    ]),
   );
 }
 
 function buildOperationMethod(
   op: CleanOperation,
-  operationType: 'query' | 'mutation'
+  operationType: 'query' | 'mutation',
 ): t.ObjectProperty {
   const hasArgs = op.args.length > 0;
   const varTypeName = `${ucFirst(op.name)}Variables`;
   const varDefs = op.args.map((arg) => ({
     name: arg.name,
-    type: formatGraphQLType(arg.type)
+    type: formatGraphQLType(arg.type),
   }));
 
   const selectTypeName = getSelectTypeName(op.returnType);
@@ -192,7 +201,9 @@ function buildOperationMethod(
 
   if (hasArgs) {
     const argsParam = t.identifier('args');
-    argsParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(varTypeName)));
+    argsParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier(varTypeName)),
+    );
     params.push(argsParam);
   }
 
@@ -201,7 +212,7 @@ function buildOperationMethod(
   if (selectTypeName) {
     const selectProp = t.tsPropertySignature(
       t.identifier('select'),
-      t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S')))
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S'))),
     );
     selectProp.optional = false;
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
@@ -211,10 +222,10 @@ function buildOperationMethod(
           t.identifier('StrictSelect'),
           t.tsTypeParameterInstantiation([
             t.tsTypeReference(t.identifier('S')),
-            t.tsTypeReference(t.identifier(selectTypeName))
-          ])
-        )
-      ])
+            t.tsTypeReference(t.identifier(selectTypeName)),
+          ]),
+        ),
+      ]),
     );
   } else {
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
@@ -225,14 +236,17 @@ function buildOperationMethod(
             t.tsTypeAnnotation(
               t.tsTypeReference(
                 t.identifier('Record'),
-                t.tsTypeParameterInstantiation([t.tsStringKeyword(), t.tsUnknownKeyword()])
-              )
-            )
+                t.tsTypeParameterInstantiation([
+                  t.tsStringKeyword(),
+                  t.tsUnknownKeyword(),
+                ]),
+              ),
+            ),
           );
           prop.optional = true;
           return prop;
-        })()
-      ])
+        })(),
+      ]),
     );
   }
   params.push(optionsParam);
@@ -240,15 +254,29 @@ function buildOperationMethod(
   // Build the QueryBuilder call
   const selectExpr = selectTypeName
     ? t.memberExpression(t.identifier('options'), t.identifier('select'))
-    : t.optionalMemberExpression(t.identifier('options'), t.identifier('select'), false, true);
-  const entityTypeExpr = selectTypeName && payloadTypeName
-    ? t.stringLiteral(payloadTypeName)
-    : t.identifier('undefined');
+    : t.optionalMemberExpression(
+        t.identifier('options'),
+        t.identifier('select'),
+        false,
+        true,
+      );
+  const entityTypeExpr =
+    selectTypeName && payloadTypeName
+      ? t.stringLiteral(payloadTypeName)
+      : t.identifier('undefined');
 
   const queryBuilderArgs = t.objectExpression([
-    t.objectProperty(t.identifier('client'), t.identifier('client'), false, true),
+    t.objectProperty(
+      t.identifier('client'),
+      t.identifier('client'),
+      false,
+      true,
+    ),
     t.objectProperty(t.identifier('operation'), t.stringLiteral(operationType)),
-    t.objectProperty(t.identifier('operationName'), t.stringLiteral(ucFirst(op.name))),
+    t.objectProperty(
+      t.identifier('operationName'),
+      t.stringLiteral(ucFirst(op.name)),
+    ),
     t.objectProperty(t.identifier('fieldName'), t.stringLiteral(op.name)),
     t.spreadElement(
       t.callExpression(t.identifier('buildCustomDocument'), [
@@ -261,17 +289,19 @@ function buildOperationMethod(
           varDefs.map((v) =>
             t.objectExpression([
               t.objectProperty(t.identifier('name'), t.stringLiteral(v.name)),
-              t.objectProperty(t.identifier('type'), t.stringLiteral(v.type))
-            ])
-          )
+              t.objectProperty(t.identifier('type'), t.stringLiteral(v.type)),
+            ]),
+          ),
         ),
         t.identifier('connectionFieldsMap'),
-        entityTypeExpr
-      ])
-    )
+        entityTypeExpr,
+      ]),
+    ),
   ]);
 
-  const newExpr = t.newExpression(t.identifier('QueryBuilder'), [queryBuilderArgs]);
+  const newExpr = t.newExpression(t.identifier('QueryBuilder'), [
+    queryBuilderArgs,
+  ]);
 
   // Add type parameter to QueryBuilder for typed .unwrap() results
   if (selectTypeName && payloadTypeName) {
@@ -281,10 +311,10 @@ function buildOperationMethod(
         t.tsPropertySignature(
           t.identifier(op.name),
           t.tsTypeAnnotation(
-            buildSelectedResultTsType(op.returnType, payloadTypeName)
-          )
-        )
-      ])
+            buildSelectedResultTsType(op.returnType, payloadTypeName),
+          ),
+        ),
+      ]),
     ]);
   } else {
     // Scalar/Connection type: use raw TS type directly
@@ -293,9 +323,9 @@ function buildOperationMethod(
       t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier(op.name),
-          t.tsTypeAnnotation(parseTypeAnnotation(rawTsType))
-        )
-      ])
+          t.tsTypeAnnotation(parseTypeAnnotation(rawTsType)),
+        ),
+      ]),
     ]);
   }
 
@@ -306,7 +336,7 @@ function buildOperationMethod(
     const typeParam = t.tsTypeParameter(
       t.tsTypeReference(t.identifier(selectTypeName)),
       null,
-      'S'
+      'S',
     );
     arrowFunc.typeParameters = t.tsTypeParameterDeclaration([typeParam]);
   }
@@ -318,7 +348,7 @@ function buildOperationMethod(
  * Generate the query/index.ts file for custom query operations
  */
 export function generateCustomQueryOpsFile(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -327,17 +357,39 @@ export function generateCustomQueryOpsFile(
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
   const rawReturnTypeNames = collectRawReturnTypeNames(operations);
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames, ...rawReturnTypeNames])];
+  const allTypeImports = [
+    ...new Set([
+      ...inputTypeNames,
+      ...payloadTypeNames,
+      ...selectTypeNames,
+      ...rawReturnTypeNames,
+    ]),
+  ];
 
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
-  statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'StrictSelect'], true));
+  statements.push(
+    createImportDeclaration('../query-builder', [
+      'QueryBuilder',
+      'buildCustomDocument',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../select-types',
+      ['InferSelectResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   if (allTypeImports.length > 0) {
-    statements.push(createImportDeclaration('../input-types', allTypeImports, true));
+    statements.push(
+      createImportDeclaration('../input-types', allTypeImports, true),
+    );
   }
-  statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
+  statements.push(
+    createImportDeclaration('../input-types', ['connectionFieldsMap']),
+  );
 
   // Generate variable interfaces
   for (const op of operations) {
@@ -347,19 +399,21 @@ export function generateCustomQueryOpsFile(
 
   // Generate factory function
   const operationProperties = operations.map((op) =>
-    buildOperationMethod(op, 'query')
+    buildOperationMethod(op, 'query'),
   );
 
   const returnObj = t.objectExpression(operationProperties);
   const returnStmt = t.returnStatement(returnObj);
 
   const clientParam = t.identifier('client');
-  clientParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClient')));
+  clientParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('OrmClient')),
+  );
 
   const factoryFunc = t.functionDeclaration(
     t.identifier('createQueryOperations'),
     [clientParam],
-    t.blockStatement([returnStmt])
+    t.blockStatement([returnStmt]),
   );
   statements.push(t.exportNamedDeclaration(factoryFunc));
 
@@ -368,7 +422,7 @@ export function generateCustomQueryOpsFile(
 
   return {
     fileName: 'query/index.ts',
-    content: header + '\n' + code
+    content: header + '\n' + code,
   };
 }
 
@@ -376,7 +430,7 @@ export function generateCustomQueryOpsFile(
  * Generate the mutation/index.ts file for custom mutation operations
  */
 export function generateCustomMutationOpsFile(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -385,17 +439,39 @@ export function generateCustomMutationOpsFile(
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
   const rawReturnTypeNames = collectRawReturnTypeNames(operations);
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames, ...rawReturnTypeNames])];
+  const allTypeImports = [
+    ...new Set([
+      ...inputTypeNames,
+      ...payloadTypeNames,
+      ...selectTypeNames,
+      ...rawReturnTypeNames,
+    ]),
+  ];
 
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
-  statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'StrictSelect'], true));
+  statements.push(
+    createImportDeclaration('../query-builder', [
+      'QueryBuilder',
+      'buildCustomDocument',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../select-types',
+      ['InferSelectResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   if (allTypeImports.length > 0) {
-    statements.push(createImportDeclaration('../input-types', allTypeImports, true));
+    statements.push(
+      createImportDeclaration('../input-types', allTypeImports, true),
+    );
   }
-  statements.push(createImportDeclaration('../input-types', ['connectionFieldsMap']));
+  statements.push(
+    createImportDeclaration('../input-types', ['connectionFieldsMap']),
+  );
 
   // Generate variable interfaces
   for (const op of operations) {
@@ -405,19 +481,21 @@ export function generateCustomMutationOpsFile(
 
   // Generate factory function
   const operationProperties = operations.map((op) =>
-    buildOperationMethod(op, 'mutation')
+    buildOperationMethod(op, 'mutation'),
   );
 
   const returnObj = t.objectExpression(operationProperties);
   const returnStmt = t.returnStatement(returnObj);
 
   const clientParam = t.identifier('client');
-  clientParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClient')));
+  clientParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('OrmClient')),
+  );
 
   const factoryFunc = t.functionDeclaration(
     t.identifier('createMutationOperations'),
     [clientParam],
-    t.blockStatement([returnStmt])
+    t.blockStatement([returnStmt]),
   );
   statements.push(t.exportNamedDeclaration(factoryFunc));
 
@@ -426,7 +504,7 @@ export function generateCustomMutationOpsFile(
 
   return {
     fileName: 'mutation/index.ts',
-    content: header + '\n' + code
+    content: header + '\n' + code,
   };
 }
 

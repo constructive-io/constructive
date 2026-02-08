@@ -43,7 +43,7 @@ export class FileSchemaSource implements SchemaSource {
     if (!fs.existsSync(absolutePath)) {
       throw new SchemaSourceError(
         `Schema file not found: ${absolutePath}`,
-        this.describe()
+        this.describe(),
       );
     }
 
@@ -55,7 +55,7 @@ export class FileSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to read schema file: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -72,7 +72,7 @@ export class FileSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Invalid GraphQL SDL: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -84,14 +84,14 @@ export class FileSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to generate introspection: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
     // Convert graphql-js introspection result to our mutable type
     // The graphql-js types are readonly, but our types are mutable
     const introspection: IntrospectionQueryResponse = JSON.parse(
-      JSON.stringify(introspectionResult)
+      JSON.stringify(introspectionResult),
     ) as IntrospectionQueryResponse;
 
     return { introspection };

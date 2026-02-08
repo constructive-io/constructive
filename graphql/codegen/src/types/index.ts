@@ -16,7 +16,7 @@ export type {
   ForeignKeyConstraint,
   TableConstraints,
   TableInflection,
-  TableQueryNames
+  TableQueryNames,
 } from './schema';
 
 // Query types
@@ -28,7 +28,7 @@ export type {
   OrderByItem,
   PageInfo,
   QueryOptions,
-  RelationalFilter
+  RelationalFilter,
 } from './query';
 
 // Mutation types
@@ -37,7 +37,7 @@ export type {
   DeleteInput,
   MutationOptions,
   MutationResult,
-  UpdateInput
+  UpdateInput,
 } from './mutation';
 
 // Selection types
@@ -45,17 +45,14 @@ export type {
   FieldSelection,
   FieldSelectionPreset,
   SelectionOptions,
-  SimpleFieldSelection
+  SimpleFieldSelection,
 } from './selection';
 
 // Config types
-export type {
-  GraphQLSDKConfig,
-  GraphQLSDKConfigTarget
-} from './config';
+export type { GraphQLSDKConfig, GraphQLSDKConfigTarget } from './config';
 export {
   DEFAULT_CONFIG,
   defineConfig,
   getConfigOptions,
-  mergeConfig
+  mergeConfig,
 } from './config';

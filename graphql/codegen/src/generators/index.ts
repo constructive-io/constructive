@@ -7,7 +7,7 @@ export {
   convertToSelectionOptions,
   getAvailableRelations,
   isRelationalField,
-  validateFieldSelection
+  validateFieldSelection,
 } from './field-selector';
 
 // Query generators
@@ -19,12 +19,12 @@ export {
   createASTQueryBuilder,
   generateIntrospectionSchema,
   toCamelCasePlural,
-  toOrderByTypeName
+  toOrderByTypeName,
 } from './select';
 
 // Mutation generators
 export {
   buildPostGraphileCreate,
   buildPostGraphileDelete,
-  buildPostGraphileUpdate
+  buildPostGraphileUpdate,
 } from './mutations';

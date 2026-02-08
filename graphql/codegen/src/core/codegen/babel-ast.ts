@@ -9,7 +9,7 @@ import generate from '@babel/generator';
 import * as t from '@babel/types';
 
 // Re-export for convenience
-export { generate,t };
+export { generate, t };
 
 /**
  * Generate code from an array of statements
@@ -29,7 +29,7 @@ export const commentBlock = (value: string): t.CommentBlock => {
     value,
     start: null,
     end: null,
-    loc: null
+    loc: null,
   };
 };
 
@@ -42,7 +42,7 @@ export const commentLine = (value: string): t.CommentLine => {
     value,
     start: null,
     end: null,
-    loc: null
+    loc: null,
   };
 };
 
@@ -50,10 +50,11 @@ export const commentLine = (value: string): t.CommentLine => {
  * Add a leading JSDoc comment to a node
  */
 export function addJSDocComment<T extends t.Node>(node: T, lines: string[]): T {
-  const commentText = lines.length === 1
-    ? `* ${lines[0]} `
-    : `*\n${lines.map(line => ` * ${line}`).join('\n')}\n `;
-  
+  const commentText =
+    lines.length === 1
+      ? `* ${lines[0]} `
+      : `*\n${lines.map((line) => ` * ${line}`).join('\n')}\n `;
+
   if (!node.leadingComments) {
     node.leadingComments = [];
   }
@@ -76,16 +77,15 @@ export function addLineComment<T extends t.Node>(node: T, text: string): T {
  * Create an 'as const' assertion - common pattern worth abstracting
  */
 export function asConst(expression: t.Expression): t.TSAsExpression {
-  return t.tsAsExpression(
-    expression,
-    t.tsTypeReference(t.identifier('const'))
-  );
+  return t.tsAsExpression(expression, t.tsTypeReference(t.identifier('const')));
 }
 
 /**
  * Create an array expression with 'as const' - very common pattern
  */
-export function constArray(elements: (t.Expression | t.SpreadElement)[]): t.TSAsExpression {
+export function constArray(
+  elements: (t.Expression | t.SpreadElement)[],
+): t.TSAsExpression {
   return asConst(t.arrayExpression(elements));
 }
 
@@ -95,7 +95,7 @@ export function constArray(elements: (t.Expression | t.SpreadElement)[]): t.TSAs
 export function typedParam(
   name: string,
   typeAnnotation: t.TSType,
-  optional: boolean = false
+  optional: boolean = false,
 ): t.Identifier {
   const param = t.identifier(name);
   param.typeAnnotation = t.tsTypeAnnotation(typeAnnotation);
@@ -125,7 +125,7 @@ export function keyofTypeof(name: string): t.TSTypeOperator {
 export function createTypedCallExpression(
   callee: t.Expression,
   args: (t.Expression | t.SpreadElement)[],
-  typeParams: t.TSType[]
+  typeParams: t.TSType[],
 ): t.CallExpression {
   const call = t.callExpression(callee, args);
   if (typeParams.length > 0) {

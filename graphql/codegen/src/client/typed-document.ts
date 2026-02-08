@@ -33,7 +33,7 @@ export class TypedDocumentString<TResult = unknown, TVariables = unknown>
     this.value = value;
     this.__meta__ = {
       hash: this.generateHash(value),
-      ...meta
+      ...meta,
     };
   }
 

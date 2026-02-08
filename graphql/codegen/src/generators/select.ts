@@ -10,7 +10,7 @@ import { camelize, pluralize } from 'inflekt';
 import { TypedDocumentString } from '../client/typed-document';
 import {
   getCustomAstForCleanField,
-  requiresSubfieldSelection
+  requiresSubfieldSelection,
 } from '../core/custom-ast';
 import { QueryBuilder } from '../core/query-builder';
 import type {
@@ -20,7 +20,7 @@ import type {
   MetaObject,
   MutationDefinition,
   QueryDefinition,
-  QuerySelectionOptions
+  QuerySelectionOptions,
 } from '../core/types';
 import type { QueryOptions } from '../types/query';
 import type { CleanTable } from '../types/schema';
@@ -66,8 +66,8 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
           pgAlias: field.type.pgAlias,
           pgType: field.type.pgType,
           subtype: field.type.subtype,
-          typmod: field.type.typmod
-        }
+          typmod: field.type.typmod,
+        },
       })),
       primaryConstraints: [] as MetaConstraint[], // Would need to be derived from schema
       uniqueConstraints: [] as MetaConstraint[], // Would need to be derived from schema
@@ -82,9 +82,9 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
             pgAlias: null,
             pgType: null,
             subtype: null,
-            typmod: null
+            typmod: null,
           } as MetaFieldType,
-          alias: rel.fieldName || ''
+          alias: rel.fieldName || '',
         },
         toKey: {
           name: 'id',
@@ -95,11 +95,11 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
             pgAlias: null,
             pgType: null,
             subtype: null,
-            typmod: null
-          } as MetaFieldType
-        }
-      }))
-    }))
+            typmod: null,
+          } as MetaFieldType,
+        },
+      })),
+    })),
   };
 }
 
@@ -108,7 +108,7 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
  * This creates a minimal schema for AST generation
  */
 export function generateIntrospectionSchema(
-  tables: CleanTable[]
+  tables: CleanTable[],
 ): IntrospectionSchema {
   const schema: IntrospectionSchema = {};
 
@@ -124,7 +124,7 @@ export function generateIntrospectionSchema(
       qtype: 'getMany',
       model: modelName,
       selection,
-      properties: convertFieldsToProperties(table.fields)
+      properties: convertFieldsToProperties(table.fields),
     } as QueryDefinition;
 
     // Add getOne query (by ID)
@@ -133,7 +133,7 @@ export function generateIntrospectionSchema(
       qtype: 'getOne',
       model: modelName,
       selection,
-      properties: convertFieldsToProperties(table.fields)
+      properties: convertFieldsToProperties(table.fields),
     } as QueryDefinition;
 
     // Add create mutation
@@ -156,11 +156,11 @@ export function generateIntrospectionSchema(
               isNotNull: true,
               isArray: false,
               isArrayNotNull: false,
-              properties: convertFieldsToNestedProperties(table.fields)
-            }
-          }
-        }
-      }
+              properties: convertFieldsToNestedProperties(table.fields),
+            },
+          },
+        },
+      },
     } as MutationDefinition;
 
     // Add update mutation
@@ -183,11 +183,11 @@ export function generateIntrospectionSchema(
               isNotNull: true,
               isArray: false,
               isArrayNotNull: false,
-              properties: convertFieldsToNestedProperties(table.fields)
-            }
-          }
-        }
-      }
+              properties: convertFieldsToNestedProperties(table.fields),
+            },
+          },
+        },
+      },
     } as MutationDefinition;
 
     // Add delete mutation
@@ -209,11 +209,11 @@ export function generateIntrospectionSchema(
               type: 'UUID',
               isNotNull: true,
               isArray: false,
-              isArrayNotNull: false
-            }
-          }
-        }
-      }
+              isArrayNotNull: false,
+            },
+          },
+        },
+      },
     } as MutationDefinition;
   }
 
@@ -232,7 +232,7 @@ function convertFieldsToProperties(fields: CleanTable['fields']) {
       type: field.type.gqlType,
       isNotNull: !field.type.gqlType.endsWith('!'),
       isArray: field.type.isArray,
-      isArrayNotNull: false
+      isArrayNotNull: false,
     };
   });
 
@@ -251,7 +251,7 @@ function convertFieldsToNestedProperties(fields: CleanTable['fields']) {
       type: field.type.gqlType,
       isNotNull: false, // Mutations typically allow optional fields
       isArray: field.type.isArray,
-      isArrayNotNull: false
+      isArrayNotNull: false,
     };
   });
 
@@ -267,7 +267,7 @@ export function createASTQueryBuilder(tables: CleanTable[]): QueryBuilder {
 
   return new QueryBuilder({
     meta: metaObject,
-    introspection: introspectionSchema
+    introspection: introspectionSchema,
   });
 }
 
@@ -278,13 +278,13 @@ export function createASTQueryBuilder(tables: CleanTable[]): QueryBuilder {
 export function buildSelect(
   table: CleanTable,
   allTables: readonly CleanTable[],
-  options: QueryOptions = {}
+  options: QueryOptions = {},
 ): TypedDocumentString<Record<string, unknown>, QueryOptions> {
   const tableList = Array.from(allTables);
   const selection = convertFieldSelectionToSelectionOptions(
     table,
     tableList,
-    options.fieldSelection
+    options.fieldSelection,
   );
 
   // Generate query directly using AST
@@ -292,7 +292,7 @@ export function buildSelect(
     table,
     tableList,
     selection,
-    options
+    options,
   );
 
   return new TypedDocumentString(queryString, {}) as TypedDocumentString<
@@ -306,7 +306,7 @@ export function buildSelect(
  */
 export function buildFindOne(
   table: CleanTable,
-  _pkField: string = 'id'
+  _pkField: string = 'id',
 ): TypedDocumentString<Record<string, unknown>, Record<string, unknown>> {
   const queryString = generateFindOneQueryAST(table);
 
@@ -320,7 +320,7 @@ export function buildFindOne(
  * Build a count query for a table
  */
 export function buildCount(
-  table: CleanTable
+  table: CleanTable,
 ): TypedDocumentString<
   { [key: string]: { totalCount: number } },
   { condition?: Record<string, unknown>; filter?: Record<string, unknown> }
@@ -336,7 +336,7 @@ export function buildCount(
 function convertFieldSelectionToSelectionOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  options?: FieldSelection
+  options?: FieldSelection,
 ): QuerySelectionOptions | null {
   return convertToSelectionOptions(table, allTables, options);
 }
@@ -348,7 +348,7 @@ function generateSelectQueryAST(
   table: CleanTable,
   allTables: CleanTable[],
   selection: QuerySelectionOptions | null,
-  options: QueryOptions
+  options: QueryOptions,
 ): string {
   const pluralName = toCamelCasePlural(table.name);
 
@@ -356,7 +356,7 @@ function generateSelectQueryAST(
   const fieldSelections = generateFieldSelectionsFromOptions(
     table,
     allTables,
-    selection
+    selection,
   );
 
   // Build the query AST
@@ -369,14 +369,14 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'first' }),
-        type: t.namedType({ type: 'Int' })
-      })
+        type: t.namedType({ type: 'Int' }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'first',
-        value: t.variable({ name: 'first' })
-      })
+        value: t.variable({ name: 'first' }),
+      }),
     );
   }
 
@@ -384,14 +384,14 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'offset' }),
-        type: t.namedType({ type: 'Int' })
-      })
+        type: t.namedType({ type: 'Int' }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'offset',
-        value: t.variable({ name: 'offset' })
-      })
+        value: t.variable({ name: 'offset' }),
+      }),
     );
   }
 
@@ -400,14 +400,14 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'after' }),
-        type: t.namedType({ type: 'Cursor' })
-      })
+        type: t.namedType({ type: 'Cursor' }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'after',
-        value: t.variable({ name: 'after' })
-      })
+        value: t.variable({ name: 'after' }),
+      }),
     );
   }
 
@@ -415,14 +415,14 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'before' }),
-        type: t.namedType({ type: 'Cursor' })
-      })
+        type: t.namedType({ type: 'Cursor' }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'before',
-        value: t.variable({ name: 'before' })
-      })
+        value: t.variable({ name: 'before' }),
+      }),
     );
   }
 
@@ -431,14 +431,14 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'filter' }),
-        type: t.namedType({ type: `${table.name}Filter` })
-      })
+        type: t.namedType({ type: `${table.name}Filter` }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'filter',
-        value: t.variable({ name: 'filter' })
-      })
+        value: t.variable({ name: 'filter' }),
+      }),
     );
   }
 
@@ -450,16 +450,16 @@ function generateSelectQueryAST(
         // PostGraphile expects [ProductsOrderBy!] - list of non-null enum values
         type: t.listType({
           type: t.nonNullType({
-            type: t.namedType({ type: toOrderByTypeName(table.name) })
-          })
-        })
-      })
+            type: t.namedType({ type: toOrderByTypeName(table.name) }),
+          }),
+        }),
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'orderBy',
-        value: t.variable({ name: 'orderBy' })
-      })
+        value: t.variable({ name: 'orderBy' }),
+      }),
     );
   }
 
@@ -469,9 +469,9 @@ function generateSelectQueryAST(
     t.field({
       name: 'nodes',
       selectionSet: t.selectionSet({
-        selections: fieldSelections
-      })
-    })
+        selections: fieldSelections,
+      }),
+    }),
   ];
 
   // Add pageInfo if requested (for cursor-based pagination / infinite scroll)
@@ -488,10 +488,10 @@ function generateSelectQueryAST(
             t.field({ name: 'hasNextPage' }),
             t.field({ name: 'hasPreviousPage' }),
             t.field({ name: 'startCursor' }),
-            t.field({ name: 'endCursor' })
-          ]
-        })
-      })
+            t.field({ name: 'endCursor' }),
+          ],
+        }),
+      }),
     );
   }
 
@@ -507,13 +507,13 @@ function generateSelectQueryAST(
               name: pluralName,
               args: queryArgs,
               selectionSet: t.selectionSet({
-                selections: connectionSelections
-              })
-            })
-          ]
-        })
-      })
-    ]
+                selections: connectionSelections,
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
   });
 
   return print(ast);
@@ -525,7 +525,7 @@ function generateSelectQueryAST(
 function generateFieldSelectionsFromOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  selection: QuerySelectionOptions | null
+  selection: QuerySelectionOptions | null,
 ): FieldNode[] {
   const DEFAULT_NESTED_RELATION_FIRST = 20;
 
@@ -568,7 +568,7 @@ function generateFieldSelectionsFromOptions(
         if (include) {
           // Check if this nested field requires subfield selection
           const nestedFieldDef = relatedTable?.fields.find(
-            (f) => f.name === nestedField
+            (f) => f.name === nestedField,
           );
           if (nestedFieldDef && requiresSubfieldSelection(nestedFieldDef)) {
             // Use custom AST generation for complex nested fields
@@ -594,21 +594,21 @@ function generateFieldSelectionsFromOptions(
               t.argument({
                 name: 'first',
                 value: t.intValue({
-                  value: DEFAULT_NESTED_RELATION_FIRST.toString()
-                })
-              })
+                  value: DEFAULT_NESTED_RELATION_FIRST.toString(),
+                }),
+              }),
             ],
             selectionSet: t.selectionSet({
               selections: [
                 t.field({
                   name: 'nodes',
                   selectionSet: t.selectionSet({
-                    selections: nestedSelections
-                  })
-                })
-              ]
-            })
-          })
+                    selections: nestedSelections,
+                  }),
+                }),
+              ],
+            }),
+          }),
         );
       } else {
         // For belongsTo/hasOne relations, use direct selection
@@ -616,9 +616,9 @@ function generateFieldSelectionsFromOptions(
           t.field({
             name: fieldName,
             selectionSet: t.selectionSet({
-              selections: nestedSelections
-            })
-          })
+              selections: nestedSelections,
+            }),
+          }),
         );
       }
     }
@@ -632,7 +632,7 @@ function generateFieldSelectionsFromOptions(
  */
 function getRelationInfo(
   fieldName: string,
-  table: CleanTable
+  table: CleanTable,
 ): { type: string; relation: unknown } | null {
   const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
 
@@ -669,14 +669,14 @@ function getRelationInfo(
 function findRelatedTable(
   relationField: string,
   table: CleanTable,
-  allTables: CleanTable[]
+  allTables: CleanTable[],
 ): CleanTable | null {
   // Find the related table name
   let referencedTableName: string | undefined;
 
   // Check belongsTo relations
   const belongsToRel = table.relations.belongsTo.find(
-    (rel) => rel.fieldName === relationField
+    (rel) => rel.fieldName === relationField,
   );
   if (belongsToRel) {
     referencedTableName = belongsToRel.referencesTable;
@@ -685,7 +685,7 @@ function findRelatedTable(
   // Check hasOne relations
   if (!referencedTableName) {
     const hasOneRel = table.relations.hasOne.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasOneRel) {
       referencedTableName = hasOneRel.referencedByTable;
@@ -695,7 +695,7 @@ function findRelatedTable(
   // Check hasMany relations
   if (!referencedTableName) {
     const hasManyRel = table.relations.hasMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasManyRel) {
       referencedTableName = hasManyRel.referencedByTable;
@@ -705,7 +705,7 @@ function findRelatedTable(
   // Check manyToMany relations
   if (!referencedTableName) {
     const manyToManyRel = table.relations.manyToMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (manyToManyRel) {
       referencedTableName = manyToManyRel.rightTable;
@@ -748,9 +748,9 @@ function generateFindOneQueryAST(table: CleanTable): string {
           t.variableDefinition({
             variable: t.variable({ name: 'id' }),
             type: t.nonNullType({
-              type: t.namedType({ type: 'UUID' })
-            })
-          })
+              type: t.namedType({ type: 'UUID' }),
+            }),
+          }),
         ],
         selectionSet: t.selectionSet({
           selections: [
@@ -759,17 +759,17 @@ function generateFindOneQueryAST(table: CleanTable): string {
               args: [
                 t.argument({
                   name: 'id',
-                  value: t.variable({ name: 'id' })
-                })
+                  value: t.variable({ name: 'id' }),
+                }),
               ],
               selectionSet: t.selectionSet({
-                selections: fieldSelections
-              })
-            })
-          ]
-        })
-      })
-    ]
+                selections: fieldSelections,
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
   });
 
   return print(ast);
@@ -789,8 +789,8 @@ function generateCountQueryAST(table: CleanTable): string {
         variableDefinitions: [
           t.variableDefinition({
             variable: t.variable({ name: 'filter' }),
-            type: t.namedType({ type: `${table.name}Filter` })
-          })
+            type: t.namedType({ type: `${table.name}Filter` }),
+          }),
         ],
         selectionSet: t.selectionSet({
           selections: [
@@ -799,17 +799,17 @@ function generateCountQueryAST(table: CleanTable): string {
               args: [
                 t.argument({
                   name: 'filter',
-                  value: t.variable({ name: 'filter' })
-                })
+                  value: t.variable({ name: 'filter' }),
+                }),
               ],
               selectionSet: t.selectionSet({
-                selections: [t.field({ name: 'totalCount' })]
-              })
-            })
-          ]
-        })
-      })
-    ]
+                selections: [t.field({ name: 'totalCount' })],
+              }),
+            }),
+          ],
+        }),
+      }),
+    ],
   });
 
   return print(ast);

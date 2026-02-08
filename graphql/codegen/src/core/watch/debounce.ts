@@ -8,7 +8,7 @@
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
-  wait: number
+  wait: number,
 ): {
   (...args: Parameters<T>): void;
   cancel: () => void;
@@ -56,9 +56,11 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 /**
  * Creates an async debounced function
  */
-export function debounceAsync<T extends (...args: unknown[]) => Promise<unknown>>(
+export function debounceAsync<
+  T extends (...args: unknown[]) => Promise<unknown>,
+>(
   func: T,
-  wait: number
+  wait: number,
 ): {
   (...args: Parameters<T>): Promise<void>;
   cancel: () => void;
