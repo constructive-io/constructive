@@ -52,7 +52,7 @@
     "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
     "@types/pg": "^8.16.0",
     "graphile-test": "workspace:^",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pg": "^8.17.1",
     "pgsql-test": "workspace:^"
   }

@@ -47,7 +47,7 @@
     "@pgpm/database-jobs": "^0.16.0",
     "@pgpm/verify": "^0.16.0",
     "@pgpmjs/core": "workspace:^",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pgsql-test": "workspace:^"
   }
 }

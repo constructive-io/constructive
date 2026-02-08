@@ -41,7 +41,7 @@
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
     "graphile-test": "workspace:^",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {

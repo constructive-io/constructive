@@ -43,7 +43,7 @@
     "@graphile-contrib/pg-many-to-many": "^1.0.0",
     "graphile-test": "workspace:^",
     "graphql-tag": "2.12.6",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {

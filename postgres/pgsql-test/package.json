@@ -58,7 +58,7 @@
     "@pgpmjs/core": "workspace:*",
     "@types/pg": "^8.16.0",
     "@types/pg-copy-streams": "^1.2.5",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@pgpmjs/env": "workspace:^",

@@ -36,7 +36,7 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "devDependencies": {
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@constructive-io/job-pg": "workspace:^",
