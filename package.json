@@ -16,8 +16,8 @@
   },
   "scripts": {
     "clean": "pnpm -r run clean",
-    "build": "pnpm -r --filter '!./examples/**' run build",
-    "build:dev": "pnpm -r --filter '!./examples/**' run build:dev",
+    "build": "pnpm -r --filter '!./examples/**' --filter '!@constructive-io/test-codegen-app' run build",
+    "build:dev": "pnpm -r --filter '!./examples/**' --filter '!@constructive-io/test-codegen-app' run build:dev",
     "lint": "pnpm -r run lint",
     "internal:deps": "makage update-workspace",
     "deps": "pnpm up -r -i -L"

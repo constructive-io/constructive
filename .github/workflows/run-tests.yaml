@@ -191,7 +191,7 @@ jobs:
 
       - name: build
         run: |
-          pnpm -r --filter '!./examples/**' run build
+          pnpm -r --filter '!./examples/**' --filter '!@constructive-io/test-codegen-app' run build
 
       - name: seed app_user
         run: |
