@@ -10,8 +10,7 @@
   "types": "index.d.ts",
   "scripts": {
     "clean": "makage clean",
-    "copy": "makage assets",
-    "prepack": "pnpm run build",
+    "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
@@ -25,13 +24,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/constructive-io/constructive"
-  },
-  "exports": {
-    ".": {
-      "import": "./esm/index.js",
-      "require": "./index.js",
-      "types": "./index.d.ts"
-    }
   },
   "keywords": [
     "postgraphile",
