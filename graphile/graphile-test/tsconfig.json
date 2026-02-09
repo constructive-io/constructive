@@ -2,9 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
-    "moduleResolution": "bundler",
-    "module": "es2022"
+    "rootDir": "src/",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "**/*.spec.*", "**/*.test.*"]
 }

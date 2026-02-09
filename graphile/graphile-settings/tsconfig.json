@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "moduleResolution": "bundler",
-    "module": "es2022"
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
   },
   "include": ["src/**/*"]
 }

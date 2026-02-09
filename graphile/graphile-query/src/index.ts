@@ -4,7 +4,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { makeSchema } from 'graphile-build';
 import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
 import { defaultPreset as graphileBuildPgDefaultPreset, withPgClientFromPgService } from 'graphile-build-pg';
-import { makePgService } from 'postgraphile/adaptors/pg';
+import { makePgService } from 'graphile-settings';
 import { execute } from 'grafast';
 import type { Pool } from 'pg';
 

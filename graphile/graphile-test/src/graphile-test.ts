@@ -7,8 +7,8 @@ import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
 import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
 import { makePgService } from 'postgraphile/adaptors/pg';
 
-import { runGraphQLInContext } from './context.js';
-import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from './types.js';
+import { runGraphQLInContext } from './context';
+import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from './types';
 
 /**
  * Minimal preset that provides core functionality without Node/Relay.

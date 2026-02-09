@@ -4,7 +4,7 @@ import type { GraphQLSchema } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { makeSchema } from 'graphile-build';
-import { makePgService } from 'postgraphile/adaptors/pg';
+import { makePgService } from 'graphile-settings';
 import { runGraphQLInContext } from 'graphile-test/context';
 
 /**
