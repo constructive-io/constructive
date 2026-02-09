@@ -230,6 +230,9 @@ importers:
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
+      pg-sql2:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.3
       postgraphile:
         specifier: ^5.0.0-rc.4
         version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
@@ -237,9 +240,6 @@ importers:
       '@types/node':
         specifier: ^22.19.1
         version: 22.19.7
-      graphile-settings:
-        specifier: workspace:^
-        version: link:../graphile-settings/dist
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist

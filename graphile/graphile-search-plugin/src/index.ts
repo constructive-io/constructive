@@ -23,4 +23,5 @@
 
 export { PgSearchPlugin, createPgSearchPlugin } from './plugin';
 export { PgSearchPreset } from './preset';
+export { TsvectorCodecPlugin, TsvectorCodecPreset } from './tsvector-codec';
 export type { PgSearchPluginOptions } from './types';

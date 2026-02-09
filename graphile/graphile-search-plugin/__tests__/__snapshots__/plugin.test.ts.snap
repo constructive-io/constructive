@@ -2,11 +2,11 @@
 
 exports[`PgSearchPlugin condition-based search on stsv column returns only title-matched rows for fullTextStsv condition 1`] = `
 {
-  "goals": {
+  "allGoals": {
     "nodes": [
       {
         "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-        "id": "[ID]",
+        "rowId": 6,
         "title": "green fowl",
       },
     ],
@@ -16,21 +16,21 @@ exports[`PgSearchPlugin condition-based search on stsv column returns only title
 
 exports[`PgSearchPlugin condition-based search on tsv column returns matching rows ordered by relevance (ts_rank DESC) 1`] = `
 {
-  "goals": {
+  "allGoals": {
     "nodes": [
       {
         "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-        "id": "[ID]",
+        "rowId": 6,
         "title": "green fowl",
       },
       {
         "description": "Appear evening that gathered saying. Sea subdue so fill stars. Bring is man divided behold fish their. Also won't fowl.",
-        "id": "[ID]",
+        "rowId": 2,
         "title": "evenings",
       },
       {
         "description": "Heaven. Tree creeping was. Gathered living dominion us likeness first subdue fill. Fowl him moveth fly also the is created.",
-        "id": "[ID]",
+        "rowId": 3,
         "title": "heaven",
       },
     ],

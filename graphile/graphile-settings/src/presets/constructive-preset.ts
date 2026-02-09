@@ -8,7 +8,6 @@ import { NoUniqueLookupPreset } from '../plugins/primary-key-only';
 import { EnableAllFilterColumnsPreset } from '../plugins/enable-all-filter-columns';
 import { ManyToManyOptInPreset } from '../plugins/many-to-many-preset';
 import { MetaSchemaPreset } from '../plugins/meta-schema';
-import { TsvectorCodecPreset } from '../plugins/tsvector-codec';
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
 
@@ -60,7 +59,6 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     EnableAllFilterColumnsPreset,
     ManyToManyOptInPreset,
     MetaSchemaPreset,
-    TsvectorCodecPreset,
     PgSearchPreset({ pgSearchPrefix: 'fullText' }),
     PgTypeMappingsPreset,
   ],

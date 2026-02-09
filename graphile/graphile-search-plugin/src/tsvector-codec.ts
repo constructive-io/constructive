@@ -1,18 +1,19 @@
+/**
+ * TsvectorCodecPlugin
+ *
+ * Teaches PostGraphile v5 how to handle PostgreSQL's tsvector and tsquery types.
+ * Without this, tsvector columns are invisible to the schema builder and the
+ * search plugin cannot generate condition fields.
+ *
+ * This plugin:
+ * 1. Creates codecs for tsvector/tsquery via gather.hooks.pgCodecs_findPgCodec
+ * 2. Maps those codecs to GraphQL String via schema.hooks.init
+ */
+
 import type { GraphileConfig } from 'graphile-config';
 import { GraphQLString } from 'graphql';
 import sql from 'pg-sql2';
 
-/**
- * Plugin that adds support for PostgreSQL's tsvector and tsquery types.
- *
- * The tsvector type is used for full-text search in PostgreSQL.
- * PostGraphile v5 doesn't have built-in support for it, so we need
- * to add a custom codec AND register the GraphQL type mapping.
- *
- * This plugin:
- * 1. Implements gather.hooks.pgCodecs_findPgCodec to create codecs for tsvector/tsquery
- * 2. Implements schema.hooks.init to map these codecs to GraphQL String type
- */
 export const TsvectorCodecPlugin: GraphileConfig.Plugin = {
   name: 'TsvectorCodecPlugin',
   version: '1.0.0',
@@ -99,11 +100,6 @@ export const TsvectorCodecPlugin: GraphileConfig.Plugin = {
   },
 };
 
-/**
- * Preset that includes the tsvector codec plugin.
- */
 export const TsvectorCodecPreset: GraphileConfig.Preset = {
   plugins: [TsvectorCodecPlugin],
 };
-
-export default TsvectorCodecPlugin;

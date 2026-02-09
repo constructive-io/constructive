@@ -42,7 +42,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.1",
-    "graphile-settings": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
@@ -51,7 +50,8 @@
     "@dataplan/pg": "1.0.0-rc.3",
     "graphile-build": "^5.0.0-rc.3",
     "graphile-build-pg": "^5.0.0-rc.3",
-    "graphile-config": "1.0.0-rc.3"
+    "graphile-config": "1.0.0-rc.3",
+    "pg-sql2": "^5.0.0-rc.3"
   },
   "peerDependencies": {
     "graphql": "^16.9.0",

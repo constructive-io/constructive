@@ -2,15 +2,15 @@ import { join } from 'path';
 import { getConnections, seed, snapshot } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
-import { ConstructivePreset } from 'graphile-settings';
+import { PgSearchPreset } from '../src';
 
 const SCHEMA = 'app_public';
 const sqlFile = (f: string) => join(__dirname, '../sql', f);
 
 interface GoalsResult {
-  goals: {
+  allGoals: {
     nodes: Array<{
-      id: number;
+      rowId: number;
       title: string;
       description: string;
     }>;
@@ -28,10 +28,9 @@ describe('PgSearchPlugin', () => {
   let query: QueryFn;
 
   beforeAll(async () => {
-    // ConstructivePreset already includes PgSearchPreset({ pgSearchPrefix: 'fullText' })
     const testPreset = {
       extends: [
-        ConstructivePreset,
+        PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
     };
 
@@ -79,9 +78,9 @@ describe('PgSearchPlugin', () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {
-          goals(condition: { fullTextTsv: $search }) {
+          allGoals(condition: { fullTextTsv: $search }) {
             nodes {
-              id
+              rowId
               title
               description
             }
@@ -99,9 +98,9 @@ describe('PgSearchPlugin', () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {
-          goals(condition: { fullTextTsv: $search }) {
+          allGoals(condition: { fullTextTsv: $search }) {
             nodes {
-              id
+              rowId
               title
             }
           }
@@ -111,7 +110,7 @@ describe('PgSearchPlugin', () => {
       );
 
       expect(result.errors).toBeUndefined();
-      expect(result.data?.goals.nodes).toHaveLength(0);
+      expect(result.data?.allGoals.nodes).toHaveLength(0);
     });
   });
 
@@ -120,9 +119,9 @@ describe('PgSearchPlugin', () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition2($search: String!) {
-          goals(condition: { fullTextStsv: $search }) {
+          allGoals(condition: { fullTextStsv: $search }) {
             nodes {
-              id
+              rowId
               title
               description
             }
@@ -142,9 +141,9 @@ describe('PgSearchPlugin', () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {
-          goals(condition: { fullTextTsv: $search }) {
+          allGoals(condition: { fullTextTsv: $search }) {
             nodes {
-              id
+              rowId
               title
             }
           }
@@ -155,16 +154,16 @@ describe('PgSearchPlugin', () => {
 
       // Empty string may return all or no results depending on PostgreSQL behavior
       expect(result.errors).toBeUndefined();
-      expect(result.data?.goals).toBeDefined();
+      expect(result.data?.allGoals).toBeDefined();
     });
 
     it('works with multi-word search terms', async () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {
-          goals(condition: { fullTextTsv: $search }) {
+          allGoals(condition: { fullTextTsv: $search }) {
             nodes {
-              id
+              rowId
               title
             }
           }
@@ -174,8 +173,8 @@ describe('PgSearchPlugin', () => {
       );
 
       expect(result.errors).toBeUndefined();
-      expect(result.data?.goals).toBeDefined();
-      expect(result.data?.goals.nodes.length).toBeGreaterThan(0);
+      expect(result.data?.allGoals).toBeDefined();
+      expect(result.data?.allGoals.nodes.length).toBeGreaterThan(0);
     });
   });
 });
