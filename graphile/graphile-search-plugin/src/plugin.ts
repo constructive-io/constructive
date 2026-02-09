@@ -6,18 +6,27 @@
  * `column @@ websearch_to_tsquery('english', $value)` WHERE clause and
  * automatically orders results by `ts_rank` (descending) for relevance.
  *
+ * Additionally provides:
+ * - `matches` filter operator for postgraphile-plugin-connection-filter
+ * - `fullTextRank` computed fields on output types (null when no search active)
+ * - `FULL_TEXT_RANK_ASC/DESC` orderBy enum values
+ *
  * Uses the graphile-build hooks API to extend condition input types with
  * search fields for each tsvector column found on a table's codec.
  *
- * MIGRATION NOTE (V4 -> V5):
- * - V4 used `addArgDataGenerator` to inject WHERE and ORDER BY clauses.
- *   This API was removed in V5.
- * - V5 uses the `GraphQLInputObjectType_fields` hook with an `apply` function
- *   on condition fields, following the same pattern as PgConditionCustomFieldsPlugin
- *   in graphile-build-pg.
- * - ORDER BY ts_rank relevance is automatically injected via the condition's
- *   runtime `apply` function, matching the V4 behavior of
- *   `queryBuilder.orderBy()`.
+ * ARCHITECTURE NOTE:
+ * Condition field apply functions run during a deferred phase (SQL generation)
+ * on a queryBuilder proxy — NOT on the real PgSelectStep. The rank field plan
+ * runs earlier, during Grafast's planning phase, on the real PgSelectStep.
+ *
+ * To bridge these two phases we use a module-level WeakMap keyed by the SQL
+ * alias object (shared between proxy and PgSelectStep via reference identity).
+ *
+ * The rank field plan creates a `lambda` step that reads the row tuple at a
+ * dynamically-determined index. The condition apply adds `ts_rank(...)` to
+ * the SQL SELECT list via `proxy.selectAndReturnIndex()` and stores the
+ * resulting index in the WeakMap slot. At execution time the lambda reads
+ * the rank value from that index.
  */
 
 import 'graphile-build';
@@ -28,17 +37,49 @@ import type { SQL } from 'pg-sql2';
 import type { PgSearchPluginOptions } from './types';
 
 /**
+ * Module-level WeakMap keyed by SQL alias object (shared reference between
+ * the queryBuilder proxy and PgSelectStep via buildTheQueryCore).
+ *
+ * 1. Rank field plan (planning phase): initialises the slot keyed by alias.
+ * 2. OrderBy enum apply (planning phase): stores direction in PgSelectStep meta.
+ * 3. Condition apply (deferred/SQL-gen phase): adds ts_rank to the proxy's
+ *    select list via selectAndReturnIndex, stores the index in `indices`.
+ *    Also reads direction from meta and adds ORDER BY ts_rank.
+ * 4. Rank field lambda (execute phase): reads row[indices[field]] for the value.
+ */
+interface FtsRankSlot {
+  /** Map of fieldName → index into info.selects (set during condition apply) */
+  indices: Record<string, number>;
+}
+const ftsRankSlots = new WeakMap<object, FtsRankSlot>();
+
+function isTsvectorCodec(codec: any): boolean {
+  return (
+    codec?.extensions?.pg?.schemaName === 'pg_catalog' &&
+    codec?.extensions?.pg?.name === 'tsvector'
+  );
+}
+
+/**
+ * Navigates from a PgSelectSingleStep up to the PgSelectStep.
+ * Uses duck-typing to avoid dependency on exact class names across rc versions.
+ */
+function getPgSelectStep($someStep: any): any | null {
+  let $step = $someStep;
+
+  if ($step && typeof $step.getClassStep === 'function') {
+    $step = $step.getClassStep();
+  }
+
+  if ($step && typeof $step.orderBy === 'function' && $step.id !== undefined) {
+    return $step;
+  }
+
+  return null;
+}
+
+/**
  * Creates the search plugin with the given options.
- *
- * @param options - Plugin configuration
- * @returns GraphileConfig.Plugin
- *
- * @example
- * ```typescript
- * import { createPgSearchPlugin } from 'graphile-search-plugin';
- *
- * const plugin = createPgSearchPlugin({ pgSearchPrefix: 'fullText' });
- * ```
  */
 export function createPgSearchPlugin(
   options: PgSearchPluginOptions = {}
@@ -61,8 +102,7 @@ export function createPgSearchPlugin(
           } = build;
 
           // Register the `matches` filter operator for the FullText scalar.
-          // This requires postgraphile-plugin-connection-filter to be loaded.
-          // If it's not loaded, we skip gracefully.
+          // Requires postgraphile-plugin-connection-filter; skip if not loaded.
           const addConnectionFilterOperator = (build as any)
             .addConnectionFilterOperator;
           if (typeof addConnectionFilterOperator === 'function') {
@@ -70,13 +110,12 @@ export function createPgSearchPlugin(
             addConnectionFilterOperator(fullTextScalarName, 'matches', {
               description: 'Performs a full text search on the field.',
               resolveType: () => GraphQLString,
-              // The input is a plain text search string, not a tsvector value
               resolveInputCodec: TYPES ? () => TYPES.text : undefined,
               resolve(
                 sqlIdentifier: SQL,
                 sqlValue: SQL,
                 _input: unknown,
-                _parentStep: unknown,
+                _$where: any,
                 _details: { fieldName: string | null; operatorName: string }
               ) {
                 return sql`${sqlIdentifier} @@ to_tsquery(${sqlValue})`;
@@ -85,6 +124,143 @@ export function createPgSearchPlugin(
           }
 
           return _;
+        },
+
+        GraphQLObjectType_fields(fields, build, context) {
+          const {
+            sql,
+            inflection,
+            graphql: { GraphQLFloat },
+            grafast: { constant, lambda },
+          } = build;
+          const {
+            scope: { isPgClassType, pgCodec },
+            fieldWithHooks,
+          } = context;
+
+          if (!isPgClassType || !pgCodec?.attributes) {
+            return fields;
+          }
+
+          let newFields = fields;
+
+          for (const [attributeName, attribute] of Object.entries(
+            pgCodec.attributes as Record<string, any>
+          )) {
+            if (!isTsvectorCodec(attribute.codec)) continue;
+
+            const baseFieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
+            const fieldName = inflection.camelCase(`${baseFieldName}-rank`);
+
+            newFields = build.extend(
+              newFields,
+              {
+                [fieldName]: fieldWithHooks(
+                  { fieldName } as any,
+                  () => ({
+                    description: `Full-text search ranking when filtered by \`${baseFieldName}\`. Returns null when no search condition is active.`,
+                    type: GraphQLFloat,
+                    plan($step: any) {
+                      const $select = getPgSelectStep($step);
+                      if (!$select) return constant(null);
+
+                      if (typeof $select.setInliningForbidden === 'function') {
+                        $select.setInliningForbidden();
+                      }
+
+                      // Initialise the WeakMap slot for this query, keyed by the
+                      // SQL alias (same object ref on PgSelectStep and the proxy).
+                      const alias = $select.alias;
+                      if (!ftsRankSlots.has(alias)) {
+                        ftsRankSlots.set(alias, {
+                          indices: Object.create(null),
+                        });
+                      }
+
+                      // Return a lambda that reads the rank value from the result
+                      // row at a dynamically-determined index. The index is set
+                      // by the condition apply (deferred phase) via the proxy's
+                      // selectAndReturnIndex, and stored in the WeakMap slot.
+                      const capturedField = baseFieldName;
+                      const capturedAlias = alias;
+                      return lambda($step, (row: any) => {
+                        if (row == null) return null;
+                        const slot = ftsRankSlots.get(capturedAlias);
+                        if (!slot || slot.indices[capturedField] === undefined) return null;
+                        const rawValue = row[slot.indices[capturedField]];
+                        return rawValue == null ? null : parseFloat(rawValue);
+                      }, true);
+                    },
+                  })
+                ),
+              },
+              `PgSearchPlugin adding rank field '${fieldName}' for '${attributeName}' on '${pgCodec.name}'`
+            );
+          }
+
+          return newFields;
+        },
+
+        GraphQLEnumType_values(values, build, context) {
+          const {
+            sql,
+            inflection,
+          } = build;
+
+          const {
+            scope: { isPgRowSortEnum, pgCodec },
+          } = context;
+
+          if (!isPgRowSortEnum || !pgCodec?.attributes) {
+            return values;
+          }
+
+          let newValues = values;
+
+          for (const [attributeName, attribute] of Object.entries(
+            pgCodec.attributes as Record<string, any>
+          )) {
+            if (!isTsvectorCodec(attribute.codec)) continue;
+
+            const fieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
+            const metaKey = `fts_order_${fieldName}`;
+            const makePlan = (direction: 'ASC' | 'DESC') =>
+              (step: any) => {
+                // The enum apply runs during the PLANNING phase on PgSelectStep.
+                // Store the requested direction in PgSelectStep._meta so that
+                // the condition apply (deferred phase) can read it via the
+                // proxy's getMetaRaw and add the actual ORDER BY clause.
+                if (typeof step.setMeta === 'function') {
+                  step.setMeta(metaKey, direction);
+                }
+              };
+
+            const ascName = inflection.constantCase(`${attributeName}_rank_asc`);
+            const descName = inflection.constantCase(`${attributeName}_rank_desc`);
+
+            newValues = build.extend(
+              newValues,
+              {
+                [ascName]: {
+                  extensions: {
+                    grafast: {
+                      apply: makePlan('ASC'),
+                    },
+                  },
+                },
+                [descName]: {
+                  extensions: {
+                    grafast: {
+                      apply: makePlan('DESC'),
+                    },
+                  },
+                },
+              },
+              `PgSearchPlugin adding rank orderBy for '${attributeName}' on '${pgCodec.name}'`
+            );
+          }
+
+          return newValues;
         },
 
         GraphQLInputObjectType_fields(fields, build, context) {
@@ -98,7 +274,6 @@ export function createPgSearchPlugin(
             fieldWithHooks,
           } = context;
 
-          // Only operate on condition input types for codecs (tables) with attributes
           if (
             !isPgCondition ||
             !pgCodec ||
@@ -108,7 +283,6 @@ export function createPgSearchPlugin(
             return fields;
           }
 
-          // Find all tsvector attributes on the codec
           const tsvectorAttributes = Object.entries(
             pgCodec.attributes as Record<string, any>
           ).filter(
@@ -119,13 +293,13 @@ export function createPgSearchPlugin(
             return fields;
           }
 
-          // Add a search condition field for each tsvector column
           let newFields = fields;
 
           for (const [attributeName] of tsvectorAttributes) {
             const fieldName = inflection.camelCase(
               `${pgSearchPrefix}_${attributeName}`
             );
+            const baseFieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
 
             newFields = build.extend(
               newFields,
@@ -144,50 +318,43 @@ export function createPgSearchPlugin(
                     apply: function plan($condition: any, val: any) {
                       if (val == null) return;
                       const tsquery = sql`websearch_to_tsquery('english', ${sql.value(val)})`;
+                      const columnExpr = sql`${$condition.alias}.${sql.identifier(attributeName)}`;
+
                       // WHERE: column @@ tsquery
-                      $condition.where(
-                        sql`${$condition.alias}.${sql.identifier(
-                          attributeName
-                        )} @@ ${tsquery}`
-                      );
-                      // ORDER BY: ts_rank(column, tsquery) DESC — automatic relevance ordering like v4
-                      // The runtime queryBuilder's orderBy() appends to an internal
-                      // orders array that already contains the default ordering
-                      // (e.g. PRIMARY_KEY_ASC). To make relevance the primary sort,
-                      // we intercept the push to capture the orders array reference,
-                      // then unshift our entry to the front.
-                      // makeOrderUniqueIfPossible runs after all apply callbacks and
-                      // will re-add PK columns for cursor stability.
+                      $condition.where(sql`${columnExpr} @@ ${tsquery}`);
+
+                      // Add ts_rank to the SELECT list via the proxy's
+                      // selectAndReturnIndex. This runs during the deferred
+                      // SQL-generation phase, so the expression goes into
+                      // info.selects (the live array used for SQL generation).
                       const $parent = $condition.dangerouslyGetParent();
-                      const tsRankFragment = sql`ts_rank(${$condition.alias}.${sql.identifier(attributeName)}, ${tsquery})`;
-                      const orderSpec = {
-                        fragment: tsRankFragment,
+                      if (typeof $parent.selectAndReturnIndex === 'function') {
+                        const rankSql = sql`ts_rank(${columnExpr}, ${tsquery})`;
+                        const wrappedRankSql = sql`${sql.parens(rankSql)}::text`;
+                        const rankIndex = $parent.selectAndReturnIndex(wrappedRankSql);
+
+                        // Store the index in the alias-keyed WeakMap slot so
+                        // the rank field's lambda can read it at execute time.
+                        const slot = ftsRankSlots.get($condition.alias);
+                        if (slot) {
+                          slot.indices[baseFieldName] = rankIndex;
+                        }
+                      }
+
+                      // ORDER BY ts_rank: check if the user provided an
+                      // explicit rank orderBy enum (stored in meta during
+                      // planning). If so, use their direction. Otherwise add
+                      // automatic DESC ordering for relevance.
+                      const metaKey = `fts_order_${baseFieldName}`;
+                      const explicitDir = typeof $parent.getMetaRaw === 'function'
+                        ? $parent.getMetaRaw(metaKey)
+                        : undefined;
+                      const orderDirection = explicitDir ?? 'DESC';
+                      $parent.orderBy({
+                        fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
                         codec: TYPES.float4,
-                        direction: 'DESC' as const,
-                      };
-
-                      // Capture the internal orders array by briefly intercepting
-                      // Array.prototype.push during the synchronous orderBy() call.
-                      // runtimeScopedSQL passes plain objects through unchanged, so
-                      // the only push() that fires is on info.orders.
-                      let ordersArray: any[] | null = null;
-                      const origPush = Array.prototype.push;
-                      Array.prototype.push = function (...args: any[]) {
-                        ordersArray = this;
-                        return origPush.apply(this, args);
-                      };
-                      try {
-                        $parent.orderBy(orderSpec);
-                      } finally {
-                        Array.prototype.push = origPush;
-                      }
-
-                      // Move ts_rank from the end to the front so it becomes the
-                      // primary sort key instead of secondary.
-                      if (ordersArray && ordersArray.length > 1) {
-                        const item = ordersArray.pop();
-                        ordersArray.unshift(item);
-                      }
+                        direction: orderDirection,
+                      });
                     },
                   }
                 ),

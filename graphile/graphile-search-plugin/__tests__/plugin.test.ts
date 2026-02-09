@@ -74,7 +74,7 @@ describe('PgSearchPlugin', () => {
   });
 
   describe('condition-based search on tsv column', () => {
-    it('returns matching rows ordered by relevance (ts_rank DESC)', async () => {
+    it('returns matching rows with ts_rank as secondary sort', async () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {

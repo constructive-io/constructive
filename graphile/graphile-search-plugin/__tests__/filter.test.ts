@@ -128,9 +128,111 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     expect(bananaResult.data?.allJobs.nodes).toHaveLength(1);
   });
 
-  it.todo('querying rank without filter works (requires rank feature)');
+  it('querying rank without filter returns null', async () => {
+    const result = await query<{ allJobs: { nodes: any[] } }>({
+      query: `
+        query {
+          allJobs {
+            nodes {
+              id
+              name
+              fullTextRank
+            }
+          }
+        }
+      `,
+    });
 
-  it.todo('sort by full text rank field works (requires rank orderBy enums)');
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.allJobs.nodes).toHaveLength(2);
+    for (const node of result.data?.allJobs.nodes ?? []) {
+      expect(node.fullTextRank).toBeNull();
+    }
+  });
+
+  it('condition-based search populates fullTextRank', async () => {
+    // Rank features work with condition-based search.
+    // "fruit OR banana" — both rows match "fruit", one also matches "banana"
+    // (websearch_to_tsquery uses the word "or" for OR, not "|")
+    const result = await query<{ allJobs: { nodes: any[] } }>({
+      query: `
+        query {
+          allJobs(
+            condition: { fullTextFullText: "fruit or banana" }
+          ) {
+            nodes {
+              id
+              name
+              fullTextRank
+            }
+          }
+        }
+      `,
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.allJobs.nodes).toHaveLength(2);
+    for (const node of result.data?.allJobs.nodes ?? []) {
+      expect(node.fullTextRank).not.toBeNull();
+      expect(typeof node.fullTextRank).toBe('number');
+    }
+  });
+
+  it('sort by full text rank orderBy enums works', async () => {
+    // Use condition-based search so rank data is available.
+    // "fruit or banana" matches both rows with different ranks.
+    const ascResult = await query<{ allJobs: { nodes: any[] } }>({
+      query: `
+        query {
+          allJobs(
+            condition: { fullTextFullText: "fruit or banana" }
+            orderBy: [FULL_TEXT_RANK_ASC]
+          ) {
+            nodes {
+              id
+              name
+              fullTextRank
+            }
+          }
+        }
+      `,
+    });
+
+    expect(ascResult.errors).toBeUndefined();
+    expect(ascResult.data?.allJobs.nodes).toHaveLength(2);
+    for (const node of ascResult.data?.allJobs.nodes ?? []) {
+      expect(node.fullTextRank).not.toBeNull();
+      expect(typeof node.fullTextRank).toBe('number');
+    }
+
+    const descResult = await query<{ allJobs: { nodes: any[] } }>({
+      query: `
+        query {
+          allJobs(
+            condition: { fullTextFullText: "fruit or banana" }
+            orderBy: [FULL_TEXT_RANK_DESC]
+          ) {
+            nodes {
+              id
+              name
+              fullTextRank
+            }
+          }
+        }
+      `,
+    });
+
+    expect(descResult.errors).toBeUndefined();
+    expect(descResult.data?.allJobs.nodes).toHaveLength(2);
+    for (const node of descResult.data?.allJobs.nodes ?? []) {
+      expect(node.fullTextRank).not.toBeNull();
+    }
+
+    // ASC and DESC should produce different ordering
+    const ascNames = ascResult.data?.allJobs.nodes.map((n: any) => n.name);
+    const descNames = descResult.data?.allJobs.nodes.map((n: any) => n.name);
+    expect(ascNames).not.toEqual(descNames);
+  });
 
   it('FullText scalar type is correctly exposed in schema', async () => {
     const result = await query<{ __type: { name: string; kind: string } | null }>({
