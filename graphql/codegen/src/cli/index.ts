@@ -15,6 +15,8 @@ import {
   buildGenerateOptions,
   camelizeArgv,
   codegenQuestions,
+  hasResolvedCodegenSource,
+  normalizeCodegenListOptions,
   printResult,
   seedArgvFromConfig,
 } from './shared';
@@ -105,7 +107,9 @@ export const commands = async (
       }
 
       const cliOptions = buildDbConfig(
-        camelizeArgv(argv as Record<string, any>),
+        normalizeCodegenListOptions(
+          camelizeArgv(argv as Record<string, any>),
+        ),
       );
       let hasError = false;
       for (const name of names) {
@@ -127,7 +131,9 @@ export const commands = async (
   }
 
   const seeded = seedArgvFromConfig(argv, fileConfig);
-  const answers = await prompter.prompt(seeded, codegenQuestions);
+  const answers = hasResolvedCodegenSource(seeded)
+    ? seeded
+    : await prompter.prompt(seeded, codegenQuestions);
   const options = buildGenerateOptions(answers, fileConfig);
   const result = await generate(options);
   printResult(result);
@@ -147,15 +153,6 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
-    boolean: [
-      'help',
-      'version',
-      'verbose',
-      'dry-run',
-      'react-query',
-      'orm',
-      'keep-db',
-    ],
     string: [
       'config',
       'endpoint',

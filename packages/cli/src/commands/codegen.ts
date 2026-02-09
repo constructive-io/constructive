@@ -7,6 +7,7 @@ import {
   printResult,
   buildGenerateOptions,
   seedArgvFromConfig,
+  hasResolvedCodegenSource,
   type GraphQLSDKConfigTarget,
 } from '@constructive-io/graphql-codegen';
 
@@ -63,7 +64,9 @@ export default async (
   }
 
   const seeded = seedArgvFromConfig(argv as Record<string, unknown>, fileConfig);
-  const answers = await prompter.prompt(seeded, codegenQuestions);
+  const answers = hasResolvedCodegenSource(seeded)
+    ? seeded
+    : await prompter.prompt(seeded, codegenQuestions);
   const options = buildGenerateOptions(answers, fileConfig);
   const result = await generate(options);
   printResult(result);

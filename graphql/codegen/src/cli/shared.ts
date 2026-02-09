@@ -21,6 +21,25 @@ export const splitCommas = (
     .filter(Boolean);
 };
 
+function normalizeListOption(
+  input: unknown,
+): string[] | undefined {
+  if (Array.isArray(input)) {
+    return input
+      .flatMap((item) =>
+        typeof item === 'string' ? (splitCommas(item) ?? []) : [String(item)],
+      )
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof input === 'string') {
+    return splitCommas(input);
+  }
+
+  return undefined;
+}
+
 export interface CodegenAnswers {
   endpoint?: string;
   schemaFile?: string;
@@ -188,6 +207,41 @@ export function buildDbConfig(
   return rest;
 }
 
+/**
+ * Normalizes top-level list-like CLI options to string arrays.
+ * This keeps non-interactive paths equivalent to prompt sanitize behavior.
+ */
+export function normalizeCodegenListOptions(
+  options: Record<string, unknown>,
+): Record<string, unknown> {
+  return {
+    ...options,
+    schemas: normalizeListOption(options.schemas),
+    apiNames: normalizeListOption(options.apiNames),
+  };
+}
+
+/**
+ * Returns true when source options are already available, so prompting can be skipped.
+ */
+export function hasResolvedCodegenSource(
+  options: Record<string, unknown>,
+): boolean {
+  const normalized = normalizeCodegenListOptions(camelizeArgv(options));
+  const db = normalized.db as Record<string, unknown> | undefined;
+  const dbSchemas = normalizeListOption(db?.schemas);
+  const dbApiNames = normalizeListOption(db?.apiNames);
+
+  return Boolean(
+    normalized.endpoint ||
+      normalized.schemaFile ||
+      (normalized.schemas as string[] | undefined)?.length ||
+      (normalized.apiNames as string[] | undefined)?.length ||
+      dbSchemas?.length ||
+      dbApiNames?.length,
+  );
+}
+
 export function seedArgvFromConfig(
   argv: Record<string, unknown>,
   fileConfig: GraphQLSDKConfigTarget,
@@ -203,6 +257,7 @@ export function buildGenerateOptions(
   fileConfig: GraphQLSDKConfigTarget = {},
 ): GraphQLSDKConfigTarget {
   const camelized = camelizeArgv(answers);
-  const withDb = buildDbConfig(camelized);
+  const normalized = normalizeCodegenListOptions(camelized);
+  const withDb = buildDbConfig(normalized);
   return { ...fileConfig, ...withDb } as GraphQLSDKConfigTarget;
 }

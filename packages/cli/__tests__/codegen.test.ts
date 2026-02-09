@@ -39,10 +39,27 @@ jest.mock('@constructive-io/graphql-codegen', () => {
     }),
     camelizeArgv: jest.fn((argv: Record<string, any>) => argv),
     seedArgvFromConfig: jest.fn((argv: Record<string, unknown>, _fileConfig: any) => argv),
+    hasResolvedCodegenSource: jest.fn((argv: Record<string, unknown>) => {
+      const db = argv.db as Record<string, unknown> | undefined;
+      return Boolean(
+        argv.endpoint ||
+          argv['schema-file'] ||
+          argv.schemas ||
+          argv['api-names'] ||
+          db?.schemas ||
+          db?.apiNames
+      );
+    }),
     buildGenerateOptions: jest.fn((answers: Record<string, unknown>, _fileConfig: any) => {
       const { schemas, apiNames, ...rest } = answers;
+      const normalizedSchemas = Array.isArray(schemas)
+        ? schemas
+        : splitCommasMock(schemas as string | undefined);
+      const normalizedApiNames = Array.isArray(apiNames)
+        ? apiNames
+        : splitCommasMock(apiNames as string | undefined);
       if (schemas || apiNames) {
-        return { ...rest, db: { schemas, apiNames } };
+        return { ...rest, db: { schemas: normalizedSchemas, apiNames: normalizedApiNames } };
       }
       return rest;
     }),
@@ -101,6 +118,7 @@ describe('codegen command', () => {
 
     await codegenCommand(argv, mockPrompter as any, {} as any)
 
+    expect(mockPrompter.prompt).not.toHaveBeenCalled()
     expect(mockGenerate).toHaveBeenCalled()
     const call = mockGenerate.mock.calls[0][0]
     expect(call).toMatchObject({
@@ -125,6 +143,7 @@ describe('codegen command', () => {
 
     await codegenCommand(argv, mockPrompter as any, {} as any)
 
+    expect(mockPrompter.prompt).not.toHaveBeenCalled()
     expect(mockGenerate).toHaveBeenCalled()
     const call = mockGenerate.mock.calls[0][0]
     expect(call.db).toEqual({ schemas: ['public', 'app'], apiNames: undefined })
