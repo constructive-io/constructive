@@ -50,8 +50,12 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel with al
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
@@ -88,8 +92,12 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel without
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
@@ -123,8 +131,12 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel without
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
@@ -207,10 +219,10 @@ export function useLoginMutation<S extends LoginPayloadSelect>(params: {
 }, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
   login: InferSelectResult<LoginPayload, S>;
 }, Error, LoginVariables>;
-export function useLoginMutation(params?: {
+export function useLoginMutation(params: {
   selection: SelectionConfig<LoginPayloadSelect>;
 } & Omit<UseMutationOptions<any, Error, LoginVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<LoginPayloadSelect>(params?.selection);
+  const args = buildSelectionArgs<LoginPayloadSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -254,10 +266,10 @@ export function useRegisterMutation<S extends RegisterPayloadSelect>(params: {
 }, Error, RegisterVariables>, "mutationFn">): UseMutationResult<{
   register: InferSelectResult<RegisterPayload, S>;
 }, Error, RegisterVariables>;
-export function useRegisterMutation(params?: {
+export function useRegisterMutation(params: {
   selection: SelectionConfig<RegisterPayloadSelect>;
 } & Omit<UseMutationOptions<any, Error, RegisterVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<RegisterPayloadSelect>(params?.selection);
+  const args = buildSelectionArgs<RegisterPayloadSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -299,10 +311,10 @@ export function useLogoutMutation<S extends LogoutPayloadSelect>(params: {
 }, Error, void>, "mutationFn">): UseMutationResult<{
   logout: InferSelectResult<LogoutPayload, S>;
 }, Error, void>;
-export function useLogoutMutation(params?: {
+export function useLogoutMutation(params: {
   selection: SelectionConfig<LogoutPayloadSelect>;
 } & Omit<UseMutationOptions<any, Error, void>, "mutationFn">) {
-  const args = buildSelectionArgs<LogoutPayloadSelect>(params?.selection);
+  const args = buildSelectionArgs<LogoutPayloadSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -345,10 +357,10 @@ export function useLoginMutation<S extends LoginPayloadSelect>(params: {
 }, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
   login: InferSelectResult<LoginPayload, S>;
 }, Error, LoginVariables>;
-export function useLoginMutation(params?: {
+export function useLoginMutation(params: {
   selection: SelectionConfig<LoginPayloadSelect>;
 } & Omit<UseMutationOptions<any, Error, LoginVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<LoginPayloadSelect>(params?.selection);
+  const args = buildSelectionArgs<LoginPayloadSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -389,7 +401,7 @@ export const searchUsersQueryKey = customQueryKeys.searchUsers;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useSearchUsersQuery({ query, limit });
+ * const { data, isLoading } = useSearchUsersQuery({ variables: { query, limit }, selection: { fields: { id: true } } });
  * 
  * if (data?.searchUsers) {
  *   console.log(data.searchUsers);
@@ -410,8 +422,8 @@ export function useSearchUsersQuery(params: {
   variables: SearchUsersVariables;
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const variables = params?.variables;
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     variables: _variables,
     selection: _selection,
@@ -433,7 +445,7 @@ export function useSearchUsersQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchSearchUsersQuery({ query, limit });
+ * const data = await fetchSearchUsersQuery({ variables: { query, limit }, selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function fetchSearchUsersQuery<S extends UserSelect>(params: {
@@ -448,8 +460,8 @@ export async function fetchSearchUsersQuery(params: {
   variables: SearchUsersVariables;
   selection: SelectionConfig<UserSelect>;
 }) {
-  const variables = params?.variables;
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient().query.searchUsers(variables!, {
     select: args.select
   }).unwrap();
@@ -459,7 +471,7 @@ export async function fetchSearchUsersQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchSearchUsersQuery(queryClient, { query, limit });
+ * await prefetchSearchUsersQuery(queryClient, { variables: { query, limit }, selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchSearchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -471,9 +483,9 @@ export async function prefetchSearchUsersQuery<S extends UserSelect>(queryClient
 export async function prefetchSearchUsersQuery(queryClient: QueryClient, params: {
   variables: SearchUsersVariables;
   selection: SelectionConfig<UserSelect>;
-}): void {
-  const variables = params?.variables;
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+}): Promise<void> {
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: searchUsersQueryKey(variables),
     queryFn: () => getClient().query.searchUsers(variables!, {
@@ -507,7 +519,7 @@ export const currentUserQueryKey = customQueryKeys.currentUser;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useCurrentUserQuery();
+ * const { data, isLoading } = useCurrentUserQuery({ selection: { fields: { id: true } } });
  * 
  * if (data?.currentUser) {
  *   console.log(data.currentUser);
@@ -523,10 +535,10 @@ export function useCurrentUserQuery<S extends UserSelect, TData = {
 } & Omit<UseQueryOptions<{
   currentUser: InferSelectResult<User, S>;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCurrentUserQuery(params?: {
+export function useCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...queryOptions
@@ -545,7 +557,7 @@ export function useCurrentUserQuery(params?: {
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchCurrentUserQuery();
+ * const data = await fetchCurrentUserQuery({ selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
@@ -558,7 +570,7 @@ export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
 export async function fetchCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
 }) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient().query.currentUser({
     select: args.select
   }).unwrap();
@@ -568,7 +580,7 @@ export async function fetchCurrentUserQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchCurrentUserQuery(queryClient);
+ * await prefetchCurrentUserQuery(queryClient, { selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -578,8 +590,8 @@ export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient
 }): Promise<void>;
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
   selection: SelectionConfig<UserSelect>;
-}): void {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
     queryFn: () => getClient().query.currentUser({
@@ -612,7 +624,7 @@ export const currentUserQueryKey = () => ["currentUser"] as const;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useCurrentUserQuery();
+ * const { data, isLoading } = useCurrentUserQuery({ selection: { fields: { id: true } } });
  * 
  * if (data?.currentUser) {
  *   console.log(data.currentUser);
@@ -628,10 +640,10 @@ export function useCurrentUserQuery<S extends UserSelect, TData = {
 } & Omit<UseQueryOptions<{
   currentUser: InferSelectResult<User, S>;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
-export function useCurrentUserQuery(params?: {
+export function useCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...queryOptions
@@ -650,7 +662,7 @@ export function useCurrentUserQuery(params?: {
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchCurrentUserQuery();
+ * const data = await fetchCurrentUserQuery({ selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
@@ -663,7 +675,7 @@ export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
 export async function fetchCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
 }) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient().query.currentUser({
     select: args.select
   }).unwrap();
@@ -673,7 +685,7 @@ export async function fetchCurrentUserQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchCurrentUserQuery(queryClient);
+ * await prefetchCurrentUserQuery(queryClient, { selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -683,8 +695,8 @@ export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient
 }): Promise<void>;
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
   selection: SelectionConfig<UserSelect>;
-}): void {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
     queryFn: () => getClient().query.currentUser({
@@ -740,7 +752,7 @@ export function useCreateUserMutation<S extends UserSelect>(params: {
 export function useCreateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, CreateUserInput["user"]>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -809,7 +821,7 @@ export function useCreatePostMutation<S extends PostSelect>(params: {
 export function useCreatePostMutation(params: {
   selection: SelectionConfig<PostSelect>;
 } & Omit<UseMutationOptions<any, Error, CreatePostInput["post"]>, "mutationFn">) {
-  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -876,7 +888,7 @@ export function useCreateUserMutation<S extends UserSelect>(params: {
 export function useCreateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, CreateUserInput["user"]>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -945,36 +957,12 @@ export function useDeleteUserMutation<S extends UserSelect>(params: {
 }, Error, {
   id: string;
 }>;
-/**
- * Fire-and-forget mutation hook for deleting a User
- * Returns only clientMutationId (no entity data selected)
- * 
- * @example
- * \`\`\`tsx
- * const { mutate, isPending } = useDeleteUserMutation();
- * 
- * mutate({ id: 'value-to-delete' });
- * \`\`\`
- */
-export function useDeleteUserMutation(params?: Omit<UseMutationOptions<{
-  deleteUser: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteUser: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>;
 export function useDeleteUserMutation(params: {
-  selection?: SelectionConfig<UserSelect>;
+  selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1053,36 +1041,12 @@ export function useDeletePostMutation<S extends PostSelect>(params: {
 }, Error, {
   id: string;
 }>;
-/**
- * Fire-and-forget mutation hook for deleting a Post
- * Returns only clientMutationId (no entity data selected)
- * 
- * @example
- * \`\`\`tsx
- * const { mutate, isPending } = useDeletePostMutation();
- * 
- * mutate({ id: 'value-to-delete' });
- * \`\`\`
- */
-export function useDeletePostMutation(params?: Omit<UseMutationOptions<{
-  deletePost: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deletePost: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>;
 export function useDeletePostMutation(params: {
-  selection?: SelectionConfig<PostSelect>;
+  selection: SelectionConfig<PostSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1159,36 +1123,12 @@ export function useDeleteUserMutation<S extends UserSelect>(params: {
 }, Error, {
   id: string;
 }>;
-/**
- * Fire-and-forget mutation hook for deleting a User
- * Returns only clientMutationId (no entity data selected)
- * 
- * @example
- * \`\`\`tsx
- * const { mutate, isPending } = useDeleteUserMutation();
- * 
- * mutate({ id: 'value-to-delete' });
- * \`\`\`
- */
-export function useDeleteUserMutation(params?: Omit<UseMutationOptions<{
-  deleteUser: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>, "mutationFn">): UseMutationResult<{
-  deleteUser: {
-    clientMutationId: string;
-  };
-}, Error, {
-  id: string;
-}>;
 export function useDeleteUserMutation(params: {
-  selection?: SelectionConfig<UserSelect>;
+  selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1274,7 +1214,7 @@ export function useUpdateUserMutation(params: {
   id: string;
   patch: UserPatch;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1364,7 +1304,7 @@ export function useUpdatePostMutation(params: {
   id: string;
   patch: PostPatch;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<PostSelect>(params?.selection);
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1452,7 +1392,7 @@ export function useUpdateUserMutation(params: {
   id: string;
   patch: UserPatch;
 }>, "mutationFn">) {
-  const args = buildSelectionArgs<UserSelect>(params?.selection);
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -1532,8 +1472,7 @@ export function useUsersQuery<S extends UserSelect, TData = {
 export function useUsersQuery(params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const selection = params.selection;
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   const {
     selection: _selection,
     ...queryOptions
@@ -1541,10 +1480,7 @@ export function useUsersQuery(params: {
   void _selection;
   return useQuery({
     queryKey: userKeys.list(args),
-    queryFn: () => getClient().user.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap(),
+    queryFn: () => getClient().user.findMany(args).unwrap(),
     ...queryOptions
   });
 }
@@ -1571,18 +1507,15 @@ export async function fetchUsersQuery<S extends UserSelect>(params: {
 export async function fetchUsersQuery(params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
 }) {
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
-  return getClient().user.findMany({
-    ...(args ?? {}),
-    select: args.select
-  }).unwrap();
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  return getClient().user.findMany(args).unwrap();
 }
 /**
  * Prefetch User list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { selection: { first: 10 } });
+ * await prefetchUsersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
 export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -1592,14 +1525,11 @@ export async function prefetchUsersQuery<S extends UserSelect>(queryClient: Quer
 }): Promise<void>;
 export async function prefetchUsersQuery(queryClient: QueryClient, params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
-}): void {
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+}): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userKeys.list(args),
-    queryFn: () => getClient().user.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap()
+    queryFn: () => getClient().user.findMany(args).unwrap()
   });
 }
 "
@@ -1642,7 +1572,7 @@ export const postsQueryKey = postKeys.list;
  * @example With scope for hierarchical cache invalidation
  * \`\`\`tsx
  * const { data } = usePostsQuery({
- *   selection: { first: 10 },
+ *   selection: { fields: { id: true }, first: 10 },
  *   scope: { parentId: 'parent-id' },
  * });
  * \`\`\`
@@ -1663,8 +1593,7 @@ export function usePostsQuery(params: {
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn"> & {
   scope?: PostScope;
 }) {
-  const selection = params.selection;
-  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(selection);
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
   const {
     scope,
     selection: _selection,
@@ -1673,10 +1602,7 @@ export function usePostsQuery(params: {
   void _selection;
   return useQuery({
     queryKey: postKeys.list(args, scope),
-    queryFn: () => getClient().post.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap(),
+    queryFn: () => getClient().post.findMany(args).unwrap(),
     ...queryOptions
   });
 }
@@ -1703,18 +1629,15 @@ export async function fetchPostsQuery<S extends PostSelect>(params: {
 export async function fetchPostsQuery(params: {
   selection: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>;
 }) {
-  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(selection);
-  return getClient().post.findMany({
-    ...(args ?? {}),
-    select: args.select
-  }).unwrap();
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
+  return getClient().post.findMany(args).unwrap();
 }
 /**
  * Prefetch Post list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchPostsQuery(queryClient, { selection: { first: 10 } });
+ * await prefetchPostsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
 export async function prefetchPostsQuery<S extends PostSelect>(queryClient: QueryClient, params: {
@@ -1728,14 +1651,11 @@ export async function prefetchPostsQuery(queryClient: QueryClient, params: {
   selection: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>;
 } & {
   scope?: PostScope;
-}): void {
-  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(selection);
+}): Promise<void> {
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: postKeys.list(args, params?.scope),
-    queryFn: () => getClient().post.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap()
+    queryFn: () => getClient().post.findMany(args).unwrap()
   });
 }
 "
@@ -1784,8 +1704,7 @@ export function useUsersQuery<S extends UserSelect, TData = {
 export function useUsersQuery(params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
 } & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
-  const selection = params.selection;
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   const {
     selection: _selection,
     ...queryOptions
@@ -1793,10 +1712,7 @@ export function useUsersQuery(params: {
   void _selection;
   return useQuery({
     queryKey: usersQueryKey(args),
-    queryFn: () => getClient().user.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap(),
+    queryFn: () => getClient().user.findMany(args).unwrap(),
     ...queryOptions
   });
 }
@@ -1823,18 +1739,15 @@ export async function fetchUsersQuery<S extends UserSelect>(params: {
 export async function fetchUsersQuery(params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
 }) {
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
-  return getClient().user.findMany({
-    ...(args ?? {}),
-    select: args.select
-  }).unwrap();
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  return getClient().user.findMany(args).unwrap();
 }
 /**
  * Prefetch User list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { selection: { first: 10 } });
+ * await prefetchUsersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
 export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -1844,14 +1757,11 @@ export async function prefetchUsersQuery<S extends UserSelect>(queryClient: Quer
 }): Promise<void>;
 export async function prefetchUsersQuery(queryClient: QueryClient, params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
-}): void {
-  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(selection);
+}): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: usersQueryKey(args),
-    queryFn: () => getClient().user.findMany({
-      ...(args ?? {}),
-      select: args.select
-    }).unwrap()
+    queryFn: () => getClient().user.findMany(args).unwrap()
   });
 }
 "
@@ -1910,7 +1820,6 @@ export function useUserQuery(params: {
     queryKey: userKeys.detail(params.id),
     queryFn: () => getClient().user.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap(),
     ...queryOptions
@@ -1942,7 +1851,6 @@ export async function fetchUserQuery(params: {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient().user.findOne({
     id: params.id,
-    ...(args ?? {}),
     select: args.select
   }).unwrap();
 }
@@ -1951,7 +1859,7 @@ export async function fetchUserQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchUserQuery(queryClient, { id: 'some-id' });
+ * await prefetchUserQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -1963,13 +1871,12 @@ export async function prefetchUserQuery<S extends UserSelect>(queryClient: Query
 export async function prefetchUserQuery(queryClient: QueryClient, params: {
   id: string;
   selection: SelectionConfig<UserSelect>;
-}): void {
+}): Promise<void> {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userKeys.detail(params.id),
     queryFn: () => getClient().user.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap()
   });
@@ -2011,6 +1918,7 @@ export const postQueryKey = postKeys.detail;
  * \`\`\`tsx
  * const { data } = usePostQuery({
  *   id: 'some-id',
+ *   selection: { fields: { id: true } },
  *   scope: { parentId: 'parent-id' },
  * });
  * \`\`\`
@@ -2044,7 +1952,6 @@ export function usePostQuery(params: {
     queryKey: postKeys.detail(params.id, scope),
     queryFn: () => getClient().post.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap(),
     ...queryOptions
@@ -2076,7 +1983,6 @@ export async function fetchPostQuery(params: {
   const args = buildSelectionArgs<PostSelect>(params.selection);
   return getClient().post.findOne({
     id: params.id,
-    ...(args ?? {}),
     select: args.select
   }).unwrap();
 }
@@ -2085,7 +1991,7 @@ export async function fetchPostQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchPostQuery(queryClient, { id: 'some-id' });
+ * await prefetchPostQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchPostQuery<S extends PostSelect>(queryClient: QueryClient, params: {
@@ -2101,13 +2007,12 @@ export async function prefetchPostQuery(queryClient: QueryClient, params: {
   selection: SelectionConfig<PostSelect>;
 } & {
   scope?: PostScope;
-}): void {
+}): Promise<void> {
   const args = buildSelectionArgs<PostSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: postKeys.detail(params.id, params?.scope),
     queryFn: () => getClient().post.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap()
   });
@@ -2166,7 +2071,6 @@ export function useUserQuery(params: {
     queryKey: userQueryKey(params.id),
     queryFn: () => getClient().user.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap(),
     ...queryOptions
@@ -2198,7 +2102,6 @@ export async function fetchUserQuery(params: {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   return getClient().user.findOne({
     id: params.id,
-    ...(args ?? {}),
     select: args.select
   }).unwrap();
 }
@@ -2207,7 +2110,7 @@ export async function fetchUserQuery(params: {
  * 
  * @example
  * \`\`\`ts
- * await prefetchUserQuery(queryClient, { id: 'some-id' });
+ * await prefetchUserQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
 export async function prefetchUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
@@ -2219,13 +2122,12 @@ export async function prefetchUserQuery<S extends UserSelect>(queryClient: Query
 export async function prefetchUserQuery(queryClient: QueryClient, params: {
   id: string;
   selection: SelectionConfig<UserSelect>;
-}): void {
+}): Promise<void> {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: userQueryKey(params.id),
     queryFn: () => getClient().user.findOne({
       id: params.id,
-      ...(args ?? {}),
       select: args.select
     }).unwrap()
   });

@@ -662,25 +662,11 @@ export function getClientCustomCallUnwrap(
 // Select/args expression builders
 // ============================================================================
 
-export function buildSelectExpr(argsIdent: string): t.MemberExpression {
-  return t.memberExpression(t.identifier(argsIdent), t.identifier('select'));
-}
-
 export function buildFindManyCallExpr(
   singularName: string,
   argsIdent: string,
 ): t.CallExpression {
-  const spreadArgs = t.parenthesizedExpression(
-    t.logicalExpression('??', t.identifier(argsIdent), t.objectExpression([])),
-  );
-  return getClientCallUnwrap(
-    singularName,
-    'findMany',
-    t.objectExpression([
-      t.spreadElement(spreadArgs),
-      objectProp('select', buildSelectExpr(argsIdent)),
-    ]),
-  );
+  return getClientCallUnwrap(singularName, 'findMany', t.identifier(argsIdent));
 }
 
 export function buildFindOneCallExpr(
@@ -700,16 +686,10 @@ export function buildFindOneCallExpr(
           t.identifier(pkFieldName),
         ),
       ),
-      t.spreadElement(
-        t.parenthesizedExpression(
-          t.logicalExpression(
-            '??',
-            t.identifier(argsIdent),
-            t.objectExpression([]),
-          ),
-        ),
+      objectProp(
+        'select',
+        t.memberExpression(t.identifier(argsIdent), t.identifier('select')),
       ),
-      objectProp('select', buildSelectExpr(argsIdent)),
     ]),
   );
 }
@@ -794,12 +774,7 @@ export function buildSelectionArgsCall(
   selectTypeName: string,
 ): t.VariableDeclaration {
   const call = t.callExpression(t.identifier('buildSelectionArgs'), [
-    t.optionalMemberExpression(
-      t.identifier('params'),
-      t.identifier('selection'),
-      false,
-      true,
-    ),
+    t.memberExpression(t.identifier('params'), t.identifier('selection')),
   ]);
   // @ts-ignore - Babel types support typeParameters on CallExpression for TS
   call.typeParameters = t.tsTypeParameterInstantiation([
@@ -814,7 +789,7 @@ export function buildListSelectionArgsCall(
   orderByTypeName: string,
 ): t.VariableDeclaration {
   const call = t.callExpression(t.identifier('buildListSelectionArgs'), [
-    t.identifier('selection'),
+    t.memberExpression(t.identifier('params'), t.identifier('selection')),
   ]);
   // @ts-ignore - Babel types support typeParameters on CallExpression for TS
   call.typeParameters = t.tsTypeParameterInstantiation([

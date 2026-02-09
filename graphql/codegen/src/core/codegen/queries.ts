@@ -252,7 +252,7 @@ export function generateListQueryHook(
       docLines.push('@example With scope for hierarchical cache invalidation');
       docLines.push('```tsx');
       docLines.push(`const { data } = ${hookName}({`);
-      docLines.push('  selection: { first: 10 },');
+      docLines.push('  selection: { fields: { id: true }, first: 10 },');
       docLines.push("  scope: { parentId: 'parent-id' },");
       docLines.push('});');
       docLines.push('```');
@@ -308,12 +308,6 @@ export function generateListQueryHook(
     ]);
 
     const body: t.Statement[] = [];
-    body.push(
-      constDecl(
-        'selection',
-        t.memberExpression(t.identifier('params'), t.identifier('selection')),
-      ),
-    );
     body.push(
       buildListSelectionArgsCall(
         selectTypeName,
@@ -393,16 +387,18 @@ export function generateListQueryHook(
     statements.push(f1Decl);
 
     // Implementation
-    const fImplSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(
-        listSelectionConfigType(
-          typeRef(selectTypeName),
-          filterTypeName,
-          orderByTypeName,
+    const fImplParamType = t.tsTypeLiteral([
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(
+          listSelectionConfigType(
+            typeRef(selectTypeName),
+            filterTypeName,
+            orderByTypeName,
+          ),
         ),
       ),
-    );
+    ]);
     const fBody: t.Statement[] = [];
     fBody.push(
       buildListSelectionArgsCall(
@@ -416,7 +412,7 @@ export function generateListQueryHook(
       exportAsyncFunction(
         fetchFnName,
         null,
-        [createFunctionParam('params', t.tsTypeLiteral([fImplSelProp]))],
+        [createFunctionParam('params', fImplParamType)],
         fBody,
       ),
     );
@@ -461,30 +457,41 @@ export function generateListQueryHook(
       '',
       '@example',
       '```ts',
-      `await ${prefetchFnName}(queryClient, { selection: { first: 10 } });`,
+      `await ${prefetchFnName}(queryClient, { selection: { fields: { id: true }, first: 10 } });`,
       '```',
     ]);
     statements.push(p1Decl);
 
     // Implementation
-    const pImplSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(
-        listSelectionConfigType(
-          typeRef(selectTypeName),
-          filterTypeName,
-          orderByTypeName,
-        ),
-      ),
-    );
     const pImplParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral([pImplSelProp]),
+            t.tsTypeLiteral([
+              t.tsPropertySignature(
+                t.identifier('selection'),
+                t.tsTypeAnnotation(
+                  listSelectionConfigType(
+                    typeRef(selectTypeName),
+                    filterTypeName,
+                    orderByTypeName,
+                  ),
+                ),
+              ),
+            ]),
             scopeTypeLiteral(scopeTypeName),
           ])
-        : t.tsTypeLiteral([pImplSelProp]);
-
+        : t.tsTypeLiteral([
+            t.tsPropertySignature(
+              t.identifier('selection'),
+              t.tsTypeAnnotation(
+                listSelectionConfigType(
+                  typeRef(selectTypeName),
+                  filterTypeName,
+                  orderByTypeName,
+                ),
+              ),
+            ),
+          ]);
     const pBody: t.Statement[] = [];
     pBody.push(
       buildListSelectionArgsCall(
@@ -530,7 +537,7 @@ export function generateListQueryHook(
           createFunctionParam('params', pImplParamType),
         ],
         pBody,
-        t.tsVoidKeyword(),
+        typeRef('Promise', [t.tsVoidKeyword()]),
       ),
     );
   }
@@ -720,6 +727,7 @@ export function generateSingleQueryHook(
       docLines.push('```tsx');
       docLines.push(`const { data } = ${hookName}({`);
       docLines.push(`  ${pkFieldName}: 'some-id',`);
+      docLines.push('  selection: { fields: { id: true } },');
       docLines.push("  scope: { parentId: 'parent-id' },");
       docLines.push('});');
       docLines.push('```');
@@ -750,16 +758,15 @@ export function generateSingleQueryHook(
     statements.push(o1);
 
     // Implementation
-    const implSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
-    );
     const implProps = [
       t.tsPropertySignature(
         t.identifier(pkFieldName),
         t.tsTypeAnnotation(pkTsType),
       ),
-      implSelProp,
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
+      ),
     ];
     const implOptionsType = (() => {
       const base = useQueryOptionsImplType();
@@ -774,15 +781,7 @@ export function generateSingleQueryHook(
     ]);
 
     const body: t.Statement[] = [];
-    // const args = buildSelectionArgs<SelectType>(params.selection);
-    const argsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection')),
-    ]);
-    // @ts-ignore
-    argsCall.typeParameters = t.tsTypeParameterInstantiation([
-      typeRef(selectTypeName),
-    ]);
-    body.push(constDecl('args', argsCall));
+    body.push(buildSelectionArgsCall(selectTypeName));
 
     const pkMemberExpr = t.memberExpression(
       t.identifier('params'),
@@ -853,31 +852,23 @@ export function generateSingleQueryHook(
     statements.push(f1Decl);
 
     // Implementation
-    const fImplSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
+    const fBody: t.Statement[] = [];
+    fBody.push(buildSelectionArgsCall(selectTypeName));
+    fBody.push(
+      t.returnStatement(
+        buildFindOneCallExpr(singularName, pkFieldName, 'args'),
+      ),
     );
     const fImplProps = [
       t.tsPropertySignature(
         t.identifier(pkFieldName),
         t.tsTypeAnnotation(pkTsType),
       ),
-      fImplSelProp,
-    ];
-    const fBody: t.Statement[] = [];
-    const fArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection')),
-    ]);
-    // @ts-ignore
-    fArgsCall.typeParameters = t.tsTypeParameterInstantiation([
-      typeRef(selectTypeName),
-    ]);
-    fBody.push(constDecl('args', fArgsCall));
-    fBody.push(
-      t.returnStatement(
-        buildFindOneCallExpr(singularName, pkFieldName, 'args'),
+      t.tsPropertySignature(
+        t.identifier('selection'),
+        t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
       ),
-    );
+    ];
     statements.push(
       exportAsyncFunction(
         fetchFnName,
@@ -924,40 +915,39 @@ export function generateSingleQueryHook(
       '',
       '@example',
       '```ts',
-      `await ${prefetchFnName}(queryClient, { ${pkFieldName}: 'some-id' });`,
+      `await ${prefetchFnName}(queryClient, { ${pkFieldName}: 'some-id', selection: { fields: { id: true } } });`,
       '```',
     ]);
     statements.push(p1Decl);
 
     // Implementation
-    const pImplSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
-    );
-    const pImplProps: t.TSPropertySignature[] = [
-      t.tsPropertySignature(
-        t.identifier(pkFieldName),
-        t.tsTypeAnnotation(pkTsType),
-      ),
-      pImplSelProp,
-    ];
     const pImplParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral(pImplProps),
+            t.tsTypeLiteral([
+              t.tsPropertySignature(
+                t.identifier(pkFieldName),
+                t.tsTypeAnnotation(pkTsType),
+              ),
+              t.tsPropertySignature(
+                t.identifier('selection'),
+                t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
+              ),
+            ]),
             scopeTypeLiteral(scopeTypeName),
           ])
-        : t.tsTypeLiteral(pImplProps);
-
+        : t.tsTypeLiteral([
+            t.tsPropertySignature(
+              t.identifier(pkFieldName),
+              t.tsTypeAnnotation(pkTsType),
+            ),
+            t.tsPropertySignature(
+              t.identifier('selection'),
+              t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
+            ),
+          ]);
     const pBody: t.Statement[] = [];
-    const pArgsCall = t.callExpression(t.identifier('buildSelectionArgs'), [
-      t.memberExpression(t.identifier('params'), t.identifier('selection')),
-    ]);
-    // @ts-ignore
-    pArgsCall.typeParameters = t.tsTypeParameterInstantiation([
-      typeRef(selectTypeName),
-    ]);
-    pBody.push(constDecl('args', pArgsCall));
+    pBody.push(buildSelectionArgsCall(selectTypeName));
 
     const queryKeyExpr =
       hasRelationships && useCentralizedKeys
@@ -1003,7 +993,7 @@ export function generateSingleQueryHook(
           createFunctionParam('params', pImplParamType),
         ],
         pBody,
-        t.tsVoidKeyword(),
+        typeRef('Promise', [t.tsVoidKeyword()]),
       ),
     );
   }

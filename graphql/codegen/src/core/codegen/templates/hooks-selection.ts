@@ -10,7 +10,7 @@
  */
 
 export interface SelectionConfig<TFields> {
-  fields?: TFields;
+  fields: TFields;
 }
 
 export interface ListSelectionConfig<
@@ -28,47 +28,23 @@ export interface ListSelectionConfig<
 }
 
 export function buildSelectionArgs<TFields>(
-  selection?: SelectionConfig<TFields>,
-): { select?: TFields } | undefined {
-  if (!selection || selection.fields === undefined) {
-    return undefined;
-  }
-
+  selection: SelectionConfig<TFields>,
+): { select: TFields } {
   return { select: selection.fields };
 }
 
 export function buildListSelectionArgs<TFields, TWhere, TOrderBy>(
-  selection?: ListSelectionConfig<TFields, TWhere, TOrderBy>,
-):
-  | {
-      select?: TFields;
-      where?: TWhere;
-      orderBy?: TOrderBy[];
-      first?: number;
-      last?: number;
-      after?: string;
-      before?: string;
-      offset?: number;
-    }
-  | undefined {
-  if (!selection) {
-    return undefined;
-  }
-
-  const hasAnyValues =
-    selection.fields !== undefined ||
-    selection.where !== undefined ||
-    selection.orderBy !== undefined ||
-    selection.first !== undefined ||
-    selection.last !== undefined ||
-    selection.after !== undefined ||
-    selection.before !== undefined ||
-    selection.offset !== undefined;
-
-  if (!hasAnyValues) {
-    return undefined;
-  }
-
+  selection: ListSelectionConfig<TFields, TWhere, TOrderBy>,
+): {
+  select: TFields;
+  where?: TWhere;
+  orderBy?: TOrderBy[];
+  first?: number;
+  last?: number;
+  after?: string;
+  before?: string;
+  offset?: number;
+} {
   return {
     select: selection.fields,
     where: selection.where,

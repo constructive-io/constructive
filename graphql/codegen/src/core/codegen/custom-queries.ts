@@ -268,8 +268,12 @@ export function generateCustomQueryHook(
       operation.description || `Query hook for ${operation.name}`;
     const argNames = operation.args.map((a) => a.name).join(', ');
     const exampleCall = hasArgs
-      ? `${hookName}({ ${argNames} })`
-      : `${hookName}()`;
+      ? hasSelect
+        ? `${hookName}({ variables: { ${argNames} }, selection: { fields: { id: true } } })`
+        : `${hookName}({ variables: { ${argNames} } })`
+      : hasSelect
+        ? `${hookName}({ selection: { fields: { id: true } } })`
+        : `${hookName}()`;
 
     if (hasSelect) {
       // Overload 1: with selection.fields
@@ -344,7 +348,7 @@ export function generateCustomQueryHook(
       const implParam = createFunctionParam(
         'params',
         implParamType,
-        !hasRequiredArgs,
+        false,
       );
 
       const body: t.Statement[] = [];
@@ -352,12 +356,16 @@ export function generateCustomQueryHook(
         body.push(
           constDecl(
             'variables',
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('variables'),
-              false,
-              true,
-            ),
+            hasRequiredArgs
+              ? t.memberExpression(
+                  t.identifier('params'),
+                  t.identifier('variables'),
+                )
+              : t.logicalExpression(
+                  '??',
+                  t.memberExpression(t.identifier('params'), t.identifier('variables')),
+                  t.objectExpression([]),
+                ),
           ),
         );
       }
@@ -398,7 +406,7 @@ export function generateCustomQueryHook(
         body.push(voidStatement('_selection'));
       }
 
-      const selectObj = t.objectExpression([
+      const selectArgExpr = t.objectExpression([
         objectProp(
           'select',
           t.memberExpression(t.identifier('args'), t.identifier('select')),
@@ -409,9 +417,9 @@ export function generateCustomQueryHook(
             hasRequiredArgs
               ? t.tsNonNullExpression(t.identifier('variables'))
               : t.identifier('variables'),
-            selectObj,
+            selectArgExpr,
           ]
-        : [selectObj];
+        : [selectArgExpr];
       const queryFnExpr = t.arrowFunctionExpression(
         [],
         getClientCustomCallUnwrap(
@@ -511,12 +519,23 @@ export function generateCustomQueryHook(
         body.push(
           constDecl(
             'variables',
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('variables'),
-              false,
-              true,
-            ),
+            hasRequiredArgs
+              ? t.optionalMemberExpression(
+                  t.identifier('params'),
+                  t.identifier('variables'),
+                  false,
+                  true,
+                )
+              : t.logicalExpression(
+                  '??',
+                  t.optionalMemberExpression(
+                    t.identifier('params'),
+                    t.identifier('variables'),
+                    false,
+                    true,
+                  ),
+                  t.objectExpression([]),
+                ),
           ),
         );
         const destructPattern = t.objectPattern([
@@ -604,7 +623,7 @@ export function generateCustomQueryHook(
       statements.push(
         exportFunction(
           hookName,
-          null,
+          createTDataTypeParam(resultTypeLiteral),
           [implParam],
           body,
           typeRef('UseQueryResult', [typeRef('TData')]),
@@ -617,8 +636,12 @@ export function generateCustomQueryHook(
   const fetchFnName = `fetch${ucFirst(operation.name)}Query`;
   const fetchArgNames = operation.args.map((a) => a.name).join(', ');
   const fetchExampleCall = hasArgs
-    ? `${fetchFnName}({ ${fetchArgNames} })`
-    : `${fetchFnName}()`;
+    ? hasSelect
+      ? `${fetchFnName}({ variables: { ${fetchArgNames} }, selection: { fields: { id: true } } })`
+      : `${fetchFnName}({ variables: { ${fetchArgNames} } })`
+    : hasSelect
+      ? `${fetchFnName}({ selection: { fields: { id: true } } })`
+      : `${fetchFnName}()`;
 
   if (hasSelect) {
     // Overload 1: with fields
@@ -677,17 +700,18 @@ export function generateCustomQueryHook(
       fBody.push(
         constDecl(
           'variables',
-          t.optionalMemberExpression(
-            t.identifier('params'),
-            t.identifier('variables'),
-            false,
-            true,
-          ),
+          hasRequiredArgs
+            ? t.memberExpression(t.identifier('params'), t.identifier('variables'))
+            : t.logicalExpression(
+                '??',
+                t.memberExpression(t.identifier('params'), t.identifier('variables')),
+                t.objectExpression([]),
+              ),
         ),
       );
     }
     fBody.push(buildSelectionArgsCall(selectTypeName!));
-    const selectObj = t.objectExpression([
+    const selectArgExpr = t.objectExpression([
       objectProp(
         'select',
         t.memberExpression(t.identifier('args'), t.identifier('select')),
@@ -698,9 +722,9 @@ export function generateCustomQueryHook(
           hasRequiredArgs
             ? t.tsNonNullExpression(t.identifier('variables'))
             : t.identifier('variables'),
-          selectObj,
+          selectArgExpr,
         ]
-      : [selectObj];
+      : [selectArgExpr];
     fBody.push(
       t.returnStatement(
         getClientCustomCallUnwrap(
@@ -714,7 +738,13 @@ export function generateCustomQueryHook(
       exportAsyncFunction(
         fetchFnName,
         null,
-        [createFunctionParam('params', t.tsTypeLiteral(fImplProps))],
+        [
+          createFunctionParam(
+            'params',
+            t.tsTypeLiteral(fImplProps),
+            false,
+          ),
+        ],
         fBody,
       ),
     );
@@ -731,12 +761,23 @@ export function generateCustomQueryHook(
       fBody.push(
         constDecl(
           'variables',
-          t.optionalMemberExpression(
-            t.identifier('params'),
-            t.identifier('variables'),
-            false,
-            true,
-          ),
+          hasRequiredArgs
+            ? t.optionalMemberExpression(
+                t.identifier('params'),
+                t.identifier('variables'),
+                false,
+                true,
+              )
+            : t.logicalExpression(
+                '??',
+                t.optionalMemberExpression(
+                  t.identifier('params'),
+                  t.identifier('variables'),
+                  false,
+                  true,
+                ),
+                t.objectExpression([]),
+              ),
         ),
       );
       const fCallArgs = hasRequiredArgs
@@ -796,8 +837,12 @@ export function generateCustomQueryHook(
     const prefetchFnName = `prefetch${ucFirst(operation.name)}Query`;
     const prefetchArgNames = operation.args.map((a) => a.name).join(', ');
     const prefetchExampleCall = hasArgs
-      ? `${prefetchFnName}(queryClient, { ${prefetchArgNames} })`
-      : `${prefetchFnName}(queryClient)`;
+      ? hasSelect
+        ? `${prefetchFnName}(queryClient, { variables: { ${prefetchArgNames} }, selection: { fields: { id: true } } })`
+        : `${prefetchFnName}(queryClient, { variables: { ${prefetchArgNames} } })`
+      : hasSelect
+        ? `${prefetchFnName}(queryClient, { selection: { fields: { id: true } } })`
+        : `${prefetchFnName}(queryClient)`;
 
     if (hasSelect) {
       // Overload 1: with fields
@@ -859,17 +904,21 @@ export function generateCustomQueryHook(
         pBody.push(
           constDecl(
             'variables',
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('variables'),
-              false,
-              true,
-            ),
+            hasRequiredArgs
+              ? t.memberExpression(
+                  t.identifier('params'),
+                  t.identifier('variables'),
+                )
+              : t.logicalExpression(
+                  '??',
+                  t.memberExpression(t.identifier('params'), t.identifier('variables')),
+                  t.objectExpression([]),
+                ),
           ),
         );
       }
       pBody.push(buildSelectionArgsCall(selectTypeName!));
-      const selectObj = t.objectExpression([
+      const selectArgExpr = t.objectExpression([
         objectProp(
           'select',
           t.memberExpression(t.identifier('args'), t.identifier('select')),
@@ -880,9 +929,9 @@ export function generateCustomQueryHook(
             hasRequiredArgs
               ? t.tsNonNullExpression(t.identifier('variables'))
               : t.identifier('variables'),
-            selectObj,
+            selectArgExpr,
           ]
-        : [selectObj];
+        : [selectArgExpr];
       const prefetchQueryCall = callExpr(
         t.memberExpression(
           t.identifier('queryClient'),
@@ -912,10 +961,14 @@ export function generateCustomQueryHook(
           null,
           [
             createFunctionParam('queryClient', typeRef('QueryClient')),
-            createFunctionParam('params', t.tsTypeLiteral(pImplProps)),
+            createFunctionParam(
+              'params',
+              t.tsTypeLiteral(pImplProps),
+              false,
+            ),
           ],
           pBody,
-          t.tsVoidKeyword(),
+          typeRef('Promise', [t.tsVoidKeyword()]),
         ),
       );
     } else {
@@ -943,12 +996,23 @@ export function generateCustomQueryHook(
         pBody.push(
           constDecl(
             'variables',
-            t.optionalMemberExpression(
-              t.identifier('params'),
-              t.identifier('variables'),
-              false,
-              true,
-            ),
+            hasRequiredArgs
+              ? t.optionalMemberExpression(
+                  t.identifier('params'),
+                  t.identifier('variables'),
+                  false,
+                  true,
+                )
+              : t.logicalExpression(
+                  '??',
+                  t.optionalMemberExpression(
+                    t.identifier('params'),
+                    t.identifier('variables'),
+                    false,
+                    true,
+                  ),
+                  t.objectExpression([]),
+                ),
           ),
         );
         const pCallArgs = hasRequiredArgs
@@ -1004,7 +1068,7 @@ export function generateCustomQueryHook(
         null,
         pParams,
         pBody,
-        t.tsVoidKeyword(),
+        typeRef('Promise', [t.tsVoidKeyword()]),
       );
       addJSDocComment(pDecl, [
         `Prefetch ${operation.name} for SSR or cache warming`,

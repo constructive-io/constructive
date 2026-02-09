@@ -659,20 +659,6 @@ export function generateDeleteMutationHook(
   const resultType = (sel: t.TSType) =>
     buildMutationResultType(mutationName, singularName, relationTypeName, sel);
 
-  const clientMutationIdResultType = t.tsTypeLiteral([
-    t.tsPropertySignature(
-      t.identifier(mutationName),
-      t.tsTypeAnnotation(
-        t.tsTypeLiteral([
-          t.tsPropertySignature(
-            t.identifier('clientMutationId'),
-            t.tsTypeAnnotation(t.tsStringKeyword()),
-          ),
-        ]),
-      ),
-    ),
-  ]);
-
   // Overload 1: with fields
   const o1ParamType = t.tsIntersectionType([
     t.tsTypeLiteral([
@@ -703,36 +689,11 @@ export function generateDeleteMutationHook(
   ]);
   statements.push(o1);
 
-  // Overload 2: fire-and-forget (no selection, returns clientMutationId only)
-  const o2ParamType = useMutationOptionsType(
-    clientMutationIdResultType,
-    deleteVarType,
-  );
-  const o2 = exportDeclareFunction(
-    hookName,
-    null,
-    [createFunctionParam('params', o2ParamType, true)],
-    useMutationResultType(clientMutationIdResultType, deleteVarType),
-  );
-  addJSDocComment(o2, [
-    `Fire-and-forget mutation hook for deleting a ${typeName}`,
-    'Returns only clientMutationId (no entity data selected)',
-    '',
-    '@example',
-    '```tsx',
-    `const { mutate, isPending } = ${hookName}();`,
-    '',
-    `mutate({ ${pkField.name}: ${pkField.tsType === 'string' ? "'value-to-delete'" : '123'} });`,
-    '```',
-  ]);
-  statements.push(o2);
-
   // Implementation
   const implSelProp = t.tsPropertySignature(
     t.identifier('selection'),
     t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName))),
   );
-  implSelProp.optional = true;
   const implParamType = t.tsIntersectionType([
     t.tsTypeLiteral([implSelProp]),
     omitType(

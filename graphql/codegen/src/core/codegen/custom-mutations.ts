@@ -260,7 +260,7 @@ function generateCustomMutationHookInternal(
         )
       : undefined;
 
-    const selectObj = t.objectExpression([
+    const selectArgExpr = t.objectExpression([
       objectProp(
         'select',
         t.memberExpression(t.identifier('args'), t.identifier('select')),
@@ -279,13 +279,18 @@ function generateCustomMutationHookInternal(
           'mutation',
           operation.name,
           [t.identifier('variables')],
-          selectObj,
+          selectArgExpr,
         ),
       );
     } else {
       mutationFnExpr = t.arrowFunctionExpression(
         [],
-        getClientCustomCallUnwrap('mutation', operation.name, [], selectObj),
+        getClientCustomCallUnwrap(
+          'mutation',
+          operation.name,
+          [],
+          selectArgExpr,
+        ),
       );
     }
 
@@ -301,7 +306,7 @@ function generateCustomMutationHookInternal(
       exportFunction(
         hookName,
         null,
-        [createFunctionParam('params', implParamType, true)],
+        [createFunctionParam('params', implParamType)],
         body,
       ),
     );
