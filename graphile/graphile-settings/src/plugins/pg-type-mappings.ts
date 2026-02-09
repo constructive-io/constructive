@@ -1,5 +1,5 @@
 import type { GraphileConfig } from 'graphile-config';
-import { GraphQLString } from 'grafast/graphql';
+import { GraphQLString } from 'graphql';
 import sql from 'pg-sql2';
 
 /**

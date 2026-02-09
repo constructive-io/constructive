@@ -19,23 +19,6 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "exports": {
-    ".": {
-      "import": "./esm/index.js",
-      "require": "./index.js",
-      "types": "./index.d.ts"
-    },
-    "./types": {
-      "import": "./esm/types/index.js",
-      "require": "./types/index.js",
-      "types": "./types/index.d.ts"
-    },
-    "./evaluators": {
-      "import": "./esm/evaluators/index.js",
-      "require": "./evaluators/index.js",
-      "types": "./evaluators/index.d.ts"
-    }
-  },
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",

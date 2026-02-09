@@ -17,7 +17,7 @@ import {
   GraphQLFloat,
   GraphQLEnumType,
   GraphQLBoolean,
-} from 'grafast/graphql';
+} from 'graphql';
 import { lambda, context as grafastContext, object, type Step } from 'grafast';
 import type { PgVectorPluginOptions, VectorCollectionConfig, VectorMetric } from './types';
 import {
