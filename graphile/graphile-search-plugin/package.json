@@ -44,6 +44,7 @@
     "@types/node": "^22.19.1",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {
@@ -55,6 +56,12 @@
   },
   "peerDependencies": {
     "graphql": "^16.9.0",
-    "postgraphile": "^5.0.0-rc.4"
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "postgraphile-plugin-connection-filter": {
+      "optional": true
+    }
   }
 }

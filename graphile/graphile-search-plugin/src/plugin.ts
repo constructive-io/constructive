@@ -24,6 +24,7 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
+import type { SQL } from 'pg-sql2';
 import type { PgSearchPluginOptions } from './types';
 
 /**
@@ -42,17 +43,50 @@ import type { PgSearchPluginOptions } from './types';
 export function createPgSearchPlugin(
   options: PgSearchPluginOptions = {}
 ): GraphileConfig.Plugin {
-  const { pgSearchPrefix = 'tsv' } = options;
+  const { pgSearchPrefix = 'tsv', fullTextScalarName = 'FullText' } = options;
 
   return {
     name: 'PgSearchPlugin',
     version: '2.0.0',
     description:
       'Generates search conditions for tsvector columns in PostGraphile v5',
-    after: ['PgAttributesPlugin'],
+    after: ['PgAttributesPlugin', 'PgConnectionArgFilterPlugin', 'PgConnectionArgFilterOperatorsPlugin', 'AddConnectionFilterOperatorPlugin'],
 
     schema: {
       hooks: {
+        init(_, build) {
+          const {
+            sql,
+            graphql: { GraphQLString },
+          } = build;
+
+          // Register the `matches` filter operator for the FullText scalar.
+          // This requires postgraphile-plugin-connection-filter to be loaded.
+          // If it's not loaded, we skip gracefully.
+          const addConnectionFilterOperator = (build as any)
+            .addConnectionFilterOperator;
+          if (typeof addConnectionFilterOperator === 'function') {
+            const TYPES = (build as any).dataplanPg?.TYPES;
+            addConnectionFilterOperator(fullTextScalarName, 'matches', {
+              description: 'Performs a full text search on the field.',
+              resolveType: () => GraphQLString,
+              // The input is a plain text search string, not a tsvector value
+              resolveInputCodec: TYPES ? () => TYPES.text : undefined,
+              resolve(
+                sqlIdentifier: SQL,
+                sqlValue: SQL,
+                _input: unknown,
+                _parentStep: unknown,
+                _details: { fieldName: string | null; operatorName: string }
+              ) {
+                return sql`${sqlIdentifier} @@ to_tsquery(${sqlValue})`;
+              },
+            });
+          }
+
+          return _;
+        },
+
         GraphQLInputObjectType_fields(fields, build, context) {
           const {
             inflection,

@@ -252,6 +252,9 @@ importers:
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
+      postgraphile-plugin-connection-filter:
+        specifier: ^3.0.0-rc.1
+        version: 3.0.0-rc.1
     publishDirectory: dist
 
   graphile/graphile-settings:

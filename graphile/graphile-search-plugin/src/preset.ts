@@ -7,7 +7,7 @@
 import type { GraphileConfig } from 'graphile-config';
 import type { PgSearchPluginOptions } from './types';
 import { createPgSearchPlugin } from './plugin';
-import { TsvectorCodecPlugin } from './tsvector-codec';
+import { createTsvectorCodecPlugin } from './tsvector-codec';
 
 /**
  * Creates a preset that includes the search plugin with the given options.
@@ -29,7 +29,7 @@ export function PgSearchPreset(
   options: PgSearchPluginOptions = {}
 ): GraphileConfig.Preset {
   return {
-    plugins: [TsvectorCodecPlugin, createPgSearchPlugin(options)],
+    plugins: [createTsvectorCodecPlugin(options), createPgSearchPlugin(options)],
   };
 }
 
