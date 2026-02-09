@@ -17,6 +17,7 @@ export type { GeneratedFile };
 export interface WriteResult {
   success: boolean;
   filesWritten?: string[];
+  filesRemoved?: string[];
   errors?: string[];
 }
 
@@ -28,6 +29,8 @@ export interface WriteOptions {
   showProgress?: boolean;
   /** Format files with oxfmt after writing (default: true) */
   formatFiles?: boolean;
+  /** Remove stale .ts files in outputDir that are not in current file list (default: false) */
+  pruneStaleFiles?: boolean;
 }
 
 type OxfmtFormatFn = (
@@ -85,9 +88,14 @@ export async function writeGeneratedFiles(
   subdirs: string[],
   options: WriteOptions = {},
 ): Promise<WriteResult> {
-  const { showProgress = true, formatFiles = true } = options;
+  const {
+    showProgress = true,
+    formatFiles = true,
+    pruneStaleFiles = false,
+  } = options;
   const errors: string[] = [];
   const written: string[] = [];
+  const removed: string[] = [];
   const total = files.length;
   const isTTY = process.stdout.isTTY;
 
@@ -115,6 +123,25 @@ export async function writeGeneratedFiles(
 
   if (errors.length > 0) {
     return { success: false, errors };
+  }
+
+  if (pruneStaleFiles) {
+    const expectedFiles = new Set(
+      files.map((file) => path.resolve(outputDir, file.path)),
+    );
+    const existingTsFiles = findTsFiles(outputDir);
+
+    for (const existingFile of existingTsFiles) {
+      const absolutePath = path.resolve(existingFile);
+      if (expectedFiles.has(absolutePath)) continue;
+      try {
+        fs.rmSync(absolutePath, { force: true });
+        removed.push(absolutePath);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        errors.push(`Failed to remove stale file ${absolutePath}: ${message}`);
+      }
+    }
   }
 
   // Get oxfmt format function if formatting is enabled
@@ -171,6 +198,7 @@ export async function writeGeneratedFiles(
   return {
     success: errors.length === 0,
     filesWritten: written,
+    filesRemoved: removed,
     errors: errors.length > 0 ? errors : undefined,
   };
 }
