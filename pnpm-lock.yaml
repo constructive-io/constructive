@@ -215,6 +215,9 @@ importers:
 
   graphile/graphile-search-plugin:
     dependencies:
+      '@dataplan/pg':
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3(@dataplan/json@1.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0)))(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)(pg-sql2@5.0.0-rc.3)(pg@8.17.1)
       graphile-build:
         specifier: ^5.0.0-rc.3
         version: 5.0.0-rc.3(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)

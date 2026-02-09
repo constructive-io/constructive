@@ -1,11 +1,11 @@
 import { join } from 'path';
-import { getConnections, seed } from 'graphile-test';
+import { getConnections, seed, snapshot } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { ConstructivePreset } from 'graphile-settings';
 
 const SCHEMA = 'app_public';
-const sqlFile = (f: string) => join(__dirname, '../../sql', f);
+const sqlFile = (f: string) => join(__dirname, '../sql', f);
 
 interface GoalsResult {
   goals: {
@@ -75,7 +75,7 @@ describe('PgSearchPlugin', () => {
   });
 
   describe('condition-based search on tsv column', () => {
-    it('returns matching rows for fullTextTsv condition', async () => {
+    it('returns matching rows ordered by relevance (ts_rank DESC)', async () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition($search: String!) {
@@ -92,12 +92,7 @@ describe('PgSearchPlugin', () => {
       );
 
       expect(result.errors).toBeUndefined();
-      expect(result.data?.goals).toBeDefined();
-      expect(result.data?.goals.nodes.length).toBeGreaterThan(0);
-
-      // 'fowl' appears in descriptions/titles of specific goals
-      const titles = result.data?.goals.nodes.map((n) => n.title);
-      expect(titles).toBeDefined();
+      expect(snapshot(result.data)).toMatchSnapshot();
     });
 
     it('returns no rows when search term does not match', async () => {
@@ -121,7 +116,7 @@ describe('PgSearchPlugin', () => {
   });
 
   describe('condition-based search on stsv column', () => {
-    it('returns matching rows for fullTextStsv condition', async () => {
+    it('returns only title-matched rows for fullTextStsv condition', async () => {
       const result = await query<GoalsResult>(
         `
         query GoalsSearchViaCondition2($search: String!) {
@@ -138,14 +133,7 @@ describe('PgSearchPlugin', () => {
       );
 
       expect(result.errors).toBeUndefined();
-      expect(result.data?.goals).toBeDefined();
-
-      // stsv only indexes the title with simple parser,
-      // so 'fowl' should only match 'green fowl' title
-      const titles = result.data?.goals.nodes.map((n) => n.title);
-      if (titles && titles.length > 0) {
-        expect(titles).toContain('green fowl');
-      }
+      expect(snapshot(result.data)).toMatchSnapshot();
     });
   });
 

@@ -28,6 +28,8 @@ npm install graphile-search-plugin
 
 - Adds full-text search condition fields for `tsvector` columns
 - Uses `websearch_to_tsquery` for natural search syntax
+- Automatic `ORDER BY ts_rank(column, tsquery) DESC` relevance ordering (matching V4 behavior)
+- Cursor-based pagination remains stable — PostGraphile re-appends unique key columns after the relevance sort
 - Works with PostGraphile v5 preset/plugin pipeline
 
 ## Usage
@@ -70,13 +72,6 @@ query SearchGoals($search: String!) {
   }
 }
 ```
-
-## Known Limitations
-
-**ORDER BY ts_rank**: The V4 version of this plugin automatically added `ORDER BY ts_rank(...)` for relevance-based ordering. In V5, the condition system only supports WHERE clause injection. Relevance ordering is not automatically applied. To achieve relevance ordering, consider:
-
-1. Adding a custom `orderBy` enum value via a separate plugin
-2. Using a dedicated search query field (similar to pgvector's approach)
 
 ## Testing
 

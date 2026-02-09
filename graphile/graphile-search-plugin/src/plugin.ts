@@ -3,7 +3,8 @@
  *
  * Generates search condition fields for tsvector columns. When a search term
  * is provided via the condition input, this plugin applies a
- * `column @@ websearch_to_tsquery('english', $value)` WHERE clause.
+ * `column @@ websearch_to_tsquery('english', $value)` WHERE clause and
+ * automatically orders results by `ts_rank` (descending) for relevance.
  *
  * Uses the graphile-build hooks API to extend condition input types with
  * search fields for each tsvector column found on a table's codec.
@@ -14,13 +15,14 @@
  * - V5 uses the `GraphQLInputObjectType_fields` hook with an `apply` function
  *   on condition fields, following the same pattern as PgConditionCustomFieldsPlugin
  *   in graphile-build-pg.
- * - ORDER BY ts_rank relevance is NOT automatically injected in V5. The condition
- *   system only supports WHERE clause injection. To get relevance ordering, use a
- *   custom orderBy enum value or a dedicated search query field.
+ * - ORDER BY ts_rank relevance is automatically injected via the condition's
+ *   runtime `apply` function, matching the V4 behavior of
+ *   `queryBuilder.orderBy()`.
  */
 
 import 'graphile-build';
 import 'graphile-build-pg';
+import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { PgSearchPluginOptions } from './types';
 
@@ -107,14 +109,51 @@ export function createPgSearchPlugin(
                     type: GraphQLString,
                     apply: function plan($condition: any, val: any) {
                       if (val == null) return;
-                      // Build: table_alias.column @@ websearch_to_tsquery('english', $val)
+                      const tsquery = sql`websearch_to_tsquery('english', ${sql.value(val)})`;
+                      // WHERE: column @@ tsquery
                       $condition.where(
                         sql`${$condition.alias}.${sql.identifier(
                           attributeName
-                        )} @@ websearch_to_tsquery('english', ${sql.value(
-                          val
-                        )})`
+                        )} @@ ${tsquery}`
                       );
+                      // ORDER BY: ts_rank(column, tsquery) DESC — automatic relevance ordering like v4
+                      // The runtime queryBuilder's orderBy() appends to an internal
+                      // orders array that already contains the default ordering
+                      // (e.g. PRIMARY_KEY_ASC). To make relevance the primary sort,
+                      // we intercept the push to capture the orders array reference,
+                      // then unshift our entry to the front.
+                      // makeOrderUniqueIfPossible runs after all apply callbacks and
+                      // will re-add PK columns for cursor stability.
+                      const $parent = $condition.dangerouslyGetParent();
+                      const tsRankFragment = sql`ts_rank(${$condition.alias}.${sql.identifier(attributeName)}, ${tsquery})`;
+                      const orderSpec = {
+                        fragment: tsRankFragment,
+                        codec: TYPES.float4,
+                        direction: 'DESC' as const,
+                      };
+
+                      // Capture the internal orders array by briefly intercepting
+                      // Array.prototype.push during the synchronous orderBy() call.
+                      // runtimeScopedSQL passes plain objects through unchanged, so
+                      // the only push() that fires is on info.orders.
+                      let ordersArray: any[] | null = null;
+                      const origPush = Array.prototype.push;
+                      Array.prototype.push = function (...args: any[]) {
+                        ordersArray = this;
+                        return origPush.apply(this, args);
+                      };
+                      try {
+                        $parent.orderBy(orderSpec);
+                      } finally {
+                        Array.prototype.push = origPush;
+                      }
+
+                      // Move ts_rank from the end to the front so it becomes the
+                      // primary sort key instead of secondary.
+                      if (ordersArray && ordersArray.length > 1) {
+                        const item = ordersArray.pop();
+                        ordersArray.unshift(item);
+                      }
                     },
                   }
                 ),
