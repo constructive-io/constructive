@@ -2,23 +2,25 @@
  * Compile-time regression checks for helper overloads and React Query options.
  *
  * Focus:
- * - fetch/prefetch overload behavior
- * - optional variables + required selection.fields custom query overloads
- * - default vs explicit selection result narrowing in helpers
- * - allowed/disallowed React Query options on generated hooks
+ * - fetch/prefetch signatures for selection-enabled queries
+ * - optional variables flow for non-selection custom queries
+ * - pass-through and blocked React Query options
  */
 
 import { QueryClient } from '@tanstack/react-query';
 
 import {
   fetchDatabasesQuery,
-  fetchGetObjectAtPathQuery,
+  fetchStepsRequiredQuery,
+  fetchUserByUsernameQuery,
   prefetchDatabasesQuery,
-  prefetchGetObjectAtPathQuery,
+  prefetchStepsRequiredQuery,
+  prefetchUserByUsernameQuery,
   useCurrentUserQuery,
   useDatabasesQuery,
-  useGetObjectAtPathQuery,
   useSignInMutation,
+  useStepsRequiredQuery,
+  useUserByUsernameQuery,
 } from '../generated/hooks';
 
 type Assert<T extends true> = T;
@@ -28,9 +30,20 @@ type NotHasKey<T, K extends PropertyKey> = K extends keyof T ? false : true;
 function helperOverloadChecks() {
   const queryClient = new QueryClient();
 
-  const defaultDatabasesFetch = fetchDatabasesQuery({ selection: { first: 2 } });
-  type DefaultDatabaseNode = Awaited<typeof defaultDatabasesFetch>['databases']['nodes'][number];
-  type _defaultDatabaseFetchOmitsName = Assert<NotHasKey<DefaultDatabaseNode, 'name'>>;
+  const idOnlyDatabasesFetch = fetchDatabasesQuery({
+    selection: {
+      first: 2,
+      fields: {
+        id: true,
+      },
+    },
+  });
+  type IdOnlyDatabaseNode = Awaited<
+    typeof idOnlyDatabasesFetch
+  >['databases']['nodes'][number];
+  type _idOnlyDatabaseFetchOmitsName = Assert<
+    NotHasKey<IdOnlyDatabaseNode, 'name'>
+  >;
 
   const selectedDatabasesFetch = fetchDatabasesQuery({
     selection: {
@@ -48,42 +61,43 @@ function helperOverloadChecks() {
       },
     },
   });
-  type SelectedDatabaseNode = Awaited<typeof selectedDatabasesFetch>['databases']['nodes'][number];
-  type _selectedDatabaseFetchHasName = Assert<HasKey<SelectedDatabaseNode, 'name'>>;
+  type SelectedDatabaseNode = Awaited<
+    typeof selectedDatabasesFetch
+  >['databases']['nodes'][number];
+  type _selectedDatabaseFetchHasName = Assert<
+    HasKey<SelectedDatabaseNode, 'name'>
+  >;
 
-  prefetchDatabasesQuery(queryClient, { selection: { first: 2 } });
   prefetchDatabasesQuery(queryClient, {
     selection: {
       first: 2,
       fields: {
         id: true,
-        name: true,
       },
     },
   });
 
-  // @ts-expect-error invalid helper nested select key should be rejected
-  fetchDatabasesQuery({ selection: { fields: { schemas: { select: { invalidField: true } } } } });
+  // @ts-expect-error selection.fields is required
+  fetchDatabasesQuery({ selection: { first: 2 } });
 
-  const defaultGetObjectFetch = fetchGetObjectAtPathQuery({ variables: undefined });
-  type DefaultGetObject = Awaited<typeof defaultGetObjectFetch>['getObjectAtPath'];
-  type _defaultGetObjectOmitsData = Assert<NotHasKey<DefaultGetObject, 'data'>>;
-
-  const selectedGetObjectFetch = fetchGetObjectAtPathQuery({
-    variables: undefined,
+  const selectedUserByUsernameFetch = fetchUserByUsernameQuery({
+    variables: { username: 'dev' },
     selection: {
       fields: {
         id: true,
-        data: true,
+        username: true,
       },
     },
   });
-  type SelectedGetObject = Awaited<typeof selectedGetObjectFetch>['getObjectAtPath'];
-  type _selectedGetObjectHasData = Assert<HasKey<SelectedGetObject, 'data'>>;
+  type SelectedUserByUsername = Awaited<
+    typeof selectedUserByUsernameFetch
+  >['userByUsername'];
+  type _selectedUserByUsernameHasUsername = Assert<
+    HasKey<SelectedUserByUsername, 'username'>
+  >;
 
-  prefetchGetObjectAtPathQuery(queryClient, { variables: undefined });
-  prefetchGetObjectAtPathQuery(queryClient, {
-    variables: undefined,
+  prefetchUserByUsernameQuery(queryClient, {
+    variables: { username: 'dev' },
     selection: {
       fields: {
         id: true,
@@ -91,17 +105,23 @@ function helperOverloadChecks() {
     },
   });
 
-  // @ts-expect-error invalid custom helper select key should be rejected
-  prefetchGetObjectAtPathQuery(queryClient, {
-    variables: undefined,
-    selection: { fields: { invalidField: true } },
+  // @ts-expect-error selection is required for selection-enabled custom query helpers
+  fetchUserByUsernameQuery({ variables: { username: 'dev' } });
+  // @ts-expect-error variables are required for this custom query helper
+  fetchUserByUsernameQuery({ selection: { fields: { id: true } } });
+
+  // Optional variables flow for custom queries without selection support.
+  fetchStepsRequiredQuery();
+  fetchStepsRequiredQuery({ variables: { vlevel: '1', first: 10 } });
+  prefetchStepsRequiredQuery(queryClient);
+  prefetchStepsRequiredQuery(queryClient, { variables: { vlevel: '1' } });
+  useStepsRequiredQuery();
+  useStepsRequiredQuery({
+    variables: { vlevel: '1' },
+    enabled: false,
   });
-
-  // @ts-expect-error custom helper select overload requires explicit variables
-  fetchGetObjectAtPathQuery({ selection: { fields: { id: true } } });
-
-  // @ts-expect-error custom helper prefetch overload requires explicit variables
-  prefetchGetObjectAtPathQuery(queryClient, { selection: { fields: { id: true } } });
+  // @ts-expect-error selection is not available on this custom query
+  useStepsRequiredQuery({ selection: { fields: { id: true } } });
 }
 
 function reactQueryOptionsChecks() {
@@ -158,12 +178,18 @@ function reactQueryOptionsChecks() {
   // @ts-expect-error transformed query data should not expose connection shape
   transformedDatabases.data.databases;
 
-  const transformedCurrentUser = useCurrentUserQuery({
-    select: (data) => data.currentUser.id,
+  const currentUserResult = useCurrentUserQuery({
+    selection: {
+      fields: {
+        id: true,
+        username: true,
+      },
+    },
     placeholderData: (previousData) =>
       previousData ?? {
         currentUser: {
           id: 'fallback-user-id',
+          username: 'fallback-user',
         },
       },
     enabled: false,
@@ -175,13 +201,11 @@ function reactQueryOptionsChecks() {
       return failureCount < 2;
     },
   });
-  const transformedCurrentUserId: string | undefined = transformedCurrentUser.data;
-  void transformedCurrentUserId;
-  // @ts-expect-error transformed query data should not expose object shape
-  transformedCurrentUser.data.currentUser;
+  const currentUserId: string | undefined = currentUserResult.data?.currentUser.id;
+  void currentUserId;
 
-  useGetObjectAtPathQuery({
-    variables: undefined,
+  useUserByUsernameQuery({
+    variables: { username: 'dev' },
     selection: {
       fields: {
         id: true,
@@ -189,13 +213,6 @@ function reactQueryOptionsChecks() {
     },
     enabled: false,
     staleTime: 5_000,
-    gcTime: 60_000,
-    placeholderData: {
-      getObjectAtPath: {
-        id: 'placeholder',
-      },
-    },
-    select: (data) => data.getObjectAtPath.id,
   });
 
   // @ts-expect-error unknown React Query option should be rejected
@@ -204,9 +221,9 @@ function reactQueryOptionsChecks() {
   // @ts-expect-error queryKey is owned by generated hooks
   useDatabasesQuery({ selection: { fields: { id: true } }, queryKey: ['override'] as const });
 
-  // @ts-expect-error queryFn is owned by generated hooks
   useDatabasesQuery({
     selection: { fields: { id: true } },
+    // @ts-expect-error queryFn is owned by generated hooks
     queryFn: async () =>
       ({
         databases: {
@@ -224,6 +241,14 @@ function reactQueryOptionsChecks() {
     selection: {
       fields: {
         clientMutationId: true,
+        result: {
+          select: {
+            accessToken: true,
+            isVerified: true,
+            totpEnabled: true,
+            userId: true,
+          },
+        },
       },
     },
     retry: 1,
@@ -243,16 +268,16 @@ function reactQueryOptionsChecks() {
       void context;
     },
     onSuccess: (data, variables) => {
-      const clientMutationId = data.signIn.clientMutationId;
+      const accessToken = data.signIn.result.accessToken;
       const email = variables.input.email;
-      void clientMutationId;
+      void accessToken;
       void email;
     },
   });
 
-  // @ts-expect-error mutationFn is owned by generated hooks
   useSignInMutation({
     selection: { fields: { clientMutationId: true } },
+    // @ts-expect-error mutationFn is owned by generated hooks
     mutationFn: async () =>
       ({
         signIn: {

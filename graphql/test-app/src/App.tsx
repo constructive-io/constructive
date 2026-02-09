@@ -813,6 +813,11 @@ function Dashboard({ token, userId, onSignOut }: { token: string; userId: string
   const [activeDbId, setActiveDbId] = useState<string | null>(null);
 
   const { mutate: signOut, isPending: signingOut } = useSignOutMutation({
+    selection: {
+      fields: {
+        clientMutationId: true,
+      },
+    },
     onSuccess: () => {
       queryClient.clear();
       onSignOut();

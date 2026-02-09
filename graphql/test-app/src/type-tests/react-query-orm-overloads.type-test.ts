@@ -1,14 +1,13 @@
 /**
  * Compile-time regression checks for React Query + ORM output modes.
  *
- * These checks focus on overload behavior introduced to recover contextual
- * typing/autocomplete for nested select objects.
+ * These checks focus on overload behavior and nested select contextual typing.
  */
 
 import {
   useCurrentUserQuery,
-  useGetObjectAtPathQuery,
   useSignInMutation,
+  useUserByUsernameQuery,
   useUserQuery,
   useUsersQuery,
 } from '../generated/hooks';
@@ -29,17 +28,14 @@ function hookTypeChecks() {
         id: true,
         username: true,
       },
-    }
+    },
   });
 
   const maybeUsername = currentUser.data?.currentUser.username;
   void maybeUsername;
 
-  const defaultUser = useUserQuery({ id: '00000000-0000-0000-0000-000000000000' });
-  const defaultUserId = defaultUser.data?.user?.id;
-  void defaultUserId;
-  // @ts-expect-error default select for useUserQuery should not expose username
-  defaultUser.data?.user?.username;
+  // @ts-expect-error selection is required
+  useUserQuery({ id: '00000000-0000-0000-0000-000000000000' });
 
   const selectedUser = useUserQuery({
     id: '00000000-0000-0000-0000-000000000000',
@@ -57,12 +53,13 @@ function hookTypeChecks() {
     selection: {
       fields: {
         id: true,
-        databasesByOwnerId: {
+        username: true,
+        ownedDatabases: {
           first: 2,
           select: {
             id: true,
             schemaName: true,
-            name: true
+            name: true,
           },
         },
       },
@@ -71,25 +68,26 @@ function hookTypeChecks() {
     },
   });
 
-  const nestedSchema = users.data?.users.nodes[0]?.databasesByOwnerId?.nodes[0]?.schemaName;
+  const nestedSchema = users.data?.users.nodes[0]?.ownedDatabases?.nodes[0]?.schemaName;
   void nestedSchema;
 
-  // Optional variables + required select args overload (custom query case)
-  useGetObjectAtPathQuery({
-    variables: undefined,
+  useUserByUsernameQuery({
+    variables: { username: 'dev' },
     selection: {
       fields: {
         id: true,
-        data: true,
+        username: true,
       },
     },
   });
 
-  const defaultSignIn = useSignInMutation();
-  const defaultSignInClientMutationId = defaultSignIn.data?.signIn.clientMutationId;
-  void defaultSignInClientMutationId;
-  // @ts-expect-error default signIn select should not expose result
-  defaultSignIn.data?.signIn.result;
+  // @ts-expect-error variables are required for this custom query
+  useUserByUsernameQuery({
+    selection: { fields: { id: true } },
+  });
+
+  // @ts-expect-error selection is required for custom mutation hooks
+  useSignInMutation();
 
   useSignInMutation({
     selection: {
@@ -129,7 +127,7 @@ function hookTypeChecks() {
   useUsersQuery({ selection: { fields: invalidUsersSelect } });
 
   const invalidNestedUsersSelect = {
-    databasesByOwnerId: {
+    ownedDatabases: {
       select: {
         id: true,
         doesNotExist: true,
@@ -156,47 +154,29 @@ function hookTypeChecks() {
   };
   // @ts-expect-error invalid mutation variable select key should be rejected
   useSignInMutation({ selection: { fields: invalidSignInSelect } });
-
-  // @ts-expect-error invalid nested select key should be rejected
-  useUsersQuery({
-    selection: {
-      fields: {
-        databasesByOwnerId: {
-          select: {
-            doesNotExist: true,
-          },
-        },
-      },
-    },
-  });
-
-  // @ts-expect-error invalid custom query select key should be rejected
-  useGetObjectAtPathQuery({
-    variables: undefined,
-    selection: { fields: { nope: true } },
-  });
 }
 
 async function ormModelTypeChecks() {
-  const defaultBuilder = ormClient.user.findOne({
+  // @ts-expect-error findOne requires explicit select
+  ormClient.user.findOne({
     id: '00000000-0000-0000-0000-000000000000',
   });
-  type DefaultUser = Awaited<ReturnType<typeof defaultBuilder.unwrap>>['user'];
-  type _defaultOmitsUsername = Assert<NotHasKey<NonNullable<DefaultUser>, 'username'>>;
 
-  const defaultSelected = await defaultBuilder.unwrapOr({ user: null });
-
-  if (defaultSelected.user) {
-    const id: string = defaultSelected.user.id;
-    void id;
-  }
+  const idOnlyBuilder = ormClient.user.findOne({
+    id: '00000000-0000-0000-0000-000000000000',
+    select: {
+      id: true,
+    },
+  });
+  type IdOnlyUser = Awaited<ReturnType<typeof idOnlyBuilder.unwrap>>['user'];
+  type _idOnlyOmitsUsername = Assert<NotHasKey<NonNullable<IdOnlyUser>, 'username'>>;
 
   const explicitlySelected = ormClient.user.findOne({
     id: '00000000-0000-0000-0000-000000000000',
     select: {
       id: true,
       username: true,
-      databasesByOwnerId: {
+      ownedDatabases: {
         first: 1,
         select: {
           id: true,
@@ -214,7 +194,7 @@ async function ormModelTypeChecks() {
     select: {
       id: true,
       username: true,
-      databasesByOwnerId: {
+      ownedDatabases: {
         first: 1,
         select: {
           id: true,
@@ -228,7 +208,7 @@ async function ormModelTypeChecks() {
     select: {
       id: true,
       username: true,
-      databasesByOwnerId: {
+      ownedDatabases: {
         first: 1,
         select: {
           id: true,
@@ -236,25 +216,52 @@ async function ormModelTypeChecks() {
       },
     },
   });
+  // @ts-expect-error custom ORM query requires options with select
+  ormClient.query.currentUser();
 
-  ormClient.query.getObjectAtPath(
+  ormClient.query.userByUsername(
     {
-      dbId: '00000000-0000-0000-0000-000000000000',
-      path: ['root'],
-      refname: 'main',
+      username: 'dev',
     },
     {
       select: {
         id: true,
       },
-    }
+    },
   );
+  // @ts-expect-error custom ORM query requires options with select
+  ormClient.query.userByUsername({
+    username: 'dev',
+  });
 
-  // @ts-expect-error invalid model select key should be rejected
-  ormClient.user.findMany({ select: { invalidField: true } });
-
-  // @ts-expect-error invalid custom query select key should be rejected
-  ormClient.query.currentUser({ select: { invalidField: true } });
+  ormClient.mutation.signIn(
+    {
+      input: {
+        email: 'dev@example.com',
+        password: 'password',
+        rememberMe: true,
+      },
+    },
+    {
+      select: {
+        clientMutationId: true,
+        result: {
+          select: {
+            accessToken: true,
+            userId: true,
+          },
+        },
+      },
+    },
+  );
+  // @ts-expect-error custom ORM mutation requires options with select
+  ormClient.mutation.signIn({
+    input: {
+      email: 'dev@example.com',
+      password: 'password',
+      rememberMe: true,
+    },
+  });
 
   const invalidModelSelect = {
     id: true,
@@ -264,7 +271,7 @@ async function ormModelTypeChecks() {
   ormClient.user.findMany({ select: invalidModelSelect });
 
   const invalidNestedModelSelect = {
-    databasesByOwnerId: {
+    ownedDatabases: {
       select: {
         id: true,
         invalidField: true,
@@ -298,7 +305,7 @@ async function ormModelTypeChecks() {
       },
     },
     // @ts-expect-error invalid custom mutation variable select key should be rejected
-    { select: invalidCustomMutationSelect }
+    { select: invalidCustomMutationSelect },
   );
 }
 

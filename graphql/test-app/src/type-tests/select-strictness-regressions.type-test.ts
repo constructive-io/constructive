@@ -1,17 +1,8 @@
 /**
  * Additional compile-time regression checks focused on strict selection behavior.
- *
- * These tests target edge cases around:
- * - nested relation select options (filter/orderBy)
- * - invalid relation option keys
- * - default vs explicit selection result narrowing
- * - custom ORM operation option contracts
  */
 
-import {
-  useDatabasesQuery,
-  useSignInMutation,
-} from '../generated/hooks';
+import { useDatabasesQuery, useSignInMutation } from '../generated/hooks';
 import { createClient } from '../generated/orm';
 
 type Assert<T extends true> = T;
@@ -23,11 +14,8 @@ const ormClient = createClient({
 });
 
 function hookStrictnessChecks() {
-  const defaultDatabases = useDatabasesQuery({ selection: { first: 10 } });
-  const defaultDatabaseId = defaultDatabases.data?.databases.nodes[0]?.id;
-  void defaultDatabaseId;
-  // @ts-expect-error default select for useDatabasesQuery should not expose name
-  defaultDatabases.data?.databases.nodes[0]?.name;
+  // @ts-expect-error selection.fields is required
+  useDatabasesQuery({ selection: { first: 10 } });
 
   const selectedDatabases = useDatabasesQuery({
     selection: {
@@ -63,8 +51,8 @@ function hookStrictnessChecks() {
   void selectedDatabaseName;
   void selectedNestedSchema;
 
-  // @ts-expect-error relation select options should use filter, not where
   useDatabasesQuery({
+    // @ts-expect-error relation select options should use filter, not where
     selection: {
       fields: {
         schemas: {
@@ -79,12 +67,12 @@ function hookStrictnessChecks() {
     },
   });
 
-  // @ts-expect-error invalid field inside nested relation filter should be rejected
   useDatabasesQuery({
     selection: {
       fields: {
         schemas: {
           filter: {
+            // @ts-expect-error invalid field inside nested relation filter should be rejected
             invalidField: { equalTo: 'x' },
           },
           select: {
@@ -95,11 +83,11 @@ function hookStrictnessChecks() {
     },
   });
 
-  // @ts-expect-error invalid orderBy literal should be rejected
   useDatabasesQuery({
     selection: {
       fields: {
         schemas: {
+          // @ts-expect-error invalid orderBy literal should be rejected
           orderBy: ['INVALID_ASC'],
           select: {
             id: true,
@@ -108,6 +96,24 @@ function hookStrictnessChecks() {
       },
     },
   });
+
+  const invalidDatabaseSelect = {
+    id: true,
+    invalidField: true,
+  };
+  // @ts-expect-error invalid variable select field should be rejected
+  useDatabasesQuery({ selection: { fields: invalidDatabaseSelect } });
+
+  const invalidNestedDatabaseSelect = {
+    schemas: {
+      select: {
+        id: true,
+        invalidField: true,
+      },
+    },
+  };
+  // @ts-expect-error invalid nested variable select field should be rejected
+  useDatabasesQuery({ selection: { fields: invalidNestedDatabaseSelect } });
 
   const validSignInSelect = {
     clientMutationId: true,
@@ -134,33 +140,33 @@ function hookStrictnessChecks() {
 }
 
 async function ormStrictnessChecks() {
-  const defaultCurrentUser = ormClient.query.currentUser();
-  type DefaultCurrentUser = Awaited<ReturnType<typeof defaultCurrentUser.unwrap>>['currentUser'];
-  type _defaultCurrentUserOmitsUsername = Assert<NotHasKey<DefaultCurrentUser, 'username'>>;
-
   const selectedCurrentUser = ormClient.query.currentUser({
+    select: {
+      id: true,
+    },
+  });
+  type SelectedCurrentUser = Awaited<ReturnType<typeof selectedCurrentUser.unwrap>>['currentUser'];
+  type _selectedCurrentUserOmitsUsername = Assert<
+    NotHasKey<SelectedCurrentUser, 'username'>
+  >;
+
+  const selectedCurrentUserWithUsername = ormClient.query.currentUser({
     select: {
       id: true,
       username: true,
     },
   });
-  type SelectedCurrentUser = Awaited<ReturnType<typeof selectedCurrentUser.unwrap>>['currentUser'];
-  type _selectedCurrentUserHasUsername = Assert<HasKey<SelectedCurrentUser, 'username'>>;
+  type SelectedCurrentUserWithUsername = Awaited<
+    ReturnType<typeof selectedCurrentUserWithUsername.unwrap>
+  >['currentUser'];
+  type _selectedCurrentUserHasUsername = Assert<
+    HasKey<SelectedCurrentUserWithUsername, 'username'>
+  >;
 
-  // @ts-expect-error custom ORM query options object requires select when provided
-  ormClient.query.currentUser({});
+  // @ts-expect-error custom ORM query requires options with select
+  ormClient.query.currentUser();
 
-  const defaultSignIn = ormClient.mutation.signIn({
-    input: {
-      email: 'dev@example.com',
-      password: 'password',
-      rememberMe: true,
-    },
-  });
-  type DefaultSignIn = Awaited<ReturnType<typeof defaultSignIn.unwrap>>['signIn'];
-  type _defaultSignInOmitsResult = Assert<NotHasKey<DefaultSignIn, 'result'>>;
-
-  const selectedSignIn = ormClient.mutation.signIn(
+  ormClient.mutation.signIn(
     {
       input: {
         email: 'dev@example.com',
@@ -178,10 +184,8 @@ async function ormStrictnessChecks() {
           },
         },
       },
-    }
+    },
   );
-  type SelectedSignIn = Awaited<ReturnType<typeof selectedSignIn.unwrap>>['signIn'];
-  type _selectedSignInHasResult = Assert<HasKey<SelectedSignIn, 'result'>>;
 
   ormClient.mutation.signIn(
     {
@@ -191,8 +195,8 @@ async function ormStrictnessChecks() {
         rememberMe: true,
       },
     },
-    // @ts-expect-error custom ORM mutation options object requires select when provided
-    {}
+    // @ts-expect-error custom ORM mutation options require select
+    {},
   );
 }
 
