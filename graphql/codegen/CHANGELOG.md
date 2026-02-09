@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.2.1...@constructive-io/graphql-codegen@3.3.0) (2026-02-09)
+
+### Bug Fixes
+
+- **codegen-cli:** honor source flags and config overrides ([4fac2c1](https://github.com/constructive-io/constructive/commit/4fac2c18346c9cd24a6d6fb213b4ef29d21854e8))
+- **codegen:** convert string concatenation to Babel AST and template-copy patterns ([d2e7480](https://github.com/constructive-io/constructive/commit/d2e748028fa4e1271cb35e1366a1018f1ad957b9))
+- **codegen:** prune stale generated files ([1534338](https://github.com/constructive-io/constructive/commit/15343383668467b4461a86b183c527b7362973b2))
+
+### Features
+
+- **codegen:** add fire-and-forget overload for delete hooks (clientMutationId default) ([6cce350](https://github.com/constructive-io/constructive/commit/6cce350b4e8079e10de87751621c4a16561f41f9))
+- **graphql-codegen:** unify ORM and RQ selection core ([b5eb861](https://github.com/constructive-io/constructive/commit/b5eb861201bca561c0604b6e3e74ee3689a25da7))
+
 ## [3.2.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.2.0...@constructive-io/graphql-codegen@3.2.1) (2026-02-02)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

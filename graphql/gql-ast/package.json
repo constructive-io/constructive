@@ -1,6 +1,6 @@
 {
   "name": "gql-ast",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "GraphQL ASTs",
   "main": "index.js",

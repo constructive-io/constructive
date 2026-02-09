@@ -1,6 +1,6 @@
 {
   "name": "csv-to-pg",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "description": "csv to pg statements",
   "main": "index.js",
