@@ -2,10 +2,13 @@ import { CLIOptions, Inquirerer } from 'inquirerer';
 import {
   generate,
   findConfigFile,
+  loadConfigFile,
   codegenQuestions,
   printResult,
-  camelizeArgv,
-  type CodegenAnswers,
+  buildGenerateOptions,
+  seedArgvFromConfig,
+  hasResolvedCodegenSource,
+  type GraphQLSDKConfigTarget,
 } from '@constructive-io/graphql-codegen';
 
 const usage = `
@@ -27,8 +30,6 @@ Generator Options:
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --authorization <token>    Authorization header value
-  --browser-compatible       Generate browser-compatible code (default: true)
-                             Set to false for Node.js with localhost DNS fix
   --dry-run                  Preview without writing files
   --verbose                  Verbose output
 
@@ -45,38 +46,28 @@ export default async (
     process.exit(0);
   }
 
-  // Auto-detect config file if not provided
-  const config = argv.config || findConfigFile();
-  if (config) {
-    // If config file exists, just run generate with it (config file handles everything)
-    const result = await generate({});
-    printResult(result);
-    return;
+  const hasSourceFlags = Boolean(
+    argv.endpoint || argv['schema-file'] || argv.schemas || argv['api-names']
+  );
+  const configPath = (argv.config as string | undefined) ||
+    (!hasSourceFlags ? findConfigFile() : undefined);
+
+  let fileConfig: GraphQLSDKConfigTarget = {};
+
+  if (configPath) {
+    const loaded = await loadConfigFile(configPath);
+    if (!loaded.success) {
+      console.error('x', loaded.error);
+      process.exit(1);
+    }
+    fileConfig = loaded.config as GraphQLSDKConfigTarget;
   }
 
-  // No config file - prompt for options using shared questions
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
-  // Convert kebab-case CLI args to camelCase for internal use
-  const camelized = camelizeArgv(answers);
-
-  // Build db config if schemas or apiNames provided
-  const db = (camelized.schemas || camelized.apiNames) ? {
-    schemas: camelized.schemas,
-    apiNames: camelized.apiNames,
-  } : undefined;
-
-  const result = await generate({
-    endpoint: camelized.endpoint,
-    schemaFile: camelized.schemaFile,
-    db,
-    output: camelized.output,
-    authorization: camelized.authorization,
-    reactQuery: camelized.reactQuery,
-    orm: camelized.orm,
-    browserCompatible: camelized.browserCompatible,
-    dryRun: camelized.dryRun,
-    verbose: camelized.verbose,
-  });
-
+  const seeded = seedArgvFromConfig(argv as Record<string, unknown>, fileConfig);
+  const answers = hasResolvedCodegenSource(seeded)
+    ? seeded
+    : await prompter.prompt(seeded, codegenQuestions);
+  const options = buildGenerateOptions(answers, fileConfig);
+  const result = await generate(options);
   printResult(result);
 };

@@ -1,6 +1,6 @@
 /**
  * GraphQL Schema Introspection Query
- * 
+ *
  * Full introspection query that captures all queries, mutations, and types
  * from a GraphQL endpoint via the standard __schema query.
  */
@@ -9,12 +9,12 @@ import type { IntrospectionQueryResponse } from '../../types/introspection';
 
 /**
  * Full schema introspection query
- * 
+ *
  * Captures:
  * - All Query fields with args and return types
- * - All Mutation fields with args and return types  
+ * - All Mutation fields with args and return types
  * - All types (OBJECT, INPUT_OBJECT, ENUM, SCALAR) for resolution
- * 
+ *
  * Uses a recursive TypeRef fragment to handle deeply nested type wrappers
  * (e.g., [String!]! = NON_NULL(LIST(NON_NULL(SCALAR))))
  */

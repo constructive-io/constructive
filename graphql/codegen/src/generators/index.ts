@@ -5,26 +5,26 @@
 // Field selector utilities
 export {
   convertToSelectionOptions,
-  isRelationalField,
   getAvailableRelations,
+  isRelationalField,
   validateFieldSelection,
 } from './field-selector';
 
 // Query generators
 export {
-  buildSelect,
-  buildFindOne,
   buildCount,
+  buildFindOne,
+  buildSelect,
+  cleanTableToMetaObject,
+  createASTQueryBuilder,
+  generateIntrospectionSchema,
   toCamelCasePlural,
   toOrderByTypeName,
-  cleanTableToMetaObject,
-  generateIntrospectionSchema,
-  createASTQueryBuilder,
 } from './select';
 
 // Mutation generators
 export {
   buildPostGraphileCreate,
-  buildPostGraphileUpdate,
   buildPostGraphileDelete,
+  buildPostGraphileUpdate,
 } from './mutations';

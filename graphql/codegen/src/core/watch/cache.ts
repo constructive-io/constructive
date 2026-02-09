@@ -7,6 +7,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 import { hashObject } from './hash';
 
@@ -23,7 +24,7 @@ export class SchemaCache {
    * This is the hot path - must be efficient
    */
   async hasChanged(
-    schema: IntrospectionQueryResponse
+    schema: IntrospectionQueryResponse,
   ): Promise<{ changed: boolean; newHash: string }> {
     const newHash = await this.computeHash(schema);
     const changed = this.currentHash === null || this.currentHash !== newHash;
@@ -55,7 +56,7 @@ export class SchemaCache {
    * Compute hash from schema response
    */
   private async computeHash(
-    schema: IntrospectionQueryResponse
+    schema: IntrospectionQueryResponse,
   ): Promise<string> {
     return hashObject(schema);
   }

@@ -240,8 +240,6 @@ export interface GraphQLSDKConfigTarget {
    * Code generation options
    */
   codegen?: {
-    /** Max depth for nested object field selection (default: 2) */
-    maxFieldDepth?: number;
     /** Skip 'query' field on mutation payloads (default: true) */
     skipQueryField?: boolean;
   };
@@ -260,15 +258,6 @@ export interface GraphQLSDKConfigTarget {
    * @default false
    */
   reactQuery?: boolean;
-
-  /**
-   * Generate browser-compatible code using native fetch
-   * When true (default), uses native W3C fetch API (works in browsers and Node.js)
-   * When false, uses undici fetch with dispatcher support for localhost DNS resolution
-   * (Node.js only - enables proper *.localhost subdomain resolution on macOS)
-   * @default true
-   */
-  browserCompatible?: boolean;
 
   /**
    * Query key generation configuration
@@ -402,16 +391,13 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
     schema: 'public',
   },
   codegen: {
-    maxFieldDepth: 2,
     skipQueryField: true,
   },
   orm: false,
   reactQuery: false,
-  browserCompatible: true,
   queryKeys: DEFAULT_QUERY_KEY_CONFIG,
   watch: DEFAULT_WATCH_CONFIG,
 };
-
 
 /**
  * Helper function to define configuration with type checking
@@ -427,7 +413,7 @@ export function defineConfig(config: GraphQLSDKConfig): GraphQLSDKConfig {
  */
 export function mergeConfig(
   base: GraphQLSDKConfigTarget,
-  overrides: GraphQLSDKConfigTarget
+  overrides: GraphQLSDKConfigTarget,
 ): GraphQLSDKConfigTarget {
   return deepmerge(base, overrides, { arrayMerge: replaceArrays });
 }
@@ -437,7 +423,7 @@ export function mergeConfig(
  * Similar to getEnvOptions pattern from @pgpmjs/env.
  */
 export function getConfigOptions(
-  overrides: GraphQLSDKConfigTarget = {}
+  overrides: GraphQLSDKConfigTarget = {},
 ): GraphQLSDKConfigTarget {
   return deepmerge(DEFAULT_CONFIG, overrides, { arrayMerge: replaceArrays });
 }

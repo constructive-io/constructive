@@ -4,7 +4,11 @@
  * Tests the generated model classes with findMany, findFirst, create, update, delete methods.
  */
 import { generateModelFile } from '../../core/codegen/orm/model-generator';
-import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
+import type {
+  CleanFieldType,
+  CleanRelations,
+  CleanTable,
+} from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -25,7 +29,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],

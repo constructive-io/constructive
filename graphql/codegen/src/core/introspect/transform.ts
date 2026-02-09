@@ -19,7 +19,7 @@ export function getTableNames(tables: CleanTable[]): string[] {
  */
 export function findTable(
   tables: CleanTable[],
-  name: string
+  name: string,
 ): CleanTable | undefined {
   return tables.find((t) => t.name === name);
 }
@@ -30,7 +30,7 @@ export function findTable(
 export function filterTables(
   tables: CleanTable[],
   include?: string[],
-  exclude?: string[]
+  exclude?: string[],
 ): CleanTable[] {
   let result = tables;
 
@@ -53,7 +53,7 @@ function matchesPatterns(name: string, patterns: string[]): boolean {
   return patterns.some((pattern) => {
     if (pattern.includes('*')) {
       const regex = new RegExp(
-        '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$'
+        '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$',
       );
       return regex.test(name);
     }

@@ -8,10 +8,9 @@ export {
   loadConfigFile,
   type LoadConfigFileResult,
 } from './loader';
-
 export {
-  loadAndResolveConfig,
-  loadWatchConfig,
   type ConfigOverrideOptions,
+  loadAndResolveConfig,
   type LoadConfigResult,
+  loadWatchConfig,
 } from './resolver';

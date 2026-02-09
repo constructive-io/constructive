@@ -5,12 +5,21 @@
  * This is a thin wrapper around the core generate() function.
  * All business logic is in the core modules.
  */
-import { CLI, CLIOptions, Inquirerer, getPackageJson } from 'inquirerer';
+import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
-import { generate } from '../core/generate';
 import { findConfigFile, loadConfigFile } from '../core/config';
+import { generate } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
-import { camelizeArgv, codegenQuestions, printResult, type CodegenAnswers } from './shared';
+import {
+  buildDbConfig,
+  buildGenerateOptions,
+  camelizeArgv,
+  codegenQuestions,
+  hasResolvedCodegenSource,
+  normalizeCodegenListOptions,
+  printResult,
+  seedArgvFromConfig,
+} from './shared';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -33,8 +42,6 @@ Generator Options:
   -o, --output <dir>            Output directory
   -t, --target <name>           Target name (for multi-target configs)
   -a, --authorization <token>   Authorization header value
-  --browser-compatible          Generate browser-compatible code (default: true)
-                                Set to false for Node.js with localhost DNS fix
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
@@ -45,7 +52,7 @@ Generator Options:
 export const commands = async (
   argv: Record<string, unknown>,
   prompter: Inquirerer,
-  _options: CLIOptions
+  _options: CLIOptions,
 ): Promise<Record<string, unknown>> => {
   if (argv.version) {
     const pkg = getPackageJson(__dirname);
@@ -58,10 +65,21 @@ export const commands = async (
     process.exit(0);
   }
 
-  const configPath = (argv.config || argv.c || findConfigFile()) as string | undefined;
+  const hasSourceFlags = Boolean(
+    argv.endpoint ||
+    argv.e ||
+    argv['schema-file'] ||
+    argv.s ||
+    argv.schemas ||
+    argv['api-names'],
+  );
+  const explicitConfigPath = (argv.config || argv.c) as string | undefined;
+  const configPath =
+    explicitConfigPath || (!hasSourceFlags ? findConfigFile() : undefined);
   const targetName = (argv.target || argv.t) as string | undefined;
 
-  // If config file exists, load and run
+  let fileConfig: GraphQLSDKConfigTarget = {};
+
   if (configPath) {
     const loaded = await loadConfigFile(configPath);
     if (!loaded.success) {
@@ -70,24 +88,36 @@ export const commands = async (
     }
 
     const config = loaded.config as Record<string, unknown>;
-
-    // Check if it's a multi-target config (no source fields at top level)
-    const isMulti = !('endpoint' in config || 'schemaFile' in config || 'db' in config);
+    const isMulti = !(
+      'endpoint' in config ||
+      'schemaFile' in config ||
+      'db' in config
+    );
 
     if (isMulti) {
-      // Multi-target: simple for loop over targets
       const targets = config as Record<string, GraphQLSDKConfigTarget>;
       const names = targetName ? [targetName] : Object.keys(targets);
 
       if (targetName && !targets[targetName]) {
-        console.error('x', `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`);
+        console.error(
+          'x',
+          `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`,
+        );
         process.exit(1);
       }
 
+      const cliOptions = buildDbConfig(
+        normalizeCodegenListOptions(
+          camelizeArgv(argv as Record<string, any>),
+        ),
+      );
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const result = await generate(targets[name]);
+        const result = await generate({
+          ...targets[name],
+          ...cliOptions,
+        } as GraphQLSDKConfigTarget);
         printResult(result);
         if (!result.success) hasError = true;
       }
@@ -97,39 +127,15 @@ export const commands = async (
       return argv;
     }
 
-    // Single config
-    const result = await generate(config as GraphQLSDKConfigTarget);
-    printResult(result);
-    if (!result.success) process.exit(1);
-    prompter.close();
-    return argv;
+    fileConfig = config as GraphQLSDKConfigTarget;
   }
 
-  // No config file - prompt for options using shared questions
-  const answers = await prompter.prompt<CodegenAnswers>(argv as CodegenAnswers, codegenQuestions);
-
-  // Convert kebab-case CLI args to camelCase for internal use
-  const camelized = camelizeArgv(answers) as CodegenAnswers;
-
-  // Build db config if schemas or apiNames provided
-  const db = (camelized.schemas || camelized.apiNames) ? {
-    schemas: camelized.schemas,
-    apiNames: camelized.apiNames,
-  } : undefined;
-
-  const result = await generate({
-    endpoint: camelized.endpoint,
-    schemaFile: camelized.schemaFile,
-    db,
-    output: camelized.output,
-    authorization: camelized.authorization,
-    reactQuery: camelized.reactQuery,
-    orm: camelized.orm,
-    browserCompatible: camelized.browserCompatible,
-    dryRun: camelized.dryRun,
-    verbose: camelized.verbose,
-  });
-
+  const seeded = seedArgvFromConfig(argv, fileConfig);
+  const answers = hasResolvedCodegenSource(seeded)
+    ? seeded
+    : await prompter.prompt(seeded, codegenQuestions);
+  const options = buildGenerateOptions(answers, fileConfig);
+  const result = await generate(options);
   printResult(result);
   prompter.close();
   return argv;
@@ -147,13 +153,18 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
-    boolean: [
-      'help', 'version', 'verbose', 'dry-run', 'react-query', 'orm', 'keep-db', 'browser-compatible',
-    ],
     string: [
-      'config', 'endpoint', 'schema-file', 'output', 'target', 'authorization',
-      'pgpm-module-path', 'pgpm-workspace-path', 'pgpm-module-name',
-      'schemas', 'api-names',
+      'config',
+      'endpoint',
+      'schema-file',
+      'output',
+      'target',
+      'authorization',
+      'pgpm-module-path',
+      'pgpm-workspace-path',
+      'pgpm-module-name',
+      'schemas',
+      'api-names',
     ],
   },
 };

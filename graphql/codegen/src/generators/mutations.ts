@@ -3,8 +3,8 @@
  * Uses AST-based approach for PostGraphile-compatible mutations
  */
 import * as t from 'gql-ast';
-import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
+import { print } from 'graphql';
 import { camelize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
@@ -12,9 +12,8 @@ import {
   getCustomAstForCleanField,
   requiresSubfieldSelection,
 } from '../core/custom-ast';
-import type { CleanTable } from '../types/schema';
 import type { MutationOptions } from '../types/mutation';
-
+import type { CleanTable } from '../types/schema';
 import { isRelationalField } from './field-selector';
 
 /**
@@ -42,7 +41,7 @@ function generateFieldSelections(table: CleanTable): FieldNode[] {
 export function buildPostGraphileCreate(
   table: CleanTable,
   _allTables: CleanTable[],
-  _options: MutationOptions = {}
+  _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
   { input: { [key: string]: Record<string, unknown> } }
@@ -118,7 +117,7 @@ export function buildPostGraphileCreate(
 export function buildPostGraphileUpdate(
   table: CleanTable,
   _allTables: CleanTable[],
-  _options: MutationOptions = {}
+  _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
   { input: { id: string | number; patch: Record<string, unknown> } }
@@ -194,7 +193,7 @@ export function buildPostGraphileUpdate(
 export function buildPostGraphileDelete(
   table: CleanTable,
   _allTables: CleanTable[],
-  _options: MutationOptions = {}
+  _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
   { input: { id: string | number } }

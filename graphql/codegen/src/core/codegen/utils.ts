@@ -1,13 +1,14 @@
 /**
  * Codegen utilities - naming conventions, type mapping, and helpers
  */
+import { pluralize } from 'inflekt';
+
 import type {
-  CleanTable,
   CleanField,
   CleanFieldType,
+  CleanTable,
 } from '../../types/schema';
-import { scalarToTsType, scalarToFilterType } from './scalars';
-import { pluralize } from 'inflekt';
+import { scalarToFilterType, scalarToTsType } from './scalars';
 
 // ============================================================================
 // String manipulation
@@ -304,7 +305,7 @@ export function fieldTypeToTs(fieldType: CleanFieldType): string {
  */
 export function getScalarFilterType(
   gqlType: string,
-  isArray = false
+  isArray = false,
 ): string | null {
   const cleanType = gqlType.replace(/!/g, '');
   return scalarToFilterType(cleanType, isArray);

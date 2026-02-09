@@ -3,8 +3,8 @@
  * Uses AST-based approach for all query generation
  */
 import * as t from 'gql-ast';
-import { print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
+import { print } from 'graphql';
 import { camelize, pluralize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
@@ -22,10 +22,9 @@ import type {
   QueryDefinition,
   QuerySelectionOptions,
 } from '../core/types';
-import type { CleanTable } from '../types/schema';
 import type { QueryOptions } from '../types/query';
+import type { CleanTable } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
-
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
 
 /**
@@ -109,7 +108,7 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
  * This creates a minimal schema for AST generation
  */
 export function generateIntrospectionSchema(
-  tables: CleanTable[]
+  tables: CleanTable[],
 ): IntrospectionSchema {
   const schema: IntrospectionSchema = {};
 
@@ -279,13 +278,13 @@ export function createASTQueryBuilder(tables: CleanTable[]): QueryBuilder {
 export function buildSelect(
   table: CleanTable,
   allTables: readonly CleanTable[],
-  options: QueryOptions = {}
+  options: QueryOptions = {},
 ): TypedDocumentString<Record<string, unknown>, QueryOptions> {
   const tableList = Array.from(allTables);
   const selection = convertFieldSelectionToSelectionOptions(
     table,
     tableList,
-    options.fieldSelection
+    options.fieldSelection,
   );
 
   // Generate query directly using AST
@@ -293,7 +292,7 @@ export function buildSelect(
     table,
     tableList,
     selection,
-    options
+    options,
   );
 
   return new TypedDocumentString(queryString, {}) as TypedDocumentString<
@@ -307,7 +306,7 @@ export function buildSelect(
  */
 export function buildFindOne(
   table: CleanTable,
-  _pkField: string = 'id'
+  _pkField: string = 'id',
 ): TypedDocumentString<Record<string, unknown>, Record<string, unknown>> {
   const queryString = generateFindOneQueryAST(table);
 
@@ -321,7 +320,7 @@ export function buildFindOne(
  * Build a count query for a table
  */
 export function buildCount(
-  table: CleanTable
+  table: CleanTable,
 ): TypedDocumentString<
   { [key: string]: { totalCount: number } },
   { condition?: Record<string, unknown>; filter?: Record<string, unknown> }
@@ -337,7 +336,7 @@ export function buildCount(
 function convertFieldSelectionToSelectionOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  options?: FieldSelection
+  options?: FieldSelection,
 ): QuerySelectionOptions | null {
   return convertToSelectionOptions(table, allTables, options);
 }
@@ -349,7 +348,7 @@ function generateSelectQueryAST(
   table: CleanTable,
   allTables: CleanTable[],
   selection: QuerySelectionOptions | null,
-  options: QueryOptions
+  options: QueryOptions,
 ): string {
   const pluralName = toCamelCasePlural(table.name);
 
@@ -357,7 +356,7 @@ function generateSelectQueryAST(
   const fieldSelections = generateFieldSelectionsFromOptions(
     table,
     allTables,
-    selection
+    selection,
   );
 
   // Build the query AST
@@ -371,13 +370,13 @@ function generateSelectQueryAST(
       t.variableDefinition({
         variable: t.variable({ name: 'first' }),
         type: t.namedType({ type: 'Int' }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'first',
         value: t.variable({ name: 'first' }),
-      })
+      }),
     );
   }
 
@@ -386,13 +385,13 @@ function generateSelectQueryAST(
       t.variableDefinition({
         variable: t.variable({ name: 'offset' }),
         type: t.namedType({ type: 'Int' }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'offset',
         value: t.variable({ name: 'offset' }),
-      })
+      }),
     );
   }
 
@@ -402,13 +401,13 @@ function generateSelectQueryAST(
       t.variableDefinition({
         variable: t.variable({ name: 'after' }),
         type: t.namedType({ type: 'Cursor' }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'after',
         value: t.variable({ name: 'after' }),
-      })
+      }),
     );
   }
 
@@ -417,13 +416,13 @@ function generateSelectQueryAST(
       t.variableDefinition({
         variable: t.variable({ name: 'before' }),
         type: t.namedType({ type: 'Cursor' }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'before',
         value: t.variable({ name: 'before' }),
-      })
+      }),
     );
   }
 
@@ -433,13 +432,13 @@ function generateSelectQueryAST(
       t.variableDefinition({
         variable: t.variable({ name: 'filter' }),
         type: t.namedType({ type: `${table.name}Filter` }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'filter',
         value: t.variable({ name: 'filter' }),
-      })
+      }),
     );
   }
 
@@ -454,13 +453,13 @@ function generateSelectQueryAST(
             type: t.namedType({ type: toOrderByTypeName(table.name) }),
           }),
         }),
-      })
+      }),
     );
     queryArgs.push(
       t.argument({
         name: 'orderBy',
         value: t.variable({ name: 'orderBy' }),
-      })
+      }),
     );
   }
 
@@ -492,7 +491,7 @@ function generateSelectQueryAST(
             t.field({ name: 'endCursor' }),
           ],
         }),
-      })
+      }),
     );
   }
 
@@ -526,7 +525,7 @@ function generateSelectQueryAST(
 function generateFieldSelectionsFromOptions(
   table: CleanTable,
   allTables: CleanTable[],
-  selection: QuerySelectionOptions | null
+  selection: QuerySelectionOptions | null,
 ): FieldNode[] {
   const DEFAULT_NESTED_RELATION_FIRST = 20;
 
@@ -569,7 +568,7 @@ function generateFieldSelectionsFromOptions(
         if (include) {
           // Check if this nested field requires subfield selection
           const nestedFieldDef = relatedTable?.fields.find(
-            (f) => f.name === nestedField
+            (f) => f.name === nestedField,
           );
           if (nestedFieldDef && requiresSubfieldSelection(nestedFieldDef)) {
             // Use custom AST generation for complex nested fields
@@ -609,7 +608,7 @@ function generateFieldSelectionsFromOptions(
                 }),
               ],
             }),
-          })
+          }),
         );
       } else {
         // For belongsTo/hasOne relations, use direct selection
@@ -619,7 +618,7 @@ function generateFieldSelectionsFromOptions(
             selectionSet: t.selectionSet({
               selections: nestedSelections,
             }),
-          })
+          }),
         );
       }
     }
@@ -633,7 +632,7 @@ function generateFieldSelectionsFromOptions(
  */
 function getRelationInfo(
   fieldName: string,
-  table: CleanTable
+  table: CleanTable,
 ): { type: string; relation: unknown } | null {
   const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
 
@@ -670,14 +669,14 @@ function getRelationInfo(
 function findRelatedTable(
   relationField: string,
   table: CleanTable,
-  allTables: CleanTable[]
+  allTables: CleanTable[],
 ): CleanTable | null {
   // Find the related table name
   let referencedTableName: string | undefined;
 
   // Check belongsTo relations
   const belongsToRel = table.relations.belongsTo.find(
-    (rel) => rel.fieldName === relationField
+    (rel) => rel.fieldName === relationField,
   );
   if (belongsToRel) {
     referencedTableName = belongsToRel.referencesTable;
@@ -686,7 +685,7 @@ function findRelatedTable(
   // Check hasOne relations
   if (!referencedTableName) {
     const hasOneRel = table.relations.hasOne.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasOneRel) {
       referencedTableName = hasOneRel.referencedByTable;
@@ -696,7 +695,7 @@ function findRelatedTable(
   // Check hasMany relations
   if (!referencedTableName) {
     const hasManyRel = table.relations.hasMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (hasManyRel) {
       referencedTableName = hasManyRel.referencedByTable;
@@ -706,7 +705,7 @@ function findRelatedTable(
   // Check manyToMany relations
   if (!referencedTableName) {
     const manyToManyRel = table.relations.manyToMany.find(
-      (rel) => rel.fieldName === relationField
+      (rel) => rel.fieldName === relationField,
     );
     if (manyToManyRel) {
       referencedTableName = manyToManyRel.rightTable;

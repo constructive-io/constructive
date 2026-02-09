@@ -2,12 +2,12 @@
  * Tests for scalar mappings
  */
 import {
-  SCALAR_TS_MAP,
+  BASE_FILTER_TYPE_NAMES,
   SCALAR_FILTER_MAP,
   SCALAR_NAMES,
-  BASE_FILTER_TYPE_NAMES,
-  scalarToTsType,
+  SCALAR_TS_MAP,
   scalarToFilterType,
+  scalarToTsType,
 } from '../../core/codegen/scalars';
 
 describe('scalars', () => {
@@ -81,11 +81,15 @@ describe('scalars', () => {
     });
 
     it('returns unknown for unknown scalars when option set', () => {
-      expect(scalarToTsType('CustomScalar', { unknownScalar: 'unknown' })).toBe('unknown');
+      expect(scalarToTsType('CustomScalar', { unknownScalar: 'unknown' })).toBe(
+        'unknown',
+      );
     });
 
     it('uses overrides when provided', () => {
-      expect(scalarToTsType('JSON', { overrides: { JSON: 'JsonValue' } })).toBe('JsonValue');
+      expect(scalarToTsType('JSON', { overrides: { JSON: 'JsonValue' } })).toBe(
+        'JsonValue',
+      );
     });
   });
 

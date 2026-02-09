@@ -75,13 +75,23 @@ export const BASE_FILTER_TYPE_NAMES = new Set([
 
 export function scalarToTsType(
   scalarName: string,
-  options: { unknownScalar?: 'unknown' | 'name'; overrides?: Record<string, string> } = {}
+  options: {
+    unknownScalar?: 'unknown' | 'name';
+    overrides?: Record<string, string>;
+  } = {},
 ): string {
-  return options.overrides?.[scalarName] ?? SCALAR_TS_MAP[scalarName] ?? (options.unknownScalar === 'unknown' ? 'unknown' : scalarName);
+  return (
+    options.overrides?.[scalarName] ??
+    SCALAR_TS_MAP[scalarName] ??
+    (options.unknownScalar === 'unknown' ? 'unknown' : scalarName)
+  );
 }
 
 /** Get the filter type for a scalar (handles both scalar and array types) */
-export function scalarToFilterType(scalarName: string, isArray = false): string | null {
+export function scalarToFilterType(
+  scalarName: string,
+  isArray = false,
+): string | null {
   const baseName = scalarName === 'ID' ? 'UUID' : scalarName;
   if (isArray) {
     return LIST_FILTER_SCALARS.has(baseName) ? `${baseName}ListFilter` : null;

@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/nodemailer": "^7.0.5",
     "@types/smtp-server": "^3.5.12",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "smtp-server": "^3.14.0",
     "ts-node": "^10.9.2"
   },

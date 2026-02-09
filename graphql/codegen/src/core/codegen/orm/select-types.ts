@@ -53,16 +53,10 @@ export interface NestedSelectConfig {
 /**
  * Recursively validates select objects, rejecting unknown keys.
  *
- * This type ensures that users can only select fields that actually exist
- * in the GraphQL schema. It returns `never` if any excess keys are found
- * at any nesting level, causing a TypeScript compile error.
- *
- * Why this is needed:
- * TypeScript's excess property checking has a quirk where it only catches
- * invalid fields when they are the ONLY fields. When mixed with valid fields
- * (e.g., `{ id: true, invalidField: true }`), the structural typing allows
- * the excess property through. This type explicitly checks for and rejects
- * such cases.
+ * NOTE: This type is intentionally NOT used in generated parameter positions
+ * (conditional types block IDE autocompletion). Parameters use `S` directly
+ * with `S extends XxxSelect` constraints, which provides full
+ * autocompletion via TypeScript's contextual typing.
  *
  * @example
  * // This will cause a type error because 'invalid' doesn't exist:
@@ -79,14 +73,28 @@ export type DeepExact<T, Shape> = T extends Shape
     ? {
         [K in keyof T]: K extends keyof Shape
           ? T[K] extends { select: infer NS }
-            ? Shape[K] extends { select?: infer ShapeNS }
-              ? { select: DeepExact<NS, NonNullable<ShapeNS>> }
-              : T[K]
+            ? Extract<Shape[K], { select?: unknown }> extends {
+                select?: infer ShapeNS;
+              }
+              ? DeepExact<
+                  Omit<T[K], 'select'> & {
+                    select: DeepExact<NS, NonNullable<ShapeNS>>;
+                  },
+                  Extract<Shape[K], { select?: unknown }>
+                >
+              : never
             : T[K]
           : never;
       }
     : never
   : never;
+
+/**
+ * Enforces exact select shape while keeping contextual typing on `S extends XxxSelect`.
+ * Use this as an intersection in overloads:
+ * `{ select: S } & StrictSelect<S, XxxSelect>`.
+ */
+export type StrictSelect<S, Shape> = S extends DeepExact<S, Shape> ? {} : never;
 
 /**
  * Infers the result type from a select configuration
@@ -100,7 +108,9 @@ export type DeepExact<T, Shape> = T extends Shape
 export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
   ? TEntity
   : {
-      [K in keyof TSelect as TSelect[K] extends false | undefined ? never : K]: TSelect[K] extends true
+      [K in keyof TSelect as TSelect[K] extends false | undefined
+        ? never
+        : K]: TSelect[K] extends true
         ? K extends keyof TEntity
           ? TEntity[K]
           : never
@@ -108,7 +118,9 @@ export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
           ? K extends keyof TEntity
             ? NonNullable<TEntity[K]> extends ConnectionResult<infer NodeType>
               ? ConnectionResult<InferSelectResult<NodeType, NestedSelect>>
-              : InferSelectResult<NonNullable<TEntity[K]>, NestedSelect> | (null extends TEntity[K] ? null : never)
+              :
+                  | InferSelectResult<NonNullable<TEntity[K]>, NestedSelect>
+                  | (null extends TEntity[K] ? null : never)
             : never
           : K extends keyof TEntity
             ? TEntity[K]
@@ -202,8 +214,9 @@ export interface UpdateArgs<TSelect, TWhere, TData> {
 /**
  * Arguments for delete operations
  */
-export interface DeleteArgs<TWhere> {
+export interface DeleteArgs<TWhere, TSelect = undefined> {
   where: TWhere;
+  select?: TSelect;
 }
 
 /**
@@ -231,7 +244,11 @@ export type ConnectionQueryResult<TEntity, TSelect> = QueryResult<{
 /**
  * Type for mutation that returns a payload with the entity
  */
-export type MutationResult<TEntity, TSelect, TPayloadKey extends string> = QueryResult<{
+export type MutationResult<
+  TEntity,
+  TSelect,
+  TPayloadKey extends string,
+> = QueryResult<{
   [K in TPayloadKey]: {
     [EntityKey: string]: ResolveSelectResult<TEntity, TSelect>;
   };

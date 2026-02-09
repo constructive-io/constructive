@@ -1,0 +1,24 @@
+{
+  "name": "@constructive-io/examples-codegen-integration",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "codegen": "tsx scripts/codegen-runner.ts",
+    "test:types": "pnpm run codegen && tsc --noEmit",
+    "test:codegen": "pnpm run codegen"
+  },
+  "dependencies": {
+    "@0no-co/graphql.web": "^1.2.0",
+    "@tanstack/react-query": "^5.90.20",
+    "gql-ast": "workspace:^",
+    "graphql": "15.10.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
+    "tsx": "^4.20.3",
+    "typescript": "^5.1.6"
+  }
+}

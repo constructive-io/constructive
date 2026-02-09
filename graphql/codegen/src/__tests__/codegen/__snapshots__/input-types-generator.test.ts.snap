@@ -469,7 +469,17 @@ export interface UpdateCommentInput {
 export interface DeleteCommentInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "User": {
+    "posts": "Post",
+    "comments": "Comment"
+  },
+  "Post": {
+    "comments": "Comment"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates complete types file for single table 1`] = `
@@ -785,7 +795,9 @@ export interface UpdateUserInput {
 export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates custom input types from TypeRegistry 1`] = `
@@ -1102,6 +1114,8 @@ export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface LoginInput {
   email: string;
@@ -1430,6 +1444,8 @@ export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface LoginInput {
   email: string;
@@ -1831,7 +1847,13 @@ export interface UpdateProfileInput {
 export interface DeleteProfileInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "User": {
+    "posts": "Post"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates types with manyToMany relations 1`] = `
@@ -2209,7 +2231,16 @@ export interface UpdateCategoryInput {
 export interface DeleteCategoryInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "Post": {
+    "comments": "Comment"
+  },
+  "Category": {
+    "posts": "Post"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile handles empty tables array 1`] = `
@@ -2437,5 +2468,7 @@ export interface UUIDListFilter {
   anyLessThanOrEqualTo?: string;
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;"
 `;

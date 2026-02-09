@@ -30,7 +30,7 @@
     "build:dev": "makage build --dev"
   },
   "devDependencies": {
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@constructive-io/knative-job-fn": "workspace:^",

@@ -32,7 +32,7 @@
     "@constructive-io/graphql-test": "workspace:^",
     "@jest/test-sequencer": "^30.2.0",
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {

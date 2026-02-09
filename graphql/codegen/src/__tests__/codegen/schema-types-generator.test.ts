@@ -2,17 +2,33 @@
  * Snapshot tests for schema-types-generator
  */
 import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
-import type { TypeRegistry, ResolvedType } from '../../types/schema';
+import type { ResolvedType, TypeRegistry } from '../../types/schema';
 
-function createTypeRegistry(types: Array<[string, ResolvedType]>): TypeRegistry {
+function createTypeRegistry(
+  types: Array<[string, ResolvedType]>,
+): TypeRegistry {
   return new Map(types);
 }
 
 describe('schema-types-generator', () => {
   it('generates enum types as string unions', () => {
     const registry = createTypeRegistry([
-      ['Status', { kind: 'ENUM', name: 'Status', enumValues: ['ACTIVE', 'INACTIVE', 'PENDING'] }],
-      ['Priority', { kind: 'ENUM', name: 'Priority', enumValues: ['LOW', 'MEDIUM', 'HIGH'] }],
+      [
+        'Status',
+        {
+          kind: 'ENUM',
+          name: 'Status',
+          enumValues: ['ACTIVE', 'INACTIVE', 'PENDING'],
+        },
+      ],
+      [
+        'Priority',
+        {
+          kind: 'ENUM',
+          name: 'Priority',
+          enumValues: ['LOW', 'MEDIUM', 'HIGH'],
+        },
+      ],
     ]);
 
     const result = generateSchemaTypesFile({
@@ -32,7 +48,14 @@ describe('schema-types-generator', () => {
           kind: 'INPUT_OBJECT',
           name: 'CreateUserInput',
           inputFields: [
-            { name: 'email', type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'String' } } },
+            {
+              name: 'email',
+              type: {
+                kind: 'NON_NULL',
+                name: null,
+                ofType: { kind: 'SCALAR', name: 'String' },
+              },
+            },
             { name: 'name', type: { kind: 'SCALAR', name: 'String' } },
             { name: 'age', type: { kind: 'SCALAR', name: 'Int' } },
           ],
@@ -44,7 +67,14 @@ describe('schema-types-generator', () => {
           kind: 'INPUT_OBJECT',
           name: 'UpdateUserInput',
           inputFields: [
-            { name: 'id', type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'UUID' } } },
+            {
+              name: 'id',
+              type: {
+                kind: 'NON_NULL',
+                name: null,
+                ofType: { kind: 'SCALAR', name: 'UUID' },
+              },
+            },
             { name: 'name', type: { kind: 'SCALAR', name: 'String' } },
           ],
         },
@@ -61,7 +91,14 @@ describe('schema-types-generator', () => {
 
   it('generates union types', () => {
     const registry = createTypeRegistry([
-      ['SearchResult', { kind: 'UNION', name: 'SearchResult', possibleTypes: ['User', 'Post', 'Comment'] }],
+      [
+        'SearchResult',
+        {
+          kind: 'UNION',
+          name: 'SearchResult',
+          possibleTypes: ['User', 'Post', 'Comment'],
+        },
+      ],
     ]);
 
     const result = generateSchemaTypesFile({
@@ -90,7 +127,14 @@ describe('schema-types-generator', () => {
           kind: 'OBJECT',
           name: 'LoginPayload',
           fields: [
-            { name: 'token', type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'String' } } },
+            {
+              name: 'token',
+              type: {
+                kind: 'NON_NULL',
+                name: null,
+                ofType: { kind: 'SCALAR', name: 'String' },
+              },
+            },
             { name: 'refreshToken', type: { kind: 'SCALAR', name: 'String' } },
             { name: 'user', type: { kind: 'OBJECT', name: 'User' } },
           ],
@@ -111,7 +155,14 @@ describe('schema-types-generator', () => {
     const registry = createTypeRegistry([
       ['User', { kind: 'ENUM', name: 'User', enumValues: ['ADMIN'] }],
       ['String', { kind: 'ENUM', name: 'String', enumValues: ['A'] }],
-      ['CustomEnum', { kind: 'ENUM', name: 'CustomEnum', enumValues: ['VALUE_A', 'VALUE_B'] }],
+      [
+        'CustomEnum',
+        {
+          kind: 'ENUM',
+          name: 'CustomEnum',
+          enumValues: ['VALUE_A', 'VALUE_B'],
+        },
+      ],
     ]);
 
     const result = generateSchemaTypesFile({

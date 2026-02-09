@@ -4,9 +4,9 @@
  * Fetches GraphQL schema via introspection from a live endpoint.
  * Wraps the existing fetchSchema() function with the SchemaSource interface.
  */
+import { fetchSchema } from '../fetch-schema';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
-import { fetchSchema } from '../fetch-schema';
 
 export interface EndpointSchemaSourceOptions {
   /**
@@ -51,14 +51,14 @@ export class EndpointSchemaSource implements SchemaSource {
     if (!result.success) {
       throw new SchemaSourceError(
         result.error ?? 'Unknown error fetching schema',
-        this.describe()
+        this.describe(),
       );
     }
 
     if (!result.data) {
       throw new SchemaSourceError(
         'No introspection data returned',
-        this.describe()
+        this.describe(),
       );
     }
 

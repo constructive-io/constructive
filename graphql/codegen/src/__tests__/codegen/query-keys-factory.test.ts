@@ -6,11 +6,17 @@
  * - Mutation keys factory (mutation-keys.ts)
  * - Cache invalidation helpers (invalidation.ts)
  */
-import { generateQueryKeysFile } from '../../core/codegen/query-keys';
-import { generateMutationKeysFile } from '../../core/codegen/mutation-keys';
 import { generateInvalidationFile } from '../../core/codegen/invalidation';
-import type { CleanTable, CleanFieldType, CleanRelations, CleanOperation, CleanTypeRef } from '../../types/schema';
-import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
+import { generateMutationKeysFile } from '../../core/codegen/mutation-keys';
+import { generateQueryKeysFile } from '../../core/codegen/query-keys';
+import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
+import type {
+  CleanFieldType,
+  CleanOperation,
+  CleanRelations,
+  CleanTable,
+  CleanTypeRef,
+} from '../../types/schema';
 
 const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
@@ -26,7 +32,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -37,7 +45,11 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
   };
 }
 
-function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
+function createTypeRef(
+  kind: CleanTypeRef['kind'],
+  name: string | null,
+  ofType?: CleanTypeRef,
+): CleanTypeRef {
   return { kind, name, ofType };
 }
 
@@ -155,8 +167,16 @@ const simpleRelationships: Record<string, EntityRelationship> = {
 
 const hierarchicalRelationships: Record<string, EntityRelationship> = {
   database: { parent: 'Organization', foreignKey: 'organizationId' },
-  table: { parent: 'Database', foreignKey: 'databaseId', ancestors: ['organization'] },
-  field: { parent: 'Table', foreignKey: 'tableId', ancestors: ['database', 'organization'] },
+  table: {
+    parent: 'Database',
+    foreignKey: 'databaseId',
+    ancestors: ['organization'],
+  },
+  field: {
+    parent: 'Table',
+    foreignKey: 'tableId',
+    ancestors: ['database', 'organization'],
+  },
 };
 
 const sampleCustomQueries: CleanOperation[] = [
@@ -171,7 +191,14 @@ const sampleCustomQueries: CleanOperation[] = [
     name: 'searchUsers',
     kind: 'query',
     args: [
-      { name: 'query', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'query',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
       { name: 'limit', type: createTypeRef('SCALAR', 'Int') },
     ],
     returnType: createTypeRef('LIST', null, createTypeRef('OBJECT', 'User')),
@@ -184,8 +211,22 @@ const sampleCustomMutations: CleanOperation[] = [
     name: 'login',
     kind: 'mutation',
     args: [
-      { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'email',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      {
+        name: 'password',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
     ],
     returnType: createTypeRef('OBJECT', 'LoginPayload'),
     description: 'Authenticate user',

@@ -1,10 +1,15 @@
 /**
  * Types generator - generates types.ts with entity interfaces using Babel AST
  */
-import type { CleanTable } from '../../types/schema';
 import * as t from '@babel/types';
+
+import type { CleanTable } from '../../types/schema';
 import { generateCode } from './babel-ast';
-import { getScalarFields, fieldTypeToTs, getGeneratedFileHeader } from './utils';
+import {
+  fieldTypeToTs,
+  getGeneratedFileHeader,
+  getScalarFields,
+} from './utils';
 
 interface InterfaceProperty {
   name: string;
@@ -16,32 +21,100 @@ interface InterfaceProperty {
 // Filter Types Configuration
 // ============================================================================
 
-type FilterOps = 'equality' | 'distinct' | 'inArray' | 'comparison' | 'string' | 'json' | 'inet' | 'fulltext' | 'listArray';
+type FilterOps =
+  | 'equality'
+  | 'distinct'
+  | 'inArray'
+  | 'comparison'
+  | 'string'
+  | 'json'
+  | 'inet'
+  | 'fulltext'
+  | 'listArray';
 
 /** All filter type configurations - scalar and list filters */
-const FILTER_CONFIGS: Array<{ name: string; tsType: string; operators: FilterOps[] }> = [
+const FILTER_CONFIGS: Array<{
+  name: string;
+  tsType: string;
+  operators: FilterOps[];
+}> = [
   // Scalar filters
-  { name: 'StringFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'] },
-  { name: 'IntFilter', tsType: 'number', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'FloatFilter', tsType: 'number', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
+  {
+    name: 'StringFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'string'],
+  },
+  {
+    name: 'IntFilter',
+    tsType: 'number',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'FloatFilter',
+    tsType: 'number',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
   { name: 'BooleanFilter', tsType: 'boolean', operators: ['equality'] },
-  { name: 'UUIDFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray'] },
-  { name: 'DatetimeFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'DateFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'JSONFilter', tsType: 'Record<string, unknown>', operators: ['equality', 'distinct', 'json'] },
-  { name: 'BigIntFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
-  { name: 'BigFloatFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison'] },
+  {
+    name: 'UUIDFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray'],
+  },
+  {
+    name: 'DatetimeFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'DateFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'JSONFilter',
+    tsType: 'Record<string, unknown>',
+    operators: ['equality', 'distinct', 'json'],
+  },
+  {
+    name: 'BigIntFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
+  {
+    name: 'BigFloatFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison'],
+  },
   { name: 'BitStringFilter', tsType: 'string', operators: ['equality'] },
-  { name: 'InternetAddressFilter', tsType: 'string', operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'] },
+  {
+    name: 'InternetAddressFilter',
+    tsType: 'string',
+    operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
+  },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
   // List filters
-  { name: 'StringListFilter', tsType: 'string[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
-  { name: 'IntListFilter', tsType: 'number[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
-  { name: 'UUIDListFilter', tsType: 'string[]', operators: ['equality', 'distinct', 'comparison', 'listArray'] },
+  {
+    name: 'StringListFilter',
+    tsType: 'string[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
+  {
+    name: 'IntListFilter',
+    tsType: 'number[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
+  {
+    name: 'UUIDListFilter',
+    tsType: 'string[]',
+    operators: ['equality', 'distinct', 'comparison', 'listArray'],
+  },
 ];
 
 /** Build filter properties based on operator sets */
-function buildFilterProperties(tsType: string, operators: FilterOps[]): InterfaceProperty[] {
+function buildFilterProperties(
+  tsType: string,
+  operators: FilterOps[],
+): InterfaceProperty[] {
   const props: InterfaceProperty[] = [];
 
   // Equality operators (isNull, equalTo, notEqualTo)
@@ -161,7 +234,9 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
   if (typeStr === 'unknown') return t.tsUnknownKeyword();
 
   if (typeStr.includes(' | ')) {
-    const parts = typeStr.split(' | ').map((p) => parseTypeAnnotation(p.trim()));
+    const parts = typeStr
+      .split(' | ')
+      .map((p) => parseTypeAnnotation(p.trim()));
     return t.tsUnionType(parts);
   }
 
@@ -176,12 +251,12 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
 
 function createInterfaceDeclaration(
   name: string,
-  properties: InterfaceProperty[]
+  properties: InterfaceProperty[],
 ): t.ExportNamedDeclaration {
   const props = properties.map((prop) => {
     const propSig = t.tsPropertySignature(
       t.identifier(prop.name),
-      t.tsTypeAnnotation(parseTypeAnnotation(prop.type))
+      t.tsTypeAnnotation(parseTypeAnnotation(prop.type)),
     );
     propSig.optional = prop.optional ?? false;
     return propSig;
@@ -191,7 +266,7 @@ function createInterfaceDeclaration(
     t.identifier(name),
     null,
     null,
-    t.tsInterfaceBody(props)
+    t.tsInterfaceBody(props),
   );
   return t.exportNamedDeclaration(interfaceDecl);
 }
@@ -201,7 +276,7 @@ function createInterfaceDeclaration(
  */
 export function generateTypesFile(
   tables: CleanTable[],
-  options: GenerateTypesOptions = {}
+  options: GenerateTypesOptions = {},
 ): string {
   const { enumsFromSchemaTypes = [] } = options;
   const enumSet = new Set(enumsFromSchemaTypes);
@@ -226,7 +301,10 @@ export function generateTypesFile(
     const specifiers = Array.from(usedEnums)
       .sort()
       .map((name) => t.importSpecifier(t.identifier(name), t.identifier(name)));
-    const importDecl = t.importDeclaration(specifiers, t.stringLiteral('./schema-types'));
+    const importDecl = t.importDeclaration(
+      specifiers,
+      t.stringLiteral('./schema-types'),
+    );
     importDecl.importKind = 'type';
     statements.push(importDecl);
   }
@@ -245,7 +323,12 @@ export function generateTypesFile(
 
   // Generate all filter types
   for (const { name, tsType, operators } of FILTER_CONFIGS) {
-    statements.push(createInterfaceDeclaration(name, buildFilterProperties(tsType, operators)));
+    statements.push(
+      createInterfaceDeclaration(
+        name,
+        buildFilterProperties(tsType, operators),
+      ),
+    );
   }
 
   const header = getGeneratedFileHeader('Entity types and filter types');

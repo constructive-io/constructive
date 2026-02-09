@@ -50,7 +50,7 @@
     "@pgpm/verify": "^0.16.0",
     "@pgpmjs/core": "workspace:^",
     "@types/supertest": "^6.0.3",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pgsql-test": "workspace:^",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2"

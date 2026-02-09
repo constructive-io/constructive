@@ -1,8 +1,11 @@
 /**
- * Custom mutation hook generators for non-table operations
+ * Custom mutation hook generators for non-table operations (Babel AST-based)
  *
  * Generates hooks for operations discovered via schema introspection
  * that are NOT table CRUD operations (e.g., login, register, etc.)
+ *
+ * Delegates to ORM custom mutation operations:
+ *   getClient().mutation.operationName(args, { select }).unwrap()
  *
  * Output structure:
  * mutations/
@@ -10,26 +13,43 @@
  *   useRegisterMutation.ts
  *   ...
  */
-import type {
-  CleanOperation,
-  CleanArgument,
-  TypeRegistry,
-} from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment, typedParam, createTypedCallExpression } from './babel-ast';
-import { buildCustomMutationString } from './schema-gql-ast';
+
+import type { CleanOperation, TypeRegistry } from '../../types/schema';
 import {
-  typeRefToTsType,
-  isTypeRequired,
-  getOperationHookName,
-  getOperationFileName,
-  getOperationVariablesTypeName,
-  getOperationResultTypeName,
-  getDocumentConstName,
+  buildSelectionArgsCall,
+  callExpr,
+  constDecl,
+  createFunctionParam,
+  createImportDeclaration,
+  createSTypeParam,
+  createTypeReExport,
+  customSelectResultTypeLiteral,
+  destructureParamsWithSelection,
+  exportDeclareFunction,
+  exportFunction,
+  generateHookFileCode,
+  getClientCustomCallUnwrap,
+  objectProp,
+  omitType,
+  returnUseMutation,
+  selectionConfigType,
+  spreadObj,
+  sRef,
+  typeRef,
+  useMutationOptionsType,
+  useMutationResultType,
+  voidStatement,
+} from './hooks-ast';
+import { getSelectTypeName } from './select-helpers';
+import {
   createTypeTracker,
-  type TypeTracker,
+  getOperationFileName,
+  getOperationHookName,
+  getTypeBaseName,
+  typeRefToTsType,
 } from './type-resolver';
-import { getGeneratedFileHeader } from './utils';
+import { ucFirst } from './utils';
 
 export interface GeneratedCustomMutationFile {
   fileName: string;
@@ -40,34 +60,14 @@ export interface GeneratedCustomMutationFile {
 export interface GenerateCustomMutationHookOptions {
   operation: CleanOperation;
   typeRegistry: TypeRegistry;
-  maxDepth?: number;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
   tableTypeNames?: Set<string>;
   useCentralizedKeys?: boolean;
 }
 
-interface VariablesProp {
-  name: string;
-  type: string;
-  optional: boolean;
-  docs?: string[];
-}
-
-function generateVariablesProperties(
-  args: CleanArgument[],
-  tracker?: TypeTracker
-): VariablesProp[] {
-  return args.map((arg) => ({
-    name: arg.name,
-    type: typeRefToTsType(arg.type, tracker),
-    optional: !isTypeRequired(arg.type),
-    docs: arg.description ? [arg.description] : undefined,
-  }));
-}
-
 export function generateCustomMutationHook(
-  options: GenerateCustomMutationHookOptions
+  options: GenerateCustomMutationHookOptions,
 ): GeneratedCustomMutationFile | null {
   const { operation, reactQueryEnabled = true } = options;
 
@@ -79,216 +79,322 @@ export function generateCustomMutationHook(
     return generateCustomMutationHookInternal(options);
   } catch (err) {
     console.error(`Error generating hook for mutation: ${operation.name}`);
-    console.error(`  Args: ${operation.args.length}, Return type: ${operation.returnType.kind}/${operation.returnType.name}`);
+    console.error(
+      `  Args: ${operation.args.length}, Return type: ${operation.returnType.kind}/${operation.returnType.name}`,
+    );
     throw err;
   }
 }
 
 function generateCustomMutationHookInternal(
-  options: GenerateCustomMutationHookOptions
+  options: GenerateCustomMutationHookOptions,
 ): GeneratedCustomMutationFile {
   const {
     operation,
     typeRegistry,
-    maxDepth = 2,
-    skipQueryField = true,
     tableTypeNames,
     useCentralizedKeys = true,
   } = options;
 
   const hookName = getOperationHookName(operation.name, 'mutation');
   const fileName = getOperationFileName(operation.name, 'mutation');
-  const variablesTypeName = getOperationVariablesTypeName(operation.name, 'mutation');
-  const resultTypeName = getOperationResultTypeName(operation.name, 'mutation');
-  const documentConstName = getDocumentConstName(operation.name, 'mutation');
+  const varTypeName = `${ucFirst(operation.name)}Variables`;
 
   const tracker = createTypeTracker({ tableTypeNames });
 
-  const mutationDocument = buildCustomMutationString({
-    operation,
-    typeRegistry,
-    maxDepth,
-    skipQueryField,
-  });
+  const hasArgs = operation.args.length > 0;
+
+  typeRefToTsType(operation.returnType, tracker);
+  for (const arg of operation.args) {
+    typeRefToTsType(arg.type, tracker);
+  }
+
+  const selectTypeName = getSelectTypeName(operation.returnType);
+  const payloadTypeName = getTypeBaseName(operation.returnType);
+  const hasSelect = !!selectTypeName && !!payloadTypeName;
 
   const statements: t.Statement[] = [];
 
-  const variablesProps =
-    operation.args.length > 0
-      ? generateVariablesProperties(operation.args, tracker)
-      : [];
-
-  const resultType = typeRefToTsType(operation.returnType, tracker);
-
-  const schemaTypes = tracker.getImportableTypes();
-  const tableTypes = tracker.getTableTypes();
-
-  const reactQueryImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier('useMutation'), t.identifier('useMutation'))],
-    t.stringLiteral('@tanstack/react-query')
+  // Imports
+  statements.push(
+    createImportDeclaration('@tanstack/react-query', ['useMutation']),
   );
-  statements.push(reactQueryImport);
-
-  const reactQueryTypeImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier('UseMutationOptions'), t.identifier('UseMutationOptions'))],
-    t.stringLiteral('@tanstack/react-query')
+  statements.push(
+    createImportDeclaration(
+      '@tanstack/react-query',
+      ['UseMutationOptions', 'UseMutationResult'],
+      true,
+    ),
   );
-  reactQueryTypeImport.importKind = 'type';
-  statements.push(reactQueryTypeImport);
-
-  const clientImport = t.importDeclaration(
-    [t.importSpecifier(t.identifier('execute'), t.identifier('execute'))],
-    t.stringLiteral('../client')
+  statements.push(createImportDeclaration('../client', ['getClient']));
+  statements.push(
+    createImportDeclaration('../selection', ['buildSelectionArgs']),
   );
-  statements.push(clientImport);
-
-  if (tableTypes.length > 0) {
-    const typesImport = t.importDeclaration(
-      tableTypes.map((tt) => t.importSpecifier(t.identifier(tt), t.identifier(tt))),
-      t.stringLiteral('../types')
-    );
-    typesImport.importKind = 'type';
-    statements.push(typesImport);
-  }
-
-  if (schemaTypes.length > 0) {
-    const schemaTypesImport = t.importDeclaration(
-      schemaTypes.map((st) => t.importSpecifier(t.identifier(st), t.identifier(st))),
-      t.stringLiteral('../schema-types')
-    );
-    schemaTypesImport.importKind = 'type';
-    statements.push(schemaTypesImport);
-  }
+  statements.push(
+    createImportDeclaration('../selection', ['SelectionConfig'], true),
+  );
 
   if (useCentralizedKeys) {
-    const mutationKeyImport = t.importDeclaration(
-      [t.importSpecifier(t.identifier('customMutationKeys'), t.identifier('customMutationKeys'))],
-      t.stringLiteral('../mutation-keys')
-    );
-    statements.push(mutationKeyImport);
-  }
-
-  const mutationDocConst = t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(documentConstName),
-      t.templateLiteral(
-        [t.templateElement({ raw: '\n' + mutationDocument, cooked: '\n' + mutationDocument }, true)],
-        []
-      )
-    ),
-  ]);
-  const mutationDocExport = t.exportNamedDeclaration(mutationDocConst);
-  addJSDocComment(mutationDocExport, ['GraphQL mutation document']);
-  statements.push(mutationDocExport);
-
-  if (operation.args.length > 0) {
-    const variablesInterfaceProps = variablesProps.map((vp) => {
-      const prop = t.tsPropertySignature(
-        t.identifier(vp.name),
-        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(vp.type)))
-      );
-      prop.optional = vp.optional;
-      return prop;
-    });
-    const variablesInterface = t.tsInterfaceDeclaration(
-      t.identifier(variablesTypeName),
-      null,
-      null,
-      t.tsInterfaceBody(variablesInterfaceProps)
-    );
-    statements.push(t.exportNamedDeclaration(variablesInterface));
-  }
-
-  const resultInterfaceBody = t.tsInterfaceBody([
-    t.tsPropertySignature(
-      t.identifier(operation.name),
-      t.tsTypeAnnotation(t.tsTypeReference(t.identifier(resultType)))
-    ),
-  ]);
-  const resultInterface = t.tsInterfaceDeclaration(
-    t.identifier(resultTypeName),
-    null,
-    null,
-    resultInterfaceBody
-  );
-  statements.push(t.exportNamedDeclaration(resultInterface));
-
-  const hasArgs = operation.args.length > 0;
-
-  const hookBodyStatements: t.Statement[] = [];
-  const mutationOptions: (t.ObjectProperty | t.SpreadElement)[] = [];
-
-  if (useCentralizedKeys) {
-    mutationOptions.push(
-      t.objectProperty(
-        t.identifier('mutationKey'),
-        t.callExpression(
-          t.memberExpression(t.identifier('customMutationKeys'), t.identifier(operation.name)),
-          []
-        )
-      )
+    statements.push(
+      createImportDeclaration('../mutation-keys', ['customMutationKeys']),
     );
   }
 
   if (hasArgs) {
-    mutationOptions.push(
-      t.objectProperty(
-        t.identifier('mutationFn'),
-        t.arrowFunctionExpression(
-          [typedParam('variables', t.tsTypeReference(t.identifier(variablesTypeName)))],
-          createTypedCallExpression(
-            t.identifier('execute'),
-            [t.identifier(documentConstName), t.identifier('variables')],
-            [
-              t.tsTypeReference(t.identifier(resultTypeName)),
-              t.tsTypeReference(t.identifier(variablesTypeName)),
-            ]
-          )
-        )
-      )
-    );
-  } else {
-    mutationOptions.push(
-      t.objectProperty(
-        t.identifier('mutationFn'),
-        t.arrowFunctionExpression(
-          [],
-          createTypedCallExpression(
-            t.identifier('execute'),
-            [t.identifier(documentConstName)],
-            [t.tsTypeReference(t.identifier(resultTypeName))]
-          )
-        )
-      )
+    statements.push(
+      createImportDeclaration('../../orm/mutation', [varTypeName], true),
     );
   }
 
-  mutationOptions.push(t.spreadElement(t.identifier('options')));
+  const inputTypeImports: string[] = [];
+  if (hasSelect) {
+    inputTypeImports.push(selectTypeName!);
+    inputTypeImports.push(payloadTypeName!);
+  } else {
+    for (const refType of tracker.referencedTypes) {
+      if (!inputTypeImports.includes(refType)) {
+        inputTypeImports.push(refType);
+      }
+    }
+  }
+  if (inputTypeImports.length > 0) {
+    statements.push(
+      createImportDeclaration('../../orm/input-types', inputTypeImports, true),
+    );
+  }
 
-  hookBodyStatements.push(
-    t.returnStatement(
-      t.callExpression(t.identifier('useMutation'), [t.objectExpression(mutationOptions)])
-    )
+  if (hasSelect) {
+    statements.push(
+      createImportDeclaration(
+        '../../orm/select-types',
+        ['InferSelectResult', 'StrictSelect'],
+        true,
+      ),
+    );
+  }
+
+  // Re-exports
+  if (hasArgs) {
+    statements.push(createTypeReExport([varTypeName], '../../orm/mutation'));
+  }
+  if (hasSelect) {
+    statements.push(
+      createTypeReExport([selectTypeName!], '../../orm/input-types'),
+    );
+  }
+
+  // Hook
+  if (hasSelect) {
+    const mutationVarType: t.TSType = hasArgs
+      ? typeRef(varTypeName)
+      : t.tsVoidKeyword();
+
+    const selectedResultType = (sel: t.TSType) =>
+      customSelectResultTypeLiteral(
+        operation.name,
+        operation.returnType,
+        payloadTypeName!,
+        sel,
+      );
+
+    // Overload 1: with selection.fields
+    const o1ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(
+            t.tsParenthesizedType(
+              t.tsIntersectionType([
+                t.tsTypeLiteral([
+                  t.tsPropertySignature(
+                    t.identifier('fields'),
+                    t.tsTypeAnnotation(sRef()),
+                  ),
+                ]),
+                typeRef('StrictSelect', [sRef(), typeRef(selectTypeName!)]),
+              ]),
+            ),
+          ),
+        ),
+      ]),
+      useMutationOptionsType(selectedResultType(sRef()), mutationVarType),
+    ]);
+    statements.push(
+      exportDeclareFunction(
+        hookName,
+        createSTypeParam(selectTypeName!),
+        [createFunctionParam('params', o1ParamType)],
+        useMutationResultType(selectedResultType(sRef()), mutationVarType),
+      ),
+    );
+
+    // Implementation
+    const implSelProp = t.tsPropertySignature(
+      t.identifier('selection'),
+      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))),
+    );
+    const implParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([implSelProp]),
+      omitType(
+        typeRef('UseMutationOptions', [
+          t.tsAnyKeyword(),
+          typeRef('Error'),
+          mutationVarType,
+        ]),
+        ['mutationFn'],
+      ),
+    ]);
+
+    const body: t.Statement[] = [];
+    body.push(buildSelectionArgsCall(selectTypeName!));
+    body.push(destructureParamsWithSelection('mutationOptions'));
+    body.push(voidStatement('_selection'));
+
+    const mutationKeyExpr = useCentralizedKeys
+      ? callExpr(
+          t.memberExpression(
+            t.identifier('customMutationKeys'),
+            t.identifier(operation.name),
+          ),
+          [],
+        )
+      : undefined;
+
+    const selectArgExpr = t.objectExpression([
+      objectProp(
+        'select',
+        t.memberExpression(t.identifier('args'), t.identifier('select')),
+      ),
+    ]);
+
+    let mutationFnExpr: t.Expression;
+    if (hasArgs) {
+      const variablesParam = createFunctionParam(
+        'variables',
+        typeRef(varTypeName),
+      );
+      mutationFnExpr = t.arrowFunctionExpression(
+        [variablesParam],
+        getClientCustomCallUnwrap(
+          'mutation',
+          operation.name,
+          [t.identifier('variables')],
+          selectArgExpr,
+        ),
+      );
+    } else {
+      mutationFnExpr = t.arrowFunctionExpression(
+        [],
+        getClientCustomCallUnwrap(
+          'mutation',
+          operation.name,
+          [],
+          selectArgExpr,
+        ),
+      );
+    }
+
+    body.push(
+      returnUseMutation(
+        mutationFnExpr,
+        [spreadObj(t.identifier('mutationOptions'))],
+        mutationKeyExpr,
+      ),
+    );
+
+    statements.push(
+      exportFunction(
+        hookName,
+        null,
+        [createFunctionParam('params', implParamType)],
+        body,
+      ),
+    );
+  } else {
+    // Without select: simple hook (scalar return type)
+    const resultTypeStr = typeRefToTsType(operation.returnType, tracker);
+    const resultTypeLiteral = t.tsTypeLiteral([
+      t.tsPropertySignature(
+        t.identifier(operation.name),
+        t.tsTypeAnnotation(typeRef(resultTypeStr)),
+      ),
+    ]);
+    const mutationVarType: t.TSType = hasArgs
+      ? typeRef(varTypeName)
+      : t.tsVoidKeyword();
+
+    const optionsType = omitType(
+      typeRef('UseMutationOptions', [
+        resultTypeLiteral,
+        typeRef('Error'),
+        mutationVarType,
+      ]),
+      ['mutationFn'],
+    );
+
+    const body: t.Statement[] = [];
+    body.push(
+      constDecl(
+        'mutationOptions',
+        t.logicalExpression(
+          '??',
+          t.identifier('params'),
+          t.objectExpression([]),
+        ),
+      ),
+    );
+
+    const mutationKeyExpr = useCentralizedKeys
+      ? callExpr(
+          t.memberExpression(
+            t.identifier('customMutationKeys'),
+            t.identifier(operation.name),
+          ),
+          [],
+        )
+      : undefined;
+
+    let mutationFnExpr: t.Expression;
+    if (hasArgs) {
+      const variablesParam = createFunctionParam(
+        'variables',
+        typeRef(varTypeName),
+      );
+      mutationFnExpr = t.arrowFunctionExpression(
+        [variablesParam],
+        getClientCustomCallUnwrap('mutation', operation.name, [
+          t.identifier('variables'),
+        ]),
+      );
+    } else {
+      mutationFnExpr = t.arrowFunctionExpression(
+        [],
+        getClientCustomCallUnwrap('mutation', operation.name, []),
+      );
+    }
+
+    body.push(
+      returnUseMutation(
+        mutationFnExpr,
+        [spreadObj(t.identifier('mutationOptions'))],
+        mutationKeyExpr,
+      ),
+    );
+
+    statements.push(
+      exportFunction(
+        hookName,
+        null,
+        [createFunctionParam('params', optionsType, true)],
+        body,
+      ),
+    );
+  }
+
+  const content = generateHookFileCode(
+    `Custom mutation hook for ${operation.name}`,
+    statements,
   );
-
-  const optionsType = hasArgs
-    ? `Omit<UseMutationOptions<${resultTypeName}, Error, ${variablesTypeName}>, 'mutationFn'>`
-    : `Omit<UseMutationOptions<${resultTypeName}, Error, void>, 'mutationFn'>`;
-
-  const optionsParam = t.identifier('options');
-  optionsParam.optional = true;
-  optionsParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(optionsType)));
-
-  const hookFunc = t.functionDeclaration(
-    t.identifier(hookName),
-    [optionsParam],
-    t.blockStatement(hookBodyStatements)
-  );
-  const hookExport = t.exportNamedDeclaration(hookFunc);
-  statements.push(hookExport);
-
-  const code = generateCode(statements);
-  const content = getGeneratedFileHeader(`Custom mutation hook for ${operation.name}`) + '\n\n' + code;
 
   return {
     fileName,
@@ -300,7 +406,6 @@ function generateCustomMutationHookInternal(
 export interface GenerateAllCustomMutationHooksOptions {
   operations: CleanOperation[];
   typeRegistry: TypeRegistry;
-  maxDepth?: number;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
   tableTypeNames?: Set<string>;
@@ -308,12 +413,11 @@ export interface GenerateAllCustomMutationHooksOptions {
 }
 
 export function generateAllCustomMutationHooks(
-  options: GenerateAllCustomMutationHooksOptions
+  options: GenerateAllCustomMutationHooksOptions,
 ): GeneratedCustomMutationFile[] {
   const {
     operations,
     typeRegistry,
-    maxDepth = 2,
     skipQueryField = true,
     reactQueryEnabled = true,
     tableTypeNames,
@@ -326,12 +430,11 @@ export function generateAllCustomMutationHooks(
       generateCustomMutationHook({
         operation,
         typeRegistry,
-        maxDepth,
         skipQueryField,
         reactQueryEnabled,
         tableTypeNames,
         useCentralizedKeys,
-      })
+      }),
     )
     .filter((result): result is GeneratedCustomMutationFile => result !== null);
 }

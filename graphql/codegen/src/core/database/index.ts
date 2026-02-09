@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import { buildSchemaSDL } from '@constructive-io/graphql-server';
 
 export interface BuildSchemaFromDatabaseOptions {
@@ -36,7 +37,7 @@ export interface BuildSchemaFromDatabaseResult {
  * @returns The path to the generated schema file and the SDL content
  */
 export async function buildSchemaFromDatabase(
-  options: BuildSchemaFromDatabaseOptions
+  options: BuildSchemaFromDatabaseOptions,
 ): Promise<BuildSchemaFromDatabaseResult> {
   const { database, schemas, outDir, filename = 'schema.graphql' } = options;
 

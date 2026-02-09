@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { camelize, underscore, pluralize } from 'inflekt';
+import { camelize, pluralize, underscore } from 'inflekt';
 
 import {
   createOne,
@@ -12,7 +12,6 @@ import {
 } from './ast';
 import { validateMetaObject } from './meta-object';
 import type {
-  QueryFieldSelection,
   IntrospectionSchema,
   MetaObject,
   MetaTable,
@@ -20,6 +19,7 @@ import type {
   QueryBuilderOptions,
   QueryBuilderResult,
   QueryDefinition,
+  QueryFieldSelection,
   QuerySelectionOptions,
 } from './types';
 
@@ -44,10 +44,7 @@ export class QueryBuilder {
   private _mutation!: string;
   private _select!: QueryFieldSelection[];
 
-  constructor({
-    meta = {} as MetaObject,
-    introspection,
-  }: QueryBuilderOptions) {
+  constructor({ meta = {} as MetaObject, introspection }: QueryBuilderOptions) {
     this._introspection = introspection;
     this._meta = meta;
     this.clear();
@@ -58,7 +55,7 @@ export class QueryBuilder {
     const result = validateMetaObject(this._meta);
     if (typeof result === 'object' && result.errors) {
       throw new Error(
-        `QueryBuilder: meta object is invalid:\n${result.message}`
+        `QueryBuilder: meta object is invalid:\n${result.message}`,
       );
     }
   }
@@ -67,7 +64,10 @@ export class QueryBuilder {
    * Save all gql queries and mutations by model name for quicker lookup
    */
   initModelMap(): void {
-    this._models = {} as Record<string, Record<string, QueryDefinition | MutationDefinition>>;
+    this._models = {} as Record<
+      string,
+      Record<string, QueryDefinition | MutationDefinition>
+    >;
 
     for (const [key, defn] of Object.entries(this._introspection)) {
       if (!this._models[defn.model]) {
@@ -102,7 +102,7 @@ export class QueryBuilder {
     }
 
     const matchQuery = Object.entries(queries).find(
-      ([_, defn]) => defn.qtype === this._op
+      ([_, defn]) => defn.qtype === this._op,
     );
 
     if (!matchQuery) {
@@ -132,12 +132,12 @@ export class QueryBuilder {
       [] as Array<{
         defn: QueryDefinition | MutationDefinition;
         mutationKey: string;
-      }>
+      }>,
     );
 
     if (matchingDefns.length === 0) {
       throw new Error(
-        'no mutation found for ' + this._model + ':' + this._mutation
+        'no mutation found for ' + this._model + ':' + this._mutation,
       );
     }
 
@@ -159,12 +159,12 @@ export class QueryBuilder {
     };
 
     const matchDefn = matchingDefns.find(
-      ({ defn }) => defn.properties.input.type === getInputName(this._mutation)
+      ({ defn }) => defn.properties.input.type === getInputName(this._mutation),
     );
 
     if (!matchDefn) {
       throw new Error(
-        'no mutation found for ' + this._model + ':' + this._mutation
+        'no mutation found for ' + this._model + ':' + this._mutation,
       );
     }
 
@@ -194,10 +194,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(
-        ['get', underscore(this._key), 'query'].join('_'),
-        true
-      )
+      camelize(['get', underscore(this._key), 'query'].join('_'), true),
     );
 
     const defn = this._introspection[this._key];
@@ -219,10 +216,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(
-        ['get', underscore(this._key), 'query', 'all'].join('_'),
-        true
-      )
+      camelize(['get', underscore(this._key), 'query', 'all'].join('_'), true),
     );
 
     const defn = this._introspection[this._key];
@@ -245,8 +239,8 @@ export class QueryBuilder {
     this.queryName(
       camelize(
         ['get', underscore(this._key), 'count', 'query'].join('_'),
-        true
-      )
+        true,
+      ),
     );
 
     const defn = this._introspection[this._key];
@@ -265,10 +259,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(
-        ['get', underscore(this._key), 'query'].join('_'),
-        true
-      )
+      camelize(['get', underscore(this._key), 'query'].join('_'), true),
     );
 
     const defn = this._introspection[this._key];
@@ -290,10 +281,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize(
-        [underscore(this._key), 'mutation'].join('_'),
-        true
-      )
+      camelize([underscore(this._key), 'mutation'].join('_'), true),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -314,10 +302,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize(
-        [underscore(this._key), 'mutation'].join('_'),
-        true
-      )
+      camelize([underscore(this._key), 'mutation'].join('_'), true),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -338,10 +323,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize(
-        [underscore(this._key), 'mutation'].join('_'),
-        true
-      )
+      camelize([underscore(this._key), 'mutation'].join('_'), true),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -377,11 +359,11 @@ export class QueryBuilder {
   // Bind methods that will be called with different this context
   pickScalarFields: (
     selection: QuerySelectionOptions | null,
-    defn: QueryDefinition
+    defn: QueryDefinition,
   ) => QueryFieldSelection[];
   pickAllFields: (
     selection: QuerySelectionOptions,
-    defn: QueryDefinition
+    defn: QueryDefinition,
   ) => QueryFieldSelection[];
 }
 
@@ -394,7 +376,7 @@ export class QueryBuilder {
 function pickScalarFields(
   this: QueryBuilder,
   selection: QuerySelectionOptions | null,
-  defn: QueryDefinition
+  defn: QueryDefinition,
 ): QueryFieldSelection[] {
   const model = defn.model;
   const modelMeta = this._meta.tables.find((t) => t.name === model);
@@ -416,7 +398,7 @@ function pickScalarFields(
       .filter(
         (fieldName) =>
           !isRelationalField(fieldName, modelMeta) &&
-          isInTableSchema(fieldName)
+          isInTableSchema(fieldName),
       )
       .map((fieldName) => ({
         name: fieldName,
@@ -445,7 +427,7 @@ function pickScalarFields(
 function pickAllFields(
   this: QueryBuilder,
   selection: QuerySelectionOptions,
-  defn: QueryDefinition
+  defn: QueryDefinition,
 ): QueryFieldSelection[] {
   const model = defn.model;
   const modelMeta = this._meta.tables.find((t) => t.name === model);
@@ -476,7 +458,7 @@ function pickAllFields(
       const referencedForeignConstraint = modelMeta.foreignConstraints.find(
         (constraint) =>
           constraint.fromKey.name === fieldName ||
-          constraint.fromKey.alias === fieldName
+          constraint.fromKey.alias === fieldName,
       );
 
       const selectOptions = fieldOptions as {
@@ -507,13 +489,13 @@ function pickAllFields(
       // location is non-scalar and non-relational, thus need to further expand into { x y ... }
       if (isBelongTo) {
         const getManyName = modelNameToGetMany(
-          referencedForeignConstraint.refTable
+          referencedForeignConstraint.refTable,
         );
         const refDefn = this._introspection[getManyName];
         fieldSelection.selection = pickScalarFields.call(
           this,
           { [fieldName]: true },
-          refDefn
+          refDefn,
         );
       }
 
@@ -542,12 +524,12 @@ function pickAllFields(
 function isFieldInDefinition(
   fieldName: string,
   defn: QueryDefinition,
-  modelMeta: MetaTable
+  modelMeta: MetaTable,
 ): boolean {
   const isReferenced = !!modelMeta.foreignConstraints.find(
     (constraint) =>
       constraint.fromKey.name === fieldName ||
-      constraint.fromKey.alias === fieldName
+      constraint.fromKey.alias === fieldName,
   );
 
   return (
@@ -570,7 +552,7 @@ function isRelationalField(fieldName: string, modelMeta: MetaTable): boolean {
   return (
     !modelMeta.primaryConstraints.find((field) => field.name === fieldName) &&
     !!modelMeta.foreignConstraints.find(
-      (constraint) => constraint.fromKey.name === fieldName
+      (constraint) => constraint.fromKey.name === fieldName,
     )
   );
 }
@@ -578,8 +560,5 @@ function isRelationalField(fieldName: string, modelMeta: MetaTable): boolean {
 // Get getMany op name from model
 // ie. UserSetting => userSettings
 function modelNameToGetMany(model: string): string {
-  return camelize(
-    pluralize(underscore(model)),
-    true
-  );
+  return camelize(pluralize(underscore(model)), true);
 }

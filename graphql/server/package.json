@@ -84,7 +84,7 @@
     "@types/pg": "^8.16.0",
     "@types/request-ip": "^0.0.41",
     "graphile-test": "workspace:*",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "nodemon": "^3.1.10",
     "rimraf": "^6.1.2",
     "ts-node": "^10.9.2"

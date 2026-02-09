@@ -4,8 +4,9 @@
  */
 import http from 'node:http';
 import https from 'node:https';
-import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
+
 import type { IntrospectionQueryResponse } from '../../types/introspection';
+import { SCHEMA_INTROSPECTION_QUERY } from './schema-query';
 
 interface HttpResponse {
   statusCode: number;
@@ -20,7 +21,7 @@ function makeRequest(
   url: URL,
   options: http.RequestOptions,
   body: string,
-  timeout: number
+  timeout: number,
 ): Promise<HttpResponse> {
   return new Promise((resolve, reject) => {
     const protocol = url.protocol === 'https:' ? https : http;
@@ -74,7 +75,7 @@ export interface FetchSchemaResult {
  * Fetch the full schema introspection from a GraphQL endpoint
  */
 export async function fetchSchema(
-  options: FetchSchemaOptions
+  options: FetchSchemaOptions,
 ): Promise<FetchSchemaResult> {
   const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
 

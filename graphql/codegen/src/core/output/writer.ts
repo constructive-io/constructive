@@ -17,6 +17,7 @@ export type { GeneratedFile };
 export interface WriteResult {
   success: boolean;
   filesWritten?: string[];
+  filesRemoved?: string[];
   errors?: string[];
 }
 
@@ -28,12 +29,14 @@ export interface WriteOptions {
   showProgress?: boolean;
   /** Format files with oxfmt after writing (default: true) */
   formatFiles?: boolean;
+  /** Remove stale .ts files in outputDir that are not in current file list (default: false) */
+  pruneStaleFiles?: boolean;
 }
 
 type OxfmtFormatFn = (
   fileName: string,
   sourceText: string,
-  options?: Record<string, unknown>
+  options?: Record<string, unknown>,
 ) => Promise<{ code: string; errors: unknown[] }>;
 
 /**
@@ -55,7 +58,7 @@ async function getOxfmtFormat(): Promise<OxfmtFormatFn | null> {
 async function formatFileContent(
   fileName: string,
   content: string,
-  formatFn: OxfmtFormatFn
+  formatFn: OxfmtFormatFn,
 ): Promise<string> {
   try {
     const result = await formatFn(fileName, content, {
@@ -83,11 +86,16 @@ export async function writeGeneratedFiles(
   files: GeneratedFile[],
   outputDir: string,
   subdirs: string[],
-  options: WriteOptions = {}
+  options: WriteOptions = {},
 ): Promise<WriteResult> {
-  const { showProgress = true, formatFiles = true } = options;
+  const {
+    showProgress = true,
+    formatFiles = true,
+    pruneStaleFiles = false,
+  } = options;
   const errors: string[] = [];
   const written: string[] = [];
+  const removed: string[] = [];
   const total = files.length;
   const isTTY = process.stdout.isTTY;
 
@@ -117,6 +125,25 @@ export async function writeGeneratedFiles(
     return { success: false, errors };
   }
 
+  if (pruneStaleFiles) {
+    const expectedFiles = new Set(
+      files.map((file) => path.resolve(outputDir, file.path)),
+    );
+    const existingTsFiles = findTsFiles(outputDir);
+
+    for (const existingFile of existingTsFiles) {
+      const absolutePath = path.resolve(existingFile);
+      if (expectedFiles.has(absolutePath)) continue;
+      try {
+        fs.rmSync(absolutePath, { force: true });
+        removed.push(absolutePath);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        errors.push(`Failed to remove stale file ${absolutePath}: ${message}`);
+      }
+    }
+  }
+
   // Get oxfmt format function if formatting is enabled
   const formatFn = formatFiles ? await getOxfmtFormat() : null;
   if (formatFiles && !formatFn && showProgress) {
@@ -132,7 +159,7 @@ export async function writeGeneratedFiles(
       const progress = Math.round(((i + 1) / total) * 100);
       if (isTTY) {
         process.stdout.write(
-          `\rWriting files: ${i + 1}/${total} (${progress}%)`
+          `\rWriting files: ${i + 1}/${total} (${progress}%)`,
         );
       } else if (i % 100 === 0 || i === total - 1) {
         // Non-TTY: periodic updates for CI/CD
@@ -171,6 +198,7 @@ export async function writeGeneratedFiles(
   return {
     success: errors.length === 0,
     filesWritten: written,
+    filesRemoved: removed,
     errors: errors.length > 0 ? errors : undefined,
   };
 }
@@ -205,7 +233,7 @@ function findTsFiles(dir: string): string[] {
  * This function is kept for backwards compatibility.
  */
 export async function formatOutput(
-  outputDir: string
+  outputDir: string,
 ): Promise<{ success: boolean; error?: string }> {
   const formatFn = await getOxfmtFormat();
   if (!formatFn) {
@@ -223,7 +251,11 @@ export async function formatOutput(
 
     for (const filePath of tsFiles) {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const formatted = await formatFileContent(path.basename(filePath), content, formatFn);
+      const formatted = await formatFileContent(
+        path.basename(filePath),
+        content,
+        formatFn,
+      );
       fs.writeFileSync(filePath, formatted, 'utf-8');
     }
 

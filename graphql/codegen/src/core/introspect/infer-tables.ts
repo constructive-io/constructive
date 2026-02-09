@@ -12,27 +12,28 @@
  * - Query operations: {pluralName} (list), {singularName} (single)
  * - Mutation operations: create{Name}, update{Name}, delete{Name}
  */
+import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
+
 import type {
+  IntrospectionField,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionField,
   IntrospectionTypeRef,
 } from '../../types/introspection';
-import { unwrapType, getBaseTypeName, isList } from '../../types/introspection';
+import { getBaseTypeName, isList, unwrapType } from '../../types/introspection';
 import type {
-  CleanTable,
+  CleanBelongsToRelation,
   CleanField,
   CleanFieldType,
-  CleanRelations,
-  CleanBelongsToRelation,
   CleanHasManyRelation,
   CleanManyToManyRelation,
+  CleanRelations,
+  CleanTable,
+  ConstraintInfo,
+  TableConstraints,
   TableInflection,
   TableQueryNames,
-  TableConstraints,
-  ConstraintInfo,
 } from '../../types/schema';
-import { singularize, pluralize, lcFirst, ucFirst } from 'inflekt';
 
 // ============================================================================
 // Pattern Matching Constants
@@ -118,7 +119,7 @@ export interface InferTablesOptions {
  */
 export function inferTablesFromIntrospection(
   introspection: IntrospectionQueryResponse,
-  options: InferTablesOptions = {}
+  options: InferTablesOptions = {},
 ): CleanTable[] {
   const { __schema: schema } = introspection;
   const { types, queryType, mutationType } = schema;
@@ -146,7 +147,7 @@ export function inferTablesFromIntrospection(
       entityType,
       typeMap,
       queryFields,
-      mutationFields
+      mutationFields,
     );
 
     // Only include tables that have at least one real operation
@@ -210,7 +211,7 @@ function buildCleanTable(
   entityType: IntrospectionType,
   typeMap: Map<string, IntrospectionType>,
   queryFields: IntrospectionField[],
-  mutationFields: IntrospectionField[]
+  mutationFields: IntrospectionField[],
 ): BuildCleanTableResult {
   // Extract scalar fields from entity type
   const fields = extractEntityFields(entityType, typeMap);
@@ -270,7 +271,7 @@ function buildCleanTable(
  */
 function extractEntityFields(
   entityType: IntrospectionType,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): CleanField[] {
   const fields: CleanField[] = [];
 
@@ -307,7 +308,7 @@ function extractEntityFields(
  */
 function isEntityType(
   typeName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): boolean {
   const connectionName = `${pluralize(typeName)}Connection`;
   return typeMap.has(connectionName);
@@ -317,7 +318,7 @@ function isEntityType(
  * Convert IntrospectionTypeRef to CleanFieldType
  */
 function convertToCleanFieldType(
-  typeRef: IntrospectionTypeRef
+  typeRef: IntrospectionTypeRef,
 ): CleanFieldType {
   const baseType = unwrapType(typeRef);
   const isArray = isList(typeRef);
@@ -339,7 +340,7 @@ function convertToCleanFieldType(
  */
 function inferRelations(
   entityType: IntrospectionType,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): CleanRelations {
   const belongsTo: CleanBelongsToRelation[] = [];
   const hasMany: CleanHasManyRelation[] = [];
@@ -388,7 +389,7 @@ function inferRelations(
 function inferHasManyOrManyToMany(
   field: IntrospectionField,
   connectionTypeName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ):
   | { type: 'hasMany'; relation: CleanHasManyRelation }
   | { type: 'manyToMany'; relation: CleanManyToManyRelation } {
@@ -415,7 +416,7 @@ function inferHasManyOrManyToMany(
     // e.g., "productsByProductCategoryProductIdAndCategoryId" → "ProductCategory"
     // The junction table name ends where the first field key begins (identified by capital letter after lowercase)
     const junctionMatch = field.name.match(
-      /By([A-Z][a-z]+(?:[A-Z][a-z]+)*?)(?:[A-Z][a-z]+Id)/
+      /By([A-Z][a-z]+(?:[A-Z][a-z]+)*?)(?:[A-Z][a-z]+Id)/,
     );
     const junctionTable = junctionMatch ? junctionMatch[1] : 'Unknown';
 
@@ -461,7 +462,7 @@ interface QueryOperations {
 function matchQueryOperations(
   entityName: string,
   queryFields: IntrospectionField[],
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): QueryOperations {
   const pluralName = pluralize(entityName);
   const connectionTypeName = `${pluralName}Connection`;
@@ -487,7 +488,7 @@ function matchQueryOperations(
         (arg) =>
           arg.name === 'id' ||
           arg.name === 'nodeId' ||
-          arg.name.toLowerCase().endsWith('id')
+          arg.name.toLowerCase().endsWith('id'),
       );
 
       if (hasIdArg) {
@@ -518,7 +519,7 @@ interface MutationOperations {
  */
 function matchMutationOperations(
   entityName: string,
-  mutationFields: IntrospectionField[]
+  mutationFields: IntrospectionField[],
 ): MutationOperations {
   let create: string | null = null;
   let update: string | null = null;
@@ -572,7 +573,7 @@ function matchMutationOperations(
  */
 function inferConstraints(
   entityName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): TableConstraints {
   const primaryKey: ConstraintInfo[] = [];
 
@@ -587,7 +588,7 @@ function inferConstraints(
   const inputToCheck = updateInput || deleteInput;
   if (inputToCheck?.inputFields) {
     const idField = inputToCheck.inputFields.find(
-      (f) => f.name === 'id' || f.name === 'nodeId'
+      (f) => f.name === 'id' || f.name === 'nodeId',
     );
 
     if (idField) {
@@ -608,7 +609,7 @@ function inferConstraints(
     const entityType = typeMap.get(entityName);
     if (entityType?.fields) {
       const idField = entityType.fields.find(
-        (f) => f.name === 'id' || f.name === 'nodeId'
+        (f) => f.name === 'id' || f.name === 'nodeId',
       );
 
       if (idField) {
@@ -641,7 +642,7 @@ function inferConstraints(
  */
 function buildInflection(
   entityName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): TableInflection {
   const pluralName = pluralize(entityName);
   const singularFieldName = lcFirst(entityName);
@@ -697,7 +698,7 @@ function buildInflection(
 function findOrderByType(
   entityName: string,
   pluralName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): string | null {
   // Try the standard pattern first: {PluralName}OrderBy
   const standardName = `${pluralName}OrderBy`;
@@ -747,7 +748,7 @@ function findOrderByType(
  * Build a map of type name → IntrospectionType for efficient lookup
  */
 function buildTypeMap(
-  types: IntrospectionType[]
+  types: IntrospectionType[],
 ): Map<string, IntrospectionType> {
   const map = new Map<string, IntrospectionType>();
   for (const type of types) {
@@ -760,7 +761,7 @@ function buildTypeMap(
  * Get fields from a type, returning empty array if null
  */
 function getTypeFields(
-  type: IntrospectionType | undefined
+  type: IntrospectionType | undefined,
 ): IntrospectionField[] {
   return type?.fields ?? [];
 }

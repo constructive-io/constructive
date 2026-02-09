@@ -42,7 +42,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "ts-jest": "^29.4.6"
   },
   "dependencies": {

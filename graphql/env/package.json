@@ -42,6 +42,6 @@
     "postgraphile"
   ],
   "devDependencies": {
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   }
 }

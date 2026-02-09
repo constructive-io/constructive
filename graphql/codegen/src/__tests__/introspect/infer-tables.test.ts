@@ -6,12 +6,12 @@
  */
 import { inferTablesFromIntrospection } from '../../core/introspect/infer-tables';
 import type {
+  IntrospectionEnumValue,
+  IntrospectionField,
+  IntrospectionInputValue,
   IntrospectionQueryResponse,
   IntrospectionType,
   IntrospectionTypeRef,
-  IntrospectionField,
-  IntrospectionInputValue,
-  IntrospectionEnumValue,
 } from '../../types/introspection';
 
 // ============================================================================
@@ -24,7 +24,7 @@ import type {
 function makeTypeRef(
   kind: 'SCALAR' | 'OBJECT' | 'INPUT_OBJECT' | 'ENUM' | 'LIST' | 'NON_NULL',
   name: string | null,
-  ofType?: IntrospectionTypeRef | null
+  ofType?: IntrospectionTypeRef | null,
 ): IntrospectionTypeRef {
   return { kind, name, ofType: ofType ?? null };
 }
@@ -89,7 +89,7 @@ interface TypeDef {
 function createIntrospection(
   types: TypeDef[],
   queryFields: FieldDef[] = [],
-  mutationFields: FieldDef[] = []
+  mutationFields: FieldDef[] = [],
 ): IntrospectionQueryResponse {
   const makeField = (f: FieldDef): IntrospectionField => ({
     name: f.name,
@@ -100,7 +100,7 @@ function createIntrospection(
         type: a.type,
         description: null,
         defaultValue: null,
-      })
+      }),
     ),
     deprecationReason: null,
     description: null,
@@ -157,13 +157,13 @@ function createIntrospection(
                   deprecationReason: null,
                   description: null,
                   isDeprecated: false,
-                })
+                }),
               )
             : null,
         interfaces: [],
         possibleTypes: null,
         description: null,
-      })
+      }),
     ),
   ];
 
@@ -210,7 +210,7 @@ describe('Entity Detection', () => {
       [
         // Query for users
         { name: 'users', type: object('UsersConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -245,7 +245,7 @@ describe('Entity Detection', () => {
         { name: 'users', type: object('UsersConnection') },
         { name: 'posts', type: object('PostsConnection') },
         { name: 'comments', type: object('CommentsConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -271,7 +271,7 @@ describe('Entity Detection', () => {
           fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -302,7 +302,7 @@ describe('Field Extraction', () => {
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -333,7 +333,7 @@ describe('Field Extraction', () => {
         },
         { name: 'PostsConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'posts', type: object('PostsConnection') }]
+      [{ name: 'posts', type: object('PostsConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -375,7 +375,7 @@ describe('Field Extraction', () => {
         { name: 'posts', type: object('PostsConnection') },
         { name: 'users', type: object('UsersConnection') },
         { name: 'comments', type: object('CommentsConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -416,7 +416,7 @@ describe('Relation Inference', () => {
       [
         { name: 'posts', type: object('PostsConnection') },
         { name: 'users', type: object('UsersConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -449,7 +449,7 @@ describe('Relation Inference', () => {
       [
         { name: 'users', type: object('UsersConnection') },
         { name: 'posts', type: object('PostsConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -486,7 +486,7 @@ describe('Relation Inference', () => {
       [
         { name: 'categories', type: object('CategoriesConnection') },
         { name: 'products', type: object('ProductsConnection') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -495,7 +495,7 @@ describe('Relation Inference', () => {
     expect(categoryTable?.relations.manyToMany).toHaveLength(1);
     expect(categoryTable?.relations.manyToMany[0].rightTable).toBe('Product');
     expect(categoryTable?.relations.manyToMany[0].junctionTable).toBe(
-      'ProductCategory'
+      'ProductCategory',
     );
   });
 });
@@ -515,7 +515,7 @@ describe('Query Operation Matching', () => {
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'allUsers', type: object('UsersConnection') }]
+      [{ name: 'allUsers', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -540,7 +540,7 @@ describe('Query Operation Matching', () => {
           type: object('User'),
           args: [{ name: 'id', type: nonNull(scalar('UUID')) }],
         },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -561,7 +561,7 @@ describe('Query Operation Matching', () => {
       [
         { name: 'users', type: object('UsersConnection') },
         // No single user query
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -593,7 +593,7 @@ describe('Mutation Operation Matching', () => {
             { name: 'input', type: nonNull(inputObject('CreateUserInput')) },
           ],
         },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -629,7 +629,7 @@ describe('Mutation Operation Matching', () => {
             { name: 'input', type: nonNull(inputObject('DeleteUserInput')) },
           ],
         },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -653,7 +653,7 @@ describe('Mutation Operation Matching', () => {
       [
         { name: 'updateUserById', type: object('UpdateUserPayload') },
         { name: 'updateUser', type: object('UpdateUserPayload') },
-      ]
+      ],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -677,7 +677,7 @@ describe('Constraint Inference', () => {
         },
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -702,7 +702,7 @@ describe('Constraint Inference', () => {
         },
       ],
       [{ name: 'users', type: object('UsersConnection') }],
-      [{ name: 'updateUser', type: object('UpdateUserPayload') }]
+      [{ name: 'updateUser', type: object('UpdateUserPayload') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -730,7 +730,7 @@ describe('Inflection Building', () => {
         { name: 'UserPatch', kind: 'INPUT_OBJECT', inputFields: [] },
         { name: 'UpdateUserPayload', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -755,7 +755,7 @@ describe('Inflection Building', () => {
         { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
         // No UserFilter, UserPatch, or UpdateUserPayload
       ],
-      [{ name: 'users', type: object('UsersConnection') }]
+      [{ name: 'users', type: object('UsersConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -778,7 +778,7 @@ describe('Edge Cases', () => {
         // Only built-in types, no entities
         { name: 'PageInfo', kind: 'OBJECT', fields: [] },
       ],
-      []
+      [],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -797,7 +797,7 @@ describe('Edge Cases', () => {
         },
         { name: 'OrphansConnection', kind: 'OBJECT', fields: [] },
       ],
-      [] // No query fields
+      [], // No query fields
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -831,7 +831,7 @@ describe('Edge Cases', () => {
       [
         { name: 'users', type: object('UsersConnection') },
         { name: 'posts', type: object('PostsConnection') },
-      ]
+      ],
     );
 
     // Should not cause infinite loops
@@ -856,7 +856,7 @@ describe('Edge Cases', () => {
         },
         { name: 'PeopleConnection', kind: 'OBJECT', fields: [] },
       ],
-      [{ name: 'people', type: object('PeopleConnection') }]
+      [{ name: 'people', type: object('PeopleConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -885,7 +885,7 @@ describe('Edge Cases', () => {
           enumValues: ['ID_ASC', 'ID_DESC'],
         },
       ],
-      [{ name: 'addresses', type: object('AddressesConnection') }]
+      [{ name: 'addresses', type: object('AddressesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -908,7 +908,7 @@ describe('Edge Cases', () => {
         { name: 'CategoriesConnection', kind: 'OBJECT', fields: [] },
         { name: 'CategoriesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] },
       ],
-      [{ name: 'categories', type: object('CategoriesConnection') }]
+      [{ name: 'categories', type: object('CategoriesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
@@ -929,7 +929,7 @@ describe('Edge Cases', () => {
         // Schema has the actual OrderBy enum
         { name: 'StatusesOrderBy', kind: 'ENUM', enumValues: ['ID_ASC'] },
       ],
-      [{ name: 'statuses', type: object('StatusesConnection') }]
+      [{ name: 'statuses', type: object('StatusesConnection') }],
     );
 
     const tables = inferTablesFromIntrospection(introspection);
