@@ -6,11 +6,33 @@
  * - Mutation generators return null (since they require React Query)
  * - Standalone fetch functions are still generated for queries
  */
-import { generateListQueryHook, generateSingleQueryHook, generateAllQueryHooks } from '../../core/codegen/queries';
-import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook, generateAllMutationHooks } from '../../core/codegen/mutations';
-import { generateCustomQueryHook, generateAllCustomQueryHooks } from '../../core/codegen/custom-queries';
-import { generateCustomMutationHook, generateAllCustomMutationHooks } from '../../core/codegen/custom-mutations';
-import type { CleanTable, CleanFieldType, CleanRelations, CleanOperation, CleanTypeRef, TypeRegistry } from '../../types/schema';
+import {
+  generateAllCustomMutationHooks,
+  generateCustomMutationHook,
+} from '../../core/codegen/custom-mutations';
+import {
+  generateAllCustomQueryHooks,
+  generateCustomQueryHook,
+} from '../../core/codegen/custom-queries';
+import {
+  generateAllMutationHooks,
+  generateCreateMutationHook,
+  generateDeleteMutationHook,
+  generateUpdateMutationHook,
+} from '../../core/codegen/mutations';
+import {
+  generateAllQueryHooks,
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from '../../core/codegen/queries';
+import type {
+  CleanFieldType,
+  CleanOperation,
+  CleanRelations,
+  CleanTable,
+  CleanTypeRef,
+  TypeRegistry,
+} from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -30,7 +52,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -58,7 +82,11 @@ const userTable = createTable({
   },
 });
 
-function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
+function createTypeRef(
+  kind: CleanTypeRef['kind'],
+  name: string | null,
+  ofType?: CleanTypeRef,
+): CleanTypeRef {
   return { kind, name, ofType };
 }
 
@@ -74,8 +102,14 @@ const sampleMutationOperation: CleanOperation = {
   name: 'login',
   kind: 'mutation',
   args: [
-    { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-    { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+    {
+      name: 'email',
+      type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')),
+    },
+    {
+      name: 'password',
+      type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')),
+    },
   ],
   returnType: createTypeRef('OBJECT', 'LoginPayload'),
   description: 'Authenticate user',
@@ -90,64 +124,88 @@ const emptyTypeRegistry: TypeRegistry = new Map();
 describe('Query generators with reactQueryEnabled: false', () => {
   describe('generateListQueryHook', () => {
     it('should not include React Query imports when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).not.toContain('@tanstack/react-query');
       expect(result.content).not.toContain('useQuery');
       expect(result.content).not.toContain('UseQueryOptions');
     });
 
     it('should not include useXxxQuery hook when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).not.toContain('export function useUsersQuery');
     });
 
     it('should not include prefetch function when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
-      expect(result.content).not.toContain('export async function prefetchUsersQuery');
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
+      expect(result.content).not.toContain(
+        'export async function prefetchUsersQuery',
+      );
     });
 
     it('should still include standalone fetch function when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).toContain('export async function fetchUsersQuery');
     });
 
-    it('should still include GraphQL document when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
-      expect(result.content).toContain('usersQueryDocument');
+    it('should still include ORM client imports when disabled', () => {
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
+      expect(result.content).toContain('getClient');
     });
 
     it('should still include query key factory when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).toContain('usersQueryKey');
     });
 
     it('should update file header when disabled', () => {
-      const result = generateListQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateListQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).toContain('List query functions for User');
     });
   });
 
   describe('generateSingleQueryHook', () => {
     it('should not include React Query imports when disabled', () => {
-      const result = generateSingleQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateSingleQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).not.toContain('@tanstack/react-query');
       expect(result.content).not.toContain('useQuery');
     });
 
     it('should not include useXxxQuery hook when disabled', () => {
-      const result = generateSingleQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateSingleQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).not.toContain('export function useUserQuery');
     });
 
     it('should still include standalone fetch function when disabled', () => {
-      const result = generateSingleQueryHook(userTable, { reactQueryEnabled: false });
+      const result = generateSingleQueryHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result.content).toContain('export async function fetchUserQuery');
     });
   });
 
   describe('generateAllQueryHooks', () => {
     it('should generate files without React Query when disabled', () => {
-      const results = generateAllQueryHooks([userTable], { reactQueryEnabled: false });
+      const results = generateAllQueryHooks([userTable], {
+        reactQueryEnabled: false,
+      });
       expect(results.length).toBe(2); // list + single
       for (const result of results) {
         expect(result.content).not.toContain('@tanstack/react-query');
@@ -176,7 +234,9 @@ describe('Query generators with reactQueryEnabled: true (default)', () => {
 
     it('should include prefetch function by default', () => {
       const result = generateListQueryHook(userTable);
-      expect(result.content).toContain('export async function prefetchUsersQuery');
+      expect(result.content).toContain(
+        'export async function prefetchUsersQuery',
+      );
     });
 
     it('should include standalone fetch function by default', () => {
@@ -193,28 +253,36 @@ describe('Query generators with reactQueryEnabled: true (default)', () => {
 describe('Mutation generators with reactQueryEnabled: false', () => {
   describe('generateCreateMutationHook', () => {
     it('should return null when disabled', () => {
-      const result = generateCreateMutationHook(userTable, { reactQueryEnabled: false });
+      const result = generateCreateMutationHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result).toBeNull();
     });
   });
 
   describe('generateUpdateMutationHook', () => {
     it('should return null when disabled', () => {
-      const result = generateUpdateMutationHook(userTable, { reactQueryEnabled: false });
+      const result = generateUpdateMutationHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result).toBeNull();
     });
   });
 
   describe('generateDeleteMutationHook', () => {
     it('should return null when disabled', () => {
-      const result = generateDeleteMutationHook(userTable, { reactQueryEnabled: false });
+      const result = generateDeleteMutationHook(userTable, {
+        reactQueryEnabled: false,
+      });
       expect(result).toBeNull();
     });
   });
 
   describe('generateAllMutationHooks', () => {
     it('should return empty array when disabled', () => {
-      const results = generateAllMutationHooks([userTable], { reactQueryEnabled: false });
+      const results = generateAllMutationHooks([userTable], {
+        reactQueryEnabled: false,
+      });
       expect(results).toEqual([]);
     });
   });
@@ -263,7 +331,9 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
         typeRegistry: emptyTypeRegistry,
         reactQueryEnabled: false,
       });
-      expect(result.content).not.toContain('export function useCurrentUserQuery');
+      expect(result.content).not.toContain(
+        'export function useCurrentUserQuery',
+      );
     });
 
     it('should still include standalone fetch function when disabled', () => {
@@ -272,7 +342,9 @@ describe('Custom query generators with reactQueryEnabled: false', () => {
         typeRegistry: emptyTypeRegistry,
         reactQueryEnabled: false,
       });
-      expect(result.content).toContain('export async function fetchCurrentUserQuery');
+      expect(result.content).toContain(
+        'export async function fetchCurrentUserQuery',
+      );
     });
   });
 

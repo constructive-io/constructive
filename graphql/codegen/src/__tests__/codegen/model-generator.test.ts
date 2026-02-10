@@ -4,7 +4,11 @@
  * Tests the generated model classes with findMany, findFirst, create, update, delete methods.
  */
 import { generateModelFile } from '../../core/codegen/orm/model-generator';
-import type { CleanTable, CleanFieldType, CleanRelations } from '../../types/schema';
+import type {
+  CleanFieldType,
+  CleanRelations,
+  CleanTable,
+} from '../../types/schema';
 
 // ============================================================================
 // Test Fixtures
@@ -25,7 +29,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -117,6 +123,31 @@ describe('model-generator', () => {
     expect(result.content).toContain('"registerOrganization"');
     expect(result.content).toContain('"modifyOrganization"');
     expect(result.content).toContain('"removeOrganization"');
+  });
+
+  it('generates findOne via collection query when single lookup is unavailable', () => {
+    const table = createTable({
+      name: 'Account',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'name', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'accounts',
+        one: null,
+        create: 'createAccount',
+        update: 'updateAccount',
+        delete: 'deleteAccount',
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    expect(result.content).toContain('findOne<S extends AccountSelect>(');
+    expect(result.content).toContain(
+      'buildFindManyDocument("Account", "accounts", args.select',
+    );
+    expect(result.content).toContain('"account": data.accounts?.nodes?.[0] ?? null');
   });
 
   it('generates correct type imports', () => {

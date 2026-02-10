@@ -9,26 +9,33 @@
  * - Schema types
  * - Barrel files
  */
-import { generateListQueryHook, generateSingleQueryHook } from '../../core/codegen/queries';
-import { generateCreateMutationHook, generateUpdateMutationHook, generateDeleteMutationHook } from '../../core/codegen/mutations';
-import { generateCustomQueryHook } from '../../core/codegen/custom-queries';
-import { generateCustomMutationHook } from '../../core/codegen/custom-mutations';
-import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import {
-  generateQueriesBarrel,
-  generateMutationsBarrel,
-  generateMainBarrel,
-  generateCustomQueriesBarrel,
   generateCustomMutationsBarrel,
+  generateCustomQueriesBarrel,
+  generateMainBarrel,
+  generateMutationsBarrel,
+  generateQueriesBarrel,
 } from '../../core/codegen/barrel';
+import { generateCustomMutationHook } from '../../core/codegen/custom-mutations';
+import { generateCustomQueryHook } from '../../core/codegen/custom-queries';
+import {
+  generateCreateMutationHook,
+  generateDeleteMutationHook,
+  generateUpdateMutationHook,
+} from '../../core/codegen/mutations';
+import {
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from '../../core/codegen/queries';
+import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import type {
-  CleanTable,
   CleanFieldType,
-  CleanRelations,
   CleanOperation,
+  CleanRelations,
+  CleanTable,
   CleanTypeRef,
-  TypeRegistry,
   ResolvedType,
+  TypeRegistry,
 } from '../../types/schema';
 
 const fieldTypes = {
@@ -46,7 +53,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -57,7 +66,11 @@ function createTable(partial: Partial<CleanTable> & { name: string }): CleanTabl
   };
 }
 
-function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
+function createTypeRef(
+  kind: CleanTypeRef['kind'],
+  name: string | null,
+  ofType?: CleanTypeRef,
+): CleanTypeRef {
   return { kind, name, ofType };
 }
 
@@ -109,7 +122,14 @@ const simpleCustomQueries: CleanOperation[] = [
     name: 'searchUsers',
     kind: 'query',
     args: [
-      { name: 'query', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'query',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
       { name: 'limit', type: createTypeRef('SCALAR', 'Int') },
     ],
     returnType: createTypeRef('LIST', null, createTypeRef('OBJECT', 'User')),
@@ -117,13 +137,35 @@ const simpleCustomQueries: CleanOperation[] = [
   },
 ];
 
+const optionalArgsCustomQuery: CleanOperation = {
+  name: 'recentUsers',
+  kind: 'query',
+  args: [{ name: 'limit', type: createTypeRef('SCALAR', 'Int') }],
+  returnType: createTypeRef('OBJECT', 'User'),
+  description: 'Fetch recently active users',
+};
+
 const simpleCustomMutations: CleanOperation[] = [
   {
     name: 'login',
     kind: 'mutation',
     args: [
-      { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'email',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      {
+        name: 'password',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
     ],
     returnType: createTypeRef('OBJECT', 'LoginPayload'),
     description: 'Authenticate user',
@@ -139,7 +181,14 @@ const simpleCustomMutations: CleanOperation[] = [
     name: 'register',
     kind: 'mutation',
     args: [
-      { name: 'input', type: createTypeRef('NON_NULL', null, createTypeRef('INPUT_OBJECT', 'RegisterInput')) },
+      {
+        name: 'input',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('INPUT_OBJECT', 'RegisterInput'),
+        ),
+      },
     ],
     returnType: createTypeRef('OBJECT', 'RegisterPayload'),
     description: 'Register a new user',
@@ -161,9 +210,7 @@ function createTypeRegistry(): TypeRegistry {
   registry.set('LogoutPayload', {
     kind: 'OBJECT',
     name: 'LogoutPayload',
-    fields: [
-      { name: 'success', type: createTypeRef('SCALAR', 'Boolean') },
-    ],
+    fields: [{ name: 'success', type: createTypeRef('SCALAR', 'Boolean') }],
   } as ResolvedType);
 
   registry.set('RegisterPayload', {
@@ -179,8 +226,22 @@ function createTypeRegistry(): TypeRegistry {
     kind: 'INPUT_OBJECT',
     name: 'RegisterInput',
     inputFields: [
-      { name: 'email', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'email',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
+      {
+        name: 'password',
+        type: createTypeRef(
+          'NON_NULL',
+          null,
+          createTypeRef('SCALAR', 'String'),
+        ),
+      },
       { name: 'name', type: createTypeRef('SCALAR', 'String') },
     ],
   } as ResolvedType);
@@ -194,9 +255,7 @@ function createTypeRegistry(): TypeRegistry {
   registry.set('Query', {
     kind: 'OBJECT',
     name: 'Query',
-    fields: [
-      { name: 'currentUser', type: createTypeRef('OBJECT', 'User') },
-    ],
+    fields: [{ name: 'currentUser', type: createTypeRef('OBJECT', 'User') }],
   } as ResolvedType);
 
   registry.set('Mutation', {
@@ -301,7 +360,6 @@ describe('Mutation Hook Generators', () => {
       const result = generateCreateMutationHook(postTable, {
         reactQueryEnabled: true,
         useCentralizedKeys: true,
-        hasRelationships: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -332,7 +390,6 @@ describe('Mutation Hook Generators', () => {
       const result = generateUpdateMutationHook(postTable, {
         reactQueryEnabled: true,
         useCentralizedKeys: true,
-        hasRelationships: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -363,7 +420,6 @@ describe('Mutation Hook Generators', () => {
       const result = generateDeleteMutationHook(postTable, {
         reactQueryEnabled: true,
         useCentralizedKeys: true,
-        hasRelationships: true,
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
@@ -403,6 +459,34 @@ describe('Custom Query Hook Generators', () => {
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
+    });
+
+    it('keeps nullable return typing for selected custom queries', () => {
+      const result = generateCustomQueryHook({
+        operation: simpleCustomQueries[0],
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      expect(result!.content).toContain(
+        'currentUser: InferSelectResult<User, S> | null;',
+      );
+    });
+
+    it('marks variables optional in selection overloads when all args are optional', () => {
+      const result = generateCustomQueryHook({
+        operation: optionalArgsCustomQuery,
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      const optionalVariablesMatches = result!.content.match(
+        /variables\?: RecentUsersVariables;/g,
+      );
+      expect(optionalVariablesMatches?.length ?? 0).toBeGreaterThanOrEqual(3);
+      expect(result!.content).not.toMatch(
+        /variables:\s*RecentUsersVariables;\s*\n\s*selection:/,
+      );
     });
   });
 });
@@ -450,6 +534,18 @@ describe('Custom Mutation Hook Generators', () => {
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
+    });
+
+    it('keeps nullable return typing for selected custom mutations', () => {
+      const result = generateCustomMutationHook({
+        operation: simpleCustomMutations[0],
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      expect(result!.content).toContain(
+        'login: InferSelectResult<LoginPayload, S> | null;',
+      );
     });
   });
 });
@@ -503,7 +599,6 @@ describe('Barrel File Generators', () => {
   describe('generateMainBarrel', () => {
     it('generates main barrel with all options enabled', () => {
       const result = generateMainBarrel([simpleUserTable, postTable], {
-        hasSchemaTypes: true,
         hasMutations: true,
         hasQueryKeys: true,
         hasMutationKeys: true,
@@ -514,7 +609,6 @@ describe('Barrel File Generators', () => {
 
     it('generates main barrel without custom operations', () => {
       const result = generateMainBarrel([simpleUserTable], {
-        hasSchemaTypes: false,
         hasMutations: true,
       });
       expect(result).toMatchSnapshot();
@@ -522,7 +616,6 @@ describe('Barrel File Generators', () => {
 
     it('generates main barrel without mutations', () => {
       const result = generateMainBarrel([simpleUserTable, postTable], {
-        hasSchemaTypes: true,
         hasMutations: false,
       });
       expect(result).toMatchSnapshot();
@@ -532,7 +625,10 @@ describe('Barrel File Generators', () => {
   describe('generateCustomQueriesBarrel', () => {
     it('generates custom queries barrel', () => {
       const customQueryNames = simpleCustomQueries.map((q) => q.name);
-      const result = generateCustomQueriesBarrel([simpleUserTable], customQueryNames);
+      const result = generateCustomQueriesBarrel(
+        [simpleUserTable],
+        customQueryNames,
+      );
       expect(result).toMatchSnapshot();
     });
   });
@@ -540,7 +636,10 @@ describe('Barrel File Generators', () => {
   describe('generateCustomMutationsBarrel', () => {
     it('generates custom mutations barrel', () => {
       const customMutationNames = simpleCustomMutations.map((m) => m.name);
-      const result = generateCustomMutationsBarrel([simpleUserTable], customMutationNames);
+      const result = generateCustomMutationsBarrel(
+        [simpleUserTable],
+        customMutationNames,
+      );
       expect(result).toMatchSnapshot();
     });
   });
