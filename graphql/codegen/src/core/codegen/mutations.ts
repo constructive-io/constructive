@@ -341,6 +341,8 @@ export function generateUpdateMutationHook(
 
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
+  const patchFieldName =
+    table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
 
   const pkTsType =
     pkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
@@ -399,14 +401,14 @@ export function generateUpdateMutationHook(
     ),
   );
 
-  // Variable type: { pkField: type; patch: PatchType }
+  // Variable type: { pkField: type; patchFieldName: PatchType }
   const updateVarType = t.tsTypeLiteral([
     t.tsPropertySignature(
       t.identifier(pkField.name),
       t.tsTypeAnnotation(pkTsType),
     ),
     t.tsPropertySignature(
-      t.identifier('patch'),
+      t.identifier(patchFieldName),
       t.tsTypeAnnotation(typeRef(patchTypeName)),
     ),
   ]);
@@ -439,7 +441,7 @@ export function generateUpdateMutationHook(
     '  selection: { fields: { id: true, name: true } },',
     '});',
     '',
-    `mutate({ ${pkField.name}: 'value-here', patch: { name: 'Updated' } });`,
+    `mutate({ ${pkField.name}: 'value-here', ${patchFieldName}: { name: 'Updated' } });`,
     '```',
   ]);
   statements.push(o1);
@@ -471,11 +473,11 @@ export function generateUpdateMutationHook(
     ? t.memberExpression(t.identifier(mutationKeysName), t.identifier('all'))
     : undefined;
 
-  // mutationFn: ({ pkField, patch }: { pkField: type; patch: PatchType }) =>
-  //   getClient().singular.update({ where: { pkField }, data: patch, select: ... }).unwrap()
+  // mutationFn: ({ pkField, patchFieldName }: VarType) =>
+  //   getClient().singular.update({ where: { pkField }, data: patchFieldName, select: ... }).unwrap()
   const destructParam = t.objectPattern([
     shorthandProp(pkField.name),
-    shorthandProp('patch'),
+    shorthandProp(patchFieldName),
   ]);
   destructParam.typeAnnotation = t.tsTypeAnnotation(updateVarType);
   const mutationFnExpr = t.arrowFunctionExpression(
@@ -485,7 +487,7 @@ export function generateUpdateMutationHook(
       'update',
       t.objectExpression([
         objectProp('where', t.objectExpression([shorthandProp(pkField.name)])),
-        objectProp('data', t.identifier('patch')),
+        objectProp('data', t.identifier(patchFieldName)),
         objectProp(
           'select',
           t.memberExpression(t.identifier('args'), t.identifier('select')),

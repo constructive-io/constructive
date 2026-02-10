@@ -112,7 +112,7 @@ export class UserModel {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", "userPatch", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -362,7 +362,7 @@ export class OrganizationModel {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", "organizationPatch", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",

@@ -425,6 +425,7 @@ export function buildUpdateDocument<
   where: TWhere,
   data: TData,
   inputTypeName: string,
+  patchFieldName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -450,7 +451,7 @@ export function buildUpdateDocument<
     variables: {
       input: {
         id: where.id,
-        patch: data,
+        [patchFieldName]: data,
       },
     },
   };
@@ -465,6 +466,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
   data: TData,
   inputTypeName: string,
   idFieldName: string,
+  patchFieldName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -490,7 +492,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
     variables: {
       input: {
         [idFieldName]: id,
-        patch: data,
+        [patchFieldName]: data,
       },
     },
   };

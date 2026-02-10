@@ -807,6 +807,8 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
+    const patchFieldName =
+      table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(updateMutationName),
@@ -819,6 +821,7 @@ export function generateModelFile(
       t.memberExpression(t.identifier('args'), t.identifier('data')),
       t.stringLiteral(updateInputTypeName),
       t.stringLiteral(pkField.name),
+      t.stringLiteral(patchFieldName),
       t.identifier('connectionFieldsMap'),
     ];
     classBody.push(

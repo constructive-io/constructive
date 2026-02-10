@@ -30,6 +30,7 @@ import {
   getPrimaryKeyInfo,
   getTableNames,
   isRelationField,
+  lcFirst,
 } from '../utils';
 
 export interface GeneratedInputTypesFile {
@@ -1386,12 +1387,14 @@ function generateCrudInputTypes(
     createExportedInterface(patchName, buildPatchProperties(table)),
   );
 
-  // Update input
+  // Update input - v5 uses entity-specific patch field names (e.g., "userPatch")
+  const patchFieldName =
+    table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
   statements.push(
     createExportedInterface(`Update${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
       { name: pkFieldName, type: pkFieldTsType, optional: false },
-      { name: 'patch', type: patchName, optional: false },
+      { name: patchFieldName, type: patchName, optional: false },
     ]),
   );
 

@@ -1182,7 +1182,7 @@ export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdateUserMutation<S extends UserSelect>(params: {
@@ -1195,20 +1195,20 @@ export function useUpdateUserMutation<S extends UserSelect>(params: {
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">): UseMutationResult<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>;
 export function useUpdateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
@@ -1221,15 +1221,15 @@ export function useUpdateUserMutation(params: {
     mutationKey: userMutationKeys.all,
     mutationFn: ({
       id,
-      patch
+      userPatch
     }: {
       id: string;
-      patch: UserPatch;
+      userPatch: UserPatch;
     }) => getClient().user.update({
       where: {
         id
       },
-      data: patch,
+      data: userPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {
@@ -1272,7 +1272,7 @@ export type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', postPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdatePostMutation<S extends PostSelect>(params: {
@@ -1285,20 +1285,20 @@ export function useUpdatePostMutation<S extends PostSelect>(params: {
   };
 }, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>, "mutationFn">): UseMutationResult<{
   updatePost: {
     post: InferSelectResult<PostWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>;
 export function useUpdatePostMutation(params: {
   selection: SelectionConfig<PostSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
@@ -1311,15 +1311,15 @@ export function useUpdatePostMutation(params: {
     mutationKey: postMutationKeys.all,
     mutationFn: ({
       id,
-      patch
+      postPatch
     }: {
       id: string;
-      patch: PostPatch;
+      postPatch: PostPatch;
     }) => getClient().post.update({
       where: {
         id
       },
-      data: patch,
+      data: postPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {
@@ -1360,7 +1360,7 @@ export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdateUserMutation<S extends UserSelect>(params: {
@@ -1373,20 +1373,20 @@ export function useUpdateUserMutation<S extends UserSelect>(params: {
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">): UseMutationResult<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>;
 export function useUpdateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
@@ -1398,15 +1398,15 @@ export function useUpdateUserMutation(params: {
   return useMutation({
     mutationFn: ({
       id,
-      patch
+      userPatch
     }: {
       id: string;
-      patch: UserPatch;
+      userPatch: UserPatch;
     }) => getClient().user.update({
       where: {
         id
       },
-      data: patch,
+      data: userPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {

@@ -416,7 +416,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -442,7 +442,7 @@ export interface PostPatch {
 export interface UpdatePostInput {
   clientMutationId?: string;
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }
 export interface DeletePostInput {
   clientMutationId?: string;
@@ -464,7 +464,7 @@ export interface CommentPatch {
 export interface UpdateCommentInput {
   clientMutationId?: string;
   id: string;
-  patch: CommentPatch;
+  commentPatch: CommentPatch;
 }
 export interface DeleteCommentInput {
   clientMutationId?: string;
@@ -790,7 +790,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -1108,7 +1108,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -1438,7 +1438,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -1820,7 +1820,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -1842,7 +1842,7 @@ export interface ProfilePatch {
 export interface UpdateProfileInput {
   clientMutationId?: string;
   id: string;
-  patch: ProfilePatch;
+  profilePatch: ProfilePatch;
 }
 export interface DeleteProfileInput {
   clientMutationId?: string;
@@ -2206,7 +2206,7 @@ export interface PostPatch {
 export interface UpdatePostInput {
   clientMutationId?: string;
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }
 export interface DeletePostInput {
   clientMutationId?: string;
@@ -2226,7 +2226,7 @@ export interface CategoryPatch {
 export interface UpdateCategoryInput {
   clientMutationId?: string;
   id: string;
-  patch: CategoryPatch;
+  categoryPatch: CategoryPatch;
 }
 export interface DeleteCategoryInput {
   clientMutationId?: string;

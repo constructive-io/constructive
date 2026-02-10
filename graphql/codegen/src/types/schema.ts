@@ -82,6 +82,8 @@ export interface TableQueryNames {
   update: string | null;
   /** Delete mutation name */
   delete: string | null;
+  /** Patch field name in update mutation input (e.g., "userPatch" for UpdateUserInput) */
+  patchFieldName?: string;
 }
 
 /**

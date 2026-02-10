@@ -292,6 +292,9 @@ function buildCleanTable(
   // Infer primary key from mutation inputs
   const constraints = inferConstraints(entityName, typeMap);
 
+  // Infer the patch field name from UpdateXxxInput (e.g., "userPatch")
+  const patchFieldName = inferPatchFieldName(entityName, typeMap);
+
   // Build inflection map from discovered types
   const inflection = buildInflection(entityName, typeMap, entityToConnection);
 
@@ -303,6 +306,7 @@ function buildCleanTable(
     create: mutationOps.create ?? `create${entityName}`,
     update: mutationOps.update,
     delete: mutationOps.delete,
+    patchFieldName,
   };
 
   return {
@@ -730,6 +734,35 @@ function inferPrimaryKeyFromInputObject(
   });
 
   return candidates.length === 1 ? candidates[0] : null;
+}
+
+/**
+ * Infer the patch field name from an Update input type.
+ *
+ * PostGraphile v5 uses entity-specific patch field names:
+ *   UpdateUserInput     → { id, userPatch: UserPatch }
+ *   UpdateDatabaseInput → { id, databasePatch: DatabasePatch }
+ *
+ * Pattern: {lcFirst(entityTypeName)}Patch
+ */
+function inferPatchFieldName(
+  entityName: string,
+  typeMap: Map<string, IntrospectionType>,
+): string {
+  const updateInputName = `Update${entityName}Input`;
+  const updateInput = typeMap.get(updateInputName);
+  const inputFields = updateInput?.inputFields ?? [];
+
+  // Find the field whose type name ends in 'Patch'
+  const patchField = inputFields.find((f) => {
+    const baseName = getBaseTypeName(f.type);
+    return baseName?.endsWith('Patch');
+  });
+
+  if (patchField) return patchField.name;
+
+  // Fallback: compute from entity name (v5 default inflection)
+  return lcFirst(entityName) + 'Patch';
 }
 
 // ============================================================================

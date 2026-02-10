@@ -616,7 +616,7 @@ describe('CRUD input types', () => {
 
     expect(result.content).toContain('export interface UpdateUserInput {');
     expect(result.content).toContain('id: string;');
-    expect(result.content).toContain('patch: UserPatch;');
+    expect(result.content).toContain('userPatch: UserPatch;');
   });
 
   it('generates delete input type', () => {
