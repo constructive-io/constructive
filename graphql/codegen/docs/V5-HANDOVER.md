@@ -147,6 +147,30 @@ After rebasing onto the fulltext search plugin merge (commit `edcb3060e`):
 - `pnpm test` — 230 tests pass, 75 snapshots match
 - No regressions from search plugin additions
 
+### 6. Update mutation patch field names (v5 convention)
+PostGraphile v5 uses entity-specific patch field names in update mutation inputs:
+```
+UpdateUserInput     → { id: UUID!, userPatch: UserPatch! }
+UpdateDatabaseInput → { id: UUID!, databasePatch: DatabasePatch! }
+```
+Pattern: `{lcFirst(entityTypeName)}Patch`
+
+Previously, codegen hardcoded `patch` as the field name, which broke all 92 update mutations at runtime against v5 servers.
+
+Fix:
+- Introspection now extracts the actual patch field name from `UpdateXxxInput` types (`infer-tables.ts`)
+- `TableQueryNames.patchFieldName` carries the discovered name through the pipeline
+- Generated `UpdateXxxInput` types, ORM model `update()` calls, query builder templates, and React Query mutation hooks all use the entity-specific name
+- Fallback: `{lcFirst(entityTypeName)}Patch` when introspection is unavailable
+
+Implementation anchors:
+- `graphql/codegen/src/core/introspect/infer-tables.ts` — `inferPatchFieldName()`
+- `graphql/codegen/src/types/schema.ts` — `TableQueryNames.patchFieldName`
+- `graphql/codegen/src/core/codegen/orm/input-types-generator.ts` — dynamic field name in `UpdateXxxInput`
+- `graphql/codegen/src/core/codegen/templates/query-builder.ts` — `patchFieldName` parameter on `buildUpdateByPkDocument`
+- `graphql/codegen/src/core/codegen/orm/model-generator.ts` — passes `patchFieldName` to query builder
+- `graphql/codegen/src/core/codegen/mutations.ts` — entity-specific field name in hook variable type
+
 ## Remaining Audit Checklist
 1. ~~Re-run generation + type/live tests whenever backend schema changes.~~ Done post-rebase.
 2. Spot-check nested relation selection autocomplete in IDE for large objects.
