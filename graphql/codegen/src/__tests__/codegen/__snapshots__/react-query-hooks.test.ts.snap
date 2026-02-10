@@ -207,7 +207,7 @@ import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { LoginVariables } from "../../orm/mutation";
 import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LoginVariables } from "../../orm/mutation";
 export type { LoginPayloadSelect } from "../../orm/input-types";
 export function useLoginMutation<S extends LoginPayloadSelect>(params: {
@@ -231,7 +231,7 @@ export function useLoginMutation<S extends LoginPayloadSelect>(params: {
       select: args.select
     } as {
       select: S;
-    } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>).unwrap(),
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -253,7 +253,7 @@ import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { RegisterVariables } from "../../orm/mutation";
 import type { RegisterPayloadSelect, RegisterPayload } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { RegisterVariables } from "../../orm/mutation";
 export type { RegisterPayloadSelect } from "../../orm/input-types";
 export function useRegisterMutation<S extends RegisterPayloadSelect>(params: {
@@ -277,7 +277,7 @@ export function useRegisterMutation<S extends RegisterPayloadSelect>(params: {
       select: args.select
     } as {
       select: S;
-    } & HookStrictSelect<NoInfer<S>, RegisterPayloadSelect>).unwrap(),
+    } & StrictSelect<S, RegisterPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -298,7 +298,7 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { LogoutPayloadSelect, LogoutPayload } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LogoutPayloadSelect } from "../../orm/input-types";
 export function useLogoutMutation<S extends LogoutPayloadSelect>(params: {
   selection: ({
@@ -321,7 +321,7 @@ export function useLogoutMutation<S extends LogoutPayloadSelect>(params: {
       select: args.select
     } as {
       select: S;
-    } & HookStrictSelect<NoInfer<S>, LogoutPayloadSelect>).unwrap(),
+    } & StrictSelect<S, LogoutPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -342,7 +342,7 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { LoginVariables } from "../../orm/mutation";
 import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
-import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LoginVariables } from "../../orm/mutation";
 export type { LoginPayloadSelect } from "../../orm/input-types";
 export function useLoginMutation<S extends LoginPayloadSelect>(params: {
@@ -365,7 +365,7 @@ export function useLoginMutation<S extends LoginPayloadSelect>(params: {
       select: args.select
     } as {
       select: S;
-    } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>).unwrap(),
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }

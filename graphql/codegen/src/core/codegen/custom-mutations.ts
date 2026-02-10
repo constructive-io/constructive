@@ -166,7 +166,7 @@ function generateCustomMutationHookInternal(
     statements.push(
     createImportDeclaration(
       '../../orm/select-types',
-      ['InferSelectResult', 'HookStrictSelect'],
+      ['InferSelectResult', 'HookStrictSelect', 'StrictSelect'],
       true,
     ),
   );
@@ -238,6 +238,9 @@ function generateCustomMutationHookInternal(
         )
       : undefined;
 
+    // Cast to ORM's StrictSelect (not HookStrictSelect) since the ORM
+    // method signature requires { select: S } & StrictSelect<S, XxxSelect>.
+    // Strictness is already enforced at the hook parameter level.
     const selectArgExpr = t.tsAsExpression(
       t.objectExpression([
         objectProp(
@@ -252,10 +255,7 @@ function generateCustomMutationHookInternal(
             t.tsTypeAnnotation(sRef()),
           ),
         ]),
-        typeRef('HookStrictSelect', [
-          typeRef('NoInfer', [sRef()]),
-          typeRef(selectTypeName!),
-        ]),
+        typeRef('StrictSelect', [sRef(), typeRef(selectTypeName!)]),
       ]),
     );
 
