@@ -27,17 +27,17 @@ Migrate `graphql/codegen` to be fully compatible with PostGraphile v5 on branch 
 
 ## Migration Workstreams
 
-### 1) Baseline Override
+### 1) Baseline Override ✅
 - Copy `graphql/codegen` from `main` into the new branch.
 - Keep all non-codegen files from `develop-v5` unchanged.
 - Resolve lockfile/package drift only where needed for codegen build/test.
 
-### 2) GraphQL 16 / AST Compatibility
+### 2) GraphQL 16 / AST Compatibility ✅
 - Ensure GraphQL operation/kind enum usage is compatible with v5/GraphQL 16 expectations.
 - Audit and patch any remaining string-literal AST node usages that break typing/runtime.
 - Confirm template-copied runtime files are also compatible (especially query-builder template paths).
 
-### 3) Codegen-to-Server Contract Alignment (v5)
+### 3) Codegen-to-Server Contract Alignment (v5) ✅
 - Remove v4-only assumptions in codegen DB schema build calls.
 - Align schema-fetch/introspection behavior with v5 server exposure.
 - Verify source mode behavior:
@@ -45,7 +45,7 @@ Migrate `graphql/codegen` to be fully compatible with PostGraphile v5 on branch 
   - schema-file codegen
   - db-backed codegen (where applicable)
 
-### 4) `findOne` Refactor for v5 Unique Lookup Changes
+### 4) `findOne` Refactor for v5 Unique Lookup Changes ✅
 - Problem:
   - v5 preset usage may remove unique/single lookup query fields.
 - Required behavior:
@@ -56,7 +56,7 @@ Migrate `graphql/codegen` to be fully compatible with PostGraphile v5 on branch 
   - Make table metadata/query-name typing reflect optional absence of single query field.
   - Ensure custom operation separation logic does not assume single query existence.
 
-### 5) Type System and DX Safeguards
+### 5) Type System and DX Safeguards ✅
 - Preserve the current selection-first API and strict select validation.
 - Keep React Query options pass-through behavior distinct from GraphQL selection args.
 - Re-validate overload signatures and inference behavior for nested selection autocomplete.
@@ -99,9 +99,19 @@ Migrate `graphql/codegen` to be fully compatible with PostGraphile v5 on branch 
 - Risk: Regressions in selection/autocomplete behavior.
   - Mitigation: keep strict type tests and nested-selection inference tests as merge gates.
 
+## Post-Migration Hardening
+
+Completed after all 5 workstreams:
+- Removed stale `--browserCompatible` CLI option from `packages/cli`
+- Updated all `_meta` references to "standard introspection" in comments/docstrings
+- Marked legacy v4 exports (`QueryBuilder`, `MetaObject`, generators) as `@deprecated`
+- Added search/fulltext entity detection test coverage
+- Added multi-entity `findOne` collection fallback test (NoUniqueLookupPreset scenario)
+- Post-rebase verification: 230 tests pass, 75 snapshots, build clean
+
 ## Definition of Done
-- `graphql/codegen` baseline from `main` is active on top of `develop-v5`.
-- Codegen builds/tests/typechecks pass.
-- Endpoint-based generation against local `packages/server` v5 instance succeeds.
-- ORM and React Query outputs both pass compile + type-level verification.
-- No unresolved contract gaps between generated code and v5 backend schema shape.
+- ✅ `graphql/codegen` baseline from `main` is active on top of `develop-v5`.
+- ✅ Codegen builds/tests/typechecks pass (230 tests, 75 snapshots).
+- ✅ Endpoint-based generation against local `packages/server` v5 instance succeeds.
+- ✅ ORM and React Query outputs both pass compile + type-level verification.
+- ✅ No unresolved contract gaps between generated code and v5 backend schema shape.
