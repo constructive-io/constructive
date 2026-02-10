@@ -40,6 +40,10 @@ import type { PgSearchPluginOptions } from './types';
  * Module-level WeakMap keyed by SQL alias object (shared reference between
  * the queryBuilder proxy and PgSelectStep via buildTheQueryCore).
  *
+ * CRITICAL INVARIANT: SQL alias objects MUST have unique identity per query
+ * execution. If PostGraphile ever pools or caches alias references across
+ * queries, rank values could leak between requests.
+ *
  * 1. Rank field plan (planning phase): initialises the slot keyed by alias.
  * 2. OrderBy enum apply (planning phase): stores direction in PgSelectStep meta.
  * 3. Condition apply (deferred/SQL-gen phase): adds ts_rank to the proxy's
@@ -52,6 +56,15 @@ interface FtsRankSlot {
   indices: Record<string, number>;
 }
 const ftsRankSlots = new WeakMap<object, FtsRankSlot>();
+
+/**
+ * FinalizationRegistry for defensive cleanup of ftsRankSlots entries.
+ * WeakMap entries are already eligible for GC when keys are unreachable,
+ * but this provides explicit cleanup and a hook for debugging leaks.
+ */
+const ftsRankCleanup = new FinalizationRegistry<object>((heldValue) => {
+  ftsRankSlots.delete(heldValue);
+});
 
 function isTsvectorCodec(codec: any): boolean {
   return (
@@ -84,7 +97,7 @@ function getPgSelectStep($someStep: any): any | null {
 export function createPgSearchPlugin(
   options: PgSearchPluginOptions = {}
 ): GraphileConfig.Plugin {
-  const { pgSearchPrefix = 'tsv', fullTextScalarName = 'FullText' } = options;
+  const { pgSearchPrefix = 'tsv', fullTextScalarName = 'FullText', tsConfig = 'english' } = options;
 
   return {
     name: 'PgSearchPlugin',
@@ -118,7 +131,7 @@ export function createPgSearchPlugin(
                 _$where: any,
                 _details: { fieldName: string | null; operatorName: string }
               ) {
-                return sql`${sqlIdentifier} @@ to_tsquery(${sqlValue})`;
+                return sql`${sqlIdentifier} @@ websearch_to_tsquery(${sql.literal(tsConfig)}, ${sqlValue})`;
               },
             });
           }
@@ -175,6 +188,7 @@ export function createPgSearchPlugin(
                         ftsRankSlots.set(alias, {
                           indices: Object.create(null),
                         });
+                        ftsRankCleanup.register($select, alias);
                       }
 
                       // Return a lambda that reads the rank value from the result
@@ -286,7 +300,7 @@ export function createPgSearchPlugin(
           const tsvectorAttributes = Object.entries(
             pgCodec.attributes as Record<string, any>
           ).filter(
-            ([_name, attr]: [string, any]) => attr.codec?.name === 'tsvector'
+            ([_name, attr]: [string, any]) => isTsvectorCodec(attr.codec)
           );
 
           if (tsvectorAttributes.length === 0) {
@@ -317,7 +331,7 @@ export function createPgSearchPlugin(
                     type: GraphQLString,
                     apply: function plan($condition: any, val: any) {
                       if (val == null) return;
-                      const tsquery = sql`websearch_to_tsquery('english', ${sql.value(val)})`;
+                      const tsquery = sql`websearch_to_tsquery(${sql.literal(tsConfig)}, ${sql.value(val)})`;
                       const columnExpr = sql`${$condition.alias}.${sql.identifier(attributeName)}`;
 
                       // WHERE: column @@ tsquery

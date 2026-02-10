@@ -30,4 +30,12 @@ export interface PgSearchPluginOptions {
    * @default 'FullText'
    */
   fullTextScalarName?: string;
+
+  /**
+   * PostgreSQL text search configuration used with `websearch_to_tsquery`.
+   * Must match the configuration used when building your tsvector columns
+   * (e.g., `'english'`, `'simple'`, `'spanish'`).
+   * @default 'english'
+   */
+  tsConfig?: string;
 }
