@@ -150,6 +150,55 @@ describe('model-generator', () => {
     expect(result.content).toContain('"account": data.accounts?.nodes?.[0] ?? null');
   });
 
+  it('generates findOne via collection fallback for all entities when no single query fields exist', () => {
+    // Simulates NoUniqueLookupPreset: query.one is null for every entity
+    const tables = [
+      createTable({
+        name: 'User',
+        fields: [
+          { name: 'id', type: fieldTypes.uuid },
+          { name: 'email', type: fieldTypes.string },
+        ],
+        query: {
+          all: 'users',
+          one: null,
+          create: 'createUser',
+          update: 'updateUser',
+          delete: 'deleteUser',
+        },
+      }),
+      createTable({
+        name: 'Post',
+        fields: [
+          { name: 'id', type: fieldTypes.uuid },
+          { name: 'title', type: fieldTypes.string },
+        ],
+        query: {
+          all: 'posts',
+          one: null,
+          create: 'createPost',
+          update: 'updatePost',
+          delete: 'deletePost',
+        },
+      }),
+    ];
+
+    for (const table of tables) {
+      const result = generateModelFile(table, false);
+      const lcName = table.name.charAt(0).toLowerCase() + table.name.slice(1);
+
+      // Should use collection fallback for findOne
+      expect(result.content).toContain(`findOne<S extends ${table.name}Select>(`);
+      expect(result.content).toContain(
+        `buildFindManyDocument("${table.name}", "${table.query!.all}", args.select`,
+      );
+      // findOne should use transform pattern (collection → single result)
+      expect(result.content).toContain(
+        `"${lcName}": data.${table.query!.all}?.nodes?.[0] ?? null`,
+      );
+    }
+  });
+
   it('generates correct type imports', () => {
     const table = createTable({
       name: 'Product',

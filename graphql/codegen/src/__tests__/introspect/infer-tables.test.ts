@@ -280,6 +280,61 @@ describe('Entity Detection', () => {
     expect(tables[0].name).toBe('User');
   });
 
+  it('detects FullTextSearch entity from FullTextSearchConnection type', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'FulltextSearch',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'headline', type: scalar('String') },
+            { name: 'rank', type: scalar('Float') },
+          ],
+        },
+        {
+          name: 'FulltextSearchesConnection',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'nodes', type: list(object('FulltextSearch')) },
+            { name: 'pageInfo', type: nonNull(object('PageInfo')) },
+          ],
+        },
+        { name: 'PageInfo', kind: 'OBJECT', fields: [] },
+        {
+          name: 'FulltextSearchFilter',
+          kind: 'INPUT_OBJECT',
+          inputFields: [
+            { name: 'headline', type: inputObject('StringFilter') },
+          ],
+        },
+      ],
+      [
+        {
+          name: 'fulltextSearches',
+          type: object('FulltextSearchesConnection'),
+          args: [
+            { name: 'filter', type: inputObject('FulltextSearchFilter') },
+            { name: 'first', type: scalar('Int') },
+            { name: 'after', type: scalar('Cursor') },
+          ],
+        },
+      ],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0].name).toBe('FulltextSearch');
+    expect(tables[0].query?.all).toBe('fulltextSearches');
+    expect(tables[0].inflection?.filterType).toBe('FulltextSearchFilter');
+    expect(tables[0].fields.map((f) => f.name)).toEqual([
+      'id',
+      'headline',
+      'rank',
+    ]);
+  });
+
   it('detects entities from singular Connection naming (v5 style)', () => {
     const introspection = createIntrospection(
       [
