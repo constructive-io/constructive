@@ -17,8 +17,10 @@ import {
   useCheckPasswordMutation,
   useCurrentUserIdQuery,
   useCurrentUserQuery,
+  useDatabasesQuery,
   useSignInMutation,
   useSignOutMutation,
+  useUpdateUserMutation,
   useUserQuery,
   useUsersQuery,
   userQueryKey,
@@ -294,6 +296,167 @@ if (!liveEnv) {
         'user detail cache entry missing'
       );
 
+      queryClient.clear();
+    });
+
+    test('useUpdateUserMutation updates displayName with entity-specific patch field', async () => {
+      const session = await ensureAuth();
+      const queryClient = createTestQueryClient();
+
+      // Read original value via fetch helper
+      const before = await fetchUserQuery({
+        id: session.userId,
+        selection: { fields: { id: true, displayName: true } },
+      });
+      const originalName = before.user?.displayName;
+
+      // Render the update mutation hook
+      const hook = await renderHookWithClient(
+        () =>
+          useUpdateUserMutation({
+            selection: { fields: { id: true, displayName: true } },
+          }),
+        queryClient,
+      );
+
+      const testName = `hook-test-${Date.now()}`;
+      let result: { updateUser: { user: { id?: string; displayName?: string | null } } } | null = null;
+
+      await act(async () => {
+        result = await hook.getResult().mutateAsync({
+          id: session.userId,
+          userPatch: { displayName: testName },
+        });
+      });
+
+      assert.equal(
+        result?.updateUser.user.displayName,
+        testName,
+        'useUpdateUserMutation should return updated displayName',
+      );
+
+      // Restore original value
+      await act(async () => {
+        await hook.getResult().mutateAsync({
+          id: session.userId,
+          userPatch: { displayName: originalName ?? null },
+        });
+      });
+
+      await hook.unmount();
+      queryClient.clear();
+    });
+
+    test('useUsersQuery with 3-level nested select (users → databases → schemas)', async () => {
+      await ensureAuth();
+      const queryClient = createTestQueryClient();
+
+      const hook = await renderHookWithClient(
+        () =>
+          useUsersQuery({
+            selection: {
+              fields: {
+                id: true,
+                username: true,
+                ownedDatabases: {
+                  first: 2,
+                  select: {
+                    id: true,
+                    name: true,
+                    schemas: {
+                      first: 3,
+                      select: {
+                        id: true,
+                        schemaName: true,
+                      },
+                    },
+                  },
+                },
+              },
+              first: 3,
+              orderBy: ['CREATED_AT_DESC'],
+            },
+          }),
+        queryClient,
+      );
+
+      const result = await hook.waitFor((value) => value.isSuccess || value.isError);
+      assert.equal(result.isError, false, 'useUsersQuery 3-level nested returned an error');
+      assert.ok(Array.isArray(result.data?.users.nodes), 'users.nodes should be an array');
+
+      // Verify nested structure exists at each level
+      for (const user of result.data?.users.nodes ?? []) {
+        assert.ok(user.id, 'user.id should exist');
+        assert.ok(
+          Array.isArray(user.ownedDatabases.nodes),
+          'ownedDatabases.nodes should be an array',
+        );
+        for (const db of user.ownedDatabases.nodes) {
+          assert.ok(db.id, 'database.id should exist');
+          assert.ok(Array.isArray(db.schemas.nodes), 'schemas.nodes should be an array');
+        }
+      }
+
+      await hook.unmount();
+      queryClient.clear();
+    });
+
+    test('useUsersQuery with pagination returns pageInfo and totalCount', async () => {
+      await ensureAuth();
+      const queryClient = createTestQueryClient();
+
+      const hook = await renderHookWithClient(
+        () =>
+          useUsersQuery({
+            selection: {
+              fields: { id: true },
+              first: 2,
+              offset: 0,
+            },
+          }),
+        queryClient,
+      );
+
+      const result = await hook.waitFor((value) => value.isSuccess || value.isError);
+      assert.equal(result.isError, false, 'useUsersQuery pagination returned an error');
+      assert.ok(
+        typeof result.data?.users.totalCount === 'number',
+        'totalCount should be a number',
+      );
+      assert.ok(result.data?.users.pageInfo, 'pageInfo should exist');
+      assert.ok(
+        typeof result.data?.users.pageInfo.hasNextPage === 'boolean',
+        'hasNextPage should be a boolean',
+      );
+
+      await hook.unmount();
+      queryClient.clear();
+    });
+
+    test('useDatabasesQuery with filter returns matching results', async () => {
+      await ensureAuth();
+      const queryClient = createTestQueryClient();
+
+      const hook = await renderHookWithClient(
+        () =>
+          useDatabasesQuery({
+            selection: {
+              fields: { id: true, name: true },
+              where: { name: { includesInsensitive: '' } },
+              first: 10,
+            },
+          }),
+        queryClient,
+      );
+
+      const result = await hook.waitFor((value) => value.isSuccess || value.isError);
+      assert.equal(result.isError, false, 'useDatabasesQuery with filter returned an error');
+      assert.ok(
+        Array.isArray(result.data?.databases.nodes),
+        'databases.nodes should be an array',
+      );
+
+      await hook.unmount();
       queryClient.clear();
     });
 

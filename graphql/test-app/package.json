@@ -10,7 +10,7 @@
     "codegen": "tsx ../codegen/src/cli/index.ts --config codegen.config.ts",
     "codegen:orm": "tsx ../codegen/src/cli/index.ts --endpoint http://api.localhost:3000/graphql --output src/generated --orm",
     "typecheck": "tsc --noEmit",
-    "test:types": "tsc --noEmit",
+    "test:types": "tsc --noEmit -p tsconfig.typecheck.json",
     "test:integration": "node --import tsx --test \"tests/**/*.test.ts\"",
     "test:integration:live": "GRAPHQL_TEST_LIVE_REQUIRED=1 node --import tsx --test \"tests/**/*.test.ts\"",
     "analyze": "tsx scripts/analyze-bundle.ts",

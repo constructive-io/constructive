@@ -238,7 +238,7 @@ importers:
         version: 5.0.0-rc.3
       postgraphile:
         specifier: ^5.0.0-rc.4
-        version: 5.0.0-rc.4(4002ad6b62e0b8cb7e8d072c2f79179b)
+        version: 5.0.0-rc.4(baaf649c2f2e98b110259ca1ecc6643d)
     devDependencies:
       '@types/node':
         specifier: ^22.19.1
