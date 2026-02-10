@@ -26,8 +26,6 @@ Generator Options:
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --authorization <token>    Authorization header value
-  --browserCompatible        Generate browser-compatible code (default: true)
-                             Set to false for Node.js with localhost DNS fix
   --dryRun                   Preview without writing files
   --verbose                  Verbose output
 
@@ -70,7 +68,6 @@ export default async (
     authorization: answers.authorization,
     reactQuery: answers.reactQuery,
     orm: answers.orm,
-    browserCompatible: answers.browserCompatible,
     dryRun: answers.dryRun,
     verbose: answers.verbose,
   });
