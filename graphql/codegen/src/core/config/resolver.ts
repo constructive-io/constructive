@@ -8,7 +8,7 @@ import type {
   GraphQLSDKConfig,
   GraphQLSDKConfigTarget,
 } from '../../types/config';
-import { mergeConfig, getConfigOptions } from '../../types/config';
+import { getConfigOptions, mergeConfig } from '../../types/config';
 import { findConfigFile, loadConfigFile } from './loader';
 
 /**
@@ -38,7 +38,7 @@ export interface LoadConfigResult {
  * 3. Returns fully resolved configuration ready for use
  */
 export async function loadAndResolveConfig(
-  options: ConfigOverrideOptions
+  options: ConfigOverrideOptions,
 ): Promise<LoadConfigResult> {
   // Destructure CLI-only fields, rest is config overrides
   const { config: configPath, ...overrides } = options;
@@ -77,9 +77,7 @@ export async function loadAndResolveConfig(
 
   // Check if we have a source (endpoint, schemaFile, or db)
   const hasSource =
-    mergedConfig.endpoint ||
-    mergedConfig.schemaFile ||
-    mergedConfig.db;
+    mergedConfig.endpoint || mergedConfig.schemaFile || mergedConfig.db;
 
   if (!hasSource) {
     return {
@@ -147,14 +145,14 @@ export async function loadWatchConfig(options: {
 
   if (!mergedConfig.endpoint) {
     console.error(
-      'x No endpoint specified. Watch mode only supports live endpoints.'
+      'x No endpoint specified. Watch mode only supports live endpoints.',
     );
     return null;
   }
 
   if (mergedConfig.schemaFile) {
     console.error(
-      'x Watch mode is only supported with an endpoint, not schemaFile.'
+      'x Watch mode is only supported with an endpoint, not schemaFile.',
     );
     return null;
   }

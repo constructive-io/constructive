@@ -12,27 +12,29 @@
  * - Query operations: {pluralName} (list), {singularName} (single)
  * - Mutation operations: create{Name}, update{Name}, delete{Name}
  */
+import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
+
 import type {
+  IntrospectionField,
+  IntrospectionInputValue,
   IntrospectionQueryResponse,
   IntrospectionType,
-  IntrospectionField,
   IntrospectionTypeRef,
 } from '../../types/introspection';
-import { unwrapType, getBaseTypeName, isList } from '../../types/introspection';
+import { getBaseTypeName, isList, unwrapType } from '../../types/introspection';
 import type {
-  CleanTable,
+  CleanBelongsToRelation,
   CleanField,
   CleanFieldType,
-  CleanRelations,
-  CleanBelongsToRelation,
   CleanHasManyRelation,
   CleanManyToManyRelation,
+  CleanRelations,
+  CleanTable,
+  ConstraintInfo,
+  TableConstraints,
   TableInflection,
   TableQueryNames,
-  TableConstraints,
-  ConstraintInfo,
 } from '../../types/schema';
-import { singularize, pluralize, lcFirst, ucFirst } from 'inflekt';
 
 // ============================================================================
 // Pattern Matching Constants
@@ -118,22 +120,21 @@ export interface InferTablesOptions {
  */
 export function inferTablesFromIntrospection(
   introspection: IntrospectionQueryResponse,
-  options: InferTablesOptions = {}
+  options: InferTablesOptions = {},
 ): CleanTable[] {
   const { __schema: schema } = introspection;
   const { types, queryType, mutationType } = schema;
 
   // Build lookup maps for efficient access
   const typeMap = buildTypeMap(types);
+  const { entityNames, entityToConnection, connectionToEntity } =
+    buildEntityConnectionMaps(types, typeMap);
   const queryFields = getTypeFields(typeMap.get(queryType.name));
   const mutationFields = mutationType
     ? getTypeFields(typeMap.get(mutationType.name))
     : [];
 
-  // Step 1: Detect entity types by finding Connection types
-  const entityNames = detectEntityTypes(types);
-
-  // Step 2: Build CleanTable for each entity
+  // Step 1: Build CleanTable for each inferred entity
   const tables: CleanTable[] = [];
 
   for (const entityName of entityNames) {
@@ -146,7 +147,9 @@ export function inferTablesFromIntrospection(
       entityType,
       typeMap,
       queryFields,
-      mutationFields
+      mutationFields,
+      entityToConnection,
+      connectionToEntity,
     );
 
     // Only include tables that have at least one real operation
@@ -162,14 +165,26 @@ export function inferTablesFromIntrospection(
 // Entity Detection
 // ============================================================================
 
+interface EntityConnectionMaps {
+  entityNames: Set<string>;
+  entityToConnection: Map<string, string>;
+  connectionToEntity: Map<string, string>;
+}
+
 /**
- * Detect entity types by finding Connection types in the schema
+ * Infer entity <-> connection mappings from schema types.
  *
- * PostGraphile generates a {PluralName}Connection type for each table.
- * From this, we can derive the entity type name.
+ * Prefer deriving entity names from the `nodes` field of connection types.
+ * This is robust across v4/v5 naming variations (e.g. `UsersConnection` and
+ * `UserConnection`).
  */
-function detectEntityTypes(types: IntrospectionType[]): Set<string> {
+function buildEntityConnectionMaps(
+  types: IntrospectionType[],
+  typeMap: Map<string, IntrospectionType>,
+): EntityConnectionMaps {
   const entityNames = new Set<string>();
+  const entityToConnection = new Map<string, string>();
+  const connectionToEntity = new Map<string, string>();
   const typeNames = new Set(types.map((t) => t.name));
 
   for (const type of types) {
@@ -180,17 +195,54 @@ function detectEntityTypes(types: IntrospectionType[]): Set<string> {
     // Check for Connection pattern
     const connectionMatch = type.name.match(PATTERNS.connection);
     if (connectionMatch) {
-      const pluralName = connectionMatch[1]; // e.g., "Users" from "UsersConnection"
-      const singularName = singularize(pluralName); // e.g., "User"
+      const fallbackEntityName = singularize(connectionMatch[1]);
+      const entityName =
+        resolveEntityNameFromConnectionType(type, typeMap) ?? fallbackEntityName;
 
-      // Verify the entity type actually exists
-      if (typeNames.has(singularName)) {
-        entityNames.add(singularName);
+      // Verify the entity type actually exists and is not a built-in/internal type.
+      if (
+        typeNames.has(entityName) &&
+        !BUILTIN_TYPES.has(entityName) &&
+        !isInternalType(entityName)
+      ) {
+        entityNames.add(entityName);
+        entityToConnection.set(entityName, type.name);
+        connectionToEntity.set(type.name, entityName);
       }
     }
   }
 
-  return entityNames;
+  return {
+    entityNames,
+    entityToConnection,
+    connectionToEntity,
+  };
+}
+
+/**
+ * Attempt to resolve an entity name from a connection type by inspecting its
+ * `nodes` field.
+ */
+function resolveEntityNameFromConnectionType(
+  connectionType: IntrospectionType,
+  typeMap: Map<string, IntrospectionType>,
+): string | null {
+  if (!connectionType.fields) return null;
+
+  const nodesField = connectionType.fields.find((field) => field.name === 'nodes');
+  if (!nodesField) return null;
+
+  const nodeTypeName = getBaseTypeName(nodesField.type);
+  if (!nodeTypeName) return null;
+
+  const nodeType = typeMap.get(nodeTypeName);
+  if (!nodeType || nodeType.kind !== 'OBJECT') return null;
+
+  if (nodeTypeName.endsWith('Connection')) return null;
+  if (BUILTIN_TYPES.has(nodeTypeName)) return null;
+  if (isInternalType(nodeTypeName)) return null;
+
+  return nodeTypeName;
 }
 
 // ============================================================================
@@ -210,16 +262,22 @@ function buildCleanTable(
   entityType: IntrospectionType,
   typeMap: Map<string, IntrospectionType>,
   queryFields: IntrospectionField[],
-  mutationFields: IntrospectionField[]
+  mutationFields: IntrospectionField[],
+  entityToConnection: Map<string, string>,
+  connectionToEntity: Map<string, string>,
 ): BuildCleanTableResult {
   // Extract scalar fields from entity type
-  const fields = extractEntityFields(entityType, typeMap);
+  const fields = extractEntityFields(entityType, typeMap, entityToConnection);
 
   // Infer relations from entity fields
-  const relations = inferRelations(entityType, typeMap);
+  const relations = inferRelations(
+    entityType,
+    entityToConnection,
+    connectionToEntity,
+  );
 
   // Match query and mutation operations
-  const queryOps = matchQueryOperations(entityName, queryFields, typeMap);
+  const queryOps = matchQueryOperations(entityName, queryFields, entityToConnection);
   const mutationOps = matchMutationOperations(entityName, mutationFields);
 
   // Check if we found at least one real operation (not a fallback)
@@ -235,13 +293,13 @@ function buildCleanTable(
   const constraints = inferConstraints(entityName, typeMap);
 
   // Build inflection map from discovered types
-  const inflection = buildInflection(entityName, typeMap);
+  const inflection = buildInflection(entityName, typeMap, entityToConnection);
 
   // Combine query operations with fallbacks for UI purposes
   // (but hasRealOperation indicates if we should include this table)
   const query: TableQueryNames = {
     all: queryOps.all ?? lcFirst(pluralize(entityName)),
-    one: queryOps.one ?? lcFirst(entityName),
+    one: queryOps.one,
     create: mutationOps.create ?? `create${entityName}`,
     update: mutationOps.update,
     delete: mutationOps.delete,
@@ -270,7 +328,8 @@ function buildCleanTable(
  */
 function extractEntityFields(
   entityType: IntrospectionType,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
+  entityToConnection: Map<string, string>,
 ): CleanField[] {
   const fields: CleanField[] = [];
 
@@ -286,7 +345,7 @@ function extractEntityFields(
       // Check if it's a Connection type (hasMany) or entity type (belongsTo)
       if (
         baseTypeName.endsWith('Connection') ||
-        isEntityType(baseTypeName, typeMap)
+        isEntityType(baseTypeName, entityToConnection)
       ) {
         continue; // Skip relation fields
       }
@@ -307,17 +366,16 @@ function extractEntityFields(
  */
 function isEntityType(
   typeName: string,
-  typeMap: Map<string, IntrospectionType>
+  entityToConnection: Map<string, string>,
 ): boolean {
-  const connectionName = `${pluralize(typeName)}Connection`;
-  return typeMap.has(connectionName);
+  return entityToConnection.has(typeName);
 }
 
 /**
  * Convert IntrospectionTypeRef to CleanFieldType
  */
 function convertToCleanFieldType(
-  typeRef: IntrospectionTypeRef
+  typeRef: IntrospectionTypeRef,
 ): CleanFieldType {
   const baseType = unwrapType(typeRef);
   const isArray = isList(typeRef);
@@ -339,7 +397,8 @@ function convertToCleanFieldType(
  */
 function inferRelations(
   entityType: IntrospectionType,
-  typeMap: Map<string, IntrospectionType>
+  entityToConnection: Map<string, string>,
+  connectionToEntity: Map<string, string>,
 ): CleanRelations {
   const belongsTo: CleanBelongsToRelation[] = [];
   const hasMany: CleanHasManyRelation[] = [];
@@ -355,17 +414,21 @@ function inferRelations(
 
     // Check for Connection type → hasMany or manyToMany
     if (baseTypeName.endsWith('Connection')) {
-      const relation = inferHasManyOrManyToMany(field, baseTypeName, typeMap);
-      if (relation.type === 'manyToMany') {
-        manyToMany.push(relation.relation as CleanManyToManyRelation);
+      const resolvedRelation = inferHasManyOrManyToMany(
+        field,
+        baseTypeName,
+        connectionToEntity,
+      );
+      if (resolvedRelation.type === 'manyToMany') {
+        manyToMany.push(resolvedRelation.relation as CleanManyToManyRelation);
       } else {
-        hasMany.push(relation.relation as CleanHasManyRelation);
+        hasMany.push(resolvedRelation.relation as CleanHasManyRelation);
       }
       continue;
     }
 
     // Check for entity type → belongsTo
-    if (isEntityType(baseTypeName, typeMap)) {
+    if (isEntityType(baseTypeName, entityToConnection)) {
       belongsTo.push({
         fieldName: field.name,
         isUnique: false, // Can't determine from introspection alone
@@ -388,14 +451,17 @@ function inferRelations(
 function inferHasManyOrManyToMany(
   field: IntrospectionField,
   connectionTypeName: string,
-  typeMap: Map<string, IntrospectionType>
+  connectionToEntity: Map<string, string>,
 ):
   | { type: 'hasMany'; relation: CleanHasManyRelation }
   | { type: 'manyToMany'; relation: CleanManyToManyRelation } {
-  // Extract the related entity name from Connection type
-  const match = connectionTypeName.match(PATTERNS.connection);
-  const relatedPluralName = match ? match[1] : connectionTypeName;
-  const relatedEntityName = singularize(relatedPluralName);
+  // Resolve the related entity from discovered connection mappings first.
+  const relatedEntityName =
+    connectionToEntity.get(connectionTypeName) ?? (() => {
+      const match = connectionTypeName.match(PATTERNS.connection);
+      const relatedPluralName = match ? match[1] : connectionTypeName;
+      return singularize(relatedPluralName);
+    })();
 
   // Check for manyToMany pattern in field name
   const isManyToMany = field.name.includes('By') && field.name.includes('And');
@@ -415,7 +481,7 @@ function inferHasManyOrManyToMany(
     // e.g., "productsByProductCategoryProductIdAndCategoryId" → "ProductCategory"
     // The junction table name ends where the first field key begins (identified by capital letter after lowercase)
     const junctionMatch = field.name.match(
-      /By([A-Z][a-z]+(?:[A-Z][a-z]+)*?)(?:[A-Z][a-z]+Id)/
+      /By([A-Z][a-z]+(?:[A-Z][a-z]+)*?)(?:[A-Z][a-z]+Id)/,
     );
     const junctionTable = junctionMatch ? junctionMatch[1] : 'Unknown';
 
@@ -461,10 +527,11 @@ interface QueryOperations {
 function matchQueryOperations(
   entityName: string,
   queryFields: IntrospectionField[],
-  typeMap: Map<string, IntrospectionType>
+  entityToConnection: Map<string, string>,
 ): QueryOperations {
   const pluralName = pluralize(entityName);
-  const connectionTypeName = `${pluralName}Connection`;
+  const connectionTypeName =
+    entityToConnection.get(entityName) ?? `${pluralName}Connection`;
 
   let all: string | null = null;
   let one: string | null = null;
@@ -487,7 +554,7 @@ function matchQueryOperations(
         (arg) =>
           arg.name === 'id' ||
           arg.name === 'nodeId' ||
-          arg.name.toLowerCase().endsWith('id')
+          arg.name.toLowerCase().endsWith('id'),
       );
 
       if (hasIdArg) {
@@ -518,7 +585,7 @@ interface MutationOperations {
  */
 function matchMutationOperations(
   entityName: string,
-  mutationFields: IntrospectionField[]
+  mutationFields: IntrospectionField[],
 ): MutationOperations {
   let create: string | null = null;
   let update: string | null = null;
@@ -572,7 +639,7 @@ function matchMutationOperations(
  */
 function inferConstraints(
   entityName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): TableConstraints {
   const primaryKey: ConstraintInfo[] = [];
 
@@ -583,24 +650,20 @@ function inferConstraints(
   const updateInput = typeMap.get(updateInputName);
   const deleteInput = typeMap.get(deleteInputName);
 
-  // Check update input for id field
-  const inputToCheck = updateInput || deleteInput;
-  if (inputToCheck?.inputFields) {
-    const idField = inputToCheck.inputFields.find(
-      (f) => f.name === 'id' || f.name === 'nodeId'
-    );
+  const keyInputField =
+    inferPrimaryKeyFromInputObject(updateInput) ||
+    inferPrimaryKeyFromInputObject(deleteInput);
 
-    if (idField) {
-      primaryKey.push({
-        name: 'primary',
-        fields: [
-          {
-            name: idField.name,
-            type: convertToCleanFieldType(idField.type),
-          },
-        ],
-      });
-    }
+  if (keyInputField) {
+    primaryKey.push({
+      name: 'primary',
+      fields: [
+        {
+          name: keyInputField.name,
+          type: convertToCleanFieldType(keyInputField.type),
+        },
+      ],
+    });
   }
 
   // If no PK found from inputs, try to find 'id' field in entity type
@@ -608,7 +671,7 @@ function inferConstraints(
     const entityType = typeMap.get(entityName);
     if (entityType?.fields) {
       const idField = entityType.fields.find(
-        (f) => f.name === 'id' || f.name === 'nodeId'
+        (f) => f.name === 'id' || f.name === 'nodeId',
       );
 
       if (idField) {
@@ -632,6 +695,43 @@ function inferConstraints(
   };
 }
 
+/**
+ * Infer a single-row lookup key from an Update/Delete input object.
+ *
+ * Priority:
+ * 1. Canonical keys: id, nodeId, rowId
+ * 2. Single non-patch/non-clientMutationId scalar-ish field
+ *
+ * If multiple possible key fields remain, return null to avoid guessing.
+ */
+function inferPrimaryKeyFromInputObject(
+  inputType: IntrospectionType | undefined,
+): IntrospectionInputValue | null {
+  const inputFields = inputType?.inputFields ?? [];
+  if (inputFields.length === 0) return null;
+
+  const canonicalKey = inputFields.find(
+    (field) =>
+      field.name === 'id' || field.name === 'nodeId' || field.name === 'rowId',
+  );
+  if (canonicalKey) return canonicalKey;
+
+  const candidates = inputFields.filter((field) => {
+    if (field.name === 'clientMutationId') return false;
+
+    const baseTypeName = getBaseTypeName(field.type);
+    const lowerName = field.name.toLowerCase();
+
+    // Exclude patch payload fields (patch / fooPatch)
+    if (lowerName === 'patch' || lowerName.endsWith('patch')) return false;
+    if (baseTypeName?.endsWith('Patch')) return false;
+
+    return true;
+  });
+
+  return candidates.length === 1 ? candidates[0] : null;
+}
+
 // ============================================================================
 // Inflection Building
 // ============================================================================
@@ -641,11 +741,14 @@ function inferConstraints(
  */
 function buildInflection(
   entityName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
+  entityToConnection: Map<string, string>,
 ): TableInflection {
   const pluralName = pluralize(entityName);
   const singularFieldName = lcFirst(entityName);
   const pluralFieldName = lcFirst(pluralName);
+  const connectionTypeName =
+    entityToConnection.get(entityName) ?? `${pluralName}Connection`;
 
   // Check which types actually exist in the schema
   const hasFilter = typeMap.has(`${entityName}Filter`);
@@ -663,7 +766,7 @@ function buildInflection(
     allRows: pluralFieldName,
     allRowsSimple: pluralFieldName,
     conditionType: `${entityName}Condition`,
-    connection: `${pluralName}Connection`,
+    connection: connectionTypeName,
     createField: `create${entityName}`,
     createInputType: `Create${entityName}Input`,
     createPayloadType: `Create${entityName}Payload`,
@@ -697,7 +800,7 @@ function buildInflection(
 function findOrderByType(
   entityName: string,
   pluralName: string,
-  typeMap: Map<string, IntrospectionType>
+  typeMap: Map<string, IntrospectionType>,
 ): string | null {
   // Try the standard pattern first: {PluralName}OrderBy
   const standardName = `${pluralName}OrderBy`;
@@ -747,7 +850,7 @@ function findOrderByType(
  * Build a map of type name → IntrospectionType for efficient lookup
  */
 function buildTypeMap(
-  types: IntrospectionType[]
+  types: IntrospectionType[],
 ): Map<string, IntrospectionType> {
   const map = new Map<string, IntrospectionType>();
   for (const type of types) {
@@ -760,7 +863,7 @@ function buildTypeMap(
  * Get fields from a type, returning empty array if null
  */
 function getTypeFields(
-  type: IntrospectionType | undefined
+  type: IntrospectionType | undefined,
 ): IntrospectionField[] {
   return type?.fields ?? [];
 }

@@ -4,17 +4,17 @@
  * This is the primary entry point for programmatic usage.
  * The CLI is a thin wrapper around this function.
  */
-import path from 'path';
+import path from 'node:path';
 
-import { createSchemaSource, validateSourceOptions } from './introspect';
-import { runCodegenPipeline, validateTablesFound } from './pipeline';
+import type { GraphQLSDKConfigTarget } from '../types/config';
+import { getConfigOptions } from '../types/config';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import { generateSharedTypes } from './codegen/shared';
+import { createSchemaSource, validateSourceOptions } from './introspect';
 import { writeGeneratedFiles } from './output';
-import type { GraphQLSDKConfigTarget } from '../types/config';
-import { getConfigOptions } from '../types/config';
+import { runCodegenPipeline, validateTablesFound } from './pipeline';
 
 export interface GenerateOptions extends GraphQLSDKConfigTarget {
   authorization?: string;
@@ -38,19 +38,25 @@ export interface GenerateResult {
  * This is the primary entry point for programmatic usage.
  * For multiple configs, call this function in a loop.
  */
-export async function generate(options: GenerateOptions = {}): Promise<GenerateResult> {
+export async function generate(
+  options: GenerateOptions = {},
+): Promise<GenerateResult> {
   // Apply defaults to get resolved config
   const config = getConfigOptions(options);
   const outputRoot = config.output;
 
   // Determine which generators to run
+  // ORM is always required when React Query is enabled (hooks delegate to ORM)
+  // This handles minimist setting orm=false when --orm flag is absent
   const runReactQuery = config.reactQuery ?? false;
-  const runOrm = config.orm ?? false;
+  const runOrm =
+    runReactQuery || (options.orm !== undefined ? !!options.orm : false);
 
   if (!runReactQuery && !runOrm) {
     return {
       success: false,
-      message: 'No generators enabled. Use reactQuery: true or orm: true in your config.',
+      message:
+        'No generators enabled. Use reactQuery: true or orm: true in your config.',
       output: outputRoot,
     };
   }
@@ -73,12 +79,12 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
     endpoint: config.endpoint || undefined,
     schemaFile: config.schemaFile || undefined,
     db: config.db,
-    authorization: options.authorization || config.headers?.['Authorization'],
+    authorization: options.authorization || config.headers?.Authorization,
     headers: config.headers,
   });
 
   // Run pipeline
-  let pipelineResult;
+  let pipelineResult: Awaited<ReturnType<typeof runCodegenPipeline>>;
   try {
     console.log(`Fetching schema from ${source.describe()}...`);
     pipelineResult = await runCodegenPipeline({
@@ -109,6 +115,7 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
 
   const allFilesWritten: string[] = [];
   const bothEnabled = runReactQuery && runOrm;
+  const filesToWrite: Array<{ path: string; content: string }> = [];
 
   // Generate shared types when both are enabled
   if (bothEnabled) {
@@ -122,24 +129,11 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       },
       config,
     });
-
-    if (!options.dryRun) {
-      const writeResult = await writeGeneratedFiles(sharedResult.files, outputRoot, []);
-      if (!writeResult.success) {
-        return {
-          success: false,
-          message: `Failed to write shared types: ${writeResult.errors?.join(', ')}`,
-          output: outputRoot,
-          errors: writeResult.errors,
-        };
-      }
-      allFilesWritten.push(...(writeResult.filesWritten ?? []));
-    }
+    filesToWrite.push(...sharedResult.files);
   }
 
   // Generate React Query hooks
   if (runReactQuery) {
-    const hooksDir = path.join(outputRoot, 'hooks');
     console.log('Generating React Query hooks...');
     const { files } = generateReactQueryFiles({
       tables,
@@ -151,24 +145,16 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       config,
       sharedTypesPath: bothEnabled ? '..' : undefined,
     });
-
-    if (!options.dryRun) {
-      const writeResult = await writeGeneratedFiles(files, hooksDir, ['queries', 'mutations']);
-      if (!writeResult.success) {
-        return {
-          success: false,
-          message: `Failed to write React Query hooks: ${writeResult.errors?.join(', ')}`,
-          output: outputRoot,
-          errors: writeResult.errors,
-        };
-      }
-      allFilesWritten.push(...(writeResult.filesWritten ?? []));
-    }
+    filesToWrite.push(
+      ...files.map((file) => ({
+        ...file,
+        path: path.posix.join('hooks', file.path),
+      })),
+    );
   }
 
   // Generate ORM client
   if (runOrm) {
-    const ormDir = path.join(outputRoot, 'orm');
     console.log('Generating ORM client...');
     const { files } = generateOrmFiles({
       tables,
@@ -180,33 +166,41 @@ export async function generate(options: GenerateOptions = {}): Promise<GenerateR
       config,
       sharedTypesPath: bothEnabled ? '..' : undefined,
     });
-
-    if (!options.dryRun) {
-      const writeResult = await writeGeneratedFiles(files, ormDir, ['models', 'query', 'mutation']);
-      if (!writeResult.success) {
-        return {
-          success: false,
-          message: `Failed to write ORM client: ${writeResult.errors?.join(', ')}`,
-          output: outputRoot,
-          errors: writeResult.errors,
-        };
-      }
-      allFilesWritten.push(...(writeResult.filesWritten ?? []));
-    }
+    filesToWrite.push(
+      ...files.map((file) => ({
+        ...file,
+        path: path.posix.join('orm', file.path),
+      })),
+    );
   }
 
   // Generate barrel file at output root
   // This re-exports from the appropriate subdirectories based on which generators are enabled
+  const barrelContent = generateRootBarrel({
+    hasTypes: bothEnabled,
+    hasHooks: runReactQuery,
+    hasOrm: runOrm,
+  });
+  filesToWrite.push({ path: 'index.ts', content: barrelContent });
+
   if (!options.dryRun) {
-    const barrelContent = generateRootBarrel({
-      hasTypes: bothEnabled,
-      hasHooks: runReactQuery,
-      hasOrm: runOrm,
+    const writeResult = await writeGeneratedFiles(filesToWrite, outputRoot, [], {
+      pruneStaleFiles: true,
     });
-    await writeGeneratedFiles([{ path: 'index.ts', content: barrelContent }], outputRoot, []);
+    if (!writeResult.success) {
+      return {
+        success: false,
+        message: `Failed to write generated files: ${writeResult.errors?.join(', ')}`,
+        output: outputRoot,
+        errors: writeResult.errors,
+      };
+    }
+    allFilesWritten.push(...(writeResult.filesWritten ?? []));
   }
 
-  const generators = [runReactQuery && 'React Query', runOrm && 'ORM'].filter(Boolean).join(' and ');
+  const generators = [runReactQuery && 'React Query', runOrm && 'ORM']
+    .filter(Boolean)
+    .join(' and ');
 
   return {
     success: true,

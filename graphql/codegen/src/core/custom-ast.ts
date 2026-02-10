@@ -1,5 +1,5 @@
 import * as t from 'gql-ast';
-import { Kind } from 'gql-ast';
+import { Kind } from 'graphql';
 import type { FieldNode, InlineFragmentNode } from 'graphql';
 
 import type { CleanField } from '../types/schema';
@@ -183,6 +183,6 @@ function toFieldArray(strArr: string[]): FieldNode[] {
 export function isIntervalType(obj: unknown): boolean {
   if (!obj || typeof obj !== 'object') return false;
   return ['days', 'hours', 'minutes', 'months', 'seconds', 'years'].every(
-    (key) => Object.prototype.hasOwnProperty.call(obj, key)
+    (key) => Object.prototype.hasOwnProperty.call(obj, key),
   );
 }

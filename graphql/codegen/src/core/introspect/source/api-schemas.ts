@@ -27,7 +27,7 @@ export interface ServicesSchemaValidation {
  * @returns Validation result
  */
 export async function validateServicesSchemas(
-  pool: Pool
+  pool: Pool,
 ): Promise<ServicesSchemaValidation> {
   try {
     // Check for services_public.apis table
@@ -39,7 +39,8 @@ export async function validateServicesSchemas(
     if (apisCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'services_public.apis table not found. The database must have the services schema deployed.',
+        error:
+          'services_public.apis table not found. The database must have the services schema deployed.',
       };
     }
 
@@ -52,7 +53,8 @@ export async function validateServicesSchemas(
     if (apiSchemasCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'services_public.api_schemas table not found. The database must have the services schema deployed.',
+        error:
+          'services_public.api_schemas table not found. The database must have the services schema deployed.',
       };
     }
 
@@ -65,7 +67,8 @@ export async function validateServicesSchemas(
     if (metaschemaCheck.rows.length === 0) {
       return {
         valid: false,
-        error: 'metaschema_public.schema table not found. The database must have the metaschema deployed.',
+        error:
+          'metaschema_public.schema table not found. The database must have the metaschema deployed.',
       };
     }
 
@@ -91,7 +94,7 @@ export async function validateServicesSchemas(
  */
 export async function resolveApiSchemas(
   pool: Pool,
-  apiNames: string[]
+  apiNames: string[],
 ): Promise<string[]> {
   // First validate that the required schemas exist
   const validation = await validateServicesSchemas(pool);
@@ -109,13 +112,13 @@ export async function resolveApiSchemas(
     WHERE api.name = ANY($1)
     ORDER BY ms.schema_name
     `,
-    [apiNames]
+    [apiNames],
   );
 
   if (result.rows.length === 0) {
     throw new Error(
       `No schemas found for API names: ${apiNames.join(', ')}. ` +
-      'Ensure the APIs exist and have schemas assigned in services_public.api_schemas.'
+        'Ensure the APIs exist and have schemas assigned in services_public.api_schemas.',
     );
   }
 
@@ -130,8 +133,9 @@ export async function resolveApiSchemas(
  */
 export function createDatabasePool(database: string): Pool {
   // Check if it's a connection string or just a database name
-  const isConnectionString = database.startsWith('postgres://') || database.startsWith('postgresql://');
-  
+  const isConnectionString =
+    database.startsWith('postgres://') || database.startsWith('postgresql://');
+
   if (isConnectionString) {
     // Parse connection string and extract database name
     // Format: postgres://user:password@host:port/database
@@ -145,7 +149,7 @@ export function createDatabasePool(database: string): Pool {
       database: dbName,
     });
   }
-  
+
   // Use environment variables for connection, just override database name
   const config = getPgEnvOptions({ database });
   return getPgPool(config);

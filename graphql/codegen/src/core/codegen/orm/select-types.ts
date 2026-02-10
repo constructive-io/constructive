@@ -50,42 +50,76 @@ export interface NestedSelectConfig {
   orderBy?: string[];
 }
 
+type DepthLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type DecrementDepth = {
+  0: 0;
+  1: 0;
+  2: 1;
+  3: 2;
+  4: 3;
+  5: 4;
+  6: 5;
+  7: 6;
+  8: 7;
+  9: 8;
+  10: 9;
+};
+
 /**
  * Recursively validates select objects, rejecting unknown keys.
  *
- * This type ensures that users can only select fields that actually exist
- * in the GraphQL schema. It returns `never` if any excess keys are found
- * at any nesting level, causing a TypeScript compile error.
- *
- * Why this is needed:
- * TypeScript's excess property checking has a quirk where it only catches
- * invalid fields when they are the ONLY fields. When mixed with valid fields
- * (e.g., `{ id: true, invalidField: true }`), the structural typing allows
- * the excess property through. This type explicitly checks for and rejects
- * such cases.
- *
- * @example
- * // This will cause a type error because 'invalid' doesn't exist:
- * type Result = DeepExact<{ id: true, invalid: true }, { id?: boolean }>;
- * // Result = never (causes assignment error)
- *
- * @example
- * // This works because all fields are valid:
- * type Result = DeepExact<{ id: true }, { id?: boolean; name?: boolean }>;
- * // Result = { id: true }
+ * NOTE: Depth is intentionally capped to avoid circular-instantiation issues
+ * in very large cyclic schemas.
  */
-export type DeepExact<T, Shape> = T extends Shape
-  ? Exclude<keyof T, keyof Shape> extends never
-    ? {
-        [K in keyof T]: K extends keyof Shape
-          ? T[K] extends { select: infer NS }
-            ? Shape[K] extends { select?: infer ShapeNS }
-              ? { select: DeepExact<NS, NonNullable<ShapeNS>> }
-              : T[K]
-            : T[K]
-          : never;
-      }
+export type DeepExact<
+  T,
+  Shape,
+  Depth extends DepthLevel = 10,
+> = Depth extends 0
+  ? T extends Shape
+    ? T
     : never
+  : T extends Shape
+    ? Exclude<keyof T, keyof Shape> extends never
+      ? {
+          [K in keyof T]: K extends keyof Shape
+            ? T[K] extends { select: infer NS }
+              ? Extract<Shape[K], { select?: unknown }> extends {
+                  select?: infer ShapeNS;
+                }
+                ? DeepExact<
+                    Omit<T[K], 'select'> & {
+                      select: DeepExact<
+                        NS,
+                        NonNullable<ShapeNS>,
+                        DecrementDepth[Depth]
+                      >;
+                    },
+                    Extract<Shape[K], { select?: unknown }>,
+                    DecrementDepth[Depth]
+                  >
+                : never
+              : T[K]
+            : never;
+        }
+      : never
+    : never;
+
+/**
+ * Enforces exact select shape while keeping contextual typing on `S extends XxxSelect`.
+ * Use this as an intersection in overloads:
+ * `{ select: S } & StrictSelect<S, XxxSelect>`.
+ */
+export type StrictSelect<S, Shape> = S extends DeepExact<S, Shape> ? {} : never;
+
+/**
+ * Hook-optimized strict select variant.
+ *
+ * Uses a shallower recursion depth to keep editor autocomplete responsive
+ * in large schemas while still validating common nested-select mistakes.
+ */
+export type HookStrictSelect<S, Shape> = S extends DeepExact<S, Shape, 5>
+  ? {}
   : never;
 
 /**
@@ -100,7 +134,9 @@ export type DeepExact<T, Shape> = T extends Shape
 export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
   ? TEntity
   : {
-      [K in keyof TSelect as TSelect[K] extends false | undefined ? never : K]: TSelect[K] extends true
+      [K in keyof TSelect as TSelect[K] extends false | undefined
+        ? never
+        : K]: TSelect[K] extends true
         ? K extends keyof TEntity
           ? TEntity[K]
           : never
@@ -108,7 +144,9 @@ export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
           ? K extends keyof TEntity
             ? NonNullable<TEntity[K]> extends ConnectionResult<infer NodeType>
               ? ConnectionResult<InferSelectResult<NodeType, NestedSelect>>
-              : InferSelectResult<NonNullable<TEntity[K]>, NestedSelect> | (null extends TEntity[K] ? null : never)
+              :
+                  | InferSelectResult<NonNullable<TEntity[K]>, NestedSelect>
+                  | (null extends TEntity[K] ? null : never)
             : never
           : K extends keyof TEntity
             ? TEntity[K]
@@ -202,8 +240,9 @@ export interface UpdateArgs<TSelect, TWhere, TData> {
 /**
  * Arguments for delete operations
  */
-export interface DeleteArgs<TWhere> {
+export interface DeleteArgs<TWhere, TSelect = undefined> {
   where: TWhere;
+  select?: TSelect;
 }
 
 /**
@@ -231,7 +270,11 @@ export type ConnectionQueryResult<TEntity, TSelect> = QueryResult<{
 /**
  * Type for mutation that returns a payload with the entity
  */
-export type MutationResult<TEntity, TSelect, TPayloadKey extends string> = QueryResult<{
+export type MutationResult<
+  TEntity,
+  TSelect,
+  TPayloadKey extends string,
+> = QueryResult<{
   [K in TPayloadKey]: {
     [EntityKey: string]: ResolveSelectResult<TEntity, TSelect>;
   };

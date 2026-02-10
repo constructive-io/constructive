@@ -1,7 +1,7 @@
 /**
- * Client generator - generates client.ts as ORM client wrapper
+ * Selection helper generator for React Query hooks
  *
- * Uses template-copy pattern: reads hooks-client.ts from templates/
+ * Uses template-copy pattern: reads hooks-selection.ts from templates/
  * and writes it to the output directory with a generated file header.
  */
 import * as fs from 'fs';
@@ -32,11 +32,11 @@ function readTemplateFile(templateName: string, description: string): string {
 }
 
 /**
- * Generate client.ts content - ORM client wrapper with configure/getClient
+ * Generate selection.ts content - shared selection types + runtime mappers
  */
-export function generateClientFile(): string {
+export function generateSelectionFile(): string {
   return readTemplateFile(
-    'hooks-client.ts',
-    'ORM client wrapper for React Query hooks',
+    'hooks-selection.ts',
+    'Selection helpers for React Query hooks',
   );
 }

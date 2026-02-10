@@ -5,8 +5,8 @@
 import type { DocumentNode } from 'graphql';
 import { print } from 'graphql';
 
+import { createError, type DataError, parseGraphQLError } from './error';
 import { TypedDocumentString } from './typed-document';
-import { createError, parseGraphQLError, type DataError } from './error';
 
 // ============================================================================
 // Types
@@ -17,13 +17,15 @@ type ExecutableDocument =
   | DocumentNode
   | string;
 
-type ResultOf<TDocument> = TDocument extends TypedDocumentString<infer TResult, unknown>
-  ? TResult
-  : unknown;
+type ResultOf<TDocument> =
+  TDocument extends TypedDocumentString<infer TResult, unknown>
+    ? TResult
+    : unknown;
 
-type VariablesOf<TDocument> = TDocument extends TypedDocumentString<unknown, infer TVariables>
-  ? TVariables
-  : Record<string, unknown>;
+type VariablesOf<TDocument> =
+  TDocument extends TypedDocumentString<unknown, infer TVariables>
+    ? TVariables
+    : Record<string, unknown>;
 
 export interface ExecuteOptions {
   /** Custom headers to include */
@@ -173,7 +175,11 @@ export interface GraphQLClientOptions {
  * Create a GraphQL client instance
  */
 export function createGraphQLClient(options: GraphQLClientOptions) {
-  const { endpoint, headers: defaultHeaders = {}, timeout: defaultTimeout = 30000 } = options;
+  const {
+    endpoint,
+    headers: defaultHeaders = {},
+    timeout: defaultTimeout = 30000,
+  } = options;
 
   return {
     /**

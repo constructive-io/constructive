@@ -4,16 +4,18 @@
  * Generates db.query.* and db.mutation.* namespaces for non-table operations
  * like login, register, currentUser, etc.
  */
-import type { CleanOperation, CleanArgument } from '../../../types/schema';
 import * as t from '@babel/types';
+
+import type { CleanArgument, CleanOperation } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
-import { ucFirst, getGeneratedFileHeader } from '../utils';
+import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
-  typeRefToTsType,
-  isTypeRequired,
   getTypeBaseName,
+  isTypeRequired,
+  scalarToTsType,
+  typeRefToTsType,
 } from '../type-resolver';
-import { SCALAR_NAMES } from '../scalars';
+import { getGeneratedFileHeader, ucFirst } from '../utils';
 
 export interface GeneratedCustomOpsFile {
   fileName: string;
@@ -45,19 +47,12 @@ function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
   return Array.from(inputTypes);
 }
 
-// Types that don't need Select types
-const NON_SELECT_TYPES = new Set<string>([
-  ...SCALAR_NAMES,
-  'Query',
-  'Mutation',
-]);
-
 /**
  * Collect all payload/return type names from operations (for Select types)
  * Filters out scalar types
  */
 function collectPayloadTypeNamesFromOps(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): string[] {
   const payloadTypes = new Set<string>();
 
@@ -66,8 +61,6 @@ function collectPayloadTypeNamesFromOps(
     if (
       baseName &&
       !baseName.endsWith('Connection') &&
-      baseName !== 'Query' &&
-      baseName !== 'Mutation' &&
       !NON_SELECT_TYPES.has(baseName)
     ) {
       payloadTypes.add(baseName);
@@ -78,38 +71,44 @@ function collectPayloadTypeNamesFromOps(
 }
 
 /**
- * Get the Select type name for a return type
- * Returns null for scalar types, Connection types (no select needed)
+ * Collect Connection and other non-scalar return type names that need importing
+ * (for typing QueryBuilder results on scalar/Connection operations)
  */
-function getSelectTypeName(returnType: CleanArgument['type']): string | null {
-  const baseName = getTypeBaseName(returnType);
-  if (
-    baseName &&
-    !NON_SELECT_TYPES.has(baseName) &&
-    baseName !== 'Query' &&
-    baseName !== 'Mutation' &&
-    !baseName.endsWith('Connection')
-  ) {
-    return `${baseName}Select`;
+function collectRawReturnTypeNames(operations: CleanOperation[]): string[] {
+  const types = new Set<string>();
+
+  for (const op of operations) {
+    const baseName = getTypeBaseName(op.returnType);
+    if (
+      baseName &&
+      !NON_SELECT_TYPES.has(baseName) &&
+      baseName.endsWith('Connection')
+    ) {
+      types.add(baseName);
+    }
   }
-  return null;
+
+  return Array.from(types);
 }
 
 function createImportDeclaration(
   moduleSpecifier: string,
   namedImports: string[],
-  typeOnly: boolean = false
+  typeOnly: boolean = false,
 ): t.ImportDeclaration {
   const specifiers = namedImports.map((name) =>
-    t.importSpecifier(t.identifier(name), t.identifier(name))
+    t.importSpecifier(t.identifier(name), t.identifier(name)),
   );
-  const decl = t.importDeclaration(specifiers, t.stringLiteral(moduleSpecifier));
+  const decl = t.importDeclaration(
+    specifiers,
+    t.stringLiteral(moduleSpecifier),
+  );
   decl.importKind = typeOnly ? 'type' : 'value';
   return decl;
 }
 
 function createVariablesInterface(
-  op: CleanOperation
+  op: CleanOperation,
 ): t.ExportNamedDeclaration | null {
   if (op.args.length === 0) return null;
 
@@ -118,7 +117,7 @@ function createVariablesInterface(
     const optional = !isTypeRequired(arg.type);
     const prop = t.tsPropertySignature(
       t.identifier(arg.name),
-      t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type)))
+      t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type))),
     );
     prop.optional = optional;
     return prop;
@@ -128,7 +127,7 @@ function createVariablesInterface(
     t.identifier(varTypeName),
     null,
     null,
-    t.tsInterfaceBody(props)
+    t.tsInterfaceBody(props),
   );
   return t.exportNamedDeclaration(interfaceDecl);
 }
@@ -142,7 +141,9 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
   if (typeStr === 'unknown') return t.tsUnknownKeyword();
 
   if (typeStr.includes(' | ')) {
-    const parts = typeStr.split(' | ').map((p) => parseTypeAnnotation(p.trim()));
+    const parts = typeStr
+      .split(' | ')
+      .map((p) => parseTypeAnnotation(p.trim()));
     return t.tsUnionType(parts);
   }
 
@@ -153,9 +154,89 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
   return t.tsTypeReference(t.identifier(typeStr));
 }
 
+function buildSelectedResultTsType(
+  typeRef: CleanArgument['type'],
+  payloadTypeName: string,
+): t.TSType {
+  const nonNullable = buildSelectedResultTsTypeNonNullable(
+    typeRef,
+    payloadTypeName,
+  );
+
+  if (typeRef.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function buildSelectedResultTsTypeNonNullable(
+  typeRef: CleanArgument['type'],
+  payloadTypeName: string,
+): t.TSType {
+  if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
+    return buildSelectedResultTsTypeNonNullable(
+      typeRef.ofType as CleanArgument['type'],
+      payloadTypeName,
+    );
+  }
+
+  if (typeRef.kind === 'LIST' && typeRef.ofType) {
+    return t.tsArrayType(
+      buildSelectedResultTsType(
+        typeRef.ofType as CleanArgument['type'],
+        payloadTypeName,
+      ),
+    );
+  }
+
+  return t.tsTypeReference(
+    t.identifier('InferSelectResult'),
+    t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier(payloadTypeName)),
+      t.tsTypeReference(t.identifier('S')),
+    ]),
+  );
+}
+
+function scalarTsTypeToAst(typeName: string): t.TSType {
+  if (typeName === 'string') return t.tsStringKeyword();
+  if (typeName === 'number') return t.tsNumberKeyword();
+  if (typeName === 'boolean') return t.tsBooleanKeyword();
+  return t.tsUnknownKeyword();
+}
+
+function buildRawResultTsType(typeRef: CleanArgument['type']): t.TSType {
+  const nonNullable = buildRawResultTsTypeNonNullable(typeRef);
+
+  if (typeRef.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function buildRawResultTsTypeNonNullable(
+  typeRef: CleanArgument['type'],
+): t.TSType {
+  if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
+    return buildRawResultTsTypeNonNullable(typeRef.ofType as CleanArgument['type']);
+  }
+
+  if (typeRef.kind === 'LIST' && typeRef.ofType) {
+    return t.tsArrayType(buildRawResultTsType(typeRef.ofType as CleanArgument['type']));
+  }
+
+  if (typeRef.kind === 'SCALAR') {
+    return scalarTsTypeToAst(scalarToTsType(typeRef.name ?? 'unknown'));
+  }
+
+  return t.tsTypeReference(t.identifier(typeRef.name ?? 'unknown'));
+}
+
 function buildOperationMethod(
   op: CleanOperation,
-  operationType: 'query' | 'mutation'
+  operationType: 'query' | 'mutation',
 ): t.ObjectProperty {
   const hasArgs = op.args.length > 0;
   const varTypeName = `${ucFirst(op.name)}Variables`;
@@ -172,34 +253,31 @@ function buildOperationMethod(
 
   if (hasArgs) {
     const argsParam = t.identifier('args');
-    argsParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier(varTypeName)));
+    argsParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeReference(t.identifier(varTypeName)),
+    );
     params.push(argsParam);
   }
 
   const optionsParam = t.identifier('options');
-  optionsParam.optional = true;
+  optionsParam.optional = !selectTypeName;
   if (selectTypeName) {
-    // Use DeepExact<S, SelectType> to enforce strict field validation
-    // This catches invalid fields even when mixed with valid ones
+    const selectProp = t.tsPropertySignature(
+      t.identifier('select'),
+      t.tsTypeAnnotation(t.tsTypeReference(t.identifier('S'))),
+    );
+    selectProp.optional = false;
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeLiteral([
-        (() => {
-          const prop = t.tsPropertySignature(
-            t.identifier('select'),
-            t.tsTypeAnnotation(
-              t.tsTypeReference(
-                t.identifier('DeepExact'),
-                t.tsTypeParameterInstantiation([
-                  t.tsTypeReference(t.identifier('S')),
-                  t.tsTypeReference(t.identifier(selectTypeName)),
-                ])
-              )
-            )
-          );
-          prop.optional = true;
-          return prop;
-        })(),
-      ])
+      t.tsIntersectionType([
+        t.tsTypeLiteral([selectProp]),
+        t.tsTypeReference(
+          t.identifier('StrictSelect'),
+          t.tsTypeParameterInstantiation([
+            t.tsTypeReference(t.identifier('S')),
+            t.tsTypeReference(t.identifier(selectTypeName)),
+          ]),
+        ),
+      ]),
     );
   } else {
     optionsParam.typeAnnotation = t.tsTypeAnnotation(
@@ -210,60 +288,93 @@ function buildOperationMethod(
             t.tsTypeAnnotation(
               t.tsTypeReference(
                 t.identifier('Record'),
-                t.tsTypeParameterInstantiation([t.tsStringKeyword(), t.tsUnknownKeyword()])
-              )
-            )
+                t.tsTypeParameterInstantiation([
+                  t.tsStringKeyword(),
+                  t.tsUnknownKeyword(),
+                ]),
+              ),
+            ),
           );
           prop.optional = true;
           return prop;
         })(),
-      ])
+      ]),
     );
   }
   params.push(optionsParam);
 
   // Build the QueryBuilder call
+  const selectExpr = selectTypeName
+    ? t.memberExpression(t.identifier('options'), t.identifier('select'))
+    : t.optionalMemberExpression(
+        t.identifier('options'),
+        t.identifier('select'),
+        false,
+        true,
+      );
+  const entityTypeExpr =
+    selectTypeName && payloadTypeName
+      ? t.stringLiteral(payloadTypeName)
+      : t.identifier('undefined');
+
   const queryBuilderArgs = t.objectExpression([
-    t.objectProperty(t.identifier('client'), t.identifier('client'), false, true),
+    t.objectProperty(
+      t.identifier('client'),
+      t.identifier('client'),
+      false,
+      true,
+    ),
     t.objectProperty(t.identifier('operation'), t.stringLiteral(operationType)),
-    t.objectProperty(t.identifier('operationName'), t.stringLiteral(ucFirst(op.name))),
+    t.objectProperty(
+      t.identifier('operationName'),
+      t.stringLiteral(ucFirst(op.name)),
+    ),
     t.objectProperty(t.identifier('fieldName'), t.stringLiteral(op.name)),
     t.spreadElement(
       t.callExpression(t.identifier('buildCustomDocument'), [
         t.stringLiteral(operationType),
         t.stringLiteral(ucFirst(op.name)),
         t.stringLiteral(op.name),
-        t.optionalMemberExpression(t.identifier('options'), t.identifier('select'), false, true),
+        selectExpr,
         hasArgs ? t.identifier('args') : t.identifier('undefined'),
         t.arrayExpression(
           varDefs.map((v) =>
             t.objectExpression([
               t.objectProperty(t.identifier('name'), t.stringLiteral(v.name)),
               t.objectProperty(t.identifier('type'), t.stringLiteral(v.type)),
-            ])
-          )
+            ]),
+          ),
         ),
-      ])
+        t.identifier('connectionFieldsMap'),
+        entityTypeExpr,
+      ]),
     ),
   ]);
 
-  const newExpr = t.newExpression(t.identifier('QueryBuilder'), [queryBuilderArgs]);
+  const newExpr = t.newExpression(t.identifier('QueryBuilder'), [
+    queryBuilderArgs,
+  ]);
 
-  // Add type parameter if we have a select type
+  // Add type parameter to QueryBuilder for typed .unwrap() results
   if (selectTypeName && payloadTypeName) {
+    // Select-based type: use InferSelectResult<PayloadType, S>
     (newExpr as any).typeParameters = t.tsTypeParameterInstantiation([
       t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier(op.name),
           t.tsTypeAnnotation(
-            t.tsTypeReference(
-              t.identifier('InferSelectResult'),
-              t.tsTypeParameterInstantiation([
-                t.tsTypeReference(t.identifier(payloadTypeName)),
-                t.tsTypeReference(t.identifier('S')),
-              ])
-            )
-          )
+            buildSelectedResultTsType(op.returnType, payloadTypeName),
+          ),
+        ),
+      ]),
+    ]);
+  } else {
+    // Scalar/Connection type: use raw TS type directly
+    (newExpr as any).typeParameters = t.tsTypeParameterInstantiation([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier(op.name),
+          t.tsTypeAnnotation(buildRawResultTsType(op.returnType)),
         ),
       ]),
     ]);
@@ -276,9 +387,8 @@ function buildOperationMethod(
     const typeParam = t.tsTypeParameter(
       t.tsTypeReference(t.identifier(selectTypeName)),
       null,
-      'S'
+      'S',
     );
-    (typeParam as any).const = true;
     arrowFunc.typeParameters = t.tsTypeParameterDeclaration([typeParam]);
   }
 
@@ -289,7 +399,7 @@ function buildOperationMethod(
  * Generate the query/index.ts file for custom query operations
  */
 export function generateCustomQueryOpsFile(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -297,16 +407,40 @@ export function generateCustomQueryOpsFile(
   const inputTypeNames = collectInputTypeNamesFromOps(operations);
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames])];
+  const rawReturnTypeNames = collectRawReturnTypeNames(operations);
+  const allTypeImports = [
+    ...new Set([
+      ...inputTypeNames,
+      ...payloadTypeNames,
+      ...selectTypeNames,
+      ...rawReturnTypeNames,
+    ]),
+  ];
 
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
-  statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
+  statements.push(
+    createImportDeclaration('../query-builder', [
+      'QueryBuilder',
+      'buildCustomDocument',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../select-types',
+      ['InferSelectResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   if (allTypeImports.length > 0) {
-    statements.push(createImportDeclaration('../input-types', allTypeImports, true));
+    statements.push(
+      createImportDeclaration('../input-types', allTypeImports, true),
+    );
   }
+  statements.push(
+    createImportDeclaration('../input-types', ['connectionFieldsMap']),
+  );
 
   // Generate variable interfaces
   for (const op of operations) {
@@ -315,18 +449,22 @@ export function generateCustomQueryOpsFile(
   }
 
   // Generate factory function
-  const operationProperties = operations.map((op) => buildOperationMethod(op, 'query'));
+  const operationProperties = operations.map((op) =>
+    buildOperationMethod(op, 'query'),
+  );
 
   const returnObj = t.objectExpression(operationProperties);
   const returnStmt = t.returnStatement(returnObj);
 
   const clientParam = t.identifier('client');
-  clientParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClient')));
+  clientParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('OrmClient')),
+  );
 
   const factoryFunc = t.functionDeclaration(
     t.identifier('createQueryOperations'),
     [clientParam],
-    t.blockStatement([returnStmt])
+    t.blockStatement([returnStmt]),
   );
   statements.push(t.exportNamedDeclaration(factoryFunc));
 
@@ -343,7 +481,7 @@ export function generateCustomQueryOpsFile(
  * Generate the mutation/index.ts file for custom mutation operations
  */
 export function generateCustomMutationOpsFile(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -351,16 +489,40 @@ export function generateCustomMutationOpsFile(
   const inputTypeNames = collectInputTypeNamesFromOps(operations);
   const payloadTypeNames = collectPayloadTypeNamesFromOps(operations);
   const selectTypeNames = payloadTypeNames.map((p) => `${p}Select`);
-  const allTypeImports = [...new Set([...inputTypeNames, ...payloadTypeNames, ...selectTypeNames])];
+  const rawReturnTypeNames = collectRawReturnTypeNames(operations);
+  const allTypeImports = [
+    ...new Set([
+      ...inputTypeNames,
+      ...payloadTypeNames,
+      ...selectTypeNames,
+      ...rawReturnTypeNames,
+    ]),
+  ];
 
   // Add imports
   statements.push(createImportDeclaration('../client', ['OrmClient']));
-  statements.push(createImportDeclaration('../query-builder', ['QueryBuilder', 'buildCustomDocument']));
-  statements.push(createImportDeclaration('../select-types', ['InferSelectResult', 'DeepExact'], true));
+  statements.push(
+    createImportDeclaration('../query-builder', [
+      'QueryBuilder',
+      'buildCustomDocument',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration(
+      '../select-types',
+      ['InferSelectResult', 'StrictSelect'],
+      true,
+    ),
+  );
 
   if (allTypeImports.length > 0) {
-    statements.push(createImportDeclaration('../input-types', allTypeImports, true));
+    statements.push(
+      createImportDeclaration('../input-types', allTypeImports, true),
+    );
   }
+  statements.push(
+    createImportDeclaration('../input-types', ['connectionFieldsMap']),
+  );
 
   // Generate variable interfaces
   for (const op of operations) {
@@ -369,18 +531,22 @@ export function generateCustomMutationOpsFile(
   }
 
   // Generate factory function
-  const operationProperties = operations.map((op) => buildOperationMethod(op, 'mutation'));
+  const operationProperties = operations.map((op) =>
+    buildOperationMethod(op, 'mutation'),
+  );
 
   const returnObj = t.objectExpression(operationProperties);
   const returnStmt = t.returnStatement(returnObj);
 
   const clientParam = t.identifier('client');
-  clientParam.typeAnnotation = t.tsTypeAnnotation(t.tsTypeReference(t.identifier('OrmClient')));
+  clientParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('OrmClient')),
+  );
 
   const factoryFunc = t.functionDeclaration(
     t.identifier('createMutationOperations'),
     [clientParam],
-    t.blockStatement([returnStmt])
+    t.blockStatement([returnStmt]),
   );
   statements.push(t.exportNamedDeclaration(factoryFunc));
 

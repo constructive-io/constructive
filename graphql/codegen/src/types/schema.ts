@@ -75,7 +75,7 @@ export interface TableQueryNames {
   /** All rows query name */
   all: string;
   /** Single row query name */
-  one: string;
+  one: string | null;
   /** Create mutation name */
   create: string;
   /** Update mutation name */

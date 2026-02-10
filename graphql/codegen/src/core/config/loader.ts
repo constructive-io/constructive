@@ -6,6 +6,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import { createJiti } from 'jiti';
 
 export const CONFIG_FILENAME = 'graphql-codegen.config.ts';
@@ -14,7 +15,7 @@ export const CONFIG_FILENAME = 'graphql-codegen.config.ts';
  * Find the nearest config file by walking up directories
  */
 export function findConfigFile(
-  startDir: string = process.cwd()
+  startDir: string = process.cwd(),
 ): string | null {
   let currentDir = startDir;
 
@@ -48,7 +49,7 @@ export interface LoadConfigFileResult {
  * tsx or ts-node installed.
  */
 export async function loadConfigFile(
-  configPath: string
+  configPath: string,
 ): Promise<LoadConfigFileResult> {
   const resolvedPath = path.resolve(configPath);
 
