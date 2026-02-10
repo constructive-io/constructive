@@ -18,7 +18,7 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLBoolean,
-} from 'grafast/graphql';
+} from 'graphql';
 
 /**
  * Interface for table metadata

@@ -56,15 +56,19 @@ export {
   MetaSchemaPreset,
 } from './meta-schema';
 
-// Tsvector codec for full-text search support
-export {
-  TsvectorCodecPlugin,
-  TsvectorCodecPreset,
-} from './tsvector-codec';
-
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
 export {
   PgTypeMappingsPlugin,
   PgTypeMappingsPreset,
 } from './pg-type-mappings';
 export type { TypeMapping } from './pg-type-mappings';
+
+// Search plugin for tsvector full-text search conditions (includes TsvectorCodec)
+export {
+  PgSearchPlugin,
+  PgSearchPreset,
+  createPgSearchPlugin,
+  TsvectorCodecPlugin,
+  TsvectorCodecPreset,
+} from 'graphile-search-plugin';
+export type { PgSearchPluginOptions } from 'graphile-search-plugin';

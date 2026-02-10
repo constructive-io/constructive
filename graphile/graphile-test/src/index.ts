@@ -1,4 +1,4 @@
-export { runGraphQLInContext, setContextOnClient } from './context.js';
+export { runGraphQLInContext, setContextOnClient } from './context';
 export {
   getConnections,
   getConnectionsObject,
@@ -8,8 +8,8 @@ export {
   getConnectionsUnwrapped,
   getConnectionsWithLogging,
   getConnectionsWithTiming,
-} from './get-connections.js';
-export { GraphQLTest } from './graphile-test.js';
+} from './get-connections';
+export { GraphQLTest } from './graphile-test';
 export type {
   GetConnectionsInput,
   GraphQLQueryFn,
@@ -21,5 +21,5 @@ export type {
   GraphQLTestContext,
   LegacyGraphileOptions,
   Variables,
-} from './types.js';
+} from './types';
 export { seed, snapshot } from 'pgsql-test';

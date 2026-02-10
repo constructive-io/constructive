@@ -15,7 +15,7 @@ import { makePgService } from 'postgraphile/adaptors/pg';
 import type { Client, Pool } from 'pg';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 
-import type { GetConnectionsInput } from './types.js';
+import type { GetConnectionsInput } from './types';
 
 /**
  * V4-compatible error format (plain object, not GraphQLError class)
