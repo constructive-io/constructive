@@ -170,7 +170,7 @@ export function getDeleteMutationFileName(table: CleanTable): string {
 
 /**
  * Get the GraphQL query name for fetching all rows
- * Uses inflection from _meta, falls back to convention
+ * Uses inflection from introspection, falls back to convention
  */
 export function getAllRowsQueryName(table: CleanTable): string {
   return (

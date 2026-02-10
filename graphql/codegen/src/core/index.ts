@@ -17,9 +17,11 @@ export * from './ast';
 export * from './custom-ast';
 
 // Query builder
+/** @deprecated Legacy v4 query builder — use v5 ORM codegen instead */
 export { MetaObject, QueryBuilder } from './query-builder';
 
 // Meta object utilities
+/** @deprecated Legacy v4 meta-object utilities — v5 uses standard introspection */
 export { convertFromMetaSchema, validateMetaObject } from './meta-object';
 
 // Configuration loading and resolution
