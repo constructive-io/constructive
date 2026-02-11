@@ -444,6 +444,25 @@ export const InflektPlugin: GraphileConfig.Plugin = {
         }
         return previous!(details);
       },
+
+      /**
+       * Uppercase enum values to match GraphQL CONSTANT_CASE convention.
+       *
+       * WHY THIS EXISTS:
+       * In PostGraphile v4, custom PostgreSQL enum values (e.g., 'app', 'core', 'module')
+       * were automatically uppercased to CONSTANT_CASE ('APP', 'CORE', 'MODULE').
+       * In PostGraphile v5, the default `enumValue` inflector preserves the original
+       * PostgreSQL casing via `coerceToGraphQLName(value)`, resulting in lowercase
+       * enum values in the GraphQL schema.
+       *
+       * OUR FIX:
+       * We call the previous inflector to retain all special character handling
+       * (asterisks, symbols, etc.), then uppercase the result to restore v4 behavior.
+       */
+      enumValue(previous, _options, value, codec) {
+        const result = previous!(value, codec);
+        return result.toUpperCase();
+      },
     },
   },
 };
