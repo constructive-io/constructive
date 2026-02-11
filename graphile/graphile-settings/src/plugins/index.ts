@@ -63,6 +63,12 @@ export {
 } from './pg-type-mappings';
 export type { TypeMapping } from './pg-type-mappings';
 
+// Uppercase enum values to match v4 CONSTANT_CASE convention
+export {
+  UppercaseEnumsPlugin,
+  UppercaseEnumsPreset,
+} from './uppercase-enums';
+
 // Search plugin for tsvector full-text search conditions (includes TsvectorCodec)
 export {
   PgSearchPlugin,

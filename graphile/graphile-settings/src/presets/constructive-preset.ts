@@ -10,6 +10,7 @@ import { ManyToManyOptInPreset } from '../plugins/many-to-many-preset';
 import { MetaSchemaPreset } from '../plugins/meta-schema';
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
+import { UppercaseEnumsPreset } from '../plugins/uppercase-enums';
 
 /**
  * Constructive PostGraphile v5 Preset
@@ -61,6 +62,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     MetaSchemaPreset,
     PgSearchPreset({ pgSearchPrefix: 'fullText' }),
     PgTypeMappingsPreset,
+    UppercaseEnumsPreset,
   ],
   /**
    * Disable relation filter plugins from postgraphile-plugin-connection-filter.
