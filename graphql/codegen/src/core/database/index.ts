@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
 import { buildSchemaSDL } from '@constructive-io/graphql-server';
 
 export interface BuildSchemaFromDatabaseOptions {
@@ -36,15 +37,14 @@ export interface BuildSchemaFromDatabaseResult {
  * @returns The path to the generated schema file and the SDL content
  */
 export async function buildSchemaFromDatabase(
-  options: BuildSchemaFromDatabaseOptions
+  options: BuildSchemaFromDatabaseOptions,
 ): Promise<BuildSchemaFromDatabaseResult> {
   const { database, schemas, outDir, filename = 'schema.graphql' } = options;
 
   // Ensure output directory exists
   await fs.promises.mkdir(outDir, { recursive: true });
 
-  // Build schema SDL from database using PostGraphile v5
-  // Note: In v5, role/settings are handled through the preset configuration
+  // Build schema SDL from database (PostGraphile v5 preset-driven settings)
   const sdl = await buildSchemaSDL({
     database,
     schemas,
@@ -71,7 +71,7 @@ export async function buildSchemaSDLFromDatabase(options: {
 }): Promise<string> {
   const { database, schemas } = options;
 
-  // In v5, role/settings are handled through the preset configuration
+  // PostGraphile v5 resolves role/settings via preset configuration.
   return buildSchemaSDL({
     database,
     schemas,

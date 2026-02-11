@@ -11,12 +11,17 @@
  *   schema-types.ts   - Enums, input types, payload types
  *   filters.ts        - Filter types (StringFilter, IntFilter, etc.)
  */
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
-import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment } from '../babel-ast';
-import { generateTypesFile } from '../types';
+
+import type { GraphQLSDKConfigTarget } from '../../../types/config';
+import type {
+  CleanOperation,
+  CleanTable,
+  TypeRegistry,
+} from '../../../types/schema';
+import { addJSDocComment, generateCode } from '../babel-ast';
 import { generateSchemaTypesFile } from '../schema-types-generator';
+import { generateTypesFile } from '../types';
 import { getTableNames } from '../utils';
 
 /**
@@ -50,7 +55,9 @@ export interface GenerateSharedResult {
 /**
  * Generate shared types that can be imported by both React Query SDK and ORM client
  */
-export function generateSharedTypes(options: GenerateSharedOptions): GenerateSharedResult {
+export function generateSharedTypes(
+  options: GenerateSharedOptions,
+): GenerateSharedResult {
   const { tables, customOperations } = options;
   const files: GeneratedFile[] = [];
 
@@ -125,5 +132,5 @@ function generateSharedBarrel(hasSchemaTypes: boolean): string {
   return generateCode(statements);
 }
 
-export { generateTypesFile } from '../types';
 export { generateSchemaTypesFile } from '../schema-types-generator';
+export { generateTypesFile } from '../types';

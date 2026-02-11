@@ -183,8 +183,6 @@ interface GraphQLSDKConfigTarget {
   // Generator flags
   reactQuery?: boolean;                 // Generate React Query hooks (output: {output}/hooks)
   orm?: boolean;                        // Generate ORM client (output: {output}/orm)
-  browserCompatible?: boolean;          // Generate browser-compatible code (default: true)
-                                        // Set to false for Node.js with localhost DNS fix
 
   // Table filtering (for CRUD operations from _meta)
   tables?: {
@@ -661,7 +659,7 @@ Filter patterns support wildcards:
 
 The CLI provides a convenient way to run code generation from the command line.
 
-### `graphql-sdk generate`
+### `graphql-codegen`
 
 Generate React Query hooks and/or ORM client from various sources.
 
@@ -682,62 +680,55 @@ Database Options (for pgpm modes):
 Generator Options:
   --react-query                    Generate React Query hooks
   --orm                            Generate ORM client
-  -t, --target <name>              Target name in config file
   -o, --output <dir>               Output directory
+  -t, --target <name>              Target name (for multi-target configs)
   -a, --authorization <token>      Authorization header value
-  --browser-compatible             Generate browser-compatible code (default: true)
-                                   Set to false for Node.js with localhost DNS fix
   --skip-custom-operations         Only generate table CRUD operations
   --dry-run                        Preview without writing files
-  --keep-db                        Keep ephemeral database after generation (pgpm modes)
   -v, --verbose                    Show detailed output
-
-Watch Mode Options:
-  -w, --watch                      Watch for schema changes and regenerate
-  --poll-interval <ms>             Polling interval in milliseconds (default: 5000)
-  --debounce <ms>                  Debounce delay in milliseconds (default: 500)
-  --touch <path>                   Touch file after regeneration
-  --no-clear                       Don't clear console on regeneration
+  --keep-db                        Keep ephemeral database after generation (pgpm modes)
+  -h, --help                       Show help message
+  --version                        Show version number
 ```
 
 Examples:
 
 ```bash
 # Generate React Query hooks from an endpoint
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --react-query
+npx @constructive-io/graphql-codegen --endpoint https://api.example.com/graphql --output ./generated --react-query
 
 # Generate ORM client from an endpoint
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --orm
+npx @constructive-io/graphql-codegen --endpoint https://api.example.com/graphql --output ./generated --orm
 
 # Generate both React Query hooks and ORM client
-npx graphql-sdk generate --endpoint https://api.example.com/graphql --output ./generated --react-query --orm
+npx @constructive-io/graphql-codegen --endpoint https://api.example.com/graphql --output ./generated --react-query --orm
 
-# Generate from a PGPM module
-npx graphql-sdk generate --pgpm-module-path ./packages/my-module --schemas public --react-query
+# Generate from schema file
+npx @constructive-io/graphql-codegen --schema-file ./schema.graphql --output ./generated --react-query
 
-# Generate using apiNames for automatic schema discovery
-npx graphql-sdk generate --pgpm-module-path ./packages/my-module --api-names my_api --react-query --orm
+# Generate from database with schemas
+npx @constructive-io/graphql-codegen --schemas public,app_public --output ./generated --react-query
+
+# Generate from database with API names
+npx @constructive-io/graphql-codegen --api-names my_api --output ./generated --orm
+
+# Use config file
+npx @constructive-io/graphql-codegen --config ./graphql-codegen.config.ts
+
+# Generate specific target from multi-target config
+npx @constructive-io/graphql-codegen --config ./graphql-codegen.config.ts --target admin
 ```
 
-### `graphql-sdk init`
+### Using with Constructive CLI
 
-Create a configuration file.
-
-```bash
-Options:
-  -f, --format <format>    Config format: ts, js, json (default: ts)
-  -o, --output <path>      Output path for config file
-```
-
-### `graphql-sdk introspect`
-
-Inspect schema without generating code.
+The `@constructive-io/cli` package includes the codegen command:
 
 ```bash
-Options:
-  -e, --endpoint <url>     GraphQL endpoint URL
-  --json                   Output as JSON
-  -v, --verbose            Show detailed output
+# Install Constructive CLI
+npm install -g @constructive-io/cli
+
+# Run codegen via cnc
+cnc codegen --endpoint http://localhost:5555/graphql --output ./codegen --react-query
 ```
 
 ## Architecture

@@ -1,9 +1,18 @@
-import type { DocumentNode, FieldNode, SelectionSetNode, VariableDefinitionNode } from 'graphql';
+import type {
+  DocumentNode,
+  FieldNode,
+  SelectionSetNode,
+  VariableDefinitionNode,
+} from 'graphql';
 
 import type { CleanField } from '../types/schema';
 
 // GraphQL AST types (re-export what we need from gql-ast)
-export type ASTNode = DocumentNode | FieldNode | SelectionSetNode | VariableDefinitionNode;
+export type ASTNode =
+  | DocumentNode
+  | FieldNode
+  | SelectionSetNode
+  | VariableDefinitionNode;
 
 // Nested property structure for complex mutation inputs
 export interface NestedProperties {
@@ -164,7 +173,7 @@ export interface ObjectArrayItem extends QueryProperty {
 
 // Type guards for runtime validation
 export function isGraphQLVariableValue(
-  value: unknown
+  value: unknown,
 ): value is GraphQLVariableValue {
   return (
     value === null ||
@@ -183,7 +192,7 @@ export function isGraphQLVariables(obj: unknown): obj is GraphQLVariables {
     if (Array.isArray(value)) {
       if (
         !value.every(
-          (item) => isGraphQLVariableValue(item) || isGraphQLVariables(item)
+          (item) => isGraphQLVariableValue(item) || isGraphQLVariables(item),
         )
       ) {
         return false;

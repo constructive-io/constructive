@@ -2,52 +2,52 @@
  * Code generation orchestrator
  *
  * Coordinates all code generators to produce the complete SDK output.
+ * Hooks delegate to ORM model methods - types are imported from ORM's input-types.ts.
  *
  * Output structure:
  * generated/
  *   index.ts              - Main barrel export
- *   client.ts             - GraphQL client with configure() and execute()
- *   types.ts              - Entity interfaces and filter types
+ *   client.ts             - ORM client wrapper (configure/getClient)
  *   queries/
  *     index.ts            - Query hooks barrel
- *     useCarsQuery.ts     - List query hook (table-based)
- *     useCarQuery.ts      - Single item query hook (table-based)
- *     useCurrentUserQuery.ts - Custom query hook
+ *     useCarsQuery.ts     - List query hook -> ORM findMany
+ *     useCarQuery.ts      - Single item query hook -> ORM findOne
+ *     useCurrentUserQuery.ts - Custom query hook -> ORM query.xxx
  *     ...
  *   mutations/
  *     index.ts            - Mutation hooks barrel
- *     useCreateCarMutation.ts  - Table-based CRUD
- *     useUpdateCarMutation.ts
- *     useDeleteCarMutation.ts
- *     useLoginMutation.ts      - Custom mutation
- *     useRegisterMutation.ts
+ *     useCreateCarMutation.ts  - -> ORM create
+ *     useUpdateCarMutation.ts  - -> ORM update
+ *     useDeleteCarMutation.ts  - -> ORM delete
+ *     useLoginMutation.ts      - Custom mutation -> ORM mutation.xxx
  *     ...
  */
 import type {
-  CleanTable,
+  GraphQLSDKConfigTarget,
+  QueryKeyConfig,
+} from '../../types/config';
+import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
+import type {
   CleanOperation,
+  CleanTable,
   TypeRegistry,
 } from '../../types/schema';
-import type { GraphQLSDKConfigTarget, QueryKeyConfig } from '../../types/config';
-import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
-
-import { generateClientFile } from './client';
-import { generateTypesFile } from './types';
-import { generateSchemaTypesFile } from './schema-types-generator';
-import { generateAllQueryHooks } from './queries';
-import { generateAllMutationHooks } from './mutations';
-import { generateAllCustomQueryHooks } from './custom-queries';
-import { generateAllCustomMutationHooks } from './custom-mutations';
-import { generateQueryKeysFile } from './query-keys';
-import { generateMutationKeysFile } from './mutation-keys';
-import { generateInvalidationFile } from './invalidation';
 import {
-  generateQueriesBarrel,
-  generateMutationsBarrel,
-  generateMainBarrel,
-  generateCustomQueriesBarrel,
   generateCustomMutationsBarrel,
+  generateCustomQueriesBarrel,
+  generateMainBarrel,
+  generateMutationsBarrel,
+  generateQueriesBarrel,
 } from './barrel';
+import { generateClientFile } from './client';
+import { generateAllCustomMutationHooks } from './custom-mutations';
+import { generateAllCustomQueryHooks } from './custom-queries';
+import { generateInvalidationFile } from './invalidation';
+import { generateMutationKeysFile } from './mutation-keys';
+import { generateAllMutationHooks } from './mutations';
+import { generateAllQueryHooks } from './queries';
+import { generateQueryKeysFile } from './query-keys';
+import { generateSelectionFile } from './selection';
 import { getTableNames } from './utils';
 
 // ============================================================================
@@ -74,7 +74,7 @@ export interface GenerateResult {
 }
 
 export interface GenerateOptions {
-  /** Tables from _meta introspection */
+  /** Tables from GraphQL introspection */
   tables: CleanTable[];
   /** Custom operations from __schema introspection */
   customOperations?: {
@@ -102,7 +102,7 @@ export interface GenerateOptions {
  */
 export function generateAllFiles(
   tables: CleanTable[],
-  config: GraphQLSDKConfigTarget
+  config: GraphQLSDKConfigTarget,
 ): GenerateResult {
   return generate({ tables, config });
 }
@@ -114,75 +114,37 @@ export function generateAllFiles(
  * (they're expected to exist in the shared types directory).
  */
 export function generate(options: GenerateOptions): GenerateResult {
-  const { tables, customOperations, config, sharedTypesPath } = options;
+  const { tables, customOperations, config } = options;
   const files: GeneratedFile[] = [];
 
   // Extract codegen options
-  const maxDepth = config.codegen.maxFieldDepth;
   const skipQueryField = config.codegen.skipQueryField;
   const reactQueryEnabled = config.reactQuery;
 
   // Query key configuration (use defaults if not provided)
-  const queryKeyConfig: QueryKeyConfig = config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
+  const queryKeyConfig: QueryKeyConfig =
+    config.queryKeys ?? DEFAULT_QUERY_KEY_CONFIG;
   const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
   const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
 
-  // 1. Generate client.ts
+  // 1. Generate client.ts (ORM client wrapper)
   files.push({
     path: 'client.ts',
-    content: generateClientFile({
-      browserCompatible: config.browserCompatible ?? true,
-    }),
+    content: generateClientFile(),
+  });
+
+  // 1b. Generate selection.ts (shared selection adapters for hooks)
+  files.push({
+    path: 'selection.ts',
+    content: generateSelectionFile(),
   });
 
   // Collect table type names for import path resolution
   const tableTypeNames = new Set(tables.map((t) => getTableNames(t).typeName));
 
-  // When using shared types, skip generating types.ts and schema-types.ts
-  // They're already generated in the shared directory
-  let hasSchemaTypes = false;
-  let generatedEnumNames: string[] = [];
-
-  if (sharedTypesPath) {
-    // Using shared types - check if schema-types would be generated
-    if (customOperations && customOperations.typeRegistry) {
-      const schemaTypesResult = generateSchemaTypesFile({
-        typeRegistry: customOperations.typeRegistry,
-        tableTypeNames,
-      });
-      if (schemaTypesResult.content.split('\n').length > 10) {
-        hasSchemaTypes = true;
-        generatedEnumNames = schemaTypesResult.generatedEnums || [];
-      }
-    }
-  } else {
-    // 2. Generate schema-types.ts for custom operations (if any)
-    // NOTE: This must come BEFORE types.ts so that types.ts can import enum types
-    if (customOperations && customOperations.typeRegistry) {
-      const schemaTypesResult = generateSchemaTypesFile({
-        typeRegistry: customOperations.typeRegistry,
-        tableTypeNames,
-      });
-
-      // Only include if there's meaningful content
-      if (schemaTypesResult.content.split('\n').length > 10) {
-        files.push({
-          path: 'schema-types.ts',
-          content: schemaTypesResult.content,
-        });
-        hasSchemaTypes = true;
-        generatedEnumNames = schemaTypesResult.generatedEnums || [];
-      }
-    }
-
-    // 3. Generate types.ts (can now import enums from schema-types)
-    files.push({
-      path: 'types.ts',
-      content: generateTypesFile(tables, {
-        enumsFromSchemaTypes: generatedEnumNames,
-      }),
-    });
-  }
+  // NOTE: types.ts and schema-types.ts are no longer generated here.
+  // Hooks now import types directly from the ORM's input-types.ts,
+  // which serves as the single source of truth for all types.
 
   // 3b. Generate centralized query keys (query-keys.ts)
   let hasQueryKeys = false;
@@ -251,7 +213,6 @@ export function generate(options: GenerateOptions): GenerateResult {
     customQueryHooks = generateAllCustomQueryHooks({
       operations: customOperations.queries,
       typeRegistry: customOperations.typeRegistry,
-      maxDepth,
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
@@ -273,7 +234,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       customQueryHooks.length > 0
         ? generateCustomQueriesBarrel(
             tables,
-            customQueryHooks.map((h) => h.operationName)
+            customQueryHooks.map((h) => h.operationName),
           )
         : generateQueriesBarrel(tables),
   });
@@ -281,10 +242,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 6. Generate table-based mutation hooks (mutations/*.ts)
   const mutationHooks = generateAllMutationHooks(tables, {
     reactQueryEnabled,
-    enumsFromSchemaTypes: generatedEnumNames,
     useCentralizedKeys,
-    hasRelationships,
-    tableTypeNames,
   });
   for (const hook of mutationHooks) {
     files.push({
@@ -303,7 +261,6 @@ export function generate(options: GenerateOptions): GenerateResult {
     customMutationHooks = generateAllCustomMutationHooks({
       operations: customOperations.mutations,
       typeRegistry: customOperations.typeRegistry,
-      maxDepth,
       skipQueryField,
       reactQueryEnabled,
       tableTypeNames,
@@ -329,17 +286,17 @@ export function generate(options: GenerateOptions): GenerateResult {
         customMutationHooks.length > 0
           ? generateCustomMutationsBarrel(
               tables,
-              customMutationHooks.map((h) => h.operationName)
+              customMutationHooks.map((h) => h.operationName),
             )
           : generateMutationsBarrel(tables),
     });
   }
 
-  // 9. Generate main index.ts barrel (with schema-types if present)
+  // 9. Generate main index.ts barrel
+  // No longer includes types.ts or schema-types.ts - hooks import from ORM directly
   files.push({
     path: 'index.ts',
     content: generateMainBarrel(tables, {
-      hasSchemaTypes,
       hasMutations,
       hasQueryKeys,
       hasMutationKeys,
@@ -364,34 +321,33 @@ export function generate(options: GenerateOptions): GenerateResult {
 // Re-exports for convenience
 // ============================================================================
 
+export {
+  generateCustomMutationsBarrel,
+  generateCustomQueriesBarrel,
+  generateMainBarrel,
+  generateMutationsBarrel,
+  generateQueriesBarrel,
+} from './barrel';
 export { generateClientFile } from './client';
-export { generateTypesFile } from './types';
-export {
-  generateAllQueryHooks,
-  generateListQueryHook,
-  generateSingleQueryHook,
-} from './queries';
-export {
-  generateAllMutationHooks,
-  generateCreateMutationHook,
-  generateUpdateMutationHook,
-  generateDeleteMutationHook,
-} from './mutations';
-export {
-  generateAllCustomQueryHooks,
-  generateCustomQueryHook,
-} from './custom-queries';
 export {
   generateAllCustomMutationHooks,
   generateCustomMutationHook,
 } from './custom-mutations';
 export {
-  generateQueriesBarrel,
-  generateMutationsBarrel,
-  generateMainBarrel,
-  generateCustomQueriesBarrel,
-  generateCustomMutationsBarrel,
-} from './barrel';
-export { generateQueryKeysFile } from './query-keys';
-export { generateMutationKeysFile } from './mutation-keys';
+  generateAllCustomQueryHooks,
+  generateCustomQueryHook,
+} from './custom-queries';
 export { generateInvalidationFile } from './invalidation';
+export { generateMutationKeysFile } from './mutation-keys';
+export {
+  generateAllMutationHooks,
+  generateCreateMutationHook,
+  generateDeleteMutationHook,
+  generateUpdateMutationHook,
+} from './mutations';
+export {
+  generateAllQueryHooks,
+  generateListQueryHook,
+  generateSingleQueryHook,
+} from './queries';
+export { generateQueryKeysFile } from './query-keys';

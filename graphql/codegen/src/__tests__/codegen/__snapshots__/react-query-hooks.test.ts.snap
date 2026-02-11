@@ -50,15 +50,17 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel with al
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
  */
 export * from "./client";
-export * from "./types";
-export * from "./schema-types";
 export * from "./query-keys";
 export * from "./mutation-keys";
 export * from "./invalidation";
@@ -90,14 +92,17 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel without
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
  */
 export * from "./client";
-export * from "./types";
 export * from "./queries";
 export * from "./mutations";"
 `;
@@ -126,15 +131,17 @@ exports[`Barrel File Generators generateMainBarrel generates main barrel without
  * import { useCarsQuery, useCreateCarMutation } from './generated';
  * 
  * function MyComponent() {
- *   const { data, isLoading } = useCarsQuery({ first: 10 });
- *   const { mutate } = useCreateCarMutation();
+ *   const { data, isLoading } = useCarsQuery({
+ *     selection: { fields: { id: true }, first: 10 },
+ *   });
+ *   const { mutate } = useCreateCarMutation({
+ *     selection: { fields: { id: true } },
+ *   });
  *   // ...
  * }
  * \`\`\`
  */
 export * from "./client";
-export * from "./types";
-export * from "./schema-types";
 export * from "./queries";"
 `;
 
@@ -193,31 +200,42 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { LoginPayload } from "../schema-types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
-/** GraphQL mutation document */
-export const loginMutationDocument = \`
-mutation LoginMutation($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    token
-  }
-}\`;
-export interface LoginMutationVariables {
-  email: string;
-  password: string;
-}
-export interface LoginMutationResult {
-  login: LoginPayload;
-}
-export function useLoginMutation(options?: Omit<UseMutationOptions<LoginMutationResult, Error, LoginMutationVariables>, 'mutationFn'>) {
+import type { LoginVariables } from "../../orm/mutation";
+import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { LoginVariables } from "../../orm/mutation";
+export type { LoginPayloadSelect } from "../../orm/input-types";
+export function useLoginMutation<S extends LoginPayloadSelect>(params: {
+  selection: ({
+    fields: S & LoginPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>);
+} & Omit<UseMutationOptions<{
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.login(),
-    mutationFn: (variables: LoginMutationVariables) => execute<LoginMutationResult, LoginMutationVariables>(loginMutationDocument, variables),
-    ...options
+    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, {
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Custom Mutation Hook Generators generateCustomMutationHook generates custom mutation hook with input object argument 1`] = `
@@ -228,30 +246,42 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { RegisterInput, RegisterPayload } from "../schema-types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
-/** GraphQL mutation document */
-export const registerMutationDocument = \`
-mutation RegisterMutation($input: RegisterInput!) {
-  register(input: $input) {
-    token
-  }
-}\`;
-export interface RegisterMutationVariables {
-  input: RegisterInput;
-}
-export interface RegisterMutationResult {
-  register: RegisterPayload;
-}
-export function useRegisterMutation(options?: Omit<UseMutationOptions<RegisterMutationResult, Error, RegisterMutationVariables>, 'mutationFn'>) {
+import type { RegisterVariables } from "../../orm/mutation";
+import type { RegisterPayloadSelect, RegisterPayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { RegisterVariables } from "../../orm/mutation";
+export type { RegisterPayloadSelect } from "../../orm/input-types";
+export function useRegisterMutation<S extends RegisterPayloadSelect>(params: {
+  selection: ({
+    fields: S & RegisterPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, RegisterPayloadSelect>);
+} & Omit<UseMutationOptions<{
+  register: InferSelectResult<RegisterPayload, S> | null;
+}, Error, RegisterVariables>, "mutationFn">): UseMutationResult<{
+  register: InferSelectResult<RegisterPayload, S> | null;
+}, Error, RegisterVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.register(),
-    mutationFn: (variables: RegisterMutationVariables) => execute<RegisterMutationResult, RegisterMutationVariables>(registerMutationDocument, variables),
-    ...options
+    mutationFn: (variables: RegisterVariables) => getClient().mutation.register(variables, {
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, RegisterPayloadSelect>).unwrap(),
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Custom Mutation Hook Generators generateCustomMutationHook generates custom mutation hook without arguments 1`] = `
@@ -262,27 +292,40 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { LogoutPayload } from "../schema-types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
-/** GraphQL mutation document */
-export const logoutMutationDocument = \`
-mutation LogoutMutation {
-  logout {
-    success
-  }
-}\`;
-export interface LogoutMutationResult {
-  logout: LogoutPayload;
-}
-export function useLogoutMutation(options?: Omit<UseMutationOptions<LogoutMutationResult, Error, void>, 'mutationFn'>) {
+import type { LogoutPayloadSelect, LogoutPayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { LogoutPayloadSelect } from "../../orm/input-types";
+export function useLogoutMutation<S extends LogoutPayloadSelect>(params: {
+  selection: ({
+    fields: S & LogoutPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LogoutPayloadSelect>);
+} & Omit<UseMutationOptions<{
+  logout: InferSelectResult<LogoutPayload, S> | null;
+}, Error, void>, "mutationFn">): UseMutationResult<{
+  logout: InferSelectResult<LogoutPayload, S> | null;
+}, Error, void> {
+  const args = buildSelectionArgs<S>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   return useMutation({
     mutationKey: customMutationKeys.logout(),
-    mutationFn: () => execute<LogoutMutationResult>(logoutMutationDocument),
-    ...options
+    mutationFn: () => getClient().mutation.logout({
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, LogoutPayloadSelect>).unwrap(),
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Custom Mutation Hook Generators generateCustomMutationHook generates custom mutation hook without centralized keys 1`] = `
@@ -293,29 +336,40 @@ exports[`Custom Mutation Hook Generators generateCustomMutationHook generates cu
  */
 
 import { useMutation } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { LoginPayload } from "../schema-types";
-/** GraphQL mutation document */
-export const loginMutationDocument = \`
-mutation LoginMutation($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    token
-  }
-}\`;
-export interface LoginMutationVariables {
-  email: string;
-  password: string;
-}
-export interface LoginMutationResult {
-  login: LoginPayload;
-}
-export function useLoginMutation(options?: Omit<UseMutationOptions<LoginMutationResult, Error, LoginMutationVariables>, 'mutationFn'>) {
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { LoginVariables } from "../../orm/mutation";
+import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
+export type { LoginVariables } from "../../orm/mutation";
+export type { LoginPayloadSelect } from "../../orm/input-types";
+export function useLoginMutation<S extends LoginPayloadSelect>(params: {
+  selection: ({
+    fields: S & LoginPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>);
+} & Omit<UseMutationOptions<{
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   return useMutation({
-    mutationFn: (variables: LoginMutationVariables) => execute<LoginMutationResult, LoginMutationVariables>(loginMutationDocument, variables),
-    ...options
+    mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, {
+      select: args.select
+    } as {
+      select: S;
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Custom Query Hook Generators generateCustomQueryHook generates custom query hook with arguments 1`] = `
@@ -326,23 +380,16 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User } from "../schema-types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { customQueryKeys } from "../query-keys";
-/** GraphQL query document */
-export const searchUsersQueryDocument = \`
-query SearchUsersQuery($query: String!, $limit: Int) {
-  searchUsers(query: $query, limit: $limit)
-}\`;
-export interface SearchUsersQueryVariables {
-  query: string;
-  limit?: number;
-}
-export interface SearchUsersQueryResult {
-  searchUsers: User[];
-}
+import type { SearchUsersVariables } from "../../orm/query";
+import type { UserSelect, User } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { SearchUsersVariables } from "../../orm/query";
+export type { UserSelect } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const searchUsersQueryKey = customQueryKeys.searchUsers;
 /**
@@ -350,19 +397,43 @@ export const searchUsersQueryKey = customQueryKeys.searchUsers;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useSearchUsersQuery({ query, limit });
+ * const { data, isLoading } = useSearchUsersQuery({ variables: { query, limit }, selection: { fields: { id: true } } });
  * 
  * if (data?.searchUsers) {
  *   console.log(data.searchUsers);
  * }
  * \`\`\`
  */
-export function useSearchUsersQuery(variables: SearchUsersQueryVariables, options?: Omit<UseQueryOptions<SearchUsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useSearchUsersQuery<S extends UserSelect, TData = {
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
+}>(params: {
+  variables: SearchUsersVariables;
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseQueryOptions<{
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useSearchUsersQuery(params: {
+  variables: SearchUsersVariables;
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    variables: _variables,
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _variables;
+  void _selection;
   return useQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables),
-    enabled: !!variables && options?.enabled !== false,
-    ...options
+    queryFn: () => getClient().query.searchUsers(variables!, {
+      select: args.select
+    }).unwrap(),
+    enabled: !!variables && params?.enabled !== false,
+    ...queryOptions
   });
 }
 /**
@@ -370,26 +441,55 @@ export function useSearchUsersQuery(variables: SearchUsersQueryVariables, option
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchSearchUsersQuery({ query, limit });
+ * const data = await fetchSearchUsersQuery({ variables: { query, limit }, selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function fetchSearchUsersQuery(variables: SearchUsersQueryVariables, options?: ExecuteOptions): Promise<SearchUsersQueryResult> {
-  return execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables, options);
+export async function fetchSearchUsersQuery<S extends UserSelect>(params: {
+  variables: SearchUsersVariables;
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<{
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
+}>;
+export async function fetchSearchUsersQuery(params: {
+  variables: SearchUsersVariables;
+  selection: SelectionConfig<UserSelect>;
+}) {
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().query.searchUsers(variables!, {
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch searchUsers for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchSearchUsersQuery(queryClient, { query, limit });
+ * await prefetchSearchUsersQuery(queryClient, { variables: { query, limit }, selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchSearchUsersQuery(queryClient: QueryClient, variables: SearchUsersQueryVariables, options?: ExecuteOptions): Promise<void> {
+export async function prefetchSearchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  variables: SearchUsersVariables;
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<void>;
+export async function prefetchSearchUsersQuery(queryClient: QueryClient, params: {
+  variables: SearchUsersVariables;
+  selection: SelectionConfig<UserSelect>;
+}): Promise<void> {
+  const variables = params.variables;
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: searchUsersQueryKey(variables),
-    queryFn: () => execute<SearchUsersQueryResult, SearchUsersQueryVariables>(searchUsersQueryDocument, variables, options)
+    queryFn: () => getClient().query.searchUsers(variables!, {
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Custom Query Hook Generators generateCustomQueryHook generates custom query hook without arguments 1`] = `
@@ -400,19 +500,14 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User } from "../schema-types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { customQueryKeys } from "../query-keys";
-/** GraphQL query document */
-export const currentUserQueryDocument = \`
-query CurrentUserQuery {
-  currentUser
-}\`;
-export interface CurrentUserQueryResult {
-  currentUser: User;
-}
+import type { UserSelect, User } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const currentUserQueryKey = customQueryKeys.currentUser;
 /**
@@ -420,18 +515,37 @@ export const currentUserQueryKey = customQueryKeys.currentUser;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useCurrentUserQuery();
+ * const { data, isLoading } = useCurrentUserQuery({ selection: { fields: { id: true } } });
  * 
  * if (data?.currentUser) {
  *   console.log(data.currentUser);
  * }
  * \`\`\`
  */
-export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useCurrentUserQuery<S extends UserSelect, TData = {
+  currentUser: InferSelectResult<User, S> | null;
+}>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseQueryOptions<{
+  currentUser: InferSelectResult<User, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useCurrentUserQuery(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument),
-    ...options
+    queryFn: () => getClient().query.currentUser({
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -439,26 +553,49 @@ export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQu
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchCurrentUserQuery();
+ * const data = await fetchCurrentUserQuery({ selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<CurrentUserQueryResult> {
-  return execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options);
+export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<{
+  currentUser: InferSelectResult<User, S> | null;
+}>;
+export async function fetchCurrentUserQuery(params: {
+  selection: SelectionConfig<UserSelect>;
+}) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().query.currentUser({
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch currentUser for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchCurrentUserQuery(queryClient);
+ * await prefetchCurrentUserQuery(queryClient, { selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchCurrentUserQuery(queryClient: QueryClient, options?: ExecuteOptions): Promise<void> {
+export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<void>;
+export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
+  selection: SelectionConfig<UserSelect>;
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options)
+    queryFn: () => getClient().query.currentUser({
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Custom Query Hook Generators generateCustomQueryHook generates custom query hook without centralized keys 1`] = `
@@ -469,18 +606,13 @@ exports[`Custom Query Hook Generators generateCustomQueryHook generates custom q
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User } from "../schema-types";
-/** GraphQL query document */
-export const currentUserQueryDocument = \`
-query CurrentUserQuery {
-  currentUser
-}\`;
-export interface CurrentUserQueryResult {
-  currentUser: User;
-}
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { UserSelect, User } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect } from "../../orm/input-types";
 /** Query key factory for caching */
 export const currentUserQueryKey = () => ["currentUser"] as const;
 /**
@@ -488,18 +620,37 @@ export const currentUserQueryKey = () => ["currentUser"] as const;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useCurrentUserQuery();
+ * const { data, isLoading } = useCurrentUserQuery({ selection: { fields: { id: true } } });
  * 
  * if (data?.currentUser) {
  *   console.log(data.currentUser);
  * }
  * \`\`\`
  */
-export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useCurrentUserQuery<S extends UserSelect, TData = {
+  currentUser: InferSelectResult<User, S> | null;
+}>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseQueryOptions<{
+  currentUser: InferSelectResult<User, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useCurrentUserQuery(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument),
-    ...options
+    queryFn: () => getClient().query.currentUser({
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -507,26 +658,49 @@ export function useCurrentUserQuery(options?: Omit<UseQueryOptions<CurrentUserQu
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchCurrentUserQuery();
+ * const data = await fetchCurrentUserQuery({ selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function fetchCurrentUserQuery(options?: ExecuteOptions): Promise<CurrentUserQueryResult> {
-  return execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options);
+export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<{
+  currentUser: InferSelectResult<User, S> | null;
+}>;
+export async function fetchCurrentUserQuery(params: {
+  selection: SelectionConfig<UserSelect>;
+}) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().query.currentUser({
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch currentUser for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchCurrentUserQuery(queryClient);
+ * await prefetchCurrentUserQuery(queryClient, { selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchCurrentUserQuery(queryClient: QueryClient, options?: ExecuteOptions): Promise<void> {
+export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+}): Promise<void>;
+export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
+  selection: SelectionConfig<UserSelect>;
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
     queryKey: currentUserQueryKey(),
-    queryFn: () => execute<CurrentUserQueryResult>(currentUserQueryDocument, undefined, options)
+    queryFn: () => getClient().query.currentUser({
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateCreateMutationHook generates create mutation hook for simple table 1`] = `
@@ -537,67 +711,65 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { User } from "../types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
-export type { User } from "../types";
-export const createUserMutationDocument = \`
-mutation CreateUserMutation($input: CreateUserInput!) {
-  createUser(input: $input) {
-    user {
-      id
-      email
-      name
-      createdAt
-    }
-  }
-}\`;
-/** Input type for creating a User */
-interface UserCreateInput {
-  email?: string | null;
-  name?: string | null;
-}
-export interface CreateUserMutationVariables {
-  input: {
-    user: UserCreateInput;
-  };
-}
-export interface CreateUserMutationResult {
-  createUser: {
-    user: User;
-  };
-}
+import type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a User
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useCreateUserMutation();
- * 
- * mutate({
- *   input: {
- *     user: {
- *       // ... fields
- *     },
- *   },
+ * const { mutate, isPending } = useCreateUserMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreateUserMutation(options?: Omit<UseMutationOptions<CreateUserMutationResult, Error, CreateUserMutationVariables>, 'mutationFn'>) {
+export function useCreateUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  createUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, CreateUserInput["user"]>, "mutationFn">): UseMutationResult<{
+  createUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, CreateUserInput["user"]>;
+export function useCreateUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateUserInput["user"]>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.create(),
-    mutationFn: (variables: CreateUserMutationVariables) => execute<CreateUserMutationResult, CreateUserMutationVariables>(createUserMutationDocument, variables),
+    mutationFn: (data: CreateUserInput["user"]) => getClient().user.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateCreateMutationHook generates create mutation hook for table with relationships 1`] = `
@@ -608,72 +780,65 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { Post } from "../types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
-import type { PostScope } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
-export type { Post } from "../types";
-export const createPostMutationDocument = \`
-mutation CreatePostMutation($input: CreatePostInput!) {
-  createPost(input: $input) {
-    post {
-      id
-      title
-      content
-      authorId
-      published
-      createdAt
-    }
-  }
-}\`;
-/** Input type for creating a Post */
-interface PostCreateInput {
-  title?: string | null;
-  content?: string | null;
-  authorId?: string | null;
-  published?: boolean | null;
-}
-export interface CreatePostMutationVariables {
-  input: {
-    post: PostCreateInput;
-  };
-}
-export interface CreatePostMutationResult {
-  createPost: {
-    post: Post;
-  };
-}
+import type { PostSelect, PostWithRelations, CreatePostInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PostSelect, PostWithRelations, CreatePostInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a Post
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useCreatePostMutation();
- * 
- * mutate({
- *   input: {
- *     post: {
- *       // ... fields
- *     },
- *   },
+ * const { mutate, isPending } = useCreatePostMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreatePostMutation(options?: Omit<UseMutationOptions<CreatePostMutationResult, Error, CreatePostMutationVariables>, 'mutationFn'>) {
+export function useCreatePostMutation<S extends PostSelect>(params: {
+  selection: ({
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
+} & Omit<UseMutationOptions<{
+  createPost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, CreatePostInput["post"]>, "mutationFn">): UseMutationResult<{
+  createPost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, CreatePostInput["post"]>;
+export function useCreatePostMutation(params: {
+  selection: SelectionConfig<PostSelect>;
+} & Omit<UseMutationOptions<any, Error, CreatePostInput["post"]>, "mutationFn">) {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.create(),
-    mutationFn: (variables: CreatePostMutationVariables) => execute<CreatePostMutationResult, CreatePostMutationVariables>(createPostMutationDocument, variables),
+    mutationFn: (data: CreatePostInput["post"]) => getClient().post.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: postKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateCreateMutationHook generates create mutation hook without centralized keys 1`] = `
@@ -684,64 +849,62 @@ exports[`Mutation Hook Generators generateCreateMutationHook generates create mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { User } from "../types";
-export type { User } from "../types";
-export const createUserMutationDocument = \`
-mutation CreateUserMutation($input: CreateUserInput!) {
-  createUser(input: $input) {
-    user {
-      id
-      email
-      name
-      createdAt
-    }
-  }
-}\`;
-/** Input type for creating a User */
-interface UserCreateInput {
-  email?: string | null;
-  name?: string | null;
-}
-export interface CreateUserMutationVariables {
-  input: {
-    user: UserCreateInput;
-  };
-}
-export interface CreateUserMutationResult {
-  createUser: {
-    user: User;
-  };
-}
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a User
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useCreateUserMutation();
- * 
- * mutate({
- *   input: {
- *     user: {
- *       // ... fields
- *     },
- *   },
+ * const { mutate, isPending } = useCreateUserMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ name: 'New item' });
  * \`\`\`
  */
-export function useCreateUserMutation(options?: Omit<UseMutationOptions<CreateUserMutationResult, Error, CreateUserMutationVariables>, 'mutationFn'>) {
+export function useCreateUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  createUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, CreateUserInput["user"]>, "mutationFn">): UseMutationResult<{
+  createUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, CreateUserInput["user"]>;
+export function useCreateUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, CreateUserInput["user"]>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: CreateUserMutationVariables) => execute<CreateUserMutationResult, CreateUserMutationVariables>(createUserMutationDocument, variables),
+    mutationFn: (data: CreateUserInput["user"]) => getClient().user.create({
+      data,
+      select: args.select
+    }).unwrap(),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user", "list"]
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mutation hook for simple table 1`] = `
@@ -752,56 +915,80 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
-export const deleteUserMutationDocument = \`
-mutation DeleteUserMutation($input: DeleteUserInput!) {
-  deleteUser(input: $input) {
-    clientMutationId
-  }
-}\`;
-export interface DeleteUserMutationVariables {
-  input: {
-    id: string;
-  };
-}
-export interface DeleteUserMutationResult {
-  deleteUser: {
-    clientMutationId: string | null;
-  };
-}
+import type { UserSelect, UserWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a User
+ * Mutation hook for deleting a User with typed selection
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useDeleteUserMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-to-delete',
- *   },
+ * const { mutate, isPending } = useDeleteUserMutation({
+ *   selection: { fields: { id: true } },
  * });
+ * 
+ * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeleteUserMutation(options?: Omit<UseMutationOptions<DeleteUserMutationResult, Error, DeleteUserMutationVariables>, 'mutationFn'>) {
+export function useDeleteUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  deleteUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: (variables: DeleteUserMutationVariables) => execute<DeleteUserMutationResult, DeleteUserMutationVariables>(deleteUserMutationDocument, variables),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().user.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: userKeys.detail(variables.input.id)
+        queryKey: userKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
         queryKey: userKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mutation hook for table with relationships 1`] = `
@@ -812,57 +999,80 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
-import type { PostScope } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
-export const deletePostMutationDocument = \`
-mutation DeletePostMutation($input: DeletePostInput!) {
-  deletePost(input: $input) {
-    clientMutationId
-  }
-}\`;
-export interface DeletePostMutationVariables {
-  input: {
-    id: string;
-  };
-}
-export interface DeletePostMutationResult {
-  deletePost: {
-    clientMutationId: string | null;
-  };
-}
+import type { PostSelect, PostWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PostSelect, PostWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a Post
+ * Mutation hook for deleting a Post with typed selection
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useDeletePostMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-to-delete',
- *   },
+ * const { mutate, isPending } = useDeletePostMutation({
+ *   selection: { fields: { id: true } },
  * });
+ * 
+ * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeletePostMutation(options?: Omit<UseMutationOptions<DeletePostMutationResult, Error, DeletePostMutationVariables>, 'mutationFn'>) {
+export function useDeletePostMutation<S extends PostSelect>(params: {
+  selection: ({
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
+} & Omit<UseMutationOptions<{
+  deletePost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deletePost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeletePostMutation(params: {
+  selection: SelectionConfig<PostSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: (variables: DeletePostMutationVariables) => execute<DeletePostMutationResult, DeletePostMutationVariables>(deletePostMutationDocument, variables),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().post.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: postKeys.detail(variables.input.id)
+        queryKey: postKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
         queryKey: postKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mutation hook without centralized keys 1`] = `
@@ -873,53 +1083,77 @@ exports[`Mutation Hook Generators generateDeleteMutationHook generates delete mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-export const deleteUserMutationDocument = \`
-mutation DeleteUserMutation($input: DeleteUserInput!) {
-  deleteUser(input: $input) {
-    clientMutationId
-  }
-}\`;
-export interface DeleteUserMutationVariables {
-  input: {
-    id: string;
-  };
-}
-export interface DeleteUserMutationResult {
-  deleteUser: {
-    clientMutationId: string | null;
-  };
-}
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { UserSelect, UserWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
- * Mutation hook for deleting a User
+ * Mutation hook for deleting a User with typed selection
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useDeleteUserMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-to-delete',
- *   },
+ * const { mutate, isPending } = useDeleteUserMutation({
+ *   selection: { fields: { id: true } },
  * });
+ * 
+ * mutate({ id: 'value-to-delete' });
  * \`\`\`
  */
-export function useDeleteUserMutation(options?: Omit<UseMutationOptions<DeleteUserMutationResult, Error, DeleteUserMutationVariables>, 'mutationFn'>) {
+export function useDeleteUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  deleteUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>, "mutationFn">): UseMutationResult<{
+  deleteUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+}>;
+export function useDeleteUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: DeleteUserMutationVariables) => execute<DeleteUserMutationResult, DeleteUserMutationVariables>(deleteUserMutationDocument, variables),
+    mutationFn: ({
+      id
+    }: {
+      id: string;
+    }) => getClient().user.delete({
+      where: {
+        id
+      },
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.removeQueries({
-        queryKey: ["user", "detail", variables.input.id]
+        queryKey: ["user", "detail", variables.id]
       });
       queryClient.invalidateQueries({
         queryKey: ["user", "list"]
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateUpdateMutationHook generates update mutation hook for simple table 1`] = `
@@ -930,73 +1164,86 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { User } from "../types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
-export type { User } from "../types";
-export const updateUserMutationDocument = \`
-mutation UpdateUserMutation($input: UpdateUserInput!) {
-  updateUser(input: $input) {
-    user {
-      id
-      email
-      name
-      createdAt
-    }
-  }
-}\`;
-/** Patch type for updating a User - all fields optional */
-interface UserPatch {
-  email?: string | null;
-  name?: string | null;
-  createdAt?: string | null;
-}
-export interface UpdateUserMutationVariables {
-  input: {
-    id: string;
-    patch: UserPatch;
-  };
-}
-export interface UpdateUserMutationResult {
-  updateUser: {
-    user: User;
-  };
-}
+import type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a User
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useUpdateUserMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-here',
- *     patch: {
- *       // ... fields to update
- *     },
- *   },
+ * const { mutate, isPending } = useUpdateUserMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdateUserMutation(options?: Omit<UseMutationOptions<UpdateUserMutationResult, Error, UpdateUserMutationVariables>, 'mutationFn'>) {
+export function useUpdateUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  updateUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>;
+export function useUpdateUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: userMutationKeys.all,
-    mutationFn: (variables: UpdateUserMutationVariables) => execute<UpdateUserMutationResult, UpdateUserMutationVariables>(updateUserMutationDocument, variables),
+    mutationFn: ({
+      id,
+      userPatch
+    }: {
+      id: string;
+      userPatch: UserPatch;
+    }) => getClient().user.update({
+      where: {
+        id
+      },
+      data: userPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.detail(variables.input.id)
+        queryKey: userKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
         queryKey: userKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateUpdateMutationHook generates update mutation hook for table with relationships 1`] = `
@@ -1007,78 +1254,86 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { Post } from "../types";
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
-import type { PostScope } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
-export type { Post } from "../types";
-export const updatePostMutationDocument = \`
-mutation UpdatePostMutation($input: UpdatePostInput!) {
-  updatePost(input: $input) {
-    post {
-      id
-      title
-      content
-      authorId
-      published
-      createdAt
-    }
-  }
-}\`;
-/** Patch type for updating a Post - all fields optional */
-interface PostPatch {
-  title?: string | null;
-  content?: string | null;
-  authorId?: string | null;
-  published?: boolean | null;
-  createdAt?: string | null;
-}
-export interface UpdatePostMutationVariables {
-  input: {
-    id: string;
-    patch: PostPatch;
-  };
-}
-export interface UpdatePostMutationResult {
-  updatePost: {
-    post: Post;
-  };
-}
+import type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a Post
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useUpdatePostMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-here',
- *     patch: {
- *       // ... fields to update
- *     },
- *   },
+ * const { mutate, isPending } = useUpdatePostMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ id: 'value-here', postPatch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdatePostMutation(options?: Omit<UseMutationOptions<UpdatePostMutationResult, Error, UpdatePostMutationVariables>, 'mutationFn'>) {
+export function useUpdatePostMutation<S extends PostSelect>(params: {
+  selection: ({
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
+} & Omit<UseMutationOptions<{
+  updatePost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  postPatch: PostPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updatePost: {
+    post: InferSelectResult<PostWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  postPatch: PostPatch;
+}>;
+export function useUpdatePostMutation(params: {
+  selection: SelectionConfig<PostSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  postPatch: PostPatch;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: postMutationKeys.all,
-    mutationFn: (variables: UpdatePostMutationVariables) => execute<UpdatePostMutationResult, UpdatePostMutationVariables>(updatePostMutationDocument, variables),
+    mutationFn: ({
+      id,
+      postPatch
+    }: {
+      id: string;
+      postPatch: PostPatch;
+    }) => getClient().post.update({
+      where: {
+        id
+      },
+      data: postPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: postKeys.detail(variables.input.id)
+        queryKey: postKeys.detail(variables.id)
       });
       queryClient.invalidateQueries({
         queryKey: postKeys.lists()
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Mutation Hook Generators generateUpdateMutationHook generates update mutation hook without centralized keys 1`] = `
@@ -1089,70 +1344,83 @@ exports[`Mutation Hook Generators generateUpdateMutationHook generates update mu
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UseMutationOptions } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { User } from "../types";
-export type { User } from "../types";
-export const updateUserMutationDocument = \`
-mutation UpdateUserMutation($input: UpdateUserInput!) {
-  updateUser(input: $input) {
-    user {
-      id
-      email
-      name
-      createdAt
-    }
-  }
-}\`;
-/** Patch type for updating a User - all fields optional */
-interface UserPatch {
-  email?: string | null;
-  name?: string | null;
-  createdAt?: string | null;
-}
-export interface UpdateUserMutationVariables {
-  input: {
-    id: string;
-    patch: UserPatch;
-  };
-}
-export interface UpdateUserMutationResult {
-  updateUser: {
-    user: User;
-  };
-}
+import type { UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a User
  * 
  * @example
  * \`\`\`tsx
- * const { mutate, isPending } = useUpdateUserMutation();
- * 
- * mutate({
- *   input: {
- *     id: 'value-here',
- *     patch: {
- *       // ... fields to update
- *     },
- *   },
+ * const { mutate, isPending } = useUpdateUserMutation({
+ *   selection: { fields: { id: true, name: true } },
  * });
+ * 
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
-export function useUpdateUserMutation(options?: Omit<UseMutationOptions<UpdateUserMutationResult, Error, UpdateUserMutationVariables>, 'mutationFn'>) {
+export function useUpdateUserMutation<S extends UserSelect>(params: {
+  selection: ({
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
+} & Omit<UseMutationOptions<{
+  updateUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>, "mutationFn">): UseMutationResult<{
+  updateUser: {
+    user: InferSelectResult<UserWithRelations, S>;
+  };
+}, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>;
+export function useUpdateUserMutation(params: {
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseMutationOptions<any, Error, {
+  id: string;
+  userPatch: UserPatch;
+}>, "mutationFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...mutationOptions
+  } = params ?? {};
+  void _selection;
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: UpdateUserMutationVariables) => execute<UpdateUserMutationResult, UpdateUserMutationVariables>(updateUserMutationDocument, variables),
+    mutationFn: ({
+      id,
+      userPatch
+    }: {
+      id: string;
+      userPatch: UserPatch;
+    }) => getClient().user.update({
+      where: {
+        id
+      },
+      data: userPatch,
+      select: args.select
+    }).unwrap(),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["user", "detail", variables.input.id]
+        queryKey: ["user", "detail", variables.id]
       });
       queryClient.invalidateQueries({
         queryKey: ["user", "list"]
       });
     },
-    ...options
+    ...mutationOptions
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateListQueryHook generates list query hook for simple table 1`] = `
@@ -1163,77 +1431,14 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook f
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User, UUIDFilter, StringFilter, DatetimeFilter } from "../types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
-export type { User } from "../types";
-export const usersQueryDocument = \`
-query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: UserFilter, $condition: UserCondition, $orderBy: [UsersOrderBy!]) {
-  users(
-    first: $first
-    last: $last
-    offset: $offset
-    before: $before
-    after: $after
-    filter: $filter
-    condition: $condition
-    orderBy: $orderBy
-  ) {
-    totalCount
-    nodes {
-      id
-      email
-      name
-      createdAt
-    }
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-  }
-}\`;
-interface UserFilter {
-  id?: UUIDFilter;
-  email?: StringFilter;
-  name?: StringFilter;
-  createdAt?: DatetimeFilter;
-  and?: UserFilter[];
-  or?: UserFilter[];
-  not?: UserFilter;
-}
-interface UserCondition {
-  id?: string;
-  email?: string;
-  name?: string;
-  createdAt?: string;
-}
-type UsersOrderBy = "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export interface UsersQueryVariables {
-  first?: number;
-  last?: number;
-  offset?: number;
-  before?: string;
-  after?: string;
-  filter?: UserFilter;
-  condition?: UserCondition;
-  orderBy?: UsersOrderBy[];
-}
-export interface UsersQueryResult {
-  users: {
-    totalCount: number;
-    nodes: User[];
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string | null;
-      endCursor: string | null;
-    };
-  };
-}
+import type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const usersQueryKey = userKeys.list;
 /**
@@ -1242,17 +1447,37 @@ export const usersQueryKey = userKeys.list;
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = useUsersQuery({
- *   first: 10,
- *   filter: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<UseQueryOptions<UsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useUsersQuery<S extends UserSelect, TData = {
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+} & Omit<UseQueryOptions<{
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUsersQuery(params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: userKeys.list(variables),
-    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables),
-    ...options
+    queryKey: userKeys.list(args),
+    queryFn: () => getClient().user.findMany(args).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -1260,33 +1485,50 @@ export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<Us
  * 
  * @example
  * \`\`\`ts
- * // Direct fetch
- * const data = await fetchUsersQuery({ first: 10 });
- * 
- * // With QueryClient
- * const data = await queryClient.fetchQuery({
- *   queryKey: usersQueryKey(variables),
- *   queryFn: () => fetchUsersQuery(variables),
+ * const data = await fetchUsersQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export async function fetchUsersQuery(variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<UsersQueryResult> {
-  return execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options);
+export async function fetchUsersQuery<S extends UserSelect>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<{
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}>;
+export async function fetchUsersQuery(params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+}) {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  return getClient().user.findMany(args).unwrap();
 }
 /**
  * Prefetch User list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { first: 10 });
+ * await prefetchUsersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
-export async function prefetchUsersQuery(queryClient: QueryClient, variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<void> {
+export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<void>;
+export async function prefetchUsersQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: userKeys.list(variables),
-    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options)
+    queryKey: userKeys.list(args),
+    queryFn: () => getClient().user.findMany(args).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateListQueryHook generates list query hook for table with relationships 1`] = `
@@ -1297,84 +1539,15 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook f
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { Post, UUIDFilter, StringFilter, BooleanFilter, DatetimeFilter } from "../types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import type { PostScope } from "../query-keys";
-export type { Post } from "../types";
-export const postsQueryDocument = \`
-query PostsQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: PostFilter, $condition: PostCondition, $orderBy: [PostsOrderBy!]) {
-  posts(
-    first: $first
-    last: $last
-    offset: $offset
-    before: $before
-    after: $after
-    filter: $filter
-    condition: $condition
-    orderBy: $orderBy
-  ) {
-    totalCount
-    nodes {
-      id
-      title
-      content
-      authorId
-      published
-      createdAt
-    }
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-  }
-}\`;
-interface PostFilter {
-  id?: UUIDFilter;
-  title?: StringFilter;
-  content?: StringFilter;
-  authorId?: UUIDFilter;
-  published?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  and?: PostFilter[];
-  or?: PostFilter[];
-  not?: PostFilter;
-}
-interface PostCondition {
-  id?: string;
-  title?: string;
-  content?: string;
-  authorId?: string;
-  published?: boolean;
-  createdAt?: string;
-}
-type PostsOrderBy = "ID_ASC" | "ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "PUBLISHED_ASC" | "PUBLISHED_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export interface PostsQueryVariables {
-  first?: number;
-  last?: number;
-  offset?: number;
-  before?: string;
-  after?: string;
-  filter?: PostFilter;
-  condition?: PostCondition;
-  orderBy?: PostsOrderBy[];
-}
-export interface PostsQueryResult {
-  posts: {
-    totalCount: number;
-    nodes: Post[];
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string | null;
-      endCursor: string | null;
-    };
-  };
-}
+import type { PostSelect, PostWithRelations, PostFilter, PostsOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { PostSelect, PostWithRelations, PostFilter, PostsOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const postsQueryKey = postKeys.list;
 /**
@@ -1383,28 +1556,49 @@ export const postsQueryKey = postKeys.list;
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = usePostsQuery({
- *   first: 10,
- *   filter: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  * 
  * @example With scope for hierarchical cache invalidation
  * \`\`\`tsx
- * const { data } = usePostsQuery(
- *   { first: 10 },
- *   { scope: { parentId: 'parent-id' } }
- * );
+ * const { data } = usePostsQuery({
+ *   selection: { fields: { id: true }, first: 10 },
+ *   scope: { parentId: 'parent-id' },
+ * });
  * \`\`\`
  */
-export function usePostsQuery(variables?: PostsQueryVariables, options?: Omit<UseQueryOptions<PostsQueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: PostScope }) {
+export function usePostsQuery<S extends PostSelect, TData = {
+  posts: ConnectionResult<InferSelectResult<PostWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
+} & Omit<UseQueryOptions<{
+  posts: ConnectionResult<InferSelectResult<PostWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn"> & {
+  scope?: PostScope;
+}): UseQueryResult<TData>;
+export function usePostsQuery(params: {
+  selection: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn"> & {
+  scope?: PostScope;
+}) {
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
   const {
     scope,
+    selection: _selection,
     ...queryOptions
-  } = options ?? {};
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: postKeys.list(variables, scope),
-    queryFn: () => execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables),
+    queryKey: postKeys.list(args, scope),
+    queryFn: () => getClient().post.findMany(args).unwrap(),
     ...queryOptions
   });
 }
@@ -1413,33 +1607,54 @@ export function usePostsQuery(variables?: PostsQueryVariables, options?: Omit<Us
  * 
  * @example
  * \`\`\`ts
- * // Direct fetch
- * const data = await fetchPostsQuery({ first: 10 });
- * 
- * // With QueryClient
- * const data = await queryClient.fetchQuery({
- *   queryKey: postsQueryKey(variables),
- *   queryFn: () => fetchPostsQuery(variables),
+ * const data = await fetchPostsQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export async function fetchPostsQuery(variables?: PostsQueryVariables, options?: ExecuteOptions): Promise<PostsQueryResult> {
-  return execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables, options);
+export async function fetchPostsQuery<S extends PostSelect>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
+}): Promise<{
+  posts: ConnectionResult<InferSelectResult<PostWithRelations, S>>;
+}>;
+export async function fetchPostsQuery(params: {
+  selection: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>;
+}) {
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
+  return getClient().post.findMany(args).unwrap();
 }
 /**
  * Prefetch Post list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchPostsQuery(queryClient, { first: 10 });
+ * await prefetchPostsQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
-export async function prefetchPostsQuery(queryClient: QueryClient, variables?: PostsQueryVariables, scope?: PostScope, options?: ExecuteOptions): Promise<void> {
+export async function prefetchPostsQuery<S extends PostSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
+} & {
+  scope?: PostScope;
+}): Promise<void>;
+export async function prefetchPostsQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<PostSelect, PostFilter, PostsOrderBy>;
+} & {
+  scope?: PostScope;
+}): Promise<void> {
+  const args = buildListSelectionArgs<PostSelect, PostFilter, PostsOrderBy>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: postKeys.list(variables, scope),
-    queryFn: () => execute<PostsQueryResult, PostsQueryVariables>(postsQueryDocument, variables, options)
+    queryKey: postKeys.list(args, params?.scope),
+    queryFn: () => getClient().post.findMany(args).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateListQueryHook generates list query hook without centralized keys 1`] = `
@@ -1450,94 +1665,51 @@ exports[`Query Hook Generators generateListQueryHook generates list query hook w
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User, UUIDFilter, StringFilter, DatetimeFilter } from "../types";
-export type { User } from "../types";
-export const usersQueryDocument = \`
-query UsersQuery($first: Int, $last: Int, $offset: Int, $before: Cursor, $after: Cursor, $filter: UserFilter, $condition: UserCondition, $orderBy: [UsersOrderBy!]) {
-  users(
-    first: $first
-    last: $last
-    offset: $offset
-    before: $before
-    after: $after
-    filter: $filter
-    condition: $condition
-    orderBy: $orderBy
-  ) {
-    totalCount
-    nodes {
-      id
-      email
-      name
-      createdAt
-    }
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-  }
-}\`;
-interface UserFilter {
-  id?: UUIDFilter;
-  email?: StringFilter;
-  name?: StringFilter;
-  createdAt?: DatetimeFilter;
-  and?: UserFilter[];
-  or?: UserFilter[];
-  not?: UserFilter;
-}
-interface UserCondition {
-  id?: string;
-  email?: string;
-  name?: string;
-  createdAt?: string;
-}
-type UsersOrderBy = "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "NATURAL" | "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC";
-export interface UsersQueryVariables {
-  first?: number;
-  last?: number;
-  offset?: number;
-  before?: string;
-  after?: string;
-  filter?: UserFilter;
-  condition?: UserCondition;
-  orderBy?: UsersOrderBy[];
-}
-export interface UsersQueryResult {
-  users: {
-    totalCount: number;
-    nodes: User[];
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string | null;
-      endCursor: string | null;
-    };
-  };
-}
-export const usersQueryKey = (variables?: UsersQueryVariables) => ["user", "list", variables] as const;
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildListSelectionArgs } from "../selection";
+import type { ListSelectionConfig } from "../selection";
+import type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
+export const usersQueryKey = (variables?: FindManyArgs<unknown, UserFilter, UsersOrderBy>) => ["user", "list", variables] as const;
 /**
  * Query hook for fetching User list
  * 
  * @example
  * \`\`\`tsx
  * const { data, isLoading } = useUsersQuery({
- *   first: 10,
- *   filter: { name: { equalTo: "example" } },
- *   orderBy: ['CREATED_AT_DESC'],
+ *   selection: {
+ *     fields: { id: true, name: true },
+ *     where: { name: { equalTo: "example" } },
+ *     orderBy: ['CREATED_AT_DESC'],
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<UseQueryOptions<UsersQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useUsersQuery<S extends UserSelect, TData = {
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+} & Omit<UseQueryOptions<{
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUsersQuery(params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: usersQueryKey(variables),
-    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables),
-    ...options
+    queryKey: usersQueryKey(args),
+    queryFn: () => getClient().user.findMany(args).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -1545,33 +1717,50 @@ export function useUsersQuery(variables?: UsersQueryVariables, options?: Omit<Us
  * 
  * @example
  * \`\`\`ts
- * // Direct fetch
- * const data = await fetchUsersQuery({ first: 10 });
- * 
- * // With QueryClient
- * const data = await queryClient.fetchQuery({
- *   queryKey: usersQueryKey(variables),
- *   queryFn: () => fetchUsersQuery(variables),
+ * const data = await fetchUsersQuery({
+ *   selection: {
+ *     fields: { id: true },
+ *     first: 10,
+ *   },
  * });
  * \`\`\`
  */
-export async function fetchUsersQuery(variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<UsersQueryResult> {
-  return execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options);
+export async function fetchUsersQuery<S extends UserSelect>(params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<{
+  users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
+}>;
+export async function fetchUsersQuery(params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+}) {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
+  return getClient().user.findMany(args).unwrap();
 }
 /**
  * Prefetch User list for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUsersQuery(queryClient, { first: 10 });
+ * await prefetchUsersQuery(queryClient, { selection: { fields: { id: true }, first: 10 } });
  * \`\`\`
  */
-export async function prefetchUsersQuery(queryClient: QueryClient, variables?: UsersQueryVariables, options?: ExecuteOptions): Promise<void> {
+export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  selection: {
+    fields: S;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<void>;
+export async function prefetchUsersQuery(queryClient: QueryClient, params: {
+  selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
+}): Promise<void> {
+  const args = buildListSelectionArgs<UserSelect, UserFilter, UsersOrderBy>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: usersQueryKey(variables),
-    queryFn: () => execute<UsersQueryResult, UsersQueryVariables>(usersQueryDocument, variables, options)
+    queryKey: usersQueryKey(args),
+    queryFn: () => getClient().user.findMany(args).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateSingleQueryHook generates single query hook for simple table 1`] = `
@@ -1582,27 +1771,14 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User } from "../types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
-export type { User } from "../types";
-export const userQueryDocument = \`
-query UserQuery($id: UUID!) {
-  user(id: $id) {
-    id
-    email
-    name
-    createdAt
-  }
-}\`;
-export interface UserQueryVariables {
-  id: string;
-}
-export interface UserQueryResult {
-  user: User | null;
-}
+import type { UserSelect, UserWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const userQueryKey = userKeys.detail;
 /**
@@ -1610,14 +1786,39 @@ export const userQueryKey = userKeys.detail;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useUserQuery({ id: 'some-id' });
+ * const { data, isLoading } = useUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true, name: true } },
+ * });
  * \`\`\`
  */
-export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQueryOptions<UserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useUserQuery<S extends UserSelect, TData = {
+  user: InferSelectResult<UserWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+} & Omit<UseQueryOptions<{
+  user: InferSelectResult<UserWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUserQuery(params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: userKeys.detail(variables.id),
-    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables),
-    ...options
+    queryKey: userKeys.detail(params.id),
+    queryFn: () => getClient().user.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -1625,26 +1826,58 @@ export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQu
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchUserQuery({ id: 'some-id' });
+ * const data = await fetchUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchUserQuery(variables: UserQueryVariables, options?: ExecuteOptions): Promise<UserQueryResult> {
-  return execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options);
+export async function fetchUserQuery<S extends UserSelect>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<{
+  user: InferSelectResult<UserWithRelations, S> | null;
+}>;
+export async function fetchUserQuery(params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+}) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().user.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single User for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUserQuery(queryClient, { id: 'some-id' });
+ * await prefetchUserQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchUserQuery(queryClient: QueryClient, variables: UserQueryVariables, options?: ExecuteOptions): Promise<void> {
+export async function prefetchUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<void>;
+export async function prefetchUserQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: userKeys.detail(variables.id),
-    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options)
+    queryKey: userKeys.detail(params.id),
+    queryFn: () => getClient().user.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateSingleQueryHook generates single query hook for table with relationships 1`] = `
@@ -1655,30 +1888,15 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { Post } from "../types";
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import type { PostScope } from "../query-keys";
-export type { Post } from "../types";
-export const postQueryDocument = \`
-query PostQuery($id: UUID!) {
-  post(id: $id) {
-    id
-    title
-    content
-    authorId
-    published
-    createdAt
-  }
-}\`;
-export interface PostQueryVariables {
-  id: string;
-}
-export interface PostQueryResult {
-  post: Post | null;
-}
+import type { PostSelect, PostWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { PostSelect, PostWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const postQueryKey = postKeys.detail;
 /**
@@ -1686,25 +1904,52 @@ export const postQueryKey = postKeys.detail;
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = usePostQuery({ id: 'some-id' });
+ * const { data, isLoading } = usePostQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true, name: true } },
+ * });
  * \`\`\`
  * 
  * @example With scope for hierarchical cache invalidation
  * \`\`\`tsx
- * const { data } = usePostQuery(
- *   { id: 'some-id' },
- *   { scope: { parentId: 'parent-id' } }
- * );
+ * const { data } = usePostQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ *   scope: { parentId: 'parent-id' },
+ * });
  * \`\`\`
  */
-export function usePostQuery(variables: PostQueryVariables, options?: Omit<UseQueryOptions<PostQueryResult, Error>, 'queryKey' | 'queryFn'> & { scope?: PostScope }) {
+export function usePostQuery<S extends PostSelect, TData = {
+  post: InferSelectResult<PostWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
+} & Omit<UseQueryOptions<{
+  post: InferSelectResult<PostWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn"> & {
+  scope?: PostScope;
+}): UseQueryResult<TData>;
+export function usePostQuery(params: {
+  id: string;
+  selection: SelectionConfig<PostSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn"> & {
+  scope?: PostScope;
+}) {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
     scope,
+    selection: _selection,
     ...queryOptions
-  } = options ?? {};
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: postKeys.detail(variables.id, scope),
-    queryFn: () => execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables),
+    queryKey: postKeys.detail(params.id, scope),
+    queryFn: () => getClient().post.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
     ...queryOptions
   });
 }
@@ -1713,26 +1958,62 @@ export function usePostQuery(variables: PostQueryVariables, options?: Omit<UseQu
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchPostQuery({ id: 'some-id' });
+ * const data = await fetchPostQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchPostQuery(variables: PostQueryVariables, options?: ExecuteOptions): Promise<PostQueryResult> {
-  return execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables, options);
+export async function fetchPostQuery<S extends PostSelect>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
+}): Promise<{
+  post: InferSelectResult<PostWithRelations, S> | null;
+}>;
+export async function fetchPostQuery(params: {
+  id: string;
+  selection: SelectionConfig<PostSelect>;
+}) {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
+  return getClient().post.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single Post for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchPostQuery(queryClient, { id: 'some-id' });
+ * await prefetchPostQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchPostQuery(queryClient: QueryClient, variables: PostQueryVariables, scope?: PostScope, options?: ExecuteOptions): Promise<void> {
+export async function prefetchPostQuery<S extends PostSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
+} & {
+  scope?: PostScope;
+}): Promise<void>;
+export async function prefetchPostQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<PostSelect>;
+} & {
+  scope?: PostScope;
+}): Promise<void> {
+  const args = buildSelectionArgs<PostSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: postKeys.detail(variables.id, scope),
-    queryFn: () => execute<PostQueryResult, PostQueryVariables>(postQueryDocument, variables, options)
+    queryKey: postKeys.detail(params.id, params?.scope),
+    queryFn: () => getClient().post.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Query Hook Generators generateSingleQueryHook generates single query hook without centralized keys 1`] = `
@@ -1743,40 +2024,52 @@ exports[`Query Hook Generators generateSingleQueryHook generates single query ho
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryClient } from "@tanstack/react-query";
-import { execute } from "../client";
-import type { ExecuteOptions } from "../client";
-import type { User } from "../types";
-export type { User } from "../types";
-export const userQueryDocument = \`
-query UserQuery($id: UUID!) {
-  user(id: $id) {
-    id
-    email
-    name
-    createdAt
-  }
-}\`;
-export interface UserQueryVariables {
-  id: string;
-}
-export interface UserQueryResult {
-  user: User | null;
-}
+import type { UseQueryOptions, UseQueryResult, QueryClient } from "@tanstack/react-query";
+import { getClient } from "../client";
+import { buildSelectionArgs } from "../selection";
+import type { SelectionConfig } from "../selection";
+import type { UserSelect, UserWithRelations } from "../../orm/input-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
+export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 export const userQueryKey = (id: string) => ["user", "detail", id] as const;
 /**
  * Query hook for fetching a single User
  * 
  * @example
  * \`\`\`tsx
- * const { data, isLoading } = useUserQuery({ id: 'some-id' });
+ * const { data, isLoading } = useUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true, name: true } },
+ * });
  * \`\`\`
  */
-export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQueryOptions<UserQueryResult, Error>, 'queryKey' | 'queryFn'>) {
+export function useUserQuery<S extends UserSelect, TData = {
+  user: InferSelectResult<UserWithRelations, S> | null;
+}>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+} & Omit<UseQueryOptions<{
+  user: InferSelectResult<UserWithRelations, S> | null;
+}, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
+export function useUserQuery(params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+} & Omit<UseQueryOptions<any, Error, any, any>, "queryKey" | "queryFn">) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  const {
+    selection: _selection,
+    ...queryOptions
+  } = params ?? {};
+  void _selection;
   return useQuery({
-    queryKey: userQueryKey(variables.id),
-    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables),
-    ...options
+    queryKey: userQueryKey(params.id),
+    queryFn: () => getClient().user.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap(),
+    ...queryOptions
   });
 }
 /**
@@ -1784,26 +2077,58 @@ export function useUserQuery(variables: UserQueryVariables, options?: Omit<UseQu
  * 
  * @example
  * \`\`\`ts
- * const data = await fetchUserQuery({ id: 'some-id' });
+ * const data = await fetchUserQuery({
+ *   id: 'some-id',
+ *   selection: { fields: { id: true } },
+ * });
  * \`\`\`
  */
-export async function fetchUserQuery(variables: UserQueryVariables, options?: ExecuteOptions): Promise<UserQueryResult> {
-  return execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options);
+export async function fetchUserQuery<S extends UserSelect>(params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<{
+  user: InferSelectResult<UserWithRelations, S> | null;
+}>;
+export async function fetchUserQuery(params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+}) {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
+  return getClient().user.findOne({
+    id: params.id,
+    select: args.select
+  }).unwrap();
 }
 /**
  * Prefetch a single User for SSR or cache warming
  * 
  * @example
  * \`\`\`ts
- * await prefetchUserQuery(queryClient, { id: 'some-id' });
+ * await prefetchUserQuery(queryClient, { id: 'some-id', selection: { fields: { id: true } } });
  * \`\`\`
  */
-export async function prefetchUserQuery(queryClient: QueryClient, variables: UserQueryVariables, options?: ExecuteOptions): Promise<void> {
+export async function prefetchUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
+  id: string;
+  selection: {
+    fields: S;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
+}): Promise<void>;
+export async function prefetchUserQuery(queryClient: QueryClient, params: {
+  id: string;
+  selection: SelectionConfig<UserSelect>;
+}): Promise<void> {
+  const args = buildSelectionArgs<UserSelect>(params.selection);
   await queryClient.prefetchQuery({
-    queryKey: userQueryKey(variables.id),
-    queryFn: () => execute<UserQueryResult, UserQueryVariables>(userQueryDocument, variables, options)
+    queryKey: userQueryKey(params.id),
+    queryFn: () => getClient().user.findOne({
+      id: params.id,
+      select: args.select
+    }).unwrap()
   });
-}"
+}
+"
 `;
 
 exports[`Schema Types Generator generateSchemaTypesFile generates schema types file with empty table types 1`] = `

@@ -10,23 +10,26 @@
  */
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
-  CleanTable,
   CleanOperation,
+  CleanTable,
   TypeRegistry,
 } from '../../types/schema';
-import type { SchemaSource } from '../introspect/source';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
+import type { SchemaSource } from '../introspect/source';
 import { filterTables } from '../introspect/transform';
 import {
-  transformSchemaToOperations,
   filterOperations,
-  getTableOperationNames,
   getCustomOperations,
+  getTableOperationNames,
+  transformSchemaToOperations,
 } from '../introspect/transform-schema';
 
 // Re-export for convenience
 export type { SchemaSource } from '../introspect/source';
-export { createSchemaSource, validateSourceOptions } from '../introspect/source';
+export {
+  createSchemaSource,
+  validateSourceOptions,
+} from '../introspect/source';
 
 // ============================================================================
 // Pipeline Types
@@ -97,7 +100,7 @@ export interface CodegenPipelineResult {
  * 5. Separate table operations from custom operations
  */
 export async function runCodegenPipeline(
-  options: CodegenPipelineOptions
+  options: CodegenPipelineOptions,
 ): Promise<CodegenPipelineResult> {
   const {
     source,
@@ -149,27 +152,27 @@ export async function runCodegenPipeline(
     const filteredQueries = filterOperations(
       allQueries,
       config.queries.include,
-      [...config.queries.exclude, ...config.queries.systemExclude]
+      [...config.queries.exclude, ...config.queries.systemExclude],
     );
     const filteredMutations = filterOperations(
       allMutations,
       config.mutations.include,
-      [...config.mutations.exclude, ...config.mutations.systemExclude]
+      [...config.mutations.exclude, ...config.mutations.systemExclude],
     );
 
     log(
-      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`
+      `  After config filtering: ${filteredQueries.length} queries, ${filteredMutations.length} mutations`,
     );
 
     // Remove table operations (already handled by table generators)
     customQueries = getCustomOperations(filteredQueries, tableOperationNames);
     customMutations = getCustomOperations(
       filteredMutations,
-      tableOperationNames
+      tableOperationNames,
     );
 
     log(
-      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`
+      `  Custom operations: ${customQueries.length} queries, ${customMutations.length} mutations`,
     );
   }
 

@@ -7,17 +7,18 @@
  * - Mutation deduplication
  * - Tracking mutation state with useIsMutating
  */
-import type { CleanTable, CleanOperation } from '../../types/schema';
-import type { QueryKeyConfig, EntityRelationship } from '../../types/config';
-import { getTableNames, getGeneratedFileHeader, lcFirst } from './utils';
 import * as t from '@babel/types';
+
+import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
+import type { CleanOperation, CleanTable } from '../../types/schema';
 import {
-  generateCode,
   addJSDocComment,
   asConst,
   constArray,
+  generateCode,
   typedParam,
 } from './babel-ast';
+import { getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
 
 export interface MutationKeyGeneratorOptions {
   tables: CleanTable[];
@@ -35,7 +36,7 @@ export interface GeneratedMutationKeysFile {
  */
 function generateEntityMutationKeysDeclaration(
   table: CleanTable,
-  relationships: Record<string, EntityRelationship>
+  relationships: Record<string, EntityRelationship>,
 ): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
@@ -48,7 +49,7 @@ function generateEntityMutationKeysDeclaration(
   // all property
   const allProp = t.objectProperty(
     t.identifier('all'),
-    constArray([t.stringLiteral('mutation'), t.stringLiteral(entityKey)])
+    constArray([t.stringLiteral('mutation'), t.stringLiteral(entityKey)]),
   );
   addJSDocComment(allProp, [`All ${singularName} mutation keys`]);
   properties.push(allProp);
@@ -73,16 +74,16 @@ function generateEntityMutationKeysDeclaration(
               t.identifier(relationship.foreignKey),
               t.identifier(relationship.foreignKey),
               false,
-              true
-            )
+              true,
+            ),
           ]),
         ]),
         constArray([
           t.stringLiteral('mutation'),
           t.stringLiteral(entityKey),
           t.stringLiteral('create'),
-        ])
-      )
+        ]),
+      ),
     );
 
     createProp = t.objectProperty(t.identifier('create'), arrowFn);
@@ -93,7 +94,7 @@ function generateEntityMutationKeysDeclaration(
         t.stringLiteral('mutation'),
         t.stringLiteral(entityKey),
         t.stringLiteral('create'),
-      ])
+      ]),
     );
 
     createProp = t.objectProperty(t.identifier('create'), arrowFn);
@@ -103,13 +104,18 @@ function generateEntityMutationKeysDeclaration(
 
   // update property
   const updateArrowFn = t.arrowFunctionExpression(
-    [typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]))],
+    [
+      typedParam(
+        'id',
+        t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]),
+      ),
+    ],
     constArray([
       t.stringLiteral('mutation'),
       t.stringLiteral(entityKey),
       t.stringLiteral('update'),
       t.identifier('id'),
-    ])
+    ]),
   );
   const updateProp = t.objectProperty(t.identifier('update'), updateArrowFn);
   addJSDocComment(updateProp, [`Update ${singularName} mutation key`]);
@@ -117,13 +123,18 @@ function generateEntityMutationKeysDeclaration(
 
   // delete property
   const deleteArrowFn = t.arrowFunctionExpression(
-    [typedParam('id', t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]))],
+    [
+      typedParam(
+        'id',
+        t.tsUnionType([t.tsStringKeyword(), t.tsNumberKeyword()]),
+      ),
+    ],
     constArray([
       t.stringLiteral('mutation'),
       t.stringLiteral(entityKey),
       t.stringLiteral('delete'),
       t.identifier('id'),
-    ])
+    ]),
   );
   const deleteProp = t.objectProperty(t.identifier('delete'), deleteArrowFn);
   addJSDocComment(deleteProp, [`Delete ${singularName} mutation key`]);
@@ -133,9 +144,9 @@ function generateEntityMutationKeysDeclaration(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier(keysName),
-        asConst(t.objectExpression(properties))
-      )
-    ])
+        asConst(t.objectExpression(properties)),
+      ),
+    ]),
   );
 }
 
@@ -143,7 +154,7 @@ function generateEntityMutationKeysDeclaration(
  * Generate custom mutation keys declaration
  */
 function generateCustomMutationKeysDeclaration(
-  operations: CleanOperation[]
+  operations: CleanOperation[],
 ): t.ExportNamedDeclaration | null {
   if (operations.length === 0) return null;
 
@@ -168,15 +179,15 @@ function generateCustomMutationKeysDeclaration(
             t.stringLiteral(op.name),
             t.identifier('identifier'),
           ]),
-          constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
-        )
+          constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)]),
+        ),
       );
 
       prop = t.objectProperty(t.identifier(op.name), arrowFn);
     } else {
       const arrowFn = t.arrowFunctionExpression(
         [],
-        constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)])
+        constArray([t.stringLiteral('mutation'), t.stringLiteral(op.name)]),
       );
 
       prop = t.objectProperty(t.identifier(op.name), arrowFn);
@@ -190,9 +201,9 @@ function generateCustomMutationKeysDeclaration(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('customMutationKeys'),
-        asConst(t.objectExpression(properties))
-      )
-    ])
+        asConst(t.objectExpression(properties)),
+      ),
+    ]),
   );
 }
 
@@ -201,7 +212,7 @@ function generateCustomMutationKeysDeclaration(
  */
 function generateUnifiedMutationStoreDeclaration(
   tables: CleanTable[],
-  hasCustomMutations: boolean
+  hasCustomMutations: boolean,
 ): t.ExportNamedDeclaration {
   const properties: t.ObjectProperty[] = [];
 
@@ -209,13 +220,16 @@ function generateUnifiedMutationStoreDeclaration(
     const { typeName } = getTableNames(table);
     const keysName = `${lcFirst(typeName)}MutationKeys`;
     properties.push(
-      t.objectProperty(t.identifier(lcFirst(typeName)), t.identifier(keysName))
+      t.objectProperty(t.identifier(lcFirst(typeName)), t.identifier(keysName)),
     );
   }
 
   if (hasCustomMutations) {
     properties.push(
-      t.objectProperty(t.identifier('custom'), t.identifier('customMutationKeys'))
+      t.objectProperty(
+        t.identifier('custom'),
+        t.identifier('customMutationKeys'),
+      ),
     );
   }
 
@@ -223,9 +237,9 @@ function generateUnifiedMutationStoreDeclaration(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('mutationKeys'),
-        asConst(t.objectExpression(properties))
-      )
-    ])
+        asConst(t.objectExpression(properties)),
+      ),
+    ]),
   );
 
   addJSDocComment(decl, [
@@ -253,7 +267,7 @@ function generateUnifiedMutationStoreDeclaration(
  * Generate the complete mutation-keys.ts file
  */
 export function generateMutationKeysFile(
-  options: MutationKeyGeneratorOptions
+  options: MutationKeyGeneratorOptions,
 ): GeneratedMutationKeysFile {
   const { tables, customMutations, config } = options;
   const { relationships } = config;
@@ -262,18 +276,28 @@ export function generateMutationKeysFile(
 
   // Generate entity mutation keys
   for (const table of tables) {
-    statements.push(generateEntityMutationKeysDeclaration(table, relationships));
+    statements.push(
+      generateEntityMutationKeysDeclaration(table, relationships),
+    );
   }
 
   // Generate custom mutation keys
-  const mutationOperations = customMutations.filter((op) => op.kind === 'mutation');
-  const customKeysDecl = generateCustomMutationKeysDeclaration(mutationOperations);
+  const mutationOperations = customMutations.filter(
+    (op) => op.kind === 'mutation',
+  );
+  const customKeysDecl =
+    generateCustomMutationKeysDeclaration(mutationOperations);
   if (customKeysDecl) {
     statements.push(customKeysDecl);
   }
 
   // Generate unified store
-  statements.push(generateUnifiedMutationStoreDeclaration(tables, mutationOperations.length > 0));
+  statements.push(
+    generateUnifiedMutationStoreDeclaration(
+      tables,
+      mutationOperations.length > 0,
+    ),
+  );
 
   // Generate code from AST
   const code = generateCode(statements);
@@ -309,7 +333,10 @@ ${description}
     const line = codeLines[i];
 
     // Detect custom mutation keys section
-    if (!addedCustomSection && line.startsWith('export const customMutationKeys')) {
+    if (
+      !addedCustomSection &&
+      line.startsWith('export const customMutationKeys')
+    ) {
       content += `
 // ============================================================================
 // Custom Mutation Keys

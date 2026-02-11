@@ -296,11 +296,11 @@ These packages exist on `develop-v5` but have no source code (only `dist/` and `
 
 | Package | Complexity | Notes | Priority |
 |---------|------------|-------|----------|
-| `graphile-pg-type-mappings` | Low | Maps custom PG types (email, url, etc.) to GraphQL scalars | High - should inline into settings |
+| `graphile-pg-type-mappings` | Low | Maps custom PG types (email, url, etc.) to GraphQL scalars | **Complete** — inlined as `PgTypeMappingsPreset` |
 | `graphile-postgis` | High | PostGIS types and filters | Medium |
 | `graphile-i18n` | Medium | Language/locale support | Low |
 | `graphile-upload-plugin` | Medium | File upload handling | Low |
-| `graphile-search-plugin` | Medium | Search functionality | Low |
+| `graphile-search-plugin` | Medium | Search functionality | **Complete** — merged to develop-v5 |
 | `graphile-plugin-connection-filter-postgis` | High | PostGIS filter operators (depends on graphile-postgis) | Medium |
 | `graphile-plugin-fulltext-filter` | Medium | Full-text search filters | Low |
 | `graphile-sql-expression-validator` | Low | SQL expression validation | Low |
@@ -313,11 +313,11 @@ These packages exist on `develop-v5` but have no source code (only `dist/` and `
 4. **Phase 5d:** Meta schema (`MetaSchemaPreset`) - **DONE**
 5. **Phase 5e:** Many-to-many (community v5 plugin) - **DONE**
 6. **Phase 5f:** Tsvector codec (`TsvectorCodecPreset`) - **DONE**
-7. **Phase 5g:** PG type mappings (inline into settings) - **TODO**
+7. **Phase 5g:** PG type mappings (inlined as `PgTypeMappingsPreset`) - **DONE**
 8. **Phase 5h:** PostGIS (requires full port) - **TODO**
 9. **Phase 5i:** i18n (requires full port) - **TODO**
 10. **Phase 5j:** Upload (requires full port) - **TODO**
-11. **Phase 5k:** Search (requires full port) - **TODO**
+11. **Phase 5k:** Search (merged to develop-v5) - **DONE**
 
 ## Phase 6: Test Migration
 
@@ -364,17 +364,21 @@ describe.skip('Server integration tests', () => {
 3. **Server tests** - Skip initially, re-enable incrementally
 4. **Plugin tests** - Use `@constructive-io/graphql-test` with ConstructivePreset
 
-## Phase 7: Codegen Updates
+## Phase 7: Codegen Updates ✅
 
-### 7.1 Update `graphql/codegen`
+### 7.1 Update `graphql/codegen` — **COMPLETE**
 
-The codegen package uses PostGraphile introspection to generate types. This needs to be updated to use v5's introspection API.
+The codegen package has been fully migrated to v5. It now uses standard GraphQL introspection (no `_meta` dependency) and generates ORM-first output with React Query hooks delegating to ORM contracts. See `graphql/codegen/docs/V5-HANDOVER.md` for full details.
 
-**Reference:** `graphile repo's packages/codegen`
+Key results:
+- 230 unit tests pass, 75 snapshots
+- `findOne` collection fallback for `NoUniqueLookupPreset` schemas
+- `selection` API for hooks with strict typing and contextual autocomplete
+- Search/fulltext entities handled generically via Connection detection
 
-### 7.2 Codegen Migration Details
+### 7.2 Codegen Migration Details (Historical)
 
-The current codegen (`graphql/codegen`) uses v4-based schema building via `buildSchemaSDLFromDatabase`. This needs to be updated to use v5's `makeSchema()` with `ConstructivePreset`.
+The original codegen (`graphql/codegen`) used v4-based schema building via `buildSchemaSDLFromDatabase`. This has been replaced with standard introspection that works with any v5 preset.
 
 **Current v4 approach (graphql/codegen/src/core/introspect/source/database.ts):**
 ```typescript
@@ -477,11 +481,11 @@ const introspection = introspectionFromSchema(schema);
 - [x] graphile-plugin-connection-filter (using community package)
 
 #### Packages requiring v5 port
-- [ ] graphile-pg-type-mappings (high priority - inline into settings)
+- [x] graphile-pg-type-mappings (inlined as `PgTypeMappingsPreset`)
 - [ ] graphile-postgis
 - [ ] graphile-i18n
 - [ ] graphile-upload-plugin
-- [ ] graphile-search-plugin
+- [x] graphile-search-plugin (merged to develop-v5)
 - [ ] graphile-plugin-connection-filter-postgis
 - [ ] graphile-plugin-fulltext-filter
 - [ ] graphile-sql-expression-validator
@@ -489,6 +493,7 @@ const introspection = introspectionFromSchema(schema);
 ### Phase 7: Re-enable
 - [x] Re-enable middleware (api.ts refactored to use direct SQL)
 - [x] Re-enable tests (server-test passing)
+- [x] Codegen v5 migration complete (230 tests, ORM + React Query verified)
 - [ ] Full integration testing
 
 ## Key API Differences (v4 vs v5)

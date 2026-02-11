@@ -6,15 +6,19 @@
  * used to validate the AST-based migration produces equivalent results.
  */
 // Jest globals - no import needed
-import { generateInputTypesFile, collectInputTypeNames, collectPayloadTypeNames } from '../../core/codegen/orm/input-types-generator';
+import {
+  collectInputTypeNames,
+  collectPayloadTypeNames,
+  generateInputTypesFile,
+} from '../../core/codegen/orm/input-types-generator';
 import type {
-  CleanTable,
+  CleanArgument,
   CleanFieldType,
   CleanRelations,
-  TypeRegistry,
-  ResolvedType,
-  CleanArgument,
+  CleanTable,
   CleanTypeRef,
+  ResolvedType,
+  TypeRegistry,
 } from '../../types/schema';
 
 // ============================================================================
@@ -46,7 +50,9 @@ const emptyRelations: CleanRelations = {
   manyToMany: [],
 };
 
-function createTable(partial: Partial<CleanTable> & { name: string }): CleanTable {
+function createTable(
+  partial: Partial<CleanTable> & { name: string },
+): CleanTable {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -61,7 +67,11 @@ function createTypeRegistry(types: Record<string, ResolvedType>): TypeRegistry {
   return new Map(Object.entries(types));
 }
 
-function createTypeRef(kind: CleanTypeRef['kind'], name: string | null, ofType?: CleanTypeRef): CleanTypeRef {
+function createTypeRef(
+  kind: CleanTypeRef['kind'],
+  name: string | null,
+  ofType?: CleanTypeRef,
+): CleanTypeRef {
   return { kind, name, ofType };
 }
 
@@ -317,7 +327,10 @@ const sampleTypeRegistry = createTypeRegistry({
     name: 'LoginInput',
     inputFields: [
       { name: 'email', type: createNonNull(createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createNonNull(createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'password',
+        type: createNonNull(createTypeRef('SCALAR', 'String')),
+      },
       { name: 'rememberMe', type: createTypeRef('SCALAR', 'Boolean') },
     ],
   },
@@ -326,7 +339,10 @@ const sampleTypeRegistry = createTypeRegistry({
     name: 'RegisterInput',
     inputFields: [
       { name: 'email', type: createNonNull(createTypeRef('SCALAR', 'String')) },
-      { name: 'password', type: createNonNull(createTypeRef('SCALAR', 'String')) },
+      {
+        name: 'password',
+        type: createNonNull(createTypeRef('SCALAR', 'String')),
+      },
       { name: 'name', type: createTypeRef('SCALAR', 'String') },
     ],
   },
@@ -376,14 +392,21 @@ describe('generateInputTypesFile', () => {
 
   it('generates custom input types from TypeRegistry', () => {
     const usedInputTypes = new Set(['LoginInput', 'RegisterInput', 'UserRole']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, [userTable]);
+    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, [
+      userTable,
+    ]);
     expect(result.content).toMatchSnapshot();
   });
 
   it('generates payload types for custom operations', () => {
     const usedInputTypes = new Set(['LoginInput']);
     const usedPayloadTypes = new Set(['LoginPayload']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, [userTable], usedPayloadTypes);
+    const result = generateInputTypesFile(
+      sampleTypeRegistry,
+      usedInputTypes,
+      [userTable],
+      usedPayloadTypes,
+    );
     expect(result.content).toMatchSnapshot();
   });
 
@@ -447,20 +470,29 @@ describe('entity types', () => {
     expect(result.content).toContain('email?: string | null;');
     expect(result.content).toContain('age?: number | null;');
     expect(result.content).toContain('isActive?: boolean | null;');
-    expect(result.content).toContain('metadata?: Record<string, unknown> | null;');
+    expect(result.content).toContain(
+      'metadata?: Record<string, unknown> | null;',
+    );
   });
 
   it('generates entity relations interface', () => {
-    const result = generateInputTypesFile(new Map(), new Set(), [userTableWithRelations, postTable]);
+    const result = generateInputTypesFile(new Map(), new Set(), [
+      userTableWithRelations,
+      postTable,
+    ]);
 
     expect(result.content).toContain('export interface UserRelations {');
     expect(result.content).toContain('posts?: ConnectionResult<Post>;');
   });
 
   it('generates WithRelations type alias', () => {
-    const result = generateInputTypesFile(new Map(), new Set(), [userTableWithRelations]);
+    const result = generateInputTypesFile(new Map(), new Set(), [
+      userTableWithRelations,
+    ]);
 
-    expect(result.content).toContain('export type UserWithRelations = User & UserRelations;');
+    expect(result.content).toContain(
+      'export type UserWithRelations = User & UserRelations;',
+    );
   });
 });
 
@@ -479,30 +511,39 @@ describe('entity select types', () => {
   });
 
   it('generates select type with belongsTo relation options', () => {
-    const result = generateInputTypesFile(new Map(), new Set(), [postTable, userTable]);
+    const result = generateInputTypesFile(new Map(), new Set(), [
+      postTable,
+      userTable,
+    ]);
 
     expect(result.content).toContain('export type PostSelect = {');
     // Babel generates multi-line format for object types
-    expect(result.content).toContain('author?: boolean | {');
-    expect(result.content).toContain('select?: UserSelect;');
+    expect(result.content).toContain('author?: {');
+    expect(result.content).toContain('select: UserSelect;');
   });
 
   it('generates select type with hasMany relation options', () => {
-    const result = generateInputTypesFile(new Map(), new Set(), [userTableWithRelations, postTable]);
+    const result = generateInputTypesFile(new Map(), new Set(), [
+      userTableWithRelations,
+      postTable,
+    ]);
 
-    expect(result.content).toContain('posts?: boolean | {');
-    expect(result.content).toContain('select?: PostSelect;');
+    expect(result.content).toContain('posts?: {');
+    expect(result.content).toContain('select: PostSelect;');
     expect(result.content).toContain('first?: number;');
     expect(result.content).toContain('filter?: PostFilter;');
     expect(result.content).toContain('orderBy?: PostsOrderBy[];');
   });
 
   it('generates select type with manyToMany relation options', () => {
-    const result = generateInputTypesFile(new Map(), new Set(), [categoryTable, postTable]);
+    const result = generateInputTypesFile(new Map(), new Set(), [
+      categoryTable,
+      postTable,
+    ]);
 
     expect(result.content).toContain('export type CategorySelect = {');
-    expect(result.content).toContain('posts?: boolean | {');
-    expect(result.content).toContain('select?: PostSelect;');
+    expect(result.content).toContain('posts?: {');
+    expect(result.content).toContain('select: PostSelect;');
   });
 });
 
@@ -575,7 +616,7 @@ describe('CRUD input types', () => {
 
     expect(result.content).toContain('export interface UpdateUserInput {');
     expect(result.content).toContain('id: string;');
-    expect(result.content).toContain('patch: UserPatch;');
+    expect(result.content).toContain('userPatch: UserPatch;');
   });
 
   it('generates delete input type', () => {
@@ -584,6 +625,62 @@ describe('CRUD input types', () => {
     expect(result.content).toContain('export interface DeleteUserInput {');
     expect(result.content).toContain('clientMutationId?: string;');
     expect(result.content).toContain('id: string;');
+  });
+
+  it('uses schema-derived requiredness for create input fields', () => {
+    const productTable = createTable({
+      name: 'Product',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'sku', type: fieldTypes.string },
+        { name: 'categoryId', type: fieldTypes.uuid },
+      ],
+      query: {
+        all: 'products',
+        one: 'product',
+        create: 'createProduct',
+        update: 'updateProduct',
+        delete: 'deleteProduct',
+      },
+    });
+
+    const registry = createTypeRegistry({
+      CreateProductInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'CreateProductInput',
+        inputFields: [
+          {
+            name: 'product',
+            type: createNonNull(createTypeRef('INPUT_OBJECT', 'ProductInput')),
+          },
+          {
+            name: 'clientMutationId',
+            type: createTypeRef('SCALAR', 'String'),
+          },
+        ],
+      },
+      ProductInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'ProductInput',
+        inputFields: [
+          {
+            name: 'sku',
+            type: createNonNull(createTypeRef('SCALAR', 'String')),
+          },
+          {
+            name: 'categoryId',
+            type: createTypeRef('SCALAR', 'UUID'),
+          },
+        ],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [productTable]);
+
+    expect(result.content).toContain('export interface CreateProductInput {');
+    expect(result.content).toContain('product: {');
+    expect(result.content).toContain('sku: string;');
+    expect(result.content).toContain('categoryId?: string;');
   });
 });
 
@@ -594,7 +691,11 @@ describe('CRUD input types', () => {
 describe('custom input types', () => {
   it('generates input types from TypeRegistry', () => {
     const usedInputTypes = new Set(['LoginInput', 'RegisterInput']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, []);
+    const result = generateInputTypesFile(
+      sampleTypeRegistry,
+      usedInputTypes,
+      [],
+    );
 
     expect(result.content).toContain('export interface LoginInput {');
     expect(result.content).toContain('email: string;'); // Non-null
@@ -604,10 +705,68 @@ describe('custom input types', () => {
 
   it('generates enum types from TypeRegistry', () => {
     const usedInputTypes = new Set(['UserRole']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, []);
+    const result = generateInputTypesFile(
+      sampleTypeRegistry,
+      usedInputTypes,
+      [],
+    );
 
     // Babel generates double quotes for string literals
-    expect(result.content).toContain('export type UserRole = "ADMIN" | "USER" | "GUEST";');
+    expect(result.content).toContain(
+      'export type UserRole = "ADMIN" | "USER" | "GUEST";',
+    );
+  });
+
+  it('emits unknown aliases for custom scalars used in table fields', () => {
+    const tableWithCustomScalar = createTable({
+      name: 'Asset',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'thumbnail',
+          type: { gqlType: 'ImageAsset', isArray: false } as CleanFieldType,
+        },
+      ],
+    });
+
+    const registry = createTypeRegistry({
+      ImageAsset: {
+        kind: 'SCALAR',
+        name: 'ImageAsset',
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [
+      tableWithCustomScalar,
+    ]);
+
+    expect(result.content).toContain('export type ImageAsset = unknown;');
+    expect(result.content).toContain('thumbnail?: ImageAsset | null;');
+  });
+
+  it('does not alias table entity names as custom scalars', () => {
+    const user = createTable({
+      name: 'User',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'email', type: fieldTypes.string },
+      ],
+    });
+    const post = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'author',
+          type: { gqlType: 'User', isArray: false } as CleanFieldType,
+        },
+      ],
+    });
+
+    const result = generateInputTypesFile(new Map(), new Set(), [user, post]);
+
+    expect(result.content).toContain('export interface User {');
+    expect(result.content).not.toContain('export type User = unknown;');
   });
 });
 
@@ -619,7 +778,12 @@ describe('payload types', () => {
   it('generates payload types for custom operations', () => {
     const usedInputTypes = new Set<string>();
     const usedPayloadTypes = new Set(['LoginPayload']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, [], usedPayloadTypes);
+    const result = generateInputTypesFile(
+      sampleTypeRegistry,
+      usedInputTypes,
+      [],
+      usedPayloadTypes,
+    );
 
     expect(result.content).toContain('export interface LoginPayload {');
     expect(result.content).toContain('token?: string | null;');
@@ -629,11 +793,17 @@ describe('payload types', () => {
   it('generates Select types for payload types', () => {
     const usedInputTypes = new Set<string>();
     const usedPayloadTypes = new Set(['LoginPayload']);
-    const result = generateInputTypesFile(sampleTypeRegistry, usedInputTypes, [], usedPayloadTypes);
+    const result = generateInputTypesFile(
+      sampleTypeRegistry,
+      usedInputTypes,
+      [],
+      usedPayloadTypes,
+    );
 
     expect(result.content).toContain('export type LoginPayloadSelect = {');
     expect(result.content).toContain('token?: boolean;');
     expect(result.content).toContain('expiresAt?: boolean;');
+    expect(result.content).toContain('user?: boolean;');
   });
 });
 
@@ -646,12 +816,18 @@ describe('collectInputTypeNames', () => {
     const operations = [
       {
         args: [
-          { name: 'input', type: createNonNull(createTypeRef('INPUT_OBJECT', 'LoginInput')) },
+          {
+            name: 'input',
+            type: createNonNull(createTypeRef('INPUT_OBJECT', 'LoginInput')),
+          },
         ] as CleanArgument[],
       },
       {
         args: [
-          { name: 'data', type: createTypeRef('INPUT_OBJECT', 'RegisterInput') },
+          {
+            name: 'data',
+            type: createTypeRef('INPUT_OBJECT', 'RegisterInput'),
+          },
         ] as CleanArgument[],
       },
     ];
@@ -690,14 +866,14 @@ describe('collectPayloadTypeNames', () => {
     expect(result.has('RegisterPayload')).toBe(true);
   });
 
-  it('excludes Connection types', () => {
+  it('includes Connection types', () => {
     const operations = [
       { returnType: createTypeRef('OBJECT', 'UsersConnection') },
     ];
 
     const result = collectPayloadTypeNames(operations);
 
-    expect(result.has('UsersConnection')).toBe(false);
+    expect(result.has('UsersConnection')).toBe(true);
   });
 });
 
@@ -742,6 +918,8 @@ describe('edge cases', () => {
     // Should generate a fallback type
     // Babel comment format may have slight differences
     expect(result.content).toContain("Type 'UnknownType' not found in schema");
-    expect(result.content).toContain('export type UnknownType = Record<string, unknown>;');
+    expect(result.content).toContain(
+      'export type UnknownType = Record<string, unknown>;',
+    );
   });
 });

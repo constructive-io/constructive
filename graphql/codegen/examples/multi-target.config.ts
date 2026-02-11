@@ -1,17 +1,15 @@
-import { defineConfig } from '../src/types/config';
+import type { GraphQLSDKConfigTarget } from '../src/types/config';
 
-export default defineConfig({
-  defaults: {
-    endpoint: 'http://api.localhost:3000/graphql',
-  },
-  targets: {
-    public: {
-      output: './examples/output/generated-sdk-public',
-      orm: { output: './examples/output/generated-orm-public' },
-    },
-    admin: {
-      output: './examples/output/generated-sdk-admin',
-      orm: { output: './examples/output/generated-orm-admin' },
-    },
-  },
-});
+/**
+ * Multi-target example config for graphql-codegen
+ *
+ * Usage with CLI flags to select mode:
+ *   tsx src/cli/index.ts --config examples/multi-target.config.ts --react-query
+ *   tsx src/cli/index.ts --config examples/multi-target.config.ts --orm
+ */
+const config: GraphQLSDKConfigTarget = {
+  endpoint: 'http://api.localhost:3000/graphql',
+  output: './examples/output/generated-sdk-public',
+};
+
+export default config;

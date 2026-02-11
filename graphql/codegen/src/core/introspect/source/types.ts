@@ -51,7 +51,7 @@ export class SchemaSourceError extends Error {
     /**
      * Original error that caused the failure
      */
-    public readonly cause?: Error
+    public readonly cause?: Error,
   ) {
     super(`${message} (source: ${source})`);
     this.name = 'SchemaSourceError';

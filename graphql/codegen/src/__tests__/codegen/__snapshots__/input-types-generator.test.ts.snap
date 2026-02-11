@@ -289,14 +289,14 @@ export type UserSelect = {
   isActive?: boolean;
   createdAt?: boolean;
   metadata?: boolean;
-  posts?: boolean | {
-    select?: PostSelect;
+  posts?: {
+    select: PostSelect;
     first?: number;
     filter?: PostFilter;
     orderBy?: PostsOrderBy[];
   };
-  comments?: boolean | {
-    select?: CommentSelect;
+  comments?: {
+    select: CommentSelect;
     first?: number;
     filter?: CommentFilter;
     orderBy?: CommentsOrderBy[];
@@ -309,11 +309,11 @@ export type PostSelect = {
   authorId?: boolean;
   publishedAt?: boolean;
   tags?: boolean;
-  author?: boolean | {
-    select?: UserSelect;
+  author?: {
+    select: UserSelect;
   };
-  comments?: boolean | {
-    select?: CommentSelect;
+  comments?: {
+    select: CommentSelect;
     first?: number;
     filter?: CommentFilter;
     orderBy?: CommentsOrderBy[];
@@ -325,11 +325,11 @@ export type CommentSelect = {
   postId?: boolean;
   authorId?: boolean;
   createdAt?: boolean;
-  post?: boolean | {
-    select?: PostSelect;
+  post?: {
+    select: PostSelect;
   };
-  author?: boolean | {
-    select?: UserSelect;
+  author?: {
+    select: UserSelect;
   };
 };
 // ============ Table Filter Types ============
@@ -416,7 +416,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -442,7 +442,7 @@ export interface PostPatch {
 export interface UpdatePostInput {
   clientMutationId?: string;
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }
 export interface DeletePostInput {
   clientMutationId?: string;
@@ -464,12 +464,22 @@ export interface CommentPatch {
 export interface UpdateCommentInput {
   clientMutationId?: string;
   id: string;
-  patch: CommentPatch;
+  commentPatch: CommentPatch;
 }
 export interface DeleteCommentInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "User": {
+    "posts": "Post",
+    "comments": "Comment"
+  },
+  "Post": {
+    "comments": "Comment"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates complete types file for single table 1`] = `
@@ -780,12 +790,14 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates custom input types from TypeRegistry 1`] = `
@@ -1096,12 +1108,14 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface LoginInput {
   email: string;
@@ -1424,12 +1438,14 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
 export interface LoginInput {
   email: string;
@@ -1723,14 +1739,14 @@ export type UserSelect = {
   isActive?: boolean;
   createdAt?: boolean;
   metadata?: boolean;
-  posts?: boolean | {
-    select?: PostSelect;
+  posts?: {
+    select: PostSelect;
     first?: number;
     filter?: PostFilter;
     orderBy?: PostsOrderBy[];
   };
-  profile?: boolean | {
-    select?: ProfileSelect;
+  profile?: {
+    select: ProfileSelect;
   };
 };
 export type ProfileSelect = {
@@ -1738,8 +1754,8 @@ export type ProfileSelect = {
   bio?: boolean;
   userId?: boolean;
   avatarUrl?: boolean;
-  user?: boolean | {
-    select?: UserSelect;
+  user?: {
+    select: UserSelect;
   };
 };
 // ============ Table Filter Types ============
@@ -1804,7 +1820,7 @@ export interface UserPatch {
 export interface UpdateUserInput {
   clientMutationId?: string;
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }
 export interface DeleteUserInput {
   clientMutationId?: string;
@@ -1826,12 +1842,18 @@ export interface ProfilePatch {
 export interface UpdateProfileInput {
   clientMutationId?: string;
   id: string;
-  patch: ProfilePatch;
+  profilePatch: ProfilePatch;
 }
 export interface DeleteProfileInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "User": {
+    "posts": "Post"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile generates types with manyToMany relations 1`] = `
@@ -2105,11 +2127,11 @@ export type PostSelect = {
   authorId?: boolean;
   publishedAt?: boolean;
   tags?: boolean;
-  author?: boolean | {
-    select?: UserSelect;
+  author?: {
+    select: UserSelect;
   };
-  comments?: boolean | {
-    select?: CommentSelect;
+  comments?: {
+    select: CommentSelect;
     first?: number;
     filter?: CommentFilter;
     orderBy?: CommentsOrderBy[];
@@ -2119,8 +2141,8 @@ export type CategorySelect = {
   id?: boolean;
   name?: boolean;
   slug?: boolean;
-  posts?: boolean | {
-    select?: PostSelect;
+  posts?: {
+    select: PostSelect;
     first?: number;
     filter?: PostFilter;
     orderBy?: PostsOrderBy[];
@@ -2184,7 +2206,7 @@ export interface PostPatch {
 export interface UpdatePostInput {
   clientMutationId?: string;
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }
 export interface DeletePostInput {
   clientMutationId?: string;
@@ -2204,12 +2226,21 @@ export interface CategoryPatch {
 export interface UpdateCategoryInput {
   clientMutationId?: string;
   id: string;
-  patch: CategoryPatch;
+  categoryPatch: CategoryPatch;
 }
 export interface DeleteCategoryInput {
   clientMutationId?: string;
   id: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {
+  "Post": {
+    "comments": "Comment"
+  },
+  "Category": {
+    "posts": "Post"
+  }
+} as Record<string, Record<string, string>>;"
 `;
 
 exports[`generateInputTypesFile handles empty tables array 1`] = `
@@ -2437,5 +2468,7 @@ export interface UUIDListFilter {
   anyLessThanOrEqualTo?: string;
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
-}"
+}
+// ============ Connection Fields Map ============
+export const connectionFieldsMap = {} as Record<string, Record<string, string>>;"
 `;

@@ -8,29 +8,31 @@
  * Any changes here will affect all generated ORM clients.
  */
 
-import * as t from 'gql-ast';
 import { parseType, print } from '@0no-co/graphql.web';
+import * as t from 'gql-ast';
 import type {
   ArgumentNode,
+  EnumValueNode,
   FieldNode,
   VariableDefinitionNode,
-  EnumValueNode,
 } from 'graphql';
-import { OrmClient, QueryResult, GraphQLRequestError } from './client';
 
-export interface QueryBuilderConfig {
+import { GraphQLRequestError, OrmClient, QueryResult } from './client';
+
+export interface QueryBuilderConfig<TResult> {
   client: OrmClient;
   operation: 'query' | 'mutation';
   operationName: string;
   fieldName: string;
   document: string;
   variables?: Record<string, unknown>;
+  transform?: (data: any) => TResult;
 }
 
 export class QueryBuilder<TResult> {
-  private config: QueryBuilderConfig;
+  private config: QueryBuilderConfig<TResult>;
 
-  constructor(config: QueryBuilderConfig) {
+  constructor(config: QueryBuilderConfig<TResult>) {
     this.config = config;
   }
 
@@ -39,10 +41,21 @@ export class QueryBuilder<TResult> {
    * Use result.ok to check success, or .unwrap() to throw on error
    */
   async execute(): Promise<QueryResult<TResult>> {
-    return this.config.client.execute<TResult>(
+    const rawResult = await this.config.client.execute<any>(
       this.config.document,
-      this.config.variables
+      this.config.variables,
     );
+    if (!rawResult.ok) {
+      return rawResult;
+    }
+    if (!this.config.transform) {
+      return rawResult as unknown as QueryResult<TResult>;
+    }
+    return {
+      ok: true,
+      data: this.config.transform(rawResult.data),
+      errors: undefined,
+    };
   }
 
   /**
@@ -72,7 +85,7 @@ export class QueryBuilder<TResult> {
    * Execute and unwrap, calling onError callback on failure
    */
   async unwrapOrElse<D>(
-    onError: (errors: import('./client').GraphQLError[]) => D
+    onError: (errors: import('./client').GraphQLError[]) => D,
   ): Promise<TResult | D> {
     const result = await this.execute();
     if (!result.ok) {
@@ -90,18 +103,27 @@ export class QueryBuilder<TResult> {
   }
 }
 
+const OP_QUERY = 'query' as unknown as import('graphql').OperationTypeNode;
+const OP_MUTATION = 'mutation' as unknown as import('graphql').OperationTypeNode;
+const ENUM_VALUE_KIND = 'EnumValue' as unknown as EnumValueNode['kind'];
+
 // ============================================================================
 // Selection Builders
 // ============================================================================
 
 export function buildSelections(
-  select: Record<string, unknown> | undefined
+  select: Record<string, unknown> | undefined,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  entityType?: string,
 ): FieldNode[] {
   if (!select) {
     return [];
   }
 
   const fields: FieldNode[] = [];
+  const entityConnections = entityType
+    ? connectionFieldsMap?.[entityType]
+    : undefined;
 
   for (const [key, value] of Object.entries(select)) {
     if (value === false || value === undefined) {
@@ -122,39 +144,52 @@ export function buildSelections(
         connection?: boolean;
       };
 
-      if (nested.select) {
-        const nestedSelections = buildSelections(nested.select);
-        const isConnection =
-          nested.connection === true ||
-          nested.first !== undefined ||
-          nested.filter !== undefined;
-        const args = buildArgs([
-          buildOptionalArg('first', nested.first),
-          nested.filter
-            ? t.argument({ name: 'filter', value: buildValueAst(nested.filter) })
-            : null,
-          buildEnumListArg('orderBy', nested.orderBy),
-        ]);
+      if (!nested.select || typeof nested.select !== 'object') {
+        throw new Error(
+          `Invalid selection for field "${key}": nested selections must include a "select" object.`,
+        );
+      }
 
-        if (isConnection) {
-          fields.push(
-            t.field({
-              name: key,
-              args,
-              selectionSet: t.selectionSet({
-                selections: buildConnectionSelections(nestedSelections),
-              }),
+      const relatedEntityType = entityConnections?.[key];
+      const nestedSelections = buildSelections(
+        nested.select,
+        connectionFieldsMap,
+        relatedEntityType,
+      );
+      const isConnection =
+        nested.connection === true ||
+        nested.first !== undefined ||
+        nested.filter !== undefined ||
+        relatedEntityType !== undefined;
+      const args = buildArgs([
+        buildOptionalArg('first', nested.first),
+        nested.filter
+          ? t.argument({
+              name: 'filter',
+              value: buildValueAst(nested.filter),
             })
-          );
-        } else {
-          fields.push(
-            t.field({
-              name: key,
-              args,
-              selectionSet: t.selectionSet({ selections: nestedSelections }),
-            })
-          );
-        }
+          : null,
+        buildEnumListArg('orderBy', nested.orderBy),
+      ]);
+
+      if (isConnection) {
+        fields.push(
+          t.field({
+            name: key,
+            args,
+            selectionSet: t.selectionSet({
+              selections: buildConnectionSelections(nestedSelections),
+            }),
+          }),
+        );
+      } else {
+        fields.push(
+          t.field({
+            name: key,
+            args,
+            selectionSet: t.selectionSet({ selections: nestedSelections }),
+          }),
+        );
       }
     }
   }
@@ -180,10 +215,15 @@ export function buildFindManyDocument<TSelect, TWhere>(
     offset?: number;
   },
   filterTypeName: string,
-  orderByTypeName: string
+  orderByTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
-    ? buildSelections(select as Record<string, unknown>)
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
     : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
@@ -191,10 +231,15 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const variables: Record<string, unknown> = {};
 
   addVariable(
-    { varName: 'where', argName: 'filter', typeName: filterTypeName, value: args.where },
+    {
+      varName: 'where',
+      argName: 'filter',
+      typeName: filterTypeName,
+      value: args.where,
+    },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     {
@@ -204,45 +249,47 @@ export function buildFindManyDocument<TSelect, TWhere>(
     },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     { varName: 'first', typeName: 'Int', value: args.first },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     { varName: 'last', typeName: 'Int', value: args.last },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     { varName: 'after', typeName: 'Cursor', value: args.after },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     { varName: 'before', typeName: 'Cursor', value: args.before },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
     { varName: 'offset', typeName: 'Int', value: args.offset },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
 
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
-        variableDefinitions: variableDefinitions.length ? variableDefinitions : undefined,
+        variableDefinitions: variableDefinitions.length
+          ? variableDefinitions
+          : undefined,
         selectionSet: t.selectionSet({
           selections: [
             t.field({
@@ -266,10 +313,15 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   queryField: string,
   select: TSelect,
   args: { where?: TWhere },
-  filterTypeName: string
+  filterTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
-    ? buildSelections(select as Record<string, unknown>)
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
     : [t.field({ name: 'id' })];
 
   const variableDefinitions: VariableDefinitionNode[] = [];
@@ -281,19 +333,24 @@ export function buildFindFirstDocument<TSelect, TWhere>(
     { varName: 'first', typeName: 'Int', value: 1 },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
   addVariable(
-    { varName: 'where', argName: 'filter', typeName: filterTypeName, value: args.where },
+    {
+      varName: 'where',
+      argName: 'filter',
+      typeName: filterTypeName,
+      value: args.where,
+    },
     variableDefinitions,
     queryArgs,
-    variables
+    variables,
   );
 
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -325,10 +382,15 @@ export function buildCreateDocument<TSelect, TData>(
   entityField: string,
   select: TSelect,
   data: TData,
-  inputTypeName: string
+  inputTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
-    ? buildSelections(select as Record<string, unknown>)
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -351,17 +413,27 @@ export function buildCreateDocument<TSelect, TData>(
   };
 }
 
-export function buildUpdateDocument<TSelect, TWhere extends { id: string }, TData>(
+export function buildUpdateDocument<
+  TSelect,
+  TWhere extends { id: string },
+  TData,
+>(
   operationName: string,
   mutationField: string,
   entityField: string,
   select: TSelect,
   where: TWhere,
   data: TData,
-  inputTypeName: string
+  inputTypeName: string,
+  patchFieldName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
-    ? buildSelections(select as Record<string, unknown>)
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
     : [t.field({ name: 'id' })];
 
   return {
@@ -379,19 +451,129 @@ export function buildUpdateDocument<TSelect, TWhere extends { id: string }, TDat
     variables: {
       input: {
         id: where.id,
-        patch: data,
+        [patchFieldName]: data,
       },
     },
   };
 }
 
-export function buildDeleteDocument<TWhere extends { id: string }>(
+export function buildUpdateByPkDocument<TSelect, TData>(
+  operationName: string,
+  mutationField: string,
+  entityField: string,
+  select: TSelect,
+  id: string | number,
+  data: TData,
+  inputTypeName: string,
+  idFieldName: string,
+  patchFieldName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({
+          name: entityField,
+          selectionSet: t.selectionSet({ selections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        [idFieldName]: id,
+        [patchFieldName]: data,
+      },
+    },
+  };
+}
+
+export function buildFindOneDocument<TSelect>(
+  operationName: string,
+  queryField: string,
+  id: string | number,
+  select: TSelect,
+  idArgName: string,
+  idTypeName: string,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+): { document: string; variables: Record<string, unknown> } {
+  const selections = select
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
+    : [t.field({ name: 'id' })];
+
+  const variableDefinitions: VariableDefinitionNode[] = [
+    t.variableDefinition({
+      variable: t.variable({ name: idArgName }),
+      type: parseType(idTypeName),
+    }),
+  ];
+
+  const queryArgs: ArgumentNode[] = [
+    t.argument({
+      name: idArgName,
+      value: t.variable({ name: idArgName }),
+    }),
+  ];
+
+  const document = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: OP_QUERY,
+        name: operationName + 'Query',
+        variableDefinitions,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: queryField,
+              args: queryArgs,
+              selectionSet: t.selectionSet({ selections }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return {
+    document: print(document),
+    variables: { [idArgName]: id },
+  };
+}
+
+export function buildDeleteDocument<
+  TWhere extends { id: string },
+  TSelect = undefined,
+>(
   operationName: string,
   mutationField: string,
   entityField: string,
   where: TWhere,
-  inputTypeName: string
+  inputTypeName: string,
+  select?: TSelect,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
+  const entitySelections = select
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
+    : [t.field({ name: 'id' })];
+
   return {
     document: buildInputMutationDocument({
       operationName,
@@ -401,7 +583,7 @@ export function buildDeleteDocument<TWhere extends { id: string }>(
         t.field({
           name: entityField,
           selectionSet: t.selectionSet({
-            selections: [t.field({ name: 'id' })],
+            selections: entitySelections,
           }),
         }),
       ],
@@ -414,40 +596,81 @@ export function buildDeleteDocument<TWhere extends { id: string }>(
   };
 }
 
+export function buildDeleteByPkDocument<TSelect = undefined>(
+  operationName: string,
+  mutationField: string,
+  entityField: string,
+  id: string | number,
+  inputTypeName: string,
+  idFieldName: string,
+  select?: TSelect,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+): { document: string; variables: Record<string, unknown> } {
+  const entitySelections = select
+    ? buildSelections(
+        select as Record<string, unknown>,
+        connectionFieldsMap,
+        operationName,
+      )
+    : [t.field({ name: 'id' })];
+
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [
+        t.field({
+          name: entityField,
+          selectionSet: t.selectionSet({ selections: entitySelections }),
+        }),
+      ],
+    }),
+    variables: {
+      input: {
+        [idFieldName]: id,
+      },
+    },
+  };
+}
+
 export function buildCustomDocument<TSelect, TArgs>(
   operationType: 'query' | 'mutation',
   operationName: string,
   fieldName: string,
   select: TSelect,
   args: TArgs,
-  variableDefinitions: Array<{ name: string; type: string }>
+  variableDefinitions: Array<{ name: string; type: string }>,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  entityType?: string,
 ): { document: string; variables: Record<string, unknown> } {
-  let actualSelect = select;
+  let actualSelect: TSelect = select;
   let isConnection = false;
 
-  if (select && typeof select === 'object' && 'select' in select) {
-    const wrapper = select as { select?: TSelect; connection?: boolean };
-    if (wrapper.select) {
-      actualSelect = wrapper.select;
-      isConnection = wrapper.connection === true;
-    }
+  if (isCustomSelectionWrapper(select)) {
+    actualSelect = select.select as TSelect;
+    isConnection = select.connection === true;
   }
 
   const selections = actualSelect
-    ? buildSelections(actualSelect as Record<string, unknown>)
+    ? buildSelections(
+        actualSelect as Record<string, unknown>,
+        connectionFieldsMap,
+        entityType,
+      )
     : [];
 
   const variableDefs = variableDefinitions.map((definition) =>
     t.variableDefinition({
       variable: t.variable({ name: definition.name }),
       type: parseType(definition.type),
-    })
+    }),
   );
   const fieldArgs = variableDefinitions.map((definition) =>
     t.argument({
       name: definition.name,
       value: t.variable({ name: definition.name }),
-    })
+    }),
   );
 
   const fieldSelections = isConnection
@@ -457,7 +680,7 @@ export function buildCustomDocument<TSelect, TArgs>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: operationType,
+        operation: operationType === 'mutation' ? OP_MUTATION : OP_QUERY,
         name: operationName,
         variableDefinitions: variableDefs.length ? variableDefs : undefined,
         selectionSet: t.selectionSet({
@@ -481,6 +704,31 @@ export function buildCustomDocument<TSelect, TArgs>(
   };
 }
 
+function isCustomSelectionWrapper(
+  value: unknown,
+): value is { select: Record<string, unknown>; connection?: boolean } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+
+  if (!keys.includes('select') || !keys.includes('connection')) {
+    return false;
+  }
+
+  if (keys.some((key) => key !== 'select' && key !== 'connection')) {
+    return false;
+  }
+
+  return (
+    !!record.select &&
+    typeof record.select === 'object' &&
+    !Array.isArray(record.select)
+  );
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -491,7 +739,7 @@ function buildArgs(args: Array<ArgumentNode | null>): ArgumentNode[] {
 
 function buildOptionalArg(
   name: string,
-  value: number | string | undefined
+  value: number | string | undefined,
 ): ArgumentNode | null {
   if (value === undefined) {
     return null;
@@ -505,7 +753,7 @@ function buildOptionalArg(
 
 function buildEnumListArg(
   name: string,
-  values: string[] | undefined
+  values: string[] | undefined,
 ): ArgumentNode | null {
   if (!values || values.length === 0) {
     return null;
@@ -520,7 +768,7 @@ function buildEnumListArg(
 
 function buildEnumValue(value: string): EnumValueNode {
   return {
-    kind: 'EnumValue',
+    kind: ENUM_VALUE_KIND,
     value,
   };
 }
@@ -566,7 +814,7 @@ function buildInputMutationDocument(config: InputMutationConfig): string {
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OP_MUTATION,
         name: config.operationName + 'Mutation',
         variableDefinitions: [
           t.variableDefinition({
@@ -600,7 +848,7 @@ function addVariable(
   spec: VariableSpec,
   definitions: VariableDefinitionNode[],
   args: ArgumentNode[],
-  variables: Record<string, unknown>
+  variables: Record<string, unknown>,
 ): void {
   if (spec.value === undefined) return;
 
@@ -608,19 +856,19 @@ function addVariable(
     t.variableDefinition({
       variable: t.variable({ name: spec.varName }),
       type: parseType(spec.typeName),
-    })
+    }),
   );
   args.push(
     t.argument({
       name: spec.argName ?? spec.varName,
       value: t.variable({ name: spec.varName }),
-    })
+    }),
   );
   variables[spec.varName] = spec.value;
 }
 
 function buildValueAst(
-  value: unknown
+  value: unknown,
 ):
   | ReturnType<typeof t.stringValue>
   | ReturnType<typeof t.intValue>
@@ -661,7 +909,7 @@ function buildValueAst(
         t.objectField({
           name: key,
           value: buildValueAst(val),
-        })
+        }),
       ),
     });
   }

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "3.1.3",
+  "version": "3.3.0",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -32,12 +32,12 @@
   "bin": {
     "graphql-codegen": "cli/index.js"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "copy:templates": "mkdir -p dist/core/codegen/templates && cp src/core/codegen/templates/*.ts dist/core/codegen/templates/",
-      "build": "makage build && npm run copy:templates",
-      "build:dev": "makage build:dev && npm run copy:templates",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "copy:templates": "mkdir -p dist/core/codegen/templates && cp src/core/codegen/templates/*.ts dist/core/codegen/templates/",
+    "build": "makage build && npm run copy:templates",
+    "build:dev": "makage build --dev && npm run copy:templates",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "fmt": "oxfmt --write .",
@@ -65,7 +65,7 @@
     "find-and-require-package-json": "^0.9.0",
     "gql-ast": "workspace:^",
     "graphql": "^16.9.0",
-    "inflekt": "^0.3.0",
+    "inflekt": "^0.3.1",
     "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
     "oxfmt": "^0.26.0",

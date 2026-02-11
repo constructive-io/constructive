@@ -1,6 +1,6 @@
 /**
  * GraphQL Introspection Types
- * 
+ *
  * Standard types for GraphQL schema introspection via __schema query.
  * These mirror the GraphQL introspection spec.
  */
@@ -159,7 +159,9 @@ export function isNamedType(kind: IntrospectionTypeKind): boolean {
 /**
  * Unwrap a type reference to get the base named type
  */
-export function unwrapType(typeRef: IntrospectionTypeRef): IntrospectionTypeRef {
+export function unwrapType(
+  typeRef: IntrospectionTypeRef,
+): IntrospectionTypeRef {
   let current = typeRef;
   while (current.ofType) {
     current = current.ofType;

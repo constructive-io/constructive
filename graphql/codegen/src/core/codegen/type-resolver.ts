@@ -4,12 +4,8 @@
  * Utilities for converting CleanTypeRef and other GraphQL types
  * into TypeScript type strings and interface definitions.
  */
-import type {
-  CleanTypeRef,
-  CleanArgument,
-  CleanObjectField,
-} from '../../types/schema';
-import { scalarToTsType as resolveScalarToTs, SCALAR_NAMES } from './scalars';
+import type { CleanTypeRef } from '../../types/schema';
+import { SCALAR_NAMES, scalarToTsType as resolveScalarToTs } from './scalars';
 
 // ============================================================================
 // Type Tracker for Collecting Referenced Types
@@ -114,7 +110,10 @@ export function scalarToTsType(scalarName: string): string {
  * @param typeRef - The GraphQL type reference
  * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function typeRefToTsType(typeRef: CleanTypeRef, tracker?: TypeTracker): string {
+export function typeRefToTsType(
+  typeRef: CleanTypeRef,
+  tracker?: TypeTracker,
+): string {
   switch (typeRef.kind) {
     case 'NON_NULL':
       // Non-null wrapper - unwrap and return the inner type
@@ -162,7 +161,10 @@ export function typeRefToTsType(typeRef: CleanTypeRef, tracker?: TypeTracker): s
  * @param typeRef - The GraphQL type reference
  * @param tracker - Optional TypeTracker to collect referenced types
  */
-export function typeRefToNullableTsType(typeRef: CleanTypeRef, tracker?: TypeTracker): string {
+export function typeRefToNullableTsType(
+  typeRef: CleanTypeRef,
+  tracker?: TypeTracker,
+): string {
   const baseType = typeRefToTsType(typeRef, tracker);
 
   // If the outer type is NON_NULL, it's required
@@ -220,39 +222,14 @@ export function getBaseTypeKind(typeRef: CleanTypeRef): CleanTypeRef['kind'] {
 /**
  * Check if a field should be skipped in selections
  */
-export function shouldSkipField(fieldName: string, skipQueryField: boolean): boolean {
+export function shouldSkipField(
+  fieldName: string,
+  skipQueryField: boolean,
+): boolean {
   if (skipQueryField && fieldName === 'query') return true;
   if (fieldName === 'nodeId') return true;
   if (fieldName === '__typename') return true;
   return false;
-}
-
-/**
- * Filter fields to only include selectable scalar and object fields
- */
-export function getSelectableFields(
-  fields: CleanObjectField[] | undefined,
-  skipQueryField: boolean,
-  maxDepth: number = 2,
-  currentDepth: number = 0
-): CleanObjectField[] {
-  if (!fields || currentDepth >= maxDepth) return [];
-
-  return fields.filter((field) => {
-    // Skip internal fields
-    if (shouldSkipField(field.name, skipQueryField)) return false;
-
-    // Get base type kind
-    const baseKind = getBaseTypeKind(field.type);
-
-    // Include scalars and enums
-    if (baseKind === 'SCALAR' || baseKind === 'ENUM') return true;
-
-    // Include objects up to max depth
-    if (baseKind === 'OBJECT' && currentDepth < maxDepth - 1) return true;
-
-    return false;
-  });
 }
 
 // ============================================================================
@@ -272,7 +249,7 @@ export function operationNameToPascal(name: string): string {
  */
 export function getOperationVariablesTypeName(
   operationName: string,
-  kind: 'query' | 'mutation'
+  kind: 'query' | 'mutation',
 ): string {
   const pascal = operationNameToPascal(operationName);
   return `${pascal}${kind === 'query' ? 'Query' : 'Mutation'}Variables`;
@@ -284,7 +261,7 @@ export function getOperationVariablesTypeName(
  */
 export function getOperationResultTypeName(
   operationName: string,
-  kind: 'query' | 'mutation'
+  kind: 'query' | 'mutation',
 ): string {
   const pascal = operationNameToPascal(operationName);
   return `${pascal}${kind === 'query' ? 'Query' : 'Mutation'}Result`;
@@ -296,7 +273,7 @@ export function getOperationResultTypeName(
  */
 export function getOperationHookName(
   operationName: string,
-  kind: 'query' | 'mutation'
+  kind: 'query' | 'mutation',
 ): string {
   const pascal = operationNameToPascal(operationName);
   return `use${pascal}${kind === 'query' ? 'Query' : 'Mutation'}`;
@@ -308,7 +285,7 @@ export function getOperationHookName(
  */
 export function getOperationFileName(
   operationName: string,
-  kind: 'query' | 'mutation'
+  kind: 'query' | 'mutation',
 ): string {
   return `${getOperationHookName(operationName, kind)}.ts`;
 }
@@ -327,7 +304,7 @@ export function getQueryKeyName(operationName: string): string {
  */
 export function getDocumentConstName(
   operationName: string,
-  kind: 'query' | 'mutation'
+  kind: 'query' | 'mutation',
 ): string {
   return `${operationName}${kind === 'query' ? 'Query' : 'Mutation'}Document`;
 }

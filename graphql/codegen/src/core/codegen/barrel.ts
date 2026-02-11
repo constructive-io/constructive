@@ -3,18 +3,19 @@
  *
  * Using Babel AST for generating barrel (index.ts) files with re-exports.
  */
-import type { CleanTable } from '../../types/schema';
 import * as t from '@babel/types';
-import { generateCode, addJSDocComment } from './babel-ast';
+
+import type { CleanTable } from '../../types/schema';
+import { addJSDocComment, generateCode } from './babel-ast';
+import { getOperationHookName } from './type-resolver';
 import {
+  getCreateMutationHookName,
+  getDeleteMutationHookName,
   getListQueryHookName,
   getSingleQueryHookName,
-  getCreateMutationHookName,
   getUpdateMutationHookName,
-  getDeleteMutationHookName,
   hasValidPrimaryKey,
 } from './utils';
-import { getOperationHookName } from './type-resolver';
 
 /**
  * Helper to create export * from './module' statement
@@ -62,16 +63,16 @@ export function generateMutationsBarrel(tables: CleanTable[]): string {
   // Export all mutation hooks
   for (const table of tables) {
     const createHookName = getCreateMutationHookName(table);
-    const updateHookName = getUpdateMutationHookName(table);
-    const deleteHookName = getDeleteMutationHookName(table);
 
     statements.push(exportAllFrom(`./${createHookName}`));
 
-    // Only add update/delete if they exist
-    if (table.query?.update !== null) {
+    // Only add update/delete if they exist AND table has valid PK
+    if (table.query?.update !== null && hasValidPrimaryKey(table)) {
+      const updateHookName = getUpdateMutationHookName(table);
       statements.push(exportAllFrom(`./${updateHookName}`));
     }
-    if (table.query?.delete !== null) {
+    if (table.query?.delete !== null && hasValidPrimaryKey(table)) {
+      const deleteHookName = getDeleteMutationHookName(table);
       statements.push(exportAllFrom(`./${deleteHookName}`));
     }
   }
@@ -95,7 +96,6 @@ export function generateMutationsBarrel(tables: CleanTable[]): string {
  * @param hasSchemaTypes - Whether schema-types.ts was generated
  */
 export interface MainBarrelOptions {
-  hasSchemaTypes?: boolean;
   hasMutations?: boolean;
   /** Whether query-keys.ts was generated */
   hasQueryKeys?: boolean;
@@ -107,12 +107,11 @@ export interface MainBarrelOptions {
 
 export function generateMainBarrel(
   tables: CleanTable[],
-  options: MainBarrelOptions = {}
+  options: MainBarrelOptions = {},
 ): string {
   const opts: MainBarrelOptions = options;
 
   const {
-    hasSchemaTypes = false,
     hasMutations = true,
     hasQueryKeys = false,
     hasMutationKeys = false,
@@ -122,16 +121,8 @@ export function generateMainBarrel(
 
   const statements: t.Statement[] = [];
 
-  // Client configuration
+  // Client configuration (ORM wrapper with configure/getClient)
   statements.push(exportAllFrom('./client'));
-
-  // Entity and filter types
-  statements.push(exportAllFrom('./types'));
-
-  // Schema types (input, payload, enum types)
-  if (hasSchemaTypes) {
-    statements.push(exportAllFrom('./schema-types'));
-  }
 
   // Centralized query keys (for cache management)
   if (hasQueryKeys) {
@@ -181,8 +172,12 @@ export function generateMainBarrel(
       "import { useCarsQuery, useCreateCarMutation } from './generated';",
       '',
       'function MyComponent() {',
-      '  const { data, isLoading } = useCarsQuery({ first: 10 });',
-      '  const { mutate } = useCreateCarMutation();',
+      '  const { data, isLoading } = useCarsQuery({',
+      '    selection: { fields: { id: true }, first: 10 },',
+      '  });',
+      '  const { mutate } = useCreateCarMutation({',
+      '    selection: { fields: { id: true } },',
+      '  });',
       '  // ...',
       '}',
       '```',
@@ -240,7 +235,7 @@ export function generateRootBarrel(options: RootBarrelOptions = {}): string {
  */
 export function generateCustomQueriesBarrel(
   tables: CleanTable[],
-  customQueryNames: string[]
+  customQueryNames: string[],
 ): string {
   const statements: t.Statement[] = [];
   const exportedHooks = new Set<string>();
@@ -289,7 +284,7 @@ export function generateCustomQueriesBarrel(
  */
 export function generateCustomMutationsBarrel(
   tables: CleanTable[],
-  customMutationNames: string[]
+  customMutationNames: string[],
 ): string {
   const statements: t.Statement[] = [];
   const exportedHooks = new Set<string>();
@@ -302,15 +297,15 @@ export function generateCustomMutationsBarrel(
       exportedHooks.add(createHookName);
     }
 
-    // Only add update/delete if they exist
-    if (table.query?.update !== null) {
+    // Only add update/delete if they exist AND table has valid PK
+    if (table.query?.update !== null && hasValidPrimaryKey(table)) {
       const updateHookName = getUpdateMutationHookName(table);
       if (!exportedHooks.has(updateHookName)) {
         statements.push(exportAllFrom(`./${updateHookName}`));
         exportedHooks.add(updateHookName);
       }
     }
-    if (table.query?.delete !== null) {
+    if (table.query?.delete !== null && hasValidPrimaryKey(table)) {
       const deleteHookName = getDeleteMutationHookName(table);
       if (!exportedHooks.has(deleteHookName)) {
         statements.push(exportAllFrom(`./${deleteHookName}`));

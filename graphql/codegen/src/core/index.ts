@@ -6,8 +6,8 @@
  */
 
 // Main generate function (orchestrates the entire pipeline)
-export { generate } from './generate';
 export type { GenerateOptions, GenerateResult } from './generate';
+export { generate } from './generate';
 
 // Types
 export * from './types';
@@ -17,10 +17,12 @@ export * from './ast';
 export * from './custom-ast';
 
 // Query builder
-export { QueryBuilder, MetaObject } from './query-builder';
+/** @deprecated Legacy v4 query builder — use v5 ORM codegen instead */
+export { MetaObject, QueryBuilder } from './query-builder';
 
 // Meta object utilities
-export { validateMetaObject, convertFromMetaSchema } from './meta-object';
+/** @deprecated Legacy v4 meta-object utilities — v5 uses standard introspection */
+export { convertFromMetaSchema, validateMetaObject } from './meta-object';
 
 // Configuration loading and resolution
 export * from './config';

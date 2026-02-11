@@ -1,10 +1,8 @@
-import type {
-  GraphQLSDKConfigTarget,
-} from '../../types/config';
+import type { GraphQLSDKConfigTarget } from '../../types/config';
 import {
-  mergeConfig,
-  getConfigOptions,
   DEFAULT_CONFIG,
+  getConfigOptions,
+  mergeConfig,
 } from '../../types/config';
 
 describe('config resolution', () => {
@@ -20,7 +18,9 @@ describe('config resolution', () => {
     expect(resolved.output).toBe(DEFAULT_CONFIG.output);
     expect(resolved.tables.include).toEqual(DEFAULT_CONFIG.tables.include);
     expect(resolved.queries.exclude).toEqual(DEFAULT_CONFIG.queries.exclude);
-    expect(resolved.queries.systemExclude).toEqual(DEFAULT_CONFIG.queries.systemExclude);
+    expect(resolved.queries.systemExclude).toEqual(
+      DEFAULT_CONFIG.queries.systemExclude,
+    );
   });
 
   it('merges nested config values with overrides', () => {

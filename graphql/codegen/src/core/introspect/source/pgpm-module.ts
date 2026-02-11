@@ -7,17 +7,17 @@
  * 3. Introspecting the database with PostGraphile
  * 4. Cleaning up the ephemeral database (unless keepDb is true)
  */
-import { buildSchema, introspectionFromSchema } from 'graphql';
 import { PgpmPackage } from '@pgpmjs/core';
+import { buildSchema, introspectionFromSchema } from 'graphql';
+import { getPgPool } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
-import { getPgPool } from 'pg-cache';
 
-import type { SchemaSource, SchemaSourceResult } from './types';
-import { SchemaSourceError } from './types';
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { buildSchemaSDLFromDatabase } from '../../database';
 import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
+import type { SchemaSource, SchemaSourceResult } from './types';
+import { SchemaSourceError } from './types';
 
 /**
  * Options for PGPM module schema source using direct module path
@@ -84,13 +84,15 @@ export interface PgpmWorkspaceOptions {
   keepDb?: boolean;
 }
 
-export type PgpmModuleSchemaSourceOptions = PgpmModulePathOptions | PgpmWorkspaceOptions;
+export type PgpmModuleSchemaSourceOptions =
+  | PgpmModulePathOptions
+  | PgpmWorkspaceOptions;
 
 /**
  * Type guard to check if options use direct module path
  */
 export function isPgpmModulePathOptions(
-  options: PgpmModuleSchemaSourceOptions
+  options: PgpmModuleSchemaSourceOptions,
 ): options is PgpmModulePathOptions {
   return 'pgpmModulePath' in options;
 }
@@ -99,7 +101,7 @@ export function isPgpmModulePathOptions(
  * Type guard to check if options use workspace + module name
  */
 export function isPgpmWorkspaceOptions(
-  options: PgpmModuleSchemaSourceOptions
+  options: PgpmModuleSchemaSourceOptions,
 ): options is PgpmWorkspaceOptions {
   return 'pgpmWorkspacePath' in options && 'pgpmModuleName' in options;
 }
@@ -130,7 +132,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to resolve module path: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -139,7 +141,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
     if (!pkg.isInModule()) {
       throw new SchemaSourceError(
         `Not a valid PGPM module: ${modulePath}. Directory must contain pgpm.plan and .control files.`,
-        this.describe()
+        this.describe(),
       );
     }
 
@@ -153,7 +155,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       throw new SchemaSourceError(
         `Failed to create ephemeral database: ${err instanceof Error ? err.message : 'Unknown error'}`,
         this.describe(),
-        err instanceof Error ? err : undefined
+        err instanceof Error ? err : undefined,
       );
     }
 
@@ -167,7 +169,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to deploy PGPM module: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined
+          err instanceof Error ? err : undefined,
         );
       }
 
@@ -187,7 +189,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
           throw new SchemaSourceError(
             `Failed to resolve API schemas: ${err instanceof Error ? err.message : 'Unknown error'}`,
             this.describe(),
-            err instanceof Error ? err : undefined
+            err instanceof Error ? err : undefined,
           );
         }
       } else {
@@ -205,7 +207,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined
+          err instanceof Error ? err : undefined,
         );
       }
 
@@ -213,7 +215,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       if (!sdl.trim()) {
         throw new SchemaSourceError(
           'Database introspection returned empty schema',
-          this.describe()
+          this.describe(),
         );
       }
 
@@ -225,7 +227,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Invalid GraphQL SDL from database: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined
+          err instanceof Error ? err : undefined,
         );
       }
 
@@ -237,13 +239,13 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         throw new SchemaSourceError(
           `Failed to generate introspection: ${err instanceof Error ? err.message : 'Unknown error'}`,
           this.describe(),
-          err instanceof Error ? err : undefined
+          err instanceof Error ? err : undefined,
         );
       }
 
       // Convert graphql-js introspection result to our mutable type
       const introspection: IntrospectionQueryResponse = JSON.parse(
-        JSON.stringify(introspectionResult)
+        JSON.stringify(introspectionResult),
       ) as IntrospectionQueryResponse;
 
       return { introspection };
@@ -252,7 +254,9 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       teardown({ keepDb });
 
       if (keepDb) {
-        console.log(`[pgpm-module] Kept ephemeral database: ${dbConfig.database}`);
+        console.log(
+          `[pgpm-module] Kept ephemeral database: ${dbConfig.database}`,
+        );
       }
     }
   }

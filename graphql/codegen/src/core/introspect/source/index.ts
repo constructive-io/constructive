@@ -7,23 +7,19 @@
  * - PostgreSQL databases (via PostGraphile introspection)
  * - PGPM modules (via ephemeral database deployment)
  */
-export * from './types';
+export * from './api-schemas';
+export * from './database';
 export * from './endpoint';
 export * from './file';
-export * from './database';
 export * from './pgpm-module';
-export * from './api-schemas';
+export * from './types';
 
-import type { SchemaSource } from './types';
-import type { DbConfig, PgpmConfig } from '../../../types/config';
+import type { DbConfig } from '../../../types/config';
+import { DatabaseSchemaSource } from './database';
 import { EndpointSchemaSource } from './endpoint';
 import { FileSchemaSource } from './file';
-import { DatabaseSchemaSource } from './database';
-import {
-  PgpmModuleSchemaSource,
-  isPgpmModulePathOptions,
-  isPgpmWorkspaceOptions,
-} from './pgpm-module';
+import { PgpmModuleSchemaSource } from './pgpm-module';
+import type { SchemaSource } from './types';
 
 /**
  * Options for endpoint-based schema source
@@ -107,15 +103,23 @@ export interface CreateSchemaSourceOptions {
 /**
  * Detect which source mode is being used based on options
  */
-export type SourceMode = 'endpoint' | 'schemaFile' | 'database' | 'pgpm-module' | 'pgpm-workspace';
+export type SourceMode =
+  | 'endpoint'
+  | 'schemaFile'
+  | 'database'
+  | 'pgpm-module'
+  | 'pgpm-workspace';
 
-export function detectSourceMode(options: CreateSchemaSourceOptions): SourceMode | null {
+export function detectSourceMode(
+  options: CreateSchemaSourceOptions,
+): SourceMode | null {
   if (options.endpoint) return 'endpoint';
   if (options.schemaFile) return 'schemaFile';
   if (options.db) {
     // Check for PGPM modes first
     if (options.db.pgpm?.modulePath) return 'pgpm-module';
-    if (options.db.pgpm?.workspacePath && options.db.pgpm?.moduleName) return 'pgpm-workspace';
+    if (options.db.pgpm?.workspacePath && options.db.pgpm?.moduleName)
+      return 'pgpm-workspace';
     // Default to database mode if db is specified without pgpm
     return 'database';
   }
@@ -137,7 +141,7 @@ export function detectSourceMode(options: CreateSchemaSourceOptions): SourceMode
  * @throws Error if no valid source is provided
  */
 export function createSchemaSource(
-  options: CreateSchemaSourceOptions
+  options: CreateSchemaSourceOptions,
 ): SchemaSource {
   const mode = detectSourceMode(options);
 
@@ -183,7 +187,7 @@ export function createSchemaSource(
 
     default:
       throw new Error(
-        'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).'
+        'No source specified. Use one of: endpoint, schemaFile, or db (with optional pgpm for module deployment).',
       );
   }
 }
@@ -196,17 +200,14 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
   error?: string;
 } {
   // Count primary sources
-  const sources = [
-    options.endpoint,
-    options.schemaFile,
-    options.db,
-  ].filter(Boolean);
+  const sources = [options.endpoint, options.schemaFile, options.db].filter(
+    Boolean,
+  );
 
   if (sources.length === 0) {
     return {
       valid: false,
-      error:
-        'No source specified. Use one of: endpoint, schemaFile, or db.',
+      error: 'No source specified. Use one of: endpoint, schemaFile, or db.',
     };
   }
 
@@ -224,14 +225,16 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
     if (pgpm.workspacePath && !pgpm.moduleName) {
       return {
         valid: false,
-        error: 'db.pgpm.workspacePath requires db.pgpm.moduleName to be specified.',
+        error:
+          'db.pgpm.workspacePath requires db.pgpm.moduleName to be specified.',
       };
     }
 
     if (pgpm.moduleName && !pgpm.workspacePath) {
       return {
         valid: false,
-        error: 'db.pgpm.moduleName requires db.pgpm.workspacePath to be specified.',
+        error:
+          'db.pgpm.moduleName requires db.pgpm.workspacePath to be specified.',
       };
     }
 
@@ -239,7 +242,8 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
     if (!pgpm.modulePath && !(pgpm.workspacePath && pgpm.moduleName)) {
       return {
         valid: false,
-        error: 'db.pgpm requires either modulePath or both workspacePath and moduleName.',
+        error:
+          'db.pgpm requires either modulePath or both workspacePath and moduleName.',
       };
     }
   }
@@ -252,14 +256,16 @@ export function validateSourceOptions(options: CreateSchemaSourceOptions): {
     if (hasSchemas && hasApiNames) {
       return {
         valid: false,
-        error: 'Cannot specify both db.schemas and db.apiNames. Use one or the other.',
+        error:
+          'Cannot specify both db.schemas and db.apiNames. Use one or the other.',
       };
     }
 
     if (!hasSchemas && !hasApiNames) {
       return {
         valid: false,
-        error: 'Must specify either db.schemas or db.apiNames for database mode.',
+        error:
+          'Must specify either db.schemas or db.apiNames for database mode.',
       };
     }
   }

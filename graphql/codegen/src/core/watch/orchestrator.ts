@@ -5,9 +5,9 @@
  */
 
 import type { GraphQLSDKConfigTarget } from '../../types/config';
-import type { GeneratorType, WatchOptions, PollEvent } from './types';
-import { SchemaPoller } from './poller';
 import { debounce } from './debounce';
+import { SchemaPoller } from './poller';
+import type { GeneratorType, PollEvent, WatchOptions } from './types';
 
 // These will be injected by the CLI layer to avoid circular dependencies
 // The watch orchestrator doesn't need to know about the full generate commands
@@ -88,7 +88,7 @@ export class WatchOrchestrator {
     // Create debounced regenerate function
     this.debouncedRegenerate = debounce(
       () => this.regenerate(),
-      options.config.watch.debounce
+      options.config.watch.debounce,
     );
 
     // Set up event handlers
@@ -172,7 +172,7 @@ export class WatchOrchestrator {
     // Start polling loop
     this.poller.start();
     this.log(
-      `Watching for schema changes (poll interval: ${this.watchOptions.pollInterval}ms)`
+      `Watching for schema changes (poll interval: ${this.watchOptions.pollInterval}ms)`,
     );
   }
 
@@ -220,15 +220,19 @@ export class WatchOrchestrator {
         case 'react-query':
           generateFn = this.options.generateReactQuery;
           // React Query hooks go to {output}/hooks
-          outputDir = this.options.outputDir ?? `${this.options.config.output}/hooks`;
+          outputDir =
+            this.options.outputDir ?? `${this.options.config.output}/hooks`;
           break;
         case 'orm':
           generateFn = this.options.generateOrm;
           // ORM client goes to {output}/orm
-          outputDir = this.options.outputDir ?? `${this.options.config.output}/orm`;
+          outputDir =
+            this.options.outputDir ?? `${this.options.config.output}/orm`;
           break;
         default:
-          throw new Error(`Unknown generator type: ${this.options.generatorType}`);
+          throw new Error(
+            `Unknown generator type: ${this.options.generatorType}`,
+          );
       }
 
       const result = await generateFn({
@@ -294,7 +298,9 @@ export class WatchOrchestrator {
         generatorName = 'ORM client';
         break;
       default:
-        throw new Error(`Unknown generator type: ${this.options.generatorType}`);
+        throw new Error(
+          `Unknown generator type: ${this.options.generatorType}`,
+        );
     }
     console.log(`\n${'─'.repeat(50)}`);
     console.log(`graphql-codegen watch mode (${generatorName})`);
@@ -322,7 +328,7 @@ export class WatchOrchestrator {
  * Start watch mode for a generator
  */
 export async function startWatch(
-  options: WatchOrchestratorOptions
+  options: WatchOrchestratorOptions,
 ): Promise<void> {
   const orchestrator = new WatchOrchestrator(options);
   await orchestrator.start();

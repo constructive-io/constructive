@@ -2,19 +2,19 @@
  * Tests for codegen utility functions
  */
 import {
+  getFilterTypeName,
+  getGeneratedFileHeader,
+  getOrderByTypeName,
+  getPrimaryKeyInfo,
+  getTableNames,
+  gqlTypeToTs,
   lcFirst,
-  ucFirst,
   toCamelCase,
   toPascalCase,
   toScreamingSnake,
-  getTableNames,
-  getFilterTypeName,
-  getOrderByTypeName,
-  gqlTypeToTs,
-  getPrimaryKeyInfo,
-  getGeneratedFileHeader,
+  ucFirst,
 } from '../../core/codegen/utils';
-import type { CleanTable, CleanRelations } from '../../types/schema';
+import type { CleanRelations, CleanTable } from '../../types/schema';
 
 const emptyRelations: CleanRelations = {
   belongsTo: [],
@@ -24,7 +24,10 @@ const emptyRelations: CleanRelations = {
 };
 
 // Use any for test fixture overrides to avoid strict type requirements
-function createTable(name: string, overrides: Record<string, unknown> = {}): CleanTable {
+function createTable(
+  name: string,
+  overrides: Record<string, unknown> = {},
+): CleanTable {
   return {
     name,
     fields: [],
@@ -79,7 +82,7 @@ describe('utils', () => {
       const result = getTableNames(
         createTable('Person', {
           inflection: { tableFieldName: 'individual', allRows: 'people' },
-        })
+        }),
       );
       expect(result.singularName).toBe('individual');
       expect(result.pluralName).toBe('people');
@@ -88,8 +91,14 @@ describe('utils', () => {
     it('uses query.all for plural name', () => {
       const result = getTableNames(
         createTable('Child', {
-          query: { all: 'children', one: 'child', create: 'createChild', update: 'updateChild', delete: 'deleteChild' },
-        })
+          query: {
+            all: 'children',
+            one: 'child',
+            create: 'createChild',
+            update: 'updateChild',
+            delete: 'deleteChild',
+          },
+        }),
       );
       expect(result.pluralName).toBe('children');
     });
@@ -98,12 +107,18 @@ describe('utils', () => {
   describe('type name generators', () => {
     it('getFilterTypeName returns correct filter type', () => {
       expect(getFilterTypeName(createTable('User'))).toBe('UserFilter');
-      expect(getFilterTypeName(createTable('Post', { inflection: { filterType: 'PostCondition' } }))).toBe('PostCondition');
+      expect(
+        getFilterTypeName(
+          createTable('Post', { inflection: { filterType: 'PostCondition' } }),
+        ),
+      ).toBe('PostCondition');
     });
 
     it('getOrderByTypeName returns correct orderBy type', () => {
       expect(getOrderByTypeName(createTable('User'))).toBe('UsersOrderBy');
-      expect(getOrderByTypeName(createTable('Address'))).toBe('AddressesOrderBy');
+      expect(getOrderByTypeName(createTable('Address'))).toBe(
+        'AddressesOrderBy',
+      );
     });
   });
 
@@ -138,11 +153,20 @@ describe('utils', () => {
     it('extracts PK from constraints', () => {
       const table = createTable('User', {
         constraints: {
-          primaryKey: [{ name: 'users_pkey', fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }] }],
+          primaryKey: [
+            {
+              name: 'users_pkey',
+              fields: [
+                { name: 'id', type: { gqlType: 'UUID', isArray: false } },
+              ],
+            },
+          ],
         },
       });
       const result = getPrimaryKeyInfo(table);
-      expect(result).toEqual([{ name: 'id', gqlType: 'UUID', tsType: 'string' }]);
+      expect(result).toEqual([
+        { name: 'id', gqlType: 'UUID', tsType: 'string' },
+      ]);
     });
 
     it('falls back to id field', () => {
@@ -150,7 +174,9 @@ describe('utils', () => {
         fields: [{ name: 'id', type: { gqlType: 'UUID', isArray: false } }],
       });
       const result = getPrimaryKeyInfo(table);
-      expect(result).toEqual([{ name: 'id', gqlType: 'UUID', tsType: 'string' }]);
+      expect(result).toEqual([
+        { name: 'id', gqlType: 'UUID', tsType: 'string' },
+      ]);
     });
 
     it('handles composite keys', () => {

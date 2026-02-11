@@ -75,7 +75,7 @@ interface ConvertedMetaObject {
  * Convert from raw _meta schema response to internal MetaObject format
  */
 export function convertFromMetaSchema(
-  metaSchema: MetaSchemaInput
+  metaSchema: MetaSchemaInput,
 ): ConvertedMetaObject {
   const {
     _meta: { tables },
@@ -93,7 +93,7 @@ export function convertFromMetaSchema(
       uniqueConstraints: pickArrayConstraint(table.uniqueConstraints),
       foreignConstraints: pickForeignConstraint(
         table.foreignKeyConstraints,
-        table.relations
+        table.relations,
       ),
     });
   }
@@ -102,7 +102,7 @@ export function convertFromMetaSchema(
 }
 
 function pickArrayConstraint(
-  constraints: MetaSchemaConstraint[]
+  constraints: MetaSchemaConstraint[],
 ): ConvertedConstraint[] {
   if (constraints.length === 0) return [];
   const c = constraints[0];
@@ -111,7 +111,7 @@ function pickArrayConstraint(
 
 function pickForeignConstraint(
   constraints: MetaSchemaForeignConstraint[],
-  relations: MetaSchemaRelations
+  relations: MetaSchemaRelations,
 ): ConvertedForeignConstraint[] {
   if (constraints.length === 0) return [];
 

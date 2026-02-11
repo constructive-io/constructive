@@ -1,0 +1,220 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`query-builder snapshots findMany document with filter and pagination 1`] = `
+"query UserQuery($where: UserFilter, $orderBy: [UsersOrderBy!], $first: Int) {
+  users(filter: $where, orderBy: $orderBy, first: $first) {
+    nodes {
+      id
+      name
+      email
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots findMany document with nested connections via connectionFieldsMap 1`] = `
+"query UserQuery {
+  users {
+    nodes {
+      id
+      name
+      posts {
+        nodes {
+          id
+          title
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+      comments {
+        nodes {
+          id
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots findMany with deeply nested connections (3 levels) 1`] = `
+"query TestQuery {
+  users {
+    nodes {
+      id
+      posts {
+        nodes {
+          id
+          title
+          comments {
+            nodes {
+              id
+              body
+            }
+            totalCount
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
+          }
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots findMany with mixed connection and singular relations 1`] = `
+"query TestQuery {
+  users {
+    nodes {
+      id
+      name
+      profile {
+        bio
+        avatar
+      }
+      posts {
+        nodes {
+          id
+          title
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+      comments {
+        nodes {
+          id
+          body
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots findMany with nested connection fields 1`] = `
+"query TestQuery {
+  users {
+    nodes {
+      id
+      name
+      posts {
+        nodes {
+          id
+          title
+          body
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots findMany without connectionFieldsMap (no wrapping) 1`] = `
+"query TestQuery {
+  users {
+    nodes {
+      id
+      name
+      posts {
+        id
+        title
+      }
+    }
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}"
+`;
+
+exports[`query-builder snapshots mutation document 1`] = `
+"mutation CreateUserMutation($input: CreateUserInput!) {
+  createUser(input: $input) {
+    user {
+      id
+      name
+      email
+    }
+  }
+}"
+`;

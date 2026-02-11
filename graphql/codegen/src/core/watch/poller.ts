@@ -6,16 +6,17 @@
  */
 
 import { EventEmitter } from 'node:events';
+
 import type { IntrospectionQueryResponse } from '../../types/introspection';
 import { fetchSchema } from '../introspect/fetch-schema';
 import { SchemaCache, touchFile } from './cache';
+import { hashObject } from './hash';
 import type {
-  PollResult,
   PollEvent,
   PollEventType,
+  PollResult,
   WatchOptions,
 } from './types';
-import { hashObject } from './hash';
 
 /**
  * Schema poller that periodically introspects a GraphQL endpoint
@@ -96,7 +97,7 @@ export class SchemaPoller extends EventEmitter {
       if (!schemaResult.success) {
         return this.handleError(
           `__schema fetch failed: ${schemaResult.error}`,
-          duration
+          duration,
         );
       }
 
@@ -119,14 +120,14 @@ export class SchemaPoller extends EventEmitter {
 
         this.emit(
           'schema-changed',
-          this.createEvent('schema-changed', { hash: newHash, duration })
+          this.createEvent('schema-changed', { hash: newHash, duration }),
         );
         return { success: true, changed: true, hash: newHash, schema };
       }
 
       this.emit(
         'schema-unchanged',
-        this.createEvent('schema-unchanged', { duration })
+        this.createEvent('schema-unchanged', { duration }),
       );
       this.emit('poll-success', this.createEvent('poll-success', { duration }));
       return { success: true, changed: false, hash: newHash, schema };
@@ -193,7 +194,7 @@ export class SchemaPoller extends EventEmitter {
     this.consecutiveErrors++;
     this.emit(
       'poll-error',
-      this.createEvent('poll-error', { error, duration })
+      this.createEvent('poll-error', { error, duration }),
     );
 
     // Slow down polling after multiple consecutive errors
@@ -213,7 +214,7 @@ export class SchemaPoller extends EventEmitter {
 
   private createEvent(
     type: PollEventType,
-    extra?: Partial<PollEvent>
+    extra?: Partial<PollEvent>,
   ): PollEvent {
     return {
       type,
@@ -227,7 +228,7 @@ export class SchemaPoller extends EventEmitter {
  * Utility to compute schema hash without full poll
  */
 export async function computeSchemaHash(
-  schema: IntrospectionQueryResponse
+  schema: IntrospectionQueryResponse,
 ): Promise<string> {
   return hashObject(schema);
 }
