@@ -1,6 +1,7 @@
 import { checkForUpdates } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 import { teardownPgPools } from 'pg-cache';
+import semver from 'semver';
 
 import add from './commands/add';
 import adminUsers from './commands/admin-users';
@@ -116,8 +117,15 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
         pkgVersion: pkg.version,
         toolName: 'pgpm',
       });
-      if (updateResult.hasUpdate && updateResult.message) {
-        console.warn(updateResult.message);
+      // Use proper semver comparison instead of the string-based check
+      // from checkForUpdates, which fails for multi-digit versions
+      // (e.g., "3.10.0" > "3.9.0" is false in string comparison)
+      const hasUpdate = updateResult.latestVersion
+        && semver.valid(updateResult.latestVersion)
+        && semver.valid(pkg.version)
+        && semver.gt(updateResult.latestVersion, pkg.version);
+      if (hasUpdate) {
+        console.warn(`Update available: ${pkg.version} -> ${updateResult.latestVersion}`);
         console.warn('Run pgpm update to upgrade.');
       }
     } catch {
