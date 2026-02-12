@@ -145,10 +145,29 @@ interface QueryMeta {
   delete: string | null;
 }
 
+/**
+ * Inflect a PG attribute name to its GraphQL field name.
+ *
+ * Uses PostGraphile's inflection chain:
+ * 1. _attributeName: applies @name smart tags, handles id→rowId (overridden to keep id)
+ * 2. camelCase: converts snake_case to camelCase (display_name → displayName)
+ */
+function inflectAttr(inflection: any, codec: any, attrName: string): string {
+  try {
+    const cleaned = inflection._attributeName({ attributeName: attrName, codec });
+    return inflection.camelCase(cleaned);
+  } catch {
+    return attrName;
+  }
+}
+
 /** Build a FieldMeta from an attribute name and attribute object */
-function buildFieldMeta(name: string, attr: any): FieldMeta {
+function buildFieldMeta(name: string, attr: any, inflection?: any, codec?: any): FieldMeta {
+  const fieldName = inflection && codec
+    ? inflectAttr(inflection, codec, name)
+    : name;
   return {
-    name,
+    name: fieldName,
     type: {
       pgType: attr?.codec?.name || 'unknown',
       gqlType: attr?.codec?.name || 'unknown',
@@ -166,19 +185,22 @@ function buildFkConstraintMeta(
   relationName: string,
   rel: any,
   localAttributes: Record<string, any>,
+  inflection?: any,
+  localCodec?: any,
 ): ForeignKeyConstraintMeta {
-  const remoteAttrs = rel.remoteResource?.codec?.attributes || {};
+  const remoteCodec = rel.remoteResource?.codec;
+  const remoteAttrs = remoteCodec?.attributes || {};
   return {
     name: relationName,
     fields: (rel.localAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, localAttributes[attrName]),
+      buildFieldMeta(attrName, localAttributes[attrName], inflection, localCodec),
     ),
-    referencedTable: rel.remoteResource?.codec?.name || 'unknown',
+    referencedTable: remoteCodec?.name || 'unknown',
     referencedFields: rel.remoteAttributes || [],
     refFields: (rel.remoteAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, remoteAttrs[attrName]),
+      buildFieldMeta(attrName, remoteAttrs[attrName], inflection, remoteCodec),
     ),
-    refTable: { name: rel.remoteResource?.codec?.name || 'unknown' },
+    refTable: { name: remoteCodec?.name || 'unknown' },
   };
 }
 
@@ -225,7 +247,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
           // Build fields metadata
           const fields: FieldMeta[] = Object.entries(attributes).map(
-            ([name, attr]: [string, any]) => buildFieldMeta(name, attr),
+            ([name, attr]: [string, any]) => buildFieldMeta(name, attr, inflection, codec),
           );
 
           // Build indexes metadata (from uniques)
@@ -235,7 +257,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             isPrimary: unique.isPrimary || false,
             columns: unique.attributes,
             fields: unique.attributes.map((attrName: string) =>
-              buildFieldMeta(attrName, attributes[attrName]),
+              buildFieldMeta(attrName, attributes[attrName], inflection, codec),
             ),
           }));
 
@@ -245,7 +267,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             ? {
                 name: primaryUnique.tags?.name || `${codec.name}_pkey`,
                 fields: primaryUnique.attributes.map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
                 ),
               }
             : null;
@@ -255,7 +277,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             .map((u: any) => ({
               name: u.tags?.name || `${codec.name}_${u.attributes.join('_')}_key`,
               fields: u.attributes.map((attrName: string) =>
-                buildFieldMeta(attrName, attributes[attrName]),
+                buildFieldMeta(attrName, attributes[attrName], inflection, codec),
               ),
             }));
 
@@ -264,7 +286,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             const rel = relation as any;
             if (rel.isReferencee === false) {
               foreignKeyConstraints.push(
-                buildFkConstraintMeta(relationName, rel, attributes),
+                buildFkConstraintMeta(relationName, rel, attributes, inflection, codec),
               );
             }
           }
@@ -294,7 +316,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
                 ),
                 references: { name: rel.remoteResource?.codec?.name || 'unknown' },
               });
@@ -311,7 +333,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
                 ),
                 referencedBy: { name: rel.remoteResource?.codec?.name || 'unknown' },
               };
