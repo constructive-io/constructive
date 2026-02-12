@@ -1457,6 +1457,10 @@ type MetaTable {
   fields: [MetaField!]!
   indexes: [MetaIndex!]!
   constraints: MetaConstraints!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  uniqueConstraints: [MetaUniqueConstraint!]!
+  relations: MetaRelations!
   inflection: MetaInflection!
   query: MetaQuery!
 }
@@ -1474,6 +1478,8 @@ type MetaType {
   pgType: String!
   gqlType: String!
   isArray: Boolean!
+  isNotNull: Boolean
+  hasDefault: Boolean
 }
 
 """Information about a database index"""
@@ -1482,6 +1488,7 @@ type MetaIndex {
   isUnique: Boolean!
   isPrimary: Boolean!
   columns: [String!]!
+  fields: [MetaField!]
 }
 
 """Table constraints"""
@@ -1509,6 +1516,54 @@ type MetaForeignKeyConstraint {
   fields: [MetaField!]!
   referencedTable: String!
   referencedFields: [String!]!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  references: MetaRefTable!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  type: String
+  junctionTable: MetaRefTable!
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
 }
 
 """Table inflection names"""
