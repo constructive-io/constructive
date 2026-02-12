@@ -145,14 +145,39 @@ interface QueryMeta {
   delete: string | null;
 }
 
+/**
+ * Resolve a PG codec to its GraphQL type name using PostGraphile's build object.
+ *
+ * Uses build.getGraphQLTypeNameByPgCodec() which respects all plugin-registered
+ * type mappings, including custom scalars (e.g. ConstructiveInternalTypeEmail).
+ * For array codecs, resolves the element type.
+ * Falls back to the raw codec name if the type isn't registered.
+ */
+function resolveGqlTypeName(build: any, codec: any): string {
+  if (!codec) return 'unknown';
+  try {
+    // For array codecs, resolve the underlying element type
+    const elementCodec = codec.arrayOfCodec || codec;
+    if (build.hasGraphQLTypeForPgCodec?.(elementCodec, 'output')) {
+      const typeName = build.getGraphQLTypeNameByPgCodec(elementCodec, 'output');
+      if (typeName) return typeName;
+    }
+  } catch {
+    // Fall through to raw codec name
+  }
+  // Fallback: raw PG codec name
+  return codec.arrayOfCodec?.name || codec.name || 'unknown';
+}
+
 /** Build a FieldMeta from an attribute name and attribute object */
-function buildFieldMeta(name: string, attr: any): FieldMeta {
+function buildFieldMeta(name: string, attr: any, build?: any): FieldMeta {
+  const attrCodec = attr?.codec;
   return {
     name,
     type: {
-      pgType: attr?.codec?.name || 'unknown',
-      gqlType: attr?.codec?.name || 'unknown',
-      isArray: !!attr?.codec?.arrayOfCodec,
+      pgType: attrCodec?.name || 'unknown',
+      gqlType: build ? resolveGqlTypeName(build, attrCodec) : (attrCodec?.name || 'unknown'),
+      isArray: !!attrCodec?.arrayOfCodec,
       isNotNull: attr?.notNull || false,
       hasDefault: attr?.hasDefault || false,
     },
@@ -166,17 +191,18 @@ function buildFkConstraintMeta(
   relationName: string,
   rel: any,
   localAttributes: Record<string, any>,
+  build?: any,
 ): ForeignKeyConstraintMeta {
   const remoteAttrs = rel.remoteResource?.codec?.attributes || {};
   return {
     name: relationName,
     fields: (rel.localAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, localAttributes[attrName]),
+      buildFieldMeta(attrName, localAttributes[attrName], build),
     ),
     referencedTable: rel.remoteResource?.codec?.name || 'unknown',
     referencedFields: rel.remoteAttributes || [],
     refFields: (rel.remoteAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, remoteAttrs[attrName]),
+      buildFieldMeta(attrName, remoteAttrs[attrName], build),
     ),
     refTable: { name: rel.remoteResource?.codec?.name || 'unknown' },
   };
@@ -196,7 +222,11 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
-      init(_, build) {
+      init: {
+        // Run after PgCodecsPlugin so build.getGraphQLTypeNameByPgCodec is populated
+        after: ['PgCodecs'],
+        provides: ['MetaSchema'],
+        callback(_, build) {
         const { pgRegistry } = build.input;
         const inflection = build.inflection;
         // Get schemas from build options - cast to any since the type doesn't include pgSchemas
@@ -225,7 +255,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
           // Build fields metadata
           const fields: FieldMeta[] = Object.entries(attributes).map(
-            ([name, attr]: [string, any]) => buildFieldMeta(name, attr),
+            ([name, attr]: [string, any]) => buildFieldMeta(name, attr, build),
           );
 
           // Build indexes metadata (from uniques)
@@ -235,7 +265,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             isPrimary: unique.isPrimary || false,
             columns: unique.attributes,
             fields: unique.attributes.map((attrName: string) =>
-              buildFieldMeta(attrName, attributes[attrName]),
+              buildFieldMeta(attrName, attributes[attrName], build),
             ),
           }));
 
@@ -245,7 +275,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             ? {
                 name: primaryUnique.tags?.name || `${codec.name}_pkey`,
                 fields: primaryUnique.attributes.map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], build),
                 ),
               }
             : null;
@@ -255,7 +285,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             .map((u: any) => ({
               name: u.tags?.name || `${codec.name}_${u.attributes.join('_')}_key`,
               fields: u.attributes.map((attrName: string) =>
-                buildFieldMeta(attrName, attributes[attrName]),
+                buildFieldMeta(attrName, attributes[attrName], build),
               ),
             }));
 
@@ -264,7 +294,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             const rel = relation as any;
             if (rel.isReferencee === false) {
               foreignKeyConstraints.push(
-                buildFkConstraintMeta(relationName, rel, attributes),
+                buildFkConstraintMeta(relationName, rel, attributes, build),
               );
             }
           }
@@ -294,7 +324,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], build),
                 ),
                 references: { name: rel.remoteResource?.codec?.name || 'unknown' },
               });
@@ -311,7 +341,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName]),
+                  buildFieldMeta(attrName, attributes[attrName], build),
                 ),
                 referencedBy: { name: rel.remoteResource?.codec?.name || 'unknown' },
               };
@@ -387,6 +417,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
         _cachedTablesMeta = tablesMeta;
 
         return _;
+        },
       },
 
       GraphQLObjectType_fields(fields, build, context) {
