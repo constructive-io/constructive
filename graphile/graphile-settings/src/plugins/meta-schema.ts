@@ -29,6 +29,10 @@ interface TableMeta {
   fields: FieldMeta[];
   indexes: IndexMeta[];
   constraints: ConstraintsMeta;
+  foreignKeyConstraints: ForeignKeyConstraintMeta[];
+  primaryKeyConstraints: PrimaryKeyConstraintMeta[];
+  uniqueConstraints: UniqueConstraintMeta[];
+  relations: RelationsMeta;
   inflection: InflectionMeta;
   query: QueryMeta;
 }
@@ -44,6 +48,8 @@ interface TypeMeta {
   pgType: string;
   gqlType: string;
   isArray: boolean;
+  isNotNull?: boolean;
+  hasDefault?: boolean;
 }
 
 interface IndexMeta {
@@ -51,6 +57,7 @@ interface IndexMeta {
   isUnique: boolean;
   isPrimary: boolean;
   columns: string[];
+  fields: FieldMeta[];
 }
 
 interface ConstraintsMeta {
@@ -74,6 +81,45 @@ interface ForeignKeyConstraintMeta {
   fields: FieldMeta[];
   referencedTable: string;
   referencedFields: string[];
+  refFields: FieldMeta[];
+  refTable: { name: string };
+}
+
+interface RelationsMeta {
+  belongsTo: BelongsToRelation[];
+  has: HasRelation[];
+  hasOne: HasRelation[];
+  hasMany: HasRelation[];
+  manyToMany: ManyToManyRelation[];
+}
+
+interface BelongsToRelation {
+  fieldName: string | null;
+  isUnique: boolean;
+  type: string | null;
+  keys: FieldMeta[];
+  references: { name: string };
+}
+
+interface HasRelation {
+  fieldName: string | null;
+  isUnique: boolean;
+  type: string | null;
+  keys: FieldMeta[];
+  referencedBy: { name: string };
+}
+
+interface ManyToManyRelation {
+  fieldName: string | null;
+  type: string | null;
+  junctionTable: { name: string };
+  junctionLeftConstraint: ForeignKeyConstraintMeta;
+  junctionLeftKeyAttributes: FieldMeta[];
+  junctionRightConstraint: ForeignKeyConstraintMeta;
+  junctionRightKeyAttributes: FieldMeta[];
+  leftKeyAttributes: FieldMeta[];
+  rightKeyAttributes: FieldMeta[];
+  rightTable: { name: string };
 }
 
 interface InflectionMeta {
@@ -97,6 +143,43 @@ interface QueryMeta {
   create: string | null;
   update: string | null;
   delete: string | null;
+}
+
+/** Build a FieldMeta from an attribute name and attribute object */
+function buildFieldMeta(name: string, attr: any): FieldMeta {
+  return {
+    name,
+    type: {
+      pgType: attr?.codec?.name || 'unknown',
+      gqlType: attr?.codec?.name || 'unknown',
+      isArray: !!attr?.codec?.arrayOfCodec,
+      isNotNull: attr?.notNull || false,
+      hasDefault: attr?.hasDefault || false,
+    },
+    isNotNull: attr?.notNull || false,
+    hasDefault: attr?.hasDefault || false,
+  };
+}
+
+/** Build an FK constraint meta from a relation and local attributes */
+function buildFkConstraintMeta(
+  relationName: string,
+  rel: any,
+  localAttributes: Record<string, any>,
+): ForeignKeyConstraintMeta {
+  const remoteAttrs = rel.remoteResource?.codec?.attributes || {};
+  return {
+    name: relationName,
+    fields: (rel.localAttributes || []).map((attrName: string) =>
+      buildFieldMeta(attrName, localAttributes[attrName]),
+    ),
+    referencedTable: rel.remoteResource?.codec?.name || 'unknown',
+    referencedFields: rel.remoteAttributes || [],
+    refFields: (rel.remoteAttributes || []).map((attrName: string) =>
+      buildFieldMeta(attrName, remoteAttrs[attrName]),
+    ),
+    refTable: { name: rel.remoteResource?.codec?.name || 'unknown' },
+  };
 }
 
 // Module-level storage for table metadata (used to pass data between hooks)
@@ -141,16 +224,9 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           const relations = resource.relations || {};
 
           // Build fields metadata
-          const fields: FieldMeta[] = Object.entries(attributes).map(([name, attr]: [string, any]) => ({
-            name,
-            type: {
-              pgType: attr.codec?.name || 'unknown',
-              gqlType: attr.codec?.name || 'unknown',
-              isArray: !!attr.codec?.arrayOfCodec,
-            },
-            isNotNull: attr.notNull || false,
-            hasDefault: attr.hasDefault || false,
-          }));
+          const fields: FieldMeta[] = Object.entries(attributes).map(
+            ([name, attr]: [string, any]) => buildFieldMeta(name, attr),
+          );
 
           // Build indexes metadata (from uniques)
           const indexes: IndexMeta[] = uniques.map((unique: any) => ({
@@ -158,68 +234,38 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             isUnique: true,
             isPrimary: unique.isPrimary || false,
             columns: unique.attributes,
+            fields: unique.attributes.map((attrName: string) =>
+              buildFieldMeta(attrName, attributes[attrName]),
+            ),
           }));
 
           // Build constraints metadata
           const primaryUnique = uniques.find((u: any) => u.isPrimary);
-          const primaryKey: PrimaryKeyConstraintMeta | null = primaryUnique ? {
-            name: primaryUnique.tags?.name || `${codec.name}_pkey`,
-            fields: primaryUnique.attributes.map((attrName: string) => {
-              const attr = attributes[attrName];
-              return {
-                name: attrName,
-                type: {
-                  pgType: attr?.codec?.name || 'unknown',
-                  gqlType: attr?.codec?.name || 'unknown',
-                  isArray: !!attr?.codec?.arrayOfCodec,
-                },
-                isNotNull: attr?.notNull || false,
-                hasDefault: attr?.hasDefault || false,
-              };
-            }),
-          } : null;
+          const primaryKey: PrimaryKeyConstraintMeta | null = primaryUnique
+            ? {
+                name: primaryUnique.tags?.name || `${codec.name}_pkey`,
+                fields: primaryUnique.attributes.map((attrName: string) =>
+                  buildFieldMeta(attrName, attributes[attrName]),
+                ),
+              }
+            : null;
 
           const uniqueConstraints: UniqueConstraintMeta[] = uniques
             .filter((u: any) => !u.isPrimary)
             .map((u: any) => ({
               name: u.tags?.name || `${codec.name}_${u.attributes.join('_')}_key`,
-              fields: u.attributes.map((attrName: string) => {
-                const attr = attributes[attrName];
-                return {
-                  name: attrName,
-                  type: {
-                    pgType: attr?.codec?.name || 'unknown',
-                    gqlType: attr?.codec?.name || 'unknown',
-                    isArray: !!attr?.codec?.arrayOfCodec,
-                  },
-                  isNotNull: attr?.notNull || false,
-                  hasDefault: attr?.hasDefault || false,
-                };
-              }),
+              fields: u.attributes.map((attrName: string) =>
+                buildFieldMeta(attrName, attributes[attrName]),
+              ),
             }));
 
           const foreignKeyConstraints: ForeignKeyConstraintMeta[] = [];
           for (const [relationName, relation] of Object.entries(relations)) {
             const rel = relation as any;
             if (rel.isReferencee === false) {
-              foreignKeyConstraints.push({
-                name: relationName,
-                fields: (rel.localAttributes || []).map((attrName: string) => {
-                  const attr = attributes[attrName];
-                  return {
-                    name: attrName,
-                    type: {
-                      pgType: attr?.codec?.name || 'unknown',
-                      gqlType: attr?.codec?.name || 'unknown',
-                      isArray: !!attr?.codec?.arrayOfCodec,
-                    },
-                    isNotNull: attr?.notNull || false,
-                    hasDefault: attr?.hasDefault || false,
-                  };
-                }),
-                referencedTable: rel.remoteResource?.codec?.name || 'unknown',
-                referencedFields: rel.remoteAttributes || [],
-              });
+              foreignKeyConstraints.push(
+                buildFkConstraintMeta(relationName, rel, attributes),
+              );
             }
           }
 
@@ -227,6 +273,62 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             primaryKey,
             unique: uniqueConstraints,
             foreignKey: foreignKeyConstraints,
+          };
+
+          // Build relations metadata
+          const belongsTo: BelongsToRelation[] = [];
+          const hasOne: HasRelation[] = [];
+          const hasMany: HasRelation[] = [];
+
+          for (const [relationName, relation] of Object.entries(relations)) {
+            const rel = relation as any;
+            if (rel.isReferencee === false) {
+              // Forward FK = belongsTo
+              const isUnique = uniques.some(
+                (u: any) =>
+                  u.attributes.length === (rel.localAttributes || []).length &&
+                  u.attributes.every((a: string) => (rel.localAttributes || []).includes(a)),
+              );
+              belongsTo.push({
+                fieldName: relationName,
+                isUnique,
+                type: rel.remoteResource?.codec?.name || null,
+                keys: (rel.localAttributes || []).map((attrName: string) =>
+                  buildFieldMeta(attrName, attributes[attrName]),
+                ),
+                references: { name: rel.remoteResource?.codec?.name || 'unknown' },
+              });
+            } else if (rel.isReferencee === true) {
+              // Reverse FK
+              const remoteUniques = rel.remoteResource?.uniques || [];
+              const isUnique = remoteUniques.some(
+                (u: any) =>
+                  u.attributes.length === (rel.remoteAttributes || []).length &&
+                  u.attributes.every((a: string) => (rel.remoteAttributes || []).includes(a)),
+              );
+              const hasRelation: HasRelation = {
+                fieldName: relationName,
+                isUnique,
+                type: rel.remoteResource?.codec?.name || null,
+                keys: (rel.localAttributes || []).map((attrName: string) =>
+                  buildFieldMeta(attrName, attributes[attrName]),
+                ),
+                referencedBy: { name: rel.remoteResource?.codec?.name || 'unknown' },
+              };
+              if (isUnique) {
+                hasOne.push(hasRelation);
+              } else {
+                hasMany.push(hasRelation);
+              }
+            }
+          }
+
+          const relationsMeta: RelationsMeta = {
+            belongsTo,
+            has: [...hasOne, ...hasMany],
+            hasOne,
+            hasMany,
+            manyToMany: [], // TODO: detect from PostGraphile manyToManyRelations if available
           };
 
           // Build inflection metadata
@@ -272,6 +374,10 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             fields,
             indexes,
             constraints,
+            foreignKeyConstraints,
+            primaryKeyConstraints: primaryKey ? [primaryKey] : [],
+            uniqueConstraints,
+            relations: relationsMeta,
             inflection: inflectionMeta,
             query: queryMeta,
           });
@@ -301,6 +407,8 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             pgType: { type: new GraphQLNonNull(GraphQLString) },
             gqlType: { type: new GraphQLNonNull(GraphQLString) },
             isArray: { type: new GraphQLNonNull(GraphQLBoolean) },
+            isNotNull: { type: GraphQLBoolean },
+            hasDefault: { type: GraphQLBoolean },
           }),
         });
 
@@ -323,6 +431,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             isUnique: { type: new GraphQLNonNull(GraphQLBoolean) },
             isPrimary: { type: new GraphQLNonNull(GraphQLBoolean) },
             columns: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))) },
+            fields: { type: new GraphQLList(new GraphQLNonNull(MetaFieldType)) },
           }),
         });
 
@@ -344,7 +453,15 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           }),
         });
 
-        const MetaForeignKeyConstraintType = new GraphQLObjectType({
+        const MetaRefTableType = new GraphQLObjectType({
+          name: 'MetaRefTable',
+          description: 'Reference to a related table',
+          fields: () => ({
+            name: { type: new GraphQLNonNull(GraphQLString) },
+          }),
+        });
+
+        const MetaForeignKeyConstraintType: GraphQLObjectType = new GraphQLObjectType({
           name: 'MetaForeignKeyConstraint',
           description: 'Information about a foreign key constraint',
           fields: () => ({
@@ -352,6 +469,8 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             fields: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
             referencedTable: { type: new GraphQLNonNull(GraphQLString) },
             referencedFields: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))) },
+            refFields: { type: new GraphQLList(new GraphQLNonNull(MetaFieldType)) },
+            refTable: { type: MetaRefTableType },
           }),
         });
 
@@ -396,6 +515,60 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           }),
         });
 
+        // Relation types
+        const MetaBelongsToRelationType = new GraphQLObjectType({
+          name: 'MetaBelongsToRelation',
+          description: 'A belongs-to (forward FK) relation',
+          fields: () => ({
+            fieldName: { type: GraphQLString },
+            isUnique: { type: new GraphQLNonNull(GraphQLBoolean) },
+            type: { type: GraphQLString },
+            keys: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            references: { type: new GraphQLNonNull(MetaRefTableType) },
+          }),
+        });
+
+        const MetaHasRelationType = new GraphQLObjectType({
+          name: 'MetaHasRelation',
+          description: 'A has-one or has-many (reverse FK) relation',
+          fields: () => ({
+            fieldName: { type: GraphQLString },
+            isUnique: { type: new GraphQLNonNull(GraphQLBoolean) },
+            type: { type: GraphQLString },
+            keys: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            referencedBy: { type: new GraphQLNonNull(MetaRefTableType) },
+          }),
+        });
+
+        const MetaManyToManyRelationType = new GraphQLObjectType({
+          name: 'MetaManyToManyRelation',
+          description: 'A many-to-many relation via junction table',
+          fields: () => ({
+            fieldName: { type: GraphQLString },
+            type: { type: GraphQLString },
+            junctionTable: { type: new GraphQLNonNull(MetaRefTableType) },
+            junctionLeftConstraint: { type: new GraphQLNonNull(MetaForeignKeyConstraintType) },
+            junctionLeftKeyAttributes: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            junctionRightConstraint: { type: new GraphQLNonNull(MetaForeignKeyConstraintType) },
+            junctionRightKeyAttributes: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            leftKeyAttributes: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            rightKeyAttributes: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
+            rightTable: { type: new GraphQLNonNull(MetaRefTableType) },
+          }),
+        });
+
+        const MetaRelationsType = new GraphQLObjectType({
+          name: 'MetaRelations',
+          description: 'Table relations',
+          fields: () => ({
+            belongsTo: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaBelongsToRelationType))) },
+            has: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaHasRelationType))) },
+            hasOne: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaHasRelationType))) },
+            hasMany: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaHasRelationType))) },
+            manyToMany: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaManyToManyRelationType))) },
+          }),
+        });
+
         const MetaTableType = new GraphQLObjectType({
           name: 'MetaTable',
           description: 'Information about a database table',
@@ -405,6 +578,10 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             fields: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaFieldType))) },
             indexes: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaIndexType))) },
             constraints: { type: new GraphQLNonNull(MetaConstraintsType) },
+            foreignKeyConstraints: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaForeignKeyConstraintType))) },
+            primaryKeyConstraints: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaPrimaryKeyConstraintType))) },
+            uniqueConstraints: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MetaUniqueConstraintType))) },
+            relations: { type: new GraphQLNonNull(MetaRelationsType) },
             inflection: { type: new GraphQLNonNull(MetaInflectionType) },
             query: { type: new GraphQLNonNull(MetaQueryType) },
           }),
