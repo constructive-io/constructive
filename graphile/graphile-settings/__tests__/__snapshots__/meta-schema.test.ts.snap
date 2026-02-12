@@ -1,0 +1,2090 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`MetaSchemaPlugin _meta query contract contains required selection paths 1`] = `
+[
+  "constraints",
+  "constraints.foreignKey",
+  "constraints.foreignKey.fields",
+  "constraints.foreignKey.fields.name",
+  "constraints.foreignKey.name",
+  "constraints.foreignKey.refFields",
+  "constraints.foreignKey.refFields.name",
+  "constraints.foreignKey.referencedFields",
+  "constraints.foreignKey.referencedTable",
+  "constraints.primaryKey",
+  "constraints.primaryKey.name",
+  "constraints.unique",
+  "constraints.unique.name",
+  "fields",
+  "fields.name",
+  "fields.type",
+  "fields.type.gqlType",
+  "fields.type.isArray",
+  "fields.type.pgType",
+  "foreignKeyConstraints",
+  "foreignKeyConstraints.fields",
+  "foreignKeyConstraints.fields.name",
+  "foreignKeyConstraints.name",
+  "foreignKeyConstraints.refFields",
+  "foreignKeyConstraints.refFields.name",
+  "foreignKeyConstraints.referencedFields",
+  "foreignKeyConstraints.referencedTable",
+  "indexes",
+  "indexes.columns",
+  "indexes.fields",
+  "indexes.fields.name",
+  "indexes.isPrimary",
+  "indexes.isUnique",
+  "indexes.name",
+  "name",
+  "primaryKeyConstraints",
+  "primaryKeyConstraints.name",
+  "query",
+  "query.all",
+  "query.create",
+  "query.delete",
+  "query.one",
+  "query.update",
+  "relations",
+  "relations.belongsTo",
+  "relations.belongsTo.fieldName",
+  "relations.belongsTo.keys",
+  "relations.belongsTo.keys.name",
+  "relations.has",
+  "relations.has.fieldName",
+  "relations.has.keys",
+  "relations.has.keys.name",
+  "relations.hasMany",
+  "relations.hasMany.fieldName",
+  "relations.hasMany.keys",
+  "relations.hasMany.keys.name",
+  "relations.hasOne",
+  "relations.hasOne.fieldName",
+  "relations.hasOne.keys",
+  "relations.hasOne.keys.name",
+  "relations.manyToMany",
+  "relations.manyToMany.fieldName",
+  "relations.manyToMany.junctionLeftConstraint",
+  "relations.manyToMany.junctionLeftConstraint.fields",
+  "relations.manyToMany.junctionLeftConstraint.fields.name",
+  "relations.manyToMany.junctionLeftConstraint.name",
+  "relations.manyToMany.junctionLeftConstraint.refFields",
+  "relations.manyToMany.junctionLeftConstraint.refFields.name",
+  "relations.manyToMany.junctionLeftConstraint.referencedFields",
+  "relations.manyToMany.junctionLeftConstraint.referencedTable",
+  "relations.manyToMany.junctionLeftKeyAttributes",
+  "relations.manyToMany.junctionLeftKeyAttributes.name",
+  "relations.manyToMany.junctionRightConstraint",
+  "relations.manyToMany.junctionRightConstraint.fields",
+  "relations.manyToMany.junctionRightConstraint.fields.name",
+  "relations.manyToMany.junctionRightConstraint.name",
+  "relations.manyToMany.junctionRightConstraint.refFields",
+  "relations.manyToMany.junctionRightConstraint.refFields.name",
+  "relations.manyToMany.junctionRightConstraint.referencedFields",
+  "relations.manyToMany.junctionRightConstraint.referencedTable",
+  "relations.manyToMany.junctionRightKeyAttributes",
+  "relations.manyToMany.junctionRightKeyAttributes.name",
+  "relations.manyToMany.junctionTable",
+  "relations.manyToMany.junctionTable.name",
+  "relations.manyToMany.leftKeyAttributes",
+  "relations.manyToMany.leftKeyAttributes.name",
+  "relations.manyToMany.rightKeyAttributes",
+  "relations.manyToMany.rightKeyAttributes.name",
+  "relations.manyToMany.rightTable",
+  "relations.manyToMany.rightTable.name",
+  "relations.manyToMany.type",
+  "schemaName",
+  "uniqueConstraints",
+  "uniqueConstraints.name",
+]
+`;
+
+exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1`] = `
+"query MetaContract {
+  _meta {
+    tables {
+      name
+      schemaName
+      query {
+        all
+        one
+        create
+        update
+        delete
+      }
+      fields {
+        name
+        type {
+          pgType
+          gqlType
+          isArray
+        }
+      }
+      indexes {
+        name
+        isUnique
+        isPrimary
+        columns
+        fields {
+          name
+        }
+      }
+      constraints {
+        primaryKey {
+          name
+        }
+        unique {
+          name
+        }
+        foreignKey {
+          name
+          referencedTable
+          referencedFields
+          fields {
+            name
+          }
+          refFields {
+            name
+          }
+        }
+      }
+      foreignKeyConstraints {
+        name
+        referencedTable
+        referencedFields
+        fields {
+          name
+        }
+        refFields {
+          name
+        }
+      }
+      primaryKeyConstraints {
+        name
+      }
+      uniqueConstraints {
+        name
+      }
+      relations {
+        belongsTo {
+          fieldName
+          keys {
+            name
+          }
+        }
+        has {
+          fieldName
+          keys {
+            name
+          }
+        }
+        hasOne {
+          fieldName
+          keys {
+            name
+          }
+        }
+        hasMany {
+          fieldName
+          keys {
+            name
+          }
+        }
+        manyToMany {
+          fieldName
+          type
+          junctionTable {
+            name
+          }
+          junctionLeftConstraint {
+            name
+            referencedTable
+            referencedFields
+            fields {
+              name
+            }
+            refFields {
+              name
+            }
+          }
+          junctionLeftKeyAttributes {
+            name
+          }
+          junctionRightConstraint {
+            name
+            referencedTable
+            referencedFields
+            fields {
+              name
+            }
+            refFields {
+              name
+            }
+          }
+          junctionRightKeyAttributes {
+            name
+          }
+          leftKeyAttributes {
+            name
+          }
+          rightKeyAttributes {
+            name
+          }
+          rightTable {
+            name
+          }
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a multi-table scenario 1`] = `
+[
+  {
+    "constraints": {
+      "foreignKey": [
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "authorId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "name": "comment_author_fkey",
+          "refFields": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "refTable": {
+            "name": "user",
+          },
+          "referencedFields": [
+            "id",
+          ],
+          "referencedTable": "user",
+        },
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "name": "comment_post_fkey",
+          "refFields": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "refTable": {
+            "name": "post",
+          },
+          "referencedFields": [
+            "id",
+          ],
+          "referencedTable": "post",
+        },
+      ],
+      "primaryKey": {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "comments_pkey",
+      },
+      "unique": [],
+    },
+    "fields": [
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "authorId",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "body",
+        "type": {
+          "gqlType": "String",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "text",
+        },
+      },
+      {
+        "hasDefault": true,
+        "isNotNull": true,
+        "name": "id",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": true,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "postId",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+    ],
+    "foreignKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "authorId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "comment_author_fkey",
+        "refFields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "refTable": {
+          "name": "user",
+        },
+        "referencedFields": [
+          "id",
+        ],
+        "referencedTable": "user",
+      },
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "postId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "comment_post_fkey",
+        "refFields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "refTable": {
+          "name": "post",
+        },
+        "referencedFields": [
+          "id",
+        ],
+        "referencedTable": "post",
+      },
+    ],
+    "indexes": [
+      {
+        "columns": [
+          "id",
+        ],
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "isPrimary": true,
+        "isUnique": true,
+        "name": "comments_pkey",
+      },
+    ],
+    "inflection": {
+      "allRows": "comments",
+      "conditionType": "CommentCondition",
+      "connection": "CommentConnection",
+      "createInputType": "CreatecommentInput",
+      "createPayloadType": "CreatecommentPayload",
+      "deletePayloadType": "DeletecommentPayload",
+      "edge": "CommentEdge",
+      "filterType": "CommentFilter",
+      "orderByType": "CommentOrderBy",
+      "patchType": "CommentPatch",
+      "tableType": "Comment",
+      "updatePayloadType": "UpdatecommentPayload",
+    },
+    "name": "Comment",
+    "primaryKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "comments_pkey",
+      },
+    ],
+    "query": {
+      "all": "comments",
+      "create": "createcomment",
+      "delete": "deletecomment",
+      "one": "comment",
+      "update": "updatecomment",
+    },
+    "relations": {
+      "belongsTo": [
+        {
+          "fieldName": "comment_author_fkey",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "authorId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "references": {
+            "name": "user",
+          },
+          "type": "user",
+        },
+        {
+          "fieldName": "comment_post_fkey",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "references": {
+            "name": "post",
+          },
+          "type": "post",
+        },
+      ],
+      "has": [],
+      "hasMany": [],
+      "hasOne": [],
+      "manyToMany": [],
+    },
+    "schemaName": "app_public",
+    "uniqueConstraints": [],
+  },
+  {
+    "constraints": {
+      "foreignKey": [
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "authorId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "name": "post_author_fkey",
+          "refFields": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "refTable": {
+            "name": "user",
+          },
+          "referencedFields": [
+            "id",
+          ],
+          "referencedTable": "user",
+        },
+      ],
+      "primaryKey": {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "posts_pkey",
+      },
+      "unique": [],
+    },
+    "fields": [
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "authorId",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": true,
+        "isNotNull": true,
+        "name": "id",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": true,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": false,
+        "name": "metadata",
+        "type": {
+          "gqlType": "JSON",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": false,
+          "pgType": "jsonb",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "title",
+        "type": {
+          "gqlType": "String",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "text",
+        },
+      },
+    ],
+    "foreignKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "authorId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "post_author_fkey",
+        "refFields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "refTable": {
+          "name": "user",
+        },
+        "referencedFields": [
+          "id",
+        ],
+        "referencedTable": "user",
+      },
+    ],
+    "indexes": [
+      {
+        "columns": [
+          "id",
+        ],
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "isPrimary": true,
+        "isUnique": true,
+        "name": "posts_pkey",
+      },
+    ],
+    "inflection": {
+      "allRows": "posts",
+      "conditionType": "PostCondition",
+      "connection": "PostConnection",
+      "createInputType": "CreatepostInput",
+      "createPayloadType": "CreatepostPayload",
+      "deletePayloadType": "DeletepostPayload",
+      "edge": "PostEdge",
+      "filterType": "PostFilter",
+      "orderByType": "PostOrderBy",
+      "patchType": "PostPatch",
+      "tableType": "Post",
+      "updatePayloadType": "UpdatepostPayload",
+    },
+    "name": "Post",
+    "primaryKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "posts_pkey",
+      },
+    ],
+    "query": {
+      "all": "posts",
+      "create": "createpost",
+      "delete": "deletepost",
+      "one": "post",
+      "update": "updatepost",
+    },
+    "relations": {
+      "belongsTo": [
+        {
+          "fieldName": "post_author_fkey",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "authorId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "references": {
+            "name": "user",
+          },
+          "type": "user",
+        },
+      ],
+      "has": [
+        {
+          "fieldName": "post_comments",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "comment",
+          },
+          "type": "comment",
+        },
+        {
+          "fieldName": "post_post_tags",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post_tag",
+          },
+          "type": "post_tag",
+        },
+      ],
+      "hasMany": [
+        {
+          "fieldName": "post_comments",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "comment",
+          },
+          "type": "comment",
+        },
+        {
+          "fieldName": "post_post_tags",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post_tag",
+          },
+          "type": "post_tag",
+        },
+      ],
+      "hasOne": [],
+      "manyToMany": [
+        {
+          "fieldName": "tags",
+          "junctionLeftConstraint": {
+            "fields": [
+              {
+                "hasDefault": false,
+                "isNotNull": true,
+                "name": "postId",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": false,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "name": "post_post_tags",
+            "refFields": [
+              {
+                "hasDefault": true,
+                "isNotNull": true,
+                "name": "id",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": true,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "refTable": {
+              "name": "post",
+            },
+            "referencedFields": [
+              "id",
+            ],
+            "referencedTable": "post",
+          },
+          "junctionLeftKeyAttributes": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "junctionRightConstraint": {
+            "fields": [
+              {
+                "hasDefault": false,
+                "isNotNull": true,
+                "name": "tagId",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": false,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "name": "post_tag_tag_fkey",
+            "refFields": [
+              {
+                "hasDefault": true,
+                "isNotNull": true,
+                "name": "id",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": true,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "refTable": {
+              "name": "tag",
+            },
+            "referencedFields": [
+              "id",
+            ],
+            "referencedTable": "tag",
+          },
+          "junctionRightKeyAttributes": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "tagId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "junctionTable": {
+            "name": "post_tag",
+          },
+          "leftKeyAttributes": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "rightKeyAttributes": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "rightTable": {
+            "name": "tag",
+          },
+          "type": "tag",
+        },
+      ],
+    },
+    "schemaName": "app_public",
+    "uniqueConstraints": [],
+  },
+  {
+    "constraints": {
+      "foreignKey": [
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "name": "post_tag_post_fkey",
+          "refFields": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "refTable": {
+            "name": "post",
+          },
+          "referencedFields": [
+            "id",
+          ],
+          "referencedTable": "post",
+        },
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "tagId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "name": "post_tag_tag_fkey",
+          "refFields": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "refTable": {
+            "name": "tag",
+          },
+          "referencedFields": [
+            "id",
+          ],
+          "referencedTable": "tag",
+        },
+      ],
+      "primaryKey": {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "postId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "tagId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "post_tags_pkey",
+      },
+      "unique": [],
+    },
+    "fields": [
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "postId",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "tagId",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+    ],
+    "foreignKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "postId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "post_tag_post_fkey",
+        "refFields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "refTable": {
+          "name": "post",
+        },
+        "referencedFields": [
+          "id",
+        ],
+        "referencedTable": "post",
+      },
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "tagId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "post_tag_tag_fkey",
+        "refFields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "refTable": {
+          "name": "tag",
+        },
+        "referencedFields": [
+          "id",
+        ],
+        "referencedTable": "tag",
+      },
+    ],
+    "indexes": [
+      {
+        "columns": [
+          "postId",
+          "tagId",
+        ],
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "postId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "tagId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "isPrimary": true,
+        "isUnique": true,
+        "name": "post_tags_pkey",
+      },
+    ],
+    "inflection": {
+      "allRows": "post_tags",
+      "conditionType": "PostTagCondition",
+      "connection": "PostTagConnection",
+      "createInputType": "Createpost_tagInput",
+      "createPayloadType": "Createpost_tagPayload",
+      "deletePayloadType": "Deletepost_tagPayload",
+      "edge": "PostTagEdge",
+      "filterType": "PostTagFilter",
+      "orderByType": "PostTagOrderBy",
+      "patchType": "PostTagPatch",
+      "tableType": "PostTag",
+      "updatePayloadType": "Updatepost_tagPayload",
+    },
+    "name": "PostTag",
+    "primaryKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "postId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "tagId",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "post_tags_pkey",
+      },
+    ],
+    "query": {
+      "all": "post_tags",
+      "create": "createpost_tag",
+      "delete": "deletepost_tag",
+      "one": "post_tag",
+      "update": "updatepost_tag",
+    },
+    "relations": {
+      "belongsTo": [
+        {
+          "fieldName": "post_tag_post_fkey",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "references": {
+            "name": "post",
+          },
+          "type": "post",
+        },
+        {
+          "fieldName": "post_tag_tag_fkey",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "tagId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "references": {
+            "name": "tag",
+          },
+          "type": "tag",
+        },
+      ],
+      "has": [],
+      "hasMany": [],
+      "hasOne": [],
+      "manyToMany": [],
+    },
+    "schemaName": "app_public",
+    "uniqueConstraints": [],
+  },
+  {
+    "constraints": {
+      "foreignKey": [],
+      "primaryKey": {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "tags_pkey",
+      },
+      "unique": [
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "slug",
+              "type": {
+                "gqlType": "String",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "text",
+              },
+            },
+          ],
+          "name": "tags_slug_key",
+        },
+      ],
+    },
+    "fields": [
+      {
+        "hasDefault": true,
+        "isNotNull": true,
+        "name": "id",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": true,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "slug",
+        "type": {
+          "gqlType": "String",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "text",
+        },
+      },
+    ],
+    "foreignKeyConstraints": [],
+    "indexes": [
+      {
+        "columns": [
+          "id",
+        ],
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "isPrimary": true,
+        "isUnique": true,
+        "name": "tags_pkey",
+      },
+      {
+        "columns": [
+          "slug",
+        ],
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "slug",
+            "type": {
+              "gqlType": "String",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "text",
+            },
+          },
+        ],
+        "isPrimary": false,
+        "isUnique": true,
+        "name": "tags_slug_key",
+      },
+    ],
+    "inflection": {
+      "allRows": "tags",
+      "conditionType": "TagCondition",
+      "connection": "TagConnection",
+      "createInputType": "CreatetagInput",
+      "createPayloadType": "CreatetagPayload",
+      "deletePayloadType": "DeletetagPayload",
+      "edge": "TagEdge",
+      "filterType": "TagFilter",
+      "orderByType": "TagOrderBy",
+      "patchType": "TagPatch",
+      "tableType": "Tag",
+      "updatePayloadType": "UpdatetagPayload",
+    },
+    "name": "Tag",
+    "primaryKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "tags_pkey",
+      },
+    ],
+    "query": {
+      "all": "tags",
+      "create": "createtag",
+      "delete": "deletetag",
+      "one": "tag",
+      "update": "updatetag",
+    },
+    "relations": {
+      "belongsTo": [],
+      "has": [
+        {
+          "fieldName": "tag_post_tags",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post_tag",
+          },
+          "type": "post_tag",
+        },
+      ],
+      "hasMany": [
+        {
+          "fieldName": "tag_post_tags",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post_tag",
+          },
+          "type": "post_tag",
+        },
+      ],
+      "hasOne": [],
+      "manyToMany": [
+        {
+          "fieldName": "posts",
+          "junctionLeftConstraint": {
+            "fields": [
+              {
+                "hasDefault": false,
+                "isNotNull": true,
+                "name": "tagId",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": false,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "name": "tag_post_tags",
+            "refFields": [
+              {
+                "hasDefault": true,
+                "isNotNull": true,
+                "name": "id",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": true,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "refTable": {
+              "name": "tag",
+            },
+            "referencedFields": [
+              "id",
+            ],
+            "referencedTable": "tag",
+          },
+          "junctionLeftKeyAttributes": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "tagId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "junctionRightConstraint": {
+            "fields": [
+              {
+                "hasDefault": false,
+                "isNotNull": true,
+                "name": "postId",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": false,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "name": "post_tag_post_fkey",
+            "refFields": [
+              {
+                "hasDefault": true,
+                "isNotNull": true,
+                "name": "id",
+                "type": {
+                  "gqlType": "UUID",
+                  "hasDefault": true,
+                  "isArray": false,
+                  "isNotNull": true,
+                  "pgType": "uuid",
+                },
+              },
+            ],
+            "refTable": {
+              "name": "post",
+            },
+            "referencedFields": [
+              "id",
+            ],
+            "referencedTable": "post",
+          },
+          "junctionRightKeyAttributes": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "postId",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "junctionTable": {
+            "name": "post_tag",
+          },
+          "leftKeyAttributes": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "rightKeyAttributes": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "rightTable": {
+            "name": "post",
+          },
+          "type": "post",
+        },
+      ],
+    },
+    "schemaName": "app_public",
+    "uniqueConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "slug",
+            "type": {
+              "gqlType": "String",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "text",
+            },
+          },
+        ],
+        "name": "tags_slug_key",
+      },
+    ],
+  },
+  {
+    "constraints": {
+      "foreignKey": [],
+      "primaryKey": {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "users_pkey",
+      },
+      "unique": [
+        {
+          "fields": [
+            {
+              "hasDefault": false,
+              "isNotNull": true,
+              "name": "emailAddress",
+              "type": {
+                "gqlType": "ConstructiveInternalTypeEmail",
+                "hasDefault": false,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "email",
+              },
+            },
+          ],
+          "name": "users_email_key",
+        },
+      ],
+    },
+    "fields": [
+      {
+        "hasDefault": false,
+        "isNotNull": false,
+        "name": "displayName",
+        "type": {
+          "gqlType": "String",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": false,
+          "pgType": "text",
+        },
+      },
+      {
+        "hasDefault": false,
+        "isNotNull": true,
+        "name": "emailAddress",
+        "type": {
+          "gqlType": "ConstructiveInternalTypeEmail",
+          "hasDefault": false,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "email",
+        },
+      },
+      {
+        "hasDefault": true,
+        "isNotNull": true,
+        "name": "id",
+        "type": {
+          "gqlType": "UUID",
+          "hasDefault": true,
+          "isArray": false,
+          "isNotNull": true,
+          "pgType": "uuid",
+        },
+      },
+    ],
+    "foreignKeyConstraints": [],
+    "indexes": [
+      {
+        "columns": [
+          "emailAddress",
+        ],
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "emailAddress",
+            "type": {
+              "gqlType": "ConstructiveInternalTypeEmail",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "email",
+            },
+          },
+        ],
+        "isPrimary": false,
+        "isUnique": true,
+        "name": "users_email_key",
+      },
+      {
+        "columns": [
+          "id",
+        ],
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "isPrimary": true,
+        "isUnique": true,
+        "name": "users_pkey",
+      },
+    ],
+    "inflection": {
+      "allRows": "users",
+      "conditionType": "UserCondition",
+      "connection": "UserConnection",
+      "createInputType": "CreateuserInput",
+      "createPayloadType": "CreateuserPayload",
+      "deletePayloadType": "DeleteuserPayload",
+      "edge": "UserEdge",
+      "filterType": "UserFilter",
+      "orderByType": "UserOrderBy",
+      "patchType": "UserPatch",
+      "tableType": "User",
+      "updatePayloadType": "UpdateuserPayload",
+    },
+    "name": "User",
+    "primaryKeyConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": true,
+            "isNotNull": true,
+            "name": "id",
+            "type": {
+              "gqlType": "UUID",
+              "hasDefault": true,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "uuid",
+            },
+          },
+        ],
+        "name": "users_pkey",
+      },
+    ],
+    "query": {
+      "all": "users",
+      "create": "createuser",
+      "delete": "deleteuser",
+      "one": "user",
+      "update": "updateuser",
+    },
+    "relations": {
+      "belongsTo": [],
+      "has": [
+        {
+          "fieldName": "user_comments",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "comment",
+          },
+          "type": "comment",
+        },
+        {
+          "fieldName": "user_posts",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post",
+          },
+          "type": "post",
+        },
+      ],
+      "hasMany": [
+        {
+          "fieldName": "user_comments",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "comment",
+          },
+          "type": "comment",
+        },
+        {
+          "fieldName": "user_posts",
+          "isUnique": false,
+          "keys": [
+            {
+              "hasDefault": true,
+              "isNotNull": true,
+              "name": "id",
+              "type": {
+                "gqlType": "UUID",
+                "hasDefault": true,
+                "isArray": false,
+                "isNotNull": true,
+                "pgType": "uuid",
+              },
+            },
+          ],
+          "referencedBy": {
+            "name": "post",
+          },
+          "type": "post",
+        },
+      ],
+      "hasOne": [],
+      "manyToMany": [],
+    },
+    "schemaName": "app_public",
+    "uniqueConstraints": [
+      {
+        "fields": [
+          {
+            "hasDefault": false,
+            "isNotNull": true,
+            "name": "emailAddress",
+            "type": {
+              "gqlType": "ConstructiveInternalTypeEmail",
+              "hasDefault": false,
+              "isArray": false,
+              "isNotNull": true,
+              "pgType": "email",
+            },
+          },
+        ],
+        "name": "users_email_key",
+      },
+    ],
+  },
+]
+`;

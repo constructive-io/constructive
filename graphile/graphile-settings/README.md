@@ -112,6 +112,11 @@ query {
 
 Useful for code generation tools that need to understand the database structure.
 
+Testing strategy:
+- Metadata behavior is tested in-process with mocked PostGraphile build resources (no live DB required).
+- Snapshot coverage captures full multi-table metadata scenarios and query contract shape.
+- Run: `pnpm --filter graphile-settings exec jest --runInBand`
+
 ### Tsvector Codec (TsvectorCodecPreset)
 
 Adds support for PostgreSQL's `tsvector` and `tsquery` types used in full-text search. These types are represented as strings in GraphQL.
