@@ -119,7 +119,10 @@ export interface AuthResult {
  * ```
  */
 export async function setupTestServer(): Promise<TestContext> {
-  // Tell pgsql-test to reuse the existing constructive database
+  // Tell pgsql-test to reuse the existing constructive database.
+  // Save and restore the original value so it doesn't leak into
+  // other test suites running in the same process (--runInBand).
+  const origTestDb = process.env.TEST_DB;
   process.env.TEST_DB = process.env.TEST_DB || 'constructive';
 
   const result = await getConnections(
@@ -145,6 +148,13 @@ export async function setupTestServer(): Promise<TestContext> {
       // would DROP the live constructive database. jest forceExit handles
       // remaining pool cleanup.
       await result.server.stop();
+
+      // Restore TEST_DB so subsequent suites get fresh databases
+      if (origTestDb === undefined) {
+        delete process.env.TEST_DB;
+      } else {
+        process.env.TEST_DB = origTestDb;
+      }
     },
   };
 }
