@@ -226,10 +226,16 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
         // Collect all table metadata at build time
         const tablesMeta: TableMeta[] = [];
+        const seenCodecs = new Set();
 
         for (const resource of Object.values(pgRegistry.pgResources) as any[]) {
           // Skip resources without codec or attributes
           if (!resource.codec?.attributes || resource.codec?.isAnonymous) continue;
+          // Skip non-table resources (unique lookups, virtual, functions)
+          if (resource.parameters || resource.isVirtual || resource.isUnique) continue;
+          // Deduplicate: multiple resources can share the same codec
+          if (seenCodecs.has(resource.codec)) continue;
+          seenCodecs.add(resource.codec);
 
           // Safely access extensions - may be undefined for some resources
           const pgExtensions = resource.codec?.extensions?.pg as { schemaName?: string } | undefined;
