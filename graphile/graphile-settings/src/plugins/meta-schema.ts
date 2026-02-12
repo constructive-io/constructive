@@ -145,32 +145,60 @@ interface QueryMeta {
   delete: string | null;
 }
 
+/** Map PostgreSQL type names to their GraphQL equivalents */
+const PG_TO_GQL_TYPE: Record<string, string> = {
+  text: 'String', varchar: 'String', char: 'String', name: 'String', bpchar: 'String',
+  uuid: 'UUID',
+  int2: 'Int', int4: 'Int', integer: 'Int',
+  int8: 'BigInt', bigint: 'BigInt',
+  float4: 'Float', float8: 'Float', numeric: 'BigFloat',
+  bool: 'Boolean', boolean: 'Boolean',
+  timestamptz: 'Datetime', timestamp: 'Datetime',
+  date: 'Date', time: 'Time', timetz: 'Time',
+  json: 'JSON', jsonb: 'JSON',
+  interval: 'Interval',
+  point: 'Point', geometry: 'GeoJSON', geography: 'GeoJSON',
+  inet: 'InternetAddress', cidr: 'InternetAddress',
+  xml: 'String', bytea: 'String', macaddr: 'String',
+};
+
+function pgTypeToGqlType(pgTypeName: string): string {
+  return PG_TO_GQL_TYPE[pgTypeName] || pgTypeName;
+}
+
 /**
- * Inflect a PG attribute name to its GraphQL field name.
- *
- * Uses PostGraphile's inflection chain:
- * 1. _attributeName: applies @name smart tags, handles id→rowId (overridden to keep id)
- * 2. camelCase: converts snake_case to camelCase (display_name → displayName)
+ * Resolve a PG codec to a GraphQL type, preferring PostGraphile's runtime map
+ * and falling back to local PG->GQL mapping when unavailable.
  */
-function inflectAttr(inflection: any, codec: any, attrName: string): string {
+function resolveGqlTypeName(build: any, codec: any): string {
+  if (!codec) return 'unknown';
+
   try {
-    const cleaned = inflection._attributeName({ attributeName: attrName, codec });
-    return inflection.camelCase(cleaned);
+    const codecForLookup = codec.arrayOfCodec || codec;
+    if (build?.hasGraphQLTypeForPgCodec?.(codecForLookup, 'output')) {
+      const resolved = build.getGraphQLTypeNameByPgCodec(codecForLookup, 'output');
+      if (resolved) return resolved;
+    }
   } catch {
-    return attrName;
+    // Fall through to static fallback mapping.
   }
+
+  const pgTypeName = codec.name || 'unknown';
+  const mapped = pgTypeToGqlType(pgTypeName);
+  if (mapped !== pgTypeName) return mapped;
+
+  const nestedTypeName = codec.arrayOfCodec?.name;
+  return nestedTypeName ? pgTypeToGqlType(nestedTypeName) : pgTypeName;
 }
 
 /** Build a FieldMeta from an attribute name and attribute object */
-function buildFieldMeta(name: string, attr: any, inflection?: any, codec?: any): FieldMeta {
-  const fieldName = inflection && codec
-    ? inflectAttr(inflection, codec, name)
-    : name;
+function buildFieldMeta(name: string, attr: any, build?: any): FieldMeta {
+  const pgType = attr?.codec?.name || 'unknown';
   return {
-    name: fieldName,
+    name,
     type: {
-      pgType: attr?.codec?.name || 'unknown',
-      gqlType: attr?.codec?.name || 'unknown',
+      pgType,
+      gqlType: build ? resolveGqlTypeName(build, attr?.codec) : pgTypeToGqlType(pgType),
       isArray: !!attr?.codec?.arrayOfCodec,
       isNotNull: attr?.notNull || false,
       hasDefault: attr?.hasDefault || false,
@@ -185,22 +213,25 @@ function buildFkConstraintMeta(
   relationName: string,
   rel: any,
   localAttributes: Record<string, any>,
-  inflection?: any,
-  localCodec?: any,
+  inflectAttr: (attrName: string, codec: any) => string,
+  localCodec: any,
+  build?: any,
 ): ForeignKeyConstraintMeta {
   const remoteCodec = rel.remoteResource?.codec;
   const remoteAttrs = remoteCodec?.attributes || {};
   return {
     name: relationName,
     fields: (rel.localAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, localAttributes[attrName], inflection, localCodec),
+      buildFieldMeta(inflectAttr(attrName, localCodec), localAttributes[attrName], build),
     ),
-    referencedTable: remoteCodec?.name || 'unknown',
-    referencedFields: rel.remoteAttributes || [],
+    referencedTable: rel.remoteResource?.codec?.name || 'unknown',
+    referencedFields: (rel.remoteAttributes || []).map((attrName: string) =>
+      inflectAttr(attrName, remoteCodec),
+    ),
     refFields: (rel.remoteAttributes || []).map((attrName: string) =>
-      buildFieldMeta(attrName, remoteAttrs[attrName], inflection, remoteCodec),
+      buildFieldMeta(inflectAttr(attrName, remoteCodec), remoteAttrs[attrName], build),
     ),
-    refTable: { name: remoteCodec?.name || 'unknown' },
+    refTable: { name: rel.remoteResource?.codec?.name || 'unknown' },
   };
 }
 
@@ -226,14 +257,38 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
         // Collect all table metadata at build time
         const tablesMeta: TableMeta[] = [];
-        const seenCodecs = new Set();
+
+        // Helper to safely call inflection methods that may fail for some resources
+        const safeInflection = <T>(fn: () => T, fallback: T): T => {
+          try {
+            return fn() ?? fallback;
+          } catch {
+            return fallback;
+          }
+        };
+
+        // Helper to inflect a PG attribute name to its GraphQL field name
+        const inflectAttr = (attrName: string, codec: any): string => {
+          const attributeName = safeInflection(
+            () => (inflection as any)._attributeName?.({ attributeName: attrName, codec }),
+            attrName,
+          );
+          return safeInflection(
+            () => (inflection as any).camelCase?.(attributeName),
+            attributeName,
+          );
+        };
+
+        // Deduplicate: pgResources can have multiple entries per codec
+        const seenCodecs = new Set<any>();
 
         for (const resource of Object.values(pgRegistry.pgResources) as any[]) {
           // Skip resources without codec or attributes
           if (!resource.codec?.attributes || resource.codec?.isAnonymous) continue;
-          // Skip non-table resources (unique lookups, virtual, functions)
+          // Skip non-table resources (unique lookups, virtual resources, functions)
           if (resource.parameters || resource.isVirtual || resource.isUnique) continue;
-          // Deduplicate: multiple resources can share the same codec
+
+          // Deduplicate by codec — multiple resources can share the same codec
           if (seenCodecs.has(resource.codec)) continue;
           seenCodecs.add(resource.codec);
 
@@ -251,9 +306,10 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           const uniques = resource.uniques || [];
           const relations = resource.relations || {};
 
-          // Build fields metadata
+          // Build fields metadata with inflected names
           const fields: FieldMeta[] = Object.entries(attributes).map(
-            ([name, attr]: [string, any]) => buildFieldMeta(name, attr, inflection, codec),
+            ([attrName, attr]: [string, any]) =>
+              buildFieldMeta(inflectAttr(attrName, codec), attr, build),
           );
 
           // Build indexes metadata (from uniques)
@@ -261,9 +317,9 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             name: unique.tags?.name || `${codec.name}_${unique.attributes.join('_')}_idx`,
             isUnique: true,
             isPrimary: unique.isPrimary || false,
-            columns: unique.attributes,
+            columns: unique.attributes.map((a: string) => inflectAttr(a, codec)),
             fields: unique.attributes.map((attrName: string) =>
-              buildFieldMeta(attrName, attributes[attrName], inflection, codec),
+              buildFieldMeta(inflectAttr(attrName, codec), attributes[attrName], build),
             ),
           }));
 
@@ -273,7 +329,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             ? {
                 name: primaryUnique.tags?.name || `${codec.name}_pkey`,
                 fields: primaryUnique.attributes.map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
+                  buildFieldMeta(inflectAttr(attrName, codec), attributes[attrName], build),
                 ),
               }
             : null;
@@ -283,7 +339,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             .map((u: any) => ({
               name: u.tags?.name || `${codec.name}_${u.attributes.join('_')}_key`,
               fields: u.attributes.map((attrName: string) =>
-                buildFieldMeta(attrName, attributes[attrName], inflection, codec),
+                buildFieldMeta(inflectAttr(attrName, codec), attributes[attrName], build),
               ),
             }));
 
@@ -292,7 +348,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
             const rel = relation as any;
             if (rel.isReferencee === false) {
               foreignKeyConstraints.push(
-                buildFkConstraintMeta(relationName, rel, attributes, inflection, codec),
+                buildFkConstraintMeta(relationName, rel, attributes, inflectAttr, codec, build),
               );
             }
           }
@@ -322,7 +378,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
+                  buildFieldMeta(inflectAttr(attrName, codec), attributes[attrName], build),
                 ),
                 references: { name: rel.remoteResource?.codec?.name || 'unknown' },
               });
@@ -339,7 +395,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
                 isUnique,
                 type: rel.remoteResource?.codec?.name || null,
                 keys: (rel.localAttributes || []).map((attrName: string) =>
-                  buildFieldMeta(attrName, attributes[attrName], inflection, codec),
+                  buildFieldMeta(inflectAttr(attrName, codec), attributes[attrName], build),
                 ),
                 referencedBy: { name: rel.remoteResource?.codec?.name || 'unknown' },
               };
@@ -361,15 +417,6 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 
           // Build inflection metadata
           const tableType = inflection.tableType(codec);
-
-          // Helper to safely call inflection methods that may fail for some resources
-          const safeInflection = <T>(fn: () => T, fallback: T): T => {
-            try {
-              return fn() ?? fallback;
-            } catch {
-              return fallback;
-            }
-          };
 
           const inflectionMeta: InflectionMeta = {
             tableType,
@@ -647,5 +694,10 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
 export const MetaSchemaPreset: GraphileConfig.Preset = {
   plugins: [MetaSchemaPlugin],
 };
+
+/** @internal Exported for testing only */
+export { pgTypeToGqlType as _pgTypeToGqlType };
+export { buildFieldMeta as _buildFieldMeta };
+export { _cachedTablesMeta };
 
 export default MetaSchemaPlugin;
