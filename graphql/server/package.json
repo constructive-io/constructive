@@ -64,6 +64,7 @@
     "graphile-config": "1.0.0-rc.3",
     "graphile-settings": "workspace:^",
     "graphql": "^16.9.0",
+    "graphql-upload": "^13.0.0",
     "lru-cache": "^11.2.4",
     "pg": "^8.17.1",
     "pg-cache": "workspace:^",

@@ -819,6 +819,9 @@ importers:
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
+      graphql-upload:
+        specifier: ^13.0.0
+        version: 13.0.0(graphql@16.12.0)
       lru-cache:
         specifier: ^11.2.4
         version: 11.2.4
@@ -16040,6 +16043,14 @@ snapshots:
       busboy: 0.3.1
       fs-capacitor: 6.2.0
       graphql: 15.10.1
+      http-errors: 1.8.1
+      object-path: 0.11.8
+
+  graphql-upload@13.0.0(graphql@16.12.0):
+    dependencies:
+      busboy: 0.3.1
+      fs-capacitor: 6.2.0
+      graphql: 16.12.0
       http-errors: 1.8.1
       object-path: 0.11.8
 
