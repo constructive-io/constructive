@@ -6,7 +6,7 @@ exports[`PgSearchPlugin condition-based search on stsv column returns only title
     "nodes": [
       {
         "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-        "rowId": 6,
+        "rowId": "[ID]",
         "title": "green fowl",
       },
     ],
@@ -20,17 +20,17 @@ exports[`PgSearchPlugin condition-based search on tsv column returns matching ro
     "nodes": [
       {
         "description": "Appear evening that gathered saying. Sea subdue so fill stars. Bring is man divided behold fish their. Also won't fowl.",
-        "rowId": 2,
+        "rowId": "[ID]",
         "title": "evenings",
       },
       {
         "description": "Heaven. Tree creeping was. Gathered living dominion us likeness first subdue fill. Fowl him moveth fly also the is created.",
-        "rowId": 3,
+        "rowId": "[ID]",
         "title": "heaven",
       },
       {
         "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-        "rowId": 6,
+        "rowId": "[ID]",
         "title": "green fowl",
       },
     ],

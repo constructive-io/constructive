@@ -1,5 +1,6 @@
 import { dirname, join } from 'path';
-import type { Server as HttpServer } from 'http';
+import { createServer, type Server as HttpServer } from 'http';
+import type { AddressInfo } from 'net';
 import supertest from 'supertest';
 import { Server as GraphQLServer } from '@constructive-io/graphql-server';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
@@ -65,7 +66,7 @@ const sendGraphql = async (
 const addJobMutation = `
   mutation AddJob($input: AddJobInput!) {
     addJob(input: $input) {
-      job {
+      result {
         id
       }
     }
@@ -74,11 +75,13 @@ const addJobMutation = `
 
 const jobByIdQuery = `
   query JobById($id: BigInt!) {
-    job(id: $id) {
-      id
-      lastError
-      attempts
-      maxAttempts
+    jobs(condition: { id: $id }, first: 1) {
+      nodes {
+        id
+        lastError
+        attempts
+        maxAttempts
+      }
     }
   }
 `;
@@ -116,11 +119,11 @@ const getJobById = async (
   const response = await sendGraphql(client, jobByIdQuery, {
     id: String(jobId)
   });
-  const data = unwrapGraphqlData<{ job: JobDetails | null }>(
-    response,
-    'Job query'
-  );
-  return data.job;
+  const data = unwrapGraphqlData<{
+    jobs: { nodes: JobDetails[] };
+  }>(response, 'Job query');
+  const nodes = data.jobs?.nodes ?? [];
+  return nodes.length > 0 ? nodes[0] : null;
 };
 
 const waitForJobCompletion = async (
@@ -238,12 +241,28 @@ const createMailgunFailureApp = () => {
 
 const seededDatabaseId = '0b22e268-16d6-582b-950a-24e108688849';
 const metaDbExtensions = ['citext', 'uuid-ossp', 'unaccent', 'pgcrypto', 'hstore'];
-// Ports are fixed by test design, if these're occupied, then the test just feel free to fail.
-const GRAPHQL_PORT = 3000;
-const CALLBACK_PORT = 12345;
-const SIMPLE_EMAIL_PORT = 8081;
-const SEND_EMAIL_LINK_PORT = 8082;
-const MAILGUN_FAILURE_PORT = 8083;
+
+// Allocate an ephemeral port by briefly binding to port 0, reading the
+// assigned port, then closing the server so the port is free for the
+// real listener.  There is a small TOCTOU window, but it is sufficient
+// for tests running on a single machine.
+const getAvailablePort = (): Promise<number> =>
+  new Promise((resolve, reject) => {
+    const srv = createServer();
+    srv.listen(0, '127.0.0.1', () => {
+      const { port } = srv.address() as AddressInfo;
+      srv.close((err) => (err ? reject(err) : resolve(port)));
+    });
+    srv.on('error', reject);
+  });
+
+// Ports are allocated dynamically to avoid conflicts with other
+// processes that may already be listening on the well-known defaults.
+let GRAPHQL_PORT: number;
+let CALLBACK_PORT: number;
+let SIMPLE_EMAIL_PORT: number;
+let SEND_EMAIL_LINK_PORT: number;
+let MAILGUN_FAILURE_PORT: number;
 
 const getPgpmModulePath = (pkgName: string): string =>
   dirname(require.resolve(`${pkgName}/pgpm.plan`));
@@ -361,6 +380,21 @@ describe('jobs e2e', () => {
   beforeAll(async () => {
     delete process.env.TEST_DB;
     delete process.env.PGDATABASE;
+
+    // Allocate dynamic ports in parallel before anything starts.
+    [
+      GRAPHQL_PORT,
+      CALLBACK_PORT,
+      SIMPLE_EMAIL_PORT,
+      SEND_EMAIL_LINK_PORT,
+      MAILGUN_FAILURE_PORT
+    ] = await Promise.all([
+      getAvailablePort(),
+      getAvailablePort(),
+      getAvailablePort(),
+      getAvailablePort(),
+      getAvailablePort()
+    ]);
 
     ({ teardown, pg } = await createTestDb());
     if (!pg) {
@@ -520,7 +554,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -546,7 +580,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -572,7 +606,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -598,7 +632,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -624,7 +658,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -656,7 +690,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -688,7 +722,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 
@@ -731,7 +765,7 @@ describe('jobs e2e', () => {
     expect(response.status).toBe(200);
     expect(response.body?.errors).toBeUndefined();
 
-    const jobId = response.body?.data?.addJob?.job?.id;
+    const jobId = response.body?.data?.addJob?.result?.id;
 
     expect(jobId).toBeTruthy();
 

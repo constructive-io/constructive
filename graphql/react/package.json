@@ -22,7 +22,8 @@
     "scripts": {
       "clean": "makage clean",
       "prepack": "npm run build",
-      "build": "echo 'SKIPPED: graphql-react disabled during v5 migration'",
+      "build": "makage build",
+      "build:dev": "makage build --dev",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },

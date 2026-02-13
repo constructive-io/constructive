@@ -22,8 +22,8 @@
     "scripts": {
       "clean": "makage clean",
       "prepack": "npm run build",
-      "build": "echo 'SKIPPED: playwright-test disabled during v5 migration'",
-      "build:dev": "echo 'SKIPPED: playwright-test disabled during v5 migration'",
+      "build": "makage build",
+      "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "playwright test",
     "test:watch": "jest --watch"

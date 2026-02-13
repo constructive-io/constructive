@@ -51,7 +51,7 @@ it('creates a user and returns typed result', async () => {
     interface CreateUserResult {
         createUser: {
             user: {
-                id: number;
+                rowId: number;
                 username: string;
             };
         };
@@ -62,7 +62,7 @@ it('creates a user and returns typed result', async () => {
         mutation CreateUser($input: CreateUserInput!) {
           createUser(input: $input) {
             user {
-              id
+              rowId
               username
             }
           }
@@ -81,7 +81,7 @@ it('creates a user and returns typed result', async () => {
     expect(result).toBeDefined();
     expect(result.createUser).toBeDefined();
     expect(result.createUser.user.username).toBe('alice');
-    expect(typeof result.createUser.user.id).toBe('number');
+    expect(typeof result.createUser.user.rowId).toBe('number');
 
     // Optional snapshot for structure
     expect(snapshot(result)).toMatchSnapshot('create-user');
@@ -103,7 +103,7 @@ it('throws error when trying to create duplicate users due to unwrapped nature',
     interface CreateUserResult {
         createUser: {
             user: {
-                id: number;
+                rowId: number;
                 username: string;
             };
         };
@@ -113,7 +113,7 @@ it('throws error when trying to create duplicate users due to unwrapped nature',
         mutation CreateUser($input: CreateUserInput!) {
           createUser(input: $input) {
             user {
-              id
+              rowId
               username
             }
           }

@@ -27,7 +27,7 @@ exports[`handles duplicate insert via internal PostGraphile savepoint: firstInse
   "data": {
     "createUser": {
       "user": {
-        "id": "[ID]",
+        "rowId": "[ID]",
         "username": "dupeuser",
       },
     },
@@ -41,7 +41,7 @@ exports[`handles duplicate insert via internal PostGraphile savepoint: queryAfte
     "allUsers": {
       "nodes": [
         {
-          "id": "[ID]",
+          "rowId": "[ID]",
           "username": "dupeuser",
         },
       ],

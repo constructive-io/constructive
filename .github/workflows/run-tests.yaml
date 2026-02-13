@@ -31,12 +31,10 @@ jobs:
             env: {}
           - package: pgpm/cli
             env: {}
-          # - package: packages/cli
-          #   env: {}
-          #   # test failures: prompt/generate call
-          # - package: jobs/knative-job-service
-          #   env: {}
-          #   # needs Knative infra
+          - package: packages/cli
+            env: {}
+          - package: jobs/knative-job-service
+            env: {}
           - package: packages/client
             env:
               TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
@@ -52,9 +50,8 @@ jobs:
             env: {}
           - package: uploads/uuid-stream
             env: {}
-          # - package: postgres/introspectron
-          #   env: {}
-          #   # GraphQL v15/v16 type mismatch
+          - package: postgres/introspectron
+            env: {}
           - package: packages/query-builder
             env: {}
           - package: graphql/query
@@ -67,16 +64,18 @@ jobs:
             env: {}
           - package: uploads/content-type-stream
             env: {}
-          # - package: uploads/s3-streamer
-          #   env:
-          #     BUCKET_NAME: test-bucket
-          #   # needs MinIO bucket setup
+          - package: uploads/s3-streamer
+            env:
+              BUCKET_NAME: test-bucket
           - package: uploads/upload-names
             env: {}
-          # - package: graphile/graphile-test
-          #   env: {}
-          #   # typed mutation test failures
+          - package: graphile/graphile-test
+            env: {}
           - package: graphile/graphile-search-plugin
+            env: {}
+          - package: graphile/graphile-authz
+            env: {}
+          - package: graphile/postgraphile-plugin-pgvector
             env: {}
           - package: graphql/server-test
             env: {}
@@ -86,16 +85,10 @@ jobs:
             env: {}
           - package: graphql/test
             env: {}
-          - package: graphile/graphile-authz
+          - package: graphql/playwright-test
             env: {}
-          - package: graphile/postgraphile-plugin-pgvector
-            env: {}
-          # - package: graphql/playwright-test
-          #   env: {}
-          #   # needs browser infra
           # - package: jobs/knative-job-worker
           #   env: {}
-          #   # needs Knative infra
           - package: packages/csv-to-pg
             env: {}
           - package: packages/smtppostmaster

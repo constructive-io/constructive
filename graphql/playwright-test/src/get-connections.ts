@@ -57,7 +57,7 @@ const createConnectionsWithServerBase = async (
       defaultDatabaseId: 'test-database',
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
-    graphile: input.graphile
+    ...(input.graphile && { graphile: input.graphile as any })
   });
 
   // Start the HTTP server

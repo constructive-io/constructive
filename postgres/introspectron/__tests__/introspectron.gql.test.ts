@@ -1,10 +1,14 @@
 process.env.LOG_SCOPE = 'introspectron';
 
 import { getConnections, GraphQLQueryFn, seed } from '@constructive-io/graphql-test';
+import { print } from 'graphql';
 import { join } from 'path';
 
 import { IntrospectionQuery } from '../src';
 import type { IntrospectionField,IntrospectionQueryResult } from '../src/gql-types';
+
+// Convert v15 DocumentNode to string to avoid type incompatibility with v16 DocumentNode
+const IntrospectionQueryString = print(IntrospectionQuery);
 
 const sql = (f: string) => join(__dirname, '/../sql', f);
 
@@ -14,7 +18,8 @@ let query: GraphQLQueryFn;
 beforeAll(async () => {
   ({ query, teardown } = await getConnections(
     {
-      schemas: ['introspectron']
+      schemas: ['introspectron'],
+      useRoot: true
     },
     [seed.sqlfile([sql('test.sql')])]
   ));
@@ -25,7 +30,7 @@ afterAll(() => teardown());
 let introspection: IntrospectionQueryResult;
 
 beforeEach(async () => {
-  const res = await query<IntrospectionQueryResult>(IntrospectionQuery);
+  const res = await query<IntrospectionQueryResult>(IntrospectionQueryString);
 
   if (res.errors) {
     console.error(res.errors);
