@@ -1,11 +1,12 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { getGraphileSettings } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
+import { makeSchema } from 'graphile-build';
 import { getPgPool } from 'pg-cache';
-import { getSchema } from 'graphile-query';
 import { printSchema } from 'graphql';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import type { GraphileConfig } from 'graphile-config';
 
 const log = new Logger('codegen-schema');
 
@@ -35,8 +36,8 @@ const getSchemaOutputPath = () =>
 
       const pool = getPgPool(pgConfig);
       const checkResult = await pool.query(
-        `SELECT schema_name FROM information_schema.schemata 
-         WHERE schema_name = ANY($1::text[]) 
+        `SELECT schema_name FROM information_schema.schemata
+         WHERE schema_name = ANY($1::text[])
          ORDER BY schema_name`,
         [schemas]
       );
@@ -63,15 +64,6 @@ const getSchemaOutputPath = () =>
       );
     }
 
-    const settings = getGraphileSettings({
-      ...opts,
-      pg: pgConfig,
-      graphile: {
-        ...opts.graphile,
-        schema: schemas,
-      },
-    });
-
     const pool = getPgPool(pgConfig);
     log.debug(`Connecting to database: ${dbName}`);
     log.debug(`Connecting to host: ${opts.pg?.host || '(default)'}`);
@@ -83,7 +75,21 @@ const getSchemaOutputPath = () =>
       `Connected to database: ${dbInfo.rows[0]?.current_database} as user: ${dbInfo.rows[0]?.current_user}`
     );
 
-    const graphqlSchema = await getSchema(pool, settings as any);
+    // Build connection string from pool config
+    const connectionString = `postgres://${pgConfig?.user || 'postgres'}:${pgConfig?.password || ''}@${pgConfig?.host || 'localhost'}:${pgConfig?.port || 5432}/${dbName}`;
+
+    // Create v5 preset with ConstructivePreset
+    const preset: GraphileConfig.Preset = {
+      extends: [ConstructivePreset],
+      pgServices: [
+        makePgService({
+          connectionString,
+          schemas,
+        }),
+      ],
+    };
+
+    const { schema: graphqlSchema } = await makeSchema(preset);
     const sdl = printSchema(graphqlSchema);
 
     const outputPath = getSchemaOutputPath();

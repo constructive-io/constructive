@@ -2,6 +2,6 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN attachment AS text CHECK (VALUE ~ '^(https?)://[^\s/$.?#].[^\s]*$');
-COMMENT ON DOMAIN attachment IS E'@name pgpmInternalTypeAttachment';
+CREATE DOMAIN attachment AS text;
+COMMENT ON DOMAIN attachment IS E'@name constructiveInternalTypeAttachment';
 COMMIT;

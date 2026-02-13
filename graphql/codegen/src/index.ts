@@ -2,7 +2,7 @@
  * @constructive-io/graphql-codegen
  *
  * GraphQL SDK generator for Constructive databases.
- * Introspects via _meta query and generates typed queries, mutations,
+ * Introspects via standard GraphQL introspection and generates typed queries, mutations,
  * and React Query v5 hooks.
  */
 

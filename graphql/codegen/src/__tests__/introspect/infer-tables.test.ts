@@ -279,6 +279,85 @@ describe('Entity Detection', () => {
     expect(tables).toHaveLength(1);
     expect(tables[0].name).toBe('User');
   });
+
+  it('detects FullTextSearch entity from FullTextSearchConnection type', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'FulltextSearch',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'headline', type: scalar('String') },
+            { name: 'rank', type: scalar('Float') },
+          ],
+        },
+        {
+          name: 'FulltextSearchesConnection',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'nodes', type: list(object('FulltextSearch')) },
+            { name: 'pageInfo', type: nonNull(object('PageInfo')) },
+          ],
+        },
+        { name: 'PageInfo', kind: 'OBJECT', fields: [] },
+        {
+          name: 'FulltextSearchFilter',
+          kind: 'INPUT_OBJECT',
+          inputFields: [
+            { name: 'headline', type: inputObject('StringFilter') },
+          ],
+        },
+      ],
+      [
+        {
+          name: 'fulltextSearches',
+          type: object('FulltextSearchesConnection'),
+          args: [
+            { name: 'filter', type: inputObject('FulltextSearchFilter') },
+            { name: 'first', type: scalar('Int') },
+            { name: 'after', type: scalar('Cursor') },
+          ],
+        },
+      ],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0].name).toBe('FulltextSearch');
+    expect(tables[0].query?.all).toBe('fulltextSearches');
+    expect(tables[0].inflection?.filterType).toBe('FulltextSearchFilter');
+    expect(tables[0].fields.map((f) => f.name)).toEqual([
+      'id',
+      'headline',
+      'rank',
+    ]);
+  });
+
+  it('detects entities from singular Connection naming (v5 style)', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'User',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        {
+          name: 'UserConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('User')) }],
+        },
+      ],
+      [{ name: 'users', type: object('UserConnection') }],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables).toHaveLength(1);
+    expect(tables[0].name).toBe('User');
+    expect(tables[0].inflection?.connection).toBe('UserConnection');
+  });
 });
 
 // ============================================================================
@@ -498,6 +577,54 @@ describe('Relation Inference', () => {
       'ProductCategory',
     );
   });
+
+  it('infers relations when connections use singular names', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'Database',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'owner', type: object('User') },
+          ],
+        },
+        {
+          name: 'DatabaseConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('Database')) }],
+        },
+        {
+          name: 'User',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'id', type: nonNull(scalar('UUID')) },
+            { name: 'databases', type: object('DatabaseConnection') },
+          ],
+        },
+        {
+          name: 'UserConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('User')) }],
+        },
+      ],
+      [
+        { name: 'databases', type: object('DatabaseConnection') },
+        { name: 'users', type: object('UserConnection') },
+      ],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+    const databaseTable = tables.find((t) => t.name === 'Database');
+    const userTable = tables.find((t) => t.name === 'User');
+
+    expect(databaseTable?.relations.belongsTo).toHaveLength(1);
+    expect(databaseTable?.relations.belongsTo[0].fieldName).toBe('owner');
+    expect(databaseTable?.relations.belongsTo[0].referencesTable).toBe('User');
+    expect(userTable?.relations.hasMany).toHaveLength(1);
+    expect(userTable?.relations.hasMany[0].fieldName).toBe('databases');
+    expect(userTable?.relations.hasMany[0].referencedByTable).toBe('Database');
+  });
 });
 
 // ============================================================================
@@ -567,8 +694,31 @@ describe('Query Operation Matching', () => {
     const tables = inferTablesFromIntrospection(introspection);
 
     expect(tables[0].query?.all).toBe('users');
-    // Should fallback to default naming
-    expect(tables[0].query?.one).toBe('user');
+    // Should remain null when no single-row lookup exists in schema
+    expect(tables[0].query?.one).toBeNull();
+  });
+
+  it('matches list query when using singular connection type names', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'User',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        {
+          name: 'UserConnection',
+          kind: 'OBJECT',
+          fields: [{ name: 'nodes', type: list(object('User')) }],
+        },
+      ],
+      [{ name: 'allUsers', type: object('UserConnection') }],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables[0].query?.all).toBe('allUsers');
+    expect(tables[0].inflection?.connection).toBe('UserConnection');
   });
 });
 
@@ -709,6 +859,65 @@ describe('Constraint Inference', () => {
 
     expect(tables[0].constraints?.primaryKey).toHaveLength(1);
     expect(tables[0].constraints?.primaryKey[0].fields[0].name).toBe('id');
+  });
+
+  it('infers lookup key from update input when entity has no id field', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'NodeTypeRegistry',
+          kind: 'OBJECT',
+          fields: [
+            { name: 'name', type: nonNull(scalar('String')) },
+            { name: 'slug', type: nonNull(scalar('String')) },
+          ],
+        },
+        { name: 'NodeTypeRegistriesConnection', kind: 'OBJECT', fields: [] },
+        {
+          name: 'UpdateNodeTypeRegistryInput',
+          kind: 'INPUT_OBJECT',
+          inputFields: [
+            { name: 'name', type: nonNull(scalar('String')) },
+            {
+              name: 'nodeTypeRegistryPatch',
+              type: nonNull(inputObject('NodeTypeRegistryPatch')),
+            },
+          ],
+        },
+      ],
+      [{ name: 'nodeTypeRegistries', type: object('NodeTypeRegistriesConnection') }],
+      [{ name: 'updateNodeTypeRegistry', type: object('UpdateNodeTypeRegistryPayload') }],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables[0].constraints?.primaryKey).toHaveLength(1);
+    expect(tables[0].constraints?.primaryKey[0].fields[0].name).toBe('name');
+  });
+
+  it('infers lookup key from delete input when update input is not present', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'InviteCode',
+          kind: 'OBJECT',
+          fields: [{ name: 'code', type: nonNull(scalar('String')) }],
+        },
+        { name: 'InviteCodesConnection', kind: 'OBJECT', fields: [] },
+        {
+          name: 'DeleteInviteCodeInput',
+          kind: 'INPUT_OBJECT',
+          inputFields: [{ name: 'code', type: nonNull(scalar('String')) }],
+        },
+      ],
+      [{ name: 'inviteCodes', type: object('InviteCodesConnection') }],
+      [{ name: 'deleteInviteCode', type: object('DeleteInviteCodePayload') }],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables[0].constraints?.primaryKey).toHaveLength(1);
+    expect(tables[0].constraints?.primaryKey[0].fields[0].name).toBe('code');
   });
 });
 

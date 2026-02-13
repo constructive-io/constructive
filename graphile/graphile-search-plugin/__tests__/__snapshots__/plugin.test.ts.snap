@@ -1,85 +1,39 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`GoalsSearchViaCondition (order is relevant) 1`] = `
+exports[`PgSearchPlugin condition-based search on stsv column returns only title-matched rows for fullTextStsv condition 1`] = `
 {
-  "data": {
-    "goals": {
-      "nodes": [
-        {
-          "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-          "id": "[ID]",
-          "title": "green fowl",
-        },
-        {
-          "description": "Appear evening that gathered saying. Sea subdue so fill stars. Bring is man divided behold fish their. Also won't fowl.",
-          "id": "[ID]",
-          "title": "evenings",
-        },
-        {
-          "description": "Heaven. Tree creeping was. Gathered living dominion us likeness first subdue fill. Fowl him moveth fly also the is created.",
-          "id": "[ID]",
-          "title": "heaven",
-        },
-      ],
-    },
+  "allGoals": {
+    "nodes": [
+      {
+        "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
+        "rowId": 6,
+        "title": "green fowl",
+      },
+    ],
   },
 }
 `;
 
-exports[`GoalsSearchViaCondition2 (order is relevant) 1`] = `
+exports[`PgSearchPlugin condition-based search on tsv column returns matching rows with ts_rank as secondary sort 1`] = `
 {
-  "data": {
-    "goals": {
-      "nodes": [
-        {
-          "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-          "id": "[ID]",
-          "title": "green fowl",
-        },
-      ],
-    },
-  },
-}
-`;
-
-exports[`GoalsSearchViaFilter (order not relevant) 1`] = `
-{
-  "data": {
-    "goals": {
-      "nodes": [
-        {
-          "description": "Appear evening that gathered saying. Sea subdue so fill stars. Bring is man divided behold fish their. Also won't fowl.",
-          "id": "[ID]",
-          "title": "evenings",
-        },
-        {
-          "description": "Heaven. Tree creeping was. Gathered living dominion us likeness first subdue fill. Fowl him moveth fly also the is created.",
-          "id": "[ID]",
-          "title": "heaven",
-        },
-        {
-          "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-          "id": "[ID]",
-          "title": "green fowl",
-        },
-      ],
-    },
-  },
-}
-`;
-
-exports[`GoalsSearchViaFilter2 (order not relevant) 1`] = `
-{
-  "data": {
-    "goals": {
-      "nodes": [
-        {
-          "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
-          "id": "[ID]",
-          "title": "green fowl",
-        },
-      ],
-    },
+  "allGoals": {
+    "nodes": [
+      {
+        "description": "Appear evening that gathered saying. Sea subdue so fill stars. Bring is man divided behold fish their. Also won't fowl.",
+        "rowId": 2,
+        "title": "evenings",
+      },
+      {
+        "description": "Heaven. Tree creeping was. Gathered living dominion us likeness first subdue fill. Fowl him moveth fly also the is created.",
+        "rowId": 3,
+        "title": "heaven",
+      },
+      {
+        "description": "Second in years female given. Us firmament. She'd kind there let moved thing evening saying set whales a fowl heaven.",
+        "rowId": 6,
+        "title": "green fowl",
+      },
+    ],
   },
 }
 `;

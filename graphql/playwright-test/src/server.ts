@@ -4,7 +4,7 @@ import {
   cors,
   graphile
 } from '@constructive-io/graphql-server';
-import { PgpmOptions } from '@pgpmjs/types';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import express from 'express';
 import { Server as HttpServer, createServer } from 'http';
 import { Pool } from 'pg';
@@ -40,7 +40,7 @@ const findAvailablePort = async (startPort: number): Promise<number> => {
  * configured with enableServicesApi: false to bypass domain routing.
  */
 export const createTestServer = async (
-  opts: PgpmOptions,
+  opts: ConstructiveOptions,
   serverOpts: PlaywrightServerOptions = {}
 ): Promise<ServerInfo> => {
   const host = serverOpts.host ?? 'localhost';
@@ -91,6 +91,6 @@ export const createTestServer = async (
 /**
  * Get the PostgreSQL pool for the test server
  */
-export const getTestPool = (opts: PgpmOptions): Pool => {
+export const getTestPool = (opts: ConstructiveOptions): Pool => {
   return getPgPool(opts.pg);
 };

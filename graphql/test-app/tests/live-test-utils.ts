@@ -11,16 +11,25 @@ export interface LiveTestEnv {
   password: string;
 }
 
-const DEFAULT_ENDPOINT = 'https://api.launchql.dev/graphql';
+const DEFAULT_ENDPOINT = 'http://api.localhost:3000/graphql';
+
+function randomSuffix(): string {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function createDefaultCredentials(): { email: string; password: string } {
+  const suffix = `${Date.now()}-${randomSuffix()}`;
+  return {
+    email: `codegen-live-${suffix}@example.local`,
+    password: `Codegen!${suffix}`,
+  };
+}
 
 export function getLiveTestEnv(): LiveTestEnv | null {
-  const email = process.env.GRAPHQL_TEST_EMAIL;
-  const password = process.env.GRAPHQL_TEST_PASSWORD;
   const endpoint = process.env.GRAPHQL_TEST_ENDPOINT ?? DEFAULT_ENDPOINT;
-
-  if (!email || !password) {
-    return null;
-  }
+  const defaults = createDefaultCredentials();
+  const email = process.env.GRAPHQL_TEST_EMAIL ?? defaults.email;
+  const password = process.env.GRAPHQL_TEST_PASSWORD ?? defaults.password;
 
   return {
     endpoint,
@@ -31,8 +40,8 @@ export function getLiveTestEnv(): LiveTestEnv | null {
 
 export function getLiveEnvHelpMessage(): string {
   return (
-    'Live tests require GRAPHQL_TEST_EMAIL and GRAPHQL_TEST_PASSWORD. ' +
-    `Optional GRAPHQL_TEST_ENDPOINT (default: ${DEFAULT_ENDPOINT}).`
+    'Live tests use local endpoint by default and auto-generate credentials. ' +
+    `Optional overrides: GRAPHQL_TEST_ENDPOINT, GRAPHQL_TEST_EMAIL, GRAPHQL_TEST_PASSWORD (default endpoint: ${DEFAULT_ENDPOINT}).`
   );
 }
 
@@ -74,37 +83,68 @@ export interface AuthSession {
 
 export async function signIn(env: LiveTestEnv): Promise<AuthSession> {
   const client = createClient({ endpoint: env.endpoint });
-  const result = await client.mutation
-    .signIn(
-      {
-        input: {
-          email: env.email,
-          password: env.password,
-          rememberMe: true,
-        },
-      },
-      {
-        select: {
-          result: {
-            select: {
-              accessToken: true,
-              userId: true,
-              isVerified: true,
-              totpEnabled: true,
-            },
+
+  const signInOnce = async (): Promise<AuthSession> => {
+    const result = await client.mutation
+      .signIn(
+        {
+          input: {
+            email: env.email,
+            password: env.password,
+            rememberMe: true,
           },
         },
-      }
-    )
-    .unwrap();
+        {
+          select: {
+            result: {
+              select: {
+                accessToken: true,
+                userId: true,
+                isVerified: true,
+                totpEnabled: true,
+              },
+            },
+          },
+        }
+      )
+      .unwrap();
 
-  const token = result.signIn.result?.accessToken ?? null;
-  const userId = result.signIn.result?.userId ?? null;
+    const token = result.signIn.result?.accessToken ?? null;
+    const userId = result.signIn.result?.userId ?? null;
 
-  assert.ok(token, 'signIn did not return accessToken');
-  assert.ok(userId, 'signIn did not return userId');
+    assert.ok(token, 'signIn did not return accessToken');
+    assert.ok(userId, 'signIn did not return userId');
 
-  return { token, userId };
+    return { token, userId };
+  };
+
+  try {
+    return await signInOnce();
+  } catch {
+    // Bootstrap path for local runs: create account, then sign in.
+    await client.mutation
+      .signUp(
+        {
+          input: {
+            email: env.email,
+            password: env.password,
+          },
+        },
+        {
+          select: {
+            result: {
+              select: {
+                accessToken: true,
+                userId: true,
+              },
+            },
+          },
+        }
+      )
+      .unwrap();
+
+    return signInOnce();
+  }
 }
 
 export async function signOut(env: LiveTestEnv, token: string): Promise<void> {

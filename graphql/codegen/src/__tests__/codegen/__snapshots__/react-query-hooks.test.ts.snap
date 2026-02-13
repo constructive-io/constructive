@@ -207,22 +207,19 @@ import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { LoginVariables } from "../../orm/mutation";
 import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LoginVariables } from "../../orm/mutation";
 export type { LoginPayloadSelect } from "../../orm/input-types";
 export function useLoginMutation<S extends LoginPayloadSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, LoginPayloadSelect>);
+    fields: S & LoginPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>);
 } & Omit<UseMutationOptions<{
-  login: InferSelectResult<LoginPayload, S>;
+  login: InferSelectResult<LoginPayload, S> | null;
 }, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
-  login: InferSelectResult<LoginPayload, S>;
-}, Error, LoginVariables>;
-export function useLoginMutation(params: {
-  selection: SelectionConfig<LoginPayloadSelect>;
-} & Omit<UseMutationOptions<any, Error, LoginVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<LoginPayloadSelect>(params.selection);
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -232,7 +229,9 @@ export function useLoginMutation(params: {
     mutationKey: customMutationKeys.login(),
     mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, {
       select: args.select
-    }).unwrap(),
+    } as {
+      select: S;
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -254,22 +253,19 @@ import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { RegisterVariables } from "../../orm/mutation";
 import type { RegisterPayloadSelect, RegisterPayload } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { RegisterVariables } from "../../orm/mutation";
 export type { RegisterPayloadSelect } from "../../orm/input-types";
 export function useRegisterMutation<S extends RegisterPayloadSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, RegisterPayloadSelect>);
+    fields: S & RegisterPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, RegisterPayloadSelect>);
 } & Omit<UseMutationOptions<{
-  register: InferSelectResult<RegisterPayload, S>;
+  register: InferSelectResult<RegisterPayload, S> | null;
 }, Error, RegisterVariables>, "mutationFn">): UseMutationResult<{
-  register: InferSelectResult<RegisterPayload, S>;
-}, Error, RegisterVariables>;
-export function useRegisterMutation(params: {
-  selection: SelectionConfig<RegisterPayloadSelect>;
-} & Omit<UseMutationOptions<any, Error, RegisterVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<RegisterPayloadSelect>(params.selection);
+  register: InferSelectResult<RegisterPayload, S> | null;
+}, Error, RegisterVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -279,7 +275,9 @@ export function useRegisterMutation(params: {
     mutationKey: customMutationKeys.register(),
     mutationFn: (variables: RegisterVariables) => getClient().mutation.register(variables, {
       select: args.select
-    }).unwrap(),
+    } as {
+      select: S;
+    } & StrictSelect<S, RegisterPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -300,21 +298,18 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import { customMutationKeys } from "../mutation-keys";
 import type { LogoutPayloadSelect, LogoutPayload } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LogoutPayloadSelect } from "../../orm/input-types";
 export function useLogoutMutation<S extends LogoutPayloadSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, LogoutPayloadSelect>);
+    fields: S & LogoutPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LogoutPayloadSelect>);
 } & Omit<UseMutationOptions<{
-  logout: InferSelectResult<LogoutPayload, S>;
+  logout: InferSelectResult<LogoutPayload, S> | null;
 }, Error, void>, "mutationFn">): UseMutationResult<{
-  logout: InferSelectResult<LogoutPayload, S>;
-}, Error, void>;
-export function useLogoutMutation(params: {
-  selection: SelectionConfig<LogoutPayloadSelect>;
-} & Omit<UseMutationOptions<any, Error, void>, "mutationFn">) {
-  const args = buildSelectionArgs<LogoutPayloadSelect>(params.selection);
+  logout: InferSelectResult<LogoutPayload, S> | null;
+}, Error, void> {
+  const args = buildSelectionArgs<S>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -324,7 +319,9 @@ export function useLogoutMutation(params: {
     mutationKey: customMutationKeys.logout(),
     mutationFn: () => getClient().mutation.logout({
       select: args.select
-    }).unwrap(),
+    } as {
+      select: S;
+    } & StrictSelect<S, LogoutPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -345,22 +342,19 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { LoginVariables } from "../../orm/mutation";
 import type { LoginPayloadSelect, LoginPayload } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect, StrictSelect } from "../../orm/select-types";
 export type { LoginVariables } from "../../orm/mutation";
 export type { LoginPayloadSelect } from "../../orm/input-types";
 export function useLoginMutation<S extends LoginPayloadSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, LoginPayloadSelect>);
+    fields: S & LoginPayloadSelect;
+  } & HookStrictSelect<NoInfer<S>, LoginPayloadSelect>);
 } & Omit<UseMutationOptions<{
-  login: InferSelectResult<LoginPayload, S>;
+  login: InferSelectResult<LoginPayload, S> | null;
 }, Error, LoginVariables>, "mutationFn">): UseMutationResult<{
-  login: InferSelectResult<LoginPayload, S>;
-}, Error, LoginVariables>;
-export function useLoginMutation(params: {
-  selection: SelectionConfig<LoginPayloadSelect>;
-} & Omit<UseMutationOptions<any, Error, LoginVariables>, "mutationFn">) {
-  const args = buildSelectionArgs<LoginPayloadSelect>(params.selection);
+  login: InferSelectResult<LoginPayload, S> | null;
+}, Error, LoginVariables> {
+  const args = buildSelectionArgs<S>(params.selection);
   const {
     selection: _selection,
     ...mutationOptions
@@ -369,7 +363,9 @@ export function useLoginMutation(params: {
   return useMutation({
     mutationFn: (variables: LoginVariables) => getClient().mutation.login(variables, {
       select: args.select
-    }).unwrap(),
+    } as {
+      select: S;
+    } & StrictSelect<S, LoginPayloadSelect>).unwrap(),
     ...mutationOptions
   });
 }
@@ -391,7 +387,7 @@ import type { SelectionConfig } from "../selection";
 import { customQueryKeys } from "../query-keys";
 import type { SearchUsersVariables } from "../../orm/query";
 import type { UserSelect, User } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { SearchUsersVariables } from "../../orm/query";
 export type { UserSelect } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
@@ -409,14 +405,14 @@ export const searchUsersQueryKey = customQueryKeys.searchUsers;
  * \`\`\`
  */
 export function useSearchUsersQuery<S extends UserSelect, TData = {
-  searchUsers: InferSelectResult<User, S>[];
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
 }>(params: {
   variables: SearchUsersVariables;
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseQueryOptions<{
-  searchUsers: InferSelectResult<User, S>[];
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
 export function useSearchUsersQuery(params: {
   variables: SearchUsersVariables;
@@ -451,10 +447,10 @@ export function useSearchUsersQuery(params: {
 export async function fetchSearchUsersQuery<S extends UserSelect>(params: {
   variables: SearchUsersVariables;
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<{
-  searchUsers: InferSelectResult<User, S>[];
+  searchUsers: (InferSelectResult<User, S> | null)[] | null;
 }>;
 export async function fetchSearchUsersQuery(params: {
   variables: SearchUsersVariables;
@@ -477,8 +473,8 @@ export async function fetchSearchUsersQuery(params: {
 export async function prefetchSearchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
   variables: SearchUsersVariables;
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<void>;
 export async function prefetchSearchUsersQuery(queryClient: QueryClient, params: {
   variables: SearchUsersVariables;
@@ -510,7 +506,7 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import { customQueryKeys } from "../query-keys";
 import type { UserSelect, User } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const currentUserQueryKey = customQueryKeys.currentUser;
@@ -527,13 +523,13 @@ export const currentUserQueryKey = customQueryKeys.currentUser;
  * \`\`\`
  */
 export function useCurrentUserQuery<S extends UserSelect, TData = {
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseQueryOptions<{
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
 export function useCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
@@ -562,10 +558,10 @@ export function useCurrentUserQuery(params: {
  */
 export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<{
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }>;
 export async function fetchCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
@@ -585,8 +581,8 @@ export async function fetchCurrentUserQuery(params: {
  */
 export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<void>;
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
   selection: SelectionConfig<UserSelect>;
@@ -615,7 +611,7 @@ import { getClient } from "../client";
 import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { UserSelect, User } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect } from "../../orm/input-types";
 /** Query key factory for caching */
 export const currentUserQueryKey = () => ["currentUser"] as const;
@@ -632,13 +628,13 @@ export const currentUserQueryKey = () => ["currentUser"] as const;
  * \`\`\`
  */
 export function useCurrentUserQuery<S extends UserSelect, TData = {
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseQueryOptions<{
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
 export function useCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
@@ -667,10 +663,10 @@ export function useCurrentUserQuery(params: {
  */
 export async function fetchCurrentUserQuery<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<{
-  currentUser: InferSelectResult<User, S>;
+  currentUser: InferSelectResult<User, S> | null;
 }>;
 export async function fetchCurrentUserQuery(params: {
   selection: SelectionConfig<UserSelect>;
@@ -690,8 +686,8 @@ export async function fetchCurrentUserQuery(params: {
  */
 export async function prefetchCurrentUserQuery<S extends UserSelect>(queryClient: QueryClient, params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 }): Promise<void>;
 export async function prefetchCurrentUserQuery(queryClient: QueryClient, params: {
   selection: SelectionConfig<UserSelect>;
@@ -722,7 +718,7 @@ import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
 import type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a User
@@ -738,8 +734,8 @@ export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/i
  */
 export function useCreateUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   createUser: {
     user: InferSelectResult<UserWithRelations, S>;
@@ -791,7 +787,7 @@ import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
 import type { PostSelect, PostWithRelations, CreatePostInput } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations, CreatePostInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a Post
@@ -807,8 +803,8 @@ export type { PostSelect, PostWithRelations, CreatePostInput } from "../../orm/i
  */
 export function useCreatePostMutation<S extends PostSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, PostSelect>);
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
 } & Omit<UseMutationOptions<{
   createPost: {
     post: InferSelectResult<PostWithRelations, S>;
@@ -858,7 +854,7 @@ import { getClient } from "../client";
 import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/input-types";
 /**
  * Mutation hook for creating a User
@@ -874,8 +870,8 @@ export type { UserSelect, UserWithRelations, CreateUserInput } from "../../orm/i
  */
 export function useCreateUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   createUser: {
     user: InferSelectResult<UserWithRelations, S>;
@@ -926,7 +922,7 @@ import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
 import type { UserSelect, UserWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a User with typed selection
@@ -942,8 +938,8 @@ export type { UserSelect, UserWithRelations } from "../../orm/input-types";
  */
 export function useDeleteUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   deleteUser: {
     user: InferSelectResult<UserWithRelations, S>;
@@ -1010,7 +1006,7 @@ import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
 import type { PostSelect, PostWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a Post with typed selection
@@ -1026,8 +1022,8 @@ export type { PostSelect, PostWithRelations } from "../../orm/input-types";
  */
 export function useDeletePostMutation<S extends PostSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, PostSelect>);
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
 } & Omit<UseMutationOptions<{
   deletePost: {
     post: InferSelectResult<PostWithRelations, S>;
@@ -1092,7 +1088,7 @@ import { getClient } from "../client";
 import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /**
  * Mutation hook for deleting a User with typed selection
@@ -1108,8 +1104,8 @@ export type { UserSelect, UserWithRelations } from "../../orm/input-types";
  */
 export function useDeleteUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   deleteUser: {
     user: InferSelectResult<UserWithRelations, S>;
@@ -1175,7 +1171,7 @@ import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import { userMutationKeys } from "../mutation-keys";
 import type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a User
@@ -1186,33 +1182,33 @@ export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdateUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">): UseMutationResult<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>;
 export function useUpdateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
@@ -1225,15 +1221,15 @@ export function useUpdateUserMutation(params: {
     mutationKey: userMutationKeys.all,
     mutationFn: ({
       id,
-      patch
+      userPatch
     }: {
       id: string;
-      patch: UserPatch;
+      userPatch: UserPatch;
     }) => getClient().user.update({
       where: {
         id
       },
-      data: patch,
+      data: userPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {
@@ -1265,7 +1261,7 @@ import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import { postMutationKeys } from "../mutation-keys";
 import type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a Post
@@ -1276,33 +1272,33 @@ export type { PostSelect, PostWithRelations, PostPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', postPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdatePostMutation<S extends PostSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, PostSelect>);
+    fields: S & PostSelect;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>);
 } & Omit<UseMutationOptions<{
   updatePost: {
     post: InferSelectResult<PostWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>, "mutationFn">): UseMutationResult<{
   updatePost: {
     post: InferSelectResult<PostWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>;
 export function useUpdatePostMutation(params: {
   selection: SelectionConfig<PostSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: PostPatch;
+  postPatch: PostPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<PostSelect>(params.selection);
   const {
@@ -1315,15 +1311,15 @@ export function useUpdatePostMutation(params: {
     mutationKey: postMutationKeys.all,
     mutationFn: ({
       id,
-      patch
+      postPatch
     }: {
       id: string;
-      patch: PostPatch;
+      postPatch: PostPatch;
     }) => getClient().post.update({
       where: {
         id
       },
-      data: patch,
+      data: postPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {
@@ -1353,7 +1349,7 @@ import { getClient } from "../client";
 import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-types";
 /**
  * Mutation hook for updating a User
@@ -1364,33 +1360,33 @@ export type { UserSelect, UserWithRelations, UserPatch } from "../../orm/input-t
  *   selection: { fields: { id: true, name: true } },
  * });
  * 
- * mutate({ id: 'value-here', patch: { name: 'Updated' } });
+ * mutate({ id: 'value-here', userPatch: { name: 'Updated' } });
  * \`\`\`
  */
 export function useUpdateUserMutation<S extends UserSelect>(params: {
   selection: ({
-    fields: S;
-  } & StrictSelect<S, UserSelect>);
+    fields: S & UserSelect;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>);
 } & Omit<UseMutationOptions<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">): UseMutationResult<{
   updateUser: {
     user: InferSelectResult<UserWithRelations, S>;
   };
 }, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>;
 export function useUpdateUserMutation(params: {
   selection: SelectionConfig<UserSelect>;
 } & Omit<UseMutationOptions<any, Error, {
   id: string;
-  patch: UserPatch;
+  userPatch: UserPatch;
 }>, "mutationFn">) {
   const args = buildSelectionArgs<UserSelect>(params.selection);
   const {
@@ -1402,15 +1398,15 @@ export function useUpdateUserMutation(params: {
   return useMutation({
     mutationFn: ({
       id,
-      patch
+      userPatch
     }: {
       id: string;
-      patch: UserPatch;
+      userPatch: UserPatch;
     }) => getClient().user.update({
       where: {
         id
       },
-      data: patch,
+      data: userPatch,
       select: args.select
     }).unwrap(),
     onSuccess: (_, variables) => {
@@ -1441,7 +1437,7 @@ import { buildListSelectionArgs } from "../selection";
 import type { ListSelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, StrictSelect } from "../../orm/select-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const usersQueryKey = userKeys.list;
@@ -1465,7 +1461,7 @@ export function useUsersQuery<S extends UserSelect, TData = {
 }>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 } & Omit<UseQueryOptions<{
   users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
@@ -1500,7 +1496,7 @@ export function useUsersQuery(params: {
 export async function fetchUsersQuery<S extends UserSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<{
   users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
 }>;
@@ -1521,7 +1517,7 @@ export async function fetchUsersQuery(params: {
 export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<void>;
 export async function prefetchUsersQuery(queryClient: QueryClient, params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
@@ -1550,7 +1546,7 @@ import type { ListSelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import type { PostScope } from "../query-keys";
 import type { PostSelect, PostWithRelations, PostFilter, PostsOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, StrictSelect } from "../../orm/select-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations, PostFilter, PostsOrderBy } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const postsQueryKey = postKeys.list;
@@ -1582,7 +1578,7 @@ export function usePostsQuery<S extends PostSelect, TData = {
 }>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & StrictSelect<S, PostSelect>;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
 } & Omit<UseQueryOptions<{
   posts: ConnectionResult<InferSelectResult<PostWithRelations, S>>;
 }, Error, TData>, "queryKey" | "queryFn"> & {
@@ -1622,7 +1618,7 @@ export function usePostsQuery(params: {
 export async function fetchPostsQuery<S extends PostSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & StrictSelect<S, PostSelect>;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
 }): Promise<{
   posts: ConnectionResult<InferSelectResult<PostWithRelations, S>>;
 }>;
@@ -1643,7 +1639,7 @@ export async function fetchPostsQuery(params: {
 export async function prefetchPostsQuery<S extends PostSelect>(queryClient: QueryClient, params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & StrictSelect<S, PostSelect>;
+  } & Omit<ListSelectionConfig<S, PostFilter, PostsOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, PostSelect>;
 } & {
   scope?: PostScope;
 }): Promise<void>;
@@ -1674,7 +1670,7 @@ import { getClient } from "../client";
 import { buildListSelectionArgs } from "../selection";
 import type { ListSelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
-import type { FindManyArgs, InferSelectResult, ConnectionResult, StrictSelect } from "../../orm/select-types";
+import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
 export const usersQueryKey = (variables?: FindManyArgs<unknown, UserFilter, UsersOrderBy>) => ["user", "list", variables] as const;
 /**
@@ -1697,7 +1693,7 @@ export function useUsersQuery<S extends UserSelect, TData = {
 }>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 } & Omit<UseQueryOptions<{
   users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
@@ -1732,7 +1728,7 @@ export function useUsersQuery(params: {
 export async function fetchUsersQuery<S extends UserSelect>(params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<{
   users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
 }>;
@@ -1753,7 +1749,7 @@ export async function fetchUsersQuery(params: {
 export async function prefetchUsersQuery<S extends UserSelect>(queryClient: QueryClient, params: {
   selection: {
     fields: S;
-  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & StrictSelect<S, UserSelect>;
+  } & Omit<ListSelectionConfig<S, UserFilter, UsersOrderBy>, "fields"> & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<void>;
 export async function prefetchUsersQuery(queryClient: QueryClient, params: {
   selection: ListSelectionConfig<UserSelect, UserFilter, UsersOrderBy>;
@@ -1781,7 +1777,7 @@ import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import { userKeys } from "../query-keys";
 import type { UserSelect, UserWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const userQueryKey = userKeys.detail;
@@ -1802,7 +1798,7 @@ export function useUserQuery<S extends UserSelect, TData = {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 } & Omit<UseQueryOptions<{
   user: InferSelectResult<UserWithRelations, S> | null;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
@@ -1840,7 +1836,7 @@ export async function fetchUserQuery<S extends UserSelect>(params: {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<{
   user: InferSelectResult<UserWithRelations, S> | null;
 }>;
@@ -1866,7 +1862,7 @@ export async function prefetchUserQuery<S extends UserSelect>(queryClient: Query
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<void>;
 export async function prefetchUserQuery(queryClient: QueryClient, params: {
   id: string;
@@ -1899,7 +1895,7 @@ import type { SelectionConfig } from "../selection";
 import { postKeys } from "../query-keys";
 import type { PostScope } from "../query-keys";
 import type { PostSelect, PostWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { PostSelect, PostWithRelations } from "../../orm/input-types";
 /** Query key factory - re-exported from query-keys.ts */
 export const postQueryKey = postKeys.detail;
@@ -1929,7 +1925,7 @@ export function usePostQuery<S extends PostSelect, TData = {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, PostSelect>;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
 } & Omit<UseQueryOptions<{
   post: InferSelectResult<PostWithRelations, S> | null;
 }, Error, TData>, "queryKey" | "queryFn"> & {
@@ -1972,7 +1968,7 @@ export async function fetchPostQuery<S extends PostSelect>(params: {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, PostSelect>;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
 }): Promise<{
   post: InferSelectResult<PostWithRelations, S> | null;
 }>;
@@ -1998,7 +1994,7 @@ export async function prefetchPostQuery<S extends PostSelect>(queryClient: Query
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, PostSelect>;
+  } & HookStrictSelect<NoInfer<S>, PostSelect>;
 } & {
   scope?: PostScope;
 }): Promise<void>;
@@ -2033,7 +2029,7 @@ import { getClient } from "../client";
 import { buildSelectionArgs } from "../selection";
 import type { SelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations } from "../../orm/input-types";
-import type { InferSelectResult, StrictSelect } from "../../orm/select-types";
+import type { InferSelectResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations } from "../../orm/input-types";
 export const userQueryKey = (id: string) => ["user", "detail", id] as const;
 /**
@@ -2053,7 +2049,7 @@ export function useUserQuery<S extends UserSelect, TData = {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 } & Omit<UseQueryOptions<{
   user: InferSelectResult<UserWithRelations, S> | null;
 }, Error, TData>, "queryKey" | "queryFn">): UseQueryResult<TData>;
@@ -2091,7 +2087,7 @@ export async function fetchUserQuery<S extends UserSelect>(params: {
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<{
   user: InferSelectResult<UserWithRelations, S> | null;
 }>;
@@ -2117,7 +2113,7 @@ export async function prefetchUserQuery<S extends UserSelect>(queryClient: Query
   id: string;
   selection: {
     fields: S;
-  } & StrictSelect<S, UserSelect>;
+  } & HookStrictSelect<NoInfer<S>, UserSelect>;
 }): Promise<void>;
 export async function prefetchUserQuery(queryClient: QueryClient, params: {
   id: string;

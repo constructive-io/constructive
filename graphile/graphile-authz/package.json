@@ -1,0 +1,49 @@
+{
+  "name": "graphile-authz",
+  "version": "1.0.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Dynamic PostGraphile v5 authorization plugin based on Authz node types from constructive-db",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "makage": "^0.1.10"
+  },
+  "dependencies": {
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphql",
+    "postgresql",
+    "authorization",
+    "authz",
+    "security",
+    "constructive"
+  ]
+}

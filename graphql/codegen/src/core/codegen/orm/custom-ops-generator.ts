@@ -12,6 +12,7 @@ import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
   getTypeBaseName,
   isTypeRequired,
+  scalarToTsType,
   typeRefToTsType,
 } from '../type-resolver';
 import { getGeneratedFileHeader, ucFirst } from '../utils';
@@ -157,8 +158,24 @@ function buildSelectedResultTsType(
   typeRef: CleanArgument['type'],
   payloadTypeName: string,
 ): t.TSType {
+  const nonNullable = buildSelectedResultTsTypeNonNullable(
+    typeRef,
+    payloadTypeName,
+  );
+
+  if (typeRef.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function buildSelectedResultTsTypeNonNullable(
+  typeRef: CleanArgument['type'],
+  payloadTypeName: string,
+): t.TSType {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
-    return buildSelectedResultTsType(
+    return buildSelectedResultTsTypeNonNullable(
       typeRef.ofType as CleanArgument['type'],
       payloadTypeName,
     );
@@ -180,6 +197,41 @@ function buildSelectedResultTsType(
       t.tsTypeReference(t.identifier('S')),
     ]),
   );
+}
+
+function scalarTsTypeToAst(typeName: string): t.TSType {
+  if (typeName === 'string') return t.tsStringKeyword();
+  if (typeName === 'number') return t.tsNumberKeyword();
+  if (typeName === 'boolean') return t.tsBooleanKeyword();
+  return t.tsUnknownKeyword();
+}
+
+function buildRawResultTsType(typeRef: CleanArgument['type']): t.TSType {
+  const nonNullable = buildRawResultTsTypeNonNullable(typeRef);
+
+  if (typeRef.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function buildRawResultTsTypeNonNullable(
+  typeRef: CleanArgument['type'],
+): t.TSType {
+  if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
+    return buildRawResultTsTypeNonNullable(typeRef.ofType as CleanArgument['type']);
+  }
+
+  if (typeRef.kind === 'LIST' && typeRef.ofType) {
+    return t.tsArrayType(buildRawResultTsType(typeRef.ofType as CleanArgument['type']));
+  }
+
+  if (typeRef.kind === 'SCALAR') {
+    return scalarTsTypeToAst(scalarToTsType(typeRef.name ?? 'unknown'));
+  }
+
+  return t.tsTypeReference(t.identifier(typeRef.name ?? 'unknown'));
 }
 
 function buildOperationMethod(
@@ -318,12 +370,11 @@ function buildOperationMethod(
     ]);
   } else {
     // Scalar/Connection type: use raw TS type directly
-    const rawTsType = typeRefToTsType(op.returnType);
     (newExpr as any).typeParameters = t.tsTypeParameterInstantiation([
       t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier(op.name),
-          t.tsTypeAnnotation(parseTypeAnnotation(rawTsType)),
+          t.tsTypeAnnotation(buildRawResultTsType(op.returnType)),
         ),
       ]),
     ]);

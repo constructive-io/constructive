@@ -27,9 +27,20 @@ export interface ListSelectionConfig<
   offset?: number;
 }
 
+function ensureSelectionFields(
+  selection: SelectionConfig<unknown> | undefined,
+): asserts selection is SelectionConfig<unknown> {
+  if (!selection || typeof selection !== 'object' || !('fields' in selection)) {
+    throw new Error(
+      'Invalid hook params: `selection.fields` is required. Example: { selection: { fields: { id: true } } }',
+    );
+  }
+}
+
 export function buildSelectionArgs<TFields>(
   selection: SelectionConfig<TFields>,
 ): { select: TFields } {
+  ensureSelectionFields(selection);
   return { select: selection.fields };
 }
 
@@ -45,6 +56,7 @@ export function buildListSelectionArgs<TFields, TWhere, TOrderBy>(
   before?: string;
   offset?: number;
 } {
+  ensureSelectionFields(selection);
   return {
     select: selection.fields,
     where: selection.where,

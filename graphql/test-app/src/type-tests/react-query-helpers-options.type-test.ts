@@ -10,17 +10,19 @@
 import { QueryClient } from '@tanstack/react-query';
 
 import {
+  fetchCurrentUserQuery,
   fetchDatabasesQuery,
+  fetchUserQuery,
   fetchStepsRequiredQuery,
-  fetchUserByUsernameQuery,
+  prefetchCurrentUserQuery,
   prefetchDatabasesQuery,
+  prefetchUserQuery,
   prefetchStepsRequiredQuery,
-  prefetchUserByUsernameQuery,
+  useAppPermissionsGetByMaskQuery,
   useCurrentUserQuery,
   useDatabasesQuery,
   useSignInMutation,
   useStepsRequiredQuery,
-  useUserByUsernameQuery,
 } from '../generated/hooks';
 
 type Assert<T extends true> = T;
@@ -80,8 +82,7 @@ function helperOverloadChecks() {
   // @ts-expect-error selection.fields is required
   fetchDatabasesQuery({ selection: { first: 2 } });
 
-  const selectedUserByUsernameFetch = fetchUserByUsernameQuery({
-    variables: { username: 'dev' },
+  const selectedCurrentUserFetch = fetchCurrentUserQuery({
     selection: {
       fields: {
         id: true,
@@ -89,15 +90,14 @@ function helperOverloadChecks() {
       },
     },
   });
-  type SelectedUserByUsername = Awaited<
-    typeof selectedUserByUsernameFetch
-  >['userByUsername'];
-  type _selectedUserByUsernameHasUsername = Assert<
-    HasKey<SelectedUserByUsername, 'username'>
+  type SelectedCurrentUser = Awaited<
+    typeof selectedCurrentUserFetch
+  >['currentUser'];
+  type _selectedCurrentUserHasUsername = Assert<
+    HasKey<SelectedCurrentUser, 'username'>
   >;
 
-  prefetchUserByUsernameQuery(queryClient, {
-    variables: { username: 'dev' },
+  prefetchCurrentUserQuery(queryClient, {
     selection: {
       fields: {
         id: true,
@@ -105,10 +105,37 @@ function helperOverloadChecks() {
     },
   });
 
+  const selectedUserFetch = fetchUserQuery({
+    id: '00000000-0000-0000-0000-000000000000',
+    selection: {
+      fields: {
+        id: true,
+        username: true,
+      },
+    },
+  });
+  type SelectedUser = Awaited<typeof selectedUserFetch>['user'];
+  type _selectedUserHasUsername = Assert<
+    HasKey<NonNullable<SelectedUser>, 'username'>
+  >;
+
+  prefetchUserQuery(queryClient, {
+    id: '00000000-0000-0000-0000-000000000000',
+    selection: {
+      fields: {
+        id: true,
+      },
+    },
+  });
+
+  // @ts-expect-error selection is required for selection-enabled single-item helpers
+  fetchUserQuery({ id: '00000000-0000-0000-0000-000000000000' });
+
+  // @ts-expect-error selection is required for selection-enabled single-item helpers
+  prefetchUserQuery(queryClient, { id: '00000000-0000-0000-0000-000000000000' });
+
   // @ts-expect-error selection is required for selection-enabled custom query helpers
-  fetchUserByUsernameQuery({ variables: { username: 'dev' } });
-  // @ts-expect-error variables are required for this custom query helper
-  fetchUserByUsernameQuery({ selection: { fields: { id: true } } });
+  fetchCurrentUserQuery();
 
   // Optional variables flow for custom queries without selection support.
   fetchStepsRequiredQuery();
@@ -122,6 +149,13 @@ function helperOverloadChecks() {
   });
   // @ts-expect-error selection is not available on this custom query
   useStepsRequiredQuery({ selection: { fields: { id: true } } });
+
+  useAppPermissionsGetByMaskQuery({
+    variables: { mask: '1001', first: 5 },
+    enabled: false,
+  });
+  // @ts-expect-error selection is not available on this custom query
+  useAppPermissionsGetByMaskQuery({ selection: { fields: { id: true } } });
 }
 
 function reactQueryOptionsChecks() {
@@ -204,16 +238,14 @@ function reactQueryOptionsChecks() {
   const currentUserId: string | undefined = currentUserResult.data?.currentUser.id;
   void currentUserId;
 
-  useUserByUsernameQuery({
-    variables: { username: 'dev' },
-    selection: {
-      fields: {
-        id: true,
-      },
-    },
+  const permissionIdsResult = useAppPermissionsGetByMaskQuery({
+    variables: { mask: '101', first: 10 },
+    select: (data) => data.appPermissionsGetByMask.nodes.map((node) => node.id),
     enabled: false,
     staleTime: 5_000,
   });
+  const permissionIds: Array<string | undefined> | undefined = permissionIdsResult.data;
+  void permissionIds;
 
   // @ts-expect-error unknown React Query option should be rejected
   useDatabasesQuery({ selection: { fields: { id: true } }, unknownOption: true });

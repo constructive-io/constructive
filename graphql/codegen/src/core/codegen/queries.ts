@@ -141,7 +141,12 @@ export function generateListQueryHook(
   statements.push(
     createImportDeclaration(
       '../../orm/select-types',
-      ['FindManyArgs', 'InferSelectResult', 'ConnectionResult', 'StrictSelect'],
+      [
+        'FindManyArgs',
+        'InferSelectResult',
+        'ConnectionResult',
+        'HookStrictSelect',
+      ],
       true,
     ),
   );
@@ -352,18 +357,20 @@ export function generateListQueryHook(
   const fetchFnName = `fetch${ucFirst(pluralName)}Query`;
   {
     // Overload 1: with fields
-    const f1ParamType = t.tsTypeLiteral([
-      t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(
-          withFieldsListSelectionType(
-            sRef(),
-            selectTypeName,
-            filterTypeName,
-            orderByTypeName,
+    const f1ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(
+            withFieldsListSelectionType(
+              sRef(),
+              selectTypeName,
+              filterTypeName,
+              orderByTypeName,
+            ),
           ),
         ),
-      ),
+      ]),
     ]);
     const f1Decl = exportAsyncDeclareFunction(
       fetchFnName,
@@ -423,26 +430,28 @@ export function generateListQueryHook(
     const prefetchFnName = `prefetch${ucFirst(pluralName)}Query`;
 
     // Overload 1: with fields
-    const p1Params: t.TSPropertySignature[] = [
-      t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(
-          withFieldsListSelectionType(
-            sRef(),
-            selectTypeName,
-            filterTypeName,
-            orderByTypeName,
+    const p1BaseParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(
+            withFieldsListSelectionType(
+              sRef(),
+              selectTypeName,
+              filterTypeName,
+              orderByTypeName,
+            ),
           ),
         ),
-      ),
-    ];
+      ]),
+    ]);
     const p1ParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral(p1Params),
+            p1BaseParamType,
             scopeTypeLiteral(scopeTypeName),
           ])
-        : t.tsTypeLiteral(p1Params);
+        : p1BaseParamType;
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
       createSTypeParam(selectTypeName),
@@ -623,7 +632,7 @@ export function generateSingleQueryHook(
   statements.push(
     createImportDeclaration(
       '../../orm/select-types',
-      ['InferSelectResult', 'StrictSelect'],
+      ['InferSelectResult', 'HookStrictSelect'],
       true,
     ),
   );
@@ -734,18 +743,17 @@ export function generateSingleQueryHook(
     }
 
     // Overload 1: with fields
-    const o1Props = [
-      t.tsPropertySignature(
-        t.identifier(pkFieldName),
-        t.tsTypeAnnotation(pkTsType),
-      ),
-      t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
-      ),
-    ];
     const o1ParamType = t.tsIntersectionType([
-      t.tsTypeLiteral(o1Props),
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier(pkFieldName),
+          t.tsTypeAnnotation(pkTsType),
+        ),
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+        ),
+      ]),
       buildSingleOptionsType(singleResultTypeAST(sRef()), typeRef('TData')),
     ]);
     const o1 = exportDeclareFunction(
@@ -822,20 +830,22 @@ export function generateSingleQueryHook(
   const fetchFnName = `fetch${ucFirst(singularName)}Query`;
   {
     // Overload 1: with fields
-    const f1Props = [
-      t.tsPropertySignature(
-        t.identifier(pkFieldName),
-        t.tsTypeAnnotation(pkTsType),
-      ),
-      t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
-      ),
-    ];
+    const f1ParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier(pkFieldName),
+          t.tsTypeAnnotation(pkTsType),
+        ),
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+        ),
+      ]),
+    ]);
     const f1Decl = exportAsyncDeclareFunction(
       fetchFnName,
       createSTypeParam(selectTypeName),
-      [createFunctionParam('params', t.tsTypeLiteral(f1Props))],
+      [createFunctionParam('params', f1ParamType)],
       typeRef('Promise', [singleResultTypeAST(sRef())]),
     );
     addJSDocComment(f1Decl, [
@@ -884,23 +894,25 @@ export function generateSingleQueryHook(
     const prefetchFnName = `prefetch${ucFirst(singularName)}Query`;
 
     // Overload 1: with fields
-    const p1Props: t.TSPropertySignature[] = [
-      t.tsPropertySignature(
-        t.identifier(pkFieldName),
-        t.tsTypeAnnotation(pkTsType),
-      ),
-      t.tsPropertySignature(
-        t.identifier('selection'),
-        t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
-      ),
-    ];
+    const p1BaseParamType = t.tsIntersectionType([
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier(pkFieldName),
+          t.tsTypeAnnotation(pkTsType),
+        ),
+        t.tsPropertySignature(
+          t.identifier('selection'),
+          t.tsTypeAnnotation(withFieldsSelectionType(sRef(), selectTypeName)),
+        ),
+      ]),
+    ]);
     const p1ParamType =
       hasRelationships && useCentralizedKeys
         ? t.tsIntersectionType([
-            t.tsTypeLiteral(p1Props),
+            p1BaseParamType,
             scopeTypeLiteral(scopeTypeName),
           ])
-        : t.tsTypeLiteral(p1Props);
+        : p1BaseParamType;
     const p1Decl = exportAsyncDeclareFunction(
       prefetchFnName,
       createSTypeParam(selectTypeName),

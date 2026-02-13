@@ -1,7 +1,7 @@
 {
   "name": "graphile-search-plugin",
-  "version": "1.1.1",
-  "description": "generate search conditions for your tsvector columns",
+  "version": "2.0.0",
+  "description": "Generate search conditions for your tsvector columns (PostGraphile v5)",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -10,8 +10,7 @@
   "types": "index.d.ts",
   "scripts": {
     "clean": "makage clean",
-    "copy": "makage assets",
-    "prepack": "pnpm run build",
+    "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
@@ -33,21 +32,36 @@
     "pgpm",
     "plugin",
     "postgres",
-    "graphql"
+    "graphql",
+    "search",
+    "tsvector",
+    "full-text-search"
   ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "graphile-plugin-connection-filter": "workspace:^",
-    "graphile-plugin-fulltext-filter": "workspace:^",
-    "graphile-simple-inflector": "workspace:^",
+    "@types/node": "^22.19.1",
     "graphile-test": "workspace:^",
-    "makage": "^0.1.12",
+    "makage": "^0.1.10",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1",
     "pgsql-test": "workspace:^"
   },
   "dependencies": {
-    "graphile-build": "^4.14.1",
-    "graphql-tag": "2.12.6"
+    "@dataplan/pg": "1.0.0-rc.3",
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "pg-sql2": "^5.0.0-rc.3"
+  },
+  "peerDependencies": {
+    "graphql": "^16.9.0",
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "postgraphile-plugin-connection-filter": {
+      "optional": true
+    }
   }
 }

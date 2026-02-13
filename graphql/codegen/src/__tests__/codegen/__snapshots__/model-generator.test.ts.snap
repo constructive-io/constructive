@@ -17,8 +17,7 @@ export class UserModel {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
-  }>;
-  findMany(args: FindManyArgs<UserSelect, UserFilter, UsersOrderBy>) {
+  }> {
     const {
       document,
       variables
@@ -46,8 +45,7 @@ export class UserModel {
     users: {
       nodes: InferSelectResult<UserWithRelations, S>[];
     };
-  }>;
-  findFirst(args: FindFirstArgs<UserSelect, UserFilter>) {
+  }> {
     const {
       document,
       variables
@@ -68,11 +66,7 @@ export class UserModel {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     user: InferSelectResult<UserWithRelations, S> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select: UserSelect;
-  }) {
+  }> {
     const {
       document,
       variables
@@ -92,8 +86,7 @@ export class UserModel {
     createUser: {
       user: InferSelectResult<UserWithRelations, S>;
     };
-  }>;
-  create(args: CreateArgs<UserSelect, CreateUserInput["user"]>) {
+  }> {
     const {
       document,
       variables
@@ -115,14 +108,11 @@ export class UserModel {
     updateUser: {
       user: InferSelectResult<UserWithRelations, S>;
     };
-  }>;
-  update(args: UpdateArgs<UserSelect, {
-    id: string;
-  }, UserPatch>) {
+  }> {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("User", "updateUser", "user", args.select, args.where.id, args.data, "UpdateUserInput", "id", "userPatch", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -140,10 +130,7 @@ export class UserModel {
     deleteUser: {
       user: InferSelectResult<UserWithRelations, S>;
     };
-  }>;
-  delete(args: DeleteArgs<{
-    id: string;
-  }, UserSelect>) {
+  }> {
     const {
       document,
       variables
@@ -177,8 +164,7 @@ export class AuditLogModel {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLogs: ConnectionResult<InferSelectResult<AuditLogWithRelations, S>>;
-  }>;
-  findMany(args: FindManyArgs<AuditLogSelect, AuditLogFilter, AuditLogsOrderBy>) {
+  }> {
     const {
       document,
       variables
@@ -206,8 +192,7 @@ export class AuditLogModel {
     auditLogs: {
       nodes: InferSelectResult<AuditLogWithRelations, S>[];
     };
-  }>;
-  findFirst(args: FindFirstArgs<AuditLogSelect, AuditLogFilter>) {
+  }> {
     const {
       document,
       variables
@@ -228,11 +213,7 @@ export class AuditLogModel {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLog: InferSelectResult<AuditLogWithRelations, S> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select: AuditLogSelect;
-  }) {
+  }> {
     const {
       document,
       variables
@@ -252,8 +233,7 @@ export class AuditLogModel {
     createAuditLog: {
       auditLog: InferSelectResult<AuditLogWithRelations, S>;
     };
-  }>;
-  create(args: CreateArgs<AuditLogSelect, CreateAuditLogInput["auditLog"]>) {
+  }> {
     const {
       document,
       variables
@@ -287,8 +267,7 @@ export class OrganizationModel {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     allOrganizations: ConnectionResult<InferSelectResult<OrganizationWithRelations, S>>;
-  }>;
-  findMany(args: FindManyArgs<OrganizationSelect, OrganizationFilter, OrganizationsOrderBy>) {
+  }> {
     const {
       document,
       variables
@@ -316,8 +295,7 @@ export class OrganizationModel {
     allOrganizations: {
       nodes: InferSelectResult<OrganizationWithRelations, S>[];
     };
-  }>;
-  findFirst(args: FindFirstArgs<OrganizationSelect, OrganizationFilter>) {
+  }> {
     const {
       document,
       variables
@@ -338,11 +316,7 @@ export class OrganizationModel {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     organizationById: InferSelectResult<OrganizationWithRelations, S> | null;
-  }>;
-  findOne(args: {
-    id: string;
-    select: OrganizationSelect;
-  }) {
+  }> {
     const {
       document,
       variables
@@ -362,8 +336,7 @@ export class OrganizationModel {
     registerOrganization: {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
-  }>;
-  create(args: CreateArgs<OrganizationSelect, CreateOrganizationInput["organization"]>) {
+  }> {
     const {
       document,
       variables
@@ -385,14 +358,11 @@ export class OrganizationModel {
     modifyOrganization: {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
-  }>;
-  update(args: UpdateArgs<OrganizationSelect, {
-    id: string;
-  }, OrganizationPatch>) {
+  }> {
     const {
       document,
       variables
-    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", connectionFieldsMap);
+    } = buildUpdateByPkDocument("Organization", "modifyOrganization", "organization", args.select, args.where.id, args.data, "UpdateOrganizationInput", "id", "organizationPatch", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -410,10 +380,7 @@ export class OrganizationModel {
     removeOrganization: {
       organization: InferSelectResult<OrganizationWithRelations, S>;
     };
-  }>;
-  delete(args: DeleteArgs<{
-    id: string;
-  }, OrganizationSelect>) {
+  }> {
     const {
       document,
       variables

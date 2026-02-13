@@ -5,9 +5,9 @@
  */
 
 import {
+  useAppPermissionsGetByMaskQuery,
   useCurrentUserQuery,
   useSignInMutation,
-  useUserByUsernameQuery,
   useUserQuery,
   useUsersQuery,
 } from '../generated/hooks';
@@ -71,20 +71,12 @@ function hookTypeChecks() {
   const nestedSchema = users.data?.users.nodes[0]?.ownedDatabases?.nodes[0]?.schemaName;
   void nestedSchema;
 
-  useUserByUsernameQuery({
-    variables: { username: 'dev' },
-    selection: {
-      fields: {
-        id: true,
-        username: true,
-      },
-    },
+  useAppPermissionsGetByMaskQuery({
+    variables: { mask: '11', first: 10 },
+    enabled: false,
   });
-
-  // @ts-expect-error variables are required for this custom query
-  useUserByUsernameQuery({
-    selection: { fields: { id: true } },
-  });
+  // @ts-expect-error selection is not available on this custom query
+  useAppPermissionsGetByMaskQuery({ selection: { fields: { id: true } } });
 
   // @ts-expect-error selection is required for custom mutation hooks
   useSignInMutation();
@@ -219,20 +211,9 @@ async function ormModelTypeChecks() {
   // @ts-expect-error custom ORM query requires options with select
   ormClient.query.currentUser();
 
-  ormClient.query.userByUsername(
-    {
-      username: 'dev',
-    },
-    {
-      select: {
-        id: true,
-      },
-    },
-  );
-  // @ts-expect-error custom ORM query requires options with select
-  ormClient.query.userByUsername({
-    username: 'dev',
-  });
+  ormClient.query.appPermissionsGetByMask({});
+  // @ts-expect-error appPermissionsGetByMask requires an args object
+  ormClient.query.appPermissionsGetByMask();
 
   ormClient.mutation.signIn(
     {

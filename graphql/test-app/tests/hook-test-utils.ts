@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  notifyManager,
+} from '@tanstack/react-query';
 import React from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 
@@ -17,6 +21,7 @@ export interface HookHarness<TResult> {
 
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_INTERVAL_MS = 30;
+let reactQueryActBridgeConfigured = false;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -30,6 +35,14 @@ export async function renderHookWithClient<TResult>(
 ): Promise<HookHarness<TResult>> {
   // Enables React's act() environment checks for non-Jest runtimes.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+  if (!reactQueryActBridgeConfigured) {
+    notifyManager.setNotifyFunction((callback) => {
+      act(() => {
+        callback();
+      });
+    });
+    reactQueryActBridgeConfigured = true;
+  }
 
   let renderer: ReactTestRenderer | null = null;
   let latestResult: TResult | undefined;

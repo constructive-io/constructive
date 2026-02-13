@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/cli",
-  "version": "6.2.1",
+  "version": "6.1.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI",
   "main": "index.js",
@@ -23,11 +23,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "scripts": {
-    "clean": "makage clean",
-    "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "scripts": {
+      "clean": "makage clean",
+      "prepack": "npm run build",
+      "build": "echo 'SKIPPED: cli disabled during v5 migration'",
+      "build:dev": "echo 'SKIPPED: cli disabled during v5 migration'",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
@@ -40,7 +40,7 @@
     "@types/pg": "^8.16.0",
     "@types/shelljs": "^0.8.16",
     "glob": "^13.0.0",
-    "makage": "^0.1.12",
+    "makage": "^0.1.10",
     "pg": "^8.17.1",
     "ts-node": "^10.9.2"
   },
@@ -49,6 +49,7 @@
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
+    "@constructive-io/graphql-types": "workspace:^",
     "@constructive-io/knative-job-service": "workspace:^",
     "@inquirerer/utils": "^3.2.0",
     "@pgpmjs/core": "workspace:^",

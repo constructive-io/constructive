@@ -2,11 +2,7 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN image AS jsonb CHECK (
-  value ?& ARRAY['url', 'mime']
-  AND
-  value->>'url' ~ '^(https?)://[^\s/$.?#].[^\s]*$'
-);
-COMMENT ON DOMAIN image IS E'@name pgpmInternalTypeImage';
+CREATE DOMAIN image AS jsonb CHECK (value ? 'url');
+COMMENT ON DOMAIN image IS E'@name constructiveInternalTypeImage';
 COMMIT;
 

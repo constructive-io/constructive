@@ -1,6 +1,6 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
-import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { GraphileCache, graphileCache } from 'graphile-cache';
@@ -13,7 +13,7 @@ import { postgraphile } from 'postgraphile';
 import { printDatabases, printSchemas } from './render';
 import { getGraphileSettings } from './settings';
 
-export const GraphQLExplorer = (rawOpts: PgpmOptions = {}): Express => {
+export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
 
   const { pg, server } = opts;

@@ -137,6 +137,14 @@ const simpleCustomQueries: CleanOperation[] = [
   },
 ];
 
+const optionalArgsCustomQuery: CleanOperation = {
+  name: 'recentUsers',
+  kind: 'query',
+  args: [{ name: 'limit', type: createTypeRef('SCALAR', 'Int') }],
+  returnType: createTypeRef('OBJECT', 'User'),
+  description: 'Fetch recently active users',
+};
+
 const simpleCustomMutations: CleanOperation[] = [
   {
     name: 'login',
@@ -452,6 +460,34 @@ describe('Custom Query Hook Generators', () => {
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
     });
+
+    it('keeps nullable return typing for selected custom queries', () => {
+      const result = generateCustomQueryHook({
+        operation: simpleCustomQueries[0],
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      expect(result!.content).toContain(
+        'currentUser: InferSelectResult<User, S> | null;',
+      );
+    });
+
+    it('marks variables optional in selection overloads when all args are optional', () => {
+      const result = generateCustomQueryHook({
+        operation: optionalArgsCustomQuery,
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      const optionalVariablesMatches = result!.content.match(
+        /variables\?: RecentUsersVariables;/g,
+      );
+      expect(optionalVariablesMatches?.length ?? 0).toBeGreaterThanOrEqual(3);
+      expect(result!.content).not.toMatch(
+        /variables:\s*RecentUsersVariables;\s*\n\s*selection:/,
+      );
+    });
   });
 });
 
@@ -498,6 +534,18 @@ describe('Custom Mutation Hook Generators', () => {
       });
       expect(result).not.toBeNull();
       expect(result!.content).toMatchSnapshot();
+    });
+
+    it('keeps nullable return typing for selected custom mutations', () => {
+      const result = generateCustomMutationHook({
+        operation: simpleCustomMutations[0],
+        typeRegistry: createTypeRegistry(),
+        useCentralizedKeys: true,
+      });
+
+      expect(result!.content).toContain(
+        'login: InferSelectResult<LoginPayload, S> | null;',
+      );
     });
   });
 });

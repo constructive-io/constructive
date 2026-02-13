@@ -26,17 +26,16 @@ import {
   createTypeReExport,
   customSelectResultTypeLiteral,
   destructureParamsWithSelection,
-  exportDeclareFunction,
   exportFunction,
   generateHookFileCode,
   getClientCustomCallUnwrap,
   objectProp,
   omitType,
   returnUseMutation,
-  selectionConfigType,
   spreadObj,
   sRef,
   typeRef,
+  typeRefToTsTypeAST,
   useMutationOptionsType,
   useMutationResultType,
   voidStatement,
@@ -165,12 +164,12 @@ function generateCustomMutationHookInternal(
 
   if (hasSelect) {
     statements.push(
-      createImportDeclaration(
-        '../../orm/select-types',
-        ['InferSelectResult', 'StrictSelect'],
-        true,
-      ),
-    );
+    createImportDeclaration(
+      '../../orm/select-types',
+      ['InferSelectResult', 'HookStrictSelect', 'StrictSelect'],
+      true,
+    ),
+  );
   }
 
   // Re-exports
@@ -197,8 +196,7 @@ function generateCustomMutationHookInternal(
         sel,
       );
 
-    // Overload 1: with selection.fields
-    const o1ParamType = t.tsIntersectionType([
+    const paramsType = t.tsIntersectionType([
       t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier('selection'),
@@ -208,10 +206,15 @@ function generateCustomMutationHookInternal(
                 t.tsTypeLiteral([
                   t.tsPropertySignature(
                     t.identifier('fields'),
-                    t.tsTypeAnnotation(sRef()),
+                    t.tsTypeAnnotation(
+                      t.tsIntersectionType([sRef(), typeRef(selectTypeName!)]),
+                    ),
                   ),
                 ]),
-                typeRef('StrictSelect', [sRef(), typeRef(selectTypeName!)]),
+                typeRef('HookStrictSelect', [
+                  typeRef('NoInfer', [sRef()]),
+                  typeRef(selectTypeName!),
+                ]),
               ]),
             ),
           ),
@@ -219,34 +222,9 @@ function generateCustomMutationHookInternal(
       ]),
       useMutationOptionsType(selectedResultType(sRef()), mutationVarType),
     ]);
-    statements.push(
-      exportDeclareFunction(
-        hookName,
-        createSTypeParam(selectTypeName!),
-        [createFunctionParam('params', o1ParamType)],
-        useMutationResultType(selectedResultType(sRef()), mutationVarType),
-      ),
-    );
-
-    // Implementation
-    const implSelProp = t.tsPropertySignature(
-      t.identifier('selection'),
-      t.tsTypeAnnotation(selectionConfigType(typeRef(selectTypeName!))),
-    );
-    const implParamType = t.tsIntersectionType([
-      t.tsTypeLiteral([implSelProp]),
-      omitType(
-        typeRef('UseMutationOptions', [
-          t.tsAnyKeyword(),
-          typeRef('Error'),
-          mutationVarType,
-        ]),
-        ['mutationFn'],
-      ),
-    ]);
 
     const body: t.Statement[] = [];
-    body.push(buildSelectionArgsCall(selectTypeName!));
+    body.push(buildSelectionArgsCall(sRef()));
     body.push(destructureParamsWithSelection('mutationOptions'));
     body.push(voidStatement('_selection'));
 
@@ -260,12 +238,26 @@ function generateCustomMutationHookInternal(
         )
       : undefined;
 
-    const selectArgExpr = t.objectExpression([
-      objectProp(
-        'select',
-        t.memberExpression(t.identifier('args'), t.identifier('select')),
-      ),
-    ]);
+    // Cast to ORM's StrictSelect (not HookStrictSelect) since the ORM
+    // method signature requires { select: S } & StrictSelect<S, XxxSelect>.
+    // Strictness is already enforced at the hook parameter level.
+    const selectArgExpr = t.tsAsExpression(
+      t.objectExpression([
+        objectProp(
+          'select',
+          t.memberExpression(t.identifier('args'), t.identifier('select')),
+        ),
+      ]),
+      t.tsIntersectionType([
+        t.tsTypeLiteral([
+          t.tsPropertySignature(
+            t.identifier('select'),
+            t.tsTypeAnnotation(sRef()),
+          ),
+        ]),
+        typeRef('StrictSelect', [sRef(), typeRef(selectTypeName!)]),
+      ]),
+    );
 
     let mutationFnExpr: t.Expression;
     if (hasArgs) {
@@ -305,18 +297,20 @@ function generateCustomMutationHookInternal(
     statements.push(
       exportFunction(
         hookName,
-        null,
-        [createFunctionParam('params', implParamType)],
+        createSTypeParam(selectTypeName!),
+        [createFunctionParam('params', paramsType)],
         body,
+        useMutationResultType(selectedResultType(sRef()), mutationVarType),
       ),
     );
   } else {
     // Without select: simple hook (scalar return type)
-    const resultTypeStr = typeRefToTsType(operation.returnType, tracker);
+    typeRefToTsType(operation.returnType, tracker);
+    const resultTsType = typeRefToTsTypeAST(operation.returnType);
     const resultTypeLiteral = t.tsTypeLiteral([
       t.tsPropertySignature(
         t.identifier(operation.name),
-        t.tsTypeAnnotation(typeRef(resultTypeStr)),
+        t.tsTypeAnnotation(resultTsType),
       ),
     ]);
     const mutationVarType: t.TSType = hasArgs

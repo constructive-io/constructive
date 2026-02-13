@@ -19,19 +19,20 @@ import type {
 
 import { GraphQLRequestError, OrmClient, QueryResult } from './client';
 
-export interface QueryBuilderConfig {
+export interface QueryBuilderConfig<TResult> {
   client: OrmClient;
   operation: 'query' | 'mutation';
   operationName: string;
   fieldName: string;
   document: string;
   variables?: Record<string, unknown>;
+  transform?: (data: any) => TResult;
 }
 
 export class QueryBuilder<TResult> {
-  private config: QueryBuilderConfig;
+  private config: QueryBuilderConfig<TResult>;
 
-  constructor(config: QueryBuilderConfig) {
+  constructor(config: QueryBuilderConfig<TResult>) {
     this.config = config;
   }
 
@@ -40,10 +41,21 @@ export class QueryBuilder<TResult> {
    * Use result.ok to check success, or .unwrap() to throw on error
    */
   async execute(): Promise<QueryResult<TResult>> {
-    return this.config.client.execute<TResult>(
+    const rawResult = await this.config.client.execute<any>(
       this.config.document,
       this.config.variables,
     );
+    if (!rawResult.ok) {
+      return rawResult;
+    }
+    if (!this.config.transform) {
+      return rawResult as unknown as QueryResult<TResult>;
+    }
+    return {
+      ok: true,
+      data: this.config.transform(rawResult.data),
+      errors: undefined,
+    };
   }
 
   /**
@@ -91,6 +103,10 @@ export class QueryBuilder<TResult> {
   }
 }
 
+const OP_QUERY = 'query' as unknown as import('graphql').OperationTypeNode;
+const OP_MUTATION = 'mutation' as unknown as import('graphql').OperationTypeNode;
+const ENUM_VALUE_KIND = 'EnumValue' as unknown as EnumValueNode['kind'];
+
 // ============================================================================
 // Selection Builders
 // ============================================================================
@@ -128,48 +144,52 @@ export function buildSelections(
         connection?: boolean;
       };
 
-      if (nested.select) {
-        const relatedEntityType = entityConnections?.[key];
-        const nestedSelections = buildSelections(
-          nested.select,
-          connectionFieldsMap,
-          relatedEntityType,
+      if (!nested.select || typeof nested.select !== 'object') {
+        throw new Error(
+          `Invalid selection for field "${key}": nested selections must include a "select" object.`,
         );
-        const isConnection =
-          nested.connection === true ||
-          nested.first !== undefined ||
-          nested.filter !== undefined ||
-          relatedEntityType !== undefined;
-        const args = buildArgs([
-          buildOptionalArg('first', nested.first),
-          nested.filter
-            ? t.argument({
-                name: 'filter',
-                value: buildValueAst(nested.filter),
-              })
-            : null,
-          buildEnumListArg('orderBy', nested.orderBy),
-        ]);
+      }
 
-        if (isConnection) {
-          fields.push(
-            t.field({
-              name: key,
-              args,
-              selectionSet: t.selectionSet({
-                selections: buildConnectionSelections(nestedSelections),
-              }),
+      const relatedEntityType = entityConnections?.[key];
+      const nestedSelections = buildSelections(
+        nested.select,
+        connectionFieldsMap,
+        relatedEntityType,
+      );
+      const isConnection =
+        nested.connection === true ||
+        nested.first !== undefined ||
+        nested.filter !== undefined ||
+        relatedEntityType !== undefined;
+      const args = buildArgs([
+        buildOptionalArg('first', nested.first),
+        nested.filter
+          ? t.argument({
+              name: 'filter',
+              value: buildValueAst(nested.filter),
+            })
+          : null,
+        buildEnumListArg('orderBy', nested.orderBy),
+      ]);
+
+      if (isConnection) {
+        fields.push(
+          t.field({
+            name: key,
+            args,
+            selectionSet: t.selectionSet({
+              selections: buildConnectionSelections(nestedSelections),
             }),
-          );
-        } else {
-          fields.push(
-            t.field({
-              name: key,
-              args,
-              selectionSet: t.selectionSet({ selections: nestedSelections }),
-            }),
-          );
-        }
+          }),
+        );
+      } else {
+        fields.push(
+          t.field({
+            name: key,
+            args,
+            selectionSet: t.selectionSet({ selections: nestedSelections }),
+          }),
+        );
       }
     }
   }
@@ -265,7 +285,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
         variableDefinitions: variableDefinitions.length
           ? variableDefinitions
@@ -330,7 +350,7 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -405,6 +425,7 @@ export function buildUpdateDocument<
   where: TWhere,
   data: TData,
   inputTypeName: string,
+  patchFieldName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -430,7 +451,7 @@ export function buildUpdateDocument<
     variables: {
       input: {
         id: where.id,
-        patch: data,
+        [patchFieldName]: data,
       },
     },
   };
@@ -445,6 +466,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
   data: TData,
   inputTypeName: string,
   idFieldName: string,
+  patchFieldName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -470,7 +492,7 @@ export function buildUpdateByPkDocument<TSelect, TData>(
     variables: {
       input: {
         [idFieldName]: id,
-        patch: data,
+        [patchFieldName]: data,
       },
     },
   };
@@ -510,7 +532,7 @@ export function buildFindOneDocument<TSelect>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
         variableDefinitions,
         selectionSet: t.selectionSet({
@@ -622,15 +644,12 @@ export function buildCustomDocument<TSelect, TArgs>(
   connectionFieldsMap?: Record<string, Record<string, string>>,
   entityType?: string,
 ): { document: string; variables: Record<string, unknown> } {
-  let actualSelect = select;
+  let actualSelect: TSelect = select;
   let isConnection = false;
 
-  if (select && typeof select === 'object' && 'select' in select) {
-    const wrapper = select as { select?: TSelect; connection?: boolean };
-    if (wrapper.select) {
-      actualSelect = wrapper.select;
-      isConnection = wrapper.connection === true;
-    }
+  if (isCustomSelectionWrapper(select)) {
+    actualSelect = select.select as TSelect;
+    isConnection = select.connection === true;
   }
 
   const selections = actualSelect
@@ -661,7 +680,7 @@ export function buildCustomDocument<TSelect, TArgs>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: operationType,
+        operation: operationType === 'mutation' ? OP_MUTATION : OP_QUERY,
         name: operationName,
         variableDefinitions: variableDefs.length ? variableDefs : undefined,
         selectionSet: t.selectionSet({
@@ -683,6 +702,31 @@ export function buildCustomDocument<TSelect, TArgs>(
     document: print(document),
     variables: (args ?? {}) as Record<string, unknown>,
   };
+}
+
+function isCustomSelectionWrapper(
+  value: unknown,
+): value is { select: Record<string, unknown>; connection?: boolean } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+
+  if (!keys.includes('select') || !keys.includes('connection')) {
+    return false;
+  }
+
+  if (keys.some((key) => key !== 'select' && key !== 'connection')) {
+    return false;
+  }
+
+  return (
+    !!record.select &&
+    typeof record.select === 'object' &&
+    !Array.isArray(record.select)
+  );
 }
 
 // ============================================================================
@@ -724,7 +768,7 @@ function buildEnumListArg(
 
 function buildEnumValue(value: string): EnumValueNode {
   return {
-    kind: 'EnumValue',
+    kind: ENUM_VALUE_KIND,
     value,
   };
 }
@@ -770,7 +814,7 @@ function buildInputMutationDocument(config: InputMutationConfig): string {
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'mutation',
+        operation: OP_MUTATION,
         name: config.operationName + 'Mutation',
         variableDefinitions: [
           t.variableDefinition({

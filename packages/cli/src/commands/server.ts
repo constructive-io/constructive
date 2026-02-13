@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { GraphQLServer as server } from '@constructive-io/graphql-server';
-import { PgpmOptions } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer, OptionValue,Question } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
@@ -189,7 +189,7 @@ export default async (
     roleName = selectedRoleName;
   }
 
-  const options: PgpmOptions = getEnvOptions({
+  const options: ConstructiveOptions = getEnvOptions({
     pg: { database: selectedDb },
     features: {
       oppositeBaseNames,
@@ -204,7 +204,7 @@ export default async (
       port,
       ...(origin ? { origin } : {})
     }
-  } as PgpmOptions);
+  } as ConstructiveOptions);
 
   log.success('✅ Selected Configuration:');
   for (const [key, value] of Object.entries(options)) {

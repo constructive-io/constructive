@@ -1,4 +1,5 @@
 import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
@@ -9,21 +10,53 @@ import type { Server as HttpServer } from 'http';
 // @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
-import { graphileCache } from 'graphile-cache';
+import { graphileCache, closeAllCaches } from 'graphile-cache';
 import { getPgPool, pgCache } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { favicon } from './middleware/favicon';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import { normalizeServerOptions } from './options';
 
 const log = new Logger('server');
 const isDev = () => getNodeEnv() === 'development';
 
-export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
-  const envOptions = getEnvOptions(rawOpts);
+/**
+ * Creates and starts a GraphQL server instance
+ *
+ * Accepts ConstructiveOptions or PgpmOptions.
+ * Options are normalized using normalizeServerOptions to apply defaults.
+ *
+ * @param rawOpts - Server configuration options
+ * @returns void (server runs until shutdown)
+ *
+ * @example
+ * ```typescript
+ * // Using ConstructiveOptions (recommended)
+ * GraphQLServer({
+ *   pg: { database: 'myapp' },
+ *   server: { port: 4000 }
+ * });
+ *
+ * // Using PgpmOptions (backward compatible)
+ * GraphQLServer(pgpmOptions);
+ * ```
+ */
+export const GraphQLServer = (
+  rawOpts: ConstructiveOptions | PgpmOptions = {}
+) => {
+  // Normalize options to ConstructiveOptions with defaults applied
+  const normalizedOpts = normalizeServerOptions(rawOpts as ConstructiveOptions);
+
+  // Apply environment variable overrides via getEnvOptions
+  // Cast to PgpmOptions for backward compatibility with getEnvOptions
+  const envOptions = getEnvOptions(normalizedOpts as PgpmOptions);
+
   const app = new Server(envOptions);
   app.addEventListener();
   app.listen();
@@ -31,14 +64,14 @@ export const GraphQLServer = (rawOpts: PgpmOptions = {}) => {
 
 class Server {
   private app: Express;
-  private opts: PgpmOptions;
+  private opts: ConstructiveOptions;
   private listenClient: PoolClient | null = null;
   private listenRelease: (() => void) | null = null;
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
 
-  constructor(opts: PgpmOptions) {
+  constructor(opts: ConstructiveOptions) {
     this.opts = getEnvOptions(opts);
     const effectiveOpts = this.opts;
 
@@ -94,6 +127,7 @@ class Server {
     });
 
     healthz(app);
+    app.use(favicon);
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
@@ -119,6 +153,10 @@ class Server {
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
     app.use(flush);
+
+    // Error handling - MUST be LAST
+    app.use(notFoundHandler); // Catches unmatched routes (404)
+    app.use(errorHandler); // Catches all thrown errors
 
     this.app = app;
   }
@@ -247,9 +285,12 @@ class Server {
   ): Promise<void> {
     const { closePools = false } = opts;
     svcCache.clear();
-    graphileCache.clear();
+    // Use closeAllCaches to properly await async disposal of PostGraphile instances
+    // before closing pg pools - this ensures all connections are released
     if (closePools) {
-      await pgCache.close();
+      await closeAllCaches();
+    } else {
+      graphileCache.clear();
     }
   }
 

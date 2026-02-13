@@ -72,6 +72,14 @@ export class PgClient {
   }
 
   /**
+   * Get the current context settings for the session.
+   * Returns a copy of the internal context settings object.
+   */
+  getContext(): Record<string, string | null> {
+    return { ...this.contextSettings };
+  }
+
+  /**
    * Set authentication context for the current session.
    * Configures role and user ID using cascading defaults from options -> opts.auth -> RoleMapping.
    */

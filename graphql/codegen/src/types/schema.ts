@@ -12,7 +12,7 @@ export interface CleanTable {
   relations: CleanRelations;
   /** PostGraphile inflection rules for this table */
   inflection?: TableInflection;
-  /** Query operation names from _meta */
+  /** Query operation names from introspection */
   query?: TableQueryNames;
   /** Constraint information */
   constraints?: TableConstraints;
@@ -69,19 +69,21 @@ export interface TableInflection {
 }
 
 /**
- * Query operation names from _meta.query
+ * Query operation names from introspection
  */
 export interface TableQueryNames {
   /** All rows query name */
   all: string;
   /** Single row query name */
-  one: string;
+  one: string | null;
   /** Create mutation name */
   create: string;
   /** Update mutation name */
   update: string | null;
   /** Delete mutation name */
   delete: string | null;
+  /** Patch field name in update mutation input (e.g., "userPatch" for UpdateUserInput) */
+  patchFieldName?: string;
 }
 
 /**

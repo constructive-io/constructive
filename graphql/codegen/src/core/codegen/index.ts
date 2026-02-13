@@ -74,7 +74,7 @@ export interface GenerateResult {
 }
 
 export interface GenerateOptions {
-  /** Tables from _meta introspection */
+  /** Tables from GraphQL introspection */
   tables: CleanTable[];
   /** Custom operations from __schema introspection */
   customOperations?: {

@@ -4,6 +4,7 @@
 import * as t from '@babel/types';
 
 import type { CleanTable } from '../../types/schema';
+import { SCALAR_NAMES } from './scalars';
 import { generateCode } from './babel-ast';
 import {
   fieldTypeToTs,
@@ -271,6 +272,38 @@ function createInterfaceDeclaration(
   return t.exportNamedDeclaration(interfaceDecl);
 }
 
+function createTypeAlias(
+  name: string,
+  typeNode: t.TSType,
+): t.ExportNamedDeclaration {
+  const typeAlias = t.tsTypeAliasDeclaration(
+    t.identifier(name),
+    null,
+    typeNode,
+  );
+  return t.exportNamedDeclaration(typeAlias);
+}
+
+function collectCustomScalarTypes(
+  tables: CleanTable[],
+  excludedTypeNames: Set<string>,
+): string[] {
+  const customScalarTypes = new Set<string>();
+  const tableTypeNames = new Set(tables.map((table) => table.name));
+
+  for (const table of tables) {
+    for (const field of getScalarFields(table)) {
+      const cleanType = field.type.gqlType.replace(/!/g, '');
+      if (SCALAR_NAMES.has(cleanType)) continue;
+      if (excludedTypeNames.has(cleanType)) continue;
+      if (tableTypeNames.has(cleanType)) continue;
+      customScalarTypes.add(cleanType);
+    }
+  }
+
+  return Array.from(customScalarTypes).sort();
+}
+
 /**
  * Generate types.ts content with all entity interfaces and base filter types
  */
@@ -280,6 +313,7 @@ export function generateTypesFile(
 ): string {
   const { enumsFromSchemaTypes = [] } = options;
   const enumSet = new Set(enumsFromSchemaTypes);
+  const customScalarTypes = collectCustomScalarTypes(tables, enumSet);
 
   const statements: t.Statement[] = [];
 
@@ -307,6 +341,10 @@ export function generateTypesFile(
     );
     importDecl.importKind = 'type';
     statements.push(importDecl);
+  }
+
+  for (const scalarType of customScalarTypes) {
+    statements.push(createTypeAlias(scalarType, t.tsUnknownKeyword()));
   }
 
   // Generate entity interfaces
