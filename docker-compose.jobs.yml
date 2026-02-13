@@ -72,25 +72,11 @@ services:
         aliases:
           - constructive-server
 
-  # Local SMTP catch-all with web UI (http://localhost:8025)
-  mailpit:
-    container_name: mailpit
-    image: axllent/mailpit:latest
-    ports:
-      - "1025:1025"   # SMTP
-      - "8025:8025"   # Web UI
-    networks:
-      constructive-net:
-        aliases:
-          - mailpit
-
   # Send email link function (invite, password reset, verification)
   send-email-link:
     container_name: send-email-link
     image: constructive:dev
     entrypoint: ["node", "functions/send-email-link/dist/index.js"]
-    depends_on:
-      - mailpit
     environment:
       NODE_ENV: development
       LOG_LEVEL: info
@@ -108,15 +94,11 @@ services:
       MAILGUN_DOMAIN: "mg.constructive.io"
       MAILGUN_FROM: "no-reply@mg.constructive.io"
       MAILGUN_REPLY: "info@mg.constructive.io"
-      # SMTP configuration (simple-smtp-server / nodemailer)
-      EMAIL_SEND_USE_SMTP: "true"
-      SMTP_HOST: "mailpit"
-      SMTP_PORT: "1025"
-      SMTP_SECURE: "false"
-      SMTP_FROM: "no-reply@constructive.local"
-      SMTP_TLS_REJECT_UNAUTHORIZED: "false"
-      # Disable dry run so emails are actually sent to Mailpit
-      SEND_EMAIL_LINK_DRY_RUN: "false"
+      # Local dashboard port for generated links, used only for
+      # localhost-style hosts in DRY RUN mode:
+      # http://localhost:LOCAL_APP_PORT/...
+      LOCAL_APP_PORT: "3000"
+      SEND_EMAIL_LINK_DRY_RUN: "${SEND_EMAIL_LINK_DRY_RUN:-true}"
     ports:
       - "8082:8080"
     networks:
