@@ -2,7 +2,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { makeSchema } from 'graphile-build';
-import { getPgPool } from 'pg-cache';
+import { buildConnectionString, getPgPool } from 'pg-cache';
 import { printSchema } from 'graphql';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -75,8 +75,9 @@ const getSchemaOutputPath = () =>
       `Connected to database: ${dbInfo.rows[0]?.current_database} as user: ${dbInfo.rows[0]?.current_user}`
     );
 
-    // Build connection string from pool config
-    const connectionString = `postgres://${pgConfig?.user || 'postgres'}:${pgConfig?.password || ''}@${pgConfig?.host || 'localhost'}:${pgConfig?.port || 5432}/${dbName}`;
+    const connectionString = buildConnectionString(
+      pgConfig.user, pgConfig.password, pgConfig.host, pgConfig.port, dbName
+    );
 
     // Create v5 preset with ConstructivePreset
     const preset: GraphileConfig.Preset = {
