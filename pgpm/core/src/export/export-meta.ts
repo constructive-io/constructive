@@ -368,8 +368,7 @@ const config: Record<string, TableConfig> = {
       og_image: 'image',
       favicon: 'upload',
       apple_touch_icon: 'image',
-      logo: 'image',
-      dbname: 'text'
+      logo: 'image'
     }
   },
   apis: {
@@ -379,7 +378,6 @@ const config: Record<string, TableConfig> = {
       id: 'uuid',
       database_id: 'uuid',
       name: 'text',
-      dbname: 'text',
       is_public: 'boolean',
       role_name: 'text',
       anon_role: 'text'
