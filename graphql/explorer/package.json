@@ -22,11 +22,11 @@
   "bin": {
     "explorer": "./run.js"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "build": "echo 'SKIPPED: graphql-explorer disabled during v5 migration'",
-      "build:dev": "echo 'SKIPPED: graphql-explorer disabled during v5 migration'",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
     "dev": "ts-node src/run.ts",
     "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/run.ts",
     "lint": "eslint . --fix",
@@ -42,14 +42,15 @@
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
-    "graphile-build": "^4.14.1",
+    "grafserv": "1.0.0-rc.4",
     "graphile-cache": "workspace:^",
+    "graphile-config": "1.0.0-rc.3",
     "graphile-settings": "workspace:^",
-    "graphql": "15.10.1",
+    "graphql": "16.12.0",
     "graphql-upload": "^13.0.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "postgraphile": "^4.14.1"
+    "postgraphile": "5.0.0-rc.6"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

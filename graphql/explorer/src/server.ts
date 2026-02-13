@@ -1,59 +1,108 @@
+import { createServer } from 'node:http';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { GraphileCache, graphileCache } from 'graphile-cache';
+import { GraphileCacheEntry, graphileCache } from 'graphile-cache';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
+import type { GraphileConfig } from 'graphile-config';
 import graphqlUpload from 'graphql-upload';
-// Scalar
+import { postgraphile } from 'postgraphile';
+import { grafserv } from 'grafserv/express/v4';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
-import { postgraphile } from 'postgraphile';
 
 import { printDatabases, printSchemas } from './render';
-import { getGraphileSettings } from './settings';
+import { getGraphilePreset } from './settings';
+
+const buildConnectionString = (
+  user: string,
+  password: string,
+  host: string,
+  port: string | number,
+  database: string
+): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
+
+const createGraphileExplorerInstance = async (
+  opts: ConstructiveOptions,
+  dbname: string,
+  schemaname: string,
+  cacheKey: string
+): Promise<GraphileCacheEntry> => {
+  const pgConfig = getPgEnvOptions({
+    ...opts.pg,
+    database: dbname,
+  });
+  const connectionString = buildConnectionString(
+    pgConfig.user,
+    pgConfig.password,
+    pgConfig.host,
+    pgConfig.port,
+    pgConfig.database
+  );
+
+  const basePreset = getGraphilePreset(opts);
+
+  const preset: GraphileConfig.Preset = {
+    ...basePreset,
+    extends: [...(basePreset.extends || [])],
+    pgServices: [
+      makePgService({
+        connectionString,
+        schemas: [schemaname],
+      }),
+    ],
+    grafserv: {
+      graphqlPath: '/graphql',
+      graphiqlPath: '/graphiql',
+      graphiql: true,
+    },
+  };
+
+  const pgl = postgraphile(preset);
+  const serv = pgl.createServ(grafserv);
+
+  const handler = express();
+  const httpServer = createServer(handler);
+  await serv.addTo(handler, httpServer);
+  await serv.ready();
+
+  return {
+    pgl,
+    serv,
+    handler,
+    httpServer,
+    cacheKey,
+    createdAt: Date.now(),
+  };
+};
 
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
 
   const { pg, server } = opts;
 
-  const getGraphileInstanceObj = (
+  const getGraphileInstanceObj = async (
     dbname: string,
     schemaname: string
-  ): GraphileCache => {
+  ): Promise<GraphileCacheEntry> => {
     const key = `${dbname}.${schemaname}`;
 
-    if (graphileCache.has(key)) {
-      return graphileCache.get(key);
+    const cached = graphileCache.get(key);
+    if (cached) {
+      return cached;
     }
 
-    const settings = {
-      ...getGraphileSettings({
-        ...opts,
-        graphile: { schema: schemaname },
-      }),
-      graphqlRoute: '/graphql',
-      graphiqlRoute: '/graphiql',
-    };
-
-    const pgPool = getPgPool(
-      getPgEnvOptions({
-        ...opts.pg,
-        database: dbname,
-      })
+    const instance = await createGraphileExplorerInstance(
+      opts,
+      dbname,
+      schemaname,
+      key
     );
 
-    const handler = postgraphile(pgPool, schemaname, settings);
-
-    const obj = {
-      pgPool,
-      pgPoolKey: dbname,
-      handler,
-    };
-
-    graphileCache.set(key, obj);
-    return obj;
+    graphileCache.set(key, instance);
+    return instance;
   };
 
   const app = express();
@@ -132,7 +181,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     if (req.urlDomains?.subdomains.length === 2) {
       const [schemaName, dbName] = req.urlDomains.subdomains;
       try {
-        const { handler } = getGraphileInstanceObj(dbName, schemaName);
+        const { handler } = await getGraphileInstanceObj(dbName, schemaName);
         handler(req, res, next);
         return;
       } catch (e: any) {

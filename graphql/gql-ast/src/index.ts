@@ -66,7 +66,7 @@ export const variableDefinition = ({
   variable: VariableNode;
   type: TypeNode;
   directives?: ConstDirectiveNode[];
-}): VariableDefinitionNode => ({
+}): VariableDefinitionNode=> ({
   kind: Kind.VARIABLE_DEFINITION,
   variable,
   type,
