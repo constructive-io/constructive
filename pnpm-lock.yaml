@@ -492,8 +492,8 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       '@inquirerer/utils':
-        specifier: ^3.2.0
-        version: 3.2.0
+        specifier: ^3.2.3
+        version: 3.2.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1390,8 +1390,8 @@ importers:
         specifier: workspace:^
         version: link:../../jobs/knative-job-service/dist
       '@inquirerer/utils':
-        specifier: ^3.2.0
-        version: 3.2.0
+        specifier: ^3.2.3
+        version: 3.2.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1653,8 +1653,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.2.0
-        version: 3.2.0
+        specifier: ^3.2.3
+        version: 3.2.3
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -3305,8 +3305,8 @@ packages:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.2.0':
-    resolution: {integrity: sha512-poeZdoOH/iDV9dG/J0apH92T5VOGiAgIp8me1yTK9wpEI2qGENyXXBmiYgcE2s+XMHuDr19R9d1UXE9ptaVneA==}
+  '@inquirerer/utils@3.2.3':
+    resolution: {integrity: sha512-Ak0GspJ8fT9aW9pp1Op53xebtJOoZpt1/7eklI1TpUh7QuLxqmk2cl7sGMP1mROvR3q5Ms10ZvJ3eS2GKI++yw==}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -5330,6 +5330,9 @@ packages:
   appstash@0.3.0:
     resolution: {integrity: sha512-F4rMrok4wQYDVitYMWbPQh2MBoKCj7GYzmI/Gw8zDeO2vDLmCmyzmbd0zAwplghB6X3VMGQw/NKcngIc8w6oTA==}
 
+  appstash@0.3.1:
+    resolution: {integrity: sha512-6blvfn9slJQeA7oavIeJ8Wbj5/KCRKkWRsmL54+sgY/ZDPTZndRGTFGOpdARHx0MZzRRQSUPrt1pUaOXXy350A==}
+
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
 
@@ -6691,6 +6694,9 @@ packages:
   find-and-require-package-json@0.9.0:
     resolution: {integrity: sha512-e7+fnRvphmWHHgOdVQct5yLEmw38GD3wpX8CMONT/qn/BLK6F0ft/iPicNKJMX6U4GlTEFzreYbLf+FlCYh4lQ==}
 
+  find-and-require-package-json@0.9.1:
+    resolution: {integrity: sha512-jFpCL0XgjipSk109viUtfp+NyR/oW6a4Xus4tV3UYkmCbsjisEeZD1x5QnD1NDDK/hXas1WFs4yO13L4TPXWlQ==}
+
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
     engines: {node: '>=4'}
@@ -7301,6 +7307,9 @@ packages:
 
   inquirerer@4.5.0:
     resolution: {integrity: sha512-ULWscyMV6Y/OH1XRODvunrQH1EO4r7q+UV/boWFiVIt9h2UZ7wa/Qc+ZpAqUaWynKUhDtY3UqZV4MVrRcEkmNg==}
+
+  inquirerer@4.5.1:
+    resolution: {integrity: sha512-/Cis0BNeqdgcXJt3loHKt7PbfawPG7fLTQHr29IfpOHCRaLACmf5737PAHakVU1rBflCNNMo4lpdso6t4FHpjg==}
 
   internmap@1.0.1:
     resolution: {integrity: sha512-lDB5YccMydFBtasVtxnZ3MRBHuaoE8GKsppq+EchKL2U4nK/DmEpPHNH8MZe5HkMtpSiTSOZwfN0tzYjO/lJEw==}
@@ -9252,6 +9261,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.4:
+    resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@1.2.1:
     resolution: {integrity: sha512-1gnZf7DFcoIcajTjTwjwuDjzuz4PPcY2StKPlsGAQ1+YH20IRVrBaXSWmdjowTJ6u8Rc01PoYOGHXfP1mYcZNQ==}
     engines: {node: '>= 18'}
@@ -10096,6 +10110,9 @@ packages:
 
   yanse@0.2.0:
     resolution: {integrity: sha512-BN6WYjJRX3mw/LpEC4d2LAlLFFdoFKKYYbd9nvhTvbbEW+/mJJccBGy0DuvcYXg75Xed2ZT8euXtplfLKBfdHA==}
+
+  yanse@0.2.1:
+    resolution: {integrity: sha512-SMi3ZO1IqsvPLLXuy8LBCP1orqcjOT8VygiuyAlplaGeH2g+n4ZSSyWlA/BZjuUuN58TyOcz89mVkflSqIPxxQ==}
 
   yargs-parser@18.1.3:
     resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}
@@ -11680,10 +11697,11 @@ snapshots:
     optionalDependencies:
       jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
 
-  '@inquirerer/utils@3.2.0':
+  '@inquirerer/utils@3.2.3':
     dependencies:
-      appstash: 0.3.0
-      inquirerer: 4.4.0
+      appstash: 0.3.1
+      inquirerer: 4.5.1
+      semver: 7.7.4
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -14196,6 +14214,8 @@ snapshots:
 
   appstash@0.3.0: {}
 
+  appstash@0.3.1: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -15652,6 +15672,8 @@ snapshots:
 
   find-and-require-package-json@0.9.0: {}
 
+  find-and-require-package-json@0.9.1: {}
+
   find-up@2.1.0:
     dependencies:
       locate-path: 2.0.0
@@ -16375,6 +16397,13 @@ snapshots:
       find-and-require-package-json: 0.9.0
       minimist: 1.2.8
       yanse: 0.2.0
+
+  inquirerer@4.5.1:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.9.1
+      minimist: 1.2.8
+      yanse: 0.2.1
 
   internmap@1.0.1: {}
 
@@ -18923,6 +18952,8 @@ snapshots:
 
   semver@7.7.3: {}
 
+  semver@7.7.4: {}
+
   send@1.2.1:
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
@@ -19779,6 +19810,8 @@ snapshots:
   yaml@2.8.2: {}
 
   yanse@0.2.0: {}
+
+  yanse@0.2.1: {}
 
   yargs-parser@18.1.3:
     dependencies:

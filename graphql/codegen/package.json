@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "3.3.0",
+  "version": "3.3.2",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -58,7 +58,7 @@
     "@babel/types": "^7.28.6",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@inquirerer/utils": "^3.2.0",
+    "@inquirerer/utils": "^3.2.3",
     "@pgpmjs/core": "workspace:^",
     "ajv": "^8.17.1",
     "deepmerge": "^4.3.1",
