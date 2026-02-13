@@ -28,3 +28,6 @@ export {
   // Clear matching entries
   clearMatchingEntries
 } from './graphile-cache';
+
+// Factory for creating PostGraphile v5 instances
+export { createGraphileInstance } from './create-instance';

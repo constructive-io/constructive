@@ -30,9 +30,10 @@
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
+    "express": "^5.2.1",
+    "grafserv": "^1.0.0-rc.4",
     "lru-cache": "^11.2.4",
     "pg-cache": "workspace:^",
-    "grafserv": "^1.0.0-rc.4",
     "postgraphile": "^5.0.0-rc.4"
   },
   "devDependencies": {

@@ -1,12 +1,10 @@
-import { createServer, Server as HttpServer } from 'node:http';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import express, { NextFunction, Request, RequestHandler, Response } from 'express';
-import { graphileCache, GraphileCacheEntry } from 'graphile-cache';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
-import { postgraphile } from 'postgraphile';
-import { grafserv } from 'grafserv/express/v4';
+import { buildConnectionString } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import './types'; // for Request type
@@ -71,104 +69,69 @@ const reqLabel = (req: Request): string =>
   req.requestId ? `[${req.requestId}]` : '[req]';
 
 /**
- * Build connection string from pg config
+ * Build a PostGraphile v5 preset for a tenant
  */
-const buildConnectionString = (
-  user: string,
-  password: string,
-  host: string,
-  port: string | number,
-  database: string
-): string => `postgres://${user}:${password}@${host}:${port}/${database}`;
-
-/**
- * Create a PostGraphile v5 instance for a tenant
- */
-const createGraphileInstance = async (
-  _opts: ConstructiveOptions,
+const buildPreset = (
   connectionString: string,
   schemas: string[],
   anonRole: string,
   roleName: string,
-  cacheKey: string
-): Promise<GraphileCacheEntry> => {
-  const preset: GraphileConfig.Preset = {
-    extends: [ConstructivePreset],
-    pgServices: [
-      makePgService({
-        connectionString,
-        schemas,
-      }),
-    ],
-    grafserv: {
-      graphqlPath: '/graphql',
-      graphiqlPath: '/graphiql',
-      graphiql: true,
-      maskError,
-    },
-    grafast: {
-      explain: process.env.NODE_ENV === 'development',
-      context: (requestContext: Partial<Grafast.RequestContext>) => {
-        // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
-        const context: Record<string, string> = {};
+): GraphileConfig.Preset => ({
+  extends: [ConstructivePreset],
+  pgServices: [
+    makePgService({
+      connectionString,
+      schemas,
+    }),
+  ],
+  grafserv: {
+    graphqlPath: '/graphql',
+    graphiqlPath: '/graphiql',
+    graphiql: true,
+    maskError,
+  },
+  grafast: {
+    explain: process.env.NODE_ENV === 'development',
+    context: (requestContext: Partial<Grafast.RequestContext>) => {
+      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+      const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+      const context: Record<string, string> = {};
 
-        if (req) {
-          if (req.databaseId) {
-            context['jwt.claims.database_id'] = req.databaseId;
-          }
-          if (req.clientIp) {
-            context['jwt.claims.ip_address'] = req.clientIp;
-          }
-          if (req.get('origin')) {
-            context['jwt.claims.origin'] = req.get('origin') as string;
-          }
-          if (req.get('User-Agent')) {
-            context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
-          }
-
-          if (req.token?.user_id) {
-            return {
-              pgSettings: {
-                role: roleName,
-                'jwt.claims.token_id': req.token.id,
-                'jwt.claims.user_id': req.token.user_id,
-                ...context,
-              },
-            };
-          }
+      if (req) {
+        if (req.databaseId) {
+          context['jwt.claims.database_id'] = req.databaseId;
+        }
+        if (req.clientIp) {
+          context['jwt.claims.ip_address'] = req.clientIp;
+        }
+        if (req.get('origin')) {
+          context['jwt.claims.origin'] = req.get('origin') as string;
+        }
+        if (req.get('User-Agent')) {
+          context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
         }
 
-        return {
-          pgSettings: {
-            role: anonRole,
-            ...context,
-          },
-        };
-      },
+        if (req.token?.user_id) {
+          return {
+            pgSettings: {
+              role: roleName,
+              'jwt.claims.token_id': req.token.id,
+              'jwt.claims.user_id': req.token.user_id,
+              ...context,
+            },
+          };
+        }
+      }
+
+      return {
+        pgSettings: {
+          role: anonRole,
+          ...context,
+        },
+      };
     },
-  };
-
-  const pgl = postgraphile(preset);
-  const serv = pgl.createServ(grafserv);
-
-  const handler = express();
-  const httpServer = createServer(handler);
-  await serv.addTo(handler, httpServer);
-
-  // Wait for the schema to be built and dynamicOptions to be populated
-  // This ensures the handler is fully initialized before use
-  await serv.ready();
-
-  return {
-    pgl,
-    serv,
-    handler,
-    httpServer,
-    cacheKey,
-    createdAt: Date.now(),
-  };
-};
+  },
+});
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -239,14 +202,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       );
 
       // Create promise and store in in-flight map BEFORE try block
-      const creationPromise = createGraphileInstance(
-        opts,
-        connectionString,
-        schema || [],
-        anonRole,
-        roleName,
-        key
-      );
+      const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
+      const creationPromise = createGraphileInstance({ preset, cacheKey: key });
       creating.set(key, creationPromise);
 
       try {

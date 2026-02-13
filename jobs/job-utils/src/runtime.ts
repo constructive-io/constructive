@@ -1,6 +1,6 @@
 import { getEnvOptions, getNodeEnv, parseEnvBoolean } from '@pgpmjs/env';
 import { defaultPgConfig, getPgEnvVars, type PgConfig } from 'pg-env';
-import { getPgPool } from 'pg-cache';
+import { buildConnectionString, getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
 import type { PgpmOptions } from '@pgpmjs/types';
 import { jobsDefaults } from '@pgpmjs/types';
@@ -27,10 +27,7 @@ export const getJobPool = (): Pool =>
 
 export const getJobConnectionString = (): string => {
   const cfg = getJobPgConfig();
-  const auth = cfg.user
-    ? `${cfg.user}${cfg.password ? `:${cfg.password}` : ''}@`
-    : '';
-  return `postgres://${auth}${cfg.host}:${cfg.port}/${cfg.database}`;
+  return buildConnectionString(cfg.user, cfg.password, cfg.host, cfg.port, cfg.database);
 };
 
 // ---- Schema ----

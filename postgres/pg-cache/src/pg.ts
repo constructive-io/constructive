@@ -6,7 +6,7 @@ import { pgCache } from './lru';
 
 const log = new Logger('pg-cache');
 
-const getDbString = (
+export const buildConnectionString = (
   user: string,
   password: string,
   host: string,
@@ -22,7 +22,7 @@ export const getPgPool = (pgConfig: Partial<PgConfig>): pg.Pool => {
     const cached = pgCache.get(database);
     if (cached) return cached;
   }
-  const connectionString = getDbString(user, password, host, port, database);
+  const connectionString = buildConnectionString(user, password, host, port, database);
   const pgPool = new pg.Pool({ connectionString });
 
   /**

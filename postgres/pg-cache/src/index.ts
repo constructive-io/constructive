@@ -6,6 +6,7 @@ export {
   teardownPgPools
 } from './lru';
 export {
+  buildConnectionString,
   getPgPool
 } from './pg';
 
