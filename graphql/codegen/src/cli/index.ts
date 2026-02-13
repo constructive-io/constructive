@@ -114,10 +114,11 @@ export const commands = async (
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const result = await generate({
-          ...targets[name],
-          ...cliOptions,
-        } as GraphQLSDKConfigTarget);
+        const targetConfig = { ...targets[name], ...cliOptions } as GraphQLSDKConfigTarget;
+        if (targets[name].db && targetConfig.db) {
+          targetConfig.db = { ...targets[name].db, ...targetConfig.db };
+        }
+        const result = await generate(targetConfig);
         printResult(result);
         if (!result.success) hasError = true;
       }
