@@ -1,6 +1,6 @@
 {
   "name": "graphile-search-plugin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "generate search conditions for your tsvector columns",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",

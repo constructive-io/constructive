@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.2.0...@pgpmjs/core@5.2.1) (2026-02-13)
+
+### Bug Fixes
+
+- remove dbname from sites and apis export config ([5158f0c](https://github.com/constructive-io/constructive/commit/5158f0c8d70eb50841c104997fef8e2dce77c4f1))
+
 # [5.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@5.1.1...@pgpmjs/core@5.2.0) (2026-02-09)
 
 **Note:** Version bump only for package @pgpmjs/core

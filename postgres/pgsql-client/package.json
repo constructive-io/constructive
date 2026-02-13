@@ -1,6 +1,6 @@
 {
   "name": "pgsql-client",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL client utilities with query helpers, RLS context management, and database administration",
   "main": "index.js",
