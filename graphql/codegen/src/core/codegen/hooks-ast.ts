@@ -186,7 +186,10 @@ export function strictSelectType(
   selectType: t.TSType,
   shapeTypeName: string,
 ): t.TSTypeReference {
-  return typeRef('StrictSelect', [selectType, typeRef(shapeTypeName)]);
+  return typeRef('HookStrictSelect', [
+    typeRef('NoInfer', [selectType]),
+    typeRef(shapeTypeName),
+  ]);
 }
 
 export function withFieldsSelectionType(
@@ -730,8 +733,26 @@ export function wrapInferSelectResultType(
   payloadTypeName: string,
   selectType: t.TSType,
 ): t.TSType {
+  const nonNullable = wrapInferSelectResultTypeNonNullable(
+    typeRefNode,
+    payloadTypeName,
+    selectType,
+  );
+
+  if (typeRefNode.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function wrapInferSelectResultTypeNonNullable(
+  typeRefNode: CleanArgument['type'],
+  payloadTypeName: string,
+  selectType: t.TSType,
+): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
-    return wrapInferSelectResultType(
+    return wrapInferSelectResultTypeNonNullable(
       typeRefNode.ofType as CleanArgument['type'],
       payloadTypeName,
       selectType,
@@ -752,8 +773,22 @@ export function wrapInferSelectResultType(
 export function typeRefToTsTypeAST(
   typeRefNode: CleanArgument['type'],
 ): t.TSType {
+  const nonNullable = typeRefToTsTypeASTNonNullable(typeRefNode);
+
+  if (typeRefNode.kind === 'NON_NULL') {
+    return nonNullable;
+  }
+
+  return t.tsUnionType([nonNullable, t.tsNullKeyword()]);
+}
+
+function typeRefToTsTypeASTNonNullable(
+  typeRefNode: CleanArgument['type'],
+): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
-    return typeRefToTsTypeAST(typeRefNode.ofType as CleanArgument['type']);
+    return typeRefToTsTypeASTNonNullable(
+      typeRefNode.ofType as CleanArgument['type'],
+    );
   }
   if (typeRefNode.kind === 'LIST' && typeRefNode.ofType) {
     return t.tsArrayType(
@@ -771,14 +806,14 @@ export function typeRefToTsTypeAST(
 }
 
 export function buildSelectionArgsCall(
-  selectTypeName: string,
+  selectType: string | t.TSType,
 ): t.VariableDeclaration {
   const call = t.callExpression(t.identifier('buildSelectionArgs'), [
     t.memberExpression(t.identifier('params'), t.identifier('selection')),
   ]);
   // @ts-ignore - Babel types support typeParameters on CallExpression for TS
   call.typeParameters = t.tsTypeParameterInstantiation([
-    typeRef(selectTypeName),
+    typeof selectType === 'string' ? typeRef(selectType) : selectType,
   ]);
   return constDecl('args', call);
 }

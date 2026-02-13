@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-query",
-  "version": "2.8.0",
+  "version": "2.7.0",
   "description": "Constructive GraphQL Query",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -31,8 +31,14 @@
   "dependencies": {
     "ajv": "^7.0.4",
     "gql-ast": "workspace:^",
-    "graphql": "15.10.1",
-    "inflection": "^3.0.2"
+    "grafast": "^1.0.0-rc.4",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "graphile-settings": "workspace:^",
+    "graphql": "^16.9.0",
+    "inflection": "^3.0.0",
+    "lru-cache": "^10.4.3",
+    "postgraphile": "^5.0.0-rc.4"
   },
   "keywords": [
     "query",
@@ -42,6 +48,6 @@
     "database"
   ],
   "devDependencies": {
-    "makage": "^0.1.12"
+    "makage": "^0.1.10"
   }
 }

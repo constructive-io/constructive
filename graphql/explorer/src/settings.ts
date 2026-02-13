@@ -1,16 +1,22 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getEnvOptions } from '@constructive-io/graphql-env';
-import { getGraphileSettings as getSettings } from 'graphile-settings';
-import { PostGraphileOptions } from 'postgraphile';
+import { ConstructivePreset } from 'graphile-settings';
+import type { GraphileConfig } from 'graphile-config';
 
-export const getGraphileSettings = (rawOpts: ConstructiveOptions): PostGraphileOptions => {
+/**
+ * Get a GraphileConfig.Preset for the explorer with grafast context configured.
+ *
+ * This returns a v5 preset that can be extended with pgServices.
+ */
+export const getGraphilePreset = (rawOpts: ConstructiveOptions): GraphileConfig.Preset => {
   const opts = getEnvOptions(rawOpts);
 
-  const baseOptions = getSettings(opts);
-
-  baseOptions.pgSettings = async function pgSettings(_req: any) {
-    return { role: opts.pg?.user ?? 'postgres' };
+  return {
+    extends: [ConstructivePreset],
+    grafast: {
+      context: () => ({
+        pgSettings: { role: opts.pg?.user ?? 'postgres' },
+      }),
+    },
   };
-
-  return baseOptions;
 };

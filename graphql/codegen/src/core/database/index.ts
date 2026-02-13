@@ -44,11 +44,10 @@ export async function buildSchemaFromDatabase(
   // Ensure output directory exists
   await fs.promises.mkdir(outDir, { recursive: true });
 
-  // Build schema SDL from database
+  // Build schema SDL from database (PostGraphile v5 preset-driven settings)
   const sdl = await buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
   });
 
   // Write schema to file
@@ -72,9 +71,9 @@ export async function buildSchemaSDLFromDatabase(options: {
 }): Promise<string> {
   const { database, schemas } = options;
 
+  // PostGraphile v5 resolves role/settings via preset configuration.
   return buildSchemaSDL({
     database,
     schemas,
-    graphile: { pgSettings: async () => ({ role: 'administrator' }) },
   });
 }

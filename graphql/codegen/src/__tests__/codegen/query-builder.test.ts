@@ -8,6 +8,10 @@ import * as t from 'gql-ast';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 import { parseType, print } from 'graphql';
 
+const OP_QUERY = 'query' as unknown as import('graphql').OperationTypeNode;
+const OP_MUTATION =
+  'mutation' as unknown as import('graphql').OperationTypeNode;
+
 // ============================================================================
 // Core functions from query-builder.ts (re-implemented for testing)
 // ============================================================================
@@ -77,38 +81,42 @@ function buildSelections(
         select?: Record<string, unknown>;
         first?: number;
         filter?: Record<string, unknown>;
+        orderBy?: string[];
         connection?: boolean;
       };
-      if (nested.select) {
-        const relatedEntityType = entityConnections?.[key];
-        const nestedSelections = buildSelections(
-          nested.select,
-          connectionFieldsMap,
-          relatedEntityType,
+      if (!nested.select || typeof nested.select !== 'object') {
+        throw new Error(
+          `Invalid selection for field "${key}": nested selections must include a "select" object.`,
         );
-        const isConnection =
-          nested.connection === true ||
-          nested.first !== undefined ||
-          nested.filter !== undefined ||
-          relatedEntityType !== undefined;
+      }
+      const relatedEntityType = entityConnections?.[key];
+      const nestedSelections = buildSelections(
+        nested.select,
+        connectionFieldsMap,
+        relatedEntityType,
+      );
+      const isConnection =
+        nested.connection === true ||
+        nested.first !== undefined ||
+        nested.filter !== undefined ||
+        relatedEntityType !== undefined;
 
-        if (isConnection) {
-          fields.push(
-            t.field({
-              name: key,
-              selectionSet: t.selectionSet({
-                selections: buildConnectionSelections(nestedSelections),
-              }),
+      if (isConnection) {
+        fields.push(
+          t.field({
+            name: key,
+            selectionSet: t.selectionSet({
+              selections: buildConnectionSelections(nestedSelections),
             }),
-          );
-        } else {
-          fields.push(
-            t.field({
-              name: key,
-              selectionSet: t.selectionSet({ selections: nestedSelections }),
-            }),
-          );
-        }
+          }),
+        );
+      } else {
+        fields.push(
+          t.field({
+            name: key,
+            selectionSet: t.selectionSet({ selections: nestedSelections }),
+          }),
+        );
       }
     }
   }
@@ -166,7 +174,7 @@ function buildFindManyDocument<TSelect, TWhere>(
   const document = t.document({
     definitions: [
       t.operationDefinition({
-        operation: 'query',
+        operation: OP_QUERY,
         name: operationName + 'Query',
         variableDefinitions: variableDefinitions.length
           ? variableDefinitions
@@ -199,7 +207,7 @@ function buildMutationDocument(
     t.document({
       definitions: [
         t.operationDefinition({
-          operation: 'mutation',
+          operation: OP_MUTATION,
           name: operationName + 'Mutation',
           variableDefinitions: [
             t.variableDefinition({
@@ -234,6 +242,101 @@ function buildMutationDocument(
   );
 }
 
+function isCustomSelectionWrapper(
+  value: unknown,
+): value is { select: Record<string, unknown>; connection?: boolean } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+
+  if (!keys.includes('select') || !keys.includes('connection')) {
+    return false;
+  }
+
+  if (keys.some((key) => key !== 'select' && key !== 'connection')) {
+    return false;
+  }
+
+  return (
+    !!record.select &&
+    typeof record.select === 'object' &&
+    !Array.isArray(record.select)
+  );
+}
+
+function buildCustomDocument<TSelect, TArgs>(
+  operationType: 'query' | 'mutation',
+  operationName: string,
+  fieldName: string,
+  select: TSelect,
+  args: TArgs,
+  variableDefinitions: Array<{ name: string; type: string }>,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  entityType?: string,
+): { document: string; variables: Record<string, unknown> } {
+  let actualSelect: TSelect = select;
+  let isConnection = false;
+
+  if (isCustomSelectionWrapper(select)) {
+    actualSelect = select.select as TSelect;
+    isConnection = select.connection === true;
+  }
+
+  const selections = actualSelect
+    ? buildSelections(
+        actualSelect as Record<string, unknown>,
+        connectionFieldsMap,
+        entityType,
+      )
+    : [];
+
+  const variableDefs = variableDefinitions.map((definition) =>
+    t.variableDefinition({
+      variable: t.variable({ name: definition.name }),
+      type: parseType(definition.type),
+    }),
+  );
+  const fieldArgs = variableDefinitions.map((definition) =>
+    t.argument({
+      name: definition.name,
+      value: t.variable({ name: definition.name }),
+    }),
+  );
+
+  const fieldSelections = isConnection
+    ? buildConnectionSelections(selections)
+    : selections;
+
+  const document = t.document({
+    definitions: [
+      t.operationDefinition({
+        operation: operationType === 'mutation' ? OP_MUTATION : OP_QUERY,
+        name: operationName,
+        variableDefinitions: variableDefs.length ? variableDefs : undefined,
+        selectionSet: t.selectionSet({
+          selections: [
+            t.field({
+              name: fieldName,
+              args: fieldArgs.length ? fieldArgs : undefined,
+              selectionSet: fieldSelections.length
+                ? t.selectionSet({ selections: fieldSelections })
+                : undefined,
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+
+  return {
+    document: print(document),
+    variables: (args ?? {}) as Record<string, unknown>,
+  };
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -253,6 +356,17 @@ describe('query-builder', () => {
       expect(result[1].name.value).toBe('name');
       expect(result[2].name.value).toBe('profile');
       expect(result[2].selectionSet?.selections).toHaveLength(1);
+    });
+
+    it('throws when nested selection object is missing select', () => {
+      expect(() =>
+        buildSelections({
+          id: true,
+          posts: { first: 1 },
+        }),
+      ).toThrow(
+        'Invalid selection for field "posts": nested selections must include a "select" object.',
+      );
     });
 
     it('wraps connection fields in nodes when connectionFieldsMap is provided', () => {
@@ -464,6 +578,48 @@ describe('query-builder', () => {
     });
   });
 
+  describe('buildCustomDocument', () => {
+    it('treats field named "select" as a normal GraphQL field', () => {
+      const { document } = buildCustomDocument(
+        'query',
+        'CurrentUserWithSelectField',
+        'currentUser',
+        {
+          id: true,
+          select: {
+            select: { id: true },
+          },
+        },
+        {},
+        [],
+      );
+
+      expect(document).toContain('currentUser {');
+      expect(document).toContain('id');
+      expect(document).toContain('select {');
+      expect(document).not.toContain('nodes {');
+    });
+
+    it('unwraps only explicit wrapper objects for connection custom operations', () => {
+      const { document } = buildCustomDocument(
+        'query',
+        'CurrentUserConnection',
+        'users',
+        {
+          select: { id: true },
+          connection: true,
+        },
+        {},
+        [],
+      );
+
+      expect(document).toContain('users {');
+      expect(document).toContain('nodes {');
+      expect(document).toContain('totalCount');
+      expect(document).toContain('id');
+    });
+  });
+
   // ==========================================================================
   // Snapshot Tests — GraphQL Document Output
   // ==========================================================================
@@ -483,7 +639,7 @@ describe('query-builder', () => {
       const doc = t.document({
         definitions: [
           t.operationDefinition({
-            operation: 'query',
+            operation: OP_QUERY,
             name: 'TestQuery',
             selectionSet: t.selectionSet({
               selections: [

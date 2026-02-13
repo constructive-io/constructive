@@ -16,44 +16,64 @@
   </a>
 </p>
 
-**`graphile-search-plugin`** enables `ts_rank` ordering and auto-generated full-text search helpers for all `tsvector` fields in PostGraphile schemas.
+**`graphile-search-plugin`** enables auto-generated full-text search condition fields for all `tsvector` columns in PostGraphile v5 schemas.
 
-## 🚀 Installation
+## Installation
 
 ```sh
 npm install graphile-search-plugin
 ```
 
-## ✨ Features
+## Features
 
-- Adds full-text search helpers for `tsvector` columns
-- Enables ordering via `ts_rank` on generated search fields
-- Works with PostGraphile append plugin pipeline
+- Adds full-text search condition fields for `tsvector` columns
+- Uses `websearch_to_tsquery` for natural search syntax
+- Automatic `ORDER BY ts_rank(column, tsquery) DESC` relevance ordering (matching V4 behavior)
+- Cursor-based pagination remains stable — PostGraphile re-appends unique key columns after the relevance sort
+- Works with PostGraphile v5 preset/plugin pipeline
 
-## 📦 Usage
+## Usage
 
-1. Append the new plugins!
-2. Query `search<YourTsvectorColumn>` in the `conditions` field
-3. Enjoy!
+### With Preset (Recommended)
 
-```js
+```typescript
+import { PgSearchPreset } from 'graphile-search-plugin';
 
-import PgSearchPlugin from 'graphile-search-plugin';
-
-app.use(
-  postgraphile(connectionStr, schemas, {
-    appendPlugins: [
-        PgSearchPlugin
-    ]
-  })
-);
+const preset = {
+  extends: [
+    // ... your other presets
+    PgSearchPreset({ pgSearchPrefix: 'fullText' }),
+  ],
+};
 ```
 
-## 🧪 Examples
+### With Plugin Directly
 
-Look in the tests ;)
+```typescript
+import { PgSearchPlugin } from 'graphile-search-plugin';
 
-## 🧪 Testing
+const preset = {
+  plugins: [
+    PgSearchPlugin({ pgSearchPrefix: 'fullText' }),
+  ],
+};
+```
+
+### GraphQL Query
+
+```graphql
+query SearchGoals($search: String!) {
+  goals(condition: { fullTextTsv: $search }) {
+    nodes {
+      id
+      title
+      description
+    }
+  }
+}
+```
+
+## Testing
 
 ```sh
 # requires a local Postgres available (defaults to postgres/password@localhost:5432)

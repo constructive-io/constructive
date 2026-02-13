@@ -55,7 +55,7 @@ it('creates a user and fetches it', async () => {
     mutation CreateUser($input: CreateUserInput!) {
       createUser(input: $input) {
         user {
-          id
+          rowId
           username
         }
       }
@@ -66,7 +66,7 @@ it('creates a user and fetches it', async () => {
     query {
       allUsers {
         nodes {
-          id
+          rowId
           username
         }
       }

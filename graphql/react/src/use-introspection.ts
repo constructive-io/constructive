@@ -21,7 +21,7 @@ export function useIntrospection(options = {}) {
     'introspection',
     async () => {
       const introspectionResults = await graphqlClient.request(
-        IntrospectionQuery
+        IntrospectionQuery as any
       );
       try {
         const { queries, mutations } = parseGraphQuery(introspectionResults);

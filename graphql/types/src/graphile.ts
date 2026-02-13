@@ -1,18 +1,15 @@
-import type { Plugin } from 'graphile-build';
-import { PostGraphileOptions } from 'postgraphile';
+import type { GraphileConfig } from 'graphile-config';
 
 /**
- * PostGraphile/Graphile configuration
+ * PostGraphile/Graphile v5 configuration
  */
 export interface GraphileOptions {
   /** Database schema(s) to expose through GraphQL */
   schema?: string | string[];
-  /** Additional Graphile plugins to load */
-  appendPlugins?: Plugin[];
-  /** Build options for Graphile */
-  graphileBuildOptions?: PostGraphileOptions['graphileBuildOptions'];
-  /** Override settings for PostGraphile */
-  overrideSettings?: Partial<PostGraphileOptions>;
+  /** Additional presets to extend */
+  extends?: GraphileConfig.Preset[];
+  /** Preset overrides */
+  preset?: Partial<GraphileConfig.Preset>;
 }
 
 /**
@@ -52,9 +49,8 @@ export interface ApiOptions {
  */
 export const graphileDefaults: GraphileOptions = {
   schema: [],
-  appendPlugins: [],
-  overrideSettings: {},
-  graphileBuildOptions: {},
+  extends: [],
+  preset: {},
 };
 
 /**

@@ -5,7 +5,7 @@ exports[`creates a user and fetches it: createUser 1`] = `
   "data": {
     "createUser": {
       "user": {
-        "id": "[ID]",
+        "rowId": "[ID]",
         "username": "testuser1",
       },
     },

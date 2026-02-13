@@ -92,6 +92,33 @@ function shouldSkipType(
   return false;
 }
 
+function collectCustomScalarTypes(typeRegistry: TypeRegistry): string[] {
+  const customScalarTypes = new Set<string>();
+
+  for (const [typeName, typeInfo] of typeRegistry) {
+    if (typeInfo.kind !== 'SCALAR') continue;
+    if (SCALAR_NAMES.has(typeName)) continue;
+    customScalarTypes.add(typeName);
+  }
+
+  return Array.from(customScalarTypes).sort();
+}
+
+function generateCustomScalarTypes(customScalarTypes: string[]): t.Statement[] {
+  const statements: t.Statement[] = [];
+
+  for (const scalarType of customScalarTypes) {
+    const alias = t.tsTypeAliasDeclaration(
+      t.identifier(scalarType),
+      null,
+      t.tsUnknownKeyword(),
+    );
+    statements.push(t.exportNamedDeclaration(alias));
+  }
+
+  return statements;
+}
+
 function generateEnumTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
@@ -341,6 +368,7 @@ export function generateSchemaTypesFile(
 
   const allStatements: t.Statement[] = [];
   let generatedTypes = new Set<string>();
+  const customScalarTypes = collectCustomScalarTypes(typeRegistry);
 
   const enumResult = generateEnumTypes(typeRegistry, tableTypeNames);
   generatedTypes = new Set([...generatedTypes, ...enumResult.generatedTypes]);
@@ -382,6 +410,7 @@ export function generateSchemaTypesFile(
     allStatements.push(typesImport);
   }
 
+  allStatements.push(...generateCustomScalarTypes(customScalarTypes));
   allStatements.push(...enumResult.statements);
   allStatements.push(...unionResult.statements);
   allStatements.push(...inputResult.statements);

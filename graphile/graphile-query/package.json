@@ -1,8 +1,8 @@
 {
   "name": "graphile-query",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "graphile query",
+  "description": "Execute GraphQL queries against PostGraphile v5 schemas",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -29,19 +29,27 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "graphql": "15.10.1",
+    "grafast": "^1.0.0-rc.4",
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "graphile-settings": "workspace:^",
+    "graphql": "^16.9.0",
     "pg": "^8.17.1",
-    "postgraphile": "^4.14.1"
+    "postgraphile": "^5.0.0-rc.4"
   },
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.12"
+    "makage": "^0.1.10",
+    "pgsql-test": "workspace:^"
   },
   "keywords": [
     "graphql",
     "query",
     "builder",
     "graphile",
+    "postgraphile",
+    "v5",
     "constructive",
     "pgpm"
   ]

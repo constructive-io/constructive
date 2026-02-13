@@ -43,6 +43,7 @@ import {
   spreadObj,
   sRef,
   typeRef,
+  typeRefToTsTypeAST,
   useQueryOptionsImplType,
   useQueryOptionsType,
   voidStatement,
@@ -98,10 +99,11 @@ export function generateCustomQueryHook(
     isTypeRequired(arg.type),
   );
 
-  const resultType = typeRefToTsType(operation.returnType, tracker);
+  typeRefToTsType(operation.returnType, tracker);
   for (const arg of operation.args) {
     typeRefToTsType(arg.type, tracker);
   }
+  const resultTsType = typeRefToTsTypeAST(operation.returnType);
 
   const selectTypeName = getSelectTypeName(operation.returnType);
   const payloadTypeName = getTypeBaseName(operation.returnType);
@@ -165,12 +167,12 @@ export function generateCustomQueryHook(
 
   if (hasSelect) {
     statements.push(
-      createImportDeclaration(
-        '../../orm/select-types',
-        ['InferSelectResult', 'StrictSelect'],
-        true,
-      ),
-    );
+    createImportDeclaration(
+      '../../orm/select-types',
+      ['InferSelectResult', 'HookStrictSelect'],
+      true,
+    ),
+  );
   }
 
   // Re-exports
@@ -248,9 +250,17 @@ export function generateCustomQueryHook(
     t.tsParenthesizedType(
       t.tsIntersectionType([
         t.tsTypeLiteral([
-          t.tsPropertySignature(t.identifier('fields'), t.tsTypeAnnotation(s)),
+          t.tsPropertySignature(
+            t.identifier('fields'),
+            t.tsTypeAnnotation(
+              t.tsIntersectionType([s, typeRef(selectTypeName!)]),
+            ),
+          ),
         ]),
-        typeRef('StrictSelect', [s, typeRef(selectTypeName!)]),
+        typeRef('HookStrictSelect', [
+          typeRef('NoInfer', [s]),
+          typeRef(selectTypeName!),
+        ]),
       ]),
     );
 
@@ -279,15 +289,14 @@ export function generateCustomQueryHook(
       // Overload 1: with selection.fields
       const o1Props: t.TSPropertySignature[] = [];
       if (hasArgs) {
-        const varType = hasRequiredArgs
-          ? typeRef(varTypeName)
-          : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-        o1Props.push(
-          t.tsPropertySignature(
-            t.identifier('variables'),
-            t.tsTypeAnnotation(varType),
-          ),
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
         );
+        if (!hasRequiredArgs) {
+          varProp.optional = true;
+        }
+        o1Props.push(varProp);
       }
       o1Props.push(
         t.tsPropertySignature(
@@ -465,7 +474,7 @@ export function generateCustomQueryHook(
       const resultTypeLiteral = t.tsTypeLiteral([
         t.tsPropertySignature(
           t.identifier(operation.name),
-          t.tsTypeAnnotation(typeRef(resultType)),
+          t.tsTypeAnnotation(resultTsType),
         ),
       ]);
 
@@ -647,15 +656,14 @@ export function generateCustomQueryHook(
     // Overload 1: with fields
     const f1Props: t.TSPropertySignature[] = [];
     if (hasArgs) {
-      const varType = hasRequiredArgs
-        ? typeRef(varTypeName)
-        : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-      f1Props.push(
-        t.tsPropertySignature(
-          t.identifier('variables'),
-          t.tsTypeAnnotation(varType),
-        ),
+      const varProp = t.tsPropertySignature(
+        t.identifier('variables'),
+        t.tsTypeAnnotation(typeRef(varTypeName)),
       );
+      if (!hasRequiredArgs) {
+        varProp.optional = true;
+      }
+      f1Props.push(varProp);
     }
     f1Props.push(
       t.tsPropertySignature(
@@ -848,15 +856,14 @@ export function generateCustomQueryHook(
       // Overload 1: with fields
       const p1Props: t.TSPropertySignature[] = [];
       if (hasArgs) {
-        const varType = hasRequiredArgs
-          ? typeRef(varTypeName)
-          : t.tsUnionType([typeRef(varTypeName), t.tsUndefinedKeyword()]);
-        p1Props.push(
-          t.tsPropertySignature(
-            t.identifier('variables'),
-            t.tsTypeAnnotation(varType),
-          ),
+        const varProp = t.tsPropertySignature(
+          t.identifier('variables'),
+          t.tsTypeAnnotation(typeRef(varTypeName)),
         );
+        if (!hasRequiredArgs) {
+          varProp.optional = true;
+        }
+        p1Props.push(varProp);
       }
       p1Props.push(
         t.tsPropertySignature(

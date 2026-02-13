@@ -19,9 +19,10 @@ import type {
   TypeRegistry,
 } from '../../../types/schema';
 import { addLineComment, generateCode } from '../babel-ast';
-import { scalarToFilterType, scalarToTsType } from '../scalars';
+import { SCALAR_NAMES, scalarToFilterType, scalarToTsType } from '../scalars';
 import { getTypeBaseName } from '../type-resolver';
 import {
+  getCreateInputTypeName,
   getConditionTypeName,
   getFilterTypeName,
   getGeneratedFileHeader,
@@ -29,6 +30,7 @@ import {
   getPrimaryKeyInfo,
   getTableNames,
   isRelationField,
+  lcFirst,
 } from '../utils';
 
 export interface GeneratedInputTypesFile {
@@ -523,6 +525,47 @@ function generateEnumTypes(
   return statements;
 }
 
+function collectCustomScalarTypes(
+  typeRegistry: TypeRegistry,
+  tables: CleanTable[],
+  excludedTypeNames: Set<string>,
+): string[] {
+  const customScalarTypes = new Set<string>();
+  const tableTypeNames = new Set(tables.map((table) => table.name));
+
+  for (const [typeName, typeInfo] of typeRegistry) {
+    if (typeInfo.kind !== 'SCALAR') continue;
+    if (SCALAR_NAMES.has(typeName)) continue;
+    if (excludedTypeNames.has(typeName)) continue;
+    customScalarTypes.add(typeName);
+  }
+
+  for (const table of tables) {
+    for (const field of table.fields) {
+      const fieldType =
+        typeof field.type === 'string' ? field.type : field.type.gqlType;
+      if (SCALAR_NAMES.has(fieldType)) continue;
+      if (excludedTypeNames.has(fieldType)) continue;
+      if (tableTypeNames.has(fieldType)) continue;
+      if (isLikelyEnumType(fieldType, typeRegistry)) continue;
+      customScalarTypes.add(fieldType);
+    }
+  }
+
+  return Array.from(customScalarTypes).sort();
+}
+
+function generateCustomScalarTypes(customScalarTypes: string[]): t.Statement[] {
+  if (customScalarTypes.length === 0) return [];
+
+  const statements: t.Statement[] = customScalarTypes.map((scalarType) =>
+    createExportedTypeAlias(scalarType, 'unknown'),
+  );
+
+  addSectionComment(statements, 'Custom Scalar Types');
+  return statements;
+}
+
 // ============================================================================
 // Entity Types Generator (AST-based)
 // ============================================================================
@@ -791,20 +834,17 @@ function buildSelectTypeLiteral(
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
         t.tsTypeAnnotation(
-          t.tsUnionType([
-            t.tsBooleanKeyword(),
-            t.tsTypeLiteral([
-              (() => {
-                const selectProp = t.tsPropertySignature(
-                  t.identifier('select'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
-                  ),
-                );
-                selectProp.optional = true;
-                return selectProp;
-              })(),
-            ]),
+          t.tsTypeLiteral([
+            (() => {
+              const selectProp = t.tsPropertySignature(
+                t.identifier('select'),
+                t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                ),
+              );
+              selectProp.optional = false;
+              return selectProp;
+            })(),
           ]),
         ),
       );
@@ -831,48 +871,43 @@ function buildSelectTypeLiteral(
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
         t.tsTypeAnnotation(
-          t.tsUnionType([
-            t.tsBooleanKeyword(),
-            t.tsTypeLiteral([
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('select'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('first'),
-                  t.tsTypeAnnotation(t.tsNumberKeyword()),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('filter'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(filterName)),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('orderBy'),
-                  t.tsTypeAnnotation(
-                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-            ]),
+          t.tsTypeLiteral([
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('select'),
+                t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                ),
+              );
+              p.optional = false;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('first'),
+                t.tsTypeAnnotation(t.tsNumberKeyword()),
+              );
+              p.optional = true;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('filter'),
+                t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterName))),
+              );
+              p.optional = true;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('orderBy'),
+                t.tsTypeAnnotation(
+                  t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
+                ),
+              );
+              p.optional = true;
+              return p;
+            })(),
           ]),
         ),
       );
@@ -896,48 +931,43 @@ function buildSelectTypeLiteral(
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
         t.tsTypeAnnotation(
-          t.tsUnionType([
-            t.tsBooleanKeyword(),
-            t.tsTypeLiteral([
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('select'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('first'),
-                  t.tsTypeAnnotation(t.tsNumberKeyword()),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('filter'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(filterName)),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-              (() => {
-                const p = t.tsPropertySignature(
-                  t.identifier('orderBy'),
-                  t.tsTypeAnnotation(
-                    t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
-                  ),
-                );
-                p.optional = true;
-                return p;
-              })(),
-            ]),
+          t.tsTypeLiteral([
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('select'),
+                t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                ),
+              );
+              p.optional = false;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('first'),
+                t.tsTypeAnnotation(t.tsNumberKeyword()),
+              );
+              p.optional = true;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('filter'),
+                t.tsTypeAnnotation(t.tsTypeReference(t.identifier(filterName))),
+              );
+              p.optional = true;
+              return p;
+            })(),
+            (() => {
+              const p = t.tsPropertySignature(
+                t.identifier('orderBy'),
+                t.tsTypeAnnotation(
+                  t.tsArrayType(t.tsTypeReference(t.identifier(orderByName))),
+                ),
+              );
+              p.optional = true;
+              return p;
+            })(),
           ]),
         ),
       );
@@ -956,20 +986,17 @@ function buildSelectTypeLiteral(
       const prop = t.tsPropertySignature(
         t.identifier(relation.fieldName),
         t.tsTypeAnnotation(
-          t.tsUnionType([
-            t.tsBooleanKeyword(),
-            t.tsTypeLiteral([
-              (() => {
-                const selectProp = t.tsPropertySignature(
-                  t.identifier('select'),
-                  t.tsTypeAnnotation(
-                    t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
-                  ),
-                );
-                selectProp.optional = true;
-                return selectProp;
-              })(),
-            ]),
+          t.tsTypeLiteral([
+            (() => {
+              const selectProp = t.tsPropertySignature(
+                t.identifier('select'),
+                t.tsTypeAnnotation(
+                  t.tsTypeReference(t.identifier(`${relatedTypeName}Select`)),
+                ),
+              );
+              selectProp.optional = false;
+              return selectProp;
+            })(),
           ]),
         ),
       );
@@ -1161,7 +1188,7 @@ function generateOrderByTypes(tables: CleanTable[]): t.Statement[] {
 /**
  * Build the nested data object fields for Create input
  */
-function buildCreateDataFields(
+function buildCreateDataFieldsFromTable(
   table: CleanTable,
 ): Array<{ name: string; type: string; optional: boolean }> {
   const fields: Array<{ name: string; type: string; optional: boolean }> = [];
@@ -1187,13 +1214,87 @@ function buildCreateDataFields(
 }
 
 /**
+ * Build Create input fields from schema Input types when available.
+ *
+ * This follows the actual GraphQL input shape:
+ * `CreateXInput { clientMutationId?, x: XInput! }`
+ */
+function buildCreateDataFieldsFromSchema(
+  table: CleanTable,
+  typeRegistry: TypeRegistry,
+): Array<{ name: string; type: string; optional: boolean }> | null {
+  const createInputTypeName = getCreateInputTypeName(table);
+  const createInputType = typeRegistry.get(createInputTypeName);
+  if (
+    !createInputType ||
+    createInputType.kind !== 'INPUT_OBJECT' ||
+    !createInputType.inputFields
+  ) {
+    return null;
+  }
+
+  const { singularName } = getTableNames(table);
+  const entityArg =
+    createInputType.inputFields.find((field) => field.name === singularName) ??
+    createInputType.inputFields.find(
+      (field) => field.name !== 'clientMutationId',
+    );
+  if (!entityArg) return null;
+
+  const entityInputTypeName = getTypeBaseName(entityArg.type);
+  if (!entityInputTypeName) return null;
+
+  const entityInputType = typeRegistry.get(entityInputTypeName);
+  if (
+    !entityInputType ||
+    entityInputType.kind !== 'INPUT_OBJECT' ||
+    !entityInputType.inputFields
+  ) {
+    return null;
+  }
+
+  const fields: Array<{ name: string; type: string; optional: boolean }> = [];
+  for (const field of entityInputType.inputFields) {
+    if (
+      EXCLUDED_MUTATION_FIELDS.includes(
+        field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number],
+      )
+    ) {
+      continue;
+    }
+
+    fields.push({
+      name: field.name,
+      type: typeRefToTs(field.type),
+      optional: !isRequired(field.type),
+    });
+  }
+
+  return fields;
+}
+
+/**
+ * Build Create input fields, preferring schema-derived Input object fields.
+ */
+function buildCreateDataFields(
+  table: CleanTable,
+  typeRegistry: TypeRegistry,
+): Array<{ name: string; type: string; optional: boolean }> {
+  return (
+    buildCreateDataFieldsFromSchema(table, typeRegistry) ??
+    buildCreateDataFieldsFromTable(table)
+  );
+}
+
+/**
  * Build Create input interface as AST
  */
 function buildCreateInputInterface(
   table: CleanTable,
+  typeRegistry: TypeRegistry,
 ): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
-  const fields = buildCreateDataFields(table);
+  const fields = buildCreateDataFields(table, typeRegistry);
 
   // Build the nested object type for the entity data
   const nestedProps: t.TSPropertySignature[] = fields.map((field) => {
@@ -1265,7 +1366,10 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Generate CRUD input type statements for a table
  */
-function generateCrudInputTypes(table: CleanTable): t.Statement[] {
+function generateCrudInputTypes(
+  table: CleanTable,
+  typeRegistry: TypeRegistry,
+): t.Statement[] {
   const statements: t.Statement[] = [];
   const { typeName } = getTableNames(table);
   const patchName = `${typeName}Patch`;
@@ -1276,19 +1380,21 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
   const pkFieldTsType = pkField?.tsType ?? 'string';
 
   // Create input
-  statements.push(buildCreateInputInterface(table));
+  statements.push(buildCreateInputInterface(table, typeRegistry));
 
   // Patch interface
   statements.push(
     createExportedInterface(patchName, buildPatchProperties(table)),
   );
 
-  // Update input
+  // Update input - v5 uses entity-specific patch field names (e.g., "userPatch")
+  const patchFieldName =
+    table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
   statements.push(
     createExportedInterface(`Update${typeName}Input`, [
       { name: 'clientMutationId', type: 'string', optional: true },
       { name: pkFieldName, type: pkFieldTsType, optional: false },
-      { name: 'patch', type: patchName, optional: false },
+      { name: patchFieldName, type: patchName, optional: false },
     ]),
   );
 
@@ -1306,11 +1412,14 @@ function generateCrudInputTypes(table: CleanTable): t.Statement[] {
 /**
  * Generate all CRUD input type statements
  */
-function generateAllCrudInputTypes(tables: CleanTable[]): t.Statement[] {
+function generateAllCrudInputTypes(
+  tables: CleanTable[],
+  typeRegistry: TypeRegistry,
+): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
-    statements.push(...generateCrudInputTypes(table));
+    statements.push(...generateCrudInputTypes(table, typeRegistry));
   }
 
   if (statements.length > 0) {
@@ -1559,20 +1668,17 @@ function generatePayloadTypes(
       const nestedType = baseType ? typeRegistry.get(baseType) : null;
       let propType: t.TSType;
       if (nestedType?.kind === 'OBJECT') {
-        propType = t.tsUnionType([
-          t.tsBooleanKeyword(),
-          t.tsTypeLiteral([
-            (() => {
-              const p = t.tsPropertySignature(
-                t.identifier('select'),
-                t.tsTypeAnnotation(
-                  t.tsTypeReference(t.identifier(`${baseType}Select`)),
-                ),
-              );
-              p.optional = true;
-              return p;
-            })(),
-          ]),
+        propType = t.tsTypeLiteral([
+          (() => {
+            const p = t.tsPropertySignature(
+              t.identifier('select'),
+              t.tsTypeAnnotation(
+                t.tsTypeReference(t.identifier(`${baseType}Select`)),
+              ),
+            );
+            p.optional = false;
+            return p;
+          })(),
         ]);
       } else {
         propType = t.tsBooleanKeyword();
@@ -1704,15 +1810,23 @@ export function generateInputTypesFile(
   const tablesList = tables ?? [];
   const hasTables = tablesList.length > 0;
   const tableByName = new Map(tablesList.map((table) => [table.name, table]));
+  const enumTypes = hasTables
+    ? collectEnumTypesFromTables(tablesList, typeRegistry)
+    : new Set<string>();
+  const customScalarTypes = collectCustomScalarTypes(
+    typeRegistry,
+    tablesList,
+    enumTypes,
+  );
 
   // 1. Scalar filter types
   statements.push(...generateScalarFilterTypes());
 
   // 2. Enum types used by table fields
-  if (hasTables) {
-    const enumTypes = collectEnumTypesFromTables(tablesList, typeRegistry);
-    statements.push(...generateEnumTypes(typeRegistry, enumTypes));
-  }
+  statements.push(...generateEnumTypes(typeRegistry, enumTypes));
+
+  // 2b. Unknown/custom scalar aliases for schema-specific scalars
+  statements.push(...generateCustomScalarTypes(customScalarTypes));
 
   // 3. Entity and relation types (if tables provided)
   if (hasTables) {
@@ -1732,7 +1846,7 @@ export function generateInputTypesFile(
     statements.push(...generateOrderByTypes(tablesList));
 
     // 6. CRUD input types
-    statements.push(...generateAllCrudInputTypes(tablesList));
+    statements.push(...generateAllCrudInputTypes(tablesList, typeRegistry));
   }
 
   // 6b. Connection fields map (runtime metadata for buildSelections)

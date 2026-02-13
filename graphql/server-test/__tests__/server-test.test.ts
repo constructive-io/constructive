@@ -46,8 +46,8 @@ describe('graphql-server-test', () => {
     });
 
     it('should query users via HTTP', async () => {
-      const res = await query<{ users: { nodes: Array<{ id: number; username: string }> } }>(
-        `query { users { nodes { id username } } }`
+      const res = await query<{ users: { nodes: Array<{ username: string }> } }>(
+        `query { users { nodes { username } } }`
       );
 
       expect(res.data).toBeDefined();
@@ -56,8 +56,8 @@ describe('graphql-server-test', () => {
     });
 
     it('should query posts via HTTP', async () => {
-      const res = await query<{ posts: { nodes: Array<{ id: number; title: string }> } }>(
-        `query { posts { nodes { id title } } }`
+      const res = await query<{ posts: { nodes: Array<{ title: string }> } }>(
+        `query { posts { nodes { title } } }`
       );
 
       expect(res.data).toBeDefined();
@@ -66,29 +66,30 @@ describe('graphql-server-test', () => {
 
     it('should support variables', async () => {
       const res = await query<
-        { userByUsername: { id: number; username: string; email: string } | null },
+        { users: { nodes: Array<{ username: string; email: string }> } },
         { username: string }
       >(
-        `query GetUser($username: String!) { 
-          userByUsername(username: $username) { 
-            id 
-            username 
-            email 
-          } 
+        `query GetUser($username: String!) {
+          users(condition: { username: $username }) {
+            nodes {
+              username
+              email
+            }
+          }
         }`,
         { username: 'alice' }
       );
 
-      expect(res.data?.userByUsername).toBeDefined();
-      expect(res.data?.userByUsername?.username).toBe('alice');
-      expect(res.data?.userByUsername?.email).toBe('alice@example.com');
+      expect(res.data?.users.nodes).toHaveLength(1);
+      expect(res.data?.users.nodes[0].username).toBe('alice');
+      expect(res.data?.users.nodes[0].email).toBe('alice@example.com');
     });
 
     it('should use SuperTest directly for custom requests', async () => {
       const res = await request
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send({ query: '{ users { nodes { id } } }' });
+        .send({ query: '{ users { nodes { username } } }' });
 
       expect(res.status).toBe(200);
       expect(res.body.data.users.nodes).toHaveLength(2);

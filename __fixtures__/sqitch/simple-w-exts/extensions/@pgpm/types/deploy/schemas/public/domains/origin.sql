@@ -2,7 +2,7 @@
 -- requires: schemas/public/schema
 
 BEGIN;
-CREATE DOMAIN origin AS text CHECK (VALUE = substring(VALUE from '^(https?://[^/]*)'));
-COMMENT ON DOMAIN origin IS E'@name pgpmInternalTypeOrigin';
+CREATE DOMAIN origin AS text CHECK (value ~ '^https?://[^\s]+$');
+COMMENT ON DOMAIN origin IS E'@name constructiveInternalTypeOrigin';
 COMMIT;
 

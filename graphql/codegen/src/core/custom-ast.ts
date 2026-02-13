@@ -1,4 +1,5 @@
 import * as t from 'gql-ast';
+import { Kind } from 'graphql';
 import type { FieldNode, InlineFragmentNode } from 'graphql';
 
 import type { CleanField } from '../types/schema';
@@ -96,28 +97,28 @@ export function geometryPointAst(name: string): FieldNode {
 export function geometryCollectionAst(name: string): FieldNode {
   // Manually create inline fragment since gql-ast doesn't support it
   const inlineFragment: InlineFragmentNode = {
-    kind: 'InlineFragment',
+    kind: Kind.INLINE_FRAGMENT,
     typeCondition: {
-      kind: 'NamedType',
+      kind: Kind.NAMED_TYPE,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: 'GeometryPoint',
       },
     },
     selectionSet: {
-      kind: 'SelectionSet',
+      kind: Kind.SELECTION_SET,
       selections: [
         {
-          kind: 'Field',
+          kind: Kind.FIELD,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'x',
           },
         },
         {
-          kind: 'Field',
+          kind: Kind.FIELD,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'y',
           },
         },

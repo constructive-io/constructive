@@ -5,7 +5,7 @@ exports[`creates a user and returns typed result: create-user 1`] = `
   "data": {
     "createUser": {
       "user": {
-        "id": "[ID]",
+        "rowId": "[ID]",
         "username": "alice",
       },
     },

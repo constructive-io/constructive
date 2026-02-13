@@ -79,7 +79,7 @@ export const pruneDates = (row: AnyObject): AnyObject =>
 
 export const pruneIds = (row: AnyObject, idHash?: IdHash): AnyObject =>
   mapValues(row, (v, k) =>
-    (k === 'id' || (typeof k === 'string' && k.endsWith('_id'))) &&
+    (k === 'id' || k === 'rowId' || (typeof k === 'string' && k.endsWith('_id'))) &&
       (typeof v === 'string' || typeof v === 'number')
       ? idReplacement(v, idHash)
       : v

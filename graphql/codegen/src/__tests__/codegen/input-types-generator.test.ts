@@ -518,8 +518,8 @@ describe('entity select types', () => {
 
     expect(result.content).toContain('export type PostSelect = {');
     // Babel generates multi-line format for object types
-    expect(result.content).toContain('author?: boolean | {');
-    expect(result.content).toContain('select?: UserSelect;');
+    expect(result.content).toContain('author?: {');
+    expect(result.content).toContain('select: UserSelect;');
   });
 
   it('generates select type with hasMany relation options', () => {
@@ -528,8 +528,8 @@ describe('entity select types', () => {
       postTable,
     ]);
 
-    expect(result.content).toContain('posts?: boolean | {');
-    expect(result.content).toContain('select?: PostSelect;');
+    expect(result.content).toContain('posts?: {');
+    expect(result.content).toContain('select: PostSelect;');
     expect(result.content).toContain('first?: number;');
     expect(result.content).toContain('filter?: PostFilter;');
     expect(result.content).toContain('orderBy?: PostsOrderBy[];');
@@ -542,8 +542,8 @@ describe('entity select types', () => {
     ]);
 
     expect(result.content).toContain('export type CategorySelect = {');
-    expect(result.content).toContain('posts?: boolean | {');
-    expect(result.content).toContain('select?: PostSelect;');
+    expect(result.content).toContain('posts?: {');
+    expect(result.content).toContain('select: PostSelect;');
   });
 });
 
@@ -616,7 +616,7 @@ describe('CRUD input types', () => {
 
     expect(result.content).toContain('export interface UpdateUserInput {');
     expect(result.content).toContain('id: string;');
-    expect(result.content).toContain('patch: UserPatch;');
+    expect(result.content).toContain('userPatch: UserPatch;');
   });
 
   it('generates delete input type', () => {
@@ -625,6 +625,62 @@ describe('CRUD input types', () => {
     expect(result.content).toContain('export interface DeleteUserInput {');
     expect(result.content).toContain('clientMutationId?: string;');
     expect(result.content).toContain('id: string;');
+  });
+
+  it('uses schema-derived requiredness for create input fields', () => {
+    const productTable = createTable({
+      name: 'Product',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'sku', type: fieldTypes.string },
+        { name: 'categoryId', type: fieldTypes.uuid },
+      ],
+      query: {
+        all: 'products',
+        one: 'product',
+        create: 'createProduct',
+        update: 'updateProduct',
+        delete: 'deleteProduct',
+      },
+    });
+
+    const registry = createTypeRegistry({
+      CreateProductInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'CreateProductInput',
+        inputFields: [
+          {
+            name: 'product',
+            type: createNonNull(createTypeRef('INPUT_OBJECT', 'ProductInput')),
+          },
+          {
+            name: 'clientMutationId',
+            type: createTypeRef('SCALAR', 'String'),
+          },
+        ],
+      },
+      ProductInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'ProductInput',
+        inputFields: [
+          {
+            name: 'sku',
+            type: createNonNull(createTypeRef('SCALAR', 'String')),
+          },
+          {
+            name: 'categoryId',
+            type: createTypeRef('SCALAR', 'UUID'),
+          },
+        ],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [productTable]);
+
+    expect(result.content).toContain('export interface CreateProductInput {');
+    expect(result.content).toContain('product: {');
+    expect(result.content).toContain('sku: string;');
+    expect(result.content).toContain('categoryId?: string;');
   });
 });
 
@@ -659,6 +715,58 @@ describe('custom input types', () => {
     expect(result.content).toContain(
       'export type UserRole = "ADMIN" | "USER" | "GUEST";',
     );
+  });
+
+  it('emits unknown aliases for custom scalars used in table fields', () => {
+    const tableWithCustomScalar = createTable({
+      name: 'Asset',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'thumbnail',
+          type: { gqlType: 'ImageAsset', isArray: false } as CleanFieldType,
+        },
+      ],
+    });
+
+    const registry = createTypeRegistry({
+      ImageAsset: {
+        kind: 'SCALAR',
+        name: 'ImageAsset',
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [
+      tableWithCustomScalar,
+    ]);
+
+    expect(result.content).toContain('export type ImageAsset = unknown;');
+    expect(result.content).toContain('thumbnail?: ImageAsset | null;');
+  });
+
+  it('does not alias table entity names as custom scalars', () => {
+    const user = createTable({
+      name: 'User',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'email', type: fieldTypes.string },
+      ],
+    });
+    const post = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        {
+          name: 'author',
+          type: { gqlType: 'User', isArray: false } as CleanFieldType,
+        },
+      ],
+    });
+
+    const result = generateInputTypesFile(new Map(), new Set(), [user, post]);
+
+    expect(result.content).toContain('export interface User {');
+    expect(result.content).not.toContain('export type User = unknown;');
   });
 });
 
@@ -695,6 +803,7 @@ describe('payload types', () => {
     expect(result.content).toContain('export type LoginPayloadSelect = {');
     expect(result.content).toContain('token?: boolean;');
     expect(result.content).toContain('expiresAt?: boolean;');
+    expect(result.content).toContain('user?: boolean;');
   });
 });
 

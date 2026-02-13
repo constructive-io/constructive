@@ -51,7 +51,7 @@ it('creates a user and returns typed result', async () => {
     interface CreateUserResult {
         createUser: {
             user: {
-                id: number;
+                rowId: number;
                 username: string;
             };
         };
@@ -61,7 +61,7 @@ it('creates a user and returns typed result', async () => {
         mutation CreateUser($input: CreateUserInput!) {
           createUser(input: $input) {
             user {
-              id
+              rowId
               username
             }
           }
@@ -85,7 +85,7 @@ it('creates a user and returns typed result', async () => {
     expect(result.data).toBeDefined();
     expect(result.data!.createUser).toBeDefined();
     expect(result.data!.createUser.user.username).toBe('alice');
-    expect(typeof result.data!.createUser.user.id).toBe('number');
+    expect(typeof result.data!.createUser.user.rowId).toBe('number');
 
     // Optional snapshot for structure
     expect(snapshot(result.data)).toMatchSnapshot('create-user');
@@ -107,7 +107,7 @@ it('handles errors gracefully with raw GraphQL responses', async () => {
     interface CreateUserResult {
         createUser: {
             user: {
-                id: number;
+                rowId: number;
                 username: string;
             };
         };
@@ -117,7 +117,7 @@ it('handles errors gracefully with raw GraphQL responses', async () => {
         mutation CreateUser($input: CreateUserInput!) {
           createUser(input: $input) {
             user {
-              id
+              rowId
               username
             }
           }

@@ -56,7 +56,7 @@ it('creates a user and fetches it', async () => {
     mutation CreateUser($input: CreateUserInput!) {
       createUser(input: $input) {
         user {
-          id
+          rowId
           username
         }
       }
@@ -67,7 +67,7 @@ it('creates a user and fetches it', async () => {
     query {
       allUsers {
         nodes {
-          id
+          rowId
           username
         }
       }
@@ -99,7 +99,7 @@ it('does not see the user created in the previous test', async () => {
     query {
       allUsers {
         nodes {
-          id
+          rowId
           username
         }
       }

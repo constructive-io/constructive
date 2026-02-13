@@ -58,7 +58,7 @@ it('handles duplicate insert via internal PostGraphile savepoint', async () => {
     mutation CreateUser($input: CreateUserInput!) {
       createUser(input: $input) {
         user {
-          id
+          rowId
           username
         }
       }
@@ -69,7 +69,7 @@ it('handles duplicate insert via internal PostGraphile savepoint', async () => {
     query {
       allUsers {
         nodes {
-          id
+          rowId
           username
         }
       }

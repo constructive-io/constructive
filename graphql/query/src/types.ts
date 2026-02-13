@@ -210,3 +210,38 @@ export function isGraphQLVariables(obj: unknown): obj is GraphQLVariables {
 export type StrictRecord<K extends PropertyKey, V> = Record<K, V> & {
   [P in PropertyKey]: P extends K ? V : never;
 };
+
+// =============================================================================
+// Executor Types
+// =============================================================================
+
+/**
+ * Configuration options for QueryExecutor
+ */
+export interface ExecutorOptions {
+  /** PostgreSQL connection string */
+  connectionString: string;
+  /** Database schemas to expose in the GraphQL schema */
+  schemas: string[];
+  /** PostgreSQL settings to apply (e.g., { role: 'authenticated' }) */
+  pgSettings?: Record<string, string>;
+  /** Maximum number of cached executor instances (default: 10) */
+  maxCacheSize?: number;
+}
+
+/**
+ * Cache statistics for QueryExecutor
+ */
+export interface ExecutorCacheStats {
+  size: number;
+  maxSize: number;
+}
+
+/**
+ * Re-export GraphQL execution types for convenience
+ */
+export type {
+  ExecutionResult,
+  GraphQLError,
+  GraphQLSchema,
+} from 'graphql';

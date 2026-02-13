@@ -173,4 +173,37 @@ describe('schema-types-generator', () => {
     expect(result.content).toMatchSnapshot();
     expect(result.generatedEnums).toEqual(['CustomEnum']);
   });
+
+  it('emits unknown aliases for custom scalars', () => {
+    const registry = createTypeRegistry([
+      ['ImageAsset', { kind: 'SCALAR', name: 'ImageAsset' }],
+      ['String', { kind: 'SCALAR', name: 'String' }],
+      [
+        'CreatePostInput',
+        {
+          kind: 'INPUT_OBJECT',
+          name: 'CreatePostInput',
+          inputFields: [
+            {
+              name: 'title',
+              type: { kind: 'SCALAR', name: 'String' },
+            },
+            {
+              name: 'thumbnail',
+              type: { kind: 'SCALAR', name: 'ImageAsset' },
+            },
+          ],
+        },
+      ],
+    ]);
+
+    const result = generateSchemaTypesFile({
+      typeRegistry: registry,
+      tableTypeNames: new Set(),
+    });
+
+    expect(result.content).toContain('export type ImageAsset = unknown;');
+    expect(result.content).not.toContain('export type String = unknown;');
+    expect(result.content).toContain('thumbnail?: ImageAsset;');
+  });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/playwright-test",
-  "version": "1.1.1",
+  "version": "1.0.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive Playwright Testing with HTTP server support",
   "main": "index.js",
@@ -19,11 +19,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "scripts": {
-    "clean": "makage clean",
-    "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "scripts": {
+      "clean": "makage clean",
+      "prepack": "npm run build",
+      "build": "makage build",
+      "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "playwright test",
     "test:watch": "jest --watch"
@@ -32,7 +32,7 @@
     "@playwright/test": "^1.57.0",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.12"
+    "makage": "^0.1.10"
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",

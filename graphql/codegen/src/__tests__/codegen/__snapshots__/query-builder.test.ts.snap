@@ -16,8 +16,7 @@ exports[`query-builder snapshots findMany document with filter and pagination 1`
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots findMany document with nested connections via connectionFieldsMap 1`] = `
@@ -60,8 +59,7 @@ exports[`query-builder snapshots findMany document with nested connections via c
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots findMany with deeply nested connections (3 levels) 1`] = `
@@ -104,8 +102,7 @@ exports[`query-builder snapshots findMany with deeply nested connections (3 leve
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots findMany with mixed connection and singular relations 1`] = `
@@ -153,8 +150,7 @@ exports[`query-builder snapshots findMany with mixed connection and singular rel
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots findMany with nested connection fields 1`] = `
@@ -186,8 +182,7 @@ exports[`query-builder snapshots findMany with nested connection fields 1`] = `
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots findMany without connectionFieldsMap (no wrapping) 1`] = `
@@ -209,8 +204,7 @@ exports[`query-builder snapshots findMany without connectionFieldsMap (no wrappi
       endCursor
     }
   }
-}
-"
+}"
 `;
 
 exports[`query-builder snapshots mutation document 1`] = `
@@ -222,6 +216,5 @@ exports[`query-builder snapshots mutation document 1`] = `
       email
     }
   }
-}
-"
+}"
 `;

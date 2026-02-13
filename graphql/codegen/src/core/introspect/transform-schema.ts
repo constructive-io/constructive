@@ -339,7 +339,7 @@ export function getTableOperationNames(
     name: string;
     query?: {
       all: string;
-      one: string;
+      one: string | null;
       create: string;
       update: string | null;
       delete: string | null;
@@ -353,7 +353,9 @@ export function getTableOperationNames(
     if (table.query) {
       // Add exact query names from _meta
       queries.add(table.query.all);
-      queries.add(table.query.one);
+      if (table.query.one) {
+        queries.add(table.query.one);
+      }
 
       // Add exact mutation names from _meta
       mutations.add(table.query.create);

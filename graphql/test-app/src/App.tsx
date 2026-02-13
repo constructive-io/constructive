@@ -28,6 +28,17 @@ import {
   useSchemasQuery,
   useApisQuery,
   useDomainsQuery,
+  useTablesQuery,
+  useFieldsQuery,
+
+  // Session & identity scalar queries
+  useCurrentIpAddressQuery,
+  useCurrentUserAgentQuery,
+
+  // Entity list queries
+  useAuditLogsQuery,
+  useEmailsQuery,
+  useRoleTypesQuery,
 
   // Authenticated mutation hooks — Users
   useCreateUserMutation,
@@ -43,6 +54,11 @@ import {
   useCreateApiMutation,
   useCreateSiteMutation,
   useCreateDomainMutation,
+
+  // Custom mutations
+  useCheckPasswordMutation,
+  useExtendTokenExpiresMutation,
+  useVerifyPasswordMutation,
 } from './generated/hooks';
 
 const ENDPOINT = 'http://api.localhost:3000/graphql';
@@ -223,6 +239,141 @@ function CurrentUserId() {
   );
 }
 
+function CheckPasswordForm() {
+  const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<'check' | 'verify'>('check');
+  const [status, setStatus] = useState<'idle' | 'success' | 'fail'>('idle');
+  const [verifyResult, setVerifyResult] = useState<{ id: string; expiresAt: string; lastPasswordVerified: string } | null>(null);
+
+  const { mutate: checkPassword, isPending: checkPending, error: checkError } = useCheckPasswordMutation({
+    selection: { fields: { clientMutationId: true } },
+  });
+
+  const { mutate: verifyPassword, isPending: verifyPending, error: verifyError } = useVerifyPasswordMutation({
+    selection: {
+      fields: {
+        result: {
+          select: { id: true, userId: true, expiresAt: true, lastPasswordVerified: true },
+        },
+      },
+    },
+  });
+
+  const isPending = mode === 'check' ? checkPending : verifyPending;
+  const error = mode === 'check' ? checkError : verifyError;
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setStatus('idle');
+    setVerifyResult(null);
+
+    if (mode === 'check') {
+      checkPassword(
+        { input: { password } },
+        {
+          onSuccess: () => setStatus('success'),
+          onError: () => setStatus('fail'),
+        },
+      );
+    } else {
+      verifyPassword(
+        { input: { password } },
+        {
+          onSuccess: (data) => {
+            setStatus('success');
+            const result = data.verifyPassword?.result;
+            if (result) {
+              setVerifyResult({ id: result.id ?? '', expiresAt: result.expiresAt ?? '', lastPasswordVerified: result.lastPasswordVerified ?? '' });
+            }
+          },
+          onError: () => setStatus('fail'),
+        },
+      );
+    }
+  };
+
+  return (
+    <div style={cardStyle}>
+      <h3>Check / Verify Password</h3>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+        <button onClick={() => { setMode('check'); setStatus('idle'); setVerifyResult(null); }} style={{ ...tabStyle, fontWeight: mode === 'check' ? 700 : 400 }}>Check</button>
+        <button onClick={() => { setMode('verify'); setStatus('idle'); setVerifyResult(null); }} style={{ ...tabStyle, fontWeight: mode === 'verify' ? 700 : 400 }}>Verify (Session)</button>
+      </div>
+      <form onSubmit={handleSubmit} style={rowForm}>
+        <input type="password" placeholder="Enter current password" value={password} onChange={(e) => setPassword(e.target.value)} required style={inputStyle} />
+        <button type="submit" disabled={isPending} style={btnStyle}>{isPending ? 'Checking...' : mode === 'check' ? 'Check' : 'Verify'}</button>
+      </form>
+      {status === 'success' && <p style={{ color: '#16a34a', fontSize: 13, marginTop: 4 }}>Password is correct</p>}
+      {status === 'fail' && <p style={errStyle}>Password is incorrect</p>}
+      {error && <p style={errStyle}>{error.message}</p>}
+      {verifyResult && (
+        <pre style={preStyle}>{JSON.stringify(verifyResult, null, 2)}</pre>
+      )}
+    </div>
+  );
+}
+
+function SessionInfo() {
+  const { data: ipData, isLoading: ipLoading } = useCurrentIpAddressQuery();
+  const { data: uaData, isLoading: uaLoading } = useCurrentUserAgentQuery();
+
+  return (
+    <div style={cardStyle}>
+      <h3>Session Info</h3>
+      <dl style={dlStyle}>
+        <dt>IP Address</dt>
+        <dd>{ipLoading ? 'Loading...' : <code>{ipData?.currentIpAddress ?? 'null'}</code>}</dd>
+        <dt>User Agent</dt>
+        <dd>{uaLoading ? 'Loading...' : <code style={{ fontSize: 11, wordBreak: 'break-all' }}>{uaData?.currentUserAgent ?? 'null'}</code>}</dd>
+      </dl>
+    </div>
+  );
+}
+
+function EmailList() {
+  const { data, isLoading, error } = useEmailsQuery({
+    selection: {
+      fields: { id: true, email: true, isVerified: true, isPrimary: true, createdAt: true },
+      first: 10,
+    },
+  });
+
+  if (isLoading) return <p>Loading emails...</p>;
+  if (error) return <p style={errStyle}>Error: {error.message}</p>;
+
+  const emails = data?.emails?.nodes ?? [];
+
+  return (
+    <div style={cardStyle}>
+      <h3>Emails ({emails.length})</h3>
+      {emails.length === 0 ? (
+        <p style={{ color: '#9ca3af' }}>None</p>
+      ) : (
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={thStyle}>Email</th>
+              <th style={thStyle}>Verified</th>
+              <th style={thStyle}>Primary</th>
+              <th style={thStyle}>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {emails.map((e) => (
+              <tr key={e.id}>
+                <td style={tdStyle}>{String(e.email ?? '—')}</td>
+                <td style={tdStyle}>{e.isVerified ? 'Yes' : 'No'}</td>
+                <td style={tdStyle}>{e.isPrimary ? 'Yes' : 'No'}</td>
+                <td style={tdStyle}>{e.createdAt ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 function UserList() {
   const { data, isLoading, error } = useUsersQuery({
     selection: {
@@ -252,13 +403,18 @@ function UserList() {
 function CreateUserForm() {
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [appMembershipId, setAppMembershipId] = useState('');
+  const [orgMembershipDefaultId, setOrgMembershipDefaultId] = useState('');
   const { mutate, isPending, error, data: result } = useCreateUserMutation({
     selection: { fields: { id: true, username: true, displayName: true } },
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutate({ username, displayName });
+    mutate({
+      username,
+      displayName,
+    });
   };
 
   return (
@@ -267,6 +423,20 @@ function CreateUserForm() {
       <form onSubmit={handleSubmit} style={rowForm}>
         <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required style={inputStyle} />
         <input placeholder="Display Name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={inputStyle} />
+        <input
+          placeholder="App Membership ID"
+          value={appMembershipId}
+          onChange={(e) => setAppMembershipId(e.target.value)}
+          required
+          style={{ ...inputStyle, fontFamily: 'monospace', fontSize: 12 }}
+        />
+        <input
+          placeholder="Org Membership Default ID"
+          value={orgMembershipDefaultId}
+          onChange={(e) => setOrgMembershipDefaultId(e.target.value)}
+          required
+          style={{ ...inputStyle, fontFamily: 'monospace', fontSize: 12 }}
+        />
         <button type="submit" disabled={isPending} style={btnStyle}>{isPending ? 'Creating...' : 'Create'}</button>
       </form>
       {error && <p style={errStyle}>{error.message}</p>}
@@ -283,7 +453,7 @@ function UpdateUserForm({ userId }: { userId: string }) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutate({ id: userId, patch: { displayName } });
+    mutate({ id: userId, userPatch: { displayName } });
   };
 
   return (
@@ -304,6 +474,10 @@ function UpdateUserForm({ userId }: { userId: string }) {
 // ===========================================================================
 
 function DatabaseListWithSchemas() {
+  const PAGE_SIZE = 10;
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [pageStack, setPageStack] = useState<string[]>([]);
+
   const { data, isLoading, error, refetch } = useDatabasesQuery({
     selection: {
       fields: {
@@ -327,13 +501,8 @@ function DatabaseListWithSchemas() {
           },
         },
       },
-      first: 10,
-      where: {
-        and: [
-          { name: { includesInsensitive: 'prod' } },
-          { createdAt: { greaterThanOrEqualTo: '2026-01-01T00:00:00.000Z' } },
-        ],
-      },
+      first: PAGE_SIZE,
+      ...(cursor ? { after: cursor } : {}),
       orderBy: ['CREATED_AT_DESC'],
     },
   });
@@ -343,12 +512,30 @@ function DatabaseListWithSchemas() {
 
   // AUTOCOMPLETION TEST: type `db.` — should suggest id, name, label, createdAt, schemas
   const databases = data?.databases?.nodes ?? [];
+  const pageInfo = data?.databases?.pageInfo;
+  const totalCount = data?.databases?.totalCount ?? 0;
+
+  const handleNextPage = () => {
+    if (pageInfo?.endCursor) {
+      setPageStack((prev) => [...prev, cursor ?? '']);
+      setCursor(pageInfo.endCursor);
+    }
+  };
+
+  const handlePrevPage = () => {
+    setPageStack((prev) => {
+      const next = [...prev];
+      const prevCursor = next.pop();
+      setCursor(prevCursor || null);
+      return next;
+    });
+  };
 
   return (
     <div style={cardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>Databases ({databases.length})</h3>
-        <button onClick={() => refetch()} style={{ ...btnSmall, background: '#6b7280' }}>Refresh</button>
+        <h3>Databases ({totalCount} total)</h3>
+        <button type='button' onClick={() => refetch()} style={{ ...btnSmall, background: '#6b7280' }}>Refresh</button>
       </div>
       {databases.length === 0 ? (
         <p>No databases — create one below</p>
@@ -376,6 +563,30 @@ function DatabaseListWithSchemas() {
           </div>
         ))
       )}
+      {/* Pagination Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, fontSize: 13 }}>
+        <span style={{ color: '#6b7280' }}>
+          Page {pageStack.length + 1} · Showing {databases.length} of {totalCount}
+        </span>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={handlePrevPage}
+            disabled={pageStack.length === 0}
+            style={{ ...btnSmall, background: pageStack.length === 0 ? '#d1d5db' : '#2563eb' }}
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            onClick={handleNextPage}
+            disabled={!pageInfo?.hasNextPage}
+            style={{ ...btnSmall, background: !pageInfo?.hasNextPage ? '#d1d5db' : '#2563eb' }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -392,9 +603,12 @@ function DatabaseDetail({ databaseId }: { databaseId: string }) {
         privateSchemaName: true,
         createdAt: true,
         updatedAt: true,
-        // NESTED: owner user
         owner: {
-          select: { id: true, username: true, displayName: true },
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+          },
         },
       },
     },
@@ -464,8 +678,8 @@ function UpdateDatabaseForm() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // AUTOCOMPLETION TEST: patch should suggest DatabasePatch fields — ownerId, name, label, etc.
-    mutate({ id, patch: { label } });
+    // AUTOCOMPLETION TEST: databasePatch should suggest DatabasePatch fields — ownerId, name, label, etc.
+    mutate({ id, databasePatch: { label } });
   };
 
   return (
@@ -526,9 +740,11 @@ function SchemaList() {
         name: true,
         schemaName: true,
         isPublic: true,
-        // NESTED RELATION: parent database
         database: {
-          select: { id: true, name: true },
+          select: {
+            id: true,
+            name: true,
+          },
         },
       },
       first: 20,
@@ -591,6 +807,7 @@ function CreateSchemaForm() {
 }
 
 function ApiList() {
+  const [search, setSearch] = useState('');
   const { data, isLoading, error } = useApisQuery({
     selection: {
       fields: {
@@ -600,12 +817,15 @@ function ApiList() {
         roleName: true,
         anonRole: true,
         isPublic: true,
-        // NESTED RELATION: parent database
         database: {
-          select: { id: true, name: true },
+          select: {
+            id: true,
+            name: true,
+          },
         },
       },
       first: 20,
+      ...(search ? { where: { name: { includesInsensitive: search } } } : {}),
     },
   });
 
@@ -616,7 +836,15 @@ function ApiList() {
 
   return (
     <div style={cardStyle}>
-      <h3>APIs ({apis.length})</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <h3 style={{ margin: 0 }}>APIs ({apis.length})</h3>
+        <input
+          placeholder="Filter by name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ ...inputStyle, fontSize: 12, padding: '4px 8px', width: 180 }}
+        />
+      </div>
       <DataTable
         columns={['Name', 'DB Name', 'Role', 'Database', 'Public']}
         rows={apis}
@@ -699,9 +927,18 @@ function DomainList() {
         id: true,
         subdomain: true,
         domain: true,
-        // NESTED RELATIONS: api and site via FK
-        api: { select: { id: true, name: true } },
-        site: { select: { id: true, title: true } },
+        api: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        site: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
       first: 20,
     },
@@ -720,8 +957,8 @@ function DomainList() {
         columns={['Subdomain', 'Domain', 'API', 'Site']}
         rows={domains}
         renderRow={(d) => [
-          d.subdomain ?? '—',
-          d.domain ?? '—',
+          d.subdomain == null ? '—' : String(d.subdomain),
+          d.domain == null ? '—' : String(d.domain),
           d.api?.name ?? '—',
           d.site?.title ?? '—',
         ]}
@@ -768,10 +1005,224 @@ function CreateDomainForm() {
 }
 
 // ===========================================================================
+// SECTION: Audit Logs
+// ===========================================================================
+
+function AuditLogList() {
+  const { data, isLoading, error } = useAuditLogsQuery({
+    selection: {
+      fields: {
+        id: true,
+        event: true,
+        ipAddress: true,
+        success: true,
+        createdAt: true,
+        actor: {
+          select: { id: true },
+        },
+      },
+      first: 20,
+      orderBy: ['CREATED_AT_DESC'],
+    },
+  });
+
+  if (isLoading) return <p>Loading audit logs...</p>;
+  if (error) return <p style={errStyle}>Error: {error.message}</p>;
+
+  const logs = data?.auditLogs?.nodes ?? [];
+
+  return (
+    <div style={cardStyle}>
+      <h3>Audit Logs ({logs.length})</h3>
+      <DataTable
+        columns={['Event', 'IP', 'Success', 'Created']}
+        rows={logs}
+        renderRow={(log) => [
+          log.event,
+          log.ipAddress,
+          log.success ? 'Yes' : 'No',
+          log.createdAt,
+        ]}
+      />
+    </div>
+  );
+}
+
+// ===========================================================================
+// SECTION: Role Types
+// ===========================================================================
+
+function RoleTypeList() {
+  const { data, isLoading, error } = useRoleTypesQuery({
+    selection: {
+      fields: { id: true, name: true },
+      first: 20,
+    },
+  });
+
+  if (isLoading) return <p>Loading role types...</p>;
+  if (error) return <p style={errStyle}>Error: {error.message}</p>;
+
+  const roleTypes = data?.roleTypes?.nodes ?? [];
+
+  return (
+    <div style={cardStyle}>
+      <h3>Role Types ({roleTypes.length})</h3>
+      {roleTypes.length === 0 ? (
+        <p style={{ color: '#9ca3af' }}>None</p>
+      ) : (
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={thStyle}>ID</th>
+              <th style={thStyle}>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roleTypes.map((rt) => (
+              <tr key={String(rt.id)}>
+                <td style={tdStyle}><code>{String(rt.id)}</code></td>
+                <td style={tdStyle}>{rt.name ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+// ===========================================================================
+// SECTION: Tables & Fields (deep nesting)
+// ===========================================================================
+
+function TableListWithFields() {
+  const { data, isLoading, error } = useTablesQuery({
+    selection: {
+      fields: {
+        id: true,
+        name: true,
+        label: true,
+        schema: {
+          select: {
+            id: true,
+            schemaName: true,
+          },
+        },
+        fields: {
+          first: 20,
+          orderBy: ['NAME_ASC'],
+          select: {
+            id: true,
+            name: true,
+            label: true,
+            type: true,
+            isRequired: true,
+          },
+        },
+      },
+      first: 20,
+    },
+  });
+
+  if (isLoading) return <p>Loading tables...</p>;
+  if (error) return <p style={errStyle}>Error: {error.message}</p>;
+
+  const tables = data?.tables?.nodes ?? [];
+
+  return (
+    <div style={cardStyle}>
+      <h3>Tables ({tables.length})</h3>
+      {tables.length === 0 ? (
+        <p style={{ color: '#9ca3af' }}>No tables found</p>
+      ) : (
+        tables.map((table) => (
+          <div key={table.id} style={{ borderBottom: '1px solid #f3f4f6', padding: '8px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <strong>{table.name}</strong>
+              {table.label && <span style={{ color: '#6b7280' }}>({table.label})</span>}
+              <span style={{ ...badge, background: '#e0e7ff', fontSize: 11 }}>
+                {table.schema?.schemaName ?? '—'}
+              </span>
+            </div>
+            {/* NESTED RELATION: fields under this table */}
+            {table.fields?.nodes && table.fields.nodes.length > 0 && (
+              <div style={{ marginLeft: 16, marginTop: 4 }}>
+                <table style={{ ...tableStyle, fontSize: 12 }}>
+                  <thead>
+                    <tr>
+                      <th style={thStyle}>Field</th>
+                      <th style={thStyle}>Label</th>
+                      <th style={thStyle}>Type</th>
+                      <th style={thStyle}>Required</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {table.fields.nodes.map((f) => (
+                      <tr key={f.id}>
+                        <td style={tdStyle}><code>{f.name}</code></td>
+                        <td style={tdStyle}>{f.label ?? '—'}</td>
+                        <td style={tdStyle}><code style={{ fontSize: 11 }}>{f.type}</code></td>
+                        <td style={tdStyle}>{f.isRequired ? 'Yes' : 'No'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function FieldList() {
+  const { data, isLoading, error } = useFieldsQuery({
+    selection: {
+      fields: {
+        id: true,
+        name: true,
+        type: true,
+        isRequired: true,
+        table: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      first: 50,
+    },
+  });
+
+  if (isLoading) return <p>Loading fields...</p>;
+  if (error) return <p style={errStyle}>Error: {error.message}</p>;
+
+  const fields = data?.fields?.nodes ?? [];
+
+  return (
+    <div style={cardStyle}>
+      <h3>Fields ({fields.length})</h3>
+      <DataTable
+        columns={['Field Name', 'Type', 'Required', 'Table']}
+        rows={fields}
+        renderRow={(f) => [
+          f.name,
+          f.type,
+          f.isRequired ? 'Yes' : 'No',
+          f.table?.name ?? '—',
+        ]}
+      />
+    </div>
+  );
+}
+
+// ===========================================================================
 // Shared: Generic data table component
 // ===========================================================================
 
-function DataTable<T extends { id: string }>({
+function DataTable<T extends { id?: string | null }>({
   columns,
   rows,
   renderRow,
@@ -792,8 +1243,8 @@ function DataTable<T extends { id: string }>({
         </tr>
       </thead>
       <tbody>
-        {rows.map((row) => (
-          <tr key={row.id}>
+        {rows.map((row, idx) => (
+          <tr key={row.id ?? `row-${idx}`}>
             {renderRow(row).map((cell, i) => (
               <td key={i} style={tdStyle}>{cell ?? '—'}</td>
             ))}
@@ -807,6 +1258,45 @@ function DataTable<T extends { id: string }>({
 // ===========================================================================
 // Authenticated Dashboard
 // ===========================================================================
+
+function ExtendTokenButton() {
+  const [result, setResult] = useState<{ expiresAt: string } | null>(null);
+  const { mutate, isPending, error } = useExtendTokenExpiresMutation({
+    selection: {
+      fields: {
+        result: {
+          select: { id: true, sessionId: true, expiresAt: true },
+        },
+      },
+    },
+  });
+
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <button
+        type="button"
+        onClick={() =>
+          mutate(
+            { input: {} },
+            {
+              onSuccess: (data) => {
+                const r = data.extendTokenExpires?.result;
+                const item = Array.isArray(r) ? r[0] : r;
+                if (item) setResult({ expiresAt: item.expiresAt ?? '' });
+              },
+            },
+          )
+        }
+        disabled={isPending}
+        style={{ ...btnSmall, background: '#059669' }}
+      >
+        {isPending ? 'Extending...' : 'Extend Token'}
+      </button>
+      {result && <span style={{ fontSize: 11, color: '#059669' }}>Expires: {result.expiresAt}</span>}
+      {error && <span style={{ fontSize: 11, color: '#dc2626' }}>{error.message}</span>}
+    </div>
+  );
+}
 
 function Dashboard({ token, userId, onSignOut }: { token: string; userId: string; onSignOut: () => void }) {
   const queryClient = useQueryClient();
@@ -832,15 +1322,23 @@ function Dashboard({ token, userId, onSignOut }: { token: string; userId: string
           <span style={{ color: '#16a34a', fontWeight: 600 }}>Authenticated</span>
           <code style={{ marginLeft: 12, fontSize: 12, color: '#666' }}>{token.slice(0, 20)}...</code>
         </div>
-        <button onClick={() => signOut({ input: {} })} disabled={signingOut} style={{ ...btnStyle, background: '#dc2626' }}>
-          {signingOut ? 'Signing out...' : 'Sign Out'}
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <ExtendTokenButton />
+          <button
+            type="button"
+            onClick={() => signOut({ input: {} })} disabled={signingOut} style={{ ...btnStyle, background: '#dc2626' }}>
+            {signingOut ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </div>
       </div>
 
       {/* Identity & Profile */}
       <SectionHeader title="Identity & Profile" />
       <CurrentUser />
       <CurrentUserId />
+      <CheckPasswordForm />
+      <SessionInfo />
+      <EmailList />
 
       {/* Users */}
       <SectionHeader title="Users" />
@@ -875,12 +1373,22 @@ function Dashboard({ token, userId, onSignOut }: { token: string; userId: string
       <CreateSchemaForm />
       <ApiList />
       <CreateApiForm />
+      <RoleTypeList />
+
+      {/* Tables & Fields */}
+      <SectionHeader title="Tables & Fields" />
+      <TableListWithFields />
+      <FieldList />
 
       {/* Sites & Domains */}
       <SectionHeader title="Sites & Domains" />
       <CreateSiteForm />
       <DomainList />
       <CreateDomainForm />
+
+      {/* Audit Logs */}
+      <SectionHeader title="Audit Logs" />
+      <AuditLogList />
     </div>
   );
 }

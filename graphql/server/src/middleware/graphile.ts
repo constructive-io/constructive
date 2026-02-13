@@ -1,20 +1,137 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
-import { getGraphileSettings as getSettings } from 'graphile-settings';
-import type { IncomingMessage } from 'http';
-import { getPgPool } from 'pg-cache';
-import { postgraphile, PostGraphileOptions } from 'postgraphile';
+import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
+import type { GraphileConfig } from 'graphile-config';
+import { buildConnectionString } from 'pg-cache';
+import { getPgEnvOptions } from 'pg-env';
+import { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import './types'; // for Request type
+import { HandlerCreationError } from '../errors/api-errors';
 
-import PublicKeySignature, {
-  PublicKeyChallengeConfig,
-} from '../plugins/PublicKeySignature';
+/**
+ * Custom maskError function that always returns the original error.
+ *
+ * By default, grafserv masks errors for security (hiding sensitive database errors
+ * from clients). We disable this masking to show full error messages.
+ *
+ * Upstream reference:
+ * - grafserv defaultMaskError: node_modules/grafserv/dist/options.js
+ * - SafeError interface: grafast isSafeError() - errors implementing SafeError
+ *   are shown as-is even with default masking
+ *
+ * If you need to restore masking behavior, see the upstream implementation which:
+ * 1. Returns GraphQLError instances as-is
+ * 2. Returns SafeError instances with their message exposed
+ * 3. Masks other errors with a hash/ID and logs the original
+ */
+const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
+  return error;
+};
+
+// =============================================================================
+// Single-Flight Pattern: In-Flight Tracking
+// =============================================================================
+
+/**
+ * Tracks in-flight handler creation promises to prevent duplicate creations.
+ * When multiple concurrent requests arrive for the same cache key, only the
+ * first request creates the handler while others wait on the same promise.
+ */
+const creating = new Map<string, Promise<GraphileCacheEntry>>();
+
+/**
+ * Returns the number of currently in-flight handler creation operations.
+ * Useful for monitoring and debugging.
+ */
+export function getInFlightCount(): number {
+  return creating.size;
+}
+
+/**
+ * Returns the cache keys for all currently in-flight handler creation operations.
+ * Useful for monitoring and debugging.
+ */
+export function getInFlightKeys(): string[] {
+  return [...creating.keys()];
+}
+
+/**
+ * Clears the in-flight map. Used for testing purposes.
+ */
+export function clearInFlightMap(): void {
+  creating.clear();
+}
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string =>
   req.requestId ? `[${req.requestId}]` : '[req]';
+
+/**
+ * Build a PostGraphile v5 preset for a tenant
+ */
+const buildPreset = (
+  connectionString: string,
+  schemas: string[],
+  anonRole: string,
+  roleName: string,
+): GraphileConfig.Preset => ({
+  extends: [ConstructivePreset],
+  pgServices: [
+    makePgService({
+      connectionString,
+      schemas,
+    }),
+  ],
+  grafserv: {
+    graphqlPath: '/graphql',
+    graphiqlPath: '/graphiql',
+    graphiql: true,
+    maskError,
+  },
+  grafast: {
+    explain: process.env.NODE_ENV === 'development',
+    context: (requestContext: Partial<Grafast.RequestContext>) => {
+      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+      const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+      const context: Record<string, string> = {};
+
+      if (req) {
+        if (req.databaseId) {
+          context['jwt.claims.database_id'] = req.databaseId;
+        }
+        if (req.clientIp) {
+          context['jwt.claims.ip_address'] = req.clientIp;
+        }
+        if (req.get('origin')) {
+          context['jwt.claims.origin'] = req.get('origin') as string;
+        }
+        if (req.get('User-Agent')) {
+          context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
+        }
+
+        if (req.token?.user_id) {
+          return {
+            pgSettings: {
+              role: roleName,
+              'jwt.claims.token_id': req.token.id,
+              'jwt.claims.user_id': req.token.user_id,
+              ...context,
+            },
+          };
+        }
+      }
+
+      return {
+        pgSettings: {
+          role: anonRole,
+          ...context,
+        },
+      };
+    },
+  },
+});
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -33,6 +150,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const { dbname, anonRole, roleName, schema } = api;
       const schemaLabel = schema?.join(',') || 'unknown';
 
+      // =========================================================================
+      // Phase A: Cache Check (fast path)
+      // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
         log.debug(
@@ -45,95 +165,62 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`
       );
 
-      const options = getSettings({
-        ...opts,
-        graphile: {
-          ...opts.graphile,
-          schema: schema,
-        },
-      });
-
-      const pubkey_challenge = api.apiModules.find(
-        (mod: any) => mod.name === 'pubkey_challenge'
-      );
-
-      if (pubkey_challenge && pubkey_challenge.data) {
-        log.info(`${label} Enabling PublicKeySignature plugin for ${dbname}`);
-        options.appendPlugins.push(
-          PublicKeySignature(pubkey_challenge.data as PublicKeyChallengeConfig)
-        );
-      }
-
-      options.appendPlugins = options.appendPlugins ?? [];
-      if (opts.graphile?.appendPlugins) {
-        options.appendPlugins.push(...opts.graphile.appendPlugins);
-      }
-
-      options.pgSettings = async function pgSettings(request: IncomingMessage) {
-        const gqlReq = request as Request;
-        const settingsLabel = reqLabel(gqlReq);
-        const context: Record<string, any> = {
-          [`jwt.claims.database_id`]: gqlReq.databaseId,
-          [`jwt.claims.ip_address`]: gqlReq.clientIp,
-        };
-
-        if (gqlReq.get('origin')) {
-          context['jwt.claims.origin'] = gqlReq.get('origin');
-        }
-        if (gqlReq.get('User-Agent')) {
-          context['jwt.claims.user_agent'] = gqlReq.get('User-Agent');
-        }
-
-        if (gqlReq?.token?.user_id) {
-          log.debug(
-            `${settingsLabel} pgSettings role=${roleName} db=${gqlReq.databaseId} ip=${gqlReq.clientIp}`
-          );
-          return {
-            role: roleName,
-            [`jwt.claims.token_id`]: gqlReq.token.id,
-            [`jwt.claims.user_id`]: gqlReq.token.user_id,
-            ...context,
-          };
-        }
-
+      // =========================================================================
+      // Phase B: In-Flight Check (single-flight coalescing)
+      // =========================================================================
+      const inFlight = creating.get(key);
+      if (inFlight) {
         log.debug(
-          `${settingsLabel} pgSettings role=${anonRole} db=${gqlReq.databaseId} ip=${gqlReq.clientIp}`
+          `${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`
         );
-        return { role: anonRole, ...context };
-      };
+        try {
+          const instance = await inFlight;
+          return instance.handler(req, res, next);
+        } catch (error) {
+          // Re-throw to be caught by outer try-catch
+          throw error;
+        }
+      }
 
-      options.graphqlRoute = '/graphql';
-      options.graphiqlRoute = '/graphiql';
-
-      options.graphileBuildOptions = {
-        ...options.graphileBuildOptions,
-        ...opts.graphile?.graphileBuildOptions,
-      };
-
-      const graphileOpts: PostGraphileOptions = {
-        ...options,
-        ...opts.graphile?.overrideSettings,
-      };
-
+      // =========================================================================
+      // Phase C: Create New Handler (first request for this key)
+      // =========================================================================
       log.info(
-        `${label} Building PostGraphile handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
+        `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgPool = getPgPool({
+      const pgConfig = getPgEnvOptions({
         ...opts.pg,
         database: dbname,
       });
-      const handler = postgraphile(pgPool, schema, graphileOpts);
+      const connectionString = buildConnectionString(
+        pgConfig.user,
+        pgConfig.password,
+        pgConfig.host,
+        pgConfig.port,
+        pgConfig.database
+      );
 
-      graphileCache.set(key, {
-        pgPool,
-        pgPoolKey: dbname,
-        handler,
-      });
+      // Create promise and store in in-flight map BEFORE try block
+      const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
+      const creationPromise = createGraphileInstance({ preset, cacheKey: key });
+      creating.set(key, creationPromise);
 
-      log.info(`${label} Cached PostGraphile handler key=${key} db=${dbname}`);
-
-      return handler(req, res, next);
+      try {
+        const instance = await creationPromise;
+        graphileCache.set(key, instance);
+        log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
+        return instance.handler(req, res, next);
+      } catch (error) {
+        log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
+        throw new HandlerCreationError(
+          `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
+          { cacheKey: key, cause: error instanceof Error ? error.message : String(error) }
+        );
+      } finally {
+        // Always clean up in-flight tracker
+        creating.delete(key);
+      }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
       return res.status(500).send(e.message);

@@ -1,64 +1,94 @@
 import type { GraphQLSchema } from 'graphql';
-import { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
-import { createPostGraphileSchema, PostGraphileOptions } from 'postgraphile';
+import type { GraphileConfig } from 'graphile-config';
+import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
+
+import { makeSchema } from 'graphile-build';
+import { defaultPreset as graphileBuildDefaultPreset } from 'graphile-build';
+import { defaultPreset as graphileBuildPgDefaultPreset } from 'graphile-build-pg';
+import { makePgService } from 'postgraphile/adaptors/pg';
 
 import { runGraphQLInContext } from './context';
-import type { GraphQLQueryOptions,GraphQLTestContext } from './types';
-import { GetConnectionsInput } from './types';
+import type { GraphQLQueryOptions, GraphQLTestContext, GetConnectionsInput, Variables } from './types';
 
+/**
+ * Minimal preset that provides core functionality without Node/Relay.
+ * This matches the pattern from graphile-settings.
+ */
+const MinimalPreset: GraphileConfig.Preset = {
+  extends: [graphileBuildDefaultPreset, graphileBuildPgDefaultPreset],
+  disablePlugins: ['NodePlugin'],
+};
+
+/**
+ * Creates a GraphQL test context using PostGraphile v5 preset-based API.
+ *
+ * @param input - Configuration including schemas and optional preset
+ * @param conn - Database connection result from pgsql-test
+ * @returns GraphQL test context with setup, teardown, and query functions
+ */
 export const GraphQLTest = (
   input: GetConnectionsInput & GetConnectionOpts,
   conn: GetConnectionResult
 ): GraphQLTestContext => {
-  const {
-    schemas,
-    authRole,
-    graphile
-  } = input;
+  const { schemas, authRole, preset: userPreset } = input;
 
   let schema: GraphQLSchema;
-  let options: PostGraphileOptions;
+  let resolvedPreset: GraphileConfig.ResolvedPreset;
+  let pgService: ReturnType<typeof makePgService>;
 
   const pgPool = conn.manager.getPool(conn.pg.config);
 
   const setup = async () => {
-    // Bare-bones configuration - no defaults, only use what's explicitly provided
-    // This gives full control over PostGraphile configuration
-    options = {
-      schema: schemas,
-      // Only apply graphile options if explicitly provided
-      ...(graphile?.appendPlugins && {
-        appendPlugins: graphile.appendPlugins
-      }),
-      ...(graphile?.graphileBuildOptions && {
-        graphileBuildOptions: graphile.graphileBuildOptions
-      }),
-      // Apply any overrideSettings if provided
-      ...(graphile?.overrideSettings || {})
-    } as PostGraphileOptions;
+    // Create the pgService - this will be used for withPgClient
+    pgService = makePgService({
+      pool: pgPool,
+      schemas,
+    });
 
-    schema = await createPostGraphileSchema(pgPool, schemas, options);
+    // Build the complete preset by extending the minimal preset
+    // with user-provided preset configuration
+    const completePreset: GraphileConfig.Preset = {
+      extends: [
+        MinimalPreset,
+        ...(userPreset?.extends ?? []),
+      ],
+      ...(userPreset?.disablePlugins && { disablePlugins: userPreset.disablePlugins }),
+      ...(userPreset?.plugins && { plugins: userPreset.plugins }),
+      ...(userPreset?.schema && { schema: userPreset.schema }),
+      ...(userPreset?.grafast && { grafast: userPreset.grafast }),
+      pgServices: [pgService],
+    };
+
+    // Use makeSchema from graphile-build to create the schema
+    const result = await makeSchema(completePreset);
+    schema = result.schema;
+    resolvedPreset = result.resolvedPreset;
   };
 
-  const teardown = async () => { /* optional cleanup */ };
+  const teardown = async () => {
+    // Optional cleanup - schema is garbage collected
+  };
 
-  const query = async <TResult = any, TVariables = Record<string, any>>(
+  const query = async <TResult = unknown, TVariables extends Variables = Variables>(
     opts: GraphQLQueryOptions<TVariables>
   ): Promise<TResult> => {
     return await runGraphQLInContext<TResult>({
       input,
       schema,
-      options,
-      authRole,
+      resolvedPreset,
+      authRole: authRole ?? 'anonymous',
       pgPool,
+      pgService,
       conn,
-      ...opts
+      query: opts.query,
+      variables: opts.variables,
+      reqOptions: opts.reqOptions,
     });
   };
 
   return {
     setup,
     teardown,
-    query
+    query,
   };
 };

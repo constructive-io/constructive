@@ -13,6 +13,7 @@ import {
   getGeneratedFileHeader,
   getOrderByTypeName,
   getPrimaryKeyInfo,
+  getSingleRowQueryName,
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
@@ -47,6 +48,7 @@ function buildMethodBody(
   operation: string,
   typeName: string,
   fieldName: string,
+  extraProps: t.ObjectProperty[] = [],
 ): t.Statement[] {
   const destructureDecl = t.variableDeclaration('const', [
     t.variableDeclarator(
@@ -93,6 +95,7 @@ function buildMethodBody(
           false,
           true,
         ),
+        ...extraProps,
       ]),
     ]),
   );
@@ -115,22 +118,6 @@ function createClassMethod(
   );
   method.typeParameters = typeParameters;
   method.returnType = returnType;
-  return method;
-}
-
-function createDeclareMethod(
-  name: string,
-  typeParameters: t.TSTypeParameterDeclaration | null,
-  params: (t.Identifier | t.TSParameterProperty)[],
-  returnType: t.TSTypeAnnotation,
-): t.TSDeclareMethod {
-  const method = t.tsDeclareMethod(
-    null,
-    t.identifier(name),
-    typeParameters,
-    params,
-    returnType,
-  );
   return method;
 }
 
@@ -197,6 +184,8 @@ export function generateModelFile(
   const pkFields = getPrimaryKeyInfo(table);
   const pkField = pkFields[0];
   const pluralQueryName = table.query?.all ?? pluralName;
+  const singleQueryName = table.query?.one;
+  const singleResultFieldName = getSingleRowQueryName(table);
   const createMutationName = table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
@@ -271,7 +260,6 @@ export function generateModelFile(
 
   // Reusable type reference factories
   const sRef = () => t.tsTypeReference(t.identifier('S'));
-  const selectRef = () => t.tsTypeReference(t.identifier(selectTypeName));
   const pkTsType = () => tsTypeFromPrimitive(pkField.tsType);
 
   // ── findMany ───────────────────────────────────────────────────────────
@@ -313,27 +301,14 @@ export function generateModelFile(
         ),
       );
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         argsType(sRef()),
         t.tsTypeLiteral([requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
       ]),
     );
-    classBody.push(
-      createDeclareMethod(
-        'findMany',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
@@ -420,9 +395,9 @@ export function generateModelFile(
     classBody.push(
       createClassMethod(
         'findMany',
-        null,
+        createTypeParam(selectTypeName),
         [implParam],
-        null,
+        retType(sRef()),
         buildMethodBody(
           'buildFindManyDocument',
           bodyArgs,
@@ -476,27 +451,14 @@ export function generateModelFile(
         ),
       );
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         argsType(sRef()),
         t.tsTypeLiteral([requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
       ]),
     );
-    classBody.push(
-      createDeclareMethod(
-        'findFirst',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
@@ -522,9 +484,9 @@ export function generateModelFile(
     classBody.push(
       createClassMethod(
         'findFirst',
-        null,
+        createTypeParam(selectTypeName),
         [implParam],
-        null,
+        retType(sRef()),
         buildMethodBody(
           'buildFindFirstDocument',
           bodyArgs,
@@ -537,10 +499,7 @@ export function generateModelFile(
   }
 
   // ── findOne ────────────────────────────────────────────────────────────
-  const singleQueryName = table.query?.one;
-  if (singleQueryName && hasValidPrimaryKey(table)) {
-    const pkGqlType = pkField.gqlType.replace(/!/g, '') + '!';
-
+  if (hasValidPrimaryKey(table)) {
     const retType = (sel: t.TSType) =>
       t.tsTypeAnnotation(
         t.tsTypeReference(
@@ -548,7 +507,7 @@ export function generateModelFile(
           t.tsTypeParameterInstantiation([
             t.tsTypeLiteral([
               t.tsPropertySignature(
-                t.identifier(singleQueryName),
+                t.identifier(singleResultFieldName),
                 t.tsTypeAnnotation(
                   t.tsUnionType([
                     t.tsTypeReference(
@@ -576,65 +535,132 @@ export function generateModelFile(
       return prop;
     };
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         t.tsTypeLiteral([pkProp(), requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
-      ]),
-    );
-    classBody.push(
-      createDeclareMethod(
-        'findOne',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(
-      t.tsTypeLiteral([
-        pkProp(),
-        (() => {
-          const prop = t.tsPropertySignature(
-            t.identifier('select'),
-            t.tsTypeAnnotation(t.tsTypeReference(t.identifier(selectTypeName))),
-          );
-          return prop;
-        })(),
       ]),
     );
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
     );
-    const bodyArgs = [
-      t.stringLiteral(typeName),
-      t.stringLiteral(singleQueryName),
-      t.memberExpression(t.identifier('args'), t.identifier(pkField.name)),
-      selectExpr,
-      t.stringLiteral(pkField.name),
-      t.stringLiteral(pkGqlType),
-      t.identifier('connectionFieldsMap'),
-    ];
-    classBody.push(
-      createClassMethod(
-        'findOne',
-        null,
-        [implParam],
-        null,
-        buildMethodBody(
-          'buildFindOneDocument',
-          bodyArgs,
-          'query',
-          typeName,
-          singleQueryName,
+    if (singleQueryName) {
+      const pkGqlType = pkField.gqlType.replace(/!/g, '') + '!';
+      const bodyArgs = [
+        t.stringLiteral(typeName),
+        t.stringLiteral(singleQueryName),
+        t.memberExpression(t.identifier('args'), t.identifier(pkField.name)),
+        selectExpr,
+        t.stringLiteral(pkField.name),
+        t.stringLiteral(pkGqlType),
+        t.identifier('connectionFieldsMap'),
+      ];
+      classBody.push(
+        createClassMethod(
+          'findOne',
+          createTypeParam(selectTypeName),
+          [implParam],
+          retType(sRef()),
+          buildMethodBody(
+            'buildFindOneDocument',
+            bodyArgs,
+            'query',
+            typeName,
+            singleResultFieldName,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      const idExpr = t.memberExpression(
+        t.identifier('args'),
+        t.identifier(pkField.name),
+      );
+      const findOneArgs = t.objectExpression([
+        t.objectProperty(
+          t.identifier('where'),
+          t.objectExpression([
+            t.objectProperty(
+              t.identifier(pkField.name),
+              t.objectExpression([
+                t.objectProperty(t.identifier('equalTo'), idExpr),
+              ]),
+            ),
+          ]),
+        ),
+        t.objectProperty(t.identifier('first'), t.numericLiteral(1)),
+      ]);
+      const bodyArgs = [
+        t.stringLiteral(typeName),
+        t.stringLiteral(pluralQueryName),
+        selectExpr,
+        findOneArgs,
+        t.stringLiteral(whereTypeName),
+        t.stringLiteral(orderByTypeName),
+        t.identifier('connectionFieldsMap'),
+      ];
+      const firstNodeExpr = t.optionalMemberExpression(
+        t.optionalMemberExpression(
+          t.memberExpression(t.identifier('data'), t.identifier(pluralQueryName)),
+          t.identifier('nodes'),
+          false,
+          true,
+        ),
+        t.numericLiteral(0),
+        true,
+        true,
+      );
+      const transformDataParam = t.identifier('data');
+      const transformedNodesProp = t.tsPropertySignature(
+        t.identifier('nodes'),
+        t.tsTypeAnnotation(
+          t.tsArrayType(
+            t.tsTypeReference(
+              t.identifier('InferSelectResult'),
+              t.tsTypeParameterInstantiation([
+                t.tsTypeReference(t.identifier(relationTypeName)),
+                sRef(),
+              ]),
+            ),
+          ),
+        ),
+      );
+      transformedNodesProp.optional = true;
+      const transformedCollectionProp = t.tsPropertySignature(
+        t.identifier(pluralQueryName),
+        t.tsTypeAnnotation(t.tsTypeLiteral([transformedNodesProp])),
+      );
+      transformedCollectionProp.optional = true;
+      transformDataParam.typeAnnotation = t.tsTypeAnnotation(
+        t.tsTypeLiteral([transformedCollectionProp]),
+      );
+      const transformFn = t.arrowFunctionExpression(
+        [transformDataParam],
+        t.objectExpression([
+          t.objectProperty(
+            t.stringLiteral(singleResultFieldName),
+            t.logicalExpression('??', firstNodeExpr, t.nullLiteral()),
+          ),
+        ]),
+      );
+      classBody.push(
+        createClassMethod(
+          'findOne',
+          createTypeParam(selectTypeName),
+          [implParam],
+          retType(sRef()),
+          buildMethodBody(
+            'buildFindManyDocument',
+            bodyArgs,
+            'query',
+            typeName,
+            singleResultFieldName,
+            [t.objectProperty(t.identifier('transform'), transformFn)],
+          ),
+        ),
+      );
+    }
   }
 
   // ── create ─────────────────────────────────────────────────────────────
@@ -679,27 +705,14 @@ export function generateModelFile(
         ),
       );
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         argsType(sRef()),
         t.tsTypeLiteral([requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
       ]),
     );
-    classBody.push(
-      createDeclareMethod(
-        'create',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
@@ -716,9 +729,9 @@ export function generateModelFile(
     classBody.push(
       createClassMethod(
         'create',
-        null,
+        createTypeParam(selectTypeName),
         [implParam],
-        null,
+        retType(sRef()),
         buildMethodBody(
           'buildCreateDocument',
           bodyArgs,
@@ -782,31 +795,20 @@ export function generateModelFile(
         ),
       );
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         argsType(sRef()),
         t.tsTypeLiteral([requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
       ]),
     );
-    classBody.push(
-      createDeclareMethod(
-        'update',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
     );
+    const patchFieldName =
+      table.query?.patchFieldName ?? lcFirst(typeName) + 'Patch';
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(updateMutationName),
@@ -819,14 +821,15 @@ export function generateModelFile(
       t.memberExpression(t.identifier('args'), t.identifier('data')),
       t.stringLiteral(updateInputTypeName),
       t.stringLiteral(pkField.name),
+      t.stringLiteral(patchFieldName),
       t.identifier('connectionFieldsMap'),
     ];
     classBody.push(
       createClassMethod(
         'update',
-        null,
+        createTypeParam(selectTypeName),
         [implParam],
-        null,
+        retType(sRef()),
         buildMethodBody(
           'buildUpdateByPkDocument',
           bodyArgs,
@@ -886,27 +889,14 @@ export function generateModelFile(
         ),
       );
 
-    // Overload 1: with select (autocompletion)
-    const o1Param = t.identifier('args');
-    o1Param.typeAnnotation = t.tsTypeAnnotation(
+    const implParam = t.identifier('args');
+    implParam.typeAnnotation = t.tsTypeAnnotation(
       t.tsIntersectionType([
         argsType(sRef()),
         t.tsTypeLiteral([requiredSelectProp()]),
         strictSelectGuard(selectTypeName),
       ]),
     );
-    classBody.push(
-      createDeclareMethod(
-        'delete',
-        createTypeParam(selectTypeName),
-        [o1Param],
-        retType(sRef()),
-      ),
-    );
-
-    // Implementation
-    const implParam = t.identifier('args');
-    implParam.typeAnnotation = t.tsTypeAnnotation(argsType(selectRef()));
     const selectExpr = t.memberExpression(
       t.identifier('args'),
       t.identifier('select'),
@@ -927,9 +917,9 @@ export function generateModelFile(
     classBody.push(
       createClassMethod(
         'delete',
-        null,
+        createTypeParam(selectTypeName),
         [implParam],
-        null,
+        retType(sRef()),
         buildMethodBody(
           'buildDeleteByPkDocument',
           bodyArgs,

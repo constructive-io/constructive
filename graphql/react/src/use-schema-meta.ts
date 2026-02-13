@@ -9,11 +9,9 @@ const fieldFragment = `
   type {
     gqlType
     isArray
-    modifier
-    pgAlias
     pgType
-    subtype
-    typmod
+    isNotNull
+    hasDefault
   }
 `;
 
@@ -36,12 +34,14 @@ const primaryConstraintsFragment = `
   }
 `;
 
-const foreignKeyConstraintsFragments = `
+const foreignKeyConstraintsFragment = `
   foreignKeyConstraints {
     name
     fields {
       ${fieldFragment}
     }
+    referencedTable
+    referencedFields
     refFields {
       ${fieldFragment}
     }
@@ -53,28 +53,18 @@ const foreignKeyConstraintsFragments = `
 
 const inflectionFragment = `
   inflection {
+    tableType
     allRows
-    allRowsSimple
-    conditionType
     connection
-    createField
+    edge
+    filterType
+    orderByType
+    conditionType
+    patchType
     createInputType
     createPayloadType
-    deleteByPrimaryKey
-    deletePayloadType
-    edge
-    edgeField
-    enumType
-    filterType
-    inputType
-    orderByType
-    patchField
-    patchType
-    tableFieldName
-    tableType
-    typeName
-    updateByPrimaryKey
     updatePayloadType
+    deletePayloadType
   }
 `;
 
@@ -93,7 +83,7 @@ const metaQuery = gql`
 
         ${primaryConstraintsFragment}
 
-        ${foreignKeyConstraintsFragments}
+        ${foreignKeyConstraintsFragment}
 
         uniqueConstraints {
           name
@@ -112,9 +102,6 @@ const metaQuery = gql`
             }
             references {
               name
-              fields {
-                ${fieldFragment}
-              }
             }
           }
           has {
@@ -126,11 +113,6 @@ const metaQuery = gql`
             }
             referencedBy {
               name
-              fields {
-                ${fieldFragment}
-              }
-              ${primaryConstraintsFragment}
-              ${foreignKeyConstraintsFragments}
             }
           }
           hasMany {
@@ -142,11 +124,6 @@ const metaQuery = gql`
             }
             referencedBy {
               name
-              fields {
-                ${fieldFragment}
-              }
-              ${primaryConstraintsFragment}
-              ${foreignKeyConstraintsFragments}
             }
           }
           hasOne {
@@ -158,11 +135,6 @@ const metaQuery = gql`
             }
             referencedBy {
               name
-              fields {
-                ${fieldFragment}
-              }
-              ${primaryConstraintsFragment}
-              ${foreignKeyConstraintsFragments}
             }
           }
           manyToMany {
@@ -176,21 +148,39 @@ const metaQuery = gql`
             }
             junctionTable {
               name
-              fields {
-                ${fieldFragment}
-              }
-              ${queryFragment}
-              ${primaryConstraintsFragment}
-              ${foreignKeyConstraintsFragments}
             }
-            rightTable {
+            junctionLeftConstraint {
               name
               fields {
                 ${fieldFragment}
               }
-              ${queryFragment}
-              ${primaryConstraintsFragment}
-              ${foreignKeyConstraintsFragments}
+              refFields {
+                ${fieldFragment}
+              }
+              refTable {
+                name
+              }
+            }
+            junctionRightConstraint {
+              name
+              fields {
+                ${fieldFragment}
+              }
+              refFields {
+                ${fieldFragment}
+              }
+              refTable {
+                name
+              }
+            }
+            junctionLeftKeyAttributes {
+              ${fieldFragment}
+            }
+            junctionRightKeyAttributes {
+              ${fieldFragment}
+            }
+            rightTable {
+              name
             }
           }
         }
