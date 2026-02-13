@@ -1,6 +1,9 @@
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, cliExitWithError, getPackageJson } from 'inquirerer';
+import { appstash } from 'appstash';
 import { spawn } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
 import { fetchLatestVersion } from '../utils/npm-version';
 
 const log = new Logger('update');
@@ -65,6 +68,12 @@ export default async (
 
   try {
     await runNpmInstall(pkgName, registry);
+
+    try {
+      const cacheFile = path.join(appstash('pgpm').cache, 'update-check.json');
+      if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    } catch {}
+
     const latest = await fetchLatestVersion(pkgName);
     if (latest) {
       log.success(`Successfully updated ${pkgName} to version ${latest}.`);

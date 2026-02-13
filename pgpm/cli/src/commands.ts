@@ -1,6 +1,7 @@
 import { checkForUpdates } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 import { teardownPgPools } from 'pg-cache';
+import semver from 'semver';
 
 import add from './commands/add';
 import adminUsers from './commands/admin-users';
@@ -116,8 +117,11 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
         pkgVersion: pkg.version,
         toolName: 'pgpm',
       });
-      if (updateResult.hasUpdate && updateResult.message) {
-        console.warn(updateResult.message);
+      if (updateResult.latestVersion
+        && semver.valid(updateResult.latestVersion)
+        && semver.valid(pkg.version)
+        && semver.gt(updateResult.latestVersion, pkg.version)) {
+        console.warn(`Update available: ${pkg.version} -> ${updateResult.latestVersion}`);
         console.warn('Run pgpm update to upgrade.');
       }
     } catch {
