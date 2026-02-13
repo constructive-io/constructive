@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@2.15.0...@constructive-io/graphql-types@3.0.0) (2026-02-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-types
+
 # [2.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@2.14.0...@constructive-io/graphql-types@2.15.0) (2026-02-09)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

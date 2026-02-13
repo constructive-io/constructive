@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "5.2.1",
+  "version": "6.0.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",

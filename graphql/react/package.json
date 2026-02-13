@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-react",
-  "version": "3.0.4",
+  "version": "4.0.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL React",
   "main": "index.js",
@@ -19,11 +19,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "build": "makage build",
-      "build:dev": "makage build --dev",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },

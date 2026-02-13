@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "3.0.4",
+  "version": "4.0.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",
@@ -33,7 +33,6 @@
     "@constructive-io/graphql-types": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
     "@pgpmjs/types": "workspace:^",
-    "inflekt": "^0.3.0",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "grafast": "^1.0.0-rc.4",
@@ -42,6 +41,7 @@
     "graphile-config": "1.0.0-rc.3",
     "graphile-search-plugin": "workspace:^",
     "graphql": "^16.9.0",
+    "inflekt": "^0.3.0",
     "lru-cache": "^11.2.4",
     "pg": "^8.17.1",
     "pg-sql2": "^5.0.0-rc.3",

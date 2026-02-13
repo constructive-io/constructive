@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/cli",
-  "version": "6.2.2",
+  "version": "7.0.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI",
   "main": "index.js",
@@ -23,11 +23,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-    "scripts": {
-      "clean": "makage clean",
-      "prepack": "npm run build",
-      "build": "makage build",
-      "build:dev": "makage build --dev",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
