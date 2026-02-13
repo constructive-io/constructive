@@ -40,8 +40,7 @@
     "@constructive-io/job-pg": "workspace:^",
     "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "pg": "8.17.1",
-    "request": "2.88.2"
+    "pg": "8.17.1"
   },
   "devDependencies": {
     "@pgpm/database-jobs": "^0.16.0",

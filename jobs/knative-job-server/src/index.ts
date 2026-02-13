@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import type { Pool, PoolClient } from 'pg';
 import * as jobs from '@constructive-io/job-utils';
 import poolManager from '@constructive-io/job-pg';
@@ -39,7 +38,7 @@ const logger = createLogger('knative-job-server');
 
 export default (pgPool: Pool = poolManager.getPool()) => {
   const app = express();
-  app.use(bodyParser.json());
+  app.use(express.json());
 
   const withClient =
     (cb: WithClientHandler) =>
