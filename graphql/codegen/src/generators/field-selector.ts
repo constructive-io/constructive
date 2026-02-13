@@ -319,6 +319,7 @@ function getRelatedTableScalarFields(
 
   // Always try to include stable identifiers first.
   push('id');
+  push('rowId');
   push('nodeId');
 
   for (const fieldName of preferred) push(fieldName);
