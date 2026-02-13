@@ -1,6 +1,6 @@
 name: Notify E2E Tests
 
-# Triggers the constructive-tests repo to update submodules and run E2E tests
+# Triggers the constructive-hub repo to update submodules and run E2E tests
 # when changes are pushed to main.
 
 on:
@@ -11,7 +11,7 @@ jobs:
   trigger-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger submodule update in constructive-tests
+      - name: Trigger submodule update in constructive-hub
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GH_SUBMODULE_PAT }}
@@ -22,7 +22,7 @@ jobs:
 
             await github.rest.repos.createDispatchEvent({
               owner: 'constructive-io',
-              repo: 'constructive-tests',
+              repo: 'constructive-hub',
               event_type: 'submodule-updated',
               client_payload: {
                 repo: '${{ github.repository }}',
@@ -31,4 +31,4 @@ jobs:
                 commit_message: safeMessage
               }
             });
-            console.log('Dispatched submodule-updated to constructive-tests');
+            console.log('Dispatched submodule-updated to constructive-hub');

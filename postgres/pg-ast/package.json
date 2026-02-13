@@ -1,6 +1,6 @@
 {
   "name": "pg-ast",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ASTs in JS",
   "main": "index.js",
@@ -37,7 +37,7 @@
     "parse"
   ],
   "devDependencies": {
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pg-proto-parser": "^1.30.4",
     "pgsql-deparser": "^17.17.2"
   },

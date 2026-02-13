@@ -1,6 +1,6 @@
 {
   "name": "pgpm",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Package Manager - Database migration and package management CLI",
   "main": "index.js",
@@ -40,7 +40,7 @@
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.16",
     "glob": "^13.0.0",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "pg": "^8.17.1",
     "ts-node": "^10.9.2"
   },

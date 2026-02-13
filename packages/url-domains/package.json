@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/url-domains",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "url domains",
   "main": "index.js",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "keywords": []
 }

@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -45,7 +45,7 @@
     "@types/pg": "^8.16.0",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.4.0",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@pgpmjs/env": "workspace:^",

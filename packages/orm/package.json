@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/orm",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ORM",
   "main": "index.js",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "keywords": [
     "orm",

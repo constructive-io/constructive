@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-query",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Constructive GraphQL Query",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -48,6 +48,6 @@
     "database"
   ],
   "devDependencies": {
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   }
 }

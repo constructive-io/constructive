@@ -1,6 +1,6 @@
 {
   "name": "graphile-settings",
-  "version": "3.0.4",
+  "version": "3.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "graphile settings",
   "main": "index.js",
@@ -54,7 +54,7 @@
     "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "@types/request-ip": "^0.0.41",
-    "makage": "^0.1.10",
+    "makage": "^0.1.12",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2"
   },

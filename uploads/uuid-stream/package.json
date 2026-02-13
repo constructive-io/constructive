@@ -1,6 +1,6 @@
 {
   "name": "uuid-stream",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "A Transform stream that generates RFC-compliant UUID v5.",
   "main": "index.js",
@@ -39,6 +39,6 @@
     "uuid-hash": "workspace:^"
   },
   "devDependencies": {
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   }
 }

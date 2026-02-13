@@ -1,6 +1,6 @@
 {
   "name": "graphile-test",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGraphile Testing",
   "main": "index.js",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/pg": "^8.16.0",
     "graphql-tag": "2.12.6",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",

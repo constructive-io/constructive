@@ -21,85 +21,62 @@ jobs:
   constructive-tests:
     runs-on: ubuntu-latest
 
-    # Tests being re-enabled as v5 migration progresses - remaining tests will be enabled when ready
     strategy:
       fail-fast: false
       matrix:
         include:
-          # - package: uploads/mime-bytes
-          #   env: {}
+          # -- pgpm --
           - package: pgpm/core
             env: {}
-          # - package: pgpm/env
-          #   env: {}
+          - package: pgpm/env
+            env: {}
           - package: pgpm/cli
             env: {}
-          # - package: packages/cli
-          #   env: {}
 
-          # - package: jobs/knative-job-service
-          #   env: {}
-          # - package: packages/client
-          #   env:
-          #     TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
+          # -- packages --
+          # - package: packages/cli
+          #   env: {}  # codegen.test.ts prompt expectations mismatch
+          - package: packages/client
+            env:
+              TEST_DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
+          - package: packages/orm
+            env: {}
+          - package: packages/url-domains
+            env: {}
+          - package: packages/query-builder
+            env: {}
+          - package: packages/csv-to-pg
+            env: {}
+          - package: packages/smtppostmaster
+            env: {}
+          - package: packages/oauth
+            env: {}
+          - package: packages/csrf
+            env: {}
+          - package: packages/12factor-env
+            env: {}
+          - package: packages/postmaster
+            env: {}
+
+          # -- postgres --
           - package: postgres/pgsql-client
             env: {}
           - package: postgres/pgsql-test
             env: {}
-          # - package: packages/orm
-          #   env: {}
-          # - package: packages/url-domains
-          #   env: {}
-          # - package: uploads/uuid-hash
-          #   env: {}
-          # - package: uploads/uuid-stream
-          #   env: {}
           # - package: postgres/introspectron
-          #   env: {}
-          # - package: packages/query-builder
-          #   env: {}
+          #   env: {}  # graphql v15/v16 DocumentNode type mismatch
+          - package: postgres/pg-ast
+            env: {}
+          - package: postgres/pg-codegen
+            env: {}
+          - package: postgres/drizzle-orm-test
+            env: {}
+
+          # -- graphql --
           - package: graphql/query
             env: {}
           - package: graphql/codegen
             env: {}
-          # - package: postgres/pg-ast
-          #   env: {}
-          # - package: postgres/pg-codegen
-          #   env: {}
-          # - package: uploads/content-type-stream
-          #   env: {}
-          # - package: uploads/s3-streamer
-          #   env:
-          #     BUCKET_NAME: test-bucket
-          # - package: uploads/upload-names
-          #   env: {}
-          # - package: graphile/graphile-test
-          #   env: {}
-          # - package: graphile/graphile-search-plugin
-          #   env: {}
-          # - package: graphile/graphile-plugin-fulltext-filter
-          #   env: {}
-          # - package: graphile/graphile-simple-inflector
-          #   env: {}
-          # - package: graphile/graphile-many-to-many
-          #   env: {}
-          # - package: graphile/graphile-i18n
-          #   env: {}
-          # - package: graphile/graphile-meta-schema
-          #   env: {}
-          # - package: graphile/graphile-upload-plugin
-          #   env:
-          #     BUCKET_NAME: test-upload-bucket
-          # - package: graphile/graphile-postgis
-          #   env: {}
-          # - package: graphile/graphile-plugin-connection-filter
-          #   env: {}
-          # - package: graphile/graphile-plugin-connection-filter-postgis
-          #   env: {}
-          # - package: graphile/graphile-pg-type-mappings
-          #   env: {}
-          # - package: graphile/graphile-sql-expression-validator
-          #   env: {}
           - package: graphql/server-test
             env: {}
           - package: graphql/env
@@ -108,37 +85,45 @@ jobs:
             env: {}
           - package: graphql/test
             env: {}
+          # - package: graphql/playwright-test
+          #   env: {}
+
+          # -- graphile --
           - package: graphile/graphile-authz
             env: {}
           - package: graphile/postgraphile-plugin-pgvector
             env: {}
-          # - package: graphql/playwright-test
-          #   env: {}
-          # - package: jobs/knative-job-worker
-          #   env: {}
-          # - package: packages/csv-to-pg
-          #   env: {}
-          # - package: packages/smtppostmaster
-          #   env: {}
-          # - package: postgres/drizzle-orm-test
-          #   env: {}
-          # - package: uploads/etag-hash
-          #   env: {}
-          # - package: uploads/etag-stream
-          #   env: {}
-          # - package: uploads/stream-to-etag
-          #   env: {}
-          # - package: packages/oauth
-          #   env: {}
-          # - package: packages/csrf
-          #   env: {}
-          # - package: packages/12factor-env
-          #   env: {}
-          # - package: packages/postmaster
-          #   env: {}
-          # Placeholder to keep matrix valid (will be skipped)
-          - package: .
+          # - package: graphile/graphile-test
+          #   env: {}  # typed mutation tests return undefined (v5 schema change)
+          - package: graphile/graphile-search-plugin
             env: {}
+
+          # -- uploads --
+          - package: uploads/mime-bytes
+            env: {}
+          - package: uploads/uuid-hash
+            env: {}
+          - package: uploads/uuid-stream
+            env: {}
+          - package: uploads/content-type-stream
+            env: {}
+          - package: uploads/upload-names
+            env: {}
+          - package: uploads/etag-hash
+            env: {}
+          - package: uploads/etag-stream
+            env: {}
+          - package: uploads/stream-to-etag
+            env: {}
+          # - package: uploads/s3-streamer
+          #   env:
+          #     BUCKET_NAME: test-bucket
+
+          # -- jobs --
+          # - package: jobs/knative-job-worker
+          #   env: {}  # integration test expects knative.internal URL, gets gateway:8080
+          # - package: jobs/knative-job-service
+          #   env: {}
 
     env:
       PGHOST: localhost
@@ -209,10 +194,5 @@ jobs:
           pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
 
       - name: Test ${{ matrix.package }}
-        if: matrix.package != '.'
         run: cd ./${{ matrix.package }} && pnpm test
         env: ${{ matrix.env }}
-
-      - name: Skip tests (v5 migration in progress)
-        if: matrix.package == '.'
-        run: echo "All tests disabled during v5 migration - will be re-enabled when ready to merge into main"

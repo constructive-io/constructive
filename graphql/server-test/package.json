@@ -1,6 +1,6 @@
 {
   "name": "graphql-server-test",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
   "main": "index.js",
@@ -32,7 +32,7 @@
     "@types/express": "^5.0.6",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^6.0.2",
-    "makage": "^0.1.10"
+    "makage": "^0.1.12"
   },
   "dependencies": {
     "@constructive-io/graphql-env": "workspace:^",
