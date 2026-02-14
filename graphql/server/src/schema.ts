@@ -1,7 +1,7 @@
 import { printSchema, getIntrospectionQuery, buildClientSchema } from 'graphql'
 import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
-import { getPgPool } from 'pg-cache'
+import { buildConnectionString, getPgPool } from 'pg-cache'
 import type { GraphileConfig } from 'graphile-config'
 import * as http from 'node:http'
 import * as https from 'node:https'
@@ -20,7 +20,13 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
   // Get pool config for connection string
   const pool = getPgPool({ database })
   const poolConfig = (pool as any).options || {}
-  const connectionString = `postgres://${poolConfig.user || 'postgres'}:${poolConfig.password || ''}@${poolConfig.host || 'localhost'}:${poolConfig.port || 5432}/${database}`
+  const connectionString = buildConnectionString(
+    poolConfig.user || 'postgres',
+    poolConfig.password || '',
+    poolConfig.host || 'localhost',
+    poolConfig.port || 5432,
+    database,
+  )
 
   // Build v5 preset
   const preset: GraphileConfig.Preset = {
