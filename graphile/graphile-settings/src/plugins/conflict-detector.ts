@@ -1,4 +1,4 @@
-import type { GraphileConfig } from 'graphile-config';
+import type { GraphileConfig } from "graphile-config";
 
 /**
  * Plugin that detects naming conflicts between tables in different schemas.
@@ -20,8 +20,8 @@ interface CodecInfo {
 }
 
 export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
-  name: 'ConflictDetectorPlugin',
-  version: '1.0.0',
+  name: "ConflictDetectorPlugin",
+  version: "1.0.0",
 
   schema: {
     hooks: {
@@ -29,17 +29,30 @@ export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
         // Track codecs by their GraphQL name to detect conflicts
         const codecsByName = new Map<string, CodecInfo[]>();
 
+        // Get configured schemas from pgServices to only check relevant codecs
+        const configuredSchemas = new Set<string>();
+        const pgServices = (build as any).resolvedPreset?.pgServices ?? [];
+
+        for (const service of pgServices) {
+          for (const schema of service.schemas ?? ["public"]) {
+            configuredSchemas.add(schema);
+          }
+        }
+
         // Iterate through all codecs to find tables
         for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
           // Skip non-table codecs (those without attributes or anonymous ones)
           if (!codec.attributes || codec.isAnonymous) continue;
 
           // Get the schema name from the codec's extensions
-          const pgExtensions = codec.extensions?.pg as
-            | { schemaName?: string }
-            | undefined;
-          const schemaName = pgExtensions?.schemaName || 'unknown';
+          const pgExtensions = codec.extensions?.pg as { schemaName?: string } | undefined;
+          const schemaName = pgExtensions?.schemaName || "unknown";
           const tableName = codec.name;
+
+          // Skip codecs from schemas not in the configured list
+          if (configuredSchemas.size > 0 && !configuredSchemas.has(schemaName)) {
+            continue;
+          }
 
           // Get the GraphQL name that would be generated
           const graphqlName = build.inflection.tableType(codec);
@@ -59,9 +72,7 @@ export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
         // Check for conflicts and log warnings
         for (const [graphqlName, codecs] of codecsByName) {
           if (codecs.length > 1) {
-            const locations = codecs
-              .map((c) => `${c.schemaName}.${c.tableName}`)
-              .join(', ');
+            const locations = codecs.map((c) => `${c.schemaName}.${c.tableName}`).join(", ");
 
             console.warn(
               `\nNAMING CONFLICT DETECTED: GraphQL type "${graphqlName}" would be generated from multiple tables:\n` +
@@ -69,7 +80,7 @@ export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
                 `   Resolution options:\n` +
                 `   1. Add @name smart tag to one table: COMMENT ON TABLE schema.table IS E'@name UniqueTypeName';\n` +
                 `   2. Rename one of the tables in the database\n` +
-                `   3. Exclude one table from the schema using @omit smart tag\n`
+                `   3. Exclude one table from the schema using @omit smart tag\n`,
             );
           }
         }

@@ -1,4 +1,4 @@
-import type { GraphileConfig } from 'graphile-config';
+import type { GraphileConfig } from "graphile-config";
 import {
   singularize,
   pluralize,
@@ -7,7 +7,7 @@ import {
   distinctPluralize,
   fixCapitalisedPlural,
   camelize,
-} from 'inflekt';
+} from "inflekt";
 
 /**
  * Custom inflector plugin for Constructive using the inflekt library.
@@ -30,14 +30,14 @@ import {
  * Add your own mappings here as needed.
  */
 const CUSTOM_OPPOSITES: Record<string, string> = {
-  parent: 'child',
-  child: 'parent',
-  author: 'authored',
-  editor: 'edited',
-  reviewer: 'reviewed',
-  owner: 'owned',
-  creator: 'created',
-  updater: 'updated',
+  parent: "child",
+  child: "parent",
+  author: "authored",
+  editor: "edited",
+  reviewer: "reviewed",
+  owner: "owned",
+  creator: "created",
+  updater: "updated",
 };
 
 /**
@@ -45,7 +45,7 @@ const CUSTOM_OPPOSITES: Record<string, string> = {
  */
 function getBaseName(attributeName: string): string | null {
   const matches = attributeName.match(
-    /^(.+?)(_row_id|_id|_uuid|_fk|_pk|RowId|Id|Uuid|UUID|Fk|Pk)$/
+    /^(.+?)(_row_id|_id|_uuid|_fk|_pk|RowId|Id|Uuid|UUID|Fk|Pk)$/,
   );
   if (matches) {
     return matches[1];
@@ -74,7 +74,7 @@ function getOppositeBaseName(baseName: string): string | null {
 function arraysMatch<T>(
   array1: readonly T[],
   array2: readonly T[],
-  comparator: (v1: T, v2: T) => boolean = (v1, v2) => v1 === v2
+  comparator: (v1: T, v2: T) => boolean = (v1, v2) => v1 === v2,
 ): boolean {
   if (array1 === array2) return true;
   const l = array1.length;
@@ -86,8 +86,8 @@ function arraysMatch<T>(
 }
 
 export const InflektPlugin: GraphileConfig.Plugin = {
-  name: 'InflektPlugin',
-  version: '1.0.0',
+  name: "InflektPlugin",
+  version: "1.0.0",
 
   inflection: {
     replace: {
@@ -126,7 +126,40 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        * same name in different schemas. Use @name smart tags to disambiguate.
        */
       _schemaPrefix(_previous, _options, _details) {
-        return '';
+        return "";
+      },
+
+      /**
+       * Restore PostGraphile's default schema prefix logic for functions.
+       *
+       * Our _schemaPrefix override returns '' for all schemas to give clean
+       * table names. However, this strips prefixes from functions too, causing
+       * resource naming collisions when a function and table share the same
+       * base name across schemas (e.g., actions_public.table_grant() collides
+       * with metaschema_public.table_grant table).
+       *
+       * Fix: bypass our _schemaPrefix override for functions and use
+       * PostGraphile's default prefix logic instead.
+       */
+      functionResourceName(_previous, options: any, details: any) {
+        const { serviceName, pgProc } = details;
+        const { tags } = pgProc.getTagsAndDescription();
+
+        if (typeof tags.name === "string") {
+          return tags.name;
+        }
+
+        const pgNamespace = pgProc.getNamespace();
+
+        if (!pgNamespace) {
+          return pgProc.proname;
+        }
+
+        const pgService = (options.pgServices ?? []).find((db: any) => db.name === serviceName);
+        const primarySchema = pgService?.schemas?.[0] ?? "public";
+        const databasePrefix = serviceName === "main" ? "" : `${serviceName}_`;
+        const schemaPrefix = pgNamespace.nspname === primarySchema ? "" : `${pgNamespace.nspname}_`;
+        return `${databasePrefix}${schemaPrefix}${pgProc.proname}`;
       },
 
       /**
@@ -167,7 +200,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       _attributeName(
         _previous,
         _options,
-        details: { attributeName: string; codec: { attributes: Record<string, { extensions?: { tags?: { name?: string } } }> } }
+        details: {
+          attributeName: string;
+          codec: { attributes: Record<string, { extensions?: { tags?: { name?: string } } }> };
+        },
       ) {
         const attribute = details.codec.attributes[details.attributeName];
         const name = attribute?.extensions?.tags?.name || details.attributeName;
@@ -211,7 +247,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       allRowsList(_previous, _options, resource) {
         const resourceName = this._singularizedResourceName(resource);
-        return camelize(distinctPluralize(resourceName), true) + 'List';
+        return camelize(distinctPluralize(resourceName), true) + "List";
       },
 
       /**
@@ -220,7 +256,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       singleRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        if (typeof relation.extensions?.tags?.fieldName === 'string') {
+        if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
 
@@ -235,16 +271,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
 
         // Fall back to the remote resource name
         const foreignPk = relation.remoteResource.uniques.find(
-          (u: { isPrimary: boolean }) => u.isPrimary
+          (u: { isPrimary: boolean }) => u.isPrimary,
         );
-        if (
-          foreignPk &&
-          arraysMatch(foreignPk.attributes, relation.remoteAttributes)
-        ) {
-          return camelize(
-            this._singularizedCodecName(relation.remoteResource.codec),
-            true
-          );
+        if (foreignPk && arraysMatch(foreignPk.attributes, relation.remoteAttributes)) {
+          return camelize(this._singularizedCodecName(relation.remoteResource.codec), true);
         }
         return previous!(details);
       },
@@ -255,12 +285,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       singleRelationBackwards(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        if (
-          typeof relation.extensions?.tags?.foreignSingleFieldName === 'string'
-        ) {
+        if (typeof relation.extensions?.tags?.foreignSingleFieldName === "string") {
           return relation.extensions.tags.foreignSingleFieldName;
         }
-        if (typeof relation.extensions?.tags?.foreignFieldName === 'string') {
+        if (typeof relation.extensions?.tags?.foreignFieldName === "string") {
           return relation.extensions.tags.foreignFieldName;
         }
 
@@ -273,14 +301,11 @@ export const InflektPlugin: GraphileConfig.Plugin = {
             if (oppositeBaseName) {
               return camelize(
                 `${oppositeBaseName}_${this._singularizedCodecName(relation.remoteResource.codec)}`,
-                true
+                true,
               );
             }
             if (baseNameMatches(baseName, codec.name)) {
-              return camelize(
-                this._singularizedCodecName(relation.remoteResource.codec),
-                true
-              );
+              return camelize(this._singularizedCodecName(relation.remoteResource.codec), true);
             }
           }
         }
@@ -295,7 +320,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         const baseOverride = relation.extensions?.tags.foreignFieldName;
-        if (typeof baseOverride === 'string') {
+        if (typeof baseOverride === "string") {
           return baseOverride;
         }
 
@@ -308,30 +333,24 @@ export const InflektPlugin: GraphileConfig.Plugin = {
             if (oppositeBaseName) {
               return camelize(
                 `${oppositeBaseName}_${distinctPluralize(this._singularizedCodecName(relation.remoteResource.codec))}`,
-                true
+                true,
               );
             }
             if (baseNameMatches(baseName, codec.name)) {
               return camelize(
-                distinctPluralize(
-                  this._singularizedCodecName(relation.remoteResource.codec)
-                ),
-                true
+                distinctPluralize(this._singularizedCodecName(relation.remoteResource.codec)),
+                true,
               );
             }
           }
         }
 
         // Fall back to pluralized remote resource name
-        const pk = relation.remoteResource.uniques.find(
-          (u: { isPrimary: boolean }) => u.isPrimary
-        );
+        const pk = relation.remoteResource.uniques.find((u: { isPrimary: boolean }) => u.isPrimary);
         if (pk && arraysMatch(pk.attributes, relation.remoteAttributes)) {
           return camelize(
-            distinctPluralize(
-              this._singularizedCodecName(relation.remoteResource.codec)
-            ),
-            true
+            distinctPluralize(this._singularizedCodecName(relation.remoteResource.codec)),
+            true,
           );
         }
         return previous!(details);
@@ -349,19 +368,17 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        * - There are multiple many-to-many relations to the same target table
        */
       _manyToManyRelation(previous, _options, details) {
-        const { leftTable, rightTable, junctionTable, rightRelationName } =
-          details;
+        const { leftTable, rightTable, junctionTable, rightRelationName } = details;
 
         const junctionRightRelation = junctionTable.getRelation(rightRelationName);
-        const baseOverride =
-          junctionRightRelation.extensions?.tags?.manyToManyFieldName;
-        if (typeof baseOverride === 'string') {
+        const baseOverride = junctionRightRelation.extensions?.tags?.manyToManyFieldName;
+        if (typeof baseOverride === "string") {
           return baseOverride;
         }
 
         const simpleName = camelize(
           distinctPluralize(this._singularizedCodecName(rightTable.codec)),
-          true
+          true,
         );
 
         const leftRelations = leftTable.getRelations();
@@ -374,10 +391,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
               hasDirectRelation = true;
             }
           }
-          if (
-            rel.isReferencee &&
-            rel.remoteResource?.codec?.name !== rightTable.codec.name
-          ) {
+          if (rel.isReferencee && rel.remoteResource?.codec?.name !== rightTable.codec.name) {
             const junctionRelations = rel.remoteResource?.getRelations?.() || {};
             for (const [_jRelName, jRel] of Object.entries(junctionRelations)) {
               if (
@@ -402,7 +416,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       rowByUnique(previous, _options, details) {
         const { unique, resource } = details;
-        if (typeof unique.extensions?.tags?.fieldName === 'string') {
+        if (typeof unique.extensions?.tags?.fieldName === "string") {
           return unique.extensions?.tags?.fieldName;
         }
         if (unique.isPrimary) {
@@ -416,14 +430,11 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       updateByKeysField(previous, _options, details) {
         const { resource, unique } = details;
-        if (typeof unique.extensions?.tags.updateFieldName === 'string') {
+        if (typeof unique.extensions?.tags.updateFieldName === "string") {
           return unique.extensions.tags.updateFieldName;
         }
         if (unique.isPrimary) {
-          return camelize(
-            `update_${this._singularizedCodecName(resource.codec)}`,
-            true
-          );
+          return camelize(`update_${this._singularizedCodecName(resource.codec)}`, true);
         }
         return previous!(details);
       },
@@ -433,14 +444,11 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       deleteByKeysField(previous, _options, details) {
         const { resource, unique } = details;
-        if (typeof unique.extensions?.tags.deleteFieldName === 'string') {
+        if (typeof unique.extensions?.tags.deleteFieldName === "string") {
           return unique.extensions.tags.deleteFieldName;
         }
         if (unique.isPrimary) {
-          return camelize(
-            `delete_${this._singularizedCodecName(resource.codec)}`,
-            true
-          );
+          return camelize(`delete_${this._singularizedCodecName(resource.codec)}`, true);
         }
         return previous!(details);
       },
