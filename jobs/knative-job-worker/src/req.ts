@@ -1,4 +1,6 @@
-import requestLib from 'request';
+import http from 'node:http';
+import https from 'node:https';
+import { URL } from 'node:url';
 import {
   getCallbackBaseUrl,
   getJobGatewayConfig,
@@ -47,35 +49,55 @@ const request = (
     databaseId
   });
   return new Promise<boolean>((resolve, reject) => {
-    requestLib.post(
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch (e) {
+      return reject(e);
+    }
+
+    const isHttps = parsed.protocol === 'https:';
+    const client = isHttps ? https : http;
+    const payload = JSON.stringify(body);
+
+    const req = client.request(
       {
+        hostname: parsed.hostname,
+        port: parsed.port || (isHttps ? 443 : 80),
+        path: parsed.pathname + parsed.search,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
 
           // these are used by job-worker/job-fn
           'X-Worker-Id': workerId,
-          'X-Job-Id': jobId,
+          'X-Job-Id': String(jobId),
           'X-Database-Id': databaseId,
 
           // async HTTP completion callback
           'X-Callback-Url': completeUrl
-        },
-        url,
-        json: true,
-        body
-      },
-      function (error: unknown) {
-        if (error) {
-          log.error(`request error for job[${jobId}] fn[${fn}]`, error);
-          if (error instanceof Error && error.stack) {
-            log.debug(error.stack);
-          }
-          return reject(error);
         }
-        log.debug(`request success for job[${jobId}] fn[${fn}]`);
-        return resolve(true);
+      },
+      (res) => {
+        res.on('data', () => {});
+        res.on('end', () => {
+          log.debug(`request success for job[${jobId}] fn[${fn}]`);
+          resolve(true);
+        });
       }
     );
+
+    req.on('error', (error) => {
+      log.error(`request error for job[${jobId}] fn[${fn}]`, error);
+      if (error.stack) {
+        log.debug(error.stack);
+      }
+      reject(error);
+    });
+
+    req.write(payload);
+    req.end();
   });
 };
 

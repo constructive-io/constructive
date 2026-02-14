@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
-    "body-parser": "1.19.0",
     "express": "5.2.1"
   }
 }

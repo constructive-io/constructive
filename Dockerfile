@@ -1,5 +1,5 @@
 ARG BASE=node
-ARG BASE_VERSION=20-bookworm
+ARG BASE_VERSION=22-bookworm
 FROM ${BASE}:${BASE_VERSION} AS build
 
 LABEL org.opencontainers.image.source="https://github.com/constructive-io/constructive"

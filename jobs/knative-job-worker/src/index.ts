@@ -183,56 +183,52 @@ export default class Worker {
       }
     }
   }
-  listen() {
+  async listen(): Promise<void> {
     if (this.stopped) return;
-    const listenForChanges = (
-      err: Error | null,
-      client: PoolClient,
-      release: () => void
-    ) => {
-      if (err) {
-        log.error('Error connecting with notify listener', err);
-        if (err instanceof Error && err.stack) {
-          log.debug(err.stack);
-        }
-        // Try again in 5 seconds
-        // should this really be done in the node process?
-        if (!this.stopped) {
-          setTimeout(this.listen, 5000);
-        }
-        return;
+    let client: PoolClient;
+    let release: () => void;
+    try {
+      client = await this.pgPool.connect();
+      release = () => client.release();
+    } catch (err) {
+      log.error('Error connecting with notify listener', err);
+      if (err instanceof Error && err.stack) {
+        log.debug(err.stack);
       }
+      if (!this.stopped) {
+        setTimeout(() => this.listen(), 5000);
+      }
+      return;
+    }
+    if (this.stopped) {
+      release();
+      return;
+    }
+    this.listenClient = client;
+    this.listenRelease = release;
+    client.on('notification', () => {
+      if (this.doNextTimer) {
+        // Must be idle, do something!
+        this.doNext(client);
+      }
+    });
+    client.query('LISTEN "jobs:insert"');
+    client.on('error', (e: unknown) => {
       if (this.stopped) {
         release();
         return;
       }
-      this.listenClient = client;
-      this.listenRelease = release;
-      client.on('notification', () => {
-        if (this.doNextTimer) {
-          // Must be idle, do something!
-          this.doNext(client);
-        }
-      });
-      client.query('LISTEN "jobs:insert"');
-      client.on('error', (e: unknown) => {
-        if (this.stopped) {
-          release();
-          return;
-        }
-        log.error('Error with database notify listener', e);
-        if (e instanceof Error && e.stack) {
-          log.debug(e.stack);
-        }
-        release();
-        if (!this.stopped) {
-          this.listen();
-        }
-      });
-      log.info(`${this.workerId} connected and looking for jobs...`);
-      this.doNext(client);
-    };
-    this.pgPool.connect(listenForChanges);
+      log.error('Error with database notify listener', e);
+      if (e instanceof Error && e.stack) {
+        log.debug(e.stack);
+      }
+      release();
+      if (!this.stopped) {
+        this.listen();
+      }
+    });
+    log.info(`${this.workerId} connected and looking for jobs...`);
+    this.doNext(client);
   }
 
   async stop(): Promise<void> {
