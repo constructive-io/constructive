@@ -9,7 +9,7 @@ import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
 import { generate } from '../core/generate';
-import type { GraphQLSDKConfigTarget } from '../types/config';
+import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
 import {
   buildDbConfig,
   buildGenerateOptions,
@@ -114,11 +114,9 @@ export const commands = async (
       let hasError = false;
       for (const name of names) {
         console.log(`\n[${name}]`);
-        const targetConfig = { ...targets[name], ...cliOptions } as GraphQLSDKConfigTarget;
-        if (targets[name].db && targetConfig.db) {
-          targetConfig.db = { ...targets[name].db, ...targetConfig.db };
-        }
-        const result = await generate(targetConfig);
+        const result = await generate(
+          mergeConfig(targets[name], cliOptions as GraphQLSDKConfigTarget),
+        );
         printResult(result);
         if (!result.success) hasError = true;
       }
