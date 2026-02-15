@@ -29,6 +29,16 @@ export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
         // Track codecs by their GraphQL name to detect conflicts
         const codecsByName = new Map<string, CodecInfo[]>();
 
+        // Get configured schemas from pgServices to only check relevant codecs
+        const configuredSchemas = new Set<string>();
+        const pgServices = (build as any).resolvedPreset?.pgServices ?? [];
+
+        for (const service of pgServices) {
+          for (const schema of service.schemas ?? ['public']) {
+            configuredSchemas.add(schema);
+          }
+        }
+
         // Iterate through all codecs to find tables
         for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
           // Skip non-table codecs (those without attributes or anonymous ones)
@@ -40,6 +50,11 @@ export const ConflictDetectorPlugin: GraphileConfig.Plugin = {
             | undefined;
           const schemaName = pgExtensions?.schemaName || 'unknown';
           const tableName = codec.name;
+
+          // Skip codecs from schemas not in the configured list
+          if (configuredSchemas.size > 0 && !configuredSchemas.has(schemaName)) {
+            continue;
+          }
 
           // Get the GraphQL name that would be generated
           const graphqlName = build.inflection.tableType(codec);
