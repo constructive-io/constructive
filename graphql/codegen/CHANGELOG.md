@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.0.0...@constructive-io/graphql-codegen@4.0.1) (2026-02-15)
+
+### Bug Fixes
+
+- **codegen:** preserve db.pgpm when merging CLI args with file config ([a4d7028](https://github.com/constructive-io/constructive/commit/a4d7028be1b2ada6ce7a4e5adec4cfdd06a29441))
+
 # [4.0.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@3.3.2...@constructive-io/graphql-codegen@4.0.0) (2026-02-13)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
