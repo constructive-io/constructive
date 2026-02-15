@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/constructive-io/constructive/compare/pgpm@4.0.0...pgpm@4.0.1) (2026-02-15)
+
+### Bug Fixes
+
+- remove double quotes from pgpm env output ([e30ad4a](https://github.com/constructive-io/constructive/commit/e30ad4ad640ed2f937d89bb0d8fccb5e8c904257))
+
 # [4.0.0](https://github.com/constructive-io/constructive/compare/pgpm@3.3.2...pgpm@4.0.0) (2026-02-13)
 
 **Note:** Version bump only for package pgpm
