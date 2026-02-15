@@ -57,8 +57,7 @@ function configToEnvVars(config: PgConfig): Record<string, string> {
 function printExports(config: PgConfig): void {
   const envVars = configToEnvVars(config);
   for (const [key, value] of Object.entries(envVars)) {
-    const escapedValue = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-    console.log(`export ${key}="${escapedValue}"`);
+    console.log(`export ${key}=${value}`);
   }
 }
 
