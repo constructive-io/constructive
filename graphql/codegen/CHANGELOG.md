@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.0.1...@constructive-io/graphql-codegen@4.0.2) (2026-02-15)
+
+### Bug Fixes
+
+- **codegen:** use deepmerge for CLI config merging ([5c6279f](https://github.com/constructive-io/constructive/commit/5c6279f2e5f5e9a35f7bedf44b401eb394cf6eca))
+
 ## [4.0.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.0.0...@constructive-io/graphql-codegen@4.0.1) (2026-02-15)
 
 ### Bug Fixes
