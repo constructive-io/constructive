@@ -9,7 +9,7 @@ import { inflektTree } from 'inflekt/transform-keys';
 import type { Question } from 'inquirerer';
 
 import type { GenerateResult } from '../core/generate';
-import type { GraphQLSDKConfigTarget } from '../types/config';
+import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
 
 export const splitCommas = (
   input: string | undefined,
@@ -202,7 +202,10 @@ export function buildDbConfig(
 ): Record<string, unknown> {
   const { schemas, apiNames, ...rest } = options;
   if (schemas || apiNames) {
-    return { ...rest, db: { schemas, apiNames } };
+    return {
+      ...rest,
+      db: filterDefined({ schemas, apiNames } as Record<string, unknown>),
+    };
   }
   return rest;
 }
@@ -259,5 +262,5 @@ export function buildGenerateOptions(
   const camelized = camelizeArgv(answers);
   const normalized = normalizeCodegenListOptions(camelized);
   const withDb = buildDbConfig(normalized);
-  return { ...fileConfig, ...withDb } as GraphQLSDKConfigTarget;
+  return mergeConfig(fileConfig, withDb as GraphQLSDKConfigTarget);
 }
