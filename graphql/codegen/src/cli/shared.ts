@@ -202,7 +202,10 @@ export function buildDbConfig(
 ): Record<string, unknown> {
   const { schemas, apiNames, ...rest } = options;
   if (schemas || apiNames) {
-    return { ...rest, db: { schemas, apiNames } };
+    return {
+      ...rest,
+      db: filterDefined({ schemas, apiNames } as Record<string, unknown>),
+    };
   }
   return rest;
 }
@@ -259,5 +262,9 @@ export function buildGenerateOptions(
   const camelized = camelizeArgv(answers);
   const normalized = normalizeCodegenListOptions(camelized);
   const withDb = buildDbConfig(normalized);
-  return { ...fileConfig, ...withDb } as GraphQLSDKConfigTarget;
+  const merged = { ...fileConfig, ...withDb } as GraphQLSDKConfigTarget;
+  if (fileConfig.db && merged.db) {
+    merged.db = { ...fileConfig.db, ...merged.db };
+  }
+  return merged;
 }
