@@ -130,39 +130,6 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       },
 
       /**
-       * Restore PostGraphile's default schema prefix logic for functions.
-       *
-       * Our _schemaPrefix override returns '' for all schemas to give clean
-       * table names. However, this strips prefixes from functions too, causing
-       * resource naming collisions when a function and table share the same
-       * base name across schemas (e.g., actions_public.table_grant() collides
-       * with metaschema_public.table_grant table).
-       *
-       * Fix: bypass our _schemaPrefix override for functions and use
-       * PostGraphile's default prefix logic instead.
-       */
-      functionResourceName(_previous, options: any, details: any) {
-        const { serviceName, pgProc } = details;
-        const { tags } = pgProc.getTagsAndDescription();
-
-        if (typeof tags.name === 'string') {
-          return tags.name;
-        }
-
-        const pgNamespace = pgProc.getNamespace();
-
-        if (!pgNamespace) {
-          return pgProc.proname;
-        }
-
-        const pgService = (options.pgServices ?? []).find((db: any) => db.name === serviceName);
-        const primarySchema = pgService?.schemas?.[0] ?? 'public';
-        const databasePrefix = serviceName === 'main' ? '' : `${serviceName}_`;
-        const schemaPrefix = pgNamespace.nspname === primarySchema ? '' : `${pgNamespace.nspname}_`;
-        return `${databasePrefix}${schemaPrefix}${pgProc.proname}`;
-      },
-
-      /**
        * Keep `id` columns as `id` instead of renaming to `rowId`.
        *
        * WHY THIS EXISTS:
