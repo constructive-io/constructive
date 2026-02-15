@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.0.0...graphile-settings@4.0.1) (2026-02-15)
+
+### Bug Fixes
+
+- **codegen:** preserve db.pgpm when merging CLI args with file config ([a4d7028](https://github.com/constructive-io/constructive/commit/a4d7028be1b2ada6ce7a4e5adec4cfdd06a29441))
+- remove functionResourceName override per user request - keep all names flat ([2b8f98d](https://github.com/constructive-io/constructive/commit/2b8f98dec014096a826cb234ebefa2b769cee122))
+
 # [4.0.0](https://github.com/constructive-io/constructive/compare/graphile-settings@3.1.1...graphile-settings@4.0.0) (2026-02-13)
 
 **Note:** Version bump only for package graphile-settings
