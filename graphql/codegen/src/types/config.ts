@@ -137,6 +137,17 @@ export interface DbConfig {
 }
 
 /**
+ * CLI generation configuration
+ */
+export interface CliConfig {
+  /**
+   * Tool name for appstash config storage (e.g., 'myapp' stores at ~/.myapp/)
+   * @default derived from output directory name
+   */
+  toolName?: string;
+}
+
+/**
  * Target configuration for graphql-codegen
  * Represents a single schema source and output destination.
  *
@@ -258,6 +269,13 @@ export interface GraphQLSDKConfigTarget {
    * @default false
    */
   reactQuery?: boolean;
+
+  /**
+   * CLI generation configuration
+   * When enabled, generates inquirerer-based CLI commands to {output}/cli
+   * Requires appstash for config storage and inquirerer for prompts
+   */
+  cli?: CliConfig | boolean;
 
   /**
    * Query key generation configuration

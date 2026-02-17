@@ -10,6 +10,7 @@ import type { GraphQLSDKConfigTarget } from '../types/config';
 import { getConfigOptions } from '../types/config';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
+import { generateCli as generateCliFiles } from './codegen/cli';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import { generateSharedTypes } from './codegen/shared';
 import { createSchemaSource, validateSourceOptions } from './introspect';
@@ -51,12 +52,13 @@ export async function generate(
   const runReactQuery = config.reactQuery ?? false;
   const runOrm =
     runReactQuery || (options.orm !== undefined ? !!options.orm : false);
+  const runCli = !!config.cli;
 
-  if (!runReactQuery && !runOrm) {
+  if (!runReactQuery && !runOrm && !runCli) {
     return {
       success: false,
       message:
-        'No generators enabled. Use reactQuery: true or orm: true in your config.',
+        'No generators enabled. Use reactQuery: true, orm: true, or cli: true in your config.',
       output: outputRoot,
     };
   }
@@ -174,12 +176,32 @@ export async function generate(
     );
   }
 
+  // Generate CLI commands
+  if (runCli) {
+    console.log('Generating CLI commands...');
+    const { files } = generateCliFiles({
+      tables,
+      customOperations: {
+        queries: customOperations.queries,
+        mutations: customOperations.mutations,
+      },
+      config,
+    });
+    filesToWrite.push(
+      ...files.map((file) => ({
+        path: path.posix.join('cli', file.fileName),
+        content: file.content,
+      })),
+    );
+  }
+
   // Generate barrel file at output root
   // This re-exports from the appropriate subdirectories based on which generators are enabled
   const barrelContent = generateRootBarrel({
     hasTypes: bothEnabled,
     hasHooks: runReactQuery,
     hasOrm: runOrm,
+    hasCli: runCli,
   });
   filesToWrite.push({ path: 'index.ts', content: barrelContent });
 
@@ -198,7 +220,11 @@ export async function generate(
     allFilesWritten.push(...(writeResult.filesWritten ?? []));
   }
 
-  const generators = [runReactQuery && 'React Query', runOrm && 'ORM']
+  const generators = [
+    runReactQuery && 'React Query',
+    runOrm && 'ORM',
+    runCli && 'CLI',
+  ]
     .filter(Boolean)
     .join(' and ');
 

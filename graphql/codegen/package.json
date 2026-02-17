@@ -68,6 +68,7 @@
     "inflekt": "^0.3.1",
     "inquirerer": "^4.4.0",
     "jiti": "^2.6.1",
+    "komoji": "^0.8.0",
     "oxfmt": "^0.26.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
