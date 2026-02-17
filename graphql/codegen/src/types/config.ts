@@ -137,8 +137,9 @@ export interface DbConfig {
 }
 
 /**
- * Documentation generation options for CLI
- * Controls which doc formats are generated alongside CLI commands
+ * Documentation generation options
+ * Controls which doc formats are generated alongside code for each generator target.
+ * Applied at the top level and affects all enabled generators (ORM, React Query, CLI).
  */
 export interface DocsConfig {
   /**
@@ -182,13 +183,6 @@ export interface CliConfig {
    */
   toolName?: string;
 
-  /**
-   * Documentation generation options
-   * Controls which doc formats are generated alongside CLI commands
-   * Set to `true` to enable all formats, or configure individually
-   * @default { readme: true, agents: true, mcp: false, skills: false }
-   */
-  docs?: DocsConfig | boolean;
 }
 
 /**
@@ -320,6 +314,15 @@ export interface GraphQLSDKConfigTarget {
    * Requires appstash for config storage and inquirerer for prompts
    */
   cli?: CliConfig | boolean;
+
+  /**
+   * Documentation generation options
+   * Controls which doc formats are generated alongside code for each generator target.
+   * Applied globally to all enabled generators (ORM, React Query, CLI).
+   * Set to `true` to enable all formats, or configure individually.
+   * @default { readme: true, agents: true, mcp: false, skills: false }
+   */
+  docs?: DocsConfig | boolean;
 
   /**
    * Query key generation configuration

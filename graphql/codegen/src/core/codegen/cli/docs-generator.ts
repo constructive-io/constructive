@@ -1,81 +1,27 @@
 import { toKebabCase } from 'komoji';
 
+import type { CleanTable, CleanOperation } from '../../../types/schema';
+import {
+  formatArgType,
+  getEditableFields,
+  gqlTypeToJsonSchemaType,
+  buildSkillFile,
+} from '../docs-utils';
+import type { GeneratedDocFile, McpTool } from '../docs-utils';
 import {
   getScalarFields,
   getTableNames,
   getPrimaryKeyInfo,
 } from '../utils';
-import type { CleanTable, CleanOperation } from '../../../types/schema';
-import type { DocsConfig } from '../../../types/config';
-import type { GeneratedFile } from './executor-generator';
 
-function formatArgType(arg: CleanOperation['args'][number]): string {
-  const t = arg.type;
-  if (t.kind === 'NON_NULL' && t.ofType) {
-    return `${formatTypeRef(t.ofType)} (required)`;
-  }
-  return formatTypeRef(t);
-}
-
-function formatTypeRef(t: CleanOperation['args'][number]['type']): string {
-  if (t.kind === 'LIST' && t.ofType) {
-    return `[${formatTypeRef(t.ofType)}]`;
-  }
-  if (t.kind === 'NON_NULL' && t.ofType) {
-    return `${formatTypeRef(t.ofType)}!`;
-  }
-  return t.name ?? 'unknown';
-}
-
-function getEditableFields(table: CleanTable) {
-  const pk = getPrimaryKeyInfo(table)[0];
-  return getScalarFields(table).filter(
-    (f) =>
-      f.name !== pk.name &&
-      f.name !== 'nodeId' &&
-      f.name !== 'createdAt' &&
-      f.name !== 'updatedAt',
-  );
-}
-
-function gqlTypeToJsonSchemaType(gqlType: string): string {
-  switch (gqlType) {
-    case 'Int':
-      return 'integer';
-    case 'Float':
-      return 'number';
-    case 'Boolean':
-      return 'boolean';
-    default:
-      return 'string';
-  }
-}
-
-export function resolveDocsConfig(
-  docs: DocsConfig | boolean | undefined,
-): DocsConfig {
-  if (docs === true) {
-    return { readme: true, agents: true, mcp: true, skills: true };
-  }
-  if (docs === false) {
-    return { readme: false, agents: false, mcp: false, skills: false };
-  }
-  if (!docs) {
-    return { readme: true, agents: true, mcp: false, skills: false };
-  }
-  return {
-    readme: docs.readme ?? true,
-    agents: docs.agents ?? true,
-    mcp: docs.mcp ?? false,
-    skills: docs.skills ?? false,
-  };
-}
+export { resolveDocsConfig } from '../docs-utils';
+export type { GeneratedDocFile, McpTool } from '../docs-utils';
 
 export function generateReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
-): GeneratedFile {
+): GeneratedDocFile {
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI`);
@@ -221,7 +167,7 @@ export function generateAgentsDocs(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
-): GeneratedFile {
+): GeneratedDocFile {
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI - Agent Reference`);
@@ -433,12 +379,12 @@ export function generateAgentsDocs(
   };
 }
 
-export function generateMcpConfig(
+export function getCliMcpTools(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
-): GeneratedFile {
-  const tools: Record<string, unknown>[] = [];
+): McpTool[] {
+  const tools: McpTool[] = [];
 
   tools.push({
     name: `${toolName}_context_create`,
@@ -638,25 +584,15 @@ export function generateMcpConfig(
     });
   }
 
-  const mcpConfig = {
-    name: toolName,
-    version: '1.0.0',
-    description: `MCP tool definitions for ${toolName} CLI (auto-generated from GraphQL schema)`,
-    tools,
-  };
-
-  return {
-    fileName: 'mcp.json',
-    content: JSON.stringify(mcpConfig, null, 2) + '\n',
-  };
+  return tools;
 }
 
 export function generateSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
-): GeneratedFile[] {
-  const files: GeneratedFile[] = [];
+): GeneratedDocFile[] {
+  const files: GeneratedDocFile[] = [];
 
   files.push({
     fileName: 'skills/context.md',
@@ -673,14 +609,14 @@ export function generateSkills(
       examples: [
         {
           description: 'Create and activate a context',
-          commands: [
+          code: [
             `${toolName} context create production --endpoint https://api.example.com/graphql`,
             `${toolName} context use production`,
           ],
         },
         {
           description: 'List all contexts',
-          commands: [`${toolName} context list`],
+          code: [`${toolName} context list`],
         },
       ],
     }),
@@ -699,11 +635,11 @@ export function generateSkills(
       examples: [
         {
           description: 'Authenticate with a token',
-          commands: [`${toolName} auth set-token eyJhbGciOiJIUzI1NiIs...`],
+          code: [`${toolName} auth set-token eyJhbGciOiJIUzI1NiIs...`],
         },
         {
           description: 'Check auth status',
-          commands: [`${toolName} auth status`],
+          code: [`${toolName} auth status`],
         },
       ],
     }),
@@ -730,27 +666,27 @@ export function generateSkills(
         examples: [
           {
             description: `List all ${singularName} records`,
-            commands: [`${toolName} ${kebab} list`],
+            code: [`${toolName} ${kebab} list`],
           },
           {
             description: `Create a ${singularName}`,
-            commands: [
+            code: [
               `${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`,
             ],
           },
           {
             description: `Get a ${singularName} by ${pk.name}`,
-            commands: [`${toolName} ${kebab} get --${pk.name} <value>`],
+            code: [`${toolName} ${kebab} get --${pk.name} <value>`],
           },
           {
             description: `Update a ${singularName}`,
-            commands: [
+            code: [
               `${toolName} ${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`,
             ],
           },
           {
             description: `Delete a ${singularName}`,
-            commands: [`${toolName} ${kebab} delete --${pk.name} <value>`],
+            code: [`${toolName} ${kebab} delete --${pk.name} <value>`],
           },
         ],
       }),
@@ -773,7 +709,7 @@ export function generateSkills(
         examples: [
           {
             description: `Run ${op.name}`,
-            commands: [usage],
+            code: [usage],
           },
         ],
       }),
@@ -781,44 +717,4 @@ export function generateSkills(
   }
 
   return files;
-}
-
-interface SkillDefinition {
-  name: string;
-  description: string;
-  usage: string[];
-  examples: { description: string; commands: string[] }[];
-}
-
-function buildSkillFile(skill: SkillDefinition): string {
-  const lines: string[] = [];
-
-  lines.push(`# ${skill.name}`);
-  lines.push('');
-  lines.push(`> @generated by @constructive-io/graphql-codegen - DO NOT EDIT`);
-  lines.push('');
-  lines.push(skill.description);
-  lines.push('');
-  lines.push('## Usage');
-  lines.push('');
-  lines.push('```bash');
-  for (const u of skill.usage) {
-    lines.push(u);
-  }
-  lines.push('```');
-  lines.push('');
-  lines.push('## Examples');
-  lines.push('');
-  for (const ex of skill.examples) {
-    lines.push(`### ${ex.description}`);
-    lines.push('');
-    lines.push('```bash');
-    for (const cmd of ex.commands) {
-      lines.push(cmd);
-    }
-    lines.push('```');
-    lines.push('');
-  }
-
-  return lines.join('\n');
 }

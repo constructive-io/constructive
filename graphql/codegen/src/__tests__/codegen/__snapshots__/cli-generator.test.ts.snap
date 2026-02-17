@@ -1,626 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`cli-generator docs: true (all formats) generates mcp.json 1`] = `
-"{
-  "name": "myapp",
-  "version": "1.0.0",
-  "description": "MCP tool definitions for myapp CLI (auto-generated from GraphQL schema)",
-  "tools": [
-    {
-      "name": "myapp_context_create",
-      "description": "Create a named API context pointing at a GraphQL endpoint",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name"
-          },
-          "endpoint": {
-            "type": "string",
-            "description": "GraphQL endpoint URL"
-          }
-        },
-        "required": [
-          "name",
-          "endpoint"
-        ]
-      }
-    },
-    {
-      "name": "myapp_context_list",
-      "description": "List all configured API contexts",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_context_use",
-      "description": "Set the active API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name to activate"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      }
-    },
-    {
-      "name": "myapp_context_current",
-      "description": "Show the currently active API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_context_delete",
-      "description": "Delete an API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name to delete"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      }
-    },
-    {
-      "name": "myapp_auth_set_token",
-      "description": "Store a bearer token for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "Bearer token value"
-          }
-        },
-        "required": [
-          "token"
-        ]
-      }
-    },
-    {
-      "name": "myapp_auth_status",
-      "description": "Show authentication status for all contexts",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_auth_logout",
-      "description": "Remove credentials for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_car_list",
-      "description": "List all Car records",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_car_get",
-      "description": "Get a single Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_create",
-      "description": "Create a new Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "make",
-          "model",
-          "year",
-          "isElectric"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_update",
-      "description": "Update an existing Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          },
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_delete",
-      "description": "Delete a Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_fields",
-      "description": "List available fields for Car",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "make",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "model",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "year",
-            "type": "Int",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "isElectric",
-            "type": "Boolean",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "createdAt",
-            "type": "Datetime",
-            "editable": false,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_list",
-      "description": "List all Driver records",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_driver_get",
-      "description": "Get a single Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_create",
-      "description": "Create a new Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "name",
-          "licenseNumber"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_update",
-      "description": "Update an existing Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          },
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_delete",
-      "description": "Delete a Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_fields",
-      "description": "List available fields for Driver",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "name",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "licenseNumber",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "myapp_current-user",
-      "description": "Get the currently authenticated user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_login",
-      "description": "Authenticate a user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "password"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      }
-    }
-  ]
-}
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 1`] = `
-"# myapp-context
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-Manage API endpoint contexts for myapp
-
-## Usage
-
-\`\`\`bash
-myapp context create <name> --endpoint <url>
-myapp context list
-myapp context use <name>
-myapp context current
-myapp context delete <name>
-\`\`\`
-
-## Examples
-
-### Create and activate a context
-
-\`\`\`bash
-myapp context create production --endpoint https://api.example.com/graphql
-myapp context use production
-\`\`\`
-
-### List all contexts
-
-\`\`\`bash
-myapp context list
-\`\`\`
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 2`] = `
-"# myapp-auth
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-Manage authentication tokens for myapp
-
-## Usage
-
-\`\`\`bash
-myapp auth set-token <token>
-myapp auth status
-myapp auth logout
-\`\`\`
-
-## Examples
-
-### Authenticate with a token
-
-\`\`\`bash
-myapp auth set-token eyJhbGciOiJIUzI1NiIs...
-\`\`\`
-
-### Check auth status
-
-\`\`\`bash
-myapp auth status
-\`\`\`
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 3`] = `
-"# myapp-car
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-CRUD operations for Car records via myapp CLI
-
-## Usage
-
-\`\`\`bash
-myapp car list
-myapp car get --id <value>
-myapp car create --make <value> --model <value> --year <value> --isElectric <value>
-myapp car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
-myapp car delete --id <value>
-\`\`\`
-
-## Examples
-
-### List all car records
-
-\`\`\`bash
-myapp car list
-\`\`\`
-
-### Create a car
-
-\`\`\`bash
-myapp car create --make "value" --model "value" --year "value" --isElectric "value"
-\`\`\`
-
-### Get a car by id
-
-\`\`\`bash
-myapp car get --id <value>
-\`\`\`
-
-### Update a car
-
-\`\`\`bash
-myapp car update --id <value> --make "new-value"
-\`\`\`
-
-### Delete a car
-
-\`\`\`bash
-myapp car delete --id <value>
-\`\`\`
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 4`] = `
-"# myapp-driver
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-CRUD operations for Driver records via myapp CLI
-
-## Usage
-
-\`\`\`bash
-myapp driver list
-myapp driver get --id <value>
-myapp driver create --name <value> --licenseNumber <value>
-myapp driver update --id <value> [--name <value>] [--licenseNumber <value>]
-myapp driver delete --id <value>
-\`\`\`
-
-## Examples
-
-### List all driver records
-
-\`\`\`bash
-myapp driver list
-\`\`\`
-
-### Create a driver
-
-\`\`\`bash
-myapp driver create --name "value" --licenseNumber "value"
-\`\`\`
-
-### Get a driver by id
-
-\`\`\`bash
-myapp driver get --id <value>
-\`\`\`
-
-### Update a driver
-
-\`\`\`bash
-myapp driver update --id <value> --name "new-value"
-\`\`\`
-
-### Delete a driver
-
-\`\`\`bash
-myapp driver delete --id <value>
-\`\`\`
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 5`] = `
-"# myapp-current-user
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-Get the currently authenticated user
-
-## Usage
-
-\`\`\`bash
-myapp current-user
-\`\`\`
-
-## Examples
-
-### Run currentUser
-
-\`\`\`bash
-myapp current-user
-\`\`\`
-"
-`;
-
-exports[`cli-generator docs: true (all formats) generates skill files 6`] = `
-"# myapp-login
-
-> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
-
-Authenticate a user
-
-## Usage
-
-\`\`\`bash
-myapp login --email <value> --password <value>
-\`\`\`
-
-## Examples
-
-### Run login
-
-\`\`\`bash
-myapp login --email <value> --password <value>
-\`\`\`
-"
-`;
-
-exports[`cli-generator generates AGENTS.md by default 1`] = `
+exports[`cli docs generator generates CLI AGENTS.md 1`] = `
 "# myapp CLI - Agent Reference
 
 > @generated by @constructive-io/graphql-codegen - DO NOT EDIT
@@ -831,7 +211,7 @@ Common errors:
 "
 `;
 
-exports[`cli-generator generates README.md by default 1`] = `
+exports[`cli docs generator generates CLI README 1`] = `
 "# myapp CLI
 
 > Auto-generated CLI commands from GraphQL schema
@@ -964,6 +344,219 @@ All commands output JSON to stdout. Pipe to \`jq\` for formatting:
 \`\`\`bash
 myapp car list | jq '.[]'
 myapp car get --id <uuid> | jq '.'
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 1`] = `
+"# myapp-context
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Manage API endpoint contexts for myapp
+
+## Usage
+
+\`\`\`bash
+myapp context create <name> --endpoint <url>
+myapp context list
+myapp context use <name>
+myapp context current
+myapp context delete <name>
+\`\`\`
+
+## Examples
+
+### Create and activate a context
+
+\`\`\`bash
+myapp context create production --endpoint https://api.example.com/graphql
+myapp context use production
+\`\`\`
+
+### List all contexts
+
+\`\`\`bash
+myapp context list
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 2`] = `
+"# myapp-auth
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Manage authentication tokens for myapp
+
+## Usage
+
+\`\`\`bash
+myapp auth set-token <token>
+myapp auth status
+myapp auth logout
+\`\`\`
+
+## Examples
+
+### Authenticate with a token
+
+\`\`\`bash
+myapp auth set-token eyJhbGciOiJIUzI1NiIs...
+\`\`\`
+
+### Check auth status
+
+\`\`\`bash
+myapp auth status
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 3`] = `
+"# myapp-car
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+CRUD operations for Car records via myapp CLI
+
+## Usage
+
+\`\`\`bash
+myapp car list
+myapp car get --id <value>
+myapp car create --make <value> --model <value> --year <value> --isElectric <value>
+myapp car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
+myapp car delete --id <value>
+\`\`\`
+
+## Examples
+
+### List all car records
+
+\`\`\`bash
+myapp car list
+\`\`\`
+
+### Create a car
+
+\`\`\`bash
+myapp car create --make "value" --model "value" --year "value" --isElectric "value"
+\`\`\`
+
+### Get a car by id
+
+\`\`\`bash
+myapp car get --id <value>
+\`\`\`
+
+### Update a car
+
+\`\`\`bash
+myapp car update --id <value> --make "new-value"
+\`\`\`
+
+### Delete a car
+
+\`\`\`bash
+myapp car delete --id <value>
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 4`] = `
+"# myapp-driver
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+CRUD operations for Driver records via myapp CLI
+
+## Usage
+
+\`\`\`bash
+myapp driver list
+myapp driver get --id <value>
+myapp driver create --name <value> --licenseNumber <value>
+myapp driver update --id <value> [--name <value>] [--licenseNumber <value>]
+myapp driver delete --id <value>
+\`\`\`
+
+## Examples
+
+### List all driver records
+
+\`\`\`bash
+myapp driver list
+\`\`\`
+
+### Create a driver
+
+\`\`\`bash
+myapp driver create --name "value" --licenseNumber "value"
+\`\`\`
+
+### Get a driver by id
+
+\`\`\`bash
+myapp driver get --id <value>
+\`\`\`
+
+### Update a driver
+
+\`\`\`bash
+myapp driver update --id <value> --name "new-value"
+\`\`\`
+
+### Delete a driver
+
+\`\`\`bash
+myapp driver delete --id <value>
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 5`] = `
+"# myapp-current-user
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Get the currently authenticated user
+
+## Usage
+
+\`\`\`bash
+myapp current-user
+\`\`\`
+
+## Examples
+
+### Run currentUser
+
+\`\`\`bash
+myapp current-user
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 6`] = `
+"# myapp-login
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Authenticate a user
+
+## Usage
+
+\`\`\`bash
+myapp login --email <value> --password <value>
+\`\`\`
+
+## Examples
+
+### Run login
+
+\`\`\`bash
+myapp login --email <value> --password <value>
 \`\`\`
 "
 `;
@@ -1803,4 +1396,1588 @@ export function getClient(contextName?: string) {
     headers: headers
   });
 }"
+`;
+
+exports[`hooks docs generator generates hooks AGENTS.md 1`] = `
+"# React Query Hooks - Agent Reference
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+> This document is structured for LLM/agent consumption.
+
+## OVERVIEW
+
+React Query hooks wrapping ORM operations for data fetching and mutations.
+All query hooks return \`UseQueryResult\`. All mutation hooks return \`UseMutationResult\`.
+
+## SETUP
+
+\`\`\`typescript
+import { configure } from './hooks';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+configure({ endpoint: 'https://api.example.com/graphql' });
+const queryClient = new QueryClient();
+// Wrap app in <QueryClientProvider client={queryClient}>
+\`\`\`
+
+## HOOKS
+
+### HOOK: useCarsQuery
+
+List all cars.
+
+\`\`\`
+TYPE: query
+USAGE: useCarsQuery({ selection: { fields: { ... } } })
+
+INPUT:
+  selection: { fields: Record<string, boolean> } - Fields to select
+
+OUTPUT: UseQueryResult<Array<{
+  id: string
+  make: string
+  model: string
+  year: number
+  isElectric: boolean
+  createdAt: string
+}>>
+\`\`\`
+
+### HOOK: useCarQuery
+
+Get a single car by id.
+
+\`\`\`
+TYPE: query
+USAGE: useCarQuery({ id: '<value>', selection: { fields: { ... } } })
+
+INPUT:
+  id: string (required)
+  selection: { fields: Record<string, boolean> } - Fields to select
+
+OUTPUT: UseQueryResult<{
+  id: string
+  make: string
+  model: string
+  year: number
+  isElectric: boolean
+  createdAt: string
+}>
+\`\`\`
+
+### HOOK: useCreateCarMutation
+
+Create a new car.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useCreateCarMutation({ selection: { fields: { ... } } })
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+### HOOK: useUpdateCarMutation
+
+Update an existing car.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useUpdateCarMutation({ selection: { fields: { ... } } })
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+### HOOK: useDeleteCarMutation
+
+Delete a car.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useDeleteCarMutation({})
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+### HOOK: useDriversQuery
+
+List all drivers.
+
+\`\`\`
+TYPE: query
+USAGE: useDriversQuery({ selection: { fields: { ... } } })
+
+INPUT:
+  selection: { fields: Record<string, boolean> } - Fields to select
+
+OUTPUT: UseQueryResult<Array<{
+  id: string
+  name: string
+  licenseNumber: string
+}>>
+\`\`\`
+
+### HOOK: useDriverQuery
+
+Get a single driver by id.
+
+\`\`\`
+TYPE: query
+USAGE: useDriverQuery({ id: '<value>', selection: { fields: { ... } } })
+
+INPUT:
+  id: string (required)
+  selection: { fields: Record<string, boolean> } - Fields to select
+
+OUTPUT: UseQueryResult<{
+  id: string
+  name: string
+  licenseNumber: string
+}>
+\`\`\`
+
+### HOOK: useCreateDriverMutation
+
+Create a new driver.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useCreateDriverMutation({ selection: { fields: { ... } } })
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+### HOOK: useUpdateDriverMutation
+
+Update an existing driver.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useUpdateDriverMutation({ selection: { fields: { ... } } })
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+### HOOK: useDeleteDriverMutation
+
+Delete a driver.
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useDeleteDriverMutation({})
+
+OUTPUT: UseMutationResult
+\`\`\`
+
+## CUSTOM OPERATION HOOKS
+
+### HOOK: useCurrentUserQuery
+
+Get the currently authenticated user
+
+\`\`\`
+TYPE: query
+USAGE: useCurrentUserQuery()
+
+INPUT: none
+
+OUTPUT: UseQueryResult
+\`\`\`
+
+### HOOK: useLoginMutation
+
+Authenticate a user
+
+\`\`\`
+TYPE: mutation
+USAGE: const { mutate } = useLoginMutation()
+  mutate({ email: <value>, password: <value> })
+
+INPUT:
+  email: String (required)
+  password: String (required)
+
+OUTPUT: UseMutationResult
+\`\`\`
+"
+`;
+
+exports[`hooks docs generator generates hooks README 1`] = `
+"# React Query Hooks
+
+> Auto-generated React Query hooks from GraphQL schema
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+## Setup
+
+\`\`\`typescript
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { configure } from './hooks';
+
+configure({
+  endpoint: 'https://api.example.com/graphql',
+  headers: { Authorization: 'Bearer <token>' },
+});
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <YourApp />
+    </QueryClientProvider>
+  );
+}
+\`\`\`
+
+## Hooks
+
+| Hook | Type | Description |
+|------|------|-------------|
+| \`useCarsQuery\` | Query | List all cars |
+| \`useCarQuery\` | Query | Get one car |
+| \`useCreateCarMutation\` | Mutation | Create a car |
+| \`useUpdateCarMutation\` | Mutation | Update a car |
+| \`useDeleteCarMutation\` | Mutation | Delete a car |
+| \`useDriversQuery\` | Query | List all drivers |
+| \`useDriverQuery\` | Query | Get one driver |
+| \`useCreateDriverMutation\` | Mutation | Create a driver |
+| \`useUpdateDriverMutation\` | Mutation | Update a driver |
+| \`useDeleteDriverMutation\` | Mutation | Delete a driver |
+| \`useCurrentUserQuery\` | Query | Get the currently authenticated user |
+| \`useLoginMutation\` | Mutation | Authenticate a user |
+
+## Table Hooks
+
+### Car
+
+\`\`\`typescript
+// List all cars
+const { data, isLoading } = useCarsQuery({
+  selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } },
+});
+
+// Get one car
+const { data: item } = useCarQuery({
+  id: '<value>',
+  selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } },
+});
+
+// Create a car
+const { mutate: create } = useCreateCarMutation({
+  selection: { fields: { id: true } },
+});
+create({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' });
+\`\`\`
+
+### Driver
+
+\`\`\`typescript
+// List all drivers
+const { data, isLoading } = useDriversQuery({
+  selection: { fields: { id: true, name: true, licenseNumber: true } },
+});
+
+// Get one driver
+const { data: item } = useDriverQuery({
+  id: '<value>',
+  selection: { fields: { id: true, name: true, licenseNumber: true } },
+});
+
+// Create a driver
+const { mutate: create } = useCreateDriverMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<value>', licenseNumber: '<value>' });
+\`\`\`
+
+## Custom Operation Hooks
+
+### \`useCurrentUserQuery\`
+
+Get the currently authenticated user
+
+- **Type:** query
+- **Arguments:** none
+
+### \`useLoginMutation\`
+
+Authenticate a user
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | \`email\` | String (required) |
+  | \`password\` | String (required) |
+"
+`;
+
+exports[`hooks docs generator generates hooks skill files 1`] = `
+"# hooks-car
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+React Query hooks for Car data operations
+
+## Usage
+
+\`\`\`typescript
+useCarsQuery({ selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } } })
+useCarQuery({ id: '<value>', selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } } })
+useCreateCarMutation({ selection: { fields: { id: true } } })
+useUpdateCarMutation({ selection: { fields: { id: true } } })
+useDeleteCarMutation({})
+\`\`\`
+
+## Examples
+
+### List all cars
+
+\`\`\`typescript
+const { data, isLoading } = useCarsQuery({
+  selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } },
+});
+\`\`\`
+
+### Create a car
+
+\`\`\`typescript
+const { mutate } = useCreateCarMutation({
+  selection: { fields: { id: true } },
+});
+mutate({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' });
+\`\`\`
+"
+`;
+
+exports[`hooks docs generator generates hooks skill files 2`] = `
+"# hooks-driver
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+React Query hooks for Driver data operations
+
+## Usage
+
+\`\`\`typescript
+useDriversQuery({ selection: { fields: { id: true, name: true, licenseNumber: true } } })
+useDriverQuery({ id: '<value>', selection: { fields: { id: true, name: true, licenseNumber: true } } })
+useCreateDriverMutation({ selection: { fields: { id: true } } })
+useUpdateDriverMutation({ selection: { fields: { id: true } } })
+useDeleteDriverMutation({})
+\`\`\`
+
+## Examples
+
+### List all drivers
+
+\`\`\`typescript
+const { data, isLoading } = useDriversQuery({
+  selection: { fields: { id: true, name: true, licenseNumber: true } },
+});
+\`\`\`
+
+### Create a driver
+
+\`\`\`typescript
+const { mutate } = useCreateDriverMutation({
+  selection: { fields: { id: true } },
+});
+mutate({ name: '<value>', licenseNumber: '<value>' });
+\`\`\`
+"
+`;
+
+exports[`hooks docs generator generates hooks skill files 3`] = `
+"# hooks-currentUser
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Get the currently authenticated user
+
+## Usage
+
+\`\`\`typescript
+useCurrentUserQuery()
+\`\`\`
+
+## Examples
+
+### Use useCurrentUserQuery
+
+\`\`\`typescript
+const { data, isLoading } = useCurrentUserQuery();
+\`\`\`
+"
+`;
+
+exports[`hooks docs generator generates hooks skill files 4`] = `
+"# hooks-login
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Authenticate a user
+
+## Usage
+
+\`\`\`typescript
+const { mutate } = useLoginMutation(); mutate({ email: '<value>', password: '<value>' });
+\`\`\`
+
+## Examples
+
+### Use useLoginMutation
+
+\`\`\`typescript
+const { mutate, isLoading } = useLoginMutation();
+mutate({ email: '<value>', password: '<value>' });
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM AGENTS.md 1`] = `
+"# ORM Client - Agent Reference
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+> This document is structured for LLM/agent consumption.
+
+## OVERVIEW
+
+Prisma-like ORM client for interacting with a GraphQL API.
+All methods return a query builder. Call \`.execute()\` to run the query.
+
+## SETUP
+
+\`\`\`typescript
+import { createClient } from './orm';
+
+const db = createClient({
+  endpoint: 'https://api.example.com/graphql',
+  headers: { Authorization: 'Bearer <token>' },
+});
+\`\`\`
+
+## MODELS
+
+### MODEL: car
+
+Access: \`db.car\`
+
+\`\`\`
+METHODS:
+  db.car.findMany({ select, where?, orderBy?, first?, offset? })
+  db.car.findOne({ where: { id }, select })
+  db.car.create({ data: { make, model, year, isElectric }, select })
+  db.car.update({ where: { id }, data, select })
+  db.car.delete({ where: { id } })
+
+FIELDS:
+  id: string (primary key)
+  make: string
+  model: string
+  year: number
+  isElectric: boolean
+  createdAt: string
+
+EDITABLE FIELDS:
+  make: string
+  model: string
+  year: number
+  isElectric: boolean
+
+OUTPUT: Promise<JSON>
+  findMany: [{ id, make, model, year, isElectric, createdAt }]
+  findOne:  { id, make, model, year, isElectric, createdAt }
+  create:   { id, make, model, year, isElectric, createdAt }
+  update:   { id, make, model, year, isElectric, createdAt }
+  delete:   { id }
+\`\`\`
+
+### MODEL: driver
+
+Access: \`db.driver\`
+
+\`\`\`
+METHODS:
+  db.driver.findMany({ select, where?, orderBy?, first?, offset? })
+  db.driver.findOne({ where: { id }, select })
+  db.driver.create({ data: { name, licenseNumber }, select })
+  db.driver.update({ where: { id }, data, select })
+  db.driver.delete({ where: { id } })
+
+FIELDS:
+  id: string (primary key)
+  name: string
+  licenseNumber: string
+
+EDITABLE FIELDS:
+  name: string
+  licenseNumber: string
+
+OUTPUT: Promise<JSON>
+  findMany: [{ id, name, licenseNumber }]
+  findOne:  { id, name, licenseNumber }
+  create:   { id, name, licenseNumber }
+  update:   { id, name, licenseNumber }
+  delete:   { id }
+\`\`\`
+
+## CUSTOM OPERATIONS
+
+### OPERATION: currentUser
+
+Get the currently authenticated user
+
+\`\`\`
+TYPE: query
+ACCESS: db.query.currentUser
+USAGE: db.query.currentUser().execute()
+
+INPUT: none
+
+OUTPUT: Promise<JSON>
+\`\`\`
+
+### OPERATION: login
+
+Authenticate a user
+
+\`\`\`
+TYPE: mutation
+ACCESS: db.mutation.login
+USAGE: db.mutation.login({ email: <value>, password: <value> }).execute()
+
+INPUT:
+  email: String (required)
+  password: String (required)
+
+OUTPUT: Promise<JSON>
+\`\`\`
+
+## PATTERNS
+
+\`\`\`typescript
+// All methods require .execute() to run
+const result = await db.modelName.findMany({ select: { id: true } }).execute();
+
+// Select specific fields
+const partial = await db.modelName.findMany({ select: { id: true, name: true } }).execute();
+
+// Filter with where clause
+const filtered = await db.modelName.findMany({ select: { id: true }, where: { name: 'test' } }).execute();
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM README 1`] = `
+"# ORM Client
+
+> Auto-generated ORM client from GraphQL schema
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+## Setup
+
+\`\`\`typescript
+import { createClient } from './orm';
+
+const db = createClient({
+  endpoint: 'https://api.example.com/graphql',
+  headers: { Authorization: 'Bearer <token>' },
+});
+\`\`\`
+
+## Models
+
+| Model | Operations |
+|-------|------------|
+| \`car\` | findMany, findOne, create, update, delete |
+| \`driver\` | findMany, findOne, create, update, delete |
+
+## Table Operations
+
+### \`db.car\`
+
+CRUD operations for Car records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| \`id\` | UUID | No |
+| \`make\` | String | Yes |
+| \`model\` | String | Yes |
+| \`year\` | Int | Yes |
+| \`isElectric\` | Boolean | Yes |
+| \`createdAt\` | Datetime | No |
+
+**Operations:**
+
+\`\`\`typescript
+// List all car records
+const items = await db.car.findMany({ select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.car.findOne({ where: { id: '<value>' }, select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.car.update({ where: { id: '<value>' }, data: { make: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.car.delete({ where: { id: '<value>' } }).execute();
+\`\`\`
+
+### \`db.driver\`
+
+CRUD operations for Driver records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| \`id\` | UUID | No |
+| \`name\` | String | Yes |
+| \`licenseNumber\` | String | Yes |
+
+**Operations:**
+
+\`\`\`typescript
+// List all driver records
+const items = await db.driver.findMany({ select: { id: true, name: true, licenseNumber: true } }).execute();
+
+// Get one by id
+const item = await db.driver.findOne({ where: { id: '<value>' }, select: { id: true, name: true, licenseNumber: true } }).execute();
+
+// Create
+const created = await db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.driver.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.driver.delete({ where: { id: '<value>' } }).execute();
+\`\`\`
+
+## Custom Operations
+
+### \`db.query.currentUser\`
+
+Get the currently authenticated user
+
+- **Type:** query
+- **Arguments:** none
+
+\`\`\`typescript
+const result = await db.query.currentUser().execute();
+\`\`\`
+
+### \`db.mutation.login\`
+
+Authenticate a user
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | \`email\` | String (required) |
+  | \`password\` | String (required) |
+
+\`\`\`typescript
+const result = await db.mutation.login({ email: '<value>', password: '<value>' }).execute();
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM skill files 1`] = `
+"# orm-car
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+ORM operations for Car records
+
+## Usage
+
+\`\`\`typescript
+db.car.findMany({ select: { id: true } }).execute()
+db.car.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute()
+db.car.update({ where: { id: '<value>' }, data: { make: '<new>' }, select: { id: true } }).execute()
+db.car.delete({ where: { id: '<value>' } }).execute()
+\`\`\`
+
+## Examples
+
+### List all car records
+
+\`\`\`typescript
+const items = await db.car.findMany({
+  select: { id: true, make: true }
+}).execute();
+\`\`\`
+
+### Create a car
+
+\`\`\`typescript
+const item = await db.car.create({
+  data: { make: 'value', model: 'value', year: 'value', isElectric: 'value' },
+  select: { id: true }
+}).execute();
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM skill files 2`] = `
+"# orm-driver
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+ORM operations for Driver records
+
+## Usage
+
+\`\`\`typescript
+db.driver.findMany({ select: { id: true } }).execute()
+db.driver.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute()
+db.driver.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
+db.driver.delete({ where: { id: '<value>' } }).execute()
+\`\`\`
+
+## Examples
+
+### List all driver records
+
+\`\`\`typescript
+const items = await db.driver.findMany({
+  select: { id: true, name: true }
+}).execute();
+\`\`\`
+
+### Create a driver
+
+\`\`\`typescript
+const item = await db.driver.create({
+  data: { name: 'value', licenseNumber: 'value' },
+  select: { id: true }
+}).execute();
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM skill files 3`] = `
+"# orm-currentUser
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Get the currently authenticated user
+
+## Usage
+
+\`\`\`typescript
+db.query.currentUser().execute()
+\`\`\`
+
+## Examples
+
+### Run currentUser
+
+\`\`\`typescript
+const result = await db.query.currentUser().execute();
+\`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM skill files 4`] = `
+"# orm-login
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+Authenticate a user
+
+## Usage
+
+\`\`\`typescript
+db.mutation.login({ email: '<value>', password: '<value>' }).execute()
+\`\`\`
+
+## Examples
+
+### Run login
+
+\`\`\`typescript
+const result = await db.mutation.login({ email: '<value>', password: '<value>' }).execute();
+\`\`\`
+"
+`;
+
+exports[`target docs generator generates combined MCP config 1`] = `
+"{
+  "name": "myapp",
+  "version": "1.0.0",
+  "description": "MCP tool definitions for myapp SDK (auto-generated from GraphQL schema)",
+  "tools": [
+    {
+      "name": "myapp_context_create",
+      "description": "Create a named API context pointing at a GraphQL endpoint",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Context name"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "GraphQL endpoint URL"
+          }
+        },
+        "required": [
+          "name",
+          "endpoint"
+        ]
+      }
+    },
+    {
+      "name": "myapp_context_list",
+      "description": "List all configured API contexts",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_context_use",
+      "description": "Set the active API context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Context name to activate"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "myapp_context_current",
+      "description": "Show the currently active API context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_context_delete",
+      "description": "Delete an API context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Context name to delete"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "myapp_auth_set_token",
+      "description": "Store a bearer token for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Bearer token value"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      }
+    },
+    {
+      "name": "myapp_auth_status",
+      "description": "Show authentication status for all contexts",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_auth_logout",
+      "description": "Remove credentials for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_car_list",
+      "description": "List all Car records",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_car_get",
+      "description": "Get a single Car record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_car_create",
+      "description": "Create a new Car record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "make": {
+            "type": "string",
+            "description": "Car make"
+          },
+          "model": {
+            "type": "string",
+            "description": "Car model"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Car year"
+          },
+          "isElectric": {
+            "type": "boolean",
+            "description": "Car isElectric"
+          }
+        },
+        "required": [
+          "make",
+          "model",
+          "year",
+          "isElectric"
+        ]
+      }
+    },
+    {
+      "name": "myapp_car_update",
+      "description": "Update an existing Car record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          },
+          "make": {
+            "type": "string",
+            "description": "Car make"
+          },
+          "model": {
+            "type": "string",
+            "description": "Car model"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Car year"
+          },
+          "isElectric": {
+            "type": "boolean",
+            "description": "Car isElectric"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_car_delete",
+      "description": "Delete a Car record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_car_fields",
+      "description": "List available fields for Car",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "_meta": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "editable": false,
+            "primaryKey": true
+          },
+          {
+            "name": "make",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "model",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "year",
+            "type": "Int",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "isElectric",
+            "type": "Boolean",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "createdAt",
+            "type": "Datetime",
+            "editable": false,
+            "primaryKey": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "myapp_driver_list",
+      "description": "List all Driver records",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_driver_get",
+      "description": "Get a single Driver record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_driver_create",
+      "description": "Create a new Driver record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Driver name"
+          },
+          "licenseNumber": {
+            "type": "string",
+            "description": "Driver licenseNumber"
+          }
+        },
+        "required": [
+          "name",
+          "licenseNumber"
+        ]
+      }
+    },
+    {
+      "name": "myapp_driver_update",
+      "description": "Update an existing Driver record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Driver name"
+          },
+          "licenseNumber": {
+            "type": "string",
+            "description": "Driver licenseNumber"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_driver_delete",
+      "description": "Delete a Driver record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "myapp_driver_fields",
+      "description": "List available fields for Driver",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "_meta": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "editable": false,
+            "primaryKey": true
+          },
+          {
+            "name": "name",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "licenseNumber",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "myapp_current-user",
+      "description": "Get the currently authenticated user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_login",
+      "description": "Authenticate a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      }
+    },
+    {
+      "name": "orm_car_findMany",
+      "description": "List all Car records via ORM",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "integer",
+            "description": "Limit number of results"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset for pagination"
+          }
+        }
+      }
+    },
+    {
+      "name": "orm_car_findOne",
+      "description": "Get a single Car record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "orm_car_create",
+      "description": "Create a new Car record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "make": {
+            "type": "string",
+            "description": "Car make"
+          },
+          "model": {
+            "type": "string",
+            "description": "Car model"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Car year"
+          },
+          "isElectric": {
+            "type": "boolean",
+            "description": "Car isElectric"
+          }
+        },
+        "required": [
+          "make",
+          "model",
+          "year",
+          "isElectric"
+        ]
+      }
+    },
+    {
+      "name": "orm_car_update",
+      "description": "Update an existing Car record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          },
+          "make": {
+            "type": "string",
+            "description": "Car make"
+          },
+          "model": {
+            "type": "string",
+            "description": "Car model"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Car year"
+          },
+          "isElectric": {
+            "type": "boolean",
+            "description": "Car isElectric"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "orm_car_delete",
+      "description": "Delete a Car record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Car id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_meta": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "editable": false,
+            "primaryKey": true
+          },
+          {
+            "name": "make",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "model",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "year",
+            "type": "Int",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "isElectric",
+            "type": "Boolean",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "createdAt",
+            "type": "Datetime",
+            "editable": false,
+            "primaryKey": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "orm_driver_findMany",
+      "description": "List all Driver records via ORM",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "integer",
+            "description": "Limit number of results"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset for pagination"
+          }
+        }
+      }
+    },
+    {
+      "name": "orm_driver_findOne",
+      "description": "Get a single Driver record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "orm_driver_create",
+      "description": "Create a new Driver record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Driver name"
+          },
+          "licenseNumber": {
+            "type": "string",
+            "description": "Driver licenseNumber"
+          }
+        },
+        "required": [
+          "name",
+          "licenseNumber"
+        ]
+      }
+    },
+    {
+      "name": "orm_driver_update",
+      "description": "Update an existing Driver record",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Driver name"
+          },
+          "licenseNumber": {
+            "type": "string",
+            "description": "Driver licenseNumber"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "orm_driver_delete",
+      "description": "Delete a Driver record by id",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Driver id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_meta": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "editable": false,
+            "primaryKey": true
+          },
+          {
+            "name": "name",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          },
+          {
+            "name": "licenseNumber",
+            "type": "String",
+            "editable": true,
+            "primaryKey": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "orm_query_currentUser",
+      "description": "Get the currently authenticated user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "orm_mutation_login",
+      "description": "Authenticate a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      }
+    }
+  ]
+}
+"
+`;
+
+exports[`target docs generator generates per-target README 1`] = `
+"# Generated GraphQL SDK
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+## Overview
+
+- **Tables:** 2
+- **Custom queries:** 1
+- **Custom mutations:** 1
+
+**Generators:** ORM, React Query, CLI
+
+## Modules
+
+### ORM Client (\`./orm\`)
+
+Prisma-like ORM client for programmatic GraphQL access.
+
+\`\`\`typescript
+import { createClient } from './orm';
+
+const db = createClient({
+  endpoint: 'https://api.example.com/graphql',
+});
+\`\`\`
+
+See [orm/README.md](./orm/README.md) for full API reference.
+
+### React Query Hooks (\`./hooks\`)
+
+Type-safe React Query hooks for data fetching and mutations.
+
+\`\`\`typescript
+import { configure } from './hooks';
+import { useCarsQuery } from './hooks';
+
+configure({ endpoint: 'https://api.example.com/graphql' });
+\`\`\`
+
+See [hooks/README.md](./hooks/README.md) for full hook reference.
+
+### CLI Commands (\`./cli\`)
+
+inquirerer-based CLI commands for \`myapp\`.
+
+See [cli/README.md](./cli/README.md) for command reference.
+"
+`;
+
+exports[`target docs generator generates root-root README for multi-target 1`] = `
+"# GraphQL SDK
+
+> @generated by @constructive-io/graphql-codegen - DO NOT EDIT
+
+## APIs
+
+| API | Endpoint | Generators | Docs |
+|-----|----------|------------|------|
+| auth | http://auth.localhost/graphql | ORM | [./generated/auth/README.md](./generated/auth/README.md) |
+| app | http://app.localhost/graphql | ORM, React Query, CLI | [./generated/app/README.md](./generated/app/README.md) |
+"
 `;

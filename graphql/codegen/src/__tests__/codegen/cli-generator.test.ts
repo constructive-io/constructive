@@ -1,4 +1,28 @@
 import { generateCli } from '../../core/codegen/cli';
+import {
+  generateReadme as generateCliReadme,
+  generateAgentsDocs as generateCliAgentsDocs,
+  getCliMcpTools,
+  generateSkills as generateCliSkills,
+} from '../../core/codegen/cli/docs-generator';
+import { resolveDocsConfig } from '../../core/codegen/docs-utils';
+import {
+  generateOrmReadme,
+  generateOrmAgentsDocs,
+  getOrmMcpTools,
+  generateOrmSkills,
+} from '../../core/codegen/orm/docs-generator';
+import {
+  generateHooksReadme,
+  generateHooksAgentsDocs,
+  getHooksMcpTools,
+  generateHooksSkills,
+} from '../../core/codegen/hooks-docs-generator';
+import {
+  generateTargetReadme,
+  generateCombinedMcpConfig,
+  generateRootRootReadme,
+} from '../../core/codegen/target-docs-generator';
 import type {
   CleanFieldType,
   CleanOperation,
@@ -129,32 +153,8 @@ describe('cli-generator', () => {
       customQueries: 1,
       customMutations: 1,
       infraFiles: 3,
-      totalFiles: 10,
+      totalFiles: 8,
     });
-  });
-
-  it('generates README.md by default', () => {
-    const file = result.files.find((f) => f.fileName === 'README.md');
-    expect(file).toBeDefined();
-    expect(file!.content).toMatchSnapshot();
-  });
-
-  it('generates AGENTS.md by default', () => {
-    const file = result.files.find((f) => f.fileName === 'AGENTS.md');
-    expect(file).toBeDefined();
-    expect(file!.content).toMatchSnapshot();
-  });
-
-  it('does not generate mcp.json by default', () => {
-    const file = result.files.find((f) => f.fileName === 'mcp.json');
-    expect(file).toBeUndefined();
-  });
-
-  it('does not generate skills by default', () => {
-    const skillFiles = result.files.filter((f) =>
-      f.fileName.startsWith('skills/'),
-    );
-    expect(skillFiles).toHaveLength(0);
   });
 
   it('generates executor.ts', () => {
@@ -241,8 +241,6 @@ describe('cli-generator', () => {
   it('generates correct file names', () => {
     const fileNames = result.files.map((f) => f.fileName).sort();
     expect(fileNames).toEqual([
-      'AGENTS.md',
-      'README.md',
       'commands.ts',
       'commands/auth.ts',
       'commands/car.ts',
@@ -255,91 +253,159 @@ describe('cli-generator', () => {
   });
 });
 
-describe('cli-generator docs: true (all formats)', () => {
-  const result = generateCli({
-    tables: [carTable, driverTable],
-    customOperations: {
-      queries: [currentUserQuery],
-      mutations: [loginMutation],
-    },
-    config: {
-      cli: { toolName: 'myapp', docs: true },
-    },
+const allCustomOps: CleanOperation[] = [currentUserQuery, loginMutation];
+
+describe('cli docs generator', () => {
+  it('generates CLI README', () => {
+    const readme = generateCliReadme([carTable, driverTable], allCustomOps, 'myapp');
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates mcp.json', () => {
-    const file = result.files.find((f) => f.fileName === 'mcp.json');
-    expect(file).toBeDefined();
-    expect(file!.content).toMatchSnapshot();
+  it('generates CLI AGENTS.md', () => {
+    const agents = generateCliAgentsDocs([carTable, driverTable], allCustomOps, 'myapp');
+    expect(agents.fileName).toBe('AGENTS.md');
+    expect(agents.content).toMatchSnapshot();
   });
 
-  it('generates skill files', () => {
-    const skillFiles = result.files.filter((f) =>
-      f.fileName.startsWith('skills/'),
-    );
-    expect(skillFiles.length).toBeGreaterThan(0);
-    for (const sf of skillFiles) {
-      expect(sf.content).toMatchSnapshot();
-    }
-  });
-
-  it('generates correct file names with all docs', () => {
-    const fileNames = result.files.map((f) => f.fileName).sort();
-    expect(fileNames).toEqual([
-      'AGENTS.md',
-      'README.md',
-      'commands.ts',
-      'commands/auth.ts',
-      'commands/car.ts',
-      'commands/context.ts',
-      'commands/current-user.ts',
-      'commands/driver.ts',
-      'commands/login.ts',
-      'executor.ts',
-      'mcp.json',
-      'skills/auth.md',
-      'skills/car.md',
-      'skills/context.md',
-      'skills/current-user.md',
-      'skills/driver.md',
-      'skills/login.md',
-    ]);
-  });
-
-  it('mcp.json has valid tool definitions', () => {
-    const file = result.files.find((f) => f.fileName === 'mcp.json');
-    const parsed = JSON.parse(file!.content);
-    expect(parsed.name).toBe('myapp');
-    expect(parsed.tools).toBeDefined();
-    expect(parsed.tools.length).toBeGreaterThan(0);
-    for (const tool of parsed.tools) {
+  it('generates CLI MCP tools', () => {
+    const tools = getCliMcpTools([carTable, driverTable], allCustomOps, 'myapp');
+    expect(tools.length).toBeGreaterThan(0);
+    for (const tool of tools) {
       expect(tool.name).toBeDefined();
       expect(tool.description).toBeDefined();
       expect(tool.inputSchema).toBeDefined();
     }
   });
+
+  it('generates CLI skill files', () => {
+    const skills = generateCliSkills([carTable, driverTable], allCustomOps, 'myapp');
+    expect(skills.length).toBeGreaterThan(0);
+    for (const sf of skills) {
+      expect(sf.content).toMatchSnapshot();
+    }
+  });
 });
 
-describe('cli-generator docs: false', () => {
-  const result = generateCli({
-    tables: [carTable, driverTable],
-    customOperations: {
-      queries: [currentUserQuery],
-      mutations: [loginMutation],
-    },
-    config: {
-      cli: { toolName: 'myapp', docs: false },
-    },
+describe('orm docs generator', () => {
+  it('generates ORM README', () => {
+    const readme = generateOrmReadme([carTable, driverTable], allCustomOps);
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates no doc files', () => {
-    const docFiles = result.files.filter(
-      (f) =>
-        f.fileName === 'README.md' ||
-        f.fileName === 'AGENTS.md' ||
-        f.fileName === 'mcp.json' ||
-        f.fileName.startsWith('skills/'),
-    );
-    expect(docFiles).toHaveLength(0);
+  it('generates ORM AGENTS.md', () => {
+    const agents = generateOrmAgentsDocs([carTable, driverTable], allCustomOps);
+    expect(agents.fileName).toBe('AGENTS.md');
+    expect(agents.content).toMatchSnapshot();
+  });
+
+  it('generates ORM MCP tools', () => {
+    const tools = getOrmMcpTools([carTable, driverTable], allCustomOps);
+    expect(tools.length).toBeGreaterThan(0);
+    for (const tool of tools) {
+      expect(tool.name).toBeDefined();
+      expect(tool.description).toBeDefined();
+      expect(tool.inputSchema).toBeDefined();
+    }
+  });
+
+  it('generates ORM skill files', () => {
+    const skills = generateOrmSkills([carTable, driverTable], allCustomOps);
+    expect(skills.length).toBeGreaterThan(0);
+    for (const sf of skills) {
+      expect(sf.content).toMatchSnapshot();
+    }
+  });
+});
+
+describe('hooks docs generator', () => {
+  it('generates hooks README', () => {
+    const readme = generateHooksReadme([carTable, driverTable], allCustomOps);
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toMatchSnapshot();
+  });
+
+  it('generates hooks AGENTS.md', () => {
+    const agents = generateHooksAgentsDocs([carTable, driverTable], allCustomOps);
+    expect(agents.fileName).toBe('AGENTS.md');
+    expect(agents.content).toMatchSnapshot();
+  });
+
+  it('generates hooks MCP tools', () => {
+    const tools = getHooksMcpTools([carTable, driverTable], allCustomOps);
+    expect(tools.length).toBeGreaterThan(0);
+    for (const tool of tools) {
+      expect(tool.name).toBeDefined();
+      expect(tool.description).toBeDefined();
+      expect(tool.inputSchema).toBeDefined();
+    }
+  });
+
+  it('generates hooks skill files', () => {
+    const skills = generateHooksSkills([carTable, driverTable], allCustomOps);
+    expect(skills.length).toBeGreaterThan(0);
+    for (const sf of skills) {
+      expect(sf.content).toMatchSnapshot();
+    }
+  });
+});
+
+describe('target docs generator', () => {
+  it('generates per-target README', () => {
+    const readme = generateTargetReadme({
+      hasOrm: true,
+      hasHooks: true,
+      hasCli: true,
+      tableCount: 2,
+      customQueryCount: 1,
+      customMutationCount: 1,
+      config: { cli: { toolName: 'myapp' } },
+    });
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toMatchSnapshot();
+  });
+
+  it('generates combined MCP config', () => {
+    const cliTools = getCliMcpTools([carTable, driverTable], allCustomOps, 'myapp');
+    const ormTools = getOrmMcpTools([carTable, driverTable], allCustomOps);
+    const allTools = [...cliTools, ...ormTools];
+    const mcp = generateCombinedMcpConfig(allTools, 'myapp');
+    expect(mcp.fileName).toBe('mcp.json');
+    const parsed = JSON.parse(mcp.content);
+    expect(parsed.name).toBe('myapp');
+    expect(parsed.tools.length).toBe(allTools.length);
+    expect(mcp.content).toMatchSnapshot();
+  });
+
+  it('generates root-root README for multi-target', () => {
+    const readme = generateRootRootReadme([
+      { name: 'auth', output: './generated/auth', endpoint: 'http://auth.localhost/graphql', generators: ['ORM'] },
+      { name: 'app', output: './generated/app', endpoint: 'http://app.localhost/graphql', generators: ['ORM', 'React Query', 'CLI'] },
+    ]);
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toMatchSnapshot();
+  });
+});
+
+describe('resolveDocsConfig', () => {
+  it('defaults to readme + agents', () => {
+    const config = resolveDocsConfig(undefined);
+    expect(config).toEqual({ readme: true, agents: true, mcp: false, skills: false });
+  });
+
+  it('docs: true enables all', () => {
+    const config = resolveDocsConfig(true);
+    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: true });
+  });
+
+  it('docs: false disables all', () => {
+    const config = resolveDocsConfig(false);
+    expect(config).toEqual({ readme: false, agents: false, mcp: false, skills: false });
+  });
+
+  it('partial config fills defaults', () => {
+    const config = resolveDocsConfig({ mcp: true });
+    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: false });
   });
 });

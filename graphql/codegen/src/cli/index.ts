@@ -8,7 +8,7 @@
 import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
-import { generate } from '../core/generate';
+import { generate, generateMulti } from '../core/generate';
 import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
 import {
   buildDbConfig,
@@ -96,7 +96,6 @@ export const commands = async (
 
     if (isMulti) {
       const targets = config as Record<string, GraphQLSDKConfigTarget>;
-      const names = targetName ? [targetName] : Object.keys(targets);
 
       if (targetName && !targets[targetName]) {
         console.error(
@@ -111,14 +110,19 @@ export const commands = async (
           camelizeArgv(argv as Record<string, any>),
         ),
       );
-      let hasError = false;
-      for (const name of names) {
+
+      const selectedTargets = targetName
+        ? { [targetName]: targets[targetName] }
+        : targets;
+
+      const { results, hasError } = await generateMulti({
+        configs: selectedTargets,
+        cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
+      });
+
+      for (const { name, result } of results) {
         console.log(`\n[${name}]`);
-        const result = await generate(
-          mergeConfig(targets[name], cliOptions as GraphQLSDKConfigTarget),
-        );
         printResult(result);
-        if (!result.success) hasError = true;
       }
 
       prompter.close();

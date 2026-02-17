@@ -8,11 +8,38 @@ import path from 'node:path';
 
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import { getConfigOptions } from '../types/config';
+import type { CleanOperation } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles } from './codegen/cli';
+import {
+  generateReadme as generateCliReadme,
+  generateAgentsDocs as generateCliAgentsDocs,
+  getCliMcpTools,
+  generateSkills as generateCliSkills,
+} from './codegen/cli/docs-generator';
+import { resolveDocsConfig } from './codegen/docs-utils';
+import type { McpTool } from './codegen/docs-utils';
+import {
+  generateHooksReadme,
+  generateHooksAgentsDocs,
+  getHooksMcpTools,
+  generateHooksSkills,
+} from './codegen/hooks-docs-generator';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
+import {
+  generateOrmReadme,
+  generateOrmAgentsDocs,
+  getOrmMcpTools,
+  generateOrmSkills,
+} from './codegen/orm/docs-generator';
 import { generateSharedTypes } from './codegen/shared';
+import {
+  generateTargetReadme,
+  generateCombinedMcpConfig,
+  generateRootRootReadme,
+} from './codegen/target-docs-generator';
+import type { RootRootReadmeTarget } from './codegen/target-docs-generator';
 import { createSchemaSource, validateSourceOptions } from './introspect';
 import { writeGeneratedFiles } from './output';
 import { runCodegenPipeline, validateTablesFound } from './pipeline';
@@ -196,7 +223,6 @@ export async function generate(
   }
 
   // Generate barrel file at output root
-  // This re-exports from the appropriate subdirectories based on which generators are enabled
   const barrelContent = generateRootBarrel({
     hasTypes: bothEnabled,
     hasHooks: runReactQuery,
@@ -204,6 +230,99 @@ export async function generate(
     hasCli: runCli,
   });
   filesToWrite.push({ path: 'index.ts', content: barrelContent });
+
+  // Generate docs for each enabled generator
+  const docsConfig = resolveDocsConfig(config.docs);
+  const allCustomOps: CleanOperation[] = [
+    ...(customOperations.queries ?? []),
+    ...(customOperations.mutations ?? []),
+  ];
+  const allMcpTools: McpTool[] = [];
+
+  if (runOrm) {
+    if (docsConfig.readme) {
+      const readme = generateOrmReadme(tables, allCustomOps);
+      filesToWrite.push({ path: path.posix.join('orm', readme.fileName), content: readme.content });
+    }
+    if (docsConfig.agents) {
+      const agents = generateOrmAgentsDocs(tables, allCustomOps);
+      filesToWrite.push({ path: path.posix.join('orm', agents.fileName), content: agents.content });
+    }
+    if (docsConfig.mcp) {
+      allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
+    }
+    if (docsConfig.skills) {
+      for (const skill of generateOrmSkills(tables, allCustomOps)) {
+        filesToWrite.push({ path: path.posix.join('orm', skill.fileName), content: skill.content });
+      }
+    }
+  }
+
+  if (runReactQuery) {
+    if (docsConfig.readme) {
+      const readme = generateHooksReadme(tables, allCustomOps);
+      filesToWrite.push({ path: path.posix.join('hooks', readme.fileName), content: readme.content });
+    }
+    if (docsConfig.agents) {
+      const agents = generateHooksAgentsDocs(tables, allCustomOps);
+      filesToWrite.push({ path: path.posix.join('hooks', agents.fileName), content: agents.content });
+    }
+    if (docsConfig.mcp) {
+      allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
+    }
+    if (docsConfig.skills) {
+      for (const skill of generateHooksSkills(tables, allCustomOps)) {
+        filesToWrite.push({ path: path.posix.join('hooks', skill.fileName), content: skill.content });
+      }
+    }
+  }
+
+  if (runCli) {
+    const toolName =
+      typeof config.cli === 'object' && config.cli?.toolName
+        ? config.cli.toolName
+        : 'app';
+    if (docsConfig.readme) {
+      const readme = generateCliReadme(tables, allCustomOps, toolName);
+      filesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
+    }
+    if (docsConfig.agents) {
+      const agents = generateCliAgentsDocs(tables, allCustomOps, toolName);
+      filesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
+    }
+    if (docsConfig.mcp) {
+      allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName));
+    }
+    if (docsConfig.skills) {
+      for (const skill of generateCliSkills(tables, allCustomOps, toolName)) {
+        filesToWrite.push({ path: path.posix.join('cli', skill.fileName), content: skill.content });
+      }
+    }
+  }
+
+  // Generate combined mcp.json at output root
+  if (docsConfig.mcp && allMcpTools.length > 0) {
+    const mcpName =
+      typeof config.cli === 'object' && config.cli?.toolName
+        ? config.cli.toolName
+        : 'graphql-sdk';
+    const mcpFile = generateCombinedMcpConfig(allMcpTools, mcpName);
+    filesToWrite.push({ path: mcpFile.fileName, content: mcpFile.content });
+  }
+
+  // Generate per-target README at output root
+  if (docsConfig.readme) {
+    const targetReadme = generateTargetReadme({
+      hasOrm: runOrm,
+      hasHooks: runReactQuery,
+      hasCli: runCli,
+      tableCount: tables.length,
+      customQueryCount: customOperations.queries.length,
+      customMutationCount: customOperations.mutations.length,
+      config,
+    });
+    filesToWrite.push({ path: targetReadme.fileName, content: targetReadme.content });
+  }
 
   if (!options.dryRun) {
     const writeResult = await writeGeneratedFiles(filesToWrite, outputRoot, [], {
@@ -237,4 +356,65 @@ export async function generate(
     tables: tables.map((t) => t.name),
     filesWritten: allFilesWritten,
   };
+}
+
+export interface GenerateMultiOptions {
+  configs: Record<string, GraphQLSDKConfigTarget>;
+  cliOverrides?: Partial<GraphQLSDKConfigTarget>;
+  verbose?: boolean;
+  dryRun?: boolean;
+}
+
+export interface GenerateMultiResult {
+  results: Array<{ name: string; result: GenerateResult }>;
+  hasError: boolean;
+}
+
+export async function generateMulti(
+  options: GenerateMultiOptions,
+): Promise<GenerateMultiResult> {
+  const { configs, cliOverrides, verbose, dryRun } = options;
+  const names = Object.keys(configs);
+  const results: Array<{ name: string; result: GenerateResult }> = [];
+  let hasError = false;
+
+  const targetInfos: RootRootReadmeTarget[] = [];
+
+  for (const name of names) {
+    const targetConfig = {
+      ...configs[name],
+      ...(cliOverrides ?? {}),
+    };
+    const result = await generate({ ...targetConfig, verbose, dryRun });
+    results.push({ name, result });
+    if (!result.success) {
+      hasError = true;
+    } else {
+      const resolvedConfig = getConfigOptions(targetConfig);
+      const gens: string[] = [];
+      if (resolvedConfig.reactQuery) gens.push('React Query');
+      if (resolvedConfig.orm || resolvedConfig.reactQuery || !!resolvedConfig.cli) gens.push('ORM');
+      if (resolvedConfig.cli) gens.push('CLI');
+      targetInfos.push({
+        name,
+        output: resolvedConfig.output,
+        endpoint: resolvedConfig.endpoint || undefined,
+        generators: gens,
+      });
+    }
+  }
+
+  // Generate root-root README if multi-target
+  if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
+    const rootReadme = generateRootRootReadme(targetInfos);
+    const { writeGeneratedFiles: writeFiles } = await import('./output');
+    await writeFiles(
+      [{ path: rootReadme.fileName, content: rootReadme.content }],
+      '.',
+      [],
+      { pruneStaleFiles: false },
+    );
+  }
+
+  return { results, hasError };
 }
