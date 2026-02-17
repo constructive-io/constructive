@@ -123,16 +123,27 @@ function buildOrmCustomCall(
   );
 }
 
-export function generateCustomCommand(op: CleanOperation): GeneratedFile {
+export interface CustomCommandOptions {
+  targetName?: string;
+  executorImportPath?: string;
+  saveToken?: boolean;
+}
+
+export function generateCustomCommand(op: CleanOperation, options?: CustomCommandOptions): GeneratedFile {
   const commandName = toKebabCase(op.name);
   const opKind = op.kind === 'mutation' ? 'mutation' : 'query';
   const statements: t.Statement[] = [];
+  const executorPath = options?.executorImportPath ?? '../executor';
+  const imports = ['getClient'];
+  if (options?.saveToken) {
+    imports.push('getStore');
+  }
 
   statements.push(
     createImportDeclaration('inquirerer', ['CLIOptions', 'Inquirerer']),
   );
   statements.push(
-    createImportDeclaration('../executor', ['getClient']),
+    createImportDeclaration(executorPath, imports),
   );
 
   const questionsArray =
@@ -201,11 +212,14 @@ export function generateCustomCommand(op: CleanOperation): GeneratedFile {
     );
   }
 
+  const getClientArgs: t.Expression[] = options?.targetName
+    ? [t.stringLiteral(options.targetName)]
+    : [];
   bodyStatements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('client'),
-        t.callExpression(t.identifier('getClient'), []),
+        t.callExpression(t.identifier('getClient'), getClientArgs),
       ),
     ]),
   );
@@ -225,6 +239,79 @@ export function generateCustomCommand(op: CleanOperation): GeneratedFile {
       ),
     ]),
   );
+
+  if (options?.saveToken) {
+    bodyStatements.push(
+      t.ifStatement(
+        t.logicalExpression(
+          '&&',
+          t.memberExpression(t.identifier('argv'), t.identifier('saveToken')),
+          t.identifier('result'),
+        ),
+        t.blockStatement([
+          t.variableDeclaration('const', [
+            t.variableDeclarator(
+              t.identifier('tokenValue'),
+              t.logicalExpression(
+                '||',
+                t.memberExpression(t.identifier('result'), t.identifier('token'), false),
+                t.logicalExpression(
+                  '||',
+                  t.memberExpression(t.identifier('result'), t.identifier('jwtToken'), false),
+                  t.memberExpression(t.identifier('result'), t.identifier('accessToken'), false),
+                ),
+              ),
+            ),
+          ]),
+          t.ifStatement(
+            t.identifier('tokenValue'),
+            t.blockStatement([
+              t.variableDeclaration('const', [
+                t.variableDeclarator(
+                  t.identifier('s'),
+                  t.callExpression(t.identifier('getStore'), []),
+                ),
+              ]),
+              t.variableDeclaration('const', [
+                t.variableDeclarator(
+                  t.identifier('ctx'),
+                  t.callExpression(
+                    t.memberExpression(t.identifier('s'), t.identifier('getCurrentContext')),
+                    [],
+                  ),
+                ),
+              ]),
+              t.ifStatement(
+                t.identifier('ctx'),
+                t.blockStatement([
+                  t.expressionStatement(
+                    t.callExpression(
+                      t.memberExpression(t.identifier('s'), t.identifier('setCredentials')),
+                      [
+                        t.memberExpression(t.identifier('ctx'), t.identifier('name')),
+                        t.objectExpression([
+                          t.objectProperty(
+                            t.identifier('token'),
+                            t.identifier('tokenValue'),
+                          ),
+                        ]),
+                      ],
+                    ),
+                  ),
+                  t.expressionStatement(
+                    t.callExpression(
+                      t.memberExpression(t.identifier('console'), t.identifier('log')),
+                      [t.stringLiteral('Token saved to current context.')],
+                    ),
+                  ),
+                ]),
+              ),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
 
   bodyStatements.push(buildJsonLog(t.identifier('result')));
 
@@ -249,7 +336,9 @@ export function generateCustomCommand(op: CleanOperation): GeneratedFile {
   const code = generateCode(statements);
 
   return {
-    fileName: `commands/${commandName}.ts`,
+    fileName: options?.targetName
+      ? `commands/${options.targetName}/${commandName}.ts`
+      : `commands/${commandName}.ts`,
     content: header + '\n' + code,
   };
 }

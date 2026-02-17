@@ -6,12 +6,13 @@
  */
 import path from 'node:path';
 
-import type { GraphQLSDKConfigTarget } from '../types/config';
+import type { CliConfig, GraphQLSDKConfigTarget } from '../types/config';
 import { getConfigOptions } from '../types/config';
-import type { CleanOperation } from '../types/schema';
+import type { CleanOperation, CleanTable } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
-import { generateCli as generateCliFiles } from './codegen/cli';
+import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
+import type { MultiTargetCliTarget } from './codegen/cli';
 import {
   generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
@@ -58,6 +59,13 @@ export interface GenerateResult {
   tables?: string[];
   filesWritten?: string[];
   errors?: string[];
+  pipelineData?: {
+    tables: CleanTable[];
+    customOperations: {
+      queries: CleanOperation[];
+      mutations: CleanOperation[];
+    };
+  };
 }
 
 /**
@@ -66,8 +74,13 @@ export interface GenerateResult {
  * This is the primary entry point for programmatic usage.
  * For multiple configs, call this function in a loop.
  */
+export interface GenerateInternalOptions {
+  skipCli?: boolean;
+}
+
 export async function generate(
   options: GenerateOptions = {},
+  internalOptions?: GenerateInternalOptions,
 ): Promise<GenerateResult> {
   // Apply defaults to get resolved config
   const config = getConfigOptions(options);
@@ -77,9 +90,9 @@ export async function generate(
   // ORM is always required when React Query is enabled (hooks delegate to ORM)
   // This handles minimist setting orm=false when --orm flag is absent
   const runReactQuery = config.reactQuery ?? false;
-  const runCli = !!config.cli;
+  const runCli = internalOptions?.skipCli ? false : !!config.cli;
   const runOrm =
-    runReactQuery || runCli || (options.orm !== undefined ? !!options.orm : false);
+    runReactQuery || !!config.cli || (options.orm !== undefined ? !!options.orm : false);
 
   if (!runReactQuery && !runOrm && !runCli) {
     return {
@@ -355,6 +368,13 @@ export async function generate(
     output: outputRoot,
     tables: tables.map((t) => t.name),
     filesWritten: allFilesWritten,
+    pipelineData: {
+      tables,
+      customOperations: {
+        queries: customOperations.queries,
+        mutations: customOperations.mutations,
+      },
+    },
   };
 }
 
@@ -363,6 +383,7 @@ export interface GenerateMultiOptions {
   cliOverrides?: Partial<GraphQLSDKConfigTarget>;
   verbose?: boolean;
   dryRun?: boolean;
+  unifiedCli?: CliConfig | boolean;
 }
 
 export interface GenerateMultiResult {
@@ -373,19 +394,25 @@ export interface GenerateMultiResult {
 export async function generateMulti(
   options: GenerateMultiOptions,
 ): Promise<GenerateMultiResult> {
-  const { configs, cliOverrides, verbose, dryRun } = options;
+  const { configs, cliOverrides, verbose, dryRun, unifiedCli } = options;
   const names = Object.keys(configs);
   const results: Array<{ name: string; result: GenerateResult }> = [];
   let hasError = false;
 
   const targetInfos: RootRootReadmeTarget[] = [];
+  const useUnifiedCli = !!unifiedCli && names.length > 1;
+
+  const cliTargets: MultiTargetCliTarget[] = [];
 
   for (const name of names) {
     const targetConfig = {
       ...configs[name],
       ...(cliOverrides ?? {}),
     };
-    const result = await generate({ ...targetConfig, verbose, dryRun });
+    const result = await generate(
+      { ...targetConfig, verbose, dryRun },
+      useUnifiedCli ? { skipCli: true } : undefined,
+    );
     results.push({ name, result });
     if (!result.success) {
       hasError = true;
@@ -401,7 +428,37 @@ export async function generateMulti(
         endpoint: resolvedConfig.endpoint || undefined,
         generators: gens,
       });
+
+      if (useUnifiedCli && result.pipelineData) {
+        const isAuthTarget = name === 'auth';
+        cliTargets.push({
+          name,
+          endpoint: resolvedConfig.endpoint || '',
+          ormImportPath: `../../${resolvedConfig.output}/orm`,
+          tables: result.pipelineData.tables,
+          customOperations: result.pipelineData.customOperations,
+          isAuthTarget,
+        });
+      }
     }
+  }
+
+  if (useUnifiedCli && cliTargets.length > 0 && !dryRun) {
+    const cliConfig = typeof unifiedCli === 'object' ? unifiedCli : {};
+    const toolName = cliConfig.toolName ?? 'app';
+    const { files } = generateMultiTargetCli({
+      toolName,
+      infraNames: cliConfig.infraNames,
+      targets: cliTargets,
+    });
+
+    const cliFilesToWrite = files.map((file) => ({
+      path: path.posix.join('cli', file.fileName),
+      content: file.content,
+    }));
+
+    const { writeGeneratedFiles: writeFiles } = await import('./output');
+    await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
   }
 
   // Generate root-root README if multi-target

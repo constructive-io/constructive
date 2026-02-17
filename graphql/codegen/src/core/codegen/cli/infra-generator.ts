@@ -2052,3 +2052,749 @@ function buildLogoutHandler(): t.FunctionDeclaration {
   );
   return func;
 }
+
+export interface MultiTargetContextInput {
+  name: string;
+  endpoint: string;
+}
+
+export function generateMultiTargetContextCommand(
+  toolName: string,
+  commandName: string,
+  targets: MultiTargetContextInput[],
+): GeneratedFile {
+  const statements: t.Statement[] = [];
+
+  statements.push(
+    createImportDeclaration('inquirerer', [
+      'CLIOptions',
+      'Inquirerer',
+      'extractFirst',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration('../executor', ['getStore']),
+  );
+
+  const usageStr = `
+${toolName} ${commandName} <command>
+
+Commands:
+  create <name>         Create a new context
+  list                  List all contexts
+  use <name>            Set the active context
+  current               Show current context
+  delete <name>         Delete a context
+
+Create Options:
+${targets.map((tgt) => `  --${tgt.name}-endpoint <url>  ${tgt.name} endpoint (default: ${tgt.endpoint})`).join('\n')}
+
+  --help, -h            Show this help message
+`;
+
+  statements.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('usage'), t.stringLiteral(usageStr)),
+    ]),
+  );
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+
+  const prompterParam = t.identifier('prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+
+  const optionsParam = t.identifier('_options');
+  optionsParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('CLIOptions')),
+  );
+
+  const mainBody: t.Statement[] = [
+    t.ifStatement(
+      t.logicalExpression(
+        '||',
+        t.memberExpression(t.identifier('argv'), t.identifier('help')),
+        t.memberExpression(t.identifier('argv'), t.identifier('h')),
+      ),
+      t.blockStatement([
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('console'), t.identifier('log')),
+            [t.identifier('usage')],
+          ),
+        ),
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('process'), t.identifier('exit')),
+            [t.numericLiteral(0)],
+          ),
+        ),
+      ]),
+    ),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('store'),
+        t.callExpression(t.identifier('getStore'), []),
+      ),
+    ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.objectPattern([
+          t.objectProperty(
+            t.identifier('first'),
+            t.identifier('subcommand'),
+          ),
+          t.objectProperty(
+            t.identifier('newArgv'),
+            t.identifier('newArgv'),
+            false,
+            true,
+          ),
+        ]),
+        t.callExpression(t.identifier('extractFirst'), [
+          t.identifier('argv'),
+        ]),
+      ),
+    ]),
+    t.ifStatement(
+      t.unaryExpression('!', t.identifier('subcommand')),
+      t.blockStatement([
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier('answer'),
+            t.awaitExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.identifier('prompter'),
+                  t.identifier('prompt'),
+                ),
+                [
+                  t.identifier('argv'),
+                  t.arrayExpression([
+                    t.objectExpression([
+                      t.objectProperty(
+                        t.identifier('type'),
+                        t.stringLiteral('autocomplete'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('name'),
+                        t.stringLiteral('subcommand'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('message'),
+                        t.stringLiteral('What do you want to do?'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('options'),
+                        t.arrayExpression([
+                          t.stringLiteral('create'),
+                          t.stringLiteral('list'),
+                          t.stringLiteral('use'),
+                          t.stringLiteral('current'),
+                          t.stringLiteral('delete'),
+                        ]),
+                      ),
+                    ]),
+                  ]),
+                ],
+              ),
+            ),
+          ),
+        ]),
+        t.returnStatement(
+          t.callExpression(t.identifier('handleSubcommand'), [
+            t.memberExpression(
+              t.identifier('answer'),
+              t.identifier('subcommand'),
+            ),
+            t.identifier('newArgv'),
+            t.identifier('prompter'),
+            t.identifier('store'),
+          ]),
+        ),
+      ]),
+    ),
+    t.returnStatement(
+      t.callExpression(t.identifier('handleSubcommand'), [
+        t.identifier('subcommand'),
+        t.identifier('newArgv'),
+        t.identifier('prompter'),
+        t.identifier('store'),
+      ]),
+    ),
+  ];
+
+  const mainExport = t.exportDefaultDeclaration(
+    t.arrowFunctionExpression(
+      [argvParam, prompterParam, optionsParam],
+      t.blockStatement(mainBody),
+      true,
+    ),
+  );
+  statements.push(mainExport);
+
+  const subcmdParam = t.identifier('subcommand');
+  subcmdParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+  const argvParam2 = t.identifier('argv');
+  argvParam2.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+  const prompterParam2 = t.identifier('prompter');
+  prompterParam2.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+  const storeParam = t.identifier('store');
+  storeParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('ReturnType'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeQuery(t.identifier('getStore')),
+      ]),
+    ),
+  );
+
+  const handleSubcommandFunc = t.functionDeclaration(
+    t.identifier('handleSubcommand'),
+    [subcmdParam, argvParam2, prompterParam2, storeParam],
+    t.blockStatement([
+      t.switchStatement(t.identifier('subcommand'), [
+        buildSwitchCase('create', 'handleCreate', [
+          t.identifier('argv'),
+          t.identifier('prompter'),
+          t.identifier('store'),
+        ]),
+        buildSwitchCase('list', 'handleList', [t.identifier('store')]),
+        buildSwitchCase('use', 'handleUse', [
+          t.identifier('argv'),
+          t.identifier('prompter'),
+          t.identifier('store'),
+        ]),
+        buildSwitchCase('current', 'handleCurrent', [t.identifier('store')]),
+        buildSwitchCase('delete', 'handleDelete', [
+          t.identifier('argv'),
+          t.identifier('prompter'),
+          t.identifier('store'),
+        ]),
+        buildDefaultSwitchCase('usage'),
+      ]),
+    ]),
+    false,
+    true,
+  );
+  statements.push(handleSubcommandFunc);
+
+  statements.push(buildMultiTargetCreateHandler(targets));
+  statements.push(buildListHandler());
+  statements.push(buildUseHandler());
+  statements.push(buildCurrentHandler());
+  statements.push(buildDeleteHandler());
+
+  const header = getGeneratedFileHeader('Multi-target context management commands');
+  const code = generateCode(statements);
+
+  return {
+    fileName: `commands/${commandName}.ts`,
+    content: header + '\n' + code,
+  };
+}
+
+function buildMultiTargetCreateHandler(
+  targets: MultiTargetContextInput[],
+): t.FunctionDeclaration {
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+  const prompterParam = t.identifier('prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+  const storeParam = t.identifier('store');
+  storeParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('ReturnType'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeQuery(t.identifier('getStore')),
+      ]),
+    ),
+  );
+
+  const promptQuestions: t.Expression[] = [
+    t.objectExpression([
+      t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+      t.objectProperty(t.identifier('name'), t.stringLiteral('name')),
+      t.objectProperty(t.identifier('message'), t.stringLiteral('Context name')),
+      t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
+    ]),
+  ];
+
+  for (const target of targets) {
+    const fieldName = `${target.name}Endpoint`;
+    promptQuestions.push(
+      t.objectExpression([
+        t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+        t.objectProperty(t.identifier('name'), t.stringLiteral(fieldName)),
+        t.objectProperty(
+          t.identifier('message'),
+          t.stringLiteral(`${target.name} endpoint`),
+        ),
+        t.objectProperty(
+          t.identifier('default'),
+          t.stringLiteral(target.endpoint),
+        ),
+      ]),
+    );
+  }
+
+  const targetsObjProps = targets.map((target) => {
+    const fieldName = `${target.name}Endpoint`;
+    return t.objectProperty(
+      t.stringLiteral(target.name),
+      t.objectExpression([
+        t.objectProperty(
+          t.identifier('endpoint'),
+          t.memberExpression(t.identifier('answers'), t.identifier(fieldName)),
+        ),
+      ]),
+    );
+  });
+
+  const body: t.Statement[] = [
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.objectPattern([
+          t.objectProperty(t.identifier('first'), t.identifier('name')),
+          t.objectProperty(
+            t.identifier('newArgv'),
+            t.identifier('restArgv'),
+          ),
+        ]),
+        t.callExpression(t.identifier('extractFirst'), [
+          t.identifier('argv'),
+        ]),
+      ),
+    ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('answers'),
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier('prompter'),
+              t.identifier('prompt'),
+            ),
+            [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('name'),
+                  t.identifier('name'),
+                  false,
+                  true,
+                ),
+                t.spreadElement(t.identifier('restArgv')),
+              ]),
+              t.arrayExpression(promptQuestions),
+            ],
+          ),
+        ),
+      ),
+    ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('contextName'),
+        t.memberExpression(t.identifier('answers'), t.identifier('name')),
+      ),
+    ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('targets'),
+        t.objectExpression(targetsObjProps),
+      ),
+    ]),
+    t.expressionStatement(
+      t.callExpression(
+        t.memberExpression(t.identifier('store'), t.identifier('createContext')),
+        [
+          t.identifier('contextName'),
+          t.objectExpression([
+            t.objectProperty(
+              t.identifier('endpoint'),
+              t.memberExpression(
+                t.identifier('answers'),
+                t.identifier(`${targets[0].name}Endpoint`),
+              ),
+            ),
+            t.objectProperty(
+              t.identifier('targets'),
+              t.identifier('targets'),
+            ),
+          ]),
+        ],
+      ),
+    ),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('settings'),
+        t.callExpression(
+          t.memberExpression(
+            t.identifier('store'),
+            t.identifier('loadSettings'),
+          ),
+          [],
+        ),
+      ),
+    ]),
+    t.ifStatement(
+      t.unaryExpression(
+        '!',
+        t.memberExpression(
+          t.identifier('settings'),
+          t.identifier('currentContext'),
+        ),
+      ),
+      t.blockStatement([
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier('store'),
+              t.identifier('setCurrentContext'),
+            ),
+            [t.identifier('contextName')],
+          ),
+        ),
+      ]),
+    ),
+    t.expressionStatement(
+      t.callExpression(
+        t.memberExpression(t.identifier('console'), t.identifier('log')),
+        [
+          t.templateLiteral(
+            [
+              t.templateElement({ raw: 'Created context: ', cooked: 'Created context: ' }),
+              t.templateElement({ raw: '', cooked: '' }, true),
+            ],
+            [t.identifier('contextName')],
+          ),
+        ],
+      ),
+    ),
+  ];
+
+  for (const target of targets) {
+    const fieldName = `${target.name}Endpoint`;
+    body.push(
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier('console'), t.identifier('log')),
+          [
+            t.templateLiteral(
+              [
+                t.templateElement({ raw: `  ${target.name}: `, cooked: `  ${target.name}: ` }),
+                t.templateElement({ raw: '', cooked: '' }, true),
+              ],
+              [t.memberExpression(t.identifier('answers'), t.identifier(fieldName))],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  const func = t.functionDeclaration(
+    t.identifier('handleCreate'),
+    [argvParam, prompterParam, storeParam],
+    t.blockStatement(body),
+    false,
+    true,
+  );
+  return func;
+}
+
+export function generateAuthCommandWithName(
+  toolName: string,
+  commandName: string,
+): GeneratedFile {
+  const statements: t.Statement[] = [];
+
+  statements.push(
+    createImportDeclaration('inquirerer', [
+      'CLIOptions',
+      'Inquirerer',
+      'extractFirst',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration('../executor', ['getStore']),
+  );
+
+  const usageStr = `
+${toolName} ${commandName} <command>
+
+Commands:
+  set-token <token>     Set API token for the current context
+  status                Show authentication status
+  logout                Remove credentials for the current context
+
+Options:
+  --context <name>      Specify context (defaults to current context)
+
+  --help, -h            Show this help message
+`;
+
+  statements.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('usage'), t.stringLiteral(usageStr)),
+    ]),
+  );
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+  const prompterParam = t.identifier('prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+  const optionsParam = t.identifier('_options');
+  optionsParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('CLIOptions')),
+  );
+
+  const mainBody: t.Statement[] = [
+    t.ifStatement(
+      t.logicalExpression(
+        '||',
+        t.memberExpression(t.identifier('argv'), t.identifier('help')),
+        t.memberExpression(t.identifier('argv'), t.identifier('h')),
+      ),
+      t.blockStatement([
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('console'), t.identifier('log')),
+            [t.identifier('usage')],
+          ),
+        ),
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('process'), t.identifier('exit')),
+            [t.numericLiteral(0)],
+          ),
+        ),
+      ]),
+    ),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('store'),
+        t.callExpression(t.identifier('getStore'), []),
+      ),
+    ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.objectPattern([
+          t.objectProperty(
+            t.identifier('first'),
+            t.identifier('subcommand'),
+          ),
+          t.objectProperty(
+            t.identifier('newArgv'),
+            t.identifier('newArgv'),
+            false,
+            true,
+          ),
+        ]),
+        t.callExpression(t.identifier('extractFirst'), [
+          t.identifier('argv'),
+        ]),
+      ),
+    ]),
+    t.ifStatement(
+      t.unaryExpression('!', t.identifier('subcommand')),
+      t.blockStatement([
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier('answer'),
+            t.awaitExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.identifier('prompter'),
+                  t.identifier('prompt'),
+                ),
+                [
+                  t.identifier('argv'),
+                  t.arrayExpression([
+                    t.objectExpression([
+                      t.objectProperty(
+                        t.identifier('type'),
+                        t.stringLiteral('autocomplete'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('name'),
+                        t.stringLiteral('subcommand'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('message'),
+                        t.stringLiteral('What do you want to do?'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('options'),
+                        t.arrayExpression([
+                          t.stringLiteral('set-token'),
+                          t.stringLiteral('status'),
+                          t.stringLiteral('logout'),
+                        ]),
+                      ),
+                    ]),
+                  ]),
+                ],
+              ),
+            ),
+          ),
+        ]),
+        t.returnStatement(
+          t.callExpression(t.identifier('handleAuthSubcommand'), [
+            t.memberExpression(
+              t.identifier('answer'),
+              t.identifier('subcommand'),
+            ),
+            t.identifier('newArgv'),
+            t.identifier('prompter'),
+            t.identifier('store'),
+          ]),
+        ),
+      ]),
+    ),
+    t.returnStatement(
+      t.callExpression(t.identifier('handleAuthSubcommand'), [
+        t.identifier('subcommand'),
+        t.identifier('newArgv'),
+        t.identifier('prompter'),
+        t.identifier('store'),
+      ]),
+    ),
+  ];
+
+  statements.push(
+    t.exportDefaultDeclaration(
+      t.arrowFunctionExpression(
+        [argvParam, prompterParam, optionsParam],
+        t.blockStatement(mainBody),
+        true,
+      ),
+    ),
+  );
+
+  const subcmdParam = t.identifier('subcommand');
+  subcmdParam.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+  const argvParam2 = t.identifier('argv');
+  argvParam2.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+  const prompterParam2 = t.identifier('prompter');
+  prompterParam2.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+  const storeParam = t.identifier('store');
+  storeParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('ReturnType'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeQuery(t.identifier('getStore')),
+      ]),
+    ),
+  );
+
+  const handleAuthSubcommandFunc = t.functionDeclaration(
+    t.identifier('handleAuthSubcommand'),
+    [subcmdParam, argvParam2, prompterParam2, storeParam],
+    t.blockStatement([
+      t.switchStatement(t.identifier('subcommand'), [
+        buildSwitchCase('set-token', 'handleSetToken', [
+          t.identifier('argv'),
+          t.identifier('prompter'),
+          t.identifier('store'),
+        ]),
+        buildSwitchCase('status', 'handleStatus', [t.identifier('store')]),
+        buildSwitchCase('logout', 'handleLogout', [
+          t.identifier('argv'),
+          t.identifier('prompter'),
+          t.identifier('store'),
+        ]),
+        buildDefaultSwitchCase('usage'),
+      ]),
+    ]),
+    false,
+    true,
+  );
+  statements.push(handleAuthSubcommandFunc);
+
+  statements.push(buildSetTokenHandler());
+  statements.push(buildStatusHandler());
+  statements.push(buildLogoutHandler());
+
+  const header = getGeneratedFileHeader('Authentication commands');
+  const code = generateCode(statements);
+
+  return {
+    fileName: `commands/${commandName}.ts`,
+    content: header + '\n' + code,
+  };
+}

@@ -1,4 +1,4 @@
-import { generateCli } from '../../core/codegen/cli';
+import { generateCli, generateMultiTargetCli, resolveInfraNames } from '../../core/codegen/cli';
 import {
   generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
@@ -407,5 +407,255 @@ describe('resolveDocsConfig', () => {
   it('partial config fills defaults', () => {
     const config = resolveDocsConfig({ mcp: true });
     expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: false });
+  });
+});
+
+describe('resolveInfraNames', () => {
+  it('uses defaults when no collisions', () => {
+    expect(resolveInfraNames(['app', 'members'])).toEqual({
+      auth: 'auth',
+      context: 'context',
+    });
+  });
+
+  it('renames auth to credentials on collision', () => {
+    expect(resolveInfraNames(['auth', 'members', 'app'])).toEqual({
+      auth: 'credentials',
+      context: 'context',
+    });
+  });
+
+  it('renames context to env on collision', () => {
+    expect(resolveInfraNames(['context', 'app'])).toEqual({
+      auth: 'auth',
+      context: 'env',
+    });
+  });
+
+  it('renames both on collision', () => {
+    expect(resolveInfraNames(['auth', 'context', 'app'])).toEqual({
+      auth: 'credentials',
+      context: 'env',
+    });
+  });
+
+  it('respects user overrides even with collisions', () => {
+    expect(
+      resolveInfraNames(['auth', 'app'], { auth: 'auth' }),
+    ).toEqual({
+      auth: 'auth',
+      context: 'context',
+    });
+  });
+
+  it('uses user override names', () => {
+    expect(
+      resolveInfraNames(['app'], { auth: 'creds', context: 'profile' }),
+    ).toEqual({
+      auth: 'creds',
+      context: 'profile',
+    });
+  });
+});
+
+const userTable = createTable({
+  name: 'User',
+  fields: [
+    { name: 'id', type: fieldTypes.uuid },
+    { name: 'email', type: fieldTypes.string },
+    { name: 'name', type: fieldTypes.string },
+  ],
+  query: {
+    all: 'users',
+    one: 'user',
+    create: 'createUser',
+    update: 'updateUser',
+    delete: 'deleteUser',
+  },
+});
+
+const memberTable = createTable({
+  name: 'Member',
+  fields: [
+    { name: 'id', type: fieldTypes.uuid },
+    { name: 'role', type: fieldTypes.string },
+  ],
+  query: {
+    all: 'members',
+    one: 'member',
+    create: 'createMember',
+    update: 'updateMember',
+    delete: 'deleteMember',
+  },
+});
+
+describe('multi-target cli generator', () => {
+  const multiResult = generateMultiTargetCli({
+    toolName: 'myapp',
+    targets: [
+      {
+        name: 'auth',
+        endpoint: 'http://auth.localhost/graphql',
+        ormImportPath: '../../generated/auth/orm',
+        tables: [userTable],
+        customOperations: {
+          queries: [currentUserQuery],
+          mutations: [loginMutation],
+        },
+        isAuthTarget: true,
+      },
+      {
+        name: 'members',
+        endpoint: 'http://members.localhost/graphql',
+        ormImportPath: '../../generated/members/orm',
+        tables: [memberTable],
+        customOperations: {
+          queries: [],
+          mutations: [],
+        },
+      },
+      {
+        name: 'app',
+        endpoint: 'http://app.localhost/graphql',
+        ormImportPath: '../../generated/app/orm',
+        tables: [carTable],
+        customOperations: {
+          queries: [],
+          mutations: [],
+        },
+      },
+    ],
+  });
+
+  it('returns correct stats', () => {
+    expect(multiResult.stats).toEqual({
+      tables: 3,
+      customQueries: 1,
+      customMutations: 1,
+      infraFiles: 3,
+      totalFiles: 9,
+    });
+  });
+
+  it('auto-renames auth infra to credentials on collision', () => {
+    const fileNames = multiResult.files.map((f) => f.fileName).sort();
+    expect(fileNames).toContain('commands/credentials.ts');
+    expect(fileNames).not.toContain('commands/auth.ts');
+  });
+
+  it('generates correct file names with target prefixes', () => {
+    const fileNames = multiResult.files.map((f) => f.fileName).sort();
+    expect(fileNames).toEqual([
+      'commands.ts',
+      'commands/app/car.ts',
+      'commands/auth/current-user.ts',
+      'commands/auth/login.ts',
+      'commands/auth/user.ts',
+      'commands/context.ts',
+      'commands/credentials.ts',
+      'commands/members/member.ts',
+      'executor.ts',
+    ]);
+  });
+
+  it('generates multi-target executor', () => {
+    const file = multiResult.files.find((f) => f.fileName === 'executor.ts');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates multi-target context command', () => {
+    const file = multiResult.files.find(
+      (f) => f.fileName === 'commands/context.ts',
+    );
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates credentials command (renamed from auth)', () => {
+    const file = multiResult.files.find(
+      (f) => f.fileName === 'commands/credentials.ts',
+    );
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates target-prefixed table commands', () => {
+    const userFile = multiResult.files.find(
+      (f) => f.fileName === 'commands/auth/user.ts',
+    );
+    expect(userFile).toBeDefined();
+    expect(userFile!.content).toMatchSnapshot();
+
+    const memberFile = multiResult.files.find(
+      (f) => f.fileName === 'commands/members/member.ts',
+    );
+    expect(memberFile).toBeDefined();
+    expect(memberFile!.content).toMatchSnapshot();
+
+    const carFile = multiResult.files.find(
+      (f) => f.fileName === 'commands/app/car.ts',
+    );
+    expect(carFile).toBeDefined();
+    expect(carFile!.content).toMatchSnapshot();
+  });
+
+  it('generates target-prefixed custom commands with save-token', () => {
+    const loginFile = multiResult.files.find(
+      (f) => f.fileName === 'commands/auth/login.ts',
+    );
+    expect(loginFile).toBeDefined();
+    expect(loginFile!.content).toContain('saveToken');
+    expect(loginFile!.content).toMatchSnapshot();
+  });
+
+  it('generates multi-target command map', () => {
+    const file = multiResult.files.find((f) => f.fileName === 'commands.ts');
+    expect(file).toBeDefined();
+    expect(file!.content).toContain('auth:user');
+    expect(file!.content).toContain('auth:login');
+    expect(file!.content).toContain('members:member');
+    expect(file!.content).toContain('app:car');
+    expect(file!.content).toContain('credentials');
+    expect(file!.content).toContain('context');
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('uses correct executor import path in target commands', () => {
+    const userFile = multiResult.files.find(
+      (f) => f.fileName === 'commands/auth/user.ts',
+    );
+    expect(userFile!.content).toContain('../../executor');
+  });
+});
+
+describe('multi-target cli with custom infraNames', () => {
+  const result = generateMultiTargetCli({
+    toolName: 'myapp',
+    infraNames: { auth: 'creds', context: 'profile' },
+    targets: [
+      {
+        name: 'auth',
+        endpoint: 'http://auth.localhost/graphql',
+        ormImportPath: '../../generated/auth/orm',
+        tables: [userTable],
+        customOperations: { queries: [], mutations: [] },
+      },
+      {
+        name: 'app',
+        endpoint: 'http://app.localhost/graphql',
+        ormImportPath: '../../generated/app/orm',
+        tables: [carTable],
+        customOperations: { queries: [], mutations: [] },
+      },
+    ],
+  });
+
+  it('uses custom infraNames from config', () => {
+    const fileNames = result.files.map((f) => f.fileName).sort();
+    expect(fileNames).toContain('commands/creds.ts');
+    expect(fileNames).toContain('commands/profile.ts');
+    expect(fileNames).not.toContain('commands/auth.ts');
+    expect(fileNames).not.toContain('commands/context.ts');
   });
 });

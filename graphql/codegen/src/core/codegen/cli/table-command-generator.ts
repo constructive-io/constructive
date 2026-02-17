@@ -120,11 +120,14 @@ function buildErrorCatch(errorMessage: string): t.CatchClause {
   );
 }
 
-function buildGetClientStatement(): t.VariableDeclaration {
+function buildGetClientStatement(targetName?: string): t.VariableDeclaration {
+  const args: t.Expression[] = targetName
+    ? [t.stringLiteral(targetName)]
+    : [];
   return t.variableDeclaration('const', [
     t.variableDeclarator(
       t.identifier('client'),
-      t.callExpression(t.identifier('getClient'), []),
+      t.callExpression(t.identifier('getClient'), args),
     ),
   ]);
 }
@@ -180,12 +183,12 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-function buildListHandler(table: CleanTable): t.FunctionDeclaration {
+function buildListHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const selectObj = buildSelectObject(table);
 
   const tryBody: t.Statement[] = [
-    buildGetClientStatement(),
+    buildGetClientStatement(targetName),
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
@@ -224,7 +227,7 @@ function buildListHandler(table: CleanTable): t.FunctionDeclaration {
   );
 }
 
-function buildGetHandler(table: CleanTable): t.FunctionDeclaration {
+function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
@@ -260,7 +263,7 @@ function buildGetHandler(table: CleanTable): t.FunctionDeclaration {
         ),
       ),
     ]),
-    buildGetClientStatement(),
+    buildGetClientStatement(targetName),
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
@@ -294,6 +297,7 @@ function buildGetHandler(table: CleanTable): t.FunctionDeclaration {
 function buildMutationHandler(
   table: CleanTable,
   operation: 'create' | 'update' | 'delete',
+  targetName?: string,
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
@@ -406,7 +410,7 @@ function buildMutationHandler(
         ),
       ),
     ]),
-    buildGetClientStatement(),
+    buildGetClientStatement(targetName),
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
@@ -441,10 +445,16 @@ function buildMutationHandler(
   );
 }
 
-export function generateTableCommand(table: CleanTable): GeneratedFile {
+export interface TableCommandOptions {
+  targetName?: string;
+  executorImportPath?: string;
+}
+
+export function generateTableCommand(table: CleanTable, options?: TableCommandOptions): GeneratedFile {
   const { singularName } = getTableNames(table);
   const commandName = toKebabCase(singularName);
   const statements: t.Statement[] = [];
+  const executorPath = options?.executorImportPath ?? '../executor';
 
   statements.push(
     createImportDeclaration('inquirerer', [
@@ -454,7 +464,7 @@ export function generateTableCommand(table: CleanTable): GeneratedFile {
     ]),
   );
   statements.push(
-    createImportDeclaration('../executor', ['getClient']),
+    createImportDeclaration(executorPath, ['getClient']),
   );
 
   const subcommands = ['list', 'get', 'create', 'update', 'delete'];
@@ -631,17 +641,20 @@ export function generateTableCommand(table: CleanTable): GeneratedFile {
     ),
   );
 
-  statements.push(buildListHandler(table));
-  statements.push(buildGetHandler(table));
-  statements.push(buildMutationHandler(table, 'create'));
-  statements.push(buildMutationHandler(table, 'update'));
-  statements.push(buildMutationHandler(table, 'delete'));
+  const tn = options?.targetName;
+  statements.push(buildListHandler(table, tn));
+  statements.push(buildGetHandler(table, tn));
+  statements.push(buildMutationHandler(table, 'create', tn));
+  statements.push(buildMutationHandler(table, 'update', tn));
+  statements.push(buildMutationHandler(table, 'delete', tn));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);
 
   return {
-    fileName: `commands/${commandName}.ts`,
+    fileName: options?.targetName
+      ? `commands/${options.targetName}/${commandName}.ts`
+      : `commands/${commandName}.ts`,
     content: header + '\n' + code,
   };
 }

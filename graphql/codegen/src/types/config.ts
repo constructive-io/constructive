@@ -174,6 +174,16 @@ export interface DocsConfig {
 }
 
 /**
+ * Infrastructure command name overrides for collision handling.
+ * When a target name collides with a default infra command name,
+ * the infra command is auto-renamed. These allow user overrides.
+ */
+export interface InfraNames {
+  auth?: string;
+  context?: string;
+}
+
+/**
  * CLI generation configuration
  */
 export interface CliConfig {
@@ -183,6 +193,12 @@ export interface CliConfig {
    */
   toolName?: string;
 
+  /**
+   * Override infra command names (for collision handling)
+   * Defaults: auth -> 'auth' (renamed to 'credentials' on collision),
+   *           context -> 'context' (renamed to 'env' on collision)
+   */
+  infraNames?: InfraNames;
 }
 
 /**
