@@ -1,0 +1,510 @@
+type Query {
+  users(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: UserFilter
+  ): UsersConnection
+  posts(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: PostFilter
+  ): PostsConnection
+  comments(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [CommentsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: CommentFilter
+  ): CommentsConnection
+  categories(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [CategoriesOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: CategoryFilter
+  ): CategoriesConnection
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): CreateUserPayload
+  updateUser(input: UpdateUserInput!): UpdateUserPayload
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
+  createComment(input: CreateCommentInput!): CreateCommentPayload
+  updateComment(input: UpdateCommentInput!): UpdateCommentPayload
+  deleteComment(input: DeleteCommentInput!): DeleteCommentPayload
+  createCategory(input: CreateCategoryInput!): CreateCategoryPayload
+  updateCategory(input: UpdateCategoryInput!): UpdateCategoryPayload
+  deleteCategory(input: DeleteCategoryInput!): DeleteCategoryPayload
+}
+
+scalar Cursor
+scalar UUID
+scalar Datetime
+scalar JSON
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+# ============================================================================
+# User
+# ============================================================================
+
+type User {
+  id: UUID!
+  email: String!
+  name: String
+  bio: String
+  isActive: Boolean!
+  role: UserRole!
+  metadata: JSON
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  posts(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: PostFilter
+  ): PostsConnection!
+  comments(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [CommentsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: CommentFilter
+  ): CommentsConnection!
+}
+
+type UsersConnection {
+  nodes: [User!]!
+  edges: [UsersEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UsersEdge {
+  cursor: Cursor
+  node: User!
+}
+
+enum UsersOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+input UserFilter {
+  id: UUIDFilter
+  email: StringFilter
+  name: StringFilter
+  isActive: BooleanFilter
+  role: UserRoleFilter
+  createdAt: DatetimeFilter
+  and: [UserFilter!]
+  or: [UserFilter!]
+  not: UserFilter
+}
+
+input UserRoleFilter {
+  equalTo: UserRole
+  notEqualTo: UserRole
+  in: [UserRole!]
+  notIn: [UserRole!]
+}
+
+input CreateUserInput {
+  user: UserInput!
+}
+
+input UserInput {
+  email: String!
+  name: String
+  bio: String
+  isActive: Boolean
+  role: UserRole
+  metadata: JSON
+}
+
+input UpdateUserInput {
+  id: UUID!
+  patch: UserPatch!
+}
+
+input UserPatch {
+  email: String
+  name: String
+  bio: String
+  isActive: Boolean
+  role: UserRole
+  metadata: JSON
+}
+
+input DeleteUserInput {
+  id: UUID!
+}
+
+type CreateUserPayload {
+  user: User
+}
+
+type UpdateUserPayload {
+  user: User
+}
+
+type DeleteUserPayload {
+  user: User
+}
+
+# ============================================================================
+# Post
+# ============================================================================
+
+type Post {
+  id: UUID!
+  title: String!
+  body: String
+  slug: String!
+  isPublished: Boolean!
+  publishedAt: Datetime
+  authorId: UUID!
+  categoryId: UUID
+  tags: [String]
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  author: User!
+  category: Category
+  comments(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [CommentsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: CommentFilter
+  ): CommentsConnection!
+}
+
+type PostsConnection {
+  nodes: [Post!]!
+  edges: [PostsEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PostsEdge {
+  cursor: Cursor
+  node: Post!
+}
+
+enum PostsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PUBLISHED_AT_ASC
+  PUBLISHED_AT_DESC
+}
+
+input PostFilter {
+  id: UUIDFilter
+  title: StringFilter
+  slug: StringFilter
+  isPublished: BooleanFilter
+  authorId: UUIDFilter
+  categoryId: UUIDFilter
+  createdAt: DatetimeFilter
+  and: [PostFilter!]
+  or: [PostFilter!]
+  not: PostFilter
+}
+
+input CreatePostInput {
+  post: PostInput!
+}
+
+input PostInput {
+  title: String!
+  body: String
+  slug: String!
+  isPublished: Boolean
+  publishedAt: Datetime
+  authorId: UUID!
+  categoryId: UUID
+  tags: [String]
+}
+
+input UpdatePostInput {
+  id: UUID!
+  patch: PostPatch!
+}
+
+input PostPatch {
+  title: String
+  body: String
+  slug: String
+  isPublished: Boolean
+  publishedAt: Datetime
+  categoryId: UUID
+  tags: [String]
+}
+
+input DeletePostInput {
+  id: UUID!
+}
+
+type CreatePostPayload {
+  post: Post
+}
+
+type UpdatePostPayload {
+  post: Post
+}
+
+type DeletePostPayload {
+  post: Post
+}
+
+# ============================================================================
+# Comment
+# ============================================================================
+
+type Comment {
+  id: UUID!
+  body: String!
+  authorId: UUID!
+  postId: UUID!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  author: User!
+  post: Post!
+}
+
+type CommentsConnection {
+  nodes: [Comment!]!
+  edges: [CommentsEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CommentsEdge {
+  cursor: Cursor
+  node: Comment!
+}
+
+enum CommentsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+input CommentFilter {
+  id: UUIDFilter
+  body: StringFilter
+  authorId: UUIDFilter
+  postId: UUIDFilter
+  createdAt: DatetimeFilter
+  and: [CommentFilter!]
+  or: [CommentFilter!]
+  not: CommentFilter
+}
+
+input CreateCommentInput {
+  comment: CommentInput!
+}
+
+input CommentInput {
+  body: String!
+  authorId: UUID!
+  postId: UUID!
+}
+
+input UpdateCommentInput {
+  id: UUID!
+  patch: CommentPatch!
+}
+
+input CommentPatch {
+  body: String
+}
+
+input DeleteCommentInput {
+  id: UUID!
+}
+
+type CreateCommentPayload {
+  comment: Comment
+}
+
+type UpdateCommentPayload {
+  comment: Comment
+}
+
+type DeleteCommentPayload {
+  comment: Comment
+}
+
+# ============================================================================
+# Category
+# ============================================================================
+
+type Category {
+  id: UUID!
+  name: String!
+  slug: String!
+  description: String
+  parentId: UUID
+  createdAt: Datetime!
+  parent: Category
+  posts(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: PostFilter
+  ): PostsConnection!
+}
+
+type CategoriesConnection {
+  nodes: [Category!]!
+  edges: [CategoriesEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CategoriesEdge {
+  cursor: Cursor
+  node: Category!
+}
+
+enum CategoriesOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NAME_ASC
+  NAME_DESC
+}
+
+input CategoryFilter {
+  id: UUIDFilter
+  name: StringFilter
+  slug: StringFilter
+  parentId: UUIDFilter
+  and: [CategoryFilter!]
+  or: [CategoryFilter!]
+  not: CategoryFilter
+}
+
+input CreateCategoryInput {
+  category: CategoryInput!
+}
+
+input CategoryInput {
+  name: String!
+  slug: String!
+  description: String
+  parentId: UUID
+}
+
+input UpdateCategoryInput {
+  id: UUID!
+  patch: CategoryPatch!
+}
+
+input CategoryPatch {
+  name: String
+  slug: String
+  description: String
+  parentId: UUID
+}
+
+input DeleteCategoryInput {
+  id: UUID!
+}
+
+type CreateCategoryPayload {
+  category: Category
+}
+
+type UpdateCategoryPayload {
+  category: Category
+}
+
+type DeleteCategoryPayload {
+  category: Category
+}
+
+# ============================================================================
+# Shared Filter Types
+# ============================================================================
+
+input UUIDFilter {
+  equalTo: UUID
+  notEqualTo: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  isNull: Boolean
+}
+
+input StringFilter {
+  equalTo: String
+  notEqualTo: String
+  in: [String!]
+  notIn: [String!]
+  includes: String
+  like: String
+  likeInsensitive: String
+  isNull: Boolean
+}
+
+input BooleanFilter {
+  equalTo: Boolean
+  notEqualTo: Boolean
+}
+
+input DatetimeFilter {
+  equalTo: Datetime
+  notEqualTo: Datetime
+  greaterThan: Datetime
+  greaterThanOrEqualTo: Datetime
+  lessThan: Datetime
+  lessThanOrEqualTo: Datetime
+  isNull: Boolean
+}
