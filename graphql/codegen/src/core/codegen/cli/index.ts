@@ -2,6 +2,7 @@ import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import type { CleanOperation, CleanTable } from '../../../types/schema';
 import { generateCommandMap } from './command-map-generator';
 import { generateCustomCommand } from './custom-command-generator';
+import { generateReadme, generateCommandReference } from './docs-generator';
 import { generateExecutorFile } from './executor-generator';
 import type { GeneratedFile } from './executor-generator';
 import { generateAuthCommand, generateContextCommand } from './infra-generator';
@@ -68,6 +69,12 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   );
   files.push(commandMapFile);
 
+  const readmeFile = generateReadme(tables, allCustomOps, toolName);
+  files.push(readmeFile);
+
+  const commandRefFile = generateCommandReference(tables, allCustomOps, toolName);
+  files.push(commandRefFile);
+
   return {
     files,
     stats: {
@@ -88,4 +95,8 @@ export {
   generateContextCommand,
   generateAuthCommand,
 } from './infra-generator';
+export {
+  generateReadme,
+  generateCommandReference,
+} from './docs-generator';
 export type { GeneratedFile } from './executor-generator';

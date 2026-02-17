@@ -129,7 +129,7 @@ describe('cli-generator', () => {
       customQueries: 1,
       customMutations: 1,
       infraFiles: 3,
-      totalFiles: 8,
+      totalFiles: 10,
     });
   });
 
@@ -187,6 +187,18 @@ describe('cli-generator', () => {
     expect(file!.content).toMatchSnapshot();
   });
 
+  it('generates README.md', () => {
+    const file = result.files.find((f) => f.fileName === 'README.md');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates COMMANDS.md (man-page reference)', () => {
+    const file = result.files.find((f) => f.fileName === 'COMMANDS.md');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
   it('uses ORM methods in table commands', () => {
     const carFile = result.files.find(
       (f) => f.fileName === 'commands/car.ts',
@@ -216,6 +228,8 @@ describe('cli-generator', () => {
   it('generates correct file names', () => {
     const fileNames = result.files.map((f) => f.fileName).sort();
     expect(fileNames).toEqual([
+      'COMMANDS.md',
+      'README.md',
       'commands.ts',
       'commands/auth.ts',
       'commands/car.ts',
