@@ -1,4 +1,4 @@
-import type { GraphQLSDKConfigTarget, InfraNames } from '../../../types/config';
+import type { BuiltinNames, GraphQLSDKConfigTarget } from '../../../types/config';
 import type { CleanOperation, CleanTable } from '../../../types/schema';
 import { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
 import { generateCustomCommand } from './custom-command-generator';
@@ -99,13 +99,13 @@ export interface MultiTargetCliTarget {
 
 export interface GenerateMultiTargetCliOptions {
   toolName: string;
-  infraNames?: InfraNames;
+  builtinNames?: BuiltinNames;
   targets: MultiTargetCliTarget[];
 }
 
-export function resolveInfraNames(
+export function resolveBuiltinNames(
   targetNames: string[],
-  userOverrides?: InfraNames,
+  userOverrides?: BuiltinNames,
 ): { auth: string; context: string } {
   let authName = userOverrides?.auth ?? 'auth';
   let contextName = userOverrides?.context ?? 'context';
@@ -127,7 +127,7 @@ export function generateMultiTargetCli(
   const files: GeneratedFile[] = [];
 
   const targetNames = targets.map((t) => t.name);
-  const infraNames = resolveInfraNames(targetNames, options.infraNames);
+  const builtinNames = resolveBuiltinNames(targetNames, options.builtinNames);
 
   const executorInputs: MultiTargetExecutorInput[] = targets.map((t) => ({
     name: t.name,
@@ -139,12 +139,12 @@ export function generateMultiTargetCli(
 
   const contextFile = generateMultiTargetContextCommand(
     toolName,
-    infraNames.context,
+    builtinNames.context,
     targets.map((t) => ({ name: t.name, endpoint: t.endpoint })),
   );
   files.push(contextFile);
 
-  const authFile = generateAuthCommandWithName(toolName, infraNames.auth);
+  const authFile = generateAuthCommandWithName(toolName, builtinNames.auth);
   files.push(authFile);
 
   let totalTables = 0;
@@ -194,7 +194,7 @@ export function generateMultiTargetCli(
 
   const commandMapFile = generateMultiTargetCommandMap({
     toolName,
-    infraNames,
+    builtinNames,
     targets: commandMapTargets,
   });
   files.push(commandMapFile);

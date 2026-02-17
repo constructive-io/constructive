@@ -178,7 +178,7 @@ export interface DocsConfig {
  * When a target name collides with a default infra command name,
  * the infra command is auto-renamed. These allow user overrides.
  */
-export interface InfraNames {
+export interface BuiltinNames {
   auth?: string;
   context?: string;
 }
@@ -198,7 +198,7 @@ export interface CliConfig {
    * Defaults: auth -> 'auth' (renamed to 'credentials' on collision),
    *           context -> 'context' (renamed to 'env' on collision)
    */
-  infraNames?: InfraNames;
+  builtinNames?: BuiltinNames;
 }
 
 /**

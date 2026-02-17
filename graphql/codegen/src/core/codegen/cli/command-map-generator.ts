@@ -383,7 +383,7 @@ export function generateCommandMap(
 
 export interface MultiTargetCommandMapInput {
   toolName: string;
-  infraNames: { auth: string; context: string };
+  builtinNames: { auth: string; context: string };
   targets: Array<{
     name: string;
     tables: CleanTable[];
@@ -394,7 +394,7 @@ export interface MultiTargetCommandMapInput {
 export function generateMultiTargetCommandMap(
   input: MultiTargetCommandMapInput,
 ): GeneratedFile {
-  const { toolName, infraNames, targets } = input;
+  const { toolName, builtinNames, targets } = input;
   const statements: t.Statement[] = [];
 
   statements.push(
@@ -407,16 +407,16 @@ export function generateMultiTargetCommandMap(
 
   const commandEntries: { kebab: string; importName: string }[] = [];
 
-  const contextImportName = `${infraNames.context}Cmd`;
-  commandEntries.push({ kebab: infraNames.context, importName: contextImportName });
+  const contextImportName = `${builtinNames.context}Cmd`;
+  commandEntries.push({ kebab: builtinNames.context, importName: contextImportName });
   statements.push(
-    createImportDeclaration(`./commands/${infraNames.context}`, contextImportName),
+    createImportDeclaration(`./commands/${builtinNames.context}`, contextImportName),
   );
 
-  const authImportName = `${infraNames.auth}Cmd`;
-  commandEntries.push({ kebab: infraNames.auth, importName: authImportName });
+  const authImportName = `${builtinNames.auth}Cmd`;
+  commandEntries.push({ kebab: builtinNames.auth, importName: authImportName });
   statements.push(
-    createImportDeclaration(`./commands/${infraNames.auth}`, authImportName),
+    createImportDeclaration(`./commands/${builtinNames.auth}`, authImportName),
   );
 
   for (const target of targets) {
@@ -465,8 +465,8 @@ export function generateMultiTargetCommandMap(
     `${toolName} <command>`,
     '',
     'Commands:',
-    `  ${infraNames.context.padEnd(20)} Manage API contexts`,
-    `  ${infraNames.auth.padEnd(20)} Manage authentication`,
+    `  ${builtinNames.context.padEnd(20)} Manage API contexts`,
+    `  ${builtinNames.auth.padEnd(20)} Manage authentication`,
   ];
 
   for (const target of targets) {

@@ -721,7 +721,7 @@ export function generateSkills(
 
 export interface MultiTargetDocsInput {
   toolName: string;
-  infraNames: { auth: string; context: string };
+  builtinNames: { auth: string; context: string };
   targets: Array<{
     name: string;
     endpoint: string;
@@ -734,7 +734,7 @@ export interface MultiTargetDocsInput {
 export function generateMultiTargetReadme(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, infraNames, targets } = input;
+  const { toolName, builtinNames, targets } = input;
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI`);
@@ -752,10 +752,10 @@ export function generateMultiTargetReadme(
   lines.push('');
   lines.push('```bash');
   lines.push(`# Interactive - prompts for each target endpoint (defaults shown)`);
-  lines.push(`${toolName} ${infraNames.context} create local`);
+  lines.push(`${toolName} ${builtinNames.context} create local`);
   lines.push('');
   lines.push(`# Non-interactive`);
-  lines.push(`${toolName} ${infraNames.context} create production \\`);
+  lines.push(`${toolName} ${builtinNames.context} create production \\`);
   for (let i = 0; i < targets.length; i++) {
     const tgt = targets[i];
     const continuation = i < targets.length - 1 ? ' \\' : '';
@@ -766,13 +766,13 @@ export function generateMultiTargetReadme(
   lines.push('### Activate a context');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} ${infraNames.context} use production`);
+  lines.push(`${toolName} ${builtinNames.context} use production`);
   lines.push('```');
   lines.push('');
   lines.push('### Authenticate');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} ${infraNames.auth} set-token <your-token>`);
+  lines.push(`${toolName} ${builtinNames.auth} set-token <your-token>`);
   lines.push('```');
   lines.push('');
 
@@ -808,8 +808,8 @@ export function generateMultiTargetReadme(
   lines.push('');
   lines.push('| Command | Description |');
   lines.push('|---------|-------------|');
-  lines.push(`| \`${infraNames.context}\` | Manage API contexts (per-target endpoints) |`);
-  lines.push(`| \`${infraNames.auth}\` | Manage authentication tokens |`);
+  lines.push(`| \`${builtinNames.context}\` | Manage API contexts (per-target endpoints) |`);
+  lines.push(`| \`${builtinNames.auth}\` | Manage authentication tokens |`);
   lines.push('');
 
   for (const tgt of targets) {
@@ -831,7 +831,7 @@ export function generateMultiTargetReadme(
 
   lines.push('## Infrastructure Commands');
   lines.push('');
-  lines.push(`### \`${infraNames.context}\``);
+  lines.push(`### \`${builtinNames.context}\``);
   lines.push('');
   lines.push('Manage named API contexts (kubectl-style). Each context stores per-target endpoint overrides.');
   lines.push('');
@@ -852,7 +852,7 @@ export function generateMultiTargetReadme(
   lines.push(`Configuration is stored at \`~/.${toolName}/config/\`.`);
   lines.push('');
 
-  lines.push(`### \`${infraNames.auth}\``);
+  lines.push(`### \`${builtinNames.auth}\``);
   lines.push('');
   lines.push('Manage authentication tokens per context. One shared token is used across all targets.');
   lines.push('');
@@ -947,7 +947,7 @@ export function generateMultiTargetReadme(
 export function generateMultiTargetAgentsDocs(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, infraNames, targets } = input;
+  const { toolName, builtinNames, targets } = input;
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI - Agent Reference`);
@@ -969,42 +969,42 @@ export function generateMultiTargetAgentsDocs(
   lines.push('');
   lines.push('COMMAND FORMAT:');
   lines.push(`  ${toolName} <target>:<command> <subcommand> [flags]    Target-specific commands`);
-  lines.push(`  ${toolName} ${infraNames.context} <subcommand> [flags]              Context management`);
-  lines.push(`  ${toolName} ${infraNames.auth} <subcommand> [flags]                 Authentication`);
+  lines.push(`  ${toolName} ${builtinNames.context} <subcommand> [flags]              Context management`);
+  lines.push(`  ${toolName} ${builtinNames.auth} <subcommand> [flags]                 Authentication`);
   lines.push('');
 
   lines.push('## PREREQUISITES');
   lines.push('');
   lines.push('Before running any data commands, you must:');
   lines.push('');
-  lines.push(`1. Create a context: \`${toolName} ${infraNames.context} create <name>\``);
+  lines.push(`1. Create a context: \`${toolName} ${builtinNames.context} create <name>\``);
   lines.push(`   (prompts for per-target endpoints, defaults baked from config)`);
-  lines.push(`2. Activate it: \`${toolName} ${infraNames.context} use <name>\``);
-  lines.push(`3. Authenticate: \`${toolName} ${infraNames.auth} set-token <token>\``);
+  lines.push(`2. Activate it: \`${toolName} ${builtinNames.context} use <name>\``);
+  lines.push(`3. Authenticate: \`${toolName} ${builtinNames.auth} set-token <token>\``);
   lines.push('');
   lines.push('For local development, create a context accepting all defaults:');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} ${infraNames.context} create local`);
-  lines.push(`${toolName} ${infraNames.context} use local`);
-  lines.push(`${toolName} ${infraNames.auth} set-token <token>`);
+  lines.push(`${toolName} ${builtinNames.context} create local`);
+  lines.push(`${toolName} ${builtinNames.context} use local`);
+  lines.push(`${toolName} ${builtinNames.auth} set-token <token>`);
   lines.push('```');
   lines.push('');
 
   lines.push('## TOOLS');
   lines.push('');
 
-  lines.push(`### TOOL: ${infraNames.context}`);
+  lines.push(`### TOOL: ${builtinNames.context}`);
   lines.push('');
   lines.push('Manage named API endpoint contexts. Each context stores per-target endpoint overrides.');
   lines.push('');
   lines.push('```');
   lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} ${infraNames.context} create <name>   Create a new context`);
-  lines.push(`  ${toolName} ${infraNames.context} list              List all contexts`);
-  lines.push(`  ${toolName} ${infraNames.context} use <name>        Set active context`);
-  lines.push(`  ${toolName} ${infraNames.context} current           Show active context`);
-  lines.push(`  ${toolName} ${infraNames.context} delete <name>     Delete a context`);
+  lines.push(`  ${toolName} ${builtinNames.context} create <name>   Create a new context`);
+  lines.push(`  ${toolName} ${builtinNames.context} list              List all contexts`);
+  lines.push(`  ${toolName} ${builtinNames.context} use <name>        Set active context`);
+  lines.push(`  ${toolName} ${builtinNames.context} current           Show active context`);
+  lines.push(`  ${toolName} ${builtinNames.context} delete <name>     Delete a context`);
   lines.push('');
   lines.push('CREATE OPTIONS:');
   for (const tgt of targets) {
@@ -1020,15 +1020,15 @@ export function generateMultiTargetAgentsDocs(
   lines.push('```');
   lines.push('');
 
-  lines.push(`### TOOL: ${infraNames.auth}`);
+  lines.push(`### TOOL: ${builtinNames.auth}`);
   lines.push('');
   lines.push('Manage authentication tokens per context. One shared token across all targets.');
   lines.push('');
   lines.push('```');
   lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} ${infraNames.auth} set-token <token>   Store bearer token for current context`);
-  lines.push(`  ${toolName} ${infraNames.auth} status               Show auth status for all contexts`);
-  lines.push(`  ${toolName} ${infraNames.auth} logout                Remove credentials for current context`);
+  lines.push(`  ${toolName} ${builtinNames.auth} set-token <token>   Store bearer token for current context`);
+  lines.push(`  ${toolName} ${builtinNames.auth} status               Show auth status for all contexts`);
+  lines.push(`  ${toolName} ${builtinNames.auth} logout                Remove credentials for current context`);
   lines.push('');
   lines.push('INPUT:');
   lines.push('  token: string (required for set-token) - Bearer token value');
@@ -1120,22 +1120,22 @@ export function generateMultiTargetAgentsDocs(
   lines.push('### Initial setup');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} ${infraNames.context} create dev`);
-  lines.push(`${toolName} ${infraNames.context} use dev`);
-  lines.push(`${toolName} ${infraNames.auth} set-token eyJhbGciOiJIUzI1NiIs...`);
+  lines.push(`${toolName} ${builtinNames.context} create dev`);
+  lines.push(`${toolName} ${builtinNames.context} use dev`);
+  lines.push(`${toolName} ${builtinNames.auth} set-token eyJhbGciOiJIUzI1NiIs...`);
   lines.push('```');
   lines.push('');
 
   lines.push('### Switch environment');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} ${infraNames.context} create production \\`);
+  lines.push(`${toolName} ${builtinNames.context} create production \\`);
   for (let i = 0; i < targets.length; i++) {
     const tgt = targets[i];
     const continuation = i < targets.length - 1 ? ' \\' : '';
     lines.push(`  --${tgt.name}-endpoint https://${tgt.name}.prod.example.com/graphql${continuation}`);
   }
-  lines.push(`${toolName} ${infraNames.context} use production`);
+  lines.push(`${toolName} ${builtinNames.context} use production`);
   lines.push('```');
   lines.push('');
 
@@ -1179,8 +1179,8 @@ export function generateMultiTargetAgentsDocs(
   lines.push('- `1`: Error (auth failure, not found, validation error, network error)');
   lines.push('');
   lines.push('Common errors:');
-  lines.push(`- "No active context": Run \`${infraNames.context} use <name>\` first`);
-  lines.push(`- "Not authenticated": Run \`${infraNames.auth} set-token <token>\` first`);
+  lines.push(`- "No active context": Run \`${builtinNames.context} use <name>\` first`);
+  lines.push(`- "Not authenticated": Run \`${builtinNames.auth} set-token <token>\` first`);
   lines.push('- "Unknown target": The target name is not recognized');
   lines.push('- "Record not found": The requested ID does not exist');
   lines.push('');
@@ -1194,7 +1194,7 @@ export function generateMultiTargetAgentsDocs(
 export function getMultiTargetCliMcpTools(
   input: MultiTargetDocsInput,
 ): McpTool[] {
-  const { toolName, infraNames, targets } = input;
+  const { toolName, builtinNames, targets } = input;
   const tools: McpTool[] = [];
 
   const contextEndpointProps: Record<string, unknown> = {
@@ -1207,7 +1207,7 @@ export function getMultiTargetCliMcpTools(
     };
   }
   tools.push({
-    name: `${toolName}_${infraNames.context}_create`,
+    name: `${toolName}_${builtinNames.context}_create`,
     description: 'Create a named API context with per-target endpoint overrides',
     inputSchema: {
       type: 'object',
@@ -1217,13 +1217,13 @@ export function getMultiTargetCliMcpTools(
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.context}_list`,
+    name: `${toolName}_${builtinNames.context}_list`,
     description: 'List all configured API contexts',
     inputSchema: { type: 'object', properties: {} },
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.context}_use`,
+    name: `${toolName}_${builtinNames.context}_use`,
     description: 'Set the active API context (switches all targets at once)',
     inputSchema: {
       type: 'object',
@@ -1235,13 +1235,13 @@ export function getMultiTargetCliMcpTools(
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.context}_current`,
+    name: `${toolName}_${builtinNames.context}_current`,
     description: 'Show the currently active API context',
     inputSchema: { type: 'object', properties: {} },
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.context}_delete`,
+    name: `${toolName}_${builtinNames.context}_delete`,
     description: 'Delete an API context',
     inputSchema: {
       type: 'object',
@@ -1253,7 +1253,7 @@ export function getMultiTargetCliMcpTools(
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.auth}_set_token`,
+    name: `${toolName}_${builtinNames.auth}_set_token`,
     description: 'Store a bearer token for the current context (shared across all targets)',
     inputSchema: {
       type: 'object',
@@ -1265,13 +1265,13 @@ export function getMultiTargetCliMcpTools(
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.auth}_status`,
+    name: `${toolName}_${builtinNames.auth}_status`,
     description: 'Show authentication status for all contexts',
     inputSchema: { type: 'object', properties: {} },
   });
 
   tools.push({
-    name: `${toolName}_${infraNames.auth}_logout`,
+    name: `${toolName}_${builtinNames.auth}_logout`,
     description: 'Remove credentials for the current context',
     inputSchema: { type: 'object', properties: {} },
   });
@@ -1417,45 +1417,45 @@ export function getMultiTargetCliMcpTools(
 export function generateMultiTargetSkills(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile[] {
-  const { toolName, infraNames, targets } = input;
+  const { toolName, builtinNames, targets } = input;
   const files: GeneratedDocFile[] = [];
 
   const contextUsage = [
-    `${toolName} ${infraNames.context} create <name>`,
-    `${toolName} ${infraNames.context} list`,
-    `${toolName} ${infraNames.context} use <name>`,
-    `${toolName} ${infraNames.context} current`,
-    `${toolName} ${infraNames.context} delete <name>`,
+    `${toolName} ${builtinNames.context} create <name>`,
+    `${toolName} ${builtinNames.context} list`,
+    `${toolName} ${builtinNames.context} use <name>`,
+    `${toolName} ${builtinNames.context} current`,
+    `${toolName} ${builtinNames.context} delete <name>`,
   ];
   const contextCreateFlags = targets
     .map((t) => `--${t.name}-endpoint <url>`)
     .join(' ');
   files.push({
-    fileName: `skills/${infraNames.context}.md`,
+    fileName: `skills/${builtinNames.context}.md`,
     content: buildSkillFile({
-      name: `${toolName}-${infraNames.context}`,
+      name: `${toolName}-${builtinNames.context}`,
       description: `Manage API endpoint contexts for ${toolName} (multi-target: ${targets.map((t) => t.name).join(', ')})`,
       usage: contextUsage,
       examples: [
         {
           description: 'Create a context for local development (accept all defaults)',
           code: [
-            `${toolName} ${infraNames.context} create local`,
-            `${toolName} ${infraNames.context} use local`,
+            `${toolName} ${builtinNames.context} create local`,
+            `${toolName} ${builtinNames.context} use local`,
           ],
         },
         {
           description: 'Create a production context with custom endpoints',
           code: [
-            `${toolName} ${infraNames.context} create production ${contextCreateFlags}`,
-            `${toolName} ${infraNames.context} use production`,
+            `${toolName} ${builtinNames.context} create production ${contextCreateFlags}`,
+            `${toolName} ${builtinNames.context} use production`,
           ],
         },
         {
           description: 'List and switch contexts',
           code: [
-            `${toolName} ${infraNames.context} list`,
-            `${toolName} ${infraNames.context} use staging`,
+            `${toolName} ${builtinNames.context} list`,
+            `${toolName} ${builtinNames.context} use staging`,
           ],
         },
       ],
@@ -1463,23 +1463,23 @@ export function generateMultiTargetSkills(
   });
 
   files.push({
-    fileName: `skills/${infraNames.auth}.md`,
+    fileName: `skills/${builtinNames.auth}.md`,
     content: buildSkillFile({
-      name: `${toolName}-${infraNames.auth}`,
+      name: `${toolName}-${builtinNames.auth}`,
       description: `Manage authentication tokens for ${toolName} (shared across all targets)`,
       usage: [
-        `${toolName} ${infraNames.auth} set-token <token>`,
-        `${toolName} ${infraNames.auth} status`,
-        `${toolName} ${infraNames.auth} logout`,
+        `${toolName} ${builtinNames.auth} set-token <token>`,
+        `${toolName} ${builtinNames.auth} status`,
+        `${toolName} ${builtinNames.auth} logout`,
       ],
       examples: [
         {
           description: 'Authenticate with a token',
-          code: [`${toolName} ${infraNames.auth} set-token eyJhbGciOiJIUzI1NiIs...`],
+          code: [`${toolName} ${builtinNames.auth} set-token eyJhbGciOiJIUzI1NiIs...`],
         },
         {
           description: 'Check auth status',
-          code: [`${toolName} ${infraNames.auth} status`],
+          code: [`${toolName} ${builtinNames.auth} status`],
         },
       ],
     }),

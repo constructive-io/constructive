@@ -453,7 +453,7 @@ export async function generateMulti(
     const toolName = cliConfig.toolName ?? 'app';
     const { files } = generateMultiTargetCli({
       toolName,
-      infraNames: cliConfig.infraNames,
+      builtinNames: cliConfig.builtinNames,
       targets: cliTargets,
     });
 
@@ -464,15 +464,15 @@ export async function generateMulti(
 
     const firstTargetDocsConfig = names.length > 0 && configs[names[0]]?.docs;
     const docsConfig = resolveDocsConfig(firstTargetDocsConfig);
-    const { resolveInfraNames } = await import('./codegen/cli');
-    const infraNames = resolveInfraNames(
+    const { resolveBuiltinNames } = await import('./codegen/cli');
+    const builtinNames = resolveBuiltinNames(
       cliTargets.map((t) => t.name),
-      cliConfig.infraNames,
+      cliConfig.builtinNames,
     );
 
     const docsInput: MultiTargetDocsInput = {
       toolName,
-      infraNames,
+      builtinNames,
       targets: cliTargets.map((t) => ({
         name: t.name,
         endpoint: t.endpoint,

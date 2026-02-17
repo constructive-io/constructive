@@ -1,4 +1,4 @@
-import { generateCli, generateMultiTargetCli, resolveInfraNames } from '../../core/codegen/cli';
+import { generateCli, generateMultiTargetCli, resolveBuiltinNames } from '../../core/codegen/cli';
 import {
   generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
@@ -415,30 +415,30 @@ describe('resolveDocsConfig', () => {
   });
 });
 
-describe('resolveInfraNames', () => {
+describe('resolveBuiltinNames', () => {
   it('uses defaults when no collisions', () => {
-    expect(resolveInfraNames(['app', 'members'])).toEqual({
+    expect(resolveBuiltinNames(['app', 'members'])).toEqual({
       auth: 'auth',
       context: 'context',
     });
   });
 
   it('renames auth to credentials on collision', () => {
-    expect(resolveInfraNames(['auth', 'members', 'app'])).toEqual({
+    expect(resolveBuiltinNames(['auth', 'members', 'app'])).toEqual({
       auth: 'credentials',
       context: 'context',
     });
   });
 
   it('renames context to env on collision', () => {
-    expect(resolveInfraNames(['context', 'app'])).toEqual({
+    expect(resolveBuiltinNames(['context', 'app'])).toEqual({
       auth: 'auth',
       context: 'env',
     });
   });
 
   it('renames both on collision', () => {
-    expect(resolveInfraNames(['auth', 'context', 'app'])).toEqual({
+    expect(resolveBuiltinNames(['auth', 'context', 'app'])).toEqual({
       auth: 'credentials',
       context: 'env',
     });
@@ -446,7 +446,7 @@ describe('resolveInfraNames', () => {
 
   it('respects user overrides even with collisions', () => {
     expect(
-      resolveInfraNames(['auth', 'app'], { auth: 'auth' }),
+      resolveBuiltinNames(['auth', 'app'], { auth: 'auth' }),
     ).toEqual({
       auth: 'auth',
       context: 'context',
@@ -455,7 +455,7 @@ describe('resolveInfraNames', () => {
 
   it('uses user override names', () => {
     expect(
-      resolveInfraNames(['app'], { auth: 'creds', context: 'profile' }),
+      resolveBuiltinNames(['app'], { auth: 'creds', context: 'profile' }),
     ).toEqual({
       auth: 'creds',
       context: 'profile',
@@ -637,7 +637,7 @@ describe('multi-target cli generator', () => {
 describe('multi-target cli docs', () => {
   const docsInput: MultiTargetDocsInput = {
     toolName: 'myapp',
-    infraNames: { auth: 'credentials', context: 'context' },
+    builtinNames: { auth: 'credentials', context: 'context' },
     targets: [
       {
         name: 'auth',
@@ -707,7 +707,7 @@ describe('multi-target cli docs', () => {
   it('handles collision-renamed infra in docs', () => {
     const collisionInput: MultiTargetDocsInput = {
       toolName: 'myapp',
-      infraNames: { auth: 'credentials', context: 'env' },
+      builtinNames: { auth: 'credentials', context: 'env' },
       targets: docsInput.targets,
     };
     const readme = generateMultiTargetReadme(collisionInput);
@@ -716,10 +716,10 @@ describe('multi-target cli docs', () => {
   });
 });
 
-describe('multi-target cli with custom infraNames', () => {
+describe('multi-target cli with custom builtinNames', () => {
   const result = generateMultiTargetCli({
     toolName: 'myapp',
-    infraNames: { auth: 'creds', context: 'profile' },
+    builtinNames: { auth: 'creds', context: 'profile' },
     targets: [
       {
         name: 'auth',
@@ -738,7 +738,7 @@ describe('multi-target cli with custom infraNames', () => {
     ],
   });
 
-  it('uses custom infraNames from config', () => {
+  it('uses custom builtinNames from config', () => {
     const fileNames = result.files.map((f) => f.fileName).sort();
     expect(fileNames).toContain('commands/creds.ts');
     expect(fileNames).toContain('commands/profile.ts');
