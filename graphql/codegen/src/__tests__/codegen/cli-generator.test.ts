@@ -4,7 +4,12 @@ import {
   generateAgentsDocs as generateCliAgentsDocs,
   getCliMcpTools,
   generateSkills as generateCliSkills,
+  generateMultiTargetReadme,
+  generateMultiTargetAgentsDocs,
+  getMultiTargetCliMcpTools,
+  generateMultiTargetSkills,
 } from '../../core/codegen/cli/docs-generator';
+import type { MultiTargetDocsInput } from '../../core/codegen/cli/docs-generator';
 import { resolveDocsConfig } from '../../core/codegen/docs-utils';
 import {
   generateOrmReadme,
@@ -626,6 +631,88 @@ describe('multi-target cli generator', () => {
       (f) => f.fileName === 'commands/auth/user.ts',
     );
     expect(userFile!.content).toContain('../../executor');
+  });
+});
+
+describe('multi-target cli docs', () => {
+  const docsInput: MultiTargetDocsInput = {
+    toolName: 'myapp',
+    infraNames: { auth: 'credentials', context: 'context' },
+    targets: [
+      {
+        name: 'auth',
+        endpoint: 'http://auth.localhost/graphql',
+        tables: [userTable],
+        customOperations: [currentUserQuery, loginMutation],
+        isAuthTarget: true,
+      },
+      {
+        name: 'members',
+        endpoint: 'http://members.localhost/graphql',
+        tables: [memberTable],
+        customOperations: [],
+      },
+      {
+        name: 'app',
+        endpoint: 'http://app.localhost/graphql',
+        tables: [carTable],
+        customOperations: [],
+      },
+    ],
+  };
+
+  it('generates multi-target README', () => {
+    const readme = generateMultiTargetReadme(docsInput);
+    expect(readme.fileName).toBe('README.md');
+    expect(readme.content).toContain('myapp');
+    expect(readme.content).toContain('auth:user');
+    expect(readme.content).toContain('members:member');
+    expect(readme.content).toContain('app:car');
+    expect(readme.content).toContain('credentials');
+    expect(readme.content).toContain('context');
+    expect(readme.content).toMatchSnapshot();
+  });
+
+  it('generates multi-target AGENTS.md', () => {
+    const agents = generateMultiTargetAgentsDocs(docsInput);
+    expect(agents.fileName).toBe('AGENTS.md');
+    expect(agents.content).toContain('auth:user');
+    expect(agents.content).toContain('members:member');
+    expect(agents.content).toContain('app:car');
+    expect(agents.content).toMatchSnapshot();
+  });
+
+  it('generates multi-target MCP tools', () => {
+    const tools = getMultiTargetCliMcpTools(docsInput);
+    expect(tools.length).toBeGreaterThan(0);
+    const toolNames = tools.map((t) => t.name);
+    expect(toolNames).toContain('myapp_credentials_set_token');
+    expect(toolNames).toContain('myapp_context_create');
+    expect(toolNames.some((n) => n.includes('auth_user'))).toBe(true);
+    expect(toolNames.some((n) => n.includes('members_member'))).toBe(true);
+    expect(toolNames.some((n) => n.includes('app_car'))).toBe(true);
+    expect(tools).toMatchSnapshot();
+  });
+
+  it('generates multi-target skills', () => {
+    const skills = generateMultiTargetSkills(docsInput);
+    expect(skills.length).toBeGreaterThan(0);
+    const fileNames = skills.map((s) => s.fileName);
+    expect(fileNames.some((n) => n.includes('auth-'))).toBe(true);
+    expect(fileNames.some((n) => n.includes('members-'))).toBe(true);
+    expect(fileNames.some((n) => n.includes('app-'))).toBe(true);
+    expect(skills).toMatchSnapshot();
+  });
+
+  it('handles collision-renamed infra in docs', () => {
+    const collisionInput: MultiTargetDocsInput = {
+      toolName: 'myapp',
+      infraNames: { auth: 'credentials', context: 'env' },
+      targets: docsInput.targets,
+    };
+    const readme = generateMultiTargetReadme(collisionInput);
+    expect(readme.content).toContain('credentials');
+    expect(readme.content).toContain('env');
   });
 });
 

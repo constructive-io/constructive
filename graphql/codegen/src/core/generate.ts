@@ -18,7 +18,12 @@ import {
   generateAgentsDocs as generateCliAgentsDocs,
   getCliMcpTools,
   generateSkills as generateCliSkills,
+  generateMultiTargetReadme,
+  generateMultiTargetAgentsDocs,
+  getMultiTargetCliMcpTools,
+  generateMultiTargetSkills,
 } from './codegen/cli/docs-generator';
+import type { MultiTargetDocsInput } from './codegen/cli/docs-generator';
 import { resolveDocsConfig } from './codegen/docs-utils';
 import type { McpTool } from './codegen/docs-utils';
 import {
@@ -456,6 +461,52 @@ export async function generateMulti(
       path: path.posix.join('cli', file.fileName),
       content: file.content,
     }));
+
+    const firstTargetDocsConfig = names.length > 0 && configs[names[0]]?.docs;
+    const docsConfig = resolveDocsConfig(firstTargetDocsConfig);
+    const { resolveInfraNames } = await import('./codegen/cli');
+    const infraNames = resolveInfraNames(
+      cliTargets.map((t) => t.name),
+      cliConfig.infraNames,
+    );
+
+    const docsInput: MultiTargetDocsInput = {
+      toolName,
+      infraNames,
+      targets: cliTargets.map((t) => ({
+        name: t.name,
+        endpoint: t.endpoint,
+        tables: t.tables,
+        customOperations: [
+          ...(t.customOperations?.queries ?? []),
+          ...(t.customOperations?.mutations ?? []),
+        ],
+        isAuthTarget: t.isAuthTarget,
+      })),
+    };
+
+    const allMcpTools: McpTool[] = [];
+
+    if (docsConfig.readme) {
+      const readme = generateMultiTargetReadme(docsInput);
+      cliFilesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
+    }
+    if (docsConfig.agents) {
+      const agents = generateMultiTargetAgentsDocs(docsInput);
+      cliFilesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
+    }
+    if (docsConfig.mcp) {
+      allMcpTools.push(...getMultiTargetCliMcpTools(docsInput));
+    }
+    if (docsConfig.skills) {
+      for (const skill of generateMultiTargetSkills(docsInput)) {
+        cliFilesToWrite.push({ path: path.posix.join('cli', skill.fileName), content: skill.content });
+      }
+    }
+    if (docsConfig.mcp && allMcpTools.length > 0) {
+      const mcpFile = generateCombinedMcpConfig(allMcpTools, toolName);
+      cliFilesToWrite.push({ path: path.posix.join('cli', mcpFile.fileName), content: mcpFile.content });
+    }
 
     const { writeGeneratedFiles: writeFiles } = await import('./output');
     await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });

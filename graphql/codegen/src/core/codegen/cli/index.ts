@@ -226,7 +226,12 @@ export {
   generateAgentsDocs,
   getCliMcpTools,
   generateSkills,
+  generateMultiTargetReadme,
+  generateMultiTargetAgentsDocs,
+  getMultiTargetCliMcpTools,
+  generateMultiTargetSkills,
 } from './docs-generator';
+export type { MultiTargetDocsInput } from './docs-generator';
 export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
 export type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';
