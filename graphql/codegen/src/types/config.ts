@@ -137,6 +137,42 @@ export interface DbConfig {
 }
 
 /**
+ * Documentation generation options for CLI
+ * Controls which doc formats are generated alongside CLI commands
+ */
+export interface DocsConfig {
+  /**
+   * Generate README.md — human-readable overview with setup, commands, examples
+   * @default true
+   */
+  readme?: boolean;
+
+  /**
+   * Generate AGENTS.md — structured markdown optimized for LLM consumption
+   * Includes: tool definitions, exact signatures, input/output schemas,
+   * workflow recipes, error handling, and machine-parseable sections
+   * @default true
+   */
+  agents?: boolean;
+
+  /**
+   * Generate mcp.json — MCP (Model Context Protocol) tool definitions
+   * Each CLI command becomes a tool with typed inputSchema (JSON Schema)
+   * Ready to plug into any MCP-compatible agent
+   * @default false
+   */
+  mcp?: boolean;
+
+  /**
+   * Generate skills/ directory — per-command .md skill files
+   * Each command gets its own skill file with description, usage, and examples
+   * Compatible with Devin and similar agent skill systems
+   * @default false
+   */
+  skills?: boolean;
+}
+
+/**
  * CLI generation configuration
  */
 export interface CliConfig {
@@ -145,6 +181,14 @@ export interface CliConfig {
    * @default derived from output directory name
    */
   toolName?: string;
+
+  /**
+   * Documentation generation options
+   * Controls which doc formats are generated alongside CLI commands
+   * Set to `true` to enable all formats, or configure individually
+   * @default { readme: true, agents: true, mcp: false, skills: false }
+   */
+  docs?: DocsConfig | boolean;
 }
 
 /**

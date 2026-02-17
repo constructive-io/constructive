@@ -133,6 +133,30 @@ describe('cli-generator', () => {
     });
   });
 
+  it('generates README.md by default', () => {
+    const file = result.files.find((f) => f.fileName === 'README.md');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates AGENTS.md by default', () => {
+    const file = result.files.find((f) => f.fileName === 'AGENTS.md');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('does not generate mcp.json by default', () => {
+    const file = result.files.find((f) => f.fileName === 'mcp.json');
+    expect(file).toBeUndefined();
+  });
+
+  it('does not generate skills by default', () => {
+    const skillFiles = result.files.filter((f) =>
+      f.fileName.startsWith('skills/'),
+    );
+    expect(skillFiles).toHaveLength(0);
+  });
+
   it('generates executor.ts', () => {
     const file = result.files.find((f) => f.fileName === 'executor.ts');
     expect(file).toBeDefined();
@@ -187,17 +211,6 @@ describe('cli-generator', () => {
     expect(file!.content).toMatchSnapshot();
   });
 
-  it('generates README.md', () => {
-    const file = result.files.find((f) => f.fileName === 'README.md');
-    expect(file).toBeDefined();
-    expect(file!.content).toMatchSnapshot();
-  });
-
-  it('generates COMMANDS.md (man-page reference)', () => {
-    const file = result.files.find((f) => f.fileName === 'COMMANDS.md');
-    expect(file).toBeDefined();
-    expect(file!.content).toMatchSnapshot();
-  });
 
   it('uses ORM methods in table commands', () => {
     const carFile = result.files.find(
@@ -228,7 +241,7 @@ describe('cli-generator', () => {
   it('generates correct file names', () => {
     const fileNames = result.files.map((f) => f.fileName).sort();
     expect(fileNames).toEqual([
-      'COMMANDS.md',
+      'AGENTS.md',
       'README.md',
       'commands.ts',
       'commands/auth.ts',
@@ -239,5 +252,94 @@ describe('cli-generator', () => {
       'commands/login.ts',
       'executor.ts',
     ]);
+  });
+});
+
+describe('cli-generator docs: true (all formats)', () => {
+  const result = generateCli({
+    tables: [carTable, driverTable],
+    customOperations: {
+      queries: [currentUserQuery],
+      mutations: [loginMutation],
+    },
+    config: {
+      cli: { toolName: 'myapp', docs: true },
+    },
+  });
+
+  it('generates mcp.json', () => {
+    const file = result.files.find((f) => f.fileName === 'mcp.json');
+    expect(file).toBeDefined();
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates skill files', () => {
+    const skillFiles = result.files.filter((f) =>
+      f.fileName.startsWith('skills/'),
+    );
+    expect(skillFiles.length).toBeGreaterThan(0);
+    for (const sf of skillFiles) {
+      expect(sf.content).toMatchSnapshot();
+    }
+  });
+
+  it('generates correct file names with all docs', () => {
+    const fileNames = result.files.map((f) => f.fileName).sort();
+    expect(fileNames).toEqual([
+      'AGENTS.md',
+      'README.md',
+      'commands.ts',
+      'commands/auth.ts',
+      'commands/car.ts',
+      'commands/context.ts',
+      'commands/current-user.ts',
+      'commands/driver.ts',
+      'commands/login.ts',
+      'executor.ts',
+      'mcp.json',
+      'skills/auth.md',
+      'skills/car.md',
+      'skills/context.md',
+      'skills/current-user.md',
+      'skills/driver.md',
+      'skills/login.md',
+    ]);
+  });
+
+  it('mcp.json has valid tool definitions', () => {
+    const file = result.files.find((f) => f.fileName === 'mcp.json');
+    const parsed = JSON.parse(file!.content);
+    expect(parsed.name).toBe('myapp');
+    expect(parsed.tools).toBeDefined();
+    expect(parsed.tools.length).toBeGreaterThan(0);
+    for (const tool of parsed.tools) {
+      expect(tool.name).toBeDefined();
+      expect(tool.description).toBeDefined();
+      expect(tool.inputSchema).toBeDefined();
+    }
+  });
+});
+
+describe('cli-generator docs: false', () => {
+  const result = generateCli({
+    tables: [carTable, driverTable],
+    customOperations: {
+      queries: [currentUserQuery],
+      mutations: [loginMutation],
+    },
+    config: {
+      cli: { toolName: 'myapp', docs: false },
+    },
+  });
+
+  it('generates no doc files', () => {
+    const docFiles = result.files.filter(
+      (f) =>
+        f.fileName === 'README.md' ||
+        f.fileName === 'AGENTS.md' ||
+        f.fileName === 'mcp.json' ||
+        f.fileName.startsWith('skills/'),
+    );
+    expect(docFiles).toHaveLength(0);
   });
 });

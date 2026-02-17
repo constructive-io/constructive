@@ -1,8 +1,14 @@
-import type { GraphQLSDKConfigTarget } from '../../../types/config';
+import type { CliConfig, GraphQLSDKConfigTarget } from '../../../types/config';
 import type { CleanOperation, CleanTable } from '../../../types/schema';
 import { generateCommandMap } from './command-map-generator';
 import { generateCustomCommand } from './custom-command-generator';
-import { generateReadme, generateCommandReference } from './docs-generator';
+import {
+  generateReadme,
+  generateAgentsDocs,
+  generateMcpConfig,
+  generateSkills,
+  resolveDocsConfig,
+} from './docs-generator';
 import { generateExecutorFile } from './executor-generator';
 import type { GeneratedFile } from './executor-generator';
 import { generateAuthCommand, generateContextCommand } from './infra-generator';
@@ -69,11 +75,27 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   );
   files.push(commandMapFile);
 
-  const readmeFile = generateReadme(tables, allCustomOps, toolName);
-  files.push(readmeFile);
+  const docsConfig = resolveDocsConfig(
+    typeof cliConfig === 'object' ? (cliConfig as CliConfig).docs : undefined,
+  );
 
-  const commandRefFile = generateCommandReference(tables, allCustomOps, toolName);
-  files.push(commandRefFile);
+  if (docsConfig.readme) {
+    files.push(generateReadme(tables, allCustomOps, toolName));
+  }
+
+  if (docsConfig.agents) {
+    files.push(generateAgentsDocs(tables, allCustomOps, toolName));
+  }
+
+  if (docsConfig.mcp) {
+    files.push(generateMcpConfig(tables, allCustomOps, toolName));
+  }
+
+  if (docsConfig.skills) {
+    for (const skillFile of generateSkills(tables, allCustomOps, toolName)) {
+      files.push(skillFile);
+    }
+  }
 
   return {
     files,
@@ -97,6 +119,9 @@ export {
 } from './infra-generator';
 export {
   generateReadme,
-  generateCommandReference,
+  generateAgentsDocs,
+  generateMcpConfig,
+  generateSkills,
+  resolveDocsConfig,
 } from './docs-generator';
 export type { GeneratedFile } from './executor-generator';

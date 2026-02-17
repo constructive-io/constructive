@@ -6,6 +6,7 @@ import {
   getPrimaryKeyInfo,
 } from '../utils';
 import type { CleanTable, CleanOperation } from '../../../types/schema';
+import type { DocsConfig } from '../../../types/config';
 import type { GeneratedFile } from './executor-generator';
 
 function formatArgType(arg: CleanOperation['args'][number]): string {
@@ -26,196 +27,48 @@ function formatTypeRef(t: CleanOperation['args'][number]['type']): string {
   return t.name ?? 'unknown';
 }
 
-function buildTableSection(table: CleanTable): string {
-  const { singularName } = getTableNames(table);
-  const kebab = toKebabCase(singularName);
+function getEditableFields(table: CleanTable) {
   const pk = getPrimaryKeyInfo(table)[0];
-  const scalarFields = getScalarFields(table);
-  const editableFields = scalarFields.filter(
+  return getScalarFields(table).filter(
     (f) =>
       f.name !== pk.name &&
       f.name !== 'nodeId' &&
       f.name !== 'createdAt' &&
       f.name !== 'updatedAt',
   );
-
-  const lines: string[] = [];
-
-  lines.push(`### \`${kebab}\``);
-  lines.push('');
-  lines.push(`CRUD operations for ${table.name} records.`);
-  lines.push('');
-  lines.push('| Subcommand | Description |');
-  lines.push('|------------|-------------|');
-  lines.push(`| \`list\` | List all ${singularName} records |`);
-  lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
-  lines.push(`| \`create\` | Create a new ${singularName} |`);
-  lines.push(`| \`update\` | Update an existing ${singularName} |`);
-  lines.push(`| \`delete\` | Delete a ${singularName} |`);
-  lines.push('');
-
-  lines.push('**Fields:**');
-  lines.push('');
-  lines.push('| Field | Type |');
-  lines.push('|-------|------|');
-  for (const f of scalarFields) {
-    lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
-  }
-  lines.push('');
-
-  lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
-  lines.push('');
-
-  return lines.join('\n');
 }
 
-function buildCustomOpSection(op: CleanOperation): string {
-  const kebab = toKebabCase(op.name);
-  const lines: string[] = [];
-
-  lines.push(`### \`${kebab}\``);
-  lines.push('');
-  lines.push(op.description || op.name);
-  lines.push('');
-  lines.push(`- **Type:** ${op.kind}`);
-
-  if (op.args.length > 0) {
-    lines.push('- **Arguments:**');
-    lines.push('');
-    lines.push('  | Argument | Type |');
-    lines.push('  |----------|------|');
-    for (const arg of op.args) {
-      lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
-    }
-    lines.push('');
-  } else {
-    lines.push('- **Arguments:** none');
-    lines.push('');
+function gqlTypeToJsonSchemaType(gqlType: string): string {
+  switch (gqlType) {
+    case 'Int':
+      return 'integer';
+    case 'Float':
+      return 'number';
+    case 'Boolean':
+      return 'boolean';
+    default:
+      return 'string';
   }
-
-  return lines.join('\n');
 }
 
-function buildTableManPage(table: CleanTable): string {
-  const { singularName } = getTableNames(table);
-  const kebab = toKebabCase(singularName);
-  const pk = getPrimaryKeyInfo(table)[0];
-  const scalarFields = getScalarFields(table);
-  const editableFields = scalarFields.filter(
-    (f) =>
-      f.name !== pk.name &&
-      f.name !== 'nodeId' &&
-      f.name !== 'createdAt' &&
-      f.name !== 'updatedAt',
-  );
-
-  const lines: string[] = [];
-
-  lines.push(`## ${kebab}(1)`);
-  lines.push('');
-  lines.push('### NAME');
-  lines.push('');
-  lines.push(`${kebab} - manage ${table.name} records`);
-  lines.push('');
-  lines.push('### SYNOPSIS');
-  lines.push('');
-  lines.push(`    ${kebab} <command> [options]`);
-  lines.push('');
-  lines.push('### COMMANDS');
-  lines.push('');
-
-  lines.push('**list**');
-  lines.push('');
-  lines.push(`    ${kebab} list`);
-  lines.push('');
-  lines.push(`List all ${singularName} records. Returns JSON array.`);
-  lines.push('');
-  lines.push(`Selected fields: ${scalarFields.map((f) => f.name).join(', ')}`);
-  lines.push('');
-
-  lines.push('**get**');
-  lines.push('');
-  lines.push(`    ${kebab} get --${pk.name} <value>`);
-  lines.push('');
-  lines.push(`Fetch a single ${singularName} by its ${pk.name}.`);
-  lines.push('');
-
-  lines.push('**create**');
-  lines.push('');
-  const createFlags = editableFields.map((f) => `--${f.name} <value>`).join(' ');
-  lines.push(`    ${kebab} create ${createFlags}`);
-  lines.push('');
-  lines.push(`Create a new ${singularName}. All fields are required.`);
-  lines.push('');
-  lines.push('  Options:');
-  for (const f of editableFields) {
-    lines.push(`    --${f.name.padEnd(20)} ${f.type.gqlType} (required)`);
+export function resolveDocsConfig(
+  docs: DocsConfig | boolean | undefined,
+): DocsConfig {
+  if (docs === true) {
+    return { readme: true, agents: true, mcp: true, skills: true };
   }
-  lines.push('');
-
-  lines.push('**update**');
-  lines.push('');
-  const updateFlags = editableFields.map((f) => `[--${f.name} <value>]`).join(' ');
-  lines.push(`    ${kebab} update --${pk.name} <value> ${updateFlags}`);
-  lines.push('');
-  lines.push(`Update an existing ${singularName}. Only provided fields are changed.`);
-  lines.push('');
-  lines.push('  Options:');
-  lines.push(`    --${pk.name.padEnd(20)} ${pk.gqlType} (required)`);
-  for (const f of editableFields) {
-    lines.push(`    --${f.name.padEnd(20)} ${f.type.gqlType}`);
+  if (docs === false) {
+    return { readme: false, agents: false, mcp: false, skills: false };
   }
-  lines.push('');
-
-  lines.push('**delete**');
-  lines.push('');
-  lines.push(`    ${kebab} delete --${pk.name} <value>`);
-  lines.push('');
-  lines.push(`Delete a ${singularName} by its ${pk.name}.`);
-  lines.push('');
-
-  return lines.join('\n');
-}
-
-function buildCustomOpManPage(op: CleanOperation): string {
-  const kebab = toKebabCase(op.name);
-  const lines: string[] = [];
-
-  lines.push(`## ${kebab}(1)`);
-  lines.push('');
-  lines.push('### NAME');
-  lines.push('');
-  lines.push(`${kebab} - ${op.description || op.name}`);
-  lines.push('');
-  lines.push('### SYNOPSIS');
-  lines.push('');
-
-  if (op.args.length > 0) {
-    const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
-    lines.push(`    ${kebab} ${flags}`);
-  } else {
-    lines.push(`    ${kebab}`);
+  if (!docs) {
+    return { readme: true, agents: true, mcp: false, skills: false };
   }
-  lines.push('');
-
-  lines.push('### DESCRIPTION');
-  lines.push('');
-  lines.push(op.description || `Execute the ${op.name} ${op.kind}.`);
-  lines.push('');
-
-  if (op.args.length > 0) {
-    lines.push('### OPTIONS');
-    lines.push('');
-    for (const arg of op.args) {
-      lines.push(`**--${arg.name}** ${formatArgType(arg)}`);
-      if (arg.description) {
-        lines.push(`    ${arg.description}`);
-      }
-      lines.push('');
-    }
-  }
-
-  return lines.join('\n');
+  return {
+    readme: docs.readme ?? true,
+    agents: docs.agents ?? true,
+    mcp: docs.mcp ?? false,
+    skills: docs.skills ?? false,
+  };
 }
 
 export function generateReadme(
@@ -292,7 +145,34 @@ export function generateReadme(
     lines.push('## Table Commands');
     lines.push('');
     for (const table of tables) {
-      lines.push(buildTableSection(table));
+      const { singularName } = getTableNames(table);
+      const kebab = toKebabCase(singularName);
+      const pk = getPrimaryKeyInfo(table)[0];
+      const scalarFields = getScalarFields(table);
+      const editableFields = getEditableFields(table);
+
+      lines.push(`### \`${kebab}\``);
+      lines.push('');
+      lines.push(`CRUD operations for ${table.name} records.`);
+      lines.push('');
+      lines.push('| Subcommand | Description |');
+      lines.push('|------------|-------------|');
+      lines.push(`| \`list\` | List all ${singularName} records |`);
+      lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
+      lines.push(`| \`create\` | Create a new ${singularName} |`);
+      lines.push(`| \`update\` | Update an existing ${singularName} |`);
+      lines.push(`| \`delete\` | Delete a ${singularName} |`);
+      lines.push('');
+      lines.push('**Fields:**');
+      lines.push('');
+      lines.push('| Field | Type |');
+      lines.push('|-------|------|');
+      for (const f of scalarFields) {
+        lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
+      }
+      lines.push('');
+      lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      lines.push('');
     }
   }
 
@@ -300,7 +180,24 @@ export function generateReadme(
     lines.push('## Custom Operations');
     lines.push('');
     for (const op of customOperations) {
-      lines.push(buildCustomOpSection(op));
+      const kebab = toKebabCase(op.name);
+      lines.push(`### \`${kebab}\``);
+      lines.push('');
+      lines.push(op.description || op.name);
+      lines.push('');
+      lines.push(`- **Type:** ${op.kind}`);
+      if (op.args.length > 0) {
+        lines.push('- **Arguments:**');
+        lines.push('');
+        lines.push('  | Argument | Type |');
+        lines.push('  |----------|------|');
+        for (const arg of op.args) {
+          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        }
+      } else {
+        lines.push('- **Arguments:** none');
+      }
+      lines.push('');
     }
   }
 
@@ -320,98 +217,608 @@ export function generateReadme(
   };
 }
 
-export function generateCommandReference(
+export function generateAgentsDocs(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
 ): GeneratedFile {
   const lines: string[] = [];
 
-  lines.push(`# ${toolName} - Command Reference`);
+  lines.push(`# ${toolName} CLI - Agent Reference`);
   lines.push('');
   lines.push('> @generated by @constructive-io/graphql-codegen - DO NOT EDIT');
-  lines.push('');
-  lines.push('---');
-  lines.push('');
-
-  lines.push('## context(1)');
-  lines.push('');
-  lines.push('### NAME');
-  lines.push('');
-  lines.push('context - manage API endpoint contexts');
-  lines.push('');
-  lines.push('### SYNOPSIS');
-  lines.push('');
-  lines.push(`    ${toolName} context <command> [options]`);
-  lines.push('');
-  lines.push('### COMMANDS');
-  lines.push('');
-  lines.push('**create** `<name>` `--endpoint <url>`');
-  lines.push('');
-  lines.push('    Create a named context pointing at a GraphQL endpoint.');
-  lines.push(`    Config stored at ~/.${toolName}/config/contexts/<name>.json`);
-  lines.push('');
-  lines.push('**list**');
-  lines.push('');
-  lines.push('    List all configured contexts with auth status.');
-  lines.push('');
-  lines.push('**use** `<name>`');
-  lines.push('');
-  lines.push('    Set the active context for subsequent commands.');
-  lines.push('');
-  lines.push('**current**');
-  lines.push('');
-  lines.push('    Display the currently active context and its endpoint.');
-  lines.push('');
-  lines.push('**delete** `<name>`');
-  lines.push('');
-  lines.push('    Remove a context and its configuration.');
-  lines.push('');
-  lines.push('---');
+  lines.push('> This document is structured for LLM/agent consumption.');
   lines.push('');
 
-  lines.push('## auth(1)');
+  lines.push('## OVERVIEW');
   lines.push('');
-  lines.push('### NAME');
+  lines.push(`\`${toolName}\` is a CLI tool for interacting with a GraphQL API.`);
+  lines.push('All commands output JSON to stdout. All commands accept `--help` or `-h` for usage.');
+  lines.push(`Configuration is stored at \`~/.${toolName}/config/\` via appstash.`);
   lines.push('');
-  lines.push('auth - manage authentication tokens');
+
+  lines.push('## PREREQUISITES');
   lines.push('');
-  lines.push('### SYNOPSIS');
+  lines.push('Before running any data commands, you must:');
   lines.push('');
-  lines.push(`    ${toolName} auth <command> [options]`);
+  lines.push(`1. Create a context: \`${toolName} context create <name> --endpoint <url>\``);
+  lines.push(`2. Activate it: \`${toolName} context use <name>\``);
+  lines.push(`3. Authenticate: \`${toolName} auth set-token <token>\``);
   lines.push('');
-  lines.push('### COMMANDS');
+
+  lines.push('## TOOLS');
   lines.push('');
-  lines.push('**set-token** `<token>` `[--context <name>]`');
+
+  lines.push('### TOOL: context');
   lines.push('');
-  lines.push('    Store a bearer token for the current (or specified) context.');
-  lines.push(`    Credentials stored at ~/.${toolName}/config/credentials.json (mode 0600).`);
+  lines.push('Manage named API endpoint contexts (like kubectl contexts).');
   lines.push('');
-  lines.push('**status**');
+  lines.push('```');
+  lines.push('SUBCOMMANDS:');
+  lines.push(`  ${toolName} context create <name> --endpoint <url>   Create a new context`);
+  lines.push(`  ${toolName} context list                              List all contexts`);
+  lines.push(`  ${toolName} context use <name>                        Set active context`);
+  lines.push(`  ${toolName} context current                           Show active context`);
+  lines.push(`  ${toolName} context delete <name>                     Delete a context`);
   lines.push('');
-  lines.push('    Show authentication status for all contexts.');
+  lines.push('INPUT:');
+  lines.push('  name:     string (required) - Context identifier');
+  lines.push('  endpoint: string (required for create) - GraphQL endpoint URL');
   lines.push('');
-  lines.push('**logout** `[--context <name>]`');
+  lines.push('OUTPUT: JSON');
+  lines.push('  create:  { name, endpoint }');
+  lines.push('  list:    [{ name, endpoint, isCurrent, hasCredentials }]');
+  lines.push('  use:     { name, endpoint }');
+  lines.push('  current: { name, endpoint }');
+  lines.push('  delete:  { deleted: name }');
+  lines.push('```');
   lines.push('');
-  lines.push('    Remove stored credentials for the current (or specified) context.');
+
+  lines.push('### TOOL: auth');
   lines.push('');
-  lines.push('---');
+  lines.push('Manage authentication tokens per context.');
+  lines.push('');
+  lines.push('```');
+  lines.push('SUBCOMMANDS:');
+  lines.push(`  ${toolName} auth set-token <token>   Store bearer token for current context`);
+  lines.push(`  ${toolName} auth status               Show auth status for all contexts`);
+  lines.push(`  ${toolName} auth logout                Remove credentials for current context`);
+  lines.push('');
+  lines.push('INPUT:');
+  lines.push('  token: string (required for set-token) - Bearer token value');
+  lines.push('');
+  lines.push('OUTPUT: JSON');
+  lines.push('  set-token: { context, status: "authenticated" }');
+  lines.push('  status:    [{ context, authenticated: boolean }]');
+  lines.push('  logout:    { context, status: "logged out" }');
+  lines.push('```');
   lines.push('');
 
   for (const table of tables) {
-    lines.push(buildTableManPage(table));
-    lines.push('---');
+    const { singularName } = getTableNames(table);
+    const kebab = toKebabCase(singularName);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const scalarFields = getScalarFields(table);
+    const editableFields = getEditableFields(table);
+
+    lines.push(`### TOOL: ${kebab}`);
+    lines.push('');
+    lines.push(`CRUD operations for ${table.name} records.`);
+    lines.push('');
+    lines.push('```');
+    lines.push('SUBCOMMANDS:');
+    lines.push(`  ${toolName} ${kebab} list                               List all records`);
+    lines.push(`  ${toolName} ${kebab} get --${pk.name} <value>              Get one record`);
+    lines.push(`  ${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`);
+    lines.push(`  ${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`);
+    lines.push(`  ${toolName} ${kebab} delete --${pk.name} <value>           Delete one record`);
+    lines.push('');
+    lines.push('INPUT FIELDS:');
+    for (const f of scalarFields) {
+      const isPk = f.name === pk.name;
+      lines.push(`  ${f.name}: ${f.type.gqlType}${isPk ? ' (primary key)' : ''}`);
+    }
+    lines.push('');
+    lines.push('EDITABLE FIELDS (for create/update):');
+    for (const f of editableFields) {
+      lines.push(`  ${f.name}: ${f.type.gqlType}`);
+    }
+    lines.push('');
+    lines.push('OUTPUT: JSON');
+    lines.push(`  list:   [{ ${scalarFields.map((f) => f.name).join(', ')} }]`);
+    lines.push(`  get:    { ${scalarFields.map((f) => f.name).join(', ')} }`);
+    lines.push(`  create: { ${scalarFields.map((f) => f.name).join(', ')} }`);
+    lines.push(`  update: { ${scalarFields.map((f) => f.name).join(', ')} }`);
+    lines.push(`  delete: { ${pk.name} }`);
+    lines.push('```');
     lines.push('');
   }
 
   for (const op of customOperations) {
-    lines.push(buildCustomOpManPage(op));
-    lines.push('---');
+    const kebab = toKebabCase(op.name);
+
+    lines.push(`### TOOL: ${kebab}`);
+    lines.push('');
+    lines.push(op.description || op.name);
+    lines.push('');
+    lines.push('```');
+    lines.push(`TYPE: ${op.kind}`);
+    if (op.args.length > 0) {
+      const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
+      lines.push(`USAGE: ${toolName} ${kebab} ${flags}`);
+      lines.push('');
+      lines.push('INPUT:');
+      for (const arg of op.args) {
+        lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+      }
+    } else {
+      lines.push(`USAGE: ${toolName} ${kebab}`);
+      lines.push('');
+      lines.push('INPUT: none');
+    }
+    lines.push('');
+    lines.push('OUTPUT: JSON');
+    lines.push('```');
     lines.push('');
   }
 
+  lines.push('## WORKFLOWS');
+  lines.push('');
+  lines.push('### Initial setup');
+  lines.push('');
+  lines.push('```bash');
+  lines.push(`${toolName} context create dev --endpoint http://localhost:5000/graphql`);
+  lines.push(`${toolName} context use dev`);
+  lines.push(`${toolName} auth set-token eyJhbGciOiJIUzI1NiIs...`);
+  lines.push('```');
+  lines.push('');
+
+  if (tables.length > 0) {
+    const firstTable = tables[0];
+    const { singularName } = getTableNames(firstTable);
+    const kebab = toKebabCase(singularName);
+    const editableFields = getEditableFields(firstTable);
+    const pk = getPrimaryKeyInfo(firstTable)[0];
+
+    lines.push(`### CRUD workflow (${kebab})`);
+    lines.push('');
+    lines.push('```bash');
+    lines.push(`# List all`);
+    lines.push(`${toolName} ${kebab} list`);
+    lines.push('');
+    lines.push(`# Create`);
+    lines.push(`${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`);
+    lines.push('');
+    lines.push(`# Get by ${pk.name}`);
+    lines.push(`${toolName} ${kebab} get --${pk.name} <value>`);
+    lines.push('');
+    lines.push(`# Update`);
+    lines.push(`${toolName} ${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`);
+    lines.push('');
+    lines.push(`# Delete`);
+    lines.push(`${toolName} ${kebab} delete --${pk.name} <value>`);
+    lines.push('```');
+    lines.push('');
+  }
+
+  lines.push('### Piping output');
+  lines.push('');
+  lines.push('```bash');
+  lines.push(`# Pretty print`);
+  lines.push(`${toolName} car list | jq '.'`);
+  lines.push('');
+  lines.push(`# Extract field`);
+  lines.push(`${toolName} car list | jq '.[].id'`);
+  lines.push('');
+  lines.push(`# Count results`);
+  lines.push(`${toolName} car list | jq 'length'`);
+  lines.push('```');
+  lines.push('');
+
+  lines.push('## ERROR HANDLING');
+  lines.push('');
+  lines.push('All errors are written to stderr. Exit codes:');
+  lines.push('- `0`: Success');
+  lines.push('- `1`: Error (auth failure, not found, validation error, network error)');
+  lines.push('');
+  lines.push('Common errors:');
+  lines.push('- "No active context": Run `context use <name>` first');
+  lines.push('- "Not authenticated": Run `auth set-token <token>` first');
+  lines.push('- "Record not found": The requested ID does not exist');
+  lines.push('');
+
   return {
-    fileName: 'COMMANDS.md',
+    fileName: 'AGENTS.md',
     content: lines.join('\n'),
   };
+}
+
+export function generateMcpConfig(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+  toolName: string,
+): GeneratedFile {
+  const tools: Record<string, unknown>[] = [];
+
+  tools.push({
+    name: `${toolName}_context_create`,
+    description: 'Create a named API context pointing at a GraphQL endpoint',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Context name' },
+        endpoint: { type: 'string', description: 'GraphQL endpoint URL' },
+      },
+      required: ['name', 'endpoint'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_context_list`,
+    description: 'List all configured API contexts',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  tools.push({
+    name: `${toolName}_context_use`,
+    description: 'Set the active API context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Context name to activate' },
+      },
+      required: ['name'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_context_current`,
+    description: 'Show the currently active API context',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  tools.push({
+    name: `${toolName}_context_delete`,
+    description: 'Delete an API context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Context name to delete' },
+      },
+      required: ['name'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_auth_set_token`,
+    description: 'Store a bearer token for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string', description: 'Bearer token value' },
+      },
+      required: ['token'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_auth_status`,
+    description: 'Show authentication status for all contexts',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  tools.push({
+    name: `${toolName}_auth_logout`,
+    description: 'Remove credentials for the current context',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    const kebab = toKebabCase(singularName);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const scalarFields = getScalarFields(table);
+    const editableFields = getEditableFields(table);
+
+    tools.push({
+      name: `${toolName}_${kebab}_list`,
+      description: `List all ${table.name} records`,
+      inputSchema: { type: 'object', properties: {} },
+    });
+
+    tools.push({
+      name: `${toolName}_${kebab}_get`,
+      description: `Get a single ${table.name} record by ${pk.name}`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          [pk.name]: {
+            type: gqlTypeToJsonSchemaType(pk.gqlType),
+            description: `${table.name} ${pk.name}`,
+          },
+        },
+        required: [pk.name],
+      },
+    });
+
+    const createProps: Record<string, unknown> = {};
+    for (const f of editableFields) {
+      createProps[f.name] = {
+        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        description: `${table.name} ${f.name}`,
+      };
+    }
+    tools.push({
+      name: `${toolName}_${kebab}_create`,
+      description: `Create a new ${table.name} record`,
+      inputSchema: {
+        type: 'object',
+        properties: createProps,
+        required: editableFields.map((f) => f.name),
+      },
+    });
+
+    const updateProps: Record<string, unknown> = {
+      [pk.name]: {
+        type: gqlTypeToJsonSchemaType(pk.gqlType),
+        description: `${table.name} ${pk.name}`,
+      },
+    };
+    for (const f of editableFields) {
+      updateProps[f.name] = {
+        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        description: `${table.name} ${f.name}`,
+      };
+    }
+    tools.push({
+      name: `${toolName}_${kebab}_update`,
+      description: `Update an existing ${table.name} record`,
+      inputSchema: {
+        type: 'object',
+        properties: updateProps,
+        required: [pk.name],
+      },
+    });
+
+    tools.push({
+      name: `${toolName}_${kebab}_delete`,
+      description: `Delete a ${table.name} record by ${pk.name}`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          [pk.name]: {
+            type: gqlTypeToJsonSchemaType(pk.gqlType),
+            description: `${table.name} ${pk.name}`,
+          },
+        },
+        required: [pk.name],
+      },
+    });
+
+    tools.push({
+      name: `${toolName}_${kebab}_fields`,
+      description: `List available fields for ${table.name}`,
+      inputSchema: { type: 'object', properties: {} },
+      _meta: {
+        fields: scalarFields.map((f) => ({
+          name: f.name,
+          type: f.type.gqlType,
+          editable: editableFields.some((ef) => ef.name === f.name),
+          primaryKey: f.name === pk.name,
+        })),
+      },
+    });
+  }
+
+  for (const op of customOperations) {
+    const kebab = toKebabCase(op.name);
+    const props: Record<string, unknown> = {};
+    const required: string[] = [];
+
+    for (const arg of op.args) {
+      const isRequired = arg.type.kind === 'NON_NULL';
+      const baseType = isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
+      props[arg.name] = {
+        type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
+        description: arg.description || arg.name,
+      };
+      if (isRequired) {
+        required.push(arg.name);
+      }
+    }
+
+    tools.push({
+      name: `${toolName}_${kebab}`,
+      description: op.description || op.name,
+      inputSchema: {
+        type: 'object',
+        properties: props,
+        ...(required.length > 0 ? { required } : {}),
+      },
+    });
+  }
+
+  const mcpConfig = {
+    name: toolName,
+    version: '1.0.0',
+    description: `MCP tool definitions for ${toolName} CLI (auto-generated from GraphQL schema)`,
+    tools,
+  };
+
+  return {
+    fileName: 'mcp.json',
+    content: JSON.stringify(mcpConfig, null, 2) + '\n',
+  };
+}
+
+export function generateSkills(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+  toolName: string,
+): GeneratedFile[] {
+  const files: GeneratedFile[] = [];
+
+  files.push({
+    fileName: 'skills/context.md',
+    content: buildSkillFile({
+      name: `${toolName}-context`,
+      description: `Manage API endpoint contexts for ${toolName}`,
+      usage: [
+        `${toolName} context create <name> --endpoint <url>`,
+        `${toolName} context list`,
+        `${toolName} context use <name>`,
+        `${toolName} context current`,
+        `${toolName} context delete <name>`,
+      ],
+      examples: [
+        {
+          description: 'Create and activate a context',
+          commands: [
+            `${toolName} context create production --endpoint https://api.example.com/graphql`,
+            `${toolName} context use production`,
+          ],
+        },
+        {
+          description: 'List all contexts',
+          commands: [`${toolName} context list`],
+        },
+      ],
+    }),
+  });
+
+  files.push({
+    fileName: 'skills/auth.md',
+    content: buildSkillFile({
+      name: `${toolName}-auth`,
+      description: `Manage authentication tokens for ${toolName}`,
+      usage: [
+        `${toolName} auth set-token <token>`,
+        `${toolName} auth status`,
+        `${toolName} auth logout`,
+      ],
+      examples: [
+        {
+          description: 'Authenticate with a token',
+          commands: [`${toolName} auth set-token eyJhbGciOiJIUzI1NiIs...`],
+        },
+        {
+          description: 'Check auth status',
+          commands: [`${toolName} auth status`],
+        },
+      ],
+    }),
+  });
+
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    const kebab = toKebabCase(singularName);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const editableFields = getEditableFields(table);
+
+    files.push({
+      fileName: `skills/${kebab}.md`,
+      content: buildSkillFile({
+        name: `${toolName}-${kebab}`,
+        description: `CRUD operations for ${table.name} records via ${toolName} CLI`,
+        usage: [
+          `${toolName} ${kebab} list`,
+          `${toolName} ${kebab} get --${pk.name} <value>`,
+          `${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`,
+          `${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`,
+          `${toolName} ${kebab} delete --${pk.name} <value>`,
+        ],
+        examples: [
+          {
+            description: `List all ${singularName} records`,
+            commands: [`${toolName} ${kebab} list`],
+          },
+          {
+            description: `Create a ${singularName}`,
+            commands: [
+              `${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`,
+            ],
+          },
+          {
+            description: `Get a ${singularName} by ${pk.name}`,
+            commands: [`${toolName} ${kebab} get --${pk.name} <value>`],
+          },
+          {
+            description: `Update a ${singularName}`,
+            commands: [
+              `${toolName} ${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`,
+            ],
+          },
+          {
+            description: `Delete a ${singularName}`,
+            commands: [`${toolName} ${kebab} delete --${pk.name} <value>`],
+          },
+        ],
+      }),
+    });
+  }
+
+  for (const op of customOperations) {
+    const kebab = toKebabCase(op.name);
+    const usage =
+      op.args.length > 0
+        ? `${toolName} ${kebab} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
+        : `${toolName} ${kebab}`;
+
+    files.push({
+      fileName: `skills/${kebab}.md`,
+      content: buildSkillFile({
+        name: `${toolName}-${kebab}`,
+        description: op.description || `Execute the ${op.name} ${op.kind}`,
+        usage: [usage],
+        examples: [
+          {
+            description: `Run ${op.name}`,
+            commands: [usage],
+          },
+        ],
+      }),
+    });
+  }
+
+  return files;
+}
+
+interface SkillDefinition {
+  name: string;
+  description: string;
+  usage: string[];
+  examples: { description: string; commands: string[] }[];
+}
+
+function buildSkillFile(skill: SkillDefinition): string {
+  const lines: string[] = [];
+
+  lines.push(`# ${skill.name}`);
+  lines.push('');
+  lines.push(`> @generated by @constructive-io/graphql-codegen - DO NOT EDIT`);
+  lines.push('');
+  lines.push(skill.description);
+  lines.push('');
+  lines.push('## Usage');
+  lines.push('');
+  lines.push('```bash');
+  for (const u of skill.usage) {
+    lines.push(u);
+  }
+  lines.push('```');
+  lines.push('');
+  lines.push('## Examples');
+  lines.push('');
+  for (const ex of skill.examples) {
+    lines.push(`### ${ex.description}`);
+    lines.push('');
+    lines.push('```bash');
+    for (const cmd of ex.commands) {
+      lines.push(cmd);
+    }
+    lines.push('```');
+    lines.push('');
+  }
+
+  return lines.join('\n');
 }
