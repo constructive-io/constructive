@@ -50,9 +50,9 @@ export async function generate(
   // ORM is always required when React Query is enabled (hooks delegate to ORM)
   // This handles minimist setting orm=false when --orm flag is absent
   const runReactQuery = config.reactQuery ?? false;
-  const runOrm =
-    runReactQuery || (options.orm !== undefined ? !!options.orm : false);
   const runCli = !!config.cli;
+  const runOrm =
+    runReactQuery || runCli || (options.orm !== undefined ? !!options.orm : false);
 
   if (!runReactQuery && !runOrm && !runCli) {
     return {
