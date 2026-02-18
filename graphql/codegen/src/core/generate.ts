@@ -439,7 +439,7 @@ export async function generateMulti(
         cliTargets.push({
           name,
           endpoint: resolvedConfig.endpoint || '',
-          ormImportPath: `../../${resolvedConfig.output}/orm`,
+          ormImportPath: `../${resolvedConfig.output.replace(/^\.\//, '')}/orm`,
           tables: result.pipelineData.tables,
           customOperations: result.pipelineData.customOperations,
           isAuthTarget,

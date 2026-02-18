@@ -22,8 +22,8 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
-export type { GenerateOptions, GenerateResult } from './core/generate';
-export { generate } from './core/generate';
+export type { GenerateOptions, GenerateResult, GenerateMultiOptions, GenerateMultiResult } from './core/generate';
+export { generate, generateMulti } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
