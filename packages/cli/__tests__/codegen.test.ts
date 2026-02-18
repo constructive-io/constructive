@@ -1,7 +1,7 @@
 import type { ParsedArgs } from 'inquirerer'
 import codegenCommand from '../src/commands/codegen'
 
-const mockRunCodegenHandler = jest.fn(async () => {});
+const mockRunCodegenHandler = jest.fn<Promise<void>, [Record<string, unknown>, unknown]>();
 
 jest.mock('@constructive-io/graphql-codegen', () => ({
   runCodegenHandler: (argv: Record<string, unknown>, prompter: unknown) => mockRunCodegenHandler(argv, prompter),
