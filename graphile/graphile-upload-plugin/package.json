@@ -1,0 +1,54 @@
+{
+  "name": "graphile-upload-plugin",
+  "version": "2.0.0",
+  "description": "File upload support for PostGraphile v5",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "postgres",
+    "graphql",
+    "upload",
+    "file-upload",
+    "s3"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3"
+  },
+  "peerDependencies": {
+    "graphql": "^16.9.0",
+    "postgraphile": "^5.0.0-rc.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "makage": "^0.1.10"
+  }
+}

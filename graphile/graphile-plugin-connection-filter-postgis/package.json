@@ -1,0 +1,68 @@
+{
+  "name": "graphile-plugin-connection-filter-postgis",
+  "version": "2.0.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "PostGIS operators for postgraphile-plugin-connection-filter (PostGraphile v5)",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-config": "1.0.0-rc.3",
+    "pg-sql2": "^5.0.0-rc.3"
+  },
+  "peerDependencies": {
+    "graphql": "^16.9.0",
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1",
+    "graphile-postgis": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "postgraphile-plugin-connection-filter": {
+      "optional": false
+    },
+    "graphile-postgis": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "graphile-postgis": "workspace:^",
+    "graphile-test": "workspace:^",
+    "makage": "^0.1.10",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphql",
+    "postgresql",
+    "postgis",
+    "connection-filter",
+    "spatial",
+    "geometry",
+    "geography",
+    "constructive"
+  ]
+}
