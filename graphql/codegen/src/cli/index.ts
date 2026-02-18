@@ -7,19 +7,7 @@
  */
 import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
-import { findConfigFile, loadConfigFile } from '../core/config';
-import { expandApiNamesToMultiTarget, generate, generateMulti } from '../core/generate';
-import type { GraphQLSDKConfigTarget } from '../types/config';
-import {
-  buildDbConfig,
-  buildGenerateOptions,
-  camelizeArgv,
-  codegenQuestions,
-  hasResolvedCodegenSource,
-  normalizeCodegenListOptions,
-  printResult,
-  seedArgvFromConfig,
-} from './shared';
+import { runCodegenHandler } from './handler';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -31,6 +19,7 @@ Source Options (choose one):
   -c, --config <path>           Path to config file
   -e, --endpoint <url>          GraphQL endpoint URL
   -s, --schema-file <path>      Path to GraphQL schema file
+  --schema-dir <dir>            Directory of .graphql files (auto-expands to multi-target)
 
 Database Options:
   --schemas <list>              Comma-separated PostgreSQL schemas
@@ -71,95 +60,7 @@ export const commands = async (
     process.exit(0);
   }
 
-  const args = camelizeArgv(argv as Record<string, any>);
-
-  const schemaOnly = Boolean(args.schemaOnly);
-
-  const hasSourceFlags = Boolean(
-    args.endpoint || args.schemaFile || args.schemas || args.apiNames
-  );
-  const configPath =
-    (args.config as string | undefined) ||
-    (!hasSourceFlags ? findConfigFile() : undefined);
-  const targetName = args.target as string | undefined;
-
-  let fileConfig: GraphQLSDKConfigTarget = {};
-
-  if (configPath) {
-    const loaded = await loadConfigFile(configPath);
-    if (!loaded.success) {
-      console.error('x', loaded.error);
-      process.exit(1);
-    }
-
-    const config = loaded.config as Record<string, unknown>;
-    const isMulti = !(
-      'endpoint' in config ||
-      'schemaFile' in config ||
-      'db' in config
-    );
-
-    if (isMulti) {
-      const targets = config as Record<string, GraphQLSDKConfigTarget>;
-
-      if (targetName && !targets[targetName]) {
-        console.error(
-          'x',
-          `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`,
-        );
-        process.exit(1);
-      }
-
-      const cliOptions = buildDbConfig(
-        normalizeCodegenListOptions(args),
-      );
-
-      const selectedTargets = targetName
-        ? { [targetName]: targets[targetName] }
-        : targets;
-
-      const { results, hasError } = await generateMulti({
-        configs: selectedTargets,
-        cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
-        schemaOnly,
-      });
-
-      for (const { name, result } of results) {
-        console.log(`\n[${name}]`);
-        printResult(result);
-      }
-
-      prompter.close();
-      if (hasError) process.exit(1);
-      return argv;
-    }
-
-    fileConfig = config as GraphQLSDKConfigTarget;
-  }
-
-  const seeded = seedArgvFromConfig(args, fileConfig);
-  const answers = hasResolvedCodegenSource(seeded)
-    ? seeded
-    : await prompter.prompt(seeded, codegenQuestions);
-  const options = buildGenerateOptions(answers, fileConfig);
-
-  const expanded = expandApiNamesToMultiTarget(options);
-  if (expanded) {
-    const { results, hasError } = await generateMulti({
-      configs: expanded,
-      schemaOnly,
-    });
-    for (const { name, result } of results) {
-      console.log(`\n[${name}]`);
-      printResult(result);
-    }
-    prompter.close();
-    if (hasError) process.exit(1);
-    return argv;
-  }
-
-  const result = await generate({ ...options, schemaOnly });
-  printResult(result);
+  await runCodegenHandler(argv, prompter);
   prompter.close();
   return argv;
 };
@@ -181,6 +82,7 @@ export const options: Partial<CLIOptions> = {
       'config',
       'endpoint',
       'schema-file',
+      'schema-dir',
       'output',
       'target',
       'authorization',

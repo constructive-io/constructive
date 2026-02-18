@@ -450,6 +450,38 @@ export function expandApiNamesToMultiTarget(
   return targets;
 }
 
+export function expandSchemaDirToMultiTarget(
+  config: GraphQLSDKConfigTarget,
+): Record<string, GraphQLSDKConfigTarget> | null {
+  const schemaDir = config.schemaDir;
+  if (!schemaDir) return null;
+
+  const resolvedDir = path.resolve(schemaDir);
+  if (!fs.existsSync(resolvedDir) || !fs.statSync(resolvedDir).isDirectory()) {
+    return null;
+  }
+
+  const graphqlFiles = fs.readdirSync(resolvedDir)
+    .filter((f) => f.endsWith('.graphql'))
+    .sort();
+
+  if (graphqlFiles.length === 0) return null;
+
+  const targets: Record<string, GraphQLSDKConfigTarget> = {};
+  for (const file of graphqlFiles) {
+    const name = path.basename(file, '.graphql');
+    targets[name] = {
+      ...config,
+      schemaDir: undefined,
+      schemaFile: path.join(resolvedDir, file),
+      output: config.output
+        ? `${config.output}/${name}`
+        : `./generated/graphql/${name}`,
+    };
+  }
+  return targets;
+}
+
 export interface GenerateMultiOptions {
   configs: Record<string, GraphQLSDKConfigTarget>;
   cliOverrides?: Partial<GraphQLSDKConfigTarget>;

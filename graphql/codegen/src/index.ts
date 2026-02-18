@@ -23,12 +23,13 @@ export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
 export type { GenerateOptions, GenerateResult, GenerateMultiOptions, GenerateMultiResult } from './core/generate';
-export { generate, generateMulti, expandApiNamesToMultiTarget } from './core/generate';
+export { generate, generateMulti, expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
 
 // CLI shared utilities (for packages/cli to import)
+export { runCodegenHandler } from './cli/handler';
 export type { CodegenAnswers } from './cli/shared';
 export {
   buildDbConfig,

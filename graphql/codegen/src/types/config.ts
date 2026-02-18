@@ -222,6 +222,13 @@ export interface GraphQLSDKConfigTarget {
   schemaFile?: string;
 
   /**
+   * Path to a directory of .graphql schema files for multi-target generation.
+   * Each *.graphql file becomes its own target, named by the filename (without extension).
+   * e.g. schemas/app.graphql + schemas/admin.graphql → targets "app" and "admin"
+   */
+  schemaDir?: string;
+
+  /**
    * Database configuration for direct database introspection or PGPM module
    * Use db.schemas or db.apiNames to specify which schemas to introspect
    */
