@@ -4,7 +4,7 @@ import codegenCommand from '../src/commands/codegen'
 const mockRunCodegenHandler = jest.fn(async () => {});
 
 jest.mock('@constructive-io/graphql-codegen', () => ({
-  runCodegenHandler: (...args: any[]) => mockRunCodegenHandler(...args),
+  runCodegenHandler: (argv: Record<string, unknown>, prompter: unknown) => mockRunCodegenHandler(argv, prompter),
 }));
 
 const createMockPrompter = () => ({
