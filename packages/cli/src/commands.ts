@@ -6,8 +6,6 @@ import codegen from './commands/codegen';
 import context from './commands/context';
 import execute from './commands/execute';
 import explorer from './commands/explorer';
-import exportSchema from './commands/export-schema';
-import getGraphqlSchema from './commands/get-graphql-schema';
 import jobs from './commands/jobs';
 import server from './commands/server';
 import { usageText } from './utils';
@@ -16,9 +14,7 @@ const createCommandMap = (): Record<string, Function> => {
   return {
     server,
     explorer,
-    'get-graphql-schema': getGraphqlSchema,
     codegen,
-    'export-schema': exportSchema,
     jobs,
     context,
     auth,

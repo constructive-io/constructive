@@ -2,6 +2,7 @@ import { CLIOptions, Inquirerer } from 'inquirerer';
 import {
   generate,
   generateMulti,
+  expandApiNamesToMultiTarget,
   findConfigFile,
   loadConfigFile,
   codegenQuestions,
@@ -38,6 +39,11 @@ Generator Options:
   --dry-run                  Preview without writing files
   --verbose                  Verbose output
 
+Schema Export:
+  --schema-only              Export GraphQL SDL instead of running full codegen.
+                             Works with any source (endpoint, file, database, PGPM).
+                             With multiple apiNames, writes one .graphql per API.
+
   --help, -h                 Show this help message
 `;
 
@@ -50,6 +56,8 @@ export default async (
     console.log(usage);
     process.exit(0);
   }
+
+  const schemaOnly = Boolean(argv['schema-only']);
 
   const hasSourceFlags = Boolean(
     argv.endpoint || argv['schema-file'] || argv.schemas || argv['api-names']
@@ -98,6 +106,7 @@ export default async (
       const { results, hasError } = await generateMulti({
         configs: selectedTargets,
         cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
+        schemaOnly,
       });
 
       for (const { name, result } of results) {
@@ -117,6 +126,21 @@ export default async (
     ? seeded
     : await prompter.prompt(seeded, codegenQuestions);
   const options = buildGenerateOptions(answers, fileConfig);
-  const result = await generate(options);
+
+  const expanded = expandApiNamesToMultiTarget(options);
+  if (expanded) {
+    const { results, hasError } = await generateMulti({
+      configs: expanded,
+      schemaOnly,
+    });
+    for (const { name, result } of results) {
+      console.log(`\n[${name}]`);
+      printResult(result);
+    }
+    if (hasError) process.exit(1);
+    return;
+  }
+
+  const result = await generate({ ...options, schemaOnly });
   printResult(result);
 };

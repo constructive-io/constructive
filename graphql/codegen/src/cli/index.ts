@@ -8,9 +8,8 @@
 import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
-import { exportSchemaSimple } from '../core/export-schema';
-import { generate, generateMulti } from '../core/generate';
-import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
+import { expandApiNamesToMultiTarget, generate, generateMulti } from '../core/generate';
+import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
   buildDbConfig,
   buildGenerateOptions,
@@ -27,7 +26,6 @@ graphql-codegen - GraphQL SDK generator for Constructive databases
 
 Usage:
   graphql-codegen [options]
-  graphql-codegen export-schema [options]
 
 Source Options (choose one):
   -c, --config <path>           Path to config file
@@ -37,6 +35,7 @@ Source Options (choose one):
 Database Options:
   --schemas <list>              Comma-separated PostgreSQL schemas
   --api-names <list>            Comma-separated API names (mutually exclusive with --schemas)
+                                Multiple apiNames auto-expand to multi-target (one schema per API).
 
 Generator Options:
   --react-query                 Generate React Query hooks
@@ -47,79 +46,14 @@ Generator Options:
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
 
+Schema Export:
+  --schema-only                 Export GraphQL SDL instead of running full codegen.
+                                Works with any source (endpoint, file, database, PGPM).
+                                With multiple apiNames, writes one .graphql per API.
+
   -h, --help                    Show this help message
   --version                     Show version number
-
-Export Schema (from PGPM module, no server required):
-  graphql-codegen export-schema --pgpm-module-path <path> --api-names <list> -o <dir>
-  graphql-codegen export-schema --pgpm-workspace-path <path> --pgpm-module-name <name> --api-names <list> -o <dir>
-  --pgpm-module-path <path>     Path to PGPM module directory
-  --pgpm-workspace-path <path>  Path to PGPM workspace directory
-  --pgpm-module-name <name>     Module name within workspace
-  --keep-db                     Keep ephemeral database after export (debug)
 `;
-
-async function handleExportSchema(
-  argv: Record<string, unknown>,
-): Promise<void> {
-  const pgpmModulePath = argv['pgpm-module-path'] as string | undefined;
-  const pgpmWorkspacePath = argv['pgpm-workspace-path'] as string | undefined;
-  const pgpmModuleName = argv['pgpm-module-name'] as string | undefined;
-  const output = (argv.output || argv.o || '.') as string;
-  const filename = argv.filename as string | undefined;
-  const verbose = Boolean(argv.verbose || argv.v);
-  const keepDb = Boolean(argv['keep-db']);
-
-  const rawSchemas = argv.schemas as string | undefined;
-  const rawApiNames = argv['api-names'] as string | undefined;
-  const schemas = rawSchemas
-    ? rawSchemas.split(',').map((s) => s.trim()).filter(Boolean)
-    : undefined;
-  const apiNames = rawApiNames
-    ? rawApiNames.split(',').map((s) => s.trim()).filter(Boolean)
-    : undefined;
-
-  if (!pgpmModulePath && !(pgpmWorkspacePath && pgpmModuleName)) {
-    console.error(
-      'x',
-      'export-schema requires --pgpm-module-path or both --pgpm-workspace-path and --pgpm-module-name',
-    );
-    process.exit(1);
-  }
-
-  if (!schemas?.length && !apiNames?.length) {
-    console.error(
-      'x',
-      'export-schema requires --schemas or --api-names',
-    );
-    process.exit(1);
-  }
-
-  const pgpm = pgpmModulePath
-    ? { modulePath: pgpmModulePath }
-    : { workspacePath: pgpmWorkspacePath!, moduleName: pgpmModuleName! };
-
-  const result = await exportSchemaSimple({
-    pgpm,
-    apiNames,
-    schemas,
-    output,
-    filename,
-    keepDb,
-    verbose,
-  });
-
-  if (result.success) {
-    console.log('[ok]', result.message);
-    for (const file of result.files ?? []) {
-      console.log(`  ${file.target}: ${file.path} (schemas: ${file.schemas.join(', ')})`);
-    }
-  } else {
-    console.error('x', result.message);
-    result.errors?.forEach((e) => console.error('  -', e));
-    process.exit(1);
-  }
-}
 
 export const commands = async (
   argv: Record<string, unknown>,
@@ -137,12 +71,7 @@ export const commands = async (
     process.exit(0);
   }
 
-  const positionalArgs = (argv._ as string[]) ?? [];
-  if (positionalArgs.includes('export-schema')) {
-    await handleExportSchema(argv);
-    prompter.close();
-    return argv;
-  }
+  const schemaOnly = Boolean(argv['schema-only']);
 
   const hasSourceFlags = Boolean(
     argv.endpoint ||
@@ -197,6 +126,7 @@ export const commands = async (
       const { results, hasError } = await generateMulti({
         configs: selectedTargets,
         cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
+        schemaOnly,
       });
 
       for (const { name, result } of results) {
@@ -217,7 +147,23 @@ export const commands = async (
     ? seeded
     : await prompter.prompt(seeded, codegenQuestions);
   const options = buildGenerateOptions(answers, fileConfig);
-  const result = await generate(options);
+
+  const expanded = expandApiNamesToMultiTarget(options);
+  if (expanded) {
+    const { results, hasError } = await generateMulti({
+      configs: expanded,
+      schemaOnly,
+    });
+    for (const { name, result } of results) {
+      console.log(`\n[${name}]`);
+      printResult(result);
+    }
+    prompter.close();
+    if (hasError) process.exit(1);
+    return argv;
+  }
+
+  const result = await generate({ ...options, schemaOnly });
   printResult(result);
   prompter.close();
   return argv;
@@ -235,6 +181,7 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
+    boolean: ['schema-only'],
     string: [
       'config',
       'endpoint',
@@ -242,9 +189,6 @@ export const options: Partial<CLIOptions> = {
       'output',
       'target',
       'authorization',
-      'pgpm-module-path',
-      'pgpm-workspace-path',
-      'pgpm-module-name',
       'schemas',
       'api-names',
     ],

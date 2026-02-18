@@ -4,7 +4,10 @@
  * This is the primary entry point for programmatic usage.
  * The CLI is a thin wrapper around this function.
  */
+import * as fs from 'node:fs';
 import path from 'node:path';
+
+import { buildClientSchema, printSchema } from 'graphql';
 
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
@@ -58,6 +61,9 @@ export interface GenerateOptions extends GraphQLSDKConfigTarget {
   verbose?: boolean;
   dryRun?: boolean;
   skipCustomOperations?: boolean;
+  schemaOnly?: boolean;
+  schemaOnlyOutput?: string;
+  schemaOnlyFilename?: string;
 }
 
 export interface GenerateResult {
@@ -102,7 +108,7 @@ export async function generate(
   const runOrm =
     runReactQuery || !!config.cli || (options.orm !== undefined ? !!options.orm : false);
 
-  if (!runReactQuery && !runOrm && !runCli) {
+  if (!options.schemaOnly && !runReactQuery && !runOrm && !runCli) {
     return {
       success: false,
       message:
@@ -132,6 +138,42 @@ export async function generate(
     authorization: options.authorization || config.headers?.Authorization,
     headers: config.headers,
   });
+
+  if (options.schemaOnly) {
+    try {
+      console.log(`Fetching schema from ${source.describe()}...`);
+      const { introspection } = await source.fetch();
+      const schema = buildClientSchema(introspection as any);
+      const sdl = printSchema(schema);
+
+      if (!sdl.trim()) {
+        return {
+          success: false,
+          message: 'Schema introspection returned empty SDL.',
+          output: outputRoot,
+        };
+      }
+
+      const outDir = path.resolve(options.schemaOnlyOutput || outputRoot || '.');
+      await fs.promises.mkdir(outDir, { recursive: true });
+      const filename = options.schemaOnlyFilename || 'schema.graphql';
+      const filePath = path.join(outDir, filename);
+      await fs.promises.writeFile(filePath, sdl, 'utf-8');
+
+      return {
+        success: true,
+        message: `Schema exported to ${filePath}`,
+        output: outDir,
+        filesWritten: [filePath],
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: `Failed to export schema: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        output: outputRoot,
+      };
+    }
+  }
 
   // Run pipeline
   let pipelineResult: Awaited<ReturnType<typeof runCodegenPipeline>>;
@@ -386,11 +428,34 @@ export async function generate(
   };
 }
 
+export function expandApiNamesToMultiTarget(
+  config: GraphQLSDKConfigTarget,
+): Record<string, GraphQLSDKConfigTarget> | null {
+  const apiNames = config.db?.apiNames;
+  if (!apiNames || apiNames.length <= 1) return null;
+
+  const targets: Record<string, GraphQLSDKConfigTarget> = {};
+  for (const apiName of apiNames) {
+    targets[apiName] = {
+      ...config,
+      db: {
+        ...config.db,
+        apiNames: [apiName],
+      },
+      output: config.output
+        ? `${config.output}/${apiName}`
+        : `./generated/graphql/${apiName}`,
+    };
+  }
+  return targets;
+}
+
 export interface GenerateMultiOptions {
   configs: Record<string, GraphQLSDKConfigTarget>;
   cliOverrides?: Partial<GraphQLSDKConfigTarget>;
   verbose?: boolean;
   dryRun?: boolean;
+  schemaOnly?: boolean;
   unifiedCli?: CliConfig | boolean;
 }
 
@@ -510,13 +575,13 @@ function applySharedPgpmDb(
 export async function generateMulti(
   options: GenerateMultiOptions,
 ): Promise<GenerateMultiResult> {
-  const { configs, cliOverrides, verbose, dryRun, unifiedCli } = options;
+  const { configs, cliOverrides, verbose, dryRun, schemaOnly, unifiedCli } = options;
   const names = Object.keys(configs);
   const results: Array<{ name: string; result: GenerateResult }> = [];
   let hasError = false;
 
   const targetInfos: RootRootReadmeTarget[] = [];
-  const useUnifiedCli = !!unifiedCli && names.length > 1;
+  const useUnifiedCli = !schemaOnly && !!unifiedCli && names.length > 1;
 
   const cliTargets: MultiTargetCliTarget[] = [];
 
@@ -530,7 +595,13 @@ export async function generateMulti(
     };
     const targetConfig = applySharedPgpmDb(baseConfig, sharedSources);
     const result = await generate(
-      { ...targetConfig, verbose, dryRun },
+      {
+        ...targetConfig,
+        verbose,
+        dryRun,
+        schemaOnly,
+        schemaOnlyFilename: schemaOnly ? `${name}.graphql` : undefined,
+      },
       useUnifiedCli ? { skipCli: true } : undefined,
     );
     results.push({ name, result });
