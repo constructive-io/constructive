@@ -1,0 +1,49 @@
+{
+  "name": "@constructive-io/sdk",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive SDK - Auto-generated GraphQL types and ORM client",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "rimraf dist/**",
+    "copy": "copyfiles -f ../../LICENSE README.md package.json dist",
+    "prepack": "pnpm run build",
+    "build": "pnpm run clean; tsc; tsc -p tsconfig.esm.json; pnpm run copy",
+    "build:dev": "pnpm run clean; tsc --declarationMap; tsc -p tsconfig.esm.json; pnpm run copy",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "graphql",
+    "sdk",
+    "orm",
+    "constructive",
+    "postgraphile"
+  ],
+  "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
+    "gql-ast": "^3.0.0",
+    "graphql": "^16.12.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  }
+}
