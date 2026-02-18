@@ -6,8 +6,9 @@
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
+import { buildSchemaSDL } from '@constructive-io/graphql-server';
+
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
-import { buildSchemaSDLFromDatabase } from '../../database';
 import {
   createDatabasePool,
   resolveApiSchemas,
@@ -80,7 +81,7 @@ export class DatabaseSchemaSource implements SchemaSource {
     // Build SDL from database
     let sdl: string;
     try {
-      sdl = await buildSchemaSDLFromDatabase({
+      sdl = await buildSchemaSDL({
         database,
         schemas,
       });

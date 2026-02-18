@@ -56,24 +56,3 @@ export async function buildSchemaFromDatabase(
 
   return { schemaPath, sdl };
 }
-
-/**
- * Build a GraphQL schema SDL string from a PostgreSQL database without writing to file.
- *
- * This is a convenience wrapper around buildSchemaSDL from graphql-server.
- *
- * @param options - Configuration options
- * @returns The SDL content as a string
- */
-export async function buildSchemaSDLFromDatabase(options: {
-  database: string;
-  schemas: string[];
-}): Promise<string> {
-  const { database, schemas } = options;
-
-  // PostGraphile v5 resolves role/settings via preset configuration.
-  return buildSchemaSDL({
-    database,
-    schemas,
-  });
-}

@@ -50,7 +50,4 @@ export type {
   BuildSchemaFromDatabaseOptions,
   BuildSchemaFromDatabaseResult,
 } from './core/database';
-export {
-  buildSchemaFromDatabase,
-  buildSchemaSDLFromDatabase,
-} from './core/database';
+export { buildSchemaFromDatabase } from './core/database';

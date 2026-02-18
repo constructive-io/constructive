@@ -57,12 +57,14 @@ export default async (
     process.exit(0);
   }
 
-  const schemaOnly = Boolean(argv['schema-only']);
+  const args = camelizeArgv(argv as Record<string, any>);
+
+  const schemaOnly = Boolean(args.schemaOnly);
 
   const hasSourceFlags = Boolean(
-    argv.endpoint || argv['schema-file'] || argv.schemas || argv['api-names']
+    args.endpoint || args.schemaFile || args.schemas || args.apiNames
   );
-  const configPath = (argv.config as string | undefined) ||
+  const configPath = (args.config as string | undefined) ||
     (!hasSourceFlags ? findConfigFile() : undefined);
 
   let fileConfig: GraphQLSDKConfigTarget = {};
@@ -83,7 +85,7 @@ export default async (
 
     if (isMulti) {
       const targets = config as Record<string, GraphQLSDKConfigTarget>;
-      const targetName = argv.target as string | undefined;
+      const targetName = args.target as string | undefined;
 
       if (targetName && !targets[targetName]) {
         console.error(
@@ -94,9 +96,7 @@ export default async (
       }
 
       const cliOptions = buildDbConfig(
-        normalizeCodegenListOptions(
-          camelizeArgv(argv as Record<string, any>),
-        ),
+        normalizeCodegenListOptions(args),
       );
 
       const selectedTargets = targetName
@@ -121,7 +121,7 @@ export default async (
     fileConfig = config as GraphQLSDKConfigTarget;
   }
 
-  const seeded = seedArgvFromConfig(argv as Record<string, unknown>, fileConfig);
+  const seeded = seedArgvFromConfig(args, fileConfig);
   const answers = hasResolvedCodegenSource(seeded)
     ? seeded
     : await prompter.prompt(seeded, codegenQuestions);

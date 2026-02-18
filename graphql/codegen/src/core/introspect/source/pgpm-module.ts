@@ -13,8 +13,9 @@ import { getPgPool } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
+import { buildSchemaSDL } from '@constructive-io/graphql-server';
+
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
-import { buildSchemaSDLFromDatabase } from '../../database';
 import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
 import type { SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
@@ -199,7 +200,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
       // Build SDL from the deployed database
       let sdl: string;
       try {
-        sdl = await buildSchemaSDLFromDatabase({
+        sdl = await buildSchemaSDL({
           database: dbConfig.database,
           schemas,
         });
