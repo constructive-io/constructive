@@ -54,3 +54,12 @@ export {
   buildSchemaFromDatabase,
   buildSchemaSDLFromDatabase,
 } from './core/database';
+
+// Schema export from PGPM modules
+export type {
+  ExportSchemaOptions,
+  ExportSchemaTarget,
+  ExportSchemaResult,
+  ExportSchemaSimpleOptions,
+} from './core/export-schema';
+export { exportSchema, exportSchemaSimple } from './core/export-schema';

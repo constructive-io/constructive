@@ -6,7 +6,10 @@
  */
 import path from 'node:path';
 
-import type { CliConfig, GraphQLSDKConfigTarget } from '../types/config';
+import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
+import { deployPgpm } from 'pgsql-seed';
+
+import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig } from '../types/config';
 import { getConfigOptions } from '../types/config';
 import type { CleanOperation, CleanTable } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
@@ -396,6 +399,114 @@ export interface GenerateMultiResult {
   hasError: boolean;
 }
 
+interface SharedPgpmSource {
+  key: string;
+  ephemeralDb: EphemeralDbResult;
+  deployed: boolean;
+}
+
+function getPgpmSourceKey(pgpm: PgpmConfig): string | null {
+  if (pgpm.modulePath) return `module:${path.resolve(pgpm.modulePath)}`;
+  if (pgpm.workspacePath && pgpm.moduleName)
+    return `workspace:${path.resolve(pgpm.workspacePath)}:${pgpm.moduleName}`;
+  return null;
+}
+
+function getModulePathFromPgpm(
+  pgpm: PgpmConfig,
+): string {
+  if (pgpm.modulePath) return pgpm.modulePath;
+  if (pgpm.workspacePath && pgpm.moduleName) {
+    const { PgpmPackage } = require('@pgpmjs/core') as typeof import('@pgpmjs/core');
+    const workspace = new PgpmPackage(pgpm.workspacePath);
+    const moduleProject = workspace.getModuleProject(pgpm.moduleName);
+    const modulePath = moduleProject.getModulePath();
+    if (!modulePath) {
+      throw new Error(`Module "${pgpm.moduleName}" not found in workspace`);
+    }
+    return modulePath;
+  }
+  throw new Error('Invalid PGPM config: requires modulePath or workspacePath+moduleName');
+}
+
+async function prepareSharedPgpmSources(
+  configs: Record<string, GraphQLSDKConfigTarget>,
+  cliOverrides?: Partial<GraphQLSDKConfigTarget>,
+): Promise<Map<string, SharedPgpmSource>> {
+  const sharedSources = new Map<string, SharedPgpmSource>();
+  const pgpmTargetCount = new Map<string, number>();
+
+  for (const name of Object.keys(configs)) {
+    const merged = { ...configs[name], ...(cliOverrides ?? {}) };
+    const pgpm = merged.db?.pgpm;
+    if (!pgpm) continue;
+    const key = getPgpmSourceKey(pgpm);
+    if (!key) continue;
+    pgpmTargetCount.set(key, (pgpmTargetCount.get(key) ?? 0) + 1);
+  }
+
+  for (const [key, count] of pgpmTargetCount) {
+    if (count < 2) continue;
+
+    let pgpmConfig: PgpmConfig | undefined;
+    for (const name of Object.keys(configs)) {
+      const merged = { ...configs[name], ...(cliOverrides ?? {}) };
+      const pgpm = merged.db?.pgpm;
+      if (pgpm && getPgpmSourceKey(pgpm) === key) {
+        pgpmConfig = pgpm;
+        break;
+      }
+    }
+    if (!pgpmConfig) continue;
+
+    const ephemeralDb = createEphemeralDb({
+      prefix: 'codegen_pgpm_shared_',
+      verbose: false,
+    });
+
+    const modulePath = getModulePathFromPgpm(pgpmConfig);
+    await deployPgpm(ephemeralDb.config, modulePath, false);
+
+    sharedSources.set(key, {
+      key,
+      ephemeralDb,
+      deployed: true,
+    });
+
+    console.log(
+      `[multi-target] Shared PGPM source deployed once for ${count} targets: ${key}`,
+    );
+  }
+
+  return sharedSources;
+}
+
+function applySharedPgpmDb(
+  config: GraphQLSDKConfigTarget,
+  sharedSources: Map<string, SharedPgpmSource>,
+): GraphQLSDKConfigTarget {
+  const pgpm = config.db?.pgpm;
+  if (!pgpm) return config;
+
+  const key = getPgpmSourceKey(pgpm);
+  if (!key) return config;
+
+  const shared = sharedSources.get(key);
+  if (!shared) return config;
+
+  const sharedDbConfig: DbConfig = {
+    ...config.db,
+    pgpm: undefined,
+    config: shared.ephemeralDb.config,
+    keepDb: true,
+  };
+
+  return {
+    ...config,
+    db: sharedDbConfig,
+  };
+}
+
 export async function generateMulti(
   options: GenerateMultiOptions,
 ): Promise<GenerateMultiResult> {
@@ -409,11 +520,15 @@ export async function generateMulti(
 
   const cliTargets: MultiTargetCliTarget[] = [];
 
+  const sharedSources = await prepareSharedPgpmSources(configs, cliOverrides);
+
+  try {
   for (const name of names) {
-    const targetConfig = {
+    const baseConfig = {
       ...configs[name],
       ...(cliOverrides ?? {}),
     };
+    const targetConfig = applySharedPgpmDb(baseConfig, sharedSources);
     const result = await generate(
       { ...targetConfig, verbose, dryRun },
       useUnifiedCli ? { skipCli: true } : undefined,
@@ -522,6 +637,13 @@ export async function generateMulti(
       [],
       { pruneStaleFiles: false },
     );
+  }
+
+  } finally {
+    for (const shared of sharedSources.values()) {
+      const keepDb = Object.values(configs).some((c) => c.db?.keepDb);
+      shared.ephemeralDb.teardown({ keepDb });
+    }
   }
 
   return { results, hasError };

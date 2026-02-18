@@ -44,3 +44,6 @@ export * from './watch';
 
 // Database schema utilities
 export * from './database';
+
+// Schema export from PGPM modules
+export * from './export-schema';
