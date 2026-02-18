@@ -14,6 +14,8 @@ jest.mock('@constructive-io/graphql-codegen', () => {
 
   return {
     generate: jest.fn(async () => ({ success: true, message: 'Generated SDK', filesWritten: [] as string[] })),
+    generateMulti: jest.fn(async () => ({ results: [], hasError: false })),
+    expandApiNamesToMultiTarget: jest.fn(() => null),
     findConfigFile: jest.fn((): string | undefined => undefined),
     loadConfigFile: jest.fn(async () => ({ success: false, error: 'not found' })),
     splitCommas: splitCommasMock,
