@@ -118,10 +118,6 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 
 Use `supertest` or your HTTP client of choice against `/graphql`. For RLS-aware tests, provide a `Bearer` token and ensure the API's auth function is available.
 
-## Codegen
-
-For local codegen test, use `PORT=5555 API_ENABLE_META=true PGDATABASE=launchql pnpm dev`
-
 ## Related Packages
 
 - `@constructive-io/graphql-env` - env parsing + defaults for GraphQL
