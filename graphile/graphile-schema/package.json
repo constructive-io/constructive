@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "deepmerge": "^4.3.1",
-    "graphile-build": "^5.0.0-rc.3",
-    "graphile-config": "1.0.0-rc.3",
+    "graphile-build": "5.0.0-rc.4",
+    "graphile-config": "1.0.0-rc.5",
     "graphile-settings": "workspace:^",
     "graphql": "^16.9.0",
     "pg-cache": "workspace:^",
