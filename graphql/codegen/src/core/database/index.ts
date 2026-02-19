@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { buildSchemaSDL } from 'graphile-schema';
 
 export interface BuildSchemaFromDatabaseOptions {
   /** Database name */
@@ -55,25 +55,4 @@ export async function buildSchemaFromDatabase(
   await fs.promises.writeFile(schemaPath, sdl, 'utf-8');
 
   return { schemaPath, sdl };
-}
-
-/**
- * Build a GraphQL schema SDL string from a PostgreSQL database without writing to file.
- *
- * This is a convenience wrapper around buildSchemaSDL from graphql-server.
- *
- * @param options - Configuration options
- * @returns The SDL content as a string
- */
-export async function buildSchemaSDLFromDatabase(options: {
-  database: string;
-  schemas: string[];
-}): Promise<string> {
-  const { database, schemas } = options;
-
-  // PostGraphile v5 resolves role/settings via preset configuration.
-  return buildSchemaSDL({
-    database,
-    schemas,
-  });
 }

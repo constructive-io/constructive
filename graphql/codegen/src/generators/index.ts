@@ -1,8 +1,5 @@
 /**
  * Query and mutation generator exports
- *
- * @deprecated Legacy v4 generators — use v5 ORM codegen pipeline instead.
- * These are retained for backward compatibility with existing v4 consumers.
  */
 
 // Field selector utilities

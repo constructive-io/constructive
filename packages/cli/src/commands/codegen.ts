@@ -1,15 +1,5 @@
-import { CLIOptions, Inquirerer } from 'inquirerer';
-import {
-  generate,
-  findConfigFile,
-  loadConfigFile,
-  codegenQuestions,
-  printResult,
-  buildGenerateOptions,
-  seedArgvFromConfig,
-  hasResolvedCodegenSource,
-  type GraphQLSDKConfigTarget,
-} from '@constructive-io/graphql-codegen';
+import type { CLIOptions, Inquirerer } from 'inquirerer';
+import { runCodegenHandler } from '@constructive-io/graphql-codegen';
 
 const usage = `
 Constructive GraphQL Codegen:
@@ -20,6 +10,7 @@ Source Options (choose one):
   --config <path>            Path to graphql-codegen config file
   --endpoint <url>           GraphQL endpoint URL
   --schema-file <path>       Path to GraphQL schema file
+  --schema-dir <dir>         Directory of .graphql files (auto-expands to multi-target)
 
 Database Options:
   --schemas <list>           Comma-separated PostgreSQL schemas
@@ -29,9 +20,15 @@ Generator Options:
   --react-query              Generate React Query hooks (default)
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
+  --target <name>            Target name (for multi-target configs)
   --authorization <token>    Authorization header value
   --dry-run                  Preview without writing files
   --verbose                  Verbose output
+
+Schema Export:
+  --schema-only              Export GraphQL SDL instead of running full codegen.
+                             Works with any source (endpoint, file, database, PGPM).
+                             With multiple apiNames, writes one .graphql per API.
 
   --help, -h                 Show this help message
 `;
@@ -46,28 +43,5 @@ export default async (
     process.exit(0);
   }
 
-  const hasSourceFlags = Boolean(
-    argv.endpoint || argv['schema-file'] || argv.schemas || argv['api-names']
-  );
-  const configPath = (argv.config as string | undefined) ||
-    (!hasSourceFlags ? findConfigFile() : undefined);
-
-  let fileConfig: GraphQLSDKConfigTarget = {};
-
-  if (configPath) {
-    const loaded = await loadConfigFile(configPath);
-    if (!loaded.success) {
-      console.error('x', loaded.error);
-      process.exit(1);
-    }
-    fileConfig = loaded.config as GraphQLSDKConfigTarget;
-  }
-
-  const seeded = seedArgvFromConfig(argv as Record<string, unknown>, fileConfig);
-  const answers = hasResolvedCodegenSource(seeded)
-    ? seeded
-    : await prompter.prompt(seeded, codegenQuestions);
-  const options = buildGenerateOptions(answers, fileConfig);
-  const result = await generate(options);
-  printResult(result);
+  await runCodegenHandler(argv as Record<string, unknown>, prompter);
 };

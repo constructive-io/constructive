@@ -7,19 +7,7 @@
  */
 import { CLI, CLIOptions, getPackageJson, Inquirerer } from 'inquirerer';
 
-import { findConfigFile, loadConfigFile } from '../core/config';
-import { generate } from '../core/generate';
-import { mergeConfig, type GraphQLSDKConfigTarget } from '../types/config';
-import {
-  buildDbConfig,
-  buildGenerateOptions,
-  camelizeArgv,
-  codegenQuestions,
-  hasResolvedCodegenSource,
-  normalizeCodegenListOptions,
-  printResult,
-  seedArgvFromConfig,
-} from './shared';
+import { runCodegenHandler } from './handler';
 
 const usage = `
 graphql-codegen - GraphQL SDK generator for Constructive databases
@@ -31,10 +19,12 @@ Source Options (choose one):
   -c, --config <path>           Path to config file
   -e, --endpoint <url>          GraphQL endpoint URL
   -s, --schema-file <path>      Path to GraphQL schema file
+  --schema-dir <dir>            Directory of .graphql files (auto-expands to multi-target)
 
 Database Options:
   --schemas <list>              Comma-separated PostgreSQL schemas
   --api-names <list>            Comma-separated API names (mutually exclusive with --schemas)
+                                Multiple apiNames auto-expand to multi-target (one schema per API).
 
 Generator Options:
   --react-query                 Generate React Query hooks
@@ -44,6 +34,11 @@ Generator Options:
   -a, --authorization <token>   Authorization header value
   --dry-run                     Preview without writing files
   -v, --verbose                 Show detailed output
+
+Schema Export:
+  --schema-only                 Export GraphQL SDL instead of running full codegen.
+                                Works with any source (endpoint, file, database, PGPM).
+                                With multiple apiNames, writes one .graphql per API.
 
   -h, --help                    Show this help message
   --version                     Show version number
@@ -65,77 +60,7 @@ export const commands = async (
     process.exit(0);
   }
 
-  const hasSourceFlags = Boolean(
-    argv.endpoint ||
-    argv.e ||
-    argv['schema-file'] ||
-    argv.s ||
-    argv.schemas ||
-    argv['api-names'],
-  );
-  const explicitConfigPath = (argv.config || argv.c) as string | undefined;
-  const configPath =
-    explicitConfigPath || (!hasSourceFlags ? findConfigFile() : undefined);
-  const targetName = (argv.target || argv.t) as string | undefined;
-
-  let fileConfig: GraphQLSDKConfigTarget = {};
-
-  if (configPath) {
-    const loaded = await loadConfigFile(configPath);
-    if (!loaded.success) {
-      console.error('x', loaded.error);
-      process.exit(1);
-    }
-
-    const config = loaded.config as Record<string, unknown>;
-    const isMulti = !(
-      'endpoint' in config ||
-      'schemaFile' in config ||
-      'db' in config
-    );
-
-    if (isMulti) {
-      const targets = config as Record<string, GraphQLSDKConfigTarget>;
-      const names = targetName ? [targetName] : Object.keys(targets);
-
-      if (targetName && !targets[targetName]) {
-        console.error(
-          'x',
-          `Target "${targetName}" not found. Available: ${Object.keys(targets).join(', ')}`,
-        );
-        process.exit(1);
-      }
-
-      const cliOptions = buildDbConfig(
-        normalizeCodegenListOptions(
-          camelizeArgv(argv as Record<string, any>),
-        ),
-      );
-      let hasError = false;
-      for (const name of names) {
-        console.log(`\n[${name}]`);
-        const result = await generate(
-          mergeConfig(targets[name], cliOptions as GraphQLSDKConfigTarget),
-        );
-        printResult(result);
-        if (!result.success) hasError = true;
-      }
-
-      prompter.close();
-      if (hasError) process.exit(1);
-      return argv;
-    }
-
-    fileConfig = config as GraphQLSDKConfigTarget;
-  }
-
-  const seeded = seedArgvFromConfig(argv, fileConfig);
-  const answers = hasResolvedCodegenSource(seeded)
-    ? seeded
-    : await prompter.prompt(seeded, codegenQuestions);
-  const options = buildGenerateOptions(answers, fileConfig);
-  const result = await generate(options);
-  printResult(result);
+  await runCodegenHandler(argv, prompter);
   prompter.close();
   return argv;
 };
@@ -152,16 +77,15 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
+    boolean: ['schema-only'],
     string: [
       'config',
       'endpoint',
       'schema-file',
+      'schema-dir',
       'output',
       'target',
       'authorization',
-      'pgpm-module-path',
-      'pgpm-workspace-path',
-      'pgpm-module-name',
       'schemas',
       'api-names',
     ],

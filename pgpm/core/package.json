@@ -28,7 +28,7 @@
     "build": "makage build && npm run copy",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch"
   },
   "keywords": [

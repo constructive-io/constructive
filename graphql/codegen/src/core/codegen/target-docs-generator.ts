@@ -1,0 +1,169 @@
+import type { GraphQLSDKConfigTarget } from '../../types/config';
+import { getReadmeHeader, getReadmeFooter } from './docs-utils';
+import type { GeneratedDocFile, McpTool } from './docs-utils';
+
+export interface TargetReadmeOptions {
+  hasOrm: boolean;
+  hasHooks: boolean;
+  hasCli: boolean;
+  tableCount: number;
+  customQueryCount: number;
+  customMutationCount: number;
+  config: GraphQLSDKConfigTarget;
+}
+
+export function generateTargetReadme(
+  options: TargetReadmeOptions,
+): GeneratedDocFile {
+  const {
+    hasOrm,
+    hasHooks,
+    hasCli,
+    tableCount,
+    customQueryCount,
+    customMutationCount,
+    config,
+  } = options;
+  const lines: string[] = [];
+
+  lines.push(...getReadmeHeader('Generated GraphQL SDK'));
+
+  lines.push('## Overview');
+  lines.push('');
+  lines.push(`- **Tables:** ${tableCount}`);
+  lines.push(`- **Custom queries:** ${customQueryCount}`);
+  lines.push(`- **Custom mutations:** ${customMutationCount}`);
+  lines.push('');
+
+  const generators: string[] = [];
+  if (hasOrm) generators.push('ORM');
+  if (hasHooks) generators.push('React Query');
+  if (hasCli) generators.push('CLI');
+  lines.push(`**Generators:** ${generators.join(', ')}`);
+  lines.push('');
+
+  if (config.endpoint) {
+    lines.push(`**Endpoint:** \`${config.endpoint}\``);
+    lines.push('');
+  }
+
+  lines.push('## Modules');
+  lines.push('');
+
+  if (hasOrm) {
+    lines.push('### ORM Client (`./orm`)');
+    lines.push('');
+    lines.push(
+      'Prisma-like ORM client for programmatic GraphQL access.',
+    );
+    lines.push('');
+    lines.push('```typescript');
+    lines.push("import { createClient } from './orm';");
+    lines.push('');
+    lines.push('const db = createClient({');
+    lines.push("  endpoint: 'https://api.example.com/graphql',");
+    lines.push('});');
+    lines.push('```');
+    lines.push('');
+    lines.push(
+      'See [orm/README.md](./orm/README.md) for full API reference.',
+    );
+    lines.push('');
+  }
+
+  if (hasHooks) {
+    lines.push('### React Query Hooks (`./hooks`)');
+    lines.push('');
+    lines.push(
+      'Type-safe React Query hooks for data fetching and mutations.',
+    );
+    lines.push('');
+    lines.push('```typescript');
+    lines.push("import { configure } from './hooks';");
+    lines.push("import { useCarsQuery } from './hooks';");
+    lines.push('');
+    lines.push("configure({ endpoint: 'https://api.example.com/graphql' });");
+    lines.push('```');
+    lines.push('');
+    lines.push(
+      'See [hooks/README.md](./hooks/README.md) for full hook reference.',
+    );
+    lines.push('');
+  }
+
+  if (hasCli) {
+    const toolName =
+      typeof config.cli === 'object' && config.cli?.toolName
+        ? config.cli.toolName
+        : 'app';
+    lines.push(`### CLI Commands (\`./cli\`)`);
+    lines.push('');
+    lines.push(
+      `inquirerer-based CLI commands for \`${toolName}\`.`,
+    );
+    lines.push('');
+    lines.push(
+      'See [cli/README.md](./cli/README.md) for command reference.',
+    );
+    lines.push('');
+  }
+
+  lines.push(...getReadmeFooter());
+
+  return {
+    fileName: 'README.md',
+    content: lines.join('\n'),
+  };
+}
+
+export function generateCombinedMcpConfig(
+  tools: McpTool[],
+  name: string,
+): GeneratedDocFile {
+  const mcpConfig = {
+    name,
+    version: '1.0.0',
+    description: `MCP tool definitions for ${name} SDK (auto-generated from GraphQL schema)`,
+    tools,
+  };
+
+  return {
+    fileName: 'mcp.json',
+    content: JSON.stringify(mcpConfig, null, 2) + '\n',
+  };
+}
+
+export interface RootRootReadmeTarget {
+  name: string;
+  output: string;
+  endpoint?: string;
+  generators: string[];
+}
+
+export function generateRootRootReadme(
+  targets: RootRootReadmeTarget[],
+): GeneratedDocFile {
+  const lines: string[] = [];
+
+  lines.push(...getReadmeHeader('GraphQL SDK'));
+
+  lines.push('## APIs');
+  lines.push('');
+  lines.push('| API | Endpoint | Generators | Docs |');
+  lines.push('|-----|----------|------------|------|');
+  for (const target of targets) {
+    const endpoint = target.endpoint || '-';
+    const gens = target.generators.join(', ');
+    lines.push(
+      `| ${target.name} | ${endpoint} | ${gens} | [${target.output}/README.md](${target.output}/README.md) |`,
+    );
+  }
+  lines.push('');
+
+  lines.push(...getReadmeFooter());
+
+  return {
+    fileName: 'README.md',
+    content: lines.join('\n'),
+  };
+}

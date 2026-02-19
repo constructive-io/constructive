@@ -10,7 +10,6 @@ export const usageText = `
 
   Code Generation:
     codegen            Generate TypeScript types and SDK from GraphQL schema
-    get-graphql-schema Fetch or build GraphQL schema SDL
 
   Jobs:
     jobs up            Start combined server (jobs runtime)
@@ -34,7 +33,7 @@ export const usageText = `
     cnc server --port 8080            Start server on custom port
     cnc explorer                      Launch GraphiQL explorer
     cnc codegen --schema schema.graphql  Generate types from schema
-    cnc get-graphql-schema --out schema.graphql  Export schema SDL
+    cnc codegen --schema-only --out schema.graphql  Export schema SDL
     cnc jobs up                       Start combined server (jobs runtime)
 
     # Execution Engine

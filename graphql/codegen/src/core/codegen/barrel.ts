@@ -195,6 +195,7 @@ export interface RootBarrelOptions {
   hasTypes?: boolean;
   hasHooks?: boolean;
   hasOrm?: boolean;
+  hasCli?: boolean;
 }
 
 /**
@@ -202,7 +203,7 @@ export interface RootBarrelOptions {
  * Re-exports from subdirectories based on which generators are enabled.
  */
 export function generateRootBarrel(options: RootBarrelOptions = {}): string {
-  const { hasTypes = false, hasHooks = false, hasOrm = false } = options;
+  const { hasTypes = false, hasHooks = false, hasOrm = false, hasCli = false } = options;
   const statements: t.Statement[] = [];
 
   if (hasTypes) {
@@ -214,8 +215,11 @@ export function generateRootBarrel(options: RootBarrelOptions = {}): string {
   if (hasOrm) {
     statements.push(exportAllFrom('./orm'));
   }
+  if (hasCli) {
+    statements.push(exportAllFrom('./cli'));
+  }
 
-  // Add file header as leading comment on first statement
+  // Add file headeras leading comment on first statement
   if (statements.length > 0) {
     addJSDocComment(statements[0], [
       'Generated SDK - auto-generated, do not edit',

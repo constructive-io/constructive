@@ -3,7 +3,6 @@
  */
 
 export {
-  formatOutput,
   type GeneratedFile,
   writeGeneratedFiles,
   type WriteOptions,

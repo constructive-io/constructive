@@ -137,6 +137,71 @@ export interface DbConfig {
 }
 
 /**
+ * Documentation generation options
+ * Controls which doc formats are generated alongside code for each generator target.
+ * Applied at the top level and affects all enabled generators (ORM, React Query, CLI).
+ */
+export interface DocsConfig {
+  /**
+   * Generate README.md — human-readable overview with setup, commands, examples
+   * @default true
+   */
+  readme?: boolean;
+
+  /**
+   * Generate AGENTS.md — structured markdown optimized for LLM consumption
+   * Includes: tool definitions, exact signatures, input/output schemas,
+   * workflow recipes, error handling, and machine-parseable sections
+   * @default true
+   */
+  agents?: boolean;
+
+  /**
+   * Generate mcp.json — MCP (Model Context Protocol) tool definitions
+   * Each CLI command becomes a tool with typed inputSchema (JSON Schema)
+   * Ready to plug into any MCP-compatible agent
+   * @default false
+   */
+  mcp?: boolean;
+
+  /**
+   * Generate skills/ directory — per-command .md skill files
+   * Each command gets its own skill file with description, usage, and examples
+   * Compatible with Devin and similar agent skill systems
+   * @default false
+   */
+  skills?: boolean;
+}
+
+/**
+ * Infrastructure command name overrides for collision handling.
+ * When a target name collides with a default infra command name,
+ * the infra command is auto-renamed. These allow user overrides.
+ */
+export interface BuiltinNames {
+  auth?: string;
+  context?: string;
+}
+
+/**
+ * CLI generation configuration
+ */
+export interface CliConfig {
+  /**
+   * Tool name for appstash config storage (e.g., 'myapp' stores at ~/.myapp/)
+   * @default derived from output directory name
+   */
+  toolName?: string;
+
+  /**
+   * Override infra command names (for collision handling)
+   * Defaults: auth -> 'auth' (renamed to 'credentials' on collision),
+   *           context -> 'context' (renamed to 'env' on collision)
+   */
+  builtinNames?: BuiltinNames;
+}
+
+/**
  * Target configuration for graphql-codegen
  * Represents a single schema source and output destination.
  *
@@ -155,6 +220,13 @@ export interface GraphQLSDKConfigTarget {
    * Path to GraphQL schema file (.graphql) for file-based generation
    */
   schemaFile?: string;
+
+  /**
+   * Path to a directory of .graphql schema files for multi-target generation.
+   * Each *.graphql file becomes its own target, named by the filename (without extension).
+   * e.g. schemas/app.graphql + schemas/admin.graphql → targets "app" and "admin"
+   */
+  schemaDir?: string;
 
   /**
    * Database configuration for direct database introspection or PGPM module
@@ -258,6 +330,22 @@ export interface GraphQLSDKConfigTarget {
    * @default false
    */
   reactQuery?: boolean;
+
+  /**
+   * CLI generation configuration
+   * When enabled, generates inquirerer-based CLI commands to {output}/cli
+   * Requires appstash for config storage and inquirerer for prompts
+   */
+  cli?: CliConfig | boolean;
+
+  /**
+   * Documentation generation options
+   * Controls which doc formats are generated alongside code for each generator target.
+   * Applied globally to all enabled generators (ORM, React Query, CLI).
+   * Set to `true` to enable all formats, or configure individually.
+   * @default { readme: true, agents: true, mcp: false, skills: false }
+   */
+  docs?: DocsConfig | boolean;
 
   /**
    * Query key generation configuration

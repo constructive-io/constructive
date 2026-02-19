@@ -29,7 +29,7 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch"
   },
   "devDependencies": {

@@ -1,0 +1,525 @@
+import type { CleanOperation, CleanTable } from '../../../types/schema';
+import {
+  buildSkillFile,
+  formatArgType,
+  getEditableFields,
+  getReadmeHeader,
+  getReadmeFooter,
+  gqlTypeToJsonSchemaType,
+} from '../docs-utils';
+import type { GeneratedDocFile, McpTool } from '../docs-utils';
+import {
+  getScalarFields,
+  getTableNames,
+  getPrimaryKeyInfo,
+  lcFirst,
+  fieldTypeToTs,
+} from '../utils';
+
+export function generateOrmReadme(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+): GeneratedDocFile {
+  const lines: string[] = [];
+
+  lines.push(...getReadmeHeader('ORM Client'));
+  lines.push('## Setup');
+  lines.push('');
+  lines.push('```typescript');
+  lines.push("import { createClient } from './orm';");
+  lines.push('');
+  lines.push('const db = createClient({');
+  lines.push("  endpoint: 'https://api.example.com/graphql',");
+  lines.push("  headers: { Authorization: 'Bearer <token>' },");
+  lines.push('});');
+  lines.push('```');
+  lines.push('');
+
+  lines.push('## Models');
+  lines.push('');
+  lines.push('| Model | Operations |');
+  lines.push('|-------|------------|');
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    lines.push(
+      `| \`${singularName}\` | findMany, findOne, create, update, delete |`,
+    );
+  }
+  lines.push('');
+
+  if (tables.length > 0) {
+    lines.push('## Table Operations');
+    lines.push('');
+    for (const table of tables) {
+      const { singularName } = getTableNames(table);
+      const pk = getPrimaryKeyInfo(table)[0];
+      const scalarFields = getScalarFields(table);
+      const editableFields = getEditableFields(table);
+
+      lines.push(`### \`db.${singularName}\``);
+      lines.push('');
+      lines.push(`CRUD operations for ${table.name} records.`);
+      lines.push('');
+      lines.push('**Fields:**');
+      lines.push('');
+      lines.push('| Field | Type | Editable |');
+      lines.push('|-------|------|----------|');
+      for (const f of scalarFields) {
+        const editable = editableFields.some((ef) => ef.name === f.name);
+        lines.push(
+          `| \`${f.name}\` | ${f.type.gqlType} | ${editable ? 'Yes' : 'No'} |`,
+        );
+      }
+      lines.push('');
+
+      lines.push('**Operations:**');
+      lines.push('');
+      lines.push('```typescript');
+      lines.push(`// List all ${singularName} records`);
+      lines.push(
+        `const items = await db.${singularName}.findMany({ select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+      );
+      lines.push('');
+      lines.push(`// Get one by ${pk.name}`);
+      lines.push(
+        `const item = await db.${singularName}.findOne({ where: { ${pk.name}: '<value>' }, select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+      );
+      lines.push('');
+      lines.push(`// Create`);
+      lines.push(
+        `const created = await db.${singularName}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { ${pk.name}: true } }).execute();`,
+      );
+      lines.push('');
+      lines.push(`// Update`);
+      lines.push(
+        `const updated = await db.${singularName}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new-value>' }, select: { ${pk.name}: true } }).execute();`,
+      );
+      lines.push('');
+      lines.push(`// Delete`);
+      lines.push(
+        `const deleted = await db.${singularName}.delete({ where: { ${pk.name}: '<value>' } }).execute();`,
+      );
+      lines.push('```');
+      lines.push('');
+    }
+  }
+
+  if (customOperations.length > 0) {
+    lines.push('## Custom Operations');
+    lines.push('');
+    for (const op of customOperations) {
+      const accessor = op.kind === 'query' ? 'query' : 'mutation';
+      lines.push(`### \`db.${accessor}.${op.name}\``);
+      lines.push('');
+      lines.push(op.description || op.name);
+      lines.push('');
+      lines.push(`- **Type:** ${op.kind}`);
+      if (op.args.length > 0) {
+        lines.push('- **Arguments:**');
+        lines.push('');
+        lines.push('  | Argument | Type |');
+        lines.push('  |----------|------|');
+        for (const arg of op.args) {
+          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        }
+        lines.push('');
+        lines.push('```typescript');
+        lines.push(
+          `const result = await db.${accessor}.${op.name}({ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }).execute();`,
+        );
+        lines.push('```');
+      } else {
+        lines.push('- **Arguments:** none');
+        lines.push('');
+        lines.push('```typescript');
+        lines.push(
+          `const result = await db.${accessor}.${op.name}().execute();`,
+        );
+        lines.push('```');
+      }
+      lines.push('');
+    }
+  }
+
+  lines.push(...getReadmeFooter());
+
+  return {
+    fileName: 'README.md',
+    content: lines.join('\n'),
+  };
+}
+
+export function generateOrmAgentsDocs(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+): GeneratedDocFile {
+  const lines: string[] = [];
+
+  lines.push('# ORM Client - Agent Reference');
+  lines.push('');
+  lines.push('> @generated by @constructive-io/graphql-codegen - DO NOT EDIT');
+  lines.push('> This document is structured for LLM/agent consumption.');
+  lines.push('');
+
+  lines.push('## OVERVIEW');
+  lines.push('');
+  lines.push(
+    'Prisma-like ORM client for interacting with a GraphQL API.',
+  );
+  lines.push(
+    'All methods return a query builder. Call `.execute()` to run the query.',
+  );
+  lines.push('');
+
+  lines.push('## SETUP');
+  lines.push('');
+  lines.push('```typescript');
+  lines.push("import { createClient } from './orm';");
+  lines.push('');
+  lines.push('const db = createClient({');
+  lines.push("  endpoint: 'https://api.example.com/graphql',");
+  lines.push("  headers: { Authorization: 'Bearer <token>' },");
+  lines.push('});');
+  lines.push('```');
+  lines.push('');
+
+  lines.push('## MODELS');
+  lines.push('');
+
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const scalarFields = getScalarFields(table);
+    const editableFields = getEditableFields(table);
+
+    lines.push(`### MODEL: ${singularName}`);
+    lines.push('');
+    lines.push(`Access: \`db.${singularName}\``);
+    lines.push('');
+    lines.push('```');
+    lines.push('METHODS:');
+    lines.push(
+      `  db.${singularName}.findMany({ select, where?, orderBy?, first?, offset? })`,
+    );
+    lines.push(
+      `  db.${singularName}.findOne({ where: { ${pk.name} }, select })`,
+    );
+    lines.push(
+      `  db.${singularName}.create({ data: { ${editableFields.map((f) => f.name).join(', ')} }, select })`,
+    );
+    lines.push(
+      `  db.${singularName}.update({ where: { ${pk.name} }, data, select })`,
+    );
+    lines.push(`  db.${singularName}.delete({ where: { ${pk.name} } })`);
+    lines.push('');
+    lines.push('FIELDS:');
+    for (const f of scalarFields) {
+      const isPk = f.name === pk.name;
+      lines.push(
+        `  ${f.name}: ${fieldTypeToTs(f.type)}${isPk ? ' (primary key)' : ''}`,
+      );
+    }
+    lines.push('');
+    lines.push('EDITABLE FIELDS:');
+    for (const f of editableFields) {
+      lines.push(`  ${f.name}: ${fieldTypeToTs(f.type)}`);
+    }
+    lines.push('');
+    lines.push('OUTPUT: Promise<JSON>');
+    lines.push(
+      `  findMany: [{ ${scalarFields.map((f) => f.name).join(', ')} }]`,
+    );
+    lines.push(
+      `  findOne:  { ${scalarFields.map((f) => f.name).join(', ')} }`,
+    );
+    lines.push(
+      `  create:   { ${scalarFields.map((f) => f.name).join(', ')} }`,
+    );
+    lines.push(
+      `  update:   { ${scalarFields.map((f) => f.name).join(', ')} }`,
+    );
+    lines.push(`  delete:   { ${pk.name} }`);
+    lines.push('```');
+    lines.push('');
+  }
+
+  if (customOperations.length > 0) {
+    lines.push('## CUSTOM OPERATIONS');
+    lines.push('');
+
+    for (const op of customOperations) {
+      const accessor = op.kind === 'query' ? 'query' : 'mutation';
+
+      lines.push(`### OPERATION: ${op.name}`);
+      lines.push('');
+      lines.push(op.description || op.name);
+      lines.push('');
+      lines.push('```');
+      lines.push(`TYPE: ${op.kind}`);
+      lines.push(`ACCESS: db.${accessor}.${op.name}`);
+      if (op.args.length > 0) {
+        lines.push(
+          `USAGE: db.${accessor}.${op.name}({ ${op.args.map((a) => `${a.name}: <value>`).join(', ')} }).execute()`,
+        );
+        lines.push('');
+        lines.push('INPUT:');
+        for (const arg of op.args) {
+          lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+        }
+      } else {
+        lines.push(
+          `USAGE: db.${accessor}.${op.name}().execute()`,
+        );
+        lines.push('');
+        lines.push('INPUT: none');
+      }
+      lines.push('');
+      lines.push('OUTPUT: Promise<JSON>');
+      lines.push('```');
+      lines.push('');
+    }
+  }
+
+  lines.push('## PATTERNS');
+  lines.push('');
+  lines.push('```typescript');
+  lines.push('// All methods require .execute() to run');
+  lines.push(
+    'const result = await db.modelName.findMany({ select: { id: true } }).execute();',
+  );
+  lines.push('');
+  lines.push('// Select specific fields');
+  lines.push(
+    'const partial = await db.modelName.findMany({ select: { id: true, name: true } }).execute();',
+  );
+  lines.push('');
+  lines.push('// Filter with where clause');
+  lines.push(
+    "const filtered = await db.modelName.findMany({ select: { id: true }, where: { name: 'test' } }).execute();",
+  );
+  lines.push('```');
+  lines.push('');
+
+  return {
+    fileName: 'AGENTS.md',
+    content: lines.join('\n'),
+  };
+}
+
+export function getOrmMcpTools(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+): McpTool[] {
+  const tools: McpTool[] = [];
+
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const scalarFields = getScalarFields(table);
+    const editableFields = getEditableFields(table);
+
+    tools.push({
+      name: `orm_${lcFirst(singularName)}_findMany`,
+      description: `List all ${table.name} records via ORM`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          first: {
+            type: 'integer',
+            description: 'Limit number of results',
+          },
+          offset: {
+            type: 'integer',
+            description: 'Offset for pagination',
+          },
+        },
+      },
+    });
+
+    tools.push({
+      name: `orm_${lcFirst(singularName)}_findOne`,
+      description: `Get a single ${table.name} record by ${pk.name}`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          [pk.name]: {
+            type: gqlTypeToJsonSchemaType(pk.gqlType),
+            description: `${table.name} ${pk.name}`,
+          },
+        },
+        required: [pk.name],
+      },
+    });
+
+    const createProps: Record<string, unknown> = {};
+    for (const f of editableFields) {
+      createProps[f.name] = {
+        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        description: `${table.name} ${f.name}`,
+      };
+    }
+    tools.push({
+      name: `orm_${lcFirst(singularName)}_create`,
+      description: `Create a new ${table.name} record`,
+      inputSchema: {
+        type: 'object',
+        properties: createProps,
+        required: editableFields.map((f) => f.name),
+      },
+    });
+
+    const updateProps: Record<string, unknown> = {
+      [pk.name]: {
+        type: gqlTypeToJsonSchemaType(pk.gqlType),
+        description: `${table.name} ${pk.name}`,
+      },
+    };
+    for (const f of editableFields) {
+      updateProps[f.name] = {
+        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        description: `${table.name} ${f.name}`,
+      };
+    }
+    tools.push({
+      name: `orm_${lcFirst(singularName)}_update`,
+      description: `Update an existing ${table.name} record`,
+      inputSchema: {
+        type: 'object',
+        properties: updateProps,
+        required: [pk.name],
+      },
+    });
+
+    tools.push({
+      name: `orm_${lcFirst(singularName)}_delete`,
+      description: `Delete a ${table.name} record by ${pk.name}`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          [pk.name]: {
+            type: gqlTypeToJsonSchemaType(pk.gqlType),
+            description: `${table.name} ${pk.name}`,
+          },
+        },
+        required: [pk.name],
+      },
+      _meta: {
+        fields: scalarFields.map((f) => ({
+          name: f.name,
+          type: f.type.gqlType,
+          editable: editableFields.some((ef) => ef.name === f.name),
+          primaryKey: f.name === pk.name,
+        })),
+      },
+    });
+  }
+
+  for (const op of customOperations) {
+    const accessor = op.kind === 'query' ? 'query' : 'mutation';
+    const props: Record<string, unknown> = {};
+    const required: string[] = [];
+
+    for (const arg of op.args) {
+      const isRequired = arg.type.kind === 'NON_NULL';
+      const baseType =
+        isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
+      props[arg.name] = {
+        type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
+        description: arg.description || arg.name,
+      };
+      if (isRequired) {
+        required.push(arg.name);
+      }
+    }
+
+    tools.push({
+      name: `orm_${accessor}_${op.name}`,
+      description: op.description || `Execute ${op.name} ${op.kind}`,
+      inputSchema: {
+        type: 'object',
+        properties: props,
+        ...(required.length > 0 ? { required } : {}),
+      },
+    });
+  }
+
+  return tools;
+}
+
+export function generateOrmSkills(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+): GeneratedDocFile[] {
+  const files: GeneratedDocFile[] = [];
+
+  for (const table of tables) {
+    const { singularName } = getTableNames(table);
+    const pk = getPrimaryKeyInfo(table)[0];
+    const editableFields = getEditableFields(table);
+
+    files.push({
+      fileName: `skills/${lcFirst(singularName)}.md`,
+      content: buildSkillFile({
+        name: `orm-${lcFirst(singularName)}`,
+        description: `ORM operations for ${table.name} records`,
+        language: 'typescript',
+        usage: [
+          `db.${lcFirst(singularName)}.findMany({ select: { id: true } }).execute()`,
+          `db.${lcFirst(singularName)}.findOne({ where: { ${pk.name}: '<value>' }, select: { id: true } }).execute()`,
+          `db.${lcFirst(singularName)}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { id: true } }).execute()`,
+          `db.${lcFirst(singularName)}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new>' }, select: { id: true } }).execute()`,
+          `db.${lcFirst(singularName)}.delete({ where: { ${pk.name}: '<value>' } }).execute()`,
+        ],
+        examples: [
+          {
+            description: `List all ${singularName} records`,
+            code: [
+              `const items = await db.${lcFirst(singularName)}.findMany({`,
+              `  select: { ${pk.name}: true, ${editableFields[0]?.name || 'name'}: true }`,
+              '}).execute();',
+            ],
+          },
+          {
+            description: `Create a ${singularName}`,
+            code: [
+              `const item = await db.${lcFirst(singularName)}.create({`,
+              `  data: { ${editableFields.map((f) => `${f.name}: 'value'`).join(', ')} },`,
+              `  select: { ${pk.name}: true }`,
+              '}).execute();',
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  for (const op of customOperations) {
+    const accessor = op.kind === 'query' ? 'query' : 'mutation';
+    const callArgs =
+      op.args.length > 0
+        ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
+        : '';
+
+    files.push({
+      fileName: `skills/${op.name}.md`,
+      content: buildSkillFile({
+        name: `orm-${op.name}`,
+        description: op.description || `Execute the ${op.name} ${op.kind}`,
+        language: 'typescript',
+        usage: [
+          `db.${accessor}.${op.name}(${callArgs}).execute()`,
+        ],
+        examples: [
+          {
+            description: `Run ${op.name}`,
+            code: [
+              `const result = await db.${accessor}.${op.name}(${callArgs}).execute();`,
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  return files;
+}

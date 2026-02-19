@@ -25,7 +25,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:send": "ts-node __tests__/test-send.ts",
     "test:send:dev": "ts-node __tests__/test-send.ts"

@@ -1,5 +1,4 @@
 export * from './server';
-export * from './schema';
 
 // Export options module - types, defaults, type guards, and utility functions
 export * from './options';

@@ -12,9 +12,7 @@
     "node_modules",
     "**/*.spec.*",
     "**/*.test.*",
-    "src/codegen/**/*",
     "src/plugins/**/*",
-    "src/schema.ts",
     "src/scripts/**/*",
     "src/middleware/gql.ts"
   ]

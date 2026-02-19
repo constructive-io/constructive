@@ -22,13 +22,14 @@ export * from './client';
 export { defineConfig } from './types/config';
 
 // Main generate function (orchestrates the entire pipeline)
-export type { GenerateOptions, GenerateResult } from './core/generate';
-export { generate } from './core/generate';
+export type { GenerateOptions, GenerateResult, GenerateMultiOptions, GenerateMultiResult } from './core/generate';
+export { generate, generateMulti, expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget } from './core/generate';
 
 // Config utilities
 export { findConfigFile, loadConfigFile } from './core/config';
 
 // CLI shared utilities (for packages/cli to import)
+export { runCodegenHandler } from './cli/handler';
 export type { CodegenAnswers } from './cli/shared';
 export {
   buildDbConfig,
@@ -50,7 +51,4 @@ export type {
   BuildSchemaFromDatabaseOptions,
   BuildSchemaFromDatabaseResult,
 } from './core/database';
-export {
-  buildSchemaFromDatabase,
-  buildSchemaSDLFromDatabase,
-} from './core/database';
+export { buildSchemaFromDatabase } from './core/database';
