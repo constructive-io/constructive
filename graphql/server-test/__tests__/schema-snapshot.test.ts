@@ -23,7 +23,7 @@
  */
 
 import path from 'path';
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { buildSchemaSDL } from 'graphile-schema';
 import { getConnections, seed } from '../src';
 
 jest.setTimeout(60000);

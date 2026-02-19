@@ -13,7 +13,6 @@
     "**/*.spec.*",
     "**/*.test.*",
     "src/plugins/**/*",
-    "src/schema.ts",
     "src/scripts/**/*",
     "src/middleware/gql.ts"
   ]

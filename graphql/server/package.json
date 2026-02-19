@@ -59,7 +59,6 @@
     "graphile-build-pg": "^5.0.0-rc.3",
     "graphile-cache": "workspace:^",
     "graphile-config": "1.0.0-rc.3",
-    "graphile-schema": "workspace:^",
     "graphile-settings": "workspace:^",
     "graphql": "^16.9.0",
     "graphql-upload": "^13.0.0",

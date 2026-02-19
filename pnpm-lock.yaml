@@ -215,7 +215,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-query:
@@ -285,7 +285,7 @@ importers:
         version: 0.1.12
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-search-plugin:
@@ -409,7 +409,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-test:
@@ -680,7 +680,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/gql-ast:
@@ -876,9 +876,6 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
-      graphile-schema:
-        specifier: workspace:^
-        version: link:../../graphile/graphile-schema/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -965,6 +962,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      graphile-schema:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-schema/dist
       graphql:
         specifier: 15.10.1
         version: 15.10.1
@@ -1334,7 +1334,7 @@ importers:
         version: 7.2.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   jobs/knative-job-worker:
@@ -1621,7 +1621,7 @@ importers:
         version: 0.1.12
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/smtppostmaster:
@@ -1650,7 +1650,7 @@ importers:
         version: 3.18.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/url-domains:
