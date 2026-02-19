@@ -50,7 +50,7 @@ All Graphile RC dependencies are pinned to **exact versions** (no `^` or `~` pre
 
 ## Packages That Use Graphile
 
-The following packages in `graphile/` depend on the Graphile RC ecosystem:
+### `graphile/` packages
 
 - **graphile-settings** -- Core settings/configuration for PostGraphile v5 (most deps, including the transitive peer deps `tamedevil`, `@dataplan/pg`, `@dataplan/json`, `grafserv`)
 - **graphile-schema** -- Builds GraphQL SDL from PostgreSQL using PostGraphile v5
@@ -61,6 +61,15 @@ The following packages in `graphile/` depend on the Graphile RC ecosystem:
 - **graphile-authz** -- Dynamic authorization plugin for PostGraphile v5
 - **postgraphile-plugin-pgvector** -- pgvector similarity search plugin for PostGraphile v5
 
+### `graphql/` packages
+
+- **@constructive-io/graphql-server** -- GraphQL server with PostGraphile v5
+- **@constructive-io/graphql-test** -- GraphQL testing with all plugins loaded
+- **@constructive-io/graphql-query** -- GraphQL query builder
+- **@constructive-io/graphql-explorer** -- GraphQL Explorer UI
+
+**Important:** Having different versions of `grafast` (or other singleton graphile packages) installed in the same workspace causes runtime errors like `Preset attempted to register version 'X' of 'grafast', but version 'Y' is already registered`. This is why **all** packages must use the same pinned versions.
+
 ## Upgrading Graphile RC Versions
 
 When upgrading to a new Graphile RC set:
@@ -68,7 +77,8 @@ When upgrading to a new Graphile RC set:
 1. Check the latest RC versions on npm for all packages listed in the table above
 2. Verify peer dependency compatibility by running `npm view <package>@<version> peerDependencies` for each package
 3. Update **all** packages in this table simultaneously -- do not upgrade one without the others
-4. Update every `graphile/*/package.json` that references these packages
+4. Update every `graphile/*/package.json` and `graphql/*/package.json` that references these packages
 5. Run `pnpm install` to update the lockfile
-6. Run tests to verify nothing broke
-7. Update the version table in this document
+6. Run `pnpm build` to verify no type errors
+7. Run tests to verify nothing broke
+8. Update the version table in this document

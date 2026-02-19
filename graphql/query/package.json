@@ -31,14 +31,14 @@
   "dependencies": {
     "ajv": "^7.0.4",
     "gql-ast": "workspace:^",
-    "grafast": "^1.0.0-rc.4",
-    "graphile-build-pg": "^5.0.0-rc.3",
-    "graphile-config": "1.0.0-rc.3",
+    "grafast": "1.0.0-rc.7",
+    "graphile-build-pg": "5.0.0-rc.5",
+    "graphile-config": "1.0.0-rc.5",
     "graphile-settings": "workspace:^",
     "graphql": "^16.9.0",
     "inflection": "^3.0.0",
     "lru-cache": "^10.4.3",
-    "postgraphile": "^5.0.0-rc.4"
+    "postgraphile": "5.0.0-rc.7"
   },
   "keywords": [
     "query",
