@@ -95,27 +95,33 @@ cnc codegen --api-names my_api --output ./codegen --orm
 - `--dry-run` - Preview without writing files
 - `--verbose` - Verbose output
 
-### `cnc get-graphql-schema`
+### `cnc codegen --schema-only`
 
-Fetch or build GraphQL schema SDL.
+Export GraphQL schema SDL without running full code generation. Works with any source (endpoint, file, database, PGPM).
 
 ```bash
 # From database schemas
-cnc get-graphql-schema --database mydb --schemas myapp,public --out ./schema.graphql
+cnc codegen --schema-only --schemas myapp,public --output ./schemas
 
 # From running server
-cnc get-graphql-schema --endpoint http://localhost:3000/graphql --out ./schema.graphql
+cnc codegen --schema-only --endpoint http://localhost:3000/graphql --output ./schemas
+
+# From schema file (useful for converting/validating)
+cnc codegen --schema-only --schema-file ./input.graphql --output ./schemas
+
+# From a directory of .graphql files (multi-target)
+cnc codegen --schema-only --schema-dir ./schemas --output ./exported
 ```
 
 **Options:**
 
-- `--database <name>` - Database name (for programmatic builder)
-- `--schemas <list>` - Comma-separated schemas to include (required unless using --endpoint)
-- `--endpoint <url>` - GraphQL endpoint to fetch schema via introspection
-- `--headerHost <host>` - Optional Host header for endpoint requests
-- `--auth <token>` - Optional Authorization header value
-- `--header "Name: Value"` - Optional HTTP header (repeatable)
-- `--out <path>` - Output file path (prints to stdout if omitted)
+- `--endpoint <url>` - GraphQL endpoint URL
+- `--schema-file <path>` - Path to GraphQL schema file
+- `--schemas <list>` - Comma-separated PostgreSQL schemas
+- `--api-names <list>` - Comma-separated API names (multi-target when >1)
+- `--schema-dir <path>` - Directory of .graphql files (auto-creates one target per file)
+- `--output <dir>` - Output directory (default: ./generated/graphql)
+- `--authorization <token>` - Authorization header value
 
 ## Configuration
 

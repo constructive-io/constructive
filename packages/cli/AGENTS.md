@@ -3,7 +3,7 @@
 The `@constructive-io/cli` package provides the user-facing CLI for the Constructive ecosystem.
 
 - **Binaries:** `constructive` (full) and `cnc` (shorthand)
-- **What it covers:** Constructive GraphQL workflows only (server, explorer, schema tools, codegen)
+- **What it covers:** Constructive GraphQL workflows only (server, explorer, codegen)
 
 **Note:** Database operations (init, add, deploy, revert, etc.) are handled by the separate `pgpm` CLI. Users should install both tools for the complete workflow.
 
@@ -15,19 +15,19 @@ The `@constructive-io/cli` package provides the user-facing CLI for the Construc
 
 ## Commands
 
-The CLI provides 4 GraphQL-focused commands:
+The CLI provides GraphQL-focused commands:
 
 - `packages/cli/src/commands/server.ts` – start the Constructive GraphQL server
 - `packages/cli/src/commands/explorer.ts` – start the Constructive GraphQL explorer
-- `packages/cli/src/commands/get-graphql-schema.ts` – emit schema SDL (DB build or endpoint introspection)
-- `packages/cli/src/commands/codegen.ts` – run GraphQL codegen (`@constructive-io/graphql-codegen`)
+- `packages/cli/src/commands/codegen.ts` – run GraphQL codegen (`@constructive-io/graphql-codegen`), including `--schema-only` for SDL export
 
 ## Debugging Tips
 
 - **Command routing:** `packages/cli/src/commands.ts`
-- **Schema generation:** `packages/cli/src/commands/get-graphql-schema.ts` delegates schema building to `@constructive-io/graphql-server`
+- **Codegen handler:** `packages/cli/src/commands/codegen.ts` delegates to `runCodegenHandler()` from `@constructive-io/graphql-codegen`
+- **Schema building:** `graphile-schema` package provides `buildSchemaSDL` (from database) and `fetchEndpointSchemaSDL` (from endpoint)
 
 ## Tests
 
-- `packages/cli/__tests__/*` covers the GraphQL commands (codegen, get-graphql-schema, cli)
+- `packages/cli/__tests__/*` covers the GraphQL commands (codegen, cli)
 - Database/PGPM tests are located in `pgpm/cli/__tests__/`

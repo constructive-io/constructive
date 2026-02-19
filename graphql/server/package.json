@@ -30,9 +30,8 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "bucket:create": "ts-node src/scripts/create-bucket.ts",
-    "codegen:schema": "ts-node src/scripts/codegen-schema.ts",
     "codegen:clean": "rimraf src/codegen/orm codegen/schema.graphql",
-    "codegen": "npm run codegen:clean && npm run codegen:schema && graphql-codegen generate-orm --schema codegen/schema.graphql --output src/codegen/orm"
+    "codegen": "npm run codegen:clean && graphql-codegen --schema-only --output codegen && graphql-codegen generate-orm --schema codegen/schema.graphql --output src/codegen/orm"
   },
   "keywords": [
     "server",
