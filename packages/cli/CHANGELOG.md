@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.0.3...@constructive-io/cli@7.1.0) (2026-02-19)
+
+### Bug Fixes
+
+- **cli:** add explicit type annotations to test mock for strict TS ([5a14718](https://github.com/constructive-io/constructive/commit/5a14718886e787128d05d1c5121dd4ef3e429139))
+- **cli:** fix spread argument type error in codegen test mock ([4825be3](https://github.com/constructive-io/constructive/commit/4825be30bc2cc0a3b20d3e151203a55ce841f775))
+- **cli:** type mock function parameters to fix TS2554 in CI ([f7c988a](https://github.com/constructive-io/constructive/commit/f7c988a6912ba207e7b1cfd268aa0ad6e3a5b55c))
+- **cli:** update tests for removed get-graphql-schema and new expandApiNamesToMultiTarget export ([6f1eaad](https://github.com/constructive-io/constructive/commit/6f1eaad1403505246d17ab1e5ed1de4eddc0e8db))
+
+### Features
+
+- **codegen:** add schemaDir multi-target expansion, unit tests, unify cnc codegen as thin wrapper ([44097ee](https://github.com/constructive-io/constructive/commit/44097ee2fa72369eb12373f19429ed5f7ed4c859))
+- **codegen:** add shared PGPM ephemeral DB, multi-target cnc codegen, and export-schema command ([d05e763](https://github.com/constructive-io/constructive/commit/d05e7632464ba6df3a5883127d3bae3eee0d388c))
+- **codegen:** apiNames auto-expansion to multi-target, --schema-only flag, remove redundant commands ([b1396bc](https://github.com/constructive-io/constructive/commit/b1396bcf0d238ae425c3a771ab07e460833a8c2f))
+
 ## [7.0.3](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@7.0.2...@constructive-io/cli@7.0.3) (2026-02-15)
 
 **Note:** Version bump only for package @constructive-io/cli

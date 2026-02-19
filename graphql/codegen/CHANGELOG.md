@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.0.2...@constructive-io/graphql-codegen@4.1.0) (2026-02-19)
+
+### Bug Fixes
+
+- **codegen:** export generateMulti and fix multi-target executor import paths ([ef638ad](https://github.com/constructive-io/constructive/commit/ef638ade062520cd6ca9f9ffe11fd9196424536b))
+
+### Features
+
+- add graphile-schema package, README headers/footers, and --schema-only tests ([4587027](https://github.com/constructive-io/constructive/commit/458702780393dd4ca514e311d10f11143ee7a254))
+- **codegen:** add CLI command generator from GraphQL schema ([be959f7](https://github.com/constructive-io/constructive/commit/be959f7388aae147369b3f080bd0bc0aa7aa4429))
+- **codegen:** add configurable docs generation (README, AGENTS.md, MCP, Skills) ([1fe5255](https://github.com/constructive-io/constructive/commit/1fe5255398d7dda4ed5ead956b29717357a737fb))
+- **codegen:** add docs generation for ORM, React Query, and multi-target support ([0fb16ea](https://github.com/constructive-io/constructive/commit/0fb16ea4187d9fb2d88fb80401908c211ffcdd9a))
+- **codegen:** add multi-target CLI docs generation (README, AGENTS.md, MCP, skills) ([5288230](https://github.com/constructive-io/constructive/commit/5288230b2dc1ee05a486daabd08f179c5582325d))
+- **codegen:** add schemaDir multi-target expansion, unit tests, unify cnc codegen as thin wrapper ([44097ee](https://github.com/constructive-io/constructive/commit/44097ee2fa72369eb12373f19429ed5f7ed4c859))
+- **codegen:** add shared PGPM ephemeral DB, multi-target cnc codegen, and export-schema command ([d05e763](https://github.com/constructive-io/constructive/commit/d05e7632464ba6df3a5883127d3bae3eee0d388c))
+- **codegen:** add unified multi-target CLI architecture ([0b15004](https://github.com/constructive-io/constructive/commit/0b1500404867136d7375b832a6c051ffc9aac85a))
+- **codegen:** apiNames auto-expansion to multi-target, --schema-only flag, remove redundant commands ([b1396bc](https://github.com/constructive-io/constructive/commit/b1396bcf0d238ae425c3a771ab07e460833a8c2f))
+- **codegen:** generate README.md and COMMANDS.md for CLI ([fde91f9](https://github.com/constructive-io/constructive/commit/fde91f9fc7e60f60688da7186faa69084650666e))
+
 ## [4.0.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.0.1...@constructive-io/graphql-codegen@4.0.2) (2026-02-15)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "graphile-search-plugin",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Generate search conditions for your tsvector columns (PostGraphile v5)",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",

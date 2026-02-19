@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.0.1...@constructive-io/graphql-server@4.1.0) (2026-02-19)
+
+### Features
+
+- add graphile-schema package, README headers/footers, and --schema-only tests ([4587027](https://github.com/constructive-io/constructive/commit/458702780393dd4ca514e311d10f11143ee7a254))
+- **codegen:** apiNames auto-expansion to multi-target, --schema-only flag, remove redundant commands ([b1396bc](https://github.com/constructive-io/constructive/commit/b1396bcf0d238ae425c3a771ab07e460833a8c2f))
+
 ## [4.0.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.0.0...@constructive-io/graphql-server@4.0.1) (2026-02-15)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

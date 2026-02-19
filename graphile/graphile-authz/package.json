@@ -1,6 +1,6 @@
 {
   "name": "graphile-authz",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Dynamic PostGraphile v5 authorization plugin based on Authz node types from constructive-db",
   "main": "index.js",
