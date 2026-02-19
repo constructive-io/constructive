@@ -30,7 +30,7 @@
     "build:dev": "makage build --dev",
     "start": "node dist/run.js",
     "dev": "ts-node --transpile-only src/run.ts",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand"
   },

@@ -42,7 +42,7 @@
     "lint": "eslint . --fix",
     "fmt": "oxfmt --write .",
     "fmt:check": "oxfmt --check .",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "example:codegen:sdk": "tsx src/cli/index.ts --config examples/multi-target.config.ts --react-query",
     "example:codegen:orm": "tsx src/cli/index.ts --config examples/multi-target.config.ts --orm",

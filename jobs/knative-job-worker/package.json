@@ -25,7 +25,7 @@
     "url": "https://github.com/constructive-io/jobs"
   },
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "clean": "makage clean",
