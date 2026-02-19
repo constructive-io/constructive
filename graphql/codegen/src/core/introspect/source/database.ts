@@ -6,7 +6,7 @@
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { buildSchemaSDL } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {

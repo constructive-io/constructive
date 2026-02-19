@@ -13,7 +13,7 @@ import { getPgPool } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { buildSchemaSDL } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';

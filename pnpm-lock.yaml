@@ -215,7 +215,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-query:
@@ -254,6 +254,38 @@ importers:
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
+  graphile/graphile-schema:
+    dependencies:
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
+      graphile-build:
+        specifier: ^5.0.0-rc.3
+        version: 5.0.0-rc.4(grafast@1.0.0-rc.4(graphql@16.12.0))(graphile-config@1.0.0-rc.3)(graphql@16.12.0)
+      graphile-config:
+        specifier: 1.0.0-rc.3
+        version: 1.0.0-rc.3
+      graphile-settings:
+        specifier: workspace:^
+        version: link:../graphile-settings/dist
+      graphql:
+        specifier: ^16.9.0
+        version: 16.12.0
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pg-env:
+        specifier: workspace:^
+        version: link:../../postgres/pg-env/dist
+    devDependencies:
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.12
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-search-plugin:
@@ -377,7 +409,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-test:
@@ -488,9 +520,6 @@ importers:
       '@babel/types':
         specifier: ^7.28.6
         version: 7.28.6
-      '@constructive-io/graphql-server':
-        specifier: workspace:^
-        version: link:../server/dist
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../types/dist
@@ -512,6 +541,9 @@ importers:
       gql-ast:
         specifier: workspace:^
         version: link:../gql-ast/dist
+      graphile-schema:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-schema/dist
       graphql:
         specifier: ^16.9.0
         version: 16.12.0
@@ -648,7 +680,7 @@ importers:
         version: 3.1.11
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/gql-ast:
@@ -844,6 +876,9 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
+      graphile-schema:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-schema/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -913,7 +948,7 @@ importers:
         version: 6.1.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/server-test:
@@ -1302,7 +1337,7 @@ importers:
         version: 7.2.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   jobs/knative-job-worker:
@@ -1589,7 +1624,7 @@ importers:
         version: 0.1.12
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/smtppostmaster:
@@ -1618,7 +1653,7 @@ importers:
         version: 3.18.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.27)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/url-domains:
@@ -11195,7 +11230,7 @@ snapshots:
 
   '@graphiql/plugin-doc-explorer@0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/react@19.2.13)(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
     dependencies:
-      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       '@headlessui/react': 2.2.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       graphql: 16.12.0
       react: 19.2.3
@@ -11209,7 +11244,7 @@ snapshots:
 
   '@graphiql/plugin-explorer@5.1.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(graphql@16.12.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
-      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       graphiql-explorer: 0.9.0(graphql@16.12.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       graphql: 16.12.0
       react: 19.2.3
@@ -11217,8 +11252,8 @@ snapshots:
 
   '@graphiql/plugin-history@0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/node@22.19.11)(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
     dependencies:
-      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
-      '@graphiql/toolkit': 0.11.3(@types/node@20.19.27)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
+      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@graphiql/toolkit': 0.11.3(@types/node@22.19.11)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
       react: 19.2.3
       react-compiler-runtime: 19.1.0-rc.1(react@19.2.3)
       react-dom: 19.2.3(react@19.2.3)
@@ -11231,9 +11266,9 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
+  '@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
     dependencies:
-      '@graphiql/toolkit': 0.11.3(@types/node@20.19.27)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
+      '@graphiql/toolkit': 0.11.3(@types/node@22.19.11)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
       '@radix-ui/react-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@radix-ui/react-dropdown-menu': 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@radix-ui/react-tooltip': 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -11262,11 +11297,11 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@graphiql/toolkit@0.11.3(@types/node@20.19.27)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)':
+  '@graphiql/toolkit@0.11.3(@types/node@22.19.11)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
       graphql: 16.12.0
-      meros: 1.3.2(@types/node@20.19.27)
+      meros: 1.3.2(@types/node@22.19.11)
     optionalDependencies:
       graphql-ws: 6.0.7(graphql@16.12.0)(ws@8.19.0)
     transitivePeerDependencies:
@@ -15522,7 +15557,7 @@ snapshots:
     dependencies:
       '@graphiql/plugin-doc-explorer': 0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/react@19.2.13)(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       '@graphiql/plugin-history': 0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/node@22.19.11)(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
-      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       graphql: 16.12.0
       react: 19.2.3
       react-compiler-runtime: 19.1.0-rc.1(react@19.2.3)
@@ -16722,9 +16757,9 @@ snapshots:
       ts-dedent: 2.2.0
       uuid: 11.1.0
 
-  meros@1.3.2(@types/node@20.19.27):
+  meros@1.3.2(@types/node@22.19.11):
     optionalDependencies:
-      '@types/node': 20.19.27
+      '@types/node': 22.19.11
 
   methods@1.1.2: {}
 
@@ -18146,8 +18181,8 @@ snapshots:
       '@graphiql/plugin-doc-explorer': 0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/react@19.2.13)(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       '@graphiql/plugin-explorer': 5.1.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(graphql@16.12.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@graphiql/plugin-history': 0.4.1(@graphiql/react@0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(@types/node@22.19.11)(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
-      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
-      '@graphiql/toolkit': 0.11.3(@types/node@20.19.27)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
+      '@graphiql/react': 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-compiler-runtime@19.1.0-rc.1(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@graphiql/toolkit': 0.11.3(@types/node@22.19.11)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)
       '@types/node': 22.19.11
       grafast: 1.0.0-rc.4(graphql@16.12.0)
       graphiql: 5.2.2(@emotion/is-prop-valid@1.4.0)(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
@@ -18650,6 +18685,24 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.19.27
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+
+  ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 22.19.11
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3

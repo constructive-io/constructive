@@ -9,6 +9,7 @@ import path from 'node:path';
 
 import { buildClientSchema, printSchema } from 'graphql';
 
+import { PgpmPackage } from '@pgpmjs/core';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
@@ -514,7 +515,6 @@ function getModulePathFromPgpm(
 ): string {
   if (pgpm.modulePath) return pgpm.modulePath;
   if (pgpm.workspacePath && pgpm.moduleName) {
-    const { PgpmPackage } = require('@pgpmjs/core') as typeof import('@pgpmjs/core');
     const workspace = new PgpmPackage(pgpm.workspacePath);
     const moduleProject = workspace.getModuleProject(pgpm.moduleName);
     const modulePath = moduleProject.getModulePath();

@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { buildSchemaSDL } from '@constructive-io/graphql-server';
+import { buildSchemaSDL } from 'graphile-schema';
 
 export interface BuildSchemaFromDatabaseOptions {
   /** Database name */
