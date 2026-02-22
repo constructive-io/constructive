@@ -11,6 +11,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
+import { generateUtilsFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: CleanTable[];
@@ -44,6 +45,9 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
 
   const executorFile = generateExecutorFile(toolName);
   files.push(executorFile);
+
+  const utilsFile = generateUtilsFile();
+  files.push(utilsFile);
 
   const contextFile = generateContextCommand(toolName);
   files.push(contextFile);
@@ -79,7 +83,7 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       tables: tables.length,
       customQueries: customOperations?.queries.length ?? 0,
       customMutations: customOperations?.mutations.length ?? 0,
-      infraFiles: 3,
+      infraFiles: 4,
       totalFiles: files.length,
     },
   };
@@ -136,6 +140,9 @@ export function generateMultiTargetCli(
   }));
   const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs);
   files.push(executorFile);
+
+  const utilsFile = generateUtilsFile();
+  files.push(utilsFile);
 
   const contextFile = generateMultiTargetContextCommand(
     toolName,
@@ -205,7 +212,7 @@ export function generateMultiTargetCli(
       tables: totalTables,
       customQueries: totalQueries,
       customMutations: totalMutations,
-      infraFiles: 3,
+      infraFiles: 4,
       totalFiles: files.length,
     },
   };
@@ -234,4 +241,5 @@ export {
 export type { MultiTargetDocsInput } from './docs-generator';
 export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
+export { generateUtilsFile } from './utils-generator';
 export type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';
