@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.1...@constructive-io/graphql-codegen@4.1.2) (2026-02-23)
+
+### Bug Fixes
+
+- **codegen:** fix CLI codegen bugs - ORM signatures, String.call, type coercion, field filtering ([91d58ad](https://github.com/constructive-io/constructive/commit/91d58adf34dd10dc55ee1068787b78f922234aa9))
+
 ## [4.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.0...@constructive-io/graphql-codegen@4.1.1) (2026-02-19)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
