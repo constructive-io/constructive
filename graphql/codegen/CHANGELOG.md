@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.3...@constructive-io/graphql-codegen@4.2.0) (2026-02-23)
+
+### Features
+
+- **codegen:** add --select flag to custom CLI commands using nested-obj ([e4095ee](https://github.com/constructive-io/constructive/commit/e4095ee9af14900a16bda35cd482e7ff86c46e95))
+
 ## [4.1.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.2...@constructive-io/graphql-codegen@4.1.3) (2026-02-23)
 
 ### Bug Fixes
