@@ -690,7 +690,7 @@ async function handleSetToken(argv: Partial<Record<string, unknown>>, prompter: 
     tokenValue = answer.token;
   }
   store.setCredentials(current.name, {
-    token: String.call(tokenValue || "").trim()
+    token: String(tokenValue || "").trim()
   });
   console.log(\`Token saved for context: \${current.name}\`);
 }
@@ -741,6 +741,15 @@ exports[`cli-generator generates commands/car.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
+import { coerceAnswers, stripUndefined } from "../utils";
+const fieldSchema = {
+  id: "uuid",
+  make: "string",
+  model: "string",
+  year: "int",
+  isElectric: "boolean",
+  createdAt: "string"
+};
 const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
@@ -832,7 +841,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 }
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "make",
       message: "make",
@@ -853,13 +862,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "isElectric",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient();
     const result = await client.car.create({
       data: {
-        make: answers.make,
-        model: answers.model,
-        year: answers.year,
-        isElectric: answers.isElectric
+        make: cleanedData.make,
+        model: cleanedData.model,
+        year: cleanedData.year,
+        isElectric: cleanedData.isElectric
       },
       select: {
         id: true,
@@ -881,7 +892,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
@@ -907,14 +918,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "isElectric",
       required: false
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient();
     const result = await client.car.update({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       data: {
-        make: answers.make,
-        model: answers.model,
-        year: answers.year,
-        isElectric: answers.isElectric
+        make: cleanedData.make,
+        model: cleanedData.model,
+        year: cleanedData.year,
+        isElectric: cleanedData.isElectric
       },
       select: {
         id: true,
@@ -936,15 +951,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient();
     const result = await client.car.delete({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       select: {
         id: true
       }
@@ -1153,6 +1171,12 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
+import { coerceAnswers, stripUndefined } from "../utils";
+const fieldSchema = {
+  id: "uuid",
+  name: "string",
+  licenseNumber: "string"
+};
 const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List all driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
@@ -1238,7 +1262,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 }
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "name",
       message: "name",
@@ -1249,11 +1273,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "licenseNumber",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient();
     const result = await client.driver.create({
       data: {
-        name: answers.name,
-        licenseNumber: answers.licenseNumber
+        name: cleanedData.name,
+        licenseNumber: cleanedData.licenseNumber
       },
       select: {
         id: true,
@@ -1272,7 +1298,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
@@ -1288,12 +1314,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "licenseNumber",
       required: false
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient();
     const result = await client.driver.update({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       data: {
-        name: answers.name,
-        licenseNumber: answers.licenseNumber
+        name: cleanedData.name,
+        licenseNumber: cleanedData.licenseNumber
       },
       select: {
         id: true,
@@ -1312,15 +1342,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient();
     const result = await client.driver.delete({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       select: {
         id: true
       }
@@ -3166,7 +3199,7 @@ async function handleSetToken(argv: Partial<Record<string, unknown>>, prompter: 
     tokenValue = answer.token;
   }
   store.setCredentials(current.name, {
-    token: String.call(tokenValue || "").trim()
+    token: String(tokenValue || "").trim()
   });
   console.log(\`Token saved for context: \${current.name}\`);
 }
@@ -3555,6 +3588,12 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
+import { coerceAnswers, stripUndefined } from "../../utils";
+const fieldSchema = {
+  id: "uuid",
+  email: "string",
+  name: "string"
+};
 const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List all user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
@@ -3640,7 +3679,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 }
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "email",
       message: "email",
@@ -3651,11 +3690,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "name",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("auth");
     const result = await client.user.create({
       data: {
-        email: answers.email,
-        name: answers.name
+        email: cleanedData.email,
+        name: cleanedData.name
       },
       select: {
         id: true,
@@ -3674,7 +3715,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
@@ -3690,12 +3731,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "name",
       required: false
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("auth");
     const result = await client.user.update({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       data: {
-        email: answers.email,
-        name: answers.name
+        email: cleanedData.email,
+        name: cleanedData.name
       },
       select: {
         id: true,
@@ -3714,15 +3759,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient("auth");
     const result = await client.user.delete({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       select: {
         id: true
       }
@@ -3746,6 +3794,11 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
+import { coerceAnswers, stripUndefined } from "../../utils";
+const fieldSchema = {
+  id: "uuid",
+  role: "string"
+};
 const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List all member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
@@ -3829,16 +3882,18 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 }
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "role",
       message: "role",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("members");
     const result = await client.member.create({
       data: {
-        role: answers.role
+        role: cleanedData.role
       },
       select: {
         id: true,
@@ -3856,7 +3911,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
@@ -3867,11 +3922,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "role",
       required: false
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("members");
     const result = await client.member.update({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       data: {
-        role: answers.role
+        role: cleanedData.role
       },
       select: {
         id: true,
@@ -3889,15 +3948,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient("members");
     const result = await client.member.delete({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       select: {
         id: true
       }
@@ -3921,6 +3983,15 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
+import { coerceAnswers, stripUndefined } from "../../utils";
+const fieldSchema = {
+  id: "uuid",
+  make: "string",
+  model: "string",
+  year: "int",
+  isElectric: "boolean",
+  createdAt: "string"
+};
 const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
@@ -4012,7 +4083,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 }
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "make",
       message: "make",
@@ -4033,13 +4104,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "isElectric",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("app");
     const result = await client.car.create({
       data: {
-        make: answers.make,
-        model: answers.model,
-        year: answers.year,
-        isElectric: answers.isElectric
+        make: cleanedData.make,
+        model: cleanedData.model,
+        year: cleanedData.year,
+        isElectric: cleanedData.isElectric
       },
       select: {
         id: true,
@@ -4061,7 +4134,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
@@ -4087,14 +4160,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "isElectric",
       required: false
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema);
     const client = getClient("app");
     const result = await client.car.update({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       data: {
-        make: answers.make,
-        model: answers.model,
-        year: answers.year,
-        isElectric: answers.isElectric
+        make: cleanedData.make,
+        model: cleanedData.model,
+        year: cleanedData.year,
+        isElectric: cleanedData.isElectric
       },
       select: {
         id: true,
@@ -4116,15 +4193,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
 }
 async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
-    const answers = await prompter.prompt(argv, [{
+    const rawAnswers = await prompter.prompt(argv, [{
       type: "text",
       name: "id",
       message: "id",
       required: true
     }]);
+    const answers = coerceAnswers(rawAnswers, fieldSchema);
     const client = getClient("app");
     const result = await client.car.delete({
-      id: answers.id,
+      where: {
+        id: answers.id as string
+      },
       select: {
         id: true
       }

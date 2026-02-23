@@ -1645,10 +1645,7 @@ function buildSetTokenHandler(): t.FunctionDeclaration {
               t.callExpression(
                 t.memberExpression(
                   t.callExpression(
-                    t.memberExpression(
-                      t.identifier('String'),
-                      t.identifier('call'),
-                    ),
+                    t.identifier('String'),
                     [
                       t.logicalExpression(
                         '||',

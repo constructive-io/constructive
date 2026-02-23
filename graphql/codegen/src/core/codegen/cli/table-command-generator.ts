@@ -28,6 +28,46 @@ function createImportDeclaration(
   return decl;
 }
 
+/**
+ * Build a field schema object that maps field names to their GraphQL types.
+ * This is used at runtime for type coercion (string CLI args → proper types).
+ * e.g., { name: 'string', isActive: 'boolean', position: 'int', status: 'enum' }
+ */
+function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
+  const fields = getScalarFields(table);
+  return t.objectExpression(
+    fields.map((f) => {
+      const gqlType = f.type.gqlType.replace(/!/g, '');
+      let schemaType: string;
+      switch (gqlType) {
+        case 'Boolean':
+          schemaType = 'boolean';
+          break;
+        case 'Int':
+        case 'BigInt':
+          schemaType = 'int';
+          break;
+        case 'Float':
+          schemaType = 'float';
+          break;
+        case 'JSON':
+        case 'GeoJSON':
+          schemaType = 'json';
+          break;
+        case 'UUID':
+          schemaType = 'uuid';
+          break;
+        default:
+          schemaType = 'string';
+      }
+      return t.objectProperty(
+        t.identifier(f.name),
+        t.stringLiteral(schemaType),
+      );
+    }),
+  );
+}
+
 function buildSelectObject(table: CleanTable): t.ObjectExpression {
   const fields = getScalarFields(table);
   return t.objectExpression(
@@ -359,7 +399,7 @@ function buildMutationHandler(
     const dataProps = editableFields.map((f) =>
       t.objectProperty(
         t.identifier(f.name),
-        t.memberExpression(t.identifier('answers'), t.identifier(f.name)),
+        t.memberExpression(t.identifier('cleanedData'), t.identifier(f.name)),
         false,
         true,
       ),
@@ -372,15 +412,23 @@ function buildMutationHandler(
     const dataProps = editableFields.map((f) =>
       t.objectProperty(
         t.identifier(f.name),
-        t.memberExpression(t.identifier('answers'), t.identifier(f.name)),
+        t.memberExpression(t.identifier('cleanedData'), t.identifier(f.name)),
         false,
         true,
       ),
     );
     ormArgs = t.objectExpression([
       t.objectProperty(
-        t.identifier(pk.name),
-        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+        t.identifier('where'),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier(pk.name),
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+              t.tsStringKeyword(),
+            ),
+          ),
+        ]),
       ),
       t.objectProperty(t.identifier('data'), t.objectExpression(dataProps)),
       t.objectProperty(t.identifier('select'), selectObj),
@@ -388,8 +436,16 @@ function buildMutationHandler(
   } else {
     ormArgs = t.objectExpression([
       t.objectProperty(
-        t.identifier(pk.name),
-        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+        t.identifier('where'),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier(pk.name),
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+              t.tsStringKeyword(),
+            ),
+          ),
+        ]),
       ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
@@ -398,7 +454,7 @@ function buildMutationHandler(
   const tryBody: t.Statement[] = [
     t.variableDeclaration('const', [
       t.variableDeclarator(
-        t.identifier('answers'),
+        t.identifier('rawAnswers'),
         t.awaitExpression(
           t.callExpression(
             t.memberExpression(
@@ -410,6 +466,32 @@ function buildMutationHandler(
         ),
       ),
     ]),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('answers'),
+        t.callExpression(t.identifier('coerceAnswers'), [
+          t.identifier('rawAnswers'),
+          t.identifier('fieldSchema'),
+        ]),
+      ),
+    ]),
+  ];
+
+  if (operation !== 'delete') {
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('cleanedData'),
+          t.callExpression(t.identifier('stripUndefined'), [
+            t.identifier('answers'),
+            t.identifier('fieldSchema'),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  tryBody.push(
     buildGetClientStatement(targetName),
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -420,7 +502,7 @@ function buildMutationHandler(
       ),
     ]),
     buildJsonLog(t.identifier('result')),
-  ];
+  );
 
   const argvParam = t.identifier('argv');
   argvParam.typeAnnotation = buildArgvType();
@@ -465,6 +547,21 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   );
   statements.push(
     createImportDeclaration(executorPath, ['getClient']),
+  );
+
+  const utilsPath = options?.targetName ? '../../utils' : '../utils';
+  statements.push(
+    createImportDeclaration(utilsPath, ['coerceAnswers', 'stripUndefined']),
+  );
+
+  // Generate field schema for type coercion
+  statements.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('fieldSchema'),
+        buildFieldSchemaObject(table),
+      ),
+    ]),
   );
 
   const subcommands = ['list', 'get', 'create', 'update', 'delete'];
