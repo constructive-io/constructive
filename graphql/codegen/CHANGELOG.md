@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.2...@constructive-io/graphql-codegen@4.1.3) (2026-02-23)
+
+### Bug Fixes
+
+- **codegen:** add select param and JSON input parsing to custom command generator ([58e631e](https://github.com/constructive-io/constructive/commit/58e631ef9b672ce48daa8a689252602a3c3ee5fd))
+
 ## [4.1.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.1.1...@constructive-io/graphql-codegen@4.1.2) (2026-02-23)
 
 ### Bug Fixes
