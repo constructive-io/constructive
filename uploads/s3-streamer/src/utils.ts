@@ -14,7 +14,7 @@ export interface UploadParams {
 
 export interface AsyncUploadParams extends UploadParams {
   readStream: Readable;
-  magic: { charset: string };
+  magic: { charset: string; type?: string };
 }
 
 export interface UploadWithFilenameParams {
@@ -23,6 +23,15 @@ export interface UploadWithFilenameParams {
   filename: string;
   key: string;
   bucket: string;
+}
+
+export interface UploadWithContentTypeParams {
+  client: S3Client;
+  readStream: Readable;
+  contentType: string;
+  key: string;
+  bucket: string;
+  magic?: { charset: string; type?: string };
 }
 
 export interface UploadResult {
@@ -34,7 +43,7 @@ export interface UploadResult {
 
 export interface AsyncUploadResult {
   upload: UploadResult;
-  magic: { charset: string };
+  magic: { charset: string; type?: string };
   contentType: string;
   contents: unknown;
 }
@@ -149,12 +158,30 @@ export const upload = async ({
     filename
   });
 
+  return await uploadWithContentType({
+    client,
+    readStream: newStream,
+    contentType,
+    magic,
+    key,
+    bucket
+  });
+};
+
+export const uploadWithContentType = async ({
+  client,
+  readStream,
+  contentType,
+  key,
+  bucket,
+  magic
+}: UploadWithContentTypeParams): Promise<AsyncUploadResult> => {
   return await asyncUpload({
     client,
-    key,
+    readStream,
     contentType,
-    readStream: newStream,
-    magic,
-    bucket
+    magic: magic ?? { charset: 'binary' },
+    key,
+    bucket,
   });
 };

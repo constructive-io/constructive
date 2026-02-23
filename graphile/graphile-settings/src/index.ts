@@ -62,3 +62,6 @@ export { MinimalPreset };
 
 // Re-export makePgService for convenience
 export { makePgService };
+
+// Upload utilities
+export { streamToStorage } from './upload-resolver';
