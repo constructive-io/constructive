@@ -1,4 +1,4 @@
-import { getEnvOptions, getNodeEnv } from '@constructive-io/graphql-env';
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
@@ -7,11 +7,10 @@ import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { randomUUID } from 'crypto';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
-// @ts-ignore
 import graphqlUpload from 'graphql-upload';
 import { Pool, PoolClient } from 'pg';
 import { graphileCache, closeAllCaches } from 'graphile-cache';
-import { getPgPool, pgCache } from 'pg-cache';
+import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
 import { createApiMiddleware } from './middleware/api';
@@ -21,10 +20,11 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
+import { multipartBridge } from './middleware/multipart-bridge';
+import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { normalizeServerOptions } from './options';
 
 const log = new Logger('server');
-const isDev = () => getNodeEnv() === 'development';
 
 /**
  * Creates and starts a GraphQL server instance
@@ -47,9 +47,7 @@ const isDev = () => getNodeEnv() === 'development';
  * GraphQLServer(pgpmOptions);
  * ```
  */
-export const GraphQLServer = (
-  rawOpts: ConstructiveOptions | PgpmOptions = {}
-) => {
+export const GraphQLServer = (rawOpts: ConstructiveOptions | PgpmOptions = {}) => {
   // Normalize options to ConstructiveOptions with defaults applied
   const normalizedOpts = normalizeServerOptions(rawOpts as ConstructiveOptions);
 
@@ -78,6 +76,7 @@ class Server {
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
+    const uploadAuthenticate = createUploadAuthenticateMiddleware(effectiveOpts);
     const requestLogger: RequestHandler = (req, res, next) => {
       const headerRequestId = req.header('x-request-id');
       const reqId = headerRequestId || randomUUID();
@@ -88,9 +87,7 @@ class Server {
       const host = req.hostname || req.headers.host || 'unknown';
       const ip = req.clientIp || req.ip;
 
-      log.debug(
-        `[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`
-      );
+      log.debug(`[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`);
 
       res.on('finish', () => {
         const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
@@ -102,8 +99,8 @@ class Server {
 
         log.debug(
           `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
-            1
-          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`
+            1,
+          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`,
         );
       });
 
@@ -123,7 +120,7 @@ class Server {
       metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
       exposedSchemas: apiOpts.exposedSchemas?.join(',') || 'none',
       anonRole: apiOpts.anonRole,
-      roleName: apiOpts.roleName
+      roleName: apiOpts.roleName,
     });
 
     healthz(app);
@@ -134,22 +131,24 @@ class Server {
     if (fallbackOrigin && process.env.NODE_ENV === 'production') {
       if (fallbackOrigin === '*') {
         log.warn(
-          'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.'
+          'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.',
         );
       } else {
-        log.warn(
-          `CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`
-        );
+        log.warn(`CORS override origin set to ${fallbackOrigin} in production. Prefer per-API CORS via meta schema.`);
       }
     }
 
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
-    app.use(graphqlUpload.graphqlUploadExpress());
+    app.use('/graphql', graphqlUpload.graphqlUploadExpress());
+
+    // Rewrite Content-Type after graphql-upload so grafserv accepts the request
+    app.use('/graphql', multipartBridge);
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(requestLogger);
     app.use(api);
+    app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
     app.use(graphile(effectiveOpts));
     app.use(flush);
@@ -164,7 +163,7 @@ class Server {
   listen(): HttpServer {
     const { server } = this.opts;
     const httpServer = this.app.listen(server?.port, server?.host, () =>
-      log.info(`listening at http://${server?.host}:${server?.port}`)
+      log.info(`listening at http://${server?.host}:${server?.port}`),
     );
 
     httpServer.on('error', (err: NodeJS.ErrnoException) => {
@@ -194,11 +193,7 @@ class Server {
     pgPool.connect(this.listenForChanges.bind(this));
   }
 
-  listenForChanges(
-    err: Error | null,
-    client: PoolClient,
-    release: () => void
-  ): void {
+  listenForChanges(err: Error | null, client: PoolClient, release: () => void): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
       if (!this.shuttingDown) {
@@ -271,18 +266,14 @@ class Server {
     this.shuttingDown = true;
     await this.removeEventListener();
     if (this.httpServer?.listening) {
-      await new Promise<void>((resolve) =>
-        this.httpServer!.close(() => resolve())
-      );
+      await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
     if (closeCaches) {
       await Server.closeCaches({ closePools: true });
     }
   }
 
-  static async closeCaches(
-    opts: { closePools?: boolean } = {}
-  ): Promise<void> {
+  static async closeCaches(opts: { closePools?: boolean } = {}): Promise<void> {
     const { closePools = false } = opts;
     svcCache.clear();
     // Use closeAllCaches to properly await async disposal of PostGraphile instances
