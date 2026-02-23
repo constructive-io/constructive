@@ -3,7 +3,7 @@ import { toKebabCase } from 'komoji';
 
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader } from '../utils';
-import type { CleanOperation } from '../../../types/schema';
+import type { CleanOperation, CleanTypeRef } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 import { buildQuestionsArray } from './arg-mapper';
 
@@ -100,10 +100,50 @@ function buildErrorCatch(errorMessage: string): t.CatchClause {
   );
 }
 
+/**
+ * Unwrap NON_NULL / LIST wrappers to get the underlying named type.
+ */
+function unwrapType(ref: CleanTypeRef): CleanTypeRef {
+  if ((ref.kind === 'NON_NULL' || ref.kind === 'LIST') && ref.ofType) {
+    return unwrapType(ref.ofType);
+  }
+  return ref;
+}
+
+/**
+ * Build a select object expression from return-type fields.
+ * If the return type has known fields, generates { field1: true, field2: true, ... }.
+ * Falls back to { clientMutationId: true } for mutations without known fields.
+ */
+function buildSelectObject(
+  returnType: CleanTypeRef,
+  isMutation: boolean,
+): t.ObjectExpression {
+  const base = unwrapType(returnType);
+  if (base.fields && base.fields.length > 0) {
+    return t.objectExpression(
+      base.fields.map((f) =>
+        t.objectProperty(t.identifier(f.name), t.booleanLiteral(true)),
+      ),
+    );
+  }
+  // Fallback: all PostGraphile mutation payloads have clientMutationId
+  if (isMutation) {
+    return t.objectExpression([
+      t.objectProperty(
+        t.identifier('clientMutationId'),
+        t.booleanLiteral(true),
+      ),
+    ]);
+  }
+  return t.objectExpression([]);
+}
+
 function buildOrmCustomCall(
   opKind: 'query' | 'mutation',
   opName: string,
   argsExpr: t.Expression,
+  selectExpr: t.ObjectExpression,
 ): t.Expression {
   return t.callExpression(
     t.memberExpression(
@@ -115,7 +155,12 @@ function buildOrmCustomCall(
           ),
           t.identifier(opName),
         ),
-        [argsExpr],
+        [
+          argsExpr,
+          t.objectExpression([
+            t.objectProperty(t.identifier('select'), selectExpr),
+          ]),
+        ],
       ),
       t.identifier('execute'),
     ),
@@ -139,12 +184,28 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     imports.push('getStore');
   }
 
+  // Check if any argument is an INPUT_OBJECT (i.e. takes JSON input like { input: SomeInput })
+  const hasInputObjectArg = op.args.some((arg) => {
+    const base = unwrapType(arg.type);
+    return base.kind === 'INPUT_OBJECT';
+  });
+
+  const utilsPath = options?.executorImportPath
+    ? options.executorImportPath.replace(/\/executor$/, '/utils')
+    : '../utils';
+
   statements.push(
     createImportDeclaration('inquirerer', ['CLIOptions', 'Inquirerer']),
   );
   statements.push(
     createImportDeclaration(executorPath, imports),
   );
+
+  if (hasInputObjectArg) {
+    statements.push(
+      createImportDeclaration(utilsPath, ['parseMutationInput']),
+    );
+  }
 
   const questionsArray =
     op.args.length > 0
@@ -224,17 +285,36 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     ]),
   );
 
+  // For mutations with INPUT_OBJECT args (like `input: SignUpInput`),
+  // parse JSON strings from CLI into proper objects
+  if (hasInputObjectArg && op.args.length > 0) {
+    bodyStatements.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('parsedAnswers'),
+          t.callExpression(t.identifier('parseMutationInput'), [
+            t.identifier('answers'),
+          ]),
+        ),
+      ]),
+    );
+  }
+
   const argsExpr =
     op.args.length > 0
-      ? t.identifier('answers')
+      ? (hasInputObjectArg
+          ? t.identifier('parsedAnswers')
+          : t.identifier('answers'))
       : t.objectExpression([]);
+
+  const selectExpr = buildSelectObject(op.returnType, op.kind === 'mutation');
 
   bodyStatements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
         t.awaitExpression(
-          buildOrmCustomCall(opKind, op.name, argsExpr),
+          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr),
         ),
       ),
     ]),

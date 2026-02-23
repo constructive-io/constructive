@@ -1151,7 +1151,9 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       process.exit(0);
     }
     const client = getClient();
-    const result = await client.query.currentUser({}).execute();
+    const result = await client.query.currentUser({}, {
+      select: {}
+    }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: currentUser");
@@ -1395,7 +1397,11 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient();
-    const result = await client.mutation.login(answers).execute();
+    const result = await client.mutation.login(answers, {
+      select: {
+        clientMutationId: true
+      }
+    }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: login");
@@ -3555,7 +3561,11 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient("auth");
-    const result = await client.mutation.login(answers).execute();
+    const result = await client.mutation.login(answers, {
+      select: {
+        clientMutationId: true
+      }
+    }).execute();
     if (argv.saveToken && result) {
       const tokenValue = result.token || result.jwtToken || result.accessToken;
       if (tokenValue) {
