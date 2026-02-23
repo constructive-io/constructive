@@ -9,7 +9,12 @@ import { EnableAllFilterColumnsPreset } from '../plugins/enable-all-filter-colum
 import { ManyToManyOptInPreset } from '../plugins/many-to-many-preset';
 import { MetaSchemaPreset } from '../plugins/meta-schema';
 import { PgSearchPreset } from 'graphile-search-plugin';
+import { GraphilePostgisPreset } from 'graphile-postgis';
+import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
+import { UploadPreset } from 'graphile-upload-plugin';
+import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
+import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**
  * Constructive PostGraphile v5 Preset
@@ -26,6 +31,10 @@ import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
  * - Connection filter plugin with all columns filterable
  * - Many-to-many relationships (opt-in via @behavior +manyToMany)
  * - Meta schema plugin (_meta query for introspection of tables, fields, indexes)
+ * - PostGIS support (geometry/geography types, GeoJSON scalar — auto-detects PostGIS extension)
+ * - PostGIS connection filter operators (spatial filtering on geometry/geography columns)
+ * - Upload plugin (file upload to S3/MinIO for image, upload, attachment domain columns)
+ * - SQL expression validator (validates @sqlExpression columns in mutations)
  * - PG type mappings (maps custom types like email, url to GraphQL scalars)
  *
  * DISABLED PLUGINS:
@@ -60,6 +69,13 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     ManyToManyOptInPreset,
     MetaSchemaPreset,
     PgSearchPreset({ pgSearchPrefix: 'fullText' }),
+    GraphilePostgisPreset,
+    PostgisConnectionFilterPreset,
+    UploadPreset({
+      uploadFieldDefinitions: constructiveUploadFieldDefinitions,
+      maxFileSize: 10 * 1024 * 1024, // 10MB
+    }),
+    SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
   ],
   /**
