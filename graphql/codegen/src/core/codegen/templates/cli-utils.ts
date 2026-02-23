@@ -3,12 +3,14 @@
  *
  * This is the RUNTIME code that gets copied to generated output.
  * Provides helpers for CLI commands: type coercion (string CLI args -> proper
- * GraphQL types), field filtering (strip extra minimist fields), and
- * mutation input parsing.
+ * GraphQL types), field filtering (strip extra minimist fields),
+ * mutation input parsing, and select field parsing.
  *
  * NOTE: This file is read at codegen time and written to output.
  * Any changes here will affect all generated CLI utils.
  */
+
+import objectPath from 'nested-obj';
 
 export type FieldType =
   | 'string'
@@ -141,4 +143,59 @@ export function parseMutationInput(
     }
   }
   return answers;
+}
+
+/**
+ * Build a select object from a comma-separated list of dot-notation paths.
+ * Uses `nested-obj` to parse paths like 'clientMutationId,result.accessToken,result.userId'
+ * into the nested structure expected by the ORM:
+ *
+ *   { clientMutationId: true, result: { select: { accessToken: true, userId: true } } }
+ *
+ * Paths without dots set the key to `true` (scalar select).
+ * Paths with dots create nested `{ select: { ... } }` wrappers, matching the
+ * ORM's expected structure for OBJECT sub-fields (e.g. `SignUpPayloadSelect.result`).
+ *
+ * @param paths - Comma-separated dot-notation field paths (e.g. 'clientMutationId,result.accessToken')
+ * @returns The nested select object for the ORM
+ */
+export function buildSelectFromPaths(
+  paths: string,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  const trimmedPaths = paths
+    .split(',')
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  for (const path of trimmedPaths) {
+    if (!path.includes('.')) {
+      // Simple scalar field: clientMutationId -> { clientMutationId: true }
+      result[path] = true;
+    } else {
+      // Nested path: result.accessToken -> { result: { select: { accessToken: true } } }
+      // Convert dot-notation to ORM's { select: { ... } } nesting pattern
+      const parts = path.split('.');
+      let current = result;
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (i === parts.length - 1) {
+          // Leaf node: set to true
+          objectPath.set(current, part, true);
+        } else {
+          // Intermediate node: ensure { select: { ... } } wrapper exists
+          if (!current[part] || typeof current[part] !== 'object') {
+            current[part] = { select: {} };
+          }
+          const wrapper = current[part] as Record<string, unknown>;
+          if (!wrapper.select || typeof wrapper.select !== 'object') {
+            wrapper.select = {};
+          }
+          current = wrapper.select as Record<string, unknown>;
+        }
+      }
+    }
+  }
+
+  return result;
 }
