@@ -1144,6 +1144,7 @@ exports[`cli-generator generates commands/current-user.ts (custom query) 1`] = `
  */
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient } from "../executor";
+import { buildSelectFromPaths } from "../utils";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -1151,8 +1152,9 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       process.exit(0);
     }
     const client = getClient();
+    const selectFields = buildSelectFromPaths(argv.select ?? "");
     const result = await client.query.currentUser({}, {
-      select: {}
+      select: selectFields
     }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
@@ -1379,6 +1381,7 @@ exports[`cli-generator generates commands/login.ts (custom mutation) 1`] = `
  */
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient } from "../executor";
+import { buildSelectFromPaths } from "../utils";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -1397,10 +1400,9 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient();
+    const selectFields = buildSelectFromPaths(argv.select ?? "clientMutationId");
     const result = await client.mutation.login(answers, {
-      select: {
-        clientMutationId: true
-      }
+      select: selectFields
     }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
@@ -3543,6 +3545,7 @@ exports[`multi-target cli generator generates target-prefixed custom commands wi
  */
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient, getStore } from "../../executor";
+import { buildSelectFromPaths } from "../../utils";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -3561,10 +3564,9 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient("auth");
+    const selectFields = buildSelectFromPaths(argv.select ?? "clientMutationId");
     const result = await client.mutation.login(answers, {
-      select: {
-        clientMutationId: true
-      }
+      select: selectFields
     }).execute();
     if (argv.saveToken && result) {
       const tokenValue = result.token || result.jwtToken || result.accessToken;
