@@ -1,0 +1,34 @@
+[
+  {
+    "toolName": "list_projects",
+    "label": "List Projects",
+    "description": "List projects visible to the current actor",
+    "capability": "read",
+    "riskClass": "read_only",
+    "document": "query ListProjects { projects { nodes { id name } } }",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "toolName": "create_project",
+    "label": "Create Project",
+    "description": "Create project under RLS context",
+    "capability": "write",
+    "riskClass": "low",
+    "document": "mutation CreateProject($name: String!) { createProject(input: { name: $name }) { project { id name } } }",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    }
+  }
+]
