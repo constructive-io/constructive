@@ -77,7 +77,10 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
               if (typeof obj.type !== 'string') {
                 throw new TypeError('GeoJSON must have a "type" string property');
               }
-              const validTypes = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection', 'Feature', 'FeatureCollection'];
+              if (obj.type === 'Feature' || obj.type === 'FeatureCollection') {
+                throw new TypeError(`GeoJSON type "${obj.type}" is not supported for PostGIS geometry input. Extract the geometry from your Feature first.`);
+              }
+              const validTypes = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
               if (!validTypes.includes(obj.type)) {
                 throw new TypeError(`GeoJSON type "${obj.type}" is not a recognized GeoJSON type`);
               }
@@ -133,8 +136,7 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                 if (typeof resolvedTypeName === 'string') {
                   return resolvedTypeName;
                 }
-                console.warn(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
-                return undefined;
+                throw new Error(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
               }
             }),
             `PostgisRegisterTypesPlugin registering ${mainInterfaceName} interface`
@@ -178,8 +180,7 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                     if (typeof concreteTypeName === 'string') {
                       return concreteTypeName;
                     }
-                    console.warn(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
-                    return undefined;
+                    throw new Error(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
                   }
                 }),
                 `PostgisRegisterTypesPlugin registering ${dimInterfaceName} interface`

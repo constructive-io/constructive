@@ -13,7 +13,7 @@ exports[`uploads any 1`] = `
 
 exports[`uploads double dots are collapsed 1`] = `
 {
-  "..config.env": ".config.env",
+  "..config.env": "config.env",
   "archive..tar..gz": "archive.tar.gz",
   "data..v1..report.csv": "data.v1.report.csv",
   "some..file..name.txt": "some.file.name.txt",
@@ -22,8 +22,8 @@ exports[`uploads double dots are collapsed 1`] = `
 
 exports[`uploads english 1`] = `
 {
-  ".gitignore": ".gitignore",
-  ".travis.yml": ".travis.yml",
+  ".gitignore": "gitignore",
+  ".travis.yml": "travis.yml",
   "LICENSE": "license",
   "PËRSH- - - ENDETJE  BOTË": "persh-endetje-bote",
   "PËRSHENDETJE BOTË": "pershendetje-bote",
@@ -81,7 +81,7 @@ exports[`uploads english 1`] = `
   "wmf.wmf": "wmf.wmf",
   "xlsx.xlsx": "xlsx.xlsx",
   "zip.zip": "zip.zip",
-  "Салом Ҷаҳон.gif": "салом-ҷаҳон.gif",
+  "Салом Ҷаҳон.gif": "unnamed.gif",
 }
 `;
 
@@ -98,8 +98,8 @@ exports[`uploads non-ASCII fallback when slug would be empty 1`] = `{}`;
 
 exports[`uploads preserves meaningful dots in name 1`] = `
 {
-  ".env": ".env",
-  "lev.р": "lev.р",
+  ".env": "env",
+  "lev.р": "lev.unnamed",
   "my.file.config.json": "my.file.config.json",
   "node.module.js": "node.module.js",
 }
@@ -107,8 +107,8 @@ exports[`uploads preserves meaningful dots in name 1`] = `
 
 exports[`uploads upper 1`] = `
 {
-  ".gitignore": ".gitignore",
-  ".travis.yml": ".travis.yml",
+  ".gitignore": "gitignore",
+  ".travis.yml": "travis.yml",
   "LICENSE": "LICENSE",
   "PËRSH- - - ENDETJE  BOTË": "PERSH-ENDETJE-BOTE",
   "PËRSHENDETJE BOTË": "PERSHENDETJE-BOTE",
@@ -166,6 +166,6 @@ exports[`uploads upper 1`] = `
   "wmf.wmf": "wmf.wmf",
   "xlsx.xlsx": "xlsx.xlsx",
   "zip.zip": "zip.zip",
-  "Салом Ҷаҳон.gif": "Салом-Ҷаҳон.gif",
+  "Салом Ҷаҳон.gif": "unnamed.gif",
 }
 `;

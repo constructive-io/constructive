@@ -16,14 +16,28 @@ import './types';
 const uploadLog = new Logger('upload');
 const authLog = new Logger('upload-auth');
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const envFileSize = process.env.MAX_UPLOAD_FILE_SIZE
+  ? parseInt(process.env.MAX_UPLOAD_FILE_SIZE, 10)
+  : NaN;
+const MAX_FILE_SIZE = envFileSize > 0 ? envFileSize : 10 * 1024 * 1024;
+
+const BLOCKED_MIME_TYPES = new Set([
+  'application/x-executable',
+  'application/x-sharedlib',
+  'application/x-mach-binary',
+  'application/x-dosexec',
+  'text/html',
+  'application/xhtml+xml',
+  'application/javascript',
+  'text/javascript'
+]);
 
 const parseFile = multer({
   storage: multer.diskStorage({
     destination: os.tmpdir(),
-    filename: (_req, file, cb) => {
+    filename: (_req, _file, cb) => {
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      cb(null, `upload-${uniqueSuffix}${path.extname(file.originalname)}`);
+      cb(null, `upload-${uniqueSuffix}.tmp`);
     },
   }),
   limits: { fileSize: MAX_FILE_SIZE },
@@ -42,37 +56,27 @@ const parseFileWithErrors: RequestHandler = (req, res, next) => {
   });
 };
 
-const RLS_MODULE_BY_DATABASE_ID_SQL = `
+const RLS_MODULE_BASE_SQL = `
   SELECT
     rm.authenticate,
     rm.authenticate_strict,
     ps.schema_name as private_schema_name
   FROM metaschema_modules_public.rls_module rm
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
+  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id`;
+
+const RLS_MODULE_BY_DATABASE_ID_SQL = `${RLS_MODULE_BASE_SQL}
   JOIN services_public.apis a ON rm.api_id = a.id
   WHERE a.database_id = $1
   ORDER BY a.id
   LIMIT 1
 `;
 
-const RLS_MODULE_BY_API_ID_SQL = `
-  SELECT
-    rm.authenticate,
-    rm.authenticate_strict,
-    ps.schema_name as private_schema_name
-  FROM metaschema_modules_public.rls_module rm
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
+const RLS_MODULE_BY_API_ID_SQL = `${RLS_MODULE_BASE_SQL}
   WHERE rm.api_id = $1
   LIMIT 1
 `;
 
-const RLS_MODULE_BY_DBNAME_SQL = `
-  SELECT
-    rm.authenticate,
-    rm.authenticate_strict,
-    ps.schema_name as private_schema_name
-  FROM metaschema_modules_public.rls_module rm
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
+const RLS_MODULE_BY_DBNAME_SQL = `${RLS_MODULE_BASE_SQL}
   JOIN services_public.apis a ON rm.api_id = a.id
   WHERE a.dbname = $1
   ORDER BY a.id
@@ -261,13 +265,18 @@ export const createUploadAuthenticateMiddleware = (
  */
 export const uploadRoute: RequestHandler[] = [
   parseFileWithErrors,
-  (async (req, res) => {
+  (async (req, res, next) => {
     if (!req.token?.user_id) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file provided. Send a "file" field.' });
+    }
+
+    if (req.file.mimetype && BLOCKED_MIME_TYPES.has(req.file.mimetype)) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(415).json({ error: 'File type not allowed' });
     }
 
     try {
@@ -284,6 +293,11 @@ export const uploadRoute: RequestHandler[] = [
         mime: result.mime,
         size: req.file.size,
       });
+    } catch (error) {
+      uploadLog.error('[upload] Upload processing failed', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Upload processing failed' });
+      }
     } finally {
       if (req.file?.path) {
         fs.unlink(req.file.path, () => {});

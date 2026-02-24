@@ -14,7 +14,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests"
+    "test": "jest"
   },
   "publishConfig": {
     "access": "public",
@@ -38,12 +38,11 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "dependencies": {
-    "graphile-build": "5.0.0-rc.4",
-    "graphile-build-pg": "5.0.0-rc.5",
-    "graphile-config": "1.0.0-rc.5"
-  },
+  "dependencies": {},
   "peerDependencies": {
+    "graphile-build": "^5.0.0-rc.4",
+    "graphile-build-pg": "^5.0.0-rc.5",
+    "graphile-config": "^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "postgraphile": "^5.0.0-rc.4"
   },

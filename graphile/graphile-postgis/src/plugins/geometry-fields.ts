@@ -124,15 +124,21 @@ function addPointFields(
     [xFieldName]: {
       type: new GraphQLNonNull(GraphQLFloat),
       resolve(data: GisFieldValue) {
-        const point = data.__geojson;
-        return (point as { coordinates: number[] }).coordinates[0];
+        const coords = (data.__geojson as { coordinates: number[] }).coordinates;
+        if (coords.length < 1) {
+          throw new Error('Point geometry has no x coordinate');
+        }
+        return coords[0];
       }
     },
     [yFieldName]: {
       type: new GraphQLNonNull(GraphQLFloat),
       resolve(data: GisFieldValue) {
-        const point = data.__geojson;
-        return (point as { coordinates: number[] }).coordinates[1];
+        const coords = (data.__geojson as { coordinates: number[] }).coordinates;
+        if (coords.length < 2) {
+          throw new Error('Point geometry has no y coordinate');
+        }
+        return coords[1];
       }
     }
   };
@@ -141,8 +147,11 @@ function addPointFields(
     newFields[zFieldName] = {
       type: new GraphQLNonNull(GraphQLFloat),
       resolve(data: GisFieldValue) {
-        const point = data.__geojson;
-        return (point as { coordinates: number[] }).coordinates[2];
+        const coords = (data.__geojson as { coordinates: number[] }).coordinates;
+        if (coords.length < 3) {
+          throw new Error('Point geometry has no z coordinate');
+        }
+        return coords[2];
       }
     };
   }
@@ -355,7 +364,6 @@ function addGeometryCollectionFields(
   const Interface = build.getTypeByName(dimInterfaceName);
 
   if (!Interface) {
-    console.warn(`PostgisGeometryFieldsPlugin: Could not find dimension interface ${dimInterfaceName}`);
     return fields;
   }
 

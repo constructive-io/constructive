@@ -36,12 +36,14 @@ import type { SqlExpressionValidatorOptions } from './validator';
 // ─── Helpers ──────────────────────────────────────────────────────
 
 /**
- * Find a value in a potentially nested mutation input object.
+ * Find all values for a key in a potentially nested mutation input object.
  * Input is typically 1 level deep, but we traverse defensively to avoid
  * silently skipping deeper/nested mutation payloads.
+ * Returns all matches to prevent bypasses via duplicate keys at different depths.
  */
-function findValue(input: Record<string, unknown>, key: string): unknown {
+function findAllValues(input: Record<string, unknown>, key: string): unknown[] {
   const visited = new Set<object>();
+  const results: unknown[] = [];
   const stack: Array<{ node: Record<string, unknown>; depth: number }> = [
     { node: input, depth: 0 }
   ];
@@ -52,7 +54,7 @@ function findValue(input: Record<string, unknown>, key: string): unknown {
     const { node, depth } = current;
 
     if (key in node) {
-      return node[key];
+      results.push(node[key]);
     }
 
     if (visited.has(node) || depth >= maxDepth) {
@@ -70,7 +72,7 @@ function findValue(input: Record<string, unknown>, key: string): unknown {
     }
   }
 
-  return undefined;
+  return results;
 }
 
 // ─── Column metadata ──────────────────────────────────────────────
@@ -230,40 +232,49 @@ export function createSqlExpressionValidatorPlugin(
                     astGqlName
                   } = col;
 
-                  const textValue = findValue(input, textGqlName);
-                  const astValue = astGqlName
-                    ? findValue(input, astGqlName)
-                    : undefined;
+                  const textValues = findAllValues(input, textGqlName);
+                  const astValues = astGqlName
+                    ? findAllValues(input, astGqlName)
+                    : [];
 
-                  // Validate text input
-                  if (textValue !== undefined && textValue !== null) {
-                    const result =
-                      await parseAndValidateSqlExpression(
-                        textValue as string,
-                        precomputedOptions
-                      );
-                    if (!result.valid) {
-                      throw new Error(
-                        `Invalid SQL expression in ${textGqlName}: ${result.error}`
-                      );
+                  // Validate all text inputs
+                  for (const textValue of textValues) {
+                    if (textValue !== undefined && textValue !== null) {
+                      if (typeof textValue !== 'string') {
+                        throw new Error(
+                          `SQL expression in ${textGqlName} must be a string, got ${typeof textValue}`
+                        );
+                      }
+                      const result =
+                        await parseAndValidateSqlExpression(
+                          textValue,
+                          precomputedOptions
+                        );
+                      if (!result.valid) {
+                        throw new Error(
+                          `Invalid SQL expression in ${textGqlName}: ${result.error}`
+                        );
+                      }
                     }
                   }
 
-                  // Validate standalone AST input (only when text is absent)
-                  if (
-                    astValue !== undefined &&
-                    astValue !== null &&
-                    textValue === undefined &&
-                    astGqlName
-                  ) {
-                    const result = await validateAst(
-                      astValue,
-                      precomputedOptions
-                    );
-                    if (!result.valid) {
-                      throw new Error(
-                        `Invalid SQL expression AST in ${astGqlName}: ${result.error}`
-                      );
+                  // Validate standalone AST inputs (only when text is absent)
+                  if (textValues.length === 0 && astGqlName) {
+                    for (const astValue of astValues) {
+                      if (
+                        astValue !== undefined &&
+                        astValue !== null
+                      ) {
+                        const result = validateAst(
+                          astValue,
+                          precomputedOptions
+                        );
+                        if (!result.valid) {
+                          throw new Error(
+                            `Invalid SQL expression AST in ${astGqlName}: ${result.error}`
+                          );
+                        }
+                      }
                     }
                   }
                 }

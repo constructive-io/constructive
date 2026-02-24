@@ -28,5 +28,5 @@ export { GisSubtype, SUBTYPE_STRING_BY_SUBTYPE, GIS_SUBTYPE_NAME, CONCRETE_SUBTY
 export { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';
 
 // Types
-export type { GisTypeDetails, GisFieldValue, PostgisCodecInfo } from './types';
+export type { GisTypeDetails, GisFieldValue } from './types';
 export type { PostgisExtensionInfo } from './plugins/detect-extension';

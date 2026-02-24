@@ -29,7 +29,6 @@ const preset: GraphileConfig.Preset = {
   extends: [
     SqlExpressionValidatorPreset({
       allowedSchemas: ['app_public'],
-      allowOwnedSchemas: true,
     }),
   ],
 };

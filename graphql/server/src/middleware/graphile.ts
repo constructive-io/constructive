@@ -14,27 +14,45 @@ import { HandlerCreationError } from '../errors/api-errors';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
+const SAFE_ERROR_CODES = new Set([
+  'UNAUTHENTICATED',
+  'FORBIDDEN',
+  'BAD_USER_INPUT',
+  'GRAPHQL_VALIDATION_FAILED',
+  'GRAPHQL_PARSE_FAILED',
+  'PERSISTED_QUERY_NOT_FOUND',
+  'PERSISTED_QUERY_NOT_SUPPORTED',
+  'FEATURE_DISABLED',
+  'INVALID_PUBLIC_KEY',
+  'INVALID_MESSAGE',
+  'INVALID_SIGNATURE',
+  'NO_ACCOUNT_EXISTS',
+  'BAD_SIGNIN',
+  'UPLOAD_MIMETYPE'
+]);
+
 /**
  * Production-aware error masking function.
  *
  * In development: returns errors as-is for debugging.
- * In production: returns errors with explicit codes (e.g. UNAUTHENTICATED, BAD_USER_INPUT)
- * as-is, but masks unexpected/database errors with a reference ID and logs the original.
+ * In production: returns errors with explicit codes from the SAFE_ERROR_CODES
+ * allowlist as-is, but masks unexpected/database errors with a reference ID
+ * and logs the original.
  */
 const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
   if (getNodeEnv() === 'development') {
     return error;
   }
 
-  // Errors with explicit codes are intentional and safe to expose.
+  // Only expose errors with codes on the safe allowlist.
   // Note: grafserv strips originalError and internal extensions before
   // serializing to the client, so returning the full error object is safe here.
-  if (error.extensions?.code) {
+  if (error.extensions?.code && SAFE_ERROR_CODES.has(error.extensions.code as string)) {
     return error;
   }
 
   // Mask unexpected/database errors with a reference ID
-  const errorId = crypto.randomBytes(4).toString('hex');
+  const errorId = crypto.randomBytes(8).toString('hex');
   maskErrorLog.error(`[masked-error:${errorId}]`, error);
 
   return {
@@ -195,6 +213,22 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       // Phase C: Create New Handler (first request for this key)
       // =========================================================================
+
+      // Re-check cache after coalesced request failure (another retry may have succeeded)
+      const recheckedCache = graphileCache.get(key);
+      if (recheckedCache) {
+        log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
+        return recheckedCache.handler(req, res, next);
+      }
+
+      // Re-check in-flight map (another retry may have started creation)
+      const retryInFlight = creating.get(key);
+      if (retryInFlight) {
+        log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
+        const retryInstance = await retryInFlight;
+        return retryInstance.handler(req, res, next);
+      }
+
       log.info(
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`,
       );
@@ -241,6 +275,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }
         });
       }
+      next(e);
     }
   };
 };

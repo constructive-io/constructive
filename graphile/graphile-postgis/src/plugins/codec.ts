@@ -146,11 +146,14 @@ function buildGisCodec(
      * PostgreSQL can process via ST_GeomFromGeoJSON.
      */
     toPg(value: GisFieldValue): string {
+      if (value && typeof value === 'object' && '__geojson' in value) {
+        return JSON.stringify(value.__geojson);
+      }
       return JSON.stringify(value);
     },
 
     attributes: undefined,
-    executor: null,
+    executor: undefined,
     extensions: {
       oid: typeOid,
       pg: {

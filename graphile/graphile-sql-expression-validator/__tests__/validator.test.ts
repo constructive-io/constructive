@@ -444,10 +444,9 @@ describe('parseAndValidateSqlExpression', () => {
       'VariableSetStmt'
     ])('should reject %s node type (not in allowlist)', (nodeType) => {
       const forbiddenAst = { [nodeType]: {} };
-      return validateAst(forbiddenAst).then((result) => {
-        expect(result.valid).toBe(false);
-        expect(result.error).toContain(`Disallowed node type "${nodeType}"`);
-      });
+      const result = validateAst(forbiddenAst);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain(`Disallowed node type "${nodeType}"`);
     });
   });
 

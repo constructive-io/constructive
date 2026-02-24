@@ -206,14 +206,17 @@ describe('PostgisCodecPlugin', () => {
         expect(result).toBe(JSON.stringify(geojson));
       });
 
-      it('should JSON.stringify GisFieldValue objects', () => {
+      it('should extract __geojson from GisFieldValue objects', () => {
         const value: GisFieldValue = {
           __gisType: 'Point',
           __srid: 4326,
           __geojson: { type: 'Point', coordinates: [1, 2] }
         };
         const result = toPg(value);
-        expect(JSON.parse(result).__gisType).toBe('Point');
+        const parsed = JSON.parse(result);
+        expect(parsed.type).toBe('Point');
+        expect(parsed.coordinates).toEqual([1, 2]);
+        expect(parsed.__gisType).toBeUndefined();
       });
     });
 

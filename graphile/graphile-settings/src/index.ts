@@ -54,12 +54,6 @@ export * from './presets/index';
 // Utilities
 // ============================================================================
 
-// Import the new MinimalPreset from plugins
-import { MinimalPreset } from './plugins/index';
-
-// Re-export MinimalPreset for backward compatibility
-export { MinimalPreset };
-
 // Re-export makePgService for convenience
 export { makePgService };
 

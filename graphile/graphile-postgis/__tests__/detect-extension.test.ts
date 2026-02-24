@@ -85,8 +85,6 @@ describe('PostgisExtensionDetectionPlugin', () => {
       expect(result.pgGISExtensionInfo.geometryCodec).toBe(geometryCodec);
       expect(result.pgGISExtensionInfo.geographyCodec).toBe(geographyCodec);
       expect(result.pgGISGraphQLTypesByCodecAndSubtype).toEqual({});
-      expect(result.pgGISGraphQLInterfaceTypesByCodec).toEqual({});
-      expect(result.pgGISIncludedTypes).toEqual([]);
     });
 
     it('should detect custom schema for PostGIS installation', () => {

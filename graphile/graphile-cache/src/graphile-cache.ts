@@ -125,6 +125,8 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     }
   } catch (err) {
     log.error(`Error disposing PostGraphile[${key}]:`, err);
+  } finally {
+    disposedKeys.delete(key);
   }
 };
 

@@ -34,6 +34,8 @@ export default (
     }
   }
 
-  const result = english ? `${slug}${slugify(ext)}` : `${name}${ext}`;
+  // Slugify extension separately; re-add the dot since slugify strips leading dots
+  const sanitizedExt = ext ? `.${slugify(ext)}` : '';
+  const result = english ? `${slug}${sanitizedExt}` : `${name}${ext}`;
   return lower ? result.toLowerCase() : result;
 };

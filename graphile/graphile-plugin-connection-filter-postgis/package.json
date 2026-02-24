@@ -25,16 +25,15 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch"
   },
-  "dependencies": {
-    "graphile-build": "5.0.0-rc.4",
-    "graphile-config": "1.0.0-rc.5",
-    "pg-sql2": "5.0.0-rc.4"
-  },
+  "dependencies": {},
   "peerDependencies": {
+    "graphile-build": "^5.0.0-rc.4",
+    "graphile-config": "^1.0.0-rc.5",
     "graphql": "^16.9.0",
+    "pg-sql2": "^5.0.0-rc.4",
     "postgraphile": "^5.0.0-rc.4",
     "postgraphile-plugin-connection-filter": "^3.0.0-rc.1",
     "graphile-postgis": "^2.0.0"

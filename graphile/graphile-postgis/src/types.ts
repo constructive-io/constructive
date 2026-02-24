@@ -17,11 +17,6 @@ export interface GisFieldValue {
   __geojson: Geometry;
 }
 
-export interface PostgisCodecInfo {
-  codecName: string;
-  schemaName: string;
-}
-
 /**
  * PostGIS extension detection result stored on the build object.
  */
@@ -48,10 +43,6 @@ declare global {
       pgGISExtensionInfo?: PostgisExtensionInfo;
       /** Map of codec name -> gisTypeKey -> GraphQL type name (for resolveType) */
       pgGISGraphQLTypesByCodecAndSubtype?: Record<string, Record<string | number, string>>;
-      /** Map of codec name -> zmflag -> GraphQL interface type (for dimension interfaces) */
-      pgGISGraphQLInterfaceTypesByCodec?: Record<string, Record<number, GraphQLInterfaceType>>;
-      /** Concrete PostGIS types to include in the schema */
-      pgGISIncludedTypes?: GraphQLObjectType[];
       /** Gets a registered PostGIS GraphQL type by geometry type, subtype, and dimension */
       getPostgisTypeByGeometryType?(
         gisCodecName: string,

@@ -61,9 +61,7 @@ export const PostgisExtensionDetectionPlugin: GraphileConfig.Plugin = {
 
         return build.extend(build, {
           pgGISExtensionInfo: postgisInfo,
-          pgGISGraphQLTypesByCodecAndSubtype: {} as Record<string, Record<string | number, string>>,
-          pgGISGraphQLInterfaceTypesByCodec: {},
-          pgGISIncludedTypes: []
+          pgGISGraphQLTypesByCodecAndSubtype: {} as Record<string, Record<string | number, string>>
         }, 'PostgisExtensionDetectionPlugin adding PostGIS build state');
       }
     }

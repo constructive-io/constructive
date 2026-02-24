@@ -99,7 +99,6 @@ const ALLOWED_NODE_TYPES = new Set([
   'MinMaxExpr',
   'SQLValueFunction',
   'A_ArrayExpr',
-  'RowExpr',
   // Structural/leaf nodes (used within expression nodes for values/identifiers)
   'String',
   'Integer',
@@ -157,10 +156,14 @@ const SQL_COMMENT_TOKENS = /--|\/\*|\*\//;
  * Extract the node type from a pgsql-parser AST node.
  * AST nodes are objects with a single key representing the node type.
  */
-function getNodeType(node: Record<string, unknown>): string | null {
+function getNodeType(node: Record<string, unknown>): { type: string | null; suspicious: boolean } {
   const keys = Object.keys(node);
-  if (keys.length === 1) return keys[0];
-  return null;
+  if (keys.length === 1) return { type: keys[0], suspicious: false };
+  const astLikeKeys = keys.filter(k => /^[A-Z]/.test(k));
+  if (astLikeKeys.length > 0) {
+    return { type: null, suspicious: true };
+  }
+  return { type: null, suspicious: false };
 }
 
 function extractStringVal(n: unknown): string {
@@ -195,7 +198,15 @@ function validateAstNode(
   }
 
   const rec = node as Record<string, unknown>;
-  const nodeType = getNodeType(rec);
+  const { type: nodeType, suspicious } = getNodeType(rec);
+
+  // Multi-key AST nodes with uppercase keys are suspicious
+  if (suspicious) {
+    return {
+      valid: false,
+      error: `Suspicious multi-key AST node at path: ${path.join('.')}`
+    };
+  }
 
   // Allowlist check: if this looks like a typed AST node, it must be allowed
   if (nodeType !== null && !ALLOWED_NODE_TYPES.has(nodeType)) {
@@ -373,7 +384,23 @@ export async function parseAndValidateSqlExpression(
       return { valid: false, error: 'Unexpected parse result structure' };
     }
 
-    const targetList = stmt.SelectStmt.targetList;
+    const selectStmt = stmt.SelectStmt;
+    const DANGEROUS_SELECT_KEYS = [
+      'fromClause', 'whereClause', 'larg', 'rarg', 'valuesLists',
+      'intoClause', 'withClause', 'groupClause', 'havingClause',
+      'windowClause', 'sortClause', 'limitOffset', 'limitCount',
+      'lockingClause'
+    ];
+    for (const dangerousKey of DANGEROUS_SELECT_KEYS) {
+      if (selectStmt[dangerousKey] !== undefined) {
+        return {
+          valid: false,
+          error: `Expression contains disallowed SQL clause: ${dangerousKey}`
+        };
+      }
+    }
+
+    const targetList = selectStmt.targetList;
     if (!targetList || targetList.length !== 1) {
       return { valid: false, error: 'Expected single expression' };
     }
@@ -429,10 +456,10 @@ export async function parseAndValidateSqlExpression(
  * @param options - Validation options.
  * @returns Validation result with canonical text on success.
  */
-export async function validateAst(
+export function validateAst(
   ast: unknown,
   options: SqlExpressionValidatorOptions = {}
-): Promise<AstValidationResult> {
+): AstValidationResult {
   const {
     allowedFunctions = DEFAULT_ALLOWED_FUNCTIONS,
     allowedSchemas = []

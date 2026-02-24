@@ -30,15 +30,18 @@
   },
   "dependencies": {
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
-    "grafast": "1.0.0-rc.7",
-    "graphile-build": "5.0.0-rc.4",
-    "graphile-build-pg": "5.0.0-rc.5",
-    "graphile-config": "1.0.0-rc.5",
     "graphile-utils": "^5.0.0-rc.5",
-    "graphql": "^16.9.0",
     "inflekt": "^0.3.0",
-    "pg-query-context": "workspace:^",
-    "pg-sql2": "5.0.0-rc.4"
+    "pg": "^8.17.1",
+    "pg-query-context": "workspace:^"
+  },
+  "peerDependencies": {
+    "grafast": "^1.0.0-rc.7",
+    "graphile-build": "^5.0.0-rc.4",
+    "graphile-build-pg": "^5.0.0-rc.5",
+    "graphile-config": "^1.0.0-rc.5",
+    "graphql": "^16.9.0",
+    "pg-sql2": "^5.0.0-rc.4"
   },
   "devDependencies": {
     "@types/node": "^22.19.1",

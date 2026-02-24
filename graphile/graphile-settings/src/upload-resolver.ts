@@ -47,6 +47,12 @@ function getStreamer(): Streamer {
 	const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
 	const minioEndpoint = cdn.minioEndpoint || 'http://localhost:9000';
 
+	if (process.env.NODE_ENV === 'production') {
+		if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
+			log.warn('[upload-resolver] WARNING: Using default credentials in production.');
+		}
+	}
+
 	log.info(
 		`[upload-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
 	);
@@ -119,11 +125,13 @@ async function uploadResolver(
 
 	// MIME type validation from smart tags
 	const typ = type || tags?.type;
+	const VALID_MIME = /^[a-z]+\/[a-z0-9][a-z0-9!#$&\-.^_+]*$/i;
 	const mim: string[] = tags?.mime
 		? String(tags.mime)
 				.trim()
 				.split(',')
 				.map((a: string) => a.trim())
+				.filter((m: string) => VALID_MIME.test(m))
 		: typ === 'image'
 			? DEFAULT_IMAGE_MIME_TYPES
 			: [];
@@ -136,7 +144,7 @@ async function uploadResolver(
 
 	if (mim.length && !mim.includes(detectedContentType)) {
 		detected.stream.destroy();
-		throw new Error(`UPLOAD_MIMETYPE ${mim.join(',')}`);
+		throw new Error('UPLOAD_MIMETYPE');
 	}
 
 	const result = await s3.uploadWithContentType({
