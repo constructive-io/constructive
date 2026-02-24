@@ -59,3 +59,20 @@ export function generateUtilsFile(): GeneratedFile {
     ),
   };
 }
+
+/**
+ * Generate a node-fetch.ts file with NodeHttpAdapter for CLI.
+ *
+ * Provides a GraphQLAdapter implementation using node:http/node:https
+ * instead of the Fetch API. This cleanly handles *.localhost subdomain
+ * routing (DNS resolution + Host header) without any global patching.
+ */
+export function generateNodeFetchFile(): GeneratedFile {
+  return {
+    fileName: 'node-fetch.ts',
+    content: readTemplateFile(
+      'node-fetch.ts',
+      'Node HTTP adapter for localhost subdomain routing',
+    ),
+  };
+}

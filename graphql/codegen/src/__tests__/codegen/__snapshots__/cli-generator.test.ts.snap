@@ -1153,7 +1153,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
     }
     const client = getClient();
     const selectFields = buildSelectFromPaths(argv.select ?? "");
-    const result = await client.query.currentUser({}, {
+    const result = await client.query.currentUser({
       select: selectFields
     }).execute();
     console.log(JSON.stringify(result, null, 2));

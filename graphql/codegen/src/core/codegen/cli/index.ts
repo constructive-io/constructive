@@ -1,5 +1,5 @@
 import type { BuiltinNames, GraphQLSDKConfigTarget } from '../../../types/config';
-import type { CleanOperation, CleanTable } from '../../../types/schema';
+import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
 import { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
 import { generateCustomCommand } from './custom-command-generator';
 import { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
@@ -11,7 +11,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile } from './utils-generator';
+import { generateUtilsFile, generateNodeFetchFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: CleanTable[];
@@ -20,6 +20,8 @@ export interface GenerateCliOptions {
     mutations: CleanOperation[];
   };
   config: GraphQLSDKConfigTarget;
+  /** TypeRegistry from introspection, used to check field defaults */
+  typeRegistry?: TypeRegistry;
 }
 
 export interface GenerateCliResult {
@@ -43,11 +45,21 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       ? cliConfig.toolName
       : 'app';
 
-  const executorFile = generateExecutorFile(toolName);
+  // Use top-level nodeHttpAdapter from config (auto-enabled for CLI by generate.ts)
+  const useNodeHttpAdapter = !!config.nodeHttpAdapter;
+
+  const executorFile = generateExecutorFile(toolName, {
+    nodeHttpAdapter: useNodeHttpAdapter,
+  });
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
+
+  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
+  if (useNodeHttpAdapter) {
+    files.push(generateNodeFetchFile());
+  }
 
   const contextFile = generateContextCommand(toolName);
   files.push(contextFile);
@@ -56,7 +68,9 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   files.push(authFile);
 
   for (const table of tables) {
-    const tableFile = generateTableCommand(table);
+    const tableFile = generateTableCommand(table, {
+      typeRegistry: options.typeRegistry,
+    });
     files.push(tableFile);
   }
 
@@ -99,12 +113,16 @@ export interface MultiTargetCliTarget {
     mutations: CleanOperation[];
   };
   isAuthTarget?: boolean;
+  /** TypeRegistry from introspection, used to check field defaults */
+  typeRegistry?: TypeRegistry;
 }
 
 export interface GenerateMultiTargetCliOptions {
   toolName: string;
   builtinNames?: BuiltinNames;
   targets: MultiTargetCliTarget[];
+  /** Enable NodeHttpAdapter for *.localhost subdomain routing */
+  nodeHttpAdapter?: boolean;
 }
 
 export function resolveBuiltinNames(
@@ -138,11 +156,18 @@ export function generateMultiTargetCli(
     endpoint: t.endpoint,
     ormImportPath: t.ormImportPath,
   }));
-  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs);
+  const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs, {
+    nodeHttpAdapter: !!options.nodeHttpAdapter,
+  });
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
+
+  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
+  if (options.nodeHttpAdapter) {
+    files.push(generateNodeFetchFile());
+  }
 
   const contextFile = generateMultiTargetContextCommand(
     toolName,
@@ -174,6 +199,7 @@ export function generateMultiTargetCli(
       const tableFile = generateTableCommand(table, {
         targetName: target.name,
         executorImportPath: '../../executor',
+        typeRegistry: target.typeRegistry,
       });
       files.push(tableFile);
     }

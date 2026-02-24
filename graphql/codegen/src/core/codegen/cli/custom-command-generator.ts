@@ -143,9 +143,21 @@ function buildOrmCustomCall(
   opName: string,
   argsExpr: t.Expression,
   selectExpr?: t.Expression,
+  hasArgs: boolean = true,
 ): t.Expression {
-  const callArgs: t.Expression[] = [argsExpr];
-  if (selectExpr) {
+  const callArgs: t.Expression[] = [];
+  if (hasArgs) {
+    // Operation has arguments: pass args as first param, select as second
+    callArgs.push(argsExpr);
+    if (selectExpr) {
+      callArgs.push(
+        t.objectExpression([
+          t.objectProperty(t.identifier('select'), selectExpr),
+        ]),
+      );
+    }
+  } else if (selectExpr) {
+    // No arguments: pass { select } as the only param (ORM signature)
     callArgs.push(
       t.objectExpression([
         t.objectProperty(t.identifier('select'), selectExpr),
@@ -343,12 +355,13 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     selectExpr = t.identifier('selectFields');
   }
 
+  const hasArgs = op.args.length > 0;
   bodyStatements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
         t.awaitExpression(
-          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr),
+          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr, hasArgs),
         ),
       ),
     ]),
