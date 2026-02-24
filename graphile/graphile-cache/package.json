@@ -1,6 +1,6 @@
 {
   "name": "graphile-cache",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGraphile v5 LRU cache with automatic pool cleanup integration",
   "main": "index.js",
