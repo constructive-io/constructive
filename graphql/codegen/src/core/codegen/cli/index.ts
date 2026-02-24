@@ -11,7 +11,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateNodeFetchFile } from './utils-generator';
+import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: CleanTable[];
@@ -91,6 +91,13 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   );
   files.push(commandMapFile);
 
+  // Generate entry point if configured
+  const generateEntryPoint =
+    typeof cliConfig === 'object' && !!cliConfig.entryPoint;
+  if (generateEntryPoint) {
+    files.push(generateEntryPointFile());
+  }
+
   return {
     files,
     stats: {
@@ -123,6 +130,8 @@ export interface GenerateMultiTargetCliOptions {
   targets: MultiTargetCliTarget[];
   /** Enable NodeHttpAdapter for *.localhost subdomain routing */
   nodeHttpAdapter?: boolean;
+  /** Generate a runnable index.ts entry point */
+  entryPoint?: boolean;
 }
 
 export function resolveBuiltinNames(
@@ -232,6 +241,11 @@ export function generateMultiTargetCli(
   });
   files.push(commandMapFile);
 
+  // Generate entry point if configured
+  if (options.entryPoint) {
+    files.push(generateEntryPointFile());
+  }
+
   return {
     files,
     stats: {
@@ -267,5 +281,5 @@ export {
 export type { MultiTargetDocsInput } from './docs-generator';
 export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
-export { generateUtilsFile } from './utils-generator';
+export { generateUtilsFile, generateEntryPointFile } from './utils-generator';
 export type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';

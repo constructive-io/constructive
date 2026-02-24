@@ -696,6 +696,7 @@ export async function generateMulti(
       builtinNames: cliConfig.builtinNames,
       targets: cliTargets,
       nodeHttpAdapter: multiNodeHttpAdapter,
+      entryPoint: cliConfig.entryPoint,
     });
 
     const cliFilesToWrite = files.map((file) => ({
