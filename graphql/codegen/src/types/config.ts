@@ -208,7 +208,7 @@ export interface CliConfig {
    * No global patching — the adapter is passed to createClient via the adapter option.
    * @default false
    */
-  localhostAdapter?: boolean;
+  nodeHttpAdapter?: boolean;
 }
 
 /**

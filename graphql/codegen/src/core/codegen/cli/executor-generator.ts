@@ -32,14 +32,14 @@ function createImportDeclaration(
 
 export interface ExecutorOptions {
   /** Enable NodeHttpAdapter for *.localhost subdomain routing */
-  localhostAdapter?: boolean;
+  nodeHttpAdapter?: boolean;
 }
 
 export function generateExecutorFile(toolName: string, options?: ExecutorOptions): GeneratedFile {
   const statements: t.Statement[] = [];
 
   // Import NodeHttpAdapter for *.localhost subdomain routing
-  if (options?.localhostAdapter) {
+  if (options?.nodeHttpAdapter) {
     statements.push(
       createImportDeclaration('./node-fetch', ['NodeHttpAdapter']),
     );
@@ -204,7 +204,7 @@ export function generateExecutorFile(toolName: string, options?: ExecutorOptions
     ),
 
     // Build createClient config — use NodeHttpAdapter for *.localhost endpoints
-    ...(options?.localhostAdapter
+    ...(options?.nodeHttpAdapter
       ? [
           t.returnStatement(
             t.callExpression(t.identifier('createClient'), [
@@ -262,7 +262,7 @@ export function generateMultiTargetExecutorFile(
   const statements: t.Statement[] = [];
 
   // Import NodeHttpAdapter for *.localhost subdomain routing
-  if (options?.localhostAdapter) {
+  if (options?.nodeHttpAdapter) {
     statements.push(
       createImportDeclaration('./node-fetch', ['NodeHttpAdapter']),
     );
@@ -515,7 +515,7 @@ export function generateMultiTargetExecutorFile(
       ]),
     ),
     // Build createClient config — use NodeHttpAdapter for *.localhost endpoints
-    ...(options?.localhostAdapter
+    ...(options?.nodeHttpAdapter
       ? [
           t.returnStatement(
             t.callExpression(t.identifier('createFn'), [

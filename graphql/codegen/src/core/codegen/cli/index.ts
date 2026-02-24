@@ -45,16 +45,19 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       ? cliConfig.toolName
       : 'app';
 
-  const useLocalhostAdapter = typeof cliConfig === 'object' && !!cliConfig.localhostAdapter;
+  const useNodeHttpAdapter =
+    typeof cliConfig === 'object' && !!cliConfig.nodeHttpAdapter;
 
-  const executorFile = generateExecutorFile(toolName, { localhostAdapter: useLocalhostAdapter });
+  const executorFile = generateExecutorFile(toolName, {
+    nodeHttpAdapter: useNodeHttpAdapter,
+  });
   files.push(executorFile);
 
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
 
   // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
-  if (useLocalhostAdapter) {
+  if (useNodeHttpAdapter) {
     files.push(generateNodeFetchFile());
   }
 
@@ -118,8 +121,8 @@ export interface GenerateMultiTargetCliOptions {
   toolName: string;
   builtinNames?: BuiltinNames;
   targets: MultiTargetCliTarget[];
-  /** Enable localhost fetch adapter for *.localhost subdomain routing */
-  localhostAdapter?: boolean;
+  /** Enable NodeHttpAdapter for *.localhost subdomain routing */
+  nodeHttpAdapter?: boolean;
 }
 
 export function resolveBuiltinNames(
@@ -154,7 +157,7 @@ export function generateMultiTargetCli(
     ormImportPath: t.ormImportPath,
   }));
   const executorFile = generateMultiTargetExecutorFile(toolName, executorInputs, {
-    localhostAdapter: !!options.localhostAdapter,
+    nodeHttpAdapter: !!options.nodeHttpAdapter,
   });
   files.push(executorFile);
 
@@ -162,7 +165,7 @@ export function generateMultiTargetCli(
   files.push(utilsFile);
 
   // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
-  if (options.localhostAdapter) {
+  if (options.nodeHttpAdapter) {
     files.push(generateNodeFetchFile());
   }
 
