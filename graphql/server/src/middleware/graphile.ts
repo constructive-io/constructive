@@ -15,20 +15,40 @@ import { HandlerCreationError } from '../errors/api-errors';
 const maskErrorLog = new Logger('graphile:maskError');
 
 const SAFE_ERROR_CODES = new Set([
-  'UNAUTHENTICATED',
-  'FORBIDDEN',
-  'BAD_USER_INPUT',
+  // GraphQL standard
   'GRAPHQL_VALIDATION_FAILED',
   'GRAPHQL_PARSE_FAILED',
   'PERSISTED_QUERY_NOT_FOUND',
   'PERSISTED_QUERY_NOT_SUPPORTED',
+  // Auth
+  'UNAUTHENTICATED',
+  'FORBIDDEN',
+  'BAD_USER_INPUT',
+  'INCORRECT_PASSWORD',
+  'PASSWORD_INSECURE',
+  'ACCOUNT_LOCKED_EXCEED_ATTEMPTS',
+  'ACCOUNT_DISABLED',
+  'ACCOUNT_EXISTS',
+  'PASSWORD_LEN',
+  'INVITE_NOT_FOUND',
+  'INVITE_LIMIT',
+  'INVITE_EMAIL_NOT_FOUND',
+  'INVALID_CREDENTIALS',
+  // PublicKeySignature
   'FEATURE_DISABLED',
   'INVALID_PUBLIC_KEY',
   'INVALID_MESSAGE',
   'INVALID_SIGNATURE',
   'NO_ACCOUNT_EXISTS',
   'BAD_SIGNIN',
-  'UPLOAD_MIMETYPE'
+  // Upload
+  'UPLOAD_MIMETYPE',
+  // PostgreSQL constraint violations (surfaced by PostGraphile)
+  '23505', // unique_violation
+  '23503', // foreign_key_violation
+  '23502', // not_null_violation
+  '23514', // check_violation
+  '23P01', // exclusion_violation
 ]);
 
 /**

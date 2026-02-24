@@ -419,10 +419,10 @@ describe('parseAndValidateSqlExpression', () => {
       expect(result.error).toContain('ParamRef');
     });
 
-    it('should reject any unrecognized/new node type via allowlist', async () => {
+    it('should reject any unrecognized/new node type via allowlist', () => {
       // Craft a fake AST with a node type not in the allowlist
       const unknownAst = { SomeNewDangerousNode: {} };
-      const result = await validateAst(unknownAst);
+      const result = validateAst(unknownAst);
       expect(result.valid).toBe(false);
       expect(result.error).toContain('Disallowed node type "SomeNewDangerousNode"');
     });
@@ -536,23 +536,57 @@ describe('parseAndValidateSqlExpression', () => {
       expect(result.error).toBeDefined();
     });
   });
+
+  // ─── SQL injection patterns ───────────────────────────────────
+
+  describe('SQL injection patterns', () => {
+    it('should reject UNION injection', async () => {
+      const result = await parseAndValidateSqlExpression(
+        '1) UNION SELECT secret FROM users --'
+      );
+      expect(result.valid).toBe(false);
+    });
+
+    it('should reject UNION ALL injection', async () => {
+      const result = await parseAndValidateSqlExpression(
+        '1) UNION ALL SELECT 1 --'
+      );
+      expect(result.valid).toBe(false);
+    });
+
+    it('should reject FROM clause injection', async () => {
+      const result = await parseAndValidateSqlExpression(
+        '(SELECT 1 FROM pg_shadow)'
+      );
+      expect(result.valid).toBe(false);
+      expect(result.error).toMatch(/disallowed SQL clause|Disallowed node type/i);
+    });
+
+    it('should reject WHERE clause injection', async () => {
+      const result = await parseAndValidateSqlExpression(
+        '(SELECT 1 WHERE true)'
+      );
+      expect(result.valid).toBe(false);
+      expect(result.error).toMatch(/disallowed SQL clause|Disallowed node type/i);
+    });
+  });
 });
 
 describe('validateAst', () => {
-  it('should reject null AST', async () => {
-    const result = await validateAst(null);
+  it('should reject null AST', () => {
+    const result = validateAst(null);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('AST must be a non-null object');
   });
 
-  it('should reject undefined AST', async () => {
-    const result = await validateAst(undefined);
+  it('should reject undefined AST', () => {
+    const result = validateAst(undefined);
     expect(result.valid).toBe(false);
     expect(result.error).toBe('AST must be a non-null object');
   });
 
-  it('should reject non-object AST', async () => {
-    const result = await validateAst('string');
+  it('should reject non-object AST', () => {
+    const result = validateAst('string');
     expect(result.valid).toBe(false);
     expect(result.error).toBe('AST must be a non-null object');
   });
@@ -561,18 +595,18 @@ describe('validateAst', () => {
     const parseResult = await parseAndValidateSqlExpression('42');
     expect(parseResult.valid).toBe(true);
 
-    const result = await validateAst(parseResult.ast);
+    const result = validateAst(parseResult.ast);
     expect(result.valid).toBe(true);
     expect(result.canonicalText).toBe('42');
   });
 
-  it('should reject AST containing disallowed nodes', async () => {
+  it('should reject AST containing disallowed nodes', () => {
     const forbiddenAst = {
       ColumnRef: {
         fields: [{ String: { sval: 'username' } }]
       }
     };
-    const result = await validateAst(forbiddenAst);
+    const result = validateAst(forbiddenAst);
     expect(result.valid).toBe(false);
     expect(result.error).toContain('Disallowed node type');
     expect(result.error).toContain('ColumnRef');
@@ -582,7 +616,7 @@ describe('validateAst', () => {
     const parseResult = await parseAndValidateSqlExpression('now()');
     expect(parseResult.valid).toBe(true);
 
-    const result = await validateAst(parseResult.ast, {
+    const result = validateAst(parseResult.ast, {
       allowedFunctions: ['gen_random_uuid']
     });
     expect(result.valid).toBe(false);

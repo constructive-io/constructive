@@ -389,7 +389,7 @@ export async function parseAndValidateSqlExpression(
       'fromClause', 'whereClause', 'larg', 'rarg', 'valuesLists',
       'intoClause', 'withClause', 'groupClause', 'havingClause',
       'windowClause', 'sortClause', 'limitOffset', 'limitCount',
-      'lockingClause'
+      'lockingClause', 'distinctClause'
     ];
     for (const dangerousKey of DANGEROUS_SELECT_KEYS) {
       if (selectStmt[dangerousKey] !== undefined) {
