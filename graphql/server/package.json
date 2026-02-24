@@ -60,7 +60,7 @@
     "graphile-cache": "workspace:^",
     "graphile-config": "1.0.0-rc.5",
     "graphile-settings": "workspace:^",
-    "graphile-utils": "^5.0.0-rc.5",
+    "graphile-utils": "5.0.0-rc.5",
     "graphql": "^16.9.0",
     "graphql-upload": "^13.0.0",
     "lru-cache": "^11.2.4",
