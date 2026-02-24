@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.3.0...@constructive-io/graphql-codegen@4.4.0) (2026-02-24)
+
+### Bug Fixes
+
+- **codegen:** use getPackageJson for --version instead of hardcoded '0.0.1' ([51cf315](https://github.com/constructive-io/constructive/commit/51cf3152e2dc89fff375990a528c361bc2e4bc7c))
+
+### Features
+
+- **codegen:** add CLI entry point generation option (cli.entryPoint) ([64cb55d](https://github.com/constructive-io/constructive/commit/64cb55da9c16b71ca1b99fdc8f0c83d54458601b))
+
 # [4.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.2.1...@constructive-io/graphql-codegen@4.3.0) (2026-02-24)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
