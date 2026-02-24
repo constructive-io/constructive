@@ -125,6 +125,8 @@ const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<voi
     }
   } catch (err) {
     log.error(`Error disposing PostGraphile[${key}]:`, err);
+  } finally {
+    disposedKeys.delete(key);
   }
 };
 
@@ -248,34 +250,38 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
   if (closePromise.promise) return closePromise.promise;
 
   closePromise.promise = (async () => {
-    if (verbose) log.info('Closing all server caches...');
+    try {
+      if (verbose) log.info('Closing all server caches...');
 
-    // Collect all entries and dispose them properly
-    const entries = [...graphileCache.entries()];
+      // Collect all entries and dispose them properly
+      const entries = [...graphileCache.entries()];
 
-    // Mark all as manual evictions
-    for (const [key] of entries) {
-      manualEvictionKeys.add(key);
+      // Mark all as manual evictions
+      for (const [key] of entries) {
+        manualEvictionKeys.add(key);
+      }
+
+      const disposePromises = entries.map(([key, entry]) =>
+        disposeEntry(entry, key)
+      );
+
+      // Wait for all disposals to complete
+      await Promise.allSettled(disposePromises);
+
+      // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
+      graphileCache.clear();
+
+      // Clear disposed keys tracking after full cleanup
+      disposedKeys.clear();
+      manualEvictionKeys.clear();
+
+      // Close pg pools
+      await pgCache.close();
+
+      if (verbose) log.success('All caches disposed.');
+    } finally {
+      closePromise.promise = null;
     }
-
-    const disposePromises = entries.map(([key, entry]) =>
-      disposeEntry(entry, key)
-    );
-
-    // Wait for all disposals to complete
-    await Promise.allSettled(disposePromises);
-
-    // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
-    graphileCache.clear();
-
-    // Clear disposed keys tracking after full cleanup
-    disposedKeys.clear();
-    manualEvictionKeys.clear();
-
-    // Close pg pools
-    await pgCache.close();
-
-    if (verbose) log.success('All caches disposed.');
   })();
 
   return closePromise.promise;

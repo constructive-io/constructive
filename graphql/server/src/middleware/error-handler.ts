@@ -88,12 +88,11 @@ export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res:
 };
 
 export const notFoundHandler = (req: Request, res: Response, _next: NextFunction): void => {
-  const message = `Route not found: ${req.method} ${req.path}`;
   log.warn({ event: 'route_not_found', path: req.path, method: req.method, requestId: req.requestId });
 
   if (wantsJson(req)) {
-    res.status(404).json({ error: { code: 'NOT_FOUND', message, requestId: req.requestId } });
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Not found', requestId: req.requestId } });
   } else {
-    res.status(404).send(errorPage404Message(message));
+    res.status(404).send(errorPage404Message('The requested page was not found'));
   }
 };

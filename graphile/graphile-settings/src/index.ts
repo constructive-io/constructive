@@ -54,11 +54,8 @@ export * from './presets/index';
 // Utilities
 // ============================================================================
 
-// Import the new MinimalPreset from plugins
-import { MinimalPreset } from './plugins/minimal-preset';
-
-// Re-export MinimalPreset for backward compatibility
-export { MinimalPreset };
-
 // Re-export makePgService for convenience
 export { makePgService };
+
+// Upload utilities
+export { streamToStorage } from './upload-resolver';

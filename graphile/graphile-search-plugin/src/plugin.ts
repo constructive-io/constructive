@@ -3,8 +3,10 @@
  *
  * Generates search condition fields for tsvector columns. When a search term
  * is provided via the condition input, this plugin applies a
- * `column @@ websearch_to_tsquery('english', $value)` WHERE clause and
- * automatically orders results by `ts_rank` (descending) for relevance.
+ * `column @@ websearch_to_tsquery('english', $value)` WHERE clause.
+ * Results are ordered by `ts_rank` only when explicitly requested via
+ * the `FULL_TEXT_RANK_ASC/DESC` orderBy enum values (not automatically),
+ * ensuring cursor pagination digests remain stable across pages.
  *
  * Additionally provides:
  * - `matches` filter operator for postgraphile-plugin-connection-filter
@@ -48,7 +50,8 @@ import type { PgSearchPluginOptions } from './types';
  * 2. OrderBy enum apply (planning phase): stores direction in PgSelectStep meta.
  * 3. Condition apply (deferred/SQL-gen phase): adds ts_rank to the proxy's
  *    select list via selectAndReturnIndex, stores the index in `indices`.
- *    Also reads direction from meta and adds ORDER BY ts_rank.
+ *    If the user explicitly requested rank ordering (meta set in step 2),
+ *    adds ORDER BY ts_rank with the requested direction.
  * 4. Rank field lambda (execute phase): reads row[indices[field]] for the value.
  */
 interface FtsRankSlot {
@@ -56,15 +59,6 @@ interface FtsRankSlot {
   indices: Record<string, number>;
 }
 const ftsRankSlots = new WeakMap<object, FtsRankSlot>();
-
-/**
- * FinalizationRegistry for defensive cleanup of ftsRankSlots entries.
- * WeakMap entries are already eligible for GC when keys are unreachable,
- * but this provides explicit cleanup and a hook for debugging leaks.
- */
-const ftsRankCleanup = new FinalizationRegistry<object>((heldValue) => {
-  ftsRankSlots.delete(heldValue);
-});
 
 function isTsvectorCodec(codec: any): boolean {
   return (
@@ -188,7 +182,6 @@ export function createPgSearchPlugin(
                         ftsRankSlots.set(alias, {
                           indices: Object.create(null),
                         });
-                        ftsRankCleanup.register($select, alias);
                       }
 
                       // Return a lambda that reads the rank value from the result
@@ -355,20 +348,22 @@ export function createPgSearchPlugin(
                         }
                       }
 
-                      // ORDER BY ts_rank: check if the user provided an
-                      // explicit rank orderBy enum (stored in meta during
-                      // planning). If so, use their direction. Otherwise add
-                      // automatic DESC ordering for relevance.
+                      // ORDER BY ts_rank: only add when the user explicitly
+                      // requested rank ordering via the FULL_TEXT_RANK_ASC/DESC
+                      // enum values. The enum's apply stores direction in meta
+                      // during planning; if no meta is set, skip the orderBy
+                      // entirely so cursors remain stable across pages.
                       const metaKey = `fts_order_${baseFieldName}`;
                       const explicitDir = typeof $parent.getMetaRaw === 'function'
                         ? $parent.getMetaRaw(metaKey)
                         : undefined;
-                      const orderDirection = explicitDir ?? 'DESC';
-                      $parent.orderBy({
-                        fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
-                        codec: TYPES.float4,
-                        direction: orderDirection,
-                      });
+                      if (explicitDir) {
+                        $parent.orderBy({
+                          fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
+                          codec: TYPES.float4,
+                          direction: explicitDir,
+                        });
+                      }
                     },
                   }
                 ),

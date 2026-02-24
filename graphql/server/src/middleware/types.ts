@@ -1,8 +1,8 @@
 import type { ApiStructure } from '../types';
 
 export type ConstructiveAPIToken = {
-  id: string;
-  user_id: string;
+  id?: string;
+  user_id?: string;
   [key: string]: unknown;
 };
 

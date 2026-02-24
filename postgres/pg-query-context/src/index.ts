@@ -1,16 +1,16 @@
 import { ClientBase, Pool, PoolClient, QueryResult } from 'pg';
 
-function setContext(ctx: Record<string, string>): string[] {
-  return Object.keys(ctx || {}).reduce<string[]>((m, el) => {
-    m.push(`SELECT set_config('${el}', '${ctx[el]}', true);`);
+function setContext(ctx: Record<string, string>): { query: string; values: string[] }[] {
+  return Object.keys(ctx || {}).reduce<{ query: string; values: string[] }[]>((m, el) => {
+    m.push({ query: 'SELECT set_config($1, $2, true)', values: [el, ctx[el]] });
     return m;
   }, []);
 }
 
 async function execContext(client: ClientBase, ctx: Record<string, string>): Promise<void> {
   const local = setContext(ctx);
-  for (const query of local) {
-    await client.query(query);
+  for (const { query, values } of local) {
+    await client.query(query, values);
   }
 }
 
@@ -19,9 +19,10 @@ interface ExecOptions {
   context?: Record<string, string>;
   query: string;
   variables?: any[];
+  skipTransaction?: boolean;
 }
 
-export default async ({ client, context = {}, query = '', variables = [] }: ExecOptions): Promise<QueryResult> => {
+export default async ({ client, context = {}, query = '', variables = [], skipTransaction = false }: ExecOptions): Promise<QueryResult> => {
   const isPool = 'connect' in client;
   const shouldRelease = isPool;
   let pgClient: ClientBase | PoolClient | null = null;
@@ -29,14 +30,18 @@ export default async ({ client, context = {}, query = '', variables = [] }: Exec
   try {
     pgClient = isPool ? await (client as Pool).connect() : client as ClientBase;
 
-    await pgClient.query('BEGIN');
+    if (!skipTransaction) {
+      await pgClient.query('BEGIN');
+    }
     await execContext(pgClient, context);
     const result = await pgClient.query(query, variables);
-    await pgClient.query('COMMIT');
+    if (!skipTransaction) {
+      await pgClient.query('COMMIT');
+    }
 
     return result;
   } catch (error) {
-    if (pgClient) {
+    if (pgClient && !skipTransaction) {
       await pgClient.query('ROLLBACK').catch(() => {});
     }
     throw error;
