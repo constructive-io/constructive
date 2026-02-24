@@ -607,6 +607,7 @@ describe('GraphQLObjectType_fields_field hook (mutation resolver wrapping)', () 
 
     // The original column value should be set
     expect((args.input as any).photo).toBe('url:photo.jpg');
+    expect((args.input as any).photoUpload).toBeUndefined();
 
     // The old resolver should have been called
     expect(oldResolve).toHaveBeenCalledTimes(1);
@@ -776,6 +777,54 @@ describe('GraphQLObjectType_fields_field hook (mutation resolver wrapping)', () 
     // Should not call the upload resolver since key doesn't match
     expect(mockResolve).not.toHaveBeenCalled();
     expect(oldResolve).toHaveBeenCalledTimes(1);
+  });
+
+  it('should resolve thenable uploads (not just Promise instances)', async () => {
+    const hooks = getHooks([def]);
+    const build = createMockBuild();
+
+    const oldResolve = jest.fn().mockResolvedValue({ id: '1' });
+    const field = { resolve: oldResolve };
+    const context = {
+      scope: {
+        isRootMutation: true,
+        fieldName: 'createPost',
+        pgCodec: {
+          name: 'Post',
+          attributes: {
+            photo: {
+              codec: { name: 'text' },
+              extensions: { tags: { upload: true } }
+            }
+          }
+        }
+      }
+    };
+
+    const wrappedField = hooks.GraphQLObjectType_fields_field(
+      field,
+      build,
+      context
+    );
+
+    const mockStream = createMockStream();
+    const fakeUpload = {
+      filename: 'thenable.jpg',
+      createReadStream: jest.fn().mockReturnValue(mockStream)
+    };
+    const args = {
+      input: {
+        photoUpload: {
+          then: (resolve: (value: unknown) => void) => resolve(fakeUpload)
+        }
+      }
+    };
+
+    await wrappedField.resolve({}, args, {}, {});
+
+    expect(mockResolve).toHaveBeenCalledTimes(1);
+    expect((args.input as any).photo).toBe('url:thenable.jpg');
+    expect((args.input as any).photoUpload).toBeUndefined();
   });
 });
 

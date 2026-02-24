@@ -92,9 +92,6 @@ function createSizeLimitStream(
     limiter.destroy(error);
   });
 
-  // Prevent unhandled stream errors if downstream forgets to subscribe.
-  limiter.on('error', () => {});
-
   limiter.on('error', (error) => {
     if (!source.destroyed) {
       source.destroy(error as Error);
@@ -103,6 +100,14 @@ function createSizeLimitStream(
 
   source.pipe(limiter);
   return limiter;
+}
+
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as PromiseLike<unknown>).then === 'function'
+  );
 }
 
 function wrapUploadForMaxFileSize(upload: any, maxFileSize?: number): any {
@@ -282,15 +287,21 @@ export function createUploadPlugin(
           return {
             ...rest,
             async resolve(source: any, args: any, context: any, info: any) {
-              // Recursively walk args to find and resolve Upload promises
+              // Recursively walk args to find and resolve upload thenables.
               async function resolvePromises(obj: any): Promise<void> {
+                const pending: Promise<void>[] = [];
+
                 for (const key of Object.keys(obj)) {
-                  if (obj[key] instanceof Promise) {
-                    if (uploadResolversByFieldName[key]) {
-                      const upload = await obj[key];
+                  const value = obj[key];
+                  if (isThenable(value)) {
+                    const resolver = uploadResolversByFieldName[key];
+                    if (!resolver) continue;
+
+                    pending.push((async () => {
+                      const upload = await value;
                       const uploadForResolver = wrapUploadForMaxFileSize(upload, maxFileSize);
 
-                      obj[originals[key]] = await uploadResolversByFieldName[key](
+                      obj[originals[key]] = await resolver(
                         uploadForResolver,
                         args,
                         context,
@@ -302,10 +313,21 @@ export function createUploadPlugin(
                           }
                         }
                       );
-                    }
-                  } else if (obj[key] !== null && typeof obj[key] === 'object') {
-                    await resolvePromises(obj[key]);
+
+                      // Remove consumed `*Upload` key so downstream resolvers only
+                      // see the materialized column value.
+                      delete obj[key];
+                    })());
+                    continue;
                   }
+
+                  if (value !== null && typeof value === 'object') {
+                    pending.push(resolvePromises(value));
+                  }
+                }
+
+                if (pending.length > 0) {
+                  await Promise.all(pending);
                 }
               }
 

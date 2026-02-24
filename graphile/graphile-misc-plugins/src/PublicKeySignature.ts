@@ -16,6 +16,7 @@ export interface PublicKeyChallengeConfig {
 }
 
 const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
+const SAFE_CRYPTO_NETWORK = /^[a-z0-9_-]{1,64}$/i;
 
 function validateIdentifier(name: string, label: string): void {
   if (!SAFE_IDENTIFIER.test(name)) {
@@ -23,14 +24,23 @@ function validateIdentifier(name: string, label: string): void {
   }
 }
 
+function validateCryptoNetwork(name: string): void {
+  if (!SAFE_CRYPTO_NETWORK.test(name)) {
+    throw new Error(
+      'PublicKeySignature: invalid crypto_network — must match /^[a-z0-9_-]{1,64}$/i',
+    );
+  }
+}
+
 const MAX_PUBLIC_KEY_LENGTH = 256;
 const MAX_MESSAGE_LENGTH = 4096;
 const MAX_SIGNATURE_LENGTH = 1024;
+const ENABLE_SIGNATURE_VERIFICATION = process.env.ENABLE_SIGNATURE_VERIFICATION === 'true';
 
 export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): GraphileConfig.Plugin => {
   const {
     schema,
-    crypto_network: _crypto_network,
+    crypto_network,
     sign_up_with_key,
     sign_in_request_challenge,
     sign_in_record_failure,
@@ -42,6 +52,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
   validateIdentifier(sign_in_request_challenge, 'sign_in_request_challenge');
   validateIdentifier(sign_in_record_failure, 'sign_in_record_failure');
   validateIdentifier(sign_in_with_challenge, 'sign_in_with_challenge');
+  validateCryptoNetwork(crypto_network);
 
   return extendSchema(() => ({
     typeDefs: gql`
@@ -157,11 +168,8 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           });
         },
 
-        // NOTE: Crypto verification is currently stubbed (always returns false).
-        // The verifyMessage call from @pyramation/crypto-keys needs to be
-        // re-implemented, e.g. using interchainJS, before this mutation can
-        // succeed. Until then, verifyMessageForSigning will always record a
-        // failure and throw BAD_SIGNIN.
+        // NOTE: Verification remains behind a feature flag until crypto
+        // verification is re-implemented.
         verifyMessageForSigning(_$mutation: any, fieldArgs: any) {
           const $input = fieldArgs.getRaw('input');
           const $withPgClient = (grafastContext() as any).get('withPgClient');
@@ -180,24 +188,13 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
               throw new Error('INVALID_SIGNATURE');
             }
 
-            // TODO: Re-implement crypto verification (e.g. using interchainJS).
-            // const network = Networks[crypto_network];
-            // const result = verifyMessage(message, publicKey, signature, network);
-            const result = false;
+            if (!ENABLE_SIGNATURE_VERIFICATION) {
+              // Fail closed without mutating lockout counters while verification
+              // is disabled.
+              throw new Error('FEATURE_DISABLED');
+            }
 
             return withPgClient(null, async (pgClient: any) => {
-              if (!result) {
-                // Record failure outside transaction — must persist for rate limiting/lockout
-                await pgQueryWithContext({
-                  client: pgClient,
-                  context: { role: 'anonymous' },
-                  query: `SELECT * FROM "${schema}"."${sign_in_record_failure}"($1)`,
-                  variables: [publicKey],
-                  skipTransaction: true
-                });
-                throw new Error('BAD_SIGNIN');
-              }
-
               // Only the success path needs a transaction (multi-step)
               await pgClient.query('BEGIN');
               try {

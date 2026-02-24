@@ -149,6 +149,7 @@ const FORBIDDEN_TYPE_CASTS = new Set([
 ]);
 
 const MAX_AST_DEPTH = 100;
+const SQL_COMMENT_TOKENS = /--|\/\*|\*\//;
 
 // ─── Internal helpers ─────────────────────────────────────────────
 
@@ -179,7 +180,7 @@ function extractStringVal(n: unknown): string {
 function validateAstNode(
   node: unknown,
   allowedFunctions: ReadonlySet<string>,
-  allowedSchemas: readonly string[],
+  allowedSchemas: ReadonlySet<string>,
   path: string[]
 ): AstNodeValidationResult {
   if (path.length > MAX_AST_DEPTH) {
@@ -247,7 +248,7 @@ function validateAstNode(
       const functionName = names[names.length - 1];
 
       if (schemaName) {
-        if (!allowedSchemas.includes(schemaName)) {
+        if (!allowedSchemas.has(schemaName.toLowerCase())) {
           return {
             valid: false,
             error: `Function schema "${schemaName}" is not in the allowed schemas list`
@@ -345,7 +346,15 @@ export async function parseAndValidateSqlExpression(
     };
   }
 
+  if (SQL_COMMENT_TOKENS.test(expression)) {
+    return {
+      valid: false,
+      error: 'Expression cannot contain SQL comments'
+    };
+  }
+
   const funcSet = new Set(allowedFunctions.map((f) => f.toLowerCase()));
+  const schemaSet = new Set(allowedSchemas.map((s) => s.toLowerCase()));
 
   try {
     const wrappedSql = `SELECT (${expression})`;
@@ -381,7 +390,7 @@ export async function parseAndValidateSqlExpression(
     const validationResult = validateAstNode(
       expressionAst,
       funcSet,
-      allowedSchemas,
+      schemaSet,
       []
     );
 
@@ -434,11 +443,12 @@ export async function validateAst(
   }
 
   const funcSet = new Set(allowedFunctions.map((f) => f.toLowerCase()));
+  const schemaSet = new Set(allowedSchemas.map((s) => s.toLowerCase()));
 
   const validationResult = validateAstNode(
     ast,
     funcSet,
-    allowedSchemas,
+    schemaSet,
     []
   );
 

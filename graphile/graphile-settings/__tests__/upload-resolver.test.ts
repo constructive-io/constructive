@@ -95,7 +95,7 @@ describe('uploadResolver MIME validation', () => {
         {},
         { uploadPlugin: { tags: {}, type: 'image' } },
       ),
-    ).rejects.toThrow('UPLOAD_MIMETYPE image/jpg,image/jpeg,image/png,image/svg+xml');
+    ).rejects.toThrow('UPLOAD_MIMETYPE image/jpeg,image/png,image/svg+xml');
 
     expect(mockDetectContentType).toHaveBeenCalledTimes(1);
     expect(mockUploadWithContentType).not.toHaveBeenCalled();
@@ -141,4 +141,3 @@ describe('uploadResolver MIME validation', () => {
     );
   });
 });
-

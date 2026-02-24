@@ -20,6 +20,7 @@ import Streamer from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
+import { randomBytes } from 'crypto';
 import type { Readable } from 'stream';
 import type {
 	FileUpload,
@@ -28,6 +29,7 @@ import type {
 } from 'graphile-upload-plugin';
 
 const log = new Logger('upload-resolver');
+const DEFAULT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
 
 let streamer: Streamer | null = null;
 let bucketName: string;
@@ -66,9 +68,7 @@ function getStreamer(): Streamer {
  * Format: {random10chars}-{sanitized-filename}
  */
 function generateKey(filename: string): string {
-	const rand =
-		Math.random().toString(36).substring(2, 7) +
-		Math.random().toString(36).substring(2, 7);
+	const rand = randomBytes(12).toString('hex');
 	return `${rand}-${uploadNames(filename)}`;
 }
 
@@ -124,9 +124,9 @@ async function uploadResolver(
 				.trim()
 				.split(',')
 				.map((a: string) => a.trim())
-			: typ === 'image'
-				? ['image/jpg', 'image/jpeg', 'image/png', 'image/svg+xml']
-				: [];
+		: typ === 'image'
+			? DEFAULT_IMAGE_MIME_TYPES
+			: [];
 
 	const detected = await s3.detectContentType({
 		readStream: upload.createReadStream(),

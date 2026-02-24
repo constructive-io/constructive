@@ -65,6 +65,12 @@ describe('PublicKeySignature config validation', () => {
     );
   });
 
+  it('throws on invalid crypto_network value', () => {
+    expect(() => PublicKeySignature({ ...defaultConfig, crypto_network: 'btc mainnet' })).toThrow(
+      /invalid crypto_network/,
+    );
+  });
+
   it('throws on function name with uppercase letters', () => {
     expect(() => PublicKeySignature({ ...defaultConfig, sign_in_request_challenge: 'BadName' })).toThrow(
       /invalid sign_in_request_challenge/,

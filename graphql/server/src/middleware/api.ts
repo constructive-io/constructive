@@ -196,6 +196,7 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
 };
 
 const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null): ApiStructure => ({
+  apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
   anonRole: row.anon_role || 'anon',
   roleName: row.role_name || 'authenticated',

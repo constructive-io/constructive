@@ -5,6 +5,7 @@ import fs from 'fs';
 import multer from 'multer';
 import os from 'os';
 import path from 'path';
+import { escapeIdentifier } from 'pg';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
@@ -54,6 +55,17 @@ const RLS_MODULE_BY_DATABASE_ID_SQL = `
   LIMIT 1
 `;
 
+const RLS_MODULE_BY_API_ID_SQL = `
+  SELECT
+    rm.authenticate,
+    rm.authenticate_strict,
+    ps.schema_name as private_schema_name
+  FROM metaschema_modules_public.rls_module rm
+  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
+  WHERE rm.api_id = $1
+  LIMIT 1
+`;
+
 const RLS_MODULE_BY_DBNAME_SQL = `
   SELECT
     rm.authenticate,
@@ -96,6 +108,11 @@ const queryRlsModuleByDatabaseId = async (pool: Pool, databaseId: string): Promi
   return toRlsModule(result.rows[0] ?? null);
 };
 
+const queryRlsModuleByApiId = async (pool: Pool, apiId: string): Promise<RlsModule | undefined> => {
+  const result = await pool.query<RlsModuleRow>(RLS_MODULE_BY_API_ID_SQL, [apiId]);
+  return toRlsModule(result.rows[0] ?? null);
+};
+
 const queryRlsModuleByDbname = async (pool: Pool, dbname: string): Promise<RlsModule | undefined> => {
   const result = await pool.query<RlsModuleRow>(RLS_MODULE_BY_DBNAME_SQL, [dbname]);
   return toRlsModule(result.rows[0] ?? null);
@@ -111,6 +128,11 @@ const resolveUploadRlsModule = async (opts: PgpmOptions, req: Request): Promise<
   }
 
   const pool = getPgPool(opts.pg);
+  if (api.apiId) {
+    const byApiId = await queryRlsModuleByApiId(pool, api.apiId);
+    if (byApiId) return byApiId;
+  }
+
   if (api.databaseId) {
     const byDatabaseId = await queryRlsModuleByDatabaseId(pool, api.databaseId);
     if (byDatabaseId) return byDatabaseId;
@@ -205,7 +227,7 @@ export const createUploadAuthenticateMiddleware = (
       const result = await pgQueryContext({
         client: pool,
         context,
-        query: `SELECT * FROM "${privateSchema}"."${authFn}"($1)`,
+        query: `SELECT * FROM ${escapeIdentifier(privateSchema)}.${escapeIdentifier(authFn)}($1)`,
         variables: [authToken],
       });
 

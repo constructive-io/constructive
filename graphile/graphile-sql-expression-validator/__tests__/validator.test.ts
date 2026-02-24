@@ -96,6 +96,18 @@ describe('parseAndValidateSqlExpression', () => {
       expect(result.valid).toBe(false);
       expect(result.error).toContain('semicolons');
     });
+
+    it('should reject line comments', async () => {
+      const result = await parseAndValidateSqlExpression('now() -- trailing');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('SQL comments');
+    });
+
+    it('should reject block comments', async () => {
+      const result = await parseAndValidateSqlExpression('now() /* comment */');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('SQL comments');
+    });
   });
 
   // ─── Valid expressions ───────────────────────────────────────────
@@ -366,6 +378,14 @@ describe('parseAndValidateSqlExpression', () => {
       );
       expect(resultA.valid).toBe(true);
       expect(resultB.valid).toBe(true);
+    });
+
+    it('should match allowed schema names case-insensitively', async () => {
+      const result = await parseAndValidateSqlExpression(
+        'app_public.my_func()',
+        { allowedSchemas: ['APP_PUBLIC'], allowedFunctions: ['my_func'] }
+      );
+      expect(result.valid).toBe(true);
     });
   });
 

@@ -31,6 +31,7 @@ export interface RlsModule {
 }
 
 export interface ApiStructure {
+  apiId?: string;
   dbname: string;
   anonRole: string;
   roleName: string;

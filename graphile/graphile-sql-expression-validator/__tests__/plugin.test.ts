@@ -280,6 +280,40 @@ describe('GraphQLObjectType_fields_field hook behavior', () => {
     ).rejects.toThrow('Invalid SQL expression in formula');
   });
 
+  it('should validate deeply nested text input in sideEffect callback', async () => {
+    const plugin = createSqlExpressionValidatorPlugin();
+    const hook = plugin.schema!.hooks!
+      .GraphQLObjectType_fields_field as Function;
+
+    const field = {
+      type: 'CreateWidgetPayload',
+      plan: jest.fn().mockReturnValue('step')
+    };
+    const build = makeMockBuild();
+    const context = makeMockContext({
+      isRootMutation: true,
+      pgCodec: {
+        attributes: {
+          formula: {
+            extensions: { tags: { sqlExpression: true } }
+          }
+        }
+      }
+    });
+
+    const result = hook(field, build, context);
+    const mockFieldArgs = {
+      get: jest.fn().mockReturnValue('inputStep')
+    };
+    result.plan('parent', mockFieldArgs);
+
+    const validationCallback = mockSideEffect.mock.calls[0][1];
+
+    await expect(
+      validationCallback({ level1: { level2: { formula: 'username' } } })
+    ).rejects.toThrow('Invalid SQL expression in formula');
+  });
+
   it('should skip null/undefined values in sideEffect callback', async () => {
     const plugin = createSqlExpressionValidatorPlugin();
     const hook = plugin.schema!.hooks!

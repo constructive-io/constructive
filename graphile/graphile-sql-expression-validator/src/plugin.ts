@@ -37,16 +37,39 @@ import type { SqlExpressionValidatorOptions } from './validator';
 
 /**
  * Find a value in a potentially nested mutation input object.
- * PostGraphile v5 mutation input is structured as `{ tablePatch: { field: value } }`
- * or `{ table: { field: value } }` — at most one level of nesting.
+ * Input is typically 1 level deep, but we traverse defensively to avoid
+ * silently skipping deeper/nested mutation payloads.
  */
 function findValue(input: Record<string, unknown>, key: string): unknown {
-  if (key in input) return input[key];
-  for (const v of Object.values(input)) {
-    if (v && typeof v === 'object' && key in (v as Record<string, unknown>)) {
-      return (v as Record<string, unknown>)[key];
+  const visited = new Set<object>();
+  const stack: Array<{ node: Record<string, unknown>; depth: number }> = [
+    { node: input, depth: 0 }
+  ];
+  const maxDepth = 32;
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    const { node, depth } = current;
+
+    if (key in node) {
+      return node[key];
+    }
+
+    if (visited.has(node) || depth >= maxDepth) {
+      continue;
+    }
+    visited.add(node);
+
+    for (const value of Object.values(node)) {
+      if (value && typeof value === 'object') {
+        stack.push({
+          node: value as Record<string, unknown>,
+          depth: depth + 1
+        });
+      }
     }
   }
+
   return undefined;
 }
 

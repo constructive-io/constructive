@@ -18,6 +18,7 @@ interface MockPool {
 }
 
 const baseApi: ApiStructure = {
+  apiId: 'api-123',
   dbname: 'tenant_db',
   anonRole: 'anonymous',
   roleName: 'authenticated',
@@ -169,6 +170,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     const req = makeReq({
       api: {
         ...baseApi,
+        apiId: undefined,
         rlsModule: undefined,
       },
       headers: { authorization: 'Bearer fallback-token' },
@@ -200,6 +202,45 @@ describe('createUploadAuthenticateMiddleware', () => {
     expect(next).toHaveBeenCalledTimes(1);
   });
 
+  it('falls back to api_id-scoped RLS module lookup when api.rlsModule is missing', async () => {
+    const middleware = createUploadAuthenticateMiddleware({
+      pg: { database: 'services' },
+      server: { strictAuth: false },
+    } as any);
+    const req = makeReq({
+      api: {
+        ...baseApi,
+        rlsModule: undefined,
+      },
+      headers: { authorization: 'Bearer fallback-token' },
+    });
+    const res = makeRes();
+    const next = makeNext();
+
+    rootPool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          authenticate: 'authenticate',
+          authenticate_strict: 'authenticate_strict',
+          private_schema_name: 'private',
+        },
+      ],
+    });
+
+    mockPgQueryContext.mockResolvedValue({
+      rowCount: 1,
+      rows: [{ id: 'token-id', user_id: 'user-id' }],
+    } as any);
+
+    await middleware(req, res, next);
+
+    expect(rootPool.query).toHaveBeenCalledWith(
+      expect.stringContaining('WHERE rm.api_id = $1'),
+      ['api-123'],
+    );
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
   it('falls back to dbname lookup when databaseId is missing', async () => {
     const middleware = createUploadAuthenticateMiddleware({
       pg: { database: 'services' },
@@ -208,6 +249,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     const req = makeReq({
       api: {
         ...baseApi,
+        apiId: undefined,
         databaseId: undefined,
         rlsModule: undefined,
       },
@@ -247,6 +289,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     const req = makeReq({
       api: {
         ...baseApi,
+        apiId: undefined,
         rlsModule: undefined,
       },
       headers: { authorization: 'Bearer missing-module-token' },

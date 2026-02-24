@@ -5,6 +5,22 @@ import type { SQL } from 'pg-sql2';
 import { CONCRETE_SUBTYPES } from 'graphile-postgis';
 import type { PostgisExtensionInfo } from 'graphile-postgis';
 
+const ALLOWED_SQL_OPERATORS = new Set([
+  '=',
+  '&&',
+  '&&&',
+  '&<',
+  '&<|',
+  '&>',
+  '|&>',
+  '<<',
+  '<<|',
+  '>>',
+  '|>>',
+  '~',
+  '~=',
+]);
+
 /**
  * PgConnectionArgFilterPostgisOperatorsPlugin
  *
@@ -257,6 +273,10 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
 
         // Process SQL operator-based operators
         for (const [op, baseTypes, operatorName, description] of operatorSpecs) {
+          if (!ALLOWED_SQL_OPERATORS.has(op)) {
+            throw new Error(`Unexpected SQL operator: ${op}`);
+          }
+
           for (const baseType of baseTypes) {
             allSpecs.push({
               typeNames: gqlTypeNamesByBase[baseType],
