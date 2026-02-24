@@ -3,7 +3,7 @@ import { toKebabCase } from 'komoji';
 
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader } from '../utils';
-import type { CleanOperation } from '../../../types/schema';
+import type { CleanOperation, CleanTypeRef } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 import { buildQuestionsArray } from './arg-mapper';
 
@@ -100,11 +100,58 @@ function buildErrorCatch(errorMessage: string): t.CatchClause {
   );
 }
 
+/**
+ * Unwrap NON_NULL / LIST wrappers to get the underlying named type.
+ */
+function unwrapType(ref: CleanTypeRef): CleanTypeRef {
+  if ((ref.kind === 'NON_NULL' || ref.kind === 'LIST') && ref.ofType) {
+    return unwrapType(ref.ofType);
+  }
+  return ref;
+}
+
+/**
+ * Check if the return type (after unwrapping) is an OBJECT type.
+ */
+function hasObjectReturnType(returnType: CleanTypeRef): boolean {
+  const base = unwrapType(returnType);
+  return base.kind === 'OBJECT';
+}
+
+/**
+ * Build a default select string from the return type's top-level scalar fields.
+ * For OBJECT return types with known fields, generates a comma-separated list
+ * of all top-level field names (e.g. 'clientMutationId,result').
+ * Falls back to 'clientMutationId' for mutations without known fields.
+ */
+function buildDefaultSelectString(
+  returnType: CleanTypeRef,
+  isMutation: boolean,
+): string {
+  const base = unwrapType(returnType);
+  if (base.fields && base.fields.length > 0) {
+    return base.fields.map((f) => f.name).join(',');
+  }
+  if (isMutation) {
+    return 'clientMutationId';
+  }
+  return '';
+}
+
 function buildOrmCustomCall(
   opKind: 'query' | 'mutation',
   opName: string,
   argsExpr: t.Expression,
+  selectExpr?: t.Expression,
 ): t.Expression {
+  const callArgs: t.Expression[] = [argsExpr];
+  if (selectExpr) {
+    callArgs.push(
+      t.objectExpression([
+        t.objectProperty(t.identifier('select'), selectExpr),
+      ]),
+    );
+  }
   return t.callExpression(
     t.memberExpression(
       t.callExpression(
@@ -115,7 +162,7 @@ function buildOrmCustomCall(
           ),
           t.identifier(opName),
         ),
-        [argsExpr],
+        callArgs,
       ),
       t.identifier('execute'),
     ),
@@ -139,12 +186,39 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     imports.push('getStore');
   }
 
+  // Check if any argument is an INPUT_OBJECT (i.e. takes JSON input like { input: SomeInput })
+  const hasInputObjectArg = op.args.some((arg) => {
+    const base = unwrapType(arg.type);
+    return base.kind === 'INPUT_OBJECT';
+  });
+
+  // Check if return type is OBJECT (needs --select flag)
+  const isObjectReturn = hasObjectReturnType(op.returnType);
+
+  const utilsPath = options?.executorImportPath
+    ? options.executorImportPath.replace(/\/executor$/, '/utils')
+    : '../utils';
+
   statements.push(
     createImportDeclaration('inquirerer', ['CLIOptions', 'Inquirerer']),
   );
   statements.push(
     createImportDeclaration(executorPath, imports),
   );
+
+  // Build the list of utils imports needed
+  const utilsImports: string[] = [];
+  if (hasInputObjectArg) {
+    utilsImports.push('parseMutationInput');
+  }
+  if (isObjectReturn) {
+    utilsImports.push('buildSelectFromPaths');
+  }
+  if (utilsImports.length > 0) {
+    statements.push(
+      createImportDeclaration(utilsPath, utilsImports),
+    );
+  }
 
   const questionsArray =
     op.args.length > 0
@@ -224,17 +298,57 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     ]),
   );
 
+  // For mutations with INPUT_OBJECT args (like `input: SignUpInput`),
+  // parse JSON strings from CLI into proper objects
+  if (hasInputObjectArg && op.args.length > 0) {
+    bodyStatements.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('parsedAnswers'),
+          t.callExpression(t.identifier('parseMutationInput'), [
+            t.identifier('answers'),
+          ]),
+        ),
+      ]),
+    );
+  }
+
   const argsExpr =
     op.args.length > 0
-      ? t.identifier('answers')
+      ? (hasInputObjectArg
+          ? t.identifier('parsedAnswers')
+          : t.identifier('answers'))
       : t.objectExpression([]);
+
+  // For OBJECT return types, generate runtime select from --select flag
+  // For scalar return types, no select is needed
+  let selectExpr: t.Expression | undefined;
+  if (isObjectReturn) {
+    const defaultSelect = buildDefaultSelectString(op.returnType, op.kind === 'mutation');
+    // Generate: const selectFields = buildSelectFromPaths(argv.select ?? 'defaultFields')
+    bodyStatements.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(
+          t.identifier('selectFields'),
+          t.callExpression(t.identifier('buildSelectFromPaths'), [
+            t.logicalExpression(
+              '??',
+              t.memberExpression(t.identifier('argv'), t.identifier('select')),
+              t.stringLiteral(defaultSelect),
+            ),
+          ]),
+        ),
+      ]),
+    );
+    selectExpr = t.identifier('selectFields');
+  }
 
   bodyStatements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
         t.awaitExpression(
-          buildOrmCustomCall(opKind, op.name, argsExpr),
+          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr),
         ),
       ),
     ]),
