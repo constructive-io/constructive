@@ -76,3 +76,21 @@ export function generateNodeFetchFile(): GeneratedFile {
     ),
   };
 }
+
+/**
+ * Generate an index.ts entry point file for the CLI.
+ *
+ * Creates a runnable entry point that imports the command map,
+ * handles --version and --tty flags, and starts the CLI.
+ * This is off by default (cliEntryPoint: false) since many projects
+ * provide their own entry point with custom configuration.
+ */
+export function generateEntryPointFile(): GeneratedFile {
+  return {
+    fileName: 'index.ts',
+    content: readTemplateFile(
+      'cli-entry.ts',
+      'CLI entry point',
+    ),
+  };
+}

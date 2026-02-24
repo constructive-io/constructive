@@ -199,6 +199,15 @@ export interface CliConfig {
    *           context -> 'context' (renamed to 'env' on collision)
    */
   builtinNames?: BuiltinNames;
+
+  /**
+   * Generate a runnable index.ts entry point for the CLI.
+   * When true, generates an index.ts that imports the command map,
+   * handles --version and --tty flags, and starts the inquirerer CLI.
+   * Useful for projects that want a ready-to-run CLI without a custom entry point.
+   * @default false
+   */
+  entryPoint?: boolean;
 }
 
 /**
