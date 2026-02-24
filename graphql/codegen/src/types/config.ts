@@ -199,16 +199,6 @@ export interface CliConfig {
    *           context -> 'context' (renamed to 'env' on collision)
    */
   builtinNames?: BuiltinNames;
-
-  /**
-   * Enable NodeHttpAdapter for *.localhost subdomain routing.
-   * When true, generates a node-fetch.ts with NodeHttpAdapter (implements GraphQLAdapter)
-   * using node:http/node:https for requests, enabling local development
-   * with subdomain-based routing (e.g. auth.localhost:3000).
-   * No global patching — the adapter is passed to createClient via the adapter option.
-   * @default false
-   */
-  nodeHttpAdapter?: boolean;
 }
 
 /**
@@ -332,6 +322,25 @@ export interface GraphQLSDKConfigTarget {
    * @default false
    */
   orm?: boolean;
+
+  /**
+   * Enable NodeHttpAdapter generation for Node.js applications.
+   * When true, generates a node-fetch.ts with NodeHttpAdapter (implements GraphQLAdapter)
+   * using node:http/node:https for requests, enabling local development
+   * with subdomain-based routing (e.g. auth.localhost:3000).
+   * No global patching — the adapter is passed to createClient via the adapter option.
+   *
+   * When CLI generation is enabled (`cli: true`), this is auto-enabled unless
+   * explicitly set to `false`.
+   *
+   * Can also be used standalone with the ORM client for any Node.js application:
+   * ```ts
+   * import { NodeHttpAdapter } from './orm/node-fetch';
+   * const db = createClient({ adapter: new NodeHttpAdapter(endpoint, headers) });
+   * ```
+   * @default false
+   */
+  nodeHttpAdapter?: boolean;
 
   /**
    * Whether to generate React Query hooks

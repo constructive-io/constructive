@@ -45,8 +45,8 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
       ? cliConfig.toolName
       : 'app';
 
-  const useNodeHttpAdapter =
-    typeof cliConfig === 'object' && !!cliConfig.nodeHttpAdapter;
+  // Use top-level nodeHttpAdapter from config (auto-enabled for CLI by generate.ts)
+  const useNodeHttpAdapter = !!config.nodeHttpAdapter;
 
   const executorFile = generateExecutorFile(toolName, {
     nodeHttpAdapter: useNodeHttpAdapter,

@@ -1,5 +1,5 @@
 /**
- * Node HTTP Adapter for CLI
+ * Node HTTP Adapter for Node.js applications
  *
  * Implements the GraphQLAdapter interface using node:http / node:https
  * instead of the Fetch API. This solves two Node.js limitations:
