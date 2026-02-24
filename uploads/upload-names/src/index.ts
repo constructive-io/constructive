@@ -4,12 +4,12 @@ import slugify from './slugify';
 interface Options {
   english?: boolean;
   lower?: boolean;
-  delimeter?: string;
+  delimiter?: string;
 }
 
 export default (
   filename: string,
-  { english = true, lower = true, delimeter = '-' }: Options = {}
+  { english = true, lower = true, delimiter = '-' }: Options = {}
 ): string => {
   // Step 1: Normalize input
   filename = filename.trim().replace(/\.{2,}/g, '.'); // collapse double dots
@@ -19,8 +19,8 @@ export default (
 
   // Step 2: Normalize base name
   const name = base
-    .replace(/\s+/g, delimeter)
-    .replace(new RegExp(`${delimeter}{2,}`, 'g'), delimeter)
+    .replace(/\s+/g, delimiter)
+    .replace(new RegExp(`${delimiter}{2,}`, 'g'), delimiter)
     .trim();
 
   // Step 3: Sluggify (ASCII-only if english = true)

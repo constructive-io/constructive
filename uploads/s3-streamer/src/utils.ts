@@ -84,6 +84,8 @@ export const uploadFromStream = ({
   return pass;
 };
 
+const UPLOAD_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
 export const asyncUpload = ({
   client,
   key,
@@ -93,6 +95,24 @@ export const asyncUpload = ({
   bucket
 }: AsyncUploadParams): Promise<AsyncUploadResult> => {
   return new Promise((resolve, reject) => {
+    let settled = false;
+
+    const settle = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn();
+    };
+
+    const timer = setTimeout(() => {
+      settle(() => {
+        readStream.destroy();
+        uploadStream.destroy();
+        contentStream.destroy();
+        reject(new Error(`Upload timed out after ${UPLOAD_TIMEOUT_MS / 1000}s for key=${key}`));
+      });
+    }, UPLOAD_TIMEOUT_MS);
+
     // upload stream
     let upload: UploadResult | undefined;
 
@@ -109,14 +129,24 @@ export const asyncUpload = ({
 
     const tryResolve = () => {
       if (contents && upload) {
-        resolve({
-          upload,
-          magic,
-          contentType,
-          contents
+        settle(() => {
+          resolve({
+            upload: upload!,
+            magic,
+            contentType,
+            contents
+          });
         });
       }
     };
+
+    readStream.on('error', (error: Error) => {
+      settle(() => {
+        uploadStream.destroy();
+        contentStream.destroy();
+        reject(error);
+      });
+    });
 
     contentStream
       .on('contents', function (results: unknown) {
@@ -124,7 +154,11 @@ export const asyncUpload = ({
         tryResolve();
       })
       .on('error', (error: Error) => {
-        reject(error);
+        settle(() => {
+          readStream.destroy();
+          uploadStream.destroy();
+          reject(error);
+        });
       });
 
     uploadStream
@@ -133,7 +167,11 @@ export const asyncUpload = ({
         tryResolve();
       })
       .on('error', (error: Error) => {
-        reject(error);
+        settle(() => {
+          readStream.destroy();
+          contentStream.destroy();
+          reject(error);
+        });
       });
 
     // Ensure proper cleanup on stream end

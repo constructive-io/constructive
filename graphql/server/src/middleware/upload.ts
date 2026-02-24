@@ -1,11 +1,13 @@
 import { Logger } from '@pgpmjs/logger';
 import type { PgpmOptions } from '@pgpmjs/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import fs from 'fs';
 import multer from 'multer';
+import os from 'os';
+import path from 'path';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
-import { Readable } from 'stream';
 import { streamToStorage } from 'graphile-settings';
 import type { RlsModule } from '../types';
 import './types';
@@ -16,9 +18,28 @@ const authLog = new Logger('upload-auth');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 const parseFile = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: os.tmpdir(),
+    filename: (_req, file, cb) => {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      cb(null, `upload-${uniqueSuffix}${path.extname(file.originalname)}`);
+    },
+  }),
   limits: { fileSize: MAX_FILE_SIZE },
 }).single('file');
+
+const parseFileWithErrors: RequestHandler = (req, res, next) => {
+  parseFile(req, res, (err: any) => {
+    if (!err) return next();
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ error: `File exceeds maximum size of ${MAX_FILE_SIZE / (1024 * 1024)} MB` });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({ error: 'Unexpected file field. Send a single file as "file".' });
+    }
+    return res.status(400).json({ error: 'File upload failed' });
+  });
+};
 
 const RLS_MODULE_BY_DATABASE_ID_SQL = `
   SELECT
@@ -157,6 +178,13 @@ export const createUploadAuthenticateMiddleware = (
       return;
     }
 
+    const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
+    if (!SAFE_IDENTIFIER.test(privateSchema) || !SAFE_IDENTIFIER.test(authFn)) {
+      authLog.error(`[upload-auth] Invalid SQL identifier: schema=${privateSchema} fn=${authFn}`);
+      authError(res);
+      return;
+    }
+
     const pool = getPgPool({
       ...opts.pg,
       database: api.dbname,
@@ -210,7 +238,7 @@ export const createUploadAuthenticateMiddleware = (
  * 2. GraphQL mutation -> patch row with the returned metadata
  */
 export const uploadRoute: RequestHandler[] = [
-  parseFile,
+  parseFileWithErrors,
   (async (req, res) => {
     if (!req.token?.user_id) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -220,18 +248,24 @@ export const uploadRoute: RequestHandler[] = [
       return res.status(400).json({ error: 'No file provided. Send a "file" field.' });
     }
 
-    const readStream = Readable.from(req.file.buffer);
-    const result = await streamToStorage(readStream, req.file.originalname);
+    try {
+      const readStream = fs.createReadStream(req.file.path);
+      const result = await streamToStorage(readStream, req.file.originalname);
 
-    uploadLog.debug(
-      `[upload] Uploaded file for user=${req.token.user_id} filename=${req.file.originalname} mime=${result.mime} size=${req.file.size}`,
-    );
+      uploadLog.debug(
+        `[upload] Uploaded file for user=${req.token.user_id} filename=${req.file.originalname} mime=${result.mime} size=${req.file.size}`,
+      );
 
-    res.json({
-      url: result.url,
-      filename: result.filename,
-      mime: result.mime,
-      size: req.file.size,
-    });
+      res.json({
+        url: result.url,
+        filename: result.filename,
+        mime: result.mime,
+        size: req.file.size,
+      });
+    } finally {
+      if (req.file?.path) {
+        fs.unlink(req.file.path, () => {});
+      }
+    }
   }) as RequestHandler,
 ];

@@ -23,6 +23,10 @@ function validateIdentifier(name: string, label: string): void {
   }
 }
 
+const MAX_PUBLIC_KEY_LENGTH = 256;
+const MAX_MESSAGE_LENGTH = 4096;
+const MAX_SIGNATURE_LENGTH = 1024;
+
 export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): GraphileConfig.Plugin => {
   const {
     schema,
@@ -90,14 +94,19 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           const $combined = object({ input: $input, withPgClient: $withPgClient });
 
           return lambda($combined, async ({ input, withPgClient }: any) => {
+            if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+              throw new Error('INVALID_PUBLIC_KEY');
+            }
+
             return withPgClient(null, async (pgClient: any) => {
               await pgClient.query('BEGIN');
               try {
                 await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM "${schema}".${sign_up_with_key}($1)`,
-                  variables: [input.publicKey]
+                  query: `SELECT * FROM "${schema}"."${sign_up_with_key}"($1)`,
+                  variables: [input.publicKey],
+                  skipTransaction: true
                 });
 
                 const {
@@ -105,8 +114,9 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 } = await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM "${schema}".${sign_in_request_challenge}($1)`,
-                  variables: [input.publicKey]
+                  query: `SELECT * FROM "${schema}"."${sign_in_request_challenge}"($1)`,
+                  variables: [input.publicKey],
+                  skipTransaction: true
                 });
 
                 await pgClient.query('COMMIT');
@@ -125,14 +135,19 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           const $combined = object({ input: $input, withPgClient: $withPgClient });
 
           return lambda($combined, async ({ input, withPgClient }: any) => {
+            if (!input.publicKey || typeof input.publicKey !== 'string' || input.publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+              throw new Error('INVALID_PUBLIC_KEY');
+            }
+
             return withPgClient(null, async (pgClient: any) => {
               const {
                 rows: [{ [sign_in_request_challenge]: message }]
               } = await pgQueryWithContext({
                 client: pgClient,
                 context: { role: 'anonymous' },
-                query: `SELECT * FROM "${schema}".${sign_in_request_challenge}($1)`,
-                variables: [input.publicKey]
+                query: `SELECT * FROM "${schema}"."${sign_in_request_challenge}"($1)`,
+                variables: [input.publicKey],
+                skipTransaction: true
               });
 
               if (!message) throw new Error('NO_ACCOUNT_EXISTS');
@@ -155,6 +170,16 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
           return lambda($combined, async ({ input, withPgClient }: any) => {
             const { publicKey, message, signature: _signature } = input;
 
+            if (!publicKey || typeof publicKey !== 'string' || publicKey.length > MAX_PUBLIC_KEY_LENGTH) {
+              throw new Error('INVALID_PUBLIC_KEY');
+            }
+            if (!message || typeof message !== 'string' || message.length > MAX_MESSAGE_LENGTH) {
+              throw new Error('INVALID_MESSAGE');
+            }
+            if (!_signature || typeof _signature !== 'string' || _signature.length > MAX_SIGNATURE_LENGTH) {
+              throw new Error('INVALID_SIGNATURE');
+            }
+
             // TODO: Re-implement crypto verification (e.g. using interchainJS).
             // const network = Networks[crypto_network];
             // const result = verifyMessage(message, publicKey, signature, network);
@@ -166,8 +191,9 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM "${schema}".${sign_in_record_failure}($1)`,
-                  variables: [publicKey]
+                  query: `SELECT * FROM "${schema}"."${sign_in_record_failure}"($1)`,
+                  variables: [publicKey],
+                  skipTransaction: true
                 });
                 throw new Error('BAD_SIGNIN');
               }
@@ -180,8 +206,9 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 } = await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM "${schema}".${sign_in_with_challenge}($1, $2)`,
-                  variables: [publicKey, message]
+                  query: `SELECT * FROM "${schema}"."${sign_in_with_challenge}"($1, $2)`,
+                  variables: [publicKey, message],
+                  skipTransaction: true
                 });
 
                 if (!token?.access_token) throw new Error('BAD_SIGNIN');

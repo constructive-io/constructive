@@ -77,9 +77,12 @@ class Server {
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const uploadAuthenticate = createUploadAuthenticateMiddleware(effectiveOpts);
+    const SAFE_REQUEST_ID = /^[a-zA-Z0-9\-_]{1,128}$/;
     const requestLogger: RequestHandler = (req, res, next) => {
       const headerRequestId = req.header('x-request-id');
-      const reqId = headerRequestId || randomUUID();
+      const reqId = (headerRequestId && SAFE_REQUEST_ID.test(headerRequestId))
+        ? headerRequestId
+        : randomUUID();
       const start = process.hrtime.bigint();
 
       req.requestId = reqId;
@@ -140,7 +143,10 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cors(fallbackOrigin));
-    app.use('/graphql', graphqlUpload.graphqlUploadExpress());
+    app.use('/graphql', graphqlUpload.graphqlUploadExpress({
+      maxFileSize: 10 * 1024 * 1024, // 10 MB
+      maxFiles: 10,
+    }));
 
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);

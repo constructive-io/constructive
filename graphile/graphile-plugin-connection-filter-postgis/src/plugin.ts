@@ -244,9 +244,7 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
         // Process function-based operators
         for (const [fn, baseTypes, operatorName, description] of functionSpecs) {
           for (const baseType of baseTypes) {
-            const sqlGisFunction = schemaName === 'public'
-              ? sql.identifier(fn.toLowerCase())
-              : sql.identifier(schemaName, fn.toLowerCase());
+            const sqlGisFunction = sql.identifier(schemaName, fn.toLowerCase());
 
             allSpecs.push({
               typeNames: gqlTypeNamesByBase[baseType],
@@ -270,7 +268,7 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
         }
 
         // Sort by operator name for deterministic schema output
-        allSpecs.sort((a, b) => (a.operatorName > b.operatorName ? 1 : -1));
+        allSpecs.sort((a, b) => a.operatorName.localeCompare(b.operatorName));
 
         // Register each operator with the connection filter plugin
         for (const spec of allSpecs) {

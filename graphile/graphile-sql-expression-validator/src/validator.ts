@@ -148,6 +148,8 @@ const FORBIDDEN_TYPE_CASTS = new Set([
   'regdictionary'
 ]);
 
+const MAX_AST_DEPTH = 100;
+
 // ─── Internal helpers ─────────────────────────────────────────────
 
 /**
@@ -180,6 +182,13 @@ function validateAstNode(
   allowedSchemas: readonly string[],
   path: string[]
 ): AstNodeValidationResult {
+  if (path.length > MAX_AST_DEPTH) {
+    return {
+      valid: false,
+      error: `AST exceeds maximum depth of ${MAX_AST_DEPTH} at path: ${path.join('.')}`
+    };
+  }
+
   if (node === null || node === undefined || typeof node !== 'object') {
     return { valid: true };
   }
@@ -242,6 +251,13 @@ function validateAstNode(
           return {
             valid: false,
             error: `Function schema "${schemaName}" is not in the allowed schemas list`
+          };
+        }
+        // Also validate the function name when schema-qualified
+        if (!allowedFunctions.has(functionName.toLowerCase())) {
+          return {
+            valid: false,
+            error: `Function "${schemaName}.${functionName}" is not in the allowed functions list`
           };
         }
       } else {

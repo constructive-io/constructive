@@ -60,15 +60,6 @@ interface FtsRankSlot {
 }
 const ftsRankSlots = new WeakMap<object, FtsRankSlot>();
 
-/**
- * FinalizationRegistry for defensive cleanup of ftsRankSlots entries.
- * WeakMap entries are already eligible for GC when keys are unreachable,
- * but this provides explicit cleanup and a hook for debugging leaks.
- */
-const ftsRankCleanup = new FinalizationRegistry<object>((heldValue) => {
-  ftsRankSlots.delete(heldValue);
-});
-
 function isTsvectorCodec(codec: any): boolean {
   return (
     codec?.extensions?.pg?.schemaName === 'pg_catalog' &&
@@ -191,7 +182,6 @@ export function createPgSearchPlugin(
                         ftsRankSlots.set(alias, {
                           indices: Object.create(null),
                         });
-                        ftsRankCleanup.register($select, alias);
                       }
 
                       // Return a lambda that reads the rank value from the result

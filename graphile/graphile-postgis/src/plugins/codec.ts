@@ -106,6 +106,9 @@ function buildGisCodec(
      * The result is cast to ::text so PostgreSQL sends it as a string,
      * which fromPg then JSON.parses.
      */
+    // NOTE: `fragment` is evaluated 4 times in the SQL. This is acceptable because
+    // PostGraphile v5 always passes simple column references here.
+    // If this changes, consider wrapping in a LATERAL subexpression.
     castFromPg(fragment: SQL): SQL {
       return sql.fragment`(case when (${fragment}) is null then null else json_build_object(
         '__gisType', ${sql.identifier(schemaName, 'geometrytype')}(${fragment}),
@@ -122,7 +125,15 @@ function buildGisCodec(
      * We normalize __gisType from PostGIS uppercase to our mixed-case format.
      */
     fromPg(value: string): GisFieldValue {
-      const parsed = JSON.parse(value);
+      let parsed: any;
+      try {
+        parsed = JSON.parse(value);
+      } catch (e) {
+        throw new Error(
+          `Failed to parse PostGIS geometry value: ${e instanceof Error ? e.message : String(e)}. ` +
+          `Raw value (first 200 chars): ${String(value).slice(0, 200)}`
+        );
+      }
       if (parsed && typeof parsed === 'object' && parsed.__gisType) {
         parsed.__gisType = normalizeGisType(parsed.__gisType);
       }

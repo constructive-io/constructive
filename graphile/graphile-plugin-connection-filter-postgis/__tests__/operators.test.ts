@@ -279,7 +279,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
 
   describe('SQL generation', () => {
     describe('function-based operators', () => {
-      it('generates correct SQL for public schema', () => {
+      it('generates schema-qualified SQL for public schema', () => {
         const { registered } = runPlugin({ schemaName: 'public' });
         const containsOp = registered.find(r => r.operatorName === 'contains');
         expect(containsOp).toBeDefined();
@@ -291,7 +291,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
           operatorName: 'contains'
         });
         const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"st_contains"("col", "val")');
+        expect(compiled.text).toBe('"public"."st_contains"("col", "val")');
       });
 
       it('generates schema-qualified SQL for non-public schema', () => {
@@ -321,7 +321,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
           operatorName: 'intersects3D'
         });
         const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"st_3dintersects"("a", "b")');
+        expect(compiled.text).toBe('"public"."st_3dintersects"("a", "b")');
       });
     });
 

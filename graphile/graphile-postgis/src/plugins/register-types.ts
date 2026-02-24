@@ -52,7 +52,10 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
           }
         } = build;
 
-        const constructedTypes = build.pgGISGraphQLTypesByCodecAndSubtype!;
+        const constructedTypes = build.pgGISGraphQLTypesByCodecAndSubtype;
+        if (!constructedTypes) {
+          return _;
+        }
 
         const { geometryCodec, geographyCodec } = postgisInfo;
 
@@ -65,7 +68,21 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
               'The `GeoJSON` scalar type represents GeoJSON values as specified by ' +
               '[RFC 7946](https://tools.ietf.org/html/rfc7946).',
             serialize: (value: unknown) => value,
-            parseValue: (value: unknown) => value,
+            parseValue: (value: unknown) => {
+              if (value === null || value === undefined) return value;
+              if (typeof value !== 'object' || Array.isArray(value)) {
+                throw new TypeError('GeoJSON must be an object');
+              }
+              const obj = value as Record<string, unknown>;
+              if (typeof obj.type !== 'string') {
+                throw new TypeError('GeoJSON must have a "type" string property');
+              }
+              const validTypes = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection', 'Feature', 'FeatureCollection'];
+              if (!validTypes.includes(obj.type)) {
+                throw new TypeError(`GeoJSON type "${obj.type}" is not a recognized GeoJSON type`);
+              }
+              return value;
+            },
             parseLiteral(ast: ValueNode, variables?: Record<string, unknown>) {
               return parseLiteralGeoJSON(ast, variables, Kind);
             }
@@ -94,22 +111,29 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
             },
             () => ({
               description: `All ${typeName} types implement this interface`,
-              fields: () => ({
-                [inflection.geojsonFieldName()]: {
-                  type: build.getTypeByName('GeoJSON')!,
-                  description: 'Converts the object to GeoJSON'
-                },
-                srid: {
-                  type: new GraphQLNonNull(GraphQLInt),
-                  description: 'Spatial reference identifier (SRID)'
+              fields: () => {
+                const geoJsonType = build.getTypeByName('GeoJSON');
+                if (!geoJsonType) {
+                  throw new Error('PostGIS: GeoJSON scalar type not found.');
                 }
-              }),
+                return {
+                  [inflection.geojsonFieldName()]: {
+                    type: geoJsonType,
+                    description: 'Converts the object to GeoJSON'
+                  },
+                  srid: {
+                    type: new GraphQLNonNull(GraphQLInt),
+                    description: 'Spatial reference identifier (SRID)'
+                  }
+                };
+              },
               resolveType(value: GisFieldValue) {
                 const gisTypeKey = value.__gisType;
                 const resolvedTypeName = constructedTypes[key]?.[gisTypeKey];
                 if (typeof resolvedTypeName === 'string') {
                   return resolvedTypeName;
                 }
+                console.warn(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
                 return undefined;
               }
             }),
@@ -132,22 +156,29 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                 },
                 () => ({
                   description: `All ${typeName} ${coords[zmflag]} types implement this interface`,
-                  fields: () => ({
-                    [inflection.geojsonFieldName()]: {
-                      type: build.getTypeByName('GeoJSON')!,
-                      description: 'Converts the object to GeoJSON'
-                    },
-                    srid: {
-                      type: new GraphQLNonNull(GraphQLInt),
-                      description: 'Spatial reference identifier (SRID)'
+                  fields: () => {
+                    const geoJsonType = build.getTypeByName('GeoJSON');
+                    if (!geoJsonType) {
+                      throw new Error('PostGIS: GeoJSON scalar type not found.');
                     }
-                  }),
+                    return {
+                      [inflection.geojsonFieldName()]: {
+                        type: geoJsonType,
+                        description: 'Converts the object to GeoJSON'
+                      },
+                      srid: {
+                        type: new GraphQLNonNull(GraphQLInt),
+                        description: 'Spatial reference identifier (SRID)'
+                      }
+                    };
+                  },
                   resolveType(value: GisFieldValue) {
                     const gisTypeKey = value.__gisType;
                     const concreteTypeName = constructedTypes[key]?.[gisTypeKey];
                     if (typeof concreteTypeName === 'string') {
                       return concreteTypeName;
                     }
+                    console.warn(`PostGIS: Could not resolve type for __gisType="${gisTypeKey}" on codec="${key}". Known types: ${Object.keys(constructedTypes[key] ?? {}).join(', ')}`);
                     return undefined;
                   }
                 }),
@@ -173,10 +204,15 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                       build.getTypeByName(mainInterfaceName),
                       build.getTypeByName(dimInterfaceName)
                     ].filter(Boolean),
-                    fields: () => ({
-                      [inflection.geojsonFieldName()]: {
-                        type: build.getTypeByName('GeoJSON')!,
-                        description: 'Converts the object to GeoJSON',
+                    fields: () => {
+                      const geoJsonType = build.getTypeByName('GeoJSON');
+                      if (!geoJsonType) {
+                        throw new Error('PostGIS: GeoJSON scalar type not found.');
+                      }
+                      return {
+                        [inflection.geojsonFieldName()]: {
+                          type: geoJsonType,
+                          description: 'Converts the object to GeoJSON',
                         resolve(data: GisFieldValue) {
                           return data.__geojson;
                         }
@@ -188,7 +224,8 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
                           return data.__srid;
                         }
                       }
-                    })
+                    };
+                    }
                   }),
                   `PostgisRegisterTypesPlugin registering ${concreteTypeName} type`
                 );
@@ -235,7 +272,10 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
         }
 
         const { schemaName } = postgisInfo;
-        const constructedTypes = build.pgGISGraphQLTypesByCodecAndSubtype!;
+        const constructedTypes = build.pgGISGraphQLTypesByCodecAndSubtype;
+        if (!constructedTypes) {
+          return build;
+        }
 
         return build.extend(build, {
           getPostgisTypeByGeometryType(
@@ -257,10 +297,7 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
             // PostGIS function names MUST be lowercase for PostgreSQL identifier matching
             const params = [
               sql.literal('__gisType'),
-              sql.fragment`${sql.identifier(schemaName, 'postgis_type_name')}(
-                ${sql.identifier(schemaName, 'geometrytype')}(${fragment}),
-                ${sql.identifier(schemaName, 'st_coorddim')}(${fragment}::text)
-              )`,
+              sql.fragment`${sql.identifier(schemaName, 'geometrytype')}(${fragment})`,
               sql.literal('__srid'),
               sql.fragment`${sql.identifier(schemaName, 'st_srid')}(${fragment})`,
               sql.literal('__geojson'),
@@ -274,9 +311,9 @@ export const PostgisRegisterTypesPlugin: GraphileConfig.Plugin = {
           pgGISFromGeoJSON(value: Record<string, unknown>, codecName: string): SQL {
             const jsonStr = sql.value(JSON.stringify(value));
             if (codecName === 'geography') {
-              return sql.fragment`st_geomfromgeojson(${jsonStr}::text)::${sql.identifier(schemaName, 'geography')}`;
+              return sql.fragment`${sql.identifier(schemaName, 'st_geomfromgeojson')}(${jsonStr}::text)::${sql.identifier(schemaName, 'geography')}`;
             }
-            return sql.fragment`st_geomfromgeojson(${jsonStr}::text)`;
+            return sql.fragment`${sql.identifier(schemaName, 'st_geomfromgeojson')}(${jsonStr}::text)`;
           }
         }, 'PostgisRegisterTypesPlugin adding PostGIS helpers to build');
       },

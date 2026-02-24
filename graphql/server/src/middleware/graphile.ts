@@ -183,9 +183,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const inFlight = creating.get(key);
       if (inFlight) {
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
-
-        const instance = await inFlight;
-        return instance.handler(req, res, next);
+        try {
+          const instance = await inFlight;
+          return instance.handler(req, res, next);
+        } catch (error) {
+          log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
+          // Fall through to Phase C to retry creation
+        }
       }
 
       // =========================================================================
@@ -232,7 +236,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
-      return res.status(500).send(e.message);
+      if (!res.headersSent) {
+        return res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }
+        });
+      }
     }
   };
 };

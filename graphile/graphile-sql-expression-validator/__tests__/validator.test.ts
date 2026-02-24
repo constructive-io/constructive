@@ -308,20 +308,38 @@ describe('parseAndValidateSqlExpression', () => {
       expect(result.error).toContain('not in the allowed schemas list');
     });
 
-    it('should accept schema-qualified calls when schema is allowed', async () => {
+    it('should accept schema-qualified calls when schema and function are allowed', async () => {
       const result = await parseAndValidateSqlExpression(
         'app_public.my_func()',
-        { allowedSchemas: ['app_public'] }
+        { allowedSchemas: ['app_public'], allowedFunctions: ['my_func'] }
       );
       expect(result.valid).toBe(true);
     });
 
-    it('should accept any function from an allowed schema', async () => {
+    it('should reject schema-qualified calls when schema is allowed but function is not', async () => {
+      const result = await parseAndValidateSqlExpression(
+        'app_public.my_func()',
+        { allowedSchemas: ['app_public'] }
+      );
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('not in the allowed functions list');
+    });
+
+    it('should accept a schema-qualified function when both schema and function are allowed', async () => {
+      const result = await parseAndValidateSqlExpression(
+        'app_public.dangerous_func()',
+        { allowedSchemas: ['app_public'], allowedFunctions: ['dangerous_func'] }
+      );
+      expect(result.valid).toBe(true);
+    });
+
+    it('should reject a schema-qualified function when schema is allowed but function is not', async () => {
       const result = await parseAndValidateSqlExpression(
         'app_public.dangerous_func()',
         { allowedSchemas: ['app_public'] }
       );
-      expect(result.valid).toBe(true);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('not in the allowed functions list');
     });
 
     it('should reject functions from a different schema', async () => {
@@ -335,7 +353,8 @@ describe('parseAndValidateSqlExpression', () => {
 
     it('should handle multiple allowed schemas', async () => {
       const options: SqlExpressionValidatorOptions = {
-        allowedSchemas: ['schema_a', 'schema_b']
+        allowedSchemas: ['schema_a', 'schema_b'],
+        allowedFunctions: ['func_a', 'func_b']
       };
       const resultA = await parseAndValidateSqlExpression(
         'schema_a.func_a()',
