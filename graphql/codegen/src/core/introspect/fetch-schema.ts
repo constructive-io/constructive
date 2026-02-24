@@ -12,6 +12,7 @@ interface HttpResponse {
   statusCode: number;
   statusMessage: string;
   data: string;
+  headers: http.IncomingHttpHeaders;
 }
 
 /**
@@ -37,6 +38,7 @@ function makeRequest(
           statusCode: res.statusCode || 0,
           statusMessage: res.statusMessage || '',
           data,
+          headers: res.headers,
         });
       });
     });
@@ -70,6 +72,69 @@ export interface FetchSchemaResult {
   error?: string;
   statusCode?: number;
 }
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+};
+
+const truncate = (value: string, maxLength: number): string => {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength - 3)}...`;
+};
+
+const safeStringify = (value: unknown): string => {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+};
+
+const toSingleHeaderValue = (value: string | string[] | undefined): string => {
+  if (!value) {
+    return '';
+  }
+
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+
+  return value;
+};
+
+const summarizeGraphQLError = (entry: unknown, index: number): string => {
+  if (typeof entry === 'string' && entry.trim().length > 0) {
+    return entry.trim();
+  }
+
+  if (!isRecord(entry)) {
+    return `error_${index + 1}`;
+  }
+
+  const message =
+    typeof entry.message === 'string' && entry.message.trim().length > 0
+      ? entry.message.trim()
+      : undefined;
+  const code =
+    isRecord(entry.extensions) && typeof entry.extensions.code === 'string'
+      ? entry.extensions.code
+      : undefined;
+
+  if (message && code) {
+    return `${message} (code=${code})`;
+  }
+  if (message) {
+    return message;
+  }
+  if (code) {
+    return code;
+  }
+
+  return truncate(safeStringify(entry), 200);
+};
 
 /**
  * Fetch the full schema introspection from a GraphQL endpoint
@@ -105,23 +170,44 @@ export async function fetchSchema(
     const response = await makeRequest(url, requestOptions, body, timeout);
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
+      const bodySnippet = truncate(response.data.trim(), 200);
       return {
         success: false,
-        error: `HTTP ${response.statusCode}: ${response.statusMessage}`,
+        error:
+          bodySnippet.length > 0
+            ? `HTTP ${response.statusCode}: ${response.statusMessage}. Response body: ${bodySnippet}`
+            : `HTTP ${response.statusCode}: ${response.statusMessage}`,
         statusCode: response.statusCode,
       };
     }
 
-    const json = JSON.parse(response.data) as {
+    let json: {
       data?: IntrospectionQueryResponse;
-      errors?: Array<{ message: string }>;
+      errors?: unknown[];
     };
-
-    if (json.errors && json.errors.length > 0) {
-      const errorMessages = json.errors.map((e) => e.message).join('; ');
+    try {
+      json = JSON.parse(response.data) as {
+        data?: IntrospectionQueryResponse;
+        errors?: unknown[];
+      };
+    } catch {
+      const contentType = toSingleHeaderValue(response.headers['content-type']);
+      const bodySnippet = truncate(response.data.trim(), 200);
       return {
         success: false,
-        error: `GraphQL errors: ${errorMessages}`,
+        error: `Invalid JSON response from GraphQL endpoint (content-type: ${contentType || 'unknown'}). Body: ${bodySnippet || '[empty]'}`,
+        statusCode: response.statusCode,
+      };
+    }
+
+    if (json.errors && json.errors.length > 0) {
+      const errorMessages = json.errors
+        .map((entry, index) => summarizeGraphQLError(entry, index))
+        .filter((message) => message.length > 0)
+        .join('; ');
+      return {
+        success: false,
+        error: `GraphQL errors: ${errorMessages || 'Unknown GraphQL error'}`,
         statusCode: response.statusCode,
       };
     }
