@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.4.0...@constructive-io/graphql-codegen@4.4.1) (2026-02-24)
+
+### Bug Fixes
+
+- **codegen:** pass typeRegistry to CLI generation for proper required/optional field detection ([1546f45](https://github.com/constructive-io/constructive/commit/1546f458dc8145f2042d518b1d0a5ac499b44c29))
+
 # [4.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.3.0...@constructive-io/graphql-codegen@4.4.0) (2026-02-24)
 
 ### Bug Fixes
