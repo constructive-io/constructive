@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.1.1...graphile-settings@4.2.0) (2026-02-24)
+
+### Features
+
+- **graphile-settings:** enable v5 postgis upload and sql presets ([68db553](https://github.com/constructive-io/constructive/commit/68db5535095d784cc8b2c690054977ebcb3e8f69))
+- **upload:** add storage resolver and mime prechecks ([e4f95fd](https://github.com/constructive-io/constructive/commit/e4f95fd5c00b6059bd6eda7693ee59d5792a8bd5))
+
 ## [4.1.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.1.0...graphile-settings@4.1.1) (2026-02-19)
 
 **Note:** Version bump only for package graphile-settings

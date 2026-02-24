@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter-postgis",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGIS operators for postgraphile-plugin-connection-filter (PostGraphile v5)",
   "main": "index.js",
@@ -28,15 +28,14 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "dependencies": {},
   "peerDependencies": {
     "graphile-build": "^5.0.0-rc.4",
     "graphile-config": "^1.0.0-rc.5",
+    "graphile-postgis": "^2.0.0",
     "graphql": "^16.9.0",
     "pg-sql2": "^5.0.0-rc.4",
     "postgraphile": "^5.0.0-rc.4",
-    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1",
-    "graphile-postgis": "^2.0.0"
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
   },
   "peerDependenciesMeta": {
     "postgraphile-plugin-connection-filter": {

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.1.1...@constructive-io/graphql-server@4.2.0) (2026-02-24)
+
+### Features
+
+- **graphql-server:** mask unexpected graphile errors ([27ce069](https://github.com/constructive-io/constructive/commit/27ce069e691022de209790084a90fdc03f72105f))
+- **upload:** add authenticated /upload endpoint middleware ([75bf841](https://github.com/constructive-io/constructive/commit/75bf8412968e5c80649ea2e6dfb5661eab1d4861))
+
 ## [4.1.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.1.0...@constructive-io/graphql-server@4.1.1) (2026-02-19)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

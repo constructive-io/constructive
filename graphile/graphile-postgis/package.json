@@ -1,6 +1,6 @@
 {
   "name": "graphile-postgis",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "PostGIS support for PostGraphile v5",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -40,7 +40,6 @@
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@dataplan/pg": "^1.0.0-rc.5",
     "grafast": "^1.0.0-rc.7",
@@ -54,8 +53,8 @@
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
     "@types/node": "^22.19.1",
-    "makage": "^0.1.10",
     "graphile-test": "workspace:^",
+    "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   }
 }

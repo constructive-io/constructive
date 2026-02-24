@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.12.0...@constructive-io/s3-streamer@2.13.0) (2026-02-24)
+
+### Features
+
+- **upload:** add storage resolver and mime prechecks ([e4f95fd](https://github.com/constructive-io/constructive/commit/e4f95fd5c00b6059bd6eda7693ee59d5792a8bd5))
+
 # [2.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.11.0...@constructive-io/s3-streamer@2.12.0) (2026-02-19)
 
 **Note:** Version bump only for package @constructive-io/s3-streamer
