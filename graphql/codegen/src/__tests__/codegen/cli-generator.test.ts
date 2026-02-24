@@ -15,6 +15,7 @@ import {
   generateOrmReadme,
   generateOrmAgentsDocs,
   getOrmMcpTools,
+  generateOrmAgentCatalog,
   generateOrmSkills,
 } from '../../core/codegen/orm/docs-generator';
 import {
@@ -313,6 +314,43 @@ describe('orm docs generator', () => {
       expect(tool.description).toBeDefined();
       expect(tool.inputSchema).toBeDefined();
     }
+  });
+
+  it('generates permissive create tool schemas', () => {
+    const tools = getOrmMcpTools([carTable], []);
+    const createTool = tools.find((tool) => tool.name === 'orm_car_create');
+    expect(createTool).toBeDefined();
+    expect((createTool!.inputSchema as { required?: string[] }).required).toBeUndefined();
+  });
+
+  it('generates ORM agent catalog', () => {
+    const catalog = generateOrmAgentCatalog([carTable, driverTable], allCustomOps);
+    expect(catalog.fileName).toBe('agent-catalog.json');
+    const parsed = JSON.parse(catalog.content) as {
+      version: number;
+      generatedAt: string;
+      tools: Array<{
+        name: string;
+        _meta: {
+          orm: {
+            kind: 'model' | 'custom';
+            method: string;
+            supportsSelect: boolean;
+          };
+          policy: {
+            capability: string;
+            riskClass: string;
+          };
+        };
+      }>;
+    };
+    expect(parsed.version).toBe(1);
+    expect(parsed.generatedAt).toBeDefined();
+    expect(parsed.tools.length).toBeGreaterThan(0);
+    expect(parsed.tools[0]?._meta.orm.kind).toBeDefined();
+    expect(parsed.tools[0]?._meta.orm.method).toBeDefined();
+    expect(parsed.tools[0]?._meta.policy.capability).toBeDefined();
+    expect(parsed.tools[0]?._meta.policy.riskClass).toBeDefined();
   });
 
   it('generates ORM skill files', () => {

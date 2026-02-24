@@ -16,6 +16,116 @@ import {
   fieldTypeToTs,
 } from '../utils';
 
+type OrmPolicyCapability = 'read' | 'write' | 'destructive';
+type OrmPolicyRiskClass = 'read_only' | 'low' | 'destructive';
+type OrmToolMethod =
+  | 'findMany'
+  | 'findOne'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'query'
+  | 'mutation';
+
+interface OrmToolPolicyMeta {
+  capability: OrmPolicyCapability;
+  riskClass: OrmPolicyRiskClass;
+}
+
+interface OrmToolDispatchMeta {
+  kind: 'model' | 'custom';
+  method: OrmToolMethod;
+  model?: string;
+  accessor?: 'query' | 'mutation';
+  operationName?: string;
+  pkField?: string;
+  hasArgs: boolean;
+  argShape:
+    | 'modelFindMany'
+    | 'modelFindOne'
+    | 'modelCreateFlat'
+    | 'modelUpdateFlat'
+    | 'modelDeleteFlat'
+    | 'customOperation';
+  supportsSelect: boolean;
+  defaultSelect: string[];
+  scalarFields: string[];
+  editableFields: string[];
+}
+
+interface OrmToolMeta {
+  orm: OrmToolDispatchMeta;
+  policy: OrmToolPolicyMeta;
+}
+
+export interface OrmMcpTool extends McpTool {
+  _meta: OrmToolMeta;
+}
+
+export interface OrmAgentCatalog {
+  version: 1;
+  generatedAt: string;
+  tools: OrmMcpTool[];
+}
+
+const resolvePolicyForMethod = (
+  method: OrmToolMethod,
+): OrmToolPolicyMeta => {
+  if (method === 'delete') {
+    return {
+      capability: 'destructive',
+      riskClass: 'destructive',
+    };
+  }
+
+  if (method === 'create' || method === 'update' || method === 'mutation') {
+    return {
+      capability: 'write',
+      riskClass: 'low',
+    };
+  }
+
+  return {
+    capability: 'read',
+    riskClass: 'read_only',
+  };
+};
+
+const buildDefaultModelSelect = (
+  scalarFieldNames: string[],
+  primaryKey: string,
+): string[] => {
+  const uniqueFields = new Set<string>();
+  uniqueFields.add(primaryKey);
+  for (const field of scalarFieldNames) {
+    if (field !== primaryKey) {
+      uniqueFields.add(field);
+    }
+    if (uniqueFields.size >= 3) {
+      break;
+    }
+  }
+  return Array.from(uniqueFields);
+};
+
+const unwrapTypeRef = (
+  typeRef: CleanOperation['returnType'],
+): CleanOperation['returnType'] => {
+  if ((typeRef.kind === 'NON_NULL' || typeRef.kind === 'LIST') && typeRef.ofType) {
+    return unwrapTypeRef(typeRef.ofType as CleanOperation['returnType']);
+  }
+  return typeRef;
+};
+
+const supportsCustomSelect = (op: CleanOperation): boolean => {
+  const unwrapped = unwrapTypeRef(op.returnType);
+  return (
+    unwrapped.kind !== 'SCALAR' &&
+    unwrapped.kind !== 'ENUM' &&
+    unwrapped.kind !== 'INPUT_OBJECT'
+  );
+};
+
 export function generateOrmReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
@@ -309,14 +419,17 @@ export function generateOrmAgentsDocs(
 export function getOrmMcpTools(
   tables: CleanTable[],
   customOperations: CleanOperation[],
-): McpTool[] {
-  const tools: McpTool[] = [];
+): OrmMcpTool[] {
+  const tools: OrmMcpTool[] = [];
 
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
     const scalarFields = getScalarFields(table);
     const editableFields = getEditableFields(table);
+    const scalarFieldNames = scalarFields.map((f) => f.name);
+    const editableFieldNames = editableFields.map((f) => f.name);
+    const defaultSelect = buildDefaultModelSelect(scalarFieldNames, pk.name);
 
     tools.push({
       name: `orm_${lcFirst(singularName)}_findMany`,
@@ -334,6 +447,21 @@ export function getOrmMcpTools(
           },
         },
       },
+      _meta: {
+        orm: {
+          kind: 'model',
+          method: 'findMany',
+          model: lcFirst(singularName),
+          pkField: pk.name,
+          hasArgs: true,
+          argShape: 'modelFindMany',
+          supportsSelect: true,
+          defaultSelect,
+          scalarFields: scalarFieldNames,
+          editableFields: editableFieldNames,
+        },
+        policy: resolvePolicyForMethod('findMany'),
+      },
     });
 
     tools.push({
@@ -348,6 +476,21 @@ export function getOrmMcpTools(
           },
         },
         required: [pk.name],
+      },
+      _meta: {
+        orm: {
+          kind: 'model',
+          method: 'findOne',
+          model: lcFirst(singularName),
+          pkField: pk.name,
+          hasArgs: true,
+          argShape: 'modelFindOne',
+          supportsSelect: true,
+          defaultSelect,
+          scalarFields: scalarFieldNames,
+          editableFields: editableFieldNames,
+        },
+        policy: resolvePolicyForMethod('findOne'),
       },
     });
 
@@ -364,7 +507,21 @@ export function getOrmMcpTools(
       inputSchema: {
         type: 'object',
         properties: createProps,
-        required: editableFields.map((f) => f.name),
+      },
+      _meta: {
+        orm: {
+          kind: 'model',
+          method: 'create',
+          model: lcFirst(singularName),
+          pkField: pk.name,
+          hasArgs: true,
+          argShape: 'modelCreateFlat',
+          supportsSelect: true,
+          defaultSelect: [pk.name],
+          scalarFields: scalarFieldNames,
+          editableFields: editableFieldNames,
+        },
+        policy: resolvePolicyForMethod('create'),
       },
     });
 
@@ -388,6 +545,21 @@ export function getOrmMcpTools(
         properties: updateProps,
         required: [pk.name],
       },
+      _meta: {
+        orm: {
+          kind: 'model',
+          method: 'update',
+          model: lcFirst(singularName),
+          pkField: pk.name,
+          hasArgs: true,
+          argShape: 'modelUpdateFlat',
+          supportsSelect: true,
+          defaultSelect: [pk.name],
+          scalarFields: scalarFieldNames,
+          editableFields: editableFieldNames,
+        },
+        policy: resolvePolicyForMethod('update'),
+      },
     });
 
     tools.push({
@@ -404,18 +576,27 @@ export function getOrmMcpTools(
         required: [pk.name],
       },
       _meta: {
-        fields: scalarFields.map((f) => ({
-          name: f.name,
-          type: f.type.gqlType,
-          editable: editableFields.some((ef) => ef.name === f.name),
-          primaryKey: f.name === pk.name,
-        })),
+        orm: {
+          kind: 'model',
+          method: 'delete',
+          model: lcFirst(singularName),
+          pkField: pk.name,
+          hasArgs: true,
+          argShape: 'modelDeleteFlat',
+          supportsSelect: true,
+          defaultSelect: [pk.name],
+          scalarFields: scalarFieldNames,
+          editableFields: editableFieldNames,
+        },
+        policy: resolvePolicyForMethod('delete'),
       },
     });
   }
 
   for (const op of customOperations) {
     const accessor = op.kind === 'query' ? 'query' : 'mutation';
+    const method: OrmToolMethod = accessor;
+    const supportsSelect = supportsCustomSelect(op);
     const props: Record<string, unknown> = {};
     const required: string[] = [];
 
@@ -440,10 +621,41 @@ export function getOrmMcpTools(
         properties: props,
         ...(required.length > 0 ? { required } : {}),
       },
+      _meta: {
+        orm: {
+          kind: 'custom',
+          method,
+          accessor,
+          operationName: op.name,
+          hasArgs: op.args.length > 0,
+          argShape: 'customOperation',
+          supportsSelect,
+          defaultSelect: supportsSelect ? ['__typename'] : [],
+          scalarFields: [],
+          editableFields: [],
+        },
+        policy: resolvePolicyForMethod(method),
+      },
     });
   }
 
   return tools;
+}
+
+export function generateOrmAgentCatalog(
+  tables: CleanTable[],
+  customOperations: CleanOperation[],
+): GeneratedDocFile {
+  const catalog: OrmAgentCatalog = {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    tools: getOrmMcpTools(tables, customOperations),
+  };
+
+  return {
+    fileName: 'agent-catalog.json',
+    content: JSON.stringify(catalog, null, 2),
+  };
 }
 
 export function generateOrmSkills(

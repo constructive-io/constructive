@@ -11,7 +11,7 @@ export interface McpTool {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  _meta?: Record<string, unknown>;
+  _meta?: unknown;
 }
 
 export interface SkillDefinition {

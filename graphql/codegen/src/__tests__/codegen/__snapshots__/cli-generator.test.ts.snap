@@ -4948,6 +4948,40 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "description": "Offset for pagination"
           }
         }
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "findMany",
+          "model": "car",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelFindMany",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id",
+            "make",
+            "model"
+          ],
+          "scalarFields": [
+            "id",
+            "make",
+            "model",
+            "year",
+            "isElectric",
+            "createdAt"
+          ],
+          "editableFields": [
+            "make",
+            "model",
+            "year",
+            "isElectric"
+          ]
+        },
+        "policy": {
+          "capability": "read",
+          "riskClass": "read_only"
+        }
       }
     },
     {
@@ -4964,6 +4998,40 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "required": [
           "id"
         ]
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "findOne",
+          "model": "car",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelFindOne",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id",
+            "make",
+            "model"
+          ],
+          "scalarFields": [
+            "id",
+            "make",
+            "model",
+            "year",
+            "isElectric",
+            "createdAt"
+          ],
+          "editableFields": [
+            "make",
+            "model",
+            "year",
+            "isElectric"
+          ]
+        },
+        "policy": {
+          "capability": "read",
+          "riskClass": "read_only"
+        }
       }
     },
     {
@@ -4988,13 +5056,39 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "type": "boolean",
             "description": "Car isElectric"
           }
+        }
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "create",
+          "model": "car",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelCreateFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "make",
+            "model",
+            "year",
+            "isElectric",
+            "createdAt"
+          ],
+          "editableFields": [
+            "make",
+            "model",
+            "year",
+            "isElectric"
+          ]
         },
-        "required": [
-          "make",
-          "model",
-          "year",
-          "isElectric"
-        ]
+        "policy": {
+          "capability": "write",
+          "riskClass": "low"
+        }
       }
     },
     {
@@ -5027,6 +5121,38 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "required": [
           "id"
         ]
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "update",
+          "model": "car",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelUpdateFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "make",
+            "model",
+            "year",
+            "isElectric",
+            "createdAt"
+          ],
+          "editableFields": [
+            "make",
+            "model",
+            "year",
+            "isElectric"
+          ]
+        },
+        "policy": {
+          "capability": "write",
+          "riskClass": "low"
+        }
       }
     },
     {
@@ -5045,44 +5171,36 @@ exports[`target docs generator generates combined MCP config 1`] = `
         ]
       },
       "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "make",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "model",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "year",
-            "type": "Int",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "isElectric",
-            "type": "Boolean",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "createdAt",
-            "type": "Datetime",
-            "editable": false,
-            "primaryKey": false
-          }
-        ]
+        "orm": {
+          "kind": "model",
+          "method": "delete",
+          "model": "car",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelDeleteFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "make",
+            "model",
+            "year",
+            "isElectric",
+            "createdAt"
+          ],
+          "editableFields": [
+            "make",
+            "model",
+            "year",
+            "isElectric"
+          ]
+        },
+        "policy": {
+          "capability": "destructive",
+          "riskClass": "destructive"
+        }
       }
     },
     {
@@ -5100,6 +5218,35 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "description": "Offset for pagination"
           }
         }
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "findMany",
+          "model": "driver",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelFindMany",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "scalarFields": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "editableFields": [
+            "name",
+            "licenseNumber"
+          ]
+        },
+        "policy": {
+          "capability": "read",
+          "riskClass": "read_only"
+        }
       }
     },
     {
@@ -5116,6 +5263,35 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "required": [
           "id"
         ]
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "findOne",
+          "model": "driver",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelFindOne",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "scalarFields": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "editableFields": [
+            "name",
+            "licenseNumber"
+          ]
+        },
+        "policy": {
+          "capability": "read",
+          "riskClass": "read_only"
+        }
       }
     },
     {
@@ -5132,11 +5308,34 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "type": "string",
             "description": "Driver licenseNumber"
           }
+        }
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "create",
+          "model": "driver",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelCreateFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "editableFields": [
+            "name",
+            "licenseNumber"
+          ]
         },
-        "required": [
-          "name",
-          "licenseNumber"
-        ]
+        "policy": {
+          "capability": "write",
+          "riskClass": "low"
+        }
       }
     },
     {
@@ -5161,6 +5360,33 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "required": [
           "id"
         ]
+      },
+      "_meta": {
+        "orm": {
+          "kind": "model",
+          "method": "update",
+          "model": "driver",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelUpdateFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "editableFields": [
+            "name",
+            "licenseNumber"
+          ]
+        },
+        "policy": {
+          "capability": "write",
+          "riskClass": "low"
+        }
       }
     },
     {
@@ -5179,26 +5405,31 @@ exports[`target docs generator generates combined MCP config 1`] = `
         ]
       },
       "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "name",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "licenseNumber",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          }
-        ]
+        "orm": {
+          "kind": "model",
+          "method": "delete",
+          "model": "driver",
+          "pkField": "id",
+          "hasArgs": true,
+          "argShape": "modelDeleteFlat",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "id"
+          ],
+          "scalarFields": [
+            "id",
+            "name",
+            "licenseNumber"
+          ],
+          "editableFields": [
+            "name",
+            "licenseNumber"
+          ]
+        },
+        "policy": {
+          "capability": "destructive",
+          "riskClass": "destructive"
+        }
       }
     },
     {
@@ -5207,6 +5438,26 @@ exports[`target docs generator generates combined MCP config 1`] = `
       "inputSchema": {
         "type": "object",
         "properties": {}
+      },
+      "_meta": {
+        "orm": {
+          "kind": "custom",
+          "method": "query",
+          "accessor": "query",
+          "operationName": "currentUser",
+          "hasArgs": false,
+          "argShape": "customOperation",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "__typename"
+          ],
+          "scalarFields": [],
+          "editableFields": []
+        },
+        "policy": {
+          "capability": "read",
+          "riskClass": "read_only"
+        }
       }
     },
     {
@@ -5228,6 +5479,26 @@ exports[`target docs generator generates combined MCP config 1`] = `
           "email",
           "password"
         ]
+      },
+      "_meta": {
+        "orm": {
+          "kind": "custom",
+          "method": "mutation",
+          "accessor": "mutation",
+          "operationName": "login",
+          "hasArgs": true,
+          "argShape": "customOperation",
+          "supportsSelect": true,
+          "defaultSelect": [
+            "__typename"
+          ],
+          "scalarFields": [],
+          "editableFields": []
+        },
+        "policy": {
+          "capability": "write",
+          "riskClass": "low"
+        }
       }
     }
   ]

@@ -44,6 +44,7 @@ import {
   generateOrmReadme,
   generateOrmAgentsDocs,
   getOrmMcpTools,
+  generateOrmAgentCatalog,
   generateOrmSkills,
 } from './codegen/orm/docs-generator';
 import { generateSharedTypes } from './codegen/shared';
@@ -304,6 +305,12 @@ export async function generate(
   const allMcpTools: McpTool[] = [];
 
   if (runOrm) {
+    const ormAgentCatalog = generateOrmAgentCatalog(tables, allCustomOps);
+    filesToWrite.push({
+      path: path.posix.join('orm', ormAgentCatalog.fileName),
+      content: ormAgentCatalog.content,
+    });
+
     if (docsConfig.readme) {
       const readme = generateOrmReadme(tables, allCustomOps);
       filesToWrite.push({ path: path.posix.join('orm', readme.fileName), content: readme.content });
