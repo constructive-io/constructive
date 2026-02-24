@@ -43,6 +43,7 @@
     "grafast": "1.0.0-rc.7",
     "grafserv": "1.0.0-rc.6",
     "graphile-build": "5.0.0-rc.4",
+    "graphile-misc-plugins": "workspace:^",
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
     "graphile-postgis": "workspace:^",

@@ -55,7 +55,7 @@ export * from './presets/index';
 // ============================================================================
 
 // Import the new MinimalPreset from plugins
-import { MinimalPreset } from './plugins/minimal-preset';
+import { MinimalPreset } from './plugins/index';
 
 // Re-export MinimalPreset for backward compatibility
 export { MinimalPreset };

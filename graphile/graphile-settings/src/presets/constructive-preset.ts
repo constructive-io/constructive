@@ -1,19 +1,21 @@
 import type { GraphileConfig } from 'graphile-config';
 import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
-import { MinimalPreset } from '../plugins/minimal-preset';
-import { InflektPreset } from '../plugins/custom-inflector';
-import { ConflictDetectorPreset } from '../plugins/conflict-detector';
-import { InflectorLoggerPreset } from '../plugins/inflector-logger';
-import { NoUniqueLookupPreset } from '../plugins/primary-key-only';
-import { EnableAllFilterColumnsPreset } from '../plugins/enable-all-filter-columns';
-import { ManyToManyOptInPreset } from '../plugins/many-to-many-preset';
-import { MetaSchemaPreset } from '../plugins/meta-schema';
+import {
+  MinimalPreset,
+  InflektPreset,
+  ConflictDetectorPreset,
+  InflectorLoggerPreset,
+  NoUniqueLookupPreset,
+  EnableAllFilterColumnsPreset,
+  ManyToManyOptInPreset,
+  MetaSchemaPreset,
+  PgTypeMappingsPreset,
+} from 'graphile-misc-plugins';
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
 import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
-import { PgTypeMappingsPreset } from '../plugins/pg-type-mappings';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**

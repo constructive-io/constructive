@@ -3,7 +3,7 @@ import {
   _pgTypeToGqlType,
   _buildFieldMeta,
   _cachedTablesMeta,
-} from '../src/plugins/meta-schema';
+} from '../src/meta-schema';
 import {
   parse,
   print,
