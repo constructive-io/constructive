@@ -61,18 +61,18 @@ export function generateUtilsFile(): GeneratedFile {
 }
 
 /**
- * Generate a localhost-fetch.ts file that patches globalThis.fetch for *.localhost URLs.
- * This enables seamless local development with subdomain routing (e.g. auth.localhost:3000).
+ * Generate a node-fetch.ts file with NodeHttpAdapter for CLI.
  *
- * Node.js cannot resolve *.localhost subdomains and the Fetch API forbids the Host header.
- * This adapter uses node:http.request to proxy requests with proper Host headers.
+ * Provides a GraphQLAdapter implementation using node:http/node:https
+ * instead of the Fetch API. This cleanly handles *.localhost subdomain
+ * routing (DNS resolution + Host header) without any global patching.
  */
-export function generateLocalhostFetchFile(): GeneratedFile {
+export function generateNodeFetchFile(): GeneratedFile {
   return {
-    fileName: 'localhost-fetch.ts',
+    fileName: 'node-fetch.ts',
     content: readTemplateFile(
-      'localhost-fetch.ts',
-      'Localhost fetch adapter — patches globalThis.fetch for *.localhost subdomain routing',
+      'node-fetch.ts',
+      'Node HTTP adapter for localhost subdomain routing',
     ),
   };
 }

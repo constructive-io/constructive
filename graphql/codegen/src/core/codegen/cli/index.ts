@@ -11,7 +11,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateLocalhostFetchFile } from './utils-generator';
+import { generateUtilsFile, generateNodeFetchFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: CleanTable[];
@@ -53,9 +53,9 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
 
-  // Generate localhost adapter if configured
+  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
   if (useLocalhostAdapter) {
-    files.push(generateLocalhostFetchFile());
+    files.push(generateNodeFetchFile());
   }
 
   const contextFile = generateContextCommand(toolName);
@@ -161,9 +161,9 @@ export function generateMultiTargetCli(
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
 
-  // Generate localhost adapter if configured
+  // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
   if (options.localhostAdapter) {
-    files.push(generateLocalhostFetchFile());
+    files.push(generateNodeFetchFile());
   }
 
   const contextFile = generateMultiTargetContextCommand(

@@ -31,17 +31,17 @@ function createImportDeclaration(
 }
 
 export interface ExecutorOptions {
-  /** Enable localhost fetch adapter import */
+  /** Enable NodeHttpAdapter for *.localhost subdomain routing */
   localhostAdapter?: boolean;
 }
 
 export function generateExecutorFile(toolName: string, options?: ExecutorOptions): GeneratedFile {
   const statements: t.Statement[] = [];
 
-  // Import localhost adapter first (side-effect import patches globalThis.fetch)
+  // Import NodeHttpAdapter for *.localhost subdomain routing
   if (options?.localhostAdapter) {
     statements.push(
-      t.importDeclaration([], t.stringLiteral('./localhost-fetch')),
+      createImportDeclaration('./node-fetch', ['NodeHttpAdapter']),
     );
   }
 
@@ -203,20 +203,39 @@ export function generateExecutorFile(toolName: string, options?: ExecutorOptions
       ]),
     ),
 
-    t.returnStatement(
-      t.callExpression(t.identifier('createClient'), [
-        t.objectExpression([
-          t.objectProperty(
-            t.identifier('endpoint'),
-            t.memberExpression(t.identifier('ctx'), t.identifier('endpoint')),
+    // Build createClient config — use NodeHttpAdapter for *.localhost endpoints
+    ...(options?.localhostAdapter
+      ? [
+          t.returnStatement(
+            t.callExpression(t.identifier('createClient'), [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('adapter'),
+                  t.newExpression(t.identifier('NodeHttpAdapter'), [
+                    t.memberExpression(t.identifier('ctx'), t.identifier('endpoint')),
+                    t.identifier('headers'),
+                  ]),
+                ),
+              ]),
+            ]),
           ),
-          t.objectProperty(
-            t.identifier('headers'),
-            t.identifier('headers'),
+        ]
+      : [
+          t.returnStatement(
+            t.callExpression(t.identifier('createClient'), [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('endpoint'),
+                  t.memberExpression(t.identifier('ctx'), t.identifier('endpoint')),
+                ),
+                t.objectProperty(
+                  t.identifier('headers'),
+                  t.identifier('headers'),
+                ),
+              ]),
+            ]),
           ),
         ]),
-      ]),
-    ),
   ]);
 
   const getClientFunc = t.functionDeclaration(
@@ -242,10 +261,10 @@ export function generateMultiTargetExecutorFile(
 ): GeneratedFile {
   const statements: t.Statement[] = [];
 
-  // Import localhost adapter first (side-effect import patches globalThis.fetch)
+  // Import NodeHttpAdapter for *.localhost subdomain routing
   if (options?.localhostAdapter) {
     statements.push(
-      t.importDeclaration([], t.stringLiteral('./localhost-fetch')),
+      createImportDeclaration('./node-fetch', ['NodeHttpAdapter']),
     );
   }
 
@@ -495,14 +514,33 @@ export function generateMultiTargetExecutorFile(
         ),
       ]),
     ),
-    t.returnStatement(
-      t.callExpression(t.identifier('createFn'), [
-        t.objectExpression([
-          t.objectProperty(t.identifier('endpoint'), t.identifier('endpoint')),
-          t.objectProperty(t.identifier('headers'), t.identifier('headers')),
+    // Build createClient config — use NodeHttpAdapter for *.localhost endpoints
+    ...(options?.localhostAdapter
+      ? [
+          t.returnStatement(
+            t.callExpression(t.identifier('createFn'), [
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('adapter'),
+                  t.newExpression(t.identifier('NodeHttpAdapter'), [
+                    t.identifier('endpoint'),
+                    t.identifier('headers'),
+                  ]),
+                ),
+              ]),
+            ]),
+          ),
+        ]
+      : [
+          t.returnStatement(
+            t.callExpression(t.identifier('createFn'), [
+              t.objectExpression([
+                t.objectProperty(t.identifier('endpoint'), t.identifier('endpoint')),
+                t.objectProperty(t.identifier('headers'), t.identifier('headers')),
+              ]),
+            ]),
+          ),
         ]),
-      ]),
-    ),
   ]);
 
   const getClientFunc = t.functionDeclaration(
