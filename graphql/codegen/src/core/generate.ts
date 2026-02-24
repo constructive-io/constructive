@@ -15,7 +15,7 @@ import { deployPgpm } from 'pgsql-seed';
 
 import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig } from '../types/config';
 import { getConfigOptions } from '../types/config';
-import type { CleanOperation, CleanTable } from '../types/schema';
+import type { CleanOperation, CleanTable, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
@@ -79,6 +79,7 @@ export interface GenerateResult {
     customOperations: {
       queries: CleanOperation[];
       mutations: CleanOperation[];
+      typeRegistry?: TypeRegistry;
     };
   };
 }
@@ -292,6 +293,7 @@ export async function generate(
         mutations: customOperations.mutations,
       },
       config: { ...config, nodeHttpAdapter: useNodeHttpAdapter },
+      typeRegistry: customOperations.typeRegistry,
     });
     filesToWrite.push(
       ...files.map((file) => ({
@@ -439,6 +441,7 @@ export async function generate(
       customOperations: {
         queries: customOperations.queries,
         mutations: customOperations.mutations,
+        typeRegistry: customOperations.typeRegistry,
       },
     },
   };
@@ -676,6 +679,7 @@ export async function generateMulti(
           tables: result.pipelineData.tables,
           customOperations: result.pipelineData.customOperations,
           isAuthTarget,
+          typeRegistry: result.pipelineData.customOperations.typeRegistry,
         });
       }
     }
