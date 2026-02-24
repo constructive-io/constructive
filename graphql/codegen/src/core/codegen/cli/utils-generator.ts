@@ -59,3 +59,20 @@ export function generateUtilsFile(): GeneratedFile {
     ),
   };
 }
+
+/**
+ * Generate a localhost-fetch.ts file that patches globalThis.fetch for *.localhost URLs.
+ * This enables seamless local development with subdomain routing (e.g. auth.localhost:3000).
+ *
+ * Node.js cannot resolve *.localhost subdomains and the Fetch API forbids the Host header.
+ * This adapter uses node:http.request to proxy requests with proper Host headers.
+ */
+export function generateLocalhostFetchFile(): GeneratedFile {
+  return {
+    fileName: 'localhost-fetch.ts',
+    content: readTemplateFile(
+      'localhost-fetch.ts',
+      'Localhost fetch adapter — patches globalThis.fetch for *.localhost subdomain routing',
+    ),
+  };
+}

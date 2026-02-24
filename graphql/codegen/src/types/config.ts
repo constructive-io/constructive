@@ -199,6 +199,15 @@ export interface CliConfig {
    *           context -> 'context' (renamed to 'env' on collision)
    */
   builtinNames?: BuiltinNames;
+
+  /**
+   * Enable localhost fetch adapter for *.localhost subdomain routing.
+   * When true, generates a localhost-fetch.ts that patches globalThis.fetch
+   * to use node:http.request for *.localhost URLs, enabling local development
+   * with subdomain-based routing (e.g. auth.localhost:3000).
+   * @default false
+   */
+  localhostAdapter?: boolean;
 }
 
 /**

@@ -9,8 +9,9 @@ import {
   getTableNames,
   ucFirst,
 } from '../utils';
-import type { CleanTable } from '../../../types/schema';
+import type { CleanTable, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
+import { getCreateInputTypeName } from '../utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -334,10 +335,55 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
   );
 }
 
+/**
+ * Get the set of field names that have defaults in the create input type.
+ * Looks up the CreateXInput -> inner input type (e.g. DatabaseInput) in the
+ * TypeRegistry and checks each field's defaultValue from introspection.
+ */
+function getFieldsWithDefaults(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): Set<string> {
+  const fieldsWithDefaults = new Set<string>();
+  if (!typeRegistry) return fieldsWithDefaults;
+
+  // Look up the CreateXInput type (e.g. CreateDatabaseInput)
+  const createInputTypeName = getCreateInputTypeName(table);
+  const createInputType = typeRegistry.get(createInputTypeName);
+  if (!createInputType?.inputFields) return fieldsWithDefaults;
+
+  // The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
+  // Find the inner input type that contains the actual field definitions
+  for (const inputField of createInputType.inputFields) {
+    // The inner field's type name is the actual input type (e.g. DatabaseInput)
+    const innerTypeName = inputField.type.name
+      || inputField.type.ofType?.name
+      || inputField.type.ofType?.ofType?.name;
+    if (!innerTypeName) continue;
+
+    const innerType = typeRegistry.get(innerTypeName);
+    if (!innerType?.inputFields) continue;
+
+    // Check each field in the inner input type for defaultValue
+    for (const field of innerType.inputFields) {
+      if (field.defaultValue !== undefined) {
+        fieldsWithDefaults.add(field.name);
+      }
+      // Also check if the field is NOT wrapped in NON_NULL (nullable = has default or is optional)
+      if (field.type.kind !== 'NON_NULL') {
+        fieldsWithDefaults.add(field.name);
+      }
+    }
+  }
+
+  return fieldsWithDefaults;
+}
+
 function buildMutationHandler(
   table: CleanTable,
   operation: 'create' | 'update' | 'delete',
   targetName?: string,
+  typeRegistry?: TypeRegistry,
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
@@ -350,6 +396,9 @@ function buildMutationHandler(
       f.name !== 'createdAt' &&
       f.name !== 'updatedAt',
   );
+
+  // Get fields that have defaults from introspection (for create operations)
+  const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
 
   const questions: t.Expression[] = [];
 
@@ -366,6 +415,9 @@ function buildMutationHandler(
 
   if (operation !== 'delete') {
     for (const field of editableFields) {
+      // For create: field is required only if it has no default value
+      // For update: all fields are optional (user only updates what they want)
+      const isRequired = operation === 'create' && !fieldsWithDefaults.has(field.name);
       questions.push(
         t.objectExpression([
           t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
@@ -379,7 +431,7 @@ function buildMutationHandler(
           ),
           t.objectProperty(
             t.identifier('required'),
-            t.booleanLiteral(operation === 'create'),
+            t.booleanLiteral(isRequired),
           ),
         ]),
       );
@@ -530,6 +582,8 @@ function buildMutationHandler(
 export interface TableCommandOptions {
   targetName?: string;
   executorImportPath?: string;
+  /** TypeRegistry from introspection, used to check field defaults */
+  typeRegistry?: TypeRegistry;
 }
 
 export function generateTableCommand(table: CleanTable, options?: TableCommandOptions): GeneratedFile {
@@ -741,9 +795,9 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   const tn = options?.targetName;
   statements.push(buildListHandler(table, tn));
   statements.push(buildGetHandler(table, tn));
-  statements.push(buildMutationHandler(table, 'create', tn));
-  statements.push(buildMutationHandler(table, 'update', tn));
-  statements.push(buildMutationHandler(table, 'delete', tn));
+  statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry));
+  statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry));
+  statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);

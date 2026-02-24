@@ -30,8 +30,20 @@ function createImportDeclaration(
   return decl;
 }
 
-export function generateExecutorFile(toolName: string): GeneratedFile {
+export interface ExecutorOptions {
+  /** Enable localhost fetch adapter import */
+  localhostAdapter?: boolean;
+}
+
+export function generateExecutorFile(toolName: string, options?: ExecutorOptions): GeneratedFile {
   const statements: t.Statement[] = [];
+
+  // Import localhost adapter first (side-effect import patches globalThis.fetch)
+  if (options?.localhostAdapter) {
+    statements.push(
+      t.importDeclaration([], t.stringLiteral('./localhost-fetch')),
+    );
+  }
 
   statements.push(
     createImportDeclaration('appstash', ['createConfigStore']),
@@ -226,8 +238,16 @@ export function generateExecutorFile(toolName: string): GeneratedFile {
 export function generateMultiTargetExecutorFile(
   toolName: string,
   targets: MultiTargetExecutorInput[],
+  options?: ExecutorOptions,
 ): GeneratedFile {
   const statements: t.Statement[] = [];
+
+  // Import localhost adapter first (side-effect import patches globalThis.fetch)
+  if (options?.localhostAdapter) {
+    statements.push(
+      t.importDeclaration([], t.stringLiteral('./localhost-fetch')),
+    );
+  }
 
   statements.push(
     createImportDeclaration('appstash', ['createConfigStore']),
