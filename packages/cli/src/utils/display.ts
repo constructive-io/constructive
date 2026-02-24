@@ -8,6 +8,11 @@ export const usageText = `
     server             Start a GraphQL server
     explorer           Launch GraphiQL explorer interface
 
+  Agent:
+    agent              Launch PI coding agent with Constructive extension wrapper
+    agent setup        Install managed PI runtime and project extension package
+    agent doctor       Validate PI runtime, extension wiring, and auth defaults
+
   Code Generation:
     codegen            Generate TypeScript types and SDK from GraphQL schema
 
@@ -35,6 +40,8 @@ export const usageText = `
     cnc codegen --schema schema.graphql  Generate types from schema
     cnc codegen --schema-only --out schema.graphql  Export schema SDL
     cnc jobs up                       Start combined server (jobs runtime)
+    cnc agent setup                   Prepare PI runtime + extension
+    cnc agent --provider openai --model gpt-4.1-mini
 
     # Execution Engine
     cnc context create my-api --endpoint https://api.example.com/graphql

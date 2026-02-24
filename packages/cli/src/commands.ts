@@ -1,6 +1,7 @@
 import { checkForUpdates } from '@inquirerer/utils';
 import { CLIOptions, Inquirerer, ParsedArgs, cliExitWithError, extractFirst, getPackageJson } from 'inquirerer';
 
+import agent from './commands/agent';
 import auth from './commands/auth';
 import codegen from './commands/codegen';
 import context from './commands/context';
@@ -12,6 +13,7 @@ import { usageText } from './utils';
 
 const createCommandMap = (): Record<string, Function> => {
   return {
+    agent,
     server,
     explorer,
     codegen,
@@ -94,8 +96,20 @@ export const commands = async (argv: Partial<ParsedArgs>, prompter: Inquirerer, 
     await cliExitWithError(`Unknown command: ${command}`);
   }
 
-  await commandFn(newArgv, prompter, options);
-  prompter.close();
+  const shouldClosePrompterBeforeCommand = command === 'agent';
+  if (shouldClosePrompterBeforeCommand) {
+    // PI takes over the terminal; close inquirerer listeners first to avoid
+    // keypress interception and corrupted interactive input.
+    prompter.close();
+  }
+
+  try {
+    await commandFn(newArgv, prompter, options);
+  } finally {
+    if (!shouldClosePrompterBeforeCommand) {
+      prompter.close();
+    }
+  }
 
   return argv;
 };
