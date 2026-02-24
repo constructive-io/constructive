@@ -8,11 +8,12 @@
  * Any changes here will affect all generated CLI entry points.
  */
 
-import { CLI, CLIOptions } from 'inquirerer';
+import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
 import { commands } from './commands';
 
 if (process.argv.includes('--version') || process.argv.includes('-v')) {
-  console.log('0.0.1');
+  const pkg = getPackageJson(__dirname);
+  console.log(pkg.version);
   process.exit(0);
 }
 
