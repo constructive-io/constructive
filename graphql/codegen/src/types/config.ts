@@ -201,10 +201,11 @@ export interface CliConfig {
   builtinNames?: BuiltinNames;
 
   /**
-   * Enable localhost fetch adapter for *.localhost subdomain routing.
-   * When true, generates a localhost-fetch.ts that patches globalThis.fetch
-   * to use node:http.request for *.localhost URLs, enabling local development
+   * Enable NodeHttpAdapter for *.localhost subdomain routing.
+   * When true, generates a node-fetch.ts with NodeHttpAdapter (implements GraphQLAdapter)
+   * using node:http/node:https for requests, enabling local development
    * with subdomain-based routing (e.g. auth.localhost:3000).
+   * No global patching — the adapter is passed to createClient via the adapter option.
    * @default false
    */
   localhostAdapter?: boolean;
