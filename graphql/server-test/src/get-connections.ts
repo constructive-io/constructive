@@ -65,9 +65,12 @@ export const getConnections = async (
   const request = createSuperTestAgent(server);
 
   // Combined teardown function
+  // When TEST_DB is set, we're using an existing database (e.g. constructive)
+  // and must NOT drop it on teardown
+  const keepDb = !!process.env.TEST_DB;
   const teardown = async () => {
     await server.stop();
-    await dbTeardown();
+    await dbTeardown({ keepDb });
   };
 
   return {

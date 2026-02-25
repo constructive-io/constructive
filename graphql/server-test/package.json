@@ -26,7 +26,9 @@
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:integration": "./__tests__/script/test-major-funcs.sh",
+    "test:integration:keep": "KEEP_DB=1 ./__tests__/script/test-major-funcs.sh"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
