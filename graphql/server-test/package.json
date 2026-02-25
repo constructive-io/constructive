@@ -27,8 +27,7 @@
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:integration": "./__tests__/script/test-major-funcs.sh",
-    "test:integration:keep": "KEEP_DB=1 ./__tests__/script/test-major-funcs.sh"
+    "test:integration": "RUN_INTEGRATION=true PGDATABASE=constructive jest --forceExit --verbose --runInBand"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

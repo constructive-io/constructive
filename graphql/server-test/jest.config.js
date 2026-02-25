@@ -1,6 +1,7 @@
 // Integration test files that require a deployed constructive-local database.
-// These are excluded from the default `pnpm test` (CI) and run via
-// `pnpm test:integration` which sets up the database first.
+// Controlled by RUN_INTEGRATION env var:
+//   pnpm test                         → unit tests only (CI default)
+//   RUN_INTEGRATION=true pnpm test    → all tests including integration
 const INTEGRATION_TESTS = [
   'authentication',
   'users-profiles',
@@ -14,6 +15,12 @@ const INTEGRATION_TESTS = [
   'sites-apis',
 ].join('|');
 
+const ignorePatterns = ['/node_modules/'];
+
+if (!process.env.RUN_INTEGRATION) {
+  ignorePatterns.push(`__tests__/(${INTEGRATION_TESTS})\\.test\\.ts$`);
+}
+
 module.exports = {
   testEnvironment: 'node',
   transform: {
@@ -25,10 +32,7 @@ module.exports = {
     ],
   },
   testMatch: ['**/__tests__/**/*.test.ts'],
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    `__tests__/(${INTEGRATION_TESTS})\\.test\\.ts$`,
-  ],
+  testPathIgnorePatterns: ignorePatterns,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
   coverageDirectory: 'coverage',
