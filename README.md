@@ -26,7 +26,7 @@ pgpm docker start
 eval "$(pgpm env)"
 ```
 
-> **Tip:** Already running Postgres? Skip the Docker step and just export your PG* vars.
+> **Tip:** Already running Postgres? Skip the Docker step and just export your PG* vars. 
 
 ---
 
