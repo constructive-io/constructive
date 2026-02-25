@@ -192,6 +192,7 @@ log "Database: $DB_NAME"
 log "Test directory: $SERVER_TEST_DIR/__tests__/"
 
 JEST_ARGS=(
+  --config jest.integration.config.js
   --forceExit
   --verbose
   --runInBand
