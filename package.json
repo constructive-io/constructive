@@ -48,7 +48,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@dataplan/json": "1.0.0-rc.4"
+      "@dataplan/json": "1.0.0-rc.5"
     },
     "publicHoistPattern": [
       "@jest/test-sequencer"
