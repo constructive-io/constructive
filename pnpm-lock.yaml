@@ -2384,6 +2384,9 @@ importers:
       '@constructive-io/graphql-types':
         specifier: workspace:^
         version: link:../../graphql/types/dist
+      '@tanstack/react-query':
+        specifier: ^5.90.16
+        version: 5.90.20(react@19.2.3)
       gql-ast:
         specifier: workspace:^
         version: link:../../graphql/gql-ast/dist

@@ -10,10 +10,10 @@
 
 | API | Endpoint | Generators | Docs |
 |-----|----------|------------|------|
-| admin | - | ORM | [./src/admin/README.md](./src/admin/README.md) |
-| auth | - | ORM | [./src/auth/README.md](./src/auth/README.md) |
-| objects | - | ORM | [./src/objects/README.md](./src/objects/README.md) |
-| public | - | ORM | [./src/public/README.md](./src/public/README.md) |
+| admin | - | React Query, ORM | [./src/admin/README.md](./src/admin/README.md) |
+| auth | - | React Query, ORM | [./src/auth/README.md](./src/auth/README.md) |
+| objects | - | React Query, ORM | [./src/objects/README.md](./src/objects/README.md) |
+| public | - | React Query, ORM | [./src/public/README.md](./src/public/README.md) |
 
 ---
 

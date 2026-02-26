@@ -15,6 +15,7 @@ async function main() {
     schemaDir: SCHEMA_DIR,
     output: './src',
     orm: true,
+    reactQuery: true,
     verbose: true,
   };
 

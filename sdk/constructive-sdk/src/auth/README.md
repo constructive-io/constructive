@@ -12,7 +12,7 @@
 - **Custom queries:** 4
 - **Custom mutations:** 16
 
-**Generators:** ORM
+**Generators:** ORM, React Query
 
 ## Modules
 
@@ -29,6 +29,19 @@ const db = createClient({
 ```
 
 See [orm/README.md](./orm/README.md) for full API reference.
+
+### React Query Hooks (`./hooks`)
+
+Type-safe React Query hooks for data fetching and mutations.
+
+```typescript
+import { configure } from './hooks';
+import { useCarsQuery } from './hooks';
+
+configure({ endpoint: 'https://api.example.com/graphql' });
+```
+
+See [hooks/README.md](./hooks/README.md) for full hook reference.
 
 ---
 
