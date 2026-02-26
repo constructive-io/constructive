@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.5.0...@constructive-io/graphql-codegen@4.5.1) (2026-02-26)
+
+### Bug Fixes
+
+- use HTML comments for [@generated](https://github.com/generated) markers in markdown, rename 'Generated SDK' ([6c48e89](https://github.com/constructive-io/constructive/commit/6c48e8935a4b97aa7f578c52417dcc3885b86caf))
+
 # [4.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.4.2...@constructive-io/graphql-codegen@4.5.0) (2026-02-26)
 
 ### Features
