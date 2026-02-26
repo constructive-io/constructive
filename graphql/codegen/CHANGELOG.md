@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.4.2...@constructive-io/graphql-codegen@4.5.0) (2026-02-26)
+
+### Features
+
+- **codegen:** add AbortSignal and per-request headers to NodeHttpAdapter ([c2e5d0b](https://github.com/constructive-io/constructive/commit/c2e5d0b5a6cce131cd76c6e3f384840677d4c475))
+
 ## [4.4.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.4.1...@constructive-io/graphql-codegen@4.4.2) (2026-02-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

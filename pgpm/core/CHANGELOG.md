@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.2.0...@pgpmjs/core@6.3.0) (2026-02-26)
+
+### Features
+
+- add secure_table_provision to export functionality ([ae91573](https://github.com/constructive-io/constructive/commit/ae91573fb554abf837bac057b92319aa52255835))
+
 # [6.2.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.1.0...@pgpmjs/core@6.2.0) (2026-02-24)
 
 **Note:** Version bump only for package @pgpmjs/core
