@@ -1,6 +1,6 @@
 {
   "name": "pgpm",
-  "version": "4.2.1",
+  "version": "4.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Package Manager - Database migration and package management CLI",
   "main": "index.js",
@@ -55,6 +55,7 @@
     "genomic": "^5.3.0",
     "inquirerer": "^4.4.0",
     "js-yaml": "^4.1.0",
+    "graphile-schema": "workspace:^",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-deparser": "^17.17.2",

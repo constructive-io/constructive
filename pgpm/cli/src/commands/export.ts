@@ -1,7 +1,9 @@
 import { exportMigrations,PgpmPackage } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
+import { buildSchemaSDL } from 'graphile-schema';
 import { CLIOptions, Inquirerer } from 'inquirerer';
+import fs from 'fs';
 import { resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 
@@ -14,6 +16,8 @@ Export Command:
 
 Options:
   --help, -h              Show this help message
+  --graphql               Export GraphQL SDL schemas instead of SQL migrations
+  --outdir <directory>    Output directory for GraphQL schemas (default: ./schemas)
   --author <name>         Project author (default: from git config)
   --extensionName <name>  Extension name
   --metaExtensionName <name>  Meta extension name (default: svc)
@@ -21,6 +25,7 @@ Options:
 
 Examples:
   pgpm export              Export migrations from selected database
+  pgpm export --graphql    Export GraphQL SDL schemas from selected database
 `;
 
 export default async (
@@ -87,36 +92,12 @@ export default async (
     database_ids: [selectedDatabase!.id]
   };
 
-  const { author, extensionName, metaExtensionName } = await prompter.prompt(argv, [
-    {
-      type: 'text',
-      name: 'author',
-      message: 'Project author',
-      default: `${username} <${email}>`,
-      required: true
-    },
-    {
-      type: 'text',
-      name: 'extensionName',
-      message: 'Extension name',
-      default: selectedDatabaseName || dbname,
-      required: true
-    },
-    {
-      type: 'text',
-      name: 'metaExtensionName',
-      message: 'Meta extension name',
-      default: `${selectedDatabaseName || dbname}-service`,
-      required: true
-    }
-  ]);
-
   const schemasResult = await selectedDb.query(
     `SELECT * FROM metaschema_public.schema WHERE database_id = $1`,
     [dbInfo.database_ids[0]]
   );
 
-  const { schema_names } = await prompter.prompt({} as any, [
+  const { schema_names: schemaAnswers } = await prompter.prompt({} as any, [
     {
       type: 'checkbox',
       name: 'schema_names',
@@ -127,19 +108,92 @@ export default async (
     }
   ]);
 
-  const outdir = resolve(project.workspacePath, 'packages/');
-  
-  await exportMigrations({
-    project,
-    options,
-    dbInfo,
-    author,
-    schema_names,
-    outdir,
-    extensionName,
-    metaExtensionName,
-    prompter
-  });
+  const schema_names = (schemaAnswers as { name: string; selected: boolean }[])
+    .filter(opt => opt.selected)
+    .map(opt => opt.name);
+
+  if (argv.graphql) {
+    // GraphQL SDL export path
+    const outdir = resolve(argv.outdir as string || './schemas');
+    fs.mkdirSync(outdir, { recursive: true });
+
+    console.log(`Exporting GraphQL SDL for ${schema_names.length} schema(s)...`);
+    console.log(`Database: ${dbname}`);
+    console.log(`Output: ${outdir}`);
+
+    let hasError = false;
+
+    for (const schemaName of schema_names) {
+      try {
+        console.log(`\n[${schemaName}] Building SDL...`);
+        const sdl = await buildSchemaSDL({
+          database: dbname,
+          schemas: [schemaName],
+        });
+
+        if (!sdl.trim()) {
+          console.error(`[${schemaName}] WARNING: Empty schema returned, skipping.`);
+          continue;
+        }
+
+        const outPath = resolve(outdir, `${schemaName}.graphql`);
+        fs.writeFileSync(outPath, sdl, 'utf-8');
+        console.log(`[${schemaName}] Written: ${outPath} (${sdl.length} bytes)`);
+      } catch (err) {
+        console.error(
+          `[${schemaName}] ERROR: ${err instanceof Error ? err.message : String(err)}`
+        );
+        hasError = true;
+      }
+    }
+
+    selectedDb.end();
+
+    if (hasError) {
+      console.error('\nGraphQL schema export failed for one or more schemas.');
+    } else {
+      console.log('\nAll GraphQL schemas exported successfully!');
+    }
+  } else {
+    // SQL migration export path (original behavior)
+    const { author, extensionName, metaExtensionName } = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'author',
+        message: 'Project author',
+        default: `${username} <${email}>`,
+        required: true
+      },
+      {
+        type: 'text',
+        name: 'extensionName',
+        message: 'Extension name',
+        default: selectedDatabaseName || dbname,
+        required: true
+      },
+      {
+        type: 'text',
+        name: 'metaExtensionName',
+        message: 'Meta extension name',
+        default: `${selectedDatabaseName || dbname}-service`,
+        required: true
+      }
+    ]);
+
+    const outdir = resolve(project.workspacePath, 'packages/');
+
+    await exportMigrations({
+      project,
+      options,
+      dbInfo,
+      author,
+      schema_names,
+      outdir,
+      extensionName,
+      metaExtensionName,
+      prompter
+    });
+  }
 
   prompter.close();
 
