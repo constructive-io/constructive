@@ -17,9 +17,9 @@ import {
   AUTH_ROLE,
   DATABASE_NAME,
   CONNECTION_FIELDS,
+  expectKnownRuntimeError,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Views, Policies & Constraints', () => {
   let db: PgTestClient;
@@ -448,9 +448,7 @@ describe('Views, Policies & Constraints', () => {
         }
       );
 
-      // The server enforces DELETE_FIRST pattern for index updates.
-      // Expect an error or the mutation to signal the pattern restriction.
-      expect(res.errors).toBeDefined();
+      expectKnownRuntimeError(res.errors, 'DELETE_FIRST');
     });
 
     it('should delete the index', async () => {
@@ -670,13 +668,10 @@ describe('Views, Policies & Constraints', () => {
         }
       );
 
-      // FK constraint creation may fail with INTERNAL_SERVER_ERROR if the
-      // server-side validation or trigger encounters issues.
+      // FK creation may fail when the referenced field set is not backed by a
+      // unique/primary key constraint. Assert that explicit failure contract.
       if (res.errors) {
-        const isSchemaError = res.errors.some(
-          (e: any) => e.message?.includes('Cannot query field')
-        );
-        expect(isSchemaError).toBe(false);
+        expectKnownRuntimeError(res.errors, 'no unique constraint matching given keys');
       } else {
         expect(res.data).toBeDefined();
         expect(res.data!.createForeignKeyConstraint.foreignKeyConstraint.id).toBeDefined();

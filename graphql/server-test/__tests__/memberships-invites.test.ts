@@ -7,9 +7,9 @@ import {
   ADMIN_USER_ID,
   DATABASE_NAME,
   getTestConnections,
+  expectKnownRuntimeError,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Memberships & Invites', () => {
   let db: PgTestClient;
@@ -125,10 +125,9 @@ describe('Memberships & Invites', () => {
   // invite CRUD (app invites)
   // -------------------------------------------------------------------------
   describe('invite CRUD (app invites)', () => {
-    it('should create an app invite - expect error without database_id in JWT', async () => {
-      // Invites require database_id in JWT context to work.
-      // Without it, the mutation fails with a NOT NULL constraint error
-      // on the jobs table (invites trigger a background job).
+    it('should create an app invite - fail without sender context', async () => {
+      // Without RLS auth context, createInvite fails with a sender_id NOT NULL
+      // violation. Assert that exact failure contract.
       const res = await query(
         `mutation($input: CreateInviteInput!) {
           createInvite(input: $input) {
@@ -142,9 +141,7 @@ describe('Memberships & Invites', () => {
         }
       );
 
-      // Expected: error related to database_id being null
-      expect(res.errors).toBeDefined();
-      expect(res.errors!.length).toBeGreaterThan(0);
+      expectKnownRuntimeError(res.errors, ['sender_id', 'invites']);
     });
 
     it('should test submitInviteCode with invalid token - expect error', async () => {
@@ -167,7 +164,7 @@ describe('Memberships & Invites', () => {
   // invite CRUD (org invites)
   // -------------------------------------------------------------------------
   describe('invite CRUD (org invites)', () => {
-    it('should create an org invite - expect error without database_id in JWT', async () => {
+    it('should create an org invite - fail without sender context', async () => {
       // First create an org for the invite
       const orgRes = await query<{
         createUser: { user: { id: string } };
@@ -197,9 +194,7 @@ describe('Memberships & Invites', () => {
         }
       );
 
-      // Expected: error related to database_id being null
-      expect(res.errors).toBeDefined();
-      expect(res.errors!.length).toBeGreaterThan(0);
+      expectKnownRuntimeError(res.errors, ['sender_id', 'org_invites']);
     });
 
     it('should test submitOrgInviteCode with invalid token - expect error', async () => {

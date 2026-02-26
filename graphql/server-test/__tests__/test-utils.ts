@@ -4,11 +4,14 @@
  * All test files import from this module for constants, auth helpers,
  * and server configuration.
  *
- * IMPORTANT: This module does NOT set process.env.TEST_DB at the top level.
- * Use getTestConnections() which temporarily sets it during the call to
- * getConnections(), then restores the previous value.
+ * Each test file gets its own isolated database cloned from a template
+ * via getTestConnections(). The template (constructive_test_tpl) is
+ * created once (lazily, on first call) from the live constructive DB
+ * using pg_dump, and reused for all subsequent clones in the same run.
+ * Leftover templates from previous runs are dropped before recreation.
  */
 
+import { execSync } from 'child_process';
 import { getConnections } from '../src';
 import type {
   GraphQLQueryFn,
@@ -23,8 +26,62 @@ export const ADMIN_EMAIL = 'admin@constructive.io';
 export const ADMIN_PASSWORD = 'admin123!@Constructive';
 export const ADMIN_USER_ID = '00000000-0000-0000-0000-000000000002';
 
-/** Database name (constructive, NOT constructive_db) */
+/** Source database name (constructive, NOT constructive_db) */
 export const DATABASE_NAME = 'constructive';
+
+/** Template database name, created from constructive via pg_dump on first use */
+const TEMPLATE_DB = 'constructive_test_tpl';
+
+// --- Template Creation (lazy, once-only) ---
+
+/** Cached promise so the template is created exactly once per test run. */
+let templatePromise: Promise<void> | null = null;
+
+/** Builds pg CLI flags from environment variables. */
+function pgOpts() {
+  const user = process.env.PGUSER || 'postgres';
+  const host = process.env.PGHOST || 'localhost';
+  const port = process.env.PGPORT || '5432';
+  return `-U "${user}" -h "${host}" -p ${port}`;
+}
+
+/**
+ * Ensures the template database exists, creating it on first call.
+ *
+ * Uses pg_dump (works even when constructive has active connections,
+ * unlike CREATE DATABASE ... TEMPLATE which requires exclusive access).
+ * Drops any leftover template from a previous run before recreating.
+ * Subsequent calls return the same cached promise (no-op).
+ */
+function ensureTemplate(): Promise<void> {
+  if (!templatePromise) {
+    templatePromise = (async () => {
+      const flags = pgOpts();
+      const password = process.env.PGPASSWORD || 'password';
+      const opts = { stdio: 'pipe' as const, env: { ...process.env, PGPASSWORD: password } };
+
+      // Drop leftover template from a previous run
+      try {
+        execSync(`psql ${flags} -c "UPDATE pg_database SET datistemplate = false WHERE datname = '${TEMPLATE_DB}'"`, opts);
+        execSync(`dropdb ${flags} --if-exists "${TEMPLATE_DB}"`, opts);
+      } catch { /* template may not exist */ }
+
+      // Create empty DB and restore constructive data into it
+      execSync(`createdb ${flags} "${TEMPLATE_DB}"`, opts);
+      execSync(
+        `pg_dump ${flags} -Fc --no-owner "${DATABASE_NAME}" | pg_restore ${flags} -d "${TEMPLATE_DB}" --no-owner 2>/dev/null || true`,
+        { ...opts, shell: '/bin/sh', timeout: 120000 }
+      );
+
+      // Mark as template for fast cloning
+      execSync(
+        `psql ${flags} -c "UPDATE pg_database SET datistemplate = true WHERE datname = '${TEMPLATE_DB}'"`,
+        opts
+      );
+    })();
+  }
+  return templatePromise;
+}
 
 /** Default role used by the test server (anonymous role for this DB) */
 export const AUTH_ROLE = 'administrator';
@@ -66,24 +123,20 @@ export const GET_CONNECTIONS_OPTS = {
 // --- Connection Helper ---
 
 /**
- * Wrapper around getConnections that temporarily sets TEST_DB to 'constructive'
- * for the duration of the call, then restores the previous value.
+ * Creates an isolated test database cloned from the constructive template.
  *
- * This avoids a global side effect that would break other test suites
- * (e.g., server-test.test.ts which expects its own fresh database).
+ * On first call, creates the template via pg_dump from the live constructive
+ * DB (subsequent calls reuse the cached template). Each call then creates a
+ * fresh database (db-<uuid>) using PostgreSQL's CREATE DATABASE ... TEMPLATE,
+ * so every test file gets its own copy of the seed data.
+ * The database is dropped automatically on teardown.
  */
 export async function getTestConnections(): Promise<GetConnectionsResult> {
-  const prev = process.env.TEST_DB;
-  process.env.TEST_DB = DATABASE_NAME;
-  try {
-    return await getConnections(GET_CONNECTIONS_OPTS);
-  } finally {
-    if (prev === undefined) {
-      delete process.env.TEST_DB;
-    } else {
-      process.env.TEST_DB = prev;
-    }
-  }
+  await ensureTemplate();
+  return getConnections({
+    ...GET_CONNECTIONS_OPTS,
+    db: { template: TEMPLATE_DB },
+  }, []);
 }
 
 // --- GraphQL Fragments ---
@@ -147,6 +200,48 @@ export function authenticatedQuery(
       ...headers,
       Authorization: `Bearer ${token}`,
     });
+}
+
+// --- Error Classification ---
+
+/** Returns true if the error message indicates a GraphQL schema validation failure. */
+export const isSchemaValidationError = (message: string): boolean =>
+  message.includes('Cannot query field') ||
+  message.includes('Unknown argument') ||
+  message.includes('Syntax Error') ||
+  message.includes('Expected type');
+
+/**
+ * Asserts that errors represent a known runtime failure, NOT a schema break.
+ *
+ * Rejects schema validation errors (which would indicate a regression).
+ * Accepts either:
+ *   - A message containing ALL of the expectedFragments (raw DB error detail)
+ *   - A masked runtime error ("An unexpected error occurred. Reference: ...")
+ */
+export function expectKnownRuntimeError(
+  errors: readonly any[] | undefined,
+  expectedFragments: string | string[]
+): void {
+  expect(errors).toBeDefined();
+  expect(errors!.length).toBeGreaterThan(0);
+
+  const fragments = Array.isArray(expectedFragments)
+    ? expectedFragments
+    : [expectedFragments];
+
+  const messages = errors!.map((e) => String(e?.message ?? ''));
+  const hasSchemaError = messages.some(isSchemaValidationError);
+  expect(hasSchemaError).toBe(false);
+
+  const hasExpectedDetail = messages.some((message) =>
+    fragments.every((fragment) => message.includes(fragment))
+  );
+  const hasMaskedRuntimeError = messages.some((message) =>
+    message.startsWith('An unexpected error occurred. Reference:')
+  );
+
+  expect(hasExpectedDetail || hasMaskedRuntimeError).toBe(true);
 }
 
 // --- Assertion Helpers ---

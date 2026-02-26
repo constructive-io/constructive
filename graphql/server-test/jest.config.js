@@ -1,26 +1,5 @@
-// Integration test files that require a deployed constructive-local database.
-// Controlled by RUN_INTEGRATION env var:
-//   pnpm test                         → unit tests only (CI default)
-//   RUN_INTEGRATION=true pnpm test    → all tests including integration
-const INTEGRATION_TESTS = [
-  'authentication',
-  'users-profiles',
-  'databases-schemas',
-  'tables-fields',
-  'views-policies-constraints',
-  'module-configuration',
-  'organizations',
-  'memberships-invites',
-  'permissions-grants',
-  'sites-apis',
-].join('|');
-
-const ignorePatterns = ['/node_modules/'];
-
-if (!process.env.RUN_INTEGRATION) {
-  ignorePatterns.push(`__tests__/(${INTEGRATION_TESTS})\\.test\\.ts$`);
-}
-
+// Each integration test file gets its own isolated database cloned from a
+// template built once (lazily) via pg_dump from the live constructive DB.
 module.exports = {
   testEnvironment: 'node',
   transform: {
@@ -32,11 +11,14 @@ module.exports = {
     ],
   },
   testMatch: ['**/__tests__/**/*.test.ts'],
-  testPathIgnorePatterns: ignorePatterns,
+  testPathIgnorePatterns: ['/node_modules/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
   coverageDirectory: 'coverage',
   verbose: true,
+  // First integration test creates the template DB via pg_dump (~30s),
+  // subsequent tests clone instantly. 60s covers both cases.
+  testTimeout: 60000,
   // Force exit after tests complete - PostGraphile v5's internal pools
   // may not fully release before Jest's timeout
   forceExit: true,

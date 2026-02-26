@@ -16,9 +16,9 @@ import {
   AUTH_ROLE,
   DATABASE_NAME,
   CONNECTION_FIELDS,
+  expectKnownRuntimeError,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Tables & Fields', () => {
   let db: PgTestClient;
@@ -278,14 +278,10 @@ describe('Tables & Fields', () => {
         }
       );
 
-      // KNOWN ISSUE: deleteTable may return INTERNAL_SERVER_ERROR due to
-      // a server-side trigger or constraint issue. Accept either success or
-      // an internal server error (not a schema error).
+      // KNOWN ISSUE: deleteTable currently fails with a runtime relation
+      // error in some environments. If it errors, assert the known contract.
       if (res.errors) {
-        const isSchemaError = res.errors.some(
-          (e: any) => e.message?.includes('Cannot query field')
-        );
-        expect(isSchemaError).toBe(false);
+        expectKnownRuntimeError(res.errors, 'does not exist');
       } else {
         expect(res.data!.deleteTable.table.id).toBe(createdTableId);
       }

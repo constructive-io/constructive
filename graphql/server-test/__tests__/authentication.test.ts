@@ -25,7 +25,6 @@ import {
   expectError,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Authentication', () => {
   let db: PgTestClient;

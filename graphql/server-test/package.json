@@ -25,9 +25,8 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:integration": "RUN_INTEGRATION=true PGDATABASE=constructive jest --forceExit --verbose --runInBand"
+    "test": "jest --forceExit --verbose --runInBand",
+    "test:watch": "jest --watch"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

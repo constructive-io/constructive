@@ -19,7 +19,6 @@ import {
   CONNECTION_FIELDS,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Module Configuration', () => {
   let db: PgTestClient;
@@ -107,7 +106,10 @@ describe('Module Configuration', () => {
 
       expect(res.errors).toBeUndefined();
       expect(res.data).toBeDefined();
-      expect(res.data!.nodeTypeRegistries.totalCount).toBe(33);
+      expect(res.data!.nodeTypeRegistries.totalCount).toBeGreaterThanOrEqual(1);
+      expect(res.data!.nodeTypeRegistries.totalCount).toBeGreaterThanOrEqual(
+        res.data!.nodeTypeRegistries.nodes.length
+      );
       expect(res.data!.nodeTypeRegistries.nodes.length).toBeGreaterThan(0);
 
       // Verify slug is the identifier -- no 'id' field

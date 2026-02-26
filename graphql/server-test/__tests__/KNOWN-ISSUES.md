@@ -20,12 +20,13 @@
 ### ISSUE-002: deleteTable returns INTERNAL_SERVER_ERROR
 
 - **Test:** `tables-fields.test.ts > table CRUD > should delete the table`
-- **Error:** `INTERNAL_SERVER_ERROR` when deleting a table
+- **Error:** Runtime DB error (often masked to `An unexpected error occurred. Reference: ...`)
+- **Observed raw error:** `table "<renamed_table_name>" does not exist`
 - **Root Cause:** Server-side trigger or constraint issue during table deletion. The table was
   created with fields, and deletion likely triggers cascading operations that fail internally.
   The GraphQL schema and input shape are correct (DeleteTableInput takes `id: UUID!`).
-- **Workaround:** Test accepts both success and internal server error (not a schema error).
-  The test passes by checking that the error is not a schema validation error.
+- **Workaround:** Test accepts both success and runtime failure, but explicitly rejects schema
+  validation errors.
 - **Fix needed in:** Server-side trigger or constraint handling for metaschema table deletion.
 
 ## Expected Limitations
@@ -52,15 +53,17 @@
 - **Affected test:** `organizations.test.ts > organization CRUD > should query org memberships`
 - Test accepts both outcomes: 0 memberships (no JWT) or 1+ (JWT active)
 
-### LIM-003: Invites require database_id in JWT context
+### LIM-003: Invites require authenticated sender context
 
-- `createInvite` and `createOrgInvite` fail with NOT NULL constraint on `database_id` in the
-  jobs table because the invite system triggers a background job that requires `database_id`
-  from the JWT context.
+- `createInvite` and `createOrgInvite` fail without authenticated sender context.
+- **Observed raw errors:**
+  - `null value in column "sender_id" of relation "invites" violates not-null constraint`
+  - `null value in column "sender_id" of relation "org_invites" violates not-null constraint`
+- In some runs, these are masked to `An unexpected error occurred. Reference: ...`.
 - **Affected tests:**
   - `memberships-invites.test.ts > invite CRUD (app invites) > should create an app invite`
   - `memberships-invites.test.ts > invite CRUD (org invites) > should create an org invite`
-- Tests assert expected error (NOT NULL constraint)
+- Tests assert expected runtime failure contract (raw sender_id detail or masked runtime error)
 
 ### LIM-004: resetPassword and verifyEmail succeed silently with invalid tokens
 

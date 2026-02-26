@@ -22,7 +22,6 @@ import {
   CONNECTION_FIELDS,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Users and Profiles', () => {
   let db: PgTestClient;

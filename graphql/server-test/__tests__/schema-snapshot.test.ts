@@ -26,7 +26,6 @@ import path from 'path';
 import { buildSchemaSDL } from 'graphile-schema';
 import { getConnections, seed } from '../src';
 
-jest.setTimeout(60000);
 
 const seedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
 const sql = (seedDir: string, file: string) =>

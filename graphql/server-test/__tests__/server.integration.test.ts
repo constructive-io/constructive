@@ -10,7 +10,6 @@ import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
 import type supertest from 'supertest';
 
-jest.setTimeout(30000);
 
 const seedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
 const sql = (seedDir: string, file: string) =>

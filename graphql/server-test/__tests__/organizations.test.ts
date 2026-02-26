@@ -9,7 +9,6 @@ import {
   getTestConnections,
 } from './test-utils';
 
-jest.setTimeout(30000);
 
 describe('Organizations', () => {
   let db: PgTestClient;
