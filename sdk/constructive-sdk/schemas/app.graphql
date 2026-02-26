@@ -1,0 +1,153 @@
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  name: String!
+  schemaName: String!
+  fields: [MetaField!]!
+  indexes: [MetaIndex!]!
+  constraints: MetaConstraints!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  uniqueConstraints: [MetaUniqueConstraint!]!
+  relations: MetaRelations!
+  inflection: MetaInflection!
+  query: MetaQuery!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  name: String!
+  type: MetaType!
+  isNotNull: Boolean!
+  hasDefault: Boolean!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  pgType: String!
+  gqlType: String!
+  isArray: Boolean!
+  isNotNull: Boolean
+  hasDefault: Boolean
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  name: String!
+  isUnique: Boolean!
+  isPrimary: Boolean!
+  columns: [String!]!
+  fields: [MetaField!]
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+  foreignKey: [MetaForeignKeyConstraint!]!
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  name: String!
+  fields: [MetaField!]!
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  name: String!
+  fields: [MetaField!]!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  name: String!
+  fields: [MetaField!]!
+  referencedTable: String!
+  referencedFields: [String!]!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  references: MetaRefTable!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  type: String
+  junctionTable: MetaRefTable!
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  tableType: String!
+  allRows: String!
+  connection: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  conditionType: String!
+  patchType: String
+  createInputType: String!
+  createPayloadType: String!
+  updatePayloadType: String
+  deletePayloadType: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  one: String
+  create: String
+  update: String
+  delete: String
+}
