@@ -43,13 +43,20 @@ function isLocalhostSubdomain(hostname: string): boolean {
 
 /**
  * Make an HTTP/HTTPS request using native Node modules.
+ * Supports optional AbortSignal for request cancellation.
  */
 function makeRequest(
   url: URL,
   options: http.RequestOptions,
   body: string,
+  signal?: AbortSignal,
 ): Promise<HttpResponse> {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new Error('The operation was aborted'));
+      return;
+    }
+
     const protocol = url.protocol === 'https:' ? https : http;
 
     const req = protocol.request(url, options, (res) => {
@@ -68,9 +75,31 @@ function makeRequest(
     });
 
     req.on('error', reject);
+
+    if (signal) {
+      const onAbort = () => {
+        req.destroy(new Error('The operation was aborted'));
+      };
+      signal.addEventListener('abort', onAbort, { once: true });
+      req.on('close', () => {
+        signal.removeEventListener('abort', onAbort);
+      });
+    }
+
     req.write(body);
     req.end();
   });
+}
+
+/**
+ * Options for individual execute calls.
+ * Allows per-request header overrides and request cancellation.
+ */
+export interface NodeHttpExecuteOptions {
+  /** Additional headers to include in this request only */
+  headers?: Record<string, string>;
+  /** AbortSignal for request cancellation */
+  signal?: AbortSignal;
 }
 
 /**
@@ -94,12 +123,14 @@ export class NodeHttpAdapter implements GraphQLAdapter {
   async execute<T>(
     document: string,
     variables?: Record<string, unknown>,
+    options?: NodeHttpExecuteOptions,
   ): Promise<QueryResult<T>> {
     const requestUrl = new URL(this.url.href);
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
       ...this.headers,
+      ...options?.headers,
     };
 
     // For *.localhost subdomains, rewrite hostname and inject Host header
@@ -118,7 +149,12 @@ export class NodeHttpAdapter implements GraphQLAdapter {
       headers: requestHeaders,
     };
 
-    const response = await makeRequest(requestUrl, requestOptions, body);
+    const response = await makeRequest(
+      requestUrl,
+      requestOptions,
+      body,
+      options?.signal,
+    );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       return {
