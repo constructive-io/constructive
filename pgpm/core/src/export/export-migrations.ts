@@ -408,6 +408,7 @@ SET session_replication_role TO DEFAULT;`;
       'crypto_auth_module',
       'field_module',
       'table_module',
+      'secure_table_provision',
       'user_profiles_module',
       'user_settings_module',
       'organization_settings_module',
