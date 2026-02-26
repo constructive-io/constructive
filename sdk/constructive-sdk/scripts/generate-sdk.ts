@@ -15,8 +15,13 @@ async function main() {
     schemaDir: SCHEMA_DIR,
     output: './src',
     orm: true,
-    reactQuery: true,
+    reactQuery: false,
     verbose: true,
+    docs: {
+      agents: false,
+      mcp: false,
+      skills: true
+    }
   };
 
   const expanded = expandSchemaDirToMultiTarget(baseConfig);

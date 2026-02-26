@@ -41,8 +41,7 @@
     "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-types": "workspace:^",
     "gql-ast": "workspace:^",
-    "graphql": "^16.12.0",
-    "@tanstack/react-query": "^5.90.16"
+    "graphql": "^16.12.0"
   },
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",
