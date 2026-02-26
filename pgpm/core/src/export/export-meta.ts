@@ -857,6 +857,28 @@ const config: Record<string, TableConfig> = {
       fields: 'uuid[]'
     }
   },
+  secure_table_provision: {
+    schema: 'metaschema_modules_public',
+    table: 'secure_table_provision',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      node_type: 'text',
+      use_rls: 'boolean',
+      node_data: 'jsonb',
+      grant_roles: 'text[]',
+      grant_privileges: 'jsonb',
+      policy_type: 'text',
+      policy_privileges: 'text[]',
+      policy_role: 'text',
+      policy_permissive: 'boolean',
+      policy_data: 'jsonb',
+      out_fields: 'uuid[]'
+    }
+  },
   table_template_module: {
     schema: 'metaschema_modules_public',
     table: 'table_template_module',
@@ -1043,6 +1065,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1`);
   await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1`);
   await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1`);
+  await queryAndParse('secure_table_provision', `SELECT * FROM metaschema_modules_public.secure_table_provision WHERE database_id = $1`);
   await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1`);
   await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
   await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
