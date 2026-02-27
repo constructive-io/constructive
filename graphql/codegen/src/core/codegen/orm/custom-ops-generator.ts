@@ -109,6 +109,7 @@ function createImportDeclaration(
 
 function createVariablesInterface(
   op: CleanOperation,
+  comments: boolean = true,
 ): t.ExportNamedDeclaration | null {
   if (op.args.length === 0) return null;
 
@@ -120,7 +121,7 @@ function createVariablesInterface(
       t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type))),
     );
     prop.optional = optional;
-    const argDescription = stripSmartComments(arg.description);
+    const argDescription = stripSmartComments(arg.description, comments);
     if (argDescription) {
       addJSDocComment(prop, argDescription.split('\n'));
     }
@@ -134,7 +135,7 @@ function createVariablesInterface(
     t.tsInterfaceBody(props),
   );
   const exportDecl = t.exportNamedDeclaration(interfaceDecl);
-  const opDescription = stripSmartComments(op.description);
+  const opDescription = stripSmartComments(op.description, comments);
   if (opDescription) {
     addJSDocComment(exportDecl, [`Variables for ${op.name}`, opDescription]);
   }
@@ -409,6 +410,7 @@ function buildOperationMethod(
  */
 export function generateCustomQueryOpsFile(
   operations: CleanOperation[],
+  comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -453,7 +455,7 @@ export function generateCustomQueryOpsFile(
 
   // Generate variable interfaces
   for (const op of operations) {
-    const varInterface = createVariablesInterface(op);
+    const varInterface = createVariablesInterface(op, comments);
     if (varInterface) statements.push(varInterface);
   }
 
@@ -491,6 +493,7 @@ export function generateCustomQueryOpsFile(
  */
 export function generateCustomMutationOpsFile(
   operations: CleanOperation[],
+  comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -535,7 +538,7 @@ export function generateCustomMutationOpsFile(
 
   // Generate variable interfaces
   for (const op of operations) {
-    const varInterface = createVariablesInterface(op);
+    const varInterface = createVariablesInterface(op, comments);
     if (varInterface) statements.push(varInterface);
   }
 

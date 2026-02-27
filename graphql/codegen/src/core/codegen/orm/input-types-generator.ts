@@ -513,6 +513,7 @@ function collectEnumTypesFromTables(
 function generateEnumTypes(
   typeRegistry: TypeRegistry,
   enumTypeNames: Set<string>,
+  comments: boolean = true,
 ): t.Statement[] {
   if (enumTypeNames.size === 0) return [];
 
@@ -529,7 +530,7 @@ function generateEnumTypes(
       unionType,
     );
     const exportDecl = t.exportNamedDeclaration(typeAlias);
-    const enumDescription = stripSmartComments(typeInfo.description);
+    const enumDescription = stripSmartComments(typeInfo.description, comments);
     if (enumDescription) {
       addJSDocComment(exportDecl, enumDescription.split('\n'));
     }
@@ -1505,6 +1506,7 @@ function generateCustomInputTypes(
   typeRegistry: TypeRegistry,
   usedInputTypes: Set<string>,
   tableCrudTypes?: Set<string>,
+  comments: boolean = true,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>();
@@ -1551,7 +1553,7 @@ function generateCustomInputTypes(
           name: field.name,
           type: tsType,
           optional,
-          description: stripSmartComments(field.description),
+          description: stripSmartComments(field.description, comments),
         });
 
         // Follow nested Input types
@@ -1569,7 +1571,7 @@ function generateCustomInputTypes(
         createExportedInterface(
           typeName,
           properties,
-          stripSmartComments(typeInfo.description),
+          stripSmartComments(typeInfo.description, comments),
         ),
       );
     } else if (typeInfo.kind === 'ENUM' && typeInfo.enumValues) {
@@ -1580,7 +1582,7 @@ function generateCustomInputTypes(
         unionType,
       );
       const enumExportDecl = t.exportNamedDeclaration(typeAlias);
-      const enumDescription = stripSmartComments(typeInfo.description);
+      const enumDescription = stripSmartComments(typeInfo.description, comments);
       if (enumDescription) {
         addJSDocComment(enumExportDecl, enumDescription.split('\n'));
       }
@@ -1629,6 +1631,7 @@ function generatePayloadTypes(
   typeRegistry: TypeRegistry,
   usedPayloadTypes: Set<string>,
   alreadyGeneratedTypes: Set<string>,
+  comments: boolean = true,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGeneratedTypes);
@@ -1680,7 +1683,7 @@ function generatePayloadTypes(
         name: field.name,
         type: isNullable ? `${tsType} | null` : tsType,
         optional: isNullable,
-        description: stripSmartComments(field.description),
+        description: stripSmartComments(field.description, comments),
       });
 
       // Follow nested OBJECT types
@@ -1700,7 +1703,7 @@ function generatePayloadTypes(
       createExportedInterface(
         typeName,
         interfaceProps,
-        stripSmartComments(typeInfo.description),
+        stripSmartComments(typeInfo.description, comments),
       ),
     );
 
@@ -1850,6 +1853,7 @@ export function generateInputTypesFile(
   usedInputTypes: Set<string>,
   tables?: CleanTable[],
   usedPayloadTypes?: Set<string>,
+  comments: boolean = true,
 ): GeneratedInputTypesFile {
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
@@ -1868,7 +1872,7 @@ export function generateInputTypesFile(
   statements.push(...generateScalarFilterTypes());
 
   // 2. Enum types used by table fields
-  statements.push(...generateEnumTypes(typeRegistry, enumTypes));
+  statements.push(...generateEnumTypes(typeRegistry, enumTypes, comments));
 
   // 2b. Unknown/custom scalar aliases for schema-specific scalars
   statements.push(...generateCustomScalarTypes(customScalarTypes));
@@ -1901,7 +1905,7 @@ export function generateInputTypesFile(
   // 7. Custom input types from TypeRegistry
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;
   statements.push(
-    ...generateCustomInputTypes(typeRegistry, usedInputTypes, tableCrudTypes),
+    ...generateCustomInputTypes(typeRegistry, usedInputTypes, tableCrudTypes, comments),
   );
 
   // 8. Payload/return types for custom operations
@@ -1918,6 +1922,7 @@ export function generateInputTypesFile(
         typeRegistry,
         usedPayloadTypes,
         alreadyGeneratedTypes,
+        comments,
       ),
     );
   }

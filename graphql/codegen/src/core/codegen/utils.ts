@@ -480,7 +480,9 @@ function isBoilerplateDescription(description: string): boolean {
  */
 export function stripSmartComments(
   description: string | null | undefined,
+  enabled: boolean = true,
 ): string | undefined {
+  if (!enabled) return undefined;
   if (!description) return undefined;
 
   // Check if entire description is boilerplate

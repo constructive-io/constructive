@@ -116,7 +116,8 @@ export async function runCodegenPipeline(
 
   // 2. Infer tables from introspection (replaces _meta)
   log('Inferring table metadata from schema...');
-  let tables = inferTablesFromIntrospection(introspection);
+  const commentsEnabled = config.codegen?.comments !== false;
+  let tables = inferTablesFromIntrospection(introspection, { comments: commentsEnabled });
   const totalTables = tables.length;
   log(`  Found ${totalTables} tables`);
 

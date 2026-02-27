@@ -37,6 +37,8 @@ export interface GeneratedSchemaTypesFile {
 export interface GenerateSchemaTypesOptions {
   typeRegistry: TypeRegistry;
   tableTypeNames: Set<string>;
+  /** Include descriptions as JSDoc comments. @default true */
+  comments?: boolean;
 }
 
 const SKIP_TYPES = new Set([
@@ -122,6 +124,7 @@ function generateCustomScalarTypes(customScalarTypes: string[]): t.Statement[] {
 function generateEnumTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
+  comments: boolean = true,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>();
@@ -140,7 +143,7 @@ function generateEnumTypes(
       unionType,
     );
     const exportDecl = t.exportNamedDeclaration(typeAlias);
-    const enumDescription = stripSmartComments(typeInfo.description);
+    const enumDescription = stripSmartComments(typeInfo.description, comments);
     if (enumDescription) {
       addJSDocComment(exportDecl, enumDescription.split('\n'));
     }
@@ -155,6 +158,7 @@ function generateInputObjectTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
   alreadyGenerated: Set<string>,
+  comments: boolean = true,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -192,7 +196,7 @@ function generateInputObjectTypes(
           t.tsTypeAnnotation(t.tsTypeReference(t.identifier(tsType))),
         );
         prop.optional = optional;
-        const fieldDescription = stripSmartComments(field.description);
+        const fieldDescription = stripSmartComments(field.description, comments);
         if (fieldDescription) {
           addJSDocComment(prop, fieldDescription.split('\n'));
         }
@@ -219,7 +223,7 @@ function generateInputObjectTypes(
       t.tsInterfaceBody(properties),
     );
     const exportDecl = t.exportNamedDeclaration(interfaceDecl);
-    const inputDescription = stripSmartComments(typeInfo.description);
+    const inputDescription = stripSmartComments(typeInfo.description, comments);
     if (inputDescription) {
       addJSDocComment(exportDecl, inputDescription.split('\n'));
     }
@@ -233,6 +237,7 @@ function generateUnionTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
   alreadyGenerated: Set<string>,
+  comments: boolean = true,
 ): { statements: t.Statement[]; generatedTypes: Set<string> } {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -253,7 +258,7 @@ function generateUnionTypes(
       unionType,
     );
     const exportDecl = t.exportNamedDeclaration(typeAlias);
-    const unionDescription = stripSmartComments(typeInfo.description);
+    const unionDescription = stripSmartComments(typeInfo.description, comments);
     if (unionDescription) {
       addJSDocComment(exportDecl, unionDescription.split('\n'));
     }
@@ -302,6 +307,7 @@ function generatePayloadObjectTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
   alreadyGenerated: Set<string>,
+  comments: boolean = true,
 ): PayloadTypesResult {
   const statements: t.Statement[] = [];
   const generatedTypes = new Set<string>(alreadyGenerated);
@@ -349,7 +355,7 @@ function generatePayloadObjectTypes(
           t.tsTypeAnnotation(t.tsTypeReference(t.identifier(finalType))),
         );
         prop.optional = isNullable;
-        const fieldDescription = stripSmartComments(field.description);
+        const fieldDescription = stripSmartComments(field.description, comments);
         if (fieldDescription) {
           addJSDocComment(prop, fieldDescription.split('\n'));
         }
@@ -379,7 +385,7 @@ function generatePayloadObjectTypes(
       t.tsInterfaceBody(properties),
     );
     const exportDecl = t.exportNamedDeclaration(interfaceDecl);
-    const payloadDescription = stripSmartComments(typeInfo.description);
+    const payloadDescription = stripSmartComments(typeInfo.description, comments);
     if (payloadDescription) {
       addJSDocComment(exportDecl, payloadDescription.split('\n'));
     }
@@ -393,18 +399,20 @@ export function generateSchemaTypesFile(
   options: GenerateSchemaTypesOptions,
 ): GeneratedSchemaTypesFile {
   const { typeRegistry, tableTypeNames } = options;
+  const comments = options.comments !== false;
 
   const allStatements: t.Statement[] = [];
   let generatedTypes = new Set<string>();
   const customScalarTypes = collectCustomScalarTypes(typeRegistry);
 
-  const enumResult = generateEnumTypes(typeRegistry, tableTypeNames);
+  const enumResult = generateEnumTypes(typeRegistry, tableTypeNames, comments);
   generatedTypes = new Set([...generatedTypes, ...enumResult.generatedTypes]);
 
   const unionResult = generateUnionTypes(
     typeRegistry,
     tableTypeNames,
     generatedTypes,
+    comments,
   );
   generatedTypes = new Set([...generatedTypes, ...unionResult.generatedTypes]);
 
@@ -412,6 +420,7 @@ export function generateSchemaTypesFile(
     typeRegistry,
     tableTypeNames,
     generatedTypes,
+    comments,
   );
   generatedTypes = new Set([...generatedTypes, ...inputResult.generatedTypes]);
 
@@ -419,6 +428,7 @@ export function generateSchemaTypesFile(
     typeRegistry,
     tableTypeNames,
     generatedTypes,
+    comments,
   );
 
   const referencedTableTypes = Array.from(

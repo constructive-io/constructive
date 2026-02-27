@@ -59,6 +59,7 @@ export function generateSharedTypes(
   options: GenerateSharedOptions,
 ): GenerateSharedResult {
   const { tables, customOperations } = options;
+  const commentsEnabled = options.config.codegen?.comments !== false;
   const files: GeneratedFile[] = [];
 
   // Collect table type names for import path resolution
@@ -72,6 +73,7 @@ export function generateSharedTypes(
     const schemaTypesResult = generateSchemaTypesFile({
       typeRegistry: customOperations.typeRegistry,
       tableTypeNames,
+      comments: commentsEnabled,
     });
 
     // Only include if there's meaningful content
