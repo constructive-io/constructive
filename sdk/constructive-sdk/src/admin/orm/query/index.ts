@@ -34,10 +34,6 @@ export interface AppPermissionsGetMaskByNamesVariables {
 export interface OrgPermissionsGetMaskByNamesVariables {
   names?: string[];
 }
-/**
- * Variables for appPermissionsGetByMask
- * Reads and enables pagination through a set of `AppPermission`.
- */
 export interface AppPermissionsGetByMaskVariables {
   mask?: string;
   /** Only read the first `n` values of the set. */
@@ -50,10 +46,6 @@ export interface AppPermissionsGetByMaskVariables {
   /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
-/**
- * Variables for orgPermissionsGetByMask
- * Reads and enables pagination through a set of `OrgPermission`.
- */
 export interface OrgPermissionsGetByMaskVariables {
   mask?: string;
   /** Only read the first `n` values of the set. */
@@ -66,10 +58,6 @@ export interface OrgPermissionsGetByMaskVariables {
   /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
-/**
- * Variables for stepsRequired
- * Reads and enables pagination through a set of `AppLevelRequirement`.
- */
 export interface StepsRequiredVariables {
   vlevel?: string;
   vroleId?: string;

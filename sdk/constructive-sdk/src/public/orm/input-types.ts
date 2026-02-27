@@ -12879,13 +12879,9 @@ export interface IntervalInput {
 /** A connection to a list of `AppPermission` values. */
 // ============ Payload/Return Types (for custom operations) ============
 export interface AppPermissionConnection {
-  /** A list of `AppPermission` objects. */
   nodes: AppPermission[];
-  /** A list of edges which contains the `AppPermission` and cursor to aid in pagination. */
   edges: AppPermissionEdge[];
-  /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  /** The count of *all* `AppPermission` you could get from the connection. */
   totalCount: number;
 }
 export type AppPermissionConnectionSelect = {
@@ -12902,13 +12898,9 @@ export type AppPermissionConnectionSelect = {
 };
 /** A connection to a list of `OrgPermission` values. */
 export interface OrgPermissionConnection {
-  /** A list of `OrgPermission` objects. */
   nodes: OrgPermission[];
-  /** A list of edges which contains the `OrgPermission` and cursor to aid in pagination. */
   edges: OrgPermissionEdge[];
-  /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  /** The count of *all* `OrgPermission` you could get from the connection. */
   totalCount: number;
 }
 export type OrgPermissionConnectionSelect = {
@@ -12925,13 +12917,9 @@ export type OrgPermissionConnectionSelect = {
 };
 /** A connection to a list of `Object` values. */
 export interface ObjectConnection {
-  /** A list of `Object` objects. */
   nodes: Object[];
-  /** A list of edges which contains the `Object` and cursor to aid in pagination. */
   edges: ObjectEdge[];
-  /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  /** The count of *all* `Object` you could get from the connection. */
   totalCount: number;
 }
 export type ObjectConnectionSelect = {
@@ -12948,13 +12936,9 @@ export type ObjectConnectionSelect = {
 };
 /** A connection to a list of `AppLevelRequirement` values. */
 export interface AppLevelRequirementConnection {
-  /** A list of `AppLevelRequirement` objects. */
   nodes: AppLevelRequirement[];
-  /** A list of edges which contains the `AppLevelRequirement` and cursor to aid in pagination. */
   edges: AppLevelRequirementEdge[];
-  /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  /** The count of *all* `AppLevelRequirement` you could get from the connection. */
   totalCount: number;
 }
 export type AppLevelRequirementConnectionSelect = {
@@ -12970,20 +12954,12 @@ export type AppLevelRequirementConnectionSelect = {
   totalCount?: boolean;
 };
 export interface SignOutPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type SignOutPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface SendAccountDeletionEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -12992,20 +12968,12 @@ export type SendAccountDeletionEmailPayloadSelect = {
   result?: boolean;
 };
 export interface CheckPasswordPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface SubmitInviteCodePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13014,10 +12982,6 @@ export type SubmitInviteCodePayloadSelect = {
   result?: boolean;
 };
 export interface SubmitOrgInviteCodePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13026,30 +12990,18 @@ export type SubmitOrgInviteCodePayloadSelect = {
   result?: boolean;
 };
 export interface FreezeObjectsPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type FreezeObjectsPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface InitEmptyRepoPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type InitEmptyRepoPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface ConfirmDeleteAccountPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13058,10 +13010,6 @@ export type ConfirmDeleteAccountPayloadSelect = {
   result?: boolean;
 };
 export interface SetPasswordPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13070,10 +13018,6 @@ export type SetPasswordPayloadSelect = {
   result?: boolean;
 };
 export interface VerifyEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13082,10 +13026,6 @@ export type VerifyEmailPayloadSelect = {
   result?: boolean;
 };
 export interface ResetPasswordPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13094,10 +13034,6 @@ export type ResetPasswordPayloadSelect = {
   result?: boolean;
 };
 export interface RemoveNodeAtPathPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13106,10 +13042,6 @@ export type RemoveNodeAtPathPayloadSelect = {
   result?: boolean;
 };
 export interface BootstrapUserPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: BootstrapUserRecord[] | null;
 }
@@ -13120,10 +13052,6 @@ export type BootstrapUserPayloadSelect = {
   };
 };
 export interface SetDataAtPathPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13132,10 +13060,6 @@ export type SetDataAtPathPayloadSelect = {
   result?: boolean;
 };
 export interface SetPropsAndCommitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13144,10 +13068,6 @@ export type SetPropsAndCommitPayloadSelect = {
   result?: boolean;
 };
 export interface ProvisionDatabaseWithUserPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: ProvisionDatabaseWithUserRecord[] | null;
 }
@@ -13158,10 +13078,6 @@ export type ProvisionDatabaseWithUserPayloadSelect = {
   };
 };
 export interface SignInOneTimeTokenPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: SignInOneTimeTokenRecord | null;
 }
@@ -13172,10 +13088,6 @@ export type SignInOneTimeTokenPayloadSelect = {
   };
 };
 export interface CreateUserDatabasePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13184,10 +13096,6 @@ export type CreateUserDatabasePayloadSelect = {
   result?: boolean;
 };
 export interface ExtendTokenExpiresPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
 }
@@ -13198,10 +13106,6 @@ export type ExtendTokenExpiresPayloadSelect = {
   };
 };
 export interface SignInPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: SignInRecord | null;
 }
@@ -13212,10 +13116,6 @@ export type SignInPayloadSelect = {
   };
 };
 export interface SignUpPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
 }
@@ -13226,20 +13126,12 @@ export type SignUpPayloadSelect = {
   };
 };
 export interface SetFieldOrderPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type SetFieldOrderPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface OneTimeTokenPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13248,10 +13140,6 @@ export type OneTimeTokenPayloadSelect = {
   result?: boolean;
 };
 export interface InsertNodeAtPathPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13260,10 +13148,6 @@ export type InsertNodeAtPathPayloadSelect = {
   result?: boolean;
 };
 export interface UpdateNodeAtPathPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13272,10 +13156,6 @@ export type UpdateNodeAtPathPayloadSelect = {
   result?: boolean;
 };
 export interface SetAndCommitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -13284,30 +13164,18 @@ export type SetAndCommitPayloadSelect = {
   result?: boolean;
 };
 export interface ApplyRlsPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type ApplyRlsPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface ForgotPasswordPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
 }
 export type ForgotPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface SendVerificationEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -13316,10 +13184,6 @@ export type SendVerificationEmailPayloadSelect = {
   result?: boolean;
 };
 export interface VerifyPasswordPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: Session | null;
 }
@@ -13330,10 +13194,6 @@ export type VerifyPasswordPayloadSelect = {
   };
 };
 export interface VerifyTotpPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   result?: Session | null;
 }
@@ -13344,14 +13204,9 @@ export type VerifyTotpPayloadSelect = {
   };
 };
 export interface CreateAppPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermission` that was created by this mutation. */
   appPermission?: AppPermission | null;
-  /** An edge for our `AppPermission`. May be used by Relay 1. */
   appPermissionEdge?: AppPermissionEdge | null;
 }
 export type CreateAppPermissionPayloadSelect = {
@@ -13364,14 +13219,9 @@ export type CreateAppPermissionPayloadSelect = {
   };
 };
 export interface UpdateAppPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermission` that was updated by this mutation. */
   appPermission?: AppPermission | null;
-  /** An edge for our `AppPermission`. May be used by Relay 1. */
   appPermissionEdge?: AppPermissionEdge | null;
 }
 export type UpdateAppPermissionPayloadSelect = {
@@ -13384,14 +13234,9 @@ export type UpdateAppPermissionPayloadSelect = {
   };
 };
 export interface DeleteAppPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermission` that was deleted by this mutation. */
   appPermission?: AppPermission | null;
-  /** An edge for our `AppPermission`. May be used by Relay 1. */
   appPermissionEdge?: AppPermissionEdge | null;
 }
 export type DeleteAppPermissionPayloadSelect = {
@@ -13404,14 +13249,9 @@ export type DeleteAppPermissionPayloadSelect = {
   };
 };
 export interface CreateOrgPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermission` that was created by this mutation. */
   orgPermission?: OrgPermission | null;
-  /** An edge for our `OrgPermission`. May be used by Relay 1. */
   orgPermissionEdge?: OrgPermissionEdge | null;
 }
 export type CreateOrgPermissionPayloadSelect = {
@@ -13424,14 +13264,9 @@ export type CreateOrgPermissionPayloadSelect = {
   };
 };
 export interface UpdateOrgPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermission` that was updated by this mutation. */
   orgPermission?: OrgPermission | null;
-  /** An edge for our `OrgPermission`. May be used by Relay 1. */
   orgPermissionEdge?: OrgPermissionEdge | null;
 }
 export type UpdateOrgPermissionPayloadSelect = {
@@ -13444,14 +13279,9 @@ export type UpdateOrgPermissionPayloadSelect = {
   };
 };
 export interface DeleteOrgPermissionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermission` that was deleted by this mutation. */
   orgPermission?: OrgPermission | null;
-  /** An edge for our `OrgPermission`. May be used by Relay 1. */
   orgPermissionEdge?: OrgPermissionEdge | null;
 }
 export type DeleteOrgPermissionPayloadSelect = {
@@ -13464,14 +13294,9 @@ export type DeleteOrgPermissionPayloadSelect = {
   };
 };
 export interface CreateObjectPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Object` that was created by this mutation. */
   object?: Object | null;
-  /** An edge for our `Object`. May be used by Relay 1. */
   objectEdge?: ObjectEdge | null;
 }
 export type CreateObjectPayloadSelect = {
@@ -13484,14 +13309,9 @@ export type CreateObjectPayloadSelect = {
   };
 };
 export interface UpdateObjectPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Object` that was updated by this mutation. */
   object?: Object | null;
-  /** An edge for our `Object`. May be used by Relay 1. */
   objectEdge?: ObjectEdge | null;
 }
 export type UpdateObjectPayloadSelect = {
@@ -13504,14 +13324,9 @@ export type UpdateObjectPayloadSelect = {
   };
 };
 export interface DeleteObjectPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Object` that was deleted by this mutation. */
   object?: Object | null;
-  /** An edge for our `Object`. May be used by Relay 1. */
   objectEdge?: ObjectEdge | null;
 }
 export type DeleteObjectPayloadSelect = {
@@ -13524,14 +13339,9 @@ export type DeleteObjectPayloadSelect = {
   };
 };
 export interface CreateAppLevelRequirementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevelRequirement` that was created by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
-  /** An edge for our `AppLevelRequirement`. May be used by Relay 1. */
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
 export type CreateAppLevelRequirementPayloadSelect = {
@@ -13544,14 +13354,9 @@ export type CreateAppLevelRequirementPayloadSelect = {
   };
 };
 export interface UpdateAppLevelRequirementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevelRequirement` that was updated by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
-  /** An edge for our `AppLevelRequirement`. May be used by Relay 1. */
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
 export type UpdateAppLevelRequirementPayloadSelect = {
@@ -13564,14 +13369,9 @@ export type UpdateAppLevelRequirementPayloadSelect = {
   };
 };
 export interface DeleteAppLevelRequirementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevelRequirement` that was deleted by this mutation. */
   appLevelRequirement?: AppLevelRequirement | null;
-  /** An edge for our `AppLevelRequirement`. May be used by Relay 1. */
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
 export type DeleteAppLevelRequirementPayloadSelect = {
@@ -13584,14 +13384,9 @@ export type DeleteAppLevelRequirementPayloadSelect = {
   };
 };
 export interface CreateDatabasePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Database` that was created by this mutation. */
   database?: Database | null;
-  /** An edge for our `Database`. May be used by Relay 1. */
   databaseEdge?: DatabaseEdge | null;
 }
 export type CreateDatabasePayloadSelect = {
@@ -13604,14 +13399,9 @@ export type CreateDatabasePayloadSelect = {
   };
 };
 export interface UpdateDatabasePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Database` that was updated by this mutation. */
   database?: Database | null;
-  /** An edge for our `Database`. May be used by Relay 1. */
   databaseEdge?: DatabaseEdge | null;
 }
 export type UpdateDatabasePayloadSelect = {
@@ -13624,14 +13414,9 @@ export type UpdateDatabasePayloadSelect = {
   };
 };
 export interface DeleteDatabasePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Database` that was deleted by this mutation. */
   database?: Database | null;
-  /** An edge for our `Database`. May be used by Relay 1. */
   databaseEdge?: DatabaseEdge | null;
 }
 export type DeleteDatabasePayloadSelect = {
@@ -13644,14 +13429,9 @@ export type DeleteDatabasePayloadSelect = {
   };
 };
 export interface CreateSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Schema` that was created by this mutation. */
   schema?: Schema | null;
-  /** An edge for our `Schema`. May be used by Relay 1. */
   schemaEdge?: SchemaEdge | null;
 }
 export type CreateSchemaPayloadSelect = {
@@ -13664,14 +13444,9 @@ export type CreateSchemaPayloadSelect = {
   };
 };
 export interface UpdateSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Schema` that was updated by this mutation. */
   schema?: Schema | null;
-  /** An edge for our `Schema`. May be used by Relay 1. */
   schemaEdge?: SchemaEdge | null;
 }
 export type UpdateSchemaPayloadSelect = {
@@ -13684,14 +13459,9 @@ export type UpdateSchemaPayloadSelect = {
   };
 };
 export interface DeleteSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Schema` that was deleted by this mutation. */
   schema?: Schema | null;
-  /** An edge for our `Schema`. May be used by Relay 1. */
   schemaEdge?: SchemaEdge | null;
 }
 export type DeleteSchemaPayloadSelect = {
@@ -13704,14 +13474,9 @@ export type DeleteSchemaPayloadSelect = {
   };
 };
 export interface CreateTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Table` that was created by this mutation. */
   table?: Table | null;
-  /** An edge for our `Table`. May be used by Relay 1. */
   tableEdge?: TableEdge | null;
 }
 export type CreateTablePayloadSelect = {
@@ -13724,14 +13489,9 @@ export type CreateTablePayloadSelect = {
   };
 };
 export interface UpdateTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Table` that was updated by this mutation. */
   table?: Table | null;
-  /** An edge for our `Table`. May be used by Relay 1. */
   tableEdge?: TableEdge | null;
 }
 export type UpdateTablePayloadSelect = {
@@ -13744,14 +13504,9 @@ export type UpdateTablePayloadSelect = {
   };
 };
 export interface DeleteTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Table` that was deleted by this mutation. */
   table?: Table | null;
-  /** An edge for our `Table`. May be used by Relay 1. */
   tableEdge?: TableEdge | null;
 }
 export type DeleteTablePayloadSelect = {
@@ -13764,14 +13519,9 @@ export type DeleteTablePayloadSelect = {
   };
 };
 export interface CreateCheckConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CheckConstraint` that was created by this mutation. */
   checkConstraint?: CheckConstraint | null;
-  /** An edge for our `CheckConstraint`. May be used by Relay 1. */
   checkConstraintEdge?: CheckConstraintEdge | null;
 }
 export type CreateCheckConstraintPayloadSelect = {
@@ -13784,14 +13534,9 @@ export type CreateCheckConstraintPayloadSelect = {
   };
 };
 export interface UpdateCheckConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CheckConstraint` that was updated by this mutation. */
   checkConstraint?: CheckConstraint | null;
-  /** An edge for our `CheckConstraint`. May be used by Relay 1. */
   checkConstraintEdge?: CheckConstraintEdge | null;
 }
 export type UpdateCheckConstraintPayloadSelect = {
@@ -13804,14 +13549,9 @@ export type UpdateCheckConstraintPayloadSelect = {
   };
 };
 export interface DeleteCheckConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CheckConstraint` that was deleted by this mutation. */
   checkConstraint?: CheckConstraint | null;
-  /** An edge for our `CheckConstraint`. May be used by Relay 1. */
   checkConstraintEdge?: CheckConstraintEdge | null;
 }
 export type DeleteCheckConstraintPayloadSelect = {
@@ -13824,14 +13564,9 @@ export type DeleteCheckConstraintPayloadSelect = {
   };
 };
 export interface CreateFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Field` that was created by this mutation. */
   field?: Field | null;
-  /** An edge for our `Field`. May be used by Relay 1. */
   fieldEdge?: FieldEdge | null;
 }
 export type CreateFieldPayloadSelect = {
@@ -13844,14 +13579,9 @@ export type CreateFieldPayloadSelect = {
   };
 };
 export interface UpdateFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Field` that was updated by this mutation. */
   field?: Field | null;
-  /** An edge for our `Field`. May be used by Relay 1. */
   fieldEdge?: FieldEdge | null;
 }
 export type UpdateFieldPayloadSelect = {
@@ -13864,14 +13594,9 @@ export type UpdateFieldPayloadSelect = {
   };
 };
 export interface DeleteFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Field` that was deleted by this mutation. */
   field?: Field | null;
-  /** An edge for our `Field`. May be used by Relay 1. */
   fieldEdge?: FieldEdge | null;
 }
 export type DeleteFieldPayloadSelect = {
@@ -13884,14 +13609,9 @@ export type DeleteFieldPayloadSelect = {
   };
 };
 export interface CreateForeignKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was created by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
-  /** An edge for our `ForeignKeyConstraint`. May be used by Relay 1. */
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export type CreateForeignKeyConstraintPayloadSelect = {
@@ -13904,14 +13624,9 @@ export type CreateForeignKeyConstraintPayloadSelect = {
   };
 };
 export interface UpdateForeignKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was updated by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
-  /** An edge for our `ForeignKeyConstraint`. May be used by Relay 1. */
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export type UpdateForeignKeyConstraintPayloadSelect = {
@@ -13924,14 +13639,9 @@ export type UpdateForeignKeyConstraintPayloadSelect = {
   };
 };
 export interface DeleteForeignKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ForeignKeyConstraint` that was deleted by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
-  /** An edge for our `ForeignKeyConstraint`. May be used by Relay 1. */
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export type DeleteForeignKeyConstraintPayloadSelect = {
@@ -13944,14 +13654,9 @@ export type DeleteForeignKeyConstraintPayloadSelect = {
   };
 };
 export interface CreateFullTextSearchPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was created by this mutation. */
   fullTextSearch?: FullTextSearch | null;
-  /** An edge for our `FullTextSearch`. May be used by Relay 1. */
   fullTextSearchEdge?: FullTextSearchEdge | null;
 }
 export type CreateFullTextSearchPayloadSelect = {
@@ -13964,14 +13669,9 @@ export type CreateFullTextSearchPayloadSelect = {
   };
 };
 export interface UpdateFullTextSearchPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was updated by this mutation. */
   fullTextSearch?: FullTextSearch | null;
-  /** An edge for our `FullTextSearch`. May be used by Relay 1. */
   fullTextSearchEdge?: FullTextSearchEdge | null;
 }
 export type UpdateFullTextSearchPayloadSelect = {
@@ -13984,14 +13684,9 @@ export type UpdateFullTextSearchPayloadSelect = {
   };
 };
 export interface DeleteFullTextSearchPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FullTextSearch` that was deleted by this mutation. */
   fullTextSearch?: FullTextSearch | null;
-  /** An edge for our `FullTextSearch`. May be used by Relay 1. */
   fullTextSearchEdge?: FullTextSearchEdge | null;
 }
 export type DeleteFullTextSearchPayloadSelect = {
@@ -14004,14 +13699,9 @@ export type DeleteFullTextSearchPayloadSelect = {
   };
 };
 export interface CreateIndexPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Index` that was created by this mutation. */
   index?: Index | null;
-  /** An edge for our `Index`. May be used by Relay 1. */
   indexEdge?: IndexEdge | null;
 }
 export type CreateIndexPayloadSelect = {
@@ -14024,14 +13714,9 @@ export type CreateIndexPayloadSelect = {
   };
 };
 export interface UpdateIndexPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Index` that was updated by this mutation. */
   index?: Index | null;
-  /** An edge for our `Index`. May be used by Relay 1. */
   indexEdge?: IndexEdge | null;
 }
 export type UpdateIndexPayloadSelect = {
@@ -14044,14 +13729,9 @@ export type UpdateIndexPayloadSelect = {
   };
 };
 export interface DeleteIndexPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Index` that was deleted by this mutation. */
   index?: Index | null;
-  /** An edge for our `Index`. May be used by Relay 1. */
   indexEdge?: IndexEdge | null;
 }
 export type DeleteIndexPayloadSelect = {
@@ -14064,14 +13744,9 @@ export type DeleteIndexPayloadSelect = {
   };
 };
 export interface CreateLimitFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitFunction` that was created by this mutation. */
   limitFunction?: LimitFunction | null;
-  /** An edge for our `LimitFunction`. May be used by Relay 1. */
   limitFunctionEdge?: LimitFunctionEdge | null;
 }
 export type CreateLimitFunctionPayloadSelect = {
@@ -14084,14 +13759,9 @@ export type CreateLimitFunctionPayloadSelect = {
   };
 };
 export interface UpdateLimitFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitFunction` that was updated by this mutation. */
   limitFunction?: LimitFunction | null;
-  /** An edge for our `LimitFunction`. May be used by Relay 1. */
   limitFunctionEdge?: LimitFunctionEdge | null;
 }
 export type UpdateLimitFunctionPayloadSelect = {
@@ -14104,14 +13774,9 @@ export type UpdateLimitFunctionPayloadSelect = {
   };
 };
 export interface DeleteLimitFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitFunction` that was deleted by this mutation. */
   limitFunction?: LimitFunction | null;
-  /** An edge for our `LimitFunction`. May be used by Relay 1. */
   limitFunctionEdge?: LimitFunctionEdge | null;
 }
 export type DeleteLimitFunctionPayloadSelect = {
@@ -14124,14 +13789,9 @@ export type DeleteLimitFunctionPayloadSelect = {
   };
 };
 export interface CreatePolicyPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Policy` that was created by this mutation. */
   policy?: Policy | null;
-  /** An edge for our `Policy`. May be used by Relay 1. */
   policyEdge?: PolicyEdge | null;
 }
 export type CreatePolicyPayloadSelect = {
@@ -14144,14 +13804,9 @@ export type CreatePolicyPayloadSelect = {
   };
 };
 export interface UpdatePolicyPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Policy` that was updated by this mutation. */
   policy?: Policy | null;
-  /** An edge for our `Policy`. May be used by Relay 1. */
   policyEdge?: PolicyEdge | null;
 }
 export type UpdatePolicyPayloadSelect = {
@@ -14164,14 +13819,9 @@ export type UpdatePolicyPayloadSelect = {
   };
 };
 export interface DeletePolicyPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Policy` that was deleted by this mutation. */
   policy?: Policy | null;
-  /** An edge for our `Policy`. May be used by Relay 1. */
   policyEdge?: PolicyEdge | null;
 }
 export type DeletePolicyPayloadSelect = {
@@ -14184,14 +13834,9 @@ export type DeletePolicyPayloadSelect = {
   };
 };
 export interface CreatePrimaryKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PrimaryKeyConstraint` that was created by this mutation. */
   primaryKeyConstraint?: PrimaryKeyConstraint | null;
-  /** An edge for our `PrimaryKeyConstraint`. May be used by Relay 1. */
   primaryKeyConstraintEdge?: PrimaryKeyConstraintEdge | null;
 }
 export type CreatePrimaryKeyConstraintPayloadSelect = {
@@ -14204,14 +13849,9 @@ export type CreatePrimaryKeyConstraintPayloadSelect = {
   };
 };
 export interface UpdatePrimaryKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PrimaryKeyConstraint` that was updated by this mutation. */
   primaryKeyConstraint?: PrimaryKeyConstraint | null;
-  /** An edge for our `PrimaryKeyConstraint`. May be used by Relay 1. */
   primaryKeyConstraintEdge?: PrimaryKeyConstraintEdge | null;
 }
 export type UpdatePrimaryKeyConstraintPayloadSelect = {
@@ -14224,14 +13864,9 @@ export type UpdatePrimaryKeyConstraintPayloadSelect = {
   };
 };
 export interface DeletePrimaryKeyConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PrimaryKeyConstraint` that was deleted by this mutation. */
   primaryKeyConstraint?: PrimaryKeyConstraint | null;
-  /** An edge for our `PrimaryKeyConstraint`. May be used by Relay 1. */
   primaryKeyConstraintEdge?: PrimaryKeyConstraintEdge | null;
 }
 export type DeletePrimaryKeyConstraintPayloadSelect = {
@@ -14244,14 +13879,9 @@ export type DeletePrimaryKeyConstraintPayloadSelect = {
   };
 };
 export interface CreateTableGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableGrant` that was created by this mutation. */
   tableGrant?: TableGrant | null;
-  /** An edge for our `TableGrant`. May be used by Relay 1. */
   tableGrantEdge?: TableGrantEdge | null;
 }
 export type CreateTableGrantPayloadSelect = {
@@ -14264,14 +13894,9 @@ export type CreateTableGrantPayloadSelect = {
   };
 };
 export interface UpdateTableGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableGrant` that was updated by this mutation. */
   tableGrant?: TableGrant | null;
-  /** An edge for our `TableGrant`. May be used by Relay 1. */
   tableGrantEdge?: TableGrantEdge | null;
 }
 export type UpdateTableGrantPayloadSelect = {
@@ -14284,14 +13909,9 @@ export type UpdateTableGrantPayloadSelect = {
   };
 };
 export interface DeleteTableGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableGrant` that was deleted by this mutation. */
   tableGrant?: TableGrant | null;
-  /** An edge for our `TableGrant`. May be used by Relay 1. */
   tableGrantEdge?: TableGrantEdge | null;
 }
 export type DeleteTableGrantPayloadSelect = {
@@ -14304,14 +13924,9 @@ export type DeleteTableGrantPayloadSelect = {
   };
 };
 export interface CreateTriggerPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Trigger` that was created by this mutation. */
   trigger?: Trigger | null;
-  /** An edge for our `Trigger`. May be used by Relay 1. */
   triggerEdge?: TriggerEdge | null;
 }
 export type CreateTriggerPayloadSelect = {
@@ -14324,14 +13939,9 @@ export type CreateTriggerPayloadSelect = {
   };
 };
 export interface UpdateTriggerPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Trigger` that was updated by this mutation. */
   trigger?: Trigger | null;
-  /** An edge for our `Trigger`. May be used by Relay 1. */
   triggerEdge?: TriggerEdge | null;
 }
 export type UpdateTriggerPayloadSelect = {
@@ -14344,14 +13954,9 @@ export type UpdateTriggerPayloadSelect = {
   };
 };
 export interface DeleteTriggerPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Trigger` that was deleted by this mutation. */
   trigger?: Trigger | null;
-  /** An edge for our `Trigger`. May be used by Relay 1. */
   triggerEdge?: TriggerEdge | null;
 }
 export type DeleteTriggerPayloadSelect = {
@@ -14364,14 +13969,9 @@ export type DeleteTriggerPayloadSelect = {
   };
 };
 export interface CreateUniqueConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UniqueConstraint` that was created by this mutation. */
   uniqueConstraint?: UniqueConstraint | null;
-  /** An edge for our `UniqueConstraint`. May be used by Relay 1. */
   uniqueConstraintEdge?: UniqueConstraintEdge | null;
 }
 export type CreateUniqueConstraintPayloadSelect = {
@@ -14384,14 +13984,9 @@ export type CreateUniqueConstraintPayloadSelect = {
   };
 };
 export interface UpdateUniqueConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UniqueConstraint` that was updated by this mutation. */
   uniqueConstraint?: UniqueConstraint | null;
-  /** An edge for our `UniqueConstraint`. May be used by Relay 1. */
   uniqueConstraintEdge?: UniqueConstraintEdge | null;
 }
 export type UpdateUniqueConstraintPayloadSelect = {
@@ -14404,14 +13999,9 @@ export type UpdateUniqueConstraintPayloadSelect = {
   };
 };
 export interface DeleteUniqueConstraintPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UniqueConstraint` that was deleted by this mutation. */
   uniqueConstraint?: UniqueConstraint | null;
-  /** An edge for our `UniqueConstraint`. May be used by Relay 1. */
   uniqueConstraintEdge?: UniqueConstraintEdge | null;
 }
 export type DeleteUniqueConstraintPayloadSelect = {
@@ -14424,14 +14014,9 @@ export type DeleteUniqueConstraintPayloadSelect = {
   };
 };
 export interface CreateViewPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `View` that was created by this mutation. */
   view?: View | null;
-  /** An edge for our `View`. May be used by Relay 1. */
   viewEdge?: ViewEdge | null;
 }
 export type CreateViewPayloadSelect = {
@@ -14444,14 +14029,9 @@ export type CreateViewPayloadSelect = {
   };
 };
 export interface UpdateViewPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `View` that was updated by this mutation. */
   view?: View | null;
-  /** An edge for our `View`. May be used by Relay 1. */
   viewEdge?: ViewEdge | null;
 }
 export type UpdateViewPayloadSelect = {
@@ -14464,14 +14044,9 @@ export type UpdateViewPayloadSelect = {
   };
 };
 export interface DeleteViewPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `View` that was deleted by this mutation. */
   view?: View | null;
-  /** An edge for our `View`. May be used by Relay 1. */
   viewEdge?: ViewEdge | null;
 }
 export type DeleteViewPayloadSelect = {
@@ -14484,14 +14059,9 @@ export type DeleteViewPayloadSelect = {
   };
 };
 export interface CreateViewTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewTable` that was created by this mutation. */
   viewTable?: ViewTable | null;
-  /** An edge for our `ViewTable`. May be used by Relay 1. */
   viewTableEdge?: ViewTableEdge | null;
 }
 export type CreateViewTablePayloadSelect = {
@@ -14504,14 +14074,9 @@ export type CreateViewTablePayloadSelect = {
   };
 };
 export interface UpdateViewTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewTable` that was updated by this mutation. */
   viewTable?: ViewTable | null;
-  /** An edge for our `ViewTable`. May be used by Relay 1. */
   viewTableEdge?: ViewTableEdge | null;
 }
 export type UpdateViewTablePayloadSelect = {
@@ -14524,14 +14089,9 @@ export type UpdateViewTablePayloadSelect = {
   };
 };
 export interface DeleteViewTablePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewTable` that was deleted by this mutation. */
   viewTable?: ViewTable | null;
-  /** An edge for our `ViewTable`. May be used by Relay 1. */
   viewTableEdge?: ViewTableEdge | null;
 }
 export type DeleteViewTablePayloadSelect = {
@@ -14544,14 +14104,9 @@ export type DeleteViewTablePayloadSelect = {
   };
 };
 export interface CreateViewGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewGrant` that was created by this mutation. */
   viewGrant?: ViewGrant | null;
-  /** An edge for our `ViewGrant`. May be used by Relay 1. */
   viewGrantEdge?: ViewGrantEdge | null;
 }
 export type CreateViewGrantPayloadSelect = {
@@ -14564,14 +14119,9 @@ export type CreateViewGrantPayloadSelect = {
   };
 };
 export interface UpdateViewGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewGrant` that was updated by this mutation. */
   viewGrant?: ViewGrant | null;
-  /** An edge for our `ViewGrant`. May be used by Relay 1. */
   viewGrantEdge?: ViewGrantEdge | null;
 }
 export type UpdateViewGrantPayloadSelect = {
@@ -14584,14 +14134,9 @@ export type UpdateViewGrantPayloadSelect = {
   };
 };
 export interface DeleteViewGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewGrant` that was deleted by this mutation. */
   viewGrant?: ViewGrant | null;
-  /** An edge for our `ViewGrant`. May be used by Relay 1. */
   viewGrantEdge?: ViewGrantEdge | null;
 }
 export type DeleteViewGrantPayloadSelect = {
@@ -14604,14 +14149,9 @@ export type DeleteViewGrantPayloadSelect = {
   };
 };
 export interface CreateViewRulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewRule` that was created by this mutation. */
   viewRule?: ViewRule | null;
-  /** An edge for our `ViewRule`. May be used by Relay 1. */
   viewRuleEdge?: ViewRuleEdge | null;
 }
 export type CreateViewRulePayloadSelect = {
@@ -14624,14 +14164,9 @@ export type CreateViewRulePayloadSelect = {
   };
 };
 export interface UpdateViewRulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewRule` that was updated by this mutation. */
   viewRule?: ViewRule | null;
-  /** An edge for our `ViewRule`. May be used by Relay 1. */
   viewRuleEdge?: ViewRuleEdge | null;
 }
 export type UpdateViewRulePayloadSelect = {
@@ -14644,14 +14179,9 @@ export type UpdateViewRulePayloadSelect = {
   };
 };
 export interface DeleteViewRulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ViewRule` that was deleted by this mutation. */
   viewRule?: ViewRule | null;
-  /** An edge for our `ViewRule`. May be used by Relay 1. */
   viewRuleEdge?: ViewRuleEdge | null;
 }
 export type DeleteViewRulePayloadSelect = {
@@ -14664,14 +14194,9 @@ export type DeleteViewRulePayloadSelect = {
   };
 };
 export interface CreateTableModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableModule` that was created by this mutation. */
   tableModule?: TableModule | null;
-  /** An edge for our `TableModule`. May be used by Relay 1. */
   tableModuleEdge?: TableModuleEdge | null;
 }
 export type CreateTableModulePayloadSelect = {
@@ -14684,14 +14209,9 @@ export type CreateTableModulePayloadSelect = {
   };
 };
 export interface UpdateTableModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableModule` that was updated by this mutation. */
   tableModule?: TableModule | null;
-  /** An edge for our `TableModule`. May be used by Relay 1. */
   tableModuleEdge?: TableModuleEdge | null;
 }
 export type UpdateTableModulePayloadSelect = {
@@ -14704,14 +14224,9 @@ export type UpdateTableModulePayloadSelect = {
   };
 };
 export interface DeleteTableModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableModule` that was deleted by this mutation. */
   tableModule?: TableModule | null;
-  /** An edge for our `TableModule`. May be used by Relay 1. */
   tableModuleEdge?: TableModuleEdge | null;
 }
 export type DeleteTableModulePayloadSelect = {
@@ -14724,14 +14239,9 @@ export type DeleteTableModulePayloadSelect = {
   };
 };
 export interface CreateTableTemplateModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableTemplateModule` that was created by this mutation. */
   tableTemplateModule?: TableTemplateModule | null;
-  /** An edge for our `TableTemplateModule`. May be used by Relay 1. */
   tableTemplateModuleEdge?: TableTemplateModuleEdge | null;
 }
 export type CreateTableTemplateModulePayloadSelect = {
@@ -14744,14 +14254,9 @@ export type CreateTableTemplateModulePayloadSelect = {
   };
 };
 export interface UpdateTableTemplateModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableTemplateModule` that was updated by this mutation. */
   tableTemplateModule?: TableTemplateModule | null;
-  /** An edge for our `TableTemplateModule`. May be used by Relay 1. */
   tableTemplateModuleEdge?: TableTemplateModuleEdge | null;
 }
 export type UpdateTableTemplateModulePayloadSelect = {
@@ -14764,14 +14269,9 @@ export type UpdateTableTemplateModulePayloadSelect = {
   };
 };
 export interface DeleteTableTemplateModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TableTemplateModule` that was deleted by this mutation. */
   tableTemplateModule?: TableTemplateModule | null;
-  /** An edge for our `TableTemplateModule`. May be used by Relay 1. */
   tableTemplateModuleEdge?: TableTemplateModuleEdge | null;
 }
 export type DeleteTableTemplateModulePayloadSelect = {
@@ -14784,14 +14284,9 @@ export type DeleteTableTemplateModulePayloadSelect = {
   };
 };
 export interface CreateSchemaGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SchemaGrant` that was created by this mutation. */
   schemaGrant?: SchemaGrant | null;
-  /** An edge for our `SchemaGrant`. May be used by Relay 1. */
   schemaGrantEdge?: SchemaGrantEdge | null;
 }
 export type CreateSchemaGrantPayloadSelect = {
@@ -14804,14 +14299,9 @@ export type CreateSchemaGrantPayloadSelect = {
   };
 };
 export interface UpdateSchemaGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SchemaGrant` that was updated by this mutation. */
   schemaGrant?: SchemaGrant | null;
-  /** An edge for our `SchemaGrant`. May be used by Relay 1. */
   schemaGrantEdge?: SchemaGrantEdge | null;
 }
 export type UpdateSchemaGrantPayloadSelect = {
@@ -14824,14 +14314,9 @@ export type UpdateSchemaGrantPayloadSelect = {
   };
 };
 export interface DeleteSchemaGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SchemaGrant` that was deleted by this mutation. */
   schemaGrant?: SchemaGrant | null;
-  /** An edge for our `SchemaGrant`. May be used by Relay 1. */
   schemaGrantEdge?: SchemaGrantEdge | null;
 }
 export type DeleteSchemaGrantPayloadSelect = {
@@ -14844,14 +14329,9 @@ export type DeleteSchemaGrantPayloadSelect = {
   };
 };
 export interface CreateApiSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiSchema` that was created by this mutation. */
   apiSchema?: ApiSchema | null;
-  /** An edge for our `ApiSchema`. May be used by Relay 1. */
   apiSchemaEdge?: ApiSchemaEdge | null;
 }
 export type CreateApiSchemaPayloadSelect = {
@@ -14864,14 +14344,9 @@ export type CreateApiSchemaPayloadSelect = {
   };
 };
 export interface UpdateApiSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiSchema` that was updated by this mutation. */
   apiSchema?: ApiSchema | null;
-  /** An edge for our `ApiSchema`. May be used by Relay 1. */
   apiSchemaEdge?: ApiSchemaEdge | null;
 }
 export type UpdateApiSchemaPayloadSelect = {
@@ -14884,14 +14359,9 @@ export type UpdateApiSchemaPayloadSelect = {
   };
 };
 export interface DeleteApiSchemaPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiSchema` that was deleted by this mutation. */
   apiSchema?: ApiSchema | null;
-  /** An edge for our `ApiSchema`. May be used by Relay 1. */
   apiSchemaEdge?: ApiSchemaEdge | null;
 }
 export type DeleteApiSchemaPayloadSelect = {
@@ -14904,14 +14374,9 @@ export type DeleteApiSchemaPayloadSelect = {
   };
 };
 export interface CreateApiModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiModule` that was created by this mutation. */
   apiModule?: ApiModule | null;
-  /** An edge for our `ApiModule`. May be used by Relay 1. */
   apiModuleEdge?: ApiModuleEdge | null;
 }
 export type CreateApiModulePayloadSelect = {
@@ -14924,14 +14389,9 @@ export type CreateApiModulePayloadSelect = {
   };
 };
 export interface UpdateApiModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiModule` that was updated by this mutation. */
   apiModule?: ApiModule | null;
-  /** An edge for our `ApiModule`. May be used by Relay 1. */
   apiModuleEdge?: ApiModuleEdge | null;
 }
 export type UpdateApiModulePayloadSelect = {
@@ -14944,14 +14404,9 @@ export type UpdateApiModulePayloadSelect = {
   };
 };
 export interface DeleteApiModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ApiModule` that was deleted by this mutation. */
   apiModule?: ApiModule | null;
-  /** An edge for our `ApiModule`. May be used by Relay 1. */
   apiModuleEdge?: ApiModuleEdge | null;
 }
 export type DeleteApiModulePayloadSelect = {
@@ -14964,14 +14419,9 @@ export type DeleteApiModulePayloadSelect = {
   };
 };
 export interface CreateDomainPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Domain` that was created by this mutation. */
   domain?: Domain | null;
-  /** An edge for our `Domain`. May be used by Relay 1. */
   domainEdge?: DomainEdge | null;
 }
 export type CreateDomainPayloadSelect = {
@@ -14984,14 +14434,9 @@ export type CreateDomainPayloadSelect = {
   };
 };
 export interface UpdateDomainPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Domain` that was updated by this mutation. */
   domain?: Domain | null;
-  /** An edge for our `Domain`. May be used by Relay 1. */
   domainEdge?: DomainEdge | null;
 }
 export type UpdateDomainPayloadSelect = {
@@ -15004,14 +14449,9 @@ export type UpdateDomainPayloadSelect = {
   };
 };
 export interface DeleteDomainPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Domain` that was deleted by this mutation. */
   domain?: Domain | null;
-  /** An edge for our `Domain`. May be used by Relay 1. */
   domainEdge?: DomainEdge | null;
 }
 export type DeleteDomainPayloadSelect = {
@@ -15024,14 +14464,9 @@ export type DeleteDomainPayloadSelect = {
   };
 };
 export interface CreateSiteMetadatumPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteMetadatum` that was created by this mutation. */
   siteMetadatum?: SiteMetadatum | null;
-  /** An edge for our `SiteMetadatum`. May be used by Relay 1. */
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
 export type CreateSiteMetadatumPayloadSelect = {
@@ -15044,14 +14479,9 @@ export type CreateSiteMetadatumPayloadSelect = {
   };
 };
 export interface UpdateSiteMetadatumPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteMetadatum` that was updated by this mutation. */
   siteMetadatum?: SiteMetadatum | null;
-  /** An edge for our `SiteMetadatum`. May be used by Relay 1. */
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
 export type UpdateSiteMetadatumPayloadSelect = {
@@ -15064,14 +14494,9 @@ export type UpdateSiteMetadatumPayloadSelect = {
   };
 };
 export interface DeleteSiteMetadatumPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteMetadatum` that was deleted by this mutation. */
   siteMetadatum?: SiteMetadatum | null;
-  /** An edge for our `SiteMetadatum`. May be used by Relay 1. */
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
 export type DeleteSiteMetadatumPayloadSelect = {
@@ -15084,14 +14509,9 @@ export type DeleteSiteMetadatumPayloadSelect = {
   };
 };
 export interface CreateSiteModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteModule` that was created by this mutation. */
   siteModule?: SiteModule | null;
-  /** An edge for our `SiteModule`. May be used by Relay 1. */
   siteModuleEdge?: SiteModuleEdge | null;
 }
 export type CreateSiteModulePayloadSelect = {
@@ -15104,14 +14524,9 @@ export type CreateSiteModulePayloadSelect = {
   };
 };
 export interface UpdateSiteModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteModule` that was updated by this mutation. */
   siteModule?: SiteModule | null;
-  /** An edge for our `SiteModule`. May be used by Relay 1. */
   siteModuleEdge?: SiteModuleEdge | null;
 }
 export type UpdateSiteModulePayloadSelect = {
@@ -15124,14 +14539,9 @@ export type UpdateSiteModulePayloadSelect = {
   };
 };
 export interface DeleteSiteModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteModule` that was deleted by this mutation. */
   siteModule?: SiteModule | null;
-  /** An edge for our `SiteModule`. May be used by Relay 1. */
   siteModuleEdge?: SiteModuleEdge | null;
 }
 export type DeleteSiteModulePayloadSelect = {
@@ -15144,14 +14554,9 @@ export type DeleteSiteModulePayloadSelect = {
   };
 };
 export interface CreateSiteThemePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteTheme` that was created by this mutation. */
   siteTheme?: SiteTheme | null;
-  /** An edge for our `SiteTheme`. May be used by Relay 1. */
   siteThemeEdge?: SiteThemeEdge | null;
 }
 export type CreateSiteThemePayloadSelect = {
@@ -15164,14 +14569,9 @@ export type CreateSiteThemePayloadSelect = {
   };
 };
 export interface UpdateSiteThemePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteTheme` that was updated by this mutation. */
   siteTheme?: SiteTheme | null;
-  /** An edge for our `SiteTheme`. May be used by Relay 1. */
   siteThemeEdge?: SiteThemeEdge | null;
 }
 export type UpdateSiteThemePayloadSelect = {
@@ -15184,14 +14584,9 @@ export type UpdateSiteThemePayloadSelect = {
   };
 };
 export interface DeleteSiteThemePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SiteTheme` that was deleted by this mutation. */
   siteTheme?: SiteTheme | null;
-  /** An edge for our `SiteTheme`. May be used by Relay 1. */
   siteThemeEdge?: SiteThemeEdge | null;
 }
 export type DeleteSiteThemePayloadSelect = {
@@ -15204,14 +14599,9 @@ export type DeleteSiteThemePayloadSelect = {
   };
 };
 export interface CreateProcedurePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Procedure` that was created by this mutation. */
   procedure?: Procedure | null;
-  /** An edge for our `Procedure`. May be used by Relay 1. */
   procedureEdge?: ProcedureEdge | null;
 }
 export type CreateProcedurePayloadSelect = {
@@ -15224,14 +14614,9 @@ export type CreateProcedurePayloadSelect = {
   };
 };
 export interface UpdateProcedurePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Procedure` that was updated by this mutation. */
   procedure?: Procedure | null;
-  /** An edge for our `Procedure`. May be used by Relay 1. */
   procedureEdge?: ProcedureEdge | null;
 }
 export type UpdateProcedurePayloadSelect = {
@@ -15244,14 +14629,9 @@ export type UpdateProcedurePayloadSelect = {
   };
 };
 export interface DeleteProcedurePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Procedure` that was deleted by this mutation. */
   procedure?: Procedure | null;
-  /** An edge for our `Procedure`. May be used by Relay 1. */
   procedureEdge?: ProcedureEdge | null;
 }
 export type DeleteProcedurePayloadSelect = {
@@ -15264,14 +14644,9 @@ export type DeleteProcedurePayloadSelect = {
   };
 };
 export interface CreateTriggerFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TriggerFunction` that was created by this mutation. */
   triggerFunction?: TriggerFunction | null;
-  /** An edge for our `TriggerFunction`. May be used by Relay 1. */
   triggerFunctionEdge?: TriggerFunctionEdge | null;
 }
 export type CreateTriggerFunctionPayloadSelect = {
@@ -15284,14 +14659,9 @@ export type CreateTriggerFunctionPayloadSelect = {
   };
 };
 export interface UpdateTriggerFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TriggerFunction` that was updated by this mutation. */
   triggerFunction?: TriggerFunction | null;
-  /** An edge for our `TriggerFunction`. May be used by Relay 1. */
   triggerFunctionEdge?: TriggerFunctionEdge | null;
 }
 export type UpdateTriggerFunctionPayloadSelect = {
@@ -15304,14 +14674,9 @@ export type UpdateTriggerFunctionPayloadSelect = {
   };
 };
 export interface DeleteTriggerFunctionPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `TriggerFunction` that was deleted by this mutation. */
   triggerFunction?: TriggerFunction | null;
-  /** An edge for our `TriggerFunction`. May be used by Relay 1. */
   triggerFunctionEdge?: TriggerFunctionEdge | null;
 }
 export type DeleteTriggerFunctionPayloadSelect = {
@@ -15324,14 +14689,9 @@ export type DeleteTriggerFunctionPayloadSelect = {
   };
 };
 export interface CreateApiPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Api` that was created by this mutation. */
   api?: Api | null;
-  /** An edge for our `Api`. May be used by Relay 1. */
   apiEdge?: ApiEdge | null;
 }
 export type CreateApiPayloadSelect = {
@@ -15344,14 +14704,9 @@ export type CreateApiPayloadSelect = {
   };
 };
 export interface UpdateApiPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Api` that was updated by this mutation. */
   api?: Api | null;
-  /** An edge for our `Api`. May be used by Relay 1. */
   apiEdge?: ApiEdge | null;
 }
 export type UpdateApiPayloadSelect = {
@@ -15364,14 +14719,9 @@ export type UpdateApiPayloadSelect = {
   };
 };
 export interface DeleteApiPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Api` that was deleted by this mutation. */
   api?: Api | null;
-  /** An edge for our `Api`. May be used by Relay 1. */
   apiEdge?: ApiEdge | null;
 }
 export type DeleteApiPayloadSelect = {
@@ -15384,14 +14734,9 @@ export type DeleteApiPayloadSelect = {
   };
 };
 export interface CreateSitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Site` that was created by this mutation. */
   site?: Site | null;
-  /** An edge for our `Site`. May be used by Relay 1. */
   siteEdge?: SiteEdge | null;
 }
 export type CreateSitePayloadSelect = {
@@ -15404,14 +14749,9 @@ export type CreateSitePayloadSelect = {
   };
 };
 export interface UpdateSitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Site` that was updated by this mutation. */
   site?: Site | null;
-  /** An edge for our `Site`. May be used by Relay 1. */
   siteEdge?: SiteEdge | null;
 }
 export type UpdateSitePayloadSelect = {
@@ -15424,14 +14764,9 @@ export type UpdateSitePayloadSelect = {
   };
 };
 export interface DeleteSitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Site` that was deleted by this mutation. */
   site?: Site | null;
-  /** An edge for our `Site`. May be used by Relay 1. */
   siteEdge?: SiteEdge | null;
 }
 export type DeleteSitePayloadSelect = {
@@ -15444,14 +14779,9 @@ export type DeleteSitePayloadSelect = {
   };
 };
 export interface CreateAppPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `App` that was created by this mutation. */
   app?: App | null;
-  /** An edge for our `App`. May be used by Relay 1. */
   appEdge?: AppEdge | null;
 }
 export type CreateAppPayloadSelect = {
@@ -15464,14 +14794,9 @@ export type CreateAppPayloadSelect = {
   };
 };
 export interface UpdateAppPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `App` that was updated by this mutation. */
   app?: App | null;
-  /** An edge for our `App`. May be used by Relay 1. */
   appEdge?: AppEdge | null;
 }
 export type UpdateAppPayloadSelect = {
@@ -15484,14 +14809,9 @@ export type UpdateAppPayloadSelect = {
   };
 };
 export interface DeleteAppPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `App` that was deleted by this mutation. */
   app?: App | null;
-  /** An edge for our `App`. May be used by Relay 1. */
   appEdge?: AppEdge | null;
 }
 export type DeleteAppPayloadSelect = {
@@ -15504,14 +14824,9 @@ export type DeleteAppPayloadSelect = {
   };
 };
 export interface CreateConnectedAccountsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccountsModule` that was created by this mutation. */
   connectedAccountsModule?: ConnectedAccountsModule | null;
-  /** An edge for our `ConnectedAccountsModule`. May be used by Relay 1. */
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
 export type CreateConnectedAccountsModulePayloadSelect = {
@@ -15524,14 +14839,9 @@ export type CreateConnectedAccountsModulePayloadSelect = {
   };
 };
 export interface UpdateConnectedAccountsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccountsModule` that was updated by this mutation. */
   connectedAccountsModule?: ConnectedAccountsModule | null;
-  /** An edge for our `ConnectedAccountsModule`. May be used by Relay 1. */
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
 export type UpdateConnectedAccountsModulePayloadSelect = {
@@ -15544,14 +14854,9 @@ export type UpdateConnectedAccountsModulePayloadSelect = {
   };
 };
 export interface DeleteConnectedAccountsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccountsModule` that was deleted by this mutation. */
   connectedAccountsModule?: ConnectedAccountsModule | null;
-  /** An edge for our `ConnectedAccountsModule`. May be used by Relay 1. */
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
 export type DeleteConnectedAccountsModulePayloadSelect = {
@@ -15564,14 +14869,9 @@ export type DeleteConnectedAccountsModulePayloadSelect = {
   };
 };
 export interface CreateCryptoAddressesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddressesModule` that was created by this mutation. */
   cryptoAddressesModule?: CryptoAddressesModule | null;
-  /** An edge for our `CryptoAddressesModule`. May be used by Relay 1. */
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
 export type CreateCryptoAddressesModulePayloadSelect = {
@@ -15584,14 +14884,9 @@ export type CreateCryptoAddressesModulePayloadSelect = {
   };
 };
 export interface UpdateCryptoAddressesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddressesModule` that was updated by this mutation. */
   cryptoAddressesModule?: CryptoAddressesModule | null;
-  /** An edge for our `CryptoAddressesModule`. May be used by Relay 1. */
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
 export type UpdateCryptoAddressesModulePayloadSelect = {
@@ -15604,14 +14899,9 @@ export type UpdateCryptoAddressesModulePayloadSelect = {
   };
 };
 export interface DeleteCryptoAddressesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddressesModule` that was deleted by this mutation. */
   cryptoAddressesModule?: CryptoAddressesModule | null;
-  /** An edge for our `CryptoAddressesModule`. May be used by Relay 1. */
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
 export type DeleteCryptoAddressesModulePayloadSelect = {
@@ -15624,14 +14914,9 @@ export type DeleteCryptoAddressesModulePayloadSelect = {
   };
 };
 export interface CreateCryptoAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAuthModule` that was created by this mutation. */
   cryptoAuthModule?: CryptoAuthModule | null;
-  /** An edge for our `CryptoAuthModule`. May be used by Relay 1. */
   cryptoAuthModuleEdge?: CryptoAuthModuleEdge | null;
 }
 export type CreateCryptoAuthModulePayloadSelect = {
@@ -15644,14 +14929,9 @@ export type CreateCryptoAuthModulePayloadSelect = {
   };
 };
 export interface UpdateCryptoAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAuthModule` that was updated by this mutation. */
   cryptoAuthModule?: CryptoAuthModule | null;
-  /** An edge for our `CryptoAuthModule`. May be used by Relay 1. */
   cryptoAuthModuleEdge?: CryptoAuthModuleEdge | null;
 }
 export type UpdateCryptoAuthModulePayloadSelect = {
@@ -15664,14 +14944,9 @@ export type UpdateCryptoAuthModulePayloadSelect = {
   };
 };
 export interface DeleteCryptoAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAuthModule` that was deleted by this mutation. */
   cryptoAuthModule?: CryptoAuthModule | null;
-  /** An edge for our `CryptoAuthModule`. May be used by Relay 1. */
   cryptoAuthModuleEdge?: CryptoAuthModuleEdge | null;
 }
 export type DeleteCryptoAuthModulePayloadSelect = {
@@ -15684,14 +14959,9 @@ export type DeleteCryptoAuthModulePayloadSelect = {
   };
 };
 export interface CreateDefaultIdsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DefaultIdsModule` that was created by this mutation. */
   defaultIdsModule?: DefaultIdsModule | null;
-  /** An edge for our `DefaultIdsModule`. May be used by Relay 1. */
   defaultIdsModuleEdge?: DefaultIdsModuleEdge | null;
 }
 export type CreateDefaultIdsModulePayloadSelect = {
@@ -15704,14 +14974,9 @@ export type CreateDefaultIdsModulePayloadSelect = {
   };
 };
 export interface UpdateDefaultIdsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DefaultIdsModule` that was updated by this mutation. */
   defaultIdsModule?: DefaultIdsModule | null;
-  /** An edge for our `DefaultIdsModule`. May be used by Relay 1. */
   defaultIdsModuleEdge?: DefaultIdsModuleEdge | null;
 }
 export type UpdateDefaultIdsModulePayloadSelect = {
@@ -15724,14 +14989,9 @@ export type UpdateDefaultIdsModulePayloadSelect = {
   };
 };
 export interface DeleteDefaultIdsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DefaultIdsModule` that was deleted by this mutation. */
   defaultIdsModule?: DefaultIdsModule | null;
-  /** An edge for our `DefaultIdsModule`. May be used by Relay 1. */
   defaultIdsModuleEdge?: DefaultIdsModuleEdge | null;
 }
 export type DeleteDefaultIdsModulePayloadSelect = {
@@ -15744,14 +15004,9 @@ export type DeleteDefaultIdsModulePayloadSelect = {
   };
 };
 export interface CreateDenormalizedTableFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DenormalizedTableField` that was created by this mutation. */
   denormalizedTableField?: DenormalizedTableField | null;
-  /** An edge for our `DenormalizedTableField`. May be used by Relay 1. */
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
 export type CreateDenormalizedTableFieldPayloadSelect = {
@@ -15764,14 +15019,9 @@ export type CreateDenormalizedTableFieldPayloadSelect = {
   };
 };
 export interface UpdateDenormalizedTableFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DenormalizedTableField` that was updated by this mutation. */
   denormalizedTableField?: DenormalizedTableField | null;
-  /** An edge for our `DenormalizedTableField`. May be used by Relay 1. */
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
 export type UpdateDenormalizedTableFieldPayloadSelect = {
@@ -15784,14 +15034,9 @@ export type UpdateDenormalizedTableFieldPayloadSelect = {
   };
 };
 export interface DeleteDenormalizedTableFieldPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DenormalizedTableField` that was deleted by this mutation. */
   denormalizedTableField?: DenormalizedTableField | null;
-  /** An edge for our `DenormalizedTableField`. May be used by Relay 1. */
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
 export type DeleteDenormalizedTableFieldPayloadSelect = {
@@ -15804,14 +15049,9 @@ export type DeleteDenormalizedTableFieldPayloadSelect = {
   };
 };
 export interface CreateEmailsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EmailsModule` that was created by this mutation. */
   emailsModule?: EmailsModule | null;
-  /** An edge for our `EmailsModule`. May be used by Relay 1. */
   emailsModuleEdge?: EmailsModuleEdge | null;
 }
 export type CreateEmailsModulePayloadSelect = {
@@ -15824,14 +15064,9 @@ export type CreateEmailsModulePayloadSelect = {
   };
 };
 export interface UpdateEmailsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EmailsModule` that was updated by this mutation. */
   emailsModule?: EmailsModule | null;
-  /** An edge for our `EmailsModule`. May be used by Relay 1. */
   emailsModuleEdge?: EmailsModuleEdge | null;
 }
 export type UpdateEmailsModulePayloadSelect = {
@@ -15844,14 +15079,9 @@ export type UpdateEmailsModulePayloadSelect = {
   };
 };
 export interface DeleteEmailsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EmailsModule` that was deleted by this mutation. */
   emailsModule?: EmailsModule | null;
-  /** An edge for our `EmailsModule`. May be used by Relay 1. */
   emailsModuleEdge?: EmailsModuleEdge | null;
 }
 export type DeleteEmailsModulePayloadSelect = {
@@ -15864,14 +15094,9 @@ export type DeleteEmailsModulePayloadSelect = {
   };
 };
 export interface CreateEncryptedSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EncryptedSecretsModule` that was created by this mutation. */
   encryptedSecretsModule?: EncryptedSecretsModule | null;
-  /** An edge for our `EncryptedSecretsModule`. May be used by Relay 1. */
   encryptedSecretsModuleEdge?: EncryptedSecretsModuleEdge | null;
 }
 export type CreateEncryptedSecretsModulePayloadSelect = {
@@ -15884,14 +15109,9 @@ export type CreateEncryptedSecretsModulePayloadSelect = {
   };
 };
 export interface UpdateEncryptedSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EncryptedSecretsModule` that was updated by this mutation. */
   encryptedSecretsModule?: EncryptedSecretsModule | null;
-  /** An edge for our `EncryptedSecretsModule`. May be used by Relay 1. */
   encryptedSecretsModuleEdge?: EncryptedSecretsModuleEdge | null;
 }
 export type UpdateEncryptedSecretsModulePayloadSelect = {
@@ -15904,14 +15124,9 @@ export type UpdateEncryptedSecretsModulePayloadSelect = {
   };
 };
 export interface DeleteEncryptedSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `EncryptedSecretsModule` that was deleted by this mutation. */
   encryptedSecretsModule?: EncryptedSecretsModule | null;
-  /** An edge for our `EncryptedSecretsModule`. May be used by Relay 1. */
   encryptedSecretsModuleEdge?: EncryptedSecretsModuleEdge | null;
 }
 export type DeleteEncryptedSecretsModulePayloadSelect = {
@@ -15924,14 +15139,9 @@ export type DeleteEncryptedSecretsModulePayloadSelect = {
   };
 };
 export interface CreateFieldModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FieldModule` that was created by this mutation. */
   fieldModule?: FieldModule | null;
-  /** An edge for our `FieldModule`. May be used by Relay 1. */
   fieldModuleEdge?: FieldModuleEdge | null;
 }
 export type CreateFieldModulePayloadSelect = {
@@ -15944,14 +15154,9 @@ export type CreateFieldModulePayloadSelect = {
   };
 };
 export interface UpdateFieldModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FieldModule` that was updated by this mutation. */
   fieldModule?: FieldModule | null;
-  /** An edge for our `FieldModule`. May be used by Relay 1. */
   fieldModuleEdge?: FieldModuleEdge | null;
 }
 export type UpdateFieldModulePayloadSelect = {
@@ -15964,14 +15169,9 @@ export type UpdateFieldModulePayloadSelect = {
   };
 };
 export interface DeleteFieldModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `FieldModule` that was deleted by this mutation. */
   fieldModule?: FieldModule | null;
-  /** An edge for our `FieldModule`. May be used by Relay 1. */
   fieldModuleEdge?: FieldModuleEdge | null;
 }
 export type DeleteFieldModulePayloadSelect = {
@@ -15984,14 +15184,9 @@ export type DeleteFieldModulePayloadSelect = {
   };
 };
 export interface CreateInvitesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `InvitesModule` that was created by this mutation. */
   invitesModule?: InvitesModule | null;
-  /** An edge for our `InvitesModule`. May be used by Relay 1. */
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
 export type CreateInvitesModulePayloadSelect = {
@@ -16004,14 +15199,9 @@ export type CreateInvitesModulePayloadSelect = {
   };
 };
 export interface UpdateInvitesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `InvitesModule` that was updated by this mutation. */
   invitesModule?: InvitesModule | null;
-  /** An edge for our `InvitesModule`. May be used by Relay 1. */
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
 export type UpdateInvitesModulePayloadSelect = {
@@ -16024,14 +15214,9 @@ export type UpdateInvitesModulePayloadSelect = {
   };
 };
 export interface DeleteInvitesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `InvitesModule` that was deleted by this mutation. */
   invitesModule?: InvitesModule | null;
-  /** An edge for our `InvitesModule`. May be used by Relay 1. */
   invitesModuleEdge?: InvitesModuleEdge | null;
 }
 export type DeleteInvitesModulePayloadSelect = {
@@ -16044,14 +15229,9 @@ export type DeleteInvitesModulePayloadSelect = {
   };
 };
 export interface CreateLevelsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LevelsModule` that was created by this mutation. */
   levelsModule?: LevelsModule | null;
-  /** An edge for our `LevelsModule`. May be used by Relay 1. */
   levelsModuleEdge?: LevelsModuleEdge | null;
 }
 export type CreateLevelsModulePayloadSelect = {
@@ -16064,14 +15244,9 @@ export type CreateLevelsModulePayloadSelect = {
   };
 };
 export interface UpdateLevelsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LevelsModule` that was updated by this mutation. */
   levelsModule?: LevelsModule | null;
-  /** An edge for our `LevelsModule`. May be used by Relay 1. */
   levelsModuleEdge?: LevelsModuleEdge | null;
 }
 export type UpdateLevelsModulePayloadSelect = {
@@ -16084,14 +15259,9 @@ export type UpdateLevelsModulePayloadSelect = {
   };
 };
 export interface DeleteLevelsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LevelsModule` that was deleted by this mutation. */
   levelsModule?: LevelsModule | null;
-  /** An edge for our `LevelsModule`. May be used by Relay 1. */
   levelsModuleEdge?: LevelsModuleEdge | null;
 }
 export type DeleteLevelsModulePayloadSelect = {
@@ -16104,14 +15274,9 @@ export type DeleteLevelsModulePayloadSelect = {
   };
 };
 export interface CreateLimitsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitsModule` that was created by this mutation. */
   limitsModule?: LimitsModule | null;
-  /** An edge for our `LimitsModule`. May be used by Relay 1. */
   limitsModuleEdge?: LimitsModuleEdge | null;
 }
 export type CreateLimitsModulePayloadSelect = {
@@ -16124,14 +15289,9 @@ export type CreateLimitsModulePayloadSelect = {
   };
 };
 export interface UpdateLimitsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitsModule` that was updated by this mutation. */
   limitsModule?: LimitsModule | null;
-  /** An edge for our `LimitsModule`. May be used by Relay 1. */
   limitsModuleEdge?: LimitsModuleEdge | null;
 }
 export type UpdateLimitsModulePayloadSelect = {
@@ -16144,14 +15304,9 @@ export type UpdateLimitsModulePayloadSelect = {
   };
 };
 export interface DeleteLimitsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `LimitsModule` that was deleted by this mutation. */
   limitsModule?: LimitsModule | null;
-  /** An edge for our `LimitsModule`. May be used by Relay 1. */
   limitsModuleEdge?: LimitsModuleEdge | null;
 }
 export type DeleteLimitsModulePayloadSelect = {
@@ -16164,14 +15319,9 @@ export type DeleteLimitsModulePayloadSelect = {
   };
 };
 export interface CreateMembershipTypesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipTypesModule` that was created by this mutation. */
   membershipTypesModule?: MembershipTypesModule | null;
-  /** An edge for our `MembershipTypesModule`. May be used by Relay 1. */
   membershipTypesModuleEdge?: MembershipTypesModuleEdge | null;
 }
 export type CreateMembershipTypesModulePayloadSelect = {
@@ -16184,14 +15334,9 @@ export type CreateMembershipTypesModulePayloadSelect = {
   };
 };
 export interface UpdateMembershipTypesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipTypesModule` that was updated by this mutation. */
   membershipTypesModule?: MembershipTypesModule | null;
-  /** An edge for our `MembershipTypesModule`. May be used by Relay 1. */
   membershipTypesModuleEdge?: MembershipTypesModuleEdge | null;
 }
 export type UpdateMembershipTypesModulePayloadSelect = {
@@ -16204,14 +15349,9 @@ export type UpdateMembershipTypesModulePayloadSelect = {
   };
 };
 export interface DeleteMembershipTypesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipTypesModule` that was deleted by this mutation. */
   membershipTypesModule?: MembershipTypesModule | null;
-  /** An edge for our `MembershipTypesModule`. May be used by Relay 1. */
   membershipTypesModuleEdge?: MembershipTypesModuleEdge | null;
 }
 export type DeleteMembershipTypesModulePayloadSelect = {
@@ -16224,14 +15364,9 @@ export type DeleteMembershipTypesModulePayloadSelect = {
   };
 };
 export interface CreateMembershipsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was created by this mutation. */
   membershipsModule?: MembershipsModule | null;
-  /** An edge for our `MembershipsModule`. May be used by Relay 1. */
   membershipsModuleEdge?: MembershipsModuleEdge | null;
 }
 export type CreateMembershipsModulePayloadSelect = {
@@ -16244,14 +15379,9 @@ export type CreateMembershipsModulePayloadSelect = {
   };
 };
 export interface UpdateMembershipsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was updated by this mutation. */
   membershipsModule?: MembershipsModule | null;
-  /** An edge for our `MembershipsModule`. May be used by Relay 1. */
   membershipsModuleEdge?: MembershipsModuleEdge | null;
 }
 export type UpdateMembershipsModulePayloadSelect = {
@@ -16264,14 +15394,9 @@ export type UpdateMembershipsModulePayloadSelect = {
   };
 };
 export interface DeleteMembershipsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipsModule` that was deleted by this mutation. */
   membershipsModule?: MembershipsModule | null;
-  /** An edge for our `MembershipsModule`. May be used by Relay 1. */
   membershipsModuleEdge?: MembershipsModuleEdge | null;
 }
 export type DeleteMembershipsModulePayloadSelect = {
@@ -16284,14 +15409,9 @@ export type DeleteMembershipsModulePayloadSelect = {
   };
 };
 export interface CreatePermissionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PermissionsModule` that was created by this mutation. */
   permissionsModule?: PermissionsModule | null;
-  /** An edge for our `PermissionsModule`. May be used by Relay 1. */
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
 export type CreatePermissionsModulePayloadSelect = {
@@ -16304,14 +15424,9 @@ export type CreatePermissionsModulePayloadSelect = {
   };
 };
 export interface UpdatePermissionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PermissionsModule` that was updated by this mutation. */
   permissionsModule?: PermissionsModule | null;
-  /** An edge for our `PermissionsModule`. May be used by Relay 1. */
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
 export type UpdatePermissionsModulePayloadSelect = {
@@ -16324,14 +15439,9 @@ export type UpdatePermissionsModulePayloadSelect = {
   };
 };
 export interface DeletePermissionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PermissionsModule` that was deleted by this mutation. */
   permissionsModule?: PermissionsModule | null;
-  /** An edge for our `PermissionsModule`. May be used by Relay 1. */
   permissionsModuleEdge?: PermissionsModuleEdge | null;
 }
 export type DeletePermissionsModulePayloadSelect = {
@@ -16344,14 +15454,9 @@ export type DeletePermissionsModulePayloadSelect = {
   };
 };
 export interface CreatePhoneNumbersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumbersModule` that was created by this mutation. */
   phoneNumbersModule?: PhoneNumbersModule | null;
-  /** An edge for our `PhoneNumbersModule`. May be used by Relay 1. */
   phoneNumbersModuleEdge?: PhoneNumbersModuleEdge | null;
 }
 export type CreatePhoneNumbersModulePayloadSelect = {
@@ -16364,14 +15469,9 @@ export type CreatePhoneNumbersModulePayloadSelect = {
   };
 };
 export interface UpdatePhoneNumbersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumbersModule` that was updated by this mutation. */
   phoneNumbersModule?: PhoneNumbersModule | null;
-  /** An edge for our `PhoneNumbersModule`. May be used by Relay 1. */
   phoneNumbersModuleEdge?: PhoneNumbersModuleEdge | null;
 }
 export type UpdatePhoneNumbersModulePayloadSelect = {
@@ -16384,14 +15484,9 @@ export type UpdatePhoneNumbersModulePayloadSelect = {
   };
 };
 export interface DeletePhoneNumbersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumbersModule` that was deleted by this mutation. */
   phoneNumbersModule?: PhoneNumbersModule | null;
-  /** An edge for our `PhoneNumbersModule`. May be used by Relay 1. */
   phoneNumbersModuleEdge?: PhoneNumbersModuleEdge | null;
 }
 export type DeletePhoneNumbersModulePayloadSelect = {
@@ -16404,14 +15499,9 @@ export type DeletePhoneNumbersModulePayloadSelect = {
   };
 };
 export interface CreateProfilesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ProfilesModule` that was created by this mutation. */
   profilesModule?: ProfilesModule | null;
-  /** An edge for our `ProfilesModule`. May be used by Relay 1. */
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
 export type CreateProfilesModulePayloadSelect = {
@@ -16424,14 +15514,9 @@ export type CreateProfilesModulePayloadSelect = {
   };
 };
 export interface UpdateProfilesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ProfilesModule` that was updated by this mutation. */
   profilesModule?: ProfilesModule | null;
-  /** An edge for our `ProfilesModule`. May be used by Relay 1. */
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
 export type UpdateProfilesModulePayloadSelect = {
@@ -16444,14 +15529,9 @@ export type UpdateProfilesModulePayloadSelect = {
   };
 };
 export interface DeleteProfilesModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ProfilesModule` that was deleted by this mutation. */
   profilesModule?: ProfilesModule | null;
-  /** An edge for our `ProfilesModule`. May be used by Relay 1. */
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
 export type DeleteProfilesModulePayloadSelect = {
@@ -16464,14 +15544,9 @@ export type DeleteProfilesModulePayloadSelect = {
   };
 };
 export interface CreateRlsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RlsModule` that was created by this mutation. */
   rlsModule?: RlsModule | null;
-  /** An edge for our `RlsModule`. May be used by Relay 1. */
   rlsModuleEdge?: RlsModuleEdge | null;
 }
 export type CreateRlsModulePayloadSelect = {
@@ -16484,14 +15559,9 @@ export type CreateRlsModulePayloadSelect = {
   };
 };
 export interface UpdateRlsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RlsModule` that was updated by this mutation. */
   rlsModule?: RlsModule | null;
-  /** An edge for our `RlsModule`. May be used by Relay 1. */
   rlsModuleEdge?: RlsModuleEdge | null;
 }
 export type UpdateRlsModulePayloadSelect = {
@@ -16504,14 +15574,9 @@ export type UpdateRlsModulePayloadSelect = {
   };
 };
 export interface DeleteRlsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RlsModule` that was deleted by this mutation. */
   rlsModule?: RlsModule | null;
-  /** An edge for our `RlsModule`. May be used by Relay 1. */
   rlsModuleEdge?: RlsModuleEdge | null;
 }
 export type DeleteRlsModulePayloadSelect = {
@@ -16524,14 +15589,9 @@ export type DeleteRlsModulePayloadSelect = {
   };
 };
 export interface CreateSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SecretsModule` that was created by this mutation. */
   secretsModule?: SecretsModule | null;
-  /** An edge for our `SecretsModule`. May be used by Relay 1. */
   secretsModuleEdge?: SecretsModuleEdge | null;
 }
 export type CreateSecretsModulePayloadSelect = {
@@ -16544,14 +15604,9 @@ export type CreateSecretsModulePayloadSelect = {
   };
 };
 export interface UpdateSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SecretsModule` that was updated by this mutation. */
   secretsModule?: SecretsModule | null;
-  /** An edge for our `SecretsModule`. May be used by Relay 1. */
   secretsModuleEdge?: SecretsModuleEdge | null;
 }
 export type UpdateSecretsModulePayloadSelect = {
@@ -16564,14 +15619,9 @@ export type UpdateSecretsModulePayloadSelect = {
   };
 };
 export interface DeleteSecretsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SecretsModule` that was deleted by this mutation. */
   secretsModule?: SecretsModule | null;
-  /** An edge for our `SecretsModule`. May be used by Relay 1. */
   secretsModuleEdge?: SecretsModuleEdge | null;
 }
 export type DeleteSecretsModulePayloadSelect = {
@@ -16584,14 +15634,9 @@ export type DeleteSecretsModulePayloadSelect = {
   };
 };
 export interface CreateSessionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SessionsModule` that was created by this mutation. */
   sessionsModule?: SessionsModule | null;
-  /** An edge for our `SessionsModule`. May be used by Relay 1. */
   sessionsModuleEdge?: SessionsModuleEdge | null;
 }
 export type CreateSessionsModulePayloadSelect = {
@@ -16604,14 +15649,9 @@ export type CreateSessionsModulePayloadSelect = {
   };
 };
 export interface UpdateSessionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SessionsModule` that was updated by this mutation. */
   sessionsModule?: SessionsModule | null;
-  /** An edge for our `SessionsModule`. May be used by Relay 1. */
   sessionsModuleEdge?: SessionsModuleEdge | null;
 }
 export type UpdateSessionsModulePayloadSelect = {
@@ -16624,14 +15664,9 @@ export type UpdateSessionsModulePayloadSelect = {
   };
 };
 export interface DeleteSessionsModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SessionsModule` that was deleted by this mutation. */
   sessionsModule?: SessionsModule | null;
-  /** An edge for our `SessionsModule`. May be used by Relay 1. */
   sessionsModuleEdge?: SessionsModuleEdge | null;
 }
 export type DeleteSessionsModulePayloadSelect = {
@@ -16644,14 +15679,9 @@ export type DeleteSessionsModulePayloadSelect = {
   };
 };
 export interface CreateUserAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UserAuthModule` that was created by this mutation. */
   userAuthModule?: UserAuthModule | null;
-  /** An edge for our `UserAuthModule`. May be used by Relay 1. */
   userAuthModuleEdge?: UserAuthModuleEdge | null;
 }
 export type CreateUserAuthModulePayloadSelect = {
@@ -16664,14 +15694,9 @@ export type CreateUserAuthModulePayloadSelect = {
   };
 };
 export interface UpdateUserAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UserAuthModule` that was updated by this mutation. */
   userAuthModule?: UserAuthModule | null;
-  /** An edge for our `UserAuthModule`. May be used by Relay 1. */
   userAuthModuleEdge?: UserAuthModuleEdge | null;
 }
 export type UpdateUserAuthModulePayloadSelect = {
@@ -16684,14 +15709,9 @@ export type UpdateUserAuthModulePayloadSelect = {
   };
 };
 export interface DeleteUserAuthModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UserAuthModule` that was deleted by this mutation. */
   userAuthModule?: UserAuthModule | null;
-  /** An edge for our `UserAuthModule`. May be used by Relay 1. */
   userAuthModuleEdge?: UserAuthModuleEdge | null;
 }
 export type DeleteUserAuthModulePayloadSelect = {
@@ -16704,14 +15724,9 @@ export type DeleteUserAuthModulePayloadSelect = {
   };
 };
 export interface CreateUsersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UsersModule` that was created by this mutation. */
   usersModule?: UsersModule | null;
-  /** An edge for our `UsersModule`. May be used by Relay 1. */
   usersModuleEdge?: UsersModuleEdge | null;
 }
 export type CreateUsersModulePayloadSelect = {
@@ -16724,14 +15739,9 @@ export type CreateUsersModulePayloadSelect = {
   };
 };
 export interface UpdateUsersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UsersModule` that was updated by this mutation. */
   usersModule?: UsersModule | null;
-  /** An edge for our `UsersModule`. May be used by Relay 1. */
   usersModuleEdge?: UsersModuleEdge | null;
 }
 export type UpdateUsersModulePayloadSelect = {
@@ -16744,14 +15754,9 @@ export type UpdateUsersModulePayloadSelect = {
   };
 };
 export interface DeleteUsersModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UsersModule` that was deleted by this mutation. */
   usersModule?: UsersModule | null;
-  /** An edge for our `UsersModule`. May be used by Relay 1. */
   usersModuleEdge?: UsersModuleEdge | null;
 }
 export type DeleteUsersModulePayloadSelect = {
@@ -16764,14 +15769,9 @@ export type DeleteUsersModulePayloadSelect = {
   };
 };
 export interface CreateUuidModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UuidModule` that was created by this mutation. */
   uuidModule?: UuidModule | null;
-  /** An edge for our `UuidModule`. May be used by Relay 1. */
   uuidModuleEdge?: UuidModuleEdge | null;
 }
 export type CreateUuidModulePayloadSelect = {
@@ -16784,14 +15784,9 @@ export type CreateUuidModulePayloadSelect = {
   };
 };
 export interface UpdateUuidModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UuidModule` that was updated by this mutation. */
   uuidModule?: UuidModule | null;
-  /** An edge for our `UuidModule`. May be used by Relay 1. */
   uuidModuleEdge?: UuidModuleEdge | null;
 }
 export type UpdateUuidModulePayloadSelect = {
@@ -16804,14 +15799,9 @@ export type UpdateUuidModulePayloadSelect = {
   };
 };
 export interface DeleteUuidModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `UuidModule` that was deleted by this mutation. */
   uuidModule?: UuidModule | null;
-  /** An edge for our `UuidModule`. May be used by Relay 1. */
   uuidModuleEdge?: UuidModuleEdge | null;
 }
 export type DeleteUuidModulePayloadSelect = {
@@ -16824,14 +15814,9 @@ export type DeleteUuidModulePayloadSelect = {
   };
 };
 export interface CreateDatabaseProvisionModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DatabaseProvisionModule` that was created by this mutation. */
   databaseProvisionModule?: DatabaseProvisionModule | null;
-  /** An edge for our `DatabaseProvisionModule`. May be used by Relay 1. */
   databaseProvisionModuleEdge?: DatabaseProvisionModuleEdge | null;
 }
 export type CreateDatabaseProvisionModulePayloadSelect = {
@@ -16844,14 +15829,9 @@ export type CreateDatabaseProvisionModulePayloadSelect = {
   };
 };
 export interface UpdateDatabaseProvisionModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DatabaseProvisionModule` that was updated by this mutation. */
   databaseProvisionModule?: DatabaseProvisionModule | null;
-  /** An edge for our `DatabaseProvisionModule`. May be used by Relay 1. */
   databaseProvisionModuleEdge?: DatabaseProvisionModuleEdge | null;
 }
 export type UpdateDatabaseProvisionModulePayloadSelect = {
@@ -16864,14 +15844,9 @@ export type UpdateDatabaseProvisionModulePayloadSelect = {
   };
 };
 export interface DeleteDatabaseProvisionModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `DatabaseProvisionModule` that was deleted by this mutation. */
   databaseProvisionModule?: DatabaseProvisionModule | null;
-  /** An edge for our `DatabaseProvisionModule`. May be used by Relay 1. */
   databaseProvisionModuleEdge?: DatabaseProvisionModuleEdge | null;
 }
 export type DeleteDatabaseProvisionModulePayloadSelect = {
@@ -16884,14 +15859,9 @@ export type DeleteDatabaseProvisionModulePayloadSelect = {
   };
 };
 export interface CreateAppAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAdminGrant` that was created by this mutation. */
   appAdminGrant?: AppAdminGrant | null;
-  /** An edge for our `AppAdminGrant`. May be used by Relay 1. */
   appAdminGrantEdge?: AppAdminGrantEdge | null;
 }
 export type CreateAppAdminGrantPayloadSelect = {
@@ -16904,14 +15874,9 @@ export type CreateAppAdminGrantPayloadSelect = {
   };
 };
 export interface UpdateAppAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAdminGrant` that was updated by this mutation. */
   appAdminGrant?: AppAdminGrant | null;
-  /** An edge for our `AppAdminGrant`. May be used by Relay 1. */
   appAdminGrantEdge?: AppAdminGrantEdge | null;
 }
 export type UpdateAppAdminGrantPayloadSelect = {
@@ -16924,14 +15889,9 @@ export type UpdateAppAdminGrantPayloadSelect = {
   };
 };
 export interface DeleteAppAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAdminGrant` that was deleted by this mutation. */
   appAdminGrant?: AppAdminGrant | null;
-  /** An edge for our `AppAdminGrant`. May be used by Relay 1. */
   appAdminGrantEdge?: AppAdminGrantEdge | null;
 }
 export type DeleteAppAdminGrantPayloadSelect = {
@@ -16944,14 +15904,9 @@ export type DeleteAppAdminGrantPayloadSelect = {
   };
 };
 export interface CreateAppOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppOwnerGrant` that was created by this mutation. */
   appOwnerGrant?: AppOwnerGrant | null;
-  /** An edge for our `AppOwnerGrant`. May be used by Relay 1. */
   appOwnerGrantEdge?: AppOwnerGrantEdge | null;
 }
 export type CreateAppOwnerGrantPayloadSelect = {
@@ -16964,14 +15919,9 @@ export type CreateAppOwnerGrantPayloadSelect = {
   };
 };
 export interface UpdateAppOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppOwnerGrant` that was updated by this mutation. */
   appOwnerGrant?: AppOwnerGrant | null;
-  /** An edge for our `AppOwnerGrant`. May be used by Relay 1. */
   appOwnerGrantEdge?: AppOwnerGrantEdge | null;
 }
 export type UpdateAppOwnerGrantPayloadSelect = {
@@ -16984,14 +15934,9 @@ export type UpdateAppOwnerGrantPayloadSelect = {
   };
 };
 export interface DeleteAppOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppOwnerGrant` that was deleted by this mutation. */
   appOwnerGrant?: AppOwnerGrant | null;
-  /** An edge for our `AppOwnerGrant`. May be used by Relay 1. */
   appOwnerGrantEdge?: AppOwnerGrantEdge | null;
 }
 export type DeleteAppOwnerGrantPayloadSelect = {
@@ -17004,14 +15949,9 @@ export type DeleteAppOwnerGrantPayloadSelect = {
   };
 };
 export interface CreateAppGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppGrant` that was created by this mutation. */
   appGrant?: AppGrant | null;
-  /** An edge for our `AppGrant`. May be used by Relay 1. */
   appGrantEdge?: AppGrantEdge | null;
 }
 export type CreateAppGrantPayloadSelect = {
@@ -17024,14 +15964,9 @@ export type CreateAppGrantPayloadSelect = {
   };
 };
 export interface UpdateAppGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppGrant` that was updated by this mutation. */
   appGrant?: AppGrant | null;
-  /** An edge for our `AppGrant`. May be used by Relay 1. */
   appGrantEdge?: AppGrantEdge | null;
 }
 export type UpdateAppGrantPayloadSelect = {
@@ -17044,14 +15979,9 @@ export type UpdateAppGrantPayloadSelect = {
   };
 };
 export interface DeleteAppGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppGrant` that was deleted by this mutation. */
   appGrant?: AppGrant | null;
-  /** An edge for our `AppGrant`. May be used by Relay 1. */
   appGrantEdge?: AppGrantEdge | null;
 }
 export type DeleteAppGrantPayloadSelect = {
@@ -17064,14 +15994,9 @@ export type DeleteAppGrantPayloadSelect = {
   };
 };
 export interface CreateOrgMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembership` that was created by this mutation. */
   orgMembership?: OrgMembership | null;
-  /** An edge for our `OrgMembership`. May be used by Relay 1. */
   orgMembershipEdge?: OrgMembershipEdge | null;
 }
 export type CreateOrgMembershipPayloadSelect = {
@@ -17084,14 +16009,9 @@ export type CreateOrgMembershipPayloadSelect = {
   };
 };
 export interface UpdateOrgMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembership` that was updated by this mutation. */
   orgMembership?: OrgMembership | null;
-  /** An edge for our `OrgMembership`. May be used by Relay 1. */
   orgMembershipEdge?: OrgMembershipEdge | null;
 }
 export type UpdateOrgMembershipPayloadSelect = {
@@ -17104,14 +16024,9 @@ export type UpdateOrgMembershipPayloadSelect = {
   };
 };
 export interface DeleteOrgMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembership` that was deleted by this mutation. */
   orgMembership?: OrgMembership | null;
-  /** An edge for our `OrgMembership`. May be used by Relay 1. */
   orgMembershipEdge?: OrgMembershipEdge | null;
 }
 export type DeleteOrgMembershipPayloadSelect = {
@@ -17124,14 +16039,9 @@ export type DeleteOrgMembershipPayloadSelect = {
   };
 };
 export interface CreateOrgMemberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMember` that was created by this mutation. */
   orgMember?: OrgMember | null;
-  /** An edge for our `OrgMember`. May be used by Relay 1. */
   orgMemberEdge?: OrgMemberEdge | null;
 }
 export type CreateOrgMemberPayloadSelect = {
@@ -17144,14 +16054,9 @@ export type CreateOrgMemberPayloadSelect = {
   };
 };
 export interface UpdateOrgMemberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMember` that was updated by this mutation. */
   orgMember?: OrgMember | null;
-  /** An edge for our `OrgMember`. May be used by Relay 1. */
   orgMemberEdge?: OrgMemberEdge | null;
 }
 export type UpdateOrgMemberPayloadSelect = {
@@ -17164,14 +16069,9 @@ export type UpdateOrgMemberPayloadSelect = {
   };
 };
 export interface DeleteOrgMemberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMember` that was deleted by this mutation. */
   orgMember?: OrgMember | null;
-  /** An edge for our `OrgMember`. May be used by Relay 1. */
   orgMemberEdge?: OrgMemberEdge | null;
 }
 export type DeleteOrgMemberPayloadSelect = {
@@ -17184,14 +16084,9 @@ export type DeleteOrgMemberPayloadSelect = {
   };
 };
 export interface CreateOrgAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgAdminGrant` that was created by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
-  /** An edge for our `OrgAdminGrant`. May be used by Relay 1. */
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
 export type CreateOrgAdminGrantPayloadSelect = {
@@ -17204,14 +16099,9 @@ export type CreateOrgAdminGrantPayloadSelect = {
   };
 };
 export interface UpdateOrgAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgAdminGrant` that was updated by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
-  /** An edge for our `OrgAdminGrant`. May be used by Relay 1. */
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
 export type UpdateOrgAdminGrantPayloadSelect = {
@@ -17224,14 +16114,9 @@ export type UpdateOrgAdminGrantPayloadSelect = {
   };
 };
 export interface DeleteOrgAdminGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgAdminGrant` that was deleted by this mutation. */
   orgAdminGrant?: OrgAdminGrant | null;
-  /** An edge for our `OrgAdminGrant`. May be used by Relay 1. */
   orgAdminGrantEdge?: OrgAdminGrantEdge | null;
 }
 export type DeleteOrgAdminGrantPayloadSelect = {
@@ -17244,14 +16129,9 @@ export type DeleteOrgAdminGrantPayloadSelect = {
   };
 };
 export interface CreateOrgOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgOwnerGrant` that was created by this mutation. */
   orgOwnerGrant?: OrgOwnerGrant | null;
-  /** An edge for our `OrgOwnerGrant`. May be used by Relay 1. */
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
 export type CreateOrgOwnerGrantPayloadSelect = {
@@ -17264,14 +16144,9 @@ export type CreateOrgOwnerGrantPayloadSelect = {
   };
 };
 export interface UpdateOrgOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgOwnerGrant` that was updated by this mutation. */
   orgOwnerGrant?: OrgOwnerGrant | null;
-  /** An edge for our `OrgOwnerGrant`. May be used by Relay 1. */
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
 export type UpdateOrgOwnerGrantPayloadSelect = {
@@ -17284,14 +16159,9 @@ export type UpdateOrgOwnerGrantPayloadSelect = {
   };
 };
 export interface DeleteOrgOwnerGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgOwnerGrant` that was deleted by this mutation. */
   orgOwnerGrant?: OrgOwnerGrant | null;
-  /** An edge for our `OrgOwnerGrant`. May be used by Relay 1. */
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
 export type DeleteOrgOwnerGrantPayloadSelect = {
@@ -17304,14 +16174,9 @@ export type DeleteOrgOwnerGrantPayloadSelect = {
   };
 };
 export interface CreateOrgGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgGrant` that was created by this mutation. */
   orgGrant?: OrgGrant | null;
-  /** An edge for our `OrgGrant`. May be used by Relay 1. */
   orgGrantEdge?: OrgGrantEdge | null;
 }
 export type CreateOrgGrantPayloadSelect = {
@@ -17324,14 +16189,9 @@ export type CreateOrgGrantPayloadSelect = {
   };
 };
 export interface UpdateOrgGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgGrant` that was updated by this mutation. */
   orgGrant?: OrgGrant | null;
-  /** An edge for our `OrgGrant`. May be used by Relay 1. */
   orgGrantEdge?: OrgGrantEdge | null;
 }
 export type UpdateOrgGrantPayloadSelect = {
@@ -17344,14 +16204,9 @@ export type UpdateOrgGrantPayloadSelect = {
   };
 };
 export interface DeleteOrgGrantPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgGrant` that was deleted by this mutation. */
   orgGrant?: OrgGrant | null;
-  /** An edge for our `OrgGrant`. May be used by Relay 1. */
   orgGrantEdge?: OrgGrantEdge | null;
 }
 export type DeleteOrgGrantPayloadSelect = {
@@ -17364,14 +16219,9 @@ export type DeleteOrgGrantPayloadSelect = {
   };
 };
 export interface CreateAppLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimit` that was created by this mutation. */
   appLimit?: AppLimit | null;
-  /** An edge for our `AppLimit`. May be used by Relay 1. */
   appLimitEdge?: AppLimitEdge | null;
 }
 export type CreateAppLimitPayloadSelect = {
@@ -17384,14 +16234,9 @@ export type CreateAppLimitPayloadSelect = {
   };
 };
 export interface UpdateAppLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimit` that was updated by this mutation. */
   appLimit?: AppLimit | null;
-  /** An edge for our `AppLimit`. May be used by Relay 1. */
   appLimitEdge?: AppLimitEdge | null;
 }
 export type UpdateAppLimitPayloadSelect = {
@@ -17404,14 +16249,9 @@ export type UpdateAppLimitPayloadSelect = {
   };
 };
 export interface DeleteAppLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimit` that was deleted by this mutation. */
   appLimit?: AppLimit | null;
-  /** An edge for our `AppLimit`. May be used by Relay 1. */
   appLimitEdge?: AppLimitEdge | null;
 }
 export type DeleteAppLimitPayloadSelect = {
@@ -17424,14 +16264,9 @@ export type DeleteAppLimitPayloadSelect = {
   };
 };
 export interface CreateOrgLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimit` that was created by this mutation. */
   orgLimit?: OrgLimit | null;
-  /** An edge for our `OrgLimit`. May be used by Relay 1. */
   orgLimitEdge?: OrgLimitEdge | null;
 }
 export type CreateOrgLimitPayloadSelect = {
@@ -17444,14 +16279,9 @@ export type CreateOrgLimitPayloadSelect = {
   };
 };
 export interface UpdateOrgLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimit` that was updated by this mutation. */
   orgLimit?: OrgLimit | null;
-  /** An edge for our `OrgLimit`. May be used by Relay 1. */
   orgLimitEdge?: OrgLimitEdge | null;
 }
 export type UpdateOrgLimitPayloadSelect = {
@@ -17464,14 +16294,9 @@ export type UpdateOrgLimitPayloadSelect = {
   };
 };
 export interface DeleteOrgLimitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimit` that was deleted by this mutation. */
   orgLimit?: OrgLimit | null;
-  /** An edge for our `OrgLimit`. May be used by Relay 1. */
   orgLimitEdge?: OrgLimitEdge | null;
 }
 export type DeleteOrgLimitPayloadSelect = {
@@ -17484,14 +16309,9 @@ export type DeleteOrgLimitPayloadSelect = {
   };
 };
 export interface CreateAppStepPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppStep` that was created by this mutation. */
   appStep?: AppStep | null;
-  /** An edge for our `AppStep`. May be used by Relay 1. */
   appStepEdge?: AppStepEdge | null;
 }
 export type CreateAppStepPayloadSelect = {
@@ -17504,14 +16324,9 @@ export type CreateAppStepPayloadSelect = {
   };
 };
 export interface UpdateAppStepPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppStep` that was updated by this mutation. */
   appStep?: AppStep | null;
-  /** An edge for our `AppStep`. May be used by Relay 1. */
   appStepEdge?: AppStepEdge | null;
 }
 export type UpdateAppStepPayloadSelect = {
@@ -17524,14 +16339,9 @@ export type UpdateAppStepPayloadSelect = {
   };
 };
 export interface DeleteAppStepPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppStep` that was deleted by this mutation. */
   appStep?: AppStep | null;
-  /** An edge for our `AppStep`. May be used by Relay 1. */
   appStepEdge?: AppStepEdge | null;
 }
 export type DeleteAppStepPayloadSelect = {
@@ -17544,14 +16354,9 @@ export type DeleteAppStepPayloadSelect = {
   };
 };
 export interface CreateAppAchievementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAchievement` that was created by this mutation. */
   appAchievement?: AppAchievement | null;
-  /** An edge for our `AppAchievement`. May be used by Relay 1. */
   appAchievementEdge?: AppAchievementEdge | null;
 }
 export type CreateAppAchievementPayloadSelect = {
@@ -17564,14 +16369,9 @@ export type CreateAppAchievementPayloadSelect = {
   };
 };
 export interface UpdateAppAchievementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAchievement` that was updated by this mutation. */
   appAchievement?: AppAchievement | null;
-  /** An edge for our `AppAchievement`. May be used by Relay 1. */
   appAchievementEdge?: AppAchievementEdge | null;
 }
 export type UpdateAppAchievementPayloadSelect = {
@@ -17584,14 +16384,9 @@ export type UpdateAppAchievementPayloadSelect = {
   };
 };
 export interface DeleteAppAchievementPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppAchievement` that was deleted by this mutation. */
   appAchievement?: AppAchievement | null;
-  /** An edge for our `AppAchievement`. May be used by Relay 1. */
   appAchievementEdge?: AppAchievementEdge | null;
 }
 export type DeleteAppAchievementPayloadSelect = {
@@ -17604,14 +16399,9 @@ export type DeleteAppAchievementPayloadSelect = {
   };
 };
 export interface CreateInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Invite` that was created by this mutation. */
   invite?: Invite | null;
-  /** An edge for our `Invite`. May be used by Relay 1. */
   inviteEdge?: InviteEdge | null;
 }
 export type CreateInvitePayloadSelect = {
@@ -17624,14 +16414,9 @@ export type CreateInvitePayloadSelect = {
   };
 };
 export interface UpdateInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Invite` that was updated by this mutation. */
   invite?: Invite | null;
-  /** An edge for our `Invite`. May be used by Relay 1. */
   inviteEdge?: InviteEdge | null;
 }
 export type UpdateInvitePayloadSelect = {
@@ -17644,14 +16429,9 @@ export type UpdateInvitePayloadSelect = {
   };
 };
 export interface DeleteInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Invite` that was deleted by this mutation. */
   invite?: Invite | null;
-  /** An edge for our `Invite`. May be used by Relay 1. */
   inviteEdge?: InviteEdge | null;
 }
 export type DeleteInvitePayloadSelect = {
@@ -17664,14 +16444,9 @@ export type DeleteInvitePayloadSelect = {
   };
 };
 export interface CreateClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ClaimedInvite` that was created by this mutation. */
   claimedInvite?: ClaimedInvite | null;
-  /** An edge for our `ClaimedInvite`. May be used by Relay 1. */
   claimedInviteEdge?: ClaimedInviteEdge | null;
 }
 export type CreateClaimedInvitePayloadSelect = {
@@ -17684,14 +16459,9 @@ export type CreateClaimedInvitePayloadSelect = {
   };
 };
 export interface UpdateClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ClaimedInvite` that was updated by this mutation. */
   claimedInvite?: ClaimedInvite | null;
-  /** An edge for our `ClaimedInvite`. May be used by Relay 1. */
   claimedInviteEdge?: ClaimedInviteEdge | null;
 }
 export type UpdateClaimedInvitePayloadSelect = {
@@ -17704,14 +16474,9 @@ export type UpdateClaimedInvitePayloadSelect = {
   };
 };
 export interface DeleteClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ClaimedInvite` that was deleted by this mutation. */
   claimedInvite?: ClaimedInvite | null;
-  /** An edge for our `ClaimedInvite`. May be used by Relay 1. */
   claimedInviteEdge?: ClaimedInviteEdge | null;
 }
 export type DeleteClaimedInvitePayloadSelect = {
@@ -17724,14 +16489,9 @@ export type DeleteClaimedInvitePayloadSelect = {
   };
 };
 export interface CreateOrgInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgInvite` that was created by this mutation. */
   orgInvite?: OrgInvite | null;
-  /** An edge for our `OrgInvite`. May be used by Relay 1. */
   orgInviteEdge?: OrgInviteEdge | null;
 }
 export type CreateOrgInvitePayloadSelect = {
@@ -17744,14 +16504,9 @@ export type CreateOrgInvitePayloadSelect = {
   };
 };
 export interface UpdateOrgInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgInvite` that was updated by this mutation. */
   orgInvite?: OrgInvite | null;
-  /** An edge for our `OrgInvite`. May be used by Relay 1. */
   orgInviteEdge?: OrgInviteEdge | null;
 }
 export type UpdateOrgInvitePayloadSelect = {
@@ -17764,14 +16519,9 @@ export type UpdateOrgInvitePayloadSelect = {
   };
 };
 export interface DeleteOrgInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgInvite` that was deleted by this mutation. */
   orgInvite?: OrgInvite | null;
-  /** An edge for our `OrgInvite`. May be used by Relay 1. */
   orgInviteEdge?: OrgInviteEdge | null;
 }
 export type DeleteOrgInvitePayloadSelect = {
@@ -17784,14 +16534,9 @@ export type DeleteOrgInvitePayloadSelect = {
   };
 };
 export interface CreateOrgClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was created by this mutation. */
   orgClaimedInvite?: OrgClaimedInvite | null;
-  /** An edge for our `OrgClaimedInvite`. May be used by Relay 1. */
   orgClaimedInviteEdge?: OrgClaimedInviteEdge | null;
 }
 export type CreateOrgClaimedInvitePayloadSelect = {
@@ -17804,14 +16549,9 @@ export type CreateOrgClaimedInvitePayloadSelect = {
   };
 };
 export interface UpdateOrgClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was updated by this mutation. */
   orgClaimedInvite?: OrgClaimedInvite | null;
-  /** An edge for our `OrgClaimedInvite`. May be used by Relay 1. */
   orgClaimedInviteEdge?: OrgClaimedInviteEdge | null;
 }
 export type UpdateOrgClaimedInvitePayloadSelect = {
@@ -17824,14 +16564,9 @@ export type UpdateOrgClaimedInvitePayloadSelect = {
   };
 };
 export interface DeleteOrgClaimedInvitePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was deleted by this mutation. */
   orgClaimedInvite?: OrgClaimedInvite | null;
-  /** An edge for our `OrgClaimedInvite`. May be used by Relay 1. */
   orgClaimedInviteEdge?: OrgClaimedInviteEdge | null;
 }
 export type DeleteOrgClaimedInvitePayloadSelect = {
@@ -17844,14 +16579,9 @@ export type DeleteOrgClaimedInvitePayloadSelect = {
   };
 };
 export interface CreateAppPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermissionDefault` that was created by this mutation. */
   appPermissionDefault?: AppPermissionDefault | null;
-  /** An edge for our `AppPermissionDefault`. May be used by Relay 1. */
   appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
 }
 export type CreateAppPermissionDefaultPayloadSelect = {
@@ -17864,14 +16594,9 @@ export type CreateAppPermissionDefaultPayloadSelect = {
   };
 };
 export interface UpdateAppPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermissionDefault` that was updated by this mutation. */
   appPermissionDefault?: AppPermissionDefault | null;
-  /** An edge for our `AppPermissionDefault`. May be used by Relay 1. */
   appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
 }
 export type UpdateAppPermissionDefaultPayloadSelect = {
@@ -17884,14 +16609,9 @@ export type UpdateAppPermissionDefaultPayloadSelect = {
   };
 };
 export interface DeleteAppPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppPermissionDefault` that was deleted by this mutation. */
   appPermissionDefault?: AppPermissionDefault | null;
-  /** An edge for our `AppPermissionDefault`. May be used by Relay 1. */
   appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
 }
 export type DeleteAppPermissionDefaultPayloadSelect = {
@@ -17904,14 +16624,9 @@ export type DeleteAppPermissionDefaultPayloadSelect = {
   };
 };
 export interface CreateRefPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Ref` that was created by this mutation. */
   ref?: Ref | null;
-  /** An edge for our `Ref`. May be used by Relay 1. */
   refEdge?: RefEdge | null;
 }
 export type CreateRefPayloadSelect = {
@@ -17924,14 +16639,9 @@ export type CreateRefPayloadSelect = {
   };
 };
 export interface UpdateRefPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Ref` that was updated by this mutation. */
   ref?: Ref | null;
-  /** An edge for our `Ref`. May be used by Relay 1. */
   refEdge?: RefEdge | null;
 }
 export type UpdateRefPayloadSelect = {
@@ -17944,14 +16654,9 @@ export type UpdateRefPayloadSelect = {
   };
 };
 export interface DeleteRefPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Ref` that was deleted by this mutation. */
   ref?: Ref | null;
-  /** An edge for our `Ref`. May be used by Relay 1. */
   refEdge?: RefEdge | null;
 }
 export type DeleteRefPayloadSelect = {
@@ -17964,14 +16669,9 @@ export type DeleteRefPayloadSelect = {
   };
 };
 export interface CreateStorePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Store` that was created by this mutation. */
   store?: Store | null;
-  /** An edge for our `Store`. May be used by Relay 1. */
   storeEdge?: StoreEdge | null;
 }
 export type CreateStorePayloadSelect = {
@@ -17984,14 +16684,9 @@ export type CreateStorePayloadSelect = {
   };
 };
 export interface UpdateStorePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Store` that was updated by this mutation. */
   store?: Store | null;
-  /** An edge for our `Store`. May be used by Relay 1. */
   storeEdge?: StoreEdge | null;
 }
 export type UpdateStorePayloadSelect = {
@@ -18004,14 +16699,9 @@ export type UpdateStorePayloadSelect = {
   };
 };
 export interface DeleteStorePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Store` that was deleted by this mutation. */
   store?: Store | null;
-  /** An edge for our `Store`. May be used by Relay 1. */
   storeEdge?: StoreEdge | null;
 }
 export type DeleteStorePayloadSelect = {
@@ -18024,14 +16714,9 @@ export type DeleteStorePayloadSelect = {
   };
 };
 export interface CreateRoleTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
   roleType?: RoleType | null;
-  /** An edge for our `RoleType`. May be used by Relay 1. */
   roleTypeEdge?: RoleTypeEdge | null;
 }
 export type CreateRoleTypePayloadSelect = {
@@ -18044,14 +16729,9 @@ export type CreateRoleTypePayloadSelect = {
   };
 };
 export interface UpdateRoleTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RoleType` that was updated by this mutation. */
   roleType?: RoleType | null;
-  /** An edge for our `RoleType`. May be used by Relay 1. */
   roleTypeEdge?: RoleTypeEdge | null;
 }
 export type UpdateRoleTypePayloadSelect = {
@@ -18064,14 +16744,9 @@ export type UpdateRoleTypePayloadSelect = {
   };
 };
 export interface DeleteRoleTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `RoleType` that was deleted by this mutation. */
   roleType?: RoleType | null;
-  /** An edge for our `RoleType`. May be used by Relay 1. */
   roleTypeEdge?: RoleTypeEdge | null;
 }
 export type DeleteRoleTypePayloadSelect = {
@@ -18084,14 +16759,9 @@ export type DeleteRoleTypePayloadSelect = {
   };
 };
 export interface CreateOrgPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermissionDefault` that was created by this mutation. */
   orgPermissionDefault?: OrgPermissionDefault | null;
-  /** An edge for our `OrgPermissionDefault`. May be used by Relay 1. */
   orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
 }
 export type CreateOrgPermissionDefaultPayloadSelect = {
@@ -18104,14 +16774,9 @@ export type CreateOrgPermissionDefaultPayloadSelect = {
   };
 };
 export interface UpdateOrgPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermissionDefault` that was updated by this mutation. */
   orgPermissionDefault?: OrgPermissionDefault | null;
-  /** An edge for our `OrgPermissionDefault`. May be used by Relay 1. */
   orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
 }
 export type UpdateOrgPermissionDefaultPayloadSelect = {
@@ -18124,14 +16789,9 @@ export type UpdateOrgPermissionDefaultPayloadSelect = {
   };
 };
 export interface DeleteOrgPermissionDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgPermissionDefault` that was deleted by this mutation. */
   orgPermissionDefault?: OrgPermissionDefault | null;
-  /** An edge for our `OrgPermissionDefault`. May be used by Relay 1. */
   orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
 }
 export type DeleteOrgPermissionDefaultPayloadSelect = {
@@ -18144,14 +16804,9 @@ export type DeleteOrgPermissionDefaultPayloadSelect = {
   };
 };
 export interface CreateAppLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimitDefault` that was created by this mutation. */
   appLimitDefault?: AppLimitDefault | null;
-  /** An edge for our `AppLimitDefault`. May be used by Relay 1. */
   appLimitDefaultEdge?: AppLimitDefaultEdge | null;
 }
 export type CreateAppLimitDefaultPayloadSelect = {
@@ -18164,14 +16819,9 @@ export type CreateAppLimitDefaultPayloadSelect = {
   };
 };
 export interface UpdateAppLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimitDefault` that was updated by this mutation. */
   appLimitDefault?: AppLimitDefault | null;
-  /** An edge for our `AppLimitDefault`. May be used by Relay 1. */
   appLimitDefaultEdge?: AppLimitDefaultEdge | null;
 }
 export type UpdateAppLimitDefaultPayloadSelect = {
@@ -18184,14 +16834,9 @@ export type UpdateAppLimitDefaultPayloadSelect = {
   };
 };
 export interface DeleteAppLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLimitDefault` that was deleted by this mutation. */
   appLimitDefault?: AppLimitDefault | null;
-  /** An edge for our `AppLimitDefault`. May be used by Relay 1. */
   appLimitDefaultEdge?: AppLimitDefaultEdge | null;
 }
 export type DeleteAppLimitDefaultPayloadSelect = {
@@ -18204,14 +16849,9 @@ export type DeleteAppLimitDefaultPayloadSelect = {
   };
 };
 export interface CreateOrgLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimitDefault` that was created by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
-  /** An edge for our `OrgLimitDefault`. May be used by Relay 1. */
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
 export type CreateOrgLimitDefaultPayloadSelect = {
@@ -18224,14 +16864,9 @@ export type CreateOrgLimitDefaultPayloadSelect = {
   };
 };
 export interface UpdateOrgLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimitDefault` that was updated by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
-  /** An edge for our `OrgLimitDefault`. May be used by Relay 1. */
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
 export type UpdateOrgLimitDefaultPayloadSelect = {
@@ -18244,14 +16879,9 @@ export type UpdateOrgLimitDefaultPayloadSelect = {
   };
 };
 export interface DeleteOrgLimitDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgLimitDefault` that was deleted by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
-  /** An edge for our `OrgLimitDefault`. May be used by Relay 1. */
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
 export type DeleteOrgLimitDefaultPayloadSelect = {
@@ -18264,14 +16894,9 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
   };
 };
 export interface CreateCryptoAddressPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was created by this mutation. */
   cryptoAddress?: CryptoAddress | null;
-  /** An edge for our `CryptoAddress`. May be used by Relay 1. */
   cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export type CreateCryptoAddressPayloadSelect = {
@@ -18284,14 +16909,9 @@ export type CreateCryptoAddressPayloadSelect = {
   };
 };
 export interface UpdateCryptoAddressPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was updated by this mutation. */
   cryptoAddress?: CryptoAddress | null;
-  /** An edge for our `CryptoAddress`. May be used by Relay 1. */
   cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export type UpdateCryptoAddressPayloadSelect = {
@@ -18304,14 +16924,9 @@ export type UpdateCryptoAddressPayloadSelect = {
   };
 };
 export interface DeleteCryptoAddressPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was deleted by this mutation. */
   cryptoAddress?: CryptoAddress | null;
-  /** An edge for our `CryptoAddress`. May be used by Relay 1. */
   cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export type DeleteCryptoAddressPayloadSelect = {
@@ -18324,14 +16939,9 @@ export type DeleteCryptoAddressPayloadSelect = {
   };
 };
 export interface CreateMembershipTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipType` that was created by this mutation. */
   membershipType?: MembershipType | null;
-  /** An edge for our `MembershipType`. May be used by Relay 1. */
   membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export type CreateMembershipTypePayloadSelect = {
@@ -18344,14 +16954,9 @@ export type CreateMembershipTypePayloadSelect = {
   };
 };
 export interface UpdateMembershipTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipType` that was updated by this mutation. */
   membershipType?: MembershipType | null;
-  /** An edge for our `MembershipType`. May be used by Relay 1. */
   membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export type UpdateMembershipTypePayloadSelect = {
@@ -18364,14 +16969,9 @@ export type UpdateMembershipTypePayloadSelect = {
   };
 };
 export interface DeleteMembershipTypePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `MembershipType` that was deleted by this mutation. */
   membershipType?: MembershipType | null;
-  /** An edge for our `MembershipType`. May be used by Relay 1. */
   membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export type DeleteMembershipTypePayloadSelect = {
@@ -18384,14 +16984,9 @@ export type DeleteMembershipTypePayloadSelect = {
   };
 };
 export interface CreateConnectedAccountPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccount` that was created by this mutation. */
   connectedAccount?: ConnectedAccount | null;
-  /** An edge for our `ConnectedAccount`. May be used by Relay 1. */
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export type CreateConnectedAccountPayloadSelect = {
@@ -18404,14 +16999,9 @@ export type CreateConnectedAccountPayloadSelect = {
   };
 };
 export interface UpdateConnectedAccountPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccount` that was updated by this mutation. */
   connectedAccount?: ConnectedAccount | null;
-  /** An edge for our `ConnectedAccount`. May be used by Relay 1. */
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export type UpdateConnectedAccountPayloadSelect = {
@@ -18424,14 +17014,9 @@ export type UpdateConnectedAccountPayloadSelect = {
   };
 };
 export interface DeleteConnectedAccountPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `ConnectedAccount` that was deleted by this mutation. */
   connectedAccount?: ConnectedAccount | null;
-  /** An edge for our `ConnectedAccount`. May be used by Relay 1. */
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export type DeleteConnectedAccountPayloadSelect = {
@@ -18444,14 +17029,9 @@ export type DeleteConnectedAccountPayloadSelect = {
   };
 };
 export interface CreatePhoneNumberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was created by this mutation. */
   phoneNumber?: PhoneNumber | null;
-  /** An edge for our `PhoneNumber`. May be used by Relay 1. */
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
 export type CreatePhoneNumberPayloadSelect = {
@@ -18464,14 +17044,9 @@ export type CreatePhoneNumberPayloadSelect = {
   };
 };
 export interface UpdatePhoneNumberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was updated by this mutation. */
   phoneNumber?: PhoneNumber | null;
-  /** An edge for our `PhoneNumber`. May be used by Relay 1. */
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
 export type UpdatePhoneNumberPayloadSelect = {
@@ -18484,14 +17059,9 @@ export type UpdatePhoneNumberPayloadSelect = {
   };
 };
 export interface DeletePhoneNumberPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was deleted by this mutation. */
   phoneNumber?: PhoneNumber | null;
-  /** An edge for our `PhoneNumber`. May be used by Relay 1. */
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
 export type DeletePhoneNumberPayloadSelect = {
@@ -18504,14 +17074,9 @@ export type DeletePhoneNumberPayloadSelect = {
   };
 };
 export interface CreateAppMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembershipDefault` that was created by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
-  /** An edge for our `AppMembershipDefault`. May be used by Relay 1. */
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
 export type CreateAppMembershipDefaultPayloadSelect = {
@@ -18524,14 +17089,9 @@ export type CreateAppMembershipDefaultPayloadSelect = {
   };
 };
 export interface UpdateAppMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembershipDefault` that was updated by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
-  /** An edge for our `AppMembershipDefault`. May be used by Relay 1. */
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
 export type UpdateAppMembershipDefaultPayloadSelect = {
@@ -18544,14 +17104,9 @@ export type UpdateAppMembershipDefaultPayloadSelect = {
   };
 };
 export interface DeleteAppMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembershipDefault` that was deleted by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
-  /** An edge for our `AppMembershipDefault`. May be used by Relay 1. */
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
 export type DeleteAppMembershipDefaultPayloadSelect = {
@@ -18564,14 +17119,9 @@ export type DeleteAppMembershipDefaultPayloadSelect = {
   };
 };
 export interface CreateNodeTypeRegistryPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `NodeTypeRegistry` that was created by this mutation. */
   nodeTypeRegistry?: NodeTypeRegistry | null;
-  /** An edge for our `NodeTypeRegistry`. May be used by Relay 1. */
   nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export type CreateNodeTypeRegistryPayloadSelect = {
@@ -18584,14 +17134,9 @@ export type CreateNodeTypeRegistryPayloadSelect = {
   };
 };
 export interface UpdateNodeTypeRegistryPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `NodeTypeRegistry` that was updated by this mutation. */
   nodeTypeRegistry?: NodeTypeRegistry | null;
-  /** An edge for our `NodeTypeRegistry`. May be used by Relay 1. */
   nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export type UpdateNodeTypeRegistryPayloadSelect = {
@@ -18604,14 +17149,9 @@ export type UpdateNodeTypeRegistryPayloadSelect = {
   };
 };
 export interface DeleteNodeTypeRegistryPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `NodeTypeRegistry` that was deleted by this mutation. */
   nodeTypeRegistry?: NodeTypeRegistry | null;
-  /** An edge for our `NodeTypeRegistry`. May be used by Relay 1. */
   nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export type DeleteNodeTypeRegistryPayloadSelect = {
@@ -18624,14 +17164,9 @@ export type DeleteNodeTypeRegistryPayloadSelect = {
   };
 };
 export interface CreateCommitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Commit` that was created by this mutation. */
   commit?: Commit | null;
-  /** An edge for our `Commit`. May be used by Relay 1. */
   commitEdge?: CommitEdge | null;
 }
 export type CreateCommitPayloadSelect = {
@@ -18644,14 +17179,9 @@ export type CreateCommitPayloadSelect = {
   };
 };
 export interface UpdateCommitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Commit` that was updated by this mutation. */
   commit?: Commit | null;
-  /** An edge for our `Commit`. May be used by Relay 1. */
   commitEdge?: CommitEdge | null;
 }
 export type UpdateCommitPayloadSelect = {
@@ -18664,14 +17194,9 @@ export type UpdateCommitPayloadSelect = {
   };
 };
 export interface DeleteCommitPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Commit` that was deleted by this mutation. */
   commit?: Commit | null;
-  /** An edge for our `Commit`. May be used by Relay 1. */
   commitEdge?: CommitEdge | null;
 }
 export type DeleteCommitPayloadSelect = {
@@ -18684,14 +17209,9 @@ export type DeleteCommitPayloadSelect = {
   };
 };
 export interface CreateOrgMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembershipDefault` that was created by this mutation. */
   orgMembershipDefault?: OrgMembershipDefault | null;
-  /** An edge for our `OrgMembershipDefault`. May be used by Relay 1. */
   orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export type CreateOrgMembershipDefaultPayloadSelect = {
@@ -18704,14 +17224,9 @@ export type CreateOrgMembershipDefaultPayloadSelect = {
   };
 };
 export interface UpdateOrgMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembershipDefault` that was updated by this mutation. */
   orgMembershipDefault?: OrgMembershipDefault | null;
-  /** An edge for our `OrgMembershipDefault`. May be used by Relay 1. */
   orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export type UpdateOrgMembershipDefaultPayloadSelect = {
@@ -18724,14 +17239,9 @@ export type UpdateOrgMembershipDefaultPayloadSelect = {
   };
 };
 export interface DeleteOrgMembershipDefaultPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `OrgMembershipDefault` that was deleted by this mutation. */
   orgMembershipDefault?: OrgMembershipDefault | null;
-  /** An edge for our `OrgMembershipDefault`. May be used by Relay 1. */
   orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export type DeleteOrgMembershipDefaultPayloadSelect = {
@@ -18744,14 +17254,9 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
   };
 };
 export interface CreateEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Email` that was created by this mutation. */
   email?: Email | null;
-  /** An edge for our `Email`. May be used by Relay 1. */
   emailEdge?: EmailEdge | null;
 }
 export type CreateEmailPayloadSelect = {
@@ -18764,14 +17269,9 @@ export type CreateEmailPayloadSelect = {
   };
 };
 export interface UpdateEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Email` that was updated by this mutation. */
   email?: Email | null;
-  /** An edge for our `Email`. May be used by Relay 1. */
   emailEdge?: EmailEdge | null;
 }
 export type UpdateEmailPayloadSelect = {
@@ -18784,14 +17284,9 @@ export type UpdateEmailPayloadSelect = {
   };
 };
 export interface DeleteEmailPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `Email` that was deleted by this mutation. */
   email?: Email | null;
-  /** An edge for our `Email`. May be used by Relay 1. */
   emailEdge?: EmailEdge | null;
 }
 export type DeleteEmailPayloadSelect = {
@@ -18804,14 +17299,9 @@ export type DeleteEmailPayloadSelect = {
   };
 };
 export interface CreateAuditLogPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AuditLog` that was created by this mutation. */
   auditLog?: AuditLog | null;
-  /** An edge for our `AuditLog`. May be used by Relay 1. */
   auditLogEdge?: AuditLogEdge | null;
 }
 export type CreateAuditLogPayloadSelect = {
@@ -18824,14 +17314,9 @@ export type CreateAuditLogPayloadSelect = {
   };
 };
 export interface UpdateAuditLogPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AuditLog` that was updated by this mutation. */
   auditLog?: AuditLog | null;
-  /** An edge for our `AuditLog`. May be used by Relay 1. */
   auditLogEdge?: AuditLogEdge | null;
 }
 export type UpdateAuditLogPayloadSelect = {
@@ -18844,14 +17329,9 @@ export type UpdateAuditLogPayloadSelect = {
   };
 };
 export interface DeleteAuditLogPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AuditLog` that was deleted by this mutation. */
   auditLog?: AuditLog | null;
-  /** An edge for our `AuditLog`. May be used by Relay 1. */
   auditLogEdge?: AuditLogEdge | null;
 }
 export type DeleteAuditLogPayloadSelect = {
@@ -18864,14 +17344,9 @@ export type DeleteAuditLogPayloadSelect = {
   };
 };
 export interface CreateAppLevelPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevel` that was created by this mutation. */
   appLevel?: AppLevel | null;
-  /** An edge for our `AppLevel`. May be used by Relay 1. */
   appLevelEdge?: AppLevelEdge | null;
 }
 export type CreateAppLevelPayloadSelect = {
@@ -18884,14 +17359,9 @@ export type CreateAppLevelPayloadSelect = {
   };
 };
 export interface UpdateAppLevelPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevel` that was updated by this mutation. */
   appLevel?: AppLevel | null;
-  /** An edge for our `AppLevel`. May be used by Relay 1. */
   appLevelEdge?: AppLevelEdge | null;
 }
 export type UpdateAppLevelPayloadSelect = {
@@ -18904,14 +17374,9 @@ export type UpdateAppLevelPayloadSelect = {
   };
 };
 export interface DeleteAppLevelPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppLevel` that was deleted by this mutation. */
   appLevel?: AppLevel | null;
-  /** An edge for our `AppLevel`. May be used by Relay 1. */
   appLevelEdge?: AppLevelEdge | null;
 }
 export type DeleteAppLevelPayloadSelect = {
@@ -18924,10 +17389,6 @@ export type DeleteAppLevelPayloadSelect = {
   };
 };
 export interface CreateSqlMigrationPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `SqlMigration` that was created by this mutation. */
   sqlMigration?: SqlMigration | null;
@@ -18939,10 +17400,6 @@ export type CreateSqlMigrationPayloadSelect = {
   };
 };
 export interface CreateAstMigrationPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AstMigration` that was created by this mutation. */
   astMigration?: AstMigration | null;
@@ -18954,14 +17411,9 @@ export type CreateAstMigrationPayloadSelect = {
   };
 };
 export interface CreateAppMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembership` that was created by this mutation. */
   appMembership?: AppMembership | null;
-  /** An edge for our `AppMembership`. May be used by Relay 1. */
   appMembershipEdge?: AppMembershipEdge | null;
 }
 export type CreateAppMembershipPayloadSelect = {
@@ -18974,14 +17426,9 @@ export type CreateAppMembershipPayloadSelect = {
   };
 };
 export interface UpdateAppMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembership` that was updated by this mutation. */
   appMembership?: AppMembership | null;
-  /** An edge for our `AppMembership`. May be used by Relay 1. */
   appMembershipEdge?: AppMembershipEdge | null;
 }
 export type UpdateAppMembershipPayloadSelect = {
@@ -18994,14 +17441,9 @@ export type UpdateAppMembershipPayloadSelect = {
   };
 };
 export interface DeleteAppMembershipPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `AppMembership` that was deleted by this mutation. */
   appMembership?: AppMembership | null;
-  /** An edge for our `AppMembership`. May be used by Relay 1. */
   appMembershipEdge?: AppMembershipEdge | null;
 }
 export type DeleteAppMembershipPayloadSelect = {
@@ -19014,14 +17456,9 @@ export type DeleteAppMembershipPayloadSelect = {
   };
 };
 export interface CreateUserPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `User` that was created by this mutation. */
   user?: User | null;
-  /** An edge for our `User`. May be used by Relay 1. */
   userEdge?: UserEdge | null;
 }
 export type CreateUserPayloadSelect = {
@@ -19034,14 +17471,9 @@ export type CreateUserPayloadSelect = {
   };
 };
 export interface UpdateUserPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `User` that was updated by this mutation. */
   user?: User | null;
-  /** An edge for our `User`. May be used by Relay 1. */
   userEdge?: UserEdge | null;
 }
 export type UpdateUserPayloadSelect = {
@@ -19054,14 +17486,9 @@ export type UpdateUserPayloadSelect = {
   };
 };
 export interface DeleteUserPayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `User` that was deleted by this mutation. */
   user?: User | null;
-  /** An edge for our `User`. May be used by Relay 1. */
   userEdge?: UserEdge | null;
 }
 export type DeleteUserPayloadSelect = {
@@ -19074,14 +17501,9 @@ export type DeleteUserPayloadSelect = {
   };
 };
 export interface CreateHierarchyModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `HierarchyModule` that was created by this mutation. */
   hierarchyModule?: HierarchyModule | null;
-  /** An edge for our `HierarchyModule`. May be used by Relay 1. */
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
 export type CreateHierarchyModulePayloadSelect = {
@@ -19094,14 +17516,9 @@ export type CreateHierarchyModulePayloadSelect = {
   };
 };
 export interface UpdateHierarchyModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `HierarchyModule` that was updated by this mutation. */
   hierarchyModule?: HierarchyModule | null;
-  /** An edge for our `HierarchyModule`. May be used by Relay 1. */
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
 export type UpdateHierarchyModulePayloadSelect = {
@@ -19114,14 +17531,9 @@ export type UpdateHierarchyModulePayloadSelect = {
   };
 };
 export interface DeleteHierarchyModulePayload {
-  /**
-   * The exact same `clientMutationId` that was provided in the mutation input,
-   * unchanged and unused. May be used by a client to track mutations.
-   */
   clientMutationId?: string | null;
   /** The `HierarchyModule` that was deleted by this mutation. */
   hierarchyModule?: HierarchyModule | null;
-  /** An edge for our `HierarchyModule`. May be used by Relay 1. */
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
 export type DeleteHierarchyModulePayloadSelect = {
@@ -19135,7 +17547,6 @@ export type DeleteHierarchyModulePayloadSelect = {
 };
 /** A `AppPermission` edge in the connection. */
 export interface AppPermissionEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppPermission` at the end of the edge. */
   node?: AppPermission | null;
@@ -19165,7 +17576,6 @@ export type PageInfoSelect = {
 };
 /** A `OrgPermission` edge in the connection. */
 export interface OrgPermissionEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgPermission` at the end of the edge. */
   node?: OrgPermission | null;
@@ -19178,7 +17588,6 @@ export type OrgPermissionEdgeSelect = {
 };
 /** A `Object` edge in the connection. */
 export interface ObjectEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Object` at the end of the edge. */
   node?: Object | null;
@@ -19191,7 +17600,6 @@ export type ObjectEdgeSelect = {
 };
 /** A `AppLevelRequirement` edge in the connection. */
 export interface AppLevelRequirementEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppLevelRequirement` at the end of the edge. */
   node?: AppLevelRequirement | null;
@@ -19322,7 +17730,6 @@ export type SessionSelect = {
 };
 /** A `Database` edge in the connection. */
 export interface DatabaseEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Database` at the end of the edge. */
   node?: Database | null;
@@ -19335,7 +17742,6 @@ export type DatabaseEdgeSelect = {
 };
 /** A `Schema` edge in the connection. */
 export interface SchemaEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Schema` at the end of the edge. */
   node?: Schema | null;
@@ -19348,7 +17754,6 @@ export type SchemaEdgeSelect = {
 };
 /** A `Table` edge in the connection. */
 export interface TableEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Table` at the end of the edge. */
   node?: Table | null;
@@ -19361,7 +17766,6 @@ export type TableEdgeSelect = {
 };
 /** A `CheckConstraint` edge in the connection. */
 export interface CheckConstraintEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `CheckConstraint` at the end of the edge. */
   node?: CheckConstraint | null;
@@ -19374,7 +17778,6 @@ export type CheckConstraintEdgeSelect = {
 };
 /** A `Field` edge in the connection. */
 export interface FieldEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Field` at the end of the edge. */
   node?: Field | null;
@@ -19387,7 +17790,6 @@ export type FieldEdgeSelect = {
 };
 /** A `ForeignKeyConstraint` edge in the connection. */
 export interface ForeignKeyConstraintEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
@@ -19400,7 +17802,6 @@ export type ForeignKeyConstraintEdgeSelect = {
 };
 /** A `FullTextSearch` edge in the connection. */
 export interface FullTextSearchEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `FullTextSearch` at the end of the edge. */
   node?: FullTextSearch | null;
@@ -19413,7 +17814,6 @@ export type FullTextSearchEdgeSelect = {
 };
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Index` at the end of the edge. */
   node?: Index | null;
@@ -19426,7 +17826,6 @@ export type IndexEdgeSelect = {
 };
 /** A `LimitFunction` edge in the connection. */
 export interface LimitFunctionEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `LimitFunction` at the end of the edge. */
   node?: LimitFunction | null;
@@ -19439,7 +17838,6 @@ export type LimitFunctionEdgeSelect = {
 };
 /** A `Policy` edge in the connection. */
 export interface PolicyEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Policy` at the end of the edge. */
   node?: Policy | null;
@@ -19452,7 +17850,6 @@ export type PolicyEdgeSelect = {
 };
 /** A `PrimaryKeyConstraint` edge in the connection. */
 export interface PrimaryKeyConstraintEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `PrimaryKeyConstraint` at the end of the edge. */
   node?: PrimaryKeyConstraint | null;
@@ -19465,7 +17862,6 @@ export type PrimaryKeyConstraintEdgeSelect = {
 };
 /** A `TableGrant` edge in the connection. */
 export interface TableGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `TableGrant` at the end of the edge. */
   node?: TableGrant | null;
@@ -19478,7 +17874,6 @@ export type TableGrantEdgeSelect = {
 };
 /** A `Trigger` edge in the connection. */
 export interface TriggerEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Trigger` at the end of the edge. */
   node?: Trigger | null;
@@ -19491,7 +17886,6 @@ export type TriggerEdgeSelect = {
 };
 /** A `UniqueConstraint` edge in the connection. */
 export interface UniqueConstraintEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `UniqueConstraint` at the end of the edge. */
   node?: UniqueConstraint | null;
@@ -19504,7 +17898,6 @@ export type UniqueConstraintEdgeSelect = {
 };
 /** A `View` edge in the connection. */
 export interface ViewEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `View` at the end of the edge. */
   node?: View | null;
@@ -19517,7 +17910,6 @@ export type ViewEdgeSelect = {
 };
 /** A `ViewTable` edge in the connection. */
 export interface ViewTableEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ViewTable` at the end of the edge. */
   node?: ViewTable | null;
@@ -19530,7 +17922,6 @@ export type ViewTableEdgeSelect = {
 };
 /** A `ViewGrant` edge in the connection. */
 export interface ViewGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ViewGrant` at the end of the edge. */
   node?: ViewGrant | null;
@@ -19543,7 +17934,6 @@ export type ViewGrantEdgeSelect = {
 };
 /** A `ViewRule` edge in the connection. */
 export interface ViewRuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ViewRule` at the end of the edge. */
   node?: ViewRule | null;
@@ -19556,7 +17946,6 @@ export type ViewRuleEdgeSelect = {
 };
 /** A `TableModule` edge in the connection. */
 export interface TableModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `TableModule` at the end of the edge. */
   node?: TableModule | null;
@@ -19569,7 +17958,6 @@ export type TableModuleEdgeSelect = {
 };
 /** A `TableTemplateModule` edge in the connection. */
 export interface TableTemplateModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `TableTemplateModule` at the end of the edge. */
   node?: TableTemplateModule | null;
@@ -19582,7 +17970,6 @@ export type TableTemplateModuleEdgeSelect = {
 };
 /** A `SchemaGrant` edge in the connection. */
 export interface SchemaGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SchemaGrant` at the end of the edge. */
   node?: SchemaGrant | null;
@@ -19595,7 +17982,6 @@ export type SchemaGrantEdgeSelect = {
 };
 /** A `ApiSchema` edge in the connection. */
 export interface ApiSchemaEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ApiSchema` at the end of the edge. */
   node?: ApiSchema | null;
@@ -19608,7 +17994,6 @@ export type ApiSchemaEdgeSelect = {
 };
 /** A `ApiModule` edge in the connection. */
 export interface ApiModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ApiModule` at the end of the edge. */
   node?: ApiModule | null;
@@ -19621,7 +18006,6 @@ export type ApiModuleEdgeSelect = {
 };
 /** A `Domain` edge in the connection. */
 export interface DomainEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Domain` at the end of the edge. */
   node?: Domain | null;
@@ -19634,7 +18018,6 @@ export type DomainEdgeSelect = {
 };
 /** A `SiteMetadatum` edge in the connection. */
 export interface SiteMetadatumEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SiteMetadatum` at the end of the edge. */
   node?: SiteMetadatum | null;
@@ -19647,7 +18030,6 @@ export type SiteMetadatumEdgeSelect = {
 };
 /** A `SiteModule` edge in the connection. */
 export interface SiteModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SiteModule` at the end of the edge. */
   node?: SiteModule | null;
@@ -19660,7 +18042,6 @@ export type SiteModuleEdgeSelect = {
 };
 /** A `SiteTheme` edge in the connection. */
 export interface SiteThemeEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SiteTheme` at the end of the edge. */
   node?: SiteTheme | null;
@@ -19673,7 +18054,6 @@ export type SiteThemeEdgeSelect = {
 };
 /** A `Procedure` edge in the connection. */
 export interface ProcedureEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Procedure` at the end of the edge. */
   node?: Procedure | null;
@@ -19686,7 +18066,6 @@ export type ProcedureEdgeSelect = {
 };
 /** A `TriggerFunction` edge in the connection. */
 export interface TriggerFunctionEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `TriggerFunction` at the end of the edge. */
   node?: TriggerFunction | null;
@@ -19699,7 +18078,6 @@ export type TriggerFunctionEdgeSelect = {
 };
 /** A `Api` edge in the connection. */
 export interface ApiEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Api` at the end of the edge. */
   node?: Api | null;
@@ -19712,7 +18090,6 @@ export type ApiEdgeSelect = {
 };
 /** A `Site` edge in the connection. */
 export interface SiteEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Site` at the end of the edge. */
   node?: Site | null;
@@ -19725,7 +18102,6 @@ export type SiteEdgeSelect = {
 };
 /** A `App` edge in the connection. */
 export interface AppEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `App` at the end of the edge. */
   node?: App | null;
@@ -19738,7 +18114,6 @@ export type AppEdgeSelect = {
 };
 /** A `ConnectedAccountsModule` edge in the connection. */
 export interface ConnectedAccountsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ConnectedAccountsModule` at the end of the edge. */
   node?: ConnectedAccountsModule | null;
@@ -19751,7 +18126,6 @@ export type ConnectedAccountsModuleEdgeSelect = {
 };
 /** A `CryptoAddressesModule` edge in the connection. */
 export interface CryptoAddressesModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `CryptoAddressesModule` at the end of the edge. */
   node?: CryptoAddressesModule | null;
@@ -19764,7 +18138,6 @@ export type CryptoAddressesModuleEdgeSelect = {
 };
 /** A `CryptoAuthModule` edge in the connection. */
 export interface CryptoAuthModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `CryptoAuthModule` at the end of the edge. */
   node?: CryptoAuthModule | null;
@@ -19777,7 +18150,6 @@ export type CryptoAuthModuleEdgeSelect = {
 };
 /** A `DefaultIdsModule` edge in the connection. */
 export interface DefaultIdsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `DefaultIdsModule` at the end of the edge. */
   node?: DefaultIdsModule | null;
@@ -19790,7 +18162,6 @@ export type DefaultIdsModuleEdgeSelect = {
 };
 /** A `DenormalizedTableField` edge in the connection. */
 export interface DenormalizedTableFieldEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `DenormalizedTableField` at the end of the edge. */
   node?: DenormalizedTableField | null;
@@ -19803,7 +18174,6 @@ export type DenormalizedTableFieldEdgeSelect = {
 };
 /** A `EmailsModule` edge in the connection. */
 export interface EmailsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `EmailsModule` at the end of the edge. */
   node?: EmailsModule | null;
@@ -19816,7 +18186,6 @@ export type EmailsModuleEdgeSelect = {
 };
 /** A `EncryptedSecretsModule` edge in the connection. */
 export interface EncryptedSecretsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `EncryptedSecretsModule` at the end of the edge. */
   node?: EncryptedSecretsModule | null;
@@ -19829,7 +18198,6 @@ export type EncryptedSecretsModuleEdgeSelect = {
 };
 /** A `FieldModule` edge in the connection. */
 export interface FieldModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `FieldModule` at the end of the edge. */
   node?: FieldModule | null;
@@ -19842,7 +18210,6 @@ export type FieldModuleEdgeSelect = {
 };
 /** A `InvitesModule` edge in the connection. */
 export interface InvitesModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `InvitesModule` at the end of the edge. */
   node?: InvitesModule | null;
@@ -19855,7 +18222,6 @@ export type InvitesModuleEdgeSelect = {
 };
 /** A `LevelsModule` edge in the connection. */
 export interface LevelsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `LevelsModule` at the end of the edge. */
   node?: LevelsModule | null;
@@ -19868,7 +18234,6 @@ export type LevelsModuleEdgeSelect = {
 };
 /** A `LimitsModule` edge in the connection. */
 export interface LimitsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `LimitsModule` at the end of the edge. */
   node?: LimitsModule | null;
@@ -19881,7 +18246,6 @@ export type LimitsModuleEdgeSelect = {
 };
 /** A `MembershipTypesModule` edge in the connection. */
 export interface MembershipTypesModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `MembershipTypesModule` at the end of the edge. */
   node?: MembershipTypesModule | null;
@@ -19894,7 +18258,6 @@ export type MembershipTypesModuleEdgeSelect = {
 };
 /** A `MembershipsModule` edge in the connection. */
 export interface MembershipsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `MembershipsModule` at the end of the edge. */
   node?: MembershipsModule | null;
@@ -19907,7 +18270,6 @@ export type MembershipsModuleEdgeSelect = {
 };
 /** A `PermissionsModule` edge in the connection. */
 export interface PermissionsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `PermissionsModule` at the end of the edge. */
   node?: PermissionsModule | null;
@@ -19920,7 +18282,6 @@ export type PermissionsModuleEdgeSelect = {
 };
 /** A `PhoneNumbersModule` edge in the connection. */
 export interface PhoneNumbersModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `PhoneNumbersModule` at the end of the edge. */
   node?: PhoneNumbersModule | null;
@@ -19933,7 +18294,6 @@ export type PhoneNumbersModuleEdgeSelect = {
 };
 /** A `ProfilesModule` edge in the connection. */
 export interface ProfilesModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ProfilesModule` at the end of the edge. */
   node?: ProfilesModule | null;
@@ -19946,7 +18306,6 @@ export type ProfilesModuleEdgeSelect = {
 };
 /** A `RlsModule` edge in the connection. */
 export interface RlsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `RlsModule` at the end of the edge. */
   node?: RlsModule | null;
@@ -19959,7 +18318,6 @@ export type RlsModuleEdgeSelect = {
 };
 /** A `SecretsModule` edge in the connection. */
 export interface SecretsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SecretsModule` at the end of the edge. */
   node?: SecretsModule | null;
@@ -19972,7 +18330,6 @@ export type SecretsModuleEdgeSelect = {
 };
 /** A `SessionsModule` edge in the connection. */
 export interface SessionsModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `SessionsModule` at the end of the edge. */
   node?: SessionsModule | null;
@@ -19985,7 +18342,6 @@ export type SessionsModuleEdgeSelect = {
 };
 /** A `UserAuthModule` edge in the connection. */
 export interface UserAuthModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `UserAuthModule` at the end of the edge. */
   node?: UserAuthModule | null;
@@ -19998,7 +18354,6 @@ export type UserAuthModuleEdgeSelect = {
 };
 /** A `UsersModule` edge in the connection. */
 export interface UsersModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `UsersModule` at the end of the edge. */
   node?: UsersModule | null;
@@ -20011,7 +18366,6 @@ export type UsersModuleEdgeSelect = {
 };
 /** A `UuidModule` edge in the connection. */
 export interface UuidModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `UuidModule` at the end of the edge. */
   node?: UuidModule | null;
@@ -20024,7 +18378,6 @@ export type UuidModuleEdgeSelect = {
 };
 /** A `DatabaseProvisionModule` edge in the connection. */
 export interface DatabaseProvisionModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `DatabaseProvisionModule` at the end of the edge. */
   node?: DatabaseProvisionModule | null;
@@ -20037,7 +18390,6 @@ export type DatabaseProvisionModuleEdgeSelect = {
 };
 /** A `AppAdminGrant` edge in the connection. */
 export interface AppAdminGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppAdminGrant` at the end of the edge. */
   node?: AppAdminGrant | null;
@@ -20050,7 +18402,6 @@ export type AppAdminGrantEdgeSelect = {
 };
 /** A `AppOwnerGrant` edge in the connection. */
 export interface AppOwnerGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppOwnerGrant` at the end of the edge. */
   node?: AppOwnerGrant | null;
@@ -20063,7 +18414,6 @@ export type AppOwnerGrantEdgeSelect = {
 };
 /** A `AppGrant` edge in the connection. */
 export interface AppGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppGrant` at the end of the edge. */
   node?: AppGrant | null;
@@ -20076,7 +18426,6 @@ export type AppGrantEdgeSelect = {
 };
 /** A `OrgMembership` edge in the connection. */
 export interface OrgMembershipEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgMembership` at the end of the edge. */
   node?: OrgMembership | null;
@@ -20089,7 +18438,6 @@ export type OrgMembershipEdgeSelect = {
 };
 /** A `OrgMember` edge in the connection. */
 export interface OrgMemberEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgMember` at the end of the edge. */
   node?: OrgMember | null;
@@ -20102,7 +18450,6 @@ export type OrgMemberEdgeSelect = {
 };
 /** A `OrgAdminGrant` edge in the connection. */
 export interface OrgAdminGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgAdminGrant` at the end of the edge. */
   node?: OrgAdminGrant | null;
@@ -20115,7 +18462,6 @@ export type OrgAdminGrantEdgeSelect = {
 };
 /** A `OrgOwnerGrant` edge in the connection. */
 export interface OrgOwnerGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgOwnerGrant` at the end of the edge. */
   node?: OrgOwnerGrant | null;
@@ -20128,7 +18474,6 @@ export type OrgOwnerGrantEdgeSelect = {
 };
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgGrant` at the end of the edge. */
   node?: OrgGrant | null;
@@ -20141,7 +18486,6 @@ export type OrgGrantEdgeSelect = {
 };
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppLimit` at the end of the edge. */
   node?: AppLimit | null;
@@ -20154,7 +18498,6 @@ export type AppLimitEdgeSelect = {
 };
 /** A `OrgLimit` edge in the connection. */
 export interface OrgLimitEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgLimit` at the end of the edge. */
   node?: OrgLimit | null;
@@ -20167,7 +18510,6 @@ export type OrgLimitEdgeSelect = {
 };
 /** A `AppStep` edge in the connection. */
 export interface AppStepEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppStep` at the end of the edge. */
   node?: AppStep | null;
@@ -20180,7 +18522,6 @@ export type AppStepEdgeSelect = {
 };
 /** A `AppAchievement` edge in the connection. */
 export interface AppAchievementEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppAchievement` at the end of the edge. */
   node?: AppAchievement | null;
@@ -20193,7 +18534,6 @@ export type AppAchievementEdgeSelect = {
 };
 /** A `Invite` edge in the connection. */
 export interface InviteEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Invite` at the end of the edge. */
   node?: Invite | null;
@@ -20206,7 +18546,6 @@ export type InviteEdgeSelect = {
 };
 /** A `ClaimedInvite` edge in the connection. */
 export interface ClaimedInviteEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ClaimedInvite` at the end of the edge. */
   node?: ClaimedInvite | null;
@@ -20219,7 +18558,6 @@ export type ClaimedInviteEdgeSelect = {
 };
 /** A `OrgInvite` edge in the connection. */
 export interface OrgInviteEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgInvite` at the end of the edge. */
   node?: OrgInvite | null;
@@ -20232,7 +18570,6 @@ export type OrgInviteEdgeSelect = {
 };
 /** A `OrgClaimedInvite` edge in the connection. */
 export interface OrgClaimedInviteEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgClaimedInvite` at the end of the edge. */
   node?: OrgClaimedInvite | null;
@@ -20245,7 +18582,6 @@ export type OrgClaimedInviteEdgeSelect = {
 };
 /** A `AppPermissionDefault` edge in the connection. */
 export interface AppPermissionDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppPermissionDefault` at the end of the edge. */
   node?: AppPermissionDefault | null;
@@ -20258,7 +18594,6 @@ export type AppPermissionDefaultEdgeSelect = {
 };
 /** A `Ref` edge in the connection. */
 export interface RefEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Ref` at the end of the edge. */
   node?: Ref | null;
@@ -20271,7 +18606,6 @@ export type RefEdgeSelect = {
 };
 /** A `Store` edge in the connection. */
 export interface StoreEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Store` at the end of the edge. */
   node?: Store | null;
@@ -20284,7 +18618,6 @@ export type StoreEdgeSelect = {
 };
 /** A `RoleType` edge in the connection. */
 export interface RoleTypeEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `RoleType` at the end of the edge. */
   node?: RoleType | null;
@@ -20297,7 +18630,6 @@ export type RoleTypeEdgeSelect = {
 };
 /** A `OrgPermissionDefault` edge in the connection. */
 export interface OrgPermissionDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgPermissionDefault` at the end of the edge. */
   node?: OrgPermissionDefault | null;
@@ -20310,7 +18642,6 @@ export type OrgPermissionDefaultEdgeSelect = {
 };
 /** A `AppLimitDefault` edge in the connection. */
 export interface AppLimitDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppLimitDefault` at the end of the edge. */
   node?: AppLimitDefault | null;
@@ -20323,7 +18654,6 @@ export type AppLimitDefaultEdgeSelect = {
 };
 /** A `OrgLimitDefault` edge in the connection. */
 export interface OrgLimitDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgLimitDefault` at the end of the edge. */
   node?: OrgLimitDefault | null;
@@ -20336,7 +18666,6 @@ export type OrgLimitDefaultEdgeSelect = {
 };
 /** A `CryptoAddress` edge in the connection. */
 export interface CryptoAddressEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `CryptoAddress` at the end of the edge. */
   node?: CryptoAddress | null;
@@ -20349,7 +18678,6 @@ export type CryptoAddressEdgeSelect = {
 };
 /** A `MembershipType` edge in the connection. */
 export interface MembershipTypeEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `MembershipType` at the end of the edge. */
   node?: MembershipType | null;
@@ -20362,7 +18690,6 @@ export type MembershipTypeEdgeSelect = {
 };
 /** A `ConnectedAccount` edge in the connection. */
 export interface ConnectedAccountEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `ConnectedAccount` at the end of the edge. */
   node?: ConnectedAccount | null;
@@ -20375,7 +18702,6 @@ export type ConnectedAccountEdgeSelect = {
 };
 /** A `PhoneNumber` edge in the connection. */
 export interface PhoneNumberEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `PhoneNumber` at the end of the edge. */
   node?: PhoneNumber | null;
@@ -20388,7 +18714,6 @@ export type PhoneNumberEdgeSelect = {
 };
 /** A `AppMembershipDefault` edge in the connection. */
 export interface AppMembershipDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppMembershipDefault` at the end of the edge. */
   node?: AppMembershipDefault | null;
@@ -20401,7 +18726,6 @@ export type AppMembershipDefaultEdgeSelect = {
 };
 /** A `NodeTypeRegistry` edge in the connection. */
 export interface NodeTypeRegistryEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `NodeTypeRegistry` at the end of the edge. */
   node?: NodeTypeRegistry | null;
@@ -20414,7 +18738,6 @@ export type NodeTypeRegistryEdgeSelect = {
 };
 /** A `Commit` edge in the connection. */
 export interface CommitEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Commit` at the end of the edge. */
   node?: Commit | null;
@@ -20427,7 +18750,6 @@ export type CommitEdgeSelect = {
 };
 /** A `OrgMembershipDefault` edge in the connection. */
 export interface OrgMembershipDefaultEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `OrgMembershipDefault` at the end of the edge. */
   node?: OrgMembershipDefault | null;
@@ -20440,7 +18762,6 @@ export type OrgMembershipDefaultEdgeSelect = {
 };
 /** A `Email` edge in the connection. */
 export interface EmailEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `Email` at the end of the edge. */
   node?: Email | null;
@@ -20453,7 +18774,6 @@ export type EmailEdgeSelect = {
 };
 /** A `AuditLog` edge in the connection. */
 export interface AuditLogEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AuditLog` at the end of the edge. */
   node?: AuditLog | null;
@@ -20466,7 +18786,6 @@ export type AuditLogEdgeSelect = {
 };
 /** A `AppLevel` edge in the connection. */
 export interface AppLevelEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppLevel` at the end of the edge. */
   node?: AppLevel | null;
@@ -20479,7 +18798,6 @@ export type AppLevelEdgeSelect = {
 };
 /** A `AppMembership` edge in the connection. */
 export interface AppMembershipEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `AppMembership` at the end of the edge. */
   node?: AppMembership | null;
@@ -20492,7 +18810,6 @@ export type AppMembershipEdgeSelect = {
 };
 /** A `User` edge in the connection. */
 export interface UserEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `User` at the end of the edge. */
   node?: User | null;
@@ -20505,7 +18822,6 @@ export type UserEdgeSelect = {
 };
 /** A `HierarchyModule` edge in the connection. */
 export interface HierarchyModuleEdge {
-  /** A cursor for use in pagination. */
   cursor?: string | null;
   /** The `HierarchyModule` at the end of the edge. */
   node?: HierarchyModule | null;

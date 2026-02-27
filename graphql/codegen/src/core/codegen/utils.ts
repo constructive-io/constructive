@@ -441,8 +441,20 @@ export function getQueryKeyPrefix(table: CleanTable): string {
 const POSTGRAPHILE_BOILERPLATE: string[] = [
   'The exclusive input argument for this mutation.',
   'An arbitrary string value with no semantic meaning.',
+  'The exact same `clientMutationId` that was provided in the mutation input,',
   'The output of our',
   'All input for the',
+  'A cursor for use in pagination.',
+  'An edge for our',
+  'Information to aid in pagination.',
+  'Reads and enables pagination through a set of',
+  'A list of edges which contains the',
+  'The count of *all* `',
+  'A list of `',
+  'Our root query field',
+  'Reads a single',
+  'The root query type',
+  'The root mutation type',
 ];
 
 /**
