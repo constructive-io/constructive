@@ -8,7 +8,7 @@ ORM operations for Api records
 
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
-db.api.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.api.findOne({ id: '<value>', select: { id: true } }).execute()
 db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>' }, select: { id: true } }).execute()
 db.api.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<value>' } }).execute()

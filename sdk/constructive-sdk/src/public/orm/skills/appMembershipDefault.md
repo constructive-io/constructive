@@ -8,7 +8,7 @@ ORM operations for AppMembershipDefault records
 
 ```typescript
 db.appMembershipDefault.findMany({ select: { id: true } }).execute()
-db.appMembershipDefault.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appMembershipDefault.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appMembershipDefault.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' }, select: { id: true } }).execute()
 db.appMembershipDefault.update({ where: { id: '<value>' }, data: { createdBy: '<new>' }, select: { id: true } }).execute()
 db.appMembershipDefault.delete({ where: { id: '<value>' } }).execute()

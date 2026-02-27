@@ -8,7 +8,7 @@ ORM operations for AppAdminGrant records
 
 ```typescript
 db.appAdminGrant.findMany({ select: { id: true } }).execute()
-db.appAdminGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appAdminGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appAdminGrant.create({ data: { isGrant: '<value>', actorId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute()
 db.appAdminGrant.update({ where: { id: '<value>' }, data: { isGrant: '<new>' }, select: { id: true } }).execute()
 db.appAdminGrant.delete({ where: { id: '<value>' } }).execute()

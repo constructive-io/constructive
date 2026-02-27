@@ -8,7 +8,7 @@ ORM operations for FullTextSearch records
 
 ```typescript
 db.fullTextSearch.findMany({ select: { id: true } }).execute()
-db.fullTextSearch.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.fullTextSearch.findOne({ id: '<value>', select: { id: true } }).execute()
 db.fullTextSearch.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', fieldIds: '<value>', weights: '<value>', langs: '<value>' }, select: { id: true } }).execute()
 db.fullTextSearch.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.fullTextSearch.delete({ where: { id: '<value>' } }).execute()

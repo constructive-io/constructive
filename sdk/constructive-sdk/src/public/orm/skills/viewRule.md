@@ -8,7 +8,7 @@ ORM operations for ViewRule records
 
 ```typescript
 db.viewRule.findMany({ select: { id: true } }).execute()
-db.viewRule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.viewRule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' }, select: { id: true } }).execute()
 db.viewRule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.viewRule.delete({ where: { id: '<value>' } }).execute()

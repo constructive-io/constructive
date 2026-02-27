@@ -8,7 +8,7 @@ ORM operations for ViewGrant records
 
 ```typescript
 db.viewGrant.findMany({ select: { id: true } }).execute()
-db.viewGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.viewGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', roleName: '<value>', privilege: '<value>', withGrantOption: '<value>' }, select: { id: true } }).execute()
 db.viewGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.viewGrant.delete({ where: { id: '<value>' } }).execute()

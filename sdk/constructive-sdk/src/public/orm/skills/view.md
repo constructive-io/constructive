@@ -8,7 +8,7 @@ ORM operations for View records
 
 ```typescript
 db.view.findMany({ select: { id: true } }).execute()
-db.view.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.view.findOne({ id: '<value>', select: { id: true } }).execute()
 db.view.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.view.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.view.delete({ where: { id: '<value>' } }).execute()

@@ -8,7 +8,7 @@ ORM operations for ApiSchema records
 
 ```typescript
 db.apiSchema.findMany({ select: { id: true } }).execute()
-db.apiSchema.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.apiSchema.findOne({ id: '<value>', select: { id: true } }).execute()
 db.apiSchema.create({ data: { databaseId: '<value>', schemaId: '<value>', apiId: '<value>' }, select: { id: true } }).execute()
 db.apiSchema.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.apiSchema.delete({ where: { id: '<value>' } }).execute()

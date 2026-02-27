@@ -8,7 +8,7 @@ ORM operations for UserAuthModule records
 
 ```typescript
 db.userAuthModule.findMany({ select: { id: true } }).execute()
-db.userAuthModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.userAuthModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.userAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>' }, select: { id: true } }).execute()
 db.userAuthModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.userAuthModule.delete({ where: { id: '<value>' } }).execute()

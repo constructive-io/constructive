@@ -8,7 +8,7 @@ ORM operations for PrimaryKeyConstraint records
 
 ```typescript
 db.primaryKeyConstraint.findMany({ select: { id: true } }).execute()
-db.primaryKeyConstraint.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.primaryKeyConstraint.findOne({ id: '<value>', select: { id: true } }).execute()
 db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.primaryKeyConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.primaryKeyConstraint.delete({ where: { id: '<value>' } }).execute()

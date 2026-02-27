@@ -8,7 +8,7 @@ ORM operations for AppAchievement records
 
 ```typescript
 db.appAchievement.findMany({ select: { id: true } }).execute()
-db.appAchievement.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appAchievement.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appAchievement.create({ data: { actorId: '<value>', name: '<value>', count: '<value>' }, select: { id: true } }).execute()
 db.appAchievement.update({ where: { id: '<value>' }, data: { actorId: '<new>' }, select: { id: true } }).execute()
 db.appAchievement.delete({ where: { id: '<value>' } }).execute()

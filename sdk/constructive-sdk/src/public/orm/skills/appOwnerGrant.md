@@ -8,7 +8,7 @@ ORM operations for AppOwnerGrant records
 
 ```typescript
 db.appOwnerGrant.findMany({ select: { id: true } }).execute()
-db.appOwnerGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appOwnerGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appOwnerGrant.create({ data: { isGrant: '<value>', actorId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute()
 db.appOwnerGrant.update({ where: { id: '<value>' }, data: { isGrant: '<new>' }, select: { id: true } }).execute()
 db.appOwnerGrant.delete({ where: { id: '<value>' } }).execute()

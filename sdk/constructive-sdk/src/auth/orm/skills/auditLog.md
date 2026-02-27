@@ -8,7 +8,7 @@ ORM operations for AuditLog records
 
 ```typescript
 db.auditLog.findMany({ select: { id: true } }).execute()
-db.auditLog.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.auditLog.findOne({ id: '<value>', select: { id: true } }).execute()
 db.auditLog.create({ data: { event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' }, select: { id: true } }).execute()
 db.auditLog.update({ where: { id: '<value>' }, data: { event: '<new>' }, select: { id: true } }).execute()
 db.auditLog.delete({ where: { id: '<value>' } }).execute()

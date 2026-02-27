@@ -8,7 +8,7 @@ ORM operations for AppLimitDefault records
 
 ```typescript
 db.appLimitDefault.findMany({ select: { id: true } }).execute()
-db.appLimitDefault.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appLimitDefault.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appLimitDefault.create({ data: { name: '<value>', max: '<value>' }, select: { id: true } }).execute()
 db.appLimitDefault.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.appLimitDefault.delete({ where: { id: '<value>' } }).execute()

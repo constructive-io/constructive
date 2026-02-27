@@ -8,7 +8,7 @@ ORM operations for Commit records
 
 ```typescript
 db.commit.findMany({ select: { id: true } }).execute()
-db.commit.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.commit.findOne({ id: '<value>', select: { id: true } }).execute()
 db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' }, select: { id: true } }).execute()
 db.commit.update({ where: { id: '<value>' }, data: { message: '<new>' }, select: { id: true } }).execute()
 db.commit.delete({ where: { id: '<value>' } }).execute()

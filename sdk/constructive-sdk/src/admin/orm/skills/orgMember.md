@@ -8,7 +8,7 @@ ORM operations for OrgMember records
 
 ```typescript
 db.orgMember.findMany({ select: { id: true } }).execute()
-db.orgMember.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.orgMember.findOne({ id: '<value>', select: { id: true } }).execute()
 db.orgMember.create({ data: { isAdmin: '<value>', actorId: '<value>', entityId: '<value>' }, select: { id: true } }).execute()
 db.orgMember.update({ where: { id: '<value>' }, data: { isAdmin: '<new>' }, select: { id: true } }).execute()
 db.orgMember.delete({ where: { id: '<value>' } }).execute()

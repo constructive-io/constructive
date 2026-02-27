@@ -8,7 +8,7 @@ ORM operations for OrgLimit records
 
 ```typescript
 db.orgLimit.findMany({ select: { id: true } }).execute()
-db.orgLimit.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.orgLimit.findOne({ id: '<value>', select: { id: true } }).execute()
 db.orgLimit.create({ data: { name: '<value>', actorId: '<value>', num: '<value>', max: '<value>', entityId: '<value>' }, select: { id: true } }).execute()
 db.orgLimit.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.orgLimit.delete({ where: { id: '<value>' } }).execute()

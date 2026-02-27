@@ -8,7 +8,7 @@ ORM operations for TableModule records
 
 ```typescript
 db.tableModule.findMany({ select: { id: true } }).execute()
-db.tableModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.tableModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.tableModule.create({ data: { databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', nodeType: '<value>', data: '<value>', fields: '<value>' }, select: { id: true } }).execute()
 db.tableModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.tableModule.delete({ where: { id: '<value>' } }).execute()

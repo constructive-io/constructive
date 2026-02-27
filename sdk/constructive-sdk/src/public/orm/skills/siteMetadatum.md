@@ -8,7 +8,7 @@ ORM operations for SiteMetadatum records
 
 ```typescript
 db.siteMetadatum.findMany({ select: { id: true } }).execute()
-db.siteMetadatum.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.siteMetadatum.findOne({ id: '<value>', select: { id: true } }).execute()
 db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' }, select: { id: true } }).execute()
 db.siteMetadatum.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.siteMetadatum.delete({ where: { id: '<value>' } }).execute()

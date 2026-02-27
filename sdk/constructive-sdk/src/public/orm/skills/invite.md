@@ -8,7 +8,7 @@ ORM operations for Invite records
 
 ```typescript
 db.invite.findMany({ select: { id: true } }).execute()
-db.invite.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.invite.findOne({ id: '<value>', select: { id: true } }).execute()
 db.invite.create({ data: { email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' }, select: { id: true } }).execute()
 db.invite.update({ where: { id: '<value>' }, data: { email: '<new>' }, select: { id: true } }).execute()
 db.invite.delete({ where: { id: '<value>' } }).execute()

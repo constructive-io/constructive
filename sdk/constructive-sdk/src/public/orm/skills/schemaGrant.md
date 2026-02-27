@@ -8,7 +8,7 @@ ORM operations for SchemaGrant records
 
 ```typescript
 db.schemaGrant.findMany({ select: { id: true } }).execute()
-db.schemaGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.schemaGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.schemaGrant.create({ data: { databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' }, select: { id: true } }).execute()
 db.schemaGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.schemaGrant.delete({ where: { id: '<value>' } }).execute()

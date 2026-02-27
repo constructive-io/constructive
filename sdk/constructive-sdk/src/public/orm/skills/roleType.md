@@ -8,7 +8,7 @@ ORM operations for RoleType records
 
 ```typescript
 db.roleType.findMany({ select: { id: true } }).execute()
-db.roleType.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.roleType.findOne({ id: '<value>', select: { id: true } }).execute()
 db.roleType.create({ data: { name: '<value>' }, select: { id: true } }).execute()
 db.roleType.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.roleType.delete({ where: { id: '<value>' } }).execute()

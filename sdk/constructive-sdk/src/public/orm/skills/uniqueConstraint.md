@@ -8,7 +8,7 @@ ORM operations for UniqueConstraint records
 
 ```typescript
 db.uniqueConstraint.findMany({ select: { id: true } }).execute()
-db.uniqueConstraint.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.uniqueConstraint.findOne({ id: '<value>', select: { id: true } }).execute()
 db.uniqueConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.uniqueConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.uniqueConstraint.delete({ where: { id: '<value>' } }).execute()

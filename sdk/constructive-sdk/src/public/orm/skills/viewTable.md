@@ -8,7 +8,7 @@ ORM operations for ViewTable records
 
 ```typescript
 db.viewTable.findMany({ select: { id: true } }).execute()
-db.viewTable.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.viewTable.findOne({ id: '<value>', select: { id: true } }).execute()
 db.viewTable.create({ data: { viewId: '<value>', tableId: '<value>', joinOrder: '<value>' }, select: { id: true } }).execute()
 db.viewTable.update({ where: { id: '<value>' }, data: { viewId: '<new>' }, select: { id: true } }).execute()
 db.viewTable.delete({ where: { id: '<value>' } }).execute()

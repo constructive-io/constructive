@@ -8,7 +8,7 @@ ORM operations for Trigger records
 
 ```typescript
 db.trigger.findMany({ select: { id: true } }).execute()
-db.trigger.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.trigger.findOne({ id: '<value>', select: { id: true } }).execute()
 db.trigger.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.trigger.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.trigger.delete({ where: { id: '<value>' } }).execute()

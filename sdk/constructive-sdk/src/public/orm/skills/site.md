@@ -8,7 +8,7 @@ ORM operations for Site records
 
 ```typescript
 db.site.findMany({ select: { id: true } }).execute()
-db.site.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.site.findOne({ id: '<value>', select: { id: true } }).execute()
 db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' }, select: { id: true } }).execute()
 db.site.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.site.delete({ where: { id: '<value>' } }).execute()

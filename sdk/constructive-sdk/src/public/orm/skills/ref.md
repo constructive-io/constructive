@@ -8,7 +8,7 @@ ORM operations for Ref records
 
 ```typescript
 db.ref.findMany({ select: { id: true } }).execute()
-db.ref.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.ref.findOne({ id: '<value>', select: { id: true } }).execute()
 db.ref.create({ data: { name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' }, select: { id: true } }).execute()
 db.ref.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.ref.delete({ where: { id: '<value>' } }).execute()

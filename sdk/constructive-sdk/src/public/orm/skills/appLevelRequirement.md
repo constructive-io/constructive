@@ -8,7 +8,7 @@ ORM operations for AppLevelRequirement records
 
 ```typescript
 db.appLevelRequirement.findMany({ select: { id: true } }).execute()
-db.appLevelRequirement.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appLevelRequirement.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' }, select: { id: true } }).execute()
 db.appLevelRequirement.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.appLevelRequirement.delete({ where: { id: '<value>' } }).execute()

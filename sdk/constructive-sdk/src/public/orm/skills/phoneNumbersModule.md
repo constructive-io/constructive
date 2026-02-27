@@ -8,7 +8,7 @@ ORM operations for PhoneNumbersModule records
 
 ```typescript
 db.phoneNumbersModule.findMany({ select: { id: true } }).execute()
-db.phoneNumbersModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.phoneNumbersModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.phoneNumbersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute()
 db.phoneNumbersModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.phoneNumbersModule.delete({ where: { id: '<value>' } }).execute()

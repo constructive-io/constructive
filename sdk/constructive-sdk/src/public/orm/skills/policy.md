@@ -8,7 +8,7 @@ ORM operations for Policy records
 
 ```typescript
 db.policy.findMany({ select: { id: true } }).execute()
-db.policy.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.policy.findOne({ id: '<value>', select: { id: true } }).execute()
 db.policy.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', roleName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.policy.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.policy.delete({ where: { id: '<value>' } }).execute()

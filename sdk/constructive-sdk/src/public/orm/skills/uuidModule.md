@@ -8,7 +8,7 @@ ORM operations for UuidModule records
 
 ```typescript
 db.uuidModule.findMany({ select: { id: true } }).execute()
-db.uuidModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.uuidModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.uuidModule.create({ data: { databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>' }, select: { id: true } }).execute()
 db.uuidModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.uuidModule.delete({ where: { id: '<value>' } }).execute()
