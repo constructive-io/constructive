@@ -13,19 +13,39 @@ export interface RevParseVariables {
   storeId?: string;
   refname?: string;
 }
+/**
+ * Variables for getAllObjectsFromRoot
+ * Reads and enables pagination through a set of `Object`.
+ */
 export interface GetAllObjectsFromRootVariables {
   databaseId?: string;
   id?: string;
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
+/**
+ * Variables for getPathObjectsFromRoot
+ * Reads and enables pagination through a set of `Object`.
+ */
 export interface GetPathObjectsFromRootVariables {
   databaseId?: string;
   id?: string;
   path?: string[];
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
 export interface GetObjectAtPathVariables {

@@ -103,96 +103,146 @@ import type {
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface SignOutVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignOutInput;
 }
 export interface SendAccountDeletionEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SendAccountDeletionEmailInput;
 }
 export interface CheckPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: CheckPasswordInput;
 }
 export interface SubmitInviteCodeVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SubmitInviteCodeInput;
 }
 export interface SubmitOrgInviteCodeVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SubmitOrgInviteCodeInput;
 }
 export interface FreezeObjectsVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: FreezeObjectsInput;
 }
 export interface InitEmptyRepoVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: InitEmptyRepoInput;
 }
 export interface ConfirmDeleteAccountVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ConfirmDeleteAccountInput;
 }
 export interface SetPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetPasswordInput;
 }
 export interface VerifyEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyEmailInput;
 }
 export interface ResetPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ResetPasswordInput;
 }
 export interface RemoveNodeAtPathVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: RemoveNodeAtPathInput;
 }
 export interface BootstrapUserVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: BootstrapUserInput;
 }
 export interface SetDataAtPathVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetDataAtPathInput;
 }
 export interface SetPropsAndCommitVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetPropsAndCommitInput;
 }
 export interface ProvisionDatabaseWithUserVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ProvisionDatabaseWithUserInput;
 }
 export interface SignInOneTimeTokenVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignInOneTimeTokenInput;
 }
+/**
+ * Variables for createUserDatabase
+ * Creates a new user database with all required modules, permissions, and RLS policies.
+
+Parameters:
+  - database_name: Name for the new database (required)
+  - owner_id: UUID of the owner user (required)
+  - include_invites: Include invite system (default: true)
+  - include_groups: Include group-level memberships (default: false)
+  - include_levels: Include levels/achievements (default: false)
+  - bitlen: Bit length for permission masks (default: 64)
+  - tokens_expiration: Token expiration interval (default: 30 days)
+
+Returns the database_id UUID of the newly created database.
+
+Example usage:
+  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
+  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
+ */
 export interface CreateUserDatabaseVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: CreateUserDatabaseInput;
 }
 export interface ExtendTokenExpiresVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ExtendTokenExpiresInput;
 }
 export interface SignInVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignInInput;
 }
 export interface SignUpVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignUpInput;
 }
 export interface SetFieldOrderVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetFieldOrderInput;
 }
 export interface OneTimeTokenVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: OneTimeTokenInput;
 }
 export interface InsertNodeAtPathVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: InsertNodeAtPathInput;
 }
 export interface UpdateNodeAtPathVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: UpdateNodeAtPathInput;
 }
 export interface SetAndCommitVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetAndCommitInput;
 }
 export interface ApplyRlsVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ApplyRlsInput;
 }
 export interface ForgotPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ForgotPasswordInput;
 }
 export interface SendVerificationEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SendVerificationEmailInput;
 }
 export interface VerifyPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyPasswordInput;
 }
 export interface VerifyTotpVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyTotpInput;
 }
 export function createMutationOperations(client: OrmClient) {

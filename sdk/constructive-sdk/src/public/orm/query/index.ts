@@ -44,31 +44,71 @@ export interface AppPermissionsGetMaskByNamesVariables {
 export interface OrgPermissionsGetMaskByNamesVariables {
   names?: string[];
 }
+/**
+ * Variables for appPermissionsGetByMask
+ * Reads and enables pagination through a set of `AppPermission`.
+ */
 export interface AppPermissionsGetByMaskVariables {
   mask?: string;
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
+/**
+ * Variables for orgPermissionsGetByMask
+ * Reads and enables pagination through a set of `OrgPermission`.
+ */
 export interface OrgPermissionsGetByMaskVariables {
   mask?: string;
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
+/**
+ * Variables for getAllObjectsFromRoot
+ * Reads and enables pagination through a set of `Object`.
+ */
 export interface GetAllObjectsFromRootVariables {
   databaseId?: string;
   id?: string;
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
+/**
+ * Variables for getPathObjectsFromRoot
+ * Reads and enables pagination through a set of `Object`.
+ */
 export interface GetPathObjectsFromRootVariables {
   databaseId?: string;
   id?: string;
   path?: string[];
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
 export interface GetObjectAtPathVariables {
@@ -77,11 +117,21 @@ export interface GetObjectAtPathVariables {
   path?: string[];
   refname?: string;
 }
+/**
+ * Variables for stepsRequired
+ * Reads and enables pagination through a set of `AppLevelRequirement`.
+ */
 export interface StepsRequiredVariables {
   vlevel?: string;
   vroleId?: string;
+  /** Only read the first `n` values of the set. */
   first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
   offset?: number;
+  /** Read all values in the set after (below) this cursor. */
   after?: string;
 }
 export function createQueryOperations(client: OrmClient) {

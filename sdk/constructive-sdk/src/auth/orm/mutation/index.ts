@@ -58,51 +58,67 @@ import type {
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface SignOutVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignOutInput;
 }
 export interface SendAccountDeletionEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SendAccountDeletionEmailInput;
 }
 export interface CheckPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: CheckPasswordInput;
 }
 export interface ConfirmDeleteAccountVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ConfirmDeleteAccountInput;
 }
 export interface SetPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetPasswordInput;
 }
 export interface VerifyEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyEmailInput;
 }
 export interface ResetPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ResetPasswordInput;
 }
 export interface SignInOneTimeTokenVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignInOneTimeTokenInput;
 }
 export interface SignInVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignInInput;
 }
 export interface SignUpVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SignUpInput;
 }
 export interface OneTimeTokenVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: OneTimeTokenInput;
 }
 export interface ExtendTokenExpiresVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ExtendTokenExpiresInput;
 }
 export interface ForgotPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: ForgotPasswordInput;
 }
 export interface SendVerificationEmailVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SendVerificationEmailInput;
 }
 export interface VerifyPasswordVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyPasswordInput;
 }
 export interface VerifyTotpVariables {
+  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: VerifyTotpInput;
 }
 export function createMutationOperations(client: OrmClient) {
