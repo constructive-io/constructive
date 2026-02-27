@@ -2596,22 +2596,12 @@ export interface DeleteOrgInviteInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
-/** All input for the `submitInviteCode` mutation. */
 // ============ Custom Input Types (from schema) ============
 export interface SubmitInviteCodeInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   token?: string;
 }
-/** All input for the `submitOrgInviteCode` mutation. */
 export interface SubmitOrgInviteCodeInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   token?: string;
 }
@@ -2685,7 +2675,6 @@ export type AppLevelRequirementConnectionSelect = {
   };
   totalCount?: boolean;
 };
-/** The output of our `submitInviteCode` mutation. */
 export interface SubmitInviteCodePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2698,7 +2687,6 @@ export type SubmitInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `submitOrgInviteCode` mutation. */
 export interface SubmitOrgInviteCodePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2711,7 +2699,6 @@ export type SubmitOrgInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our create `AppPermission` mutation. */
 export interface CreateAppPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2732,7 +2719,6 @@ export type CreateAppPermissionPayloadSelect = {
     select: AppPermissionEdgeSelect;
   };
 };
-/** The output of our update `AppPermission` mutation. */
 export interface UpdateAppPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2753,7 +2739,6 @@ export type UpdateAppPermissionPayloadSelect = {
     select: AppPermissionEdgeSelect;
   };
 };
-/** The output of our delete `AppPermission` mutation. */
 export interface DeleteAppPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2774,7 +2759,6 @@ export type DeleteAppPermissionPayloadSelect = {
     select: AppPermissionEdgeSelect;
   };
 };
-/** The output of our create `OrgPermission` mutation. */
 export interface CreateOrgPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2795,7 +2779,6 @@ export type CreateOrgPermissionPayloadSelect = {
     select: OrgPermissionEdgeSelect;
   };
 };
-/** The output of our update `OrgPermission` mutation. */
 export interface UpdateOrgPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2816,7 +2799,6 @@ export type UpdateOrgPermissionPayloadSelect = {
     select: OrgPermissionEdgeSelect;
   };
 };
-/** The output of our delete `OrgPermission` mutation. */
 export interface DeleteOrgPermissionPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2837,7 +2819,6 @@ export type DeleteOrgPermissionPayloadSelect = {
     select: OrgPermissionEdgeSelect;
   };
 };
-/** The output of our create `AppLevelRequirement` mutation. */
 export interface CreateAppLevelRequirementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2858,7 +2839,6 @@ export type CreateAppLevelRequirementPayloadSelect = {
     select: AppLevelRequirementEdgeSelect;
   };
 };
-/** The output of our update `AppLevelRequirement` mutation. */
 export interface UpdateAppLevelRequirementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2879,7 +2859,6 @@ export type UpdateAppLevelRequirementPayloadSelect = {
     select: AppLevelRequirementEdgeSelect;
   };
 };
-/** The output of our delete `AppLevelRequirement` mutation. */
 export interface DeleteAppLevelRequirementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2900,7 +2879,6 @@ export type DeleteAppLevelRequirementPayloadSelect = {
     select: AppLevelRequirementEdgeSelect;
   };
 };
-/** The output of our create `OrgMember` mutation. */
 export interface CreateOrgMemberPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2921,7 +2899,6 @@ export type CreateOrgMemberPayloadSelect = {
     select: OrgMemberEdgeSelect;
   };
 };
-/** The output of our update `OrgMember` mutation. */
 export interface UpdateOrgMemberPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2942,7 +2919,6 @@ export type UpdateOrgMemberPayloadSelect = {
     select: OrgMemberEdgeSelect;
   };
 };
-/** The output of our delete `OrgMember` mutation. */
 export interface DeleteOrgMemberPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2963,7 +2939,6 @@ export type DeleteOrgMemberPayloadSelect = {
     select: OrgMemberEdgeSelect;
   };
 };
-/** The output of our create `AppPermissionDefault` mutation. */
 export interface CreateAppPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -2984,7 +2959,6 @@ export type CreateAppPermissionDefaultPayloadSelect = {
     select: AppPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our update `AppPermissionDefault` mutation. */
 export interface UpdateAppPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3005,7 +2979,6 @@ export type UpdateAppPermissionDefaultPayloadSelect = {
     select: AppPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our delete `AppPermissionDefault` mutation. */
 export interface DeleteAppPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3026,7 +2999,6 @@ export type DeleteAppPermissionDefaultPayloadSelect = {
     select: AppPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our create `OrgPermissionDefault` mutation. */
 export interface CreateOrgPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3047,7 +3019,6 @@ export type CreateOrgPermissionDefaultPayloadSelect = {
     select: OrgPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our update `OrgPermissionDefault` mutation. */
 export interface UpdateOrgPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3068,7 +3039,6 @@ export type UpdateOrgPermissionDefaultPayloadSelect = {
     select: OrgPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our delete `OrgPermissionDefault` mutation. */
 export interface DeleteOrgPermissionDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3089,7 +3059,6 @@ export type DeleteOrgPermissionDefaultPayloadSelect = {
     select: OrgPermissionDefaultEdgeSelect;
   };
 };
-/** The output of our create `AppAdminGrant` mutation. */
 export interface CreateAppAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3110,7 +3079,6 @@ export type CreateAppAdminGrantPayloadSelect = {
     select: AppAdminGrantEdgeSelect;
   };
 };
-/** The output of our update `AppAdminGrant` mutation. */
 export interface UpdateAppAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3131,7 +3099,6 @@ export type UpdateAppAdminGrantPayloadSelect = {
     select: AppAdminGrantEdgeSelect;
   };
 };
-/** The output of our delete `AppAdminGrant` mutation. */
 export interface DeleteAppAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3152,7 +3119,6 @@ export type DeleteAppAdminGrantPayloadSelect = {
     select: AppAdminGrantEdgeSelect;
   };
 };
-/** The output of our create `AppOwnerGrant` mutation. */
 export interface CreateAppOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3173,7 +3139,6 @@ export type CreateAppOwnerGrantPayloadSelect = {
     select: AppOwnerGrantEdgeSelect;
   };
 };
-/** The output of our update `AppOwnerGrant` mutation. */
 export interface UpdateAppOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3194,7 +3159,6 @@ export type UpdateAppOwnerGrantPayloadSelect = {
     select: AppOwnerGrantEdgeSelect;
   };
 };
-/** The output of our delete `AppOwnerGrant` mutation. */
 export interface DeleteAppOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3215,7 +3179,6 @@ export type DeleteAppOwnerGrantPayloadSelect = {
     select: AppOwnerGrantEdgeSelect;
   };
 };
-/** The output of our create `AppLimitDefault` mutation. */
 export interface CreateAppLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3236,7 +3199,6 @@ export type CreateAppLimitDefaultPayloadSelect = {
     select: AppLimitDefaultEdgeSelect;
   };
 };
-/** The output of our update `AppLimitDefault` mutation. */
 export interface UpdateAppLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3257,7 +3219,6 @@ export type UpdateAppLimitDefaultPayloadSelect = {
     select: AppLimitDefaultEdgeSelect;
   };
 };
-/** The output of our delete `AppLimitDefault` mutation. */
 export interface DeleteAppLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3278,7 +3239,6 @@ export type DeleteAppLimitDefaultPayloadSelect = {
     select: AppLimitDefaultEdgeSelect;
   };
 };
-/** The output of our create `OrgLimitDefault` mutation. */
 export interface CreateOrgLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3299,7 +3259,6 @@ export type CreateOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
-/** The output of our update `OrgLimitDefault` mutation. */
 export interface UpdateOrgLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3320,7 +3279,6 @@ export type UpdateOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
-/** The output of our delete `OrgLimitDefault` mutation. */
 export interface DeleteOrgLimitDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3341,7 +3299,6 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
-/** The output of our create `OrgAdminGrant` mutation. */
 export interface CreateOrgAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3362,7 +3319,6 @@ export type CreateOrgAdminGrantPayloadSelect = {
     select: OrgAdminGrantEdgeSelect;
   };
 };
-/** The output of our update `OrgAdminGrant` mutation. */
 export interface UpdateOrgAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3383,7 +3339,6 @@ export type UpdateOrgAdminGrantPayloadSelect = {
     select: OrgAdminGrantEdgeSelect;
   };
 };
-/** The output of our delete `OrgAdminGrant` mutation. */
 export interface DeleteOrgAdminGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3404,7 +3359,6 @@ export type DeleteOrgAdminGrantPayloadSelect = {
     select: OrgAdminGrantEdgeSelect;
   };
 };
-/** The output of our create `OrgOwnerGrant` mutation. */
 export interface CreateOrgOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3425,7 +3379,6 @@ export type CreateOrgOwnerGrantPayloadSelect = {
     select: OrgOwnerGrantEdgeSelect;
   };
 };
-/** The output of our update `OrgOwnerGrant` mutation. */
 export interface UpdateOrgOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3446,7 +3399,6 @@ export type UpdateOrgOwnerGrantPayloadSelect = {
     select: OrgOwnerGrantEdgeSelect;
   };
 };
-/** The output of our delete `OrgOwnerGrant` mutation. */
 export interface DeleteOrgOwnerGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3467,7 +3419,6 @@ export type DeleteOrgOwnerGrantPayloadSelect = {
     select: OrgOwnerGrantEdgeSelect;
   };
 };
-/** The output of our create `MembershipType` mutation. */
 export interface CreateMembershipTypePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3488,7 +3439,6 @@ export type CreateMembershipTypePayloadSelect = {
     select: MembershipTypeEdgeSelect;
   };
 };
-/** The output of our update `MembershipType` mutation. */
 export interface UpdateMembershipTypePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3509,7 +3459,6 @@ export type UpdateMembershipTypePayloadSelect = {
     select: MembershipTypeEdgeSelect;
   };
 };
-/** The output of our delete `MembershipType` mutation. */
 export interface DeleteMembershipTypePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3530,7 +3479,6 @@ export type DeleteMembershipTypePayloadSelect = {
     select: MembershipTypeEdgeSelect;
   };
 };
-/** The output of our create `AppLimit` mutation. */
 export interface CreateAppLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3551,7 +3499,6 @@ export type CreateAppLimitPayloadSelect = {
     select: AppLimitEdgeSelect;
   };
 };
-/** The output of our update `AppLimit` mutation. */
 export interface UpdateAppLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3572,7 +3519,6 @@ export type UpdateAppLimitPayloadSelect = {
     select: AppLimitEdgeSelect;
   };
 };
-/** The output of our delete `AppLimit` mutation. */
 export interface DeleteAppLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3593,7 +3539,6 @@ export type DeleteAppLimitPayloadSelect = {
     select: AppLimitEdgeSelect;
   };
 };
-/** The output of our create `AppAchievement` mutation. */
 export interface CreateAppAchievementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3614,7 +3559,6 @@ export type CreateAppAchievementPayloadSelect = {
     select: AppAchievementEdgeSelect;
   };
 };
-/** The output of our update `AppAchievement` mutation. */
 export interface UpdateAppAchievementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3635,7 +3579,6 @@ export type UpdateAppAchievementPayloadSelect = {
     select: AppAchievementEdgeSelect;
   };
 };
-/** The output of our delete `AppAchievement` mutation. */
 export interface DeleteAppAchievementPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3656,7 +3599,6 @@ export type DeleteAppAchievementPayloadSelect = {
     select: AppAchievementEdgeSelect;
   };
 };
-/** The output of our create `AppStep` mutation. */
 export interface CreateAppStepPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3677,7 +3619,6 @@ export type CreateAppStepPayloadSelect = {
     select: AppStepEdgeSelect;
   };
 };
-/** The output of our update `AppStep` mutation. */
 export interface UpdateAppStepPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3698,7 +3639,6 @@ export type UpdateAppStepPayloadSelect = {
     select: AppStepEdgeSelect;
   };
 };
-/** The output of our delete `AppStep` mutation. */
 export interface DeleteAppStepPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3719,7 +3659,6 @@ export type DeleteAppStepPayloadSelect = {
     select: AppStepEdgeSelect;
   };
 };
-/** The output of our create `ClaimedInvite` mutation. */
 export interface CreateClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3740,7 +3679,6 @@ export type CreateClaimedInvitePayloadSelect = {
     select: ClaimedInviteEdgeSelect;
   };
 };
-/** The output of our update `ClaimedInvite` mutation. */
 export interface UpdateClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3761,7 +3699,6 @@ export type UpdateClaimedInvitePayloadSelect = {
     select: ClaimedInviteEdgeSelect;
   };
 };
-/** The output of our delete `ClaimedInvite` mutation. */
 export interface DeleteClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3782,7 +3719,6 @@ export type DeleteClaimedInvitePayloadSelect = {
     select: ClaimedInviteEdgeSelect;
   };
 };
-/** The output of our create `AppGrant` mutation. */
 export interface CreateAppGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3803,7 +3739,6 @@ export type CreateAppGrantPayloadSelect = {
     select: AppGrantEdgeSelect;
   };
 };
-/** The output of our update `AppGrant` mutation. */
 export interface UpdateAppGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3824,7 +3759,6 @@ export type UpdateAppGrantPayloadSelect = {
     select: AppGrantEdgeSelect;
   };
 };
-/** The output of our delete `AppGrant` mutation. */
 export interface DeleteAppGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3845,7 +3779,6 @@ export type DeleteAppGrantPayloadSelect = {
     select: AppGrantEdgeSelect;
   };
 };
-/** The output of our create `AppMembershipDefault` mutation. */
 export interface CreateAppMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3866,7 +3799,6 @@ export type CreateAppMembershipDefaultPayloadSelect = {
     select: AppMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our update `AppMembershipDefault` mutation. */
 export interface UpdateAppMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3887,7 +3819,6 @@ export type UpdateAppMembershipDefaultPayloadSelect = {
     select: AppMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our delete `AppMembershipDefault` mutation. */
 export interface DeleteAppMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3908,7 +3839,6 @@ export type DeleteAppMembershipDefaultPayloadSelect = {
     select: AppMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our create `OrgLimit` mutation. */
 export interface CreateOrgLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3929,7 +3859,6 @@ export type CreateOrgLimitPayloadSelect = {
     select: OrgLimitEdgeSelect;
   };
 };
-/** The output of our update `OrgLimit` mutation. */
 export interface UpdateOrgLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3950,7 +3879,6 @@ export type UpdateOrgLimitPayloadSelect = {
     select: OrgLimitEdgeSelect;
   };
 };
-/** The output of our delete `OrgLimit` mutation. */
 export interface DeleteOrgLimitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3971,7 +3899,6 @@ export type DeleteOrgLimitPayloadSelect = {
     select: OrgLimitEdgeSelect;
   };
 };
-/** The output of our create `OrgClaimedInvite` mutation. */
 export interface CreateOrgClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -3992,7 +3919,6 @@ export type CreateOrgClaimedInvitePayloadSelect = {
     select: OrgClaimedInviteEdgeSelect;
   };
 };
-/** The output of our update `OrgClaimedInvite` mutation. */
 export interface UpdateOrgClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4013,7 +3939,6 @@ export type UpdateOrgClaimedInvitePayloadSelect = {
     select: OrgClaimedInviteEdgeSelect;
   };
 };
-/** The output of our delete `OrgClaimedInvite` mutation. */
 export interface DeleteOrgClaimedInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4034,7 +3959,6 @@ export type DeleteOrgClaimedInvitePayloadSelect = {
     select: OrgClaimedInviteEdgeSelect;
   };
 };
-/** The output of our create `OrgGrant` mutation. */
 export interface CreateOrgGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4055,7 +3979,6 @@ export type CreateOrgGrantPayloadSelect = {
     select: OrgGrantEdgeSelect;
   };
 };
-/** The output of our update `OrgGrant` mutation. */
 export interface UpdateOrgGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4076,7 +3999,6 @@ export type UpdateOrgGrantPayloadSelect = {
     select: OrgGrantEdgeSelect;
   };
 };
-/** The output of our delete `OrgGrant` mutation. */
 export interface DeleteOrgGrantPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4097,7 +4019,6 @@ export type DeleteOrgGrantPayloadSelect = {
     select: OrgGrantEdgeSelect;
   };
 };
-/** The output of our create `OrgMembershipDefault` mutation. */
 export interface CreateOrgMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4118,7 +4039,6 @@ export type CreateOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our update `OrgMembershipDefault` mutation. */
 export interface UpdateOrgMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4139,7 +4059,6 @@ export type UpdateOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our delete `OrgMembershipDefault` mutation. */
 export interface DeleteOrgMembershipDefaultPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4160,7 +4079,6 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
-/** The output of our create `AppLevel` mutation. */
 export interface CreateAppLevelPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4181,7 +4099,6 @@ export type CreateAppLevelPayloadSelect = {
     select: AppLevelEdgeSelect;
   };
 };
-/** The output of our update `AppLevel` mutation. */
 export interface UpdateAppLevelPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4202,7 +4119,6 @@ export type UpdateAppLevelPayloadSelect = {
     select: AppLevelEdgeSelect;
   };
 };
-/** The output of our delete `AppLevel` mutation. */
 export interface DeleteAppLevelPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4223,7 +4139,6 @@ export type DeleteAppLevelPayloadSelect = {
     select: AppLevelEdgeSelect;
   };
 };
-/** The output of our create `Invite` mutation. */
 export interface CreateInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4244,7 +4159,6 @@ export type CreateInvitePayloadSelect = {
     select: InviteEdgeSelect;
   };
 };
-/** The output of our update `Invite` mutation. */
 export interface UpdateInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4265,7 +4179,6 @@ export type UpdateInvitePayloadSelect = {
     select: InviteEdgeSelect;
   };
 };
-/** The output of our delete `Invite` mutation. */
 export interface DeleteInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4286,7 +4199,6 @@ export type DeleteInvitePayloadSelect = {
     select: InviteEdgeSelect;
   };
 };
-/** The output of our create `AppMembership` mutation. */
 export interface CreateAppMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4307,7 +4219,6 @@ export type CreateAppMembershipPayloadSelect = {
     select: AppMembershipEdgeSelect;
   };
 };
-/** The output of our update `AppMembership` mutation. */
 export interface UpdateAppMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4328,7 +4239,6 @@ export type UpdateAppMembershipPayloadSelect = {
     select: AppMembershipEdgeSelect;
   };
 };
-/** The output of our delete `AppMembership` mutation. */
 export interface DeleteAppMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4349,7 +4259,6 @@ export type DeleteAppMembershipPayloadSelect = {
     select: AppMembershipEdgeSelect;
   };
 };
-/** The output of our create `OrgMembership` mutation. */
 export interface CreateOrgMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4370,7 +4279,6 @@ export type CreateOrgMembershipPayloadSelect = {
     select: OrgMembershipEdgeSelect;
   };
 };
-/** The output of our update `OrgMembership` mutation. */
 export interface UpdateOrgMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4391,7 +4299,6 @@ export type UpdateOrgMembershipPayloadSelect = {
     select: OrgMembershipEdgeSelect;
   };
 };
-/** The output of our delete `OrgMembership` mutation. */
 export interface DeleteOrgMembershipPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4412,7 +4319,6 @@ export type DeleteOrgMembershipPayloadSelect = {
     select: OrgMembershipEdgeSelect;
   };
 };
-/** The output of our create `OrgInvite` mutation. */
 export interface CreateOrgInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4433,7 +4339,6 @@ export type CreateOrgInvitePayloadSelect = {
     select: OrgInviteEdgeSelect;
   };
 };
-/** The output of our update `OrgInvite` mutation. */
 export interface UpdateOrgInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -4454,7 +4359,6 @@ export type UpdateOrgInvitePayloadSelect = {
     select: OrgInviteEdgeSelect;
   };
 };
-/** The output of our delete `OrgInvite` mutation. */
 export interface DeleteOrgInvitePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,

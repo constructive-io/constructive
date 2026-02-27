@@ -34,35 +34,27 @@ import type {
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface FreezeObjectsVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: FreezeObjectsInput;
 }
 export interface InitEmptyRepoVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: InitEmptyRepoInput;
 }
 export interface RemoveNodeAtPathVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: RemoveNodeAtPathInput;
 }
 export interface SetDataAtPathVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetDataAtPathInput;
 }
 export interface SetPropsAndCommitVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetPropsAndCommitInput;
 }
 export interface InsertNodeAtPathVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: InsertNodeAtPathInput;
 }
 export interface UpdateNodeAtPathVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: UpdateNodeAtPathInput;
 }
 export interface SetAndCommitVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SetAndCommitInput;
 }
 export function createMutationOperations(client: OrmClient) {

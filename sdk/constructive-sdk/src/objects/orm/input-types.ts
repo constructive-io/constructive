@@ -645,56 +645,31 @@ export interface DeleteCommitInput {
 }
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
-/** All input for the `freezeObjects` mutation. */
 // ============ Custom Input Types (from schema) ============
 export interface FreezeObjectsInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   databaseId?: string;
   id?: string;
 }
-/** All input for the `initEmptyRepo` mutation. */
 export interface InitEmptyRepoInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   storeId?: string;
 }
-/** All input for the `removeNodeAtPath` mutation. */
 export interface RemoveNodeAtPathInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   root?: string;
   path?: string[];
 }
-/** All input for the `setDataAtPath` mutation. */
 export interface SetDataAtPathInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   root?: string;
   path?: string[];
   data?: Record<string, unknown>;
 }
-/** All input for the `setPropsAndCommit` mutation. */
 export interface SetPropsAndCommitInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   storeId?: string;
@@ -702,12 +677,7 @@ export interface SetPropsAndCommitInput {
   path?: string[];
   data?: Record<string, unknown>;
 }
-/** All input for the `insertNodeAtPath` mutation. */
 export interface InsertNodeAtPathInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   root?: string;
@@ -716,12 +686,7 @@ export interface InsertNodeAtPathInput {
   kids?: string[];
   ktree?: string[];
 }
-/** All input for the `updateNodeAtPath` mutation. */
 export interface UpdateNodeAtPathInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   root?: string;
@@ -730,12 +695,7 @@ export interface UpdateNodeAtPathInput {
   kids?: string[];
   ktree?: string[];
 }
-/** All input for the `setAndCommit` mutation. */
 export interface SetAndCommitInput {
-  /**
-   * An arbitrary string value with no semantic meaning. Will be included in the
-   * payload verbatim. May be used to track mutations by the client.
-   */
   clientMutationId?: string;
   dbId?: string;
   storeId?: string;
@@ -769,7 +729,6 @@ export type ObjectConnectionSelect = {
   };
   totalCount?: boolean;
 };
-/** The output of our `freezeObjects` mutation. */
 export interface FreezeObjectsPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -780,7 +739,6 @@ export interface FreezeObjectsPayload {
 export type FreezeObjectsPayloadSelect = {
   clientMutationId?: boolean;
 };
-/** The output of our `initEmptyRepo` mutation. */
 export interface InitEmptyRepoPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -791,7 +749,6 @@ export interface InitEmptyRepoPayload {
 export type InitEmptyRepoPayloadSelect = {
   clientMutationId?: boolean;
 };
-/** The output of our `removeNodeAtPath` mutation. */
 export interface RemoveNodeAtPathPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -804,7 +761,6 @@ export type RemoveNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `setDataAtPath` mutation. */
 export interface SetDataAtPathPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -817,7 +773,6 @@ export type SetDataAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `setPropsAndCommit` mutation. */
 export interface SetPropsAndCommitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -830,7 +785,6 @@ export type SetPropsAndCommitPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `insertNodeAtPath` mutation. */
 export interface InsertNodeAtPathPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -843,7 +797,6 @@ export type InsertNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `updateNodeAtPath` mutation. */
 export interface UpdateNodeAtPathPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -856,7 +809,6 @@ export type UpdateNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our `setAndCommit` mutation. */
 export interface SetAndCommitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -869,7 +821,6 @@ export type SetAndCommitPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-/** The output of our create `Object` mutation. */
 export interface CreateObjectPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -890,7 +841,6 @@ export type CreateObjectPayloadSelect = {
     select: ObjectEdgeSelect;
   };
 };
-/** The output of our update `Object` mutation. */
 export interface UpdateObjectPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -911,7 +861,6 @@ export type UpdateObjectPayloadSelect = {
     select: ObjectEdgeSelect;
   };
 };
-/** The output of our delete `Object` mutation. */
 export interface DeleteObjectPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -932,7 +881,6 @@ export type DeleteObjectPayloadSelect = {
     select: ObjectEdgeSelect;
   };
 };
-/** The output of our create `Ref` mutation. */
 export interface CreateRefPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -953,7 +901,6 @@ export type CreateRefPayloadSelect = {
     select: RefEdgeSelect;
   };
 };
-/** The output of our update `Ref` mutation. */
 export interface UpdateRefPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -974,7 +921,6 @@ export type UpdateRefPayloadSelect = {
     select: RefEdgeSelect;
   };
 };
-/** The output of our delete `Ref` mutation. */
 export interface DeleteRefPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -995,7 +941,6 @@ export type DeleteRefPayloadSelect = {
     select: RefEdgeSelect;
   };
 };
-/** The output of our create `Store` mutation. */
 export interface CreateStorePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -1016,7 +961,6 @@ export type CreateStorePayloadSelect = {
     select: StoreEdgeSelect;
   };
 };
-/** The output of our update `Store` mutation. */
 export interface UpdateStorePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -1037,7 +981,6 @@ export type UpdateStorePayloadSelect = {
     select: StoreEdgeSelect;
   };
 };
-/** The output of our delete `Store` mutation. */
 export interface DeleteStorePayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -1058,7 +1001,6 @@ export type DeleteStorePayloadSelect = {
     select: StoreEdgeSelect;
   };
 };
-/** The output of our create `Commit` mutation. */
 export interface CreateCommitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -1079,7 +1021,6 @@ export type CreateCommitPayloadSelect = {
     select: CommitEdgeSelect;
   };
 };
-/** The output of our update `Commit` mutation. */
 export interface UpdateCommitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,
@@ -1100,7 +1041,6 @@ export type UpdateCommitPayloadSelect = {
     select: CommitEdgeSelect;
   };
 };
-/** The output of our delete `Commit` mutation. */
 export interface DeleteCommitPayload {
   /**
    * The exact same `clientMutationId` that was provided in the mutation input,

@@ -434,19 +434,45 @@ export function getQueryKeyPrefix(table: CleanTable): string {
  */
 
 /**
- * Strip PostGraphile smart comments from a description string.
+ * PostGraphile auto-generated boilerplate descriptions that add no value.
+ * These are generic descriptions PostGraphile puts on every mutation input,
+ * clientMutationId field, etc. We filter them out to keep generated code clean.
+ */
+const POSTGRAPHILE_BOILERPLATE: string[] = [
+  'The exclusive input argument for this mutation.',
+  'An arbitrary string value with no semantic meaning.',
+  'The output of our',
+  'All input for the',
+];
+
+/**
+ * Check if a description is generic PostGraphile boilerplate that should be suppressed.
+ */
+function isBoilerplateDescription(description: string): boolean {
+  const trimmed = description.trim();
+  return POSTGRAPHILE_BOILERPLATE.some((bp) => trimmed.startsWith(bp));
+}
+
+/**
+ * Strip PostGraphile smart comments and boilerplate from a description string.
  *
  * Smart comments are lines starting with `@` (e.g., `@omit`, `@name newName`).
- * This returns only the human-readable portion of the comment, or undefined
- * if the result is empty.
+ * Boilerplate descriptions are generic PostGraphile-generated text that repeats
+ * on every mutation input, clientMutationId field, etc.
+ *
+ * This returns only the meaningful human-readable portion of the comment,
+ * or undefined if the result is empty or boilerplate.
  *
  * @param description - Raw description from GraphQL introspection
- * @returns Cleaned description with smart comments removed, or undefined if empty
+ * @returns Cleaned description, or undefined if empty/boilerplate
  */
 export function stripSmartComments(
   description: string | null | undefined,
 ): string | undefined {
   if (!description) return undefined;
+
+  // Check if entire description is boilerplate
+  if (isBoilerplateDescription(description)) return undefined;
 
   const lines = description.split('\n');
   const cleanLines: string[] = [];
@@ -459,7 +485,12 @@ export function stripSmartComments(
   }
 
   const result = cleanLines.join('\n').trim();
-  return result.length > 0 ? result : undefined;
+  if (result.length === 0) return undefined;
+
+  // Re-check after stripping smart comments
+  if (isBoilerplateDescription(result)) return undefined;
+
+  return result;
 }
 
 // ============================================================================

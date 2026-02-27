@@ -16,11 +16,9 @@ import type {
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface SubmitInviteCodeVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SubmitInviteCodeInput;
 }
 export interface SubmitOrgInviteCodeVariables {
-  /** The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields. */
   input: SubmitOrgInviteCodeInput;
 }
 export function createMutationOperations(client: OrmClient) {
