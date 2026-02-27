@@ -4263,7 +4263,7 @@ Access: \`db.car\`
 \`\`\`
 METHODS:
   db.car.findMany({ select, where?, orderBy?, first?, offset? })
-  db.car.findOne({ where: { id }, select })
+  db.car.findOne({ id, select })
   db.car.create({ data: { make, model, year, isElectric }, select })
   db.car.update({ where: { id }, data, select })
   db.car.delete({ where: { id } })
@@ -4297,7 +4297,7 @@ Access: \`db.driver\`
 \`\`\`
 METHODS:
   db.driver.findMany({ select, where?, orderBy?, first?, offset? })
-  db.driver.findOne({ where: { id }, select })
+  db.driver.findOne({ id, select })
   db.driver.create({ data: { name, licenseNumber }, select })
   db.driver.update({ where: { id }, data, select })
   db.driver.delete({ where: { id } })
@@ -4417,7 +4417,7 @@ CRUD operations for Car records.
 const items = await db.car.findMany({ select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.car.findOne({ where: { id: '<value>' }, select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
+const item = await db.car.findOne({ id: '<value>', select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute();
@@ -4448,7 +4448,7 @@ CRUD operations for Driver records.
 const items = await db.driver.findMany({ select: { id: true, name: true, licenseNumber: true } }).execute();
 
 // Get one by id
-const item = await db.driver.findOne({ where: { id: '<value>' }, select: { id: true, name: true, licenseNumber: true } }).execute();
+const item = await db.driver.findOne({ id: '<value>', select: { id: true, name: true, licenseNumber: true } }).execute();
 
 // Create
 const created = await db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute();
@@ -4512,7 +4512,7 @@ ORM operations for Car records
 
 \`\`\`typescript
 db.car.findMany({ select: { id: true } }).execute()
-db.car.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.car.findOne({ id: '<value>', select: { id: true } }).execute()
 db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute()
 db.car.update({ where: { id: '<value>' }, data: { make: '<new>' }, select: { id: true } }).execute()
 db.car.delete({ where: { id: '<value>' } }).execute()
@@ -4550,7 +4550,7 @@ ORM operations for Driver records
 
 \`\`\`typescript
 db.driver.findMany({ select: { id: true } }).execute()
-db.driver.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.driver.findOne({ id: '<value>', select: { id: true } }).execute()
 db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute()
 db.driver.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.driver.delete({ where: { id: '<value>' } }).execute()

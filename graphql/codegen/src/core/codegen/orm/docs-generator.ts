@@ -82,7 +82,7 @@ export function generateOrmReadme(
       lines.push('');
       lines.push(`// Get one by ${pk.name}`);
       lines.push(
-        `const item = await db.${singularName}.findOne({ where: { ${pk.name}: '<value>' }, select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+        `const item = await db.${singularName}.findOne({ ${pk.name}: '<value>', select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
       );
       lines.push('');
       lines.push(`// Create`);
@@ -202,7 +202,7 @@ export function generateOrmAgentsDocs(
       `  db.${singularName}.findMany({ select, where?, orderBy?, first?, offset? })`,
     );
     lines.push(
-      `  db.${singularName}.findOne({ where: { ${pk.name} }, select })`,
+      `  db.${singularName}.findOne({ ${pk.name}, select })`,
     );
     lines.push(
       `  db.${singularName}.create({ data: { ${editableFields.map((f) => f.name).join(', ')} }, select })`,
@@ -465,7 +465,7 @@ export function generateOrmSkills(
         language: 'typescript',
         usage: [
           `db.${lcFirst(singularName)}.findMany({ select: { id: true } }).execute()`,
-          `db.${lcFirst(singularName)}.findOne({ where: { ${pk.name}: '<value>' }, select: { id: true } }).execute()`,
+          `db.${lcFirst(singularName)}.findOne({ ${pk.name}: '<value>', select: { id: true } }).execute()`,
           `db.${lcFirst(singularName)}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { id: true } }).execute()`,
           `db.${lcFirst(singularName)}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new>' }, select: { id: true } }).execute()`,
           `db.${lcFirst(singularName)}.delete({ where: { ${pk.name}: '<value>' } }).execute()`,
