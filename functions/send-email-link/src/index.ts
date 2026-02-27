@@ -195,8 +195,8 @@ export const sendEmailLink = async (
 
   // Check if this is a localhost-style domain before building hostname
   // TODO: Security consideration - this only affects localhost domains which
-  // should not exist in production. The isLocalHost check combined with isDryRun
-  // ensures special behavior (http, custom port) only applies in dev environments.
+  // should not exist in production. The isLocalHost check ensures special
+  // behavior (http, custom port) only applies in dev environments.
   const isLocalDomain =
     domain === 'localhost' ||
     domain.startsWith('localhost') ||
@@ -215,17 +215,11 @@ export const sendEmailLink = async (
     hostname.startsWith('0.0.0.0') ||
     hostname.endsWith('.localhost');
 
-  // Optional: LOCAL_APP_PORT lets you attach a port for local dashboards
-  // e.g. LOCAL_APP_PORT=3000 -> http://localhost:3000
-  // It is ignored for non-local hostnames. Only allow on DRY RUNs
-  const localPort =
-    isLocalHost && isDryRun && process.env.LOCAL_APP_PORT
-      ? `:${process.env.LOCAL_APP_PORT}`
-      : '';
-
-  // Use http only for local dry-run to avoid browser TLS warnings
-  // in dev; production stays https.
-  const protocol = isLocalHost && isDryRun ? 'http' : 'https';
+  // When localhost + LOCAL_APP_PORT: use http://localhost:PORT (local dev)
+  // Otherwise: https (production)
+  const useLocalUrl = isLocalHost && process.env.LOCAL_APP_PORT;
+  const localPort = useLocalUrl ? `:${process.env.LOCAL_APP_PORT}` : '';
+  const protocol = useLocalUrl ? 'http' : 'https';
   const url = new URL(`${protocol}://${hostname}${localPort}`);
 
   let subject: string;
