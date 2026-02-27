@@ -1,4 +1,4 @@
-import { clearUpdateCache } from '@inquirerer/utils';
+import { suppressUpdateCheck } from '@inquirerer/utils';
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, cliExitWithError, getPackageJson } from 'inquirerer';
 import { spawn } from 'child_process';
@@ -66,7 +66,7 @@ export default async (
 
   try {
     await runNpmInstall(pkgName, registry);
-    clearUpdateCache('pgpm');
+    suppressUpdateCheck('pgpm', pkgJson.version);
     const latest = await fetchLatestVersion(pkgName);
     if (latest) {
       log.success(`Successfully updated ${pkgName} to version ${latest}.`);
