@@ -7,7 +7,7 @@
 import * as t from '@babel/types';
 
 import type { CleanArgument, CleanOperation } from '../../../types/schema';
-import { generateCode } from '../babel-ast';
+import { addJSDocComment, generateCode } from '../babel-ast';
 import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
   getTypeBaseName,
@@ -15,7 +15,7 @@ import {
   scalarToTsType,
   typeRefToTsType,
 } from '../type-resolver';
-import { getGeneratedFileHeader, ucFirst } from '../utils';
+import { getGeneratedFileHeader, stripSmartComments, ucFirst } from '../utils';
 
 export interface GeneratedCustomOpsFile {
   fileName: string;
@@ -120,6 +120,10 @@ function createVariablesInterface(
       t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type))),
     );
     prop.optional = optional;
+    const argDescription = stripSmartComments(arg.description);
+    if (argDescription) {
+      addJSDocComment(prop, argDescription.split('\n'));
+    }
     return prop;
   });
 
@@ -129,7 +133,12 @@ function createVariablesInterface(
     null,
     t.tsInterfaceBody(props),
   );
-  return t.exportNamedDeclaration(interfaceDecl);
+  const exportDecl = t.exportNamedDeclaration(interfaceDecl);
+  const opDescription = stripSmartComments(op.description);
+  if (opDescription) {
+    addJSDocComment(exportDecl, [`Variables for ${op.name}`, opDescription]);
+  }
+  return exportDecl;
 }
 
 function parseTypeAnnotation(typeStr: string): t.TSType {

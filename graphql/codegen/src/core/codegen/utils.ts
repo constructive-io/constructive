@@ -414,6 +414,55 @@ export function getQueryKeyPrefix(table: CleanTable): string {
 }
 
 // ============================================================================
+// Smart Comment Utilities
+// ============================================================================
+
+/**
+ * PostGraphile smart comment tags that should be stripped from descriptions.
+ * Smart comments start with `@` and control PostGraphile behavior
+ * (e.g., `@omit`, `@name`, `@foreignKey`, etc.)
+ *
+ * A PostgreSQL COMMENT may contain both human-readable text and smart comments:
+ *   COMMENT ON TABLE users IS 'User accounts for the application\n@omit delete';
+ *
+ * PostGraphile's introspection already separates these: the GraphQL `description`
+ * field contains only the human-readable part. So in most cases, the description
+ * we receive from introspection is already clean.
+ *
+ * However, as a safety measure, this utility strips any remaining `@`-prefixed
+ * lines that may have leaked through.
+ */
+
+/**
+ * Strip PostGraphile smart comments from a description string.
+ *
+ * Smart comments are lines starting with `@` (e.g., `@omit`, `@name newName`).
+ * This returns only the human-readable portion of the comment, or undefined
+ * if the result is empty.
+ *
+ * @param description - Raw description from GraphQL introspection
+ * @returns Cleaned description with smart comments removed, or undefined if empty
+ */
+export function stripSmartComments(
+  description: string | null | undefined,
+): string | undefined {
+  if (!description) return undefined;
+
+  const lines = description.split('\n');
+  const cleanLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Skip lines that start with @ (smart comment directives)
+    if (trimmed.startsWith('@')) continue;
+    cleanLines.push(line);
+  }
+
+  const result = cleanLines.join('\n').trim();
+  return result.length > 0 ? result : undefined;
+}
+
+// ============================================================================
 // Code generation helpers
 // ============================================================================
 

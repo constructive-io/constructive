@@ -18,14 +18,14 @@ import type {
   ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
-import { generateCode } from './babel-ast';
+import { addJSDocComment, generateCode } from './babel-ast';
 import {
   BASE_FILTER_TYPE_NAMES,
   SCALAR_NAMES,
   scalarToTsType,
 } from './scalars';
 import { getTypeBaseName } from './type-resolver';
-import { getGeneratedFileHeader } from './utils';
+import { getGeneratedFileHeader, stripSmartComments } from './utils';
 
 export interface GeneratedSchemaTypesFile {
   fileName: string;
@@ -139,7 +139,12 @@ function generateEnumTypes(
       null,
       unionType,
     );
-    statements.push(t.exportNamedDeclaration(typeAlias));
+    const exportDecl = t.exportNamedDeclaration(typeAlias);
+    const enumDescription = stripSmartComments(typeInfo.description);
+    if (enumDescription) {
+      addJSDocComment(exportDecl, enumDescription.split('\n'));
+    }
+    statements.push(exportDecl);
     generatedTypes.add(typeName);
   }
 
@@ -187,6 +192,10 @@ function generateInputObjectTypes(
           t.tsTypeAnnotation(t.tsTypeReference(t.identifier(tsType))),
         );
         prop.optional = optional;
+        const fieldDescription = stripSmartComments(field.description);
+        if (fieldDescription) {
+          addJSDocComment(prop, fieldDescription.split('\n'));
+        }
         properties.push(prop);
 
         const baseType = getTypeBaseName(field.type);
@@ -209,7 +218,12 @@ function generateInputObjectTypes(
       null,
       t.tsInterfaceBody(properties),
     );
-    statements.push(t.exportNamedDeclaration(interfaceDecl));
+    const exportDecl = t.exportNamedDeclaration(interfaceDecl);
+    const inputDescription = stripSmartComments(typeInfo.description);
+    if (inputDescription) {
+      addJSDocComment(exportDecl, inputDescription.split('\n'));
+    }
+    statements.push(exportDecl);
   }
 
   return { statements, generatedTypes };
@@ -238,7 +252,12 @@ function generateUnionTypes(
       null,
       unionType,
     );
-    statements.push(t.exportNamedDeclaration(typeAlias));
+    const exportDecl = t.exportNamedDeclaration(typeAlias);
+    const unionDescription = stripSmartComments(typeInfo.description);
+    if (unionDescription) {
+      addJSDocComment(exportDecl, unionDescription.split('\n'));
+    }
+    statements.push(exportDecl);
     generatedTypes.add(typeName);
   }
 
@@ -330,6 +349,10 @@ function generatePayloadObjectTypes(
           t.tsTypeAnnotation(t.tsTypeReference(t.identifier(finalType))),
         );
         prop.optional = isNullable;
+        const fieldDescription = stripSmartComments(field.description);
+        if (fieldDescription) {
+          addJSDocComment(prop, fieldDescription.split('\n'));
+        }
         properties.push(prop);
 
         if (baseType && tableTypeNames.has(baseType)) {
@@ -355,7 +378,12 @@ function generatePayloadObjectTypes(
       null,
       t.tsInterfaceBody(properties),
     );
-    statements.push(t.exportNamedDeclaration(interfaceDecl));
+    const exportDecl = t.exportNamedDeclaration(interfaceDecl);
+    const payloadDescription = stripSmartComments(typeInfo.description);
+    if (payloadDescription) {
+      addJSDocComment(exportDecl, payloadDescription.split('\n'));
+    }
+    statements.push(exportDecl);
   }
 
   return { statements, generatedTypes, referencedTableTypes };

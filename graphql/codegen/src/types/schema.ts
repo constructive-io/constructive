@@ -8,6 +8,8 @@
  */
 export interface CleanTable {
   name: string;
+  /** Description from PostgreSQL COMMENT (smart comments stripped) */
+  description?: string;
   fields: CleanField[];
   relations: CleanRelations;
   /** PostGraphile inflection rules for this table */
@@ -110,6 +112,8 @@ export interface ForeignKeyConstraint extends ConstraintInfo {
  */
 export interface CleanField {
   name: string;
+  /** Description from PostgreSQL COMMENT (smart comments stripped) */
+  description?: string;
   type: CleanFieldType;
 }
 

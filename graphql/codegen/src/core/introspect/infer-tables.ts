@@ -14,6 +14,8 @@
  */
 import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
 
+import { stripSmartComments } from '../codegen/utils';
+
 import type {
   IntrospectionField,
   IntrospectionInputValue,
@@ -309,9 +311,13 @@ function buildCleanTable(
     patchFieldName,
   };
 
+  // Extract description from entity type (PostgreSQL COMMENT), strip smart comments
+  const description = stripSmartComments(entityType.description);
+
   return {
     table: {
       name: entityName,
+      ...(description ? { description } : {}),
       fields,
       relations,
       inflection,
@@ -356,8 +362,10 @@ function extractEntityFields(
     }
 
     // Include scalar, enum, and other non-relation fields
+    const fieldDescription = stripSmartComments(field.description);
     fields.push({
       name: field.name,
+      ...(fieldDescription ? { description: fieldDescription } : {}),
       type: convertToCleanFieldType(field.type),
     });
   }

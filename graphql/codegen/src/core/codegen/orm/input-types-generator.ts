@@ -18,7 +18,7 @@ import type {
   CleanTable,
   TypeRegistry,
 } from '../../../types/schema';
-import { addLineComment, generateCode } from '../babel-ast';
+import { addJSDocComment, addLineComment, generateCode } from '../babel-ast';
 import { SCALAR_NAMES, scalarToFilterType, scalarToTsType } from '../scalars';
 import { getTypeBaseName } from '../type-resolver';
 import {
@@ -31,6 +31,7 @@ import {
   getTableNames,
   isRelationField,
   lcFirst,
+  stripSmartComments,
 } from '../utils';
 
 export interface GeneratedInputTypesFile {
@@ -160,12 +161,16 @@ function createPropertySignature(
   name: string,
   typeStr: string,
   optional: boolean,
+  description?: string,
 ): t.TSPropertySignature {
   const prop = t.tsPropertySignature(
     t.identifier(name),
     t.tsTypeAnnotation(parseTypeString(typeStr)),
   );
   prop.optional = optional;
+  if (description) {
+    addJSDocComment(prop, description.split('\n'));
+  }
   return prop;
 }
 
@@ -174,10 +179,11 @@ function createPropertySignature(
  */
 function createExportedInterface(
   name: string,
-  properties: Array<{ name: string; type: string; optional: boolean }>,
+  properties: Array<{ name: string; type: string; optional: boolean; description?: string }>,
+  description?: string,
 ): t.ExportNamedDeclaration {
   const props = properties.map((p) =>
-    createPropertySignature(p.name, p.type, p.optional),
+    createPropertySignature(p.name, p.type, p.optional, p.description),
   );
   const body = t.tsInterfaceBody(props);
   const interfaceDecl = t.tsInterfaceDeclaration(
@@ -186,7 +192,11 @@ function createExportedInterface(
     null,
     body,
   );
-  return t.exportNamedDeclaration(interfaceDecl);
+  const exportDecl = t.exportNamedDeclaration(interfaceDecl);
+  if (description) {
+    addJSDocComment(exportDecl, description.split('\n'));
+  }
+  return exportDecl;
 }
 
 /**
@@ -231,6 +241,8 @@ interface InterfaceProperty {
   name: string;
   type: string;
   optional: boolean;
+  /** JSDoc description for this property */
+  description?: string;
 }
 
 // ============================================================================
@@ -516,7 +528,12 @@ function generateEnumTypes(
       null,
       unionType,
     );
-    statements.push(t.exportNamedDeclaration(typeAlias));
+    const exportDecl = t.exportNamedDeclaration(typeAlias);
+    const enumDescription = stripSmartComments(typeInfo.description);
+    if (enumDescription) {
+      addJSDocComment(exportDecl, enumDescription.split('\n'));
+    }
+    statements.push(exportDecl);
   }
 
   if (statements.length > 0) {
@@ -588,6 +605,7 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
       name: field.name,
       type: isNullable ? `${tsType} | null` : tsType,
       optional: isNullable,
+      description: field.description,
     });
   }
 
@@ -603,7 +621,11 @@ function generateEntityTypes(tables: CleanTable[]): t.Statement[] {
   for (const table of tables) {
     const { typeName } = getTableNames(table);
     statements.push(
-      createExportedInterface(typeName, buildEntityProperties(table)),
+      createExportedInterface(
+        typeName,
+        buildEntityProperties(table),
+        table.description,
+      ),
     );
   }
 
@@ -1525,7 +1547,12 @@ function generateCustomInputTypes(
       for (const field of typeInfo.inputFields) {
         const optional = !isRequired(field.type);
         const tsType = typeRefToTs(field.type);
-        properties.push({ name: field.name, type: tsType, optional });
+        properties.push({
+          name: field.name,
+          type: tsType,
+          optional,
+          description: stripSmartComments(field.description),
+        });
 
         // Follow nested Input types
         const baseType = getTypeBaseName(field.type);
@@ -1538,7 +1565,13 @@ function generateCustomInputTypes(
         }
       }
 
-      statements.push(createExportedInterface(typeName, properties));
+      statements.push(
+        createExportedInterface(
+          typeName,
+          properties,
+          stripSmartComments(typeInfo.description),
+        ),
+      );
     } else if (typeInfo.kind === 'ENUM' && typeInfo.enumValues) {
       const unionType = createStringLiteralUnion(typeInfo.enumValues);
       const typeAlias = t.tsTypeAliasDeclaration(
@@ -1546,7 +1579,12 @@ function generateCustomInputTypes(
         null,
         unionType,
       );
-      statements.push(t.exportNamedDeclaration(typeAlias));
+      const enumExportDecl = t.exportNamedDeclaration(typeAlias);
+      const enumDescription = stripSmartComments(typeInfo.description);
+      if (enumDescription) {
+        addJSDocComment(enumExportDecl, enumDescription.split('\n'));
+      }
+      statements.push(enumExportDecl);
     } else {
       // Add comment for unsupported type kind
       const commentStmt = t.emptyStatement();
@@ -1642,6 +1680,7 @@ function generatePayloadTypes(
         name: field.name,
         type: isNullable ? `${tsType} | null` : tsType,
         optional: isNullable,
+        description: stripSmartComments(field.description),
       });
 
       // Follow nested OBJECT types
@@ -1657,7 +1696,13 @@ function generatePayloadTypes(
       }
     }
 
-    statements.push(createExportedInterface(typeName, interfaceProps));
+    statements.push(
+      createExportedInterface(
+        typeName,
+        interfaceProps,
+        stripSmartComments(typeInfo.description),
+      ),
+    );
 
     // Build Select type
     const selectMembers: t.TSTypeElement[] = [];
