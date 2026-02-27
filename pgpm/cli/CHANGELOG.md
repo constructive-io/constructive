@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.2](https://github.com/constructive-io/constructive/compare/pgpm@4.2.1...pgpm@4.2.2) (2026-02-27)
+
+### Bug Fixes
+
+- **pgpm:** suppress stale update notification after pgpm update ([01c6636](https://github.com/constructive-io/constructive/commit/01c66363afb9b0fc9074d088eb5713110c44af4d))
+
 ## [4.2.1](https://github.com/constructive-io/constructive/compare/pgpm@4.2.0...pgpm@4.2.1) (2026-02-26)
 
 **Note:** Version bump only for package pgpm

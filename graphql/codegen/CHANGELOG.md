@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.5.1...@constructive-io/graphql-codegen@4.5.2) (2026-02-27)
+
+### Bug Fixes
+
+- correct findOne docs to use top-level PK instead of where wrapper ([7ad3b26](https://github.com/constructive-io/constructive/commit/7ad3b2643a0ccf58adb6baeea681d0d0df105470)), closes [constructive-io/constructive-planning#623](https://github.com/constructive-io/constructive-planning/issues/623)
+
 ## [4.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.5.0...@constructive-io/graphql-codegen@4.5.1) (2026-02-26)
 
 ### Bug Fixes
