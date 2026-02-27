@@ -8,7 +8,7 @@ ORM operations for OrgMembershipDefault records
 
 ```typescript
 db.orgMembershipDefault.findMany({ select: { id: true } }).execute()
-db.orgMembershipDefault.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.orgMembershipDefault.findOne({ id: '<value>', select: { id: true } }).execute()
 db.orgMembershipDefault.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', entityId: '<value>', deleteMemberCascadeGroups: '<value>', createGroupsCascadeMembers: '<value>' }, select: { id: true } }).execute()
 db.orgMembershipDefault.update({ where: { id: '<value>' }, data: { createdBy: '<new>' }, select: { id: true } }).execute()
 db.orgMembershipDefault.delete({ where: { id: '<value>' } }).execute()

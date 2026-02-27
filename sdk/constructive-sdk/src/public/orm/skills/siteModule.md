@@ -8,7 +8,7 @@ ORM operations for SiteModule records
 
 ```typescript
 db.siteModule.findMany({ select: { id: true } }).execute()
-db.siteModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.siteModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute()
 db.siteModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.siteModule.delete({ where: { id: '<value>' } }).execute()

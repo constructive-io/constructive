@@ -8,7 +8,7 @@ ORM operations for PermissionsModule records
 
 ```typescript
 db.permissionsModule.findMany({ select: { id: true } }).execute()
-db.permissionsModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.permissionsModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.permissionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' }, select: { id: true } }).execute()
 db.permissionsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.permissionsModule.delete({ where: { id: '<value>' } }).execute()

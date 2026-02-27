@@ -8,7 +8,7 @@ ORM operations for PhoneNumber records
 
 ```typescript
 db.phoneNumber.findMany({ select: { id: true } }).execute()
-db.phoneNumber.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.phoneNumber.findOne({ id: '<value>', select: { id: true } }).execute()
 db.phoneNumber.create({ data: { ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute()
 db.phoneNumber.update({ where: { id: '<value>' }, data: { ownerId: '<new>' }, select: { id: true } }).execute()
 db.phoneNumber.delete({ where: { id: '<value>' } }).execute()

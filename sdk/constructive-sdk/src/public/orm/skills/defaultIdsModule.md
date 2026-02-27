@@ -8,7 +8,7 @@ ORM operations for DefaultIdsModule records
 
 ```typescript
 db.defaultIdsModule.findMany({ select: { id: true } }).execute()
-db.defaultIdsModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.defaultIdsModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.defaultIdsModule.create({ data: { databaseId: '<value>' }, select: { id: true } }).execute()
 db.defaultIdsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.defaultIdsModule.delete({ where: { id: '<value>' } }).execute()

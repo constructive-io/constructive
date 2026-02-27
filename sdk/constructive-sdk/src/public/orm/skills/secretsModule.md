@@ -8,7 +8,7 @@ ORM operations for SecretsModule records
 
 ```typescript
 db.secretsModule.findMany({ select: { id: true } }).execute()
-db.secretsModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.secretsModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.secretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute()
 db.secretsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.secretsModule.delete({ where: { id: '<value>' } }).execute()

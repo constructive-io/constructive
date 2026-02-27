@@ -8,7 +8,7 @@ ORM operations for Procedure records
 
 ```typescript
 db.procedure.findMany({ select: { id: true } }).execute()
-db.procedure.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.procedure.findOne({ id: '<value>', select: { id: true } }).execute()
 db.procedure.create({ data: { databaseId: '<value>', name: '<value>', argnames: '<value>', argtypes: '<value>', argdefaults: '<value>', langName: '<value>', definition: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.procedure.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.procedure.delete({ where: { id: '<value>' } }).execute()

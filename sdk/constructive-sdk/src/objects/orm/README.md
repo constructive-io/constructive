@@ -47,7 +47,7 @@ CRUD operations for GetAllRecord records.
 const items = await db.getAllRecord.findMany({ select: { path: true, data: true } }).execute();
 
 // Get one by id
-const item = await db.getAllRecord.findOne({ where: { id: '<value>' }, select: { path: true, data: true } }).execute();
+const item = await db.getAllRecord.findOne({ id: '<value>', select: { path: true, data: true } }).execute();
 
 // Create
 const created = await db.getAllRecord.create({ data: { path: '<value>', data: '<value>' }, select: { id: true } }).execute();
@@ -83,7 +83,7 @@ CRUD operations for Object records.
 const items = await db.object.findMany({ select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.object.findOne({ where: { id: '<value>' }, select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+const item = await db.object.findOne({ id: '<value>', select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.object.create({ data: { hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' }, select: { id: true } }).execute();
@@ -116,7 +116,7 @@ CRUD operations for Ref records.
 const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
 
 // Get one by id
-const item = await db.ref.findOne({ where: { id: '<value>' }, select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const item = await db.ref.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
 
 // Create
 const created = await db.ref.create({ data: { name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' }, select: { id: true } }).execute();
@@ -149,7 +149,7 @@ CRUD operations for Store records.
 const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.store.findOne({ where: { id: '<value>' }, select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const item = await db.store.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.store.create({ data: { name: '<value>', databaseId: '<value>', hash: '<value>' }, select: { id: true } }).execute();
@@ -186,7 +186,7 @@ CRUD operations for Commit records.
 const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Get one by id
-const item = await db.commit.findOne({ where: { id: '<value>' }, select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Create
 const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' }, select: { id: true } }).execute();

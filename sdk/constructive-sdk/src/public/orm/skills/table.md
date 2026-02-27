@@ -8,7 +8,7 @@ ORM operations for Table records
 
 ```typescript
 db.table.findMany({ select: { id: true } }).execute()
-db.table.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.table.findOne({ id: '<value>', select: { id: true } }).execute()
 db.table.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>' }, select: { id: true } }).execute()
 db.table.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.table.delete({ where: { id: '<value>' } }).execute()

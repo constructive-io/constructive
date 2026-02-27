@@ -8,7 +8,7 @@ ORM operations for Index records
 
 ```typescript
 db.index.findMany({ select: { id: true } }).execute()
-db.index.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.index.findOne({ id: '<value>', select: { id: true } }).execute()
 db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
 db.index.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.index.delete({ where: { id: '<value>' } }).execute()

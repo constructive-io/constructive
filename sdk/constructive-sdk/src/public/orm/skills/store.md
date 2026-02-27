@@ -8,7 +8,7 @@ ORM operations for Store records
 
 ```typescript
 db.store.findMany({ select: { id: true } }).execute()
-db.store.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.store.findOne({ id: '<value>', select: { id: true } }).execute()
 db.store.create({ data: { name: '<value>', databaseId: '<value>', hash: '<value>' }, select: { id: true } }).execute()
 db.store.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.store.delete({ where: { id: '<value>' } }).execute()

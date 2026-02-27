@@ -8,7 +8,7 @@ ORM operations for Object records
 
 ```typescript
 db.object.findMany({ select: { id: true } }).execute()
-db.object.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.object.findOne({ id: '<value>', select: { id: true } }).execute()
 db.object.create({ data: { hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' }, select: { id: true } }).execute()
 db.object.update({ where: { id: '<value>' }, data: { hashUuid: '<new>' }, select: { id: true } }).execute()
 db.object.delete({ where: { id: '<value>' } }).execute()

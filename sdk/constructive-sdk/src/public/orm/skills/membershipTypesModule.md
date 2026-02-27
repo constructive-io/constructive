@@ -8,7 +8,7 @@ ORM operations for MembershipTypesModule records
 
 ```typescript
 db.membershipTypesModule.findMany({ select: { id: true } }).execute()
-db.membershipTypesModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.membershipTypesModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.membershipTypesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute()
 db.membershipTypesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.membershipTypesModule.delete({ where: { id: '<value>' } }).execute()

@@ -8,7 +8,7 @@ ORM operations for AppPermissionDefault records
 
 ```typescript
 db.appPermissionDefault.findMany({ select: { id: true } }).execute()
-db.appPermissionDefault.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appPermissionDefault.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appPermissionDefault.create({ data: { permissions: '<value>' }, select: { id: true } }).execute()
 db.appPermissionDefault.update({ where: { id: '<value>' }, data: { permissions: '<new>' }, select: { id: true } }).execute()
 db.appPermissionDefault.delete({ where: { id: '<value>' } }).execute()

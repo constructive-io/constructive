@@ -8,7 +8,7 @@ ORM operations for OrgOwnerGrant records
 
 ```typescript
 db.orgOwnerGrant.findMany({ select: { id: true } }).execute()
-db.orgOwnerGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.orgOwnerGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.orgOwnerGrant.create({ data: { isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute()
 db.orgOwnerGrant.update({ where: { id: '<value>' }, data: { isGrant: '<new>' }, select: { id: true } }).execute()
 db.orgOwnerGrant.delete({ where: { id: '<value>' } }).execute()

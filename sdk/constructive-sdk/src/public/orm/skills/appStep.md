@@ -8,7 +8,7 @@ ORM operations for AppStep records
 
 ```typescript
 db.appStep.findMany({ select: { id: true } }).execute()
-db.appStep.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appStep.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appStep.create({ data: { actorId: '<value>', name: '<value>', count: '<value>' }, select: { id: true } }).execute()
 db.appStep.update({ where: { id: '<value>' }, data: { actorId: '<new>' }, select: { id: true } }).execute()
 db.appStep.delete({ where: { id: '<value>' } }).execute()

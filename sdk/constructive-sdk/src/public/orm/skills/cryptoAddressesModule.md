@@ -8,7 +8,7 @@ ORM operations for CryptoAddressesModule records
 
 ```typescript
 db.cryptoAddressesModule.findMany({ select: { id: true } }).execute()
-db.cryptoAddressesModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.cryptoAddressesModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.cryptoAddressesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>' }, select: { id: true } }).execute()
 db.cryptoAddressesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.cryptoAddressesModule.delete({ where: { id: '<value>' } }).execute()

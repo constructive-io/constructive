@@ -8,7 +8,7 @@ ORM operations for AppLimit records
 
 ```typescript
 db.appLimit.findMany({ select: { id: true } }).execute()
-db.appLimit.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appLimit.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appLimit.create({ data: { name: '<value>', actorId: '<value>', num: '<value>', max: '<value>' }, select: { id: true } }).execute()
 db.appLimit.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.appLimit.delete({ where: { id: '<value>' } }).execute()

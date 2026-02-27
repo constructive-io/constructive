@@ -8,7 +8,7 @@ ORM operations for AppPermission records
 
 ```typescript
 db.appPermission.findMany({ select: { id: true } }).execute()
-db.appPermission.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.appPermission.findOne({ id: '<value>', select: { id: true } }).execute()
 db.appPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute()
 db.appPermission.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.appPermission.delete({ where: { id: '<value>' } }).execute()

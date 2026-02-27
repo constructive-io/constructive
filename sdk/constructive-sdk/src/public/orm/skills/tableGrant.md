@@ -8,7 +8,7 @@ ORM operations for TableGrant records
 
 ```typescript
 db.tableGrant.findMany({ select: { id: true } }).execute()
-db.tableGrant.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.tableGrant.findOne({ id: '<value>', select: { id: true } }).execute()
 db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', roleName: '<value>', fieldIds: '<value>' }, select: { id: true } }).execute()
 db.tableGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.tableGrant.delete({ where: { id: '<value>' } }).execute()

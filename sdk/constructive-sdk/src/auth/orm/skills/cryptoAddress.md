@@ -8,7 +8,7 @@ ORM operations for CryptoAddress records
 
 ```typescript
 db.cryptoAddress.findMany({ select: { id: true } }).execute()
-db.cryptoAddress.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.cryptoAddress.findOne({ id: '<value>', select: { id: true } }).execute()
 db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute()
 db.cryptoAddress.update({ where: { id: '<value>' }, data: { ownerId: '<new>' }, select: { id: true } }).execute()
 db.cryptoAddress.delete({ where: { id: '<value>' } }).execute()

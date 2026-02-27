@@ -8,7 +8,7 @@ ORM operations for LimitFunction records
 
 ```typescript
 db.limitFunction.findMany({ select: { id: true } }).execute()
-db.limitFunction.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.limitFunction.findOne({ id: '<value>', select: { id: true } }).execute()
 db.limitFunction.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', data: '<value>', security: '<value>' }, select: { id: true } }).execute()
 db.limitFunction.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.limitFunction.delete({ where: { id: '<value>' } }).execute()

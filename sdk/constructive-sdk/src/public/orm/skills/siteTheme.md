@@ -8,7 +8,7 @@ ORM operations for SiteTheme records
 
 ```typescript
 db.siteTheme.findMany({ select: { id: true } }).execute()
-db.siteTheme.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.siteTheme.findOne({ id: '<value>', select: { id: true } }).execute()
 db.siteTheme.create({ data: { databaseId: '<value>', siteId: '<value>', theme: '<value>' }, select: { id: true } }).execute()
 db.siteTheme.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.siteTheme.delete({ where: { id: '<value>' } }).execute()

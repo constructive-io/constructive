@@ -141,7 +141,7 @@ CRUD operations for GetAllRecord records.
 const items = await db.getAllRecord.findMany({ select: { path: true, data: true } }).execute();
 
 // Get one by id
-const item = await db.getAllRecord.findOne({ where: { id: '<value>' }, select: { path: true, data: true } }).execute();
+const item = await db.getAllRecord.findOne({ id: '<value>', select: { path: true, data: true } }).execute();
 
 // Create
 const created = await db.getAllRecord.create({ data: { path: '<value>', data: '<value>' }, select: { id: true } }).execute();
@@ -174,7 +174,7 @@ CRUD operations for AppPermission records.
 const items = await db.appPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
 
 // Get one by id
-const item = await db.appPermission.findOne({ where: { id: '<value>' }, select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
+const item = await db.appPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
 
 // Create
 const created = await db.appPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute();
@@ -207,7 +207,7 @@ CRUD operations for OrgPermission records.
 const items = await db.orgPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
 
 // Get one by id
-const item = await db.orgPermission.findOne({ where: { id: '<value>' }, select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
+const item = await db.orgPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
 
 // Create
 const created = await db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute();
@@ -243,7 +243,7 @@ CRUD operations for Object records.
 const items = await db.object.findMany({ select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.object.findOne({ where: { id: '<value>' }, select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+const item = await db.object.findOne({ id: '<value>', select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.object.create({ data: { hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' }, select: { id: true } }).execute();
@@ -279,7 +279,7 @@ CRUD operations for AppLevelRequirement records.
 const items = await db.appLevelRequirement.findMany({ select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appLevelRequirement.findOne({ where: { id: '<value>' }, select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appLevelRequirement.findOne({ id: '<value>', select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' }, select: { id: true } }).execute();
@@ -315,7 +315,7 @@ CRUD operations for Database records.
 const items = await db.database.findMany({ select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.database.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.database.findOne({ id: '<value>', select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.database.create({ data: { ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>' }, select: { id: true } }).execute();
@@ -357,7 +357,7 @@ CRUD operations for Schema records.
 const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.schema.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schema.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>' }, select: { id: true } }).execute();
@@ -404,7 +404,7 @@ CRUD operations for Table records.
 const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.table.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.table.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>' }, select: { id: true } }).execute();
@@ -446,7 +446,7 @@ CRUD operations for CheckConstraint records.
 const items = await db.checkConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.checkConstraint.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.checkConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.checkConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', expr: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -498,7 +498,7 @@ CRUD operations for Field records.
 const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.field.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>' }, select: { id: true } }).execute();
@@ -544,7 +544,7 @@ CRUD operations for ForeignKeyConstraint records.
 const items = await db.foreignKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.foreignKeyConstraint.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.foreignKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.foreignKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', refTableId: '<value>', refFieldIds: '<value>', deleteAction: '<value>', updateAction: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -581,7 +581,7 @@ CRUD operations for FullTextSearch records.
 const items = await db.fullTextSearch.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.fullTextSearch.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.fullTextSearch.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, fieldId: true, fieldIds: true, weights: true, langs: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.fullTextSearch.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', fieldIds: '<value>', weights: '<value>', langs: '<value>' }, select: { id: true } }).execute();
@@ -626,7 +626,7 @@ CRUD operations for Index records.
 const items = await db.index.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.index.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.index.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -662,7 +662,7 @@ CRUD operations for LimitFunction records.
 const items = await db.limitFunction.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, data: true, security: true } }).execute();
 
 // Get one by id
-const item = await db.limitFunction.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, data: true, security: true } }).execute();
+const item = await db.limitFunction.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, data: true, security: true } }).execute();
 
 // Create
 const created = await db.limitFunction.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', data: '<value>', security: '<value>' }, select: { id: true } }).execute();
@@ -707,7 +707,7 @@ CRUD operations for Policy records.
 const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, roleName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.policy.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, roleName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.policy.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, roleName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.policy.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', roleName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -748,7 +748,7 @@ CRUD operations for PrimaryKeyConstraint records.
 const items = await db.primaryKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.primaryKeyConstraint.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.primaryKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -784,7 +784,7 @@ CRUD operations for TableGrant records.
 const items = await db.tableGrant.findMany({ select: { id: true, databaseId: true, tableId: true, privilege: true, roleName: true, fieldIds: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.tableGrant.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, privilege: true, roleName: true, fieldIds: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.tableGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, privilege: true, roleName: true, fieldIds: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', roleName: '<value>', fieldIds: '<value>' }, select: { id: true } }).execute();
@@ -825,7 +825,7 @@ CRUD operations for Trigger records.
 const items = await db.trigger.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.trigger.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.trigger.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.trigger.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -867,7 +867,7 @@ CRUD operations for UniqueConstraint records.
 const items = await db.uniqueConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.uniqueConstraint.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.uniqueConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.uniqueConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -911,7 +911,7 @@ CRUD operations for View records.
 const items = await db.view.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
 
 // Get one by id
-const item = await db.view.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
+const item = await db.view.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
 
 // Create
 const created = await db.view.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -943,7 +943,7 @@ CRUD operations for ViewTable records.
 const items = await db.viewTable.findMany({ select: { id: true, viewId: true, tableId: true, joinOrder: true } }).execute();
 
 // Get one by id
-const item = await db.viewTable.findOne({ where: { id: '<value>' }, select: { id: true, viewId: true, tableId: true, joinOrder: true } }).execute();
+const item = await db.viewTable.findOne({ id: '<value>', select: { id: true, viewId: true, tableId: true, joinOrder: true } }).execute();
 
 // Create
 const created = await db.viewTable.create({ data: { viewId: '<value>', tableId: '<value>', joinOrder: '<value>' }, select: { id: true } }).execute();
@@ -977,7 +977,7 @@ CRUD operations for ViewGrant records.
 const items = await db.viewGrant.findMany({ select: { id: true, databaseId: true, viewId: true, roleName: true, privilege: true, withGrantOption: true } }).execute();
 
 // Get one by id
-const item = await db.viewGrant.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, viewId: true, roleName: true, privilege: true, withGrantOption: true } }).execute();
+const item = await db.viewGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, roleName: true, privilege: true, withGrantOption: true } }).execute();
 
 // Create
 const created = await db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', roleName: '<value>', privilege: '<value>', withGrantOption: '<value>' }, select: { id: true } }).execute();
@@ -1011,7 +1011,7 @@ CRUD operations for ViewRule records.
 const items = await db.viewRule.findMany({ select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } }).execute();
 
 // Get one by id
-const item = await db.viewRule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } }).execute();
+const item = await db.viewRule.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } }).execute();
 
 // Create
 const created = await db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' }, select: { id: true } }).execute();
@@ -1046,7 +1046,7 @@ CRUD operations for TableModule records.
 const items = await db.tableModule.findMany({ select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, nodeType: true, data: true, fields: true } }).execute();
 
 // Get one by id
-const item = await db.tableModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, nodeType: true, data: true, fields: true } }).execute();
+const item = await db.tableModule.findOne({ id: '<value>', select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, nodeType: true, data: true, fields: true } }).execute();
 
 // Create
 const created = await db.tableModule.create({ data: { databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', nodeType: '<value>', data: '<value>', fields: '<value>' }, select: { id: true } }).execute();
@@ -1083,7 +1083,7 @@ CRUD operations for TableTemplateModule records.
 const items = await db.tableTemplateModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } }).execute();
 
 // Get one by id
-const item = await db.tableTemplateModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } }).execute();
+const item = await db.tableTemplateModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } }).execute();
 
 // Create
 const created = await db.tableTemplateModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>' }, select: { id: true } }).execute();
@@ -1117,7 +1117,7 @@ CRUD operations for SchemaGrant records.
 const items = await db.schemaGrant.findMany({ select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.schemaGrant.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schemaGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.schemaGrant.create({ data: { databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' }, select: { id: true } }).execute();
@@ -1149,7 +1149,7 @@ CRUD operations for ApiSchema records.
 const items = await db.apiSchema.findMany({ select: { id: true, databaseId: true, schemaId: true, apiId: true } }).execute();
 
 // Get one by id
-const item = await db.apiSchema.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, apiId: true } }).execute();
+const item = await db.apiSchema.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, apiId: true } }).execute();
 
 // Create
 const created = await db.apiSchema.create({ data: { databaseId: '<value>', schemaId: '<value>', apiId: '<value>' }, select: { id: true } }).execute();
@@ -1182,7 +1182,7 @@ CRUD operations for ApiModule records.
 const items = await db.apiModule.findMany({ select: { id: true, databaseId: true, apiId: true, name: true, data: true } }).execute();
 
 // Get one by id
-const item = await db.apiModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, apiId: true, name: true, data: true } }).execute();
+const item = await db.apiModule.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, name: true, data: true } }).execute();
 
 // Create
 const created = await db.apiModule.create({ data: { databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute();
@@ -1216,7 +1216,7 @@ CRUD operations for Domain records.
 const items = await db.domain.findMany({ select: { id: true, databaseId: true, apiId: true, siteId: true, subdomain: true, domain: true } }).execute();
 
 // Get one by id
-const item = await db.domain.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, apiId: true, siteId: true, subdomain: true, domain: true } }).execute();
+const item = await db.domain.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, siteId: true, subdomain: true, domain: true } }).execute();
 
 // Create
 const created = await db.domain.create({ data: { databaseId: '<value>', apiId: '<value>', siteId: '<value>', subdomain: '<value>', domain: '<value>' }, select: { id: true } }).execute();
@@ -1250,7 +1250,7 @@ CRUD operations for SiteMetadatum records.
 const items = await db.siteMetadatum.findMany({ select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } }).execute();
 
 // Get one by id
-const item = await db.siteMetadatum.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } }).execute();
+const item = await db.siteMetadatum.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } }).execute();
 
 // Create
 const created = await db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' }, select: { id: true } }).execute();
@@ -1283,7 +1283,7 @@ CRUD operations for SiteModule records.
 const items = await db.siteModule.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, data: true } }).execute();
 
 // Get one by id
-const item = await db.siteModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, siteId: true, name: true, data: true } }).execute();
+const item = await db.siteModule.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, data: true } }).execute();
 
 // Create
 const created = await db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute();
@@ -1315,7 +1315,7 @@ CRUD operations for SiteTheme records.
 const items = await db.siteTheme.findMany({ select: { id: true, databaseId: true, siteId: true, theme: true } }).execute();
 
 // Get one by id
-const item = await db.siteTheme.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, siteId: true, theme: true } }).execute();
+const item = await db.siteTheme.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, theme: true } }).execute();
 
 // Create
 const created = await db.siteTheme.create({ data: { databaseId: '<value>', siteId: '<value>', theme: '<value>' }, select: { id: true } }).execute();
@@ -1358,7 +1358,7 @@ CRUD operations for Procedure records.
 const items = await db.procedure.findMany({ select: { id: true, databaseId: true, name: true, argnames: true, argtypes: true, argdefaults: true, langName: true, definition: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.procedure.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, name: true, argnames: true, argtypes: true, argdefaults: true, langName: true, definition: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.procedure.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, argnames: true, argtypes: true, argdefaults: true, langName: true, definition: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.procedure.create({ data: { databaseId: '<value>', name: '<value>', argnames: '<value>', argtypes: '<value>', argdefaults: '<value>', langName: '<value>', definition: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
@@ -1392,7 +1392,7 @@ CRUD operations for TriggerFunction records.
 const items = await db.triggerFunction.findMany({ select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.triggerFunction.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.triggerFunction.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.triggerFunction.create({ data: { databaseId: '<value>', name: '<value>', code: '<value>' }, select: { id: true } }).execute();
@@ -1427,7 +1427,7 @@ CRUD operations for Api records.
 const items = await db.api.findMany({ select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
 
 // Get one by id
-const item = await db.api.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
+const item = await db.api.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
 
 // Create
 const created = await db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>' }, select: { id: true } }).execute();
@@ -1464,7 +1464,7 @@ CRUD operations for Site records.
 const items = await db.site.findMany({ select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
 
 // Get one by id
-const item = await db.site.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
+const item = await db.site.findOne({ id: '<value>', select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
 
 // Create
 const created = await db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' }, select: { id: true } }).execute();
@@ -1501,7 +1501,7 @@ CRUD operations for App records.
 const items = await db.app.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } }).execute();
 
 // Get one by id
-const item = await db.app.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } }).execute();
+const item = await db.app.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } }).execute();
 
 // Create
 const created = await db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>' }, select: { id: true } }).execute();
@@ -1536,7 +1536,7 @@ CRUD operations for ConnectedAccountsModule records.
 const items = await db.connectedAccountsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.connectedAccountsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.connectedAccountsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.connectedAccountsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -1572,7 +1572,7 @@ CRUD operations for CryptoAddressesModule records.
 const items = await db.cryptoAddressesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddressesModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } }).execute();
+const item = await db.cryptoAddressesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } }).execute();
 
 // Create
 const created = await db.cryptoAddressesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>' }, select: { id: true } }).execute();
@@ -1614,7 +1614,7 @@ CRUD operations for CryptoAuthModule records.
 const items = await db.cryptoAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAuthModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } }).execute();
+const item = await db.cryptoAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } }).execute();
 
 // Create
 const created = await db.cryptoAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>' }, select: { id: true } }).execute();
@@ -1644,7 +1644,7 @@ CRUD operations for DefaultIdsModule records.
 const items = await db.defaultIdsModule.findMany({ select: { id: true, databaseId: true } }).execute();
 
 // Get one by id
-const item = await db.defaultIdsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true } }).execute();
+const item = await db.defaultIdsModule.findOne({ id: '<value>', select: { id: true, databaseId: true } }).execute();
 
 // Create
 const created = await db.defaultIdsModule.create({ data: { databaseId: '<value>' }, select: { id: true } }).execute();
@@ -1684,7 +1684,7 @@ CRUD operations for DenormalizedTableField records.
 const items = await db.denormalizedTableField.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } }).execute();
 
 // Get one by id
-const item = await db.denormalizedTableField.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } }).execute();
+const item = await db.denormalizedTableField.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } }).execute();
 
 // Create
 const created = await db.denormalizedTableField.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>' }, select: { id: true } }).execute();
@@ -1719,7 +1719,7 @@ CRUD operations for EmailsModule records.
 const items = await db.emailsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.emailsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.emailsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.emailsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -1752,7 +1752,7 @@ CRUD operations for EncryptedSecretsModule records.
 const items = await db.encryptedSecretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.encryptedSecretsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.encryptedSecretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.encryptedSecretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -1789,7 +1789,7 @@ CRUD operations for FieldModule records.
 const items = await db.fieldModule.findMany({ select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
 
 // Get one by id
-const item = await db.fieldModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
+const item = await db.fieldModule.findOne({ id: '<value>', select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
 
 // Create
 const created = await db.fieldModule.create({ data: { databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>' }, select: { id: true } }).execute();
@@ -1831,7 +1831,7 @@ CRUD operations for InvitesModule records.
 const items = await db.invitesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } }).execute();
 
 // Get one by id
-const item = await db.invitesModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } }).execute();
+const item = await db.invitesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } }).execute();
 
 // Create
 const created = await db.invitesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', invitesTableId: '<value>', claimedInvitesTableId: '<value>', invitesTableName: '<value>', claimedInvitesTableName: '<value>', submitInviteCodeFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>' }, select: { id: true } }).execute();
@@ -1885,7 +1885,7 @@ CRUD operations for LevelsModule records.
 const items = await db.levelsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
 
 // Get one by id
-const item = await db.levelsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const item = await db.levelsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
 
 // Create
 const created = await db.levelsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', stepsTableId: '<value>', stepsTableName: '<value>', achievementsTableId: '<value>', achievementsTableName: '<value>', levelsTableId: '<value>', levelsTableName: '<value>', levelRequirementsTableId: '<value>', levelRequirementsTableName: '<value>', completedStep: '<value>', incompletedStep: '<value>', tgAchievement: '<value>', tgAchievementToggle: '<value>', tgAchievementToggleBoolean: '<value>', tgAchievementBoolean: '<value>', upsertAchievement: '<value>', tgUpdateAchievements: '<value>', stepsRequired: '<value>', levelAchieved: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' }, select: { id: true } }).execute();
@@ -1931,7 +1931,7 @@ CRUD operations for LimitsModule records.
 const items = await db.limitsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
 
 // Get one by id
-const item = await db.limitsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const item = await db.limitsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
 
 // Create
 const created = await db.limitsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' }, select: { id: true } }).execute();
@@ -1964,7 +1964,7 @@ CRUD operations for MembershipTypesModule records.
 const items = await db.membershipTypesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.membershipTypesModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.membershipTypesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.membershipTypesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -2023,7 +2023,7 @@ CRUD operations for MembershipsModule records.
 const items = await db.membershipsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } }).execute();
 
 // Get one by id
-const item = await db.membershipsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } }).execute();
+const item = await db.membershipsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } }).execute();
 
 // Create
 const created = await db.membershipsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>' }, select: { id: true } }).execute();
@@ -2068,7 +2068,7 @@ CRUD operations for PermissionsModule records.
 const items = await db.permissionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } }).execute();
 
 // Get one by id
-const item = await db.permissionsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } }).execute();
+const item = await db.permissionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } }).execute();
 
 // Create
 const created = await db.permissionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' }, select: { id: true } }).execute();
@@ -2103,7 +2103,7 @@ CRUD operations for PhoneNumbersModule records.
 const items = await db.phoneNumbersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.phoneNumbersModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.phoneNumbersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.phoneNumbersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -2150,7 +2150,7 @@ CRUD operations for ProfilesModule records.
 const items = await db.profilesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } }).execute();
 
 // Get one by id
-const item = await db.profilesModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } }).execute();
+const item = await db.profilesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } }).execute();
 
 // Create
 const created = await db.profilesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' }, select: { id: true } }).execute();
@@ -2190,7 +2190,7 @@ CRUD operations for RlsModule records.
 const items = await db.rlsModule.findMany({ select: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } }).execute();
 
 // Get one by id
-const item = await db.rlsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } }).execute();
+const item = await db.rlsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } }).execute();
 
 // Create
 const created = await db.rlsModule.create({ data: { databaseId: '<value>', apiId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>' }, select: { id: true } }).execute();
@@ -2223,7 +2223,7 @@ CRUD operations for SecretsModule records.
 const items = await db.secretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Get one by id
-const item = await db.secretsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.secretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
 
 // Create
 const created = await db.secretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
@@ -2262,7 +2262,7 @@ CRUD operations for SessionsModule records.
 const items = await db.sessionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } }).execute();
 
 // Get one by id
-const item = await db.sessionsModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } }).execute();
+const item = await db.sessionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } }).execute();
 
 // Create
 const created = await db.sessionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>' }, select: { id: true } }).execute();
@@ -2316,7 +2316,7 @@ CRUD operations for UserAuthModule records.
 const items = await db.userAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } }).execute();
 
 // Get one by id
-const item = await db.userAuthModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } }).execute();
+const item = await db.userAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } }).execute();
 
 // Create
 const created = await db.userAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>' }, select: { id: true } }).execute();
@@ -2351,7 +2351,7 @@ CRUD operations for UsersModule records.
 const items = await db.usersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } }).execute();
 
 // Get one by id
-const item = await db.usersModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } }).execute();
+const item = await db.usersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } }).execute();
 
 // Create
 const created = await db.usersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>' }, select: { id: true } }).execute();
@@ -2384,7 +2384,7 @@ CRUD operations for UuidModule records.
 const items = await db.uuidModule.findMany({ select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } }).execute();
 
 // Get one by id
-const item = await db.uuidModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } }).execute();
+const item = await db.uuidModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } }).execute();
 
 // Create
 const created = await db.uuidModule.create({ data: { databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>' }, select: { id: true } }).execute();
@@ -2426,7 +2426,7 @@ CRUD operations for DatabaseProvisionModule records.
 const items = await db.databaseProvisionModule.findMany({ select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } }).execute();
 
 // Get one by id
-const item = await db.databaseProvisionModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } }).execute();
+const item = await db.databaseProvisionModule.findOne({ id: '<value>', select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } }).execute();
 
 // Create
 const created = await db.databaseProvisionModule.create({ data: { databaseName: '<value>', ownerId: '<value>', subdomain: '<value>', domain: '<value>', modules: '<value>', options: '<value>', bootstrapUser: '<value>', status: '<value>', errorMessage: '<value>', databaseId: '<value>', completedAt: '<value>' }, select: { id: true } }).execute();
@@ -2460,7 +2460,7 @@ CRUD operations for AppAdminGrant records.
 const items = await db.appAdminGrant.findMany({ select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appAdminGrant.findOne({ where: { id: '<value>' }, select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appAdminGrant.findOne({ id: '<value>', select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appAdminGrant.create({ data: { isGrant: '<value>', actorId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2494,7 +2494,7 @@ CRUD operations for AppOwnerGrant records.
 const items = await db.appOwnerGrant.findMany({ select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appOwnerGrant.findOne({ where: { id: '<value>' }, select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appOwnerGrant.findOne({ id: '<value>', select: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appOwnerGrant.create({ data: { isGrant: '<value>', actorId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2529,7 +2529,7 @@ CRUD operations for AppGrant records.
 const items = await db.appGrant.findMany({ select: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appGrant.findOne({ where: { id: '<value>' }, select: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appGrant.findOne({ id: '<value>', select: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appGrant.create({ data: { permissions: '<value>', isGrant: '<value>', actorId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2572,7 +2572,7 @@ CRUD operations for OrgMembership records.
 const items = await db.orgMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgMembership.findOne({ where: { id: '<value>' }, select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true } }).execute();
+const item = await db.orgMembership.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgMembership.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -2604,7 +2604,7 @@ CRUD operations for OrgMember records.
 const items = await db.orgMember.findMany({ select: { id: true, isAdmin: true, actorId: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgMember.findOne({ where: { id: '<value>' }, select: { id: true, isAdmin: true, actorId: true, entityId: true } }).execute();
+const item = await db.orgMember.findOne({ id: '<value>', select: { id: true, isAdmin: true, actorId: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgMember.create({ data: { isAdmin: '<value>', actorId: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -2639,7 +2639,7 @@ CRUD operations for OrgAdminGrant records.
 const items = await db.orgAdminGrant.findMany({ select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.orgAdminGrant.findOne({ where: { id: '<value>' }, select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.orgAdminGrant.findOne({ id: '<value>', select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.orgAdminGrant.create({ data: { isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2674,7 +2674,7 @@ CRUD operations for OrgOwnerGrant records.
 const items = await db.orgOwnerGrant.findMany({ select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.orgOwnerGrant.findOne({ where: { id: '<value>' }, select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.orgOwnerGrant.findOne({ id: '<value>', select: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.orgOwnerGrant.create({ data: { isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2710,7 +2710,7 @@ CRUD operations for OrgGrant records.
 const items = await db.orgGrant.findMany({ select: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.orgGrant.findOne({ where: { id: '<value>' }, select: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.orgGrant.findOne({ id: '<value>', select: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.orgGrant.create({ data: { permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' }, select: { id: true } }).execute();
@@ -2743,7 +2743,7 @@ CRUD operations for AppLimit records.
 const items = await db.appLimit.findMany({ select: { id: true, name: true, actorId: true, num: true, max: true } }).execute();
 
 // Get one by id
-const item = await db.appLimit.findOne({ where: { id: '<value>' }, select: { id: true, name: true, actorId: true, num: true, max: true } }).execute();
+const item = await db.appLimit.findOne({ id: '<value>', select: { id: true, name: true, actorId: true, num: true, max: true } }).execute();
 
 // Create
 const created = await db.appLimit.create({ data: { name: '<value>', actorId: '<value>', num: '<value>', max: '<value>' }, select: { id: true } }).execute();
@@ -2777,7 +2777,7 @@ CRUD operations for OrgLimit records.
 const items = await db.orgLimit.findMany({ select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgLimit.findOne({ where: { id: '<value>' }, select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
+const item = await db.orgLimit.findOne({ id: '<value>', select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgLimit.create({ data: { name: '<value>', actorId: '<value>', num: '<value>', max: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -2811,7 +2811,7 @@ CRUD operations for AppStep records.
 const items = await db.appStep.findMany({ select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appStep.findOne({ where: { id: '<value>' }, select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appStep.findOne({ id: '<value>', select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appStep.create({ data: { actorId: '<value>', name: '<value>', count: '<value>' }, select: { id: true } }).execute();
@@ -2845,7 +2845,7 @@ CRUD operations for AppAchievement records.
 const items = await db.appAchievement.findMany({ select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appAchievement.findOne({ where: { id: '<value>' }, select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appAchievement.findOne({ id: '<value>', select: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appAchievement.create({ data: { actorId: '<value>', name: '<value>', count: '<value>' }, select: { id: true } }).execute();
@@ -2885,7 +2885,7 @@ CRUD operations for Invite records.
 const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.invite.findOne({ where: { id: '<value>' }, select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.invite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.invite.create({ data: { email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' }, select: { id: true } }).execute();
@@ -2919,7 +2919,7 @@ CRUD operations for ClaimedInvite records.
 const items = await db.claimedInvite.findMany({ select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.claimedInvite.findOne({ where: { id: '<value>' }, select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.claimedInvite.findOne({ id: '<value>', select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.claimedInvite.create({ data: { data: '<value>', senderId: '<value>', receiverId: '<value>' }, select: { id: true } }).execute();
@@ -2961,7 +2961,7 @@ CRUD operations for OrgInvite records.
 const items = await db.orgInvite.findMany({ select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgInvite.findOne({ where: { id: '<value>' }, select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const item = await db.orgInvite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgInvite.create({ data: { email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -2996,7 +2996,7 @@ CRUD operations for OrgClaimedInvite records.
 const items = await db.orgClaimedInvite.findMany({ select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgClaimedInvite.findOne({ where: { id: '<value>' }, select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const item = await db.orgClaimedInvite.findOne({ id: '<value>', select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgClaimedInvite.create({ data: { data: '<value>', senderId: '<value>', receiverId: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -3026,7 +3026,7 @@ CRUD operations for AppPermissionDefault records.
 const items = await db.appPermissionDefault.findMany({ select: { id: true, permissions: true } }).execute();
 
 // Get one by id
-const item = await db.appPermissionDefault.findOne({ where: { id: '<value>' }, select: { id: true, permissions: true } }).execute();
+const item = await db.appPermissionDefault.findOne({ id: '<value>', select: { id: true, permissions: true } }).execute();
 
 // Create
 const created = await db.appPermissionDefault.create({ data: { permissions: '<value>' }, select: { id: true } }).execute();
@@ -3059,7 +3059,7 @@ CRUD operations for Ref records.
 const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
 
 // Get one by id
-const item = await db.ref.findOne({ where: { id: '<value>' }, select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const item = await db.ref.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
 
 // Create
 const created = await db.ref.create({ data: { name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' }, select: { id: true } }).execute();
@@ -3092,7 +3092,7 @@ CRUD operations for Store records.
 const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.store.findOne({ where: { id: '<value>' }, select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const item = await db.store.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.store.create({ data: { name: '<value>', databaseId: '<value>', hash: '<value>' }, select: { id: true } }).execute();
@@ -3122,7 +3122,7 @@ CRUD operations for RoleType records.
 const items = await db.roleType.findMany({ select: { id: true, name: true } }).execute();
 
 // Get one by id
-const item = await db.roleType.findOne({ where: { id: '<value>' }, select: { id: true, name: true } }).execute();
+const item = await db.roleType.findOne({ id: '<value>', select: { id: true, name: true } }).execute();
 
 // Create
 const created = await db.roleType.create({ data: { name: '<value>' }, select: { id: true } }).execute();
@@ -3153,7 +3153,7 @@ CRUD operations for OrgPermissionDefault records.
 const items = await db.orgPermissionDefault.findMany({ select: { id: true, permissions: true, entityId: true } }).execute();
 
 // Get one by id
-const item = await db.orgPermissionDefault.findOne({ where: { id: '<value>' }, select: { id: true, permissions: true, entityId: true } }).execute();
+const item = await db.orgPermissionDefault.findOne({ id: '<value>', select: { id: true, permissions: true, entityId: true } }).execute();
 
 // Create
 const created = await db.orgPermissionDefault.create({ data: { permissions: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
@@ -3184,7 +3184,7 @@ CRUD operations for AppLimitDefault records.
 const items = await db.appLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
 
 // Get one by id
-const item = await db.appLimitDefault.findOne({ where: { id: '<value>' }, select: { id: true, name: true, max: true } }).execute();
+const item = await db.appLimitDefault.findOne({ id: '<value>', select: { id: true, name: true, max: true } }).execute();
 
 // Create
 const created = await db.appLimitDefault.create({ data: { name: '<value>', max: '<value>' }, select: { id: true } }).execute();
@@ -3215,7 +3215,7 @@ CRUD operations for OrgLimitDefault records.
 const items = await db.orgLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
 
 // Get one by id
-const item = await db.orgLimitDefault.findOne({ where: { id: '<value>' }, select: { id: true, name: true, max: true } }).execute();
+const item = await db.orgLimitDefault.findOne({ id: '<value>', select: { id: true, name: true, max: true } }).execute();
 
 // Create
 const created = await db.orgLimitDefault.create({ data: { name: '<value>', max: '<value>' }, select: { id: true } }).execute();
@@ -3250,7 +3250,7 @@ CRUD operations for CryptoAddress records.
 const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddress.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.cryptoAddress.findOne({ id: '<value>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -3282,7 +3282,7 @@ CRUD operations for MembershipType records.
 const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true } }).execute();
 
 // Get one by id
-const item = await db.membershipType.findOne({ where: { id: '<value>' }, select: { id: true, name: true, description: true, prefix: true } }).execute();
+const item = await db.membershipType.findOne({ id: '<value>', select: { id: true, name: true, description: true, prefix: true } }).execute();
 
 // Create
 const created = await db.membershipType.create({ data: { name: '<value>', description: '<value>', prefix: '<value>' }, select: { id: true } }).execute();
@@ -3318,7 +3318,7 @@ CRUD operations for ConnectedAccount records.
 const items = await db.connectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.connectedAccount.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.connectedAccount.findOne({ id: '<value>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' }, select: { id: true } }).execute();
@@ -3354,7 +3354,7 @@ CRUD operations for PhoneNumber records.
 const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.phoneNumber.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.phoneNumber.findOne({ id: '<value>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.phoneNumber.create({ data: { ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -3389,7 +3389,7 @@ CRUD operations for AppMembershipDefault records.
 const items = await db.appMembershipDefault.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } }).execute();
 
 // Get one by id
-const item = await db.appMembershipDefault.findOne({ where: { id: '<value>' }, select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } }).execute();
+const item = await db.appMembershipDefault.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } }).execute();
 
 // Create
 const created = await db.appMembershipDefault.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' }, select: { id: true } }).execute();
@@ -3426,7 +3426,7 @@ CRUD operations for NodeTypeRegistry records.
 const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by name
-const item = await db.nodeTypeRegistry.findOne({ where: { name: '<value>' }, select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.nodeTypeRegistry.findOne({ name: '<value>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.nodeTypeRegistry.create({ data: { slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' }, select: { name: true } }).execute();
@@ -3463,7 +3463,7 @@ CRUD operations for Commit records.
 const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Get one by id
-const item = await db.commit.findOne({ where: { id: '<value>' }, select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
 
 // Create
 const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' }, select: { id: true } }).execute();
@@ -3500,7 +3500,7 @@ CRUD operations for OrgMembershipDefault records.
 const items = await db.orgMembershipDefault.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } }).execute();
 
 // Get one by id
-const item = await db.orgMembershipDefault.findOne({ where: { id: '<value>' }, select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } }).execute();
+const item = await db.orgMembershipDefault.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } }).execute();
 
 // Create
 const created = await db.orgMembershipDefault.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', entityId: '<value>', deleteMemberCascadeGroups: '<value>', createGroupsCascadeMembers: '<value>' }, select: { id: true } }).execute();
@@ -3535,7 +3535,7 @@ CRUD operations for Email records.
 const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.email.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.email.findOne({ id: '<value>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.email.create({ data: { ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -3571,7 +3571,7 @@ CRUD operations for AuditLog records.
 const items = await db.auditLog.findMany({ select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.auditLog.findOne({ where: { id: '<value>' }, select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+const item = await db.auditLog.findOne({ id: '<value>', select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.auditLog.create({ data: { event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' }, select: { id: true } }).execute();
@@ -3606,7 +3606,7 @@ CRUD operations for AppLevel records.
 const items = await db.appLevel.findMany({ select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.appLevel.findOne({ where: { id: '<value>' }, select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appLevel.findOne({ id: '<value>', select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.appLevel.create({ data: { name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' }, select: { id: true } }).execute();
@@ -3647,7 +3647,7 @@ CRUD operations for SqlMigration records.
 const items = await db.sqlMigration.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.sqlMigration.findOne({ where: { id: '<value>' }, select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.sqlMigration.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
 const created = await db.sqlMigration.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
@@ -3688,7 +3688,7 @@ CRUD operations for AstMigration records.
 const items = await db.astMigration.findMany({ select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.astMigration.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.astMigration.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
 const created = await db.astMigration.create({ data: { databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
@@ -3731,7 +3731,7 @@ CRUD operations for AppMembership records.
 const items = await db.appMembership.findMany({ select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.appMembership.findOne({ where: { id: '<value>' }, select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true } }).execute();
+const item = await db.appMembership.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true } }).execute();
 
 // Create
 const created = await db.appMembership.create({ data: { createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
@@ -3768,7 +3768,7 @@ CRUD operations for User records.
 const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
 
 // Get one by id
-const item = await db.user.findOne({ where: { id: '<value>' }, select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
+const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
 
 // Create
 const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' }, select: { id: true } }).execute();
@@ -3816,7 +3816,7 @@ CRUD operations for HierarchyModule records.
 const items = await db.hierarchyModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.hierarchyModule.findOne({ where: { id: '<value>' }, select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } }).execute();
+const item = await db.hierarchyModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.hierarchyModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', chartEdgesTableId: '<value>', chartEdgesTableName: '<value>', hierarchySprtTableId: '<value>', hierarchySprtTableName: '<value>', chartEdgeGrantsTableId: '<value>', chartEdgeGrantsTableName: '<value>', entityTableId: '<value>', usersTableId: '<value>', prefix: '<value>', privateSchemaName: '<value>', sprtTableName: '<value>', rebuildHierarchyFunction: '<value>', getSubordinatesFunction: '<value>', getManagersFunction: '<value>', isManagerOfFunction: '<value>' }, select: { id: true } }).execute();

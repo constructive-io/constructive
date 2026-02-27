@@ -8,7 +8,7 @@ ORM operations for GetAllRecord records
 
 ```typescript
 db.getAllRecord.findMany({ select: { id: true } }).execute()
-db.getAllRecord.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.getAllRecord.findOne({ id: '<value>', select: { id: true } }).execute()
 db.getAllRecord.create({ data: { path: '<value>', data: '<value>' }, select: { id: true } }).execute()
 db.getAllRecord.update({ where: { id: '<value>' }, data: { path: '<new>' }, select: { id: true } }).execute()
 db.getAllRecord.delete({ where: { id: '<value>' } }).execute()

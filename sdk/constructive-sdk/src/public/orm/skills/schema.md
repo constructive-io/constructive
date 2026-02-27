@@ -8,7 +8,7 @@ ORM operations for Schema records
 
 ```typescript
 db.schema.findMany({ select: { id: true } }).execute()
-db.schema.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.schema.findOne({ id: '<value>', select: { id: true } }).execute()
 db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>' }, select: { id: true } }).execute()
 db.schema.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.schema.delete({ where: { id: '<value>' } }).execute()

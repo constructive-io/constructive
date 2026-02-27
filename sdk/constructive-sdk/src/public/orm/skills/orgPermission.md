@@ -8,7 +8,7 @@ ORM operations for OrgPermission records
 
 ```typescript
 db.orgPermission.findMany({ select: { id: true } }).execute()
-db.orgPermission.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.orgPermission.findOne({ id: '<value>', select: { id: true } }).execute()
 db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute()
 db.orgPermission.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.orgPermission.delete({ where: { id: '<value>' } }).execute()

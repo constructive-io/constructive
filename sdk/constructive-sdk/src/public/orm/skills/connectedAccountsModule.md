@@ -8,7 +8,7 @@ ORM operations for ConnectedAccountsModule records
 
 ```typescript
 db.connectedAccountsModule.findMany({ select: { id: true } }).execute()
-db.connectedAccountsModule.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.connectedAccountsModule.findOne({ id: '<value>', select: { id: true } }).execute()
 db.connectedAccountsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute()
 db.connectedAccountsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.connectedAccountsModule.delete({ where: { id: '<value>' } }).execute()

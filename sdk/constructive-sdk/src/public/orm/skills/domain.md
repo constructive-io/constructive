@@ -8,7 +8,7 @@ ORM operations for Domain records
 
 ```typescript
 db.domain.findMany({ select: { id: true } }).execute()
-db.domain.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.domain.findOne({ id: '<value>', select: { id: true } }).execute()
 db.domain.create({ data: { databaseId: '<value>', apiId: '<value>', siteId: '<value>', subdomain: '<value>', domain: '<value>' }, select: { id: true } }).execute()
 db.domain.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.domain.delete({ where: { id: '<value>' } }).execute()

@@ -8,7 +8,7 @@ ORM operations for ClaimedInvite records
 
 ```typescript
 db.claimedInvite.findMany({ select: { id: true } }).execute()
-db.claimedInvite.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.claimedInvite.findOne({ id: '<value>', select: { id: true } }).execute()
 db.claimedInvite.create({ data: { data: '<value>', senderId: '<value>', receiverId: '<value>' }, select: { id: true } }).execute()
 db.claimedInvite.update({ where: { id: '<value>' }, data: { data: '<new>' }, select: { id: true } }).execute()
 db.claimedInvite.delete({ where: { id: '<value>' } }).execute()

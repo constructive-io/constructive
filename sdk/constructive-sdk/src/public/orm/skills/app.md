@@ -8,7 +8,7 @@ ORM operations for App records
 
 ```typescript
 db.app.findMany({ select: { id: true } }).execute()
-db.app.findOne({ where: { id: '<value>' }, select: { id: true } }).execute()
+db.app.findOne({ id: '<value>', select: { id: true } }).execute()
 db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>' }, select: { id: true } }).execute()
 db.app.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.app.delete({ where: { id: '<value>' } }).execute()

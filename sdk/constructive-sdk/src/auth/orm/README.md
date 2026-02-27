@@ -49,7 +49,7 @@ CRUD operations for RoleType records.
 const items = await db.roleType.findMany({ select: { id: true, name: true } }).execute();
 
 // Get one by id
-const item = await db.roleType.findOne({ where: { id: '<value>' }, select: { id: true, name: true } }).execute();
+const item = await db.roleType.findOne({ id: '<value>', select: { id: true, name: true } }).execute();
 
 // Create
 const created = await db.roleType.create({ data: { name: '<value>' }, select: { id: true } }).execute();
@@ -84,7 +84,7 @@ CRUD operations for CryptoAddress records.
 const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddress.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.cryptoAddress.findOne({ id: '<value>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -120,7 +120,7 @@ CRUD operations for PhoneNumber records.
 const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.phoneNumber.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.phoneNumber.findOne({ id: '<value>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.phoneNumber.create({ data: { ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -156,7 +156,7 @@ CRUD operations for ConnectedAccount records.
 const items = await db.connectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.connectedAccount.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.connectedAccount.findOne({ id: '<value>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' }, select: { id: true } }).execute();
@@ -191,7 +191,7 @@ CRUD operations for Email records.
 const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.email.findOne({ where: { id: '<value>' }, select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.email.findOne({ id: '<value>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
 const created = await db.email.create({ data: { ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
@@ -227,7 +227,7 @@ CRUD operations for AuditLog records.
 const items = await db.auditLog.findMany({ select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.auditLog.findOne({ where: { id: '<value>' }, select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+const item = await db.auditLog.findOne({ id: '<value>', select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
 
 // Create
 const created = await db.auditLog.create({ data: { event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' }, select: { id: true } }).execute();
@@ -264,7 +264,7 @@ CRUD operations for User records.
 const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
 
 // Get one by id
-const item = await db.user.findOne({ where: { id: '<value>' }, select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
+const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
 
 // Create
 const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' }, select: { id: true } }).execute();
