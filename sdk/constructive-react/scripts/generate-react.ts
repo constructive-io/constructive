@@ -2,6 +2,7 @@ import {
   generateMulti,
   expandSchemaDirToMultiTarget,
 } from '@constructive-io/graphql-codegen';
+import type { GraphQLSDKConfigTarget } from '@constructive-io/graphql-codegen';
 
 const SCHEMA_DIR = '../constructive-sdk/schemas';
 
@@ -11,7 +12,7 @@ async function main() {
   console.log('Generating React SDK from schema files...');
   console.log(`Schema directory: ${SCHEMA_DIR}`);
 
-  const baseConfig = {
+  const baseConfig: GraphQLSDKConfigTarget = {
     schemaDir: SCHEMA_DIR,
     output: './src',
     orm: true,

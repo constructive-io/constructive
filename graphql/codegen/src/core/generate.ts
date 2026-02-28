@@ -639,7 +639,7 @@ export async function generateMulti(
 
   try {
   for (const name of names) {
-    const baseConfig = {
+    const baseConfig: GraphQLSDKConfigTarget = {
       ...configs[name],
       ...(cliOverrides ?? {}),
     };
