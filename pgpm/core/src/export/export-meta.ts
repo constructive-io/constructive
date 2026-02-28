@@ -671,8 +671,7 @@ const config: Record<string, TableConfig> = {
       rebuild_hierarchy_function: 'text',
       get_subordinates_function: 'text',
       get_managers_function: 'text',
-      is_manager_of_function: 'text',
-      created_at: 'timestamptz'
+      is_manager_of_function: 'text'
     }
   },
   membership_types_module: {
