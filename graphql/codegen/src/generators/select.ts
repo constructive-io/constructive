@@ -5,7 +5,6 @@
 import * as t from 'gql-ast';
 import { OperationTypeNode, print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
-import { camelize, pluralize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
@@ -26,29 +25,23 @@ import type { QueryOptions } from '../types/query';
 import type { CleanTable } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
+import {
+  normalizeInflectionValue,
+  toCamelCasePlural,
+  toCamelCaseSingular,
+  toCreateInputTypeName,
+  toCreateMutationName,
+  toDeleteInputTypeName,
+  toDeleteMutationName,
+  toFilterTypeName,
+  toOrderByTypeName,
+  toPatchFieldName,
+  toUpdateInputTypeName,
+  toUpdateMutationName,
+} from './naming-helpers';
 
-/**
- * Convert PascalCase table name to camelCase plural for GraphQL queries
- * Uses the inflection library for proper pluralization
- * Example: "ActionGoal" -> "actionGoals", "User" -> "users", "Person" -> "people"
- */
-export function toCamelCasePlural(tableName: string): string {
-  // First convert to camelCase (lowercase first letter)
-  const camelCase = camelize(tableName, true);
-  // Then pluralize properly
-  return pluralize(camelCase);
-}
-
-/**
- * Generate the PostGraphile OrderBy enum type name for a table
- * PostGraphile uses pluralized PascalCase: "Product" -> "ProductsOrderBy"
- * Example: "Product" -> "ProductsOrderBy", "Person" -> "PeopleOrderBy"
- */
-export function toOrderByTypeName(tableName: string): string {
-  const plural = toCamelCasePlural(tableName); // "products", "people"
-  // Capitalize first letter for PascalCase
-  return `${plural.charAt(0).toUpperCase() + plural.slice(1)}OrderBy`;
-}
+// Re-export naming helpers for backwards compatibility
+export { toCamelCasePlural, toOrderByTypeName } from './naming-helpers';
 
 /**
  * Convert CleanTable to MetaObject format for QueryBuilder
@@ -114,7 +107,7 @@ export function generateIntrospectionSchema(
 
   for (const table of tables) {
     const modelName = table.name;
-    const pluralName = toCamelCasePlural(modelName);
+    const pluralName = toCamelCasePlural(modelName, table);
 
     // Basic field selection for the model
     const selection = table.fields.map((field) => field.name);
@@ -128,7 +121,7 @@ export function generateIntrospectionSchema(
     } as QueryDefinition;
 
     // Add getOne query (by ID)
-    const singularName = camelize(modelName, true);
+    const singularName = toCamelCaseSingular(modelName, table);
     schema[singularName] = {
       qtype: 'getOne',
       model: modelName,
@@ -136,8 +129,18 @@ export function generateIntrospectionSchema(
       properties: convertFieldsToProperties(table.fields),
     } as QueryDefinition;
 
+    // Derive entity-specific names from introspection data
+    const patchFieldName = toPatchFieldName(modelName, table);
+    const createMutationName = toCreateMutationName(modelName, table);
+    const updateMutationName = toUpdateMutationName(modelName, table);
+    const deleteMutationName = toDeleteMutationName(modelName, table);
+    const createInputType = toCreateInputTypeName(modelName, table);
+    const patchType =
+      normalizeInflectionValue(table.inflection?.patchType) ??
+      `${modelName}Patch`;
+
     // Add create mutation
-    schema[`create${modelName}`] = {
+    schema[createMutationName] = {
       qtype: 'mutation',
       mutationType: 'create',
       model: modelName,
@@ -145,13 +148,13 @@ export function generateIntrospectionSchema(
       properties: {
         input: {
           name: 'input',
-          type: `Create${modelName}Input`,
+          type: createInputType,
           isNotNull: true,
           isArray: false,
           isArrayNotNull: false,
           properties: {
-            [camelize(modelName, true)]: {
-              name: camelize(modelName, true),
+            [singularName]: {
+              name: singularName,
               type: `${modelName}Input`,
               isNotNull: true,
               isArray: false,
@@ -164,7 +167,7 @@ export function generateIntrospectionSchema(
     } as MutationDefinition;
 
     // Add update mutation
-    schema[`update${modelName}`] = {
+    schema[updateMutationName] = {
       qtype: 'mutation',
       mutationType: 'patch',
       model: modelName,
@@ -172,14 +175,14 @@ export function generateIntrospectionSchema(
       properties: {
         input: {
           name: 'input',
-          type: `Update${modelName}Input`,
+          type: toUpdateInputTypeName(modelName),
           isNotNull: true,
           isArray: false,
           isArrayNotNull: false,
           properties: {
-            patch: {
-              name: 'patch',
-              type: `${modelName}Patch`,
+            [patchFieldName]: {
+              name: patchFieldName,
+              type: patchType,
               isNotNull: true,
               isArray: false,
               isArrayNotNull: false,
@@ -191,7 +194,7 @@ export function generateIntrospectionSchema(
     } as MutationDefinition;
 
     // Add delete mutation
-    schema[`delete${modelName}`] = {
+    schema[deleteMutationName] = {
       qtype: 'mutation',
       mutationType: 'delete',
       model: modelName,
@@ -199,7 +202,7 @@ export function generateIntrospectionSchema(
       properties: {
         input: {
           name: 'input',
-          type: `Delete${modelName}Input`,
+          type: toDeleteInputTypeName(modelName),
           isNotNull: true,
           isArray: false,
           isArrayNotNull: false,
@@ -350,7 +353,7 @@ function generateSelectQueryAST(
   selection: QuerySelectionOptions | null,
   options: QueryOptions,
 ): string {
-  const pluralName = toCamelCasePlural(table.name);
+  const pluralName = toCamelCasePlural(table.name, table);
 
   // Generate field selections
   const fieldSelections = generateFieldSelectionsFromOptions(
@@ -431,7 +434,7 @@ function generateSelectQueryAST(
     variableDefinitions.push(
       t.variableDefinition({
         variable: t.variable({ name: 'filter' }),
-        type: t.namedType({ type: `${table.name}Filter` }),
+        type: t.namedType({ type: toFilterTypeName(table.name, table) }),
       }),
     );
     queryArgs.push(
@@ -450,7 +453,7 @@ function generateSelectQueryAST(
         // PostGraphile expects [ProductsOrderBy!] - list of non-null enum values
         type: t.listType({
           type: t.nonNullType({
-            type: t.namedType({ type: toOrderByTypeName(table.name) }),
+            type: t.namedType({ type: toOrderByTypeName(table.name, table) }),
           }),
         }),
       }),
@@ -724,7 +727,7 @@ function findRelatedTable(
  * Generate FindOne query AST directly from CleanTable
  */
 function generateFindOneQueryAST(table: CleanTable): string {
-  const singularName = camelize(table.name, true);
+  const singularName = toCamelCaseSingular(table.name, table);
 
   // Generate field selections (include all non-relational fields, including complex types)
   const fieldSelections = table.fields
@@ -779,7 +782,7 @@ function generateFindOneQueryAST(table: CleanTable): string {
  * Generate Count query AST directly from CleanTable
  */
 function generateCountQueryAST(table: CleanTable): string {
-  const pluralName = toCamelCasePlural(table.name);
+  const pluralName = toCamelCasePlural(table.name, table);
 
   const ast = t.document({
     definitions: [
@@ -789,7 +792,7 @@ function generateCountQueryAST(table: CleanTable): string {
         variableDefinitions: [
           t.variableDefinition({
             variable: t.variable({ name: 'filter' }),
-            type: t.namedType({ type: `${table.name}Filter` }),
+            type: t.namedType({ type: toFilterTypeName(table.name, table) }),
           }),
         ],
         selectionSet: t.selectionSet({

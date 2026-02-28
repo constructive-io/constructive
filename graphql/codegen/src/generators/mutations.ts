@@ -5,7 +5,6 @@
 import * as t from 'gql-ast';
 import { OperationTypeNode, print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
-import { camelize } from 'inflekt';
 
 import { TypedDocumentString } from '../client/typed-document';
 import {
@@ -15,6 +14,15 @@ import {
 import type { MutationOptions } from '../types/mutation';
 import type { CleanTable } from '../types/schema';
 import { isRelationalField } from './field-selector';
+import {
+  toCamelCaseSingular,
+  toCreateInputTypeName,
+  toCreateMutationName,
+  toDeleteInputTypeName,
+  toDeleteMutationName,
+  toUpdateInputTypeName,
+  toUpdateMutationName,
+} from './naming-helpers';
 
 /**
  * Generate field selections for PostGraphile mutations using custom AST logic
@@ -46,15 +54,16 @@ export function buildPostGraphileCreate(
   Record<string, unknown>,
   { input: { [key: string]: Record<string, unknown> } }
 > {
-  const mutationName = `create${table.name}`;
-  const singularName = camelize(table.name, true);
+  const mutationName = toCreateMutationName(table.name, table);
+  const singularName = toCamelCaseSingular(table.name, table);
+  const inputTypeName = toCreateInputTypeName(table.name, table);
 
   // Create the variable definition for $input
   const variableDefinitions: VariableDefinitionNode[] = [
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Create${table.name}Input` }),
+        type: t.namedType({ type: inputTypeName }),
       }),
     }),
   ];
@@ -120,17 +129,18 @@ export function buildPostGraphileUpdate(
   _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
-  { input: { id: string | number; patch: Record<string, unknown> } }
+  { input: { id: string | number } & Record<string, unknown> }
 > {
-  const mutationName = `update${table.name}`;
-  const singularName = camelize(table.name, true);
+  const mutationName = toUpdateMutationName(table.name, table);
+  const singularName = toCamelCaseSingular(table.name, table);
+  const inputTypeName = toUpdateInputTypeName(table.name);
 
   // Create the variable definition for $input
   const variableDefinitions: VariableDefinitionNode[] = [
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Update${table.name}Input` }),
+        type: t.namedType({ type: inputTypeName }),
       }),
     }),
   ];
@@ -182,7 +192,7 @@ export function buildPostGraphileUpdate(
     __ast: ast,
   }) as TypedDocumentString<
     Record<string, unknown>,
-    { input: { id: string | number; patch: Record<string, unknown> } }
+    { input: { id: string | number } & Record<string, unknown> }
   >;
 }
 
@@ -198,14 +208,15 @@ export function buildPostGraphileDelete(
   Record<string, unknown>,
   { input: { id: string | number } }
 > {
-  const mutationName = `delete${table.name}`;
+  const mutationName = toDeleteMutationName(table.name, table);
+  const inputTypeName = toDeleteInputTypeName(table.name);
 
   // Create the variable definition for $input
   const variableDefinitions: VariableDefinitionNode[] = [
     t.variableDefinition({
       variable: t.variable({ name: 'input' }),
       type: t.nonNullType({
-        type: t.namedType({ type: `Delete${table.name}Input` }),
+        type: t.namedType({ type: inputTypeName }),
       }),
     }),
   ];
