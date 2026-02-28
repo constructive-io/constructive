@@ -1,6 +1,6 @@
 {
   "name": "graphile-plugin-connection-filter-postgis",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGIS operators for postgraphile-plugin-connection-filter (PostGraphile v5)",
   "main": "index.js",
