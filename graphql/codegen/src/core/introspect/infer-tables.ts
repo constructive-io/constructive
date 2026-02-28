@@ -14,6 +14,8 @@
  */
 import { lcFirst, pluralize, singularize, ucFirst } from 'inflekt';
 
+import { stripSmartComments } from '../codegen/utils';
+
 import type {
   IntrospectionField,
   IntrospectionInputValue,
@@ -109,6 +111,11 @@ export interface InferTablesOptions {
    * Custom pattern overrides (for non-standard PostGraphile configurations)
    */
   patterns?: Partial<typeof PATTERNS>;
+  /**
+   * Include PostgreSQL COMMENT descriptions on tables and fields.
+   * @default true
+   */
+  comments?: boolean;
 }
 
 /**
@@ -124,6 +131,7 @@ export function inferTablesFromIntrospection(
 ): CleanTable[] {
   const { __schema: schema } = introspection;
   const { types, queryType, mutationType } = schema;
+  const commentsEnabled = options.comments !== false;
 
   // Build lookup maps for efficient access
   const typeMap = buildTypeMap(types);
@@ -150,6 +158,7 @@ export function inferTablesFromIntrospection(
       mutationFields,
       entityToConnection,
       connectionToEntity,
+      commentsEnabled,
     );
 
     // Only include tables that have at least one real operation
@@ -265,9 +274,10 @@ function buildCleanTable(
   mutationFields: IntrospectionField[],
   entityToConnection: Map<string, string>,
   connectionToEntity: Map<string, string>,
+  commentsEnabled: boolean,
 ): BuildCleanTableResult {
   // Extract scalar fields from entity type
-  const fields = extractEntityFields(entityType, typeMap, entityToConnection);
+  const fields = extractEntityFields(entityType, typeMap, entityToConnection, commentsEnabled);
 
   // Infer relations from entity fields
   const relations = inferRelations(
@@ -309,9 +319,13 @@ function buildCleanTable(
     patchFieldName,
   };
 
+  // Extract description from entity type (PostgreSQL COMMENT), strip smart comments
+  const description = commentsEnabled ? stripSmartComments(entityType.description) : undefined;
+
   return {
     table: {
       name: entityName,
+      ...(description ? { description } : {}),
       fields,
       relations,
       inflection,
@@ -334,6 +348,7 @@ function extractEntityFields(
   entityType: IntrospectionType,
   typeMap: Map<string, IntrospectionType>,
   entityToConnection: Map<string, string>,
+  commentsEnabled: boolean,
 ): CleanField[] {
   const fields: CleanField[] = [];
 
@@ -356,8 +371,10 @@ function extractEntityFields(
     }
 
     // Include scalar, enum, and other non-relation fields
+    const fieldDescription = commentsEnabled ? stripSmartComments(field.description) : undefined;
     fields.push({
       name: field.name,
+      ...(fieldDescription ? { description: fieldDescription } : {}),
       type: convertToCleanFieldType(field.type),
     });
   }

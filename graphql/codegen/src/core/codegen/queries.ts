@@ -237,8 +237,9 @@ export function generateListQueryHook(
 
   // Hook
   if (reactQueryEnabled) {
+    const descLine = table.description || `Query hook for fetching ${typeName} list`;
     const docLines = [
-      `Query hook for fetching ${typeName} list`,
+      descLine,
       '',
       '@example',
       '```tsx',
@@ -379,7 +380,7 @@ export function generateListQueryHook(
       typeRef('Promise', [listResultTypeAST(sRef())]),
     );
     addJSDocComment(f1Decl, [
-      `Fetch ${typeName} list without React hooks`,
+      table.description || `Fetch ${typeName} list without React hooks`,
       '',
       '@example',
       '```ts',
@@ -462,7 +463,7 @@ export function generateListQueryHook(
       typeRef('Promise', [t.tsVoidKeyword()]),
     );
     addJSDocComment(p1Decl, [
-      `Prefetch ${typeName} list for SSR or cache warming`,
+      table.description || `Prefetch ${typeName} list for SSR or cache warming`,
       '',
       '@example',
       '```ts',
@@ -551,9 +552,9 @@ export function generateListQueryHook(
     );
   }
 
-  const headerText = reactQueryEnabled
+  const headerText = table.description || (reactQueryEnabled
     ? `List query hook for ${typeName}`
-    : `List query functions for ${typeName}`;
+    : `List query functions for ${typeName}`);
 
   return {
     fileName: getListQueryFileName(table),
@@ -719,8 +720,9 @@ export function generateSingleQueryHook(
 
   // Hook
   if (reactQueryEnabled) {
+    const singleDescLine = table.description || `Query hook for fetching a single ${typeName}`;
     const docLines = [
-      `Query hook for fetching a single ${typeName}`,
+      singleDescLine,
       '',
       '@example',
       '```tsx',
@@ -849,7 +851,7 @@ export function generateSingleQueryHook(
       typeRef('Promise', [singleResultTypeAST(sRef())]),
     );
     addJSDocComment(f1Decl, [
-      `Fetch a single ${typeName} without React hooks`,
+      table.description || `Fetch a single ${typeName} without React hooks`,
       '',
       '@example',
       '```ts',
@@ -923,7 +925,7 @@ export function generateSingleQueryHook(
       typeRef('Promise', [t.tsVoidKeyword()]),
     );
     addJSDocComment(p1Decl, [
-      `Prefetch a single ${typeName} for SSR or cache warming`,
+      table.description || `Prefetch a single ${typeName} for SSR or cache warming`,
       '',
       '@example',
       '```ts',
@@ -1010,9 +1012,9 @@ export function generateSingleQueryHook(
     );
   }
 
-  const headerText = reactQueryEnabled
+  const headerText = table.description || (reactQueryEnabled
     ? `Single item query hook for ${typeName}`
-    : `Single item query functions for ${typeName}`;
+    : `Single item query functions for ${typeName}`);
 
   return {
     fileName: getSingleQueryFileName(table),

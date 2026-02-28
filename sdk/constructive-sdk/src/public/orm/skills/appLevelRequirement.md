@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for AppLevelRequirement records
+Requirements to achieve a level
 
 ## Usage
 

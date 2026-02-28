@@ -1,0 +1,34 @@
+# orm-membershipsModule
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+ORM operations for MembershipsModule records
+
+## Usage
+
+```typescript
+db.membershipsModule.findMany({ select: { id: true } }).execute()
+db.membershipsModule.findOne({ id: '<value>', select: { id: true } }).execute()
+db.membershipsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>' }, select: { id: true } }).execute()
+db.membershipsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
+db.membershipsModule.delete({ where: { id: '<value>' } }).execute()
+```
+
+## Examples
+
+### List all membershipsModule records
+
+```typescript
+const items = await db.membershipsModule.findMany({
+  select: { id: true, databaseId: true }
+}).execute();
+```
+
+### Create a membershipsModule
+
+```typescript
+const item = await db.membershipsModule.create({
+  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', membershipsTableId: 'value', membershipsTableName: 'value', membersTableId: 'value', membersTableName: 'value', membershipDefaultsTableId: 'value', membershipDefaultsTableName: 'value', grantsTableId: 'value', grantsTableName: 'value', actorTableId: 'value', limitsTableId: 'value', defaultLimitsTableId: 'value', permissionsTableId: 'value', defaultPermissionsTableId: 'value', sprtTableId: 'value', adminGrantsTableId: 'value', adminGrantsTableName: 'value', ownerGrantsTableId: 'value', ownerGrantsTableName: 'value', membershipType: 'value', entityTableId: 'value', entityTableOwnerId: 'value', prefix: 'value', actorMaskCheck: 'value', actorPermCheck: 'value', entityIdsByMask: 'value', entityIdsByPerm: 'value', entityIdsFunction: 'value' },
+  select: { id: true }
+}).execute();
+```

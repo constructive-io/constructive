@@ -65,6 +65,7 @@ export interface GenerateOrmResult {
  */
 export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   const { tables, customOperations, sharedTypesPath } = options;
+  const commentsEnabled = options.config.codegen?.comments !== false;
   const files: GeneratedFile[] = [];
 
   // Use shared types when a sharedTypesPath is provided (unified output mode)
@@ -138,6 +139,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
       usedInputTypes,
       tables,
       usedPayloadTypes,
+      commentsEnabled,
     );
     files.push({
       path: inputTypesFile.fileName,
@@ -147,13 +149,14 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
 
   // 5. Generate custom operations (if any)
   if (hasCustomQueries && customOperations?.queries) {
-    const queryOpsFile = generateCustomQueryOpsFile(customOperations.queries);
+    const queryOpsFile = generateCustomQueryOpsFile(customOperations.queries, commentsEnabled);
     files.push({ path: queryOpsFile.fileName, content: queryOpsFile.content });
   }
 
   if (hasCustomMutations && customOperations?.mutations) {
     const mutationOpsFile = generateCustomMutationOpsFile(
       customOperations.mutations,
+      commentsEnabled,
     );
     files.push({
       path: mutationOpsFile.fileName,

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for Ref records
+A ref is a data structure for pointing to a commit.
 
 ## Usage
 

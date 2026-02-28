@@ -1,0 +1,61 @@
+{
+  "name": "@constructive-io/react",
+  "version": "0.0.1",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive React - Auto-generated React Query hooks and ORM client",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "generate": "tsx scripts/generate-react.ts",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "graphql",
+    "sdk",
+    "orm",
+    "react-query",
+    "tanstack-query",
+    "constructive",
+    "postgraphile",
+    "schema-dir"
+  ],
+  "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/graphql-types": "workspace:^",
+    "@tanstack/react-query": "^5.90.19",
+    "gql-ast": "workspace:^",
+    "graphql": "^16.12.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@types/node": "^20.12.7",
+    "@types/react": "^19.2.8",
+    "makage": "^0.1.12",
+    "react": "^19.2.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.3"
+  }
+}

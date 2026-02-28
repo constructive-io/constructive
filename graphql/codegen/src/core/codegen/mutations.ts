@@ -202,7 +202,7 @@ export function generateCreateMutationHook(
     useMutationResultType(resultType(sRef()), createVarType),
   );
   addJSDocComment(o1, [
-    `Mutation hook for creating a ${typeName}`,
+    table.description || `Mutation hook for creating a ${typeName}`,
     '',
     '@example',
     '```tsx',
@@ -314,7 +314,7 @@ export function generateCreateMutationHook(
   return {
     fileName: getCreateMutationFileName(table),
     content: generateHookFileCode(
-      `Create mutation hook for ${typeName}`,
+      table.description || `Create mutation hook for ${typeName}`,
       statements,
     ),
   };
@@ -433,7 +433,7 @@ export function generateUpdateMutationHook(
     useMutationResultType(resultType(sRef()), updateVarType),
   );
   addJSDocComment(o1, [
-    `Mutation hook for updating a ${typeName}`,
+    table.description || `Mutation hook for updating a ${typeName}`,
     '',
     '@example',
     '```tsx',
@@ -574,7 +574,7 @@ export function generateUpdateMutationHook(
   return {
     fileName: getUpdateMutationFileName(table),
     content: generateHookFileCode(
-      `Update mutation hook for ${typeName}`,
+      table.description || `Update mutation hook for ${typeName}`,
       statements,
     ),
   };
@@ -686,7 +686,7 @@ export function generateDeleteMutationHook(
     useMutationResultType(resultType(sRef()), deleteVarType),
   );
   addJSDocComment(o1, [
-    `Mutation hook for deleting a ${typeName} with typed selection`,
+    table.description || `Mutation hook for deleting a ${typeName} with typed selection`,
     '',
     '@example',
     '```tsx',
@@ -821,7 +821,7 @@ export function generateDeleteMutationHook(
   return {
     fileName: getDeleteMutationFileName(table),
     content: generateHookFileCode(
-      `Delete mutation hook for ${typeName}`,
+      table.description || `Delete mutation hook for ${typeName}`,
       statements,
     ),
   };

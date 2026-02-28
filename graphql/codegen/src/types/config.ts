@@ -323,6 +323,12 @@ export interface GraphQLSDKConfigTarget {
   codegen?: {
     /** Skip 'query' field on mutation payloads (default: true) */
     skipQueryField?: boolean;
+    /**
+     * Include PostgreSQL COMMENT descriptions as JSDoc comments in generated code.
+     * PostGraphile smart comments and boilerplate descriptions are automatically stripped.
+     * @default true
+     */
+    comments?: boolean;
   };
 
   /**
@@ -508,6 +514,7 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   },
   codegen: {
     skipQueryField: true,
+    comments: true,
   },
   orm: false,
   reactQuery: false,

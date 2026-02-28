@@ -66,22 +66,22 @@ export function generateHooksReadme(
   for (const table of tables) {
     const { singularName, pluralName } = getTableNames(table);
     lines.push(
-      `| \`${getListQueryHookName(table)}\` | Query | List all ${pluralName} |`,
+      `| \`${getListQueryHookName(table)}\` | Query | ${table.description || `List all ${pluralName}`} |`,
     );
     if (hasValidPrimaryKey(table)) {
       lines.push(
-        `| \`${getSingleQueryHookName(table)}\` | Query | Get one ${singularName} |`,
+        `| \`${getSingleQueryHookName(table)}\` | Query | ${table.description || `Get one ${singularName}`} |`,
       );
     }
     lines.push(
-      `| \`${getCreateMutationHookName(table)}\` | Mutation | Create a ${singularName} |`,
+      `| \`${getCreateMutationHookName(table)}\` | Mutation | ${table.description || `Create a ${singularName}`} |`,
     );
     if (hasValidPrimaryKey(table)) {
       lines.push(
-        `| \`${getUpdateMutationHookName(table)}\` | Mutation | Update a ${singularName} |`,
+        `| \`${getUpdateMutationHookName(table)}\` | Mutation | ${table.description || `Update a ${singularName}`} |`,
       );
       lines.push(
-        `| \`${getDeleteMutationHookName(table)}\` | Mutation | Delete a ${singularName} |`,
+        `| \`${getDeleteMutationHookName(table)}\` | Mutation | ${table.description || `Delete a ${singularName}`} |`,
       );
     }
   }
@@ -220,7 +220,7 @@ export function generateHooksAgentsDocs(
 
     lines.push(`### HOOK: ${getListQueryHookName(table)}`);
     lines.push('');
-    lines.push(`List all ${pluralName}.`);
+    lines.push(`${table.description || `List all ${pluralName}`}.`);
     lines.push('');
     lines.push('```');
     lines.push(`TYPE: query`);
@@ -244,7 +244,7 @@ export function generateHooksAgentsDocs(
     if (hasValidPrimaryKey(table)) {
       lines.push(`### HOOK: ${getSingleQueryHookName(table)}`);
       lines.push('');
-      lines.push(`Get a single ${singularName} by ${pk.name}.`);
+      lines.push(`${table.description || `Get a single ${singularName} by ${pk.name}`}.`);
       lines.push('');
       lines.push('```');
       lines.push(`TYPE: query`);
@@ -269,7 +269,7 @@ export function generateHooksAgentsDocs(
 
     lines.push(`### HOOK: ${getCreateMutationHookName(table)}`);
     lines.push('');
-    lines.push(`Create a new ${singularName}.`);
+    lines.push(`${table.description || `Create a new ${singularName}`}.`);
     lines.push('');
     lines.push('```');
     lines.push('TYPE: mutation');
@@ -284,7 +284,7 @@ export function generateHooksAgentsDocs(
     if (hasValidPrimaryKey(table)) {
       lines.push(`### HOOK: ${getUpdateMutationHookName(table)}`);
       lines.push('');
-      lines.push(`Update an existing ${singularName}.`);
+      lines.push(`${table.description || `Update an existing ${singularName}`}.`);
       lines.push('');
       lines.push('```');
       lines.push('TYPE: mutation');
@@ -298,7 +298,7 @@ export function generateHooksAgentsDocs(
 
       lines.push(`### HOOK: ${getDeleteMutationHookName(table)}`);
       lines.push('');
-      lines.push(`Delete a ${singularName}.`);
+      lines.push(`${table.description || `Delete a ${singularName}`}.`);
       lines.push('');
       lines.push('```');
       lines.push('TYPE: mutation');
@@ -374,7 +374,7 @@ export function getHooksMcpTools(
 
     tools.push({
       name: `hooks_${lcFirst(pluralName)}_query`,
-      description: `React Query hook to list all ${pluralName}`,
+      description: table.description || `React Query hook to list all ${pluralName}`,
       inputSchema: {
         type: 'object',
         properties: {
@@ -389,7 +389,7 @@ export function getHooksMcpTools(
     if (hasValidPrimaryKey(table)) {
       tools.push({
         name: `hooks_${lcFirst(singularName)}_query`,
-        description: `React Query hook to get a single ${singularName} by ${pk.name}`,
+        description: table.description || `React Query hook to get a single ${singularName} by ${pk.name}`,
         inputSchema: {
           type: 'object',
           properties: {
@@ -405,7 +405,7 @@ export function getHooksMcpTools(
 
     tools.push({
       name: `hooks_create_${lcFirst(singularName)}_mutation`,
-      description: `React Query mutation hook to create a ${singularName}`,
+      description: table.description || `React Query mutation hook to create a ${singularName}`,
       inputSchema: {
         type: 'object',
         properties: Object.fromEntries(
@@ -431,7 +431,7 @@ export function getHooksMcpTools(
     if (hasValidPrimaryKey(table)) {
       tools.push({
         name: `hooks_update_${lcFirst(singularName)}_mutation`,
-        description: `React Query mutation hook to update a ${singularName}`,
+        description: table.description || `React Query mutation hook to update a ${singularName}`,
         inputSchema: {
           type: 'object',
           properties: {
@@ -446,7 +446,7 @@ export function getHooksMcpTools(
 
       tools.push({
         name: `hooks_delete_${lcFirst(singularName)}_mutation`,
-        description: `React Query mutation hook to delete a ${singularName}`,
+        description: table.description || `React Query mutation hook to delete a ${singularName}`,
         inputSchema: {
           type: 'object',
           properties: {
@@ -511,7 +511,7 @@ export function generateHooksSkills(
       fileName: `skills/${lcFirst(singularName)}.md`,
       content: buildSkillFile({
         name: `hooks-${lcFirst(singularName)}`,
-        description: `React Query hooks for ${table.name} data operations`,
+        description: table.description || `React Query hooks for ${table.name} data operations`,
         language: 'typescript',
         usage: [
           `${getListQueryHookName(table)}({ selection: { fields: { ${selectFields} } } })`,

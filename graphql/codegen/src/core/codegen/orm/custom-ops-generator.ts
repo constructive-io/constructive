@@ -7,7 +7,7 @@
 import * as t from '@babel/types';
 
 import type { CleanArgument, CleanOperation } from '../../../types/schema';
-import { generateCode } from '../babel-ast';
+import { addJSDocComment, generateCode } from '../babel-ast';
 import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
   getTypeBaseName,
@@ -15,7 +15,7 @@ import {
   scalarToTsType,
   typeRefToTsType,
 } from '../type-resolver';
-import { getGeneratedFileHeader, ucFirst } from '../utils';
+import { getGeneratedFileHeader, stripSmartComments, ucFirst } from '../utils';
 
 export interface GeneratedCustomOpsFile {
   fileName: string;
@@ -109,6 +109,7 @@ function createImportDeclaration(
 
 function createVariablesInterface(
   op: CleanOperation,
+  comments: boolean = true,
 ): t.ExportNamedDeclaration | null {
   if (op.args.length === 0) return null;
 
@@ -120,6 +121,10 @@ function createVariablesInterface(
       t.tsTypeAnnotation(parseTypeAnnotation(typeRefToTsType(arg.type))),
     );
     prop.optional = optional;
+    const argDescription = stripSmartComments(arg.description, comments);
+    if (argDescription) {
+      addJSDocComment(prop, argDescription.split('\n'));
+    }
     return prop;
   });
 
@@ -129,7 +134,12 @@ function createVariablesInterface(
     null,
     t.tsInterfaceBody(props),
   );
-  return t.exportNamedDeclaration(interfaceDecl);
+  const exportDecl = t.exportNamedDeclaration(interfaceDecl);
+  const opDescription = stripSmartComments(op.description, comments);
+  if (opDescription) {
+    addJSDocComment(exportDecl, [`Variables for ${op.name}`, opDescription]);
+  }
+  return exportDecl;
 }
 
 function parseTypeAnnotation(typeStr: string): t.TSType {
@@ -400,6 +410,7 @@ function buildOperationMethod(
  */
 export function generateCustomQueryOpsFile(
   operations: CleanOperation[],
+  comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -444,7 +455,7 @@ export function generateCustomQueryOpsFile(
 
   // Generate variable interfaces
   for (const op of operations) {
-    const varInterface = createVariablesInterface(op);
+    const varInterface = createVariablesInterface(op, comments);
     if (varInterface) statements.push(varInterface);
   }
 
@@ -482,6 +493,7 @@ export function generateCustomQueryOpsFile(
  */
 export function generateCustomMutationOpsFile(
   operations: CleanOperation[],
+  comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
 
@@ -526,7 +538,7 @@ export function generateCustomMutationOpsFile(
 
   // Generate variable interfaces
   for (const op of operations) {
-    const varInterface = createVariablesInterface(op);
+    const varInterface = createVariablesInterface(op, comments);
     if (varInterface) statements.push(varInterface);
   }
 
