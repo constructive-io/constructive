@@ -10,6 +10,31 @@ import type {
   SimpleFieldSelection,
 } from '../types/selection';
 
+const relationalFieldSetCache = new WeakMap<CleanTable, Set<string>>();
+
+function getRelationalFieldSet(table: CleanTable): Set<string> {
+  const cached = relationalFieldSetCache.get(table);
+  if (cached) return cached;
+
+  const set = new Set<string>();
+
+  for (const rel of table.relations.belongsTo) {
+    if (rel.fieldName) set.add(rel.fieldName);
+  }
+  for (const rel of table.relations.hasOne) {
+    if (rel.fieldName) set.add(rel.fieldName);
+  }
+  for (const rel of table.relations.hasMany) {
+    if (rel.fieldName) set.add(rel.fieldName);
+  }
+  for (const rel of table.relations.manyToMany) {
+    if (rel.fieldName) set.add(rel.fieldName);
+  }
+
+  relationalFieldSetCache.set(table, set);
+  return set;
+}
+
 /**
  * Convert simplified field selection to QueryBuilder SelectionOptions
  */
@@ -210,14 +235,7 @@ export function isRelationalField(
   fieldName: string,
   table: CleanTable,
 ): boolean {
-  const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
-
-  return (
-    belongsTo.some((rel) => rel.fieldName === fieldName) ||
-    hasOne.some((rel) => rel.fieldName === fieldName) ||
-    hasMany.some((rel) => rel.fieldName === fieldName) ||
-    manyToMany.some((rel) => rel.fieldName === fieldName)
-  );
+  return getRelationalFieldSet(table).has(fieldName);
 }
 
 /**
@@ -308,12 +326,18 @@ function getRelatedTableScalarFields(
     'updatedAt',
   ];
 
+  const scalarFieldSet = new Set(scalarFields);
+
+  // Use Set for O(1) duplicate checking
+  const includedSet = new Set<string>();
   const included: string[] = [];
+
   const push = (fieldName: string | undefined) => {
     if (!fieldName) return;
-    if (!scalarFields.includes(fieldName)) return;
-    if (included.includes(fieldName)) return;
+    if (!scalarFieldSet.has(fieldName)) return;
+    if (includedSet.has(fieldName)) return;
     if (included.length >= MAX_RELATED_FIELDS) return;
+    includedSet.add(fieldName);
     included.push(fieldName);
   };
 
