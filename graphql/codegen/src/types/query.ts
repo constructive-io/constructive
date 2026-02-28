@@ -43,6 +43,15 @@ export interface QueryOptions {
   orderBy?: OrderByItem[];
   /** Field selection options */
   fieldSelection?: FieldSelection;
+  /**
+   * Maps requested relation field names to actual schema field names (or null to omit).
+   * When the mapped name differs from the key, a GraphQL alias is emitted so the
+   * consumer sees a stable field name regardless of the server-side name.
+   *
+   * Example: `{ contact: 'contactByOwnerId' }` emits `contact: contactByOwnerId { … }`
+   * Pass `null` to suppress a relation entirely: `{ internalNotes: null }`
+   */
+  relationFieldMap?: Record<string, string | null>;
   /** Include pageInfo in response */
   includePageInfo?: boolean;
 }

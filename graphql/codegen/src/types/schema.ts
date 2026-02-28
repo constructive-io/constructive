@@ -115,6 +115,10 @@ export interface CleanField {
   /** Description from PostgreSQL COMMENT (smart comments stripped) */
   description?: string;
   type: CleanFieldType;
+  /** Whether the column has a NOT NULL constraint (inferred from NON_NULL wrapper on entity type field) */
+  isNotNull?: boolean | null;
+  /** Whether the column has a DEFAULT value (inferred by comparing entity vs CreateInput field nullability) */
+  hasDefault?: boolean | null;
 }
 
 /**

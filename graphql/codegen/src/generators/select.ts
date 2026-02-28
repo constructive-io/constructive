@@ -3,7 +3,7 @@
  * Uses AST-based approach for all query generation
  */
 import * as t from 'gql-ast';
-import { OperationTypeNode, print } from 'graphql';
+import { Kind, OperationTypeNode, print } from 'graphql';
 import type { ArgumentNode, FieldNode, VariableDefinitionNode } from 'graphql';
 
 import { TypedDocumentString } from '../client/typed-document';
@@ -296,6 +296,7 @@ export function buildSelect(
     tableList,
     selection,
     options,
+    options.relationFieldMap,
   );
 
   return new TypedDocumentString(queryString, {}) as TypedDocumentString<
@@ -352,6 +353,7 @@ function generateSelectQueryAST(
   allTables: CleanTable[],
   selection: QuerySelectionOptions | null,
   options: QueryOptions,
+  relationFieldMap?: Record<string, string | null>,
 ): string {
   const pluralName = toCamelCasePlural(table.name, table);
 
@@ -360,6 +362,7 @@ function generateSelectQueryAST(
     table,
     allTables,
     selection,
+    relationFieldMap,
   );
 
   // Build the query AST
@@ -529,6 +532,7 @@ function generateFieldSelectionsFromOptions(
   table: CleanTable,
   allTables: CleanTable[],
   selection: QuerySelectionOptions | null,
+  relationFieldMap?: Record<string, string | null>,
 ): FieldNode[] {
   const DEFAULT_NESTED_RELATION_FIRST = 20;
 
@@ -550,6 +554,11 @@ function generateFieldSelectionsFromOptions(
   const fieldSelections: FieldNode[] = [];
 
   Object.entries(selection).forEach(([fieldName, fieldOptions]) => {
+    const resolvedField = resolveSelectionFieldName(fieldName, relationFieldMap);
+    if (!resolvedField) {
+      return; // Field mapped to null — omit it
+    }
+
     if (fieldOptions === true) {
       // Check if this field requires subfield selection
       const field = table.fields.find((f) => f.name === fieldName);
@@ -558,7 +567,9 @@ function generateFieldSelectionsFromOptions(
         fieldSelections.push(getCustomAstForCleanField(field));
       } else {
         // Simple field selection for scalar fields
-        fieldSelections.push(t.field({ name: fieldName }));
+        fieldSelections.push(
+          createFieldSelectionNode(resolvedField.name, resolvedField.alias),
+        );
       }
     } else if (typeof fieldOptions === 'object' && fieldOptions.select) {
       // Nested field selection (for relation fields)
@@ -591,9 +602,10 @@ function generateFieldSelectionsFromOptions(
       ) {
         // For hasMany/manyToMany relations, wrap selections in nodes { ... }
         fieldSelections.push(
-          t.field({
-            name: fieldName,
-            args: [
+          createFieldSelectionNode(
+            resolvedField.name,
+            resolvedField.alias,
+            [
               t.argument({
                 name: 'first',
                 value: t.intValue({
@@ -601,7 +613,7 @@ function generateFieldSelectionsFromOptions(
                 }),
               }),
             ],
-            selectionSet: t.selectionSet({
+            t.selectionSet({
               selections: [
                 t.field({
                   name: 'nodes',
@@ -611,23 +623,79 @@ function generateFieldSelectionsFromOptions(
                 }),
               ],
             }),
-          }),
+          ),
         );
       } else {
         // For belongsTo/hasOne relations, use direct selection
         fieldSelections.push(
-          t.field({
-            name: fieldName,
-            selectionSet: t.selectionSet({
+          createFieldSelectionNode(
+            resolvedField.name,
+            resolvedField.alias,
+            undefined,
+            t.selectionSet({
               selections: nestedSelections,
             }),
-          }),
+          ),
         );
       }
     }
   });
 
   return fieldSelections;
+}
+
+// ---------------------------------------------------------------------------
+// Field aliasing helpers (back-ported from Dashboard query-generator.ts)
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve a field name through the optional relationFieldMap.
+ * Returns `null` if the field should be omitted (mapped to null).
+ * Returns `{ name, alias? }` where alias is set when the mapped name differs.
+ */
+function resolveSelectionFieldName(
+  fieldName: string,
+  relationFieldMap?: Record<string, string | null>,
+): { name: string; alias?: string } | null {
+  if (!relationFieldMap || !(fieldName in relationFieldMap)) {
+    return { name: fieldName };
+  }
+
+  const mappedFieldName = relationFieldMap[fieldName];
+  if (!mappedFieldName) {
+    return null; // mapped to null → omit
+  }
+
+  if (mappedFieldName === fieldName) {
+    return { name: fieldName };
+  }
+
+  return { name: mappedFieldName, alias: fieldName };
+}
+
+/**
+ * Create a field AST node with optional alias support.
+ * When alias is provided and differs from name, a GraphQL alias is emitted:
+ * `alias: name { … }` instead of `name { … }`
+ */
+function createFieldSelectionNode(
+  name: string,
+  alias?: string,
+  args?: ArgumentNode[],
+  selectionSet?: ReturnType<typeof t.selectionSet>,
+): FieldNode {
+  const node = t.field({ name, args, selectionSet });
+  if (!alias || alias === name) {
+    return node;
+  }
+
+  return {
+    ...node,
+    alias: {
+      kind: Kind.NAME,
+      value: alias,
+    },
+  };
 }
 
 /**

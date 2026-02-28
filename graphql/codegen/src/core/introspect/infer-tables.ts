@@ -23,7 +23,7 @@ import type {
   IntrospectionType,
   IntrospectionTypeRef,
 } from '../../types/introspection';
-import { getBaseTypeName, isList, unwrapType } from '../../types/introspection';
+import { getBaseTypeName, isList, isNonNull, unwrapType } from '../../types/introspection';
 import type {
   CleanBelongsToRelation,
   CleanField,
@@ -354,6 +354,14 @@ function extractEntityFields(
 
   if (!entityType.fields) return fields;
 
+  // Build a lookup of CreateXxxInput fields to infer hasDefault.
+  // If a field is NOT NULL on the entity but NOT required in CreateXxxInput,
+  // then it likely has a server-side default (serial, uuid_generate_v4, now(), etc.).
+  const createInputRequiredFields = buildCreateInputRequiredFieldSet(
+    entityType.name,
+    typeMap,
+  );
+
   for (const field of entityType.fields) {
     const baseTypeName = getBaseTypeName(field.type);
     if (!baseTypeName) continue;
@@ -370,16 +378,60 @@ function extractEntityFields(
       }
     }
 
+    // Infer isNotNull from the NON_NULL wrapper on the entity type field
+    const fieldIsNotNull = isNonNull(field.type);
+
+    // Infer hasDefault: if a field is NOT NULL on the entity but NOT required
+    // in CreateXxxInput, it likely has a default value.
+    // Also: if it's absent from CreateInput entirely, it's likely computed/generated.
+    let fieldHasDefault: boolean | null = null;
+    if (createInputRequiredFields !== null) {
+      if (fieldIsNotNull && !createInputRequiredFields.has(field.name)) {
+        fieldHasDefault = true;
+      } else {
+        fieldHasDefault = false;
+      }
+    }
+
     // Include scalar, enum, and other non-relation fields
     const fieldDescription = commentsEnabled ? stripSmartComments(field.description) : undefined;
     fields.push({
       name: field.name,
       ...(fieldDescription ? { description: fieldDescription } : {}),
       type: convertToCleanFieldType(field.type),
+      isNotNull: fieldIsNotNull,
+      hasDefault: fieldHasDefault,
     });
   }
 
   return fields;
+}
+
+/**
+ * Build a set of field names that are required (NON_NULL) in the CreateXxxInput type.
+ * Returns null if the CreateXxxInput type doesn't exist (no create mutation).
+ */
+function buildCreateInputRequiredFieldSet(
+  entityName: string,
+  typeMap: Map<string, IntrospectionType>,
+): Set<string> | null {
+  const createInputName = `Create${entityName}Input`;
+  const createInput = typeMap.get(createInputName);
+  if (!createInput?.inputFields) return null;
+
+  // The CreateXxxInput typically has a single field like { user: UserInput! }
+  // We need to look inside the actual entity input type (e.g., UserInput)
+  const entityInputName = `${entityName}Input`;
+  const entityInput = typeMap.get(entityInputName);
+  if (!entityInput?.inputFields) return null;
+
+  const requiredFields = new Set<string>();
+  for (const inputField of entityInput.inputFields) {
+    if (isNonNull(inputField.type)) {
+      requiredFields.add(inputField.name);
+    }
+  }
+  return requiredFields;
 }
 
 /**
