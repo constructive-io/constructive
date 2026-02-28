@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for Store records
+A store represents an isolated object repository within a database.
 
 ## Usage
 

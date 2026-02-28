@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for Commit records
+A commit records changes to the repository.
 
 ## Usage
 

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for Ref data operations
+A ref is a data structure for pointing to a commit.
 
 ## Usage
 

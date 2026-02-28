@@ -320,7 +320,7 @@ export function getOrmMcpTools(
 
     tools.push({
       name: `orm_${lcFirst(singularName)}_findMany`,
-      description: `List all ${table.name} records via ORM`,
+      description: table.description || `List all ${table.name} records via ORM`,
       inputSchema: {
         type: 'object',
         properties: {
@@ -338,7 +338,7 @@ export function getOrmMcpTools(
 
     tools.push({
       name: `orm_${lcFirst(singularName)}_findOne`,
-      description: `Get a single ${table.name} record by ${pk.name}`,
+      description: table.description || `Get a single ${table.name} record by ${pk.name}`,
       inputSchema: {
         type: 'object',
         properties: {
@@ -360,7 +360,7 @@ export function getOrmMcpTools(
     }
     tools.push({
       name: `orm_${lcFirst(singularName)}_create`,
-      description: `Create a new ${table.name} record`,
+      description: table.description || `Create a new ${table.name} record`,
       inputSchema: {
         type: 'object',
         properties: createProps,
@@ -382,7 +382,7 @@ export function getOrmMcpTools(
     }
     tools.push({
       name: `orm_${lcFirst(singularName)}_update`,
-      description: `Update an existing ${table.name} record`,
+      description: table.description || `Update an existing ${table.name} record`,
       inputSchema: {
         type: 'object',
         properties: updateProps,
@@ -392,7 +392,7 @@ export function getOrmMcpTools(
 
     tools.push({
       name: `orm_${lcFirst(singularName)}_delete`,
-      description: `Delete a ${table.name} record by ${pk.name}`,
+      description: table.description || `Delete a ${table.name} record by ${pk.name}`,
       inputSchema: {
         type: 'object',
         properties: {
@@ -461,7 +461,7 @@ export function generateOrmSkills(
       fileName: `skills/${lcFirst(singularName)}.md`,
       content: buildSkillFile({
         name: `orm-${lcFirst(singularName)}`,
-        description: `ORM operations for ${table.name} records`,
+        description: table.description || `ORM operations for ${table.name} records`,
         language: 'typescript',
         usage: [
           `db.${lcFirst(singularName)}.findMany({ select: { id: true } }).execute()`,

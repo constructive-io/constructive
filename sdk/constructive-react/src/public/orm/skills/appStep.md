@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for AppStep records
+The user achieving a requirement for a level. Log table that has every single step ever taken.
 
 ## Usage
 

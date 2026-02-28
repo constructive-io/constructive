@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for ViewTable data operations
+Junction table linking views to their joined tables for referential integrity
 
 ## Usage
 

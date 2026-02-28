@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for ViewRule data operations
+DO INSTEAD rules for views (e.g., read-only enforcement)
 
 ## Usage
 

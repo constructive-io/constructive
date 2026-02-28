@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for ViewRule records
+DO INSTEAD rules for views (e.g., read-only enforcement)
 
 ## Usage
 

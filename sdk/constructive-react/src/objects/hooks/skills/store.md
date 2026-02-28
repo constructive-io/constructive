@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for Store data operations
+A store represents an isolated object repository within a database.
 
 ## Usage
 

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for AppStep data operations
+The user achieving a requirement for a level. Log table that has every single step ever taken.
 
 ## Usage
 

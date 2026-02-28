@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for AppLevelRequirement data operations
+Requirements to achieve a level
 
 ## Usage
 

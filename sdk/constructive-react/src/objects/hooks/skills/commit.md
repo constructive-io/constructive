@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for Commit data operations
+A commit records changes to the repository.
 
 ## Usage
 

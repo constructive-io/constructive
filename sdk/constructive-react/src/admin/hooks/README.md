@@ -42,11 +42,11 @@ function App() {
 | `useCreateOrgPermissionMutation` | Mutation | Create a orgPermission |
 | `useUpdateOrgPermissionMutation` | Mutation | Update a orgPermission |
 | `useDeleteOrgPermissionMutation` | Mutation | Delete a orgPermission |
-| `useAppLevelRequirementsQuery` | Query | List all appLevelRequirements |
-| `useAppLevelRequirementQuery` | Query | Get one appLevelRequirement |
-| `useCreateAppLevelRequirementMutation` | Mutation | Create a appLevelRequirement |
-| `useUpdateAppLevelRequirementMutation` | Mutation | Update a appLevelRequirement |
-| `useDeleteAppLevelRequirementMutation` | Mutation | Delete a appLevelRequirement |
+| `useAppLevelRequirementsQuery` | Query | Requirements to achieve a level |
+| `useAppLevelRequirementQuery` | Query | Requirements to achieve a level |
+| `useCreateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
+| `useUpdateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
+| `useDeleteAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
 | `useOrgMembersQuery` | Query | List all orgMembers |
 | `useOrgMemberQuery` | Query | Get one orgMember |
 | `useCreateOrgMemberMutation` | Mutation | Create a orgMember |
@@ -102,16 +102,16 @@ function App() {
 | `useCreateAppLimitMutation` | Mutation | Create a appLimit |
 | `useUpdateAppLimitMutation` | Mutation | Update a appLimit |
 | `useDeleteAppLimitMutation` | Mutation | Delete a appLimit |
-| `useAppAchievementsQuery` | Query | List all appAchievements |
-| `useAppAchievementQuery` | Query | Get one appAchievement |
-| `useCreateAppAchievementMutation` | Mutation | Create a appAchievement |
-| `useUpdateAppAchievementMutation` | Mutation | Update a appAchievement |
-| `useDeleteAppAchievementMutation` | Mutation | Delete a appAchievement |
-| `useAppStepsQuery` | Query | List all appSteps |
-| `useAppStepQuery` | Query | Get one appStep |
-| `useCreateAppStepMutation` | Mutation | Create a appStep |
-| `useUpdateAppStepMutation` | Mutation | Update a appStep |
-| `useDeleteAppStepMutation` | Mutation | Delete a appStep |
+| `useAppAchievementsQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useAppAchievementQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useCreateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useUpdateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useDeleteAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useAppStepsQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useAppStepQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useCreateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useUpdateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useDeleteAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
 | `useClaimedInvitesQuery` | Query | List all claimedInvites |
 | `useClaimedInviteQuery` | Query | Get one claimedInvite |
 | `useCreateClaimedInviteMutation` | Mutation | Create a claimedInvite |
@@ -147,11 +147,11 @@ function App() {
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Create a orgMembershipDefault |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Update a orgMembershipDefault |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Delete a orgMembershipDefault |
-| `useAppLevelsQuery` | Query | List all appLevels |
-| `useAppLevelQuery` | Query | Get one appLevel |
-| `useCreateAppLevelMutation` | Mutation | Create a appLevel |
-| `useUpdateAppLevelMutation` | Mutation | Update a appLevel |
-| `useDeleteAppLevelMutation` | Mutation | Delete a appLevel |
+| `useAppLevelsQuery` | Query | Levels for achievement |
+| `useAppLevelQuery` | Query | Levels for achievement |
+| `useCreateAppLevelMutation` | Mutation | Levels for achievement |
+| `useUpdateAppLevelMutation` | Mutation | Levels for achievement |
+| `useDeleteAppLevelMutation` | Mutation | Levels for achievement |
 | `useInvitesQuery` | Query | List all invites |
 | `useInviteQuery` | Query | Get one invite |
 | `useCreateInviteMutation` | Mutation | Create a invite |

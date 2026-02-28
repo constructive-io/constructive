@@ -39,21 +39,21 @@ function App() {
 | `useCreateObjectMutation` | Mutation | Create a object |
 | `useUpdateObjectMutation` | Mutation | Update a object |
 | `useDeleteObjectMutation` | Mutation | Delete a object |
-| `useRefsQuery` | Query | List all refs |
-| `useRefQuery` | Query | Get one ref |
-| `useCreateRefMutation` | Mutation | Create a ref |
-| `useUpdateRefMutation` | Mutation | Update a ref |
-| `useDeleteRefMutation` | Mutation | Delete a ref |
-| `useStoresQuery` | Query | List all stores |
-| `useStoreQuery` | Query | Get one store |
-| `useCreateStoreMutation` | Mutation | Create a store |
-| `useUpdateStoreMutation` | Mutation | Update a store |
-| `useDeleteStoreMutation` | Mutation | Delete a store |
-| `useCommitsQuery` | Query | List all commits |
-| `useCommitQuery` | Query | Get one commit |
-| `useCreateCommitMutation` | Mutation | Create a commit |
-| `useUpdateCommitMutation` | Mutation | Update a commit |
-| `useDeleteCommitMutation` | Mutation | Delete a commit |
+| `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
+| `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
+| `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useUpdateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useDeleteRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useStoresQuery` | Query | A store represents an isolated object repository within a database. |
+| `useStoreQuery` | Query | A store represents an isolated object repository within a database. |
+| `useCreateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useUpdateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useDeleteStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useCommitsQuery` | Query | A commit records changes to the repository. |
+| `useCommitQuery` | Query | A commit records changes to the repository. |
+| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useRevParseQuery` | Query | revParse |
 | `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetPathObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |

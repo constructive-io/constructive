@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for AppAchievement records
+This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually.
 
 ## Usage
 

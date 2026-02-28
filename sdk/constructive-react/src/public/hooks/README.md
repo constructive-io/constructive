@@ -49,11 +49,11 @@ function App() {
 | `useCreateObjectMutation` | Mutation | Create a object |
 | `useUpdateObjectMutation` | Mutation | Update a object |
 | `useDeleteObjectMutation` | Mutation | Delete a object |
-| `useAppLevelRequirementsQuery` | Query | List all appLevelRequirements |
-| `useAppLevelRequirementQuery` | Query | Get one appLevelRequirement |
-| `useCreateAppLevelRequirementMutation` | Mutation | Create a appLevelRequirement |
-| `useUpdateAppLevelRequirementMutation` | Mutation | Update a appLevelRequirement |
-| `useDeleteAppLevelRequirementMutation` | Mutation | Delete a appLevelRequirement |
+| `useAppLevelRequirementsQuery` | Query | Requirements to achieve a level |
+| `useAppLevelRequirementQuery` | Query | Requirements to achieve a level |
+| `useCreateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
+| `useUpdateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
+| `useDeleteAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
 | `useDatabasesQuery` | Query | List all databases |
 | `useDatabaseQuery` | Query | Get one database |
 | `useCreateDatabaseMutation` | Mutation | Create a database |
@@ -129,21 +129,21 @@ function App() {
 | `useCreateViewMutation` | Mutation | Create a view |
 | `useUpdateViewMutation` | Mutation | Update a view |
 | `useDeleteViewMutation` | Mutation | Delete a view |
-| `useViewTablesQuery` | Query | List all viewTables |
-| `useViewTableQuery` | Query | Get one viewTable |
-| `useCreateViewTableMutation` | Mutation | Create a viewTable |
-| `useUpdateViewTableMutation` | Mutation | Update a viewTable |
-| `useDeleteViewTableMutation` | Mutation | Delete a viewTable |
+| `useViewTablesQuery` | Query | Junction table linking views to their joined tables for referential integrity |
+| `useViewTableQuery` | Query | Junction table linking views to their joined tables for referential integrity |
+| `useCreateViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
+| `useUpdateViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
+| `useDeleteViewTableMutation` | Mutation | Junction table linking views to their joined tables for referential integrity |
 | `useViewGrantsQuery` | Query | List all viewGrants |
 | `useViewGrantQuery` | Query | Get one viewGrant |
 | `useCreateViewGrantMutation` | Mutation | Create a viewGrant |
 | `useUpdateViewGrantMutation` | Mutation | Update a viewGrant |
 | `useDeleteViewGrantMutation` | Mutation | Delete a viewGrant |
-| `useViewRulesQuery` | Query | List all viewRules |
-| `useViewRuleQuery` | Query | Get one viewRule |
-| `useCreateViewRuleMutation` | Mutation | Create a viewRule |
-| `useUpdateViewRuleMutation` | Mutation | Update a viewRule |
-| `useDeleteViewRuleMutation` | Mutation | Delete a viewRule |
+| `useViewRulesQuery` | Query | DO INSTEAD rules for views (e.g., read-only enforcement) |
+| `useViewRuleQuery` | Query | DO INSTEAD rules for views (e.g., read-only enforcement) |
+| `useCreateViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
+| `useUpdateViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
+| `useDeleteViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
 | `useTableModulesQuery` | Query | List all tableModules |
 | `useTableModuleQuery` | Query | Get one tableModule |
 | `useCreateTableModuleMutation` | Mutation | Create a tableModule |
@@ -324,11 +324,11 @@ function App() {
 | `useCreateUuidModuleMutation` | Mutation | Create a uuidModule |
 | `useUpdateUuidModuleMutation` | Mutation | Update a uuidModule |
 | `useDeleteUuidModuleMutation` | Mutation | Delete a uuidModule |
-| `useDatabaseProvisionModulesQuery` | Query | List all databaseProvisionModules |
-| `useDatabaseProvisionModuleQuery` | Query | Get one databaseProvisionModule |
-| `useCreateDatabaseProvisionModuleMutation` | Mutation | Create a databaseProvisionModule |
-| `useUpdateDatabaseProvisionModuleMutation` | Mutation | Update a databaseProvisionModule |
-| `useDeleteDatabaseProvisionModuleMutation` | Mutation | Delete a databaseProvisionModule |
+| `useDatabaseProvisionModulesQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
+| `useDatabaseProvisionModuleQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
+| `useCreateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
+| `useUpdateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
+| `useDeleteDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useAppAdminGrantsQuery` | Query | List all appAdminGrants |
 | `useAppAdminGrantQuery` | Query | Get one appAdminGrant |
 | `useCreateAppAdminGrantMutation` | Mutation | Create a appAdminGrant |
@@ -379,16 +379,16 @@ function App() {
 | `useCreateOrgLimitMutation` | Mutation | Create a orgLimit |
 | `useUpdateOrgLimitMutation` | Mutation | Update a orgLimit |
 | `useDeleteOrgLimitMutation` | Mutation | Delete a orgLimit |
-| `useAppStepsQuery` | Query | List all appSteps |
-| `useAppStepQuery` | Query | Get one appStep |
-| `useCreateAppStepMutation` | Mutation | Create a appStep |
-| `useUpdateAppStepMutation` | Mutation | Update a appStep |
-| `useDeleteAppStepMutation` | Mutation | Delete a appStep |
-| `useAppAchievementsQuery` | Query | List all appAchievements |
-| `useAppAchievementQuery` | Query | Get one appAchievement |
-| `useCreateAppAchievementMutation` | Mutation | Create a appAchievement |
-| `useUpdateAppAchievementMutation` | Mutation | Update a appAchievement |
-| `useDeleteAppAchievementMutation` | Mutation | Delete a appAchievement |
+| `useAppStepsQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useAppStepQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useCreateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useUpdateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useDeleteAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
+| `useAppAchievementsQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useAppAchievementQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useCreateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useUpdateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
+| `useDeleteAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
 | `useInvitesQuery` | Query | List all invites |
 | `useInviteQuery` | Query | Get one invite |
 | `useCreateInviteMutation` | Mutation | Create a invite |
@@ -414,16 +414,16 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Create a appPermissionDefault |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Update a appPermissionDefault |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Delete a appPermissionDefault |
-| `useRefsQuery` | Query | List all refs |
-| `useRefQuery` | Query | Get one ref |
-| `useCreateRefMutation` | Mutation | Create a ref |
-| `useUpdateRefMutation` | Mutation | Update a ref |
-| `useDeleteRefMutation` | Mutation | Delete a ref |
-| `useStoresQuery` | Query | List all stores |
-| `useStoreQuery` | Query | Get one store |
-| `useCreateStoreMutation` | Mutation | Create a store |
-| `useUpdateStoreMutation` | Mutation | Update a store |
-| `useDeleteStoreMutation` | Mutation | Delete a store |
+| `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
+| `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
+| `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useUpdateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useDeleteRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
+| `useStoresQuery` | Query | A store represents an isolated object repository within a database. |
+| `useStoreQuery` | Query | A store represents an isolated object repository within a database. |
+| `useCreateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useUpdateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useDeleteStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
@@ -469,16 +469,16 @@ function App() {
 | `useCreateAppMembershipDefaultMutation` | Mutation | Create a appMembershipDefault |
 | `useUpdateAppMembershipDefaultMutation` | Mutation | Update a appMembershipDefault |
 | `useDeleteAppMembershipDefaultMutation` | Mutation | Delete a appMembershipDefault |
-| `useNodeTypeRegistriesQuery` | Query | List all nodeTypeRegistries |
-| `useNodeTypeRegistryQuery` | Query | Get one nodeTypeRegistry |
-| `useCreateNodeTypeRegistryMutation` | Mutation | Create a nodeTypeRegistry |
-| `useUpdateNodeTypeRegistryMutation` | Mutation | Update a nodeTypeRegistry |
-| `useDeleteNodeTypeRegistryMutation` | Mutation | Delete a nodeTypeRegistry |
-| `useCommitsQuery` | Query | List all commits |
-| `useCommitQuery` | Query | Get one commit |
-| `useCreateCommitMutation` | Mutation | Create a commit |
-| `useUpdateCommitMutation` | Mutation | Update a commit |
-| `useDeleteCommitMutation` | Mutation | Delete a commit |
+| `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useCommitsQuery` | Query | A commit records changes to the repository. |
+| `useCommitQuery` | Query | A commit records changes to the repository. |
+| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useOrgMembershipDefaultsQuery` | Query | List all orgMembershipDefaults |
 | `useOrgMembershipDefaultQuery` | Query | Get one orgMembershipDefault |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Create a orgMembershipDefault |
@@ -494,11 +494,11 @@ function App() {
 | `useCreateAuditLogMutation` | Mutation | Create a auditLog |
 | `useUpdateAuditLogMutation` | Mutation | Update a auditLog |
 | `useDeleteAuditLogMutation` | Mutation | Delete a auditLog |
-| `useAppLevelsQuery` | Query | List all appLevels |
-| `useAppLevelQuery` | Query | Get one appLevel |
-| `useCreateAppLevelMutation` | Mutation | Create a appLevel |
-| `useUpdateAppLevelMutation` | Mutation | Update a appLevel |
-| `useDeleteAppLevelMutation` | Mutation | Delete a appLevel |
+| `useAppLevelsQuery` | Query | Levels for achievement |
+| `useAppLevelQuery` | Query | Levels for achievement |
+| `useCreateAppLevelMutation` | Mutation | Levels for achievement |
+| `useUpdateAppLevelMutation` | Mutation | Levels for achievement |
+| `useDeleteAppLevelMutation` | Mutation | Levels for achievement |
 | `useSqlMigrationsQuery` | Query | List all sqlMigrations |
 | `useSqlMigrationQuery` | Query | Get one sqlMigration |
 | `useCreateSqlMigrationMutation` | Mutation | Create a sqlMigration |

@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM operations for ViewTable records
+Junction table linking views to their joined tables for referential integrity
 
 ## Usage
 
