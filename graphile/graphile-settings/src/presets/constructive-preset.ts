@@ -13,6 +13,7 @@ import {
 } from 'graphile-misc-plugins';
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
+import { VectorCodecPreset } from 'graphile-pgvector-plugin';
 import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
@@ -72,6 +73,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     MetaSchemaPreset,
     PgSearchPreset({ pgSearchPrefix: 'fullText' }),
     GraphilePostgisPreset,
+    VectorCodecPreset,
     PostgisConnectionFilterPreset,
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
