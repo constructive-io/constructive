@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.3.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.3.0...@pgpmjs/core@6.3.1) (2026-02-28)
+
+### Bug Fixes
+
+- update export config for grantee_name rename and add default_privilege table ([4fcc147](https://github.com/constructive-io/constructive/commit/4fcc14765da5c53a64bdff317012d179e239a76f))
+
 # [6.3.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.2.0...@pgpmjs/core@6.3.0) (2026-02-26)
 
 ### Features
