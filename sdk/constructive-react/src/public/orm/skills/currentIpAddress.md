@@ -1,0 +1,19 @@
+# orm-currentIpAddress
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Execute the currentIpAddress query
+
+## Usage
+
+```typescript
+db.query.currentIpAddress().execute()
+```
+
+## Examples
+
+### Run currentIpAddress
+
+```typescript
+const result = await db.query.currentIpAddress().execute();
+```
