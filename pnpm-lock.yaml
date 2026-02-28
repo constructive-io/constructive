@@ -289,9 +289,6 @@ importers:
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
-      graphile-settings:
-        specifier: workspace:^
-        version: link:../graphile-settings/dist
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
