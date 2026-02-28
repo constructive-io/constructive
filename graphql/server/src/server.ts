@@ -22,6 +22,7 @@ import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
+import { debugMemory } from './middleware/debug-memory';
 import { normalizeServerOptions } from './options';
 
 const log = new Logger('server');
@@ -127,6 +128,7 @@ class Server {
     });
 
     healthz(app);
+    app.get('/debug/memory', debugMemory);
     app.use(favicon);
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
