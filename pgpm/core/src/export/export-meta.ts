@@ -161,7 +161,7 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
-      role_name: 'text',
+      grantee_name: 'text',
       privilege: 'text',
       permissive: 'boolean',
       disabled: 'boolean',
@@ -338,8 +338,22 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       privilege: 'text',
-      role_name: 'text',
-      field_ids: 'uuid[]'
+      grantee_name: 'text',
+      field_ids: 'uuid[]',
+      is_grant: 'boolean'
+    }
+  },
+  default_privilege: {
+    schema: 'metaschema_public',
+    table: 'default_privilege',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      object_type: 'text',
+      privilege: 'text',
+      grantee_name: 'text',
+      is_grant: 'boolean'
     }
   },
   // =============================================================================
@@ -1026,6 +1040,7 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1`);
   await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1`);
   await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1`);
+  await queryAndParse('default_privilege', `SELECT * FROM metaschema_public.default_privilege WHERE database_id = $1`);
 
   // =============================================================================
   // services_public tables

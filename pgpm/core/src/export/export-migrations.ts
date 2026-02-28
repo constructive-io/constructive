@@ -378,6 +378,7 @@ SET session_replication_role TO DEFAULT;`;
       'full_text_search',
       'schema_grant',
       'table_grant',
+      'default_privilege',
       'domains',
       'sites',
       'apis',
