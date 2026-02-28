@@ -36,6 +36,9 @@ export {
 } from 'graphile-misc-plugins';
 export type { UniqueLookupOptions, TypeMapping, PublicKeyChallengeConfig } from 'graphile-misc-plugins';
 
+// pgvector — Vector scalar + codec
+export { VectorCodecPlugin, VectorCodecPreset } from './vector-codec';
+
 // Search plugin (stays in graphile-search-plugin, re-exported here for convenience)
 export {
   PgSearchPlugin,
