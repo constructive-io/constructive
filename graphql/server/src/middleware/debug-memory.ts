@@ -30,7 +30,6 @@ export const debugMemory: RequestHandler = (_req, res) => {
 
   const mem = process.memoryUsage();
   const cacheStats = getCacheStats();
-  const now = Date.now();
 
   const response = {
     memory: {
