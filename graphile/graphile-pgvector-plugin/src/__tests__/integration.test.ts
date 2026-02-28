@@ -3,7 +3,6 @@ import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { VectorCodecPreset } from '../vector-codec';
-import { ConstructivePreset } from 'graphile-settings';
 
 interface DocumentResult {
   pgvectorTestDocuments: {
@@ -49,7 +48,6 @@ describe('graphile-pgvector-plugin integration', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
-        ConstructivePreset,
         VectorCodecPreset,
       ],
     };
