@@ -216,16 +216,15 @@ export const sendEmailLink = async (
     hostname.endsWith('.localhost');
 
   // Optional: LOCAL_APP_PORT lets you attach a port for local dashboards
-  // e.g. LOCAL_APP_PORT=3000 -> http://localhost:3000
-  // It is ignored for non-local hostnames. Only allow on DRY RUNs
+  // e.g. LOCAL_APP_PORT=3001 -> http://localhost:3001/register?...
+  // Required for localhost when dashboard runs on non-default port
   const localPort =
-    isLocalHost && isDryRun && process.env.LOCAL_APP_PORT
+    isLocalHost && process.env.LOCAL_APP_PORT
       ? `:${process.env.LOCAL_APP_PORT}`
       : '';
 
-  // Use http only for local dry-run to avoid browser TLS warnings
-  // in dev; production stays https.
-  const protocol = isLocalHost && isDryRun ? 'http' : 'https';
+  // Use http for localhost in dev (dry-run or LOCAL_APP_PORT set) to avoid TLS warnings
+  const protocol = isLocalHost && (isDryRun || process.env.LOCAL_APP_PORT) ? 'http' : 'https';
   const url = new URL(`${protocol}://${hostname}${localPort}`);
 
   let subject: string;

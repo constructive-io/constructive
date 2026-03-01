@@ -83,7 +83,7 @@ Recommended / optional:
 - `DEFAULT_DATABASE_ID`  
   Used if `X-Database-Id` is not provided by the worker. In normal jobs usage, `X-Database-Id` should always be present.
 - `LOCAL_APP_PORT`  
-  Optional port suffix for localhost-style hosts (e.g. `3000`). When the resolved hostname is `localhost` / `*.localhost` and `SEND_EMAIL_LINK_DRY_RUN=true`, links are generated as `http://localhost:LOCAL_APP_PORT/...`. Ignored for non-local hostnames and in production.
+  Optional port suffix for localhost-style hosts (e.g. `3001`). When the resolved hostname is `localhost` / `*.localhost`, links are generated as `http://localhost:LOCAL_APP_PORT/...`. Required for local dev when the dashboard runs on a non-default port. Ignored for non-local hostnames and in production.
 
 Email delivery (default: `@launchql/postmaster`):
 
