@@ -5,9 +5,9 @@ import type { PgTestClient } from 'pgsql-test';
 import { VectorCodecPreset } from '../vector-codec';
 
 interface DocumentResult {
-  pgvectorTestDocuments: {
+  allDocuments: {
     nodes: Array<{
-      id: number;
+      rowId: number;
       title: string;
       content: string | null;
       embedding: number[];
@@ -16,9 +16,9 @@ interface DocumentResult {
 }
 
 interface SearchResult {
-  pgvectorTestSearchDocuments: {
+  searchDocuments: {
     nodes: Array<{
-      id: number;
+      rowId: number;
       title: string;
       embedding: number[];
     }>;
@@ -26,9 +26,9 @@ interface SearchResult {
 }
 
 interface CreateDocumentResult {
-  createPgvectorTestDocument: {
-    pgvectorTestDocument: {
-      id: number;
+  createDocument: {
+    document: {
+      rowId: number;
       title: string;
       embedding: number[];
     };
@@ -56,6 +56,7 @@ describe('graphile-pgvector-plugin integration', () => {
       schemas: ['pgvector_test'],
       preset: testPreset,
       useRoot: true,
+      authRole: 'postgres',
     }, [
       seed.sqlfile([join(__dirname, './setup.sql')])
     ]);
@@ -94,9 +95,9 @@ describe('graphile-pgvector-plugin integration', () => {
     it('exposes vector column as array of floats', async () => {
       const result = await query<DocumentResult>(`
         query {
-          pgvectorTestDocuments(first: 1) {
+          allDocuments(first: 1) {
             nodes {
-              id
+              rowId
               title
               embedding
             }
@@ -105,7 +106,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const nodes = result.data?.pgvectorTestDocuments?.nodes;
+      const nodes = result.data?.allDocuments?.nodes;
       expect(nodes).toBeDefined();
       expect(nodes!.length).toBeGreaterThan(0);
 
@@ -118,7 +119,7 @@ describe('graphile-pgvector-plugin integration', () => {
     it('returns correct vector values', async () => {
       const result = await query<DocumentResult>(`
         query {
-          pgvectorTestDocuments(condition: { title: "Document A" }) {
+          allDocuments(condition: { title: "Document A" }) {
             nodes {
               title
               embedding
@@ -128,16 +129,16 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const doc = result.data?.pgvectorTestDocuments?.nodes[0];
+      const doc = result.data?.allDocuments?.nodes[0];
       expect(doc?.embedding).toEqual([1, 0, 0]);
     });
 
     it('returns all documents with vector data', async () => {
       const result = await query<DocumentResult>(`
         query {
-          pgvectorTestDocuments {
+          allDocuments {
             nodes {
-              id
+              rowId
               title
               embedding
             }
@@ -146,7 +147,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const nodes = result.data?.pgvectorTestDocuments?.nodes;
+      const nodes = result.data?.allDocuments?.nodes;
       expect(nodes?.length).toBe(5);
       for (const node of nodes!) {
         expect(Array.isArray(node.embedding)).toBe(true);
@@ -159,9 +160,9 @@ describe('graphile-pgvector-plugin integration', () => {
     it('exposes search function that accepts vector input', async () => {
       const result = await query<SearchResult>(`
         query {
-          pgvectorTestSearchDocuments(queryEmbedding: [1, 0, 0]) {
+          searchDocuments(queryEmbedding: [1, 0, 0]) {
             nodes {
-              id
+              rowId
               title
               embedding
             }
@@ -170,7 +171,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const nodes = result.data?.pgvectorTestSearchDocuments?.nodes;
+      const nodes = result.data?.searchDocuments?.nodes;
       expect(nodes).toBeDefined();
       expect(nodes!.length).toBeGreaterThan(0);
     });
@@ -178,7 +179,7 @@ describe('graphile-pgvector-plugin integration', () => {
     it('returns results ordered by similarity (closest first)', async () => {
       const result = await query<SearchResult>(`
         query {
-          pgvectorTestSearchDocuments(queryEmbedding: [1, 0, 0]) {
+          searchDocuments(queryEmbedding: [1, 0, 0]) {
             nodes {
               title
               embedding
@@ -188,7 +189,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const nodes = result.data?.pgvectorTestSearchDocuments?.nodes;
+      const nodes = result.data?.searchDocuments?.nodes;
       // Document A [1,0,0] should be closest to query [1,0,0]
       expect(nodes![0].title).toBe('Document A');
     });
@@ -196,7 +197,7 @@ describe('graphile-pgvector-plugin integration', () => {
     it('respects result_limit parameter', async () => {
       const result = await query<SearchResult>(`
         query {
-          pgvectorTestSearchDocuments(queryEmbedding: [1, 0, 0], resultLimit: 2) {
+          searchDocuments(queryEmbedding: [1, 0, 0], resultLimit: 2) {
             nodes {
               title
             }
@@ -205,7 +206,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const nodes = result.data?.pgvectorTestSearchDocuments?.nodes;
+      const nodes = result.data?.searchDocuments?.nodes;
       expect(nodes?.length).toBe(2);
     });
   });
@@ -214,14 +215,14 @@ describe('graphile-pgvector-plugin integration', () => {
     it('creates a document with vector embedding', async () => {
       const result = await query<CreateDocumentResult>(`
         mutation {
-          createPgvectorTestDocument(input: {
-            pgvectorTestDocument: {
+          createDocument(input: {
+            document: {
               title: "New Document"
               embedding: [0.5, 0.5, 0.0]
             }
           }) {
-            pgvectorTestDocument {
-              id
+            document {
+              rowId
               title
               embedding
             }
@@ -230,7 +231,7 @@ describe('graphile-pgvector-plugin integration', () => {
       `);
 
       expect(result.errors).toBeUndefined();
-      const doc = result.data?.createPgvectorTestDocument?.pgvectorTestDocument;
+      const doc = result.data?.createDocument?.document;
       expect(doc).toBeDefined();
       expect(doc!.title).toBe('New Document');
       expect(doc!.embedding).toEqual([0.5, 0.5, 0]);
@@ -241,14 +242,14 @@ describe('graphile-pgvector-plugin integration', () => {
 
       const createResult = await query<CreateDocumentResult>(`
         mutation($embedding: Vector!) {
-          createPgvectorTestDocument(input: {
-            pgvectorTestDocument: {
+          createDocument(input: {
+            document: {
               title: "Round Trip Test"
               embedding: $embedding
             }
           }) {
-            pgvectorTestDocument {
-              id
+            document {
+              rowId
               embedding
             }
           }
@@ -256,22 +257,22 @@ describe('graphile-pgvector-plugin integration', () => {
       `, { embedding: inputVector });
 
       expect(createResult.errors).toBeUndefined();
-      const created = createResult.data?.createPgvectorTestDocument?.pgvectorTestDocument;
+      const created = createResult.data?.createDocument?.document;
       expect(created).toBeDefined();
 
       // Read it back
       const readResult = await query<DocumentResult>(`
-        query($id: Int!) {
-          pgvectorTestDocuments(condition: { id: $id }) {
+        query($rowId: Int!) {
+          allDocuments(condition: { rowId: $rowId }) {
             nodes {
               embedding
             }
           }
         }
-      `, { id: created!.id });
+      `, { rowId: created!.rowId });
 
       expect(readResult.errors).toBeUndefined();
-      const readDoc = readResult.data?.pgvectorTestDocuments?.nodes[0];
+      const readDoc = readResult.data?.allDocuments?.nodes[0];
       // pgvector stores at ~6 decimal precision
       for (let i = 0; i < inputVector.length; i++) {
         expect(readDoc!.embedding[i]).toBeCloseTo(inputVector[i], 3);

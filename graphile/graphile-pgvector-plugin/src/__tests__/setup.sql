@@ -25,7 +25,7 @@ INSERT INTO pgvector_test.documents (title, content, embedding) VALUES
     ('Document E', 'Fifth test document', '[0.577, 0.577, 0.577]');
 
 -- Create a vector search function to test function exposure
-CREATE OR REPLACE FUNCTION pgvector_test.search_documents(
+CREATE FUNCTION pgvector_test.search_documents(
     query_embedding vector(3),
     result_limit INT DEFAULT 5
 )
