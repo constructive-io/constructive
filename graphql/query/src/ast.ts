@@ -1,22 +1,22 @@
 import * as t from 'gql-ast';
-import {
-  OperationTypeNode,
-  type ArgumentNode,
-  type DocumentNode,
-  type FieldNode,
-  type TypeNode,
-  type ValueNode,
-  type VariableDefinitionNode,
+import { OperationTypeNode } from 'graphql';
+import type {
+  ArgumentNode,
+  DocumentNode,
+  FieldNode,
+  TypeNode,
+  ValueNode,
+  VariableDefinitionNode,
 } from 'graphql';
-import { camelize, singularize } from 'inflection';
+import { camelize, singularize } from 'inflekt';
 
 import { getCustomAst } from './custom-ast';
 import type {
   ASTFunctionParams,
-  FieldSelection,
   MutationASTParams,
   NestedProperties,
   ObjectArrayItem,
+  QueryFieldSelection,
   QueryProperty,
 } from './types';
 
@@ -92,7 +92,6 @@ const createGqlMutation = ({
 export const getAll = ({
   queryName,
   operationName,
-  query: _query,
   selection,
 }: ASTFunctionParams): DocumentNode => {
   const selections = getSelections(selection);
@@ -238,7 +237,10 @@ export const getMany = ({
     t.argument({ name: 'offset', value: t.variable({ name: 'offset' }) }),
     t.argument({ name: 'after', value: t.variable({ name: 'after' }) }),
     t.argument({ name: 'before', value: t.variable({ name: 'before' }) }),
-    t.argument({ name: 'condition', value: t.variable({ name: 'condition' }) }),
+    t.argument({
+      name: 'condition',
+      value: t.variable({ name: 'condition' }),
+    }),
     t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
     t.argument({ name: 'orderBy', value: t.variable({ name: 'orderBy' }) }),
   ];
@@ -306,7 +308,7 @@ export const getOne = ({
   selection,
 }: ASTFunctionParams): DocumentNode => {
   const variableDefinitions: VariableDefinitionNode[] = Object.keys(
-    query.properties
+    query.properties,
   )
     .map((key) => ({ key, ...query.properties[key] }))
     .filter((field) => field.isNotNull)
@@ -374,24 +376,21 @@ export const createOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-    const modelName = camelize(
-      [singularize(mutation.model)].join('_'),
-      true
-    );
+  const modelName = camelize([singularize(mutation.model)].join('_'), true);
 
-    const inputProperties = mutation.properties.input
-      .properties as NestedProperties;
-    const modelProperties = inputProperties[modelName] as QueryProperty;
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const modelProperties = inputProperties[modelName] as QueryProperty;
 
   if (!modelProperties.properties) {
     throw new Error(`No properties found for model: ${modelName}`);
   }
 
   const allAttrs = objectToArray(
-    modelProperties.properties as Record<string, QueryProperty>
+    modelProperties.properties as Record<string, QueryProperty>,
   );
   const attrs = allAttrs.filter(
-    (field) => !NON_MUTABLE_PROPS.includes(field.name)
+    (field) => !NON_MUTABLE_PROPS.includes(field.name),
   );
 
   const variableDefinitions = getCreateVariablesAst(attrs);
@@ -408,7 +407,7 @@ export const createOne = ({
                 t.objectField({
                   name: field.name,
                   value: t.variable({ name: field.name }),
-                })
+                }),
               ),
             }),
           }),
@@ -443,24 +442,21 @@ export const patchOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-    const modelName = camelize(
-      [singularize(mutation.model)].join('_'),
-      true
-    );
+  const modelName = camelize([singularize(mutation.model)].join('_'), true);
 
-    const inputProperties = mutation.properties.input
-      .properties as NestedProperties;
-    const patchProperties = inputProperties['patch'] as QueryProperty;
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const patchProperties = inputProperties['patch'] as QueryProperty;
 
   const allAttrs = patchProperties?.properties
     ? objectToArray(patchProperties.properties as Record<string, QueryProperty>)
     : [];
 
   const patchAttrs = allAttrs.filter(
-    (prop) => !NON_MUTABLE_PROPS.includes(prop.name)
+    (prop) => !NON_MUTABLE_PROPS.includes(prop.name),
   );
   const patchByAttrs = objectToArray(
-    inputProperties as Record<string, QueryProperty>
+    inputProperties as Record<string, QueryProperty>,
   ).filter((n) => n.name !== 'patch');
   const patchers = patchByAttrs.map((p) => p.name);
 
@@ -475,7 +471,7 @@ export const patchOne = ({
             t.objectField({
               name: field.name,
               value: t.variable({ name: field.name }),
-            })
+            }),
           ),
           t.objectField({
             name: 'patch',
@@ -486,7 +482,7 @@ export const patchOne = ({
                   t.objectField({
                     name: field.name,
                     value: t.variable({ name: field.name }),
-                  })
+                  }),
                 ),
             }),
           }),
@@ -520,15 +516,12 @@ export const deleteOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-    const modelName = camelize(
-      [singularize(mutation.model)].join('_'),
-      true
-    );
+  const modelName = camelize([singularize(mutation.model)].join('_'), true);
 
-    const inputProperties = mutation.properties.input
-      .properties as NestedProperties;
-    const deleteAttrs = objectToArray(
-    inputProperties as Record<string, QueryProperty>
+  const inputProperties = mutation.properties.input
+    .properties as NestedProperties;
+  const deleteAttrs = objectToArray(
+    inputProperties as Record<string, QueryProperty>,
   );
 
   const variableDefinitions: VariableDefinitionNode[] = deleteAttrs.map(
@@ -545,7 +538,7 @@ export const deleteOne = ({
         variable: t.variable({ name: fieldName }),
         type,
       });
-    }
+    },
   );
 
   const selectArgs: ArgumentNode[] = [
@@ -556,7 +549,7 @@ export const deleteOne = ({
           t.objectField({
             name: f.name,
             value: t.variable({ name: f.name }),
-          })
+          }),
         ),
       }),
     }),
@@ -577,11 +570,31 @@ export const deleteOne = ({
   return ast;
 };
 
-export function getSelections(selection: FieldSelection[] = []): FieldNode[] {
-  const selectionAst = (field: string | FieldSelection): FieldNode => {
-    return typeof field === 'string'
-      ? t.field({ name: field })
-      : getCustomAst(field.fieldDefn) || t.field({ name: field.name });
+export function getSelections(
+  selection: QueryFieldSelection[] = [],
+): FieldNode[] {
+  const selectionAst = (field: string | QueryFieldSelection): FieldNode => {
+    if (typeof field === 'string') {
+      return t.field({ name: field });
+    }
+    // Check if fieldDefn has MetaField shape (has type.pgType)
+    const fieldDefn = field.fieldDefn;
+    if (
+      fieldDefn &&
+      'type' in fieldDefn &&
+      fieldDefn.type &&
+      typeof fieldDefn.type === 'object' &&
+      'pgType' in fieldDefn.type
+    ) {
+      const customAst = getCustomAst(
+        fieldDefn as {
+          name: string;
+          type: { gqlType: string; pgType: string; isArray: boolean };
+        },
+      );
+      if (customAst) return customAst;
+    }
+    return t.field({ name: field.name });
   };
 
   return selection
@@ -598,7 +611,7 @@ export function getSelections(selection: FieldSelection[] = []): FieldNode[] {
             });
             return argAst ? [...acc, argAst] : acc;
           },
-          []
+          [],
         );
 
         const subSelections =
@@ -662,7 +675,7 @@ function getComplexValueAst(value: unknown): ValueNode {
         t.objectField({
           name: key,
           value: getComplexValueAst(val),
-        })
+        }),
       ),
     });
   }
@@ -671,7 +684,7 @@ function getComplexValueAst(value: unknown): ValueNode {
 }
 
 function getCreateVariablesAst(
-  attrs: ObjectArrayItem[]
+  attrs: ObjectArrayItem[],
 ): VariableDefinitionNode[] {
   return attrs.map((field) => {
     const {
@@ -696,7 +709,7 @@ function getCreateVariablesAst(
 
 function getUpdateVariablesAst(
   attrs: ObjectArrayItem[],
-  patchers: string[]
+  patchers: string[],
 ): VariableDefinitionNode[] {
   const patchVariables: VariableDefinitionNode[] = attrs
     .filter((field) => !patchers.includes(field.name))

@@ -1,9 +1,14 @@
 import * as t from 'gql-ast';
-import { Kind, type InlineFragmentNode } from 'graphql';
+import { Kind } from 'graphql';
+import type { FieldNode, InlineFragmentNode } from 'graphql';
 
-import type { CleanField, MetaField } from './types';
+import type { CleanField } from './types/schema';
+import type { MetaField } from './types';
 
-export function getCustomAst(fieldDefn?: MetaField): any {
+/**
+ * Get custom AST for MetaField type - handles PostgreSQL types that need subfield selections
+ */
+export function getCustomAst(fieldDefn?: MetaField): FieldNode | null {
   if (!fieldDefn) {
     return null;
   }
@@ -25,7 +30,7 @@ export function getCustomAst(fieldDefn?: MetaField): any {
 /**
  * Generate custom AST for CleanField type - handles GraphQL types that need subfield selections
  */
-export function getCustomAstForCleanField(field: CleanField): any {
+export function getCustomAstForCleanField(field: CleanField): FieldNode {
   const { name, type } = field;
   const { gqlType, pgType } = type;
 
@@ -77,7 +82,7 @@ export function requiresSubfieldSelection(field: CleanField): boolean {
 /**
  * Generate AST for GeometryPoint type
  */
-export function geometryPointAst(name: string): any {
+export function geometryPointAst(name: string): FieldNode {
   return t.field({
     name,
     selectionSet: t.selectionSet({
@@ -89,7 +94,7 @@ export function geometryPointAst(name: string): any {
 /**
  * Generate AST for GeometryGeometryCollection type
  */
-export function geometryCollectionAst(name: string): any {
+export function geometryCollectionAst(name: string): FieldNode {
   // Manually create inline fragment since gql-ast doesn't support it
   const inlineFragment: InlineFragmentNode = {
     kind: Kind.INLINE_FRAGMENT,
@@ -128,6 +133,7 @@ export function geometryCollectionAst(name: string): any {
         t.field({
           name: 'geometries',
           selectionSet: t.selectionSet({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             selections: [inlineFragment as any], // gql-ast limitation with inline fragments
           }),
         }),
@@ -136,7 +142,10 @@ export function geometryCollectionAst(name: string): any {
   });
 }
 
-export function geometryAst(name: string): any {
+/**
+ * Generate AST for generic geometry type (returns geojson)
+ */
+export function geometryAst(name: string): FieldNode {
   return t.field({
     name,
     selectionSet: t.selectionSet({
@@ -145,7 +154,10 @@ export function geometryAst(name: string): any {
   });
 }
 
-export function intervalAst(name: string): any {
+/**
+ * Generate AST for interval type
+ */
+export function intervalAst(name: string): FieldNode {
   return t.field({
     name,
     selectionSet: t.selectionSet({
@@ -161,12 +173,16 @@ export function intervalAst(name: string): any {
   });
 }
 
-function toFieldArray(strArr: string[]): any[] {
+function toFieldArray(strArr: string[]): FieldNode[] {
   return strArr.map((fieldName) => t.field({ name: fieldName }));
 }
 
-export function isIntervalType(obj: any): boolean {
+/**
+ * Check if an object has interval type shape
+ */
+export function isIntervalType(obj: unknown): boolean {
+  if (!obj || typeof obj !== 'object') return false;
   return ['days', 'hours', 'minutes', 'months', 'seconds', 'years'].every(
-    (key) => obj.hasOwnProperty(key)
+    (key) => Object.prototype.hasOwnProperty.call(obj, key),
   );
 }

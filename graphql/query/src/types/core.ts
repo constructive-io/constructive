@@ -5,6 +5,8 @@ import type {
   VariableDefinitionNode,
 } from 'graphql';
 
+import type { CleanField } from './schema';
+
 // GraphQL AST types (re-export what we need from gql-ast)
 export type ASTNode =
   | DocumentNode
@@ -40,7 +42,12 @@ export interface MutationDefinition extends QueryDefinition {
   mutationType: 'create' | 'patch' | 'delete';
 }
 
-export interface IntrospectionSchema {
+/**
+ * Runtime QueryBuilder's internal schema map.
+ * Named with 'Query' prefix to avoid collision with the standard
+ * GraphQL IntrospectionSchema from ./introspection.ts
+ */
+export interface QueryIntrospectionSchema {
   [key: string]: QueryDefinition | MutationDefinition;
 }
 
@@ -60,8 +67,8 @@ export interface MetaField {
   type: MetaFieldType;
 }
 
-// Alias for compatibility with code migrated from other repos
-export type CleanField = MetaField;
+// Note: The codegen-style CleanField is in ./schema.ts
+// This MetaField is for the QueryBuilder runtime API
 
 export interface MetaConstraint {
   name: string;
@@ -98,17 +105,19 @@ export interface GraphQLVariables {
     | GraphQLVariables[];
 }
 
-// Selection interfaces with better typing
-export interface FieldSelection {
+// Selection interfaces for QueryBuilder runtime API
+// Note: These are renamed with 'Query' prefix to avoid collisions with
+// the codegen-style FieldSelection/SelectionOptions in ./selection.ts
+export interface QueryFieldSelection {
   name: string;
   isObject: boolean;
-  fieldDefn?: MetaField;
-  selection?: FieldSelection[];
+  fieldDefn?: MetaField | CleanField;
+  selection?: QueryFieldSelection[];
   variables?: GraphQLVariables;
   isBelongTo?: boolean;
 }
 
-export interface SelectionOptions {
+export interface QuerySelectionOptions {
   [fieldName: string]:
     | boolean
     | {
@@ -119,7 +128,7 @@ export interface SelectionOptions {
 
 // QueryBuilder class interface
 export interface QueryBuilderInstance {
-  _introspection: IntrospectionSchema;
+  _introspection: QueryIntrospectionSchema;
   _meta: MetaObject;
   _edges?: boolean;
 }
@@ -129,7 +138,7 @@ export interface ASTFunctionParams {
   queryName: string;
   operationName: string;
   query: QueryDefinition;
-  selection: FieldSelection[];
+  selection: QueryFieldSelection[];
   builder?: QueryBuilderInstance;
 }
 
@@ -137,13 +146,13 @@ export interface MutationASTParams {
   mutationName: string;
   operationName: string;
   mutation: MutationDefinition;
-  selection?: FieldSelection[];
+  selection?: QueryFieldSelection[];
 }
 
 // QueryBuilder interface
 export interface QueryBuilderOptions {
   meta: MetaObject;
-  introspection: IntrospectionSchema;
+  introspection: QueryIntrospectionSchema;
 }
 
 export interface QueryBuilderResult {
@@ -155,13 +164,13 @@ export interface QueryBuilderResult {
 // Public QueryBuilder interface
 export interface IQueryBuilder {
   query(model: string): IQueryBuilder;
-  getMany(options?: { select?: SelectionOptions }): IQueryBuilder;
-  getOne(options?: { select?: SelectionOptions }): IQueryBuilder;
-  all(options?: { select?: SelectionOptions }): IQueryBuilder;
+  getMany(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
+  getOne(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
+  all(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
   count(): IQueryBuilder;
-  create(options?: { select?: SelectionOptions }): IQueryBuilder;
-  update(options?: { select?: SelectionOptions }): IQueryBuilder;
-  delete(options?: { select?: SelectionOptions }): IQueryBuilder;
+  create(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
+  update(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
+  delete(options?: { select?: QuerySelectionOptions }): IQueryBuilder;
   edges(useEdges: boolean): IQueryBuilder;
   print(): QueryBuilderResult;
 }
@@ -238,10 +247,8 @@ export interface ExecutorCacheStats {
 }
 
 /**
- * Re-export GraphQL execution types for convenience
+ * Re-export GraphQL execution types for convenience.
+ * Note: GraphQLError is NOT re-exported here to avoid collision with
+ * the client/error.ts GraphQLError interface (which is the PostGraphile-oriented one).
  */
-export type {
-  ExecutionResult,
-  GraphQLError,
-  GraphQLSchema,
-} from 'graphql';
+export type { ExecutionResult, GraphQLSchema } from 'graphql';

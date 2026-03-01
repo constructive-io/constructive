@@ -5,44 +5,27 @@
   "definitions": {
     "field": {
       "type": "object",
-      "required": [
-        "name",
-        "type"
-      ],
+      "required": ["name", "type"],
       "additionalProperties": true,
       "properties": {
         "name": {
           "type": "string",
           "default": "id",
-          "examples": [
-            "id"
-          ]
+          "examples": ["id"]
         },
         "type": {
           "type": "object",
-          "required": [
-            "pgType",
-            "gqlType"
-          ],
+          "required": ["pgType", "gqlType"],
           "additionalProperties": true,
           "properties": {
             "gqlType": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "pgType": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "subtype": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             }
           }
         }
@@ -58,9 +41,7 @@
           "name": {
             "type": "string",
             "default": "User",
-            "examples": [
-              "User"
-            ]
+            "examples": ["User"]
           },
           "fields": {
             "type": "array",
@@ -88,9 +69,7 @@
                 "refTable": {
                   "type": "string",
                   "default": "User",
-                  "examples": [
-                    "User"
-                  ]
+                  "examples": ["User"]
                 },
                 "fromKey": {
                   "$ref": "#/definitions/field"
@@ -99,25 +78,16 @@
                   "$ref": "#/definitions/field"
                 }
               },
-              "required": [
-                "refTable",
-                "fromKey",
-                "toKey"
-              ],
+              "required": ["refTable", "fromKey", "toKey"],
               "additionalProperties": false
             }
           }
         },
-        "required": [
-          "name",
-          "fields"
-        ],
+        "required": ["name", "fields"],
         "additionalProperties": false
       }
     }
   },
-  "required": [
-    "tables"
-  ],
+  "required": ["tables"],
   "additionalProperties": false
 }
