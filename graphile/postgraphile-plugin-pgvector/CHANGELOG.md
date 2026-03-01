@@ -1,0 +1,44 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.2.4](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.2.3...postgraphile-plugin-pgvector@2.2.4) (2026-02-28)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.2.3](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.2.2...postgraphile-plugin-pgvector@2.2.3) (2026-02-28)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.2.2](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.2.1...postgraphile-plugin-pgvector@2.2.2) (2026-02-26)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.2.1](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.2.0...postgraphile-plugin-pgvector@2.2.1) (2026-02-25)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+# [2.2.0](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.1.2...postgraphile-plugin-pgvector@2.2.0) (2026-02-24)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.1.2](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.1.1...postgraphile-plugin-pgvector@2.1.2) (2026-02-24)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.1.1](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.1.0...postgraphile-plugin-pgvector@2.1.1) (2026-02-19)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+# [2.1.0](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.0.1...postgraphile-plugin-pgvector@2.1.0) (2026-02-19)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+## [2.0.1](https://github.com/constructive-io/constructive/compare/postgraphile-plugin-pgvector@2.0.0...postgraphile-plugin-pgvector@2.0.1) (2026-02-15)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
+
+# 2.0.0 (2026-02-13)
+
+**Note:** Version bump only for package postgraphile-plugin-pgvector
