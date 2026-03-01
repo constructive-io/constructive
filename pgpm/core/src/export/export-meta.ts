@@ -222,34 +222,6 @@ const config: Record<string, TableConfig> = {
       security: 'int'
     }
   },
-  limit_function: {
-    schema: 'metaschema_public',
-    table: 'limit_function',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      table_id: 'uuid',
-      name: 'text',
-      label: 'text',
-      description: 'text',
-      data: 'jsonb',
-      security: 'int'
-    }
-  },
-  procedure: {
-    schema: 'metaschema_public',
-    table: 'procedure',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      name: 'text',
-      argnames: 'text[]',
-      argtypes: 'text[]',
-      argdefaults: 'text[]',
-      lang_name: 'text',
-      definition: 'text'
-    }
-  },
   foreign_key_constraint: {
     schema: 'metaschema_public',
     table: 'foreign_key_constraint',
@@ -1030,8 +1002,6 @@ export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams
   await queryAndParse('trigger', `SELECT * FROM metaschema_public.trigger WHERE database_id = $1`);
   await queryAndParse('trigger_function', `SELECT * FROM metaschema_public.trigger_function WHERE database_id = $1`);
   await queryAndParse('rls_function', `SELECT * FROM metaschema_public.rls_function WHERE database_id = $1`);
-  await queryAndParse('limit_function', `SELECT * FROM metaschema_public.limit_function WHERE database_id = $1`);
-  await queryAndParse('procedure', `SELECT * FROM metaschema_public.procedure WHERE database_id = $1`);
   await queryAndParse('foreign_key_constraint', `SELECT * FROM metaschema_public.foreign_key_constraint WHERE database_id = $1`);
   await queryAndParse('primary_key_constraint', `SELECT * FROM metaschema_public.primary_key_constraint WHERE database_id = $1`);
   await queryAndParse('unique_constraint', `SELECT * FROM metaschema_public.unique_constraint WHERE database_id = $1`);

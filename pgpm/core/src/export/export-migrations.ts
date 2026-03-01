@@ -369,8 +369,6 @@ SET session_replication_role TO DEFAULT;`;
       'trigger',
       'trigger_function',
       'rls_function',
-      'limit_function',
-      'procedure',
       'foreign_key_constraint',
       'primary_key_constraint',
       'unique_constraint',
