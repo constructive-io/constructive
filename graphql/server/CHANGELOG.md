@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.3.4...@constructive-io/graphql-server@4.4.0) (2026-03-01)
+
+### Bug Fixes
+
+- remove unused variable ([fbbc524](https://github.com/constructive-io/constructive/commit/fbbc524ab56bef142b0eaef569fc689dacbd29d3))
+
+### Features
+
+- **graphql-server:** add dev-only /debug/memory endpoint for OOM debugging ([88f7ca9](https://github.com/constructive-io/constructive/commit/88f7ca96183dee6fcf996cc10fd6e5ca46c94308)), closes [constructive-io/constructive-planning#654](https://github.com/constructive-io/constructive-planning/issues/654)
+
 ## [4.3.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.3.3...@constructive-io/graphql-server@4.3.4) (2026-02-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
