@@ -12,15 +12,16 @@
  *
  * @example
  * ```typescript
- * import { createNodeClient } from '@constructive-io/node';
+ * import { auth, NodeHttpAdapter } from '@constructive-io/node';
  *
- * const db = createNodeClient({
- *   endpoint: 'http://auth.localhost:3000/graphql',
- *   headers: { Authorization: 'Bearer token' },
- * });
+ * const adapter = new NodeHttpAdapter(
+ *   'http://auth.localhost:3000/graphql',
+ *   { Authorization: 'Bearer token' },
+ * );
  *
- * // Use exactly like @constructive-io/sdk
- * const users = await db.auth.orm.createClient({ endpoint }).user.findMany({
+ * const db = auth.orm.createClient({ adapter });
+ *
+ * const users = await db.user.findMany({
  *   select: { id: true, name: true },
  * }).execute();
  * ```
