@@ -27,7 +27,6 @@ This package is the **canonical source** for PostGraphile query generation logic
 - **Query generators** — `buildSelect`, `buildFindOne`, `buildCount` for read operations
 - **Mutation generators** — `buildPostGraphileCreate`, `buildPostGraphileUpdate`, `buildPostGraphileDelete`
 - **Introspection pipeline** — `inferTablesFromIntrospection` to convert a GraphQL schema into `CleanTable` metadata
-- **QueryBuilder** — fluent API for composing nested queries with filters and pagination
 - **AST builders** — low-level `getAll`, `getMany`, `getOne`, `createOne`, `patchOne`, `deleteOne`
 - **Client utilities** — `TypedDocumentString`, `execute`, `DataError` for type-safe execution and error handling
 - **Naming helpers** — server-aware inflection functions that respect PostGraphile's schema naming
@@ -168,104 +167,54 @@ mutation deleteUserMutation($input: DeleteUserInput!) {
 
 ---
 
-## QueryBuilder (Fluent API)
+## Nested Relations
 
-For more control over nested queries, filters, and pagination, use the `QueryBuilder` class:
+Include related tables in your query with automatic Connection wrapping for hasMany relations:
 
 ```ts
-import { QueryBuilder } from '@constructive-io/graphql-query';
+import { buildSelect } from '@constructive-io/graphql-query';
 
-const builder = new QueryBuilder({
-  introspection: { ...queries, ...mutations } // provide your GraphQL schema metadata
+const actionTable = tables.find(t => t.name === 'Action')!;
+
+const query = buildSelect(actionTable, tables, {
+  fieldSelection: {
+    select: ['id', 'name', 'photo', 'title'],
+    include: {
+      actionResults: ['id', 'actionId'],  // hasMany → wrapped in nodes { ... }
+      category: true,                      // belongsTo → direct nesting
+    },
+  },
 });
-
-const result = builder
-  .query('Action')
-  .edges(true)
-  .getMany({
-    select: {
-      id: true,
-      name: true,
-      photo: true,
-      title: true,
-      actionResults: {
-        select: {
-          id: true,
-          actionId: true
-        },
-        variables: {
-          first: 10,
-          before: null,
-          filter: {
-            name: {
-              in: ['abc', 'def']
-            },
-            actionId: {
-              equalTo: 'dc310161-7a42-4b93-6a56-9fa48adcad7e'
-            }
-          }
-        }
-      }
-    }
-  })
-  .print();
 ```
 
 **Generated GraphQL:**
 
 ```graphql
-query getActionsQuery(
-  $first: Int
-  $last: Int
-  $after: Cursor
-  $before: Cursor
-  $offset: Int
-  $condition: ActionCondition
-  $filter: ActionFilter
-  $orderBy: [ActionsOrderBy!]
-) {
-  actions(
-    first: $first
-    last: $last
-    offset: $offset
-    after: $after
-    before: $before
-    condition: $condition
-    filter: $filter
-    orderBy: $orderBy
-  ) {
+query actionsQuery {
+  actions {
     totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      endCursor
-      startCursor
-    }
-    edges {
-      cursor
-      node {
+    nodes {
+      id
+      name
+      photo
+      title
+      actionResults(first: 20) {
+        nodes {
+          id
+          actionId
+        }
+      }
+      category {
         id
         name
-        photo
-        title
-        actionResults(
-          first: 10
-          before: null
-          filter: {
-            name: { in: ["abc", "def"] }
-            actionId: { equalTo: "dc310161-7a42-4b93-6a56-9fa48adcad7e" }
-          }
-        ) {
-          nodes {
-            id
-            actionId
-          }
-        }
       }
     }
   }
 }
 ```
+
+> **hasMany** relations are automatically wrapped in the PostGraphile Connection pattern (`nodes { ... }` with a default `first: 20` limit).
+> **belongsTo** relations are nested directly.
 
 ---
 
@@ -319,15 +268,26 @@ query getUsersCountQuery(
 
 ## Field Selection
 
-Control which fields and relations are included in the query:
+Control which fields and relations are included using presets or custom selection:
 
 ```ts
 import { buildSelect } from '@constructive-io/graphql-query';
 
-const query = buildSelect(userTable, tables, {
+// Preset: just id + a few display fields
+const minimal = buildSelect(userTable, tables, { fieldSelection: 'minimal' });
+
+// Preset: all scalar fields (no relations)
+const allFields = buildSelect(userTable, tables, { fieldSelection: 'all' });
+
+// Preset: everything including relations
+const full = buildSelect(userTable, tables, { fieldSelection: 'full' });
+
+// Custom: pick specific fields + exclude some + include specific relations
+const custom = buildSelect(userTable, tables, {
   fieldSelection: {
-    preset: 'all',           // 'all' | 'scalar' | 'custom'
-    includeRelations: true,  // include related tables
+    select: ['id', 'name', 'email'],
+    exclude: ['internalNotes'],
+    include: { posts: ['id', 'title'] },
   },
 });
 ```
