@@ -558,6 +558,7 @@ async function handleModuleInit(
       answers: templateAnswers,
       noTty: ctx.noTty,
       pgpm: isPgpmTemplate,
+      prompter,
     });
 
     const isRoot = path.resolve(project.workspacePath) === path.resolve(ctx.cwd);
