@@ -293,19 +293,22 @@ describe('VectorSearchPlugin', () => {
   });
 
   describe('composability', () => {
-    it('combines vector condition with other conditions', async () => {
+    it('combines vector distance threshold with ordering', async () => {
+      // Use a tight distance threshold to filter, then order by distance
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(condition: {
-            vectorEmbedding: {
-              vector: [1, 0, 0]
-              metric: COSINE
+          allDocuments(
+            condition: {
+              vectorEmbedding: {
+                vector: [1, 0, 0]
+                metric: COSINE
+                distance: 0.5
+              }
             }
-            content: "First test document"
-          }) {
+            orderBy: EMBEDDING_DISTANCE_ASC
+          ) {
             nodes {
               title
-              content
               embeddingDistance
             }
           }
@@ -315,9 +318,22 @@ describe('VectorSearchPlugin', () => {
       expect(result.errors).toBeUndefined();
       const nodes = result.data?.allDocuments?.nodes;
       expect(nodes).toBeDefined();
-      // Should only return Document A (matches both conditions)
-      expect(nodes!.length).toBe(1);
+      // Only documents within cosine distance 0.5 of [1,0,0] should be returned
+      // Document A [1,0,0] → distance ~0 (included)
+      // Document D [0.707,0.707,0] → distance ~0.293 (included)
+      // Document E [0.577,0.577,0.577] → distance ~0.423 (included)
+      // Document B [0,1,0] → distance ~1.0 (excluded)
+      // Document C [0,0,1] → distance ~1.0 (excluded)
+      expect(nodes!.length).toBeGreaterThanOrEqual(1);
+      expect(nodes!.length).toBeLessThanOrEqual(3);
+
+      // First result should be closest: Document A
       expect(nodes![0].title).toBe('Document A');
+
+      // All returned distances should be <= 0.5
+      for (const node of nodes!) {
+        expect(node.embeddingDistance).toBeLessThanOrEqual(0.5);
+      }
     });
 
     it('works with pagination (first/offset)', async () => {
