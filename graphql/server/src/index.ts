@@ -1,8 +1,5 @@
 export * from './server';
 
-// Export options module - types, defaults, type guards, and utility functions
-export * from './options';
-
 // Export middleware for use in testing packages
 export { createApiMiddleware, getSubdomain, getApiConfig } from './middleware/api';
 export { createAuthenticateMiddleware } from './middleware/auth';
