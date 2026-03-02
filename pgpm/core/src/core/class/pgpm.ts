@@ -129,6 +129,11 @@ export interface InitModuleOptions {
    * Defaults to true for backward compatibility.
    */
   pgpm?: boolean;
+  /**
+   * Optional prompter instance to reuse for interactive prompts.
+   * Prevents multiple readline interfaces from being created on stdin.
+   */
+  prompter?: any;
 }
 
 export class PgpmPackage {
@@ -476,7 +481,8 @@ export class PgpmPackage {
       noTty: options.noTty ?? false,
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
       toolName: options.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
-      cwd: this.cwd
+      cwd: this.cwd,
+      prompter: options.prompter
     });
 
     // Only create pgpm files (pgpm.plan, .control, deploy/revert/verify dirs) for pgpm-managed modules
