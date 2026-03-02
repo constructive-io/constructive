@@ -1,6 +1,7 @@
-import { getNodeEnv } from '@constructive-io/graphql-env';
+import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
+import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseUrl } from '@constructive-io/url-domains';
 import { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
@@ -8,7 +9,7 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
-import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, RlsModule } from '../types';
+import { ApiConfigResult, ApiError, ApiStructure, RlsModule } from '../types';
 import './types';
 
 const log = new Logger('api');
@@ -122,7 +123,7 @@ interface ApiListRow {
 }
 
 interface ResolveContext {
-  opts: ApiOptions;
+  opts: ConstructiveOptions;
   pool: Pool;
   domain: string;
   subdomain: string | null;
@@ -166,7 +167,7 @@ export const getSubdomain = (subdomains: string[]): string | null => {
   return filtered.length ? filtered.join('.') : null;
 };
 
-export const getSvcKey = (opts: ApiOptions, req: Request): string => {
+export const getSvcKey = (opts: ConstructiveOptions, req: Request): string => {
   const { domain, subdomains } = getUrlDomains(req);
   const baseKey = subdomains.filter((n) => n !== 'www').concat(domain).join('.');
 
@@ -195,7 +196,7 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
   };
 };
 
-const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null): ApiStructure => ({
+const toApiStructure = (row: ApiRow, opts: ConstructiveOptions, rlsModuleRow?: RlsModuleRow | null): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
   anonRole: row.anon_role || 'anon',
@@ -209,7 +210,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleR
 });
 
 const createAdminStructure = (
-  opts: ApiOptions,
+  opts: ConstructiveOptions,
   schemas: string[],
   databaseId?: string
 ): ApiStructure => ({
@@ -408,7 +409,7 @@ const buildDevFallbackError = async (
 // =============================================================================
 
 export const getApiConfig = async (
-  opts: ApiOptions,
+  opts: ConstructiveOptions,
   req: Request
 ): Promise<ApiConfigResult> => {
   const pool = getPgPool(opts.pg);
@@ -500,7 +501,7 @@ export const getApiConfig = async (
 // Express Middleware
 // =============================================================================
 
-export const createApiMiddleware = (opts: ApiOptions) => {
+export const createApiMiddleware = (opts: ConstructiveOptions) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     log.debug(`[api-middleware] ${req.method} ${req.path}`);
 

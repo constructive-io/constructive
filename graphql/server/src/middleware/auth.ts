@@ -1,4 +1,4 @@
-import { getNodeEnv } from '@constructive-io/graphql-env';
+import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
