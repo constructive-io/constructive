@@ -101,14 +101,14 @@ interface ApiRow {
 }
 
 interface RlsModuleData {
-  authenticate?: string;
-  authenticate_strict?: string;
-  authenticate_schema?: string;
-  role_schema?: string;
-  current_role?: string;
-  current_role_id?: string;
-  current_ip_address?: string;
-  current_user_agent?: string;
+  authenticate: string;
+  authenticate_strict: string;
+  authenticate_schema: string;
+  role_schema: string;
+  current_role: string;
+  current_role_id: string;
+  current_ip_address: string;
+  current_user_agent: string;
 }
 
 interface RlsModuleRow {
@@ -190,19 +190,21 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 };
 
 const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
-  const d = row?.data;
-  if (!d || !d.authenticate_schema) return undefined;
+  if (!row?.data) return undefined;
+  const d = row.data;
   return {
-    authenticate: d.authenticate ?? undefined,
-    authenticateStrict: d.authenticate_strict ?? undefined,
+    authenticate: d.authenticate,
+    authenticateStrict: d.authenticate_strict,
     privateSchema: {
       schemaName: d.authenticate_schema,
     },
-    publicSchema: d.role_schema ? { schemaName: d.role_schema } : undefined,
-    currentRole: d.current_role ?? undefined,
-    currentRoleId: d.current_role_id ?? undefined,
-    currentIpAddress: d.current_ip_address ?? undefined,
-    currentUserAgent: d.current_user_agent ?? undefined,
+    publicSchema: {
+      schemaName: d.role_schema,
+    },
+    currentRole: d.current_role,
+    currentRoleId: d.current_role_id,
+    currentIpAddress: d.current_ip_address,
+    currentUserAgent: d.current_user_agent,
   };
 };
 
