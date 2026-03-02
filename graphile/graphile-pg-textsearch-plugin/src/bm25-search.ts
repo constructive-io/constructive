@@ -17,9 +17,6 @@
  *    - ASC = best matches first (most negative BM25 scores first)
  *    - DESC = worst matches first
  *
- * 4. **Connection filter operators** for text columns with BM25 indexes
- *    - `bm25Matches` operator for use with postgraphile-plugin-connection-filter
- *
  * The plugin reads BM25 index info from the module-level bm25IndexStore
  * that is populated by Bm25CodecPlugin during the gather phase.
  *
@@ -36,7 +33,6 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
-import type { SQL } from 'pg-sql2';
 import type { Bm25SearchPluginOptions, Bm25IndexInfo } from './types';
 import { bm25IndexStore, bm25ExtensionDetected } from './bm25-codec';
 
@@ -107,21 +103,17 @@ export function createBm25SearchPlugin(
     name: 'Bm25SearchPlugin',
     version: '1.0.0',
     description:
-      'Auto-discovers text columns with BM25 indexes and adds search conditions, score fields, orderBy, and filter operators',
+      'Auto-discovers text columns with BM25 indexes and adds search conditions, score fields, and orderBy',
     after: [
       'Bm25CodecPlugin',
       'PgAttributesPlugin',
-      'PgConnectionArgFilterPlugin',
-      'PgConnectionArgFilterOperatorsPlugin',
-      'AddConnectionFilterOperatorPlugin',
     ],
 
     schema: {
       hooks: {
         init(_, build) {
           const {
-            sql,
-            graphql: { GraphQLString, GraphQLFloat, GraphQLInputObjectType },
+            graphql: { GraphQLString, GraphQLFloat },
           } = build;
 
           // Register the Bm25SearchInput type for condition fields
@@ -147,29 +139,6 @@ export function createBm25SearchPlugin(
             }),
             'Bm25SearchPlugin registering Bm25SearchInput type'
           );
-
-          // Register connection filter operators for text columns with BM25 indexes
-          const addConnectionFilterOperator = (build as any)
-            .addConnectionFilterOperator;
-          if (typeof addConnectionFilterOperator === 'function') {
-            addConnectionFilterOperator('String', 'bm25Matches', {
-              description:
-                'Performs a BM25 ranked text search on the field. Requires a BM25 index on the column.',
-              resolveType: () => GraphQLString,
-              resolveInputCodec: TYPES ? () => TYPES.text : undefined,
-              resolve(
-                sqlIdentifier: SQL,
-                sqlValue: SQL,
-                _input: unknown,
-                _$where: any,
-                _details: { fieldName: string | null; operatorName: string }
-              ) {
-                // Basic BM25 matching: column <@> query returns a score (negative = match)
-                // Filter to only rows that have any match (score < 0)
-                return sql`(${sqlIdentifier} <@> ${sqlValue}) < 0`;
-              },
-            });
-          }
 
           return _;
         },
