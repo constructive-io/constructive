@@ -23,7 +23,6 @@ import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { debugMemory } from './middleware/debug-memory';
-import { normalizeServerOptions } from './options';
 
 const log = new Logger('server');
 
@@ -49,14 +48,8 @@ const log = new Logger('server');
  * ```
  */
 export const GraphQLServer = (rawOpts: ConstructiveOptions | PgpmOptions = {}) => {
-  // Normalize options to ConstructiveOptions with defaults applied
-  const normalizedOpts = normalizeServerOptions(rawOpts as ConstructiveOptions);
-
-  // Apply environment variable overrides via getEnvOptions
-  // Cast to PgpmOptions for backward compatibility with getEnvOptions
-  const envOptions = getEnvOptions(normalizedOpts as PgpmOptions);
-
-  const app = new Server(envOptions);
+  const opts = getEnvOptions(rawOpts);
+  const app = new Server(opts);
   app.addEventListener();
   app.listen();
 };

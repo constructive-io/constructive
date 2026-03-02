@@ -14,6 +14,7 @@ import {
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
 import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
+import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
 import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
@@ -40,7 +41,9 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - SQL expression validator (validates @sqlExpression columns in mutations)
  * - PG type mappings (maps custom types like email, url to GraphQL scalars)
  * - pgvector search (auto-discovers vector columns: condition fields, distance computed fields,
- *   orderBy distance, connection filter closeTo operator — zero config)
+ *   orderBy distance — zero config)
+ * - pg_textsearch BM25 search (auto-discovers BM25 indexes: condition fields, score computed fields,
+ *   orderBy score — zero config)
  *
  * DISABLED PLUGINS:
  * - PgConnectionArgFilterBackwardRelationsPlugin (relation filters bloat the API)
@@ -79,6 +82,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     {
       plugins: [createVectorSearchPlugin()],
     },
+    Bm25SearchPreset(),
     PostgisConnectionFilterPreset,
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
