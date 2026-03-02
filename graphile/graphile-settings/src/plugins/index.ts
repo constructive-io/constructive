@@ -48,3 +48,13 @@ export {
   TsvectorCodecPreset,
 } from 'graphile-search-plugin';
 export type { PgSearchPluginOptions } from 'graphile-search-plugin';
+
+// pg_textsearch — BM25 ranked search (auto-discovers BM25 indexes)
+export {
+  Bm25CodecPlugin,
+  Bm25CodecPreset,
+  Bm25SearchPlugin,
+  createBm25SearchPlugin,
+  Bm25SearchPreset,
+} from 'graphile-pg-textsearch-plugin';
+export type { Bm25SearchPluginOptions, Bm25IndexInfo } from 'graphile-pg-textsearch-plugin';
