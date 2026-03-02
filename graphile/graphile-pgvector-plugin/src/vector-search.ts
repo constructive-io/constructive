@@ -17,9 +17,6 @@
  * 4. **<COLUMN>_DISTANCE_ASC/DESC** orderBy enum values
  *    - Orders results by vector distance when a nearby condition is active
  *
- * 5. **Connection filter operators** for vector columns
- *    - `closeTo` operator for use with postgraphile-plugin-connection-filter
- *
  * Follows the same patterns as graphile-search-plugin (for tsvector columns).
  */
 
@@ -27,7 +24,6 @@ import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
-import type { SQL } from 'pg-sql2';
 import type { VectorSearchPluginOptions } from './types';
 
 /**
@@ -93,84 +89,25 @@ export function createVectorSearchPlugin(
     name: 'VectorSearchPlugin',
     version: '1.0.0',
     description:
-      'Auto-discovers vector columns and adds search fields, conditions, orderBy, and filter operators',
+      'Auto-discovers vector columns and adds search fields, conditions, and orderBy',
     after: [
       'VectorCodecPlugin',
       'PgAttributesPlugin',
-      'PgConnectionArgFilterPlugin',
-      'PgConnectionArgFilterOperatorsPlugin',
-      'AddConnectionFilterOperatorPlugin',
     ],
 
     schema: {
       hooks: {
         init(_, build) {
           const {
-            sql,
             graphql: {
               GraphQLList,
               GraphQLNonNull,
               GraphQLFloat,
-              GraphQLInputObjectType,
-              GraphQLEnumType,
             },
           } = build;
 
-          // Register the VectorNearbyInput type for condition fields
-          build.registerInputObjectType(
-            'VectorNearbyInput',
-            {},
-            () => ({
-              description:
-                'Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold.',
-              fields: () => {
-                const VectorMetricEnumForInput =
-                  build.getTypeByName('VectorMetric') as any ||
-                  new GraphQLEnumType({
-                    name: 'VectorMetric',
-                    description: 'Similarity metric for vector search',
-                    values: {
-                      COSINE: {
-                        value: 'COSINE',
-                        description:
-                          'Cosine distance (1 - cosine similarity). Range: 0 (identical) to 2 (opposite).',
-                      },
-                      L2: {
-                        value: 'L2',
-                        description:
-                          'Euclidean (L2) distance. Range: 0 (identical) to infinity.',
-                      },
-                      IP: {
-                        value: 'IP',
-                        description:
-                          'Negative inner product. Higher (less negative) = more similar.',
-                      },
-                    },
-                  });
-
-                return {
-                  vector: {
-                    type: new GraphQLNonNull(
-                      new GraphQLList(new GraphQLNonNull(GraphQLFloat))
-                    ),
-                    description: 'Query vector for similarity search.',
-                  },
-                  metric: {
-                    type: VectorMetricEnumForInput,
-                    description: `Similarity metric to use (default: ${defaultMetric}).`,
-                  },
-                  distance: {
-                    type: GraphQLFloat,
-                    description:
-                      'Maximum distance threshold. Only rows within this distance are returned.',
-                  },
-                };
-              },
-            }),
-            'VectorSearchPlugin registering VectorNearbyInput type'
-          );
-
-          // Register the VectorMetric enum type
+          // Register the VectorMetric enum type FIRST so it's available
+          // for VectorNearbyInput's fields resolver
           build.registerEnumType(
             'VectorMetric',
             {},
@@ -197,29 +134,38 @@ export function createVectorSearchPlugin(
             'VectorSearchPlugin registering VectorMetric enum'
           );
 
-          // Register connection filter operators for vector columns
-          const addConnectionFilterOperator = (build as any)
-            .addConnectionFilterOperator;
-          if (typeof addConnectionFilterOperator === 'function') {
-            addConnectionFilterOperator('Vector', 'closeTo', {
+          // Register the VectorNearbyInput type for condition fields
+          build.registerInputObjectType(
+            'VectorNearbyInput',
+            {},
+            () => ({
               description:
-                'Filters rows where the vector is within the specified cosine distance of the given vector. Input: "[0.1,0.2,...]" as a vector string.',
-              resolveType: () => build.graphql.GraphQLString,
-              resolveInputCodec: TYPES ? () => TYPES.text : undefined,
-              resolve(
-                sqlIdentifier: SQL,
-                sqlValue: SQL,
-                _input: unknown,
-                _$where: any,
-                _details: { fieldName: string | null; operatorName: string }
-              ) {
-                // sqlValue is the text representation of the threshold+vector combo
-                // For simplicity, closeTo filters by cosine distance <= threshold
-                // The user provides the vector as the value; we use a default distance
-                return sql`(${sqlIdentifier} <=> ${sqlValue}::vector) <= 1.0`;
+                'Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold.',
+              fields: () => {
+                const VectorMetricEnum =
+                  build.getTypeByName('VectorMetric') as any;
+
+                return {
+                  vector: {
+                    type: new GraphQLNonNull(
+                      new GraphQLList(new GraphQLNonNull(GraphQLFloat))
+                    ),
+                    description: 'Query vector for similarity search.',
+                  },
+                  metric: {
+                    type: VectorMetricEnum,
+                    description: `Similarity metric to use (default: ${defaultMetric}).`,
+                  },
+                  distance: {
+                    type: GraphQLFloat,
+                    description:
+                      'Maximum distance threshold. Only rows within this distance are returned.',
+                  },
+                };
               },
-            });
-          }
+            }),
+            'VectorSearchPlugin registering VectorNearbyInput type'
+          );
 
           return _;
         },
