@@ -80,13 +80,9 @@ const API_LIST_SQL = `
 `;
 
 const RLS_MODULE_SQL = `
-  SELECT 
-    rm.authenticate,
-    rm.authenticate_strict,
-    ps.schema_name as private_schema_name
-  FROM metaschema_modules_public.rls_module rm
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
-  WHERE rm.api_id = $1
+  SELECT data
+  FROM services_public.api_modules
+  WHERE api_id = $1 AND name = 'rls_module'
   LIMIT 1
 `;
 
@@ -104,10 +100,19 @@ interface ApiRow {
   schemas: string[];
 }
 
+interface RlsModuleData {
+  authenticate?: string;
+  authenticate_strict?: string;
+  authenticate_schema?: string;
+  role_schema?: string;
+  current_role?: string;
+  current_role_id?: string;
+  current_ip_address?: string;
+  current_user_agent?: string;
+}
+
 interface RlsModuleRow {
-  authenticate: string | null;
-  authenticate_strict: string | null;
-  private_schema_name: string | null;
+  data: RlsModuleData | null;
 }
 
 interface ApiListRow {
@@ -185,13 +190,19 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 };
 
 const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
-  if (!row || !row.private_schema_name) return undefined;
+  const d = row?.data;
+  if (!d || !d.authenticate_schema) return undefined;
   return {
-    authenticate: row.authenticate ?? undefined,
-    authenticateStrict: row.authenticate_strict ?? undefined,
+    authenticate: d.authenticate ?? undefined,
+    authenticateStrict: d.authenticate_strict ?? undefined,
     privateSchema: {
-      schemaName: row.private_schema_name,
+      schemaName: d.authenticate_schema,
     },
+    publicSchema: d.role_schema ? { schemaName: d.role_schema } : undefined,
+    currentRole: d.current_role ?? undefined,
+    currentRoleId: d.current_role_id ?? undefined,
+    currentIpAddress: d.current_ip_address ?? undefined,
+    currentUserAgent: d.current_user_agent ?? undefined,
   };
 };
 

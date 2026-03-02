@@ -28,6 +28,13 @@ export interface RlsModule {
   privateSchema: {
     schemaName: string;
   };
+  publicSchema?: {
+    schemaName: string;
+  };
+  currentRole?: string;
+  currentRoleId?: string;
+  currentIpAddress?: string;
+  currentUserAgent?: string;
 }
 
 export interface ApiStructure {
