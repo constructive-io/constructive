@@ -197,6 +197,8 @@ describe('createUploadAuthenticateMiddleware', () => {
             current_ip_address: 'current_ip_address',
             current_user_agent: 'current_user_agent',
           },
+          private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
@@ -243,6 +245,8 @@ describe('createUploadAuthenticateMiddleware', () => {
             current_ip_address: 'current_ip_address',
             current_user_agent: 'current_user_agent',
           },
+          private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
@@ -291,6 +295,8 @@ describe('createUploadAuthenticateMiddleware', () => {
             current_ip_address: 'current_ip_address',
             current_user_agent: 'current_user_agent',
           },
+          private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
