@@ -23,11 +23,18 @@ export type ApiModule =
   | { name: string; data?: GenericModuleData };
 
 export interface RlsModule {
-  authenticate?: string;
-  authenticateStrict?: string;
+  authenticate: string;
+  authenticateStrict: string;
   privateSchema: {
     schemaName: string;
   };
+  publicSchema: {
+    schemaName: string;
+  };
+  currentRole: string;
+  currentRoleId: string;
+  currentIpAddress: string;
+  currentUserAgent: string;
 }
 
 export interface ApiStructure {
