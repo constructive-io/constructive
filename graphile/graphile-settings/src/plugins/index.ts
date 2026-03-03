@@ -36,8 +36,9 @@ export {
 } from 'graphile-misc-plugins';
 export type { UniqueLookupOptions, TypeMapping, PublicKeyChallengeConfig } from 'graphile-misc-plugins';
 
-// pgvector — Vector scalar + codec
-export { VectorCodecPlugin, VectorCodecPreset } from 'graphile-pgvector-plugin';
+// pgvector — Vector scalar + codec + auto-discovered search/filter/orderBy
+export { VectorCodecPlugin, VectorCodecPreset, VectorSearchPlugin, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
+export type { VectorSearchPluginOptions, VectorMetric } from 'graphile-pgvector-plugin';
 
 // Search plugin (stays in graphile-search-plugin, re-exported here for convenience)
 export {
@@ -48,3 +49,13 @@ export {
   TsvectorCodecPreset,
 } from 'graphile-search-plugin';
 export type { PgSearchPluginOptions } from 'graphile-search-plugin';
+
+// pg_textsearch — BM25 ranked search (auto-discovers BM25 indexes)
+export {
+  Bm25CodecPlugin,
+  Bm25CodecPreset,
+  Bm25SearchPlugin,
+  createBm25SearchPlugin,
+  Bm25SearchPreset,
+} from 'graphile-pg-textsearch-plugin';
+export type { Bm25SearchPluginOptions, Bm25IndexInfo } from 'graphile-pg-textsearch-plugin';

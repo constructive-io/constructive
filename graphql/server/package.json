@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -46,6 +46,7 @@
     "@constructive-io/url-domains": "workspace:^",
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
     "@graphile/simplify-inflection": "8.0.0-rc.3",
+    "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",

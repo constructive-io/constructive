@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/constructive-io/constructive/compare/pgpm@4.3.0...pgpm@4.3.1) (2026-03-03)
+
+### Bug Fixes
+
+- pass prompter through to initModule to prevent duplicate stdin listeners ([40a3e16](https://github.com/constructive-io/constructive/commit/40a3e1668886470056a92b41a5e96278b3f65752))
+
 # [4.3.0](https://github.com/constructive-io/constructive/compare/pgpm@4.2.4...pgpm@4.3.0) (2026-03-01)
 
 **Note:** Version bump only for package pgpm

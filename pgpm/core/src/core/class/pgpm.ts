@@ -130,10 +130,12 @@ export interface InitModuleOptions {
    */
   pgpm?: boolean;
   /**
-   * Optional prompter instance to reuse for interactive prompts.
-   * Prevents multiple readline interfaces from being created on stdin.
+   * Optional Inquirerer instance to reuse for prompting during template scaffolding.
+   * If provided, prevents creating a duplicate instance on process.stdin which
+   * would cause double-echoed keystrokes and other input conflicts.
+   * The caller retains ownership and is responsible for closing it.
    */
-  prompter?: any;
+  prompter?: import('inquirerer').Inquirerer;
 }
 
 export class PgpmPackage {
@@ -482,7 +484,7 @@ export class PgpmPackage {
       cacheTtlMs: options.cacheTtlMs ?? DEFAULT_TEMPLATE_TTL_MS,
       toolName: options.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
       cwd: this.cwd,
-      prompter: options.prompter
+      prompter: options.prompter,
     });
 
     // Only create pgpm files (pgpm.plan, .control, deploy/revert/verify dirs) for pgpm-managed modules

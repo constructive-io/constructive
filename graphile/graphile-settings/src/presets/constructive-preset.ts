@@ -13,7 +13,8 @@ import {
 } from 'graphile-misc-plugins';
 import { PgSearchPreset } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
-import { VectorCodecPreset } from 'graphile-pgvector-plugin';
+import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
+import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
 import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
@@ -39,6 +40,10 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - Upload plugin (file upload to S3/MinIO for image, upload, attachment domain columns)
  * - SQL expression validator (validates @sqlExpression columns in mutations)
  * - PG type mappings (maps custom types like email, url to GraphQL scalars)
+ * - pgvector search (auto-discovers vector columns: condition fields, distance computed fields,
+ *   orderBy distance — zero config)
+ * - pg_textsearch BM25 search (auto-discovers BM25 indexes: condition fields, score computed fields,
+ *   orderBy score — zero config)
  *
  * DISABLED PLUGINS:
  * - PgConnectionArgFilterBackwardRelationsPlugin (relation filters bloat the API)
@@ -74,6 +79,10 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     PgSearchPreset({ pgSearchPrefix: 'fullText' }),
     GraphilePostgisPreset,
     VectorCodecPreset,
+    {
+      plugins: [createVectorSearchPlugin()],
+    },
+    Bm25SearchPreset(),
     PostgisConnectionFilterPreset,
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,

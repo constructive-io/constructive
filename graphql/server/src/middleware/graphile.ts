@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { getNodeEnv } from '@constructive-io/graphql-env';
+import { getNodeEnv } from '@pgpmjs/env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';

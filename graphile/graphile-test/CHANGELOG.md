@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/constructive-io/constructive/compare/graphile-test@4.3.0...graphile-test@4.3.1) (2026-03-03)
+
+**Note:** Version bump only for package graphile-test
+
 # [4.3.0](https://github.com/constructive-io/constructive/compare/graphile-test@4.2.4...graphile-test@4.3.0) (2026-03-01)
 
 **Note:** Version bump only for package graphile-test

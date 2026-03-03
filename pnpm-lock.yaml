@@ -261,8 +261,11 @@ importers:
         version: 0.1.12
     publishDirectory: dist
 
-  graphile/graphile-pgvector-plugin:
+  graphile/graphile-pg-textsearch-plugin:
     dependencies:
+      '@dataplan/pg':
+        specifier: 1.0.0-rc.5
+        version: 1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.12.0)))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1)
       graphile-build:
         specifier: 5.0.0-rc.4
         version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)
@@ -281,6 +284,56 @@ importers:
       postgraphile:
         specifier: 5.0.0-rc.7
         version: 5.0.0-rc.7(31cdc8d134b08730595d424ed57d41b2)
+      postgraphile-plugin-connection-filter:
+        specifier: 3.0.0-rc.1
+        version: 3.0.0-rc.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.1
+        version: 22.19.11
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.12
+      pg:
+        specifier: ^8.17.1
+        version: 8.17.1
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
+  graphile/graphile-pgvector-plugin:
+    dependencies:
+      '@dataplan/pg':
+        specifier: 1.0.0-rc.5
+        version: 1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.12.0)))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1)
+      graphile-build:
+        specifier: 5.0.0-rc.4
+        version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)
+      graphile-build-pg:
+        specifier: 5.0.0-rc.5
+        version: 5.0.0-rc.5(@dataplan/pg@1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.12.0)))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-build@5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1)(tamedevil@0.1.0-rc.4)
+      graphile-config:
+        specifier: 1.0.0-rc.5
+        version: 1.0.0-rc.5
+      graphql:
+        specifier: ^16.9.0
+        version: 16.12.0
+      pg-sql2:
+        specifier: 5.0.0-rc.4
+        version: 5.0.0-rc.4
+      postgraphile:
+        specifier: 5.0.0-rc.7
+        version: 5.0.0-rc.7(31cdc8d134b08730595d424ed57d41b2)
+      postgraphile-plugin-connection-filter:
+        specifier: 3.0.0-rc.1
+        version: 3.0.0-rc.1
     devDependencies:
       '@types/node':
         specifier: ^22.19.1
@@ -545,6 +598,9 @@ importers:
       graphile-misc-plugins:
         specifier: workspace:^
         version: link:../graphile-misc-plugins/dist
+      graphile-pg-textsearch-plugin:
+        specifier: workspace:^
+        version: link:../graphile-pg-textsearch-plugin/dist
       graphile-pgvector-plugin:
         specifier: workspace:^
         version: link:../graphile-pgvector-plugin/dist
@@ -722,53 +778,6 @@ importers:
         version: 0.1.12
     publishDirectory: dist
 
-  graphile/postgraphile-plugin-pgvector:
-    dependencies:
-      grafast:
-        specifier: 1.0.0-rc.7
-        version: 1.0.0-rc.7(graphql@16.12.0)
-      graphile-build:
-        specifier: 5.0.0-rc.4
-        version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)
-      graphile-build-pg:
-        specifier: 5.0.0-rc.5
-        version: 5.0.0-rc.5(@dataplan/pg@1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.12.0)))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1))(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-build@5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0))(graphile-config@1.0.0-rc.5)(graphql@16.12.0)(pg-sql2@5.0.0-rc.4)(pg@8.17.1)(tamedevil@0.1.0-rc.4)
-      graphile-config:
-        specifier: 1.0.0-rc.5
-        version: 1.0.0-rc.5
-      graphql:
-        specifier: ^16.9.0
-        version: 16.12.0
-      pg-sql2:
-        specifier: 5.0.0-rc.4
-        version: 5.0.0-rc.4
-      postgraphile:
-        specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(31cdc8d134b08730595d424ed57d41b2)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.19.1
-        version: 22.19.11
-      '@types/pg':
-        specifier: ^8.16.0
-        version: 8.16.0
-      graphile-settings:
-        specifier: workspace:^
-        version: link:../graphile-settings/dist
-      graphile-test:
-        specifier: workspace:^
-        version: link:../graphile-test/dist
-      makage:
-        specifier: ^0.1.10
-        version: 0.1.12
-      pg:
-        specifier: ^8.17.1
-        version: 8.17.1
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-    publishDirectory: dist
-
   graphql/codegen:
     dependencies:
       '@0no-co/graphql.web':
@@ -787,8 +796,8 @@ importers:
         specifier: workspace:^
         version: link:../types/dist
       '@inquirerer/utils':
-        specifier: ^3.2.3
-        version: 3.2.3
+        specifier: ^3.3.1
+        version: 3.3.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -814,8 +823,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       inquirerer:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.5.2
+        version: 4.5.2
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -1103,6 +1112,9 @@ importers:
       '@graphile/simplify-inflection':
         specifier: 8.0.0-rc.3
         version: 8.0.0-rc.3
+      '@pgpmjs/env':
+        specifier: workspace:^
+        version: link:../../pgpm/env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -1682,8 +1694,8 @@ importers:
         specifier: workspace:^
         version: link:../../jobs/knative-job-service/dist
       '@inquirerer/utils':
-        specifier: ^3.2.3
-        version: 3.2.3
+        specifier: ^3.3.1
+        version: 3.3.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1703,8 +1715,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       inquirerer:
-        specifier: ^4.5.0
-        version: 4.5.0
+        specifier: ^4.5.2
+        version: 4.5.2
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1725,8 +1737,8 @@ importers:
         version: 0.2.0
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.3.0
-        version: 1.3.0(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.3.3
+        version: 1.3.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1792,8 +1804,8 @@ importers:
         specifier: ^2.3.3
         version: 2.3.5
       inquirerer:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.5.2
+        version: 4.5.2
       js-yaml:
         specifier: ^3.14.0
         version: 3.14.2
@@ -1945,8 +1957,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.3.0
-        version: 3.3.0
+        specifier: ^3.3.1
+        version: 3.3.1
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -1966,11 +1978,11 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       genomic:
-        specifier: ^5.3.0
-        version: 5.3.0
+        specifier: ^5.3.5
+        version: 5.3.5
       inquirerer:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.5.2
+        version: 4.5.2
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1994,8 +2006,8 @@ importers:
         version: 0.2.0
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.3.0
-        version: 1.3.0(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
+        specifier: ^1.3.3
+        version: 1.3.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -2043,8 +2055,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.3.0
-        version: 5.3.0
+        specifier: ^5.3.5
+        version: 5.3.5
       glob:
         specifier: ^13.0.0
         version: 13.0.0
@@ -2086,8 +2098,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.5.2
+        version: 4.5.2
       makage:
         specifier: ^0.1.12
         version: 0.1.12
@@ -4248,10 +4260,10 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/test@1.3.0':
+  '@inquirerer/test@1.3.3':
     resolution:
       {
-        integrity: sha512-uKn1yJ66MKaPf8ECxoTRma6+lQSLy1YtBOXHDrTGn/j6xtCDdfDYw34h51gM0MLimPTd1vAoxMG+zQGXRSHZLg==,
+        integrity: sha512-PowD9YoBzvThoIrfxGcEVPH3FuXpWqVStTmqhFDhvmrYdnN8FrnQ49S5QoLDU8hIzMKhDj3t/ZJbp61kkSU0Rw==,
       }
     peerDependencies:
       jest: '>=29.0.0'
@@ -4259,16 +4271,10 @@ packages:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.2.3':
+  '@inquirerer/utils@3.3.1':
     resolution:
       {
-        integrity: sha512-Ak0GspJ8fT9aW9pp1Op53xebtJOoZpt1/7eklI1TpUh7QuLxqmk2cl7sGMP1mROvR3q5Ms10ZvJ3eS2GKI++yw==,
-      }
-
-  '@inquirerer/utils@3.3.0':
-    resolution:
-      {
-        integrity: sha512-QugrMW6U6UfPLBKiAvGRUsyQ/WmQlGnOfWOtXX4Zd5uwJuaxbwcXoTy7MJvZpD9WRjg7IaDhI1Wwdlewxq2nFg==,
+        integrity: sha512-9KkXpM3q7C59KTZXrSDAWBto5RoTQlwoJ2w6fAAt/8o6OdsXwJUQa8huzg25yGvydxcivxEoNT6/yAERT1EZJw==,
       }
 
   '@isaacs/balanced-match@4.0.1':
@@ -7403,12 +7409,6 @@ packages:
         integrity: sha512-F4rMrok4wQYDVitYMWbPQh2MBoKCj7GYzmI/Gw8zDeO2vDLmCmyzmbd0zAwplghB6X3VMGQw/NKcngIc8w6oTA==,
       }
 
-  appstash@0.3.1:
-    resolution:
-      {
-        integrity: sha512-6blvfn9slJQeA7oavIeJ8Wbj5/KCRKkWRsmL54+sgY/ZDPTZndRGTFGOpdARHx0MZzRRQSUPrt1pUaOXXy350A==,
-      }
-
   appstash@0.5.0:
     resolution:
       {
@@ -7923,10 +7923,10 @@ packages:
         integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==,
       }
 
-  clean-ansi@0.2.0:
+  clean-ansi@0.2.1:
     resolution:
       {
-        integrity: sha512-AX26I7oo87AIA4OixLOARtjeNdX85aKGI+HPJ7wQEnXkoC3ytbwIuPu3d5+cmDoh2j1I2pQsQa/z3/FNAR8vOQ==,
+        integrity: sha512-V9IOKBKHv0Sqay4efImuCVWwO8kVmaKU66cvbDBa99F21j2G3ye3mrKkPSfZ7RTR7yP4CNDjtESkNY5dFq+8Sg==,
       }
 
   clean-css@4.2.4:
@@ -9475,10 +9475,10 @@ packages:
         integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==,
       }
 
-  genomic@5.3.0:
+  genomic@5.3.5:
     resolution:
       {
-        integrity: sha512-59rZ++BMgR4/rbh/j55n0BCYAZI/KrP9l7IgxdOHT+HEMAADA6kGaPOhDBltekw2QpHOAUeOXoRiTvntM7b1Ug==,
+        integrity: sha512-VDaKXRUjqR15DjXjx5qCxkHPBzUR7TFKbuOXSpifesUY7vmsYM9/EivetfbVJ957pheSIV+qDyojKuU08uLNfQ==,
       }
 
   gensync@1.0.0-beta.2:
@@ -10176,22 +10176,10 @@ packages:
       }
     engines: { node: '>=12.0.0' }
 
-  inquirerer@4.4.0:
+  inquirerer@4.5.2:
     resolution:
       {
-        integrity: sha512-zra0M4Oh+rzgr7PMJy9cNi/LbkJbtB6QRABou65nN6NTwb368/lMJ8ACHXozM7bw3+t5SOI0TP3gxKAyT0BCRw==,
-      }
-
-  inquirerer@4.5.0:
-    resolution:
-      {
-        integrity: sha512-ULWscyMV6Y/OH1XRODvunrQH1EO4r7q+UV/boWFiVIt9h2UZ7wa/Qc+ZpAqUaWynKUhDtY3UqZV4MVrRcEkmNg==,
-      }
-
-  inquirerer@4.5.1:
-    resolution:
-      {
-        integrity: sha512-/Cis0BNeqdgcXJt3loHKt7PbfawPG7fLTQHr29IfpOHCRaLACmf5737PAHakVU1rBflCNNMo4lpdso6t4FHpjg==,
+        integrity: sha512-MUSAR2HuIPuriITCA9X1j7e9FS2P/6HJyKTI6/f6mMdpAkMQDXPERX+D9UmUFmQ3eeUaqvXYfFb406DS2dBpzA==,
       }
 
   interpret@3.1.1:
@@ -16210,23 +16198,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  '@inquirerer/test@1.3.0(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
+  '@inquirerer/test@1.3.3(jest@30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3)))':
     dependencies:
-      clean-ansi: 0.2.0
-      inquirerer: 4.4.0
+      clean-ansi: 0.2.1
+      inquirerer: 4.5.2
     optionalDependencies:
       jest: 30.2.0(@types/node@20.19.27)(ts-node@10.9.2(@types/node@20.19.27)(typescript@5.9.3))
 
-  '@inquirerer/utils@3.2.3':
-    dependencies:
-      appstash: 0.3.1
-      inquirerer: 4.5.1
-      semver: 7.7.4
-
-  '@inquirerer/utils@3.3.0':
+  '@inquirerer/utils@3.3.1':
     dependencies:
       appstash: 0.5.0
-      inquirerer: 4.5.1
+      inquirerer: 4.5.2
       semver: 7.7.4
 
   '@isaacs/balanced-match@4.0.1': {}
@@ -18605,8 +18587,6 @@ snapshots:
 
   appstash@0.3.0: {}
 
-  appstash@0.3.1: {}
-
   appstash@0.5.0: {}
 
   aproba@2.0.0: {}
@@ -18959,7 +18939,7 @@ snapshots:
 
   cjs-module-lexer@2.2.0: {}
 
-  clean-ansi@0.2.0: {}
+  clean-ansi@0.2.1: {}
 
   clean-css@4.2.4:
     dependencies:
@@ -19841,10 +19821,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  genomic@5.3.0:
+  genomic@5.3.5:
     dependencies:
-      appstash: 0.3.0
-      inquirerer: 4.4.0
+      appstash: 0.5.0
+      inquirerer: 4.5.2
 
   gensync@1.0.0-beta.2: {}
 
@@ -20364,21 +20344,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@4.4.0:
-    dependencies:
-      deepmerge: 4.3.1
-      find-and-require-package-json: 0.9.0
-      minimist: 1.2.8
-      yanse: 0.2.0
-
-  inquirerer@4.5.0:
-    dependencies:
-      deepmerge: 4.3.1
-      find-and-require-package-json: 0.9.0
-      minimist: 1.2.8
-      yanse: 0.2.0
-
-  inquirerer@4.5.1:
+  inquirerer@4.5.2:
     dependencies:
       deepmerge: 4.3.1
       find-and-require-package-json: 0.9.1
