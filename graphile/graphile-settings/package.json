@@ -46,6 +46,7 @@
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
     "graphile-misc-plugins": "workspace:^",
+    "graphile-pg-textsearch-plugin": "workspace:^",
     "graphile-pgvector-plugin": "workspace:^",
     "graphile-plugin-connection-filter-postgis": "workspace:^",
     "graphile-postgis": "workspace:^",

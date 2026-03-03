@@ -1,7 +1,7 @@
 {
-  "name": "graphile-pgvector-plugin",
-  "version": "1.2.0",
-  "description": "PostGraphile v5 codec plugin for pgvector — makes vector columns, mutations, and functions work automatically",
+  "name": "graphile-pg-textsearch-plugin",
+  "version": "1.0.0",
+  "description": "PostGraphile v5 plugin for pg_textsearch BM25 ranked full-text search — auto-discovers BM25 indexes and adds search condition, score, orderBy, and filter fields",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -58,9 +58,10 @@
     "plugin",
     "postgres",
     "graphql",
-    "pgvector",
-    "vector",
-    "embeddings",
-    "ai"
+    "pg_textsearch",
+    "bm25",
+    "full-text-search",
+    "text-search",
+    "ranking"
   ]
 }

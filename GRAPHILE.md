@@ -59,7 +59,7 @@ All Graphile RC dependencies are pinned to **exact versions** (no `^` or `~` pre
 - **graphile-cache** -- LRU cache with PostGraphile v5 integration
 - **graphile-test** -- PostGraphile v5 testing utilities
 - **graphile-authz** -- Dynamic authorization plugin for PostGraphile v5
-- **postgraphile-plugin-pgvector** -- pgvector similarity search plugin for PostGraphile v5
+- **graphile-pgvector-plugin** -- pgvector codec + auto-discovered vector search plugin for PostGraphile v5
 
 ### `graphql/` packages
 
