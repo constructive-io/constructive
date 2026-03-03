@@ -80,15 +80,9 @@ const API_LIST_SQL = `
 `;
 
 const RLS_MODULE_SQL = `
-  SELECT
-    am.data,
-    ps.schema_name as private_schema_name,
-    rs.schema_name as public_schema_name
-  FROM services_public.api_modules am
-  JOIN metaschema_modules_public.rls_module rm ON rm.database_id = am.database_id
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id
-  LEFT JOIN metaschema_public.schema rs ON rm.schema_id = rs.id
-  WHERE am.api_id = $1 AND am.name = 'rls_module'
+  SELECT data
+  FROM services_public.api_modules
+  WHERE api_id = $1 AND name = 'rls_module'
   LIMIT 1
 `;
 
@@ -119,8 +113,6 @@ interface RlsModuleData {
 
 interface RlsModuleRow {
   data: RlsModuleData | null;
-  private_schema_name: string | null;
-  public_schema_name: string | null;
 }
 
 interface ApiListRow {
@@ -198,16 +190,16 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 };
 
 const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
-  if (!row?.data || !row.private_schema_name) return undefined;
+  if (!row?.data) return undefined;
   const d = row.data;
   return {
     authenticate: d.authenticate,
     authenticateStrict: d.authenticate_strict,
     privateSchema: {
-      schemaName: row.private_schema_name,
+      schemaName: d.authenticate_schema,
     },
     publicSchema: {
-      schemaName: row.public_schema_name ?? d.role_schema,
+      schemaName: d.role_schema,
     },
     currentRole: d.current_role,
     currentRoleId: d.current_role_id,
