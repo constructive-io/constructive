@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.4.0...@pgpmjs/core@6.4.1) (2026-03-03)
+
+### Bug Fixes
+
+- pass prompter through to initModule to prevent duplicate stdin listeners ([40a3e16](https://github.com/constructive-io/constructive/commit/40a3e1668886470056a92b41a5e96278b3f65752))
+
 # [6.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.3.2...@pgpmjs/core@6.4.0) (2026-03-01)
 
 **Note:** Version bump only for package @pgpmjs/core

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.5.0...graphile-settings@4.6.0) (2026-03-03)
+
+### Features
+
+- **graphile-pg-textsearch-plugin:** auto-discover BM25 indexes with condition, score, orderBy, and filter ([aeacf87](https://github.com/constructive-io/constructive/commit/aeacf876b4457c4cb0aa206e3321447fc92f68f2))
+- **graphile-pgvector-plugin:** auto-discover vector columns with condition, distance, orderBy, and filter ([c621427](https://github.com/constructive-io/constructive/commit/c6214276d1ef8f34afd451af2e90e1e7a3229600))
+
 # [4.5.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.4.0...graphile-settings@4.5.0) (2026-03-01)
 
 **Note:** Version bump only for package graphile-settings

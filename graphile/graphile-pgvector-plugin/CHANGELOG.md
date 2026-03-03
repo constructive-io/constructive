@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/constructive-io/constructive/compare/graphile-pgvector-plugin@1.2.0...graphile-pgvector-plugin@1.3.0) (2026-03-03)
+
+### Bug Fixes
+
+- resolve duplicate VectorMetric enum type and remove global closeTo filter operator ([7c76a19](https://github.com/constructive-io/constructive/commit/7c76a1932e28c3a331b5e460d854ad12f18ba45d))
+- **vector-search:** fix composability test to use distance threshold instead of content condition ([dc48e4c](https://github.com/constructive-io/constructive/commit/dc48e4cbf791a48110150a8fe7baeca904f38bfa))
+
+### Features
+
+- **graphile-pgvector-plugin:** auto-discover vector columns with condition, distance, orderBy, and filter ([c621427](https://github.com/constructive-io/constructive/commit/c6214276d1ef8f34afd451af2e90e1e7a3229600))
+
 # [1.2.0](https://github.com/constructive-io/constructive/compare/graphile-pgvector-plugin@1.1.0...graphile-pgvector-plugin@1.2.0) (2026-03-01)
 
 **Note:** Version bump only for package graphile-pgvector-plugin
