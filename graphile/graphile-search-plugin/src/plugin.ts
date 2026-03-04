@@ -121,11 +121,9 @@ function getQueryBuilder(
   }
 
   // Verify we found a query builder with matching alias
-  // Using duck-typing (isPgSelectQueryBuilder) per Benjie's pattern
   if (
     current &&
     typeof current.selectAndReturnIndex === 'function' &&
-    typeof current.where === 'function' &&
     current.alias === alias
   ) {
     return current;
@@ -301,7 +299,7 @@ export function createPgSearchPlugin(
             origin: string,
           ) {
             const metaKey = `__fts_ranks_${baseFieldName}`;
-            build.extend(
+            fields = build.extend(
               fields,
               {
                 [fieldName]: fieldWithHooks(
@@ -378,8 +376,6 @@ export function createPgSearchPlugin(
           }
 
           // ── Computed columns (functions returning tsvector) ──
-          // Following Benjie's pattern: find pgResources that are functions
-          // returning tsvector whose first parameter matches this codec.
           if (pgRegistry) {
             const tsvProcs = Object.values(pgRegistry.pgResources).filter(
               (r: any): boolean => {
@@ -460,8 +456,8 @@ export function createPgSearchPlugin(
                 }
               };
 
-            const ascName = inflection.pgTsvOrderByColumnRankEnum(codec, attributeName, true);
-            const descName = inflection.pgTsvOrderByColumnRankEnum(codec, attributeName, false);
+            const ascName = inflection.constantCase(`${attributeName}_rank_asc`);
+            const descName = inflection.constantCase(`${attributeName}_rank_desc`);
 
             newValues = build.extend(
               newValues,
@@ -608,10 +604,7 @@ export function createPgSearchPlugin(
 
                       // Get the query builder via meta-safe traversal
                       const qb = getQueryBuilder(build, $condition);
-
-                      // Only inject SELECT expressions when in "normal" mode
-                      // (not aggregate mode). Following Benjie's qb.mode check.
-                      if (qb && qb.mode === 'normal') {
+                      if (qb) {
                         // Add ts_rank to the SELECT list
                         const rankSql = sql`ts_rank(${columnExpr}, ${tsquery})`;
                         const wrappedRankSql = sql`${sql.parens(rankSql)}::text`;

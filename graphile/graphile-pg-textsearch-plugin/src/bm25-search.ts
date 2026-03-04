@@ -135,7 +135,6 @@ function getQueryBuilder(
   if (
     current &&
     typeof current.selectAndReturnIndex === 'function' &&
-    typeof current.where === 'function' &&
     current.alias === alias
   ) {
     return current;
