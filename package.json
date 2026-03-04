@@ -48,7 +48,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@dataplan/json": "1.0.0-rc.5"
+      "@dataplan/json": "1.0.0-rc.5",
+      "graphql": "16.13.0"
     },
     "publicHoistPattern": [
       "@jest/test-sequencer"

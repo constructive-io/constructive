@@ -29,7 +29,7 @@ export class PgClient {
       password: this.config.password
     });
     if (!opts.deferConnect) {
-      this.connectPromise = this.client.connect();
+      this.connectPromise = this.client.connect().then(() => {});
       if (opts.trackConnect) opts.trackConnect(this.connectPromise);
     }
   }
