@@ -49,7 +49,7 @@
     "@pgpm/types": "^0.18.0",
     "@pgpm/verify": "^0.18.0",
     "@pgpmjs/core": "workspace:^",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.0",
     "makage": "^0.1.12",
     "pgsql-test": "workspace:^",
     "supertest": "^7.2.2",

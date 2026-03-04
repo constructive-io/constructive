@@ -53,7 +53,7 @@
     "graphql": "^16.9.0"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.10"
   }
 }

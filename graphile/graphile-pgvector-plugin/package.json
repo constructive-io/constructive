@@ -29,7 +29,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "@types/pg": "^8.18.0",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
