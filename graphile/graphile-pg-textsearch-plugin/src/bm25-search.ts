@@ -396,7 +396,8 @@ export function createBm25SearchPlugin(
 
                       const columnExpr = sql`${$condition.alias}.${sql.identifier(attributeName)}`;
                       // Use to_bm25query with explicit index name for reliable scoring
-                      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(bm25Index.indexName)})`;
+                      const qualifiedIndexName = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
+                      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
                       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
                       // If a threshold is provided, add WHERE clause
