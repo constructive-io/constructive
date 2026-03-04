@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/constructive-io/constructive/compare/graphile-pg-textsearch-plugin@1.1.0...graphile-pg-textsearch-plugin@1.1.1) (2026-03-04)
+
+### Bug Fixes
+
+- **graphile-pg-textsearch-plugin:** qualify index names with schema in BM25 queries ([3d85c65](https://github.com/constructive-io/constructive/commit/3d85c65436abeac6d2530daac6a9508cd01d243d))
+
 # 1.1.0 (2026-03-03)
 
 ### Bug Fixes
