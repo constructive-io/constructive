@@ -3,6 +3,7 @@ import { toKebabCase } from 'komoji';
 import type { CleanOperation, CleanTable } from '../../../types/schema';
 import {
   buildSkillFile,
+  buildSkillReference,
   formatArgType,
   getEditableFields,
   getReadmeHeader,
@@ -454,20 +455,23 @@ export function generateOrmSkills(
   targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
+  const skillName = `orm-${targetName}`;
+  const referenceNames: string[] = [];
 
+  // Generate reference files for each table
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
     const editableFields = getEditableFields(table);
 
     const modelName = lcFirst(singularName);
-    const tableKebab = toKebabCase(singularName);
-    const skillName = `orm-${targetName}-${tableKebab}`;
+    const refName = toKebabCase(singularName);
+    referenceNames.push(refName);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: singularName,
         description: table.description || `ORM operations for ${table.name} records`,
         language: 'typescript',
         usage: [
@@ -500,6 +504,7 @@ export function generateOrmSkills(
     });
   }
 
+  // Generate reference files for custom operations
   for (const op of customOperations) {
     const accessor = op.kind === 'query' ? 'query' : 'mutation';
     const callArgs =
@@ -507,13 +512,13 @@ export function generateOrmSkills(
         ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
         : '';
 
-    const opKebab = toKebabCase(op.name);
-    const skillName = `orm-${targetName}-${opKebab}`;
+    const refName = toKebabCase(op.name);
+    referenceNames.push(refName);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: op.name,
         description: op.description || `Execute the ${op.name} ${op.kind}`,
         language: 'typescript',
         usage: [`db.${accessor}.${op.name}(${callArgs}).execute()`],
@@ -526,6 +531,41 @@ export function generateOrmSkills(
       }),
     });
   }
+
+  // Generate the overview SKILL.md
+  const tableNames = tables.map((t) => lcFirst(getTableNames(t).singularName));
+  files.push({
+    fileName: `${skillName}/SKILL.md`,
+    content: buildSkillFile(
+      {
+        name: skillName,
+        description: `ORM client for the ${targetName} API — provides typed CRUD operations for ${tables.length} tables and ${customOperations.length} custom operations`,
+        language: 'typescript',
+        usage: [
+          `// Import the ORM client`,
+          `import { db } from './orm';`,
+          '',
+          `// Available models: ${tableNames.slice(0, 8).join(', ')}${tableNames.length > 8 ? ', ...' : ''}`,
+          `db.<model>.findMany({ select: { id: true } }).execute()`,
+          `db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()`,
+          `db.<model>.create({ data: { ... }, select: { id: true } }).execute()`,
+          `db.<model>.update({ where: { id: '<value>' }, data: { ... }, select: { id: true } }).execute()`,
+          `db.<model>.delete({ where: { id: '<value>' } }).execute()`,
+        ],
+        examples: [
+          {
+            description: 'Query records',
+            code: [
+              `const items = await db.${tableNames[0] || 'model'}.findMany({`,
+              '  select: { id: true }',
+              '}).execute();',
+            ],
+          },
+        ],
+      },
+      referenceNames,
+    ),
+  });
 
   return files;
 }

@@ -8,6 +8,7 @@ import {
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
   buildSkillFile,
+  buildSkillReference,
 } from '../docs-utils';
 import type { GeneratedDocFile, McpTool } from '../docs-utils';
 import {
@@ -594,13 +595,15 @@ export function generateSkills(
   targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
+  const skillName = `cli-${targetName}`;
+  const referenceNames: string[] = [];
 
-  const contextSkillName = 'cli-context';
-
+  // Context reference
+  referenceNames.push('context');
   files.push({
-    fileName: `${contextSkillName}/SKILL.md`,
-    content: buildSkillFile({
-      name: contextSkillName,
+    fileName: `${skillName}/references/context.md`,
+    content: buildSkillReference({
+      title: 'Context Management',
       description: `Manage API endpoint contexts for ${toolName}`,
       usage: [
         `${toolName} context create <name> --endpoint <url>`,
@@ -625,12 +628,12 @@ export function generateSkills(
     }),
   });
 
-  const authSkillName = 'cli-auth';
-
+  // Auth reference
+  referenceNames.push('auth');
   files.push({
-    fileName: `${authSkillName}/SKILL.md`,
-    content: buildSkillFile({
-      name: authSkillName,
+    fileName: `${skillName}/references/auth.md`,
+    content: buildSkillReference({
+      title: 'Authentication',
       description: `Manage authentication tokens for ${toolName}`,
       usage: [
         `${toolName} auth set-token <token>`,
@@ -650,18 +653,19 @@ export function generateSkills(
     }),
   });
 
+  // Table references
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const kebab = toKebabCase(singularName);
     const pk = getPrimaryKeyInfo(table)[0];
     const editableFields = getEditableFields(table);
 
-    const skillName = `cli-${targetName}-${kebab}`;
+    referenceNames.push(kebab);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${kebab}.md`,
+      content: buildSkillReference({
+        title: singularName,
         description: `CRUD operations for ${table.name} records via ${toolName} CLI`,
         usage: [
           `${toolName} ${kebab} list`,
@@ -685,21 +689,12 @@ export function generateSkills(
             description: `Get a ${singularName} by ${pk.name}`,
             code: [`${toolName} ${kebab} get --${pk.name} <value>`],
           },
-          {
-            description: `Update a ${singularName}`,
-            code: [
-              `${toolName} ${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`,
-            ],
-          },
-          {
-            description: `Delete a ${singularName}`,
-            code: [`${toolName} ${kebab} delete --${pk.name} <value>`],
-          },
         ],
       }),
     });
   }
 
+  // Custom operation references
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
     const usage =
@@ -707,12 +702,12 @@ export function generateSkills(
         ? `${toolName} ${kebab} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
         : `${toolName} ${kebab}`;
 
-    const skillName = `cli-${targetName}-${kebab}`;
+    referenceNames.push(kebab);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${kebab}.md`,
+      content: buildSkillReference({
+        title: op.name,
         description: op.description || `Execute the ${op.name} ${op.kind}`,
         usage: [usage],
         examples: [
@@ -724,6 +719,43 @@ export function generateSkills(
       }),
     });
   }
+
+  // Overview SKILL.md
+  const tableKebabs = tables.slice(0, 5).map((t) => toKebabCase(getTableNames(t).singularName));
+  files.push({
+    fileName: `${skillName}/SKILL.md`,
+    content: buildSkillFile(
+      {
+        name: skillName,
+        description: `CLI tool (${toolName}) for the ${targetName} API — provides CRUD commands for ${tables.length} tables and ${customOperations.length} custom operations`,
+        usage: [
+          `# Context management`,
+          `${toolName} context create <name> --endpoint <url>`,
+          `${toolName} context use <name>`,
+          '',
+          `# Authentication`,
+          `${toolName} auth set-token <token>`,
+          '',
+          `# CRUD for any table (e.g. ${tableKebabs[0] || 'model'})`,
+          `${toolName} ${tableKebabs[0] || 'model'} list`,
+          `${toolName} ${tableKebabs[0] || 'model'} get --id <value>`,
+          `${toolName} ${tableKebabs[0] || 'model'} create --<field> <value>`,
+        ],
+        examples: [
+          {
+            description: 'Set up and query',
+            code: [
+              `${toolName} context create local --endpoint http://localhost:5000/graphql`,
+              `${toolName} context use local`,
+              `${toolName} auth set-token <token>`,
+              `${toolName} ${tableKebabs[0] || 'model'} list`,
+            ],
+          },
+        ],
+      },
+      referenceNames,
+    ),
+  });
 
   return files;
 }
@@ -1427,24 +1459,28 @@ export function generateMultiTargetSkills(
   const { toolName, builtinNames, targets } = input;
   const files: GeneratedDocFile[] = [];
 
-  const contextUsage = [
-    `${toolName} ${builtinNames.context} create <name>`,
-    `${toolName} ${builtinNames.context} list`,
-    `${toolName} ${builtinNames.context} use <name>`,
-    `${toolName} ${builtinNames.context} current`,
-    `${toolName} ${builtinNames.context} delete <name>`,
-  ];
+  // Generate one skill per target, plus a shared cli-common skill for context/auth
+  const commonSkillName = 'cli-common';
+  const commonReferenceNames: string[] = [];
+
   const contextCreateFlags = targets
     .map((t) => `--${t.name}-endpoint <url>`)
     .join(' ');
-  const contextSkillName = 'cli-context';
 
+  // Context reference
+  commonReferenceNames.push('context');
   files.push({
-    fileName: `${contextSkillName}/SKILL.md`,
-    content: buildSkillFile({
-      name: contextSkillName,
+    fileName: `${commonSkillName}/references/context.md`,
+    content: buildSkillReference({
+      title: 'Context Management',
       description: `Manage API endpoint contexts for ${toolName} (multi-target: ${targets.map((t) => t.name).join(', ')})`,
-      usage: contextUsage,
+      usage: [
+        `${toolName} ${builtinNames.context} create <name>`,
+        `${toolName} ${builtinNames.context} list`,
+        `${toolName} ${builtinNames.context} use <name>`,
+        `${toolName} ${builtinNames.context} current`,
+        `${toolName} ${builtinNames.context} delete <name>`,
+      ],
       examples: [
         {
           description: 'Create a context for local development (accept all defaults)',
@@ -1460,23 +1496,16 @@ export function generateMultiTargetSkills(
             `${toolName} ${builtinNames.context} use production`,
           ],
         },
-        {
-          description: 'List and switch contexts',
-          code: [
-            `${toolName} ${builtinNames.context} list`,
-            `${toolName} ${builtinNames.context} use staging`,
-          ],
-        },
       ],
     }),
   });
 
-  const authSkillName = 'cli-auth';
-
+  // Auth reference
+  commonReferenceNames.push('auth');
   files.push({
-    fileName: `${authSkillName}/SKILL.md`,
-    content: buildSkillFile({
-      name: authSkillName,
+    fileName: `${commonSkillName}/references/auth.md`,
+    content: buildSkillReference({
+      title: 'Authentication',
       description: `Manage authentication tokens for ${toolName} (shared across all targets)`,
       usage: [
         `${toolName} ${builtinNames.auth} set-token <token>`,
@@ -1496,7 +1525,42 @@ export function generateMultiTargetSkills(
     }),
   });
 
+  // Common SKILL.md
+  files.push({
+    fileName: `${commonSkillName}/SKILL.md`,
+    content: buildSkillFile(
+      {
+        name: commonSkillName,
+        description: `Shared CLI utilities for ${toolName} — context management and authentication across targets: ${targets.map((t) => t.name).join(', ')}`,
+        usage: [
+          `# Context management`,
+          `${toolName} ${builtinNames.context} create <name>`,
+          `${toolName} ${builtinNames.context} use <name>`,
+          '',
+          `# Authentication`,
+          `${toolName} ${builtinNames.auth} set-token <token>`,
+          `${toolName} ${builtinNames.auth} status`,
+        ],
+        examples: [
+          {
+            description: 'Set up and authenticate',
+            code: [
+              `${toolName} ${builtinNames.context} create local`,
+              `${toolName} ${builtinNames.context} use local`,
+              `${toolName} ${builtinNames.auth} set-token <token>`,
+            ],
+          },
+        ],
+      },
+      commonReferenceNames,
+    ),
+  });
+
+  // Generate one skill per target with table/op references
   for (const tgt of targets) {
+    const tgtSkillName = `cli-${tgt.name}`;
+    const tgtReferenceNames: string[] = [];
+
     for (const table of tgt.tables) {
       const { singularName } = getTableNames(table);
       const kebab = toKebabCase(singularName);
@@ -1504,12 +1568,12 @@ export function generateMultiTargetSkills(
       const editableFields = getEditableFields(table);
       const cmd = `${tgt.name}:${kebab}`;
 
-      const skillName = `cli-${tgt.name}-${kebab}`;
+      tgtReferenceNames.push(kebab);
 
       files.push({
-        fileName: `${skillName}/SKILL.md`,
-        content: buildSkillFile({
-          name: skillName,
+        fileName: `${tgtSkillName}/references/${kebab}.md`,
+        content: buildSkillReference({
+          title: singularName,
           description: `CRUD operations for ${table.name} records via ${toolName} CLI (${tgt.name} target)`,
           usage: [
             `${toolName} ${cmd} list`,
@@ -1529,10 +1593,6 @@ export function generateMultiTargetSkills(
                 `${toolName} ${cmd} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`,
               ],
             },
-            {
-              description: `Get a ${singularName} by ${pk.name}`,
-              code: [`${toolName} ${cmd} get --${pk.name} <value>`],
-            },
           ],
         }),
       });
@@ -1550,12 +1610,12 @@ export function generateMultiTargetSkills(
         usageLines.push(`${baseUsage} --save-token`);
       }
 
-      const skillName = `cli-${tgt.name}-${kebab}`;
+      tgtReferenceNames.push(kebab);
 
       files.push({
-        fileName: `${skillName}/SKILL.md`,
-        content: buildSkillFile({
-          name: skillName,
+        fileName: `${tgtSkillName}/references/${kebab}.md`,
+        content: buildSkillReference({
+          title: op.name,
           description: `${op.description || `Execute the ${op.name} ${op.kind}`} (${tgt.name} target)`,
           usage: usageLines,
           examples: [
@@ -1567,6 +1627,33 @@ export function generateMultiTargetSkills(
         }),
       });
     }
+
+    // Target SKILL.md
+    const firstKebab = tgt.tables.length > 0
+      ? toKebabCase(getTableNames(tgt.tables[0]).singularName)
+      : 'model';
+    files.push({
+      fileName: `${tgtSkillName}/SKILL.md`,
+      content: buildSkillFile(
+        {
+          name: tgtSkillName,
+          description: `CLI commands for the ${tgt.name} API target — ${tgt.tables.length} tables and ${tgt.customOperations.length} custom operations via ${toolName}`,
+          usage: [
+            `# CRUD for ${tgt.name} tables (e.g. ${firstKebab})`,
+            `${toolName} ${tgt.name}:${firstKebab} list`,
+            `${toolName} ${tgt.name}:${firstKebab} get --id <value>`,
+            `${toolName} ${tgt.name}:${firstKebab} create --<field> <value>`,
+          ],
+          examples: [
+            {
+              description: `Query ${tgt.name} records`,
+              code: [`${toolName} ${tgt.name}:${firstKebab} list`],
+            },
+          ],
+        },
+        tgtReferenceNames,
+      ),
+    });
   }
 
   return files;
