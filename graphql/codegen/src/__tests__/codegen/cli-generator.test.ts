@@ -700,9 +700,10 @@ describe('multi-target cli docs', () => {
     const skills = generateMultiTargetSkills(docsInput);
     expect(skills.length).toBeGreaterThan(0);
     const fileNames = skills.map((s) => s.fileName);
-    expect(fileNames.some((n) => n.includes('auth-'))).toBe(true);
-    expect(fileNames.some((n) => n.includes('members-'))).toBe(true);
-    expect(fileNames.some((n) => n.includes('app-'))).toBe(true);
+    expect(fileNames.some((n) => n.startsWith('cli-auth/'))).toBe(true);
+    expect(fileNames.some((n) => n.startsWith('cli-members/'))).toBe(true);
+    expect(fileNames.some((n) => n.startsWith('cli-app/'))).toBe(true);
+    expect(fileNames.some((n) => n.startsWith('cli-common/'))).toBe(true);
     expect(skills).toMatchSnapshot();
   });
 

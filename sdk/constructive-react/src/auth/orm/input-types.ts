@@ -232,25 +232,35 @@ export interface RoleType {
   id: number;
   name?: string | null;
 }
+/** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
 export interface CryptoAddress {
   id: string;
   ownerId?: string | null;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
   address?: string | null;
+  /** Whether ownership of this address has been cryptographically verified */
   isVerified?: boolean | null;
+  /** Whether this is the user's primary cryptocurrency address */
   isPrimary?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** User phone numbers with country code, verification, and primary-number management */
 export interface PhoneNumber {
   id: string;
   ownerId?: string | null;
+  /** Country calling code (e.g. +1, +44) */
   cc?: string | null;
+  /** The phone number without country code */
   number?: string | null;
+  /** Whether the phone number has been verified via SMS code */
   isVerified?: boolean | null;
+  /** Whether this is the user's primary phone number */
   isPrimary?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** OAuth and social login connections linking external service accounts to users */
 export interface ConnectedAccount {
   id: string;
   ownerId?: string | null;
@@ -260,28 +270,41 @@ export interface ConnectedAccount {
   identifier?: string | null;
   /** Additional profile details extracted from this login method */
   details?: Record<string, unknown> | null;
+  /** Whether this connected account has been verified */
   isVerified?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
+export interface AuditLog {
+  id: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
+  event?: string | null;
+  /** User who performed the authentication action */
+  actorId?: string | null;
+  /** Request origin (domain) where the auth event occurred */
+  origin?: ConstructiveInternalTypeOrigin | null;
+  /** Browser or client user-agent string from the request */
+  userAgent?: string | null;
+  /** IP address of the client that initiated the auth event */
+  ipAddress?: string | null;
+  /** Whether the authentication attempt succeeded */
+  success?: boolean | null;
+  /** Timestamp when the audit event was recorded */
+  createdAt?: string | null;
+}
+/** User email addresses with verification and primary-email management */
 export interface Email {
   id: string;
   ownerId?: string | null;
+  /** The email address */
   email?: ConstructiveInternalTypeEmail | null;
+  /** Whether the email address has been verified via confirmation link */
   isVerified?: boolean | null;
+  /** Whether this is the user's primary email address */
   isPrimary?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-}
-export interface AuditLog {
-  id: string;
-  event?: string | null;
-  actorId?: string | null;
-  origin?: ConstructiveInternalTypeOrigin | null;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-  success?: boolean | null;
-  createdAt?: string | null;
 }
 export interface User {
   id: string;
@@ -318,11 +341,11 @@ export interface PhoneNumberRelations {
 export interface ConnectedAccountRelations {
   owner?: User | null;
 }
-export interface EmailRelations {
-  owner?: User | null;
-}
 export interface AuditLogRelations {
   actor?: User | null;
+}
+export interface EmailRelations {
+  owner?: User | null;
 }
 export interface UserRelations {
   roleType?: RoleType | null;
@@ -332,8 +355,8 @@ export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
-export type EmailWithRelations = Email & EmailRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
+export type EmailWithRelations = Email & EmailRelations;
 export type UserWithRelations = User & UserRelations;
 // ============ Entity Select Types ============
 export type RoleTypeSelect = {
@@ -378,18 +401,6 @@ export type ConnectedAccountSelect = {
     select: UserSelect;
   };
 };
-export type EmailSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  email?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type AuditLogSelect = {
   id?: boolean;
   event?: boolean;
@@ -400,6 +411,18 @@ export type AuditLogSelect = {
   success?: boolean;
   createdAt?: boolean;
   actor?: {
+    select: UserSelect;
+  };
+};
+export type EmailSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  email?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
     select: UserSelect;
   };
 };
@@ -463,18 +486,6 @@ export interface ConnectedAccountFilter {
   or?: ConnectedAccountFilter[];
   not?: ConnectedAccountFilter;
 }
-export interface EmailFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  email?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  and?: EmailFilter[];
-  or?: EmailFilter[];
-  not?: EmailFilter;
-}
 export interface AuditLogFilter {
   id?: UUIDFilter;
   event?: StringFilter;
@@ -487,6 +498,18 @@ export interface AuditLogFilter {
   and?: AuditLogFilter[];
   or?: AuditLogFilter[];
   not?: AuditLogFilter;
+}
+export interface EmailFilter {
+  id?: UUIDFilter;
+  ownerId?: UUIDFilter;
+  email?: StringFilter;
+  isVerified?: BooleanFilter;
+  isPrimary?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: EmailFilter[];
+  or?: EmailFilter[];
+  not?: EmailFilter;
 }
 export interface UserFilter {
   id?: UUIDFilter;
@@ -536,15 +559,6 @@ export interface ConnectedAccountCondition {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-export interface EmailCondition {
-  id?: string | null;
-  ownerId?: string | null;
-  email?: unknown | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
 export interface AuditLogCondition {
   id?: string | null;
   event?: string | null;
@@ -554,6 +568,15 @@ export interface AuditLogCondition {
   ipAddress?: string | null;
   success?: boolean | null;
   createdAt?: string | null;
+}
+export interface EmailCondition {
+  id?: string | null;
+  ownerId?: string | null;
+  email?: unknown | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 export interface UserCondition {
   id?: string | null;
@@ -633,24 +656,6 @@ export type ConnectedAccountOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type EmailOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 export type AuditLogOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -671,6 +676,24 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+export type EmailOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'IS_PRIMARY_ASC'
+  | 'IS_PRIMARY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type UserOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -788,30 +811,6 @@ export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateEmailInput {
-  clientMutationId?: string;
-  email: {
-    ownerId?: string;
-    email: ConstructiveInternalTypeEmail;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface EmailPatch {
-  ownerId?: string | null;
-  email?: ConstructiveInternalTypeEmail | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdateEmailInput {
-  clientMutationId?: string;
-  id: string;
-  emailPatch: EmailPatch;
-}
-export interface DeleteEmailInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAuditLogInput {
   clientMutationId?: string;
   auditLog: {
@@ -837,6 +836,30 @@ export interface UpdateAuditLogInput {
   auditLogPatch: AuditLogPatch;
 }
 export interface DeleteAuditLogInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailInput {
+  clientMutationId?: string;
+  email: {
+    ownerId?: string;
+    email: ConstructiveInternalTypeEmail;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface EmailPatch {
+  ownerId?: string | null;
+  email?: ConstructiveInternalTypeEmail | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdateEmailInput {
+  clientMutationId?: string;
+  id: string;
+  emailPatch: EmailPatch;
+}
+export interface DeleteEmailInput {
   clientMutationId?: string;
   id: string;
 }
@@ -1283,51 +1306,6 @@ export type DeleteConnectedAccountPayloadSelect = {
     select: ConnectedAccountEdgeSelect;
   };
 };
-export interface CreateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was created by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type CreateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface UpdateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was updated by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type UpdateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface DeleteEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was deleted by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type DeleteEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
 export interface CreateAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was created by this mutation. */
@@ -1371,6 +1349,51 @@ export type DeleteAuditLogPayloadSelect = {
   };
   auditLogEdge?: {
     select: AuditLogEdgeSelect;
+  };
+};
+export interface CreateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was created by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type CreateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface UpdateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was updated by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type UpdateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface DeleteEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was deleted by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type DeleteEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
   };
 };
 export interface CreateUserPayload {
@@ -1476,18 +1499,30 @@ export type ExtendTokenExpiresRecordSelect = {
   sessionId?: boolean;
   expiresAt?: boolean;
 };
+/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {
   id: string;
+  /** References the authenticated user; NULL for anonymous sessions */
   userId?: string | null;
+  /** Whether this is an anonymous session (no authenticated user) */
   isAnonymous: boolean;
+  /** When this session expires and can no longer be used for authentication */
   expiresAt: string;
+  /** When this session was explicitly revoked (soft delete); NULL means active */
   revokedAt?: string | null;
+  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
   origin?: ConstructiveInternalTypeOrigin | null;
+  /** IP address from which the session was created, used for strict fingerprint validation */
   ip?: string | null;
+  /** User-Agent string from the client, used for strict fingerprint validation */
   uagent?: string | null;
+  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
   fingerprintMode: string;
+  /** Timestamp of last password re-verification for step-up authentication */
   lastPasswordVerified?: string | null;
+  /** Timestamp of last MFA verification for step-up authentication */
   lastMfaVerified?: string | null;
+  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -1556,18 +1591,6 @@ export type ConnectedAccountEdgeSelect = {
     select: ConnectedAccountSelect;
   };
 };
-/** A `Email` edge in the connection. */
-export interface EmailEdge {
-  cursor?: string | null;
-  /** The `Email` at the end of the edge. */
-  node?: Email | null;
-}
-export type EmailEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: EmailSelect;
-  };
-};
 /** A `AuditLog` edge in the connection. */
 export interface AuditLogEdge {
   cursor?: string | null;
@@ -1578,6 +1601,18 @@ export type AuditLogEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AuditLogSelect;
+  };
+};
+/** A `Email` edge in the connection. */
+export interface EmailEdge {
+  cursor?: string | null;
+  /** The `Email` at the end of the edge. */
+  node?: Email | null;
+}
+export type EmailEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailSelect;
   };
 };
 /** A `User` edge in the connection. */

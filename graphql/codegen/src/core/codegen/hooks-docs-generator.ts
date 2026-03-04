@@ -3,6 +3,7 @@ import { toKebabCase } from 'komoji';
 import type { CleanOperation, CleanTable } from '../../types/schema';
 import {
   buildSkillFile,
+  buildSkillReference,
   formatArgType,
   getReadmeHeader,
   getReadmeFooter,
@@ -501,7 +502,10 @@ export function generateHooksSkills(
   targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
+  const skillName = `hooks-${targetName}`;
+  const referenceNames: string[] = [];
 
+  // Generate reference files for each table
   for (const table of tables) {
     const { singularName, pluralName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
@@ -510,13 +514,13 @@ export function generateHooksSkills(
       .map((f) => `${f.name}: true`)
       .join(', ');
 
-    const tableKebab = toKebabCase(singularName);
-    const skillName = `hooks-${targetName}-${tableKebab}`;
+    const refName = toKebabCase(singularName);
+    referenceNames.push(refName);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: singularName,
         description: table.description || `React Query hooks for ${table.name} data operations`,
         language: 'typescript',
         usage: [
@@ -557,6 +561,7 @@ export function generateHooksSkills(
     });
   }
 
+  // Generate reference files for custom operations
   for (const op of customOperations) {
     const hookName = getCustomHookName(op);
     const callArgs =
@@ -564,13 +569,13 @@ export function generateHooksSkills(
         ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
         : '';
 
-    const opKebab = toKebabCase(op.name);
-    const skillName = `hooks-${targetName}-${opKebab}`;
+    const refName = toKebabCase(op.name);
+    referenceNames.push(refName);
 
     files.push({
-      fileName: `${skillName}/SKILL.md`,
-      content: buildSkillFile({
-        name: skillName,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: op.name,
         description:
           op.description ||
           `React Query ${op.kind} hook for ${op.name}`,
@@ -599,6 +604,41 @@ export function generateHooksSkills(
       }),
     });
   }
+
+  // Generate the overview SKILL.md
+  const hookExamples = tables.slice(0, 3).map((t) => getListQueryHookName(t));
+  files.push({
+    fileName: `${skillName}/SKILL.md`,
+    content: buildSkillFile(
+      {
+        name: skillName,
+        description: `React Query hooks for the ${targetName} API — provides typed query and mutation hooks for ${tables.length} tables and ${customOperations.length} custom operations`,
+        language: 'typescript',
+        usage: [
+          `// Import hooks`,
+          `import { ${hookExamples[0] || 'useModelQuery'} } from './hooks';`,
+          '',
+          `// Query hooks: use<Model>Query, use<Model>sQuery`,
+          `// Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation`,
+          '',
+          `const { data, isLoading } = ${hookExamples[0] || 'useModelQuery'}({`,
+          `  selection: { fields: { id: true } },`,
+          `});`,
+        ],
+        examples: [
+          {
+            description: 'Query records',
+            code: [
+              `const { data, isLoading } = ${hookExamples[0] || 'useModelQuery'}({`,
+              '  selection: { fields: { id: true } },',
+              '});',
+            ],
+          },
+        ],
+      },
+      referenceNames,
+    ),
+  });
 
   return files;
 }

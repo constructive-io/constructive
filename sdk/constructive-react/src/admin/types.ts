@@ -5,6 +5,14 @@
  */
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
+export interface OrgGetManagersRecord {
+  userId: string | null;
+  depth: number | null;
+}
+export interface OrgGetSubordinatesRecord {
+  userId: string | null;
+  depth: number | null;
+}
 export interface AppPermission {
   id: string | null;
   name: string | null;
@@ -60,16 +68,6 @@ export interface AppOwnerGrant {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface AppLimitDefault {
-  id: string | null;
-  name: string | null;
-  max: number | null;
-}
-export interface OrgLimitDefault {
-  id: string | null;
-  name: string | null;
-  max: number | null;
-}
 export interface OrgAdminGrant {
   id: string | null;
   isGrant: boolean | null;
@@ -88,11 +86,32 @@ export interface OrgOwnerGrant {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface AppLimitDefault {
+  id: string | null;
+  name: string | null;
+  max: number | null;
+}
+export interface OrgLimitDefault {
+  id: string | null;
+  name: string | null;
+  max: number | null;
+}
 export interface MembershipType {
   id: number | null;
   name: string | null;
   description: string | null;
   prefix: string | null;
+}
+export interface OrgChartEdgeGrant {
+  id: string | null;
+  entityId: string | null;
+  childId: string | null;
+  parentId: string | null;
+  grantorId: string | null;
+  isGrant: boolean | null;
+  positionTitle: string | null;
+  positionLevel: number | null;
+  createdAt: string | null;
 }
 export interface AppLimit {
   id: string | null;
@@ -170,6 +189,16 @@ export interface OrgGrant {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface OrgChartEdge {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  entityId: string | null;
+  childId: string | null;
+  parentId: string | null;
+  positionTitle: string | null;
+  positionLevel: number | null;
+}
 export interface OrgMembershipDefault {
   id: string | null;
   createdAt: string | null;
@@ -180,15 +209,6 @@ export interface OrgMembershipDefault {
   entityId: string | null;
   deleteMemberCascadeGroups: boolean | null;
   createGroupsCascadeMembers: boolean | null;
-}
-export interface AppLevel {
-  id: string | null;
-  name: string | null;
-  description: string | null;
-  image: ConstructiveInternalTypeImage | null;
-  ownerId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 export interface Invite {
   id: string | null;
@@ -201,6 +221,15 @@ export interface Invite {
   multiple: boolean | null;
   data: unknown | null;
   expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface AppLevel {
+  id: string | null;
+  name: string | null;
+  description: string | null;
+  image: ConstructiveInternalTypeImage | null;
+  ownerId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -220,6 +249,7 @@ export interface AppMembership {
   permissions: string | null;
   granted: string | null;
   actorId: string | null;
+  profileId: string | null;
 }
 export interface OrgMembership {
   id: string | null;
@@ -237,6 +267,7 @@ export interface OrgMembership {
   granted: string | null;
   actorId: string | null;
   entityId: string | null;
+  profileId: string | null;
 }
 export interface OrgInvite {
   id: string | null;

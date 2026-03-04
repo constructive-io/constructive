@@ -55,15 +55,6 @@ export const connectedAccountKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...connectedAccountKeys.details(), id] as const,
 } as const;
-export const emailKeys = {
-  /** All email queries */ all: ['email'] as const,
-  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...emailKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...emailKeys.details(), id] as const,
-} as const;
 export const auditLogKeys = {
   /** All auditLog queries */ all: ['auditlog'] as const,
   /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
@@ -72,6 +63,15 @@ export const auditLogKeys = {
   /** Detail query keys */ details: () => [...auditLogKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...auditLogKeys.details(), id] as const,
+} as const;
+export const emailKeys = {
+  /** All email queries */ all: ['email'] as const,
+  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailKeys.details(), id] as const,
 } as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
@@ -120,8 +120,8 @@ export const queryKeys = {
   cryptoAddress: cryptoAddressKeys,
   phoneNumber: phoneNumberKeys,
   connectedAccount: connectedAccountKeys,
-  email: emailKeys,
   auditLog: auditLogKeys,
+  email: emailKeys,
   user: userKeys,
   custom: customQueryKeys,
 } as const;

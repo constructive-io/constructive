@@ -7,6 +7,6 @@ export { RoleTypeModel } from './roleType';
 export { CryptoAddressModel } from './cryptoAddress';
 export { PhoneNumberModel } from './phoneNumber';
 export { ConnectedAccountModel } from './connectedAccount';
-export { EmailModel } from './email';
 export { AuditLogModel } from './auditLog';
+export { EmailModel } from './email';
 export { UserModel } from './user';

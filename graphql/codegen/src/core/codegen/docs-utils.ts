@@ -22,6 +22,14 @@ export interface SkillDefinition {
   language?: string;
 }
 
+export interface SkillReferenceDefinition {
+  title: string;
+  description: string;
+  usage: string[];
+  examples: { description: string; code: string[] }[];
+  language?: string;
+}
+
 const CONSTRUCTIVE_LOGO_URL =
   'https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg';
 
@@ -119,7 +127,10 @@ export function gqlTypeToJsonSchemaType(gqlType: string): string {
   }
 }
 
-export function buildSkillFile(skill: SkillDefinition): string {
+export function buildSkillFile(
+  skill: SkillDefinition,
+  referenceNames?: string[],
+): string {
   const lang = skill.language ?? 'bash';
   const lines: string[] = [];
 
@@ -147,6 +158,51 @@ export function buildSkillFile(skill: SkillDefinition): string {
   lines.push('## Examples');
   lines.push('');
   for (const ex of skill.examples) {
+    lines.push(`### ${ex.description}`);
+    lines.push('');
+    lines.push(`\`\`\`${lang}`);
+    for (const cmd of ex.code) {
+      lines.push(cmd);
+    }
+    lines.push('```');
+    lines.push('');
+  }
+
+  if (referenceNames && referenceNames.length > 0) {
+    lines.push('## References');
+    lines.push('');
+    lines.push('See the `references/` directory for detailed per-entity API documentation:');
+    lines.push('');
+    for (const name of referenceNames) {
+      lines.push(`- [${name}](references/${name}.md)`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+export function buildSkillReference(ref: SkillReferenceDefinition): string {
+  const lang = ref.language ?? 'bash';
+  const lines: string[] = [];
+
+  lines.push(`# ${ref.title}`);
+  lines.push('');
+  lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');
+  lines.push('');
+  lines.push(ref.description);
+  lines.push('');
+  lines.push('## Usage');
+  lines.push('');
+  lines.push(`\`\`\`${lang}`);
+  for (const u of ref.usage) {
+    lines.push(u);
+  }
+  lines.push('```');
+  lines.push('');
+  lines.push('## Examples');
+  lines.push('');
+  for (const ex of ref.examples) {
     lines.push(`### ${ex.description}`);
     lines.push('');
     lines.push(`\`\`\`${lang}`);

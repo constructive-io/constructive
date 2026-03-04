@@ -5,6 +5,8 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
+import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
 import { AppLevelRequirementModel } from './models/appLevelRequirement';
@@ -13,11 +15,12 @@ import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
-import { AppLimitDefaultModel } from './models/appLimitDefault';
-import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
+import { AppLimitDefaultModel } from './models/appLimitDefault';
+import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { MembershipTypeModel } from './models/membershipType';
+import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { AppLimitModel } from './models/appLimit';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
@@ -27,9 +30,10 @@ import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { OrgLimitModel } from './models/orgLimit';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGrantModel } from './models/orgGrant';
+import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
-import { AppLevelModel } from './models/appLevel';
 import { InviteModel } from './models/invite';
+import { AppLevelModel } from './models/appLevel';
 import { AppMembershipModel } from './models/appMembership';
 import { OrgMembershipModel } from './models/orgMembership';
 import { OrgInviteModel } from './models/orgInvite';
@@ -68,6 +72,8 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    orgGetManagersRecord: new OrgGetManagersRecordModel(client),
+    orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
     appLevelRequirement: new AppLevelRequirementModel(client),
@@ -76,11 +82,12 @@ export function createClient(config: OrmClientConfig) {
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
-    appLimitDefault: new AppLimitDefaultModel(client),
-    orgLimitDefault: new OrgLimitDefaultModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
+    appLimitDefault: new AppLimitDefaultModel(client),
+    orgLimitDefault: new OrgLimitDefaultModel(client),
     membershipType: new MembershipTypeModel(client),
+    orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     appLimit: new AppLimitModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
@@ -90,9 +97,10 @@ export function createClient(config: OrmClientConfig) {
     orgLimit: new OrgLimitModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     orgGrant: new OrgGrantModel(client),
+    orgChartEdge: new OrgChartEdgeModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
-    appLevel: new AppLevelModel(client),
     invite: new InviteModel(client),
+    appLevel: new AppLevelModel(client),
     appMembership: new AppMembershipModel(client),
     orgMembership: new OrgMembershipModel(client),
     orgInvite: new OrgInviteModel(client),

@@ -1,0 +1,34 @@
+# permissionsModule
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+ORM operations for PermissionsModule records
+
+## Usage
+
+```typescript
+db.permissionsModule.findMany({ select: { id: true } }).execute()
+db.permissionsModule.findOne({ id: '<value>', select: { id: true } }).execute()
+db.permissionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' }, select: { id: true } }).execute()
+db.permissionsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
+db.permissionsModule.delete({ where: { id: '<value>' } }).execute()
+```
+
+## Examples
+
+### List all permissionsModule records
+
+```typescript
+const items = await db.permissionsModule.findMany({
+  select: { id: true, databaseId: true }
+}).execute();
+```
+
+### Create a permissionsModule
+
+```typescript
+const item = await db.permissionsModule.create({
+  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', tableId: 'value', tableName: 'value', defaultTableId: 'value', defaultTableName: 'value', bitlen: 'value', membershipType: 'value', entityTableId: 'value', actorTableId: 'value', prefix: 'value', getPaddedMask: 'value', getMask: 'value', getByMask: 'value', getMaskByName: 'value' },
+  select: { id: true }
+}).execute();
+```

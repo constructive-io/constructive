@@ -10,6 +10,14 @@ export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
+export interface OrgGetManagersRecord {
+  userId: string | null;
+  depth: number | null;
+}
+export interface OrgGetSubordinatesRecord {
+  userId: string | null;
+  depth: number | null;
+}
 export interface GetAllRecord {
   path: string[] | null;
   data: unknown | null;
@@ -187,22 +195,12 @@ export interface Index {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface LimitFunction {
-  id: string | null;
-  databaseId: string | null;
-  tableId: string | null;
-  name: string | null;
-  label: string | null;
-  description: string | null;
-  data: unknown | null;
-  security: number | null;
-}
 export interface Policy {
   id: string | null;
   databaseId: string | null;
   tableId: string | null;
   name: string | null;
-  roleName: string | null;
+  granteeName: string | null;
   privilege: string | null;
   permissive: boolean | null;
   disabled: boolean | null;
@@ -236,8 +234,9 @@ export interface TableGrant {
   databaseId: string | null;
   tableId: string | null;
   privilege: string | null;
-  roleName: string | null;
+  granteeName: string | null;
   fieldIds: string[] | null;
+  isGrant: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -300,9 +299,10 @@ export interface ViewGrant {
   id: string | null;
   databaseId: string | null;
   viewId: string | null;
-  roleName: string | null;
+  granteeName: string | null;
   privilege: string | null;
   withGrantOption: boolean | null;
+  isGrant: boolean | null;
 }
 export interface ViewRule {
   id: string | null;
@@ -315,9 +315,11 @@ export interface ViewRule {
 export interface TableModule {
   id: string | null;
   databaseId: string | null;
-  privateSchemaId: string | null;
+  schemaId: string | null;
   tableId: string | null;
+  tableName: string | null;
   nodeType: string | null;
+  useRls: boolean | null;
   data: unknown | null;
   fields: string[] | null;
 }
@@ -332,6 +334,55 @@ export interface TableTemplateModule {
   nodeType: string | null;
   data: unknown | null;
 }
+export interface SecureTableProvision {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  tableId: string | null;
+  tableName: string | null;
+  nodeType: string | null;
+  useRls: boolean | null;
+  nodeData: unknown | null;
+  grantRoles: string[] | null;
+  grantPrivileges: unknown | null;
+  policyType: string | null;
+  policyPrivileges: string[] | null;
+  policyRole: string | null;
+  policyPermissive: boolean | null;
+  policyName: string | null;
+  policyData: unknown | null;
+  outFields: string[] | null;
+}
+export interface RelationProvision {
+  id: string | null;
+  databaseId: string | null;
+  relationType: string | null;
+  sourceTableId: string | null;
+  targetTableId: string | null;
+  fieldName: string | null;
+  deleteAction: string | null;
+  isRequired: boolean | null;
+  junctionTableId: string | null;
+  junctionTableName: string | null;
+  junctionSchemaId: string | null;
+  sourceFieldName: string | null;
+  targetFieldName: string | null;
+  useCompositeKey: boolean | null;
+  nodeType: string | null;
+  nodeData: unknown | null;
+  grantRoles: string[] | null;
+  grantPrivileges: unknown | null;
+  policyType: string | null;
+  policyPrivileges: string[] | null;
+  policyRole: string | null;
+  policyPermissive: boolean | null;
+  policyName: string | null;
+  policyData: unknown | null;
+  outFieldId: string | null;
+  outJunctionTableId: string | null;
+  outSourceFieldId: string | null;
+  outTargetFieldId: string | null;
+}
 export interface SchemaGrant {
   id: string | null;
   databaseId: string | null;
@@ -339,6 +390,15 @@ export interface SchemaGrant {
   granteeName: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface DefaultPrivilege {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  objectType: string | null;
+  privilege: string | null;
+  granteeName: string | null;
+  isGrant: boolean | null;
 }
 export interface ApiSchema {
   id: string | null;
@@ -381,23 +441,6 @@ export interface SiteTheme {
   databaseId: string | null;
   siteId: string | null;
   theme: unknown | null;
-}
-export interface Procedure {
-  id: string | null;
-  databaseId: string | null;
-  name: string | null;
-  argnames: string[] | null;
-  argtypes: string[] | null;
-  argdefaults: string[] | null;
-  langName: string | null;
-  definition: string | null;
-  smartTags: unknown | null;
-  category: ObjectCategory | null;
-  module: string | null;
-  scope: number | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 export interface TriggerFunction {
   id: string | null;
@@ -663,7 +706,6 @@ export interface ProfilesModule {
   profileGrantsTableName: string | null;
   profileDefinitionGrantsTableId: string | null;
   profileDefinitionGrantsTableName: string | null;
-  bitlen: number | null;
   membershipType: number | null;
   entityTableId: string | null;
   actorTableId: string | null;
@@ -806,6 +848,7 @@ export interface OrgMembership {
   granted: string | null;
   actorId: string | null;
   entityId: string | null;
+  profileId: string | null;
 }
 export interface OrgMember {
   id: string | null;
@@ -840,6 +883,27 @@ export interface OrgGrant {
   grantorId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface OrgChartEdge {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  entityId: string | null;
+  childId: string | null;
+  parentId: string | null;
+  positionTitle: string | null;
+  positionLevel: number | null;
+}
+export interface OrgChartEdgeGrant {
+  id: string | null;
+  entityId: string | null;
+  childId: string | null;
+  parentId: string | null;
+  grantorId: string | null;
+  isGrant: boolean | null;
+  positionTitle: string | null;
+  positionLevel: number | null;
+  createdAt: string | null;
 }
 export interface AppLimit {
   id: string | null;
@@ -919,10 +983,6 @@ export interface OrgClaimedInvite {
   updatedAt: string | null;
   entityId: string | null;
 }
-export interface AppPermissionDefault {
-  id: string | null;
-  permissions: string | null;
-}
 export interface Ref {
   id: string | null;
   name: string | null;
@@ -937,6 +997,10 @@ export interface Store {
   hash: string | null;
   createdAt: string | null;
 }
+export interface AppPermissionDefault {
+  id: string | null;
+  permissions: string | null;
+}
 export interface RoleType {
   id: number | null;
   name: string | null;
@@ -945,16 +1009,6 @@ export interface OrgPermissionDefault {
   id: string | null;
   permissions: string | null;
   entityId: string | null;
-}
-export interface AppLimitDefault {
-  id: string | null;
-  name: string | null;
-  max: number | null;
-}
-export interface OrgLimitDefault {
-  id: string | null;
-  name: string | null;
-  max: number | null;
 }
 export interface CryptoAddress {
   id: string | null;
@@ -965,11 +1019,15 @@ export interface CryptoAddress {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface MembershipType {
-  id: number | null;
+export interface AppLimitDefault {
+  id: string | null;
   name: string | null;
-  description: string | null;
-  prefix: string | null;
+  max: number | null;
+}
+export interface OrgLimitDefault {
+  id: string | null;
+  name: string | null;
+  max: number | null;
 }
 export interface ConnectedAccount {
   id: string | null;
@@ -991,14 +1049,11 @@ export interface PhoneNumber {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface AppMembershipDefault {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  isApproved: boolean | null;
-  isVerified: boolean | null;
+export interface MembershipType {
+  id: number | null;
+  name: string | null;
+  description: string | null;
+  prefix: string | null;
 }
 export interface NodeTypeRegistry {
   name: string | null;
@@ -1010,6 +1065,15 @@ export interface NodeTypeRegistry {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface AppMembershipDefault {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  isApproved: boolean | null;
+  isVerified: boolean | null;
 }
 export interface Commit {
   id: string | null;
@@ -1033,15 +1097,6 @@ export interface OrgMembershipDefault {
   deleteMemberCascadeGroups: boolean | null;
   createGroupsCascadeMembers: boolean | null;
 }
-export interface Email {
-  id: string | null;
-  ownerId: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface AuditLog {
   id: string | null;
   event: string | null;
@@ -1058,6 +1113,15 @@ export interface AppLevel {
   description: string | null;
   image: ConstructiveInternalTypeImage | null;
   ownerId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface Email {
+  id: string | null;
+  ownerId: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -1091,6 +1155,17 @@ export interface AstMigration {
   actionId: string | null;
   actorId: string | null;
 }
+export interface User {
+  id: string | null;
+  username: string | null;
+  displayName: string | null;
+  profilePicture: ConstructiveInternalTypeImage | null;
+  searchTsv: string | null;
+  type: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  searchTsvRank: number | null;
+}
 export interface AppMembership {
   id: string | null;
   createdAt: string | null;
@@ -1107,17 +1182,7 @@ export interface AppMembership {
   permissions: string | null;
   granted: string | null;
   actorId: string | null;
-}
-export interface User {
-  id: string | null;
-  username: string | null;
-  displayName: string | null;
-  profilePicture: ConstructiveInternalTypeImage | null;
-  searchTsv: string | null;
-  type: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  searchTsvRank: number | null;
+  profileId: string | null;
 }
 export interface HierarchyModule {
   id: string | null;
