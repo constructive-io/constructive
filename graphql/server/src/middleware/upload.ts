@@ -56,45 +56,58 @@ const parseFileWithErrors: RequestHandler = (req, res, next) => {
   });
 };
 
-const RLS_MODULE_BASE_SQL = `
-  SELECT
-    rm.authenticate,
-    rm.authenticate_strict,
-    ps.schema_name as private_schema_name
-  FROM metaschema_modules_public.rls_module rm
-  LEFT JOIN metaschema_public.schema ps ON rm.private_schema_id = ps.id`;
-
-const RLS_MODULE_BY_DATABASE_ID_SQL = `${RLS_MODULE_BASE_SQL}
-  JOIN services_public.apis a ON rm.api_id = a.id
-  WHERE a.database_id = $1
+const RLS_MODULE_BY_DATABASE_ID_SQL = `
+  SELECT am.data
+  FROM services_public.api_modules am
+  JOIN services_public.apis a ON am.api_id = a.id
+  WHERE am.name = 'rls_module' AND a.database_id = $1
   ORDER BY a.id
   LIMIT 1
 `;
 
-const RLS_MODULE_BY_API_ID_SQL = `${RLS_MODULE_BASE_SQL}
-  WHERE rm.api_id = $1
+const RLS_MODULE_BY_API_ID_SQL = `
+  SELECT data
+  FROM services_public.api_modules
+  WHERE api_id = $1 AND name = 'rls_module'
   LIMIT 1
 `;
 
-const RLS_MODULE_BY_DBNAME_SQL = `${RLS_MODULE_BASE_SQL}
-  JOIN services_public.apis a ON rm.api_id = a.id
-  WHERE a.dbname = $1
+const RLS_MODULE_BY_DBNAME_SQL = `
+  SELECT am.data
+  FROM services_public.api_modules am
+  JOIN services_public.apis a ON am.api_id = a.id
+  WHERE am.name = 'rls_module' AND a.dbname = $1
   ORDER BY a.id
   LIMIT 1
 `;
+
+interface RlsModuleData {
+  authenticate: string;
+  authenticate_strict: string;
+  authenticate_schema: string;
+  role_schema: string;
+  current_role: string;
+  current_role_id: string;
+  current_ip_address: string;
+  current_user_agent: string;
+}
 
 interface RlsModuleRow {
-  authenticate: string | null;
-  authenticate_strict: string | null;
-  private_schema_name: string | null;
+  data: RlsModuleData | null;
 }
 
 const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
-  if (!row || !row.private_schema_name) return undefined;
+  if (!row?.data) return undefined;
+  const d = row.data;
   return {
-    authenticate: row.authenticate ?? undefined,
-    authenticateStrict: row.authenticate_strict ?? undefined,
-    privateSchema: { schemaName: row.private_schema_name },
+    authenticate: d.authenticate,
+    authenticateStrict: d.authenticate_strict,
+    privateSchema: { schemaName: d.authenticate_schema },
+    publicSchema: { schemaName: d.role_schema },
+    currentRole: d.current_role,
+    currentRoleId: d.current_role_id,
+    currentIpAddress: d.current_ip_address,
+    currentUserAgent: d.current_user_agent,
   };
 };
 
@@ -200,13 +213,6 @@ export const createUploadAuthenticateMiddleware = (
       authLog.warn(
         `[upload-auth] Missing auth function or private schema for db=${api.dbname}; strictAuth=${opts.server?.strictAuth ?? false}`,
       );
-      authError(res);
-      return;
-    }
-
-    const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
-    if (!SAFE_IDENTIFIER.test(privateSchema) || !SAFE_IDENTIFIER.test(authFn)) {
-      authLog.error(`[upload-auth] Invalid SQL identifier: schema=${privateSchema} fn=${authFn}`);
       authError(res);
       return;
     }
