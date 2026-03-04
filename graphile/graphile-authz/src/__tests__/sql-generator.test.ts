@@ -18,7 +18,7 @@ describe('SQL Generator', () => {
         AuthzDirectOwner: { entity_field: 'owner_id' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('"owner_id" = current_user_id()');
+      expect(result.sql).toBe('owner_id = current_user_id()');
     });
 
     it('uses table alias when provided', () => {
@@ -26,7 +26,7 @@ describe('SQL Generator', () => {
         AuthzDirectOwner: { entity_field: 'owner_id' },
       };
       const result = generateSql(node, { ...defaultOptions, tableAlias: 't' });
-      expect(result.sql).toBe('"t"."owner_id" = current_user_id()');
+      expect(result.sql).toBe('t.owner_id = current_user_id()');
     });
 
     it('escapes special characters in field names', () => {
@@ -45,7 +45,7 @@ describe('SQL Generator', () => {
       };
       const result = generateSql(node, defaultOptions);
       expect(result.sql).toBe(
-        '("owner_id" = current_user_id() OR "created_by" = current_user_id())'
+        '(owner_id = current_user_id() OR created_by = current_user_id())'
       );
     });
 
@@ -54,7 +54,7 @@ describe('SQL Generator', () => {
         AuthzDirectOwnerAny: { entity_fields: ['owner_id'] },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('"owner_id" = current_user_id()');
+      expect(result.sql).toBe('owner_id = current_user_id()');
     });
 
     it('returns FALSE for empty fields', () => {
@@ -74,8 +74,8 @@ describe('SQL Generator', () => {
       };
       const result = generateSql(node, defaultOptions);
       expect(result.sql).toContain('EXISTS');
-      expect(result.sql).toContain('"app_private"."app_memberships_sprt"');
-      expect(result.sql).toContain('sprt."actor_id" = current_user_id()');
+      expect(result.sql).toContain('app_private.app_memberships_sprt');
+      expect(result.sql).toContain('sprt.actor_id = current_user_id()');
     });
 
     it('generates membership check with permission', () => {
@@ -83,7 +83,7 @@ describe('SQL Generator', () => {
         AuthzMembership: { membership_type: 2, permission: 'read' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"org_memberships_sprt"');
+      expect(result.sql).toContain('org_memberships_sprt');
       expect(result.sql).toContain("get_permission_mask('read')");
     });
 
@@ -92,7 +92,7 @@ describe('SQL Generator', () => {
         AuthzMembership: { membership_type: 1, is_admin: true },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('sprt."is_admin" = TRUE');
+      expect(result.sql).toContain('sprt.is_admin = TRUE');
     });
 
     it('generates membership check with is_owner', () => {
@@ -100,7 +100,7 @@ describe('SQL Generator', () => {
         AuthzMembership: { membership_type: 1, is_owner: true },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('sprt."is_owner" = TRUE');
+      expect(result.sql).toContain('sprt.is_owner = TRUE');
     });
 
     it('combines is_admin and is_owner with OR by default', () => {
@@ -108,7 +108,7 @@ describe('SQL Generator', () => {
         AuthzMembership: { membership_type: 1, is_admin: true, is_owner: true },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('sprt."is_admin" = TRUE OR sprt."is_owner" = TRUE');
+      expect(result.sql).toContain('sprt.is_admin = TRUE OR sprt.is_owner = TRUE');
     });
 
     it('combines is_admin and is_owner with AND when specified', () => {
@@ -121,7 +121,7 @@ describe('SQL Generator', () => {
         },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('sprt."is_admin" = TRUE AND sprt."is_owner" = TRUE');
+      expect(result.sql).toContain('sprt.is_admin = TRUE AND sprt.is_owner = TRUE');
     });
 
     it('handles string membership type', () => {
@@ -129,7 +129,7 @@ describe('SQL Generator', () => {
         AuthzMembership: { membership_type: 'group' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"group_memberships_sprt"');
+      expect(result.sql).toContain('group_memberships_sprt');
     });
   });
 
@@ -139,9 +139,9 @@ describe('SQL Generator', () => {
         AuthzMembershipByField: { entity_field: 'org_id', membership_type: 2 },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"org_id" = ANY');
-      expect(result.sql).toContain('SELECT sprt."entity_id"');
-      expect(result.sql).toContain('"org_memberships_sprt"');
+      expect(result.sql).toContain('org_id = ANY');
+      expect(result.sql).toContain('SELECT sprt.entity_id');
+      expect(result.sql).toContain('org_memberships_sprt');
     });
 
     it('defaults to org membership type', () => {
@@ -149,7 +149,7 @@ describe('SQL Generator', () => {
         AuthzMembershipByField: { entity_field: 'org_id' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"org_memberships_sprt"');
+      expect(result.sql).toContain('org_memberships_sprt');
     });
   });
 
@@ -160,9 +160,9 @@ describe('SQL Generator', () => {
       };
       const result = generateSql(node, defaultOptions);
       expect(result.sql).toContain('EXISTS');
-      expect(result.sql).toContain('"org_hierarchy_acl"');
-      expect(result.sql).toContain('h."ancestor_id" = current_user_id()');
-      expect(result.sql).toContain('h."descendant_id" = "owner_id"');
+      expect(result.sql).toContain('org_hierarchy_acl');
+      expect(result.sql).toContain('h.ancestor_id = current_user_id()');
+      expect(result.sql).toContain('h.descendant_id = owner_id');
     });
 
     it('generates hierarchy check for upward visibility', () => {
@@ -170,8 +170,8 @@ describe('SQL Generator', () => {
         AuthzOrgHierarchy: { direction: 'up', anchor_field: 'owner_id' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('h."descendant_id" = current_user_id()');
-      expect(result.sql).toContain('h."ancestor_id" = "owner_id"');
+      expect(result.sql).toContain('h.descendant_id = current_user_id()');
+      expect(result.sql).toContain('h.ancestor_id = owner_id');
     });
 
     it('includes max_depth when specified', () => {
@@ -179,7 +179,7 @@ describe('SQL Generator', () => {
         AuthzOrgHierarchy: { direction: 'down', anchor_field: 'owner_id', max_depth: 3 },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('h."depth" <= 3');
+      expect(result.sql).toContain('h.depth <= 3');
     });
   });
 
@@ -189,7 +189,7 @@ describe('SQL Generator', () => {
         AuthzTemporal: { valid_from_field: 'starts_at' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('"starts_at" <= NOW()');
+      expect(result.sql).toBe('starts_at <= NOW()');
     });
 
     it('generates valid_until check', () => {
@@ -197,7 +197,7 @@ describe('SQL Generator', () => {
         AuthzTemporal: { valid_until_field: 'ends_at' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('("ends_at" IS NULL OR "ends_at" > NOW())');
+      expect(result.sql).toBe('(ends_at IS NULL OR ends_at > NOW())');
     });
 
     it('generates combined temporal check', () => {
@@ -205,8 +205,8 @@ describe('SQL Generator', () => {
         AuthzTemporal: { valid_from_field: 'starts_at', valid_until_field: 'ends_at' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"starts_at" <= NOW()');
-      expect(result.sql).toContain('"ends_at" IS NULL OR "ends_at" > NOW()');
+      expect(result.sql).toContain('starts_at <= NOW()');
+      expect(result.sql).toContain('ends_at IS NULL OR ends_at > NOW()');
     });
 
     it('returns TRUE for empty temporal config', () => {
@@ -225,9 +225,9 @@ describe('SQL Generator', () => {
         AuthzPublishable: {},
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"is_published" IS TRUE');
-      expect(result.sql).toContain('"published_at" IS NOT NULL');
-      expect(result.sql).toContain('"published_at" <= NOW()');
+      expect(result.sql).toContain('is_published IS TRUE');
+      expect(result.sql).toContain('published_at IS NOT NULL');
+      expect(result.sql).toContain('published_at <= NOW()');
     });
 
     it('uses custom field names', () => {
@@ -238,8 +238,8 @@ describe('SQL Generator', () => {
         },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"visible" IS TRUE');
-      expect(result.sql).toContain('"made_public_at"');
+      expect(result.sql).toContain('visible IS TRUE');
+      expect(result.sql).toContain('made_public_at');
     });
 
     it('skips published_at check when not required', () => {
@@ -247,7 +247,7 @@ describe('SQL Generator', () => {
         AuthzPublishable: { require_published_at: false },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('"is_published" IS TRUE');
+      expect(result.sql).toBe('is_published IS TRUE');
     });
   });
 
@@ -257,7 +257,7 @@ describe('SQL Generator', () => {
         AuthzArrayContainsActor: { array_field: 'collaborator_ids' },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toBe('current_user_id() = ANY("collaborator_ids")');
+      expect(result.sql).toBe('current_user_id() = ANY(collaborator_ids)');
     });
   });
 
@@ -291,9 +291,9 @@ describe('SQL Generator', () => {
         },
       };
       const result = generateSql(node, defaultOptions);
-      expect(result.sql).toContain('"owner_id" = current_user_id()');
+      expect(result.sql).toContain('owner_id = current_user_id()');
       expect(result.sql).toContain(' AND ');
-      expect(result.sql).toContain('"is_published" IS TRUE');
+      expect(result.sql).toContain('is_published IS TRUE');
     });
 
     it('generates OR expression', () => {
@@ -391,28 +391,28 @@ describe('SQL Generator', () => {
   describe('AuthzSql convenience functions', () => {
     it('directOwner generates correct SQL', () => {
       const sql = AuthzSql.directOwner('owner_id');
-      expect(sql).toBe('"owner_id" = current_user_id()');
+      expect(sql).toBe('owner_id = current_user_id()');
     });
 
     it('membership generates correct SQL', () => {
       const sql = AuthzSql.membership(1, { is_admin: true });
-      expect(sql).toContain('"app_memberships_sprt"');
+      expect(sql).toContain('app_memberships_sprt');
       expect(sql).toContain('is_admin');
     });
 
     it('membershipByField generates correct SQL', () => {
       const sql = AuthzSql.membershipByField('org_id', { membership_type: 2 });
-      expect(sql).toContain('"org_id" = ANY');
+      expect(sql).toContain('org_id = ANY');
     });
 
     it('temporal generates correct SQL', () => {
       const sql = AuthzSql.temporal({ valid_from_field: 'starts_at' });
-      expect(sql).toBe('"starts_at" <= NOW()');
+      expect(sql).toBe('starts_at <= NOW()');
     });
 
     it('publishable generates correct SQL', () => {
       const sql = AuthzSql.publishable();
-      expect(sql).toContain('"is_published" IS TRUE');
+      expect(sql).toContain('is_published IS TRUE');
     });
 
     it('composite generates correct SQL', () => {

@@ -149,7 +149,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     expect(mockPgQueryContext).toHaveBeenCalledWith(
       expect.objectContaining({
         client: tenantPool,
-        query: 'SELECT * FROM "private"."authenticate"($1)',
+        query: 'SELECT * FROM private.authenticate($1)',
         variables: ['good-token'],
         context: expect.objectContaining({
           'jwt.claims.ip_address': '10.0.0.1',
@@ -399,7 +399,7 @@ describe('createUploadAuthenticateMiddleware', () => {
 
     expect(mockPgQueryContext).toHaveBeenCalledWith(
       expect.objectContaining({
-        query: 'SELECT * FROM "private"."authenticate_strict"($1)',
+        query: 'SELECT * FROM private.authenticate_strict($1)',
       }),
     );
     expect(next).toHaveBeenCalledTimes(1);
