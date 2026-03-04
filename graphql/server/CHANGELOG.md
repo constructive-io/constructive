@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.5.2...@constructive-io/graphql-server@4.6.0) (2026-03-04)
+
+### Bug Fixes
+
+- update test expectations for keyword-aware quoting from @pgsql/quotes ([438d50c](https://github.com/constructive-io/constructive/commit/438d50c929187e62e73638a0e320a7c32eb2586f))
+
+### Features
+
+- replace manual identifier quoting with @pgsql/quotes across all plugins ([8a42a33](https://github.com/constructive-io/constructive/commit/8a42a33ccfcdbba146f2136c70152fd300ee2876))
+
 ## [4.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.5.1...@constructive-io/graphql-server@4.5.2) (2026-03-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
