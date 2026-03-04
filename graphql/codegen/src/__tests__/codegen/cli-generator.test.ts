@@ -285,7 +285,7 @@ describe('cli docs generator', () => {
   });
 
   it('generates CLI skill files', () => {
-    const skills = generateCliSkills([carTable, driverTable], allCustomOps, 'myapp');
+    const skills = generateCliSkills([carTable, driverTable], allCustomOps, 'myapp', 'default');
     expect(skills.length).toBeGreaterThan(0);
     for (const sf of skills) {
       expect(sf.content).toMatchSnapshot();
@@ -317,7 +317,7 @@ describe('orm docs generator', () => {
   });
 
   it('generates ORM skill files', () => {
-    const skills = generateOrmSkills([carTable, driverTable], allCustomOps);
+    const skills = generateOrmSkills([carTable, driverTable], allCustomOps, 'default');
     expect(skills.length).toBeGreaterThan(0);
     for (const sf of skills) {
       expect(sf.content).toMatchSnapshot();
@@ -349,7 +349,7 @@ describe('hooks docs generator', () => {
   });
 
   it('generates hooks skill files', () => {
-    const skills = generateHooksSkills([carTable, driverTable], allCustomOps);
+    const skills = generateHooksSkills([carTable, driverTable], allCustomOps, 'default');
     expect(skills.length).toBeGreaterThan(0);
     for (const sf of skills) {
       expect(sf.content).toMatchSnapshot();
