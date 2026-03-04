@@ -17,18 +17,16 @@
  * search fields for each tsvector column found on a table's codec.
  *
  * ARCHITECTURE NOTE:
- * Condition field apply functions run during a deferred phase (SQL generation)
- * on a queryBuilder proxy — NOT on the real PgSelectStep. The rank field plan
- * runs earlier, during Grafast's planning phase, on the real PgSelectStep.
+ * Uses the Grafast meta system (setMeta/getMeta) to pass data between
+ * the condition apply phase and the output field plan, following the
+ * pattern from Benjie's postgraphile-plugin-fulltext-filter reference.
  *
- * To bridge these two phases we use a module-level WeakMap keyed by the SQL
- * alias object (shared between proxy and PgSelectStep via reference identity).
- *
- * The rank field plan creates a `lambda` step that reads the row tuple at a
- * dynamically-determined index. The condition apply adds `ts_rank(...)` to
- * the SQL SELECT list via `proxy.selectAndReturnIndex()` and stores the
- * resulting index in the WeakMap slot. At execution time the lambda reads
- * the rank value from that index.
+ * 1. Condition apply (deferred/SQL-gen phase): adds ts_rank to the query
+ *    builder's SELECT list via selectAndReturnIndex, stores { selectIndex }
+ *    in meta via qb.setMeta(key, { selectIndex }).
+ * 2. Output field plan (planning phase): calls $select.getMeta(key) which
+ *    returns a Grafast Step that resolves at execution time.
+ * 3. lambda([$details, $row]) reads the rank from row[details.selectIndex].
  */
 
 import 'graphile-build';
@@ -39,26 +37,12 @@ import type { SQL } from 'pg-sql2';
 import type { PgSearchPluginOptions } from './types';
 
 /**
- * Module-level WeakMap keyed by SQL alias object (shared reference between
- * the queryBuilder proxy and PgSelectStep via buildTheQueryCore).
- *
- * CRITICAL INVARIANT: SQL alias objects MUST have unique identity per query
- * execution. If PostGraphile ever pools or caches alias references across
- * queries, rank values could leak between requests.
- *
- * 1. Rank field plan (planning phase): initialises the slot keyed by alias.
- * 2. OrderBy enum apply (planning phase): stores direction in PgSelectStep meta.
- * 3. Condition apply (deferred/SQL-gen phase): adds ts_rank to the proxy's
- *    select list via selectAndReturnIndex, stores the index in `indices`.
- *    If the user explicitly requested rank ordering (meta set in step 2),
- *    adds ORDER BY ts_rank with the requested direction.
- * 4. Rank field lambda (execute phase): reads row[indices[field]] for the value.
+ * Interface for the meta value stored by the condition apply via setMeta
+ * and read by the output field plan via getMeta.
  */
-interface FtsRankSlot {
-  /** Map of fieldName → index into info.selects (set during condition apply) */
-  indices: Record<string, number>;
+interface FtsRankDetails {
+  selectIndex: number;
 }
-const ftsRankSlots = new WeakMap<object, FtsRankSlot>();
 
 function isTsvectorCodec(codec: any): boolean {
   return (
@@ -68,18 +52,38 @@ function isTsvectorCodec(codec: any): boolean {
 }
 
 /**
- * Navigates from a PgSelectSingleStep up to the PgSelectStep.
- * Uses duck-typing to avoid dependency on exact class names across rc versions.
+ * Walks from a PgCondition up to the PgSelectQueryBuilder.
+ * Uses the .parent property on PgCondition to traverse up the chain,
+ * following Benjie's pattern from postgraphile-plugin-fulltext-filter.
+ *
+ * Returns the query builder if found, or null if the traversal fails.
  */
-function getPgSelectStep($someStep: any): any | null {
-  let $step = $someStep;
+function getQueryBuilder(
+  build: any,
+  $condition: any
+): any | null {
+  const PgCondition = build.dataplanPg?.PgCondition;
+  if (!PgCondition) return null;
 
-  if ($step && typeof $step.getClassStep === 'function') {
-    $step = $step.getClassStep();
+  let current = $condition;
+  const { alias } = current;
+
+  // Walk up through nested PgConditions (e.g. and/or/not)
+  while (
+    current &&
+    current instanceof PgCondition &&
+    current.alias === alias
+  ) {
+    current = (current as any).parent;
   }
 
-  if ($step && typeof $step.orderBy === 'function' && $step.id !== undefined) {
-    return $step;
+  // Verify we found a query builder with matching alias
+  if (
+    current &&
+    typeof current.selectAndReturnIndex === 'function' &&
+    current.alias === alias
+  ) {
+    return current;
   }
 
   return null;
@@ -135,7 +139,6 @@ export function createPgSearchPlugin(
 
         GraphQLObjectType_fields(fields, build, context) {
           const {
-            sql,
             inflection,
             graphql: { GraphQLFloat },
             grafast: { constant, lambda },
@@ -158,6 +161,7 @@ export function createPgSearchPlugin(
 
             const baseFieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
             const fieldName = inflection.camelCase(`${baseFieldName}-rank`);
+            const metaKey = `__fts_ranks_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
@@ -168,35 +172,37 @@ export function createPgSearchPlugin(
                     description: `Full-text search ranking when filtered by \`${baseFieldName}\`. Returns null when no search condition is active.`,
                     type: GraphQLFloat,
                     plan($step: any) {
-                      const $select = getPgSelectStep($step);
+                      const $row = $step;
+                      const $select = typeof $row.getClassStep === 'function'
+                        ? $row.getClassStep()
+                        : null;
                       if (!$select) return constant(null);
 
                       if (typeof $select.setInliningForbidden === 'function') {
                         $select.setInliningForbidden();
                       }
 
-                      // Initialise the WeakMap slot for this query, keyed by the
-                      // SQL alias (same object ref on PgSelectStep and the proxy).
-                      const alias = $select.alias;
-                      if (!ftsRankSlots.has(alias)) {
-                        ftsRankSlots.set(alias, {
-                          indices: Object.create(null),
-                        });
-                      }
+                      // Use the meta system to retrieve rank details.
+                      // getMeta returns a Grafast Step that resolves at
+                      // execution time to the value set by setMeta in
+                      // the condition apply phase.
+                      const $details = $select.getMeta(metaKey);
 
-                      // Return a lambda that reads the rank value from the result
-                      // row at a dynamically-determined index. The index is set
-                      // by the condition apply (deferred phase) via the proxy's
-                      // selectAndReturnIndex, and stored in the WeakMap slot.
-                      const capturedField = baseFieldName;
-                      const capturedAlias = alias;
-                      return lambda($step, (row: any) => {
-                        if (row == null) return null;
-                        const slot = ftsRankSlots.get(capturedAlias);
-                        if (!slot || slot.indices[capturedField] === undefined) return null;
-                        const rawValue = row[slot.indices[capturedField]];
-                        return rawValue == null ? null : parseFloat(rawValue);
-                      }, true);
+                      return lambda(
+                        [$details, $row],
+                        ([details, row]: readonly [any, any]) => {
+                          const d = details as FtsRankDetails | null;
+                          if (
+                            d == null ||
+                            row == null ||
+                            d.selectIndex == null
+                          ) {
+                            return null;
+                          }
+                          const rawValue = row[d.selectIndex];
+                          return rawValue == null ? null : parseFloat(rawValue);
+                        }
+                      );
                     },
                   })
                 ),
@@ -307,6 +313,7 @@ export function createPgSearchPlugin(
               `${pgSearchPrefix}_${attributeName}`
             );
             const baseFieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
+            const rankMetaKey = `__fts_ranks_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
@@ -330,22 +337,18 @@ export function createPgSearchPlugin(
                       // WHERE: column @@ tsquery
                       $condition.where(sql`${columnExpr} @@ ${tsquery}`);
 
-                      // Add ts_rank to the SELECT list via the proxy's
-                      // selectAndReturnIndex. This runs during the deferred
-                      // SQL-generation phase, so the expression goes into
-                      // info.selects (the live array used for SQL generation).
-                      const $parent = $condition.dangerouslyGetParent();
-                      if (typeof $parent.selectAndReturnIndex === 'function') {
+                      // Get the query builder via meta-safe traversal
+                      const qb = getQueryBuilder(build, $condition);
+                      if (qb) {
+                        // Add ts_rank to the SELECT list
                         const rankSql = sql`ts_rank(${columnExpr}, ${tsquery})`;
                         const wrappedRankSql = sql`${sql.parens(rankSql)}::text`;
-                        const rankIndex = $parent.selectAndReturnIndex(wrappedRankSql);
+                        const rankIndex = qb.selectAndReturnIndex(wrappedRankSql);
 
-                        // Store the index in the alias-keyed WeakMap slot so
-                        // the rank field's lambda can read it at execute time.
-                        const slot = ftsRankSlots.get($condition.alias);
-                        if (slot) {
-                          slot.indices[baseFieldName] = rankIndex;
-                        }
+                        // Store the select index in meta (replaces WeakMap)
+                        qb.setMeta(rankMetaKey, {
+                          selectIndex: rankIndex,
+                        } as FtsRankDetails);
                       }
 
                       // ORDER BY ts_rank: only add when the user explicitly
@@ -353,16 +356,16 @@ export function createPgSearchPlugin(
                       // enum values. The enum's apply stores direction in meta
                       // during planning; if no meta is set, skip the orderBy
                       // entirely so cursors remain stable across pages.
-                      const metaKey = `fts_order_${baseFieldName}`;
-                      const explicitDir = typeof $parent.getMetaRaw === 'function'
-                        ? $parent.getMetaRaw(metaKey)
-                        : undefined;
-                      if (explicitDir) {
-                        $parent.orderBy({
-                          fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
-                          codec: TYPES.float4,
-                          direction: explicitDir,
-                        });
+                      if (qb && typeof qb.getMetaRaw === 'function') {
+                        const orderMetaKey = `fts_order_${baseFieldName}`;
+                        const explicitDir = qb.getMetaRaw(orderMetaKey);
+                        if (explicitDir) {
+                          qb.orderBy({
+                            fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
+                            codec: TYPES.float4,
+                            direction: explicitDir,
+                          });
+                        }
                       }
                     },
                   }

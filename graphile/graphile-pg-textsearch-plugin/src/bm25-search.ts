@@ -21,12 +21,16 @@
  * that is populated by Bm25CodecPlugin during the gather phase.
  *
  * ARCHITECTURE NOTE:
- * Condition field apply functions run during a deferred phase (SQL generation)
- * on a queryBuilder proxy — NOT on the real PgSelectStep. The score field plan
- * runs earlier, during Grafast's planning phase, on the real PgSelectStep.
+ * Uses the Grafast meta system (setMeta/getMeta) to pass data between
+ * the condition apply phase and the output field plan, following the
+ * pattern from Benjie's postgraphile-plugin-fulltext-filter reference.
  *
- * To bridge these two phases we use a module-level WeakMap keyed by the SQL
- * alias object (shared between proxy and PgSelectStep via reference identity).
+ * 1. Condition apply (deferred/SQL-gen phase): adds BM25 score to the query
+ *    builder's SELECT list via selectAndReturnIndex, stores { selectIndex }
+ *    in meta via qb.setMeta(key, { selectIndex }).
+ * 2. Output field plan (planning phase): calls $select.getMeta(key) which
+ *    returns a Grafast Step that resolves at execution time.
+ * 3. lambda([$details, $row]) reads the score from row[details.selectIndex].
  */
 
 import 'graphile-build';
@@ -38,17 +42,12 @@ import { bm25IndexStore, bm25ExtensionDetected } from './bm25-codec';
 import { QuoteUtils } from '@pgsql/quotes';
 
 /**
- * WeakMap keyed by SQL alias object (shared reference between
- * the queryBuilder proxy and PgSelectStep).
- *
- * Stores per-query BM25 search state so the score field's lambda
- * can read the computed score value at execution time.
+ * Interface for the meta value stored by the condition apply via setMeta
+ * and read by the output field plan via getMeta.
  */
-interface Bm25ScoreSlot {
-  /** Map of fieldName -> index into the select list */
-  indices: Record<string, number>;
+interface Bm25ScoreDetails {
+  selectIndex: number;
 }
-const bm25ScoreSlots = new WeakMap<object, Bm25ScoreSlot>();
 
 /**
  * Checks if a given codec attribute has a BM25 index.
@@ -75,18 +74,38 @@ function isTextCodec(codec: any): boolean {
 }
 
 /**
- * Navigates from a PgSelectSingleStep up to the PgSelectStep.
- * Uses duck-typing to avoid dependency on exact class names across rc versions.
+ * Walks from a PgCondition up to the PgSelectQueryBuilder.
+ * Uses the .parent property on PgCondition to traverse up the chain,
+ * following Benjie's pattern from postgraphile-plugin-fulltext-filter.
+ *
+ * Returns the query builder if found, or null if the traversal fails.
  */
-function getPgSelectStep($someStep: any): any | null {
-  let $step = $someStep;
+function getQueryBuilder(
+  build: any,
+  $condition: any
+): any | null {
+  const PgCondition = build.dataplanPg?.PgCondition;
+  if (!PgCondition) return null;
 
-  if ($step && typeof $step.getClassStep === 'function') {
-    $step = $step.getClassStep();
+  let current = $condition;
+  const { alias } = current;
+
+  // Walk up through nested PgConditions (e.g. and/or/not)
+  while (
+    current &&
+    current instanceof PgCondition &&
+    current.alias === alias
+  ) {
+    current = (current as any).parent;
   }
 
-  if ($step && typeof $step.orderBy === 'function' && $step.id !== undefined) {
-    return $step;
+  // Verify we found a query builder with matching alias
+  if (
+    current &&
+    typeof current.selectAndReturnIndex === 'function' &&
+    current.alias === alias
+  ) {
+    return current;
   }
 
   return null;
@@ -165,7 +184,6 @@ export function createBm25SearchPlugin(
          */
         GraphQLObjectType_fields(fields, build, context) {
           const {
-            sql,
             inflection,
             graphql: { GraphQLFloat },
             grafast: { constant, lambda },
@@ -194,6 +212,7 @@ export function createBm25SearchPlugin(
               attributeName,
             });
             const fieldName = inflection.camelCase(`bm25-${baseFieldName}-score`);
+            const metaKey = `__bm25_score_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
@@ -204,7 +223,10 @@ export function createBm25SearchPlugin(
                     description: `BM25 relevance score when searching \`${baseFieldName}\`. Returns negative values (more negative = more relevant). Returns null when no BM25 search condition is active.`,
                     type: GraphQLFloat,
                     plan($step: any) {
-                      const $select = getPgSelectStep($step);
+                      const $row = $step;
+                      const $select = typeof $row.getClassStep === 'function'
+                        ? $row.getClassStep()
+                        : null;
                       if (!$select) return constant(null);
 
                       if (
@@ -213,34 +235,28 @@ export function createBm25SearchPlugin(
                         $select.setInliningForbidden();
                       }
 
-                      // Initialise the WeakMap slot for this query
-                      const alias = $select.alias;
-                      if (!bm25ScoreSlots.has(alias)) {
-                        bm25ScoreSlots.set(alias, {
-                          indices: Object.create(null),
-                        });
-                      }
+                      // Use the meta system to retrieve score details.
+                      // getMeta returns a Grafast Step that resolves at
+                      // execution time to the value set by setMeta in
+                      // the condition apply phase.
+                      const $details = $select.getMeta(metaKey);
 
-                      const capturedField = baseFieldName;
-                      const capturedAlias = alias;
                       return lambda(
-                        $step,
-                        (row: any) => {
-                          if (row == null) return null;
-                          const slot =
-                            bm25ScoreSlots.get(capturedAlias);
+                        [$details, $row],
+                        ([details, row]: readonly [any, any]) => {
+                          const d = details as Bm25ScoreDetails | null;
                           if (
-                            !slot ||
-                            slot.indices[capturedField] === undefined
-                          )
+                            d == null ||
+                            row == null ||
+                            d.selectIndex == null
+                          ) {
                             return null;
-                          const rawValue =
-                            row[slot.indices[capturedField]];
+                          }
+                          const rawValue = row[d.selectIndex];
                           return rawValue == null
                             ? null
                             : parseFloat(rawValue);
-                        },
-                        true
+                        }
                       );
                     },
                   })
@@ -366,6 +382,7 @@ export function createBm25SearchPlugin(
               codec: pgCodec as any,
               attributeName,
             });
+            const scoreMetaKey = `__bm25_score_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
@@ -413,43 +430,34 @@ export function createBm25SearchPlugin(
                         );
                       }
 
-                      // Add score to the SELECT list
-                      const $parent =
-                        $condition.dangerouslyGetParent();
-                      if (
-                        typeof $parent.selectAndReturnIndex ===
-                        'function'
-                      ) {
+                      // Get the query builder via meta-safe traversal
+                      const qb = getQueryBuilder(build, $condition);
+                      if (qb) {
+                        // Add score to the SELECT list
                         const wrappedScoreSql = sql`${sql.parens(scoreExpr)}::text`;
-                        const scoreIndex =
-                          $parent.selectAndReturnIndex(
-                            wrappedScoreSql
-                          );
-
-                        // Store index in alias-keyed WeakMap
-                        const slot = bm25ScoreSlots.get(
-                          $condition.alias
+                        const scoreIndex = qb.selectAndReturnIndex(
+                          wrappedScoreSql
                         );
-                        if (slot) {
-                          slot.indices[baseFieldName] =
-                            scoreIndex;
-                        }
+
+                        // Store the select index in meta (replaces WeakMap)
+                        qb.setMeta(scoreMetaKey, {
+                          selectIndex: scoreIndex,
+                        } as Bm25ScoreDetails);
                       }
 
                       // ORDER BY score: only add when the user
                       // explicitly requested score ordering via
                       // the BM25_<COLUMN>_SCORE_ASC/DESC enum values.
-                      const metaKey = `bm25_order_${baseFieldName}`;
-                      const explicitDir =
-                        typeof $parent.getMetaRaw === 'function'
-                          ? $parent.getMetaRaw(metaKey)
-                          : undefined;
-                      if (explicitDir) {
-                        $parent.orderBy({
-                          fragment: scoreExpr,
-                          codec: TYPES.float,
-                          direction: explicitDir,
-                        });
+                      if (qb && typeof qb.getMetaRaw === 'function') {
+                        const orderMetaKey = `bm25_order_${baseFieldName}`;
+                        const explicitDir = qb.getMetaRaw(orderMetaKey);
+                        if (explicitDir) {
+                          qb.orderBy({
+                            fragment: scoreExpr,
+                            codec: TYPES.float,
+                            direction: explicitDir,
+                          });
+                        }
                       }
                     },
                   }
