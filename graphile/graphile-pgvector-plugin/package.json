@@ -30,10 +30,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.1",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {

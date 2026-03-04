@@ -39,10 +39,10 @@
   "devDependencies": {
     "makage": "^0.1.12",
     "pg-proto-parser": "^1.30.4",
-    "pgsql-deparser": "^17.17.2"
+    "pgsql-deparser": "^17.18.0"
   },
   "dependencies": {
     "@pgsql/types": "^17.6.2",
-    "nested-obj": "0.2.0"
+    "nested-obj": "0.2.1"
   }
 }

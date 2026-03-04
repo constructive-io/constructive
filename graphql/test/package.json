@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "graphql-tag": "2.12.6",
     "makage": "^0.1.10"
   },
@@ -43,9 +43,9 @@
     "graphile-config": "1.0.0-rc.5",
     "graphile-settings": "workspace:^",
     "graphile-test": "workspace:^",
-    "graphql": "^16.9.0",
+    "graphql": "^16.13.0",
     "mock-req": "^0.2.0",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pgsql-test": "workspace:^",
     "postgraphile": "5.0.0-rc.7"
   },

@@ -34,12 +34,12 @@
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
     "graphile-settings": "workspace:^",
-    "graphql": "^16.9.0",
-    "pg": "^8.17.1",
+    "graphql": "^16.13.0",
+    "pg": "^8.19.0",
     "postgraphile": "5.0.0-rc.7"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
   },

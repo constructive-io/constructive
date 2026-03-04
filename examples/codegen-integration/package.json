@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.2.0",
-    "@tanstack/react-query": "^5.90.20",
+    "@tanstack/react-query": "^5.90.21",
     "gql-ast": "workspace:^",
-    "graphql": "15.10.1",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "graphql": "16.13.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",

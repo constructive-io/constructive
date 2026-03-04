@@ -31,9 +31,9 @@
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
-    "lru-cache": "^11.2.4"
+    "lru-cache": "^11.2.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

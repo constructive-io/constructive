@@ -40,11 +40,11 @@
     "@constructive-io/job-pg": "workspace:^",
     "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "pg": "8.17.1"
+    "pg": "8.19.0"
   },
   "devDependencies": {
-    "@pgpm/database-jobs": "^0.16.0",
-    "@pgpm/verify": "^0.16.0",
+    "@pgpm/database-jobs": "^0.18.0",
+    "@pgpm/verify": "^0.18.0",
     "@pgpmjs/core": "workspace:^",
     "makage": "^0.1.12",
     "pgsql-test": "workspace:^"
