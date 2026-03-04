@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "@types/supertest": "^6.0.2",
     "makage": "^0.1.12"
   },
@@ -41,8 +41,8 @@
     "@pgpmjs/types": "workspace:^",
     "express": "^5.2.1",
     "graphile-schema": "workspace:^",
-    "graphql": "15.10.1",
-    "pg": "^8.17.1",
+    "graphql": "16.13.0",
+    "pg": "^8.19.0",
     "pg-cache": "workspace:^",
     "pgsql-test": "workspace:^",
     "supertest": "^7.0.0"

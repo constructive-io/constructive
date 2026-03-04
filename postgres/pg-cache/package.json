@@ -31,12 +31,12 @@
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "lru-cache": "^11.2.4",
-    "pg": "^8.17.1",
+    "lru-cache": "^11.2.6",
+    "pg": "^8.19.0",
     "pg-env": "workspace:^"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.12"
   },
   "keywords": [

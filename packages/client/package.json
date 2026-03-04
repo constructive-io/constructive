@@ -37,10 +37,10 @@
     "api"
   ],
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.12"
   },
   "dependencies": {
-    "pg": "^8.17.1"
+    "pg": "^8.19.0"
   }
 }

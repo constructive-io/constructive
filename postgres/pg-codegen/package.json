@@ -39,19 +39,19 @@
     "generator"
   ],
   "dependencies": {
-    "@babel/generator": "^7.28.6",
-    "@babel/types": "^7.28.6",
+    "@babel/generator": "^7.29.1",
+    "@babel/types": "^7.29.0",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-test": "workspace:^"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.12"
   }
 }
