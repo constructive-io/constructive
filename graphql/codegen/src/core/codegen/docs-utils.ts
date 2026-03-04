@@ -59,18 +59,19 @@ export function resolveDocsConfig(
   docs: DocsConfig | boolean | undefined,
 ): DocsConfig {
   if (docs === true) {
-    return { readme: true, agents: true, mcp: true };
+    return { readme: true, agents: true, mcp: true, skills: true };
   }
   if (docs === false) {
-    return { readme: false, agents: false, mcp: false };
+    return { readme: false, agents: false, mcp: false, skills: false };
   }
   if (!docs) {
-    return { readme: true, agents: true, mcp: false };
+    return { readme: true, agents: true, mcp: false, skills: false };
   }
   return {
     readme: docs.readme ?? true,
     agents: docs.agents ?? true,
     mcp: docs.mcp ?? false,
+    skills: docs.skills ?? false,
   };
 }
 

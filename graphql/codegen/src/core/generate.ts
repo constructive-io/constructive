@@ -358,8 +358,10 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
     }
-    for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
-      skillsToWrite.push({ path: skill.fileName, content: skill.content });
+    if (docsConfig.skills) {
+      for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
+        skillsToWrite.push({ path: skill.fileName, content: skill.content });
+      }
     }
   }
 
@@ -375,8 +377,10 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
     }
-    for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
-      skillsToWrite.push({ path: skill.fileName, content: skill.content });
+    if (docsConfig.skills) {
+      for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
+        skillsToWrite.push({ path: skill.fileName, content: skill.content });
+      }
     }
   }
 
@@ -396,8 +400,10 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName));
     }
-    for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName)) {
-      skillsToWrite.push({ path: skill.fileName, content: skill.content });
+    if (docsConfig.skills) {
+      for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName)) {
+        skillsToWrite.push({ path: skill.fileName, content: skill.content });
+      }
     }
   }
 
@@ -789,10 +795,6 @@ export async function generateMulti(
     if (docsConfig.mcp) {
       allMcpTools.push(...getMultiTargetCliMcpTools(docsInput));
     }
-    const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
-      path: skill.fileName,
-      content: skill.content,
-    }));
     if (docsConfig.mcp && allMcpTools.length > 0) {
       const mcpFile = generateCombinedMcpConfig(allMcpTools, toolName);
       cliFilesToWrite.push({ path: path.posix.join('cli', mcpFile.fileName), content: mcpFile.content });
@@ -801,20 +803,27 @@ export async function generateMulti(
     const { writeGeneratedFiles: writeFiles } = await import('./output');
     await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
 
-    const firstTargetResolved = getConfigOptions({
-      ...(firstTargetConfig ?? {}),
-      ...(cliOverrides ?? {}),
-    });
-    const skillsOutputDir = resolveSkillsOutputDir(
-      firstTargetResolved,
-      firstTargetResolved.output,
-    );
-    await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+    if (docsConfig.skills) {
+      const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
+        path: skill.fileName,
+        content: skill.content,
+      }));
 
-    // Remove old nested unified-cli skill output dir
-    const oldUnifiedCliSkillsDir = path.resolve('cli', 'skills');
-    if (fs.existsSync(oldUnifiedCliSkillsDir)) {
-      fs.rmSync(oldUnifiedCliSkillsDir, { recursive: true, force: true });
+      const firstTargetResolved = getConfigOptions({
+        ...(firstTargetConfig ?? {}),
+        ...(cliOverrides ?? {}),
+      });
+      const skillsOutputDir = resolveSkillsOutputDir(
+        firstTargetResolved,
+        firstTargetResolved.output,
+      );
+      await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+
+      // Remove old nested unified-cli skill output dir
+      const oldUnifiedCliSkillsDir = path.resolve('cli', 'skills');
+      if (fs.existsSync(oldUnifiedCliSkillsDir)) {
+        fs.rmSync(oldUnifiedCliSkillsDir, { recursive: true, force: true });
+      }
     }
   }
 

@@ -397,22 +397,22 @@ describe('target docs generator', () => {
 describe('resolveDocsConfig', () => {
   it('defaults to readme + agents', () => {
     const config = resolveDocsConfig(undefined);
-    expect(config).toEqual({ readme: true, agents: true, mcp: false });
+    expect(config).toEqual({ readme: true, agents: true, mcp: false, skills: false });
   });
 
   it('docs: true enables all', () => {
     const config = resolveDocsConfig(true);
-    expect(config).toEqual({ readme: true, agents: true, mcp: true });
+    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: true });
   });
 
   it('docs: false disables all', () => {
     const config = resolveDocsConfig(false);
-    expect(config).toEqual({ readme: false, agents: false, mcp: false });
+    expect(config).toEqual({ readme: false, agents: false, mcp: false, skills: false });
   });
 
   it('partial config fills defaults', () => {
     const config = resolveDocsConfig({ mcp: true });
-    expect(config).toEqual({ readme: true, agents: true, mcp: true });
+    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: false });
   });
 });
 

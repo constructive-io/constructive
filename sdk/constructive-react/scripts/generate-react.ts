@@ -21,6 +21,7 @@ async function main() {
     docs: {
       agents: false,
       mcp: false,
+      skills: true,
     }
   };
 
