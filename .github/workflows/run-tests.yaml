@@ -73,8 +73,6 @@ jobs:
             env: {}
           - package: graphile/graphile-search-plugin
             env: {}
-          - package: graphile/graphile-authz
-            env: {}
           - package: graphile/graphile-pgvector-plugin
             env: {}
           - package: graphql/server-test

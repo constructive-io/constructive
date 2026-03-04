@@ -5,7 +5,7 @@ import fs from 'fs';
 import multer from 'multer';
 import os from 'os';
 import path from 'path';
-import { escapeIdentifier } from 'pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
@@ -231,7 +231,7 @@ export const createUploadAuthenticateMiddleware = (
       const result = await pgQueryContext({
         client: pool,
         context,
-        query: `SELECT * FROM ${escapeIdentifier(privateSchema)}.${escapeIdentifier(authFn)}($1)`,
+        query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(privateSchema, authFn)}($1)`,
         variables: [authToken],
       });
 

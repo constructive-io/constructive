@@ -35,6 +35,7 @@ import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { Bm25SearchPluginOptions, Bm25IndexInfo } from './types';
 import { bm25IndexStore, bm25ExtensionDetected } from './bm25-codec';
+import { QuoteUtils } from '@pgsql/quotes';
 
 /**
  * WeakMap keyed by SQL alias object (shared reference between
@@ -396,7 +397,7 @@ export function createBm25SearchPlugin(
 
                       const columnExpr = sql`${$condition.alias}.${sql.identifier(attributeName)}`;
                       // Use to_bm25query with explicit index name for reliable scoring
-                      const qualifiedIndexName = `"${bm25Index.schemaName}"."${bm25Index.indexName}"`;
+                      const qualifiedIndexName = QuoteUtils.quoteQualifiedIdentifier(bm25Index.schemaName, bm25Index.indexName);
                       const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
                       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 

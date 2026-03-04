@@ -37,5 +37,8 @@
   ],
   "devDependencies": {
     "makage": "^0.1.12"
+  },
+  "dependencies": {
+    "@pgsql/quotes": "^17.1.0"
   }
 }
