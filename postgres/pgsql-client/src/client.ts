@@ -16,7 +16,7 @@ export class PgClient {
   protected ctxStmts: string = '';
   protected contextSettings: PgTestClientContext = {};
   protected _ended: boolean = false;
-  protected connectPromise: Promise<void> | null = null;
+  protected connectPromise: Promise<Client> | null = null;
 
   constructor(config: PgConfig, opts: PgClientOpts = {}) {
     this.opts = opts;
@@ -29,7 +29,7 @@ export class PgClient {
       password: this.config.password
     });
     if (!opts.deferConnect) {
-      this.connectPromise = this.client.connect().then(() => {});
+      this.connectPromise = this.client.connect();
       if (opts.trackConnect) opts.trackConnect(this.connectPromise);
     }
   }
