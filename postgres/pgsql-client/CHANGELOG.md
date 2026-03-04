@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://github.com/constructive-io/constructive/compare/pgsql-client@3.3.1...pgsql-client@3.3.2) (2026-03-04)
+
+### Bug Fixes
+
+- deduplicate graphql resolution and fix pg Client.connect() return type ([aa09f9e](https://github.com/constructive-io/constructive/commit/aa09f9ef9932de7446b90195a4d8eac16349cb57))
+- use Promise<Client> type for connectPromise instead of .then(() => {}) ([16a155b](https://github.com/constructive-io/constructive/commit/16a155b3cf2d0ef83de9ead3a2bb51cddda9f2ea))
+
 ## [3.3.1](https://github.com/constructive-io/constructive/compare/pgsql-client@3.3.0...pgsql-client@3.3.1) (2026-03-03)
 
 **Note:** Version bump only for package pgsql-client

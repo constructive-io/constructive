@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.7.3...@constructive-io/graphql-codegen@4.8.0) (2026-03-04)
+
+### Bug Fixes
+
+- pass targetName to skill generator functions in tests and update snapshots ([138c4e2](https://github.com/constructive-io/constructive/commit/138c4e2f613bf52987330a2b4fc25b6f191b1a6b))
+- restore docs.skills toggle for generated skills ([fdeb909](https://github.com/constructive-io/constructive/commit/fdeb909ddc81b301bac2e8322e642342c0dd21ea))
+
+### Features
+
+- consolidate skills into single-per-API with references/ subdirectories ([71544df](https://github.com/constructive-io/constructive/commit/71544df34e7528124a45a9fc62b3a8ae55519fd8))
+- generate skills to workspace root with composable naming and YAML frontmatter ([3224805](https://github.com/constructive-io/constructive/commit/3224805b02c7240019764a6d6a95f243dede3fb1))
+
 ## [4.7.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.7.2...@constructive-io/graphql-codegen@4.7.3) (2026-03-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

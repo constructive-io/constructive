@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.2.4...@constructive-io/sdk@0.3.0) (2026-03-04)
+
+### Bug Fixes
+
+- restore docs.skills toggle for generated skills ([fdeb909](https://github.com/constructive-io/constructive/commit/fdeb909ddc81b301bac2e8322e642342c0dd21ea))
+
+### Features
+
+- generate skills to workspace root with composable naming and YAML frontmatter ([3224805](https://github.com/constructive-io/constructive/commit/3224805b02c7240019764a6d6a95f243dede3fb1))
+
 ## [0.2.4](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.2.3...@constructive-io/sdk@0.2.4) (2026-03-04)
 
 **Note:** Version bump only for package @constructive-io/sdk
