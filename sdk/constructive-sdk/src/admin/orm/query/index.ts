@@ -18,6 +18,12 @@ export interface AppPermissionsGetPaddedMaskVariables {
 export interface OrgPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
+export interface OrgIsManagerOfVariables {
+  pEntityId?: string;
+  pManagerId?: string;
+  pUserId?: string;
+  pMaxDepth?: number;
+}
 export interface StepsAchievedVariables {
   vlevel?: string;
   vroleId?: string;
@@ -125,6 +131,47 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'mask',
               type: 'BitString',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    orgIsManagerOf: (
+      args: OrgIsManagerOfVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        orgIsManagerOf: boolean | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'OrgIsManagerOf',
+        fieldName: 'orgIsManagerOf',
+        ...buildCustomDocument(
+          'query',
+          'OrgIsManagerOf',
+          'orgIsManagerOf',
+          options?.select,
+          args,
+          [
+            {
+              name: 'pEntityId',
+              type: 'UUID',
+            },
+            {
+              name: 'pManagerId',
+              type: 'UUID',
+            },
+            {
+              name: 'pUserId',
+              type: 'UUID',
+            },
+            {
+              name: 'pMaxDepth',
+              type: 'Int',
             },
           ],
           connectionFieldsMap,

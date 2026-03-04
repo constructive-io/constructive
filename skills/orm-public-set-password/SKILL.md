@@ -1,0 +1,24 @@
+---
+name: orm-public-set-password
+description: Execute the setPassword mutation
+---
+
+# orm-public-set-password
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Execute the setPassword mutation
+
+## Usage
+
+```typescript
+db.mutation.setPassword({ input: '<value>' }).execute()
+```
+
+## Examples
+
+### Run setPassword
+
+```typescript
+const result = await db.mutation.setPassword({ input: '<value>' }).execute();
+```

@@ -1,0 +1,25 @@
+---
+name: hooks-public-remove-node-at-path
+description: React Query mutation hook for removeNodeAtPath
+---
+
+# hooks-public-remove-node-at-path
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+React Query mutation hook for removeNodeAtPath
+
+## Usage
+
+```typescript
+const { mutate } = useRemoveNodeAtPathMutation(); mutate({ input: '<value>' });
+```
+
+## Examples
+
+### Use useRemoveNodeAtPathMutation
+
+```typescript
+const { mutate, isLoading } = useRemoveNodeAtPathMutation();
+mutate({ input: '<value>' });
+```

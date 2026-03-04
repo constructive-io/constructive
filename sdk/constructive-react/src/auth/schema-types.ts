@@ -82,6 +82,15 @@ export type ConnectedAccountOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `AuditLog`. */
+export type AuditLogOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'EVENT_ASC'
+  | 'EVENT_DESC';
 /** Methods to use when ordering `Email`. */
 export type EmailOrderBy =
   | 'NATURAL'
@@ -95,15 +104,6 @@ export type EmailOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `AuditLog`. */
-export type AuditLogOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC';
 /** Methods to use when ordering `User`. */
 export type UserOrderBy =
   | 'NATURAL'
@@ -281,123 +281,6 @@ export interface ConnectedAccountFilter {
   /** Negates the expression. */
   not?: ConnectedAccountFilter;
 }
-/** A condition to be used against `Email` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface EmailCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmail;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `isPrimary` field. */
-  isPrimary?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
-/** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
-export interface EmailFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmailFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `isPrimary` field. */
-  isPrimary?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: EmailFilter[];
-  /** Checks for any expressions in this list. */
-  or?: EmailFilter[];
-  /** Negates the expression. */
-  not?: EmailFilter;
-}
-/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeEmailFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Contains the specified string (case-sensitive). */
-  includes?: string;
-  /** Does not contain the specified string (case-sensitive). */
-  notIncludes?: string;
-  /** Contains the specified string (case-insensitive). */
-  includesInsensitive?: ConstructiveInternalTypeEmail;
-  /** Does not contain the specified string (case-insensitive). */
-  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
-  /** Starts with the specified string (case-sensitive). */
-  startsWith?: string;
-  /** Does not start with the specified string (case-sensitive). */
-  notStartsWith?: string;
-  /** Starts with the specified string (case-insensitive). */
-  startsWithInsensitive?: ConstructiveInternalTypeEmail;
-  /** Does not start with the specified string (case-insensitive). */
-  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
-  /** Ends with the specified string (case-sensitive). */
-  endsWith?: string;
-  /** Does not end with the specified string (case-sensitive). */
-  notEndsWith?: string;
-  /** Ends with the specified string (case-insensitive). */
-  endsWithInsensitive?: ConstructiveInternalTypeEmail;
-  /** Does not end with the specified string (case-insensitive). */
-  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
-  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  like?: string;
-  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLike?: string;
-  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  likeInsensitive?: ConstructiveInternalTypeEmail;
-  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
-  notLikeInsensitive?: ConstructiveInternalTypeEmail;
-  /** Equal to the specified value (case-insensitive). */
-  equalToInsensitive?: ConstructiveInternalTypeEmail;
-  /** Not equal to the specified value (case-insensitive). */
-  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
-  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
-  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
-  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
-  /** Included in the specified list (case-insensitive). */
-  inInsensitive?: ConstructiveInternalTypeEmail[];
-  /** Not included in the specified list (case-insensitive). */
-  notInInsensitive?: ConstructiveInternalTypeEmail[];
-  /** Less than the specified value (case-insensitive). */
-  lessThanInsensitive?: ConstructiveInternalTypeEmail;
-  /** Less than or equal to the specified value (case-insensitive). */
-  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
-  /** Greater than the specified value (case-insensitive). */
-  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
-  /** Greater than or equal to the specified value (case-insensitive). */
-  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
-}
 /**
  * A condition to be used against `AuditLog` object types. All fields are tested
  * for equality and combined with a logical ‘and.’
@@ -521,6 +404,123 @@ export interface ConstructiveInternalTypeOriginFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
+}
+/** A condition to be used against `Email` object types. All fields are tested for equality and combined with a logical ‘and.’ */
+export interface EmailCondition {
+  /** Checks for equality with the object’s `id` field. */
+  id?: string;
+  /** Checks for equality with the object’s `ownerId` field. */
+  ownerId?: string;
+  /** Checks for equality with the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmail;
+  /** Checks for equality with the object’s `isVerified` field. */
+  isVerified?: boolean;
+  /** Checks for equality with the object’s `isPrimary` field. */
+  isPrimary?: boolean;
+  /** Checks for equality with the object’s `createdAt` field. */
+  createdAt?: string;
+  /** Checks for equality with the object’s `updatedAt` field. */
+  updatedAt?: string;
+}
+/** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailFilter[];
+  /** Negates the expression. */
+  not?: EmailFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeEmailFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
 }
 /** A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’ */
 export interface UserCondition {
@@ -720,8 +720,11 @@ export interface CreateCryptoAddressInput {
 export interface CryptoAddressInput {
   id?: string;
   ownerId?: string;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
   address: string;
+  /** Whether ownership of this address has been cryptographically verified */
   isVerified?: boolean;
+  /** Whether this is the user's primary cryptocurrency address */
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -735,9 +738,13 @@ export interface CreatePhoneNumberInput {
 export interface PhoneNumberInput {
   id?: string;
   ownerId?: string;
+  /** Country calling code (e.g. +1, +44) */
   cc: string;
+  /** The phone number without country code */
   number: string;
+  /** Whether the phone number has been verified via SMS code */
   isVerified?: boolean;
+  /** Whether this is the user's primary phone number */
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -757,22 +764,8 @@ export interface ConnectedAccountInput {
   identifier: string;
   /** Additional profile details extracted from this login method */
   details: unknown;
+  /** Whether this connected account has been verified */
   isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateEmailInput {
-  clientMutationId?: string;
-  /** The `Email` to be created by this mutation. */
-  email: EmailInput;
-}
-/** An input for mutations affecting `Email` */
-export interface EmailInput {
-  id?: string;
-  ownerId?: string;
-  email: ConstructiveInternalTypeEmail;
-  isVerified?: boolean;
-  isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -784,13 +777,38 @@ export interface CreateAuditLogInput {
 /** An input for mutations affecting `AuditLog` */
 export interface AuditLogInput {
   id?: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
   event: string;
+  /** User who performed the authentication action */
   actorId?: string;
+  /** Request origin (domain) where the auth event occurred */
   origin?: ConstructiveInternalTypeOrigin;
+  /** Browser or client user-agent string from the request */
   userAgent?: string;
+  /** IP address of the client that initiated the auth event */
   ipAddress?: string;
+  /** Whether the authentication attempt succeeded */
   success: boolean;
+  /** Timestamp when the audit event was recorded */
   createdAt?: string;
+}
+export interface CreateEmailInput {
+  clientMutationId?: string;
+  /** The `Email` to be created by this mutation. */
+  email: EmailInput;
+}
+/** An input for mutations affecting `Email` */
+export interface EmailInput {
+  id?: string;
+  ownerId?: string;
+  /** The email address */
+  email: ConstructiveInternalTypeEmail;
+  /** Whether the email address has been verified via confirmation link */
+  isVerified?: boolean;
+  /** Whether this is the user's primary email address */
+  isPrimary?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateUserInput {
   clientMutationId?: string;
@@ -829,8 +847,11 @@ export interface UpdateCryptoAddressInput {
 export interface CryptoAddressPatch {
   id?: string;
   ownerId?: string;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
   address?: string;
+  /** Whether ownership of this address has been cryptographically verified */
   isVerified?: boolean;
+  /** Whether this is the user's primary cryptocurrency address */
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -845,9 +866,13 @@ export interface UpdatePhoneNumberInput {
 export interface PhoneNumberPatch {
   id?: string;
   ownerId?: string;
+  /** Country calling code (e.g. +1, +44) */
   cc?: string;
+  /** The phone number without country code */
   number?: string;
+  /** Whether the phone number has been verified via SMS code */
   isVerified?: boolean;
+  /** Whether this is the user's primary phone number */
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -868,23 +893,8 @@ export interface ConnectedAccountPatch {
   identifier?: string;
   /** Additional profile details extracted from this login method */
   details?: unknown;
+  /** Whether this connected account has been verified */
   isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateEmailInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Email` being updated. */
-  emailPatch: EmailPatch;
-}
-/** Represents an update to a `Email`. Fields that are set will be updated. */
-export interface EmailPatch {
-  id?: string;
-  ownerId?: string;
-  email?: ConstructiveInternalTypeEmail;
-  isVerified?: boolean;
-  isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -897,13 +907,39 @@ export interface UpdateAuditLogInput {
 /** Represents an update to a `AuditLog`. Fields that are set will be updated. */
 export interface AuditLogPatch {
   id?: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
   event?: string;
+  /** User who performed the authentication action */
   actorId?: string;
+  /** Request origin (domain) where the auth event occurred */
   origin?: ConstructiveInternalTypeOrigin;
+  /** Browser or client user-agent string from the request */
   userAgent?: string;
+  /** IP address of the client that initiated the auth event */
   ipAddress?: string;
+  /** Whether the authentication attempt succeeded */
   success?: boolean;
+  /** Timestamp when the audit event was recorded */
   createdAt?: string;
+}
+export interface UpdateEmailInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Email` being updated. */
+  emailPatch: EmailPatch;
+}
+/** Represents an update to a `Email`. Fields that are set will be updated. */
+export interface EmailPatch {
+  id?: string;
+  ownerId?: string;
+  /** The email address */
+  email?: ConstructiveInternalTypeEmail;
+  /** Whether the email address has been verified via confirmation link */
+  isVerified?: boolean;
+  /** Whether this is the user's primary email address */
+  isPrimary?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateUserInput {
   clientMutationId?: string;
@@ -921,6 +957,8 @@ export interface UserPatch {
   type?: number;
   createdAt?: string;
   updatedAt?: string;
+  /** File upload for the `profilePicture` field. */
+  profilePictureUpload?: File;
 }
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
@@ -938,11 +976,11 @@ export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteEmailInput {
+export interface DeleteAuditLogInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteAuditLogInput {
+export interface DeleteEmailInput {
   clientMutationId?: string;
   id: string;
 }
@@ -978,17 +1016,17 @@ export interface ConnectedAccountConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Email` values. */
-export interface EmailConnection {
-  nodes: Email[];
-  edges: EmailEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `AuditLog` values. */
 export interface AuditLogConnection {
   nodes: AuditLog[];
   edges: AuditLogEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Email` values. */
+export interface EmailConnection {
+  nodes: Email[];
+  edges: EmailEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1088,17 +1126,17 @@ export interface CreateConnectedAccountPayload {
   connectedAccount?: ConnectedAccount | null;
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
-export interface CreateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was created by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
 export interface CreateAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was created by this mutation. */
   auditLog?: AuditLog | null;
   auditLogEdge?: AuditLogEdge | null;
+}
+export interface CreateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was created by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
 }
 export interface CreateUserPayload {
   clientMutationId?: string | null;
@@ -1130,17 +1168,17 @@ export interface UpdateConnectedAccountPayload {
   connectedAccount?: ConnectedAccount | null;
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
-export interface UpdateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was updated by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
 export interface UpdateAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was updated by this mutation. */
   auditLog?: AuditLog | null;
   auditLogEdge?: AuditLogEdge | null;
+}
+export interface UpdateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was updated by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
 }
 export interface UpdateUserPayload {
   clientMutationId?: string | null;
@@ -1172,17 +1210,17 @@ export interface DeleteConnectedAccountPayload {
   connectedAccount?: ConnectedAccount | null;
   connectedAccountEdge?: ConnectedAccountEdge | null;
 }
-export interface DeleteEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was deleted by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
 export interface DeleteAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was deleted by this mutation. */
   auditLog?: AuditLog | null;
   auditLogEdge?: AuditLogEdge | null;
+}
+export interface DeleteEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was deleted by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
 }
 export interface DeleteUserPayload {
   clientMutationId?: string | null;
@@ -1225,17 +1263,17 @@ export interface ConnectedAccountEdge {
   /** The `ConnectedAccount` at the end of the edge. */
   node?: ConnectedAccount | null;
 }
-/** A `Email` edge in the connection. */
-export interface EmailEdge {
-  cursor?: string | null;
-  /** The `Email` at the end of the edge. */
-  node?: Email | null;
-}
 /** A `AuditLog` edge in the connection. */
 export interface AuditLogEdge {
   cursor?: string | null;
   /** The `AuditLog` at the end of the edge. */
   node?: AuditLog | null;
+}
+/** A `Email` edge in the connection. */
+export interface EmailEdge {
+  cursor?: string | null;
+  /** The `Email` at the end of the edge. */
+  node?: Email | null;
 }
 /** A `User` edge in the connection. */
 export interface UserEdge {
@@ -1286,18 +1324,30 @@ export interface ExtendTokenExpiresRecord {
   sessionId?: string | null;
   expiresAt?: string | null;
 }
+/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {
   id: string;
+  /** References the authenticated user; NULL for anonymous sessions */
   userId?: string | null;
+  /** Whether this is an anonymous session (no authenticated user) */
   isAnonymous: boolean;
+  /** When this session expires and can no longer be used for authentication */
   expiresAt: string;
+  /** When this session was explicitly revoked (soft delete); NULL means active */
   revokedAt?: string | null;
+  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
   origin?: ConstructiveInternalTypeOrigin | null;
+  /** IP address from which the session was created, used for strict fingerprint validation */
   ip?: string | null;
+  /** User-Agent string from the client, used for strict fingerprint validation */
   uagent?: string | null;
+  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
   fingerprintMode: string;
+  /** Timestamp of last password re-verification for step-up authentication */
   lastPasswordVerified?: string | null;
+  /** Timestamp of last MFA verification for step-up authentication */
   lastMfaVerified?: string | null;
+  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;

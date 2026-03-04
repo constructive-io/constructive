@@ -37,31 +37,31 @@ function App() {
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
-| `useCryptoAddressesQuery` | Query | List all cryptoAddresses |
-| `useCryptoAddressQuery` | Query | Get one cryptoAddress |
-| `useCreateCryptoAddressMutation` | Mutation | Create a cryptoAddress |
-| `useUpdateCryptoAddressMutation` | Mutation | Update a cryptoAddress |
-| `useDeleteCryptoAddressMutation` | Mutation | Delete a cryptoAddress |
-| `usePhoneNumbersQuery` | Query | List all phoneNumbers |
-| `usePhoneNumberQuery` | Query | Get one phoneNumber |
-| `useCreatePhoneNumberMutation` | Mutation | Create a phoneNumber |
-| `useUpdatePhoneNumberMutation` | Mutation | Update a phoneNumber |
-| `useDeletePhoneNumberMutation` | Mutation | Delete a phoneNumber |
-| `useConnectedAccountsQuery` | Query | List all connectedAccounts |
-| `useConnectedAccountQuery` | Query | Get one connectedAccount |
-| `useCreateConnectedAccountMutation` | Mutation | Create a connectedAccount |
-| `useUpdateConnectedAccountMutation` | Mutation | Update a connectedAccount |
-| `useDeleteConnectedAccountMutation` | Mutation | Delete a connectedAccount |
-| `useEmailsQuery` | Query | List all emails |
-| `useEmailQuery` | Query | Get one email |
-| `useCreateEmailMutation` | Mutation | Create a email |
-| `useUpdateEmailMutation` | Mutation | Update a email |
-| `useDeleteEmailMutation` | Mutation | Delete a email |
-| `useAuditLogsQuery` | Query | List all auditLogs |
-| `useAuditLogQuery` | Query | Get one auditLog |
-| `useCreateAuditLogMutation` | Mutation | Create a auditLog |
-| `useUpdateAuditLogMutation` | Mutation | Update a auditLog |
-| `useDeleteAuditLogMutation` | Mutation | Delete a auditLog |
+| `useCryptoAddressesQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCryptoAddressQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `usePhoneNumberQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `useCreatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useUpdatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useDeletePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useConnectedAccountsQuery` | Query | OAuth and social login connections linking external service accounts to users |
+| `useConnectedAccountQuery` | Query | OAuth and social login connections linking external service accounts to users |
+| `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `useAuditLogsQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAuditLogQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
+| `useEmailQuery` | Query | User email addresses with verification and primary-email management |
+| `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
@@ -174,27 +174,6 @@ const { mutate: create } = useCreateConnectedAccountMutation({
 create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' });
 ```
 
-### Email
-
-```typescript
-// List all emails
-const { data, isLoading } = useEmailsQuery({
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one email
-const { data: item } = useEmailQuery({
-  id: '<value>',
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a email
-const { mutate: create } = useCreateEmailMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
-```
-
 ### AuditLog
 
 ```typescript
@@ -214,6 +193,27 @@ const { mutate: create } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
 create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' });
+```
+
+### Email
+
+```typescript
+// List all emails
+const { data, isLoading } = useEmailsQuery({
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one email
+const { data: item } = useEmailQuery({
+  id: '<value>',
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a email
+const { mutate: create } = useCreateEmailMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
 ```
 
 ### User

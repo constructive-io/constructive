@@ -25,8 +25,8 @@ const db = createClient({
 | `cryptoAddress` | findMany, findOne, create, update, delete |
 | `phoneNumber` | findMany, findOne, create, update, delete |
 | `connectedAccount` | findMany, findOne, create, update, delete |
-| `email` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
+| `email` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -168,41 +168,6 @@ const updated = await db.connectedAccount.update({ where: { id: '<value>' }, dat
 const deleted = await db.connectedAccount.delete({ where: { id: '<value>' } }).execute();
 ```
 
-### `db.email`
-
-CRUD operations for Email records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `ownerId` | UUID | Yes |
-| `email` | ConstructiveInternalTypeEmail | Yes |
-| `isVerified` | Boolean | Yes |
-| `isPrimary` | Boolean | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all email records
-const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.email.findOne({ id: '<value>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.email.create({ data: { ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.email.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.email.delete({ where: { id: '<value>' } }).execute();
-```
-
 ### `db.auditLog`
 
 CRUD operations for AuditLog records.
@@ -237,6 +202,41 @@ const updated = await db.auditLog.update({ where: { id: '<value>' }, data: { eve
 
 // Delete
 const deleted = await db.auditLog.delete({ where: { id: '<value>' } }).execute();
+```
+
+### `db.email`
+
+CRUD operations for Email records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `email` | ConstructiveInternalTypeEmail | Yes |
+| `isVerified` | Boolean | Yes |
+| `isPrimary` | Boolean | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all email records
+const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.email.findOne({ id: '<value>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.email.create({ data: { ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.email.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.email.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.user`

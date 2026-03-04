@@ -19,8 +19,8 @@ import {
   cryptoAddressKeys,
   phoneNumberKeys,
   connectedAccountKeys,
-  emailKeys,
   auditLogKeys,
+  emailKeys,
   userKeys,
 } from './query-keys';
 /**
@@ -108,20 +108,6 @@ export const invalidate = {
         queryKey: connectedAccountKeys.detail(id),
       }),
   },
-  /** Invalidate email queries */ email: {
-    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: emailKeys.all,
-      }),
-    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: emailKeys.lists(),
-      }),
-    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: emailKeys.detail(id),
-      }),
-  },
   /** Invalidate auditLog queries */ auditLog: {
     /** Invalidate all auditLog queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -134,6 +120,20 @@ export const invalidate = {
     /** Invalidate a specific auditLog */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: auditLogKeys.detail(id),
+      }),
+  },
+  /** Invalidate email queries */ email: {
+    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.all,
+      }),
+    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.lists(),
+      }),
+    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: emailKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -192,14 +192,14 @@ export const remove = {
       queryKey: connectedAccountKeys.detail(id),
     });
   },
-  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: emailKeys.detail(id),
-    });
-  },
   /** Remove auditLog from cache */ auditLog: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: auditLogKeys.detail(id),
+    });
+  },
+  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: emailKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

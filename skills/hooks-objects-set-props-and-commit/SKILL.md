@@ -1,0 +1,25 @@
+---
+name: hooks-objects-set-props-and-commit
+description: React Query mutation hook for setPropsAndCommit
+---
+
+# hooks-objects-set-props-and-commit
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+React Query mutation hook for setPropsAndCommit
+
+## Usage
+
+```typescript
+const { mutate } = useSetPropsAndCommitMutation(); mutate({ input: '<value>' });
+```
+
+## Examples
+
+### Use useSetPropsAndCommitMutation
+
+```typescript
+const { mutate, isLoading } = useSetPropsAndCommitMutation();
+mutate({ input: '<value>' });
+```
