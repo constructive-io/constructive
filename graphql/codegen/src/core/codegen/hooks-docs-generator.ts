@@ -1,3 +1,5 @@
+import { toKebabCase } from 'komoji';
+
 import type { CleanOperation, CleanTable } from '../../types/schema';
 import {
   buildSkillFile,
@@ -496,6 +498,7 @@ export function getHooksMcpTools(
 export function generateHooksSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
+  targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
 
@@ -507,10 +510,13 @@ export function generateHooksSkills(
       .map((f) => `${f.name}: true`)
       .join(', ');
 
+    const tableKebab = toKebabCase(singularName);
+    const skillName = `hooks-${targetName}-${tableKebab}`;
+
     files.push({
-      fileName: `skills/${lcFirst(singularName)}.md`,
+      fileName: `${skillName}/SKILL.md`,
       content: buildSkillFile({
-        name: `hooks-${lcFirst(singularName)}`,
+        name: skillName,
         description: table.description || `React Query hooks for ${table.name} data operations`,
         language: 'typescript',
         usage: [
@@ -558,10 +564,13 @@ export function generateHooksSkills(
         ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
         : '';
 
+    const opKebab = toKebabCase(op.name);
+    const skillName = `hooks-${targetName}-${opKebab}`;
+
     files.push({
-      fileName: `skills/${op.name}.md`,
+      fileName: `${skillName}/SKILL.md`,
       content: buildSkillFile({
-        name: `hooks-${op.name}`,
+        name: skillName,
         description:
           op.description ||
           `React Query ${op.kind} hook for ${op.name}`,

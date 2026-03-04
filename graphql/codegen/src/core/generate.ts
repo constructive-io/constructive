@@ -56,6 +56,7 @@ import type { RootRootReadmeTarget } from './codegen/target-docs-generator';
 import { createSchemaSource, validateSourceOptions } from './introspect';
 import { writeGeneratedFiles } from './output';
 import { runCodegenPipeline, validateTablesFound } from './pipeline';
+import { findWorkspaceRoot } from './workspace';
 
 export interface GenerateOptions extends GraphQLSDKConfigTarget {
   authorization?: string;
@@ -92,6 +93,29 @@ export interface GenerateResult {
  */
 export interface GenerateInternalOptions {
   skipCli?: boolean;
+  /**
+   * Internal-only name for the target when generating skills.
+   * Used by generateMulti() so skill names are stable and composable.
+   */
+  targetName?: string;
+}
+
+function resolveSkillsOutputDir(
+  config: GraphQLSDKConfigTarget,
+  outputRoot: string,
+): string {
+  const workspaceRoot =
+    findWorkspaceRoot(path.resolve(outputRoot)) ??
+    findWorkspaceRoot(process.cwd()) ??
+    process.cwd();
+
+  if (config.skillsPath) {
+    return path.isAbsolute(config.skillsPath)
+      ? config.skillsPath
+      : path.resolve(workspaceRoot, config.skillsPath);
+  }
+
+  return path.resolve(workspaceRoot, 'skills');
 }
 
 export async function generate(
@@ -319,6 +343,8 @@ export async function generate(
     ...(customOperations.mutations ?? []),
   ];
   const allMcpTools: McpTool[] = [];
+  const targetName = internalOptions?.targetName ?? 'default';
+  const skillsToWrite: Array<{ path: string; content: string }> = [];
 
   if (runOrm) {
     if (docsConfig.readme) {
@@ -332,10 +358,8 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
     }
-    if (docsConfig.skills) {
-      for (const skill of generateOrmSkills(tables, allCustomOps)) {
-        filesToWrite.push({ path: path.posix.join('orm', skill.fileName), content: skill.content });
-      }
+    for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
+      skillsToWrite.push({ path: skill.fileName, content: skill.content });
     }
   }
 
@@ -351,10 +375,8 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
     }
-    if (docsConfig.skills) {
-      for (const skill of generateHooksSkills(tables, allCustomOps)) {
-        filesToWrite.push({ path: path.posix.join('hooks', skill.fileName), content: skill.content });
-      }
+    for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
+      skillsToWrite.push({ path: skill.fileName, content: skill.content });
     }
   }
 
@@ -374,10 +396,8 @@ export async function generate(
     if (docsConfig.mcp) {
       allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName));
     }
-    if (docsConfig.skills) {
-      for (const skill of generateCliSkills(tables, allCustomOps, toolName)) {
-        filesToWrite.push({ path: path.posix.join('cli', skill.fileName), content: skill.content });
-      }
+    for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName)) {
+      skillsToWrite.push({ path: skill.fileName, content: skill.content });
     }
   }
 
@@ -418,6 +438,31 @@ export async function generate(
       };
     }
     allFilesWritten.push(...(writeResult.filesWritten ?? []));
+
+    if (skillsToWrite.length > 0) {
+      const skillsOutputDir = resolveSkillsOutputDir(config, outputRoot);
+      const skillsWriteResult = await writeGeneratedFiles(skillsToWrite, skillsOutputDir, [], {
+        pruneStaleFiles: false,
+      });
+      if (!skillsWriteResult.success) {
+        return {
+          success: false,
+          message: `Failed to write generated skill files: ${skillsWriteResult.errors?.join(', ')}`,
+          output: skillsOutputDir,
+          errors: skillsWriteResult.errors,
+        };
+      }
+      allFilesWritten.push(...(skillsWriteResult.filesWritten ?? []));
+    }
+
+    // Remove old nested skill output dirs (pre-workspace-root behavior)
+    const outputRootAbs = path.resolve(outputRoot);
+    for (const oldSkillsDir of ['orm/skills', 'hooks/skills', 'cli/skills']) {
+      const abs = path.join(outputRootAbs, oldSkillsDir);
+      if (fs.existsSync(abs)) {
+        fs.rmSync(abs, { recursive: true, force: true });
+      }
+    }
   }
 
   const generators = [
@@ -652,7 +697,7 @@ export async function generateMulti(
         schemaOnly,
         schemaOnlyFilename: schemaOnly ? `${name}.graphql` : undefined,
       },
-      useUnifiedCli ? { skipCli: true } : undefined,
+      useUnifiedCli ? { skipCli: true, targetName: name } : { targetName: name },
     );
     results.push({ name, result });
     if (!result.success) {
@@ -744,11 +789,10 @@ export async function generateMulti(
     if (docsConfig.mcp) {
       allMcpTools.push(...getMultiTargetCliMcpTools(docsInput));
     }
-    if (docsConfig.skills) {
-      for (const skill of generateMultiTargetSkills(docsInput)) {
-        cliFilesToWrite.push({ path: path.posix.join('cli', skill.fileName), content: skill.content });
-      }
-    }
+    const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
+      path: skill.fileName,
+      content: skill.content,
+    }));
     if (docsConfig.mcp && allMcpTools.length > 0) {
       const mcpFile = generateCombinedMcpConfig(allMcpTools, toolName);
       cliFilesToWrite.push({ path: path.posix.join('cli', mcpFile.fileName), content: mcpFile.content });
@@ -756,6 +800,22 @@ export async function generateMulti(
 
     const { writeGeneratedFiles: writeFiles } = await import('./output');
     await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
+
+    const firstTargetResolved = getConfigOptions({
+      ...(firstTargetConfig ?? {}),
+      ...(cliOverrides ?? {}),
+    });
+    const skillsOutputDir = resolveSkillsOutputDir(
+      firstTargetResolved,
+      firstTargetResolved.output,
+    );
+    await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+
+    // Remove old nested unified-cli skill output dir
+    const oldUnifiedCliSkillsDir = path.resolve('cli', 'skills');
+    if (fs.existsSync(oldUnifiedCliSkillsDir)) {
+      fs.rmSync(oldUnifiedCliSkillsDir, { recursive: true, force: true });
+    }
   }
 
   // Generate root-root README if multi-target

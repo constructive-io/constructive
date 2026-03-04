@@ -59,19 +59,18 @@ export function resolveDocsConfig(
   docs: DocsConfig | boolean | undefined,
 ): DocsConfig {
   if (docs === true) {
-    return { readme: true, agents: true, mcp: true, skills: true };
+    return { readme: true, agents: true, mcp: true };
   }
   if (docs === false) {
-    return { readme: false, agents: false, mcp: false, skills: false };
+    return { readme: false, agents: false, mcp: false };
   }
   if (!docs) {
-    return { readme: true, agents: true, mcp: false, skills: false };
+    return { readme: true, agents: true, mcp: false };
   }
   return {
     readme: docs.readme ?? true,
     agents: docs.agents ?? true,
     mcp: docs.mcp ?? false,
-    skills: docs.skills ?? false,
   };
 }
 
@@ -122,6 +121,13 @@ export function gqlTypeToJsonSchemaType(gqlType: string): string {
 export function buildSkillFile(skill: SkillDefinition): string {
   const lang = skill.language ?? 'bash';
   const lines: string[] = [];
+
+  // YAML frontmatter (Agent Skills format)
+  lines.push('---');
+  lines.push(`name: ${skill.name}`);
+  lines.push(`description: ${skill.description}`);
+  lines.push('---');
+  lines.push('');
 
   lines.push(`# ${skill.name}`);
   lines.push('');

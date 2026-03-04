@@ -164,13 +164,6 @@ export interface DocsConfig {
    */
   mcp?: boolean;
 
-  /**
-   * Generate skills/ directory — per-command .md skill files
-   * Each command gets its own skill file with description, usage, and examples
-   * Compatible with Devin and similar agent skill systems
-   * @default false
-   */
-  skills?: boolean;
 }
 
 /**
@@ -377,9 +370,18 @@ export interface GraphQLSDKConfigTarget {
    * Controls which doc formats are generated alongside code for each generator target.
    * Applied globally to all enabled generators (ORM, React Query, CLI).
    * Set to `true` to enable all formats, or configure individually.
-   * @default { readme: true, agents: true, mcp: false, skills: false }
+   * @default { readme: true, agents: true, mcp: false }
    */
   docs?: DocsConfig | boolean;
+
+  /**
+   * Custom path for generated skill files.
+   * When set, skills are written to this directory.
+   * When undefined (default), skills are written to {workspaceRoot}/skills/
+   * where workspaceRoot is auto-detected by walking up from the output directory
+   * looking for pnpm-workspace.yaml, lerna.json, or package.json with workspaces.
+   */
+  skillsPath?: string;
 
   /**
    * Query key generation configuration
