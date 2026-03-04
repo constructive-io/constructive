@@ -281,23 +281,23 @@ function generatePermissionConditions(
     // Single permission - would need to resolve to bit position
     // For now, use a placeholder that can be resolved at runtime
     conditions.push(
-      `(${sprtAlias}."permissions" & get_permission_mask('${payload.permission}')) = get_permission_mask('${payload.permission}')`
+      `(${sprtAlias}.${quoteIdent('permissions')} & get_permission_mask('${payload.permission}')) = get_permission_mask('${payload.permission}')`
     );
   } else if (payload.permissions && payload.permissions.length > 0) {
     // Multiple permissions (ORed together)
     const permList = payload.permissions.map((p) => `'${p}'`).join(', ');
     conditions.push(
-      `(${sprtAlias}."permissions" & get_permission_mask(ARRAY[${permList}])) = get_permission_mask(ARRAY[${permList}])`
+      `(${sprtAlias}.${quoteIdent('permissions')} & get_permission_mask(ARRAY[${permList}])) = get_permission_mask(ARRAY[${permList}])`
     );
   }
 
   // Admin/owner checks
   const adminOwnerConditions: string[] = [];
   if (payload.is_admin) {
-    adminOwnerConditions.push(`${sprtAlias}."is_admin" = TRUE`);
+    adminOwnerConditions.push(`${sprtAlias}.${quoteIdent('is_admin')} = TRUE`);
   }
   if (payload.is_owner) {
-    adminOwnerConditions.push(`${sprtAlias}."is_owner" = TRUE`);
+    adminOwnerConditions.push(`${sprtAlias}.${quoteIdent('is_owner')} = TRUE`);
   }
 
   if (adminOwnerConditions.length > 0) {
@@ -323,7 +323,7 @@ function generateMembership(
   const sprtAlias = 'sprt';
 
   const conditions = [
-    `${sprtAlias}."actor_id" = ${opts.currentUserIdFunc}`,
+    `${sprtAlias}.${quoteIdent('actor_id')} = ${opts.currentUserIdFunc}`,
     ...generatePermissionConditions(payload, sprtAlias),
   ];
 
@@ -344,11 +344,11 @@ function generateMembershipByField(
   const sprtAlias = 'sprt';
 
   const conditions = [
-    `${sprtAlias}."actor_id" = ${opts.currentUserIdFunc}`,
+    `${sprtAlias}.${quoteIdent('actor_id')} = ${opts.currentUserIdFunc}`,
     ...generatePermissionConditions(payload, sprtAlias),
   ];
 
-  const sql = `${colRef(payload.entity_field, opts)} = ANY (SELECT ${sprtAlias}."entity_id" FROM ${sprtTable} AS ${sprtAlias} WHERE ${conditions.join(' AND ')})`;
+  const sql = `${colRef(payload.entity_field, opts)} = ANY (SELECT ${sprtAlias}.${quoteIdent('entity_id')} FROM ${sprtTable} AS ${sprtAlias} WHERE ${conditions.join(' AND ')})`;
   return { sql };
 }
 
@@ -391,14 +391,14 @@ function generateMembershipByJoin(
   }
 
   const conditions = [
-    `${sprtAlias}."actor_id" = ${opts.currentUserIdFunc}`,
+    `${sprtAlias}.${quoteIdent('actor_id')} = ${opts.currentUserIdFunc}`,
     ...generatePermissionConditions(payload, sprtAlias),
   ];
 
   const sql = `${colRef(payload.entity_field, opts)} = ANY (
     SELECT ${joinAlias}.${quoteIdent(payload.entity_field)}
     FROM ${sprtTable} AS ${sprtAlias}
-    JOIN ${joinTable} AS ${joinAlias} ON ${sprtAlias}."entity_id" = ${joinAlias}.${joinField}
+    JOIN ${joinTable} AS ${joinAlias} ON ${sprtAlias}.${quoteIdent('entity_id')} = ${joinAlias}.${joinField}
     WHERE ${conditions.join(' AND ')}
   )`;
 
@@ -421,21 +421,21 @@ function generateOrgHierarchy(
   if (payload.direction === 'down') {
     // Manager sees subordinates: current user is ancestor, row's anchor is descendant
     conditions = [
-      `${hAlias}."entity_id" = ${colRef(entityField, opts)}`,
-      `${hAlias}."ancestor_id" = ${opts.currentUserIdFunc}`,
-      `${hAlias}."descendant_id" = ${colRef(payload.anchor_field, opts)}`,
+      `${hAlias}.${quoteIdent('entity_id')} = ${colRef(entityField, opts)}`,
+      `${hAlias}.${quoteIdent('ancestor_id')} = ${opts.currentUserIdFunc}`,
+      `${hAlias}.${quoteIdent('descendant_id')} = ${colRef(payload.anchor_field, opts)}`,
     ];
   } else {
     // Subordinate sees managers: current user is descendant, row's anchor is ancestor
     conditions = [
-      `${hAlias}."entity_id" = ${colRef(entityField, opts)}`,
-      `${hAlias}."descendant_id" = ${opts.currentUserIdFunc}`,
-      `${hAlias}."ancestor_id" = ${colRef(payload.anchor_field, opts)}`,
+      `${hAlias}.${quoteIdent('entity_id')} = ${colRef(entityField, opts)}`,
+      `${hAlias}.${quoteIdent('descendant_id')} = ${opts.currentUserIdFunc}`,
+      `${hAlias}.${quoteIdent('ancestor_id')} = ${colRef(payload.anchor_field, opts)}`,
     ];
   }
 
   if (payload.max_depth !== undefined) {
-    conditions.push(`${hAlias}."depth" <= ${payload.max_depth}`);
+    conditions.push(`${hAlias}.${quoteIdent('depth')} <= ${payload.max_depth}`);
   }
 
   const sql = `EXISTS (SELECT 1 FROM ${hierarchyTable} AS ${hAlias} WHERE ${conditions.join(' AND ')})`;
