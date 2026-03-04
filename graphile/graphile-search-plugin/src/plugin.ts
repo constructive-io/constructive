@@ -32,9 +32,52 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
+import type { PgCodecWithAttributes, PgResource } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { SQL } from 'pg-sql2';
 import type { PgSearchPluginOptions } from './types';
+
+// ─── TypeScript Namespace Augmentations ──────────────────────────────────────
+// Following Benjie's pattern for proper type safety across the plugin system.
+
+declare global {
+  namespace GraphileBuild {
+    interface Inflection {
+      /** Name for the FullText scalar type */
+      fullTextScalarTypeName(this: Inflection): string;
+      /** Name for the rank field (e.g. "bodyRank") */
+      pgTsvRank(this: Inflection, fieldName: string): string;
+      /** Name for orderBy enum value for column rank */
+      pgTsvOrderByColumnRankEnum(
+        this: Inflection,
+        codec: PgCodecWithAttributes,
+        attributeName: string,
+        ascending: boolean,
+      ): string;
+      /** Name for orderBy enum value for computed column rank */
+      pgTsvOrderByComputedColumnRankEnum(
+        this: Inflection,
+        codec: PgCodecWithAttributes,
+        resource: PgResource,
+        ascending: boolean,
+      ): string;
+    }
+    interface ScopeObjectFieldsField {
+      isPgTSVRankField?: boolean;
+    }
+    interface BehaviorStrings {
+      'attributeFtsRank:select': true;
+      'procFtsRank:select': true;
+      'attributeFtsRank:orderBy': true;
+      'procFtsRank:orderBy': true;
+    }
+  }
+  namespace GraphileConfig {
+    interface Plugins {
+      PgSearchPlugin: true;
+    }
+  }
+}
 
 /**
  * Interface for the meta value stored by the condition apply via setMeta
@@ -78,9 +121,11 @@ function getQueryBuilder(
   }
 
   // Verify we found a query builder with matching alias
+  // Using duck-typing (isPgSelectQueryBuilder) per Benjie's pattern
   if (
     current &&
     typeof current.selectAndReturnIndex === 'function' &&
+    typeof current.where === 'function' &&
     current.alias === alias
   ) {
     return current;
@@ -104,7 +149,100 @@ export function createPgSearchPlugin(
       'Generates search conditions for tsvector columns in PostGraphile v5',
     after: ['PgAttributesPlugin', 'PgConnectionArgFilterPlugin', 'PgConnectionArgFilterOperatorsPlugin', 'AddConnectionFilterOperatorPlugin'],
 
+    // ─── Custom Inflection Methods ─────────────────────────────────────
+    // Makes field naming configurable and overridable by downstream plugins.
+    inflection: {
+      add: {
+        fullTextScalarTypeName() {
+          return fullTextScalarName;
+        },
+        pgTsvRank(_preset, fieldName) {
+          return this.camelCase(`${fieldName}-rank`);
+        },
+        pgTsvOrderByColumnRankEnum(_preset, codec, attributeName, ascending) {
+          const columnName = this._attributeName({
+            codec,
+            attributeName,
+            skipRowId: true,
+          });
+          return this.constantCase(
+            `${columnName}_rank_${ascending ? 'asc' : 'desc'}`,
+          );
+        },
+        pgTsvOrderByComputedColumnRankEnum(_preset, _codec, resource, ascending) {
+          const columnName = this.computedAttributeField({
+            resource,
+          });
+          return this.constantCase(
+            `${columnName}_rank_${ascending ? 'asc' : 'desc'}`,
+          );
+        },
+      },
+    },
+
     schema: {
+      // ─── Behavior Registry ─────────────────────────────────────────────
+      // Declarative control over which columns get FTS features.
+      // Users can opt out per-column via `@behavior -attributeFtsRank:select`.
+      behaviorRegistry: {
+        add: {
+          'attributeFtsRank:select': {
+            description:
+              'Should the full text search rank be exposed for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+          'procFtsRank:select': {
+            description:
+              'Should the full text search rank be exposed for this computed column function',
+            entities: ['pgResource'],
+          },
+          'attributeFtsRank:orderBy': {
+            description:
+              'Should you be able to order by the FTS rank for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+          'procFtsRank:orderBy': {
+            description:
+              'Should you be able to order by the FTS rank for this computed column function',
+            entities: ['pgResource'],
+          },
+        },
+      },
+      entityBehavior: {
+        pgCodecAttribute: {
+          inferred: {
+            provides: ['default'],
+            before: ['inferred', 'override', 'PgAttributesPlugin'],
+            callback(behavior, [codec, attributeName], build) {
+              const attr = codec.attributes[attributeName];
+              if (attr.codec === (build as any).dataplanPg.TYPES.tsvector) {
+                return [
+                  'attributeFtsRank:orderBy',
+                  'attributeFtsRank:select',
+                  behavior,
+                ];
+              }
+              return behavior;
+            },
+          },
+        },
+        pgResource: {
+          inferred: {
+            provides: ['default'],
+            before: ['inferred', 'override', 'PgProceduresPlugin'],
+            callback(behavior, resource, build) {
+              if (!(resource as any).parameters) {
+                return behavior;
+              }
+              if ((resource as any).codec !== (build as any).dataplanPg.TYPES.tsvector) {
+                return behavior;
+              }
+              return ['procFtsRank:orderBy', 'procFtsRank:select', behavior];
+            },
+          },
+        },
+      },
+
       hooks: {
         init(_, build) {
           const {
@@ -141,33 +279,36 @@ export function createPgSearchPlugin(
           const {
             inflection,
             graphql: { GraphQLFloat },
-            grafast: { constant, lambda },
+            grafast: { lambda },
           } = build;
           const {
-            scope: { isPgClassType, pgCodec },
+            scope: { isPgClassType, pgCodec: rawPgCodec },
             fieldWithHooks,
           } = context;
 
-          if (!isPgClassType || !pgCodec?.attributes) {
+          if (!isPgClassType || !rawPgCodec?.attributes) {
             return fields;
           }
 
-          let newFields = fields;
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
+          const pgRegistry = (build as any).input?.pgRegistry;
 
-          for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
-          )) {
-            if (!isTsvectorCodec(attribute.codec)) continue;
-
-            const baseFieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
-            const fieldName = inflection.camelCase(`${baseFieldName}-rank`);
+          // Helper to add a rank field for a given base field name
+          function addTsvField(
+            baseFieldName: string,
+            fieldName: string,
+            origin: string,
+          ) {
             const metaKey = `__fts_ranks_${baseFieldName}`;
-
-            newFields = build.extend(
-              newFields,
+            build.extend(
+              fields,
               {
                 [fieldName]: fieldWithHooks(
-                  { fieldName } as any,
+                  {
+                    fieldName,
+                    isPgTSVRankField: true,
+                  } as any,
                   () => ({
                     description: `Full-text search ranking when filtered by \`${baseFieldName}\`. Returns null when no search condition is active.`,
                     type: GraphQLFloat,
@@ -176,16 +317,12 @@ export function createPgSearchPlugin(
                       const $select = typeof $row.getClassStep === 'function'
                         ? $row.getClassStep()
                         : null;
-                      if (!$select) return constant(null);
+                      if (!$select) return build.grafast.constant(null);
 
                       if (typeof $select.setInliningForbidden === 'function') {
                         $select.setInliningForbidden();
                       }
 
-                      // Use the meta system to retrieve rank details.
-                      // getMeta returns a Grafast Step that resolves at
-                      // execution time to the value set by setMeta in
-                      // the condition apply phase.
                       const $details = $select.getMeta(metaKey);
 
                       return lambda(
@@ -200,56 +337,131 @@ export function createPgSearchPlugin(
                             return null;
                           }
                           const rawValue = row[d.selectIndex];
-                          return rawValue == null ? null : parseFloat(rawValue);
+                          return rawValue == null
+                            ? null
+                            : TYPES.float.fromPg(rawValue as string);
                         }
                       );
                     },
                   })
                 ),
               },
-              `PgSearchPlugin adding rank field '${fieldName}' for '${attributeName}' on '${pgCodec.name}'`
+              origin
             );
           }
 
-          return newFields;
+          // ── Direct tsvector columns ──
+          for (const [attributeName, attribute] of Object.entries(
+            codec.attributes as Record<string, any>
+          )) {
+            if (!isTsvectorCodec(attribute.codec)) continue;
+
+            // Check behavior registry — skip if user opted out
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeFtsRank:select',
+              )
+            ) {
+              continue;
+            }
+
+            const baseFieldName = inflection.attribute({ codec: codec as any, attributeName });
+            const fieldName = inflection.pgTsvRank(baseFieldName);
+            addTsvField(
+              baseFieldName,
+              fieldName,
+              `PgSearchPlugin adding rank field for ${attributeName}`,
+            );
+          }
+
+          // ── Computed columns (functions returning tsvector) ──
+          // Following Benjie's pattern: find pgResources that are functions
+          // returning tsvector whose first parameter matches this codec.
+          if (pgRegistry) {
+            const tsvProcs = Object.values(pgRegistry.pgResources).filter(
+              (r: any): boolean => {
+                if (r.codec !== (build as any).dataplanPg?.TYPES?.tsvector) return false;
+                if (!r.parameters) return false;
+                if (!r.parameters[0]) return false;
+                if (r.parameters[0].codec !== codec) return false;
+                if (
+                  behavior &&
+                  typeof behavior.pgResourceMatches === 'function'
+                ) {
+                  if (!behavior.pgResourceMatches(r, 'typeField')) return false;
+                  if (!behavior.pgResourceMatches(r, 'procFtsRank:select'))
+                    return false;
+                }
+                if (typeof r.from !== 'function') return false;
+                return true;
+              },
+            );
+
+            for (const resource of tsvProcs) {
+              const baseFieldName = inflection.computedAttributeField({ resource: resource as any });
+              const fieldName = inflection.pgTsvRank(baseFieldName);
+              addTsvField(
+                baseFieldName,
+                fieldName,
+                `PgSearchPlugin adding rank field for computed column ${(resource as any).name} on ${(context as any).Self.name}`,
+              );
+            }
+          }
+
+          return fields;
         },
 
         GraphQLEnumType_values(values, build, context) {
           const {
-            sql,
             inflection,
           } = build;
 
           const {
-            scope: { isPgRowSortEnum, pgCodec },
+            scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
           } = context;
 
-          if (!isPgRowSortEnum || !pgCodec?.attributes) {
+          if (!isPgRowSortEnum || !rawPgCodec?.attributes) {
             return values;
           }
 
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
+          const pgRegistry = (build as any).input?.pgRegistry;
+
           let newValues = values;
 
+          // ── Direct tsvector columns ──
           for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
+            codec.attributes as Record<string, any>
           )) {
             if (!isTsvectorCodec(attribute.codec)) continue;
 
-            const fieldName = inflection.attribute({ codec: pgCodec as any, attributeName });
+            // Check behavior registry
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeFtsRank:orderBy',
+              )
+            ) {
+              continue;
+            }
+
+            const fieldName = inflection.attribute({ codec: codec as any, attributeName });
             const metaKey = `fts_order_${fieldName}`;
             const makePlan = (direction: 'ASC' | 'DESC') =>
               (step: any) => {
-                // The enum apply runs during the PLANNING phase on PgSelectStep.
-                // Store the requested direction in PgSelectStep._meta so that
-                // the condition apply (deferred phase) can read it via the
-                // proxy's getMetaRaw and add the actual ORDER BY clause.
                 if (typeof step.setMeta === 'function') {
                   step.setMeta(metaKey, direction);
                 }
               };
 
-            const ascName = inflection.constantCase(`${attributeName}_rank_asc`);
-            const descName = inflection.constantCase(`${attributeName}_rank_desc`);
+            const ascName = inflection.pgTsvOrderByColumnRankEnum(codec, attributeName, true);
+            const descName = inflection.pgTsvOrderByColumnRankEnum(codec, attributeName, false);
 
             newValues = build.extend(
               newValues,
@@ -269,8 +481,65 @@ export function createPgSearchPlugin(
                   },
                 },
               },
-              `PgSearchPlugin adding rank orderBy for '${attributeName}' on '${pgCodec.name}'`
+              `PgSearchPlugin adding rank orderBy for '${attributeName}' on '${codec.name}'`
             );
+          }
+
+          // ── Computed columns returning tsvector ──
+          if (pgRegistry) {
+            const tsvProcs = Object.values(pgRegistry.pgResources).filter(
+              (r: any): boolean => {
+                if (r.codec !== (build as any).dataplanPg?.TYPES?.tsvector) return false;
+                if (!r.parameters) return false;
+                if (!r.parameters[0]) return false;
+                if (r.parameters[0].codec !== codec) return false;
+                if (
+                  behavior &&
+                  typeof behavior.pgResourceMatches === 'function'
+                ) {
+                  if (!behavior.pgResourceMatches(r, 'typeField')) return false;
+                  if (!behavior.pgResourceMatches(r, 'procFtsRank:orderBy'))
+                    return false;
+                }
+                if (typeof r.from !== 'function') return false;
+                return true;
+              },
+            );
+
+            for (const resource of tsvProcs) {
+              const baseFieldName = inflection.computedAttributeField({ resource: resource as any });
+              const metaKey = `fts_order_${baseFieldName}`;
+              const makePlan = (direction: 'ASC' | 'DESC') =>
+                (step: any) => {
+                  if (typeof step.setMeta === 'function') {
+                    step.setMeta(metaKey, direction);
+                  }
+                };
+
+              const ascName = inflection.pgTsvOrderByComputedColumnRankEnum(codec, resource as any, true);
+              const descName = inflection.pgTsvOrderByComputedColumnRankEnum(codec, resource as any, false);
+
+              newValues = build.extend(
+                newValues,
+                {
+                  [ascName]: {
+                    extensions: {
+                      grafast: {
+                        apply: makePlan('ASC'),
+                      },
+                    },
+                  },
+                  [descName]: {
+                    extensions: {
+                      grafast: {
+                        apply: makePlan('DESC'),
+                      },
+                    },
+                  },
+                },
+                `PgSearchPlugin adding rank orderBy for computed column '${(resource as any).name}' on '${codec.name}'`
+              );
+            }
           }
 
           return newValues;
@@ -339,13 +608,16 @@ export function createPgSearchPlugin(
 
                       // Get the query builder via meta-safe traversal
                       const qb = getQueryBuilder(build, $condition);
-                      if (qb) {
+
+                      // Only inject SELECT expressions when in "normal" mode
+                      // (not aggregate mode). Following Benjie's qb.mode check.
+                      if (qb && qb.mode === 'normal') {
                         // Add ts_rank to the SELECT list
                         const rankSql = sql`ts_rank(${columnExpr}, ${tsquery})`;
                         const wrappedRankSql = sql`${sql.parens(rankSql)}::text`;
                         const rankIndex = qb.selectAndReturnIndex(wrappedRankSql);
 
-                        // Store the select index in meta (replaces WeakMap)
+                        // Store the select index in meta
                         qb.setMeta(rankMetaKey, {
                           selectIndex: rankIndex,
                         } as FtsRankDetails);
@@ -356,7 +628,7 @@ export function createPgSearchPlugin(
                       // enum values. The enum's apply stores direction in meta
                       // during planning; if no meta is set, skip the orderBy
                       // entirely so cursors remain stable across pages.
-                      if (qb && typeof qb.getMetaRaw === 'function') {
+                      if (qb && qb.mode === 'normal' && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `fts_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);
                         if (explicitDir) {

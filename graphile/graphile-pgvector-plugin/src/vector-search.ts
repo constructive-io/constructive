@@ -27,8 +27,39 @@
 import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
+import type { PgCodecWithAttributes } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { VectorSearchPluginOptions } from './types';
+
+// ─── TypeScript Namespace Augmentations ──────────────────────────────────────
+
+declare global {
+  namespace GraphileBuild {
+    interface Inflection {
+      /** Name for the distance field (e.g. "embeddingDistance") */
+      pgVectorDistance(this: Inflection, fieldName: string): string;
+      /** Name for orderBy enum value for vector distance */
+      pgVectorOrderByDistanceEnum(
+        this: Inflection,
+        codec: PgCodecWithAttributes,
+        attributeName: string,
+        ascending: boolean,
+      ): string;
+    }
+    interface ScopeObjectFieldsField {
+      isPgVectorDistanceField?: boolean;
+    }
+    interface BehaviorStrings {
+      'attributeVectorDistance:select': true;
+      'attributeVectorDistance:orderBy': true;
+    }
+  }
+  namespace GraphileConfig {
+    interface Plugins {
+      VectorSearchPlugin: true;
+    }
+  }
+}
 
 /**
  * Interface for the meta value stored by the condition apply via setMeta
@@ -81,9 +112,11 @@ function getQueryBuilder(
   }
 
   // Verify we found a query builder with matching alias
+  // Using duck-typing (isPgSelectQueryBuilder) per Benjie's pattern
   if (
     current &&
     typeof current.selectAndReturnIndex === 'function' &&
+    typeof current.where === 'function' &&
     current.alias === alias
   ) {
     return current;
@@ -114,7 +147,61 @@ export function createVectorSearchPlugin(
       'PgAttributesPlugin',
     ],
 
+    // ─── Custom Inflection Methods ─────────────────────────────────────
+    inflection: {
+      add: {
+        pgVectorDistance(_preset, fieldName) {
+          return this.camelCase(`${fieldName}-distance`);
+        },
+        pgVectorOrderByDistanceEnum(_preset, codec, attributeName, ascending) {
+          const columnName = this._attributeName({
+            codec,
+            attributeName,
+            skipRowId: true,
+          });
+          return this.constantCase(
+            `${columnName}_distance_${ascending ? 'asc' : 'desc'}`,
+          );
+        },
+      },
+    },
+
     schema: {
+      // ─── Behavior Registry ─────────────────────────────────────────────
+      behaviorRegistry: {
+        add: {
+          'attributeVectorDistance:select': {
+            description:
+              'Should the vector distance be exposed for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+          'attributeVectorDistance:orderBy': {
+            description:
+              'Should you be able to order by the vector distance for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+        },
+      },
+      entityBehavior: {
+        pgCodecAttribute: {
+          inferred: {
+            provides: ['default'],
+            before: ['inferred', 'override', 'PgAttributesPlugin'],
+            callback(behavior, [codec, attributeName], _build) {
+              const attr = codec.attributes[attributeName];
+              if (attr.codec?.name === 'vector') {
+                return [
+                  'attributeVectorDistance:orderBy',
+                  'attributeVectorDistance:select',
+                  behavior,
+                ];
+              }
+              return behavior;
+            },
+          },
+        },
+      },
+
       hooks: {
         init(_, build) {
           const {
@@ -197,36 +284,54 @@ export function createVectorSearchPlugin(
           const {
             inflection,
             graphql: { GraphQLFloat },
-            grafast: { constant, lambda },
+            grafast: { lambda },
           } = build;
           const {
-            scope: { isPgClassType, pgCodec },
+            scope: { isPgClassType, pgCodec: rawPgCodec },
             fieldWithHooks,
           } = context;
 
-          if (!isPgClassType || !pgCodec?.attributes) {
+          if (!isPgClassType || !rawPgCodec?.attributes) {
             return fields;
           }
+
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
 
           let newFields = fields;
 
           for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
+            codec.attributes as Record<string, any>
           )) {
             if (!isVectorCodec(attribute.codec)) continue;
 
+            // Check behavior registry — skip if user opted out
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeVectorDistance:select',
+              )
+            ) {
+              continue;
+            }
+
             const baseFieldName = inflection.attribute({
-              codec: pgCodec as any,
+              codec: codec as any,
               attributeName,
             });
-            const fieldName = inflection.camelCase(`${baseFieldName}-distance`);
+            const fieldName = inflection.pgVectorDistance(baseFieldName);
             const metaKey = `__vector_distance_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
               {
                 [fieldName]: fieldWithHooks(
-                  { fieldName } as any,
+                  {
+                    fieldName,
+                    isPgVectorDistanceField: true,
+                  } as any,
                   () => ({
                     description: `Vector distance when filtered by \`${baseFieldName}\` nearby condition. Returns null when no nearby condition is active.`,
                     type: GraphQLFloat,
@@ -235,7 +340,7 @@ export function createVectorSearchPlugin(
                       const $select = typeof $row.getClassStep === 'function'
                         ? $row.getClassStep()
                         : null;
-                      if (!$select) return constant(null);
+                      if (!$select) return build.grafast.constant(null);
 
                       if (
                         typeof $select.setInliningForbidden === 'function'
@@ -243,10 +348,6 @@ export function createVectorSearchPlugin(
                         $select.setInliningForbidden();
                       }
 
-                      // Use the meta system to retrieve distance details.
-                      // getMeta returns a Grafast Step that resolves at
-                      // execution time to the value set by setMeta in
-                      // the condition apply phase.
                       const $details = $select.getMeta(metaKey);
 
                       return lambda(
@@ -263,14 +364,14 @@ export function createVectorSearchPlugin(
                           const rawValue = row[d.selectIndex];
                           return rawValue == null
                             ? null
-                            : parseFloat(rawValue);
+                            : TYPES.float.fromPg(rawValue as string);
                         }
                       );
                     },
                   })
                 ),
               },
-              `VectorSearchPlugin adding distance field '${fieldName}' for '${attributeName}' on '${pgCodec.name}'`
+              `VectorSearchPlugin adding distance field '${fieldName}' for '${attributeName}' on '${codec.name}'`
             );
           }
 
@@ -284,22 +385,37 @@ export function createVectorSearchPlugin(
         GraphQLEnumType_values(values, build, context) {
           const { inflection } = build;
           const {
-            scope: { isPgRowSortEnum, pgCodec },
+            scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
           } = context;
 
-          if (!isPgRowSortEnum || !pgCodec?.attributes) {
+          if (!isPgRowSortEnum || !rawPgCodec?.attributes) {
             return values;
           }
+
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
 
           let newValues = values;
 
           for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
+            codec.attributes as Record<string, any>
           )) {
             if (!isVectorCodec(attribute.codec)) continue;
 
+            // Check behavior registry
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeVectorDistance:orderBy',
+              )
+            ) {
+              continue;
+            }
+
             const fieldName = inflection.attribute({
-              codec: pgCodec as any,
+              codec: codec as any,
               attributeName,
             });
             const metaKey = `vector_order_${fieldName}`;
@@ -310,12 +426,8 @@ export function createVectorSearchPlugin(
                 }
               };
 
-            const ascName = inflection.constantCase(
-              `${attributeName}_distance_asc`
-            );
-            const descName = inflection.constantCase(
-              `${attributeName}_distance_desc`
-            );
+            const ascName = inflection.pgVectorOrderByDistanceEnum(codec, attributeName, true);
+            const descName = inflection.pgVectorOrderByDistanceEnum(codec, attributeName, false);
 
             newValues = build.extend(
               newValues,
@@ -335,7 +447,7 @@ export function createVectorSearchPlugin(
                   },
                 },
               },
-              `VectorSearchPlugin adding distance orderBy for '${attributeName}' on '${pgCodec.name}'`
+              `VectorSearchPlugin adding distance orderBy for '${attributeName}' on '${codec.name}'`
             );
           }
 
@@ -438,14 +550,17 @@ export function createVectorSearchPlugin(
 
                       // Get the query builder via meta-safe traversal
                       const qb = getQueryBuilder(build, $condition);
-                      if (qb) {
+
+                      // Only inject SELECT expressions when in "normal" mode
+                      // (not aggregate mode). Following Benjie's qb.mode check.
+                      if (qb && qb.mode === 'normal') {
                         // Add distance to the SELECT list
                         const wrappedDistanceSql = sql`${sql.parens(distanceExpr)}::text`;
                         const distanceIndex = qb.selectAndReturnIndex(
                           wrappedDistanceSql
                         );
 
-                        // Store the select index in meta (replaces WeakMap)
+                        // Store the select index in meta
                         qb.setMeta(distanceMetaKey, {
                           selectIndex: distanceIndex,
                         } as VectorDistanceDetails);
@@ -454,7 +569,7 @@ export function createVectorSearchPlugin(
                       // ORDER BY distance: only add when the user
                       // explicitly requested distance ordering via
                       // the EMBEDDING_DISTANCE_ASC/DESC enum values.
-                      if (qb && typeof qb.getMetaRaw === 'function') {
+                      if (qb && qb.mode === 'normal' && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `vector_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);
                         if (explicitDir) {
