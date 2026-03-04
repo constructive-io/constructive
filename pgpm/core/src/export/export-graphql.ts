@@ -12,6 +12,8 @@ import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
 import path from 'path';
 
+import { Inquirerer } from 'inquirerer';
+
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
 import { getMissingInstallableModules } from '../modules/modules';
@@ -53,9 +55,6 @@ const SERVICE_REQUIRED_EXTENSIONS = [
   'services'
 ] as const;
 
-interface Prompter {
-  prompt: (argv: any, questions: any[]) => Promise<Record<string, any>>;
-}
 
 interface MissingModulesResult {
   missingModules: { controlName: string; npmName: string }[];
@@ -65,7 +64,7 @@ interface MissingModulesResult {
 const detectMissingModules = async (
   project: PgpmPackage,
   extensions: string[],
-  prompter?: Prompter,
+  prompter?: Inquirerer,
   argv?: Record<string, any>
 ): Promise<MissingModulesResult> => {
   const installed = project.getWorkspaceInstalledModules();
@@ -79,12 +78,13 @@ const detectMissingModules = async (
   console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
 
   if (prompter) {
-    const { install } = await prompter.prompt(argv || {}, [
+    const { install } = await prompter.prompt(argv || {} as Record<string, any>, [
       {
         type: 'confirm',
         name: 'install',
         message: `Install missing modules (${missingNames.join(', ')})?`,
-        default: true
+        default: true,
+        useDefault: true
       }
     ]);
 
@@ -153,7 +153,7 @@ interface PreparePackageOptions {
   name: string;
   description: string;
   extensions: string[];
-  prompter?: Prompter;
+  prompter?: Inquirerer;
   repoName?: string;
   username?: string;
 }
@@ -178,13 +178,17 @@ const preparePackage = async ({
   if (!plan.length) {
     const { fullName, email } = parseAuthor(author);
 
+    // If username is provided, run non-interactively with all answers pre-filled.
+    // Otherwise, let the prompter ask for it.
+    const knownUsername = username || undefined;
+
     await project.initModule({
       name,
       description,
       author,
       extensions,
       outputDir: outdir,
-      noTty: !!username,
+      noTty: !prompter || !!knownUsername,
       prompter,
       answers: {
         moduleName: name,
@@ -194,17 +198,18 @@ const preparePackage = async ({
         fullName,
         ...(email && { email }),
         repoName: repoName || name,
-        ...(username && { username })
+        ...(knownUsername && { username: knownUsername })
       }
     });
   } else {
     if (prompter) {
-      const { overwrite } = await prompter.prompt({}, [
+      const { overwrite } = await prompter.prompt({} as Record<string, any>, [
         {
           type: 'confirm',
           name: 'overwrite',
           message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-          default: false
+          default: true,
+          useDefault: true
         }
       ]);
       if (!overwrite) {
@@ -253,7 +258,7 @@ export interface ExportGraphQLOptions {
   metaExtensionName: string;
   /** Description for the service/meta extension */
   metaExtensionDesc?: string;
-  prompter?: Prompter;
+  prompter?: Inquirerer;
   argv?: Record<string, any>;
   repoName?: string;
   username?: string;
@@ -431,6 +436,8 @@ SET session_replication_role TO DEFAULT;`;
       'trigger',
       'trigger_function',
       'rls_function',
+      'limit_function',
+      'procedure',
       'foreign_key_constraint',
       'primary_key_constraint',
       'unique_constraint',
@@ -439,6 +446,7 @@ SET session_replication_role TO DEFAULT;`;
       'schema_grant',
       'table_grant',
       'default_privilege',
+      'database_extension',
       'domains',
       'sites',
       'apis',
@@ -468,7 +476,7 @@ SET session_replication_role TO DEFAULT;`;
       'crypto_addresses_module',
       'crypto_auth_module',
       'field_module',
-      'table_module',
+      'table_template_module',
       'secure_table_provision',
       'user_profiles_module',
       'user_settings_module',

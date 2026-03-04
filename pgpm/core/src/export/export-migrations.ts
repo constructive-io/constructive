@@ -1,6 +1,7 @@
 import { PgpmOptions } from '@pgpmjs/types';
 import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
+import { Inquirerer } from 'inquirerer';
 import { toSnakeCase } from 'komoji';
 import path from 'path';
 import { getPgPool } from 'pg-cache';
@@ -46,13 +47,6 @@ const SERVICE_REQUIRED_EXTENSIONS = [
   'services'
 ] as const;
 
-/**
- * Prompter interface for interactive prompts.
- * Compatible with Inquirerer from the CLI.
- */
-interface Prompter {
-  prompt: (argv: any, questions: any[]) => Promise<Record<string, any>>;
-}
 
 /**
  * Result of checking for missing modules at workspace level.
@@ -77,7 +71,7 @@ interface MissingModulesResult {
 const detectMissingModules = async (
   project: PgpmPackage,
   extensions: string[],
-  prompter?: Prompter,
+  prompter?: Inquirerer,
   argv?: Record<string, any>
 ): Promise<MissingModulesResult> => {
   // Use workspace-level check - doesn't require being inside a module
@@ -145,7 +139,7 @@ interface ExportMigrationsToDiskOptions {
   extensionDesc?: string;
   metaExtensionName: string;
   metaExtensionDesc?: string;
-  prompter?: Prompter;
+  prompter?: Inquirerer;
   argv?: Record<string, any>;
   /** Repository name for module scaffolding. Defaults to module name if not provided. */
   repoName?: string;
@@ -176,7 +170,7 @@ interface ExportOptions {
   extensionDesc?: string;
   metaExtensionName: string;
   metaExtensionDesc?: string;
-  prompter?: Prompter;
+  prompter?: Inquirerer;
   argv?: Record<string, any>;
   /** Repository name for module scaffolding. Defaults to module name if not provided. */
   repoName?: string;
@@ -514,7 +508,7 @@ interface PreparePackageOptions {
   name: string;
   description: string;
   extensions: string[];
-  prompter?: Prompter;
+  prompter?: Inquirerer;
   /** Repository name for module scaffolding. Defaults to module name if not provided. */
   repoName?: string;
   /** GitHub username/org for module scaffolding. Required for non-interactive use. */
@@ -562,6 +556,9 @@ const preparePackage = async ({
   if (!plan.length) {
     const { fullName, email } = parseAuthor(author);
 
+    // Always run non-interactively — all answers are pre-filled
+    const effectiveUsername = username || fullName || 'export';
+
     await project.initModule({
       name,
       description,
@@ -569,7 +566,7 @@ const preparePackage = async ({
       extensions,
       // Use outputDir to create module directly in the specified location
       outputDir: outdir,
-      noTty: !!username,
+      noTty: true,
       prompter,
       answers: {
         moduleName: name,
@@ -580,17 +577,18 @@ const preparePackage = async ({
         ...(email && { email }),
         // Use provided values or sensible defaults
         repoName: repoName || name,
-        ...(username && { username })
+        username: effectiveUsername
       }
     });
   } else {
     if (prompter) {
-      const { overwrite } = await prompter.prompt({}, [
+      const { overwrite } = await prompter.prompt({} as Record<string, any>, [
         {
           type: 'confirm',
           name: 'overwrite',
           message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-          default: false
+          default: true,
+          useDefault: true
         }
       ]);
       if (!overwrite) {

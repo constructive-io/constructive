@@ -122,6 +122,11 @@ export default async (
     // Convert camelCase to snake_case for schema rows
     const pgSchemaRows = schemaRows.map(s => graphqlRowToPostgresRow(s)) as Array<{ id: string; schema_name: string; name: string }>;
 
+    // Normalize comma-separated schema_names string into an array for checkbox override
+    if (typeof argv.schema_names === 'string') {
+      argv.schema_names = argv.schema_names.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+
     const { schema_names } = await prompter.prompt(argv, [
       {
         type: 'checkbox',
@@ -149,7 +154,8 @@ export default async (
       extensionName,
       metaExtensionName,
       prompter,
-      argv
+      argv,
+      username
     });
   } else {
     // =========================================================================
@@ -184,7 +190,7 @@ export default async (
       SELECT id, name FROM metaschema_public.database;
     `);
 
-    const { database_ids: selectedDatabaseName } = await prompter.prompt({} as any, [
+    const { database_ids: selectedDatabaseName } = await prompter.prompt(argv, [
       {
         type: 'list',
         name: 'database_ids',
@@ -231,7 +237,12 @@ export default async (
       [dbInfo.database_ids[0]]
     );
 
-    const { schema_names } = await prompter.prompt({} as any, [
+    // Normalize comma-separated schema_names string into an array for checkbox override
+    if (typeof argv.schema_names === 'string') {
+      argv.schema_names = argv.schema_names.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+
+    const { schema_names } = await prompter.prompt(argv, [
       {
         type: 'checkbox',
         name: 'schema_names',
@@ -254,7 +265,8 @@ export default async (
       extensionName,
       metaExtensionName,
       prompter,
-      argv
+      argv,
+      username
     });
   }
 
