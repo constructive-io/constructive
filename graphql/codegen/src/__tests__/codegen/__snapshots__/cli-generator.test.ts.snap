@@ -362,7 +362,12 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`cli docs generator generates CLI skill files 1`] = `
-"# myapp-context
+"---
+name: cli-context
+description: Manage API endpoint contexts for myapp
+---
+
+# cli-context
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -396,7 +401,12 @@ myapp context list
 `;
 
 exports[`cli docs generator generates CLI skill files 2`] = `
-"# myapp-auth
+"---
+name: cli-auth
+description: Manage authentication tokens for myapp
+---
+
+# cli-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -427,7 +437,12 @@ myapp auth status
 `;
 
 exports[`cli docs generator generates CLI skill files 3`] = `
-"# myapp-car
+"---
+name: cli-default-car
+description: CRUD operations for Car records via myapp CLI
+---
+
+# cli-default-car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -478,7 +493,12 @@ myapp car delete --id <value>
 `;
 
 exports[`cli docs generator generates CLI skill files 4`] = `
-"# myapp-driver
+"---
+name: cli-default-driver
+description: CRUD operations for Driver records via myapp CLI
+---
+
+# cli-default-driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -529,7 +549,12 @@ myapp driver delete --id <value>
 `;
 
 exports[`cli docs generator generates CLI skill files 5`] = `
-"# myapp-current-user
+"---
+name: cli-default-current-user
+description: Get the currently authenticated user
+---
+
+# cli-default-current-user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -552,7 +577,12 @@ myapp current-user
 `;
 
 exports[`cli docs generator generates CLI skill files 6`] = `
-"# myapp-login
+"---
+name: cli-default-login
+description: Authenticate a user
+---
+
+# cli-default-login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1781,7 +1811,12 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`hooks docs generator generates hooks skill files 1`] = `
-"# hooks-car
+"---
+name: hooks-default-car
+description: React Query hooks for Car data operations
+---
+
+# hooks-default-car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1819,7 +1854,12 @@ mutate({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value
 `;
 
 exports[`hooks docs generator generates hooks skill files 2`] = `
-"# hooks-driver
+"---
+name: hooks-default-driver
+description: React Query hooks for Driver data operations
+---
+
+# hooks-default-driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1857,7 +1897,12 @@ mutate({ name: '<value>', licenseNumber: '<value>' });
 `;
 
 exports[`hooks docs generator generates hooks skill files 3`] = `
-"# hooks-currentUser
+"---
+name: hooks-default-current-user
+description: Get the currently authenticated user
+---
+
+# hooks-default-current-user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1880,7 +1925,12 @@ const { data, isLoading } = useCurrentUserQuery();
 `;
 
 exports[`hooks docs generator generates hooks skill files 4`] = `
-"# hooks-login
+"---
+name: hooks-default-login
+description: Authenticate a user
+---
+
+# hooks-default-login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -2905,7 +2955,12 @@ No developer or entity involved in creating this software will be liable for any
 exports[`multi-target cli docs generates multi-target skills 1`] = `
 [
   {
-    "content": "# myapp-context
+    "content": "---
+name: cli-context
+description: Manage API endpoint contexts for myapp (multi-target: auth, members, app)
+---
+
+# cli-context
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -2944,10 +2999,15 @@ myapp context list
 myapp context use staging
 \`\`\`
 ",
-    "fileName": "skills/context.md",
+    "fileName": "cli-context/SKILL.md",
   },
   {
-    "content": "# myapp-credentials
+    "content": "---
+name: cli-auth
+description: Manage authentication tokens for myapp (shared across all targets)
+---
+
+# cli-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -2975,10 +3035,15 @@ myapp credentials set-token eyJhbGciOiJIUzI1NiIs...
 myapp credentials status
 \`\`\`
 ",
-    "fileName": "skills/credentials.md",
+    "fileName": "cli-auth/SKILL.md",
   },
   {
-    "content": "# myapp-auth:user
+    "content": "---
+name: cli-auth-user
+description: CRUD operations for User records via myapp CLI (auth target)
+---
+
+# cli-auth-user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3014,10 +3079,15 @@ myapp auth:user create --email "value" --name "value"
 myapp auth:user get --id <value>
 \`\`\`
 ",
-    "fileName": "skills/auth-user.md",
+    "fileName": "cli-auth-user/SKILL.md",
   },
   {
-    "content": "# myapp-auth:current-user
+    "content": "---
+name: cli-auth-current-user
+description: Get the currently authenticated user (auth target)
+---
+
+# cli-auth-current-user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3037,10 +3107,15 @@ myapp auth:current-user
 myapp auth:current-user
 \`\`\`
 ",
-    "fileName": "skills/auth-current-user.md",
+    "fileName": "cli-auth-current-user/SKILL.md",
   },
   {
-    "content": "# myapp-auth:login
+    "content": "---
+name: cli-auth-login
+description: Authenticate a user (auth target)
+---
+
+# cli-auth-login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3061,10 +3136,15 @@ myapp auth:login --email <value> --password <value> --save-token
 myapp auth:login --email <value> --password <value>
 \`\`\`
 ",
-    "fileName": "skills/auth-login.md",
+    "fileName": "cli-auth-login/SKILL.md",
   },
   {
-    "content": "# myapp-members:member
+    "content": "---
+name: cli-members-member
+description: CRUD operations for Member records via myapp CLI (members target)
+---
+
+# cli-members-member
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3100,10 +3180,15 @@ myapp members:member create --role "value"
 myapp members:member get --id <value>
 \`\`\`
 ",
-    "fileName": "skills/members-member.md",
+    "fileName": "cli-members-member/SKILL.md",
   },
   {
-    "content": "# myapp-app:car
+    "content": "---
+name: cli-app-car
+description: CRUD operations for Car records via myapp CLI (app target)
+---
+
+# cli-app-car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3139,7 +3224,7 @@ myapp app:car create --make "value" --model "value" --year "value" --isElectric 
 myapp app:car get --id <value>
 \`\`\`
 ",
-    "fileName": "skills/app-car.md",
+    "fileName": "cli-app-car/SKILL.md",
   },
 ]
 `;
@@ -4502,7 +4587,12 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`orm docs generator generates ORM skill files 1`] = `
-"# orm-car
+"---
+name: orm-default-car
+description: ORM operations for Car records
+---
+
+# orm-default-car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4540,7 +4630,12 @@ const item = await db.car.create({
 `;
 
 exports[`orm docs generator generates ORM skill files 2`] = `
-"# orm-driver
+"---
+name: orm-default-driver
+description: ORM operations for Driver records
+---
+
+# orm-default-driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4578,7 +4673,12 @@ const item = await db.driver.create({
 `;
 
 exports[`orm docs generator generates ORM skill files 3`] = `
-"# orm-currentUser
+"---
+name: orm-default-current-user
+description: Get the currently authenticated user
+---
+
+# orm-default-current-user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4601,7 +4701,12 @@ const result = await db.query.currentUser().execute();
 `;
 
 exports[`orm docs generator generates ORM skill files 4`] = `
-"# orm-login
+"---
+name: orm-default-login
+description: Authenticate a user
+---
+
+# orm-default-login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 

@@ -123,6 +123,13 @@ export function buildSkillFile(skill: SkillDefinition): string {
   const lang = skill.language ?? 'bash';
   const lines: string[] = [];
 
+  // YAML frontmatter (Agent Skills format)
+  lines.push('---');
+  lines.push(`name: ${skill.name}`);
+  lines.push(`description: ${skill.description}`);
+  lines.push('---');
+  lines.push('');
+
   lines.push(`# ${skill.name}`);
   lines.push('');
   lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');

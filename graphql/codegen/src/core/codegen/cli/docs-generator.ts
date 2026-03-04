@@ -591,13 +591,16 @@ export function generateSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
 
+  const contextSkillName = 'cli-context';
+
   files.push({
-    fileName: 'skills/context.md',
+    fileName: `${contextSkillName}/SKILL.md`,
     content: buildSkillFile({
-      name: `${toolName}-context`,
+      name: contextSkillName,
       description: `Manage API endpoint contexts for ${toolName}`,
       usage: [
         `${toolName} context create <name> --endpoint <url>`,
@@ -622,10 +625,12 @@ export function generateSkills(
     }),
   });
 
+  const authSkillName = 'cli-auth';
+
   files.push({
-    fileName: 'skills/auth.md',
+    fileName: `${authSkillName}/SKILL.md`,
     content: buildSkillFile({
-      name: `${toolName}-auth`,
+      name: authSkillName,
       description: `Manage authentication tokens for ${toolName}`,
       usage: [
         `${toolName} auth set-token <token>`,
@@ -651,10 +656,12 @@ export function generateSkills(
     const pk = getPrimaryKeyInfo(table)[0];
     const editableFields = getEditableFields(table);
 
+    const skillName = `cli-${targetName}-${kebab}`;
+
     files.push({
-      fileName: `skills/${kebab}.md`,
+      fileName: `${skillName}/SKILL.md`,
       content: buildSkillFile({
-        name: `${toolName}-${kebab}`,
+        name: skillName,
         description: `CRUD operations for ${table.name} records via ${toolName} CLI`,
         usage: [
           `${toolName} ${kebab} list`,
@@ -700,10 +707,12 @@ export function generateSkills(
         ? `${toolName} ${kebab} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
         : `${toolName} ${kebab}`;
 
+    const skillName = `cli-${targetName}-${kebab}`;
+
     files.push({
-      fileName: `skills/${kebab}.md`,
+      fileName: `${skillName}/SKILL.md`,
       content: buildSkillFile({
-        name: `${toolName}-${kebab}`,
+        name: skillName,
         description: op.description || `Execute the ${op.name} ${op.kind}`,
         usage: [usage],
         examples: [
@@ -1428,10 +1437,12 @@ export function generateMultiTargetSkills(
   const contextCreateFlags = targets
     .map((t) => `--${t.name}-endpoint <url>`)
     .join(' ');
+  const contextSkillName = 'cli-context';
+
   files.push({
-    fileName: `skills/${builtinNames.context}.md`,
+    fileName: `${contextSkillName}/SKILL.md`,
     content: buildSkillFile({
-      name: `${toolName}-${builtinNames.context}`,
+      name: contextSkillName,
       description: `Manage API endpoint contexts for ${toolName} (multi-target: ${targets.map((t) => t.name).join(', ')})`,
       usage: contextUsage,
       examples: [
@@ -1460,10 +1471,12 @@ export function generateMultiTargetSkills(
     }),
   });
 
+  const authSkillName = 'cli-auth';
+
   files.push({
-    fileName: `skills/${builtinNames.auth}.md`,
+    fileName: `${authSkillName}/SKILL.md`,
     content: buildSkillFile({
-      name: `${toolName}-${builtinNames.auth}`,
+      name: authSkillName,
       description: `Manage authentication tokens for ${toolName} (shared across all targets)`,
       usage: [
         `${toolName} ${builtinNames.auth} set-token <token>`,
@@ -1491,10 +1504,12 @@ export function generateMultiTargetSkills(
       const editableFields = getEditableFields(table);
       const cmd = `${tgt.name}:${kebab}`;
 
+      const skillName = `cli-${tgt.name}-${kebab}`;
+
       files.push({
-        fileName: `skills/${tgt.name}-${kebab}.md`,
+        fileName: `${skillName}/SKILL.md`,
         content: buildSkillFile({
-          name: `${toolName}-${cmd}`,
+          name: skillName,
           description: `CRUD operations for ${table.name} records via ${toolName} CLI (${tgt.name} target)`,
           usage: [
             `${toolName} ${cmd} list`,
@@ -1535,10 +1550,12 @@ export function generateMultiTargetSkills(
         usageLines.push(`${baseUsage} --save-token`);
       }
 
+      const skillName = `cli-${tgt.name}-${kebab}`;
+
       files.push({
-        fileName: `skills/${tgt.name}-${kebab}.md`,
+        fileName: `${skillName}/SKILL.md`,
         content: buildSkillFile({
-          name: `${toolName}-${cmd}`,
+          name: skillName,
           description: `${op.description || `Execute the ${op.name} ${op.kind}`} (${tgt.name} target)`,
           usage: usageLines,
           examples: [
