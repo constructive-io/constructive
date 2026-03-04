@@ -571,7 +571,7 @@ export function createBm25SearchPlugin(
                       // ORDER BY score: only add when the user
                       // explicitly requested score ordering via
                       // the BM25_<COLUMN>_SCORE_ASC/DESC enum values.
-                      if (qb && qb.mode === 'normal' && typeof qb.getMetaRaw === 'function') {
+                      if (qb && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `bm25_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);
                         if (explicitDir) {

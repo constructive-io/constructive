@@ -569,7 +569,7 @@ export function createVectorSearchPlugin(
                       // ORDER BY distance: only add when the user
                       // explicitly requested distance ordering via
                       // the EMBEDDING_DISTANCE_ASC/DESC enum values.
-                      if (qb && qb.mode === 'normal' && typeof qb.getMetaRaw === 'function') {
+                      if (qb && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `vector_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);
                         if (explicitDir) {

@@ -628,7 +628,7 @@ export function createPgSearchPlugin(
                       // enum values. The enum's apply stores direction in meta
                       // during planning; if no meta is set, skip the orderBy
                       // entirely so cursors remain stable across pages.
-                      if (qb && qb.mode === 'normal' && typeof qb.getMetaRaw === 'function') {
+                      if (qb && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `fts_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);
                         if (explicitDir) {
