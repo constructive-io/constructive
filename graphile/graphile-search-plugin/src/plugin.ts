@@ -18,15 +18,17 @@
  *
  * ARCHITECTURE NOTE:
  * Uses the Grafast meta system (setMeta/getMeta) to pass data between
- * the condition apply phase and the output field plan, following the
- * pattern from Benjie's postgraphile-plugin-fulltext-filter reference.
+ * the condition apply phase, the orderBy enum apply, and the output field
+ * plan, following the pattern from Benjie's postgraphile-plugin-fulltext-filter.
  *
- * 1. Condition apply (deferred/SQL-gen phase): adds ts_rank to the query
- *    builder's SELECT list via selectAndReturnIndex, stores { selectIndex }
- *    in meta via qb.setMeta(key, { selectIndex }).
- * 2. Output field plan (planning phase): calls $select.getMeta(key) which
+ * 1. Condition apply (runs first): adds ts_rank to the query builder's
+ *    SELECT list via selectAndReturnIndex, stores { selectIndex, scoreFragment }
+ *    in meta via qb.setMeta(key, { selectIndex, scoreFragment }).
+ * 2. OrderBy enum apply (runs second): reads the scoreFragment from meta
+ *    and calls qb.orderBy({ fragment, codec, direction }) directly.
+ * 3. Output field plan (planning phase): calls $select.getMeta(key) which
  *    returns a Grafast Step that resolves at execution time.
- * 3. lambda([$details, $row]) reads the rank from row[details.selectIndex].
+ * 4. lambda([$details, $row]) reads the rank from row[details.selectIndex].
  */
 
 import 'graphile-build';
@@ -85,6 +87,24 @@ declare global {
  */
 interface FtsRankDetails {
   selectIndex: number;
+  scoreFragment: SQL;
+}
+
+/**
+ * Direction flag stored by the orderBy enum apply at planning time.
+ *
+ * PostGraphile processes orderBy enum applies at PLANNING time (receiving
+ * PgSelectStep), but condition applies at EXECUTION time (receiving a runtime
+ * proxy). The proxy's meta is initialized from PgSelectStep._meta, so data
+ * stored at planning time IS available at execution time.
+ *
+ * Flow:
+ * 1. Enum apply (planning): stores direction in PgSelectStep._meta
+ * 2. PgSelectStep._meta gets copied to proxy's meta closure
+ * 3. Condition apply (execution): reads direction from proxy, adds ORDER BY
+ */
+interface FtsOrderByRequest {
+  direction: 'ASC' | 'DESC';
 }
 
 function isTsvectorCodec(codec: any): boolean {
@@ -208,16 +228,17 @@ export function createPgSearchPlugin(
       },
       entityBehavior: {
         pgCodecAttribute: {
-          inferred: {
-            provides: ['default'],
-            before: ['inferred', 'override', 'PgAttributesPlugin'],
-            callback(behavior, [codec, attributeName], build) {
+          override: {
+            provides: ['PgSearchPlugin'],
+            after: ['inferred'],
+            before: ['override'],
+            callback(behavior, [codec, attributeName]) {
               const attr = codec.attributes[attributeName];
-              if (attr.codec === (build as any).dataplanPg.TYPES.tsvector) {
+              if (isTsvectorCodec(attr.codec)) {
                 return [
+                  behavior,
                   'attributeFtsRank:orderBy',
                   'attributeFtsRank:select',
-                  behavior,
                 ];
               }
               return behavior;
@@ -225,17 +246,18 @@ export function createPgSearchPlugin(
           },
         },
         pgResource: {
-          inferred: {
-            provides: ['default'],
-            before: ['inferred', 'override', 'PgProceduresPlugin'],
-            callback(behavior, resource, build) {
+          override: {
+            provides: ['PgSearchPlugin'],
+            after: ['inferred'],
+            before: ['override'],
+            callback(behavior, resource) {
               if (!(resource as any).parameters) {
                 return behavior;
               }
-              if ((resource as any).codec !== (build as any).dataplanPg.TYPES.tsvector) {
+              if (!isTsvectorCodec((resource as any).codec)) {
                 return behavior;
               }
-              return ['procFtsRank:orderBy', 'procFtsRank:select', behavior];
+              return [behavior, 'procFtsRank:orderBy', 'procFtsRank:select'];
             },
           },
         },
@@ -412,7 +434,9 @@ export function createPgSearchPlugin(
 
         GraphQLEnumType_values(values, build, context) {
           const {
+            sql,
             inflection,
+            dataplanPg: { TYPES: DP_TYPES },
           } = build;
 
           const {
@@ -428,6 +452,28 @@ export function createPgSearchPlugin(
           const pgRegistry = (build as any).input?.pgRegistry;
 
           let newValues = values;
+
+          // The enum apply runs at PLANNING time (receives PgSelectStep).
+          // It stores a direction flag in meta. The condition apply runs at
+          // EXECUTION time (receives proxy whose meta was copied from
+          // PgSelectStep._meta). The condition apply reads this flag and
+          // adds the ORDER BY with the scoreFragment it computes.
+          const makeApply =
+            (fieldName: string, direction: 'ASC' | 'DESC') =>
+            (queryBuilder: any) => {
+              const orderMetaKey = `__fts_orderBy_${fieldName}`;
+              queryBuilder.setMeta(orderMetaKey, {
+                direction,
+              } as FtsOrderByRequest);
+            };
+
+          const makeSpec = (fieldName: string, direction: 'ASC' | 'DESC') => ({
+            extensions: {
+              grafast: {
+                apply: makeApply(fieldName, direction),
+              },
+            },
+          });
 
           // ── Direct tsvector columns ──
           for (const [attributeName, attribute] of Object.entries(
@@ -448,34 +494,14 @@ export function createPgSearchPlugin(
             }
 
             const fieldName = inflection.attribute({ codec: codec as any, attributeName });
-            const metaKey = `fts_order_${fieldName}`;
-            const makePlan = (direction: 'ASC' | 'DESC') =>
-              (step: any) => {
-                if (typeof step.setMeta === 'function') {
-                  step.setMeta(metaKey, direction);
-                }
-              };
-
-            const ascName = inflection.constantCase(`${attributeName}_rank_asc`);
-            const descName = inflection.constantCase(`${attributeName}_rank_desc`);
+            const ascName = inflection.pgTsvOrderByColumnRankEnum(codec as any, attributeName, true);
+            const descName = inflection.pgTsvOrderByColumnRankEnum(codec as any, attributeName, false);
 
             newValues = build.extend(
               newValues,
               {
-                [ascName]: {
-                  extensions: {
-                    grafast: {
-                      apply: makePlan('ASC'),
-                    },
-                  },
-                },
-                [descName]: {
-                  extensions: {
-                    grafast: {
-                      apply: makePlan('DESC'),
-                    },
-                  },
-                },
+                [ascName]: makeSpec(fieldName, 'ASC'),
+                [descName]: makeSpec(fieldName, 'DESC'),
               },
               `PgSearchPlugin adding rank orderBy for '${attributeName}' on '${codec.name}'`
             );
@@ -503,35 +529,15 @@ export function createPgSearchPlugin(
             );
 
             for (const resource of tsvProcs) {
-              const baseFieldName = inflection.computedAttributeField({ resource: resource as any });
-              const metaKey = `fts_order_${baseFieldName}`;
-              const makePlan = (direction: 'ASC' | 'DESC') =>
-                (step: any) => {
-                  if (typeof step.setMeta === 'function') {
-                    step.setMeta(metaKey, direction);
-                  }
-                };
-
+              const fieldName = inflection.computedAttributeField({ resource: resource as any });
               const ascName = inflection.pgTsvOrderByComputedColumnRankEnum(codec, resource as any, true);
               const descName = inflection.pgTsvOrderByComputedColumnRankEnum(codec, resource as any, false);
 
               newValues = build.extend(
                 newValues,
                 {
-                  [ascName]: {
-                    extensions: {
-                      grafast: {
-                        apply: makePlan('ASC'),
-                      },
-                    },
-                  },
-                  [descName]: {
-                    extensions: {
-                      grafast: {
-                        apply: makePlan('DESC'),
-                      },
-                    },
-                  },
+                  [ascName]: makeSpec(fieldName, 'ASC'),
+                  [descName]: makeSpec(fieldName, 'DESC'),
                 },
                 `PgSearchPlugin adding rank orderBy for computed column '${(resource as any).name}' on '${codec.name}'`
               );
@@ -602,33 +608,35 @@ export function createPgSearchPlugin(
                       // WHERE: column @@ tsquery
                       $condition.where(sql`${columnExpr} @@ ${tsquery}`);
 
-                      // Get the query builder via meta-safe traversal
+                      // Get the query builder (execution-time proxy) via
+                      // meta-safe traversal.
                       const qb = getQueryBuilder(build, $condition);
                       if (qb) {
                         // Add ts_rank to the SELECT list
-                        const rankSql = sql`ts_rank(${columnExpr}, ${tsquery})`;
-                        const wrappedRankSql = sql`${sql.parens(rankSql)}::text`;
+                        const scoreFragment = sql`ts_rank(${columnExpr}, ${tsquery})`;
+                        const wrappedRankSql = sql`${sql.parens(scoreFragment)}::text`;
                         const rankIndex = qb.selectAndReturnIndex(wrappedRankSql);
 
-                        // Store the select index in meta
-                        qb.setMeta(rankMetaKey, {
+                        const rankDetails: FtsRankDetails = {
                           selectIndex: rankIndex,
-                        } as FtsRankDetails);
-                      }
+                          scoreFragment,
+                        };
 
-                      // ORDER BY ts_rank: only add when the user explicitly
-                      // requested rank ordering via the FULL_TEXT_RANK_ASC/DESC
-                      // enum values. The enum's apply stores direction in meta
-                      // during planning; if no meta is set, skip the orderBy
-                      // entirely so cursors remain stable across pages.
-                      if (qb && typeof qb.getMetaRaw === 'function') {
-                        const orderMetaKey = `fts_order_${baseFieldName}`;
-                        const explicitDir = qb.getMetaRaw(orderMetaKey);
-                        if (explicitDir) {
+                        // Store via qb.setMeta for the output field plan.
+                        // ($select.getMeta() creates a deferred Step that works
+                        // across the proxy/step boundary at execution time.)
+                        qb.setMeta(rankMetaKey, rankDetails);
+
+                        // Check if the orderBy enum stored a direction flag
+                        // at planning time. The flag was set on PgSelectStep._meta
+                        // and copied into this proxy's meta closure.
+                        const orderMetaKey = `__fts_orderBy_${baseFieldName}`;
+                        const orderRequest = qb.getMetaRaw(orderMetaKey) as FtsOrderByRequest | undefined;
+                        if (orderRequest) {
                           qb.orderBy({
-                            fragment: sql`ts_rank(${columnExpr}, ${tsquery})`,
-                            codec: TYPES.float4,
-                            direction: explicitDir,
+                            codec: (build as any).dataplanPg?.TYPES?.float,
+                            fragment: scoreFragment,
+                            direction: orderRequest.direction,
                           });
                         }
                       }
