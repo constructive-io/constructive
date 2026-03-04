@@ -461,14 +461,6 @@ export async function generate(
       allFilesWritten.push(...(skillsWriteResult.filesWritten ?? []));
     }
 
-    // Remove old nested skill output dirs (pre-workspace-root behavior)
-    const outputRootAbs = path.resolve(outputRoot);
-    for (const oldSkillsDir of ['orm/skills', 'hooks/skills', 'cli/skills']) {
-      const abs = path.join(outputRootAbs, oldSkillsDir);
-      if (fs.existsSync(abs)) {
-        fs.rmSync(abs, { recursive: true, force: true });
-      }
-    }
   }
 
   const generators = [
@@ -819,11 +811,6 @@ export async function generateMulti(
       );
       await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
 
-      // Remove old nested unified-cli skill output dir
-      const oldUnifiedCliSkillsDir = path.resolve('cli', 'skills');
-      if (fs.existsSync(oldUnifiedCliSkillsDir)) {
-        fs.rmSync(oldUnifiedCliSkillsDir, { recursive: true, force: true });
-      }
     }
   }
 
