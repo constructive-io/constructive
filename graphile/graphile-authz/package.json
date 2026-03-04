@@ -33,6 +33,7 @@
     "makage": "^0.1.10"
   },
   "dependencies": {
+    "@pgsql/quotes": "^17.1.0",
     "graphile-build": "5.0.0-rc.4",
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5"

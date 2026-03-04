@@ -3,7 +3,7 @@
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
-import { escapeIdentifier } from 'pg';
+import { QuoteUtils } from '@pgsql/quotes';
 import pgQueryWithContext from 'pg-query-context';
 
 export interface PublicKeyChallengeConfig {
@@ -116,7 +116,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${escapeIdentifier(schema)}.${escapeIdentifier(sign_up_with_key)}($1)`,
+                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_up_with_key)}($1)`,
                   variables: [input.publicKey],
                   skipTransaction: true
                 });
@@ -126,7 +126,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 } = await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${escapeIdentifier(schema)}.${escapeIdentifier(sign_in_request_challenge)}($1)`,
+                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
                   variables: [input.publicKey],
                   skipTransaction: true
                 });
@@ -157,7 +157,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
               } = await pgQueryWithContext({
                 client: pgClient,
                 context: { role: 'anonymous' },
-                query: `SELECT * FROM ${escapeIdentifier(schema)}.${escapeIdentifier(sign_in_request_challenge)}($1)`,
+                query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
                 variables: [input.publicKey]
               });
 
@@ -203,7 +203,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 } = await pgQueryWithContext({
                   client: pgClient,
                   context: { role: 'anonymous' },
-                  query: `SELECT * FROM ${escapeIdentifier(schema)}.${escapeIdentifier(sign_in_with_challenge)}($1, $2)`,
+                  query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_with_challenge)}($1, $2)`,
                   variables: [publicKey, message],
                   skipTransaction: true
                 });

@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
+    "@pgsql/quotes": "^17.1.0",
     "graphile-utils": "5.0.0-rc.5",
     "inflekt": "^0.3.0",
     "pg": "^8.17.1",

@@ -63,5 +63,8 @@
     "full-text-search",
     "text-search",
     "ranking"
-  ]
+  ],
+  "dependencies": {
+    "@pgsql/quotes": "^17.1.0"
+  }
 }

@@ -25,6 +25,7 @@ import type {
   BoolOp,
 } from '../types/authz-nodes';
 import { getNodeType, getNodePayload } from '../types/authz-nodes';
+import { QuoteUtils } from '@pgsql/quotes';
 
 /**
  * Options for SQL generation.
@@ -191,11 +192,10 @@ function colRef(column: string, opts: SqlGeneratorOptions): string {
 }
 
 /**
- * Quotes a SQL identifier.
+ * Quotes a SQL identifier using PostgreSQL-accurate keyword-aware quoting.
  */
 function quoteIdent(ident: string): string {
-  // Simple quoting - in production, use a proper SQL escaping library
-  return `"${ident.replace(/"/g, '""')}"`;
+  return QuoteUtils.quoteIdentifier(ident);
 }
 
 /**

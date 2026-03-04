@@ -13,7 +13,7 @@ jest.mock('../src/utils', () => ({
 }));
 
 // mock quoteutils
-jest.mock('pgsql-deparser/utils/quote-utils', () => ({
+jest.mock('@pgsql/quotes', () => ({
     QuoteUtils: {
         quoteIdentifier: (s: string) => `"${s}"`,
         quoteQualifiedIdentifier: (s: string, t: string) => `"${s}"."${t}"`,
