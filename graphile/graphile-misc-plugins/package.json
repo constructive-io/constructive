@@ -45,7 +45,7 @@
     "pg-sql2": "5.0.0-rc.4"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.10"
   },
   "keywords": [

@@ -20,7 +20,7 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.12",
     "ts-node": "^10.9.2"
   }

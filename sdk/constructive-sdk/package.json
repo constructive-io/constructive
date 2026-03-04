@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",
-    "@types/node": "^20.12.7",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.12",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"

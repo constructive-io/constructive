@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/pg": "^8.18.0",
-    "@types/supertest": "^6.0.2",
+    "@types/supertest": "^7.2.0",
     "makage": "^0.1.12"
   },
   "dependencies": {

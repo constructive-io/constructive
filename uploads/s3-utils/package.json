@@ -34,7 +34,7 @@
     "@aws-sdk/lib-storage": "^3.1001.0"
   },
   "devDependencies": {
-    "@types/node": "^18.19.69",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.12"
   }
 }

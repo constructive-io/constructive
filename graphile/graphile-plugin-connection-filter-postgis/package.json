@@ -46,7 +46,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "graphile-postgis": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",

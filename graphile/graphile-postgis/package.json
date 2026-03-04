@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
     "pgsql-test": "workspace:^"
