@@ -13,93 +13,17 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-import { camelize, pluralize, underscore } from 'inflekt';
-
-/**
- * Known irregular plurals used by PostGraphile in this codebase.
- * Maps singular camelCase table name -> GraphQL query field name.
- */
-const KNOWN_QUERY_NAMES: Record<string, string> = {
-  // metaschema_public
-  'database': 'databases',
-  'schema': 'schemas',
-  'table': 'tables',
-  'field': 'fields',
-  'policy': 'policies',
-  'index': 'indices',
-  'trigger': 'triggers',
-  'trigger_function': 'triggerFunctions',
-  // rls_function is NOT exposed as a separate query in the GraphQL schema
-  // 'rls_function': 'rlsFunctions',
-  'limit_function': 'limitFunctions',
-  'procedure': 'procedures',
-  'foreign_key_constraint': 'foreignKeyConstraints',
-  'primary_key_constraint': 'primaryKeyConstraints',
-  'unique_constraint': 'uniqueConstraints',
-  'check_constraint': 'checkConstraints',
-  'full_text_search': 'fullTextSearches',
-  'schema_grant': 'schemaGrants',
-  'table_grant': 'tableGrants',
-  'view_grant': 'viewGrants',
-  'view_table': 'viewTables',
-  'database_extension': 'databaseExtensions',
-  // services_public
-  'domains': 'domains',
-  'sites': 'sites',
-  'apis': 'apis',
-  'apps': 'apps',
-  'site_modules': 'siteModules',
-  'site_themes': 'siteThemes',
-  'site_metadata': 'siteMetadata',
-  'api_modules': 'apiModules',
-  'api_schemas': 'apiSchemas',
-  'api_extensions': 'apiExtensions',
-  // metaschema_modules_public
-  'rls_module': 'rlsModules',
-  'user_auth_module': 'userAuthModules',
-  'memberships_module': 'membershipsModules',
-  'permissions_module': 'permissionsModules',
-  'limits_module': 'limitsModules',
-  'levels_module': 'levelsModules',
-  'users_module': 'usersModules',
-  'hierarchy_module': 'hierarchyModules',
-  'membership_types_module': 'membershipTypesModules',
-  'invites_module': 'invitesModules',
-  'emails_module': 'emailsModules',
-  'sessions_module': 'sessionsModules',
-  'secrets_module': 'secretsModules',
-  'profiles_module': 'profilesModules',
-  'encrypted_secrets_module': 'encryptedSecretsModules',
-  'connected_accounts_module': 'connectedAccountsModules',
-  'phone_numbers_module': 'phoneNumbersModules',
-  'crypto_addresses_module': 'cryptoAddressesModules',
-  'crypto_auth_module': 'cryptoAuthModules',
-  'field_module': 'fieldModules',
-  'table_module': 'tableModules',
-  'table_template_module': 'tableTemplateModules',
-  'uuid_module': 'uuidModules',
-  'default_ids_module': 'defaultIdsModules',
-  'denormalized_table_field': 'denormalizedTableFields',
-  'secure_table_provision': 'secureTableProvisions',
-  'user_profiles_module': 'userProfilesModules',
-  'user_settings_module': 'userSettingsModules',
-  'organization_settings_module': 'organizationSettingsModules',
-  'database_provision_module': 'databaseProvisionModules',
-  // db_migrate
-  'sql_actions': 'sqlActions',
-};
+import { camelize, distinctPluralize, singularizeLast, underscore } from 'inflekt';
 
 /**
  * Get the GraphQL query field name for a given Postgres table name.
- * Uses known mappings first, then falls back to computed inflection.
+ * Mirrors the PostGraphile InflektPlugin's allRowsConnection inflector:
+ *   camelize(distinctPluralize(singularizeLast(camelize(pgTableName))), true)
  */
 export const getGraphQLQueryName = (pgTableName: string): string => {
-  if (KNOWN_QUERY_NAMES[pgTableName]) {
-    return KNOWN_QUERY_NAMES[pgTableName];
-  }
-  // Fallback: convert snake_case to PascalCase, pluralize, then lcFirst for camelCase
   const pascal = camelize(pgTableName);
-  return camelize(pluralize(pascal), true);
+  const singularized = singularizeLast(pascal);
+  return camelize(distinctPluralize(singularized), true);
 };
 
 /**

@@ -147,34 +147,6 @@ const config: Record<string, TableConfig> = {
       security: 'int'
     }
   },
-  limit_function: {
-    schema: 'metaschema_public',
-    table: 'limit_function',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      table_id: 'uuid',
-      name: 'text',
-      label: 'text',
-      description: 'text',
-      data: 'jsonb',
-      security: 'int'
-    }
-  },
-  procedure: {
-    schema: 'metaschema_public',
-    table: 'procedure',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      name: 'text',
-      argnames: 'text[]',
-      argtypes: 'text[]',
-      argdefaults: 'text[]',
-      lang_name: 'text',
-      definition: 'text'
-    }
-  },
   foreign_key_constraint: {
     schema: 'metaschema_public',
     table: 'foreign_key_constraint',
@@ -993,6 +965,7 @@ export const exportGraphQLMeta = async ({
   // metaschema_public tables
   // =============================================================================
   await queryAndParse('database');
+  await queryAndParse('database_extension');
   await queryAndParse('schema');
   await queryAndParse('table');
   await queryAndParse('field');
@@ -1001,8 +974,6 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('trigger');
   await queryAndParse('trigger_function');
   await queryAndParse('rls_function');
-  await queryAndParse('limit_function');
-  await queryAndParse('procedure');
   await queryAndParse('foreign_key_constraint');
   await queryAndParse('primary_key_constraint');
   await queryAndParse('unique_constraint');
@@ -1011,7 +982,6 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('schema_grant');
   await queryAndParse('table_grant');
   await queryAndParse('default_privilege');
-  await queryAndParse('database_extension');
 
   // =============================================================================
   // services_public tables
