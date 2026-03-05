@@ -281,19 +281,11 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
     t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
   ]);
 
-  // For integer PKs, coerce string CLI input to number; otherwise cast as string
-  const isIntPk = pk.gqlType === 'Int' || pk.gqlType === 'BigInt' || pk.tsType === 'number';
-  const pkValueExpr = isIntPk
-    ? t.callExpression(t.identifier('Number'), [
-        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-      ])
-    : t.tsAsExpression(
-        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-        t.tsStringKeyword(),
-      );
-
   const ormArgs = t.objectExpression([
-    t.objectProperty(t.identifier(pk.name), pkValueExpr),
+    t.objectProperty(
+      t.identifier(pk.name),
+      t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+    ),
     t.objectProperty(t.identifier('select'), selectObj),
   ]);
 
@@ -396,7 +388,6 @@ function buildMutationHandler(
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
-  const isIntPk = pk.gqlType === 'Int' || pk.gqlType === 'BigInt' || pk.tsType === 'number';
 
   const editableFields = getScalarFields(table).filter(
     (f) =>
@@ -466,10 +457,7 @@ function buildMutationHandler(
       ),
     );
     ormArgs = t.objectExpression([
-      t.objectProperty(
-        t.identifier('data'),
-        t.tsAsExpression(t.objectExpression(dataProps), t.tsAnyKeyword()),
-      ),
+      t.objectProperty(t.identifier('data'), t.objectExpression(dataProps)),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
   } else if (operation === 'update') {
@@ -481,46 +469,33 @@ function buildMutationHandler(
         true,
       ),
     );
-    const updatePkExpr = isIntPk
-      ? t.callExpression(t.identifier('Number'), [
-          t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-        ])
-      : t.tsAsExpression(
-          t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-          t.tsStringKeyword(),
-        );
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('where'),
         t.objectExpression([
           t.objectProperty(
             t.identifier(pk.name),
-            updatePkExpr,
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+              t.tsStringKeyword(),
+            ),
           ),
         ]),
       ),
-      t.objectProperty(
-        t.identifier('data'),
-        t.tsAsExpression(t.objectExpression(dataProps), t.tsAnyKeyword()),
-      ),
+      t.objectProperty(t.identifier('data'), t.objectExpression(dataProps)),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
   } else {
-    const deletePkExpr = isIntPk
-      ? t.callExpression(t.identifier('Number'), [
-          t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-        ])
-      : t.tsAsExpression(
-          t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-          t.tsStringKeyword(),
-        );
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('where'),
         t.objectExpression([
           t.objectProperty(
             t.identifier(pk.name),
-            deletePkExpr,
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+              t.tsStringKeyword(),
+            ),
           ),
         ]),
       ),
@@ -632,36 +607,18 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   statements.push(
     createImportDeclaration(utilsPath, ['coerceAnswers', 'stripUndefined']),
   );
-  statements.push(
-    createImportDeclaration(utilsPath, ['FieldSchema'], true),
-  );
 
   // Generate field schema for type coercion
-  // Use explicit FieldSchema type annotation so TS narrows string literals to FieldType
-  const fieldSchemaId = t.identifier('fieldSchema');
-  fieldSchemaId.typeAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(t.identifier('FieldSchema')),
-  );
   statements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
-        fieldSchemaId,
+        t.identifier('fieldSchema'),
         buildFieldSchemaObject(table),
       ),
     ]),
   );
 
-  // Determine which subcommands are available based on table query capabilities
-  const hasGet = table.query?.one !== null;
-  const hasUpdate = table.query?.update !== null;
-  const hasDelete = table.query?.delete !== null;
-  const subcommands = [
-    'list',
-    ...(hasGet ? ['get'] : []),
-    'create',
-    ...(hasUpdate ? ['update'] : []),
-    ...(hasDelete ? ['delete'] : []),
-  ];
+  const subcommands = ['list', 'get', 'create', 'update', 'delete'];
 
   const usageLines = [
     '',
@@ -785,12 +742,9 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleTableSubcommand'), [
-            t.tsAsExpression(
-              t.memberExpression(
-                t.identifier('answer'),
-                t.identifier('subcommand'),
-              ),
-              t.tsStringKeyword(),
+            t.memberExpression(
+              t.identifier('answer'),
+              t.identifier('subcommand'),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),
@@ -840,16 +794,10 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
 
   const tn = options?.targetName;
   statements.push(buildListHandler(table, tn));
-  if (hasGet) {
-    statements.push(buildGetHandler(table, tn));
-  }
+  statements.push(buildGetHandler(table, tn));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry));
-  if (hasUpdate) {
-    statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry));
-  }
-  if (hasDelete) {
-    statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry));
-  }
+  statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry));
+  statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);

@@ -230,24 +230,12 @@ export function generateCommandMap(
         ]),
       ),
     ]),
-    (() => {
-      const commandMapId = t.identifier('commandMap');
-      commandMapId.typeAnnotation = t.tsTypeAnnotation(
-        t.tsTypeReference(
-          t.identifier('Record'),
-          t.tsTypeParameterInstantiation([
-            t.tsStringKeyword(),
-            t.tsAnyKeyword(),
-          ]),
-        ),
-      );
-      return t.variableDeclaration('const', [
-        t.variableDeclarator(
-          commandMapId,
-          t.callExpression(t.identifier('createCommandMap'), []),
-        ),
-      ]);
-    })(),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('commandMap'),
+        t.callExpression(t.identifier('createCommandMap'), []),
+      ),
+    ]),
     t.ifStatement(
       t.unaryExpression('!', t.identifier('command')),
       t.blockStatement([
@@ -297,12 +285,9 @@ export function generateCommandMap(
           t.assignmentExpression(
             '=',
             t.identifier('command'),
-            t.tsAsExpression(
-              t.memberExpression(
-                t.identifier('answer'),
-                t.identifier('command'),
-              ),
-              t.tsStringKeyword(),
+            t.memberExpression(
+              t.identifier('answer'),
+              t.identifier('command'),
             ),
           ),
         ),
@@ -586,24 +571,12 @@ export function generateMultiTargetCommandMap(
         ]),
       ),
     ]),
-    (() => {
-      const commandMapId = t.identifier('commandMap');
-      commandMapId.typeAnnotation = t.tsTypeAnnotation(
-        t.tsTypeReference(
-          t.identifier('Record'),
-          t.tsTypeParameterInstantiation([
-            t.tsStringKeyword(),
-            t.tsAnyKeyword(),
-          ]),
-        ),
-      );
-      return t.variableDeclaration('const', [
-        t.variableDeclarator(
-          commandMapId,
-          t.callExpression(t.identifier('createCommandMap'), []),
-        ),
-      ]);
-    })(),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('commandMap'),
+        t.callExpression(t.identifier('createCommandMap'), []),
+      ),
+    ]),
     t.ifStatement(
       t.unaryExpression('!', t.identifier('command')),
       t.blockStatement([
@@ -653,12 +626,9 @@ export function generateMultiTargetCommandMap(
           t.assignmentExpression(
             '=',
             t.identifier('command'),
-            t.tsAsExpression(
-              t.memberExpression(
-                t.identifier('answer'),
-                t.identifier('command'),
-              ),
-              t.tsStringKeyword(),
+            t.memberExpression(
+              t.identifier('answer'),
+              t.identifier('command'),
             ),
           ),
         ),

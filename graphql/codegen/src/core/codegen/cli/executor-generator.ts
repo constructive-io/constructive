@@ -141,33 +141,12 @@ export function generateExecutorFile(toolName: string, options?: ExecutorOptions
       ]),
     ),
 
-    (() => {
-      const headersId = t.identifier('headers');
-      headersId.typeAnnotation = t.tsTypeAnnotation(
-        t.tsTypeReference(
-          t.identifier('Record'),
-          t.tsTypeParameterInstantiation([
-            t.tsStringKeyword(),
-            t.tsStringKeyword(),
-          ]),
-        ),
-      );
-      return t.variableDeclaration('const', [
-        t.variableDeclarator(
-          headersId,
-          t.tsAsExpression(
-            t.objectExpression([]),
-            t.tsTypeReference(
-              t.identifier('Record'),
-              t.tsTypeParameterInstantiation([
-                t.tsStringKeyword(),
-                t.tsStringKeyword(),
-              ]),
-            ),
-          ),
-        ),
-      ]);
-    })(),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('headers'),
+        t.objectExpression([]),
+      ),
+    ]),
 
     t.ifStatement(
       t.callExpression(
@@ -420,33 +399,12 @@ export function generateMultiTargetExecutorFile(
         ),
       ]),
     ),
-    (() => {
-      const headersId = t.identifier('headers');
-      headersId.typeAnnotation = t.tsTypeAnnotation(
-        t.tsTypeReference(
-          t.identifier('Record'),
-          t.tsTypeParameterInstantiation([
-            t.tsStringKeyword(),
-            t.tsStringKeyword(),
-          ]),
-        ),
-      );
-      return t.variableDeclaration('const', [
-        t.variableDeclarator(
-          headersId,
-          t.tsAsExpression(
-            t.objectExpression([]),
-            t.tsTypeReference(
-              t.identifier('Record'),
-              t.tsTypeParameterInstantiation([
-                t.tsStringKeyword(),
-                t.tsStringKeyword(),
-              ]),
-            ),
-          ),
-        ),
-      ]);
-    })(),
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('headers'),
+        t.objectExpression([]),
+      ),
+    ]),
     t.variableDeclaration('let', [
       t.variableDeclarator(t.identifier('endpoint'), t.stringLiteral('')),
     ]),

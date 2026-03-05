@@ -151,24 +151,17 @@ function buildOrmCustomCall(
     callArgs.push(argsExpr);
     if (selectExpr) {
       callArgs.push(
-        t.tsAsExpression(
-          t.objectExpression([
-            t.objectProperty(t.identifier('select'), selectExpr),
-          ]),
-          t.tsAnyKeyword(),
-        ),
+        t.objectExpression([
+          t.objectProperty(t.identifier('select'), selectExpr),
+        ]),
       );
     }
   } else if (selectExpr) {
     // No arguments: pass { select } as the only param (ORM signature)
-    // Cast to any to satisfy strict ORM type signatures
     callArgs.push(
-      t.tsAsExpression(
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), selectExpr),
-        ]),
-        t.tsAnyKeyword(),
-      ),
+      t.objectExpression([
+        t.objectProperty(t.identifier('select'), selectExpr),
+      ]),
     );
   }
   return t.callExpression(
@@ -334,12 +327,9 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
 
   const argsExpr =
     op.args.length > 0
-      ? t.tsAsExpression(
-          hasInputObjectArg
-            ? t.identifier('parsedAnswers')
-            : t.identifier('answers'),
-          t.tsAnyKeyword(),
-        )
+      ? (hasInputObjectArg
+          ? t.identifier('parsedAnswers')
+          : t.identifier('answers'))
       : t.objectExpression([]);
 
   // For OBJECT return types, generate runtime select from --select flag
@@ -347,7 +337,7 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
   let selectExpr: t.Expression | undefined;
   if (isObjectReturn) {
     const defaultSelect = buildDefaultSelectString(op.returnType, op.kind === 'mutation');
-    // Generate: const selectFields = buildSelectFromPaths((argv.select as string) ?? 'defaultFields')
+    // Generate: const selectFields = buildSelectFromPaths(argv.select ?? 'defaultFields')
     bodyStatements.push(
       t.variableDeclaration('const', [
         t.variableDeclarator(
@@ -355,10 +345,7 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
           t.callExpression(t.identifier('buildSelectFromPaths'), [
             t.logicalExpression(
               '??',
-              t.tsAsExpression(
-                t.memberExpression(t.identifier('argv'), t.identifier('select')),
-                t.tsStringKeyword(),
-              ),
+              t.memberExpression(t.identifier('argv'), t.identifier('select')),
               t.stringLiteral(defaultSelect),
             ),
           ]),

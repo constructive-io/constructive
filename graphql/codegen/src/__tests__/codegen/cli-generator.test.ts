@@ -158,7 +158,7 @@ describe('cli-generator', () => {
       customQueries: 1,
       customMutations: 1,
       infraFiles: 4,
-      totalFiles: 10,
+      totalFiles: 9,
     });
   });
 
@@ -254,7 +254,6 @@ describe('cli-generator', () => {
       'commands/driver.ts',
       'commands/login.ts',
       'executor.ts',
-      'index.ts',
       'utils.ts',
     ]);
   });
@@ -540,7 +539,7 @@ describe('multi-target cli generator', () => {
       customQueries: 1,
       customMutations: 1,
       infraFiles: 4,
-      totalFiles: 11,
+      totalFiles: 10,
     });
   });
 
@@ -562,7 +561,6 @@ describe('multi-target cli generator', () => {
       'commands/credentials.ts',
       'commands/members/member.ts',
       'executor.ts',
-      'index.ts',
       'utils.ts',
     ]);
   });
