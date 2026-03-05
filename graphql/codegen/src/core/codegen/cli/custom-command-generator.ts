@@ -2,7 +2,7 @@ import * as t from '@babel/types';
 import { toKebabCase } from 'komoji';
 
 import { generateCode } from '../babel-ast';
-import { getGeneratedFileHeader } from '../utils';
+import { getGeneratedFileHeader, ucFirst } from '../utils';
 import type { CleanOperation, CleanTypeRef } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 import { buildQuestionsArray } from './arg-mapper';
@@ -144,35 +144,40 @@ function buildOrmCustomCall(
   argsExpr: t.Expression,
   selectExpr?: t.Expression,
   hasArgs: boolean = true,
+  selectTypeName?: string,
 ): t.Expression {
   const callArgs: t.Expression[] = [];
+  // Helper: wrap { select } and cast to `{ select: XxxSelect }` via `unknown`.
+  // The ORM method's second parameter is `{ select: S } & StrictSelect<S, XxxSelect>`.
+  // We import the concrete Select type (e.g. CheckPasswordPayloadSelect) and cast
+  // `{ select: selectFields } as unknown as { select: XxxSelect }` so TS infers
+  // `S = XxxSelect` and StrictSelect is satisfied.
+  const castSelectWrapper = (sel: t.Expression) => {
+    const selectObj = t.objectExpression([
+      t.objectProperty(t.identifier('select'), sel),
+    ]);
+    if (!selectTypeName) return selectObj;
+    return t.tsAsExpression(
+      t.tsAsExpression(selectObj, t.tsUnknownKeyword()),
+      t.tsTypeLiteral([
+        t.tsPropertySignature(
+          t.identifier('select'),
+          t.tsTypeAnnotation(
+            t.tsTypeReference(t.identifier(selectTypeName)),
+          ),
+        ),
+      ]),
+    );
+  };
   if (hasArgs) {
     // Operation has arguments: pass args as first param, select as second.
-    // Cast { select } through `never` to satisfy StrictSelect constraints
-    // that narrow the parameter type when the select shape is dynamic.
     callArgs.push(argsExpr);
     if (selectExpr) {
-      callArgs.push(
-        t.tsAsExpression(
-          t.objectExpression([
-            t.objectProperty(t.identifier('select'), selectExpr),
-          ]),
-          t.tsNeverKeyword(),
-        ),
-      );
+      callArgs.push(castSelectWrapper(selectExpr));
     }
   } else if (selectExpr) {
     // No arguments: pass { select } as the only param (ORM signature).
-    // Cast through `never` to satisfy StrictSelect constraints that may
-    // narrow the parameter type when the select shape is unknown at compile time.
-    callArgs.push(
-      t.tsAsExpression(
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), selectExpr),
-        ]),
-        t.tsNeverKeyword(),
-      ),
-    );
+    callArgs.push(castSelectWrapper(selectExpr));
   }
   return t.callExpression(
     t.memberExpression(
@@ -239,6 +244,21 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
   if (utilsImports.length > 0) {
     statements.push(
       createImportDeclaration(utilsPath, utilsImports),
+    );
+  }
+
+  // Import the Variables type for this operation from the ORM query/mutation module.
+  // Custom operations define their own Variables types (e.g. CheckPasswordVariables)
+  // in the ORM layer. We import and cast CLI answers to this type for proper typing.
+  if (op.args.length > 0) {
+    const variablesTypeName = `${ucFirst(op.name)}Variables`;
+    // Commands are at cli/commands/xxx.ts (no target) or cli/commands/{target}/xxx.ts (with target).
+    // ORM query/mutation is at orm/{opKind}/ — two or three levels up from commands.
+    const ormOpPath = options?.targetName
+      ? `../../../orm/${opKind}`
+      : `../../orm/${opKind}`;
+    statements.push(
+      createImportDeclaration(ormOpPath, [variablesTypeName], true),
     );
   }
 
@@ -335,16 +355,22 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     );
   }
 
-  // Cast args through `never` so the ORM method accepts them regardless
-  // of the specific Variables type (e.g. CheckPasswordVariables).
-  // `never` is the bottom type — assignable to every type.
+  // Cast args to the specific Variables type for this operation.
+  // The ORM expects typed variables (e.g. CheckPasswordVariables), and CLI
+  // prompt answers are Record<string, unknown>. We cast through `unknown`
+  // first because Record<string, unknown> doesn't directly overlap with
+  // Variables types that have specific property types (like `input: SomeInput`).
+  const variablesTypeName = `${ucFirst(op.name)}Variables`;
   const argsExpr =
     op.args.length > 0
       ? t.tsAsExpression(
-          hasInputObjectArg
-            ? t.identifier('parsedAnswers')
-            : t.identifier('answers'),
-          t.tsNeverKeyword(),
+          t.tsAsExpression(
+            hasInputObjectArg
+              ? t.identifier('parsedAnswers')
+              : t.identifier('answers'),
+            t.tsUnknownKeyword(),
+          ),
+          t.tsTypeReference(t.identifier(variablesTypeName)),
         )
       : t.objectExpression([]);
 
@@ -374,13 +400,34 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     selectExpr = t.identifier('selectFields');
   }
 
+  // Derive the Select type name from the operation's return type.
+  // e.g. CheckPasswordPayload → CheckPasswordPayloadSelect
+  // This is used to cast { select } to the proper type for StrictSelect.
+  let selectTypeName: string | undefined;
+  if (isObjectReturn) {
+    const baseReturnType = unwrapType(op.returnType);
+    if (baseReturnType.name) {
+      selectTypeName = `${baseReturnType.name}Select`;
+    }
+  }
+
+  // Import the Select type from orm/input-types if we have one
+  if (selectTypeName) {
+    const inputTypesPath = options?.targetName
+      ? `../../../orm/input-types`
+      : `../../orm/input-types`;
+    statements.push(
+      createImportDeclaration(inputTypesPath, [selectTypeName], true),
+    );
+  }
+
   const hasArgs = op.args.length > 0;
   bodyStatements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
         t.awaitExpression(
-          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr, hasArgs),
+          buildOrmCustomCall(opKind, op.name, argsExpr, selectExpr, hasArgs, selectTypeName),
         ),
       ),
     ]),

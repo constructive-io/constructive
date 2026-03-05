@@ -5,6 +5,7 @@
  */
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
+import type { OrgPermissionsGetPaddedMaskVariables } from '../../orm/query';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -25,7 +26,9 @@ export default async (
       },
     ]);
     const client = getClient();
-    const result = await client.query.orgPermissionsGetPaddedMask(answers as never).execute();
+    const result = await client.query
+      .orgPermissionsGetPaddedMask(answers as unknown as OrgPermissionsGetPaddedMaskVariables)
+      .execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed: orgPermissionsGetPaddedMask');

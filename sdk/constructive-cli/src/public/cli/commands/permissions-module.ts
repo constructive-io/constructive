@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreatePermissionsModuleInput, PermissionsModulePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -206,7 +207,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreatePermissionsModuleInput['permissionsModule'];
     const client = getClient();
     const result = await client.permissionsModule
       .create({
@@ -227,7 +231,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           getMask: cleanedData.getMask,
           getByMask: cleanedData.getByMask,
           getMaskByName: cleanedData.getMaskByName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -365,7 +369,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as PermissionsModulePatch;
     const client = getClient();
     const result = await client.permissionsModule
       .update({
@@ -389,7 +393,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           getMask: cleanedData.getMask,
           getByMask: cleanedData.getByMask,
           getMaskByName: cleanedData.getMaskByName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

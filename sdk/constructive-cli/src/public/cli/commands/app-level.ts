@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateAppLevelInput, AppLevelPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -114,7 +115,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateAppLevelInput['appLevel'];
     const client = getClient();
     const result = await client.appLevel
       .create({
@@ -123,7 +124,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           image: cleanedData.image,
           ownerId: cleanedData.ownerId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,
@@ -179,7 +180,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppLevelPatch;
     const client = getClient();
     const result = await client.appLevel
       .update({
@@ -191,7 +192,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           image: cleanedData.image,
           ownerId: cleanedData.ownerId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,

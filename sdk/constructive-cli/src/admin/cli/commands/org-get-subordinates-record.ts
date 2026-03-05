@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateOrgGetSubordinatesRecordInput,
+  OrgGetSubordinatesRecordPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   userId: 'uuid',
   depth: 'int',
@@ -88,14 +92,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateOrgGetSubordinatesRecordInput['orgGetSubordinatesRecord'];
     const client = getClient();
     const result = await client.orgGetSubordinatesRecord
       .create({
         data: {
           userId: cleanedData.userId,
           depth: cleanedData.depth,
-        } as never,
+        },
         select: {
           userId: true,
           depth: true,

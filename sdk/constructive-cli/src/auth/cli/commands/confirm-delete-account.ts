@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { ConfirmDeleteAccountVariables } from '../../orm/mutation';
+import type { ConfirmDeleteAccountPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -32,10 +34,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .confirmDeleteAccount(
-        parsedAnswers as never,
+        parsedAnswers as unknown as ConfirmDeleteAccountVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: ConfirmDeleteAccountPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

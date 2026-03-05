@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateOrgMemberInput, OrgMemberPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   isAdmin: 'boolean',
@@ -102,7 +103,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateOrgMemberInput['orgMember'];
     const client = getClient();
     const result = await client.orgMember
       .create({
@@ -110,7 +111,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isAdmin: cleanedData.isAdmin,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           isAdmin: true,
@@ -157,7 +158,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgMemberPatch;
     const client = getClient();
     const result = await client.orgMember
       .update({
@@ -168,7 +169,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isAdmin: cleanedData.isAdmin,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           isAdmin: true,

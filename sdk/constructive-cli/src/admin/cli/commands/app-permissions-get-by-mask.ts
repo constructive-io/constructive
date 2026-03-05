@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { buildSelectFromPaths } from '../utils';
+import type { AppPermissionsGetByMaskVariables } from '../../orm/query';
+import type { AppPermissionConnectionSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -45,10 +47,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? '');
     const result = await client.query
       .appPermissionsGetByMask(
-        answers as never,
+        answers as unknown as AppPermissionsGetByMaskVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: AppPermissionConnectionSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

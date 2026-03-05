@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateTableInput, TablePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -210,7 +211,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateTableInput['table'];
     const client = getClient();
     const result = await client.table
       .create({
@@ -231,7 +232,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           singularName: cleanedData.singularName,
           tags: cleanedData.tags,
           inheritsId: cleanedData.inheritsId,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -371,7 +372,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as TablePatch;
     const client = getClient();
     const result = await client.table
       .update({
@@ -395,7 +396,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           singularName: cleanedData.singularName,
           tags: cleanedData.tags,
           inheritsId: cleanedData.inheritsId,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

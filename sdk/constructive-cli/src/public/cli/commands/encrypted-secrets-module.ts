@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateEncryptedSecretsModuleInput,
+  EncryptedSecretsModulePatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -110,7 +114,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateEncryptedSecretsModuleInput['encryptedSecretsModule'];
     const client = getClient();
     const result = await client.encryptedSecretsModule
       .create({
@@ -119,7 +126,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -173,7 +180,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as EncryptedSecretsModulePatch;
     const client = getClient();
     const result = await client.encryptedSecretsModule
       .update({
@@ -185,7 +192,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           schemaId: cleanedData.schemaId,
           tableId: cleanedData.tableId,
           tableName: cleanedData.tableName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

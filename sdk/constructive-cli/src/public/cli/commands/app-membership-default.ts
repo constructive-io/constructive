@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateAppMembershipDefaultInput,
+  AppMembershipDefaultPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -114,7 +118,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateAppMembershipDefaultInput['appMembershipDefault'];
     const client = getClient();
     const result = await client.appMembershipDefault
       .create({
@@ -123,7 +130,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: cleanedData.updatedBy,
           isApproved: cleanedData.isApproved,
           isVerified: cleanedData.isVerified,
-        } as never,
+        },
         select: {
           id: true,
           createdAt: true,
@@ -179,7 +186,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppMembershipDefaultPatch;
     const client = getClient();
     const result = await client.appMembershipDefault
       .update({
@@ -191,7 +198,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: cleanedData.updatedBy,
           isApproved: cleanedData.isApproved,
           isVerified: cleanedData.isVerified,
-        } as never,
+        },
         select: {
           id: true,
           createdAt: true,

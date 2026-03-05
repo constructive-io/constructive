@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateSqlMigrationInput, SqlMigrationPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'int',
   name: 'string',
@@ -164,7 +165,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateSqlMigrationInput['sqlMigration'];
     const client = getClient();
     const result = await client.sqlMigration
       .create({
@@ -180,7 +184,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           action: cleanedData.action,
           actionId: cleanedData.actionId,
           actorId: cleanedData.actorId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,

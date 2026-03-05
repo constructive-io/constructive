@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateObjectInput, ObjectPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   hashUuid: 'uuid',
   id: 'uuid',
@@ -159,7 +160,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateObjectInput['object'];
     const client = getClient();
     const result = await client.object
       .create({
@@ -169,7 +170,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           ktree: cleanedData.ktree,
           data: cleanedData.data,
           frzn: cleanedData.frzn,
-        } as never,
+        },
         select: {
           hashUuid: true,
           id: true,
@@ -232,7 +233,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as ObjectPatch;
     const client = getClient();
     const result = await client.object
       .update({
@@ -245,7 +246,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           ktree: cleanedData.ktree,
           data: cleanedData.data,
           frzn: cleanedData.frzn,
-        } as never,
+        },
         select: {
           hashUuid: true,
           id: true,

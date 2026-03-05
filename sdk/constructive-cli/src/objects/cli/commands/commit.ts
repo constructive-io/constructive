@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateCommitInput, CommitPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   message: 'string',
@@ -142,7 +143,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateCommitInput['commit'];
     const client = getClient();
     const result = await client.commit
       .create({
@@ -155,7 +156,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           committerId: cleanedData.committerId,
           treeId: cleanedData.treeId,
           date: cleanedData.date,
-        } as never,
+        },
         select: {
           id: true,
           message: true,
@@ -237,7 +238,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CommitPatch;
     const client = getClient();
     const result = await client.commit
       .update({
@@ -253,7 +254,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           committerId: cleanedData.committerId,
           treeId: cleanedData.treeId,
           date: cleanedData.date,
-        } as never,
+        },
         select: {
           id: true,
           message: true,

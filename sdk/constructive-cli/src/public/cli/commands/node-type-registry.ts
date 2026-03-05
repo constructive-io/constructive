@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateNodeTypeRegistryInput, NodeTypeRegistryPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   name: 'string',
   slug: 'string',
@@ -94,6 +95,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
+        name: 'name',
+        message: 'name',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'slug',
         message: 'slug',
         required: true,
@@ -130,18 +137,22 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateNodeTypeRegistryInput['nodeTypeRegistry'];
     const client = getClient();
     const result = await client.nodeTypeRegistry
       .create({
         data: {
+          name: cleanedData.name,
           slug: cleanedData.slug,
           category: cleanedData.category,
           displayName: cleanedData.displayName,
           description: cleanedData.description,
           parameterSchema: cleanedData.parameterSchema,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           name: true,
           slug: true,
@@ -211,7 +222,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as NodeTypeRegistryPatch;
     const client = getClient();
     const result = await client.nodeTypeRegistry
       .update({
@@ -225,7 +236,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           parameterSchema: cleanedData.parameterSchema,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           name: true,
           slug: true,

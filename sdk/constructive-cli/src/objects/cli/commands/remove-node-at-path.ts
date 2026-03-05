@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { RemoveNodeAtPathVariables } from '../../orm/mutation';
+import type { RemoveNodeAtPathPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -32,10 +34,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .removeNodeAtPath(
-        parsedAnswers as never,
+        parsedAnswers as unknown as RemoveNodeAtPathVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: RemoveNodeAtPathPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

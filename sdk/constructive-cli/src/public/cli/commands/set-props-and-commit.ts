@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { SetPropsAndCommitVariables } from '../../orm/mutation';
+import type { SetPropsAndCommitPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -32,10 +34,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .setPropsAndCommit(
-        parsedAnswers as never,
+        parsedAnswers as unknown as SetPropsAndCommitVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: SetPropsAndCommitPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

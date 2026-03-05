@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateAppInput, AppPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -142,7 +143,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateAppInput['app'];
     const client = getClient();
     const result = await client.app
       .create({
@@ -155,7 +156,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           appStoreId: cleanedData.appStoreId,
           appIdPrefix: cleanedData.appIdPrefix,
           playStoreLink: cleanedData.playStoreLink,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -237,7 +238,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppPatch;
     const client = getClient();
     const result = await client.app
       .update({
@@ -253,7 +254,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           appStoreId: cleanedData.appStoreId,
           appIdPrefix: cleanedData.appIdPrefix,
           playStoreLink: cleanedData.playStoreLink,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

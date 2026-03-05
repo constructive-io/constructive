@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateDefaultPrivilegeInput, DefaultPrivilegePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -126,7 +127,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateDefaultPrivilegeInput['defaultPrivilege'];
     const client = getClient();
     const result = await client.defaultPrivilege
       .create({
@@ -137,7 +141,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privilege: cleanedData.privilege,
           granteeName: cleanedData.granteeName,
           isGrant: cleanedData.isGrant,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -205,7 +209,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as DefaultPrivilegePatch;
     const client = getClient();
     const result = await client.defaultPrivilege
       .update({
@@ -219,7 +223,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privilege: cleanedData.privilege,
           granteeName: cleanedData.granteeName,
           isGrant: cleanedData.isGrant,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateOrgAdminGrantInput, OrgAdminGrantPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   isGrant: 'boolean',
@@ -114,7 +115,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateOrgAdminGrantInput['orgAdminGrant'];
     const client = getClient();
     const result = await client.orgAdminGrant
       .create({
@@ -123,7 +127,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
-        } as never,
+        },
         select: {
           id: true,
           isGrant: true,
@@ -179,7 +183,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgAdminGrantPatch;
     const client = getClient();
     const result = await client.orgAdminGrant
       .update({
@@ -191,7 +195,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
           grantorId: cleanedData.grantorId,
-        } as never,
+        },
         select: {
           id: true,
           isGrant: true,

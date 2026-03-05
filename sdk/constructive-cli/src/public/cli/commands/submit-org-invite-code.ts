@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { SubmitOrgInviteCodeVariables } from '../../orm/mutation';
+import type { SubmitOrgInviteCodePayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -32,10 +34,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .submitOrgInviteCode(
-        parsedAnswers as never,
+        parsedAnswers as unknown as SubmitOrgInviteCodeVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: SubmitOrgInviteCodePayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

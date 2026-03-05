@@ -771,6 +771,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
+import type { CreateCarInput, CarPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   make: "string",
@@ -892,7 +893,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       required: true
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateCarInput["car"];
     const client = getClient();
     const result = await client.car.create({
       data: {
@@ -900,7 +901,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      } as never,
+      },
       select: {
         id: true,
         make: true,
@@ -948,7 +949,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       required: false
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CarPatch;
     const client = getClient();
     const result = await client.car.update({
       where: {
@@ -959,7 +960,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      } as never,
+      },
       select: {
         id: true,
         make: true,
@@ -1174,6 +1175,7 @@ exports[`cli-generator generates commands/current-user.ts (custom query) 1`] = `
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient } from "../executor";
 import { buildSelectFromPaths } from "../utils";
+import type { UserSelect } from "../../orm/input-types";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -1184,7 +1186,9 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
     const selectFields = buildSelectFromPaths(argv.select as string ?? "");
     const result = await client.query.currentUser({
       select: selectFields
-    } as never).execute();
+    } as unknown as {
+      select: UserSelect;
+    }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: currentUser");
@@ -1206,6 +1210,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
+import type { CreateDriverInput, DriverPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   name: "string",
@@ -1308,13 +1313,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       required: true
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateDriverInput["driver"];
     const client = getClient();
     const result = await client.driver.create({
       data: {
         name: cleanedData.name,
         licenseNumber: cleanedData.licenseNumber
-      } as never,
+      },
       select: {
         id: true,
         name: true,
@@ -1349,7 +1354,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       required: false
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as DriverPatch;
     const client = getClient();
     const result = await client.driver.update({
       where: {
@@ -1358,7 +1363,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         name: cleanedData.name,
         licenseNumber: cleanedData.licenseNumber
-      } as never,
+      },
       select: {
         id: true,
         name: true,
@@ -1412,6 +1417,8 @@ exports[`cli-generator generates commands/login.ts (custom mutation) 1`] = `
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient } from "../executor";
 import { buildSelectFromPaths } from "../utils";
+import type { LoginVariables } from "../../orm/mutation";
+import type { LoginPayloadSelect } from "../../orm/input-types";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -1431,9 +1438,11 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
     }]);
     const client = getClient();
     const selectFields = buildSelectFromPaths(argv.select as string ?? "clientMutationId");
-    const result = await client.mutation.login(answers as never, {
+    const result = await client.mutation.login(answers as unknown as LoginVariables, {
       select: selectFields
-    } as never).execute();
+    } as unknown as {
+      select: LoginPayloadSelect;
+    }).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: login");
@@ -3754,6 +3763,8 @@ exports[`multi-target cli generator generates target-prefixed custom commands wi
 import { CLIOptions, Inquirerer } from "inquirerer";
 import { getClient, getStore } from "../../executor";
 import { buildSelectFromPaths } from "../../utils";
+import type { LoginVariables } from "../../../orm/mutation";
+import type { LoginPayloadSelect } from "../../../orm/input-types";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   try {
     if (argv.help || argv.h) {
@@ -3773,9 +3784,11 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
     }]);
     const client = getClient("auth");
     const selectFields = buildSelectFromPaths(argv.select as string ?? "clientMutationId");
-    const result = await client.mutation.login(answers as never, {
+    const result = await client.mutation.login(answers as unknown as LoginVariables, {
       select: selectFields
-    } as never).execute();
+    } as unknown as {
+      select: LoginPayloadSelect;
+    }).execute();
     if (argv.saveToken && result) {
       const tokenValue = result.token || result.jwtToken || result.accessToken;
       if (tokenValue) {
@@ -3810,6 +3823,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
+import type { CreateUserInput, UserPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   email: "string",
@@ -3912,13 +3926,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       required: true
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateUserInput["user"];
     const client = getClient("auth");
     const result = await client.user.create({
       data: {
         email: cleanedData.email,
         name: cleanedData.name
-      } as never,
+      },
       select: {
         id: true,
         email: true,
@@ -3953,7 +3967,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       required: false
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as UserPatch;
     const client = getClient("auth");
     const result = await client.user.update({
       where: {
@@ -3962,7 +3976,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         email: cleanedData.email,
         name: cleanedData.name
-      } as never,
+      },
       select: {
         id: true,
         email: true,
@@ -4017,6 +4031,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
+import type { CreateMemberInput, MemberPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
@@ -4111,12 +4126,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       required: true
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateMemberInput["member"];
     const client = getClient("members");
     const result = await client.member.create({
       data: {
         role: cleanedData.role
-      } as never,
+      },
       select: {
         id: true,
         role: true
@@ -4145,7 +4160,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       required: false
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as MemberPatch;
     const client = getClient("members");
     const result = await client.member.update({
       where: {
@@ -4153,7 +4168,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       data: {
         role: cleanedData.role
-      } as never,
+      },
       select: {
         id: true,
         role: true
@@ -4207,6 +4222,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
+import type { CreateCarInput, CarPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   make: "string",
@@ -4328,7 +4344,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       required: true
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateCarInput["car"];
     const client = getClient("app");
     const result = await client.car.create({
       data: {
@@ -4336,7 +4352,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      } as never,
+      },
       select: {
         id: true,
         make: true,
@@ -4384,7 +4400,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       required: false
     }]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CarPatch;
     const client = getClient("app");
     const result = await client.car.update({
       where: {
@@ -4395,7 +4411,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      } as never,
+      },
       select: {
         id: true,
         make: true,

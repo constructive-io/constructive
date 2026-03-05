@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateOrgPermissionDefaultInput,
+  OrgPermissionDefaultPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   permissions: 'string',
@@ -94,14 +98,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateOrgPermissionDefaultInput['orgPermissionDefault'];
     const client = getClient();
     const result = await client.orgPermissionDefault
       .create({
         data: {
           permissions: cleanedData.permissions,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           permissions: true,
@@ -141,7 +148,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgPermissionDefaultPatch;
     const client = getClient();
     const result = await client.orgPermissionDefault
       .update({
@@ -151,7 +158,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           permissions: cleanedData.permissions,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           permissions: true,

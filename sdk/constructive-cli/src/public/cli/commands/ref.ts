@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateRefInput, RefPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -110,7 +111,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateRefInput['ref'];
     const client = getClient();
     const result = await client.ref
       .create({
@@ -119,7 +120,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           storeId: cleanedData.storeId,
           commitId: cleanedData.commitId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,
@@ -173,7 +174,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as RefPatch;
     const client = getClient();
     const result = await client.ref
       .update({
@@ -185,7 +186,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           databaseId: cleanedData.databaseId,
           storeId: cleanedData.storeId,
           commitId: cleanedData.commitId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,

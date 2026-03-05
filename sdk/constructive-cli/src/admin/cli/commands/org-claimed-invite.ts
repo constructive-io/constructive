@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateOrgClaimedInviteInput, OrgClaimedInvitePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   data: 'json',
@@ -114,7 +115,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateOrgClaimedInviteInput['orgClaimedInvite'];
     const client = getClient();
     const result = await client.orgClaimedInvite
       .create({
@@ -123,7 +127,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           senderId: cleanedData.senderId,
           receiverId: cleanedData.receiverId,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           data: true,
@@ -179,7 +183,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgClaimedInvitePatch;
     const client = getClient();
     const result = await client.orgClaimedInvite
       .update({
@@ -191,7 +195,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           senderId: cleanedData.senderId,
           receiverId: cleanedData.receiverId,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           data: true,

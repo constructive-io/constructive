@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateDatabaseInput, DatabasePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   ownerId: 'uuid',
@@ -122,7 +123,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateDatabaseInput['database'];
     const client = getClient();
     const result = await client.database
       .create({
@@ -132,7 +133,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           label: cleanedData.label,
           hash: cleanedData.hash,
-        } as never,
+        },
         select: {
           id: true,
           ownerId: true,
@@ -195,7 +196,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as DatabasePatch;
     const client = getClient();
     const result = await client.database
       .update({
@@ -208,7 +209,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           label: cleanedData.label,
           hash: cleanedData.hash,
-        } as never,
+        },
         select: {
           id: true,
           ownerId: true,

@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateUserInput, UserPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   username: 'string',
@@ -124,7 +125,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateUserInput['user'];
     const client = getClient();
     const result = await client.user
       .create({
@@ -134,7 +135,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           profilePicture: cleanedData.profilePicture,
           searchTsv: cleanedData.searchTsv,
           type: cleanedData.type,
-        } as never,
+        },
         select: {
           id: true,
           username: true,
@@ -198,7 +199,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as UserPatch;
     const client = getClient();
     const result = await client.user
       .update({
@@ -211,7 +212,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           profilePicture: cleanedData.profilePicture,
           searchTsv: cleanedData.searchTsv,
           type: cleanedData.type,
-        } as never,
+        },
         select: {
           id: true,
           username: true,

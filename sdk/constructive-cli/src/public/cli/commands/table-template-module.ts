@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateTableTemplateModuleInput,
+  TableTemplateModulePatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -142,7 +146,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateTableTemplateModuleInput['tableTemplateModule'];
     const client = getClient();
     const result = await client.tableTemplateModule
       .create({
@@ -155,7 +162,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tableName: cleanedData.tableName,
           nodeType: cleanedData.nodeType,
           data: cleanedData.data,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -237,7 +244,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as TableTemplateModulePatch;
     const client = getClient();
     const result = await client.tableTemplateModule
       .update({
@@ -253,7 +260,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tableName: cleanedData.tableName,
           nodeType: cleanedData.nodeType,
           data: cleanedData.data,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

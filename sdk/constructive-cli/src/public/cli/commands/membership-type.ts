@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateMembershipTypeInput, MembershipTypePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'int',
   name: 'string',
@@ -102,7 +103,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateMembershipTypeInput['membershipType'];
     const client = getClient();
     const result = await client.membershipType
       .create({
@@ -110,7 +114,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           description: cleanedData.description,
           prefix: cleanedData.prefix,
-        } as never,
+        },
         select: {
           id: true,
           name: true,
@@ -157,7 +161,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as MembershipTypePatch;
     const client = getClient();
     const result = await client.membershipType
       .update({
@@ -168,7 +172,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           description: cleanedData.description,
           prefix: cleanedData.prefix,
-        } as never,
+        },
         select: {
           id: true,
           name: true,

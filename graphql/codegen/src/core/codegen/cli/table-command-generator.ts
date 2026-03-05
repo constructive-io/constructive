@@ -8,10 +8,12 @@ import {
   getScalarFields,
   getTableNames,
   ucFirst,
+  lcFirst,
+  getCreateInputTypeName,
+  getPatchTypeName,
 } from '../utils';
 import type { CleanTable, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
-import { getCreateInputTypeName } from '../utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -483,6 +485,7 @@ function buildMutationHandler(
   operation: 'create' | 'update' | 'delete',
   targetName?: string,
   typeRegistry?: TypeRegistry,
+  ormTypes?: { createInputTypeName: string; innerFieldName: string; patchTypeName: string },
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
@@ -493,18 +496,27 @@ function buildMutationHandler(
   // on the entity type but not on the create/update input type.
   const writableFields = getWritableFieldNames(table, typeRegistry);
 
+  // Get fields that have defaults from introspection (for create operations)
+  const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
+
+  // For create: include fields that are in the create input type.
+  // For update/delete: always exclude the PK (it goes in `where`, not `data`).
+  // The ORM input-types generator always excludes these fields from create inputs
+  // (see EXCLUDED_MUTATION_FIELDS in input-types-generator.ts). We must match this
+  // to avoid generating data properties that don't exist on the ORM create type.
+  // For non-'id' PKs (e.g. NodeTypeRegistry.name), we allow them in create data
+  // since they are user-provided natural keys that DO appear in the create input.
+  const ORM_EXCLUDED_FIELDS = ['id', 'createdAt', 'updatedAt', 'nodeId'];
   const editableFields = getScalarFields(table).filter(
     (f) =>
-      f.name !== pk.name &&
-      f.name !== 'nodeId' &&
-      f.name !== 'createdAt' &&
-      f.name !== 'updatedAt' &&
+      // For update/delete: always exclude PK (it goes in `where`, not `data`)
+      // For create: exclude PK only if it's in the ORM exclusion list (e.g. 'id')
+      (f.name !== pk.name || (operation === 'create' && !ORM_EXCLUDED_FIELDS.includes(pk.name))) &&
+      // Always exclude ORM-excluded fields (except PK which is handled above)
+      (f.name === pk.name || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
       // If we have type registry info, only include fields that exist in the input type
       (writableFields === null || writableFields.has(f.name)),
   );
-
-  // Get fields that have defaults from introspection (for create operations)
-  const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
 
   const questions: t.Expression[] = [];
 
@@ -567,18 +579,12 @@ function buildMutationHandler(
       ),
     );
 
-  // Helper: wrap an expression in `expr as never`.
-  // `never` is the bottom type — assignable to every type — so the ORM
-  // accepts our dynamically-built data object regardless of the specific
-  // input type (handles scalars, enums, and array fields uniformly).
-  const castDataExpr = (dataObjExpr: t.Expression): t.Expression =>
-    t.tsAsExpression(dataObjExpr, t.tsNeverKeyword());
 
   if (operation === 'create') {
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('data'),
-        castDataExpr(t.objectExpression(buildDataProps())),
+        t.objectExpression(buildDataProps()),
       ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
@@ -600,7 +606,7 @@ function buildMutationHandler(
       ),
       t.objectProperty(
         t.identifier('data'),
-        castDataExpr(t.objectExpression(buildDataProps())),
+        t.objectExpression(buildDataProps()),
       ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
@@ -651,14 +657,38 @@ function buildMutationHandler(
   ];
 
   if (operation !== 'delete') {
+    // Build stripUndefined call and cast to the proper ORM input type
+    // so that property accesses on cleanedData are correctly typed.
+    const stripUndefinedCall = t.callExpression(t.identifier('stripUndefined'), [
+      t.identifier('answers'),
+      t.identifier('fieldSchema'),
+    ]);
+
+    let cleanedDataExpr: t.Expression = stripUndefinedCall;
+    if (ormTypes) {
+      if (operation === 'create') {
+        // cleanedData as CreateXxxInput['fieldName']
+        cleanedDataExpr = t.tsAsExpression(
+          stripUndefinedCall,
+          t.tsIndexedAccessType(
+            t.tsTypeReference(t.identifier(ormTypes.createInputTypeName)),
+            t.tsLiteralType(t.stringLiteral(ormTypes.innerFieldName)),
+          ),
+        );
+      } else if (operation === 'update') {
+        // cleanedData as XxxPatch
+        cleanedDataExpr = t.tsAsExpression(
+          stripUndefinedCall,
+          t.tsTypeReference(t.identifier(ormTypes.patchTypeName)),
+        );
+      }
+    }
+
     tryBody.push(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier('cleanedData'),
-          t.callExpression(t.identifier('stripUndefined'), [
-            t.identifier('answers'),
-            t.identifier('fieldSchema'),
-          ]),
+          cleanedDataExpr,
         ),
       ]),
     );
@@ -732,6 +762,22 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
     createImportDeclaration(utilsPath, ['FieldSchema'], true),
   );
 
+  // Import ORM input types for proper type assertions in mutation handlers.
+  // These types ensure that cleanedData is cast to the correct ORM input type
+  // (e.g., CreateAppPermissionInput['appPermission'] for create, AppPermissionPatch for update)
+  // instead of remaining as Record<string, unknown>.
+  const createInputTypeName = getCreateInputTypeName(table);
+  const patchTypeName = getPatchTypeName(table);
+  const innerFieldName = lcFirst(table.name);
+  // Commands are at cli/commands/xxx.ts (no target) or cli/commands/{target}/xxx.ts (with target).
+  // ORM input-types is at orm/input-types.ts — two or three levels up from commands.
+  const inputTypesPath = options?.targetName
+    ? `../../../orm/input-types`
+    : `../../orm/input-types`;
+  statements.push(
+    createImportDeclaration(inputTypesPath, [createInputTypeName, patchTypeName], true),
+  );
+
   // Generate field schema for type coercion
   // Use explicit FieldSchema type annotation so TS narrows string literals to FieldType
   const fieldSchemaId = t.identifier('fieldSchema');
@@ -747,15 +793,16 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
     ]),
   );
 
-  // Determine which operations are available based on table.query metadata
+  // Determine which operations the ORM model supports for this table.
+  // Read-only views (e.g. GetAllRecord) only have findMany/create,
+  // while full tables also have findOne, update, and delete.
   const hasGet = table.query?.one !== null;
-  const hasCreate = table.query?.create !== undefined;
-  const hasUpdate = table.query?.update !== null;
-  const hasDelete = table.query?.delete !== null;
+  const hasUpdate = table.query?.update !== undefined && table.query?.update !== null;
+  const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
 
   const subcommands: string[] = ['list'];
   if (hasGet) subcommands.push('get');
-  if (hasCreate) subcommands.push('create');
+  subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
   if (hasDelete) subcommands.push('delete');
 
@@ -765,14 +812,12 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
     '',
     'Commands:',
     `  list                  List all ${singularName} records`,
-    ...(hasGet ? [`  get                   Get a ${singularName} by ID`] : []),
-    ...(hasCreate ? [`  create                Create a new ${singularName}`] : []),
-    ...(hasUpdate ? [`  update                Update an existing ${singularName}`] : []),
-    ...(hasDelete ? [`  delete                Delete a ${singularName}`] : []),
-    '',
-    '  --help, -h            Show this help message',
-    '',
   ];
+  if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
+  usageLines.push(`  create                Create a new ${singularName}`);
+  if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
+  if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
+  usageLines.push('', '  --help, -h            Show this help message', '');
 
   statements.push(
     t.variableDeclaration('const', [
@@ -935,11 +980,12 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   );
 
   const tn = options?.targetName;
+  const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
   statements.push(buildListHandler(table, tn));
   if (hasGet) statements.push(buildGetHandler(table, tn));
-  if (hasCreate) statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry));
-  if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry));
-  if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry));
+  statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
+  if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
+  if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry, ormTypes));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);

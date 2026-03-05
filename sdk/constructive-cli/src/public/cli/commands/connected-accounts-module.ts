@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateConnectedAccountsModuleInput,
+  ConnectedAccountsModulePatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -126,7 +130,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateConnectedAccountsModuleInput['connectedAccountsModule'];
     const client = getClient();
     const result = await client.connectedAccountsModule
       .create({
@@ -137,7 +144,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tableId: cleanedData.tableId,
           ownerTableId: cleanedData.ownerTableId,
           tableName: cleanedData.tableName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -205,7 +212,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as ConnectedAccountsModulePatch;
     const client = getClient();
     const result = await client.connectedAccountsModule
       .update({
@@ -219,7 +226,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tableId: cleanedData.tableId,
           ownerTableId: cleanedData.ownerTableId,
           tableName: cleanedData.tableName,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

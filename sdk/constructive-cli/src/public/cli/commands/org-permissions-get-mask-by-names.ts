@@ -5,6 +5,7 @@
  */
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
+import type { OrgPermissionsGetMaskByNamesVariables } from '../../orm/query';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -25,7 +26,9 @@ export default async (
       },
     ]);
     const client = getClient();
-    const result = await client.query.orgPermissionsGetMaskByNames(answers as never).execute();
+    const result = await client.query
+      .orgPermissionsGetMaskByNames(answers as unknown as OrgPermissionsGetMaskByNamesVariables)
+      .execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed: orgPermissionsGetMaskByNames');

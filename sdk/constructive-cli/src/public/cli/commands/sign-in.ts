@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { SignInVariables } from '../../orm/mutation';
+import type { SignInPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -30,10 +32,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .signIn(
-        parsedAnswers as never,
+        parsedAnswers as unknown as SignInVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: SignInPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

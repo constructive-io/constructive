@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateTriggerInput, TriggerPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -162,7 +163,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateTriggerInput['trigger'];
     const client = getClient();
     const result = await client.trigger
       .create({
@@ -177,7 +178,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           module: cleanedData.module,
           scope: cleanedData.scope,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -275,7 +276,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as TriggerPatch;
     const client = getClient();
     const result = await client.trigger
       .update({
@@ -293,7 +294,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           module: cleanedData.module,
           scope: cleanedData.scope,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

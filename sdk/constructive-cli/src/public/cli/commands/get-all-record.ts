@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateGetAllRecordInput, GetAllRecordPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   path: 'string',
   data: 'json',
@@ -88,14 +89,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateGetAllRecordInput['getAllRecord'];
     const client = getClient();
     const result = await client.getAllRecord
       .create({
         data: {
           path: cleanedData.path,
           data: cleanedData.data,
-        } as never,
+        },
         select: {
           path: true,
           data: true,

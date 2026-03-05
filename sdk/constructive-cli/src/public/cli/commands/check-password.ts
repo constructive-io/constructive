@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { CheckPasswordVariables } from '../../orm/mutation';
+import type { CheckPasswordPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -30,10 +32,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .checkPassword(
-        parsedAnswers as never,
+        parsedAnswers as unknown as CheckPasswordVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: CheckPasswordPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

@@ -6,6 +6,7 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { buildSelectFromPaths } from '../utils';
+import type { UserSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -21,7 +22,9 @@ export default async (
     const result = await client.query
       .currentUser({
         select: selectFields,
-      } as never)
+      } as unknown as {
+        select: UserSelect;
+      })
       .execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {

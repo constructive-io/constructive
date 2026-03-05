@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateSiteMetadatumInput, SiteMetadatumPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -118,7 +119,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateSiteMetadatumInput['siteMetadatum'];
     const client = getClient();
     const result = await client.siteMetadatum
       .create({
@@ -128,7 +132,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           title: cleanedData.title,
           description: cleanedData.description,
           ogImage: cleanedData.ogImage,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -189,7 +193,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as SiteMetadatumPatch;
     const client = getClient();
     const result = await client.siteMetadatum
       .update({
@@ -202,7 +206,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           title: cleanedData.title,
           description: cleanedData.description,
           ogImage: cleanedData.ogImage,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

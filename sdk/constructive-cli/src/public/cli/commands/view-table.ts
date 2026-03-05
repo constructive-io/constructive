@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateViewTableInput, ViewTablePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   viewId: 'uuid',
@@ -102,7 +103,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateViewTableInput['viewTable'];
     const client = getClient();
     const result = await client.viewTable
       .create({
@@ -110,7 +111,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           viewId: cleanedData.viewId,
           tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
-        } as never,
+        },
         select: {
           id: true,
           viewId: true,
@@ -157,7 +158,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as ViewTablePatch;
     const client = getClient();
     const result = await client.viewTable
       .update({
@@ -168,7 +169,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           viewId: cleanedData.viewId,
           tableId: cleanedData.tableId,
           joinOrder: cleanedData.joinOrder,
-        } as never,
+        },
         select: {
           id: true,
           viewId: true,

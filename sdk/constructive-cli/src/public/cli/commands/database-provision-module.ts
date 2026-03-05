@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateDatabaseProvisionModuleInput,
+  DatabaseProvisionModulePatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseName: 'string',
@@ -170,7 +174,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateDatabaseProvisionModuleInput['databaseProvisionModule'];
     const client = getClient();
     const result = await client.databaseProvisionModule
       .create({
@@ -186,7 +193,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           errorMessage: cleanedData.errorMessage,
           databaseId: cleanedData.databaseId,
           completedAt: cleanedData.completedAt,
-        } as never,
+        },
         select: {
           id: true,
           databaseName: true,
@@ -291,7 +298,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as DatabaseProvisionModulePatch;
     const client = getClient();
     const result = await client.databaseProvisionModule
       .update({
@@ -310,7 +317,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           errorMessage: cleanedData.errorMessage,
           databaseId: cleanedData.databaseId,
           completedAt: cleanedData.completedAt,
-        } as never,
+        },
         select: {
           id: true,
           databaseName: true,

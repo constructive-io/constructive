@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateOrgLimitInput, OrgLimitPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -118,7 +119,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateOrgLimitInput['orgLimit'];
     const client = getClient();
     const result = await client.orgLimit
       .create({
@@ -128,7 +129,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           num: cleanedData.num,
           max: cleanedData.max,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,
@@ -189,7 +190,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgLimitPatch;
     const client = getClient();
     const result = await client.orgLimit
       .update({
@@ -202,7 +203,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           num: cleanedData.num,
           max: cleanedData.max,
           entityId: cleanedData.entityId,
-        } as never,
+        },
         select: {
           id: true,
           name: true,

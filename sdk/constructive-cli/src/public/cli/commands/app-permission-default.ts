@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateAppPermissionDefaultInput,
+  AppPermissionDefaultPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   permissions: 'string',
@@ -86,13 +90,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateAppPermissionDefaultInput['appPermissionDefault'];
     const client = getClient();
     const result = await client.appPermissionDefault
       .create({
         data: {
           permissions: cleanedData.permissions,
-        } as never,
+        },
         select: {
           id: true,
           permissions: true,
@@ -125,7 +132,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppPermissionDefaultPatch;
     const client = getClient();
     const result = await client.appPermissionDefault
       .update({
@@ -134,7 +141,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           permissions: cleanedData.permissions,
-        } as never,
+        },
         select: {
           id: true,
           permissions: true,

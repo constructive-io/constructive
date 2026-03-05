@@ -6,6 +6,8 @@
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
 import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import type { SetFieldOrderVariables } from '../../orm/mutation';
+import type { SetFieldOrderPayloadSelect } from '../../orm/input-types';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -30,10 +32,12 @@ export default async (
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .setFieldOrder(
-        parsedAnswers as never,
+        parsedAnswers as unknown as SetFieldOrderVariables,
         {
           select: selectFields,
-        } as never
+        } as unknown as {
+          select: SetFieldOrderPayloadSelect;
+        }
       )
       .execute();
     console.log(JSON.stringify(result, null, 2));

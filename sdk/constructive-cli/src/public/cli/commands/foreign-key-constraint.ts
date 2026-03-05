@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateForeignKeyConstraintInput,
+  ForeignKeyConstraintPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -202,7 +206,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateForeignKeyConstraintInput['foreignKeyConstraint'];
     const client = getClient();
     const result = await client.foreignKeyConstraint
       .create({
@@ -222,7 +229,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           module: cleanedData.module,
           scope: cleanedData.scope,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -355,7 +362,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as ForeignKeyConstraintPatch;
     const client = getClient();
     const result = await client.foreignKeyConstraint
       .update({
@@ -378,7 +385,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           module: cleanedData.module,
           scope: cleanedData.scope,
           tags: cleanedData.tags,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

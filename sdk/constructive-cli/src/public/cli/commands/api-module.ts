@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateApiModuleInput, ApiModulePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -110,7 +111,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateApiModuleInput['apiModule'];
     const client = getClient();
     const result = await client.apiModule
       .create({
@@ -119,7 +120,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           apiId: cleanedData.apiId,
           name: cleanedData.name,
           data: cleanedData.data,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -173,7 +174,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as ApiModulePatch;
     const client = getClient();
     const result = await client.apiModule
       .update({
@@ -185,7 +186,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           apiId: cleanedData.apiId,
           name: cleanedData.name,
           data: cleanedData.data,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,

@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateAppOwnerGrantInput, AppOwnerGrantPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   isGrant: 'boolean',
@@ -106,7 +107,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateAppOwnerGrantInput['appOwnerGrant'];
     const client = getClient();
     const result = await client.appOwnerGrant
       .create({
@@ -114,7 +118,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           grantorId: cleanedData.grantorId,
-        } as never,
+        },
         select: {
           id: true,
           isGrant: true,
@@ -163,7 +167,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppOwnerGrantPatch;
     const client = getClient();
     const result = await client.appOwnerGrant
       .update({
@@ -174,7 +178,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isGrant: cleanedData.isGrant,
           actorId: cleanedData.actorId,
           grantorId: cleanedData.grantorId,
-        } as never,
+        },
         select: {
           id: true,
           isGrant: true,

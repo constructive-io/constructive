@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateAppStepInput, AppStepPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   actorId: 'uuid',
@@ -106,7 +107,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CreateAppStepInput['appStep'];
     const client = getClient();
     const result = await client.appStep
       .create({
@@ -114,7 +115,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           name: cleanedData.name,
           count: cleanedData.count,
-        } as never,
+        },
         select: {
           id: true,
           actorId: true,
@@ -163,7 +164,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as AppStepPatch;
     const client = getClient();
     const result = await client.appStep
       .update({
@@ -174,7 +175,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           name: cleanedData.name,
           count: cleanedData.count,
-        } as never,
+        },
         select: {
           id: true,
           actorId: true,

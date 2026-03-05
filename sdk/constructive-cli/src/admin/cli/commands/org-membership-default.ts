@@ -7,6 +7,10 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type {
+  CreateOrgMembershipDefaultInput,
+  OrgMembershipDefaultPatch,
+} from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -130,7 +134,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateOrgMembershipDefaultInput['orgMembershipDefault'];
     const client = getClient();
     const result = await client.orgMembershipDefault
       .create({
@@ -141,7 +148,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityId: cleanedData.entityId,
           deleteMemberCascadeGroups: cleanedData.deleteMemberCascadeGroups,
           createGroupsCascadeMembers: cleanedData.createGroupsCascadeMembers,
-        } as never,
+        },
         select: {
           id: true,
           createdAt: true,
@@ -211,7 +218,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as OrgMembershipDefaultPatch;
     const client = getClient();
     const result = await client.orgMembershipDefault
       .update({
@@ -225,7 +232,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityId: cleanedData.entityId,
           deleteMemberCascadeGroups: cleanedData.deleteMemberCascadeGroups,
           createGroupsCascadeMembers: cleanedData.createGroupsCascadeMembers,
-        } as never,
+        },
         select: {
           id: true,
           createdAt: true,

@@ -7,6 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
+import type { CreateCryptoAuthModuleInput, CryptoAuthModulePatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -182,7 +183,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(
+      answers,
+      fieldSchema
+    ) as CreateCryptoAuthModuleInput['cryptoAuthModule'];
     const client = getClient();
     const result = await client.cryptoAuthModule
       .create({
@@ -200,7 +204,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           signInRecordFailure: cleanedData.signInRecordFailure,
           signUpWithKey: cleanedData.signUpWithKey,
           signInWithChallenge: cleanedData.signInWithChallenge,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
@@ -317,7 +321,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema);
+    const cleanedData = stripUndefined(answers, fieldSchema) as CryptoAuthModulePatch;
     const client = getClient();
     const result = await client.cryptoAuthModule
       .update({
@@ -338,7 +342,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           signInRecordFailure: cleanedData.signInRecordFailure,
           signUpWithKey: cleanedData.signUpWithKey,
           signInWithChallenge: cleanedData.signInWithChallenge,
-        } as never,
+        },
         select: {
           id: true,
           databaseId: true,
