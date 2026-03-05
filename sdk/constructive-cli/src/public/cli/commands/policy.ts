@@ -28,7 +28,7 @@ const fieldSchema: FieldSchema = {
   updatedAt: 'string',
 };
 const usage =
-  '\npolicy <command>\n\nCommands:\n  list                  List all policy records\n  create                Create a new policy\n  update                Update an existing policy\n  delete                Delete a policy\n\n  --help, -h            Show this help message\n';
+  '\npolicy <command>\n\nCommands:\n  list                  List all policy records\n  get                   Get a policy by ID\n  create                Create a new policy\n  update                Update an existing policy\n  delete                Delete a policy\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -45,7 +45,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'create', 'update', 'delete'],
+        options: ['list', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -60,6 +60,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'get':
+      return handleGet(argv, prompter);
     case 'create':
       return handleCreate(argv, prompter);
     case 'update':
@@ -100,6 +102,50 @@ async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: In
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
+  try {
+    const answers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'id',
+        message: 'id',
+        required: true,
+      },
+    ]);
+    const client = getClient();
+    const result = await client.policy
+      .findOne({
+        id: answers.id as string,
+        select: {
+          id: true,
+          databaseId: true,
+          tableId: true,
+          name: true,
+          granteeName: true,
+          privilege: true,
+          permissive: true,
+          disabled: true,
+          policyType: true,
+          data: true,
+          smartTags: true,
+          category: true,
+          module: true,
+          scope: true,
+          tags: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+      .execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Record not found.');
     if (error instanceof Error) {
       console.error(error.message);
     }

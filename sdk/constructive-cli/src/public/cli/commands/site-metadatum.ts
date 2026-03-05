@@ -17,7 +17,7 @@ const fieldSchema: FieldSchema = {
   ogImage: 'string',
 };
 const usage =
-  '\nsite-metadatum <command>\n\nCommands:\n  list                  List all siteMetadatum records\n  create                Create a new siteMetadatum\n  update                Update an existing siteMetadatum\n  delete                Delete a siteMetadatum\n\n  --help, -h            Show this help message\n';
+  '\nsite-metadatum <command>\n\nCommands:\n  list                  List all siteMetadatum records\n  get                   Get a siteMetadatum by ID\n  create                Create a new siteMetadatum\n  update                Update an existing siteMetadatum\n  delete                Delete a siteMetadatum\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -34,7 +34,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'create', 'update', 'delete'],
+        options: ['list', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -49,6 +49,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'get':
+      return handleGet(argv, prompter);
     case 'create':
       return handleCreate(argv, prompter);
     case 'update':
@@ -78,6 +80,39 @@ async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: In
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
+  try {
+    const answers = await prompter.prompt(argv, [
+      {
+        type: 'text',
+        name: 'id',
+        message: 'id',
+        required: true,
+      },
+    ]);
+    const client = getClient();
+    const result = await client.siteMetadatum
+      .findOne({
+        id: answers.id as string,
+        select: {
+          id: true,
+          databaseId: true,
+          siteId: true,
+          title: true,
+          description: true,
+          ogImage: true,
+        },
+      })
+      .execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Record not found.');
     if (error instanceof Error) {
       console.error(error.message);
     }

@@ -794,11 +794,15 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   );
 
   // Determine which operations the ORM model supports for this table.
-  // Read-only views (e.g. GetAllRecord) only have findMany/create,
-  // while full tables also have findOne, update, and delete.
-  const hasGet = table.query?.one !== null;
+  // Most tables have `one: null` simply because there's no dedicated GraphQL
+  // findOne query, but the ORM still generates `findOne` using the PK.
+  // The only tables WITHOUT `findOne` are pure record types from SQL functions
+  // (e.g. GetAllRecord, OrgGetManagersRecord) which have no update/delete either.
+  // We detect these by checking: if one, update, AND delete are all null, it's a
+  // read-only record type with no `findOne`.
   const hasUpdate = table.query?.update !== undefined && table.query?.update !== null;
   const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
+  const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
 
   const subcommands: string[] = ['list'];
   if (hasGet) subcommands.push('get');
