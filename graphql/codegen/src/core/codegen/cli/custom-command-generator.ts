@@ -147,21 +147,31 @@ function buildOrmCustomCall(
 ): t.Expression {
   const callArgs: t.Expression[] = [];
   if (hasArgs) {
-    // Operation has arguments: pass args as first param, select as second
+    // Operation has arguments: pass args as first param, select as second.
+    // Cast { select } through `never` to satisfy StrictSelect constraints
+    // that narrow the parameter type when the select shape is dynamic.
     callArgs.push(argsExpr);
     if (selectExpr) {
       callArgs.push(
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), selectExpr),
-        ]),
+        t.tsAsExpression(
+          t.objectExpression([
+            t.objectProperty(t.identifier('select'), selectExpr),
+          ]),
+          t.tsNeverKeyword(),
+        ),
       );
     }
   } else if (selectExpr) {
-    // No arguments: pass { select } as the only param (ORM signature)
+    // No arguments: pass { select } as the only param (ORM signature).
+    // Cast through `never` to satisfy StrictSelect constraints that may
+    // narrow the parameter type when the select shape is unknown at compile time.
     callArgs.push(
-      t.objectExpression([
-        t.objectProperty(t.identifier('select'), selectExpr),
-      ]),
+      t.tsAsExpression(
+        t.objectExpression([
+          t.objectProperty(t.identifier('select'), selectExpr),
+        ]),
+        t.tsNeverKeyword(),
+      ),
     );
   }
   return t.callExpression(
@@ -325,11 +335,17 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
     );
   }
 
+  // Cast args through `never` so the ORM method accepts them regardless
+  // of the specific Variables type (e.g. CheckPasswordVariables).
+  // `never` is the bottom type — assignable to every type.
   const argsExpr =
     op.args.length > 0
-      ? (hasInputObjectArg
-          ? t.identifier('parsedAnswers')
-          : t.identifier('answers'))
+      ? t.tsAsExpression(
+          hasInputObjectArg
+            ? t.identifier('parsedAnswers')
+            : t.identifier('answers'),
+          t.tsNeverKeyword(),
+        )
       : t.objectExpression([]);
 
   // For OBJECT return types, generate runtime select from --select flag
@@ -345,7 +361,10 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
           t.callExpression(t.identifier('buildSelectFromPaths'), [
             t.logicalExpression(
               '??',
-              t.memberExpression(t.identifier('argv'), t.identifier('select')),
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('select')),
+                t.tsStringKeyword(),
+              ),
               t.stringLiteral(defaultSelect),
             ),
           ]),

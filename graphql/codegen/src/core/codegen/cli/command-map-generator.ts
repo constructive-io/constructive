@@ -32,6 +32,47 @@ function createNamedImportDeclaration(
   return decl;
 }
 
+/**
+ * Build the command handler function type:
+ * (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => Promise<void>
+ * This matches the actual exported handler signatures from table/custom command files.
+ */
+function buildCommandHandlerType(): t.TSFunctionType {
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(
+      t.identifier('Partial'),
+      t.tsTypeParameterInstantiation([
+        t.tsTypeReference(
+          t.identifier('Record'),
+          t.tsTypeParameterInstantiation([
+            t.tsStringKeyword(),
+            t.tsUnknownKeyword(),
+          ]),
+        ),
+      ]),
+    ),
+  );
+  const prompterParam = t.identifier('prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+  const optionsParam = t.identifier('options');
+  optionsParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('CLIOptions')),
+  );
+  return t.tsFunctionType(
+    null,
+    [argvParam, prompterParam, optionsParam],
+    t.tsTypeAnnotation(
+      t.tsTypeReference(
+        t.identifier('Promise'),
+        t.tsTypeParameterInstantiation([t.tsVoidKeyword()]),
+      ),
+    ),
+  );
+}
+
 export function generateCommandMap(
   tables: CleanTable[],
   customOperations: CleanOperation[],
@@ -83,25 +124,9 @@ export function generateCommandMap(
     ),
   );
 
-  const createCommandMapFunc = t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier('createCommandMap'),
-      t.arrowFunctionExpression(
-        [],
-        t.objectExpression(mapProperties),
-      ),
-    ),
-  ]);
-
-  const createCommandMapAnnotation = t.tsTypeAnnotation(
-    t.tsTypeReference(
-      t.identifier('Record'),
-      t.tsTypeParameterInstantiation([
-        t.tsStringKeyword(),
-        t.tsFunctionType(null, [], t.tsTypeAnnotation(t.tsAnyKeyword())),
-      ]),
-    ),
-  );
+  // Build command handler type matching actual handler signature:
+  // (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => Promise<void>
+  const commandHandlerType = buildCommandHandlerType();
 
   const createCommandMapId = t.identifier('createCommandMap');
   createCommandMapId.typeAnnotation = t.tsTypeAnnotation(
@@ -114,7 +139,7 @@ export function generateCommandMap(
             t.identifier('Record'),
             t.tsTypeParameterInstantiation([
               t.tsStringKeyword(),
-              t.tsFunctionType(null, [], t.tsTypeAnnotation(t.tsUnknownKeyword())),
+              commandHandlerType,
             ]),
           ),
         ),
@@ -122,6 +147,15 @@ export function generateCommandMap(
     ),
   );
 
+  const createCommandMapFunc = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      createCommandMapId,
+      t.arrowFunctionExpression(
+        [],
+        t.objectExpression(mapProperties),
+      ),
+    ),
+  ]);
   statements.push(createCommandMapFunc);
 
   const usageLines = [
@@ -285,9 +319,12 @@ export function generateCommandMap(
           t.assignmentExpression(
             '=',
             t.identifier('command'),
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('command'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('command'),
+              ),
+              t.tsStringKeyword(),
             ),
           ),
         ),
@@ -449,9 +486,31 @@ export function generateMultiTargetCommandMap(
     ),
   );
 
+  // Build command handler type matching actual handler signature
+  const multiTargetCommandHandlerType = buildCommandHandlerType();
+
+  const multiTargetCreateCommandMapId = t.identifier('createCommandMap');
+  multiTargetCreateCommandMapId.typeAnnotation = t.tsTypeAnnotation(
+    t.tsParenthesizedType(
+      t.tsFunctionType(
+        null,
+        [],
+        t.tsTypeAnnotation(
+          t.tsTypeReference(
+            t.identifier('Record'),
+            t.tsTypeParameterInstantiation([
+              t.tsStringKeyword(),
+              multiTargetCommandHandlerType,
+            ]),
+          ),
+        ),
+      ),
+    ),
+  );
+
   const createCommandMapFunc = t.variableDeclaration('const', [
     t.variableDeclarator(
-      t.identifier('createCommandMap'),
+      multiTargetCreateCommandMapId,
       t.arrowFunctionExpression(
         [],
         t.objectExpression(mapProperties),
@@ -626,9 +685,12 @@ export function generateMultiTargetCommandMap(
           t.assignmentExpression(
             '=',
             t.identifier('command'),
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('command'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('command'),
+              ),
+              t.tsStringKeyword(),
             ),
           ),
         ),

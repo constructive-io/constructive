@@ -615,7 +615,7 @@ import carCmd from "./commands/car";
 import driverCmd from "./commands/driver";
 import currentUserCmd from "./commands/current-user";
 import loginCmd from "./commands/login";
-const createCommandMap = () => ({
+const createCommandMap: (() => Record<string, (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => Promise<void>>) = () => ({
   "context": contextCmd,
   "auth": authCmd,
   "car": carCmd,
@@ -641,7 +641,7 @@ export const commands = async (argv: Partial<Record<string, unknown>>, prompter:
       message: "What do you want to do?",
       options: Object.keys(commandMap)
     }]);
-    command = answer.command;
+    command = answer.command as string;
   }
   const commandFn = commandMap[command];
   if (!commandFn) {
@@ -681,7 +681,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["set-token", "status", "logout"]
     }]);
-    return handleAuthSubcommand(answer.subcommand, newArgv, prompter, store);
+    return handleAuthSubcommand(answer.subcommand as string, newArgv, prompter, store);
   }
   return handleAuthSubcommand(subcommand, newArgv, prompter, store);
 };
@@ -715,7 +715,7 @@ async function handleSetToken(argv: Partial<Record<string, unknown>>, prompter: 
       message: "API Token",
       required: true
     }]);
-    tokenValue = answer.token;
+    tokenValue = answer.token as string;
   }
   store.setCredentials(current.name, {
     token: String(tokenValue || "").trim()
@@ -750,7 +750,7 @@ async function handleLogout(argv: Partial<Record<string, unknown>>, prompter: In
     message: \`Remove credentials for "\${current.name}"?\`,
     default: false
   }]);
-  if (!confirm.confirm) {
+  if (!(confirm.confirm as boolean)) {
     return;
   }
   if (store.removeCredentials(current.name)) {
@@ -770,7 +770,8 @@ exports[`cli-generator generates commands/car.ts 1`] = `
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, stripUndefined } from "../utils";
-const fieldSchema = {
+import type { FieldSchema } from "../utils";
+const fieldSchema: FieldSchema = {
   id: "uuid",
   make: "string",
   model: "string",
@@ -795,7 +796,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["list", "get", "create", "update", "delete"]
     }]);
-    return handleTableSubcommand(answer.subcommand, newArgv, prompter);
+    return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
   return handleTableSubcommand(subcommand, newArgv, prompter);
 };
@@ -848,7 +849,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     }]);
     const client = getClient();
     const result = await client.car.findOne({
-      id: answers.id,
+      id: answers.id as string,
       select: {
         id: true,
         make: true,
@@ -899,7 +900,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      },
+      } as never,
       select: {
         id: true,
         make: true,
@@ -958,7 +959,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      },
+      } as never,
       select: {
         id: true,
         make: true,
@@ -1032,7 +1033,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["create", "list", "use", "current", "delete"]
     }]);
-    return handleSubcommand(answer.subcommand, newArgv, prompter, store);
+    return handleSubcommand(answer.subcommand as string, newArgv, prompter, store);
   }
   return handleSubcommand(subcommand, newArgv, prompter, store);
 };
@@ -1058,7 +1059,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     first: name,
     newArgv: restArgv
   } = extractFirst(argv);
-  const answers = await prompter.prompt({
+  const answers = (await prompter.prompt({
     name,
     ...restArgv
   }, [{
@@ -1071,7 +1072,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     name: "endpoint",
     message: "GraphQL endpoint URL",
     required: true
-  }]);
+  }])) as unknown as Record<string, string>;
   const contextName = answers.name;
   const endpoint = answers.endpoint;
   store.createContext(contextName, {
@@ -1116,7 +1117,7 @@ async function handleUse(argv: Partial<Record<string, unknown>>, prompter: Inqui
       message: "Select context",
       options: contexts.map(c => c.name)
     }]);
-    contextName = answer.name;
+    contextName = answer.name as string;
   }
   if (store.setCurrentContext(contextName)) {
     console.log(\`Switched to context: \${contextName}\`);
@@ -1153,7 +1154,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       message: "Select context to delete",
       options: contexts.map(c => c.name)
     }]);
-    contextName = answer.name;
+    contextName = answer.name as string;
   }
   if (store.deleteContext(contextName)) {
     console.log(\`Deleted context: \${contextName}\`);
@@ -1180,10 +1181,10 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       process.exit(0);
     }
     const client = getClient();
-    const selectFields = buildSelectFromPaths(argv.select ?? "");
+    const selectFields = buildSelectFromPaths(argv.select as string ?? "");
     const result = await client.query.currentUser({
       select: selectFields
-    }).execute();
+    } as never).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: currentUser");
@@ -1204,7 +1205,8 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, stripUndefined } from "../utils";
-const fieldSchema = {
+import type { FieldSchema } from "../utils";
+const fieldSchema: FieldSchema = {
   id: "uuid",
   name: "string",
   licenseNumber: "string"
@@ -1226,7 +1228,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["list", "get", "create", "update", "delete"]
     }]);
-    return handleTableSubcommand(answer.subcommand, newArgv, prompter);
+    return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
   return handleTableSubcommand(subcommand, newArgv, prompter);
 };
@@ -1276,7 +1278,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     }]);
     const client = getClient();
     const result = await client.driver.findOne({
-      id: answers.id,
+      id: answers.id as string,
       select: {
         id: true,
         name: true,
@@ -1312,7 +1314,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         name: cleanedData.name,
         licenseNumber: cleanedData.licenseNumber
-      },
+      } as never,
       select: {
         id: true,
         name: true,
@@ -1356,7 +1358,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         name: cleanedData.name,
         licenseNumber: cleanedData.licenseNumber
-      },
+      } as never,
       select: {
         id: true,
         name: true,
@@ -1428,10 +1430,10 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient();
-    const selectFields = buildSelectFromPaths(argv.select ?? "clientMutationId");
-    const result = await client.mutation.login(answers, {
+    const selectFields = buildSelectFromPaths(argv.select as string ?? "clientMutationId");
+    const result = await client.mutation.login(answers as never, {
       select: selectFields
-    }).execute();
+    } as never).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed: login");
@@ -1466,7 +1468,7 @@ export function getClient(contextName?: string) {
       throw new Error("No active context. Run \\"context create\\" or \\"context use\\" first.");
     }
   }
-  const headers = {};
+  const headers: Record<string, string> = {};
   if (store.hasValidCredentials(ctx.name)) {
     const creds = store.getCredentials(ctx.name);
     if (creds?.token) {
@@ -3376,7 +3378,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["set-token", "status", "logout"]
     }]);
-    return handleAuthSubcommand(answer.subcommand, newArgv, prompter, store);
+    return handleAuthSubcommand(answer.subcommand as string, newArgv, prompter, store);
   }
   return handleAuthSubcommand(subcommand, newArgv, prompter, store);
 };
@@ -3410,7 +3412,7 @@ async function handleSetToken(argv: Partial<Record<string, unknown>>, prompter: 
       message: "API Token",
       required: true
     }]);
-    tokenValue = answer.token;
+    tokenValue = answer.token as string;
   }
   store.setCredentials(current.name, {
     token: String(tokenValue || "").trim()
@@ -3445,7 +3447,7 @@ async function handleLogout(argv: Partial<Record<string, unknown>>, prompter: In
     message: \`Remove credentials for "\${current.name}"?\`,
     default: false
   }]);
-  if (!confirm.confirm) {
+  if (!(confirm.confirm as boolean)) {
     return;
   }
   if (store.removeCredentials(current.name)) {
@@ -3470,7 +3472,7 @@ import authCurrentUserCmd from "./commands/auth/current-user";
 import authLoginCmd from "./commands/auth/login";
 import membersMemberCmd from "./commands/members/member";
 import appCarCmd from "./commands/app/car";
-const createCommandMap = () => ({
+const createCommandMap: (() => Record<string, (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => Promise<void>>) = () => ({
   "context": contextCmd,
   "credentials": credentialsCmd,
   "auth:user": authUserCmd,
@@ -3497,7 +3499,7 @@ export const commands = async (argv: Partial<Record<string, unknown>>, prompter:
       message: "What do you want to do?",
       options: Object.keys(commandMap)
     }]);
-    command = answer.command;
+    command = answer.command as string;
   }
   const commandFn = commandMap[command];
   if (!commandFn) {
@@ -3537,7 +3539,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["create", "list", "use", "current", "delete"]
     }]);
-    return handleSubcommand(answer.subcommand, newArgv, prompter, store);
+    return handleSubcommand(answer.subcommand as string, newArgv, prompter, store);
   }
   return handleSubcommand(subcommand, newArgv, prompter, store);
 };
@@ -3587,20 +3589,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     message: "app endpoint",
     default: "http://app.localhost/graphql"
   }]);
-  const contextName = answers.name;
+  const contextName = answers.name as string;
   const targets = {
     "auth": {
-      endpoint: answers.authEndpoint
+      endpoint: answers.authEndpoint as string
     },
     "members": {
-      endpoint: answers.membersEndpoint
+      endpoint: answers.membersEndpoint as string
     },
     "app": {
-      endpoint: answers.appEndpoint
+      endpoint: answers.appEndpoint as string
     }
   };
   store.createContext(contextName, {
-    endpoint: answers.authEndpoint,
+    endpoint: answers.authEndpoint as string,
     targets: targets
   });
   const settings = store.loadSettings();
@@ -3608,9 +3610,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     store.setCurrentContext(contextName);
   }
   console.log(\`Created context: \${contextName}\`);
-  console.log(\`  auth: \${answers.authEndpoint}\`);
-  console.log(\`  members: \${answers.membersEndpoint}\`);
-  console.log(\`  app: \${answers.appEndpoint}\`);
+  console.log(\`  auth: \${answers.authEndpoint as string}\`);
+  console.log(\`  members: \${answers.membersEndpoint as string}\`);
+  console.log(\`  app: \${answers.appEndpoint as string}\`);
 }
 function handleList(store: ReturnType<typeof getStore>) {
   const contexts = store.listContexts();
@@ -3644,7 +3646,7 @@ async function handleUse(argv: Partial<Record<string, unknown>>, prompter: Inqui
       message: "Select context",
       options: contexts.map(c => c.name)
     }]);
-    contextName = answer.name;
+    contextName = answer.name as string;
   }
   if (store.setCurrentContext(contextName)) {
     console.log(\`Switched to context: \${contextName}\`);
@@ -3681,7 +3683,7 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
       message: "Select context to delete",
       options: contexts.map(c => c.name)
     }]);
-    contextName = answer.name;
+    contextName = answer.name as string;
   }
   if (store.deleteContext(contextName)) {
     console.log(\`Deleted context: \${contextName}\`);
@@ -3721,7 +3723,7 @@ export function getClient(targetName: string, contextName?: string) {
   if (!createFn) {
     throw new Error(\`Unknown target: \${targetName}\`);
   }
-  const headers = {};
+  const headers: Record<string, string> = {};
   let endpoint = "";
   const ctx = contextName ? store.loadContext(contextName) : store.getCurrentContext();
   if (ctx) {
@@ -3770,10 +3772,10 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       required: true
     }]);
     const client = getClient("auth");
-    const selectFields = buildSelectFromPaths(argv.select ?? "clientMutationId");
-    const result = await client.mutation.login(answers, {
+    const selectFields = buildSelectFromPaths(argv.select as string ?? "clientMutationId");
+    const result = await client.mutation.login(answers as never, {
       select: selectFields
-    }).execute();
+    } as never).execute();
     if (argv.saveToken && result) {
       const tokenValue = result.token || result.jwtToken || result.accessToken;
       if (tokenValue) {
@@ -3807,7 +3809,8 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
-const fieldSchema = {
+import type { FieldSchema } from "../../utils";
+const fieldSchema: FieldSchema = {
   id: "uuid",
   email: "string",
   name: "string"
@@ -3829,7 +3832,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["list", "get", "create", "update", "delete"]
     }]);
-    return handleTableSubcommand(answer.subcommand, newArgv, prompter);
+    return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
   return handleTableSubcommand(subcommand, newArgv, prompter);
 };
@@ -3879,7 +3882,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     }]);
     const client = getClient("auth");
     const result = await client.user.findOne({
-      id: answers.id,
+      id: answers.id as string,
       select: {
         id: true,
         email: true,
@@ -3915,7 +3918,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         email: cleanedData.email,
         name: cleanedData.name
-      },
+      } as never,
       select: {
         id: true,
         email: true,
@@ -3959,7 +3962,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       data: {
         email: cleanedData.email,
         name: cleanedData.name
-      },
+      } as never,
       select: {
         id: true,
         email: true,
@@ -4013,7 +4016,8 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
-const fieldSchema = {
+import type { FieldSchema } from "../../utils";
+const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
@@ -4034,7 +4038,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["list", "get", "create", "update", "delete"]
     }]);
-    return handleTableSubcommand(answer.subcommand, newArgv, prompter);
+    return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
   return handleTableSubcommand(subcommand, newArgv, prompter);
 };
@@ -4083,7 +4087,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     }]);
     const client = getClient("members");
     const result = await client.member.findOne({
-      id: answers.id,
+      id: answers.id as string,
       select: {
         id: true,
         role: true
@@ -4112,7 +4116,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.member.create({
       data: {
         role: cleanedData.role
-      },
+      } as never,
       select: {
         id: true,
         role: true
@@ -4149,7 +4153,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       data: {
         role: cleanedData.role
-      },
+      } as never,
       select: {
         id: true,
         role: true
@@ -4202,7 +4206,8 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, stripUndefined } from "../../utils";
-const fieldSchema = {
+import type { FieldSchema } from "../../utils";
+const fieldSchema: FieldSchema = {
   id: "uuid",
   make: "string",
   model: "string",
@@ -4227,7 +4232,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       message: "What do you want to do?",
       options: ["list", "get", "create", "update", "delete"]
     }]);
-    return handleTableSubcommand(answer.subcommand, newArgv, prompter);
+    return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
   return handleTableSubcommand(subcommand, newArgv, prompter);
 };
@@ -4280,7 +4285,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     }]);
     const client = getClient("app");
     const result = await client.car.findOne({
-      id: answers.id,
+      id: answers.id as string,
       select: {
         id: true,
         make: true,
@@ -4331,7 +4336,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      },
+      } as never,
       select: {
         id: true,
         make: true,
@@ -4390,7 +4395,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         model: cleanedData.model,
         year: cleanedData.year,
         isElectric: cleanedData.isElectric
-      },
+      } as never,
       select: {
         id: true,
         make: true,
