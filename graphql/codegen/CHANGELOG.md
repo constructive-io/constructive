@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.8.1...@constructive-io/graphql-codegen@4.9.0) (2026-03-05)
+
+### Features
+
+- **codegen:** emit skipPrompt: true for fields with backend-managed defaults ([9a8de1c](https://github.com/constructive-io/constructive/commit/9a8de1cebc2c44bcbdc91f2b3a3675d23f8532d7))
+
 ## [4.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.8.0...@constructive-io/graphql-codegen@4.8.1) (2026-03-05)
 
 ### Bug Fixes
