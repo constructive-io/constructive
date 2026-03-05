@@ -4,7 +4,7 @@ import {
 } from '@constructive-io/graphql-codegen';
 import type { GraphQLSDKConfigTarget } from '@constructive-io/graphql-codegen';
 
-const SCHEMA_DIR = '../constructive-cli/schemas';
+const SCHEMA_DIR = '../constructive-sdk/schemas';
 
 const EXCLUDE_TARGETS = ['private'];
 
@@ -16,10 +16,7 @@ async function main() {
     schemaDir: SCHEMA_DIR,
     output: './src',
     orm: true,
-    cli: {
-      toolName: 'csdk',
-      entryPoint: true,
-    },
+    cli: true,
     reactQuery: false,
     verbose: true,
     docs: {
