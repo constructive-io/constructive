@@ -887,7 +887,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "year",
       required: true
     }, {
-      type: "text",
+      type: "boolean",
       name: "isElectric",
       message: "isElectric",
       required: true
@@ -943,7 +943,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "year",
       required: false
     }, {
-      type: "text",
+      type: "boolean",
       name: "isElectric",
       message: "isElectric",
       required: false
@@ -4338,7 +4338,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "year",
       required: true
     }, {
-      type: "text",
+      type: "boolean",
       name: "isElectric",
       message: "isElectric",
       required: true
@@ -4394,7 +4394,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       message: "year",
       required: false
     }, {
-      type: "text",
+      type: "boolean",
       name: "isElectric",
       message: "isElectric",
       required: false

@@ -16,22 +16,23 @@ function resolveBaseType(typeRef: CleanTypeRef): CleanTypeRef {
   return typeRef;
 }
 
-export function buildQuestionObject(arg: CleanArgument): t.ObjectExpression {
+export function buildQuestionObject(arg: CleanArgument, namePrefix?: string): t.ObjectExpression {
   const { inner, required } = unwrapNonNull(arg.type);
   const base = resolveBaseType(arg.type);
   const props: t.ObjectProperty[] = [];
+  const questionName = namePrefix ? `${namePrefix}.${arg.name}` : arg.name;
 
   if (base.kind === 'ENUM' && base.enumValues && base.enumValues.length > 0) {
     props.push(
       t.objectProperty(t.identifier('type'), t.stringLiteral('autocomplete')),
     );
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(arg.name)),
+      t.objectProperty(t.identifier('name'), t.stringLiteral(questionName)),
     );
     props.push(
       t.objectProperty(
         t.identifier('message'),
-        t.stringLiteral(arg.description || arg.name),
+        t.stringLiteral(arg.description || questionName),
       ),
     );
     props.push(
@@ -45,12 +46,12 @@ export function buildQuestionObject(arg: CleanArgument): t.ObjectExpression {
       t.objectProperty(t.identifier('type'), t.stringLiteral('confirm')),
     );
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(arg.name)),
+      t.objectProperty(t.identifier('name'), t.stringLiteral(questionName)),
     );
     props.push(
       t.objectProperty(
         t.identifier('message'),
-        t.stringLiteral(arg.description || arg.name),
+        t.stringLiteral(arg.description || questionName),
       ),
     );
     props.push(
@@ -64,27 +65,28 @@ export function buildQuestionObject(arg: CleanArgument): t.ObjectExpression {
       t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
     );
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(arg.name)),
+      t.objectProperty(t.identifier('name'), t.stringLiteral(questionName)),
     );
     props.push(
       t.objectProperty(
         t.identifier('message'),
-        t.stringLiteral(arg.description || `${arg.name} (number)`),
+        t.stringLiteral(arg.description || `${questionName} (number)`),
       ),
     );
   } else if (inner.kind === 'INPUT_OBJECT' && inner.inputFields) {
+    // INPUT_OBJECT fields are flattened in buildQuestionsArray with dot-notation
     return buildInputObjectQuestion(arg.name, inner, required);
   } else {
     props.push(
       t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
     );
     props.push(
-      t.objectProperty(t.identifier('name'), t.stringLiteral(arg.name)),
+      t.objectProperty(t.identifier('name'), t.stringLiteral(questionName)),
     );
     props.push(
       t.objectProperty(
         t.identifier('message'),
-        t.stringLiteral(arg.description || arg.name),
+        t.stringLiteral(arg.description || questionName),
       ),
     );
   }
@@ -124,12 +126,14 @@ export function buildQuestionsArray(args: CleanArgument[]): t.ArrayExpression {
     const { inner } = unwrapNonNull(arg.type);
 
     if (inner.kind === 'INPUT_OBJECT' && inner.inputFields) {
+      // Flatten INPUT_OBJECT fields with dot-notation: e.g. input.email, input.password
       for (const field of inner.inputFields) {
-        questions.push(buildQuestionObject(field));
+        questions.push(buildQuestionObject(field, arg.name));
       }
     } else if (base.kind === 'INPUT_OBJECT' && base.inputFields) {
+      // Same for NON_NULL-wrapped INPUT_OBJECT
       for (const field of base.inputFields) {
-        questions.push(buildQuestionObject(field));
+        questions.push(buildQuestionObject(field, arg.name));
       }
     } else {
       questions.push(buildQuestionObject(arg));

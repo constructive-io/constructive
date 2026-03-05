@@ -180,7 +180,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'smartTags',
         message: 'smartTags',
         required: false,
@@ -304,7 +304,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'smartTags',
         message: 'smartTags',
         required: false,

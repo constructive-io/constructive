@@ -126,7 +126,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isGrant',
         message: 'isGrant',
         required: false,
@@ -196,7 +196,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isGrant',
         message: 'isGrant',
         required: false,
