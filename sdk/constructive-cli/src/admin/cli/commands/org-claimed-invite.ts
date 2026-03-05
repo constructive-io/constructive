@@ -130,18 +130,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'senderId',
         message: 'senderId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'receiverId',
         message: 'receiverId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -198,18 +201,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'senderId',
         message: 'senderId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'receiverId',
         message: 'receiverId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',

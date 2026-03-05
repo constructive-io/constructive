@@ -151,6 +151,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -163,24 +164,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'smartTags',
         message: 'smartTags',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'type',
         message: 'type',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -193,24 +198,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'category',
         message: 'category',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'module',
         message: 'module',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'scope',
         message: 'scope',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -275,6 +284,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -287,24 +297,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'smartTags',
         message: 'smartTags',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'type',
         message: 'type',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -317,24 +331,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'category',
         message: 'category',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'module',
         message: 'module',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'scope',
         message: 'scope',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

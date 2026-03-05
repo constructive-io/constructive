@@ -121,6 +121,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'permissions',
         message: 'permissions',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -171,6 +172,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'permissions',
         message: 'permissions',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',

@@ -124,6 +124,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'max',
         message: 'max',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -174,6 +175,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'max',
         message: 'max',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

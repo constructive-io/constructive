@@ -136,30 +136,35 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableName',
         message: 'tableName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'typeTableId',
         message: 'typeTableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'typeTableName',
         message: 'typeTableName',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -218,30 +223,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableName',
         message: 'tableName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'typeTableId',
         message: 'typeTableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'typeTableName',
         message: 'typeTableName',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

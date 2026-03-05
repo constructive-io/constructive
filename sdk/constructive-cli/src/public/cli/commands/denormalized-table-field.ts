@@ -166,6 +166,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'setIds',
         message: 'setIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -184,30 +185,35 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'refIds',
         message: 'refIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'useUpdates',
         message: 'useUpdates',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'updateDefaults',
         message: 'updateDefaults',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'funcName',
         message: 'funcName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'funcOrder',
         message: 'funcOrder',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -288,6 +294,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'setIds',
         message: 'setIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -306,30 +313,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'refIds',
         message: 'refIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'useUpdates',
         message: 'useUpdates',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'updateDefaults',
         message: 'updateDefaults',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'funcName',
         message: 'funcName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'funcOrder',
         message: 'funcOrder',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

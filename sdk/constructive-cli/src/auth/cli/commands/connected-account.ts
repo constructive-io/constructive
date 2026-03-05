@@ -133,6 +133,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'ownerId',
         message: 'ownerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -157,6 +158,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'isVerified',
         message: 'isVerified',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -209,6 +211,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'ownerId',
         message: 'ownerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -233,6 +236,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'isVerified',
         message: 'isVerified',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

@@ -148,18 +148,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'requiredCount',
         message: 'requiredCount',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'priority',
         message: 'priority',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -224,18 +227,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'requiredCount',
         message: 'requiredCount',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'priority',
         message: 'priority',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

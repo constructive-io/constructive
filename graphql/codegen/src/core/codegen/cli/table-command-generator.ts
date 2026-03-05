@@ -536,23 +536,33 @@ function buildMutationHandler(
       // For create: field is required only if it has no default value
       // For update: all fields are optional (user only updates what they want)
       const isRequired = operation === 'create' && !fieldsWithDefaults.has(field.name);
-      questions.push(
-        t.objectExpression([
-          t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+      const hasDefault = fieldsWithDefaults.has(field.name);
+      const questionProps = [
+        t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+        t.objectProperty(
+          t.identifier('name'),
+          t.stringLiteral(field.name),
+        ),
+        t.objectProperty(
+          t.identifier('message'),
+          t.stringLiteral(field.name),
+        ),
+        t.objectProperty(
+          t.identifier('required'),
+          t.booleanLiteral(isRequired),
+        ),
+      ];
+      // Skip prompting for fields with backend-managed defaults.
+      // The field still appears in man pages and can be overridden via CLI flags.
+      if (hasDefault) {
+        questionProps.push(
           t.objectProperty(
-            t.identifier('name'),
-            t.stringLiteral(field.name),
+            t.identifier('skipPrompt'),
+            t.booleanLiteral(true),
           ),
-          t.objectProperty(
-            t.identifier('message'),
-            t.stringLiteral(field.name),
-          ),
-          t.objectProperty(
-            t.identifier('required'),
-            t.booleanLiteral(isRequired),
-          ),
-        ]),
-      );
+        );
+      }
+      questions.push(t.objectExpression(questionProps));
     }
   }
 

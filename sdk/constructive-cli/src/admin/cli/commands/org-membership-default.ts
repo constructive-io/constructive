@@ -139,18 +139,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'createdBy',
         message: 'createdBy',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'updatedBy',
         message: 'updatedBy',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -163,12 +166,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'deleteMemberCascadeGroups',
         message: 'deleteMemberCascadeGroups',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'createGroupsCascadeMembers',
         message: 'createGroupsCascadeMembers',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -223,18 +228,21 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'createdBy',
         message: 'createdBy',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'updatedBy',
         message: 'updatedBy',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -247,12 +255,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'deleteMemberCascadeGroups',
         message: 'deleteMemberCascadeGroups',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'createGroupsCascadeMembers',
         message: 'createGroupsCascadeMembers',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

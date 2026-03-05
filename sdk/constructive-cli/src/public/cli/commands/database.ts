@@ -133,30 +133,35 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'ownerId',
         message: 'ownerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'schemaHash',
         message: 'schemaHash',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'label',
         message: 'label',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'hash',
         message: 'hash',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -206,30 +211,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'ownerId',
         message: 'ownerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'schemaHash',
         message: 'schemaHash',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'label',
         message: 'label',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'hash',
         message: 'hash',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
