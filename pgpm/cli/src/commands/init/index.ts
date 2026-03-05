@@ -74,7 +74,7 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const { cwd = process.cwd() } = argv;
   const templateRepo = (argv.repo as string) ?? DEFAULT_TEMPLATE_REPO;
   const branch = argv.fromBranch as string | undefined;
-  const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
+  const noTty = Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true');
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
   const createWorkspace = Boolean(argv.createWorkspace || argv['create-workspace'] || argv.w);
 
@@ -413,7 +413,7 @@ async function handleModuleInit(
     }
 
     if (!resolvedWorkspacePath) {
-      const noTty = Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true');
+      const noTty = Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true');
 
       // Handle --create-workspace flag: create workspace first, then module
       if (ctx.createWorkspace && (workspaceType === 'pgpm' || workspaceType === 'pnpm')) {

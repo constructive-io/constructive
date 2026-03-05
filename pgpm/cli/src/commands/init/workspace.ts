@@ -54,7 +54,7 @@ export default async function runWorkspaceSetup(
       workspaceName: answers.name
     },
     toolName: DEFAULT_TEMPLATE_TOOL_NAME,
-    noTty: Boolean((argv as any).noTty || argv['no-tty'] || process.env.CI === 'true'),
+    noTty: Boolean((argv as any).noTty || argv['no-tty'] || argv.tty === false || process.env.CI === 'true'),
     cwd,
     prompter
   });
