@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.2.0...@constructive-sdk/cli@0.2.1) (2026-03-05)
+
+### Bug Fixes
+
+- **codegen:** eliminate all CLI TypeScript compilation errors ([23e49e3](https://github.com/constructive-io/constructive/commit/23e49e3a4e7487be641cb0e585677e49dbba8e36))
+- **codegen:** properly type CLI code - eliminate all TS errors ([5f07136](https://github.com/constructive-io/constructive/commit/5f07136e3f45e0066a3918ea30cfd732f444677a))
+- **codegen:** restore handleGet for all tables with PKs, skip only for pure record types ([814e810](https://github.com/constructive-io/constructive/commit/814e81034e156a36d0b7e34855d9509468aef0b4))
+
 # 0.2.0 (2026-03-05)
 
 ### Bug Fixes
