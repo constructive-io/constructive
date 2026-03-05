@@ -188,14 +188,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'useUpdates',
         message: 'useUpdates',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'updateDefaults',
         message: 'updateDefaults',
         required: false,
@@ -316,14 +316,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'useUpdates',
         message: 'useUpdates',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'updateDefaults',
         message: 'updateDefaults',
         required: false,

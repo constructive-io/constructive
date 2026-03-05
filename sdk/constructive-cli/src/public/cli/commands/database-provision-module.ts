@@ -182,14 +182,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'options',
         message: 'options',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'bootstrapUser',
         message: 'bootstrapUser',
         required: false,
@@ -314,14 +314,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'options',
         message: 'options',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'bootstrapUser',
         message: 'bootstrapUser',
         required: false,

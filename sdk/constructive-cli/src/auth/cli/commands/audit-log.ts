@@ -163,7 +163,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'success',
         message: 'success',
         required: true,
@@ -247,7 +247,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'success',
         message: 'success',
         required: false,

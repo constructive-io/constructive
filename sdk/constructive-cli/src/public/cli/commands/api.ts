@@ -159,7 +159,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isPublic',
         message: 'isPublic',
         required: false,
@@ -242,7 +242,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isPublic',
         message: 'isPublic',
         required: false,

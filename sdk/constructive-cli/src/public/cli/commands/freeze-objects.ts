@@ -5,7 +5,7 @@
  */
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
-import { parseMutationInput, buildSelectFromPaths } from '../utils';
+import { unflattenDotNotation, buildSelectFromPaths } from '../utils';
 import type { FreezeObjectsVariables } from '../../orm/mutation';
 import type { FreezeObjectsPayloadSelect } from '../../orm/input-types';
 export default async (
@@ -28,7 +28,7 @@ export default async (
       },
     ]);
     const client = getClient();
-    const parsedAnswers = parseMutationInput(answers);
+    const parsedAnswers = unflattenDotNotation(answers);
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .freezeObjects(
