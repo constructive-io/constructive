@@ -1,6 +1,6 @@
 {
   "name": "pgsql-test",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "pgsql-test offers isolated, role-aware, and rollback-friendly PostgreSQL environments for integration tests — giving developers realistic test coverage without external state pollution",
   "main": "index.js",
@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@pgpmjs/core": "workspace:*",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "@types/pg-copy-streams": "^1.2.5",
     "makage": "^0.1.12"
   },
@@ -65,7 +65,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",

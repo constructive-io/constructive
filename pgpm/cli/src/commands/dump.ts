@@ -5,7 +5,7 @@ import { getPgPool } from 'pg-cache';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { QuoteUtils } from 'pgsql-deparser/utils/quote-utils';
+import { QuoteUtils } from '@pgsql/quotes';
 
 import { getTargetDatabase } from '../utils';
 

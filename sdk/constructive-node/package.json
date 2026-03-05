@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/node",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive SDK for Node.js - Drop-in replacement for @constructive-io/sdk with Node.js HTTP adapter",
   "main": "index.js",
@@ -42,7 +42,7 @@
     "@constructive-io/sdk": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.12",
     "typescript": "^5.9.3"
   }

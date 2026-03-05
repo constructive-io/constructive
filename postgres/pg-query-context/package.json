@@ -1,6 +1,6 @@
 {
   "name": "pg-query-context",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "pg query context",
   "main": "index.js",
@@ -29,10 +29,10 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "pg": "^8.17.1"
+    "pg": "^8.19.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.12"
   },
   "keywords": [

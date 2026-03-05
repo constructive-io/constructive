@@ -32,28 +32,32 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
+| `useOrgGetManagersQuery` | Query | List all orgGetManagers |
+| `useCreateOrgGetManagersRecordMutation` | Mutation | Create a orgGetManagersRecord |
+| `useOrgGetSubordinatesQuery` | Query | List all orgGetSubordinates |
+| `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
 | `useGetAllQuery` | Query | List all getAll |
 | `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
-| `useAppPermissionsQuery` | Query | List all appPermissions |
-| `useAppPermissionQuery` | Query | Get one appPermission |
-| `useCreateAppPermissionMutation` | Mutation | Create a appPermission |
-| `useUpdateAppPermissionMutation` | Mutation | Update a appPermission |
-| `useDeleteAppPermissionMutation` | Mutation | Delete a appPermission |
-| `useOrgPermissionsQuery` | Query | List all orgPermissions |
-| `useOrgPermissionQuery` | Query | Get one orgPermission |
-| `useCreateOrgPermissionMutation` | Mutation | Create a orgPermission |
-| `useUpdateOrgPermissionMutation` | Mutation | Update a orgPermission |
-| `useDeleteOrgPermissionMutation` | Mutation | Delete a orgPermission |
+| `useAppPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useAppPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useCreateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useUpdateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useDeleteAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useOrgPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useOrgPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
+| `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useObjectsQuery` | Query | List all objects |
 | `useObjectQuery` | Query | Get one object |
 | `useCreateObjectMutation` | Mutation | Create a object |
 | `useUpdateObjectMutation` | Mutation | Update a object |
 | `useDeleteObjectMutation` | Mutation | Delete a object |
-| `useAppLevelRequirementsQuery` | Query | Requirements to achieve a level |
-| `useAppLevelRequirementQuery` | Query | Requirements to achieve a level |
-| `useCreateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
-| `useUpdateAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
-| `useDeleteAppLevelRequirementMutation` | Mutation | Requirements to achieve a level |
+| `useAppLevelRequirementsQuery` | Query | Defines the specific requirements that must be met to achieve a level |
+| `useAppLevelRequirementQuery` | Query | Defines the specific requirements that must be met to achieve a level |
+| `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
+| `useUpdateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
+| `useDeleteAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
 | `useDatabasesQuery` | Query | List all databases |
 | `useDatabaseQuery` | Query | Get one database |
 | `useCreateDatabaseMutation` | Mutation | Create a database |
@@ -94,11 +98,6 @@ function App() {
 | `useCreateIndexMutation` | Mutation | Create a index |
 | `useUpdateIndexMutation` | Mutation | Update a index |
 | `useDeleteIndexMutation` | Mutation | Delete a index |
-| `useLimitFunctionsQuery` | Query | List all limitFunctions |
-| `useLimitFunctionQuery` | Query | Get one limitFunction |
-| `useCreateLimitFunctionMutation` | Mutation | Create a limitFunction |
-| `useUpdateLimitFunctionMutation` | Mutation | Update a limitFunction |
-| `useDeleteLimitFunctionMutation` | Mutation | Delete a limitFunction |
 | `usePoliciesQuery` | Query | List all policies |
 | `usePolicyQuery` | Query | Get one policy |
 | `useCreatePolicyMutation` | Mutation | Create a policy |
@@ -154,66 +153,111 @@ function App() {
 | `useCreateTableTemplateModuleMutation` | Mutation | Create a tableTemplateModule |
 | `useUpdateTableTemplateModuleMutation` | Mutation | Update a tableTemplateModule |
 | `useDeleteTableTemplateModuleMutation` | Mutation | Delete a tableTemplateModule |
+| `useSecureTableProvisionsQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useSecureTableProvisionQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useCreateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useUpdateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useDeleteSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useRelationProvisionsQuery` | Query | Provisions relational structure between tables. Supports four relation types:
+     - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
+     - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
+     - RelationHasOne: adds a FK field with a unique constraint on the source table referencing the target table. Also supports shared-primary-key patterns where the FK field IS the primary key (set field_name to the existing PK field name).
+     - RelationManyToMany: creates a junction table with FK fields to both source and target tables, delegating table creation and security to secure_table_provision.
+     This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
+     All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
+     The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
+| `useRelationProvisionQuery` | Query | Provisions relational structure between tables. Supports four relation types:
+     - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
+     - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
+     - RelationHasOne: adds a FK field with a unique constraint on the source table referencing the target table. Also supports shared-primary-key patterns where the FK field IS the primary key (set field_name to the existing PK field name).
+     - RelationManyToMany: creates a junction table with FK fields to both source and target tables, delegating table creation and security to secure_table_provision.
+     This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
+     All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
+     The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
+| `useCreateRelationProvisionMutation` | Mutation | Provisions relational structure between tables. Supports four relation types:
+     - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
+     - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
+     - RelationHasOne: adds a FK field with a unique constraint on the source table referencing the target table. Also supports shared-primary-key patterns where the FK field IS the primary key (set field_name to the existing PK field name).
+     - RelationManyToMany: creates a junction table with FK fields to both source and target tables, delegating table creation and security to secure_table_provision.
+     This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
+     All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
+     The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
+| `useUpdateRelationProvisionMutation` | Mutation | Provisions relational structure between tables. Supports four relation types:
+     - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
+     - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
+     - RelationHasOne: adds a FK field with a unique constraint on the source table referencing the target table. Also supports shared-primary-key patterns where the FK field IS the primary key (set field_name to the existing PK field name).
+     - RelationManyToMany: creates a junction table with FK fields to both source and target tables, delegating table creation and security to secure_table_provision.
+     This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
+     All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
+     The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
+| `useDeleteRelationProvisionMutation` | Mutation | Provisions relational structure between tables. Supports four relation types:
+     - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
+     - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
+     - RelationHasOne: adds a FK field with a unique constraint on the source table referencing the target table. Also supports shared-primary-key patterns where the FK field IS the primary key (set field_name to the existing PK field name).
+     - RelationManyToMany: creates a junction table with FK fields to both source and target tables, delegating table creation and security to secure_table_provision.
+     This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
+     All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
+     The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
 | `useSchemaGrantsQuery` | Query | List all schemaGrants |
 | `useSchemaGrantQuery` | Query | Get one schemaGrant |
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
 | `useUpdateSchemaGrantMutation` | Mutation | Update a schemaGrant |
 | `useDeleteSchemaGrantMutation` | Mutation | Delete a schemaGrant |
-| `useApiSchemasQuery` | Query | List all apiSchemas |
-| `useApiSchemaQuery` | Query | Get one apiSchema |
-| `useCreateApiSchemaMutation` | Mutation | Create a apiSchema |
-| `useUpdateApiSchemaMutation` | Mutation | Update a apiSchema |
-| `useDeleteApiSchemaMutation` | Mutation | Delete a apiSchema |
-| `useApiModulesQuery` | Query | List all apiModules |
-| `useApiModuleQuery` | Query | Get one apiModule |
-| `useCreateApiModuleMutation` | Mutation | Create a apiModule |
-| `useUpdateApiModuleMutation` | Mutation | Update a apiModule |
-| `useDeleteApiModuleMutation` | Mutation | Delete a apiModule |
-| `useDomainsQuery` | Query | List all domains |
-| `useDomainQuery` | Query | Get one domain |
-| `useCreateDomainMutation` | Mutation | Create a domain |
-| `useUpdateDomainMutation` | Mutation | Update a domain |
-| `useDeleteDomainMutation` | Mutation | Delete a domain |
-| `useSiteMetadataQuery` | Query | List all siteMetadata |
-| `useSiteMetadatumQuery` | Query | Get one siteMetadatum |
-| `useCreateSiteMetadatumMutation` | Mutation | Create a siteMetadatum |
-| `useUpdateSiteMetadatumMutation` | Mutation | Update a siteMetadatum |
-| `useDeleteSiteMetadatumMutation` | Mutation | Delete a siteMetadatum |
-| `useSiteModulesQuery` | Query | List all siteModules |
-| `useSiteModuleQuery` | Query | Get one siteModule |
-| `useCreateSiteModuleMutation` | Mutation | Create a siteModule |
-| `useUpdateSiteModuleMutation` | Mutation | Update a siteModule |
-| `useDeleteSiteModuleMutation` | Mutation | Delete a siteModule |
-| `useSiteThemesQuery` | Query | List all siteThemes |
-| `useSiteThemeQuery` | Query | Get one siteTheme |
-| `useCreateSiteThemeMutation` | Mutation | Create a siteTheme |
-| `useUpdateSiteThemeMutation` | Mutation | Update a siteTheme |
-| `useDeleteSiteThemeMutation` | Mutation | Delete a siteTheme |
-| `useProceduresQuery` | Query | List all procedures |
-| `useProcedureQuery` | Query | Get one procedure |
-| `useCreateProcedureMutation` | Mutation | Create a procedure |
-| `useUpdateProcedureMutation` | Mutation | Update a procedure |
-| `useDeleteProcedureMutation` | Mutation | Delete a procedure |
+| `useDefaultPrivilegesQuery` | Query | List all defaultPrivileges |
+| `useDefaultPrivilegeQuery` | Query | Get one defaultPrivilege |
+| `useCreateDefaultPrivilegeMutation` | Mutation | Create a defaultPrivilege |
+| `useUpdateDefaultPrivilegeMutation` | Mutation | Update a defaultPrivilege |
+| `useDeleteDefaultPrivilegeMutation` | Mutation | Delete a defaultPrivilege |
+| `useApiSchemasQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
+| `useApiSchemaQuery` | Query | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
+| `useCreateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
+| `useUpdateApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
+| `useDeleteApiSchemaMutation` | Mutation | Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API |
+| `useApiModulesQuery` | Query | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
+| `useApiModuleQuery` | Query | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
+| `useCreateApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
+| `useUpdateApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
+| `useDeleteApiModuleMutation` | Mutation | Server-side module configuration for an API endpoint; stores module name and JSON settings used by the application server |
+| `useDomainsQuery` | Query | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useDomainQuery` | Query | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useCreateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useUpdateDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useDeleteDomainMutation` | Mutation | DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site |
+| `useSiteMetadataQuery` | Query | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
+| `useSiteMetadatumQuery` | Query | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
+| `useCreateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
+| `useUpdateSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
+| `useDeleteSiteMetadatumMutation` | Mutation | SEO and social sharing metadata for a site: page title, description, and Open Graph image |
+| `useSiteModulesQuery` | Query | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
+| `useSiteModuleQuery` | Query | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
+| `useCreateSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
+| `useUpdateSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
+| `useDeleteSiteModuleMutation` | Mutation | Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site |
+| `useSiteThemesQuery` | Query | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
+| `useSiteThemeQuery` | Query | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
+| `useCreateSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
+| `useUpdateSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
+| `useDeleteSiteThemeMutation` | Mutation | Theme configuration for a site; stores design tokens, colors, and typography as JSONB |
 | `useTriggerFunctionsQuery` | Query | List all triggerFunctions |
 | `useTriggerFunctionQuery` | Query | Get one triggerFunction |
 | `useCreateTriggerFunctionMutation` | Mutation | Create a triggerFunction |
 | `useUpdateTriggerFunctionMutation` | Mutation | Update a triggerFunction |
 | `useDeleteTriggerFunctionMutation` | Mutation | Delete a triggerFunction |
-| `useApisQuery` | Query | List all apis |
-| `useApiQuery` | Query | Get one api |
-| `useCreateApiMutation` | Mutation | Create a api |
-| `useUpdateApiMutation` | Mutation | Update a api |
-| `useDeleteApiMutation` | Mutation | Delete a api |
-| `useSitesQuery` | Query | List all sites |
-| `useSiteQuery` | Query | Get one site |
-| `useCreateSiteMutation` | Mutation | Create a site |
-| `useUpdateSiteMutation` | Mutation | Update a site |
-| `useDeleteSiteMutation` | Mutation | Delete a site |
-| `useAppsQuery` | Query | List all apps |
-| `useAppQuery` | Query | Get one app |
-| `useCreateAppMutation` | Mutation | Create a app |
-| `useUpdateAppMutation` | Mutation | Update a app |
-| `useDeleteAppMutation` | Mutation | Delete a app |
+| `useApisQuery` | Query | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
+| `useApiQuery` | Query | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
+| `useCreateApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
+| `useUpdateApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
+| `useDeleteApiMutation` | Mutation | API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings |
+| `useSitesQuery` | Query | Top-level site configuration: branding assets, title, and description for a deployed application |
+| `useSiteQuery` | Query | Top-level site configuration: branding assets, title, and description for a deployed application |
+| `useCreateSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
+| `useUpdateSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
+| `useDeleteSiteMutation` | Mutation | Top-level site configuration: branding assets, title, and description for a deployed application |
+| `useAppsQuery` | Query | Mobile and native app configuration linked to a site, including store links and identifiers |
+| `useAppQuery` | Query | Mobile and native app configuration linked to a site, including store links and identifiers |
+| `useCreateAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
+| `useUpdateAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
+| `useDeleteAppMutation` | Mutation | Mobile and native app configuration linked to a site, including store links and identifiers |
 | `useConnectedAccountsModulesQuery` | Query | List all connectedAccountsModules |
 | `useConnectedAccountsModuleQuery` | Query | Get one connectedAccountsModule |
 | `useCreateConnectedAccountsModuleMutation` | Mutation | Create a connectedAccountsModule |
@@ -329,91 +373,96 @@ function App() {
 | `useCreateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useUpdateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useDeleteDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
-| `useAppAdminGrantsQuery` | Query | List all appAdminGrants |
-| `useAppAdminGrantQuery` | Query | Get one appAdminGrant |
-| `useCreateAppAdminGrantMutation` | Mutation | Create a appAdminGrant |
-| `useUpdateAppAdminGrantMutation` | Mutation | Update a appAdminGrant |
-| `useDeleteAppAdminGrantMutation` | Mutation | Delete a appAdminGrant |
-| `useAppOwnerGrantsQuery` | Query | List all appOwnerGrants |
-| `useAppOwnerGrantQuery` | Query | Get one appOwnerGrant |
-| `useCreateAppOwnerGrantMutation` | Mutation | Create a appOwnerGrant |
-| `useUpdateAppOwnerGrantMutation` | Mutation | Update a appOwnerGrant |
-| `useDeleteAppOwnerGrantMutation` | Mutation | Delete a appOwnerGrant |
-| `useAppGrantsQuery` | Query | List all appGrants |
-| `useAppGrantQuery` | Query | Get one appGrant |
-| `useCreateAppGrantMutation` | Mutation | Create a appGrant |
-| `useUpdateAppGrantMutation` | Mutation | Update a appGrant |
-| `useDeleteAppGrantMutation` | Mutation | Delete a appGrant |
-| `useOrgMembershipsQuery` | Query | List all orgMemberships |
-| `useOrgMembershipQuery` | Query | Get one orgMembership |
-| `useCreateOrgMembershipMutation` | Mutation | Create a orgMembership |
-| `useUpdateOrgMembershipMutation` | Mutation | Update a orgMembership |
-| `useDeleteOrgMembershipMutation` | Mutation | Delete a orgMembership |
-| `useOrgMembersQuery` | Query | List all orgMembers |
-| `useOrgMemberQuery` | Query | Get one orgMember |
-| `useCreateOrgMemberMutation` | Mutation | Create a orgMember |
-| `useUpdateOrgMemberMutation` | Mutation | Update a orgMember |
-| `useDeleteOrgMemberMutation` | Mutation | Delete a orgMember |
-| `useOrgAdminGrantsQuery` | Query | List all orgAdminGrants |
-| `useOrgAdminGrantQuery` | Query | Get one orgAdminGrant |
-| `useCreateOrgAdminGrantMutation` | Mutation | Create a orgAdminGrant |
-| `useUpdateOrgAdminGrantMutation` | Mutation | Update a orgAdminGrant |
-| `useDeleteOrgAdminGrantMutation` | Mutation | Delete a orgAdminGrant |
-| `useOrgOwnerGrantsQuery` | Query | List all orgOwnerGrants |
-| `useOrgOwnerGrantQuery` | Query | Get one orgOwnerGrant |
-| `useCreateOrgOwnerGrantMutation` | Mutation | Create a orgOwnerGrant |
-| `useUpdateOrgOwnerGrantMutation` | Mutation | Update a orgOwnerGrant |
-| `useDeleteOrgOwnerGrantMutation` | Mutation | Delete a orgOwnerGrant |
-| `useOrgGrantsQuery` | Query | List all orgGrants |
-| `useOrgGrantQuery` | Query | Get one orgGrant |
-| `useCreateOrgGrantMutation` | Mutation | Create a orgGrant |
-| `useUpdateOrgGrantMutation` | Mutation | Update a orgGrant |
-| `useDeleteOrgGrantMutation` | Mutation | Delete a orgGrant |
-| `useAppLimitsQuery` | Query | List all appLimits |
-| `useAppLimitQuery` | Query | Get one appLimit |
-| `useCreateAppLimitMutation` | Mutation | Create a appLimit |
-| `useUpdateAppLimitMutation` | Mutation | Update a appLimit |
-| `useDeleteAppLimitMutation` | Mutation | Delete a appLimit |
-| `useOrgLimitsQuery` | Query | List all orgLimits |
-| `useOrgLimitQuery` | Query | Get one orgLimit |
-| `useCreateOrgLimitMutation` | Mutation | Create a orgLimit |
-| `useUpdateOrgLimitMutation` | Mutation | Update a orgLimit |
-| `useDeleteOrgLimitMutation` | Mutation | Delete a orgLimit |
-| `useAppStepsQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
-| `useAppStepQuery` | Query | The user achieving a requirement for a level. Log table that has every single step ever taken. |
-| `useCreateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
-| `useUpdateAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
-| `useDeleteAppStepMutation` | Mutation | The user achieving a requirement for a level. Log table that has every single step ever taken. |
-| `useAppAchievementsQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
-| `useAppAchievementQuery` | Query | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
-| `useCreateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
-| `useUpdateAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
-| `useDeleteAppAchievementMutation` | Mutation | This table represents the users progress for particular level requirements, tallying the total count. This table is updated via triggers and should not be updated maually. |
-| `useInvitesQuery` | Query | List all invites |
-| `useInviteQuery` | Query | Get one invite |
-| `useCreateInviteMutation` | Mutation | Create a invite |
-| `useUpdateInviteMutation` | Mutation | Update a invite |
-| `useDeleteInviteMutation` | Mutation | Delete a invite |
-| `useClaimedInvitesQuery` | Query | List all claimedInvites |
-| `useClaimedInviteQuery` | Query | Get one claimedInvite |
-| `useCreateClaimedInviteMutation` | Mutation | Create a claimedInvite |
-| `useUpdateClaimedInviteMutation` | Mutation | Update a claimedInvite |
-| `useDeleteClaimedInviteMutation` | Mutation | Delete a claimedInvite |
-| `useOrgInvitesQuery` | Query | List all orgInvites |
-| `useOrgInviteQuery` | Query | Get one orgInvite |
-| `useCreateOrgInviteMutation` | Mutation | Create a orgInvite |
-| `useUpdateOrgInviteMutation` | Mutation | Update a orgInvite |
-| `useDeleteOrgInviteMutation` | Mutation | Delete a orgInvite |
-| `useOrgClaimedInvitesQuery` | Query | List all orgClaimedInvites |
-| `useOrgClaimedInviteQuery` | Query | Get one orgClaimedInvite |
-| `useCreateOrgClaimedInviteMutation` | Mutation | Create a orgClaimedInvite |
-| `useUpdateOrgClaimedInviteMutation` | Mutation | Update a orgClaimedInvite |
-| `useDeleteOrgClaimedInviteMutation` | Mutation | Delete a orgClaimedInvite |
-| `useAppPermissionDefaultsQuery` | Query | List all appPermissionDefaults |
-| `useAppPermissionDefaultQuery` | Query | Get one appPermissionDefault |
-| `useCreateAppPermissionDefaultMutation` | Mutation | Create a appPermissionDefault |
-| `useUpdateAppPermissionDefaultMutation` | Mutation | Update a appPermissionDefault |
-| `useDeleteAppPermissionDefaultMutation` | Mutation | Delete a appPermissionDefault |
+| `useAppAdminGrantsQuery` | Query | Records of admin role grants and revocations between members |
+| `useAppAdminGrantQuery` | Query | Records of admin role grants and revocations between members |
+| `useCreateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useUpdateAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useDeleteAppAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useAppOwnerGrantsQuery` | Query | Records of ownership transfers and grants between members |
+| `useAppOwnerGrantQuery` | Query | Records of ownership transfers and grants between members |
+| `useCreateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useUpdateAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useDeleteAppOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useAppGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
+| `useAppGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
+| `useCreateAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useUpdateAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useDeleteAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useOrgMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useOrgMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useCreateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useUpdateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useDeleteOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useOrgMembersQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
+| `useOrgMemberQuery` | Query | Simplified view of active members in an entity, used for listing who belongs to an org or group |
+| `useCreateOrgMemberMutation` | Mutation | Simplified view of active members in an entity, used for listing who belongs to an org or group |
+| `useUpdateOrgMemberMutation` | Mutation | Simplified view of active members in an entity, used for listing who belongs to an org or group |
+| `useDeleteOrgMemberMutation` | Mutation | Simplified view of active members in an entity, used for listing who belongs to an org or group |
+| `useOrgAdminGrantsQuery` | Query | Records of admin role grants and revocations between members |
+| `useOrgAdminGrantQuery` | Query | Records of admin role grants and revocations between members |
+| `useCreateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useUpdateOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useDeleteOrgAdminGrantMutation` | Mutation | Records of admin role grants and revocations between members |
+| `useOrgOwnerGrantsQuery` | Query | Records of ownership transfers and grants between members |
+| `useOrgOwnerGrantQuery` | Query | Records of ownership transfers and grants between members |
+| `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useOrgGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
+| `useOrgGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
+| `useCreateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useUpdateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useDeleteOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
+| `useOrgChartEdgesQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useOrgChartEdgeQuery` | Query | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useCreateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useUpdateOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useDeleteOrgChartEdgeMutation` | Mutation | Organizational chart edges defining parent-child reporting relationships between members within an entity |
+| `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useUpdateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useDeleteOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useOrgLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useOrgLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
+| `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useAppStepsQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useAppStepQuery` | Query | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useCreateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useUpdateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useDeleteAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
+| `useAppAchievementsQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useAppAchievementQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useCreateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useUpdateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useDeleteAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
+| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useCreateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useUpdateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useDeleteClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useOrgClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useOrgClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useCreateOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useUpdateOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useDeleteOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
@@ -424,81 +473,86 @@ function App() {
 | `useCreateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
 | `useUpdateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
 | `useDeleteStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
+| `useAppPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useAppPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
-| `useOrgPermissionDefaultsQuery` | Query | List all orgPermissionDefaults |
-| `useOrgPermissionDefaultQuery` | Query | Get one orgPermissionDefault |
-| `useCreateOrgPermissionDefaultMutation` | Mutation | Create a orgPermissionDefault |
-| `useUpdateOrgPermissionDefaultMutation` | Mutation | Update a orgPermissionDefault |
-| `useDeleteOrgPermissionDefaultMutation` | Mutation | Delete a orgPermissionDefault |
-| `useAppLimitDefaultsQuery` | Query | List all appLimitDefaults |
-| `useAppLimitDefaultQuery` | Query | Get one appLimitDefault |
-| `useCreateAppLimitDefaultMutation` | Mutation | Create a appLimitDefault |
-| `useUpdateAppLimitDefaultMutation` | Mutation | Update a appLimitDefault |
-| `useDeleteAppLimitDefaultMutation` | Mutation | Delete a appLimitDefault |
-| `useOrgLimitDefaultsQuery` | Query | List all orgLimitDefaults |
-| `useOrgLimitDefaultQuery` | Query | Get one orgLimitDefault |
-| `useCreateOrgLimitDefaultMutation` | Mutation | Create a orgLimitDefault |
-| `useUpdateOrgLimitDefaultMutation` | Mutation | Update a orgLimitDefault |
-| `useDeleteOrgLimitDefaultMutation` | Mutation | Delete a orgLimitDefault |
-| `useCryptoAddressesQuery` | Query | List all cryptoAddresses |
-| `useCryptoAddressQuery` | Query | Get one cryptoAddress |
-| `useCreateCryptoAddressMutation` | Mutation | Create a cryptoAddress |
-| `useUpdateCryptoAddressMutation` | Mutation | Update a cryptoAddress |
-| `useDeleteCryptoAddressMutation` | Mutation | Delete a cryptoAddress |
-| `useMembershipTypesQuery` | Query | List all membershipTypes |
-| `useMembershipTypeQuery` | Query | Get one membershipType |
-| `useCreateMembershipTypeMutation` | Mutation | Create a membershipType |
-| `useUpdateMembershipTypeMutation` | Mutation | Update a membershipType |
-| `useDeleteMembershipTypeMutation` | Mutation | Delete a membershipType |
-| `useConnectedAccountsQuery` | Query | List all connectedAccounts |
-| `useConnectedAccountQuery` | Query | Get one connectedAccount |
-| `useCreateConnectedAccountMutation` | Mutation | Create a connectedAccount |
-| `useUpdateConnectedAccountMutation` | Mutation | Update a connectedAccount |
-| `useDeleteConnectedAccountMutation` | Mutation | Delete a connectedAccount |
-| `usePhoneNumbersQuery` | Query | List all phoneNumbers |
-| `usePhoneNumberQuery` | Query | Get one phoneNumber |
-| `useCreatePhoneNumberMutation` | Mutation | Create a phoneNumber |
-| `useUpdatePhoneNumberMutation` | Mutation | Update a phoneNumber |
-| `useDeletePhoneNumberMutation` | Mutation | Delete a phoneNumber |
-| `useAppMembershipDefaultsQuery` | Query | List all appMembershipDefaults |
-| `useAppMembershipDefaultQuery` | Query | Get one appMembershipDefault |
-| `useCreateAppMembershipDefaultMutation` | Mutation | Create a appMembershipDefault |
-| `useUpdateAppMembershipDefaultMutation` | Mutation | Update a appMembershipDefault |
-| `useDeleteAppMembershipDefaultMutation` | Mutation | Delete a appMembershipDefault |
+| `useOrgPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useOrgPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useCreateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useUpdateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useDeleteOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useCryptoAddressesQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCryptoAddressQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useUpdateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useDeleteAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useOrgLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useOrgLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useConnectedAccountsQuery` | Query | OAuth and social login connections linking external service accounts to users |
+| `useConnectedAccountQuery` | Query | OAuth and social login connections linking external service accounts to users |
+| `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
+| `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `usePhoneNumberQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `useCreatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useUpdatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useDeletePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCommitsQuery` | Query | A commit records changes to the repository. |
 | `useCommitQuery` | Query | A commit records changes to the repository. |
 | `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useOrgMembershipDefaultsQuery` | Query | List all orgMembershipDefaults |
-| `useOrgMembershipDefaultQuery` | Query | Get one orgMembershipDefault |
-| `useCreateOrgMembershipDefaultMutation` | Mutation | Create a orgMembershipDefault |
-| `useUpdateOrgMembershipDefaultMutation` | Mutation | Update a orgMembershipDefault |
-| `useDeleteOrgMembershipDefaultMutation` | Mutation | Delete a orgMembershipDefault |
-| `useEmailsQuery` | Query | List all emails |
-| `useEmailQuery` | Query | Get one email |
-| `useCreateEmailMutation` | Mutation | Create a email |
-| `useUpdateEmailMutation` | Mutation | Update a email |
-| `useDeleteEmailMutation` | Mutation | Delete a email |
-| `useAuditLogsQuery` | Query | List all auditLogs |
-| `useAuditLogQuery` | Query | Get one auditLog |
-| `useCreateAuditLogMutation` | Mutation | Create a auditLog |
-| `useUpdateAuditLogMutation` | Mutation | Update a auditLog |
-| `useDeleteAuditLogMutation` | Mutation | Delete a auditLog |
-| `useAppLevelsQuery` | Query | Levels for achievement |
-| `useAppLevelQuery` | Query | Levels for achievement |
-| `useCreateAppLevelMutation` | Mutation | Levels for achievement |
-| `useUpdateAppLevelMutation` | Mutation | Levels for achievement |
-| `useDeleteAppLevelMutation` | Mutation | Levels for achievement |
+| `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useAuditLogsQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAuditLogQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
+| `useEmailQuery` | Query | User email addresses with verification and primary-email management |
+| `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useSqlMigrationsQuery` | Query | List all sqlMigrations |
 | `useSqlMigrationQuery` | Query | Get one sqlMigration |
 | `useCreateSqlMigrationMutation` | Mutation | Create a sqlMigration |
@@ -509,16 +563,16 @@ function App() {
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
 | `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
 | `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
-| `useAppMembershipsQuery` | Query | List all appMemberships |
-| `useAppMembershipQuery` | Query | Get one appMembership |
-| `useCreateAppMembershipMutation` | Mutation | Create a appMembership |
-| `useUpdateAppMembershipMutation` | Mutation | Update a appMembership |
-| `useDeleteAppMembershipMutation` | Mutation | Delete a appMembership |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
+| `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useHierarchyModulesQuery` | Query | List all hierarchyModules |
 | `useHierarchyModuleQuery` | Query | Get one hierarchyModule |
 | `useCreateHierarchyModuleMutation` | Mutation | Create a hierarchyModule |
@@ -531,6 +585,7 @@ function App() {
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useRevParseQuery` | Query | revParse |
+| `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
@@ -591,6 +646,36 @@ Example usage:
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
 
 ## Table Hooks
+
+### OrgGetManagersRecord
+
+```typescript
+// List all orgGetManagers
+const { data, isLoading } = useOrgGetManagersQuery({
+  selection: { fields: { userId: true, depth: true } },
+});
+
+// Create a orgGetManagersRecord
+const { mutate: create } = useCreateOrgGetManagersRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ userId: '<value>', depth: '<value>' });
+```
+
+### OrgGetSubordinatesRecord
+
+```typescript
+// List all orgGetSubordinates
+const { data, isLoading } = useOrgGetSubordinatesQuery({
+  selection: { fields: { userId: true, depth: true } },
+});
+
+// Create a orgGetSubordinatesRecord
+const { mutate: create } = useCreateOrgGetSubordinatesRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ userId: '<value>', depth: '<value>' });
+```
 
 ### GetAllRecord
 
@@ -859,46 +944,25 @@ const { mutate: create } = useCreateIndexMutation({
 create({ databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
 ```
 
-### LimitFunction
-
-```typescript
-// List all limitFunctions
-const { data, isLoading } = useLimitFunctionsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, data: true, security: true } },
-});
-
-// Get one limitFunction
-const { data: item } = useLimitFunctionQuery({
-  id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, data: true, security: true } },
-});
-
-// Create a limitFunction
-const { mutate: create } = useCreateLimitFunctionMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', data: '<value>', security: '<value>' });
-```
-
 ### Policy
 
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, roleName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, roleName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', roleName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -927,20 +991,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<val
 ```typescript
 // List all tableGrants
 const { data, isLoading } = useTableGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, roleName: true, fieldIds: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one tableGrant
 const { data: item } = useTableGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, roleName: true, fieldIds: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a tableGrant
 const { mutate: create } = useCreateTableGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', privilege: '<value>', roleName: '<value>', fieldIds: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>' });
 ```
 
 ### Trigger
@@ -1032,20 +1096,20 @@ create({ viewId: '<value>', tableId: '<value>', joinOrder: '<value>' });
 ```typescript
 // List all viewGrants
 const { data, isLoading } = useViewGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, roleName: true, privilege: true, withGrantOption: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
 });
 
 // Get one viewGrant
 const { data: item } = useViewGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, viewId: true, roleName: true, privilege: true, withGrantOption: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
 });
 
 // Create a viewGrant
 const { mutate: create } = useCreateViewGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', viewId: '<value>', roleName: '<value>', privilege: '<value>', withGrantOption: '<value>' });
+create({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>' });
 ```
 
 ### ViewRule
@@ -1074,20 +1138,20 @@ create({ databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<val
 ```typescript
 // List all tableModules
 const { data, isLoading } = useTableModulesQuery({
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, nodeType: true, data: true, fields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } },
 });
 
 // Get one tableModule
 const { data: item } = useTableModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, nodeType: true, data: true, fields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } },
 });
 
 // Create a tableModule
 const { mutate: create } = useCreateTableModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', nodeType: '<value>', data: '<value>', fields: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', data: '<value>', fields: '<value>' });
 ```
 
 ### TableTemplateModule
@@ -1111,6 +1175,48 @@ const { mutate: create } = useCreateTableTemplateModuleMutation({
 create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>' });
 ```
 
+### SecureTableProvision
+
+```typescript
+// List all secureTableProvisions
+const { data, isLoading } = useSecureTableProvisionsQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+});
+
+// Get one secureTableProvision
+const { data: item } = useSecureTableProvisionQuery({
+  id: '<value>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+});
+
+// Create a secureTableProvision
+const { mutate: create } = useCreateSecureTableProvisionMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>' });
+```
+
+### RelationProvision
+
+```typescript
+// List all relationProvisions
+const { data, isLoading } = useRelationProvisionsQuery({
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+});
+
+// Get one relationProvision
+const { data: item } = useRelationProvisionQuery({
+  id: '<value>',
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+});
+
+// Create a relationProvision
+const { mutate: create } = useCreateRelationProvisionMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>', targetTableId: '<value>', fieldName: '<value>', deleteAction: '<value>', isRequired: '<value>', junctionTableId: '<value>', junctionTableName: '<value>', junctionSchemaId: '<value>', sourceFieldName: '<value>', targetFieldName: '<value>', useCompositeKey: '<value>', nodeType: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFieldId: '<value>', outJunctionTableId: '<value>', outSourceFieldId: '<value>', outTargetFieldId: '<value>' });
+```
+
 ### SchemaGrant
 
 ```typescript
@@ -1130,6 +1236,27 @@ const { mutate: create } = useCreateSchemaGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' });
+```
+
+### DefaultPrivilege
+
+```typescript
+// List all defaultPrivileges
+const { data, isLoading } = useDefaultPrivilegesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+});
+
+// Get one defaultPrivilege
+const { data: item } = useDefaultPrivilegeQuery({
+  id: '<value>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+});
+
+// Create a defaultPrivilege
+const { mutate: create } = useCreateDefaultPrivilegeMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>' });
 ```
 
 ### ApiSchema
@@ -1256,27 +1383,6 @@ const { mutate: create } = useCreateSiteThemeMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<value>', siteId: '<value>', theme: '<value>' });
-```
-
-### Procedure
-
-```typescript
-// List all procedures
-const { data, isLoading } = useProceduresQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, argnames: true, argtypes: true, argdefaults: true, langName: true, definition: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one procedure
-const { data: item } = useProcedureQuery({
-  id: '<value>',
-  selection: { fields: { id: true, databaseId: true, name: true, argnames: true, argtypes: true, argdefaults: true, langName: true, definition: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a procedure
-const { mutate: create } = useCreateProcedureMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<value>', name: '<value>', argnames: '<value>', argtypes: '<value>', argdefaults: '<value>', langName: '<value>', definition: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
 ```
 
 ### TriggerFunction
@@ -1683,20 +1789,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all profilesModules
 const { data, isLoading } = useProfilesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
 });
 
 // Get one profilesModule
 const { data: item } = useProfilesModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
 });
 
 // Create a profilesModule
 const { mutate: create } = useCreateProfilesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' });
 ```
 
 ### RlsModule
@@ -1914,20 +2020,20 @@ create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', grantor
 ```typescript
 // List all orgMemberships
 const { data, isLoading } = useOrgMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
 });
 
 // Get one orgMembership
 const { data: item } = useOrgMembershipQuery({
   id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
 });
 
 // Create a orgMembership
 const { mutate: create } = useCreateOrgMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', entityId: '<value>' });
+create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', entityId: '<value>', profileId: '<value>' });
 ```
 
 ### OrgMember
@@ -2012,6 +2118,48 @@ const { mutate: create } = useCreateOrgGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' });
+```
+
+### OrgChartEdge
+
+```typescript
+// List all orgChartEdges
+const { data, isLoading } = useOrgChartEdgesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+});
+
+// Get one orgChartEdge
+const { data: item } = useOrgChartEdgeQuery({
+  id: '<value>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+});
+
+// Create a orgChartEdge
+const { mutate: create } = useCreateOrgChartEdgeMutation({
+  selection: { fields: { id: true } },
+});
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+```
+
+### OrgChartEdgeGrant
+
+```typescript
+// List all orgChartEdgeGrants
+const { data, isLoading } = useOrgChartEdgeGrantsQuery({
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+});
+
+// Get one orgChartEdgeGrant
+const { data: item } = useOrgChartEdgeGrantQuery({
+  id: '<value>',
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+});
+
+// Create a orgChartEdgeGrant
+const { mutate: create } = useCreateOrgChartEdgeGrantMutation({
+  selection: { fields: { id: true } },
+});
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
 ```
 
 ### AppLimit
@@ -2182,27 +2330,6 @@ const { mutate: create } = useCreateOrgClaimedInviteMutation({
 create({ data: '<value>', senderId: '<value>', receiverId: '<value>', entityId: '<value>' });
 ```
 
-### AppPermissionDefault
-
-```typescript
-// List all appPermissionDefaults
-const { data, isLoading } = useAppPermissionDefaultsQuery({
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Get one appPermissionDefault
-const { data: item } = useAppPermissionDefaultQuery({
-  id: '<value>',
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Create a appPermissionDefault
-const { mutate: create } = useCreateAppPermissionDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ permissions: '<value>' });
-```
-
 ### Ref
 
 ```typescript
@@ -2243,6 +2370,27 @@ const { mutate: create } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<value>', databaseId: '<value>', hash: '<value>' });
+```
+
+### AppPermissionDefault
+
+```typescript
+// List all appPermissionDefaults
+const { data, isLoading } = useAppPermissionDefaultsQuery({
+  selection: { fields: { id: true, permissions: true } },
+});
+
+// Get one appPermissionDefault
+const { data: item } = useAppPermissionDefaultQuery({
+  id: '<value>',
+  selection: { fields: { id: true, permissions: true } },
+});
+
+// Create a appPermissionDefault
+const { mutate: create } = useCreateAppPermissionDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissions: '<value>' });
 ```
 
 ### RoleType
@@ -2287,6 +2435,27 @@ const { mutate: create } = useCreateOrgPermissionDefaultMutation({
 create({ permissions: '<value>', entityId: '<value>' });
 ```
 
+### CryptoAddress
+
+```typescript
+// List all cryptoAddresses
+const { data, isLoading } = useCryptoAddressesQuery({
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one cryptoAddress
+const { data: item } = useCryptoAddressQuery({
+  id: '<value>',
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a cryptoAddress
+const { mutate: create } = useCreateCryptoAddressMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' });
+```
+
 ### AppLimitDefault
 
 ```typescript
@@ -2327,48 +2496,6 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<value>', max: '<value>' });
-```
-
-### CryptoAddress
-
-```typescript
-// List all cryptoAddresses
-const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one cryptoAddress
-const { data: item } = useCryptoAddressQuery({
-  id: '<value>',
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a cryptoAddress
-const { mutate: create } = useCreateCryptoAddressMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' });
-```
-
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<value>', description: '<value>', prefix: '<value>' });
 ```
 
 ### ConnectedAccount
@@ -2413,25 +2540,25 @@ const { mutate: create } = useCreatePhoneNumberMutation({
 create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' });
 ```
 
-### AppMembershipDefault
+### MembershipType
 
 ```typescript
-// List all appMembershipDefaults
-const { data, isLoading } = useAppMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true } },
 });
 
-// Get one appMembershipDefault
-const { data: item } = useAppMembershipDefaultQuery({
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
   id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true } },
 });
 
-// Create a appMembershipDefault
-const { mutate: create } = useCreateAppMembershipDefaultMutation({
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' });
+create({ name: '<value>', description: '<value>', prefix: '<value>' });
 ```
 
 ### NodeTypeRegistry
@@ -2453,6 +2580,27 @@ const { mutate: create } = useCreateNodeTypeRegistryMutation({
   selection: { fields: { name: true } },
 });
 create({ slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' });
+```
+
+### AppMembershipDefault
+
+```typescript
+// List all appMembershipDefaults
+const { data, isLoading } = useAppMembershipDefaultsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+});
+
+// Get one appMembershipDefault
+const { data: item } = useAppMembershipDefaultQuery({
+  id: '<value>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
+});
+
+// Create a appMembershipDefault
+const { mutate: create } = useCreateAppMembershipDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' });
 ```
 
 ### Commit
@@ -2497,27 +2645,6 @@ const { mutate: create } = useCreateOrgMembershipDefaultMutation({
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', entityId: '<value>', deleteMemberCascadeGroups: '<value>', createGroupsCascadeMembers: '<value>' });
 ```
 
-### Email
-
-```typescript
-// List all emails
-const { data, isLoading } = useEmailsQuery({
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one email
-const { data: item } = useEmailQuery({
-  id: '<value>',
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a email
-const { mutate: create } = useCreateEmailMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
-```
-
 ### AuditLog
 
 ```typescript
@@ -2558,6 +2685,27 @@ const { mutate: create } = useCreateAppLevelMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' });
+```
+
+### Email
+
+```typescript
+// List all emails
+const { data, isLoading } = useEmailsQuery({
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one email
+const { data: item } = useEmailQuery({
+  id: '<value>',
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a email
+const { mutate: create } = useCreateEmailMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
 ```
 
 ### SqlMigration
@@ -2602,27 +2750,6 @@ const { mutate: create } = useCreateAstMigrationMutation({
 create({ databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' });
 ```
 
-### AppMembership
-
-```typescript
-// List all appMemberships
-const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true } },
-});
-
-// Get one appMembership
-const { data: item } = useAppMembershipQuery({
-  id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true } },
-});
-
-// Create a appMembership
-const { mutate: create } = useCreateAppMembershipMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>' });
-```
-
 ### User
 
 ```typescript
@@ -2642,6 +2769,27 @@ const { mutate: create } = useCreateUserMutation({
   selection: { fields: { id: true } },
 });
 create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' });
+```
+
+### AppMembership
+
+```typescript
+// List all appMemberships
+const { data, isLoading } = useAppMembershipsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+});
+
+// Get one appMembership
+const { data: item } = useAppMembershipQuery({
+  id: '<value>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+});
+
+// Create a appMembership
+const { mutate: create } = useCreateAppMembershipMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', profileId: '<value>' });
 ```
 
 ### HierarchyModule
@@ -2734,6 +2882,20 @@ revParse
   | `dbId` | UUID |
   | `storeId` | UUID |
   | `refname` | String |
+
+### `useOrgIsManagerOfQuery`
+
+orgIsManagerOf
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `pEntityId` | UUID |
+  | `pManagerId` | UUID |
+  | `pUserId` | UUID |
+  | `pMaxDepth` | Int |
 
 ### `useAppPermissionsGetMaskQuery`
 

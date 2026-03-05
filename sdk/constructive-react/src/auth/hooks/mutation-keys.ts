@@ -53,14 +53,6 @@ export const connectedAccountMutationKeys = {
   /** Delete connectedAccount mutation key */ delete: (id: string | number) =>
     ['mutation', 'connectedaccount', 'delete', id] as const,
 } as const;
-export const emailMutationKeys = {
-  /** All email mutation keys */ all: ['mutation', 'email'] as const,
-  /** Create email mutation key */ create: () => ['mutation', 'email', 'create'] as const,
-  /** Update email mutation key */ update: (id: string | number) =>
-    ['mutation', 'email', 'update', id] as const,
-  /** Delete email mutation key */ delete: (id: string | number) =>
-    ['mutation', 'email', 'delete', id] as const,
-} as const;
 export const auditLogMutationKeys = {
   /** All auditLog mutation keys */ all: ['mutation', 'auditlog'] as const,
   /** Create auditLog mutation key */ create: () => ['mutation', 'auditlog', 'create'] as const,
@@ -68,6 +60,14 @@ export const auditLogMutationKeys = {
     ['mutation', 'auditlog', 'update', id] as const,
   /** Delete auditLog mutation key */ delete: (id: string | number) =>
     ['mutation', 'auditlog', 'delete', id] as const,
+} as const;
+export const emailMutationKeys = {
+  /** All email mutation keys */ all: ['mutation', 'email'] as const,
+  /** Create email mutation key */ create: () => ['mutation', 'email', 'create'] as const,
+  /** Update email mutation key */ update: (id: string | number) =>
+    ['mutation', 'email', 'update', id] as const,
+  /** Delete email mutation key */ delete: (id: string | number) =>
+    ['mutation', 'email', 'delete', id] as const,
 } as const;
 export const userMutationKeys = {
   /** All user mutation keys */ all: ['mutation', 'user'] as const,
@@ -173,8 +173,8 @@ export const mutationKeys = {
   cryptoAddress: cryptoAddressMutationKeys,
   phoneNumber: phoneNumberMutationKeys,
   connectedAccount: connectedAccountMutationKeys,
-  email: emailMutationKeys,
   auditLog: auditLogMutationKeys,
+  email: emailMutationKeys,
   user: userMutationKeys,
   custom: customMutationKeys,
 } as const;

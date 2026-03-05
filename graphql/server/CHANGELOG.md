@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.6.0...@constructive-io/graphql-server@4.6.1) (2026-03-04)
+
+### Bug Fixes
+
+- resolve PG schema names via JOIN instead of JSONB to fix dashes-vs-underscores mismatch ([2a9d836](https://github.com/constructive-io/constructive/commit/2a9d8363e7a7c3c7fd6a606c56aa54ae900042c7))
+- simplify RLS module query - read schema names directly from JSONB ([84eb2a6](https://github.com/constructive-io/constructive/commit/84eb2a6d7498d4886190afe024372b7086cb3fc1))
+- simplify upload.ts RLS queries - read schema names directly from JSONB ([1b20b00](https://github.com/constructive-io/constructive/commit/1b20b004a2348c56f7fa1cafdda5fa4832223387))
+- switch RLS module query from metaschema table to services_public.api_modules ([0d26f90](https://github.com/constructive-io/constructive/commit/0d26f908acd048146f0abd821892d4901f860ef4))
+
+# [4.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.5.2...@constructive-io/graphql-server@4.6.0) (2026-03-04)
+
+### Bug Fixes
+
+- update test expectations for keyword-aware quoting from @pgsql/quotes ([438d50c](https://github.com/constructive-io/constructive/commit/438d50c929187e62e73638a0e320a7c32eb2586f))
+
+### Features
+
+- replace manual identifier quoting with @pgsql/quotes across all plugins ([8a42a33](https://github.com/constructive-io/constructive/commit/8a42a33ccfcdbba146f2136c70152fd300ee2876))
+
+## [4.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.5.1...@constructive-io/graphql-server@4.5.2) (2026-03-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [4.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.5.0...@constructive-io/graphql-server@4.5.1) (2026-03-03)
 
 ### Bug Fixes

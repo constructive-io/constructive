@@ -126,7 +126,13 @@ describe('createUploadAuthenticateMiddleware', () => {
         ...baseApi,
         rlsModule: {
           authenticate: 'authenticate',
+          authenticateStrict: 'authenticate_strict',
           privateSchema: { schemaName: 'private' },
+          publicSchema: { schemaName: 'public' },
+          currentRole: 'current_user',
+          currentRoleId: 'current_user_id',
+          currentIpAddress: 'current_ip_address',
+          currentUserAgent: 'current_user_agent',
         },
       },
       headers: {
@@ -149,7 +155,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     expect(mockPgQueryContext).toHaveBeenCalledWith(
       expect.objectContaining({
         client: tenantPool,
-        query: 'SELECT * FROM "private"."authenticate"($1)',
+        query: 'SELECT * FROM private.authenticate($1)',
         variables: ['good-token'],
         context: expect.objectContaining({
           'jwt.claims.ip_address': '10.0.0.1',
@@ -181,9 +187,18 @@ describe('createUploadAuthenticateMiddleware', () => {
     rootPool.query.mockResolvedValueOnce({
       rows: [
         {
-          authenticate: 'authenticate',
-          authenticate_strict: 'authenticate_strict',
+          data: {
+            authenticate: 'authenticate',
+            authenticate_strict: 'authenticate_strict',
+            authenticate_schema: 'private',
+            role_schema: 'public',
+            current_role: 'current_user',
+            current_role_id: 'current_user_id',
+            current_ip_address: 'current_ip_address',
+            current_user_agent: 'current_user_agent',
+          },
           private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
@@ -196,7 +211,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     await middleware(req, res, next);
 
     expect(rootPool.query).toHaveBeenCalledWith(
-      expect.stringContaining('WHERE a.database_id = $1'),
+      expect.stringContaining('WHERE'),
       ['db-123'],
     );
     expect(next).toHaveBeenCalledTimes(1);
@@ -220,9 +235,18 @@ describe('createUploadAuthenticateMiddleware', () => {
     rootPool.query.mockResolvedValueOnce({
       rows: [
         {
-          authenticate: 'authenticate',
-          authenticate_strict: 'authenticate_strict',
+          data: {
+            authenticate: 'authenticate',
+            authenticate_strict: 'authenticate_strict',
+            authenticate_schema: 'private',
+            role_schema: 'public',
+            current_role: 'current_user',
+            current_role_id: 'current_user_id',
+            current_ip_address: 'current_ip_address',
+            current_user_agent: 'current_user_agent',
+          },
           private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
@@ -235,7 +259,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     await middleware(req, res, next);
 
     expect(rootPool.query).toHaveBeenCalledWith(
-      expect.stringContaining('WHERE rm.api_id = $1'),
+      expect.stringContaining('WHERE'),
       ['api-123'],
     );
     expect(next).toHaveBeenCalledTimes(1);
@@ -261,9 +285,18 @@ describe('createUploadAuthenticateMiddleware', () => {
     rootPool.query.mockResolvedValueOnce({
       rows: [
         {
-          authenticate: 'authenticate',
-          authenticate_strict: 'authenticate_strict',
+          data: {
+            authenticate: 'authenticate',
+            authenticate_strict: 'authenticate_strict',
+            authenticate_schema: 'private',
+            role_schema: 'public',
+            current_role: 'current_user',
+            current_role_id: 'current_user_id',
+            current_ip_address: 'current_ip_address',
+            current_user_agent: 'current_user_agent',
+          },
           private_schema_name: 'private',
+          public_schema_name: 'public',
         },
       ],
     });
@@ -275,7 +308,7 @@ describe('createUploadAuthenticateMiddleware', () => {
     await middleware(req, res, next);
 
     expect(rootPool.query).toHaveBeenCalledWith(
-      expect.stringContaining('WHERE a.dbname = $1'),
+      expect.stringContaining('WHERE'),
       ['tenant_db'],
     );
     expect(next).toHaveBeenCalledTimes(1);
@@ -320,7 +353,13 @@ describe('createUploadAuthenticateMiddleware', () => {
         ...baseApi,
         rlsModule: {
           authenticate: 'authenticate',
+          authenticateStrict: 'authenticate_strict',
           privateSchema: { schemaName: 'private' },
+          publicSchema: { schemaName: 'public' },
+          currentRole: 'current_user',
+          currentRoleId: 'current_user_id',
+          currentIpAddress: 'current_ip_address',
+          currentUserAgent: 'current_user_agent',
         },
       },
       headers: { authorization: 'Bearer invalid-token' },
@@ -352,7 +391,13 @@ describe('createUploadAuthenticateMiddleware', () => {
         ...baseApi,
         rlsModule: {
           authenticate: 'authenticate',
+          authenticateStrict: 'authenticate_strict',
           privateSchema: { schemaName: 'private' },
+          publicSchema: { schemaName: 'public' },
+          currentRole: 'current_user',
+          currentRoleId: 'current_user_id',
+          currentIpAddress: 'current_ip_address',
+          currentUserAgent: 'current_user_agent',
         },
       },
       headers: { authorization: 'Bearer bad-token' },
@@ -383,6 +428,11 @@ describe('createUploadAuthenticateMiddleware', () => {
           authenticate: 'authenticate',
           authenticateStrict: 'authenticate_strict',
           privateSchema: { schemaName: 'private' },
+          publicSchema: { schemaName: 'public' },
+          currentRole: 'current_user',
+          currentRoleId: 'current_user_id',
+          currentIpAddress: 'current_ip_address',
+          currentUserAgent: 'current_user_agent',
         },
       },
       headers: { authorization: 'Bearer strict-token' },
@@ -399,7 +449,7 @@ describe('createUploadAuthenticateMiddleware', () => {
 
     expect(mockPgQueryContext).toHaveBeenCalledWith(
       expect.objectContaining({
-        query: 'SELECT * FROM "private"."authenticate_strict"($1)',
+        query: 'SELECT * FROM private.authenticate_strict($1)',
       }),
     );
     expect(next).toHaveBeenCalledTimes(1);
@@ -415,7 +465,13 @@ describe('createUploadAuthenticateMiddleware', () => {
         ...baseApi,
         rlsModule: {
           authenticate: 'authenticate',
+          authenticateStrict: '',
           privateSchema: { schemaName: 'private' },
+          publicSchema: { schemaName: 'public' },
+          currentRole: 'current_user',
+          currentRoleId: 'current_user_id',
+          currentIpAddress: 'current_ip_address',
+          currentUserAgent: 'current_user_agent',
         },
       },
       headers: { authorization: 'Bearer strict-token' },

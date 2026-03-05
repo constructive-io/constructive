@@ -39,15 +39,6 @@ export interface ConnectedAccount {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface Email {
-  id: string | null;
-  ownerId: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface AuditLog {
   id: string | null;
   event: string | null;
@@ -57,6 +48,15 @@ export interface AuditLog {
   ipAddress: string | null;
   success: boolean | null;
   createdAt: string | null;
+}
+export interface Email {
+  id: string | null;
+  ownerId: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface User {
   id: string | null;

@@ -1,6 +1,9 @@
+import { toKebabCase } from 'komoji';
+
 import type { CleanOperation, CleanTable } from '../../../types/schema';
 import {
   buildSkillFile,
+  buildSkillReference,
   formatArgType,
   getEditableFields,
   getReadmeHeader,
@@ -449,32 +452,40 @@ export function getOrmMcpTools(
 export function generateOrmSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
+  targetName: string,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
+  const skillName = `orm-${targetName}`;
+  const referenceNames: string[] = [];
 
+  // Generate reference files for each table
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
     const editableFields = getEditableFields(table);
 
+    const modelName = lcFirst(singularName);
+    const refName = toKebabCase(singularName);
+    referenceNames.push(refName);
+
     files.push({
-      fileName: `skills/${lcFirst(singularName)}.md`,
-      content: buildSkillFile({
-        name: `orm-${lcFirst(singularName)}`,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: singularName,
         description: table.description || `ORM operations for ${table.name} records`,
         language: 'typescript',
         usage: [
-          `db.${lcFirst(singularName)}.findMany({ select: { id: true } }).execute()`,
-          `db.${lcFirst(singularName)}.findOne({ ${pk.name}: '<value>', select: { id: true } }).execute()`,
-          `db.${lcFirst(singularName)}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { id: true } }).execute()`,
-          `db.${lcFirst(singularName)}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new>' }, select: { id: true } }).execute()`,
-          `db.${lcFirst(singularName)}.delete({ where: { ${pk.name}: '<value>' } }).execute()`,
+          `db.${modelName}.findMany({ select: { id: true } }).execute()`,
+          `db.${modelName}.findOne({ ${pk.name}: '<value>', select: { id: true } }).execute()`,
+          `db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { id: true } }).execute()`,
+          `db.${modelName}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new>' }, select: { id: true } }).execute()`,
+          `db.${modelName}.delete({ where: { ${pk.name}: '<value>' } }).execute()`,
         ],
         examples: [
           {
             description: `List all ${singularName} records`,
             code: [
-              `const items = await db.${lcFirst(singularName)}.findMany({`,
+              `const items = await db.${modelName}.findMany({`,
               `  select: { ${pk.name}: true, ${editableFields[0]?.name || 'name'}: true }`,
               '}).execute();',
             ],
@@ -482,7 +493,7 @@ export function generateOrmSkills(
           {
             description: `Create a ${singularName}`,
             code: [
-              `const item = await db.${lcFirst(singularName)}.create({`,
+              `const item = await db.${modelName}.create({`,
               `  data: { ${editableFields.map((f) => `${f.name}: 'value'`).join(', ')} },`,
               `  select: { ${pk.name}: true }`,
               '}).execute();',
@@ -493,6 +504,7 @@ export function generateOrmSkills(
     });
   }
 
+  // Generate reference files for custom operations
   for (const op of customOperations) {
     const accessor = op.kind === 'query' ? 'query' : 'mutation';
     const callArgs =
@@ -500,26 +512,60 @@ export function generateOrmSkills(
         ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
         : '';
 
+    const refName = toKebabCase(op.name);
+    referenceNames.push(refName);
+
     files.push({
-      fileName: `skills/${op.name}.md`,
-      content: buildSkillFile({
-        name: `orm-${op.name}`,
+      fileName: `${skillName}/references/${refName}.md`,
+      content: buildSkillReference({
+        title: op.name,
         description: op.description || `Execute the ${op.name} ${op.kind}`,
         language: 'typescript',
-        usage: [
-          `db.${accessor}.${op.name}(${callArgs}).execute()`,
-        ],
+        usage: [`db.${accessor}.${op.name}(${callArgs}).execute()`],
         examples: [
           {
             description: `Run ${op.name}`,
-            code: [
-              `const result = await db.${accessor}.${op.name}(${callArgs}).execute();`,
-            ],
+            code: [`const result = await db.${accessor}.${op.name}(${callArgs}).execute();`],
           },
         ],
       }),
     });
   }
+
+  // Generate the overview SKILL.md
+  const tableNames = tables.map((t) => lcFirst(getTableNames(t).singularName));
+  files.push({
+    fileName: `${skillName}/SKILL.md`,
+    content: buildSkillFile(
+      {
+        name: skillName,
+        description: `ORM client for the ${targetName} API — provides typed CRUD operations for ${tables.length} tables and ${customOperations.length} custom operations`,
+        language: 'typescript',
+        usage: [
+          `// Import the ORM client`,
+          `import { db } from './orm';`,
+          '',
+          `// Available models: ${tableNames.slice(0, 8).join(', ')}${tableNames.length > 8 ? ', ...' : ''}`,
+          `db.<model>.findMany({ select: { id: true } }).execute()`,
+          `db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()`,
+          `db.<model>.create({ data: { ... }, select: { id: true } }).execute()`,
+          `db.<model>.update({ where: { id: '<value>' }, data: { ... }, select: { id: true } }).execute()`,
+          `db.<model>.delete({ where: { id: '<value>' } }).execute()`,
+        ],
+        examples: [
+          {
+            description: 'Query records',
+            code: [
+              `const items = await db.${tableNames[0] || 'model'}.findMany({`,
+              '  select: { id: true }',
+              '}).execute();',
+            ],
+          },
+        ],
+      },
+      referenceNames,
+    ),
+  });
 
   return files;
 }

@@ -18,6 +18,27 @@
 // Entity Mutation Keys
 // ============================================================================
 
+export const orgGetManagersRecordMutationKeys = {
+  /** All orgGetManagersRecord mutation keys */ all: ['mutation', 'orggetmanagersrecord'] as const,
+  /** Create orgGetManagersRecord mutation key */ create: () =>
+    ['mutation', 'orggetmanagersrecord', 'create'] as const,
+  /** Update orgGetManagersRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'orggetmanagersrecord', 'update', id] as const,
+  /** Delete orgGetManagersRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orggetmanagersrecord', 'delete', id] as const,
+} as const;
+export const orgGetSubordinatesRecordMutationKeys = {
+  /** All orgGetSubordinatesRecord mutation keys */ all: [
+    'mutation',
+    'orggetsubordinatesrecord',
+  ] as const,
+  /** Create orgGetSubordinatesRecord mutation key */ create: () =>
+    ['mutation', 'orggetsubordinatesrecord', 'create'] as const,
+  /** Update orgGetSubordinatesRecord mutation key */ update: (id: string | number) =>
+    ['mutation', 'orggetsubordinatesrecord', 'update', id] as const,
+  /** Delete orgGetSubordinatesRecord mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orggetsubordinatesrecord', 'delete', id] as const,
+} as const;
 export const appPermissionMutationKeys = {
   /** All appPermission mutation keys */ all: ['mutation', 'apppermission'] as const,
   /** Create appPermission mutation key */ create: () =>
@@ -89,24 +110,6 @@ export const appOwnerGrantMutationKeys = {
   /** Delete appOwnerGrant mutation key */ delete: (id: string | number) =>
     ['mutation', 'appownergrant', 'delete', id] as const,
 } as const;
-export const appLimitDefaultMutationKeys = {
-  /** All appLimitDefault mutation keys */ all: ['mutation', 'applimitdefault'] as const,
-  /** Create appLimitDefault mutation key */ create: () =>
-    ['mutation', 'applimitdefault', 'create'] as const,
-  /** Update appLimitDefault mutation key */ update: (id: string | number) =>
-    ['mutation', 'applimitdefault', 'update', id] as const,
-  /** Delete appLimitDefault mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applimitdefault', 'delete', id] as const,
-} as const;
-export const orgLimitDefaultMutationKeys = {
-  /** All orgLimitDefault mutation keys */ all: ['mutation', 'orglimitdefault'] as const,
-  /** Create orgLimitDefault mutation key */ create: () =>
-    ['mutation', 'orglimitdefault', 'create'] as const,
-  /** Update orgLimitDefault mutation key */ update: (id: string | number) =>
-    ['mutation', 'orglimitdefault', 'update', id] as const,
-  /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
-    ['mutation', 'orglimitdefault', 'delete', id] as const,
-} as const;
 export const orgAdminGrantMutationKeys = {
   /** All orgAdminGrant mutation keys */ all: ['mutation', 'orgadmingrant'] as const,
   /** Create orgAdminGrant mutation key */ create: () =>
@@ -125,6 +128,24 @@ export const orgOwnerGrantMutationKeys = {
   /** Delete orgOwnerGrant mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgownergrant', 'delete', id] as const,
 } as const;
+export const appLimitDefaultMutationKeys = {
+  /** All appLimitDefault mutation keys */ all: ['mutation', 'applimitdefault'] as const,
+  /** Create appLimitDefault mutation key */ create: () =>
+    ['mutation', 'applimitdefault', 'create'] as const,
+  /** Update appLimitDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimitdefault', 'update', id] as const,
+  /** Delete appLimitDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimitdefault', 'delete', id] as const,
+} as const;
+export const orgLimitDefaultMutationKeys = {
+  /** All orgLimitDefault mutation keys */ all: ['mutation', 'orglimitdefault'] as const,
+  /** Create orgLimitDefault mutation key */ create: () =>
+    ['mutation', 'orglimitdefault', 'create'] as const,
+  /** Update orgLimitDefault mutation key */ update: (id: string | number) =>
+    ['mutation', 'orglimitdefault', 'update', id] as const,
+  /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orglimitdefault', 'delete', id] as const,
+} as const;
 export const membershipTypeMutationKeys = {
   /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
   /** Create membershipType mutation key */ create: () =>
@@ -133,6 +154,15 @@ export const membershipTypeMutationKeys = {
     ['mutation', 'membershiptype', 'update', id] as const,
   /** Delete membershipType mutation key */ delete: (id: string | number) =>
     ['mutation', 'membershiptype', 'delete', id] as const,
+} as const;
+export const orgChartEdgeGrantMutationKeys = {
+  /** All orgChartEdgeGrant mutation keys */ all: ['mutation', 'orgchartedgegrant'] as const,
+  /** Create orgChartEdgeGrant mutation key */ create: () =>
+    ['mutation', 'orgchartedgegrant', 'create'] as const,
+  /** Update orgChartEdgeGrant mutation key */ update: (id: string | number) =>
+    ['mutation', 'orgchartedgegrant', 'update', id] as const,
+  /** Delete orgChartEdgeGrant mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orgchartedgegrant', 'delete', id] as const,
 } as const;
 export const appLimitMutationKeys = {
   /** All appLimit mutation keys */ all: ['mutation', 'applimit'] as const,
@@ -210,6 +240,15 @@ export const orgGrantMutationKeys = {
   /** Delete orgGrant mutation key */ delete: (id: string | number) =>
     ['mutation', 'orggrant', 'delete', id] as const,
 } as const;
+export const orgChartEdgeMutationKeys = {
+  /** All orgChartEdge mutation keys */ all: ['mutation', 'orgchartedge'] as const,
+  /** Create orgChartEdge mutation key */ create: () =>
+    ['mutation', 'orgchartedge', 'create'] as const,
+  /** Update orgChartEdge mutation key */ update: (id: string | number) =>
+    ['mutation', 'orgchartedge', 'update', id] as const,
+  /** Delete orgChartEdge mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orgchartedge', 'delete', id] as const,
+} as const;
 export const orgMembershipDefaultMutationKeys = {
   /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
   /** Create orgMembershipDefault mutation key */ create: () =>
@@ -219,14 +258,6 @@ export const orgMembershipDefaultMutationKeys = {
   /** Delete orgMembershipDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgmembershipdefault', 'delete', id] as const,
 } as const;
-export const appLevelMutationKeys = {
-  /** All appLevel mutation keys */ all: ['mutation', 'applevel'] as const,
-  /** Create appLevel mutation key */ create: () => ['mutation', 'applevel', 'create'] as const,
-  /** Update appLevel mutation key */ update: (id: string | number) =>
-    ['mutation', 'applevel', 'update', id] as const,
-  /** Delete appLevel mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applevel', 'delete', id] as const,
-} as const;
 export const inviteMutationKeys = {
   /** All invite mutation keys */ all: ['mutation', 'invite'] as const,
   /** Create invite mutation key */ create: () => ['mutation', 'invite', 'create'] as const,
@@ -234,6 +265,14 @@ export const inviteMutationKeys = {
     ['mutation', 'invite', 'update', id] as const,
   /** Delete invite mutation key */ delete: (id: string | number) =>
     ['mutation', 'invite', 'delete', id] as const,
+} as const;
+export const appLevelMutationKeys = {
+  /** All appLevel mutation keys */ all: ['mutation', 'applevel'] as const,
+  /** Create appLevel mutation key */ create: () => ['mutation', 'applevel', 'create'] as const,
+  /** Update appLevel mutation key */ update: (id: string | number) =>
+    ['mutation', 'applevel', 'update', id] as const,
+  /** Delete appLevel mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applevel', 'delete', id] as const,
 } as const;
 export const appMembershipMutationKeys = {
   /** All appMembership mutation keys */ all: ['mutation', 'appmembership'] as const,
@@ -299,6 +338,8 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
+  orgGetManagersRecord: orgGetManagersRecordMutationKeys,
+  orgGetSubordinatesRecord: orgGetSubordinatesRecordMutationKeys,
   appPermission: appPermissionMutationKeys,
   orgPermission: orgPermissionMutationKeys,
   appLevelRequirement: appLevelRequirementMutationKeys,
@@ -307,11 +348,12 @@ export const mutationKeys = {
   orgPermissionDefault: orgPermissionDefaultMutationKeys,
   appAdminGrant: appAdminGrantMutationKeys,
   appOwnerGrant: appOwnerGrantMutationKeys,
-  appLimitDefault: appLimitDefaultMutationKeys,
-  orgLimitDefault: orgLimitDefaultMutationKeys,
   orgAdminGrant: orgAdminGrantMutationKeys,
   orgOwnerGrant: orgOwnerGrantMutationKeys,
+  appLimitDefault: appLimitDefaultMutationKeys,
+  orgLimitDefault: orgLimitDefaultMutationKeys,
   membershipType: membershipTypeMutationKeys,
+  orgChartEdgeGrant: orgChartEdgeGrantMutationKeys,
   appLimit: appLimitMutationKeys,
   appAchievement: appAchievementMutationKeys,
   appStep: appStepMutationKeys,
@@ -321,9 +363,10 @@ export const mutationKeys = {
   orgLimit: orgLimitMutationKeys,
   orgClaimedInvite: orgClaimedInviteMutationKeys,
   orgGrant: orgGrantMutationKeys,
+  orgChartEdge: orgChartEdgeMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
-  appLevel: appLevelMutationKeys,
   invite: inviteMutationKeys,
+  appLevel: appLevelMutationKeys,
   appMembership: appMembershipMutationKeys,
   orgMembership: orgMembershipMutationKeys,
   orgInvite: orgInviteMutationKeys,

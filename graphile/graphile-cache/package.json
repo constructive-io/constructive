@@ -1,6 +1,6 @@
 {
   "name": "graphile-cache",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGraphile v5 LRU cache with automatic pool cleanup integration",
   "main": "index.js",
@@ -32,14 +32,14 @@
     "@pgpmjs/logger": "workspace:^",
     "express": "^5.2.1",
     "grafserv": "1.0.0-rc.6",
-    "lru-cache": "^11.2.4",
+    "lru-cache": "^11.2.6",
     "pg-cache": "workspace:^",
     "postgraphile": "5.0.0-rc.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "makage": "^0.1.10",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.14",
     "ts-node": "^10.9.2"
   },
   "keywords": [

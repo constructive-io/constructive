@@ -1,3 +1,5 @@
+import { QuoteUtils } from '@pgsql/quotes';
+
 type WhereCondition = {
   column: string;
   operator: string;
@@ -5,10 +7,6 @@ type WhereCondition = {
 };
 
 type ValueType = 'string' | 'number' | 'boolean' | 'null';
-
-const RESERVED_KEYWORDS = new Set([
-  'SELECT', 'FROM', 'WHERE', 'INSERT', 'UPDATE', 'DELETE', 'TABLE', 'USER',
-]);
 
 export class QueryBuilder {
   private schemaName: string | null = null;
@@ -232,18 +230,7 @@ export class QueryBuilder {
   }  
 
   private escapeIdentifier(identifier: string): string {
-    if (this.needsQuoting(identifier)) {
-      return `"${identifier.replace(/"/g, '""')}"`;
-    }
-    return identifier;
-  }
-
-  private needsQuoting(identifier: string): boolean {
-    return (
-      RESERVED_KEYWORDS.has(identifier.toUpperCase()) ||
-      /[^a-zA-Z0-9_]/.test(identifier) ||
-      /^\d/.test(identifier)
-    );
+    return QuoteUtils.quoteIdentifier(identifier);
   }
 
   private formatValue(column: string, value: any): string {

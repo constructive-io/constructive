@@ -1,6 +1,6 @@
 {
   "name": "pg-seed",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL seeding utilities for CSV, JSON, and SQL data loading",
   "main": "index.js",
@@ -42,13 +42,13 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "@types/pg-copy-streams": "^1.2.5",
     "makage": "^0.1.12"
   },
   "dependencies": {
     "csv-parse": "^6.1.0",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pg-copy-streams": "^7.0.0"
   }
 }

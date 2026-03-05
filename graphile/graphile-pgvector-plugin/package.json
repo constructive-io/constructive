@@ -1,6 +1,6 @@
 {
   "name": "graphile-pgvector-plugin",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "PostGraphile v5 codec plugin for pgvector — makes vector columns, mutations, and functions work automatically",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -29,11 +29,11 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
-    "@types/pg": "^8.16.0",
+    "@types/node": "^22.19.11",
+    "@types/pg": "^8.18.0",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {

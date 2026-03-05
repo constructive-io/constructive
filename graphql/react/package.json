@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-react",
-  "version": "4.3.1",
+  "version": "4.3.4",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL React",
   "main": "index.js",
@@ -31,14 +31,14 @@
     "@constructive-io/graphql-query": "workspace:^",
     "graphql-request": "^7.1.2",
     "introspectron": "workspace:^",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-query": "^3.39.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.11.10",
     "@testing-library/react": "11.2.5",
-    "@types/react": "^19.2.8",
+    "@types/react": "^19.2.14",
     "makage": "^0.1.10"
   }
 }

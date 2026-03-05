@@ -1,6 +1,6 @@
 {
   "name": "pgsql-client",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL client utilities with query helpers, RLS context management, and database administration",
   "main": "index.js",
@@ -41,14 +41,14 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "makage": "^0.1.12"
   },
   "dependencies": {
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.17.1",
+    "pg": "^8.19.0",
     "pg-env": "workspace:^"
   }
 }

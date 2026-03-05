@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.7.0...@constructive-io/query-builder@2.8.0) (2026-03-04)
+
+### Features
+
+- replace manual identifier quoting with @pgsql/quotes across all plugins ([8a42a33](https://github.com/constructive-io/constructive/commit/8a42a33ccfcdbba146f2136c70152fd300ee2876))
+
 # [2.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@2.6.0...@constructive-io/query-builder@2.7.0) (2026-02-24)
 
 **Note:** Version bump only for package @constructive-io/query-builder

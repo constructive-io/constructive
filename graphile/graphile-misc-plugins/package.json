@@ -1,6 +1,6 @@
 {
   "name": "graphile-misc-plugins",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "Miscellaneous PostGraphile v5 plugins: inflection, conflict detection, meta-schema, type mappings, and more",
   "main": "index.js",
@@ -30,9 +30,10 @@
   },
   "dependencies": {
     "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
+    "@pgsql/quotes": "^17.1.0",
     "graphile-utils": "5.0.0-rc.5",
-    "inflekt": "^0.3.0",
-    "pg": "^8.17.1",
+    "inflekt": "^0.3.3",
+    "pg": "^8.19.0",
     "pg-query-context": "workspace:^"
   },
   "peerDependencies": {
@@ -44,7 +45,7 @@
     "pg-sql2": "5.0.0-rc.4"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "makage": "^0.1.10"
   },
   "keywords": [

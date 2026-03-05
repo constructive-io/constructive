@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "4.7.1",
+  "version": "4.8.0",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -54,28 +54,28 @@
   },
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
-    "@babel/generator": "^7.28.6",
-    "@babel/types": "^7.28.6",
+    "@babel/generator": "^7.29.1",
+    "@babel/types": "^7.29.0",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@inquirerer/utils": "^3.3.1",
     "@pgpmjs/core": "workspace:^",
-    "ajv": "^8.17.1",
+    "ajv": "^8.18.0",
     "deepmerge": "^4.3.1",
-    "find-and-require-package-json": "^0.9.0",
+    "find-and-require-package-json": "^0.9.1",
     "gql-ast": "workspace:^",
     "graphile-schema": "workspace:^",
-    "graphql": "^16.9.0",
-    "inflekt": "^0.3.1",
+    "graphql": "^16.13.0",
+    "inflekt": "^0.3.3",
     "inquirerer": "^4.5.2",
     "jiti": "^2.6.1",
-    "komoji": "^0.8.0",
-    "oxfmt": "^0.26.0",
+    "komoji": "^0.8.1",
+    "oxfmt": "^0.36.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
-    "undici": "^7.19.0"
+    "undici": "^7.22.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
@@ -90,13 +90,13 @@
     }
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.90.19",
+    "@tanstack/react-query": "^5.90.21",
     "@types/babel__generator": "^7.27.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.19.27",
-    "@types/react": "^19.2.8",
+    "@types/node": "^22.19.11",
+    "@types/react": "^19.2.14",
     "jest": "^30.2.0",
-    "react": "^19.2.3",
+    "react": "^19.2.4",
     "ts-jest": "^29.2.5",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

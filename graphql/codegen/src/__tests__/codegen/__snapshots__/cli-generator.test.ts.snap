@@ -362,7 +362,7 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`cli docs generator generates CLI skill files 1`] = `
-"# myapp-context
+"# Context Management
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -396,7 +396,7 @@ myapp context list
 `;
 
 exports[`cli docs generator generates CLI skill files 2`] = `
-"# myapp-auth
+"# Authentication
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -427,7 +427,7 @@ myapp auth status
 `;
 
 exports[`cli docs generator generates CLI skill files 3`] = `
-"# myapp-car
+"# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -462,23 +462,11 @@ myapp car create --make "value" --model "value" --year "value" --isElectric "val
 \`\`\`bash
 myapp car get --id <value>
 \`\`\`
-
-### Update a car
-
-\`\`\`bash
-myapp car update --id <value> --make "new-value"
-\`\`\`
-
-### Delete a car
-
-\`\`\`bash
-myapp car delete --id <value>
-\`\`\`
 "
 `;
 
 exports[`cli docs generator generates CLI skill files 4`] = `
-"# myapp-driver
+"# driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -513,23 +501,11 @@ myapp driver create --name "value" --licenseNumber "value"
 \`\`\`bash
 myapp driver get --id <value>
 \`\`\`
-
-### Update a driver
-
-\`\`\`bash
-myapp driver update --id <value> --name "new-value"
-\`\`\`
-
-### Delete a driver
-
-\`\`\`bash
-myapp driver delete --id <value>
-\`\`\`
 "
 `;
 
 exports[`cli docs generator generates CLI skill files 5`] = `
-"# myapp-current-user
+"# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -552,7 +528,7 @@ myapp current-user
 `;
 
 exports[`cli docs generator generates CLI skill files 6`] = `
-"# myapp-login
+"# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -571,6 +547,58 @@ myapp login --email <value> --password <value>
 \`\`\`bash
 myapp login --email <value> --password <value>
 \`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 7`] = `
+"---
+name: cli-default
+description: CLI tool (myapp) for the default API — provides CRUD commands for 2 tables and 2 custom operations
+---
+
+# cli-default
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+CLI tool (myapp) for the default API — provides CRUD commands for 2 tables and 2 custom operations
+
+## Usage
+
+\`\`\`bash
+# Context management
+myapp context create <name> --endpoint <url>
+myapp context use <name>
+
+# Authentication
+myapp auth set-token <token>
+
+# CRUD for any table (e.g. car)
+myapp car list
+myapp car get --id <value>
+myapp car create --<field> <value>
+\`\`\`
+
+## Examples
+
+### Set up and query
+
+\`\`\`bash
+myapp context create local --endpoint http://localhost:5000/graphql
+myapp context use local
+myapp auth set-token <token>
+myapp car list
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [context](references/context.md)
+- [auth](references/auth.md)
+- [car](references/car.md)
+- [driver](references/driver.md)
+- [current-user](references/current-user.md)
+- [login](references/login.md)
 "
 `;
 
@@ -1781,7 +1809,7 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`hooks docs generator generates hooks skill files 1`] = `
-"# hooks-car
+"# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1819,7 +1847,7 @@ mutate({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value
 `;
 
 exports[`hooks docs generator generates hooks skill files 2`] = `
-"# hooks-driver
+"# driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1857,7 +1885,7 @@ mutate({ name: '<value>', licenseNumber: '<value>' });
 `;
 
 exports[`hooks docs generator generates hooks skill files 3`] = `
-"# hooks-currentUser
+"# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1880,7 +1908,7 @@ const { data, isLoading } = useCurrentUserQuery();
 `;
 
 exports[`hooks docs generator generates hooks skill files 4`] = `
-"# hooks-login
+"# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -1900,6 +1928,53 @@ const { mutate } = useLoginMutation(); mutate({ email: '<value>', password: '<va
 const { mutate, isLoading } = useLoginMutation();
 mutate({ email: '<value>', password: '<value>' });
 \`\`\`
+"
+`;
+
+exports[`hooks docs generator generates hooks skill files 5`] = `
+"---
+name: hooks-default
+description: React Query hooks for the default API — provides typed query and mutation hooks for 2 tables and 2 custom operations
+---
+
+# hooks-default
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+React Query hooks for the default API — provides typed query and mutation hooks for 2 tables and 2 custom operations
+
+## Usage
+
+\`\`\`typescript
+// Import hooks
+import { useCarsQuery } from './hooks';
+
+// Query hooks: use<Model>Query, use<Model>sQuery
+// Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
+
+const { data, isLoading } = useCarsQuery({
+  selection: { fields: { id: true } },
+});
+\`\`\`
+
+## Examples
+
+### Query records
+
+\`\`\`typescript
+const { data, isLoading } = useCarsQuery({
+  selection: { fields: { id: true } },
+});
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [car](references/car.md)
+- [driver](references/driver.md)
+- [current-user](references/current-user.md)
+- [login](references/login.md)
 "
 `;
 
@@ -2905,7 +2980,7 @@ No developer or entity involved in creating this software will be liable for any
 exports[`multi-target cli docs generates multi-target skills 1`] = `
 [
   {
-    "content": "# myapp-context
+    "content": "# Context Management
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -2936,18 +3011,11 @@ myapp context use local
 myapp context create production --auth-endpoint <url> --members-endpoint <url> --app-endpoint <url>
 myapp context use production
 \`\`\`
-
-### List and switch contexts
-
-\`\`\`bash
-myapp context list
-myapp context use staging
-\`\`\`
 ",
-    "fileName": "skills/context.md",
+    "fileName": "cli-common/references/context.md",
   },
   {
-    "content": "# myapp-credentials
+    "content": "# Authentication
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -2975,10 +3043,53 @@ myapp credentials set-token eyJhbGciOiJIUzI1NiIs...
 myapp credentials status
 \`\`\`
 ",
-    "fileName": "skills/credentials.md",
+    "fileName": "cli-common/references/auth.md",
   },
   {
-    "content": "# myapp-auth:user
+    "content": "---
+name: cli-common
+description: Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+---
+
+# cli-common
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+
+## Usage
+
+\`\`\`bash
+# Context management
+myapp context create <name>
+myapp context use <name>
+
+# Authentication
+myapp credentials set-token <token>
+myapp credentials status
+\`\`\`
+
+## Examples
+
+### Set up and authenticate
+
+\`\`\`bash
+myapp context create local
+myapp context use local
+myapp credentials set-token <token>
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [context](references/context.md)
+- [auth](references/auth.md)
+",
+    "fileName": "cli-common/SKILL.md",
+  },
+  {
+    "content": "# user
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3007,17 +3118,11 @@ myapp auth:user list
 \`\`\`bash
 myapp auth:user create --email "value" --name "value"
 \`\`\`
-
-### Get a user by id
-
-\`\`\`bash
-myapp auth:user get --id <value>
-\`\`\`
 ",
-    "fileName": "skills/auth-user.md",
+    "fileName": "cli-auth/references/user.md",
   },
   {
-    "content": "# myapp-auth:current-user
+    "content": "# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3037,10 +3142,10 @@ myapp auth:current-user
 myapp auth:current-user
 \`\`\`
 ",
-    "fileName": "skills/auth-current-user.md",
+    "fileName": "cli-auth/references/current-user.md",
   },
   {
-    "content": "# myapp-auth:login
+    "content": "# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3061,10 +3166,49 @@ myapp auth:login --email <value> --password <value> --save-token
 myapp auth:login --email <value> --password <value>
 \`\`\`
 ",
-    "fileName": "skills/auth-login.md",
+    "fileName": "cli-auth/references/login.md",
   },
   {
-    "content": "# myapp-members:member
+    "content": "---
+name: cli-auth
+description: CLI commands for the auth API target — 1 tables and 2 custom operations via myapp
+---
+
+# cli-auth
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+CLI commands for the auth API target — 1 tables and 2 custom operations via myapp
+
+## Usage
+
+\`\`\`bash
+# CRUD for auth tables (e.g. user)
+myapp auth:user list
+myapp auth:user get --id <value>
+myapp auth:user create --<field> <value>
+\`\`\`
+
+## Examples
+
+### Query auth records
+
+\`\`\`bash
+myapp auth:user list
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [user](references/user.md)
+- [current-user](references/current-user.md)
+- [login](references/login.md)
+",
+    "fileName": "cli-auth/SKILL.md",
+  },
+  {
+    "content": "# member
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3093,17 +3237,48 @@ myapp members:member list
 \`\`\`bash
 myapp members:member create --role "value"
 \`\`\`
-
-### Get a member by id
-
-\`\`\`bash
-myapp members:member get --id <value>
-\`\`\`
 ",
-    "fileName": "skills/members-member.md",
+    "fileName": "cli-members/references/member.md",
   },
   {
-    "content": "# myapp-app:car
+    "content": "---
+name: cli-members
+description: CLI commands for the members API target — 1 tables and 0 custom operations via myapp
+---
+
+# cli-members
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+CLI commands for the members API target — 1 tables and 0 custom operations via myapp
+
+## Usage
+
+\`\`\`bash
+# CRUD for members tables (e.g. member)
+myapp members:member list
+myapp members:member get --id <value>
+myapp members:member create --<field> <value>
+\`\`\`
+
+## Examples
+
+### Query members records
+
+\`\`\`bash
+myapp members:member list
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [member](references/member.md)
+",
+    "fileName": "cli-members/SKILL.md",
+  },
+  {
+    "content": "# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -3132,14 +3307,45 @@ myapp app:car list
 \`\`\`bash
 myapp app:car create --make "value" --model "value" --year "value" --isElectric "value"
 \`\`\`
+",
+    "fileName": "cli-app/references/car.md",
+  },
+  {
+    "content": "---
+name: cli-app
+description: CLI commands for the app API target — 1 tables and 0 custom operations via myapp
+---
 
-### Get a car by id
+# cli-app
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+CLI commands for the app API target — 1 tables and 0 custom operations via myapp
+
+## Usage
 
 \`\`\`bash
+# CRUD for app tables (e.g. car)
+myapp app:car list
 myapp app:car get --id <value>
+myapp app:car create --<field> <value>
 \`\`\`
+
+## Examples
+
+### Query app records
+
+\`\`\`bash
+myapp app:car list
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [car](references/car.md)
 ",
-    "fileName": "skills/app-car.md",
+    "fileName": "cli-app/SKILL.md",
   },
 ]
 `;
@@ -4502,7 +4708,7 @@ No developer or entity involved in creating this software will be liable for any
 `;
 
 exports[`orm docs generator generates ORM skill files 1`] = `
-"# orm-car
+"# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4540,7 +4746,7 @@ const item = await db.car.create({
 `;
 
 exports[`orm docs generator generates ORM skill files 2`] = `
-"# orm-driver
+"# driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4578,7 +4784,7 @@ const item = await db.driver.create({
 `;
 
 exports[`orm docs generator generates ORM skill files 3`] = `
-"# orm-currentUser
+"# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4601,7 +4807,7 @@ const result = await db.query.currentUser().execute();
 `;
 
 exports[`orm docs generator generates ORM skill files 4`] = `
-"# orm-login
+"# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
@@ -4620,6 +4826,53 @@ db.mutation.login({ email: '<value>', password: '<value>' }).execute()
 \`\`\`typescript
 const result = await db.mutation.login({ email: '<value>', password: '<value>' }).execute();
 \`\`\`
+"
+`;
+
+exports[`orm docs generator generates ORM skill files 5`] = `
+"---
+name: orm-default
+description: ORM client for the default API — provides typed CRUD operations for 2 tables and 2 custom operations
+---
+
+# orm-default
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+ORM client for the default API — provides typed CRUD operations for 2 tables and 2 custom operations
+
+## Usage
+
+\`\`\`typescript
+// Import the ORM client
+import { db } from './orm';
+
+// Available models: car, driver
+db.<model>.findMany({ select: { id: true } }).execute()
+db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()
+db.<model>.create({ data: { ... }, select: { id: true } }).execute()
+db.<model>.update({ where: { id: '<value>' }, data: { ... }, select: { id: true } }).execute()
+db.<model>.delete({ where: { id: '<value>' } }).execute()
+\`\`\`
+
+## Examples
+
+### Query records
+
+\`\`\`typescript
+const items = await db.car.findMany({
+  select: { id: true }
+}).execute();
+\`\`\`
+
+## References
+
+See the \`references/\` directory for detailed per-entity API documentation:
+
+- [car](references/car.md)
+- [driver](references/driver.md)
+- [current-user](references/current-user.md)
+- [login](references/login.md)
 "
 `;
 

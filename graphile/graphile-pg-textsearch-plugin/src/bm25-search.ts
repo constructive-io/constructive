@@ -21,33 +21,64 @@
  * that is populated by Bm25CodecPlugin during the gather phase.
  *
  * ARCHITECTURE NOTE:
- * Condition field apply functions run during a deferred phase (SQL generation)
- * on a queryBuilder proxy — NOT on the real PgSelectStep. The score field plan
- * runs earlier, during Grafast's planning phase, on the real PgSelectStep.
+ * Uses the Grafast meta system (setMeta/getMeta) to pass data between
+ * the condition apply phase and the output field plan, following the
+ * pattern from Benjie's postgraphile-plugin-fulltext-filter reference.
  *
- * To bridge these two phases we use a module-level WeakMap keyed by the SQL
- * alias object (shared between proxy and PgSelectStep via reference identity).
+ * 1. Condition apply (deferred/SQL-gen phase): adds BM25 score to the query
+ *    builder's SELECT list via selectAndReturnIndex, stores { selectIndex }
+ *    in meta via qb.setMeta(key, { selectIndex }).
+ * 2. Output field plan (planning phase): calls $select.getMeta(key) which
+ *    returns a Grafast Step that resolves at execution time.
+ * 3. lambda([$details, $row]) reads the score from row[details.selectIndex].
  */
 
 import 'graphile-build';
 import 'graphile-build-pg';
 import { TYPES } from '@dataplan/pg';
+import type { PgCodecWithAttributes } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { Bm25SearchPluginOptions, Bm25IndexInfo } from './types';
 import { bm25IndexStore, bm25ExtensionDetected } from './bm25-codec';
+import { QuoteUtils } from '@pgsql/quotes';
+
+// ─── TypeScript Namespace Augmentations ──────────────────────────────────────
+
+declare global {
+  namespace GraphileBuild {
+    interface Inflection {
+      /** Name for the BM25 score field (e.g. "bm25BodyScore") */
+      pgBm25Score(this: Inflection, fieldName: string): string;
+      /** Name for orderBy enum value for BM25 score */
+      pgBm25OrderByScoreEnum(
+        this: Inflection,
+        codec: PgCodecWithAttributes,
+        attributeName: string,
+        ascending: boolean,
+      ): string;
+    }
+    interface ScopeObjectFieldsField {
+      isPgBm25ScoreField?: boolean;
+    }
+    interface BehaviorStrings {
+      'attributeBm25Score:select': true;
+      'attributeBm25Score:orderBy': true;
+    }
+  }
+  namespace GraphileConfig {
+    interface Plugins {
+      Bm25SearchPlugin: true;
+    }
+  }
+}
 
 /**
- * WeakMap keyed by SQL alias object (shared reference between
- * the queryBuilder proxy and PgSelectStep).
- *
- * Stores per-query BM25 search state so the score field's lambda
- * can read the computed score value at execution time.
+ * Interface for the meta value stored by the condition apply via setMeta
+ * and read by the output field plan via getMeta.
  */
-interface Bm25ScoreSlot {
-  /** Map of fieldName -> index into the select list */
-  indices: Record<string, number>;
+interface Bm25ScoreDetails {
+  selectIndex: number;
 }
-const bm25ScoreSlots = new WeakMap<object, Bm25ScoreSlot>();
 
 /**
  * Checks if a given codec attribute has a BM25 index.
@@ -74,18 +105,39 @@ function isTextCodec(codec: any): boolean {
 }
 
 /**
- * Navigates from a PgSelectSingleStep up to the PgSelectStep.
- * Uses duck-typing to avoid dependency on exact class names across rc versions.
+ * Walks from a PgCondition up to the PgSelectQueryBuilder.
+ * Uses the .parent property on PgCondition to traverse up the chain,
+ * following Benjie's pattern from postgraphile-plugin-fulltext-filter.
+ *
+ * Returns the query builder if found, or null if the traversal fails.
  */
-function getPgSelectStep($someStep: any): any | null {
-  let $step = $someStep;
+function getQueryBuilder(
+  build: any,
+  $condition: any
+): any | null {
+  const PgCondition = build.dataplanPg?.PgCondition;
+  if (!PgCondition) return null;
 
-  if ($step && typeof $step.getClassStep === 'function') {
-    $step = $step.getClassStep();
+  let current = $condition;
+  const { alias } = current;
+
+  // Walk up through nested PgConditions (e.g. and/or/not)
+  while (
+    current &&
+    current instanceof PgCondition &&
+    current.alias === alias
+  ) {
+    current = (current as any).parent;
   }
 
-  if ($step && typeof $step.orderBy === 'function' && $step.id !== undefined) {
-    return $step;
+  // Verify we found a query builder with matching alias
+  // Using duck-typing (isPgSelectQueryBuilder) per Benjie's pattern
+  if (
+    current &&
+    typeof current.selectAndReturnIndex === 'function' &&
+    current.alias === alias
+  ) {
+    return current;
   }
 
   return null;
@@ -109,7 +161,69 @@ export function createBm25SearchPlugin(
       'PgAttributesPlugin',
     ],
 
+    // ─── Custom Inflection Methods ─────────────────────────────────────
+    inflection: {
+      add: {
+        pgBm25Score(_preset, fieldName) {
+          return this.camelCase(`bm25-${fieldName}-score`);
+        },
+        pgBm25OrderByScoreEnum(_preset, codec, attributeName, ascending) {
+          const columnName = this._attributeName({
+            codec,
+            attributeName,
+            skipRowId: true,
+          });
+          return this.constantCase(
+            `bm25_${columnName}_score_${ascending ? 'asc' : 'desc'}`,
+          );
+        },
+      },
+    },
+
     schema: {
+      // ─── Behavior Registry ─────────────────────────────────────────────
+      behaviorRegistry: {
+        add: {
+          'attributeBm25Score:select': {
+            description:
+              'Should the BM25 score be exposed for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+          'attributeBm25Score:orderBy': {
+            description:
+              'Should you be able to order by the BM25 score for this attribute',
+            entities: ['pgCodecAttribute'],
+          },
+        },
+      },
+      entityBehavior: {
+        pgCodecAttribute: {
+          inferred: {
+            provides: ['default'],
+            before: ['inferred', 'override', 'PgAttributesPlugin'],
+            callback(behavior, [codec, attributeName], _build) {
+              const attr = codec.attributes[attributeName];
+              const codecName = attr.codec?.name;
+              if (codecName === 'text' || codecName === 'varchar' || codecName === 'bpchar') {
+                // Check if this attribute has a BM25 index
+                const pg = codec?.extensions?.pg;
+                if (pg) {
+                  const key = `${pg.schemaName}.${pg.name}.${attributeName}`;
+                  if (bm25IndexStore.has(key)) {
+                    return [
+                      'attributeBm25Score:orderBy',
+                      'attributeBm25Score:select',
+                      behavior,
+                    ];
+                  }
+                }
+              }
+              return behavior;
+            },
+          },
+        },
+      },
+
       hooks: {
         init(_, build) {
           const {
@@ -164,47 +278,68 @@ export function createBm25SearchPlugin(
          */
         GraphQLObjectType_fields(fields, build, context) {
           const {
-            sql,
             inflection,
             graphql: { GraphQLFloat },
-            grafast: { constant, lambda },
+            grafast: { lambda },
           } = build;
           const {
-            scope: { isPgClassType, pgCodec },
+            scope: { isPgClassType, pgCodec: rawPgCodec },
             fieldWithHooks,
           } = context;
 
-          if (!isPgClassType || !pgCodec?.attributes) {
+          if (!isPgClassType || !rawPgCodec?.attributes) {
             return fields;
           }
+
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
 
           let newFields = fields;
 
           for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
+            codec.attributes as Record<string, any>
           )) {
             if (!isTextCodec(attribute.codec)) continue;
 
-            const bm25Index = getBm25IndexForAttribute(pgCodec, attributeName);
+            const bm25Index = getBm25IndexForAttribute(codec, attributeName);
             if (!bm25Index) continue;
 
+            // Check behavior registry — skip if user opted out
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeBm25Score:select',
+              )
+            ) {
+              continue;
+            }
+
             const baseFieldName = inflection.attribute({
-              codec: pgCodec as any,
+              codec: codec as any,
               attributeName,
             });
-            const fieldName = inflection.camelCase(`bm25-${baseFieldName}-score`);
+            const fieldName = inflection.pgBm25Score(baseFieldName);
+            const metaKey = `__bm25_score_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
               {
                 [fieldName]: fieldWithHooks(
-                  { fieldName } as any,
+                  {
+                    fieldName,
+                    isPgBm25ScoreField: true,
+                  } as any,
                   () => ({
                     description: `BM25 relevance score when searching \`${baseFieldName}\`. Returns negative values (more negative = more relevant). Returns null when no BM25 search condition is active.`,
                     type: GraphQLFloat,
                     plan($step: any) {
-                      const $select = getPgSelectStep($step);
-                      if (!$select) return constant(null);
+                      const $row = $step;
+                      const $select = typeof $row.getClassStep === 'function'
+                        ? $row.getClassStep()
+                        : null;
+                      if (!$select) return build.grafast.constant(null);
 
                       if (
                         typeof $select.setInliningForbidden === 'function'
@@ -212,40 +347,30 @@ export function createBm25SearchPlugin(
                         $select.setInliningForbidden();
                       }
 
-                      // Initialise the WeakMap slot for this query
-                      const alias = $select.alias;
-                      if (!bm25ScoreSlots.has(alias)) {
-                        bm25ScoreSlots.set(alias, {
-                          indices: Object.create(null),
-                        });
-                      }
+                      const $details = $select.getMeta(metaKey);
 
-                      const capturedField = baseFieldName;
-                      const capturedAlias = alias;
                       return lambda(
-                        $step,
-                        (row: any) => {
-                          if (row == null) return null;
-                          const slot =
-                            bm25ScoreSlots.get(capturedAlias);
+                        [$details, $row],
+                        ([details, row]: readonly [any, any]) => {
+                          const d = details as Bm25ScoreDetails | null;
                           if (
-                            !slot ||
-                            slot.indices[capturedField] === undefined
-                          )
+                            d == null ||
+                            row == null ||
+                            d.selectIndex == null
+                          ) {
                             return null;
-                          const rawValue =
-                            row[slot.indices[capturedField]];
+                          }
+                          const rawValue = row[d.selectIndex];
                           return rawValue == null
                             ? null
-                            : parseFloat(rawValue);
-                        },
-                        true
+                            : TYPES.float.fromPg(rawValue as string);
+                        }
                       );
                     },
                   })
                 ),
               },
-              `Bm25SearchPlugin adding score field '${fieldName}' for '${attributeName}' on '${pgCodec.name}'`
+              `Bm25SearchPlugin adding score field '${fieldName}' for '${attributeName}' on '${codec.name}'`
             );
           }
 
@@ -259,25 +384,40 @@ export function createBm25SearchPlugin(
         GraphQLEnumType_values(values, build, context) {
           const { inflection } = build;
           const {
-            scope: { isPgRowSortEnum, pgCodec },
+            scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
           } = context;
 
-          if (!isPgRowSortEnum || !pgCodec?.attributes) {
+          if (!isPgRowSortEnum || !rawPgCodec?.attributes) {
             return values;
           }
+
+          const codec = rawPgCodec as PgCodecWithAttributes;
+          const behavior = (build as any).behavior;
 
           let newValues = values;
 
           for (const [attributeName, attribute] of Object.entries(
-            pgCodec.attributes as Record<string, any>
+            codec.attributes as Record<string, any>
           )) {
             if (!isTextCodec(attribute.codec)) continue;
 
-            const bm25Index = getBm25IndexForAttribute(pgCodec, attributeName);
+            const bm25Index = getBm25IndexForAttribute(codec, attributeName);
             if (!bm25Index) continue;
 
+            // Check behavior registry
+            if (
+              behavior &&
+              typeof behavior.pgCodecAttributeMatches === 'function' &&
+              !behavior.pgCodecAttributeMatches(
+                [codec, attributeName],
+                'attributeBm25Score:orderBy',
+              )
+            ) {
+              continue;
+            }
+
             const fieldName = inflection.attribute({
-              codec: pgCodec as any,
+              codec: codec as any,
               attributeName,
             });
             const metaKey = `bm25_order_${fieldName}`;
@@ -288,12 +428,8 @@ export function createBm25SearchPlugin(
                 }
               };
 
-            const ascName = inflection.constantCase(
-              `bm25_${attributeName}_score_asc`
-            );
-            const descName = inflection.constantCase(
-              `bm25_${attributeName}_score_desc`
-            );
+            const ascName = inflection.pgBm25OrderByScoreEnum(codec, attributeName, true);
+            const descName = inflection.pgBm25OrderByScoreEnum(codec, attributeName, false);
 
             newValues = build.extend(
               newValues,
@@ -313,7 +449,7 @@ export function createBm25SearchPlugin(
                   },
                 },
               },
-              `Bm25SearchPlugin adding score orderBy for '${attributeName}' on '${pgCodec.name}'`
+              `Bm25SearchPlugin adding score orderBy for '${attributeName}' on '${codec.name}'`
             );
           }
 
@@ -365,6 +501,7 @@ export function createBm25SearchPlugin(
               codec: pgCodec as any,
               attributeName,
             });
+            const scoreMetaKey = `__bm25_score_${baseFieldName}`;
 
             newFields = build.extend(
               newFields,
@@ -396,7 +533,8 @@ export function createBm25SearchPlugin(
 
                       const columnExpr = sql`${$condition.alias}.${sql.identifier(attributeName)}`;
                       // Use to_bm25query with explicit index name for reliable scoring
-                      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(bm25Index.indexName)})`;
+                      const qualifiedIndexName = QuoteUtils.quoteQualifiedIdentifier(bm25Index.schemaName, bm25Index.indexName);
+                      const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
                       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
                       // If a threshold is provided, add WHERE clause
@@ -411,43 +549,37 @@ export function createBm25SearchPlugin(
                         );
                       }
 
-                      // Add score to the SELECT list
-                      const $parent =
-                        $condition.dangerouslyGetParent();
-                      if (
-                        typeof $parent.selectAndReturnIndex ===
-                        'function'
-                      ) {
-                        const wrappedScoreSql = sql`${sql.parens(scoreExpr)}::text`;
-                        const scoreIndex =
-                          $parent.selectAndReturnIndex(
-                            wrappedScoreSql
-                          );
+                      // Get the query builder via meta-safe traversal
+                      const qb = getQueryBuilder(build, $condition);
 
-                        // Store index in alias-keyed WeakMap
-                        const slot = bm25ScoreSlots.get(
-                          $condition.alias
+                      // Only inject SELECT expressions when in "normal" mode
+                      // (not aggregate mode). Following Benjie's qb.mode check.
+                      if (qb && qb.mode === 'normal') {
+                        // Add score to the SELECT list
+                        const wrappedScoreSql = sql`${sql.parens(scoreExpr)}::text`;
+                        const scoreIndex = qb.selectAndReturnIndex(
+                          wrappedScoreSql
                         );
-                        if (slot) {
-                          slot.indices[baseFieldName] =
-                            scoreIndex;
-                        }
+
+                        // Store the select index in meta
+                        qb.setMeta(scoreMetaKey, {
+                          selectIndex: scoreIndex,
+                        } as Bm25ScoreDetails);
                       }
 
                       // ORDER BY score: only add when the user
                       // explicitly requested score ordering via
                       // the BM25_<COLUMN>_SCORE_ASC/DESC enum values.
-                      const metaKey = `bm25_order_${baseFieldName}`;
-                      const explicitDir =
-                        typeof $parent.getMetaRaw === 'function'
-                          ? $parent.getMetaRaw(metaKey)
-                          : undefined;
-                      if (explicitDir) {
-                        $parent.orderBy({
-                          fragment: scoreExpr,
-                          codec: TYPES.float,
-                          direction: explicitDir,
-                        });
+                      if (qb && typeof qb.getMetaRaw === 'function') {
+                        const orderMetaKey = `bm25_order_${baseFieldName}`;
+                        const explicitDir = qb.getMetaRaw(orderMetaKey);
+                        if (explicitDir) {
+                          qb.orderBy({
+                            fragment: scoreExpr,
+                            codec: TYPES.float,
+                            direction: explicitDir,
+                          });
+                        }
                       }
                     },
                   }

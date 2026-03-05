@@ -1,6 +1,6 @@
 {
   "name": "simple-smtp-server",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "SMTP email sender for Constructive",
   "main": "index.js",
@@ -36,10 +36,10 @@
     "nodemailer": "^6.9.13"
   },
   "devDependencies": {
-    "@types/nodemailer": "^7.0.5",
+    "@types/nodemailer": "^7.0.11",
     "@types/smtp-server": "^3.5.12",
     "makage": "^0.1.12",
-    "smtp-server": "^3.14.0",
+    "smtp-server": "^3.18.1",
     "ts-node": "^10.9.2"
   },
   "keywords": [
