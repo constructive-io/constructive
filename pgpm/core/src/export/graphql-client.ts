@@ -39,49 +39,72 @@ export class GraphQLClient {
   }
 
   /**
-   * Execute a single GraphQL query.
+   * Execute a single GraphQL query with retry for transient network errors.
    */
   async query<T = any>(
     queryString: string,
-    variables?: Record<string, unknown>
+    variables?: Record<string, unknown>,
+    retries = 3
   ): Promise<T> {
     const body: Record<string, unknown> = { query: queryString };
     if (variables) {
       body.variables = variables;
     }
 
-    const response = await fetch(this.endpoint, {
-      method: 'POST',
-      headers: this.defaultHeaders,
-      body: JSON.stringify(body)
-    });
+    let lastError: Error | undefined;
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const response = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: this.defaultHeaders,
+          body: JSON.stringify(body)
+        });
 
-    // Try to parse JSON even on non-200 responses (GraphQL servers often
-    // return 400 with a JSON body containing error details)
-    let json: GraphQLResponse<T>;
-    try {
-      json = (await response.json()) as GraphQLResponse<T>;
-    } catch {
-      if (!response.ok) {
-        throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+        // Try to parse JSON even on non-200 responses (GraphQL servers often
+        // return 400 with a JSON body containing error details)
+        let json: GraphQLResponse<T>;
+        try {
+          json = (await response.json()) as GraphQLResponse<T>;
+        } catch {
+          if (!response.ok) {
+            throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+          }
+          throw new Error('GraphQL response is not valid JSON');
+        }
+
+        if (json.errors?.length) {
+          const messages = json.errors.map(e => e.message).join('; ');
+          throw new Error(`GraphQL errors: ${messages}`);
+        }
+
+        if (!response.ok) {
+          throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+        }
+
+        if (!json.data) {
+          throw new Error('GraphQL response missing data');
+        }
+
+        return json.data;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        const cause = (lastError as any).cause;
+        const isTransient = cause?.code === 'ECONNRESET' ||
+          cause?.code === 'ECONNREFUSED' ||
+          cause?.code === 'UND_ERR_SOCKET' ||
+          lastError.message.includes('fetch failed');
+
+        if (isTransient && attempt < retries - 1) {
+          const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+          console.warn(`  Retry ${attempt + 1}/${retries - 1}: ${cause?.code || lastError.message} — waiting ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw lastError;
       }
-      throw new Error('GraphQL response is not valid JSON');
     }
 
-    if (json.errors?.length) {
-      const messages = json.errors.map(e => e.message).join('; ');
-      throw new Error(`GraphQL errors: ${messages}`);
-    }
-
-    if (!response.ok) {
-      throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
-    }
-
-    if (!json.data) {
-      throw new Error('GraphQL response missing data');
-    }
-
-    return json.data;
+    throw lastError;
   }
 
   /**

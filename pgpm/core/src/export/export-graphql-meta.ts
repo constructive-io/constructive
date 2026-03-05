@@ -87,7 +87,6 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       name: 'text',
-      role_name: 'text',
       privilege: 'text',
       permissive: 'boolean',
       disabled: 'boolean',
@@ -264,7 +263,6 @@ const config: Record<string, TableConfig> = {
       database_id: 'uuid',
       table_id: 'uuid',
       privilege: 'text',
-      role_name: 'text',
       field_ids: 'uuid[]'
     }
   },
@@ -616,8 +614,7 @@ const config: Record<string, TableConfig> = {
       rebuild_hierarchy_function: 'text',
       get_subordinates_function: 'text',
       get_managers_function: 'text',
-      is_manager_of_function: 'text',
-      created_at: 'timestamptz'
+      is_manager_of_function: 'text'
     }
   },
   membership_types_module: {
@@ -831,6 +828,28 @@ const config: Record<string, TableConfig> = {
       data: 'jsonb'
     }
   },
+  secure_table_provision: {
+    schema: 'metaschema_modules_public',
+    table: 'secure_table_provision',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      table_id: 'uuid',
+      table_name: 'text',
+      node_type: 'text',
+      use_rls: 'boolean',
+      node_data: 'jsonb',
+      grant_roles: 'text[]',
+      grant_privileges: 'jsonb',
+      policy_type: 'text',
+      policy_privileges: 'text[]',
+      policy_role: 'text',
+      policy_permissive: 'boolean',
+      policy_data: 'jsonb',
+      out_fields: 'uuid[]'
+    }
+  },
   uuid_module: {
     schema: 'metaschema_modules_public',
     table: 'uuid_module',
@@ -991,6 +1010,8 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('full_text_search');
   await queryAndParse('schema_grant');
   await queryAndParse('table_grant');
+  await queryAndParse('default_privilege');
+  await queryAndParse('database_extension');
 
   // =============================================================================
   // services_public tables
@@ -1003,6 +1024,7 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('site_themes');
   await queryAndParse('site_metadata');
   await queryAndParse('api_modules');
+  await queryAndParse('api_extensions');
   await queryAndParse('api_schemas');
 
   // =============================================================================
@@ -1029,6 +1051,7 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('crypto_auth_module');
   await queryAndParse('field_module');
   await queryAndParse('table_template_module');
+  await queryAndParse('secure_table_provision');
   await queryAndParse('uuid_module');
   await queryAndParse('default_ids_module');
   await queryAndParse('denormalized_table_field');

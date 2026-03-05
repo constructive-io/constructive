@@ -4,7 +4,7 @@ export * from './export/export-migrations';
 export * from './export/export-graphql';
 export * from './export/export-graphql-meta';
 export { GraphQLClient } from './export/graphql-client';
-export { getGraphQLQueryName, graphqlRowToPostgresRow, snakeToCamel, camelToSnake, buildFieldsFragment, intervalToPostgres } from './export/graphql-naming';
+export { getGraphQLQueryName, graphqlRowToPostgresRow, buildFieldsFragment, intervalToPostgres } from './export/graphql-naming';
 export * from './slice';
 export * from './extensions/extensions';
 export * from './modules/modules';

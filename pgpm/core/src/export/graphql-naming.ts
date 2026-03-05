@@ -13,34 +13,7 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-
-/**
- * Convert a snake_case string to camelCase.
- */
-export const snakeToCamel = (str: string): string => {
-  return str.replace(/_([a-z0-9])/g, (_, char) => char.toUpperCase());
-};
-
-/**
- * Convert a camelCase string to snake_case.
- */
-export const camelToSnake = (str: string): string => {
-  return str.replace(/[A-Z]/g, (char) => `_${char.toLowerCase()}`);
-};
-
-/**
- * Simple pluralization for table names.
- * Handles common English plural rules used by PostGraphile.
- */
-const pluralize = (word: string): string => {
-  if (word.endsWith('s') || word.endsWith('x') || word.endsWith('ch') || word.endsWith('sh')) {
-    return word + 'es';
-  }
-  if (word.endsWith('y') && !['a', 'e', 'i', 'o', 'u'].includes(word[word.length - 2])) {
-    return word.slice(0, -1) + 'ies';
-  }
-  return word + 's';
-};
+import { camelize, pluralize, underscore } from 'inflekt';
 
 /**
  * Known irregular plurals used by PostGraphile in this codebase.
@@ -124,21 +97,22 @@ export const getGraphQLQueryName = (pgTableName: string): string => {
   if (KNOWN_QUERY_NAMES[pgTableName]) {
     return KNOWN_QUERY_NAMES[pgTableName];
   }
-  // Fallback: convert snake_case to camelCase and pluralize
-  const camel = snakeToCamel(pgTableName);
-  return pluralize(camel);
+  // Fallback: convert snake_case to PascalCase, pluralize, then lcFirst for camelCase
+  const pascal = camelize(pgTableName);
+  return camelize(pluralize(pascal), true);
 };
 
 /**
  * Convert a row of GraphQL camelCase keys back to Postgres snake_case keys.
  * This is needed because the csv-to-pg Parser expects snake_case column names.
+ * Only transforms top-level keys — nested objects (e.g. JSONB values) are left intact.
  */
 export const graphqlRowToPostgresRow = (
   row: Record<string, unknown>
 ): Record<string, unknown> => {
   const result: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(row)) {
-    result[camelToSnake(key)] = value;
+    result[underscore(key)] = value;
   }
   return result;
 };
@@ -170,7 +144,7 @@ export const buildFieldsFragment = (
   fieldTypes?: Record<string, string>
 ): string => {
   return pgFieldNames.map(name => {
-    const camel = snakeToCamel(name);
+    const camel = camelize(name, true);
     const fieldType = fieldTypes?.[name];
     if (fieldType === 'interval') {
       return `${camel} { seconds minutes hours days months years }`;
