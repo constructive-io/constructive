@@ -157,7 +157,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isGrant',
         message: 'isGrant',
         required: false,
@@ -241,7 +241,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isGrant',
         message: 'isGrant',
         required: false,

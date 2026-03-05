@@ -143,14 +143,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isVerified',
         message: 'isVerified',
         required: false,
@@ -215,14 +215,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isVerified',
         message: 'isVerified',
         required: false,

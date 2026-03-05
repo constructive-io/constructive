@@ -123,7 +123,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
   try {
     const rawAnswers = await prompter.prompt(argv, [
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,
@@ -186,7 +186,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,

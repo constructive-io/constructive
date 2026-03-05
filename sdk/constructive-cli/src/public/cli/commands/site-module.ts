@@ -138,7 +138,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: true,
@@ -201,7 +201,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,

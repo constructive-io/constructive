@@ -149,14 +149,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'frzn',
         message: 'frzn',
         required: false,
@@ -226,14 +226,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'frzn',
         message: 'frzn',
         required: false,

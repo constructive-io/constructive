@@ -119,7 +119,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'payload',
         message: 'payload',
         required: false,
@@ -133,21 +133,21 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'deploy',
         message: 'deploy',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'revert',
         message: 'revert',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'verify',
         message: 'verify',
         required: false,

@@ -179,7 +179,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'smartTags',
         message: 'smartTags',
         required: false,
@@ -214,7 +214,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isPublic',
         message: 'isPublic',
         required: false,
@@ -308,7 +308,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'smartTags',
         message: 'smartTags',
         required: false,
@@ -343,7 +343,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isPublic',
         message: 'isPublic',
         required: false,

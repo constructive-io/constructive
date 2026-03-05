@@ -175,7 +175,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'inviteValid',
         message: 'inviteValid',
         required: false,
@@ -196,14 +196,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'multiple',
         message: 'multiple',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,
@@ -306,7 +306,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'inviteValid',
         message: 'inviteValid',
         required: false,
@@ -327,14 +327,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'multiple',
         message: 'multiple',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'data',
         message: 'data',
         required: false,

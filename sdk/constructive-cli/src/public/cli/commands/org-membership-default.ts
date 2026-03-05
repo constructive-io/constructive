@@ -149,7 +149,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
@@ -162,14 +162,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'deleteMemberCascadeGroups',
         message: 'deleteMemberCascadeGroups',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'createGroupsCascadeMembers',
         message: 'createGroupsCascadeMembers',
         required: false,
@@ -238,7 +238,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'isApproved',
         message: 'isApproved',
         required: false,
@@ -251,14 +251,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'deleteMemberCascadeGroups',
         message: 'deleteMemberCascadeGroups',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'createGroupsCascadeMembers',
         message: 'createGroupsCascadeMembers',
         required: false,

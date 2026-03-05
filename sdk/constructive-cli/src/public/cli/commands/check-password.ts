@@ -5,7 +5,7 @@
  */
 import { CLIOptions, Inquirerer } from 'inquirerer';
 import { getClient } from '../executor';
-import { unflattenDotNotation, buildSelectFromPaths } from '../utils';
+import { parseMutationInput, buildSelectFromPaths } from '../utils';
 import type { CheckPasswordVariables } from '../../orm/mutation';
 import type { CheckPasswordPayloadSelect } from '../../orm/input-types';
 export default async (
@@ -28,7 +28,7 @@ export default async (
       },
     ]);
     const client = getClient();
-    const parsedAnswers = unflattenDotNotation(answers);
+    const parsedAnswers = parseMutationInput(answers);
     const selectFields = buildSelectFromPaths((argv.select as string) ?? 'clientMutationId');
     const result = await client.mutation
       .checkPassword(

@@ -193,14 +193,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'useRls',
         message: 'useRls',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'nodeData',
         message: 'nodeData',
         required: false,
@@ -214,7 +214,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'grantPrivileges',
         message: 'grantPrivileges',
         required: false,
@@ -242,7 +242,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'policyPermissive',
         message: 'policyPermissive',
         required: false,
@@ -256,7 +256,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'policyData',
         message: 'policyData',
         required: false,
@@ -370,14 +370,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'useRls',
         message: 'useRls',
         required: false,
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'nodeData',
         message: 'nodeData',
         required: false,
@@ -391,7 +391,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'grantPrivileges',
         message: 'grantPrivileges',
         required: false,
@@ -419,7 +419,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'boolean',
+        type: 'text',
         name: 'policyPermissive',
         message: 'policyPermissive',
         required: false,
@@ -433,7 +433,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'policyData',
         message: 'policyData',
         required: false,

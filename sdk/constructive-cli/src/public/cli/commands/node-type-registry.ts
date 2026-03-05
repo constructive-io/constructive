@@ -164,7 +164,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'parameterSchema',
         message: 'parameterSchema',
         required: false,
@@ -253,7 +253,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'json',
+        type: 'text',
         name: 'parameterSchema',
         message: 'parameterSchema',
         required: false,
