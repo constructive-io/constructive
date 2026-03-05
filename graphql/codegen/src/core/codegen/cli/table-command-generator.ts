@@ -8,10 +8,12 @@ import {
   getScalarFields,
   getTableNames,
   ucFirst,
+  lcFirst,
+  getCreateInputTypeName,
+  getPatchTypeName,
 } from '../utils';
 import type { CleanTable, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
-import { getCreateInputTypeName } from '../utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -34,6 +36,68 @@ function createImportDeclaration(
  * This is used at runtime for type coercion (string CLI args → proper types).
  * e.g., { name: 'string', isActive: 'boolean', position: 'int', status: 'enum' }
  */
+/**
+ * Returns a t.TSType node for the appropriate TypeScript type assertion
+ * based on a field's GraphQL type. Used to cast `cleanedData.fieldName`
+ * to the correct type expected by the ORM.
+ */
+/**
+ * Known GraphQL scalar types. Anything not in this set is an enum or custom type.
+ */
+const KNOWN_SCALARS = new Set([
+  'String', 'Boolean', 'Int', 'BigInt', 'Float', 'UUID',
+  'JSON', 'GeoJSON', 'Datetime', 'Date', 'Time', 'Cursor',
+  'BigFloat', 'Interval',
+]);
+
+/**
+ * Returns true if the GraphQL type is a known scalar.
+ * Non-scalar types (enums, custom input types) need different handling.
+ */
+function isKnownScalar(gqlType: string): boolean {
+  return KNOWN_SCALARS.has(gqlType.replace(/!/g, ''));
+}
+
+function getTsTypeForField(field: { type: { gqlType: string; isArray: boolean } }): t.TSType | null {
+  const gqlType = field.type.gqlType.replace(/!/g, '');
+
+  // For non-scalar types (enums, custom types), return null to signal
+  // that no type assertion should be emitted — the value will be passed
+  // without casting, which avoids "string is not assignable to EnumType" errors.
+  if (!isKnownScalar(gqlType)) {
+    return null;
+  }
+
+  // Determine the base scalar type
+  // Note: ORM input types flatten array fields to their scalar base type
+  // (e.g., _uuid[] in PG -> string in the ORM input), so we do NOT wrap
+  // in tsArrayType here.
+  switch (gqlType) {
+    case 'Boolean':
+      return t.tsBooleanKeyword();
+    case 'Int':
+    case 'BigInt':
+    case 'Float':
+    case 'BigFloat':
+      return t.tsNumberKeyword();
+    case 'JSON':
+    case 'GeoJSON':
+      return t.tsTypeReference(
+        t.identifier('Record'),
+        t.tsTypeParameterInstantiation([
+          t.tsStringKeyword(),
+          t.tsUnknownKeyword(),
+        ]),
+      );
+    case 'Interval':
+      // IntervalInput is a complex type, skip assertion
+      return null;
+    case 'UUID':
+    default:
+      return t.tsStringKeyword();
+  }
+}
+
 function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
   const fields = getScalarFields(table);
   return t.objectExpression(
@@ -281,10 +345,17 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
     t.objectProperty(t.identifier('required'), t.booleanLiteral(true)),
   ]);
 
+  const pkTsType = pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
+    ? t.tsNumberKeyword()
+    : t.tsStringKeyword();
+
   const ormArgs = t.objectExpression([
     t.objectProperty(
       t.identifier(pk.name),
-      t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+      t.tsAsExpression(
+        t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
+        pkTsType,
+      ),
     ),
     t.objectProperty(t.identifier('select'), selectObj),
   ]);
@@ -340,22 +411,19 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
  * Looks up the CreateXInput -> inner input type (e.g. DatabaseInput) in the
  * TypeRegistry and checks each field's defaultValue from introspection.
  */
-function getFieldsWithDefaults(
-  table: CleanTable,
-  typeRegistry?: TypeRegistry,
-): Set<string> {
-  const fieldsWithDefaults = new Set<string>();
-  if (!typeRegistry) return fieldsWithDefaults;
+/**
+ * Resolve the inner input type from a CreateXInput or UpdateXInput type.
+ * The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
+ * that contains the actual field definitions.
+ */
+function resolveInnerInputType(
+  inputTypeName: string,
+  typeRegistry: TypeRegistry,
+): { name: string; fields: Set<string> } | null {
+  const inputType = typeRegistry.get(inputTypeName);
+  if (!inputType?.inputFields) return null;
 
-  // Look up the CreateXInput type (e.g. CreateDatabaseInput)
-  const createInputTypeName = getCreateInputTypeName(table);
-  const createInputType = typeRegistry.get(createInputTypeName);
-  if (!createInputType?.inputFields) return fieldsWithDefaults;
-
-  // The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
-  // Find the inner input type that contains the actual field definitions
-  for (const inputField of createInputType.inputFields) {
-    // The inner field's type name is the actual input type (e.g. DatabaseInput)
+  for (const inputField of inputType.inputFields) {
     const innerTypeName = inputField.type.name
       || inputField.type.ofType?.name
       || inputField.type.ofType?.ofType?.name;
@@ -364,19 +432,52 @@ function getFieldsWithDefaults(
     const innerType = typeRegistry.get(innerTypeName);
     if (!innerType?.inputFields) continue;
 
-    // Check each field in the inner input type for defaultValue
-    for (const field of innerType.inputFields) {
-      if (field.defaultValue !== undefined) {
-        fieldsWithDefaults.add(field.name);
-      }
-      // Also check if the field is NOT wrapped in NON_NULL (nullable = has default or is optional)
-      if (field.type.kind !== 'NON_NULL') {
-        fieldsWithDefaults.add(field.name);
-      }
+    const fields = new Set(innerType.inputFields.map((f) => f.name));
+    return { name: innerTypeName, fields };
+  }
+  return null;
+}
+
+function getFieldsWithDefaults(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): Set<string> {
+  const fieldsWithDefaults = new Set<string>();
+  if (!typeRegistry) return fieldsWithDefaults;
+
+  const createInputTypeName = getCreateInputTypeName(table);
+  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
+  if (!resolved) return fieldsWithDefaults;
+
+  const innerType = typeRegistry.get(resolved.name);
+  if (!innerType?.inputFields) return fieldsWithDefaults;
+
+  for (const field of innerType.inputFields) {
+    if (field.defaultValue !== undefined) {
+      fieldsWithDefaults.add(field.name);
+    }
+    if (field.type.kind !== 'NON_NULL') {
+      fieldsWithDefaults.add(field.name);
     }
   }
 
   return fieldsWithDefaults;
+}
+
+/**
+ * Get the set of field names that actually exist in the create/update input type.
+ * Fields not in this set (e.g. computed fields like searchTsvRank, hashUuid)
+ * should be excluded from the data object in create/update handlers.
+ */
+function getWritableFieldNames(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): Set<string> | null {
+  if (!typeRegistry) return null;
+
+  const createInputTypeName = getCreateInputTypeName(table);
+  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
+  return resolved?.fields ?? null;
 }
 
 function buildMutationHandler(
@@ -384,21 +485,38 @@ function buildMutationHandler(
   operation: 'create' | 'update' | 'delete',
   targetName?: string,
   typeRegistry?: TypeRegistry,
+  ormTypes?: { createInputTypeName: string; innerFieldName: string; patchTypeName: string },
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
 
-  const editableFields = getScalarFields(table).filter(
-    (f) =>
-      f.name !== pk.name &&
-      f.name !== 'nodeId' &&
-      f.name !== 'createdAt' &&
-      f.name !== 'updatedAt',
-  );
+  // Get the set of writable field names from the type registry
+  // This filters out computed fields (e.g. searchTsvRank, hashUuid) that exist
+  // on the entity type but not on the create/update input type.
+  const writableFields = getWritableFieldNames(table, typeRegistry);
 
   // Get fields that have defaults from introspection (for create operations)
   const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
+
+  // For create: include fields that are in the create input type.
+  // For update/delete: always exclude the PK (it goes in `where`, not `data`).
+  // The ORM input-types generator always excludes these fields from create inputs
+  // (see EXCLUDED_MUTATION_FIELDS in input-types-generator.ts). We must match this
+  // to avoid generating data properties that don't exist on the ORM create type.
+  // For non-'id' PKs (e.g. NodeTypeRegistry.name), we allow them in create data
+  // since they are user-provided natural keys that DO appear in the create input.
+  const ORM_EXCLUDED_FIELDS = ['id', 'createdAt', 'updatedAt', 'nodeId'];
+  const editableFields = getScalarFields(table).filter(
+    (f) =>
+      // For update/delete: always exclude PK (it goes in `where`, not `data`)
+      // For create: exclude PK only if it's in the ORM exclusion list (e.g. 'id')
+      (f.name !== pk.name || (operation === 'create' && !ORM_EXCLUDED_FIELDS.includes(pk.name))) &&
+      // Always exclude ORM-excluded fields (except PK which is handled above)
+      (f.name === pk.name || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
+      // If we have type registry info, only include fields that exist in the input type
+      (writableFields === null || writableFields.has(f.name)),
+  );
 
   const questions: t.Expression[] = [];
 
@@ -447,28 +565,30 @@ function buildMutationHandler(
 
   let ormArgs: t.ObjectExpression;
 
-  if (operation === 'create') {
-    const dataProps = editableFields.map((f) =>
+  // Build data properties without individual type assertions.
+  // Instead, we build a plain object from cleanedData and cast the entire
+  // data value through `unknown` to bridge the type gap between
+  // Record<string, unknown> and the ORM's specific input type.
+  // This handles scalars, enums (string literal unions like ObjectCategory),
+  // and array fields uniformly without needing to import each type.
+  const buildDataProps = () =>
+    editableFields.map((f) =>
       t.objectProperty(
         t.identifier(f.name),
         t.memberExpression(t.identifier('cleanedData'), t.identifier(f.name)),
-        false,
-        true,
       ),
     );
+
+
+  if (operation === 'create') {
     ormArgs = t.objectExpression([
-      t.objectProperty(t.identifier('data'), t.objectExpression(dataProps)),
+      t.objectProperty(
+        t.identifier('data'),
+        t.objectExpression(buildDataProps()),
+      ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
   } else if (operation === 'update') {
-    const dataProps = editableFields.map((f) =>
-      t.objectProperty(
-        t.identifier(f.name),
-        t.memberExpression(t.identifier('cleanedData'), t.identifier(f.name)),
-        false,
-        true,
-      ),
-    );
     ormArgs = t.objectExpression([
       t.objectProperty(
         t.identifier('where'),
@@ -477,12 +597,17 @@ function buildMutationHandler(
             t.identifier(pk.name),
             t.tsAsExpression(
               t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-              t.tsStringKeyword(),
+              pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
+                ? t.tsNumberKeyword()
+                : t.tsStringKeyword(),
             ),
           ),
         ]),
       ),
-      t.objectProperty(t.identifier('data'), t.objectExpression(dataProps)),
+      t.objectProperty(
+        t.identifier('data'),
+        t.objectExpression(buildDataProps()),
+      ),
       t.objectProperty(t.identifier('select'), selectObj),
     ]);
   } else {
@@ -494,7 +619,9 @@ function buildMutationHandler(
             t.identifier(pk.name),
             t.tsAsExpression(
               t.memberExpression(t.identifier('answers'), t.identifier(pk.name)),
-              t.tsStringKeyword(),
+              pk.gqlType === 'Int' || pk.gqlType === 'BigInt'
+                ? t.tsNumberKeyword()
+                : t.tsStringKeyword(),
             ),
           ),
         ]),
@@ -530,14 +657,38 @@ function buildMutationHandler(
   ];
 
   if (operation !== 'delete') {
+    // Build stripUndefined call and cast to the proper ORM input type
+    // so that property accesses on cleanedData are correctly typed.
+    const stripUndefinedCall = t.callExpression(t.identifier('stripUndefined'), [
+      t.identifier('answers'),
+      t.identifier('fieldSchema'),
+    ]);
+
+    let cleanedDataExpr: t.Expression = stripUndefinedCall;
+    if (ormTypes) {
+      if (operation === 'create') {
+        // cleanedData as CreateXxxInput['fieldName']
+        cleanedDataExpr = t.tsAsExpression(
+          stripUndefinedCall,
+          t.tsIndexedAccessType(
+            t.tsTypeReference(t.identifier(ormTypes.createInputTypeName)),
+            t.tsLiteralType(t.stringLiteral(ormTypes.innerFieldName)),
+          ),
+        );
+      } else if (operation === 'update') {
+        // cleanedData as XxxPatch
+        cleanedDataExpr = t.tsAsExpression(
+          stripUndefinedCall,
+          t.tsTypeReference(t.identifier(ormTypes.patchTypeName)),
+        );
+      }
+    }
+
     tryBody.push(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier('cleanedData'),
-          t.callExpression(t.identifier('stripUndefined'), [
-            t.identifier('answers'),
-            t.identifier('fieldSchema'),
-          ]),
+          cleanedDataExpr,
         ),
       ]),
     );
@@ -607,18 +758,57 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   statements.push(
     createImportDeclaration(utilsPath, ['coerceAnswers', 'stripUndefined']),
   );
+  statements.push(
+    createImportDeclaration(utilsPath, ['FieldSchema'], true),
+  );
+
+  // Import ORM input types for proper type assertions in mutation handlers.
+  // These types ensure that cleanedData is cast to the correct ORM input type
+  // (e.g., CreateAppPermissionInput['appPermission'] for create, AppPermissionPatch for update)
+  // instead of remaining as Record<string, unknown>.
+  const createInputTypeName = getCreateInputTypeName(table);
+  const patchTypeName = getPatchTypeName(table);
+  const innerFieldName = lcFirst(table.name);
+  // Commands are at cli/commands/xxx.ts (no target) or cli/commands/{target}/xxx.ts (with target).
+  // ORM input-types is at orm/input-types.ts — two or three levels up from commands.
+  const inputTypesPath = options?.targetName
+    ? `../../../orm/input-types`
+    : `../../orm/input-types`;
+  statements.push(
+    createImportDeclaration(inputTypesPath, [createInputTypeName, patchTypeName], true),
+  );
 
   // Generate field schema for type coercion
+  // Use explicit FieldSchema type annotation so TS narrows string literals to FieldType
+  const fieldSchemaId = t.identifier('fieldSchema');
+  fieldSchemaId.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('FieldSchema')),
+  );
   statements.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
-        t.identifier('fieldSchema'),
+        fieldSchemaId,
         buildFieldSchemaObject(table),
       ),
     ]),
   );
 
-  const subcommands = ['list', 'get', 'create', 'update', 'delete'];
+  // Determine which operations the ORM model supports for this table.
+  // Most tables have `one: null` simply because there's no dedicated GraphQL
+  // findOne query, but the ORM still generates `findOne` using the PK.
+  // The only tables WITHOUT `findOne` are pure record types from SQL functions
+  // (e.g. GetAllRecord, OrgGetManagersRecord) which have no update/delete either.
+  // We detect these by checking: if one, update, AND delete are all null, it's a
+  // read-only record type with no `findOne`.
+  const hasUpdate = table.query?.update !== undefined && table.query?.update !== null;
+  const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
+  const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
+
+  const subcommands: string[] = ['list'];
+  if (hasGet) subcommands.push('get');
+  subcommands.push('create');
+  if (hasUpdate) subcommands.push('update');
+  if (hasDelete) subcommands.push('delete');
 
   const usageLines = [
     '',
@@ -626,14 +816,12 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
     '',
     'Commands:',
     `  list                  List all ${singularName} records`,
-    `  get                   Get a ${singularName} by ID`,
-    `  create                Create a new ${singularName}`,
-    `  update                Update an existing ${singularName}`,
-    `  delete                Delete a ${singularName}`,
-    '',
-    '  --help, -h            Show this help message',
-    '',
   ];
+  if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
+  usageLines.push(`  create                Create a new ${singularName}`);
+  if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
+  if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
+  usageLines.push('', '  --help, -h            Show this help message', '');
 
   statements.push(
     t.variableDeclaration('const', [
@@ -742,9 +930,12 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleTableSubcommand'), [
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('subcommand'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('subcommand'),
+              ),
+              t.tsStringKeyword(),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),
@@ -793,11 +984,12 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
   );
 
   const tn = options?.targetName;
+  const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
   statements.push(buildListHandler(table, tn));
-  statements.push(buildGetHandler(table, tn));
-  statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry));
-  statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry));
-  statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry));
+  if (hasGet) statements.push(buildGetHandler(table, tn));
+  statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
+  if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
+  if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry, ormTypes));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);
