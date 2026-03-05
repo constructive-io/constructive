@@ -11,7 +11,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile } from './utils-generator';
+import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile, generateCliBarrelFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: CleanTable[];
@@ -90,6 +90,9 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
     toolName,
   );
   files.push(commandMapFile);
+
+  // Generate CLI barrel file (index.ts) for re-exports
+  files.push(generateCliBarrelFile());
 
   // Generate entry point if configured
   const generateEntryPoint =
@@ -240,6 +243,9 @@ export function generateMultiTargetCli(
     targets: commandMapTargets,
   });
   files.push(commandMapFile);
+
+  // Generate CLI barrel file (index.ts) for re-exports
+  files.push(generateCliBarrelFile());
 
   // Generate entry point if configured
   if (options.entryPoint) {

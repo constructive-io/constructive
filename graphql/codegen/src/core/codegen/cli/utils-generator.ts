@@ -94,3 +94,23 @@ export function generateEntryPointFile(): GeneratedFile {
     ),
   };
 }
+
+/**
+ * Generate a barrel index.ts for the cli/ directory.
+ *
+ * Re-exports from commands.ts and executor.ts so that
+ * parent index.ts files can do `export * from './cli'`.
+ */
+export function generateCliBarrelFile(): GeneratedFile {
+  const header = getGeneratedFileHeader('CLI barrel exports');
+  const content = [
+    header,
+    "export * from './commands';",
+    "export * from './executor';",
+    '',
+  ].join('\n');
+  return {
+    fileName: 'index.ts',
+    content,
+  };
+}

@@ -1,31 +1,26 @@
-# @constructive-sdk/cli
+# GraphQL SDK
 
-Runtime utilities for building interactive command-line interfaces using Constructive's CLI toolkit.
+<p align="center" width="100%">
+  <img height="120" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
 
-- **inquirerer** - Interactive prompts and argument parsing
-- **appstash** - Persistent configuration, context, and credential storage
-- **yanse** - Terminal colors and formatting
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-## Installation
+## APIs
 
-```bash
-pnpm add @constructive-sdk/cli
-```
+| API | Endpoint | Generators | Docs |
+|-----|----------|------------|------|
+| admin | - | ORM, CLI | [./src/admin/README.md](./src/admin/README.md) |
+| auth | - | ORM, CLI | [./src/auth/README.md](./src/auth/README.md) |
+| objects | - | ORM, CLI | [./src/objects/README.md](./src/objects/README.md) |
+| public | - | ORM, CLI | [./src/public/README.md](./src/public/README.md) |
 
-## Usage
+---
 
-```typescript
-import { CLI } from 'inquirerer';
-import {
-  buildCommands,
-  getConfigStore,
-  coerceAnswers,
-  printSuccess,
-} from '@constructive-sdk/cli';
-```
+Built by the [Constructive](https://constructive.io) team.
 
-See [SKILL.md](./SKILL.md) for full API reference and examples.
+## Disclaimer
 
-## License
+AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
-MIT
+No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.

@@ -177,7 +177,7 @@ Create Options:
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -213,7 +213,7 @@ Create Options:
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.returnStatement(
@@ -372,7 +372,7 @@ function buildCreateHandler(): t.FunctionDeclaration {
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('answers'),
-        t.awaitExpression(
+        t.tsAsExpression(t.awaitExpression(
           t.callExpression(
             t.memberExpression(
               t.identifier('prompter'),
@@ -428,7 +428,7 @@ function buildCreateHandler(): t.FunctionDeclaration {
               ]),
             ],
           ),
-        ),
+        ), t.tsAnyKeyword()),
       ),
     ]),
     t.variableDeclaration('const', [
@@ -790,7 +790,7 @@ function buildUseHandler(): t.FunctionDeclaration {
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -834,7 +834,7 @@ function buildUseHandler(): t.FunctionDeclaration {
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.expressionStatement(
@@ -1125,7 +1125,7 @@ function buildDeleteHandler(): t.FunctionDeclaration {
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -1169,7 +1169,7 @@ function buildDeleteHandler(): t.FunctionDeclaration {
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.expressionStatement(
@@ -1360,7 +1360,7 @@ Options:
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -1394,7 +1394,7 @@ Options:
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.returnStatement(
@@ -1583,7 +1583,7 @@ function buildSetTokenHandler(): t.FunctionDeclaration {
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -1613,7 +1613,7 @@ function buildSetTokenHandler(): t.FunctionDeclaration {
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.expressionStatement(
@@ -1916,7 +1916,7 @@ function buildLogoutHandler(): t.FunctionDeclaration {
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('confirm'),
-        t.awaitExpression(
+        t.tsAsExpression(t.awaitExpression(
           t.callExpression(
             t.memberExpression(
               t.identifier('prompter'),
@@ -1963,7 +1963,7 @@ function buildLogoutHandler(): t.FunctionDeclaration {
               ]),
             ],
           ),
-        ),
+        ), t.tsAnyKeyword()),
       ),
     ]),
     t.ifStatement(
@@ -2174,7 +2174,7 @@ ${targets.map((tgt) => `  --${tgt.name}-endpoint <url>  ${tgt.name} endpoint (de
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -2210,7 +2210,7 @@ ${targets.map((tgt) => `  --${tgt.name}-endpoint <url>  ${tgt.name} endpoint (de
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.returnStatement(
@@ -2411,7 +2411,7 @@ function buildMultiTargetCreateHandler(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('answers'),
-        t.awaitExpression(
+        t.tsAsExpression(t.awaitExpression(
           t.callExpression(
             t.memberExpression(
               t.identifier('prompter'),
@@ -2430,7 +2430,7 @@ function buildMultiTargetCreateHandler(
               t.arrayExpression(promptQuestions),
             ],
           ),
-        ),
+        ), t.tsAnyKeyword()),
       ),
     ]),
     t.variableDeclaration('const', [
@@ -2658,7 +2658,7 @@ Options:
         t.variableDeclaration('const', [
           t.variableDeclarator(
             t.identifier('answer'),
-            t.awaitExpression(
+            t.tsAsExpression(t.awaitExpression(
               t.callExpression(
                 t.memberExpression(
                   t.identifier('prompter'),
@@ -2692,7 +2692,7 @@ Options:
                   ]),
                 ],
               ),
-            ),
+            ), t.tsAnyKeyword()),
           ),
         ]),
         t.returnStatement(
