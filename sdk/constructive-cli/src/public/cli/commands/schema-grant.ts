@@ -127,6 +127,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -187,6 +188,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',

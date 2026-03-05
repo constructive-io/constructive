@@ -133,24 +133,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'apiId',
         message: 'apiId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'subdomain',
         message: 'subdomain',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'domain',
         message: 'domain',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -204,24 +208,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'apiId',
         message: 'apiId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'subdomain',
         message: 'subdomain',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'domain',
         message: 'domain',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

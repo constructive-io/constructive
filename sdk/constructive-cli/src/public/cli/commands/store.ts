@@ -136,6 +136,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'hash',
         message: 'hash',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -192,6 +193,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'hash',
         message: 'hash',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

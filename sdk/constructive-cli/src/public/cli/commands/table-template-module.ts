@@ -145,24 +145,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'privateSchemaId',
         message: 'privateSchemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'ownerTableId',
         message: 'ownerTableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -181,6 +185,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -243,24 +248,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'privateSchemaId',
         message: 'privateSchemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'ownerTableId',
         message: 'ownerTableId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -279,6 +288,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

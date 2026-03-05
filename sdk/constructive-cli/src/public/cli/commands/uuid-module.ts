@@ -130,12 +130,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'uuidFunction',
         message: 'uuidFunction',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -193,12 +195,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'schemaId',
         message: 'schemaId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'uuidFunction',
         message: 'uuidFunction',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',

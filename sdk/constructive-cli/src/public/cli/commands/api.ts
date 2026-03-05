@@ -142,24 +142,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'dbname',
         message: 'dbname',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'roleName',
         message: 'roleName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'anonRole',
         message: 'anonRole',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isPublic',
         message: 'isPublic',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -221,24 +225,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'dbname',
         message: 'dbname',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'roleName',
         message: 'roleName',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'anonRole',
         message: 'anonRole',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isPublic',
         message: 'isPublic',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

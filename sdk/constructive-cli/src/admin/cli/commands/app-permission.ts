@@ -124,24 +124,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'bitnum',
         message: 'bitnum',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'bitstr',
         message: 'bitstr',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -190,24 +194,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'name',
         message: 'name',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'bitnum',
         message: 'bitnum',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'bitstr',
         message: 'bitstr',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

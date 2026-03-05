@@ -130,6 +130,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -154,12 +155,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'withGrantOption',
         message: 'withGrantOption',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isGrant',
         message: 'isGrant',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -209,6 +212,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -233,12 +237,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'withGrantOption',
         message: 'withGrantOption',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'isGrant',
         message: 'isGrant',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

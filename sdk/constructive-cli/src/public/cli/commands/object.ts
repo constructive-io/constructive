@@ -139,24 +139,28 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'kids',
         message: 'kids',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'ktree',
         message: 'ktree',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'frzn',
         message: 'frzn',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -212,24 +216,28 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'kids',
         message: 'kids',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'ktree',
         message: 'ktree',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'data',
         message: 'data',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'frzn',
         message: 'frzn',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);

@@ -136,6 +136,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'message',
         message: 'message',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -154,30 +155,35 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'parentIds',
         message: 'parentIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'authorId',
         message: 'authorId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'committerId',
         message: 'committerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'treeId',
         message: 'treeId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'date',
         message: 'date',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -231,6 +237,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'message',
         message: 'message',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -249,30 +256,35 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'parentIds',
         message: 'parentIds',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'authorId',
         message: 'authorId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'committerId',
         message: 'committerId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'treeId',
         message: 'treeId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'date',
         message: 'date',
         required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
