@@ -24,7 +24,7 @@ Runtime utilities for building interactive command-line interfaces using Constru
 ## Installation
 
 ```bash
-pnpm add @constructive-io/cli
+pnpm add @constructive-sdk/cli
 ```
 
 ## Quick Start
@@ -33,7 +33,7 @@ pnpm add @constructive-io/cli
 
 ```typescript
 import { CLI } from 'inquirerer';
-import { buildCommands, CommandHandler } from '@constructive-io/cli';
+import { buildCommands, CommandHandler } from '@constructive-sdk/cli';
 
 const hello: CommandHandler = async (argv, prompter, _options) => {
   const answers = await prompter.prompt(argv, [
@@ -53,7 +53,7 @@ app.run();
 ### Config Management with appstash
 
 ```typescript
-import { getConfigStore } from '@constructive-io/cli';
+import { getConfigStore } from '@constructive-sdk/cli';
 
 const store = getConfigStore('my-tool');
 
@@ -71,7 +71,7 @@ const ctx = store.getCurrentContext();
 ### Type Coercion for CLI Arguments
 
 ```typescript
-import { coerceAnswers, stripUndefined, FieldSchema } from '@constructive-io/cli';
+import { coerceAnswers, stripUndefined, FieldSchema } from '@constructive-sdk/cli';
 
 const schema: FieldSchema = {
   name: 'string',
@@ -94,7 +94,7 @@ const clean = stripUndefined(typed, schema);
 ### Display Utilities
 
 ```typescript
-import { printSuccess, printError, printTable, printDetails } from '@constructive-io/cli';
+import { printSuccess, printError, printTable, printDetails } from '@constructive-sdk/cli';
 
 printSuccess('Context created');
 printError('Connection failed');
@@ -116,7 +116,7 @@ printDetails([
 ### Subcommand Dispatching
 
 ```typescript
-import { createSubcommandHandler, CommandHandler } from '@constructive-io/cli';
+import { createSubcommandHandler, CommandHandler } from '@constructive-sdk/cli';
 
 const createCmd: CommandHandler = async (argv, prompter, options) => {
   // Handle 'context create'
@@ -134,14 +134,14 @@ const contextHandler = createSubcommandHandler(
 
 ## API Reference
 
-### Config (`@constructive-io/cli`)
+### Config (`@constructive-sdk/cli`)
 
 | Export | Description |
 |--------|-------------|
 | `getAppDirs(toolName, options?)` | Get XDG-compliant app directories for a CLI tool |
 | `getConfigStore(toolName)` | Create a config store with context and credential management |
 
-### Commands (`@constructive-io/cli`)
+### Commands (`@constructive-sdk/cli`)
 
 | Export | Description |
 |--------|-------------|
@@ -150,7 +150,7 @@ const contextHandler = createSubcommandHandler(
 | `CommandHandler` | Type: `(argv, prompter, options) => Promise<void>` |
 | `CommandDefinition` | Interface: `{ name, handler, usage? }` |
 
-### CLI Utilities (`@constructive-io/cli`)
+### CLI Utilities (`@constructive-sdk/cli`)
 
 | Export | Description |
 |--------|-------------|
@@ -159,7 +159,7 @@ const contextHandler = createSubcommandHandler(
 | `parseMutationInput(answers)` | Parse JSON input field from CLI mutation commands |
 | `buildSelectFromPaths(paths)` | Build ORM select object from dot-notation paths |
 
-### Display (`@constructive-io/cli`)
+### Display (`@constructive-sdk/cli`)
 
 | Export | Description |
 |--------|-------------|

@@ -1,5 +1,5 @@
 {
-  "name": "@constructive-io/cli",
+  "name": "@constructive-sdk/cli",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI SDK - Runtime utilities for building interactive command-line tools with inquirerer, appstash, and yanse",

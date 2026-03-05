@@ -1,5 +1,5 @@
 /**
- * @constructive-io/cli - Runtime utilities for building interactive CLI tools.
+ * @constructive-sdk/cli - Runtime utilities for building interactive CLI tools.
  *
  * This package provides the building blocks for creating command-line interfaces
  * using the Constructive CLI toolkit:

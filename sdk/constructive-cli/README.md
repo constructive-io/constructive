@@ -1,4 +1,4 @@
-# @constructive-io/cli
+# @constructive-sdk/cli
 
 Runtime utilities for building interactive command-line interfaces using Constructive's CLI toolkit.
 
@@ -9,7 +9,7 @@ Runtime utilities for building interactive command-line interfaces using Constru
 ## Installation
 
 ```bash
-pnpm add @constructive-io/cli
+pnpm add @constructive-sdk/cli
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ import {
   getConfigStore,
   coerceAnswers,
   printSuccess,
-} from '@constructive-io/cli';
+} from '@constructive-sdk/cli';
 ```
 
 See [SKILL.md](./SKILL.md) for full API reference and examples.
