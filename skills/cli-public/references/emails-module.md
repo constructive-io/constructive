@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for EmailsModule records via app CLI
+CRUD operations for EmailsModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app emails-module list
-app emails-module get --id <value>
-app emails-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --ownerTableId <value> --tableName <value>
-app emails-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>]
-app emails-module delete --id <value>
+csdk emails-module list
+csdk emails-module get --id <value>
+csdk emails-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --ownerTableId <value> --tableName <value>
+csdk emails-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>]
+csdk emails-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app emails-module delete --id <value>
 ### List all emailsModule records
 
 ```bash
-app emails-module list
+csdk emails-module list
 ```
 
 ### Create a emailsModule
 
 ```bash
-app emails-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --ownerTableId "value" --tableName "value"
+csdk emails-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --ownerTableId "value" --tableName "value"
 ```
 
 ### Get a emailsModule by id
 
 ```bash
-app emails-module get --id <value>
+csdk emails-module get --id <value>
 ```

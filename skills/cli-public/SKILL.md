@@ -1,28 +1,28 @@
 ---
 name: cli-public
-description: CLI tool (app) for the public API — provides CRUD commands for 104 tables and 50 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 104 tables and 50 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (app) for the public API — provides CRUD commands for 104 tables and 50 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 104 tables and 50 custom operations
 
 ## Usage
 
 ```bash
 # Context management
-app context create <name> --endpoint <url>
-app context use <name>
+csdk context create <name> --endpoint <url>
+csdk context use <name>
 
 # Authentication
-app auth set-token <token>
+csdk auth set-token <token>
 
 # CRUD for any table (e.g. org-get-managers-record)
-app org-get-managers-record list
-app org-get-managers-record get --id <value>
-app org-get-managers-record create --<field> <value>
+csdk org-get-managers-record list
+csdk org-get-managers-record get --id <value>
+csdk org-get-managers-record create --<field> <value>
 ```
 
 ## Examples
@@ -30,10 +30,10 @@ app org-get-managers-record create --<field> <value>
 ### Set up and query
 
 ```bash
-app context create local --endpoint http://localhost:5000/graphql
-app context use local
-app auth set-token <token>
-app org-get-managers-record list
+csdk context create local --endpoint http://localhost:5000/graphql
+csdk context use local
+csdk auth set-token <token>
+csdk org-get-managers-record list
 ```
 
 ## References

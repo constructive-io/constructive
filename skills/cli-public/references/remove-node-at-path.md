@@ -7,7 +7,7 @@ Execute the removeNodeAtPath mutation
 ## Usage
 
 ```bash
-app remove-node-at-path --input <value>
+csdk remove-node-at-path --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app remove-node-at-path --input <value>
 ### Run removeNodeAtPath
 
 ```bash
-app remove-node-at-path --input <value>
+csdk remove-node-at-path --input <value>
 ```

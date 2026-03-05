@@ -7,7 +7,7 @@ Execute the signIn mutation
 ## Usage
 
 ```bash
-app sign-in --input <value>
+csdk sign-in --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app sign-in --input <value>
 ### Run signIn
 
 ```bash
-app sign-in --input <value>
+csdk sign-in --input <value>
 ```

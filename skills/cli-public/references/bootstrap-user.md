@@ -7,7 +7,7 @@ Execute the bootstrapUser mutation
 ## Usage
 
 ```bash
-app bootstrap-user --input <value>
+csdk bootstrap-user --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app bootstrap-user --input <value>
 ### Run bootstrapUser
 
 ```bash
-app bootstrap-user --input <value>
+csdk bootstrap-user --input <value>
 ```

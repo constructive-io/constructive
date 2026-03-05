@@ -7,7 +7,7 @@ Execute the verifyPassword mutation
 ## Usage
 
 ```bash
-app verify-password --input <value>
+csdk verify-password --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app verify-password --input <value>
 ### Run verifyPassword
 
 ```bash
-app verify-password --input <value>
+csdk verify-password --input <value>
 ```

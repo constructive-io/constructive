@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Email records via app CLI
+CRUD operations for Email records via csdk CLI
 
 ## Usage
 
 ```bash
-app email list
-app email get --id <value>
-app email create --ownerId <value> --email <value> --isVerified <value> --isPrimary <value>
-app email update --id <value> [--ownerId <value>] [--email <value>] [--isVerified <value>] [--isPrimary <value>]
-app email delete --id <value>
+csdk email list
+csdk email get --id <value>
+csdk email create --ownerId <value> --email <value> --isVerified <value> --isPrimary <value>
+csdk email update --id <value> [--ownerId <value>] [--email <value>] [--isVerified <value>] [--isPrimary <value>]
+csdk email delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app email delete --id <value>
 ### List all email records
 
 ```bash
-app email list
+csdk email list
 ```
 
 ### Create a email
 
 ```bash
-app email create --ownerId "value" --email "value" --isVerified "value" --isPrimary "value"
+csdk email create --ownerId "value" --email "value" --isVerified "value" --isPrimary "value"
 ```
 
 ### Get a email by id
 
 ```bash
-app email get --id <value>
+csdk email get --id <value>
 ```

@@ -7,7 +7,7 @@ Execute the orgPermissionsGetPaddedMask query
 ## Usage
 
 ```bash
-app org-permissions-get-padded-mask --mask <value>
+csdk org-permissions-get-padded-mask --mask <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app org-permissions-get-padded-mask --mask <value>
 ### Run orgPermissionsGetPaddedMask
 
 ```bash
-app org-permissions-get-padded-mask --mask <value>
+csdk org-permissions-get-padded-mask --mask <value>
 ```

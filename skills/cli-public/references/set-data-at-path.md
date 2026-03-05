@@ -7,7 +7,7 @@ Execute the setDataAtPath mutation
 ## Usage
 
 ```bash
-app set-data-at-path --input <value>
+csdk set-data-at-path --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app set-data-at-path --input <value>
 ### Run setDataAtPath
 
 ```bash
-app set-data-at-path --input <value>
+csdk set-data-at-path --input <value>
 ```

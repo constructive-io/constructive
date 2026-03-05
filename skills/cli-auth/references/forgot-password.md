@@ -7,7 +7,7 @@ Execute the forgotPassword mutation
 ## Usage
 
 ```bash
-app forgot-password --input <value>
+csdk forgot-password --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app forgot-password --input <value>
 ### Run forgotPassword
 
 ```bash
-app forgot-password --input <value>
+csdk forgot-password --input <value>
 ```

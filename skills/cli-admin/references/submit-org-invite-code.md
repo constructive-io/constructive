@@ -7,7 +7,7 @@ Execute the submitOrgInviteCode mutation
 ## Usage
 
 ```bash
-app submit-org-invite-code --input <value>
+csdk submit-org-invite-code --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app submit-org-invite-code --input <value>
 ### Run submitOrgInviteCode
 
 ```bash
-app submit-org-invite-code --input <value>
+csdk submit-org-invite-code --input <value>
 ```

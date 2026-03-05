@@ -7,7 +7,7 @@ Execute the confirmDeleteAccount mutation
 ## Usage
 
 ```bash
-app confirm-delete-account --input <value>
+csdk confirm-delete-account --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app confirm-delete-account --input <value>
 ### Run confirmDeleteAccount
 
 ```bash
-app confirm-delete-account --input <value>
+csdk confirm-delete-account --input <value>
 ```

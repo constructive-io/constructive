@@ -7,7 +7,7 @@ Execute the orgPermissionsGetMaskByNames query
 ## Usage
 
 ```bash
-app org-permissions-get-mask-by-names --names <value>
+csdk org-permissions-get-mask-by-names --names <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app org-permissions-get-mask-by-names --names <value>
 ### Run orgPermissionsGetMaskByNames
 
 ```bash
-app org-permissions-get-mask-by-names --names <value>
+csdk org-permissions-get-mask-by-names --names <value>
 ```

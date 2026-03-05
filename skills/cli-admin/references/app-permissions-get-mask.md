@@ -7,7 +7,7 @@ Execute the appPermissionsGetMask query
 ## Usage
 
 ```bash
-app app-permissions-get-mask --ids <value>
+csdk app-permissions-get-mask --ids <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app app-permissions-get-mask --ids <value>
 ### Run appPermissionsGetMask
 
 ```bash
-app app-permissions-get-mask --ids <value>
+csdk app-permissions-get-mask --ids <value>
 ```

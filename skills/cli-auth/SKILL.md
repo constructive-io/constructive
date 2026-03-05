@@ -1,28 +1,28 @@
 ---
 name: cli-auth
-description: CLI tool (app) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
+description: CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
 ---
 
 # cli-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (app) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
+CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
 
 ## Usage
 
 ```bash
 # Context management
-app context create <name> --endpoint <url>
-app context use <name>
+csdk context create <name> --endpoint <url>
+csdk context use <name>
 
 # Authentication
-app auth set-token <token>
+csdk auth set-token <token>
 
 # CRUD for any table (e.g. role-type)
-app role-type list
-app role-type get --id <value>
-app role-type create --<field> <value>
+csdk role-type list
+csdk role-type get --id <value>
+csdk role-type create --<field> <value>
 ```
 
 ## Examples
@@ -30,10 +30,10 @@ app role-type create --<field> <value>
 ### Set up and query
 
 ```bash
-app context create local --endpoint http://localhost:5000/graphql
-app context use local
-app auth set-token <token>
-app role-type list
+csdk context create local --endpoint http://localhost:5000/graphql
+csdk context use local
+csdk auth set-token <token>
+csdk role-type list
 ```
 
 ## References

@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ProfilesModule records via app CLI
+CRUD operations for ProfilesModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app profiles-module list
-app profiles-module get --id <value>
-app profiles-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --tableName <value> --profilePermissionsTableId <value> --profilePermissionsTableName <value> --profileGrantsTableId <value> --profileGrantsTableName <value> --profileDefinitionGrantsTableId <value> --profileDefinitionGrantsTableName <value> --membershipType <value> --entityTableId <value> --actorTableId <value> --permissionsTableId <value> --membershipsTableId <value> --prefix <value>
-app profiles-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--tableName <value>] [--profilePermissionsTableId <value>] [--profilePermissionsTableName <value>] [--profileGrantsTableId <value>] [--profileGrantsTableName <value>] [--profileDefinitionGrantsTableId <value>] [--profileDefinitionGrantsTableName <value>] [--membershipType <value>] [--entityTableId <value>] [--actorTableId <value>] [--permissionsTableId <value>] [--membershipsTableId <value>] [--prefix <value>]
-app profiles-module delete --id <value>
+csdk profiles-module list
+csdk profiles-module get --id <value>
+csdk profiles-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --tableName <value> --profilePermissionsTableId <value> --profilePermissionsTableName <value> --profileGrantsTableId <value> --profileGrantsTableName <value> --profileDefinitionGrantsTableId <value> --profileDefinitionGrantsTableName <value> --membershipType <value> --entityTableId <value> --actorTableId <value> --permissionsTableId <value> --membershipsTableId <value> --prefix <value>
+csdk profiles-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--tableName <value>] [--profilePermissionsTableId <value>] [--profilePermissionsTableName <value>] [--profileGrantsTableId <value>] [--profileGrantsTableName <value>] [--profileDefinitionGrantsTableId <value>] [--profileDefinitionGrantsTableName <value>] [--membershipType <value>] [--entityTableId <value>] [--actorTableId <value>] [--permissionsTableId <value>] [--membershipsTableId <value>] [--prefix <value>]
+csdk profiles-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app profiles-module delete --id <value>
 ### List all profilesModule records
 
 ```bash
-app profiles-module list
+csdk profiles-module list
 ```
 
 ### Create a profilesModule
 
 ```bash
-app profiles-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --tableName "value" --profilePermissionsTableId "value" --profilePermissionsTableName "value" --profileGrantsTableId "value" --profileGrantsTableName "value" --profileDefinitionGrantsTableId "value" --profileDefinitionGrantsTableName "value" --membershipType "value" --entityTableId "value" --actorTableId "value" --permissionsTableId "value" --membershipsTableId "value" --prefix "value"
+csdk profiles-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --tableName "value" --profilePermissionsTableId "value" --profilePermissionsTableName "value" --profileGrantsTableId "value" --profileGrantsTableName "value" --profileDefinitionGrantsTableId "value" --profileDefinitionGrantsTableName "value" --membershipType "value" --entityTableId "value" --actorTableId "value" --permissionsTableId "value" --membershipsTableId "value" --prefix "value"
 ```
 
 ### Get a profilesModule by id
 
 ```bash
-app profiles-module get --id <value>
+csdk profiles-module get --id <value>
 ```

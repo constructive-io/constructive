@@ -7,7 +7,7 @@ Execute the updateNodeAtPath mutation
 ## Usage
 
 ```bash
-app update-node-at-path --input <value>
+csdk update-node-at-path --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app update-node-at-path --input <value>
 ### Run updateNodeAtPath
 
 ```bash
-app update-node-at-path --input <value>
+csdk update-node-at-path --input <value>
 ```

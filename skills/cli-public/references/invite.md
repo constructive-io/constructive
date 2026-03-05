@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Invite records via app CLI
+CRUD operations for Invite records via csdk CLI
 
 ## Usage
 
 ```bash
-app invite list
-app invite get --id <value>
-app invite create --email <value> --senderId <value> --inviteToken <value> --inviteValid <value> --inviteLimit <value> --inviteCount <value> --multiple <value> --data <value> --expiresAt <value>
-app invite update --id <value> [--email <value>] [--senderId <value>] [--inviteToken <value>] [--inviteValid <value>] [--inviteLimit <value>] [--inviteCount <value>] [--multiple <value>] [--data <value>] [--expiresAt <value>]
-app invite delete --id <value>
+csdk invite list
+csdk invite get --id <value>
+csdk invite create --email <value> --senderId <value> --inviteToken <value> --inviteValid <value> --inviteLimit <value> --inviteCount <value> --multiple <value> --data <value> --expiresAt <value>
+csdk invite update --id <value> [--email <value>] [--senderId <value>] [--inviteToken <value>] [--inviteValid <value>] [--inviteLimit <value>] [--inviteCount <value>] [--multiple <value>] [--data <value>] [--expiresAt <value>]
+csdk invite delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app invite delete --id <value>
 ### List all invite records
 
 ```bash
-app invite list
+csdk invite list
 ```
 
 ### Create a invite
 
 ```bash
-app invite create --email "value" --senderId "value" --inviteToken "value" --inviteValid "value" --inviteLimit "value" --inviteCount "value" --multiple "value" --data "value" --expiresAt "value"
+csdk invite create --email "value" --senderId "value" --inviteToken "value" --inviteValid "value" --inviteLimit "value" --inviteCount "value" --multiple "value" --data "value" --expiresAt "value"
 ```
 
 ### Get a invite by id
 
 ```bash
-app invite get --id <value>
+csdk invite get --id <value>
 ```

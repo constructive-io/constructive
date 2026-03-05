@@ -7,7 +7,7 @@ Execute the currentUserId query
 ## Usage
 
 ```bash
-app current-user-id
+csdk current-user-id
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app current-user-id
 ### Run currentUserId
 
 ```bash
-app current-user-id
+csdk current-user-id
 ```

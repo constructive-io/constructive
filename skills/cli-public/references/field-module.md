@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for FieldModule records via app CLI
+CRUD operations for FieldModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app field-module list
-app field-module get --id <value>
-app field-module create --databaseId <value> --privateSchemaId <value> --tableId <value> --fieldId <value> --nodeType <value> --data <value> --triggers <value> --functions <value>
-app field-module update --id <value> [--databaseId <value>] [--privateSchemaId <value>] [--tableId <value>] [--fieldId <value>] [--nodeType <value>] [--data <value>] [--triggers <value>] [--functions <value>]
-app field-module delete --id <value>
+csdk field-module list
+csdk field-module get --id <value>
+csdk field-module create --databaseId <value> --privateSchemaId <value> --tableId <value> --fieldId <value> --nodeType <value> --data <value> --triggers <value> --functions <value>
+csdk field-module update --id <value> [--databaseId <value>] [--privateSchemaId <value>] [--tableId <value>] [--fieldId <value>] [--nodeType <value>] [--data <value>] [--triggers <value>] [--functions <value>]
+csdk field-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app field-module delete --id <value>
 ### List all fieldModule records
 
 ```bash
-app field-module list
+csdk field-module list
 ```
 
 ### Create a fieldModule
 
 ```bash
-app field-module create --databaseId "value" --privateSchemaId "value" --tableId "value" --fieldId "value" --nodeType "value" --data "value" --triggers "value" --functions "value"
+csdk field-module create --databaseId "value" --privateSchemaId "value" --tableId "value" --fieldId "value" --nodeType "value" --data "value" --triggers "value" --functions "value"
 ```
 
 ### Get a fieldModule by id
 
 ```bash
-app field-module get --id <value>
+csdk field-module get --id <value>
 ```

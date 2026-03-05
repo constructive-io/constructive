@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 ## Usage
 
 ```bash
-app steps-required --vlevel <value> --vroleId <value> --first <value> --offset <value> --after <value>
+csdk steps-required --vlevel <value> --vroleId <value> --first <value> --offset <value> --after <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app steps-required --vlevel <value> --vroleId <value> --first <value> --offset <
 ### Run stepsRequired
 
 ```bash
-app steps-required --vlevel <value> --vroleId <value> --first <value> --offset <value> --after <value>
+csdk steps-required --vlevel <value> --vroleId <value> --first <value> --offset <value> --after <value>
 ```

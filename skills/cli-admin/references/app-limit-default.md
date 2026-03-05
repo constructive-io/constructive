@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for AppLimitDefault records via app CLI
+CRUD operations for AppLimitDefault records via csdk CLI
 
 ## Usage
 
 ```bash
-app app-limit-default list
-app app-limit-default get --id <value>
-app app-limit-default create --name <value> --max <value>
-app app-limit-default update --id <value> [--name <value>] [--max <value>]
-app app-limit-default delete --id <value>
+csdk app-limit-default list
+csdk app-limit-default get --id <value>
+csdk app-limit-default create --name <value> --max <value>
+csdk app-limit-default update --id <value> [--name <value>] [--max <value>]
+csdk app-limit-default delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app app-limit-default delete --id <value>
 ### List all appLimitDefault records
 
 ```bash
-app app-limit-default list
+csdk app-limit-default list
 ```
 
 ### Create a appLimitDefault
 
 ```bash
-app app-limit-default create --name "value" --max "value"
+csdk app-limit-default create --name "value" --max "value"
 ```
 
 ### Get a appLimitDefault by id
 
 ```bash
-app app-limit-default get --id <value>
+csdk app-limit-default get --id <value>
 ```

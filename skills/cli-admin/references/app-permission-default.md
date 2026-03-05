@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for AppPermissionDefault records via app CLI
+CRUD operations for AppPermissionDefault records via csdk CLI
 
 ## Usage
 
 ```bash
-app app-permission-default list
-app app-permission-default get --id <value>
-app app-permission-default create --permissions <value>
-app app-permission-default update --id <value> [--permissions <value>]
-app app-permission-default delete --id <value>
+csdk app-permission-default list
+csdk app-permission-default get --id <value>
+csdk app-permission-default create --permissions <value>
+csdk app-permission-default update --id <value> [--permissions <value>]
+csdk app-permission-default delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app app-permission-default delete --id <value>
 ### List all appPermissionDefault records
 
 ```bash
-app app-permission-default list
+csdk app-permission-default list
 ```
 
 ### Create a appPermissionDefault
 
 ```bash
-app app-permission-default create --permissions "value"
+csdk app-permission-default create --permissions "value"
 ```
 
 ### Get a appPermissionDefault by id
 
 ```bash
-app app-permission-default get --id <value>
+csdk app-permission-default get --id <value>
 ```

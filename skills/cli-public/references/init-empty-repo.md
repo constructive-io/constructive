@@ -7,7 +7,7 @@ Execute the initEmptyRepo mutation
 ## Usage
 
 ```bash
-app init-empty-repo --input <value>
+csdk init-empty-repo --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app init-empty-repo --input <value>
 ### Run initEmptyRepo
 
 ```bash
-app init-empty-repo --input <value>
+csdk init-empty-repo --input <value>
 ```

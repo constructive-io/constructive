@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Ref records via app CLI
+CRUD operations for Ref records via csdk CLI
 
 ## Usage
 
 ```bash
-app ref list
-app ref get --id <value>
-app ref create --name <value> --databaseId <value> --storeId <value> --commitId <value>
-app ref update --id <value> [--name <value>] [--databaseId <value>] [--storeId <value>] [--commitId <value>]
-app ref delete --id <value>
+csdk ref list
+csdk ref get --id <value>
+csdk ref create --name <value> --databaseId <value> --storeId <value> --commitId <value>
+csdk ref update --id <value> [--name <value>] [--databaseId <value>] [--storeId <value>] [--commitId <value>]
+csdk ref delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app ref delete --id <value>
 ### List all ref records
 
 ```bash
-app ref list
+csdk ref list
 ```
 
 ### Create a ref
 
 ```bash
-app ref create --name "value" --databaseId "value" --storeId "value" --commitId "value"
+csdk ref create --name "value" --databaseId "value" --storeId "value" --commitId "value"
 ```
 
 ### Get a ref by id
 
 ```bash
-app ref get --id <value>
+csdk ref get --id <value>
 ```

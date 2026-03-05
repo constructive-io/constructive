@@ -32,7 +32,7 @@ See [orm/README.md](./orm/README.md) for full API reference.
 
 ### CLI Commands (`./cli`)
 
-inquirerer-based CLI commands for `app`.
+inquirerer-based CLI commands for `csdk`.
 
 See [cli/README.md](./cli/README.md) for command reference.
 

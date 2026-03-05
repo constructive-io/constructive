@@ -7,7 +7,7 @@ Execute the appPermissionsGetMaskByNames query
 ## Usage
 
 ```bash
-app app-permissions-get-mask-by-names --names <value>
+csdk app-permissions-get-mask-by-names --names <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app app-permissions-get-mask-by-names --names <value>
 ### Run appPermissionsGetMaskByNames
 
 ```bash
-app app-permissions-get-mask-by-names --names <value>
+csdk app-permissions-get-mask-by-names --names <value>
 ```

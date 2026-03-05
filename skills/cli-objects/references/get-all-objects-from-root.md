@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `Object`.
 ## Usage
 
 ```bash
-app get-all-objects-from-root --databaseId <value> --id <value> --first <value> --offset <value> --after <value>
+csdk get-all-objects-from-root --databaseId <value> --id <value> --first <value> --offset <value> --after <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app get-all-objects-from-root --databaseId <value> --id <value> --first <value> 
 ### Run getAllObjectsFromRoot
 
 ```bash
-app get-all-objects-from-root --databaseId <value> --id <value> --first <value> --offset <value> --after <value>
+csdk get-all-objects-from-root --databaseId <value> --id <value> --first <value> --offset <value> --after <value>
 ```

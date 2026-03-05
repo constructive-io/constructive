@@ -7,7 +7,7 @@ Execute the oneTimeToken mutation
 ## Usage
 
 ```bash
-app one-time-token --input <value>
+csdk one-time-token --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app one-time-token --input <value>
 ### Run oneTimeToken
 
 ```bash
-app one-time-token --input <value>
+csdk one-time-token --input <value>
 ```

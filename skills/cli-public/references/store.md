@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Store records via app CLI
+CRUD operations for Store records via csdk CLI
 
 ## Usage
 
 ```bash
-app store list
-app store get --id <value>
-app store create --name <value> --databaseId <value> --hash <value>
-app store update --id <value> [--name <value>] [--databaseId <value>] [--hash <value>]
-app store delete --id <value>
+csdk store list
+csdk store get --id <value>
+csdk store create --name <value> --databaseId <value> --hash <value>
+csdk store update --id <value> [--name <value>] [--databaseId <value>] [--hash <value>]
+csdk store delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app store delete --id <value>
 ### List all store records
 
 ```bash
-app store list
+csdk store list
 ```
 
 ### Create a store
 
 ```bash
-app store create --name "value" --databaseId "value" --hash "value"
+csdk store create --name "value" --databaseId "value" --hash "value"
 ```
 
 ### Get a store by id
 
 ```bash
-app store get --id <value>
+csdk store get --id <value>
 ```

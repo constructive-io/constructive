@@ -7,7 +7,7 @@ Execute the submitInviteCode mutation
 ## Usage
 
 ```bash
-app submit-invite-code --input <value>
+csdk submit-invite-code --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app submit-invite-code --input <value>
 ### Run submitInviteCode
 
 ```bash
-app submit-invite-code --input <value>
+csdk submit-invite-code --input <value>
 ```

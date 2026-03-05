@@ -1,4 +1,4 @@
-# app CLI
+# csdk CLI
 
 <p align="center" width="100%">
   <img height="120" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -10,13 +10,13 @@
 
 ```bash
 # Create a context pointing at your GraphQL endpoint
-app context create production --endpoint https://api.example.com/graphql
+csdk context create production --endpoint https://api.example.com/graphql
 
 # Set the active context
-app context use production
+csdk context use production
 
 # Authenticate
-app auth set-token <your-token>
+csdk auth set-token <your-token>
 ```
 
 ## Commands
@@ -85,7 +85,7 @@ Manage named API contexts (kubectl-style).
 | `current` | Show current context |
 | `delete <name>` | Delete a context |
 
-Configuration is stored at `~/.app/config/`.
+Configuration is stored at `~/.csdk/config/`.
 
 ### `auth`
 
@@ -1087,8 +1087,8 @@ submitOrgInviteCode
 All commands output JSON to stdout. Pipe to `jq` for formatting:
 
 ```bash
-app car list | jq '.[]'
-app car get --id <uuid> | jq '.'
+csdk car list | jq '.[]'
+csdk car get --id <uuid> | jq '.'
 ```
 
 ---

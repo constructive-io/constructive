@@ -7,7 +7,7 @@ Execute the currentUserAgent query
 ## Usage
 
 ```bash
-app current-user-agent
+csdk current-user-agent
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app current-user-agent
 ### Run currentUserAgent
 
 ```bash
-app current-user-agent
+csdk current-user-agent
 ```

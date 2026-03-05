@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgClaimedInvite records via app CLI
+CRUD operations for OrgClaimedInvite records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-claimed-invite list
-app org-claimed-invite get --id <value>
-app org-claimed-invite create --data <value> --senderId <value> --receiverId <value> --entityId <value>
-app org-claimed-invite update --id <value> [--data <value>] [--senderId <value>] [--receiverId <value>] [--entityId <value>]
-app org-claimed-invite delete --id <value>
+csdk org-claimed-invite list
+csdk org-claimed-invite get --id <value>
+csdk org-claimed-invite create --data <value> --senderId <value> --receiverId <value> --entityId <value>
+csdk org-claimed-invite update --id <value> [--data <value>] [--senderId <value>] [--receiverId <value>] [--entityId <value>]
+csdk org-claimed-invite delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-claimed-invite delete --id <value>
 ### List all orgClaimedInvite records
 
 ```bash
-app org-claimed-invite list
+csdk org-claimed-invite list
 ```
 
 ### Create a orgClaimedInvite
 
 ```bash
-app org-claimed-invite create --data "value" --senderId "value" --receiverId "value" --entityId "value"
+csdk org-claimed-invite create --data "value" --senderId "value" --receiverId "value" --entityId "value"
 ```
 
 ### Get a orgClaimedInvite by id
 
 ```bash
-app org-claimed-invite get --id <value>
+csdk org-claimed-invite get --id <value>
 ```

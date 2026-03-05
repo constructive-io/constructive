@@ -7,7 +7,7 @@ Execute the resetPassword mutation
 ## Usage
 
 ```bash
-app reset-password --input <value>
+csdk reset-password --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app reset-password --input <value>
 ### Run resetPassword
 
 ```bash
-app reset-password --input <value>
+csdk reset-password --input <value>
 ```

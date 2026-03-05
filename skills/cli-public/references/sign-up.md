@@ -7,7 +7,7 @@ Execute the signUp mutation
 ## Usage
 
 ```bash
-app sign-up --input <value>
+csdk sign-up --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app sign-up --input <value>
 ### Run signUp
 
 ```bash
-app sign-up --input <value>
+csdk sign-up --input <value>
 ```

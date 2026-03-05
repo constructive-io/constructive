@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgMember records via app CLI
+CRUD operations for OrgMember records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-member list
-app org-member get --id <value>
-app org-member create --isAdmin <value> --actorId <value> --entityId <value>
-app org-member update --id <value> [--isAdmin <value>] [--actorId <value>] [--entityId <value>]
-app org-member delete --id <value>
+csdk org-member list
+csdk org-member get --id <value>
+csdk org-member create --isAdmin <value> --actorId <value> --entityId <value>
+csdk org-member update --id <value> [--isAdmin <value>] [--actorId <value>] [--entityId <value>]
+csdk org-member delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-member delete --id <value>
 ### List all orgMember records
 
 ```bash
-app org-member list
+csdk org-member list
 ```
 
 ### Create a orgMember
 
 ```bash
-app org-member create --isAdmin "value" --actorId "value" --entityId "value"
+csdk org-member create --isAdmin "value" --actorId "value" --entityId "value"
 ```
 
 ### Get a orgMember by id
 
 ```bash
-app org-member get --id <value>
+csdk org-member get --id <value>
 ```

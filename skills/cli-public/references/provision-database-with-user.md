@@ -7,7 +7,7 @@ Execute the provisionDatabaseWithUser mutation
 ## Usage
 
 ```bash
-app provision-database-with-user --input <value>
+csdk provision-database-with-user --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app provision-database-with-user --input <value>
 ### Run provisionDatabaseWithUser
 
 ```bash
-app provision-database-with-user --input <value>
+csdk provision-database-with-user --input <value>
 ```

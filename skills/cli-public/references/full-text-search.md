@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for FullTextSearch records via app CLI
+CRUD operations for FullTextSearch records via csdk CLI
 
 ## Usage
 
 ```bash
-app full-text-search list
-app full-text-search get --id <value>
-app full-text-search create --databaseId <value> --tableId <value> --fieldId <value> --fieldIds <value> --weights <value> --langs <value>
-app full-text-search update --id <value> [--databaseId <value>] [--tableId <value>] [--fieldId <value>] [--fieldIds <value>] [--weights <value>] [--langs <value>]
-app full-text-search delete --id <value>
+csdk full-text-search list
+csdk full-text-search get --id <value>
+csdk full-text-search create --databaseId <value> --tableId <value> --fieldId <value> --fieldIds <value> --weights <value> --langs <value>
+csdk full-text-search update --id <value> [--databaseId <value>] [--tableId <value>] [--fieldId <value>] [--fieldIds <value>] [--weights <value>] [--langs <value>]
+csdk full-text-search delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app full-text-search delete --id <value>
 ### List all fullTextSearch records
 
 ```bash
-app full-text-search list
+csdk full-text-search list
 ```
 
 ### Create a fullTextSearch
 
 ```bash
-app full-text-search create --databaseId "value" --tableId "value" --fieldId "value" --fieldIds "value" --weights "value" --langs "value"
+csdk full-text-search create --databaseId "value" --tableId "value" --fieldId "value" --fieldIds "value" --weights "value" --langs "value"
 ```
 
 ### Get a fullTextSearch by id
 
 ```bash
-app full-text-search get --id <value>
+csdk full-text-search get --id <value>
 ```

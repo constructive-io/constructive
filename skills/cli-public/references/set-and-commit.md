@@ -7,7 +7,7 @@ Execute the setAndCommit mutation
 ## Usage
 
 ```bash
-app set-and-commit --input <value>
+csdk set-and-commit --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app set-and-commit --input <value>
 ### Run setAndCommit
 
 ```bash
-app set-and-commit --input <value>
+csdk set-and-commit --input <value>
 ```

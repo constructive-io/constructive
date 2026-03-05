@@ -23,7 +23,7 @@ Example usage:
 ## Usage
 
 ```bash
-app create-user-database --input <value>
+csdk create-user-database --input <value>
 ```
 
 ## Examples
@@ -31,5 +31,5 @@ app create-user-database --input <value>
 ### Run createUserDatabase
 
 ```bash
-app create-user-database --input <value>
+csdk create-user-database --input <value>
 ```

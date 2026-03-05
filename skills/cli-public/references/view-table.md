@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ViewTable records via app CLI
+CRUD operations for ViewTable records via csdk CLI
 
 ## Usage
 
 ```bash
-app view-table list
-app view-table get --id <value>
-app view-table create --viewId <value> --tableId <value> --joinOrder <value>
-app view-table update --id <value> [--viewId <value>] [--tableId <value>] [--joinOrder <value>]
-app view-table delete --id <value>
+csdk view-table list
+csdk view-table get --id <value>
+csdk view-table create --viewId <value> --tableId <value> --joinOrder <value>
+csdk view-table update --id <value> [--viewId <value>] [--tableId <value>] [--joinOrder <value>]
+csdk view-table delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app view-table delete --id <value>
 ### List all viewTable records
 
 ```bash
-app view-table list
+csdk view-table list
 ```
 
 ### Create a viewTable
 
 ```bash
-app view-table create --viewId "value" --tableId "value" --joinOrder "value"
+csdk view-table create --viewId "value" --tableId "value" --joinOrder "value"
 ```
 
 ### Get a viewTable by id
 
 ```bash
-app view-table get --id <value>
+csdk view-table get --id <value>
 ```

@@ -7,7 +7,7 @@ Execute the currentIpAddress query
 ## Usage
 
 ```bash
-app current-ip-address
+csdk current-ip-address
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app current-ip-address
 ### Run currentIpAddress
 
 ```bash
-app current-ip-address
+csdk current-ip-address
 ```

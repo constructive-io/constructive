@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ConnectedAccountsModule records via app CLI
+CRUD operations for ConnectedAccountsModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app connected-accounts-module list
-app connected-accounts-module get --id <value>
-app connected-accounts-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --ownerTableId <value> --tableName <value>
-app connected-accounts-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>]
-app connected-accounts-module delete --id <value>
+csdk connected-accounts-module list
+csdk connected-accounts-module get --id <value>
+csdk connected-accounts-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --ownerTableId <value> --tableName <value>
+csdk connected-accounts-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>]
+csdk connected-accounts-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app connected-accounts-module delete --id <value>
 ### List all connectedAccountsModule records
 
 ```bash
-app connected-accounts-module list
+csdk connected-accounts-module list
 ```
 
 ### Create a connectedAccountsModule
 
 ```bash
-app connected-accounts-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --ownerTableId "value" --tableName "value"
+csdk connected-accounts-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --ownerTableId "value" --tableName "value"
 ```
 
 ### Get a connectedAccountsModule by id
 
 ```bash
-app connected-accounts-module get --id <value>
+csdk connected-accounts-module get --id <value>
 ```

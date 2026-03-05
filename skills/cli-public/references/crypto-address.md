@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for CryptoAddress records via app CLI
+CRUD operations for CryptoAddress records via csdk CLI
 
 ## Usage
 
 ```bash
-app crypto-address list
-app crypto-address get --id <value>
-app crypto-address create --ownerId <value> --address <value> --isVerified <value> --isPrimary <value>
-app crypto-address update --id <value> [--ownerId <value>] [--address <value>] [--isVerified <value>] [--isPrimary <value>]
-app crypto-address delete --id <value>
+csdk crypto-address list
+csdk crypto-address get --id <value>
+csdk crypto-address create --ownerId <value> --address <value> --isVerified <value> --isPrimary <value>
+csdk crypto-address update --id <value> [--ownerId <value>] [--address <value>] [--isVerified <value>] [--isPrimary <value>]
+csdk crypto-address delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app crypto-address delete --id <value>
 ### List all cryptoAddress records
 
 ```bash
-app crypto-address list
+csdk crypto-address list
 ```
 
 ### Create a cryptoAddress
 
 ```bash
-app crypto-address create --ownerId "value" --address "value" --isVerified "value" --isPrimary "value"
+csdk crypto-address create --ownerId "value" --address "value" --isVerified "value" --isPrimary "value"
 ```
 
 ### Get a cryptoAddress by id
 
 ```bash
-app crypto-address get --id <value>
+csdk crypto-address get --id <value>
 ```

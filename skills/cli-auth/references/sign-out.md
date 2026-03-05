@@ -7,7 +7,7 @@ Execute the signOut mutation
 ## Usage
 
 ```bash
-app sign-out --input <value>
+csdk sign-out --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app sign-out --input <value>
 ### Run signOut
 
 ```bash
-app sign-out --input <value>
+csdk sign-out --input <value>
 ```

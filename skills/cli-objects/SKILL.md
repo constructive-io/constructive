@@ -1,28 +1,28 @@
 ---
 name: cli-objects
-description: CLI tool (app) for the objects API — provides CRUD commands for 5 tables and 12 custom operations
+description: CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 12 custom operations
 ---
 
 # cli-objects
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (app) for the objects API — provides CRUD commands for 5 tables and 12 custom operations
+CLI tool (csdk) for the objects API — provides CRUD commands for 5 tables and 12 custom operations
 
 ## Usage
 
 ```bash
 # Context management
-app context create <name> --endpoint <url>
-app context use <name>
+csdk context create <name> --endpoint <url>
+csdk context use <name>
 
 # Authentication
-app auth set-token <token>
+csdk auth set-token <token>
 
 # CRUD for any table (e.g. get-all-record)
-app get-all-record list
-app get-all-record get --id <value>
-app get-all-record create --<field> <value>
+csdk get-all-record list
+csdk get-all-record get --id <value>
+csdk get-all-record create --<field> <value>
 ```
 
 ## Examples
@@ -30,10 +30,10 @@ app get-all-record create --<field> <value>
 ### Set up and query
 
 ```bash
-app context create local --endpoint http://localhost:5000/graphql
-app context use local
-app auth set-token <token>
-app get-all-record list
+csdk context create local --endpoint http://localhost:5000/graphql
+csdk context use local
+csdk auth set-token <token>
+csdk get-all-record list
 ```
 
 ## References

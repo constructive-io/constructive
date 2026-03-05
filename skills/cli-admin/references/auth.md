@@ -2,14 +2,14 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Manage authentication tokens for app
+Manage authentication tokens for csdk
 
 ## Usage
 
 ```bash
-app auth set-token <token>
-app auth status
-app auth logout
+csdk auth set-token <token>
+csdk auth status
+csdk auth logout
 ```
 
 ## Examples
@@ -17,11 +17,11 @@ app auth logout
 ### Authenticate with a token
 
 ```bash
-app auth set-token eyJhbGciOiJIUzI1NiIs...
+csdk auth set-token eyJhbGciOiJIUzI1NiIs...
 ```
 
 ### Check auth status
 
 ```bash
-app auth status
+csdk auth status
 ```

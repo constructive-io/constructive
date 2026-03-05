@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for AppPermission records via app CLI
+CRUD operations for AppPermission records via csdk CLI
 
 ## Usage
 
 ```bash
-app app-permission list
-app app-permission get --id <value>
-app app-permission create --name <value> --bitnum <value> --bitstr <value> --description <value>
-app app-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
-app app-permission delete --id <value>
+csdk app-permission list
+csdk app-permission get --id <value>
+csdk app-permission create --name <value> --bitnum <value> --bitstr <value> --description <value>
+csdk app-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk app-permission delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app app-permission delete --id <value>
 ### List all appPermission records
 
 ```bash
-app app-permission list
+csdk app-permission list
 ```
 
 ### Create a appPermission
 
 ```bash
-app app-permission create --name "value" --bitnum "value" --bitstr "value" --description "value"
+csdk app-permission create --name "value" --bitnum "value" --bitstr "value" --description "value"
 ```
 
 ### Get a appPermission by id
 
 ```bash
-app app-permission get --id <value>
+csdk app-permission get --id <value>
 ```

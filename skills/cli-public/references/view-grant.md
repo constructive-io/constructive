@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ViewGrant records via app CLI
+CRUD operations for ViewGrant records via csdk CLI
 
 ## Usage
 
 ```bash
-app view-grant list
-app view-grant get --id <value>
-app view-grant create --databaseId <value> --viewId <value> --granteeName <value> --privilege <value> --withGrantOption <value> --isGrant <value>
-app view-grant update --id <value> [--databaseId <value>] [--viewId <value>] [--granteeName <value>] [--privilege <value>] [--withGrantOption <value>] [--isGrant <value>]
-app view-grant delete --id <value>
+csdk view-grant list
+csdk view-grant get --id <value>
+csdk view-grant create --databaseId <value> --viewId <value> --granteeName <value> --privilege <value> --withGrantOption <value> --isGrant <value>
+csdk view-grant update --id <value> [--databaseId <value>] [--viewId <value>] [--granteeName <value>] [--privilege <value>] [--withGrantOption <value>] [--isGrant <value>]
+csdk view-grant delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app view-grant delete --id <value>
 ### List all viewGrant records
 
 ```bash
-app view-grant list
+csdk view-grant list
 ```
 
 ### Create a viewGrant
 
 ```bash
-app view-grant create --databaseId "value" --viewId "value" --granteeName "value" --privilege "value" --withGrantOption "value" --isGrant "value"
+csdk view-grant create --databaseId "value" --viewId "value" --granteeName "value" --privilege "value" --withGrantOption "value" --isGrant "value"
 ```
 
 ### Get a viewGrant by id
 
 ```bash
-app view-grant get --id <value>
+csdk view-grant get --id <value>
 ```

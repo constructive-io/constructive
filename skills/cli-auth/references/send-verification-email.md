@@ -7,7 +7,7 @@ Execute the sendVerificationEmail mutation
 ## Usage
 
 ```bash
-app send-verification-email --input <value>
+csdk send-verification-email --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app send-verification-email --input <value>
 ### Run sendVerificationEmail
 
 ```bash
-app send-verification-email --input <value>
+csdk send-verification-email --input <value>
 ```

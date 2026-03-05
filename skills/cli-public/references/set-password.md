@@ -7,7 +7,7 @@ Execute the setPassword mutation
 ## Usage
 
 ```bash
-app set-password --input <value>
+csdk set-password --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app set-password --input <value>
 ### Run setPassword
 
 ```bash
-app set-password --input <value>
+csdk set-password --input <value>
 ```

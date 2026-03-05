@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for SiteModule records via app CLI
+CRUD operations for SiteModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app site-module list
-app site-module get --id <value>
-app site-module create --databaseId <value> --siteId <value> --name <value> --data <value>
-app site-module update --id <value> [--databaseId <value>] [--siteId <value>] [--name <value>] [--data <value>]
-app site-module delete --id <value>
+csdk site-module list
+csdk site-module get --id <value>
+csdk site-module create --databaseId <value> --siteId <value> --name <value> --data <value>
+csdk site-module update --id <value> [--databaseId <value>] [--siteId <value>] [--name <value>] [--data <value>]
+csdk site-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app site-module delete --id <value>
 ### List all siteModule records
 
 ```bash
-app site-module list
+csdk site-module list
 ```
 
 ### Create a siteModule
 
 ```bash
-app site-module create --databaseId "value" --siteId "value" --name "value" --data "value"
+csdk site-module create --databaseId "value" --siteId "value" --name "value" --data "value"
 ```
 
 ### Get a siteModule by id
 
 ```bash
-app site-module get --id <value>
+csdk site-module get --id <value>
 ```

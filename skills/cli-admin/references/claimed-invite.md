@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ClaimedInvite records via app CLI
+CRUD operations for ClaimedInvite records via csdk CLI
 
 ## Usage
 
 ```bash
-app claimed-invite list
-app claimed-invite get --id <value>
-app claimed-invite create --data <value> --senderId <value> --receiverId <value>
-app claimed-invite update --id <value> [--data <value>] [--senderId <value>] [--receiverId <value>]
-app claimed-invite delete --id <value>
+csdk claimed-invite list
+csdk claimed-invite get --id <value>
+csdk claimed-invite create --data <value> --senderId <value> --receiverId <value>
+csdk claimed-invite update --id <value> [--data <value>] [--senderId <value>] [--receiverId <value>]
+csdk claimed-invite delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app claimed-invite delete --id <value>
 ### List all claimedInvite records
 
 ```bash
-app claimed-invite list
+csdk claimed-invite list
 ```
 
 ### Create a claimedInvite
 
 ```bash
-app claimed-invite create --data "value" --senderId "value" --receiverId "value"
+csdk claimed-invite create --data "value" --senderId "value" --receiverId "value"
 ```
 
 ### Get a claimedInvite by id
 
 ```bash
-app claimed-invite get --id <value>
+csdk claimed-invite get --id <value>
 ```

@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgGetSubordinatesRecord records via app CLI
+CRUD operations for OrgGetSubordinatesRecord records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-get-subordinates-record list
-app org-get-subordinates-record get --id <value>
-app org-get-subordinates-record create --userId <value> --depth <value>
-app org-get-subordinates-record update --id <value> [--userId <value>] [--depth <value>]
-app org-get-subordinates-record delete --id <value>
+csdk org-get-subordinates-record list
+csdk org-get-subordinates-record get --id <value>
+csdk org-get-subordinates-record create --userId <value> --depth <value>
+csdk org-get-subordinates-record update --id <value> [--userId <value>] [--depth <value>]
+csdk org-get-subordinates-record delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-get-subordinates-record delete --id <value>
 ### List all orgGetSubordinatesRecord records
 
 ```bash
-app org-get-subordinates-record list
+csdk org-get-subordinates-record list
 ```
 
 ### Create a orgGetSubordinatesRecord
 
 ```bash
-app org-get-subordinates-record create --userId "value" --depth "value"
+csdk org-get-subordinates-record create --userId "value" --depth "value"
 ```
 
 ### Get a orgGetSubordinatesRecord by id
 
 ```bash
-app org-get-subordinates-record get --id <value>
+csdk org-get-subordinates-record get --id <value>
 ```

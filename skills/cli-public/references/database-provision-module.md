@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for DatabaseProvisionModule records via app CLI
+CRUD operations for DatabaseProvisionModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app database-provision-module list
-app database-provision-module get --id <value>
-app database-provision-module create --databaseName <value> --ownerId <value> --subdomain <value> --domain <value> --modules <value> --options <value> --bootstrapUser <value> --status <value> --errorMessage <value> --databaseId <value> --completedAt <value>
-app database-provision-module update --id <value> [--databaseName <value>] [--ownerId <value>] [--subdomain <value>] [--domain <value>] [--modules <value>] [--options <value>] [--bootstrapUser <value>] [--status <value>] [--errorMessage <value>] [--databaseId <value>] [--completedAt <value>]
-app database-provision-module delete --id <value>
+csdk database-provision-module list
+csdk database-provision-module get --id <value>
+csdk database-provision-module create --databaseName <value> --ownerId <value> --subdomain <value> --domain <value> --modules <value> --options <value> --bootstrapUser <value> --status <value> --errorMessage <value> --databaseId <value> --completedAt <value>
+csdk database-provision-module update --id <value> [--databaseName <value>] [--ownerId <value>] [--subdomain <value>] [--domain <value>] [--modules <value>] [--options <value>] [--bootstrapUser <value>] [--status <value>] [--errorMessage <value>] [--databaseId <value>] [--completedAt <value>]
+csdk database-provision-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app database-provision-module delete --id <value>
 ### List all databaseProvisionModule records
 
 ```bash
-app database-provision-module list
+csdk database-provision-module list
 ```
 
 ### Create a databaseProvisionModule
 
 ```bash
-app database-provision-module create --databaseName "value" --ownerId "value" --subdomain "value" --domain "value" --modules "value" --options "value" --bootstrapUser "value" --status "value" --errorMessage "value" --databaseId "value" --completedAt "value"
+csdk database-provision-module create --databaseName "value" --ownerId "value" --subdomain "value" --domain "value" --modules "value" --options "value" --bootstrapUser "value" --status "value" --errorMessage "value" --databaseId "value" --completedAt "value"
 ```
 
 ### Get a databaseProvisionModule by id
 
 ```bash
-app database-provision-module get --id <value>
+csdk database-provision-module get --id <value>
 ```

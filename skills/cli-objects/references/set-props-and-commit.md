@@ -7,7 +7,7 @@ Execute the setPropsAndCommit mutation
 ## Usage
 
 ```bash
-app set-props-and-commit --input <value>
+csdk set-props-and-commit --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app set-props-and-commit --input <value>
 ### Run setPropsAndCommit
 
 ```bash
-app set-props-and-commit --input <value>
+csdk set-props-and-commit --input <value>
 ```

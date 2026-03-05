@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for AuditLog records via app CLI
+CRUD operations for AuditLog records via csdk CLI
 
 ## Usage
 
 ```bash
-app audit-log list
-app audit-log get --id <value>
-app audit-log create --event <value> --actorId <value> --origin <value> --userAgent <value> --ipAddress <value> --success <value>
-app audit-log update --id <value> [--event <value>] [--actorId <value>] [--origin <value>] [--userAgent <value>] [--ipAddress <value>] [--success <value>]
-app audit-log delete --id <value>
+csdk audit-log list
+csdk audit-log get --id <value>
+csdk audit-log create --event <value> --actorId <value> --origin <value> --userAgent <value> --ipAddress <value> --success <value>
+csdk audit-log update --id <value> [--event <value>] [--actorId <value>] [--origin <value>] [--userAgent <value>] [--ipAddress <value>] [--success <value>]
+csdk audit-log delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app audit-log delete --id <value>
 ### List all auditLog records
 
 ```bash
-app audit-log list
+csdk audit-log list
 ```
 
 ### Create a auditLog
 
 ```bash
-app audit-log create --event "value" --actorId "value" --origin "value" --userAgent "value" --ipAddress "value" --success "value"
+csdk audit-log create --event "value" --actorId "value" --origin "value" --userAgent "value" --ipAddress "value" --success "value"
 ```
 
 ### Get a auditLog by id
 
 ```bash
-app audit-log get --id <value>
+csdk audit-log get --id <value>
 ```

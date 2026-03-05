@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgPermission records via app CLI
+CRUD operations for OrgPermission records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-permission list
-app org-permission get --id <value>
-app org-permission create --name <value> --bitnum <value> --bitstr <value> --description <value>
-app org-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
-app org-permission delete --id <value>
+csdk org-permission list
+csdk org-permission get --id <value>
+csdk org-permission create --name <value> --bitnum <value> --bitstr <value> --description <value>
+csdk org-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk org-permission delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-permission delete --id <value>
 ### List all orgPermission records
 
 ```bash
-app org-permission list
+csdk org-permission list
 ```
 
 ### Create a orgPermission
 
 ```bash
-app org-permission create --name "value" --bitnum "value" --bitstr "value" --description "value"
+csdk org-permission create --name "value" --bitnum "value" --bitstr "value" --description "value"
 ```
 
 ### Get a orgPermission by id
 
 ```bash
-app org-permission get --id <value>
+csdk org-permission get --id <value>
 ```

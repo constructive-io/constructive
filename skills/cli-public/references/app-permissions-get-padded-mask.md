@@ -7,7 +7,7 @@ Execute the appPermissionsGetPaddedMask query
 ## Usage
 
 ```bash
-app app-permissions-get-padded-mask --mask <value>
+csdk app-permissions-get-padded-mask --mask <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app app-permissions-get-padded-mask --mask <value>
 ### Run appPermissionsGetPaddedMask
 
 ```bash
-app app-permissions-get-padded-mask --mask <value>
+csdk app-permissions-get-padded-mask --mask <value>
 ```

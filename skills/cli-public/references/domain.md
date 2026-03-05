@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Domain records via app CLI
+CRUD operations for Domain records via csdk CLI
 
 ## Usage
 
 ```bash
-app domain list
-app domain get --id <value>
-app domain create --databaseId <value> --apiId <value> --siteId <value> --subdomain <value> --domain <value>
-app domain update --id <value> [--databaseId <value>] [--apiId <value>] [--siteId <value>] [--subdomain <value>] [--domain <value>]
-app domain delete --id <value>
+csdk domain list
+csdk domain get --id <value>
+csdk domain create --databaseId <value> --apiId <value> --siteId <value> --subdomain <value> --domain <value>
+csdk domain update --id <value> [--databaseId <value>] [--apiId <value>] [--siteId <value>] [--subdomain <value>] [--domain <value>]
+csdk domain delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app domain delete --id <value>
 ### List all domain records
 
 ```bash
-app domain list
+csdk domain list
 ```
 
 ### Create a domain
 
 ```bash
-app domain create --databaseId "value" --apiId "value" --siteId "value" --subdomain "value" --domain "value"
+csdk domain create --databaseId "value" --apiId "value" --siteId "value" --subdomain "value" --domain "value"
 ```
 
 ### Get a domain by id
 
 ```bash
-app domain get --id <value>
+csdk domain get --id <value>
 ```

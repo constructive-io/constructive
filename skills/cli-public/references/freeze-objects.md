@@ -7,7 +7,7 @@ Execute the freezeObjects mutation
 ## Usage
 
 ```bash
-app freeze-objects --input <value>
+csdk freeze-objects --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app freeze-objects --input <value>
 ### Run freezeObjects
 
 ```bash
-app freeze-objects --input <value>
+csdk freeze-objects --input <value>
 ```

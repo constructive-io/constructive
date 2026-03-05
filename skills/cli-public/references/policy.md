@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Policy records via app CLI
+CRUD operations for Policy records via csdk CLI
 
 ## Usage
 
 ```bash
-app policy list
-app policy get --id <value>
-app policy create --databaseId <value> --tableId <value> --name <value> --granteeName <value> --privilege <value> --permissive <value> --disabled <value> --policyType <value> --data <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
-app policy update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--granteeName <value>] [--privilege <value>] [--permissive <value>] [--disabled <value>] [--policyType <value>] [--data <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
-app policy delete --id <value>
+csdk policy list
+csdk policy get --id <value>
+csdk policy create --databaseId <value> --tableId <value> --name <value> --granteeName <value> --privilege <value> --permissive <value> --disabled <value> --policyType <value> --data <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
+csdk policy update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--granteeName <value>] [--privilege <value>] [--permissive <value>] [--disabled <value>] [--policyType <value>] [--data <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk policy delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app policy delete --id <value>
 ### List all policy records
 
 ```bash
-app policy list
+csdk policy list
 ```
 
 ### Create a policy
 
 ```bash
-app policy create --databaseId "value" --tableId "value" --name "value" --granteeName "value" --privilege "value" --permissive "value" --disabled "value" --policyType "value" --data "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
+csdk policy create --databaseId "value" --tableId "value" --name "value" --granteeName "value" --privilege "value" --permissive "value" --disabled "value" --policyType "value" --data "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
 ```
 
 ### Get a policy by id
 
 ```bash
-app policy get --id <value>
+csdk policy get --id <value>
 ```

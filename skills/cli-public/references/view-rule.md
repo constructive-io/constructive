@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for ViewRule records via app CLI
+CRUD operations for ViewRule records via csdk CLI
 
 ## Usage
 
 ```bash
-app view-rule list
-app view-rule get --id <value>
-app view-rule create --databaseId <value> --viewId <value> --name <value> --event <value> --action <value>
-app view-rule update --id <value> [--databaseId <value>] [--viewId <value>] [--name <value>] [--event <value>] [--action <value>]
-app view-rule delete --id <value>
+csdk view-rule list
+csdk view-rule get --id <value>
+csdk view-rule create --databaseId <value> --viewId <value> --name <value> --event <value> --action <value>
+csdk view-rule update --id <value> [--databaseId <value>] [--viewId <value>] [--name <value>] [--event <value>] [--action <value>]
+csdk view-rule delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app view-rule delete --id <value>
 ### List all viewRule records
 
 ```bash
-app view-rule list
+csdk view-rule list
 ```
 
 ### Create a viewRule
 
 ```bash
-app view-rule create --databaseId "value" --viewId "value" --name "value" --event "value" --action "value"
+csdk view-rule create --databaseId "value" --viewId "value" --name "value" --event "value" --action "value"
 ```
 
 ### Get a viewRule by id
 
 ```bash
-app view-rule get --id <value>
+csdk view-rule get --id <value>
 ```

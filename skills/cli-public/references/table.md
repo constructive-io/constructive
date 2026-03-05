@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Table records via app CLI
+CRUD operations for Table records via csdk CLI
 
 ## Usage
 
 ```bash
-app table list
-app table get --id <value>
-app table create --databaseId <value> --schemaId <value> --name <value> --label <value> --description <value> --smartTags <value> --category <value> --module <value> --scope <value> --useRls <value> --timestamps <value> --peoplestamps <value> --pluralName <value> --singularName <value> --tags <value> --inheritsId <value>
-app table update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--useRls <value>] [--timestamps <value>] [--peoplestamps <value>] [--pluralName <value>] [--singularName <value>] [--tags <value>] [--inheritsId <value>]
-app table delete --id <value>
+csdk table list
+csdk table get --id <value>
+csdk table create --databaseId <value> --schemaId <value> --name <value> --label <value> --description <value> --smartTags <value> --category <value> --module <value> --scope <value> --useRls <value> --timestamps <value> --peoplestamps <value> --pluralName <value> --singularName <value> --tags <value> --inheritsId <value>
+csdk table update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--useRls <value>] [--timestamps <value>] [--peoplestamps <value>] [--pluralName <value>] [--singularName <value>] [--tags <value>] [--inheritsId <value>]
+csdk table delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app table delete --id <value>
 ### List all table records
 
 ```bash
-app table list
+csdk table list
 ```
 
 ### Create a table
 
 ```bash
-app table create --databaseId "value" --schemaId "value" --name "value" --label "value" --description "value" --smartTags "value" --category "value" --module "value" --scope "value" --useRls "value" --timestamps "value" --peoplestamps "value" --pluralName "value" --singularName "value" --tags "value" --inheritsId "value"
+csdk table create --databaseId "value" --schemaId "value" --name "value" --label "value" --description "value" --smartTags "value" --category "value" --module "value" --scope "value" --useRls "value" --timestamps "value" --peoplestamps "value" --pluralName "value" --singularName "value" --tags "value" --inheritsId "value"
 ```
 
 ### Get a table by id
 
 ```bash
-app table get --id <value>
+csdk table get --id <value>
 ```

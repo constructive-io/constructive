@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for UsersModule records via app CLI
+CRUD operations for UsersModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app users-module list
-app users-module get --id <value>
-app users-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value> --typeTableId <value> --typeTableName <value>
-app users-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--typeTableId <value>] [--typeTableName <value>]
-app users-module delete --id <value>
+csdk users-module list
+csdk users-module get --id <value>
+csdk users-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value> --typeTableId <value> --typeTableName <value>
+csdk users-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--typeTableId <value>] [--typeTableName <value>]
+csdk users-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app users-module delete --id <value>
 ### List all usersModule records
 
 ```bash
-app users-module list
+csdk users-module list
 ```
 
 ### Create a usersModule
 
 ```bash
-app users-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value" --typeTableId "value" --typeTableName "value"
+csdk users-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value" --typeTableId "value" --typeTableName "value"
 ```
 
 ### Get a usersModule by id
 
 ```bash
-app users-module get --id <value>
+csdk users-module get --id <value>
 ```

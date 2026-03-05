@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for AppLevel records via app CLI
+CRUD operations for AppLevel records via csdk CLI
 
 ## Usage
 
 ```bash
-app app-level list
-app app-level get --id <value>
-app app-level create --name <value> --description <value> --image <value> --ownerId <value>
-app app-level update --id <value> [--name <value>] [--description <value>] [--image <value>] [--ownerId <value>]
-app app-level delete --id <value>
+csdk app-level list
+csdk app-level get --id <value>
+csdk app-level create --name <value> --description <value> --image <value> --ownerId <value>
+csdk app-level update --id <value> [--name <value>] [--description <value>] [--image <value>] [--ownerId <value>]
+csdk app-level delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app app-level delete --id <value>
 ### List all appLevel records
 
 ```bash
-app app-level list
+csdk app-level list
 ```
 
 ### Create a appLevel
 
 ```bash
-app app-level create --name "value" --description "value" --image "value" --ownerId "value"
+csdk app-level create --name "value" --description "value" --image "value" --ownerId "value"
 ```
 
 ### Get a appLevel by id
 
 ```bash
-app app-level get --id <value>
+csdk app-level get --id <value>
 ```

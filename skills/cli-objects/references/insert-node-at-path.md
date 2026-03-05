@@ -7,7 +7,7 @@ Execute the insertNodeAtPath mutation
 ## Usage
 
 ```bash
-app insert-node-at-path --input <value>
+csdk insert-node-at-path --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app insert-node-at-path --input <value>
 ### Run insertNodeAtPath
 
 ```bash
-app insert-node-at-path --input <value>
+csdk insert-node-at-path --input <value>
 ```

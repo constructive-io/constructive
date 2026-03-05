@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for SecretsModule records via app CLI
+CRUD operations for SecretsModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app secrets-module list
-app secrets-module get --id <value>
-app secrets-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value>
-app secrets-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>]
-app secrets-module delete --id <value>
+csdk secrets-module list
+csdk secrets-module get --id <value>
+csdk secrets-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value>
+csdk secrets-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>]
+csdk secrets-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app secrets-module delete --id <value>
 ### List all secretsModule records
 
 ```bash
-app secrets-module list
+csdk secrets-module list
 ```
 
 ### Create a secretsModule
 
 ```bash
-app secrets-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value"
+csdk secrets-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value"
 ```
 
 ### Get a secretsModule by id
 
 ```bash
-app secrets-module get --id <value>
+csdk secrets-module get --id <value>
 ```

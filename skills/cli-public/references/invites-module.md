@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for InvitesModule records via app CLI
+CRUD operations for InvitesModule records via csdk CLI
 
 ## Usage
 
 ```bash
-app invites-module list
-app invites-module get --id <value>
-app invites-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --emailsTableId <value> --usersTableId <value> --invitesTableId <value> --claimedInvitesTableId <value> --invitesTableName <value> --claimedInvitesTableName <value> --submitInviteCodeFunction <value> --prefix <value> --membershipType <value> --entityTableId <value>
-app invites-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--membershipType <value>] [--entityTableId <value>]
-app invites-module delete --id <value>
+csdk invites-module list
+csdk invites-module get --id <value>
+csdk invites-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --emailsTableId <value> --usersTableId <value> --invitesTableId <value> --claimedInvitesTableId <value> --invitesTableName <value> --claimedInvitesTableName <value> --submitInviteCodeFunction <value> --prefix <value> --membershipType <value> --entityTableId <value>
+csdk invites-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--membershipType <value>] [--entityTableId <value>]
+csdk invites-module delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app invites-module delete --id <value>
 ### List all invitesModule records
 
 ```bash
-app invites-module list
+csdk invites-module list
 ```
 
 ### Create a invitesModule
 
 ```bash
-app invites-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --emailsTableId "value" --usersTableId "value" --invitesTableId "value" --claimedInvitesTableId "value" --invitesTableName "value" --claimedInvitesTableName "value" --submitInviteCodeFunction "value" --prefix "value" --membershipType "value" --entityTableId "value"
+csdk invites-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --emailsTableId "value" --usersTableId "value" --invitesTableId "value" --claimedInvitesTableId "value" --invitesTableName "value" --claimedInvitesTableName "value" --submitInviteCodeFunction "value" --prefix "value" --membershipType "value" --entityTableId "value"
 ```
 
 ### Get a invitesModule by id
 
 ```bash
-app invites-module get --id <value>
+csdk invites-module get --id <value>
 ```

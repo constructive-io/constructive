@@ -7,7 +7,7 @@ Execute the orgPermissionsGetMask query
 ## Usage
 
 ```bash
-app org-permissions-get-mask --ids <value>
+csdk org-permissions-get-mask --ids <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app org-permissions-get-mask --ids <value>
 ### Run orgPermissionsGetMask
 
 ```bash
-app org-permissions-get-mask --ids <value>
+csdk org-permissions-get-mask --ids <value>
 ```

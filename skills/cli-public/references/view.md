@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for View records via app CLI
+CRUD operations for View records via csdk CLI
 
 ## Usage
 
 ```bash
-app view list
-app view get --id <value>
-app view create --databaseId <value> --schemaId <value> --name <value> --tableId <value> --viewType <value> --data <value> --filterType <value> --filterData <value> --securityInvoker <value> --isReadOnly <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
-app view update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--tableId <value>] [--viewType <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
-app view delete --id <value>
+csdk view list
+csdk view get --id <value>
+csdk view create --databaseId <value> --schemaId <value> --name <value> --tableId <value> --viewType <value> --data <value> --filterType <value> --filterData <value> --securityInvoker <value> --isReadOnly <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
+csdk view update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--tableId <value>] [--viewType <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk view delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app view delete --id <value>
 ### List all view records
 
 ```bash
-app view list
+csdk view list
 ```
 
 ### Create a view
 
 ```bash
-app view create --databaseId "value" --schemaId "value" --name "value" --tableId "value" --viewType "value" --data "value" --filterType "value" --filterData "value" --securityInvoker "value" --isReadOnly "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
+csdk view create --databaseId "value" --schemaId "value" --name "value" --tableId "value" --viewType "value" --data "value" --filterType "value" --filterData "value" --securityInvoker "value" --isReadOnly "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
 ```
 
 ### Get a view by id
 
 ```bash
-app view get --id <value>
+csdk view get --id <value>
 ```

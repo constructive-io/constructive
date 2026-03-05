@@ -7,7 +7,7 @@ Execute the orgIsManagerOf query
 ## Usage
 
 ```bash
-app org-is-manager-of --pEntityId <value> --pManagerId <value> --pUserId <value> --pMaxDepth <value>
+csdk org-is-manager-of --pEntityId <value> --pManagerId <value> --pUserId <value> --pMaxDepth <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app org-is-manager-of --pEntityId <value> --pManagerId <value> --pUserId <value>
 ### Run orgIsManagerOf
 
 ```bash
-app org-is-manager-of --pEntityId <value> --pManagerId <value> --pUserId <value> --pMaxDepth <value>
+csdk org-is-manager-of --pEntityId <value> --pManagerId <value> --pUserId <value> --pMaxDepth <value>
 ```

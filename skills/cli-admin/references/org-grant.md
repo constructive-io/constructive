@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgGrant records via app CLI
+CRUD operations for OrgGrant records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-grant list
-app org-grant get --id <value>
-app org-grant create --permissions <value> --isGrant <value> --actorId <value> --entityId <value> --grantorId <value>
-app org-grant update --id <value> [--permissions <value>] [--isGrant <value>] [--actorId <value>] [--entityId <value>] [--grantorId <value>]
-app org-grant delete --id <value>
+csdk org-grant list
+csdk org-grant get --id <value>
+csdk org-grant create --permissions <value> --isGrant <value> --actorId <value> --entityId <value> --grantorId <value>
+csdk org-grant update --id <value> [--permissions <value>] [--isGrant <value>] [--actorId <value>] [--entityId <value>] [--grantorId <value>]
+csdk org-grant delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-grant delete --id <value>
 ### List all orgGrant records
 
 ```bash
-app org-grant list
+csdk org-grant list
 ```
 
 ### Create a orgGrant
 
 ```bash
-app org-grant create --permissions "value" --isGrant "value" --actorId "value" --entityId "value" --grantorId "value"
+csdk org-grant create --permissions "value" --isGrant "value" --actorId "value" --entityId "value" --grantorId "value"
 ```
 
 ### Get a orgGrant by id
 
 ```bash
-app org-grant get --id <value>
+csdk org-grant get --id <value>
 ```

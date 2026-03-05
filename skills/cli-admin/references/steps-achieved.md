@@ -7,7 +7,7 @@ Execute the stepsAchieved query
 ## Usage
 
 ```bash
-app steps-achieved --vlevel <value> --vroleId <value>
+csdk steps-achieved --vlevel <value> --vroleId <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app steps-achieved --vlevel <value> --vroleId <value>
 ### Run stepsAchieved
 
 ```bash
-app steps-achieved --vlevel <value> --vroleId <value>
+csdk steps-achieved --vlevel <value> --vroleId <value>
 ```

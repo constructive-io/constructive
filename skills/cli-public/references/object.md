@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Object records via app CLI
+CRUD operations for Object records via csdk CLI
 
 ## Usage
 
 ```bash
-app object list
-app object get --id <value>
-app object create --hashUuid <value> --databaseId <value> --kids <value> --ktree <value> --data <value> --frzn <value>
-app object update --id <value> [--hashUuid <value>] [--databaseId <value>] [--kids <value>] [--ktree <value>] [--data <value>] [--frzn <value>]
-app object delete --id <value>
+csdk object list
+csdk object get --id <value>
+csdk object create --hashUuid <value> --databaseId <value> --kids <value> --ktree <value> --data <value> --frzn <value>
+csdk object update --id <value> [--hashUuid <value>] [--databaseId <value>] [--kids <value>] [--ktree <value>] [--data <value>] [--frzn <value>]
+csdk object delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app object delete --id <value>
 ### List all object records
 
 ```bash
-app object list
+csdk object list
 ```
 
 ### Create a object
 
 ```bash
-app object create --hashUuid "value" --databaseId "value" --kids "value" --ktree "value" --data "value" --frzn "value"
+csdk object create --hashUuid "value" --databaseId "value" --kids "value" --ktree "value" --data "value" --frzn "value"
 ```
 
 ### Get a object by id
 
 ```bash
-app object get --id <value>
+csdk object get --id <value>
 ```

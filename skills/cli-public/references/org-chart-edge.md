@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for OrgChartEdge records via app CLI
+CRUD operations for OrgChartEdge records via csdk CLI
 
 ## Usage
 
 ```bash
-app org-chart-edge list
-app org-chart-edge get --id <value>
-app org-chart-edge create --entityId <value> --childId <value> --parentId <value> --positionTitle <value> --positionLevel <value>
-app org-chart-edge update --id <value> [--entityId <value>] [--childId <value>] [--parentId <value>] [--positionTitle <value>] [--positionLevel <value>]
-app org-chart-edge delete --id <value>
+csdk org-chart-edge list
+csdk org-chart-edge get --id <value>
+csdk org-chart-edge create --entityId <value> --childId <value> --parentId <value> --positionTitle <value> --positionLevel <value>
+csdk org-chart-edge update --id <value> [--entityId <value>] [--childId <value>] [--parentId <value>] [--positionTitle <value>] [--positionLevel <value>]
+csdk org-chart-edge delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app org-chart-edge delete --id <value>
 ### List all orgChartEdge records
 
 ```bash
-app org-chart-edge list
+csdk org-chart-edge list
 ```
 
 ### Create a orgChartEdge
 
 ```bash
-app org-chart-edge create --entityId "value" --childId "value" --parentId "value" --positionTitle "value" --positionLevel "value"
+csdk org-chart-edge create --entityId "value" --childId "value" --parentId "value" --positionTitle "value" --positionLevel "value"
 ```
 
 ### Get a orgChartEdge by id
 
 ```bash
-app org-chart-edge get --id <value>
+csdk org-chart-edge get --id <value>
 ```

@@ -7,7 +7,7 @@ Execute the applyRls mutation
 ## Usage
 
 ```bash
-app apply-rls --input <value>
+csdk apply-rls --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app apply-rls --input <value>
 ### Run applyRls
 
 ```bash
-app apply-rls --input <value>
+csdk apply-rls --input <value>
 ```

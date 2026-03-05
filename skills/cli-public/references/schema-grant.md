@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for SchemaGrant records via app CLI
+CRUD operations for SchemaGrant records via csdk CLI
 
 ## Usage
 
 ```bash
-app schema-grant list
-app schema-grant get --id <value>
-app schema-grant create --databaseId <value> --schemaId <value> --granteeName <value>
-app schema-grant update --id <value> [--databaseId <value>] [--schemaId <value>] [--granteeName <value>]
-app schema-grant delete --id <value>
+csdk schema-grant list
+csdk schema-grant get --id <value>
+csdk schema-grant create --databaseId <value> --schemaId <value> --granteeName <value>
+csdk schema-grant update --id <value> [--databaseId <value>] [--schemaId <value>] [--granteeName <value>]
+csdk schema-grant delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app schema-grant delete --id <value>
 ### List all schemaGrant records
 
 ```bash
-app schema-grant list
+csdk schema-grant list
 ```
 
 ### Create a schemaGrant
 
 ```bash
-app schema-grant create --databaseId "value" --schemaId "value" --granteeName "value"
+csdk schema-grant create --databaseId "value" --schemaId "value" --granteeName "value"
 ```
 
 ### Get a schemaGrant by id
 
 ```bash
-app schema-grant get --id <value>
+csdk schema-grant get --id <value>
 ```

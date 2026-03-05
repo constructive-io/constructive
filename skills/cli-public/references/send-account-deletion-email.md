@@ -7,7 +7,7 @@ Execute the sendAccountDeletionEmail mutation
 ## Usage
 
 ```bash
-app send-account-deletion-email --input <value>
+csdk send-account-deletion-email --input <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ app send-account-deletion-email --input <value>
 ### Run sendAccountDeletionEmail
 
 ```bash
-app send-account-deletion-email --input <value>
+csdk send-account-deletion-email --input <value>
 ```

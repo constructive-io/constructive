@@ -2,16 +2,16 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CRUD operations for Field records via app CLI
+CRUD operations for Field records via csdk CLI
 
 ## Usage
 
 ```bash
-app field list
-app field get --id <value>
-app field create --databaseId <value> --tableId <value> --name <value> --label <value> --description <value> --smartTags <value> --isRequired <value> --defaultValue <value> --defaultValueAst <value> --isHidden <value> --type <value> --fieldOrder <value> --regexp <value> --chk <value> --chkExpr <value> --min <value> --max <value> --tags <value> --category <value> --module <value> --scope <value>
-app field update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--type <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
-app field delete --id <value>
+csdk field list
+csdk field get --id <value>
+csdk field create --databaseId <value> --tableId <value> --name <value> --label <value> --description <value> --smartTags <value> --isRequired <value> --defaultValue <value> --defaultValueAst <value> --isHidden <value> --type <value> --fieldOrder <value> --regexp <value> --chk <value> --chkExpr <value> --min <value> --max <value> --tags <value> --category <value> --module <value> --scope <value>
+csdk field update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--type <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
+csdk field delete --id <value>
 ```
 
 ## Examples
@@ -19,17 +19,17 @@ app field delete --id <value>
 ### List all field records
 
 ```bash
-app field list
+csdk field list
 ```
 
 ### Create a field
 
 ```bash
-app field create --databaseId "value" --tableId "value" --name "value" --label "value" --description "value" --smartTags "value" --isRequired "value" --defaultValue "value" --defaultValueAst "value" --isHidden "value" --type "value" --fieldOrder "value" --regexp "value" --chk "value" --chkExpr "value" --min "value" --max "value" --tags "value" --category "value" --module "value" --scope "value"
+csdk field create --databaseId "value" --tableId "value" --name "value" --label "value" --description "value" --smartTags "value" --isRequired "value" --defaultValue "value" --defaultValueAst "value" --isHidden "value" --type "value" --fieldOrder "value" --regexp "value" --chk "value" --chkExpr "value" --min "value" --max "value" --tags "value" --category "value" --module "value" --scope "value"
 ```
 
 ### Get a field by id
 
 ```bash
-app field get --id <value>
+csdk field get --id <value>
 ```
