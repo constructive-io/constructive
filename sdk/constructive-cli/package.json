@@ -2,7 +2,7 @@
   "name": "@constructive-sdk/cli",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Constructive CLI SDK - Runtime utilities for building interactive command-line tools with inquirerer, appstash, and yanse",
+  "description": "Constructive CLI SDK - Auto-generated GraphQL CLI with ORM client, context management, and interactive prompts",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -27,6 +27,7 @@
     "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
+    "generate": "tsx scripts/generate-sdk.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
@@ -34,22 +35,29 @@
   "keywords": [
     "cli",
     "sdk",
-    "inquirerer",
-    "appstash",
-    "yanse",
+    "graphql",
+    "orm",
     "constructive",
+    "postgraphile",
+    "schema-dir",
     "command-line",
     "interactive"
   ],
   "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/graphql-types": "workspace:^",
     "appstash": "^0.5.0",
+    "gql-ast": "workspace:^",
+    "graphql": "^16.13.0",
     "inquirerer": "^4.5.2",
     "nested-obj": "^0.2.1",
     "yanse": "^0.2.1"
   },
   "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
     "@types/node": "^22.19.11",
     "makage": "^0.1.12",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }
 }
