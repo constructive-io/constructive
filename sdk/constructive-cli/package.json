@@ -1,0 +1,52 @@
+{
+  "name": "@constructive-io/cli",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive CLI SDK - Runtime utilities for building interactive command-line tools with inquirerer, appstash, and yanse",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "cli",
+    "sdk",
+    "inquirerer",
+    "appstash",
+    "yanse",
+    "constructive",
+    "command-line",
+    "interactive"
+  ],
+  "dependencies": {
+    "appstash": "^0.5.0",
+    "inquirerer": "^4.5.2",
+    "nested-obj": "^0.2.1",
+    "yanse": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.1.12",
+    "typescript": "^5.9.3"
+  }
+}
