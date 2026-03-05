@@ -6,6 +6,9 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
+  "bin": {
+    "csdk": "cli.js"
+  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {
