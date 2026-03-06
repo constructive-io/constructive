@@ -3220,7 +3220,7 @@ appPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-permissions-get-padded-mask`
 
@@ -3231,7 +3231,7 @@ orgPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `steps-achieved`
 
@@ -3242,8 +3242,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
 
 ### `rev-parse`
 
@@ -3254,9 +3254,9 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--refname` | String |
 
 ### `org-is-manager-of`
 
@@ -3267,10 +3267,10 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pUserId` | UUID |
-  | `pMaxDepth` | Int |
+  | `--pEntityId` | UUID |
+  | `--pManagerId` | UUID |
+  | `--pUserId` | UUID |
+  | `--pMaxDepth` | Int |
 
 ### `app-permissions-get-mask`
 
@@ -3281,7 +3281,7 @@ appPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `org-permissions-get-mask`
 
@@ -3292,7 +3292,7 @@ orgPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 
@@ -3303,7 +3303,7 @@ appPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `org-permissions-get-mask-by-names`
 
@@ -3314,7 +3314,7 @@ orgPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `app-permissions-get-by-mask`
 
@@ -3325,10 +3325,10 @@ Reads and enables pagination through a set of `AppPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `org-permissions-get-by-mask`
 
@@ -3339,10 +3339,10 @@ Reads and enables pagination through a set of `OrgPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-all-objects-from-root`
 
@@ -3353,11 +3353,11 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-path-objects-from-root`
 
@@ -3368,12 +3368,12 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `path` | [String] |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--path` | String |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-object-at-path`
 
@@ -3384,10 +3384,10 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `path` | [String] |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--path` | String |
+  | `--refname` | String |
 
 ### `steps-required`
 
@@ -3398,11 +3398,11 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `current-user`
 
@@ -3420,7 +3420,7 @@ signOut
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignOutInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `send-account-deletion-email`
 
@@ -3431,7 +3431,7 @@ sendAccountDeletionEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendAccountDeletionEmailInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `check-password`
 
@@ -3442,7 +3442,8 @@ checkPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | CheckPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String |
 
 ### `submit-invite-code`
 
@@ -3453,7 +3454,8 @@ submitInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `submit-org-invite-code`
 
@@ -3464,7 +3466,8 @@ submitOrgInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitOrgInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `freeze-objects`
 
@@ -3475,7 +3478,9 @@ freezeObjects
 
   | Argument | Type |
   |----------|------|
-  | `input` | FreezeObjectsInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.id` | UUID |
 
 ### `init-empty-repo`
 
@@ -3486,7 +3491,9 @@ initEmptyRepo
 
   | Argument | Type |
   |----------|------|
-  | `input` | InitEmptyRepoInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `confirm-delete-account`
 
@@ -3497,7 +3504,9 @@ confirmDeleteAccount
 
   | Argument | Type |
   |----------|------|
-  | `input` | ConfirmDeleteAccountInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.userId` | UUID |
+  | `--input.token` | String |
 
 ### `set-password`
 
@@ -3508,7 +3517,9 @@ setPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.currentPassword` | String |
+  | `--input.newPassword` | String |
 
 ### `verify-email`
 
@@ -3519,7 +3530,9 @@ verifyEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.token` | String |
 
 ### `reset-password`
 
@@ -3530,7 +3543,10 @@ resetPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ResetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.roleId` | UUID |
+  | `--input.resetToken` | String |
+  | `--input.newPassword` | String |
 
 ### `remove-node-at-path`
 
@@ -3541,7 +3557,10 @@ removeNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
 
 ### `bootstrap-user`
 
@@ -3552,7 +3571,14 @@ bootstrapUser
 
   | Argument | Type |
   |----------|------|
-  | `input` | BootstrapUserInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.targetDatabaseId` | UUID |
+  | `--input.password` | String |
+  | `--input.isAdmin` | Boolean |
+  | `--input.isOwner` | Boolean |
+  | `--input.username` | String |
+  | `--input.displayName` | String |
+  | `--input.returnApiKey` | Boolean |
 
 ### `set-data-at-path`
 
@@ -3563,7 +3589,11 @@ setDataAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetDataAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `set-props-and-commit`
 
@@ -3574,7 +3604,12 @@ setPropsAndCommit
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `provision-database-with-user`
 
@@ -3585,7 +3620,12 @@ provisionDatabaseWithUser
 
   | Argument | Type |
   |----------|------|
-  | `input` | ProvisionDatabaseWithUserInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.pDatabaseName` | String |
+  | `--input.pDomain` | String |
+  | `--input.pSubdomain` | String |
+  | `--input.pModules` | String |
+  | `--input.pOptions` | JSON |
 
 ### `sign-in-one-time-token`
 
@@ -3596,7 +3636,9 @@ signInOneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
+  | `--input.credentialKind` | String |
 
 ### `create-user-database`
 
@@ -3623,7 +3665,14 @@ Example usage:
 
   | Argument | Type |
   |----------|------|
-  | `input` | CreateUserDatabaseInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseName` | String |
+  | `--input.ownerId` | UUID |
+  | `--input.includeInvites` | Boolean |
+  | `--input.includeGroups` | Boolean |
+  | `--input.includeLevels` | Boolean |
+  | `--input.bitlen` | Int |
+  | `--input.tokensExpiration` | IntervalInput |
 
 ### `extend-token-expires`
 
@@ -3634,7 +3683,8 @@ extendTokenExpires
 
   | Argument | Type |
   |----------|------|
-  | `input` | ExtendTokenExpiresInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.amount` | IntervalInput |
 
 ### `sign-in`
 
@@ -3645,7 +3695,12 @@ signIn
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -3656,7 +3711,12 @@ signUp
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignUpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `set-field-order`
 
@@ -3667,7 +3727,8 @@ setFieldOrder
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetFieldOrderInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.fieldIds` | UUID |
 
 ### `one-time-token`
 
@@ -3678,7 +3739,11 @@ oneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.origin` | ConstructiveInternalTypeOrigin |
+  | `--input.rememberMe` | Boolean |
 
 ### `insert-node-at-path`
 
@@ -3689,7 +3754,13 @@ insertNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `update-node-at-path`
 
@@ -3700,7 +3771,13 @@ updateNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `set-and-commit`
 
@@ -3711,7 +3788,14 @@ setAndCommit
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetAndCommitInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `apply-rls`
 
@@ -3722,7 +3806,14 @@ applyRls
 
   | Argument | Type |
   |----------|------|
-  | `input` | ApplyRlsInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.tableId` | UUID |
+  | `--input.grants` | JSON |
+  | `--input.policyType` | String |
+  | `--input.vars` | JSON |
+  | `--input.fieldIds` | UUID |
+  | `--input.permissive` | Boolean |
+  | `--input.name` | String |
 
 ### `forgot-password`
 
@@ -3733,7 +3824,8 @@ forgotPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ForgotPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | ConstructiveInternalTypeEmail |
 
 ### `send-verification-email`
 
@@ -3744,7 +3836,8 @@ sendVerificationEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendVerificationEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | ConstructiveInternalTypeEmail |
 
 ### `verify-password`
 
@@ -3755,7 +3848,8 @@ verifyPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
 
 ### `verify-totp`
 
@@ -3766,7 +3860,8 @@ verifyTotp
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyTotpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
 
 ## Output
 
@@ -3775,6 +3870,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

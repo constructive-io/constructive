@@ -1,5 +1,5 @@
 import type { DocsConfig } from '../../types/config';
-import type { CleanField, CleanOperation, CleanTable } from '../../types/schema';
+import type { CleanArgument, CleanField, CleanOperation, CleanTable, CleanTypeRef, TypeRegistry } from '../../types/schema';
 import { getScalarFields, getPrimaryKeyInfo } from './utils';
 
 export interface GeneratedDocFile {
@@ -112,6 +112,123 @@ export function getEditableFields(table: CleanTable): CleanField[] {
       f.name !== 'createdAt' &&
       f.name !== 'updatedAt',
   );
+}
+
+/**
+ * Represents a flattened argument for docs/skills generation.
+ * INPUT_OBJECT args are expanded to dot-notation fields.
+ */
+export interface FlattenedArg {
+  /** Flag name for CLI usage, e.g. 'input.email' or 'clientMutationId' */
+  flag: string;
+  /** Human-readable type string */
+  type: string;
+  /** Whether the argument is required */
+  required: boolean;
+  /** Description from schema */
+  description?: string;
+}
+
+function unwrapNonNull(typeRef: CleanTypeRef): { inner: CleanTypeRef; required: boolean } {
+  if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
+    return { inner: typeRef.ofType, required: true };
+  }
+  return { inner: typeRef, required: false };
+}
+
+function resolveBaseType(typeRef: CleanTypeRef): CleanTypeRef {
+  if ((typeRef.kind === 'NON_NULL' || typeRef.kind === 'LIST') && typeRef.ofType) {
+    return resolveBaseType(typeRef.ofType);
+  }
+  return typeRef;
+}
+
+function getScalarTypeName(typeRef: CleanTypeRef): string {
+  const base = resolveBaseType(typeRef);
+  return base.name ?? 'String';
+}
+
+/**
+ * Flatten operation args for docs/skills, expanding INPUT_OBJECT types
+ * to dot-notation fields (e.g. input.email, input.password).
+ * Mirrors the logic in arg-mapper.ts buildQuestionsArray.
+ */
+/**
+ * Resolve inputFields for an INPUT_OBJECT type.
+ * Checks the CleanTypeRef first, then falls back to the TypeRegistry.
+ */
+function resolveInputFields(
+  typeRef: CleanTypeRef,
+  registry?: TypeRegistry,
+): CleanArgument[] | undefined {
+  if (typeRef.inputFields && typeRef.inputFields.length > 0) {
+    return typeRef.inputFields;
+  }
+  if (registry && typeRef.name) {
+    const resolved = registry.get(typeRef.name);
+    if (resolved?.kind === 'INPUT_OBJECT' && resolved.inputFields && resolved.inputFields.length > 0) {
+      return resolved.inputFields;
+    }
+  }
+  return undefined;
+}
+
+export function flattenArgs(args: CleanArgument[], registry?: TypeRegistry): FlattenedArg[] {
+  const result: FlattenedArg[] = [];
+  for (const arg of args) {
+    const { inner, required } = unwrapNonNull(arg.type);
+    const base = resolveBaseType(arg.type);
+
+    // Try to resolve inputFields from the inner type first (unwrapped NON_NULL)
+    const innerFields = inner.kind === 'INPUT_OBJECT'
+      ? resolveInputFields(inner, registry)
+      : undefined;
+
+    if (innerFields) {
+      for (const field of innerFields) {
+        const { required: fieldRequired } = unwrapNonNull(field.type);
+        result.push({
+          flag: `${arg.name}.${field.name}`,
+          type: getScalarTypeName(field.type),
+          required: required && fieldRequired,
+          description: field.description,
+        });
+      }
+    } else {
+      // Try the base type (unwrapped LIST+NON_NULL)
+      const baseFields = base.kind === 'INPUT_OBJECT'
+        ? resolveInputFields(base, registry)
+        : undefined;
+
+      if (baseFields) {
+        for (const field of baseFields) {
+          const { required: fieldRequired } = unwrapNonNull(field.type);
+          result.push({
+            flag: `${arg.name}.${field.name}`,
+            type: getScalarTypeName(field.type),
+            required: required && fieldRequired,
+            description: field.description,
+          });
+        }
+      } else {
+        result.push({
+          flag: arg.name,
+          type: getScalarTypeName(arg.type),
+          required,
+          description: arg.description,
+        });
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Build CLI flags string from flattened args.
+ * e.g. '--input.email <value> --input.password <value>'
+ */
+export function flattenedArgsToFlags(flatArgs: FlattenedArg[]): string {
+  return flatArgs.map((a) => `--${a.flag} <value>`).join(' ');
 }
 
 export function gqlTypeToJsonSchemaType(gqlType: string): string {

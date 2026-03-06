@@ -390,18 +390,18 @@ export async function generate(
         ? config.cli.toolName
         : 'app';
     if (docsConfig.readme) {
-      const readme = generateCliReadme(tables, allCustomOps, toolName);
+      const readme = generateCliReadme(tables, allCustomOps, toolName, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
     }
     if (docsConfig.agents) {
-      const agents = generateCliAgentsDocs(tables, allCustomOps, toolName);
+      const agents = generateCliAgentsDocs(tables, allCustomOps, toolName, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
     }
     if (docsConfig.mcp) {
-      allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName));
+      allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName, customOperations.typeRegistry));
     }
     if (docsConfig.skills) {
-      for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName)) {
+      for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }
@@ -759,9 +759,20 @@ export async function generateMulti(
       cliConfig.builtinNames,
     );
 
+    // Merge all target type registries into a combined registry for docs generation
+    const combinedRegistry = new Map<string, import('../types/schema').ResolvedType>();
+    for (const t of cliTargets) {
+      if (t.typeRegistry) {
+        for (const [key, value] of t.typeRegistry) {
+          combinedRegistry.set(key, value);
+        }
+      }
+    }
+
     const docsInput: MultiTargetDocsInput = {
       toolName,
       builtinNames,
+      registry: combinedRegistry.size > 0 ? combinedRegistry : undefined,
       targets: cliTargets.map((t) => ({
         name: t.name,
         endpoint: t.endpoint,
