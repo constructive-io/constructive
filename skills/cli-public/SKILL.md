@@ -23,6 +23,9 @@ csdk auth set-token <token>
 csdk org-get-managers-record list
 csdk org-get-managers-record get --id <value>
 csdk org-get-managers-record create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+csdk --no-tty org-get-managers-record list
 ```
 
 ## Examples
@@ -34,6 +37,12 @@ csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
 csdk org-get-managers-record list
+```
+
+### Non-interactive mode (for scripts and CI)
+
+```bash
+csdk --no-tty org-get-managers-record create --<field> <value>
 ```
 
 ## References

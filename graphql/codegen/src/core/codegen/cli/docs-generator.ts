@@ -1,8 +1,9 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanTable, CleanOperation } from '../../../types/schema';
+import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
 import {
-  formatArgType,
+  flattenArgs,
+  flattenedArgsToFlags,
   getEditableFields,
   getReadmeHeader,
   getReadmeFooter,
@@ -24,6 +25,7 @@ export function generateReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -126,18 +128,20 @@ export function generateReadme(
     lines.push('');
     for (const op of customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       lines.push(`### \`${kebab}\``);
       lines.push('');
       lines.push(op.description || op.name);
       lines.push('');
       lines.push(`- **Type:** ${op.kind}`);
-      if (op.args.length > 0) {
+      if (flat.length > 0) {
         lines.push('- **Arguments:**');
         lines.push('');
         lines.push('  | Argument | Type |');
         lines.push('  |----------|------|');
-        for (const arg of op.args) {
-          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  | \`--${a.flag}\` | ${a.type}${reqLabel} |`);
         }
       } else {
         lines.push('- **Arguments:** none');
@@ -155,6 +159,14 @@ export function generateReadme(
   lines.push(`${toolName} car get --id <uuid> | jq '.'`);
   lines.push('```');
   lines.push('');
+  lines.push('## Non-Interactive Mode');
+  lines.push('');
+  lines.push('Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):');
+  lines.push('');
+  lines.push('```bash');
+  lines.push(`${toolName} --no-tty car create --name "Sedan" --year 2024`);
+  lines.push('```');
+  lines.push('');
 
   lines.push(...getReadmeFooter());
 
@@ -168,6 +180,7 @@ export function generateAgentsDocs(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -283,6 +296,7 @@ export function generateAgentsDocs(
 
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
 
     lines.push(`### TOOL: ${kebab}`);
     lines.push('');
@@ -290,13 +304,14 @@ export function generateAgentsDocs(
     lines.push('');
     lines.push('```');
     lines.push(`TYPE: ${op.kind}`);
-    if (op.args.length > 0) {
-      const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
+    if (flat.length > 0) {
+      const flags = flattenedArgsToFlags(flat);
       lines.push(`USAGE: ${toolName} ${kebab} ${flags}`);
       lines.push('');
       lines.push('INPUT:');
-      for (const arg of op.args) {
-        lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+      for (const a of flat) {
+        const reqLabel = a.required ? ' (required)' : '';
+        lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
       }
     } else {
       lines.push(`USAGE: ${toolName} ${kebab}`);
@@ -384,6 +399,7 @@ export function getCliMcpTools(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): McpTool[] {
   const tools: McpTool[] = [];
 
@@ -559,18 +575,17 @@ export function getCliMcpTools(
 
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
     const props: Record<string, unknown> = {};
     const required: string[] = [];
 
-    for (const arg of op.args) {
-      const isRequired = arg.type.kind === 'NON_NULL';
-      const baseType = isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
-      props[arg.name] = {
-        type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
-        description: arg.description || arg.name,
+    for (const a of flat) {
+      props[a.flag] = {
+        type: gqlTypeToJsonSchemaType(a.type),
+        description: a.description || a.flag,
       };
-      if (isRequired) {
-        required.push(arg.name);
+      if (a.required) {
+        required.push(a.flag);
       }
     }
 
@@ -593,6 +608,7 @@ export function generateSkills(
   customOperations: CleanOperation[],
   toolName: string,
   targetName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
   const skillName = `cli-${targetName}`;
@@ -697,9 +713,10 @@ export function generateSkills(
   // Custom operation references
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
     const usage =
-      op.args.length > 0
-        ? `${toolName} ${kebab} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
+      flat.length > 0
+        ? `${toolName} ${kebab} ${flattenedArgsToFlags(flat)}`
         : `${toolName} ${kebab}`;
 
     referenceNames.push(kebab);
@@ -740,6 +757,9 @@ export function generateSkills(
           `${toolName} ${tableKebabs[0] || 'model'} list`,
           `${toolName} ${tableKebabs[0] || 'model'} get --id <value>`,
           `${toolName} ${tableKebabs[0] || 'model'} create --<field> <value>`,
+          '',
+          `# Non-interactive mode (skip all prompts, use flags only)`,
+          `${toolName} --no-tty ${tableKebabs[0] || 'model'} list`,
         ],
         examples: [
           {
@@ -749,6 +769,12 @@ export function generateSkills(
               `${toolName} context use local`,
               `${toolName} auth set-token <token>`,
               `${toolName} ${tableKebabs[0] || 'model'} list`,
+            ],
+          },
+          {
+            description: 'Non-interactive mode (for scripts and CI)',
+            code: [
+              `${toolName} --no-tty ${tableKebabs[0] || 'model'} create --<field> <value>`,
             ],
           },
         ],
@@ -763,6 +789,7 @@ export function generateSkills(
 export interface MultiTargetDocsInput {
   toolName: string;
   builtinNames: { auth: string; context: string };
+  registry?: TypeRegistry;
   targets: Array<{
     name: string;
     endpoint: string;
@@ -775,7 +802,7 @@ export interface MultiTargetDocsInput {
 export function generateMultiTargetReadme(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const lines: string[] = [];
 
   lines.push(...getReadmeHeader(`${toolName} CLI`));
@@ -938,18 +965,20 @@ export function generateMultiTargetReadme(
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       lines.push(`### \`${tgt.name}:${kebab}\``);
       lines.push('');
       lines.push(op.description || op.name);
       lines.push('');
       lines.push(`- **Type:** ${op.kind}`);
-      if (op.args.length > 0) {
+      if (flat.length > 0) {
         lines.push('- **Arguments:**');
         lines.push('');
         lines.push('  | Argument | Type |');
         lines.push('  |----------|------|');
-        for (const arg of op.args) {
-          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  | \`--${a.flag}\` | ${a.type}${reqLabel} |`);
         }
       } else {
         lines.push('- **Arguments:** none');
@@ -974,6 +1003,18 @@ export function generateMultiTargetReadme(
   }
   lines.push('```');
   lines.push('');
+  lines.push('## Non-Interactive Mode');
+  lines.push('');
+  lines.push('Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):');
+  lines.push('');
+  lines.push('```bash');
+  if (targets.length > 0 && targets[0].tables.length > 0) {
+    const tgt = targets[0];
+    const kebab = toKebabCase(getTableNames(tgt.tables[0]).singularName);
+    lines.push(`${toolName} --no-tty ${tgt.name}:${kebab} create --name "Example"`);
+  }
+  lines.push('```');
+  lines.push('');
 
   lines.push(...getReadmeFooter());
 
@@ -986,7 +1027,7 @@ export function generateMultiTargetReadme(
 export function generateMultiTargetAgentsDocs(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI - Agent Reference`);
@@ -1122,6 +1163,7 @@ export function generateMultiTargetAgentsDocs(
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
 
       lines.push(`### TOOL: ${tgt.name}:${kebab}`);
       lines.push('');
@@ -1129,13 +1171,14 @@ export function generateMultiTargetAgentsDocs(
       lines.push('');
       lines.push('```');
       lines.push(`TYPE: ${op.kind}`);
-      if (op.args.length > 0) {
-        const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
+      if (flat.length > 0) {
+        const flags = flattenedArgsToFlags(flat);
         lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab} ${flags}`);
         lines.push('');
         lines.push('INPUT:');
-        for (const arg of op.args) {
-          lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
         }
       } else {
         lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab}`);
@@ -1233,7 +1276,7 @@ export function generateMultiTargetAgentsDocs(
 export function getMultiTargetCliMcpTools(
   input: MultiTargetDocsInput,
 ): McpTool[] {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const tools: McpTool[] = [];
 
   const contextEndpointProps: Record<string, unknown> = {
@@ -1416,18 +1459,17 @@ export function getMultiTargetCliMcpTools(
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       const props: Record<string, unknown> = {};
       const required: string[] = [];
 
-      for (const arg of op.args) {
-        const isRequired = arg.type.kind === 'NON_NULL';
-        const baseType = isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
-        props[arg.name] = {
-          type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
-          description: arg.description || arg.name,
+      for (const a of flat) {
+        props[a.flag] = {
+          type: gqlTypeToJsonSchemaType(a.type),
+          description: a.description || a.flag,
         };
-        if (isRequired) {
-          required.push(arg.name);
+        if (a.required) {
+          required.push(a.flag);
         }
       }
 
@@ -1456,7 +1498,7 @@ export function getMultiTargetCliMcpTools(
 export function generateMultiTargetSkills(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile[] {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const files: GeneratedDocFile[] = [];
 
   // Generate one skill per target, plus a shared cli-common skill for context/auth
@@ -1601,9 +1643,10 @@ export function generateMultiTargetSkills(
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
       const cmd = `${tgt.name}:${kebab}`;
+      const flat = flattenArgs(op.args, registry);
       const baseUsage =
-        op.args.length > 0
-          ? `${toolName} ${cmd} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
+        flat.length > 0
+          ? `${toolName} ${cmd} ${flattenedArgsToFlags(flat)}`
           : `${toolName} ${cmd}`;
       const usageLines = [baseUsage];
       if (tgt.isAuthTarget && op.kind === 'mutation') {
@@ -1643,11 +1686,20 @@ export function generateMultiTargetSkills(
             `${toolName} ${tgt.name}:${firstKebab} list`,
             `${toolName} ${tgt.name}:${firstKebab} get --id <value>`,
             `${toolName} ${tgt.name}:${firstKebab} create --<field> <value>`,
+            '',
+            `# Non-interactive mode (skip all prompts, use flags only)`,
+            `${toolName} --no-tty ${tgt.name}:${firstKebab} list`,
           ],
           examples: [
             {
               description: `Query ${tgt.name} records`,
               code: [`${toolName} ${tgt.name}:${firstKebab} list`],
+            },
+            {
+              description: 'Non-interactive mode (for scripts and CI)',
+              code: [
+                `${toolName} --no-tty ${tgt.name}:${firstKebab} create --<field> <value>`,
+              ],
             },
           ],
         },

@@ -7,7 +7,7 @@ Execute the verifyPassword mutation
 ## Usage
 
 ```bash
-csdk verify-password --input <value>
+csdk verify-password --input.clientMutationId <value> --input.password <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk verify-password --input <value>
 ### Run verifyPassword
 
 ```bash
-csdk verify-password --input <value>
+csdk verify-password --input.clientMutationId <value> --input.password <value>
 ```

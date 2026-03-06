@@ -302,7 +302,7 @@ signOut
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignOutInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `send-account-deletion-email`
 
@@ -313,7 +313,7 @@ sendAccountDeletionEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendAccountDeletionEmailInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `check-password`
 
@@ -324,7 +324,8 @@ checkPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | CheckPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String |
 
 ### `confirm-delete-account`
 
@@ -335,7 +336,9 @@ confirmDeleteAccount
 
   | Argument | Type |
   |----------|------|
-  | `input` | ConfirmDeleteAccountInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.userId` | UUID |
+  | `--input.token` | String |
 
 ### `set-password`
 
@@ -346,7 +349,9 @@ setPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.currentPassword` | String |
+  | `--input.newPassword` | String |
 
 ### `verify-email`
 
@@ -357,7 +362,9 @@ verifyEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.token` | String |
 
 ### `reset-password`
 
@@ -368,7 +375,10 @@ resetPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ResetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.roleId` | UUID |
+  | `--input.resetToken` | String |
+  | `--input.newPassword` | String |
 
 ### `sign-in-one-time-token`
 
@@ -379,7 +389,9 @@ signInOneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
+  | `--input.credentialKind` | String |
 
 ### `sign-in`
 
@@ -390,7 +402,12 @@ signIn
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -401,7 +418,12 @@ signUp
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignUpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `one-time-token`
 
@@ -412,7 +434,11 @@ oneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.origin` | ConstructiveInternalTypeOrigin |
+  | `--input.rememberMe` | Boolean |
 
 ### `extend-token-expires`
 
@@ -423,7 +449,8 @@ extendTokenExpires
 
   | Argument | Type |
   |----------|------|
-  | `input` | ExtendTokenExpiresInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.amount` | IntervalInput |
 
 ### `forgot-password`
 
@@ -434,7 +461,8 @@ forgotPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ForgotPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | ConstructiveInternalTypeEmail |
 
 ### `send-verification-email`
 
@@ -445,7 +473,8 @@ sendVerificationEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendVerificationEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | ConstructiveInternalTypeEmail |
 
 ### `verify-password`
 
@@ -456,7 +485,8 @@ verifyPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
 
 ### `verify-totp`
 
@@ -467,7 +497,8 @@ verifyTotp
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyTotpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
 
 ## Output
 
@@ -476,6 +507,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

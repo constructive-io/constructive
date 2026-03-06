@@ -934,7 +934,7 @@ appPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-permissions-get-padded-mask`
 
@@ -945,7 +945,7 @@ orgPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-is-manager-of`
 
@@ -956,10 +956,10 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pUserId` | UUID |
-  | `pMaxDepth` | Int |
+  | `--pEntityId` | UUID |
+  | `--pManagerId` | UUID |
+  | `--pUserId` | UUID |
+  | `--pMaxDepth` | Int |
 
 ### `steps-achieved`
 
@@ -970,8 +970,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
 
 ### `app-permissions-get-mask`
 
@@ -982,7 +982,7 @@ appPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `org-permissions-get-mask`
 
@@ -993,7 +993,7 @@ orgPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 
@@ -1004,7 +1004,7 @@ appPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `org-permissions-get-mask-by-names`
 
@@ -1015,7 +1015,7 @@ orgPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `app-permissions-get-by-mask`
 
@@ -1026,10 +1026,10 @@ Reads and enables pagination through a set of `AppPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `org-permissions-get-by-mask`
 
@@ -1040,10 +1040,10 @@ Reads and enables pagination through a set of `OrgPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `steps-required`
 
@@ -1054,11 +1054,11 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `submit-invite-code`
 
@@ -1069,7 +1069,8 @@ submitInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `submit-org-invite-code`
 
@@ -1080,7 +1081,8 @@ submitOrgInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitOrgInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ## Output
 
@@ -1089,6 +1091,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---
