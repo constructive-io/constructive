@@ -98,6 +98,23 @@ function getTsTypeForField(field: { type: { gqlType: string; isArray: boolean } 
   }
 }
 
+/**
+ * Maps a GraphQL scalar type to the appropriate inquirerer question type.
+ * Used by table CRUD commands to generate semantic prompts.
+ */
+function getQuestionTypeForField(field: { type: { gqlType: string } }): string {
+  const gqlType = field.type.gqlType.replace(/!/g, '');
+  switch (gqlType) {
+    case 'Boolean':
+      return 'boolean';
+    case 'JSON':
+    case 'GeoJSON':
+      return 'json';
+    default:
+      return 'text';
+  }
+}
+
 function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
   const fields = getScalarFields(table);
   return t.objectExpression(
@@ -537,8 +554,9 @@ function buildMutationHandler(
       // For update: all fields are optional (user only updates what they want)
       const isRequired = operation === 'create' && !fieldsWithDefaults.has(field.name);
       const hasDefault = fieldsWithDefaults.has(field.name);
+      const questionType = getQuestionTypeForField(field);
       const questionProps = [
-        t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
+        t.objectProperty(t.identifier('type'), t.stringLiteral(questionType)),
         t.objectProperty(
           t.identifier('name'),
           t.stringLiteral(field.name),

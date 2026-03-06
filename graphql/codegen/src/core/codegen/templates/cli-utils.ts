@@ -146,6 +146,34 @@ export function parseMutationInput(
 }
 
 /**
+ * Reconstruct nested objects from dot-notation CLI answers.
+ * When INPUT_OBJECT args are flattened to dot-notation questions
+ * (e.g. `--input.email foo --input.password bar`), this function
+ * rebuilds the nested structure expected by the ORM:
+ *
+ *   { 'input.email': 'foo', 'input.password': 'bar' }
+ *   → { input: { email: 'foo', password: 'bar' } }
+ *
+ * Non-dotted keys are passed through unchanged.
+ * Uses `nested-obj` for safe nested property setting.
+ */
+export function unflattenDotNotation(
+  answers: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(answers)) {
+    if (key.includes('.')) {
+      objectPath.set(result, key, value);
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Build a select object from a comma-separated list of dot-notation paths.
  * Uses `nested-obj` to parse paths like 'clientMutationId,result.accessToken,result.userId'
  * into the nested structure expected by the ORM:

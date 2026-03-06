@@ -126,7 +126,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'payload',
         message: 'payload',
         required: false,

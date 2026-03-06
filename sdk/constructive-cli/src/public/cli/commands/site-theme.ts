@@ -129,7 +129,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'theme',
         message: 'theme',
         required: true,
@@ -184,7 +184,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'theme',
         message: 'theme',
         required: false,

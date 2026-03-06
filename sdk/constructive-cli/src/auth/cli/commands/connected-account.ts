@@ -148,13 +148,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'details',
         message: 'details',
         required: true,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isVerified',
         message: 'isVerified',
         required: false,
@@ -226,13 +226,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'details',
         message: 'details',
         required: false,
       },
       {
-        type: 'text',
+        type: 'boolean',
         name: 'isVerified',
         message: 'isVerified',
         required: false,

@@ -236,7 +236,7 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
   // Build the list of utils imports needed
   const utilsImports: string[] = [];
   if (hasInputObjectArg) {
-    utilsImports.push('parseMutationInput');
+    utilsImports.push('unflattenDotNotation');
   }
   if (isObjectReturn) {
     utilsImports.push('buildSelectFromPaths');
@@ -341,13 +341,14 @@ export function generateCustomCommand(op: CleanOperation, options?: CustomComman
   );
 
   // For mutations with INPUT_OBJECT args (like `input: SignUpInput`),
-  // parse JSON strings from CLI into proper objects
+  // reconstruct nested objects from dot-notation CLI answers.
+  // e.g. { 'input.email': 'foo', 'input.password': 'bar' } → { input: { email: 'foo', password: 'bar' } }
   if (hasInputObjectArg && op.args.length > 0) {
     bodyStatements.push(
       t.variableDeclaration('const', [
         t.variableDeclarator(
           t.identifier('parsedAnswers'),
-          t.callExpression(t.identifier('parseMutationInput'), [
+          t.callExpression(t.identifier('unflattenDotNotation'), [
             t.identifier('answers'),
           ]),
         ),
