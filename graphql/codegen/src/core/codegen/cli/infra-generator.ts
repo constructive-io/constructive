@@ -218,9 +218,12 @@ Create Options:
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleSubcommand'), [
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('subcommand'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('subcommand'),
+              ),
+              t.tsStringKeyword(),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),
@@ -372,61 +375,73 @@ function buildCreateHandler(): t.FunctionDeclaration {
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('answers'),
-        t.awaitExpression(
-          t.callExpression(
-            t.memberExpression(
-              t.identifier('prompter'),
-              t.identifier('prompt'),
-            ),
-            [
-              t.objectExpression([
-                t.objectProperty(
-                  t.identifier('name'),
-                  t.identifier('name'),
-                  false,
-                  true,
+        t.tsAsExpression(
+          t.tsAsExpression(
+            t.awaitExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.identifier('prompter'),
+                  t.identifier('prompt'),
                 ),
-                t.spreadElement(t.identifier('restArgv')),
-              ]),
-              t.arrayExpression([
-                t.objectExpression([
-                  t.objectProperty(
-                    t.identifier('type'),
-                    t.stringLiteral('text'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('name'),
-                    t.stringLiteral('name'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('message'),
-                    t.stringLiteral('Context name'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('required'),
-                    t.booleanLiteral(true),
-                  ),
-                ]),
-                t.objectExpression([
-                  t.objectProperty(
-                    t.identifier('type'),
-                    t.stringLiteral('text'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('name'),
-                    t.stringLiteral('endpoint'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('message'),
-                    t.stringLiteral('GraphQL endpoint URL'),
-                  ),
-                  t.objectProperty(
-                    t.identifier('required'),
-                    t.booleanLiteral(true),
-                  ),
-                ]),
-              ]),
-            ],
+                [
+                  t.objectExpression([
+                    t.objectProperty(
+                      t.identifier('name'),
+                      t.identifier('name'),
+                      false,
+                      true,
+                    ),
+                    t.spreadElement(t.identifier('restArgv')),
+                  ]),
+                  t.arrayExpression([
+                    t.objectExpression([
+                      t.objectProperty(
+                        t.identifier('type'),
+                        t.stringLiteral('text'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('name'),
+                        t.stringLiteral('name'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('message'),
+                        t.stringLiteral('Context name'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('required'),
+                        t.booleanLiteral(true),
+                      ),
+                    ]),
+                    t.objectExpression([
+                      t.objectProperty(
+                        t.identifier('type'),
+                        t.stringLiteral('text'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('name'),
+                        t.stringLiteral('endpoint'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('message'),
+                        t.stringLiteral('GraphQL endpoint URL'),
+                      ),
+                      t.objectProperty(
+                        t.identifier('required'),
+                        t.booleanLiteral(true),
+                      ),
+                    ]),
+                  ]),
+                ],
+              ),
+            ),
+            t.tsUnknownKeyword(),
+          ),
+          t.tsTypeReference(
+            t.identifier('Record'),
+            t.tsTypeParameterInstantiation([
+              t.tsStringKeyword(),
+              t.tsStringKeyword(),
+            ]),
           ),
         ),
       ),
@@ -841,9 +856,12 @@ function buildUseHandler(): t.FunctionDeclaration {
           t.assignmentExpression(
             '=',
             t.identifier('contextName'),
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('name'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('name'),
+              ),
+              t.tsStringKeyword(),
             ),
           ),
         ),
@@ -1176,9 +1194,12 @@ function buildDeleteHandler(): t.FunctionDeclaration {
           t.assignmentExpression(
             '=',
             t.identifier('contextName'),
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('name'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('name'),
+              ),
+              t.tsStringKeyword(),
             ),
           ),
         ),
@@ -1399,9 +1420,12 @@ Options:
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleAuthSubcommand'), [
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('subcommand'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('subcommand'),
+              ),
+              t.tsStringKeyword(),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),
@@ -1620,9 +1644,12 @@ function buildSetTokenHandler(): t.FunctionDeclaration {
           t.assignmentExpression(
             '=',
             t.identifier('tokenValue'),
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('token'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('token'),
+              ),
+              t.tsStringKeyword(),
             ),
           ),
         ),
@@ -1969,9 +1996,12 @@ function buildLogoutHandler(): t.FunctionDeclaration {
     t.ifStatement(
       t.unaryExpression(
         '!',
-        t.memberExpression(
-          t.identifier('confirm'),
-          t.identifier('confirm'),
+        t.tsAsExpression(
+          t.memberExpression(
+            t.identifier('confirm'),
+            t.identifier('confirm'),
+          ),
+          t.tsBooleanKeyword(),
         ),
       ),
       t.blockStatement([t.returnStatement()]),
@@ -2215,9 +2245,12 @@ ${targets.map((tgt) => `  --${tgt.name}-endpoint <url>  ${tgt.name} endpoint (de
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleSubcommand'), [
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('subcommand'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('subcommand'),
+              ),
+              t.tsStringKeyword(),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),
@@ -2387,7 +2420,7 @@ function buildMultiTargetCreateHandler(
       t.objectExpression([
         t.objectProperty(
           t.identifier('endpoint'),
-          t.memberExpression(t.identifier('answers'), t.identifier(fieldName)),
+          t.tsAsExpression(t.memberExpression(t.identifier('answers'), t.identifier(fieldName)), t.tsStringKeyword()),
         ),
       ]),
     );
@@ -2436,7 +2469,7 @@ function buildMultiTargetCreateHandler(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('contextName'),
-        t.memberExpression(t.identifier('answers'), t.identifier('name')),
+        t.tsAsExpression(t.memberExpression(t.identifier('answers'), t.identifier('name')), t.tsStringKeyword()),
       ),
     ]),
     t.variableDeclaration('const', [
@@ -2453,9 +2486,12 @@ function buildMultiTargetCreateHandler(
           t.objectExpression([
             t.objectProperty(
               t.identifier('endpoint'),
-              t.memberExpression(
-                t.identifier('answers'),
-                t.identifier(`${targets[0].name}Endpoint`),
+              t.tsAsExpression(
+                t.memberExpression(
+                  t.identifier('answers'),
+                  t.identifier(`${targets[0].name}Endpoint`),
+                ),
+                t.tsStringKeyword(),
               ),
             ),
             t.objectProperty(
@@ -2526,7 +2562,7 @@ function buildMultiTargetCreateHandler(
                 t.templateElement({ raw: `  ${target.name}: `, cooked: `  ${target.name}: ` }),
                 t.templateElement({ raw: '', cooked: '' }, true),
               ],
-              [t.memberExpression(t.identifier('answers'), t.identifier(fieldName))],
+              [t.tsAsExpression(t.memberExpression(t.identifier('answers'), t.identifier(fieldName)), t.tsStringKeyword())],
             ),
           ],
         ),
@@ -2697,9 +2733,12 @@ Options:
         ]),
         t.returnStatement(
           t.callExpression(t.identifier('handleAuthSubcommand'), [
-            t.memberExpression(
-              t.identifier('answer'),
-              t.identifier('subcommand'),
+            t.tsAsExpression(
+              t.memberExpression(
+                t.identifier('answer'),
+                t.identifier('subcommand'),
+              ),
+              t.tsStringKeyword(),
             ),
             t.identifier('newArgv'),
             t.identifier('prompter'),

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.2.1...@constructive-sdk/cli@0.3.0) (2026-03-05)
+
+### Bug Fixes
+
+- add [@ts-nocheck](https://github.com/ts-nocheck) to generated CLI files until inquirerer skipPrompt is published ([ddd69cd](https://github.com/constructive-io/constructive/commit/ddd69cd9fe367ca9218ef56e392c994b65ffaabe)), closes [#68](https://github.com/constructive-io/constructive/issues/68)
+- upgrade inquirerer to v4.6.0 and remove [@ts-nocheck](https://github.com/ts-nocheck) workaround ([c8316c5](https://github.com/constructive-io/constructive/commit/c8316c55acd4b5602840c1417d7c68de10693b76))
+
+### Features
+
+- **codegen:** emit skipPrompt: true for fields with backend-managed defaults ([9a8de1c](https://github.com/constructive-io/constructive/commit/9a8de1cebc2c44bcbdc91f2b3a3675d23f8532d7))
+
+## [0.2.1](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.2.0...@constructive-sdk/cli@0.2.1) (2026-03-05)
+
+### Bug Fixes
+
+- **codegen:** eliminate all CLI TypeScript compilation errors ([23e49e3](https://github.com/constructive-io/constructive/commit/23e49e3a4e7487be641cb0e585677e49dbba8e36))
+- **codegen:** properly type CLI code - eliminate all TS errors ([5f07136](https://github.com/constructive-io/constructive/commit/5f07136e3f45e0066a3918ea30cfd732f444677a))
+- **codegen:** restore handleGet for all tables with PKs, skip only for pure record types ([814e810](https://github.com/constructive-io/constructive/commit/814e81034e156a36d0b7e34855d9509468aef0b4))
+
 # 0.2.0 (2026-03-05)
 
 ### Bug Fixes

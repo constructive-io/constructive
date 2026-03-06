@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 import {
   generateMulti,
   expandSchemaDirToMultiTarget,
@@ -73,43 +70,7 @@ async function main() {
     process.exit(1);
   }
 
-  // Post-generation: add // @ts-nocheck to generated CLI .ts files
-  // The CLI codegen templates have known type issues that need proper fixes upstream.
-  // For now, suppress TS errors in generated CLI code so the build passes.
-  const srcDir = path.resolve('./src');
-  addTsNocheckToCliFiles(srcDir);
-
   console.log('\nCLI SDK generation completed successfully!');
-}
-
-/**
- * Recursively find all .ts files under cli/ directories and prepend // @ts-nocheck
- * if they contain the codegen header marker.
- */
-function addTsNocheckToCliFiles(dir: string): void {
-  const CODEGEN_MARKER = '@constructive-io/graphql-codegen';
-  const TS_NOCHECK = '// @ts-nocheck\n';
-
-  function walk(currentDir: string): void {
-    for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
-      const fullPath = path.join(currentDir, entry.name);
-      if (entry.isDirectory()) {
-        walk(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.ts')) {
-        // Only process files inside cli/ directories
-        const relative = path.relative(dir, fullPath);
-        if (!relative.includes(`cli${path.sep}`) && !relative.includes('cli/')) continue;
-
-        const content = fs.readFileSync(fullPath, 'utf-8');
-        if (content.includes(CODEGEN_MARKER) && !content.startsWith(TS_NOCHECK)) {
-          fs.writeFileSync(fullPath, TS_NOCHECK + content);
-        }
-      }
-    }
-  }
-
-  walk(dir);
-  console.log('Added // @ts-nocheck to generated CLI files');
 }
 
 main().catch((err) => {
