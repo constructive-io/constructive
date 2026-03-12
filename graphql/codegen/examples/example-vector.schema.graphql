@@ -1,0 +1,356 @@
+"""A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."""
+scalar UUID
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+"""A location as described by the [GeoJSON](https://geojson.org/) format."""
+scalar JSON
+
+"""A string representing a cursor for pagination."""
+scalar Cursor
+
+"""A vector embedding type from pgvector."""
+scalar Vector
+
+"""The root query type."""
+type Query {
+  """Reads and enables pagination through a set of `Contact`."""
+  contacts(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [ContactsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: ContactFilter
+    condition: ContactCondition
+  ): ContactsConnection
+
+  """Reads a single `Contact` using its globally unique `ID`."""
+  contact(id: UUID!): Contact
+
+  """Reads and enables pagination through a set of `Document`."""
+  documents(
+    first: Int
+    last: Int
+    offset: Int
+    before: Cursor
+    after: Cursor
+    orderBy: [DocumentsOrderBy!] = [PRIMARY_KEY_ASC]
+    filter: DocumentFilter
+    condition: DocumentCondition
+  ): DocumentsConnection
+
+  """Reads a single `Document` using its globally unique `ID`."""
+  document(id: UUID!): Document
+}
+
+"""The root mutation type."""
+type Mutation {
+  """Creates a single `Contact`."""
+  createContact(input: CreateContactInput!): CreateContactPayload
+
+  """Updates a single `Contact` using its globally unique `ID`."""
+  updateContact(input: UpdateContactInput!): UpdateContactPayload
+
+  """Deletes a single `Contact` using its globally unique `ID`."""
+  deleteContact(input: DeleteContactInput!): DeleteContactPayload
+
+  """Creates a single `Document`."""
+  createDocument(input: CreateDocumentInput!): CreateDocumentPayload
+
+  """Updates a single `Document` using its globally unique `ID`."""
+  updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload
+
+  """Deletes a single `Document` using its globally unique `ID`."""
+  deleteDocument(input: DeleteDocumentInput!): DeleteDocumentPayload
+}
+
+# ============================================================================
+# Entity Types
+# ============================================================================
+
+type Contact {
+  id: UUID!
+  name: String!
+  email: String!
+  embedding: Vector
+  createdAt: Datetime!
+  updatedAt: Datetime
+}
+
+type Document {
+  id: UUID!
+  title: String!
+  content: String
+  contentEmbedding: Vector
+  createdAt: Datetime!
+}
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+"""Metric used for vector distance calculations."""
+enum VectorMetric {
+  L2
+  INNER_PRODUCT
+  COSINE
+}
+
+enum ContactsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  """Sort by vector distance to a reference embedding (ascending)."""
+  EMBEDDING_DISTANCE_ASC
+  """Sort by vector distance to a reference embedding (descending)."""
+  EMBEDDING_DISTANCE_DESC
+}
+
+enum DocumentsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  """Sort by content embedding distance (ascending)."""
+  CONTENT_EMBEDDING_DISTANCE_ASC
+  """Sort by content embedding distance (descending)."""
+  CONTENT_EMBEDDING_DISTANCE_DESC
+}
+
+# ============================================================================
+# Connection Types
+# ============================================================================
+
+type ContactsConnection {
+  nodes: [Contact!]!
+  edges: [ContactsEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ContactsEdge {
+  node: Contact!
+  cursor: Cursor!
+}
+
+type DocumentsConnection {
+  nodes: [Document!]!
+  edges: [DocumentsEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type DocumentsEdge {
+  node: Document!
+  cursor: Cursor!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+# ============================================================================
+# Filter Types
+# ============================================================================
+
+input ContactFilter {
+  id: UUIDFilter
+  name: StringFilter
+  email: StringFilter
+  and: [ContactFilter!]
+  or: [ContactFilter!]
+  not: ContactFilter
+}
+
+input DocumentFilter {
+  id: UUIDFilter
+  title: StringFilter
+  and: [DocumentFilter!]
+  or: [DocumentFilter!]
+  not: DocumentFilter
+}
+
+input UUIDFilter {
+  equalTo: UUID
+  notEqualTo: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  isNull: Boolean
+}
+
+input StringFilter {
+  equalTo: String
+  notEqualTo: String
+  in: [String!]
+  notIn: [String!]
+  includes: String
+  startsWith: String
+  endsWith: String
+  isNull: Boolean
+}
+
+input BooleanFilter {
+  equalTo: Boolean
+  notEqualTo: Boolean
+  isNull: Boolean
+}
+
+# ============================================================================
+# Condition Types (includes plugin-injected vector search fields)
+# ============================================================================
+
+"""
+Condition type for Contact table.
+Includes standard column equality fields plus plugin-injected vector search fields.
+"""
+input ContactCondition {
+  id: UUID
+  name: String
+  email: String
+  embedding: Vector
+
+  """Find contacts whose embedding is near the given vector (injected by VectorSearchPlugin)."""
+  embeddingNearby: VectorNearbyInput
+}
+
+"""
+Condition type for Document table.
+Includes standard column equality fields plus plugin-injected vector search fields.
+"""
+input DocumentCondition {
+  id: UUID
+  title: String
+  contentEmbedding: Vector
+
+  """Find documents whose content embedding is near the given vector (injected by VectorSearchPlugin)."""
+  contentEmbeddingNearby: VectorNearbyInput
+}
+
+"""
+Input type for vector similarity search.
+Injected by VectorSearchPlugin into condition types for vector columns.
+"""
+input VectorNearbyInput {
+  """The reference vector to compare against."""
+  vector: Vector!
+  """The distance metric to use for comparison."""
+  metric: VectorMetric
+  """Maximum distance threshold."""
+  threshold: Float
+}
+
+# ============================================================================
+# Mutation Input Types
+# ============================================================================
+
+input CreateContactInput {
+  clientMutationId: String
+  contact: ContactInput!
+}
+
+input ContactInput {
+  name: String!
+  email: String!
+  embedding: Vector
+}
+
+input UpdateContactInput {
+  clientMutationId: String
+  id: UUID!
+  patch: ContactPatch!
+}
+
+input ContactPatch {
+  name: String
+  email: String
+  embedding: Vector
+}
+
+input DeleteContactInput {
+  clientMutationId: String
+  id: UUID!
+}
+
+input CreateDocumentInput {
+  clientMutationId: String
+  document: DocumentInput!
+}
+
+input DocumentInput {
+  title: String!
+  content: String
+  contentEmbedding: Vector
+}
+
+input UpdateDocumentInput {
+  clientMutationId: String
+  id: UUID!
+  patch: DocumentPatch!
+}
+
+input DocumentPatch {
+  title: String
+  content: String
+  contentEmbedding: Vector
+}
+
+input DeleteDocumentInput {
+  clientMutationId: String
+  id: UUID!
+}
+
+# ============================================================================
+# Mutation Payload Types
+# ============================================================================
+
+type CreateContactPayload {
+  clientMutationId: String
+  contact: Contact
+}
+
+type UpdateContactPayload {
+  clientMutationId: String
+  contact: Contact
+}
+
+type DeleteContactPayload {
+  clientMutationId: String
+  contact: Contact
+}
+
+type CreateDocumentPayload {
+  clientMutationId: String
+  document: Document
+}
+
+type UpdateDocumentPayload {
+  clientMutationId: String
+  document: Document
+}
+
+type DeleteDocumentPayload {
+  clientMutationId: String
+  document: Document
+}
