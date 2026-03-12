@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.9.0...@constructive-io/graphql-codegen@4.10.0) (2026-03-12)
+
+### Bug Fixes
+
+- **codegen:** add VectorFilter scalar filter type for pgvector fields ([7aa49cb](https://github.com/constructive-io/constructive/commit/7aa49cbd3db1d1c204f7902394cf03771b6674a6))
+- **codegen:** include plugin-injected fields in condition and orderBy types ([3c4a91a](https://github.com/constructive-io/constructive/commit/3c4a91a85ab2290fd2aa54c3359a701c3db8f23e)), closes [constructive-io/constructive-planning#663](https://github.com/constructive-io/constructive-planning/issues/663)
+- **codegen:** mark fields with backend defaults as optional in generated docs ([ac6d46e](https://github.com/constructive-io/constructive/commit/ac6d46e6db4a9ed2889d036009aa425e7bf07a9f))
+- **codegen:** resolve transitive enum types referenced by input fields ([0ffda8e](https://github.com/constructive-io/constructive/commit/0ffda8eb9f6d56d5a3e34142b6372aa23b1abf23))
+- **codegen:** strip ConstructiveInternalType prefix from generated docs type names ([bc62778](https://github.com/constructive-io/constructive/commit/bc627789bbfd1bf20c1c42446895e38a9dafbfb7))
+
+### Features
+
+- **codegen:** semantic question types, INPUT_OBJECT dot-notation, --no-tty flag ([46156de](https://github.com/constructive-io/constructive/commit/46156deb156ed9d7adb14ab53b87b570cda072fc))
+- **codegen:** update docs generators with INPUT_OBJECT dot-notation, TypeRegistry threading, and --no-tty docs ([e481604](https://github.com/constructive-io/constructive/commit/e481604c2e161d42b5b3eede54d164db55c5016e))
+- **codegen:** wire condition arg through ORM query builder for findMany/findFirst ([1588296](https://github.com/constructive-io/constructive/commit/1588296da227fe56633bbe5b4165858544615753))
+
 # [4.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.8.1...@constructive-io/graphql-codegen@4.9.0) (2026-03-05)
 
 ### Features

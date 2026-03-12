@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.2](https://github.com/constructive-io/constructive/compare/pg-cache@3.1.1...pg-cache@3.1.2) (2026-03-12)
+
+### Bug Fixes
+
+- **pg-cache:** allow cache to reopen after close for process survival ([cea2f6b](https://github.com/constructive-io/constructive/commit/cea2f6bffcce577f0a4d5fa146f9f9424a092da4))
+
 ## [3.1.1](https://github.com/constructive-io/constructive/compare/pg-cache@3.1.0...pg-cache@3.1.1) (2026-03-04)
 
 **Note:** Version bump only for package pg-cache

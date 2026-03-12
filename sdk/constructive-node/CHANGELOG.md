@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.7](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.1.6...@constructive-io/node@0.1.7) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/node
+
 ## [0.1.6](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.1.5...@constructive-io/node@0.1.6) (2026-03-05)
 
 **Note:** Version bump only for package @constructive-io/node
