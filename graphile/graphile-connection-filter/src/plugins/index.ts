@@ -5,4 +5,5 @@ export { ConnectionFilterAttributesPlugin } from './ConnectionFilterAttributesPl
 export { ConnectionFilterOperatorsPlugin } from './ConnectionFilterOperatorsPlugin';
 export { ConnectionFilterCustomOperatorsPlugin } from './ConnectionFilterCustomOperatorsPlugin';
 export { ConnectionFilterLogicalOperatorsPlugin } from './ConnectionFilterLogicalOperatorsPlugin';
+export { ConnectionFilterComputedAttributesPlugin } from './ConnectionFilterComputedAttributesPlugin';
 export { makeApplyFromOperatorSpec } from './operatorApply';

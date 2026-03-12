@@ -83,6 +83,7 @@ declare global {
       ConnectionFilterOperatorsPlugin: true;
       ConnectionFilterCustomOperatorsPlugin: true;
       ConnectionFilterLogicalOperatorsPlugin: true;
+      ConnectionFilterComputedAttributesPlugin: true;
     }
   }
 }

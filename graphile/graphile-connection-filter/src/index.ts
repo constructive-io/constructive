@@ -39,6 +39,7 @@ export {
   ConnectionFilterOperatorsPlugin,
   ConnectionFilterCustomOperatorsPlugin,
   ConnectionFilterLogicalOperatorsPlugin,
+  ConnectionFilterComputedAttributesPlugin,
   makeApplyFromOperatorSpec,
 } from './plugins';
 

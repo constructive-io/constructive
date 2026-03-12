@@ -32,6 +32,7 @@ import {
   ConnectionFilterOperatorsPlugin,
   ConnectionFilterCustomOperatorsPlugin,
   ConnectionFilterLogicalOperatorsPlugin,
+  ConnectionFilterComputedAttributesPlugin,
 } from './plugins';
 
 /**
@@ -72,6 +73,11 @@ export function ConnectionFilterPreset(
   // Logical operators are opt-out
   if (mergedOptions.connectionFilterLogicalOperators !== false) {
     plugins.push(ConnectionFilterLogicalOperatorsPlugin);
+  }
+
+  // Computed columns are opt-in (disabled by default)
+  if (mergedOptions.connectionFilterComputedColumns) {
+    plugins.push(ConnectionFilterComputedAttributesPlugin);
   }
 
   return {
