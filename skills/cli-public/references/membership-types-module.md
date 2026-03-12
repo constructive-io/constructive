@@ -9,7 +9,7 @@ CRUD operations for MembershipTypesModule records via csdk CLI
 ```bash
 csdk membership-types-module list
 csdk membership-types-module get --id <value>
-csdk membership-types-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value>
+csdk membership-types-module create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>]
 csdk membership-types-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>]
 csdk membership-types-module delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk membership-types-module list
 ### Create a membershipTypesModule
 
 ```bash
-csdk membership-types-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value"
+csdk membership-types-module create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>]
 ```
 
 ### Get a membershipTypesModule by id

@@ -25,7 +25,7 @@ csdk api-schema list
 ### Create a apiSchema
 
 ```bash
-csdk api-schema create --databaseId "value" --schemaId "value" --apiId "value"
+csdk api-schema create --databaseId <value> --schemaId <value> --apiId <value>
 ```
 
 ### Get a apiSchema by id

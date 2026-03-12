@@ -9,7 +9,7 @@ CRUD operations for Domain records via csdk CLI
 ```bash
 csdk domain list
 csdk domain get --id <value>
-csdk domain create --databaseId <value> --apiId <value> --siteId <value> --subdomain <value> --domain <value>
+csdk domain create --databaseId <value> [--apiId <value>] [--siteId <value>] [--subdomain <value>] [--domain <value>]
 csdk domain update --id <value> [--databaseId <value>] [--apiId <value>] [--siteId <value>] [--subdomain <value>] [--domain <value>]
 csdk domain delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk domain list
 ### Create a domain
 
 ```bash
-csdk domain create --databaseId "value" --apiId "value" --siteId "value" --subdomain "value" --domain "value"
+csdk domain create --databaseId <value> [--apiId <value>] [--siteId <value>] [--subdomain <value>] [--domain <value>]
 ```
 
 ### Get a domain by id

@@ -23,7 +23,7 @@ Example usage:
 ## Usage
 
 ```bash
-csdk create-user-database --input <value>
+csdk create-user-database --input.clientMutationId <value> --input.databaseName <value> --input.ownerId <value> --input.includeInvites <value> --input.includeGroups <value> --input.includeLevels <value> --input.bitlen <value> --input.tokensExpiration <value>
 ```
 
 ## Examples
@@ -31,5 +31,5 @@ csdk create-user-database --input <value>
 ### Run createUserDatabase
 
 ```bash
-csdk create-user-database --input <value>
+csdk create-user-database --input.clientMutationId <value> --input.databaseName <value> --input.ownerId <value> --input.includeInvites <value> --input.includeGroups <value> --input.includeLevels <value> --input.bitlen <value> --input.tokensExpiration <value>
 ```

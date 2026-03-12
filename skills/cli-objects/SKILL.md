@@ -23,6 +23,9 @@ csdk auth set-token <token>
 csdk get-all-record list
 csdk get-all-record get --id <value>
 csdk get-all-record create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+csdk --no-tty get-all-record list
 ```
 
 ## Examples
@@ -34,6 +37,12 @@ csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
 csdk get-all-record list
+```
+
+### Non-interactive mode (for scripts and CI)
+
+```bash
+csdk --no-tty get-all-record create --<field> <value>
 ```
 
 ## References

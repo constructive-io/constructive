@@ -9,7 +9,7 @@ CRUD operations for SchemaGrant records via csdk CLI
 ```bash
 csdk schema-grant list
 csdk schema-grant get --id <value>
-csdk schema-grant create --databaseId <value> --schemaId <value> --granteeName <value>
+csdk schema-grant create --schemaId <value> --granteeName <value> [--databaseId <value>]
 csdk schema-grant update --id <value> [--databaseId <value>] [--schemaId <value>] [--granteeName <value>]
 csdk schema-grant delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk schema-grant list
 ### Create a schemaGrant
 
 ```bash
-csdk schema-grant create --databaseId "value" --schemaId "value" --granteeName "value"
+csdk schema-grant create --schemaId <value> --granteeName <value> [--databaseId <value>]
 ```
 
 ### Get a schemaGrant by id

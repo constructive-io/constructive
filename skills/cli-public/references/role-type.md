@@ -25,7 +25,7 @@ csdk role-type list
 ### Create a roleType
 
 ```bash
-csdk role-type create --name "value"
+csdk role-type create --name <value>
 ```
 
 ### Get a roleType by id

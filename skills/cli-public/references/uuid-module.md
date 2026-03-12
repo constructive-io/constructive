@@ -9,7 +9,7 @@ CRUD operations for UuidModule records via csdk CLI
 ```bash
 csdk uuid-module list
 csdk uuid-module get --id <value>
-csdk uuid-module create --databaseId <value> --schemaId <value> --uuidFunction <value> --uuidSeed <value>
+csdk uuid-module create --databaseId <value> --uuidSeed <value> [--schemaId <value>] [--uuidFunction <value>]
 csdk uuid-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--uuidFunction <value>] [--uuidSeed <value>]
 csdk uuid-module delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk uuid-module list
 ### Create a uuidModule
 
 ```bash
-csdk uuid-module create --databaseId "value" --schemaId "value" --uuidFunction "value" --uuidSeed "value"
+csdk uuid-module create --databaseId <value> --uuidSeed <value> [--schemaId <value>] [--uuidFunction <value>]
 ```
 
 ### Get a uuidModule by id

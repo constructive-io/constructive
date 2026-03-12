@@ -7,7 +7,7 @@ Execute the extendTokenExpires mutation
 ## Usage
 
 ```bash
-csdk extend-token-expires --input <value>
+csdk extend-token-expires --input.clientMutationId <value> --input.amount <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk extend-token-expires --input <value>
 ### Run extendTokenExpires
 
 ```bash
-csdk extend-token-expires --input <value>
+csdk extend-token-expires --input.clientMutationId <value> --input.amount <value>
 ```

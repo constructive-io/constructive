@@ -9,7 +9,7 @@ CRUD operations for AppAchievement records via csdk CLI
 ```bash
 csdk app-achievement list
 csdk app-achievement get --id <value>
-csdk app-achievement create --actorId <value> --name <value> --count <value>
+csdk app-achievement create --name <value> [--actorId <value>] [--count <value>]
 csdk app-achievement update --id <value> [--actorId <value>] [--name <value>] [--count <value>]
 csdk app-achievement delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk app-achievement list
 ### Create a appAchievement
 
 ```bash
-csdk app-achievement create --actorId "value" --name "value" --count "value"
+csdk app-achievement create --name <value> [--actorId <value>] [--count <value>]
 ```
 
 ### Get a appAchievement by id

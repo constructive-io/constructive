@@ -9,7 +9,7 @@ CRUD operations for Trigger records via csdk CLI
 ```bash
 csdk trigger list
 csdk trigger get --id <value>
-csdk trigger create --databaseId <value> --tableId <value> --name <value> --event <value> --functionName <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
+csdk trigger create --tableId <value> --name <value> [--databaseId <value>] [--event <value>] [--functionName <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
 csdk trigger update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--event <value>] [--functionName <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
 csdk trigger delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk trigger list
 ### Create a trigger
 
 ```bash
-csdk trigger create --databaseId "value" --tableId "value" --name "value" --event "value" --functionName "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
+csdk trigger create --tableId <value> --name <value> [--databaseId <value>] [--event <value>] [--functionName <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
 ```
 
 ### Get a trigger by id

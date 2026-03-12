@@ -7,7 +7,7 @@ Execute the signIn mutation
 ## Usage
 
 ```bash
-csdk sign-in --input <value>
+csdk sign-in --input.clientMutationId <value> --input.email <value> --input.password <value> --input.rememberMe <value> --input.credentialKind <value> --input.csrfToken <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk sign-in --input <value>
 ### Run signIn
 
 ```bash
-csdk sign-in --input <value>
+csdk sign-in --input.clientMutationId <value> --input.email <value> --input.password <value> --input.rememberMe <value> --input.credentialKind <value> --input.csrfToken <value>
 ```
