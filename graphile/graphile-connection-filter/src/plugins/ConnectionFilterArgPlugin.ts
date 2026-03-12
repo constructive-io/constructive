@@ -1,0 +1,150 @@
+import '../augmentations';
+import type { GraphileConfig } from 'graphile-config';
+import { makeAssertAllowed } from '../utils';
+
+const version = '1.0.0';
+
+/**
+ * ConnectionFilterArgPlugin
+ *
+ * Adds the `filter` argument to connection and simple collection fields.
+ * Uses `applyPlan` to create a PgCondition that child filter fields can
+ * add WHERE clauses to.
+ *
+ * This runs before PgConnectionArgOrderByPlugin so that filters are applied
+ * before ordering (important for e.g. full-text search rank ordering).
+ */
+export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
+  name: 'ConnectionFilterArgPlugin',
+  version,
+  description: 'Adds the filter argument to connection and list fields',
+  before: ['PgConnectionArgOrderByPlugin'],
+
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields_field_args(args, build, context) {
+        const {
+          extend,
+          inflection,
+          EXPORTABLE,
+          dataplanPg: { PgCondition },
+        } = build;
+        const {
+          scope: {
+            isPgFieldConnection,
+            isPgFieldSimpleCollection,
+            pgFieldResource: resource,
+            pgFieldCodec,
+            fieldName,
+          },
+          Self,
+        } = context;
+
+        const shouldAddFilter =
+          isPgFieldConnection || isPgFieldSimpleCollection;
+        if (!shouldAddFilter) return args;
+
+        const codec = pgFieldCodec ?? resource?.codec;
+        if (!codec) return args;
+
+        // Check behavior: procedures use "filterProc", tables use "filter"
+        const desiredBehavior = resource?.parameters
+          ? 'filterProc'
+          : 'filter';
+        if (
+          resource
+            ? !build.behavior.pgResourceMatches(resource, desiredBehavior)
+            : !build.behavior.pgCodecMatches(codec, desiredBehavior)
+        ) {
+          return args;
+        }
+
+        const returnCodec = codec;
+        const nodeType = build.getGraphQLTypeByPgCodec(
+          returnCodec,
+          'output'
+        );
+        if (!nodeType) return args;
+
+        const nodeTypeName = nodeType.name;
+        const filterTypeName = inflection.filterType(nodeTypeName);
+        const FilterType = build.getTypeByName(filterTypeName);
+        if (!FilterType) return args;
+
+        const assertAllowed = makeAssertAllowed(build);
+
+        // For setof functions returning scalars, track the codec
+        const attributeCodec =
+          resource?.parameters && !resource?.codec.attributes
+            ? resource.codec
+            : null;
+
+        return extend(
+          args,
+          {
+            filter: {
+              description:
+                'A filter to be used in determining which values should be returned by the collection.',
+              type: FilterType,
+              ...(isPgFieldConnection
+                ? {
+                    applyPlan: EXPORTABLE(
+                      (
+                        PgCondition: any,
+                        assertAllowed: any,
+                        attributeCodec: any
+                      ) =>
+                        function (_: any, $connection: any, fieldArg: any) {
+                          const $pgSelect = $connection.getSubplan();
+                          fieldArg.apply(
+                            $pgSelect,
+                            (queryBuilder: any, value: any) => {
+                              assertAllowed(value, 'object');
+                              if (value == null) return;
+                              const condition = new PgCondition(queryBuilder);
+                              if (attributeCodec) {
+                                condition.extensions.pgFilterAttribute = {
+                                  codec: attributeCodec,
+                                };
+                              }
+                              return condition;
+                            }
+                          );
+                        },
+                      [PgCondition, assertAllowed, attributeCodec]
+                    ),
+                  }
+                : {
+                    applyPlan: EXPORTABLE(
+                      (
+                        PgCondition: any,
+                        assertAllowed: any,
+                        attributeCodec: any
+                      ) =>
+                        function (_: any, $pgSelect: any, fieldArg: any) {
+                          fieldArg.apply(
+                            $pgSelect,
+                            (queryBuilder: any, value: any) => {
+                              assertAllowed(value, 'object');
+                              if (value == null) return;
+                              const condition = new PgCondition(queryBuilder);
+                              if (attributeCodec) {
+                                condition.extensions.pgFilterAttribute = {
+                                  codec: attributeCodec,
+                                };
+                              }
+                              return condition;
+                            }
+                          );
+                        },
+                      [PgCondition, assertAllowed, attributeCodec]
+                    ),
+                  }),
+            },
+          },
+          `Adding connection filter arg to field '${fieldName}' of '${Self.name}'`
+        );
+      },
+    },
+  },
+};
