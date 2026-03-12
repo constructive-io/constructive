@@ -1191,8 +1191,8 @@ CRUD operations for Domain records.
 | `databaseId` | UUID |
 | `apiId` | UUID |
 | `siteId` | UUID |
-| `subdomain` | ConstructiveInternalTypeHostname |
-| `domain` | ConstructiveInternalTypeHostname |
+| `subdomain` | Hostname |
+| `domain` | Hostname |
 
 **Create fields:** `databaseId`, `apiId`, `siteId`, `subdomain`, `domain`
 
@@ -1217,7 +1217,7 @@ CRUD operations for SiteMetadatum records.
 | `siteId` | UUID |
 | `title` | String |
 | `description` | String |
-| `ogImage` | ConstructiveInternalTypeImage |
+| `ogImage` | Image |
 
 **Create fields:** `databaseId`, `siteId`, `title`, `description`, `ogImage`
 
@@ -1339,10 +1339,10 @@ CRUD operations for Site records.
 | `databaseId` | UUID |
 | `title` | String |
 | `description` | String |
-| `ogImage` | ConstructiveInternalTypeImage |
-| `favicon` | ConstructiveInternalTypeAttachment |
-| `appleTouchIcon` | ConstructiveInternalTypeImage |
-| `logo` | ConstructiveInternalTypeImage |
+| `ogImage` | Image |
+| `favicon` | Attachment |
+| `appleTouchIcon` | Image |
+| `logo` | Image |
 | `dbname` | String |
 
 **Create fields:** `databaseId`, `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
@@ -1367,11 +1367,11 @@ CRUD operations for App records.
 | `databaseId` | UUID |
 | `siteId` | UUID |
 | `name` | String |
-| `appImage` | ConstructiveInternalTypeImage |
-| `appStoreLink` | ConstructiveInternalTypeUrl |
+| `appImage` | Image |
+| `appStoreLink` | Url |
 | `appStoreId` | String |
 | `appIdPrefix` | String |
-| `playStoreLink` | ConstructiveInternalTypeUrl |
+| `playStoreLink` | Url |
 
 **Create fields:** `databaseId`, `siteId`, `name`, `appImage`, `appStoreLink`, `appStoreId`, `appIdPrefix`, `playStoreLink`
 
@@ -2476,7 +2476,7 @@ CRUD operations for Invite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `inviteToken` | String |
 | `inviteValid` | Boolean |
@@ -2532,7 +2532,7 @@ CRUD operations for OrgInvite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `receiverId` | UUID |
 | `inviteToken` | String |
@@ -2962,7 +2962,7 @@ CRUD operations for AuditLog records.
 | `id` | UUID |
 | `event` | String |
 | `actorId` | UUID |
-| `origin` | ConstructiveInternalTypeOrigin |
+| `origin` | Origin |
 | `userAgent` | String |
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
@@ -2989,7 +2989,7 @@ CRUD operations for AppLevel records.
 | `id` | UUID |
 | `name` | String |
 | `description` | String |
-| `image` | ConstructiveInternalTypeImage |
+| `image` | Image |
 | `ownerId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
@@ -3014,7 +3014,7 @@ CRUD operations for Email records.
 |-------|------|
 | `id` | UUID |
 | `ownerId` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
@@ -3105,7 +3105,7 @@ CRUD operations for User records.
 | `id` | UUID |
 | `username` | String |
 | `displayName` | String |
-| `profilePicture` | ConstructiveInternalTypeImage |
+| `profilePicture` | Image |
 | `searchTsv` | FullText |
 | `type` | Int |
 | `createdAt` | Datetime |
@@ -3742,7 +3742,7 @@ oneTimeToken
   | `--input.clientMutationId` | String |
   | `--input.email` | String |
   | `--input.password` | String |
-  | `--input.origin` | ConstructiveInternalTypeOrigin |
+  | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
 
 ### `insert-node-at-path`
@@ -3825,7 +3825,7 @@ forgotPassword
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.email` | ConstructiveInternalTypeEmail |
+  | `--input.email` | Email |
 
 ### `send-verification-email`
 
@@ -3837,7 +3837,7 @@ sendVerificationEmail
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.email` | ConstructiveInternalTypeEmail |
+  | `--input.email` | Email |
 
 ### `verify-password`
 

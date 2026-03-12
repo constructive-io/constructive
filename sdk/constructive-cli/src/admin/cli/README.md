@@ -780,7 +780,7 @@ CRUD operations for Invite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `inviteToken` | String |
 | `inviteValid` | Boolean |
@@ -813,7 +813,7 @@ CRUD operations for AppLevel records.
 | `id` | UUID |
 | `name` | String |
 | `description` | String |
-| `image` | ConstructiveInternalTypeImage |
+| `image` | Image |
 | `ownerId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
@@ -907,7 +907,7 @@ CRUD operations for OrgInvite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `receiverId` | UUID |
 | `inviteToken` | String |

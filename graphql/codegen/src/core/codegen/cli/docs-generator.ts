@@ -4,6 +4,7 @@ import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/sc
 import {
   flattenArgs,
   flattenedArgsToFlags,
+  cleanTypeName,
   getEditableFields,
   getReadmeHeader,
   getReadmeFooter,
@@ -115,7 +116,7 @@ export function generateReadme(
       lines.push('| Field | Type |');
       lines.push('|-------|------|');
       for (const f of scalarFields) {
-        lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
+        lines.push(`| \`${f.name}\` | ${cleanTypeName(f.type.gqlType)} |`);
       }
       lines.push('');
       lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
@@ -276,12 +277,12 @@ export function generateAgentsDocs(
     lines.push('INPUT FIELDS:');
     for (const f of scalarFields) {
       const isPk = f.name === pk.name;
-      lines.push(`  ${f.name}: ${f.type.gqlType}${isPk ? ' (primary key)' : ''}`);
+      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
     }
     lines.push('');
     lines.push('EDITABLE FIELDS (for create/update):');
     for (const f of editableFields) {
-      lines.push(`  ${f.name}: ${f.type.gqlType}`);
+      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}`);
     }
     lines.push('');
     lines.push('OUTPUT: JSON');
@@ -507,7 +508,7 @@ export function getCliMcpTools(
     const createProps: Record<string, unknown> = {};
     for (const f of editableFields) {
       createProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
         description: `${table.name} ${f.name}`,
       };
     }
@@ -529,7 +530,7 @@ export function getCliMcpTools(
     };
     for (const f of editableFields) {
       updateProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
         description: `${table.name} ${f.name}`,
       };
     }
@@ -565,7 +566,7 @@ export function getCliMcpTools(
       _meta: {
         fields: scalarFields.map((f) => ({
           name: f.name,
-          type: f.type.gqlType,
+          type: cleanTypeName(f.type.gqlType),
           editable: editableFields.some((ef) => ef.name === f.name),
           primaryKey: f.name === pk.name,
         })),
@@ -956,7 +957,7 @@ export function generateMultiTargetReadme(
       lines.push('| Field | Type |');
       lines.push('|-------|------|');
       for (const f of scalarFields) {
-        lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
+        lines.push(`| \`${f.name}\` | ${cleanTypeName(f.type.gqlType)} |`);
       }
       lines.push('');
       lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
@@ -1143,12 +1144,12 @@ export function generateMultiTargetAgentsDocs(
       lines.push('INPUT FIELDS:');
       for (const f of scalarFields) {
         const isPk = f.name === pk.name;
-        lines.push(`  ${f.name}: ${f.type.gqlType}${isPk ? ' (primary key)' : ''}`);
+        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
       }
       lines.push('');
       lines.push('EDITABLE FIELDS (for create/update):');
       for (const f of editableFields) {
-        lines.push(`  ${f.name}: ${f.type.gqlType}`);
+        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}`);
       }
       lines.push('');
       lines.push('OUTPUT: JSON');
@@ -1391,7 +1392,7 @@ export function getMultiTargetCliMcpTools(
       const createProps: Record<string, unknown> = {};
       for (const f of editableFields) {
         createProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(f.type.gqlType),
+          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
           description: `${table.name} ${f.name}`,
         };
       }
@@ -1413,7 +1414,7 @@ export function getMultiTargetCliMcpTools(
       };
       for (const f of editableFields) {
         updateProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(f.type.gqlType),
+          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
           description: `${table.name} ${f.name}`,
         };
       }
@@ -1449,7 +1450,7 @@ export function getMultiTargetCliMcpTools(
         _meta: {
           fields: scalarFields.map((f) => ({
             name: f.name,
-            type: f.type.gqlType,
+            type: cleanTypeName(f.type.gqlType),
             editable: editableFields.some((ef) => ef.name === f.name),
             primaryKey: f.name === pk.name,
           })),

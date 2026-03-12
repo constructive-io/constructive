@@ -201,7 +201,7 @@ CRUD operations for AuditLog records.
 | `id` | UUID |
 | `event` | String |
 | `actorId` | UUID |
-| `origin` | ConstructiveInternalTypeOrigin |
+| `origin` | Origin |
 | `userAgent` | String |
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
@@ -227,7 +227,7 @@ CRUD operations for Email records.
 |-------|------|
 | `id` | UUID |
 | `ownerId` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
@@ -254,7 +254,7 @@ CRUD operations for User records.
 | `id` | UUID |
 | `username` | String |
 | `displayName` | String |
-| `profilePicture` | ConstructiveInternalTypeImage |
+| `profilePicture` | Image |
 | `searchTsv` | FullText |
 | `type` | Int |
 | `createdAt` | Datetime |
@@ -437,7 +437,7 @@ oneTimeToken
   | `--input.clientMutationId` | String |
   | `--input.email` | String |
   | `--input.password` | String |
-  | `--input.origin` | ConstructiveInternalTypeOrigin |
+  | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
 
 ### `extend-token-expires`
@@ -462,7 +462,7 @@ forgotPassword
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.email` | ConstructiveInternalTypeEmail |
+  | `--input.email` | Email |
 
 ### `send-verification-email`
 
@@ -474,7 +474,7 @@ sendVerificationEmail
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.email` | ConstructiveInternalTypeEmail |
+  | `--input.email` | Email |
 
 ### `verify-password`
 

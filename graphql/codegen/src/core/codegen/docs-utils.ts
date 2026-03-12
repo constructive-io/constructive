@@ -143,9 +143,20 @@ function resolveBaseType(typeRef: CleanTypeRef): CleanTypeRef {
   return typeRef;
 }
 
+/**
+ * Strip internal type prefixes for cleaner docs display.
+ * e.g. 'ConstructiveInternalTypeEmail' -> 'Email'
+ */
+export function cleanTypeName(name: string): string {
+  if (name.startsWith('ConstructiveInternalType')) {
+    return name.slice('ConstructiveInternalType'.length);
+  }
+  return name;
+}
+
 function getScalarTypeName(typeRef: CleanTypeRef): string {
   const base = resolveBaseType(typeRef);
-  return base.name ?? 'String';
+  return cleanTypeName(base.name ?? 'String');
 }
 
 /**
