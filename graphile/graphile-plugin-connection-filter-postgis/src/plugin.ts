@@ -1,4 +1,6 @@
 import 'graphile-build';
+import 'graphile-connection-filter';
+import type { ConnectionFilterOperatorSpec } from 'graphile-connection-filter';
 import type { GraphileConfig } from 'graphile-config';
 import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
@@ -30,7 +32,7 @@ const ALLOWED_SQL_OPERATORS = new Set([
  * - ST_ function-based operators (contains, intersects, within, etc.)
  * - SQL operator-based operators (&&, =, ~, etc. for bounding box ops)
  *
- * Requires graphile-postgis and postgraphile-plugin-connection-filter to be loaded.
+ * Requires graphile-postgis and graphile-connection-filter to be loaded.
  */
 export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin = {
   name: 'PgConnectionArgFilterPostgisOperatorsPlugin',
@@ -51,8 +53,7 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
           return _;
         }
 
-        const addConnectionFilterOperator = (build as any).addConnectionFilterOperator;
-        if (typeof addConnectionFilterOperator !== 'function') {
+        if (typeof build.addConnectionFilterOperator !== 'function') {
           return _;
         }
 
@@ -293,9 +294,9 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
         // Register each operator with the connection filter plugin
         for (const spec of allSpecs) {
           for (const typeName of spec.typeNames) {
-            addConnectionFilterOperator(typeName, spec.operatorName, {
+            build.addConnectionFilterOperator(typeName, spec.operatorName, {
               description: spec.description,
-              resolveType: (fieldType: any) => fieldType,
+              resolveType: (fieldType) => fieldType,
               resolve(
                 sqlIdentifier: SQL,
                 sqlValue: SQL,
@@ -305,7 +306,7 @@ export const PgConnectionArgFilterPostgisOperatorsPlugin: GraphileConfig.Plugin 
               ) {
                 return spec.resolve(sqlIdentifier, sqlValue);
               }
-            });
+            } satisfies ConnectionFilterOperatorSpec);
           }
         }
 

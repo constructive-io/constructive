@@ -33,6 +33,7 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
+import 'graphile-connection-filter';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes, PgResource } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
@@ -271,12 +272,10 @@ export function createPgSearchPlugin(
           } = build;
 
           // Register the `matches` filter operator for the FullText scalar.
-          // Requires postgraphile-plugin-connection-filter; skip if not loaded.
-          const addConnectionFilterOperator = (build as any)
-            .addConnectionFilterOperator;
-          if (typeof addConnectionFilterOperator === 'function') {
+          // Requires graphile-connection-filter; skip if not loaded.
+          if (typeof build.addConnectionFilterOperator === 'function') {
             const TYPES = (build as any).dataplanPg?.TYPES;
-            addConnectionFilterOperator(fullTextScalarName, 'matches', {
+            build.addConnectionFilterOperator(fullTextScalarName, 'matches', {
               description: 'Performs a full text search on the field.',
               resolveType: () => GraphQLString,
               resolveInputCodec: TYPES ? () => TYPES.text : undefined,
