@@ -15,10 +15,6 @@ import path from 'node:path';
 
 import { getConfigOptions } from '../../types/config';
 import { generateOrm } from '../../core/codegen/orm';
-import {
-  collectInputTypeNames,
-  collectPayloadTypeNames,
-} from '../../core/codegen/orm/input-types-generator';
 import { runCodegenPipeline } from '../../core/pipeline';
 import { FileSchemaSource } from '../../core/introspect/source/file';
 
@@ -99,10 +95,6 @@ describe('vector codegen integration', () => {
       const { tables, customOperations } = pipelineResult;
       const config = getConfigOptions({ orm: true, output: '/tmp/test-output' });
 
-      const allOps = [
-        ...customOperations.queries,
-        ...customOperations.mutations,
-      ];
       const result = generateOrm({
         tables,
         customOperations,
