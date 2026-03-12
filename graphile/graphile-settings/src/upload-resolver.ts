@@ -221,6 +221,26 @@ export async function streamToStorage(
 	};
 }
 
+export async function __resetUploadResolverForTests(): Promise<void> {
+	if (streamer && typeof (streamer as { destroy?: () => void }).destroy === 'function') {
+		streamer.destroy();
+	}
+	streamer = null;
+
+	if (
+		storageProvider
+		&& typeof (storageProvider as StorageProvider & { destroy?: () => void }).destroy === 'function'
+	) {
+		(storageProvider as StorageProvider & { destroy: () => void }).destroy();
+	}
+	storageProvider = null;
+
+	if (pgPool) {
+		await pgPool.end();
+	}
+	pgPool = null;
+}
+
 /**
  * Upload resolver that streams files to S3/MinIO.
  *
