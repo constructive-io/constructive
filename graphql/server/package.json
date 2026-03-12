@@ -26,6 +26,8 @@
     "build:dev": "makage build --dev",
     "dev": "ts-node src/run.ts",
     "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/run.ts",
+    "debug:memory:analyze": "node scripts/analyze-debug-logs.mjs",
+    "debug:heap:capture": "node scripts/capture-heap-snapshot.mjs",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",

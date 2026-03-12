@@ -66,6 +66,28 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 - File uploads via `graphql-upload`
 - GraphiQL and health check endpoints
 - Schema cache flush via `/flush` or database notifications
+- Opt-in observability for memory, DB activity, and Graphile build debugging
+
+## Observability
+
+`@constructive-io/graphql-server` includes an opt-in observability mode for local debugging.
+
+- Master switch: `GRAPHQL_OBSERVABILITY_ENABLED=true`
+- Debug routes: `GET /debug/memory`, `GET /debug/db`
+- Background sampler: periodic NDJSON snapshots under `graphql/server/logs/`
+- CLI helpers:
+  - `pnpm debug:memory:analyze`
+  - `pnpm debug:heap:capture`
+
+Observability only activates when all of the following are true:
+
+- `GRAPHQL_OBSERVABILITY_ENABLED=true`
+- `NODE_ENV=development`
+- the server is bound to a loopback host such as `localhost`, `127.0.0.1`, or `::1`
+
+When those conditions are not met, the debug routes are not mounted and the sampler does not start. This keeps the default runtime surface minimal and prevents the observability layer from being exposed remotely.
+
+For the operational workflow, sampler output, and heap snapshot usage, see [docs/memory-debugging.md](./docs/memory-debugging.md).
 
 ## Routes
 
@@ -74,6 +96,8 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 - `GET /graphql` / `POST /graphql` -> GraphQL endpoint
 - `POST /graphql` (multipart) -> file uploads
 - `POST /flush` -> clears cached Graphile schema for the current API
+- `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
+- `GET /debug/db` -> PostgreSQL activity/locks/pool debug snapshot when observability is enabled
 
 ## Meta API routing
 
@@ -113,6 +137,10 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `API_ANON_ROLE`                | Anonymous role name                   | `administrator`                                               |
 | `API_ROLE_NAME`                | Authenticated role name               | `administrator`                                               |
 | `API_DEFAULT_DATABASE_ID`      | Default database ID                   | `hard-coded`                                                  |
+| `GRAPHQL_OBSERVABILITY_ENABLED` | Master switch for debug routes and sampler | `false`                                                  |
+| `GRAPHQL_DEBUG_SAMPLER_ENABLED` | Enables periodic NDJSON sampling when observability is on | `true`                                   |
+| `GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS` | Sampler interval in milliseconds | `10000`                                                       |
+| `GRAPHQL_DEBUG_SAMPLER_DIR`    | Override output directory for sampler logs | `graphql/server/logs`                                     |
 
 ## Testing
 
