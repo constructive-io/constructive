@@ -83,11 +83,10 @@ export function ConnectionFilterPreset(
     plugins.push(ConnectionFilterComputedAttributesPlugin);
   }
 
-  // Relation filters are opt-in (disabled by default)
-  if (mergedOptions.connectionFilterRelations) {
-    plugins.push(ConnectionFilterForwardRelationsPlugin);
-    plugins.push(ConnectionFilterBackwardRelationsPlugin);
-  }
+  // Relation filter plugins are always included but check
+  // build.options.connectionFilterRelations at runtime
+  plugins.push(ConnectionFilterForwardRelationsPlugin);
+  plugins.push(ConnectionFilterBackwardRelationsPlugin);
 
   return {
     plugins,

@@ -57,6 +57,11 @@ export const ConnectionFilterForwardRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLInputObjectType_fields(inFields, build, context) {
         let fields = inFields;
 
+        // Runtime check: only proceed if relation filters are enabled
+        if (!build.options.connectionFilterRelations) {
+          return fields;
+        }
+
         const {
           extend,
           inflection,

@@ -82,6 +82,11 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
 
     hooks: {
       init(_, build) {
+        // Runtime check: only proceed if relation filters are enabled
+        if (!build.options.connectionFilterRelations) {
+          return _;
+        }
+
         const { inflection } = build;
 
         // Register "many" filter types (e.g. ClientToManyOrderFilter)
@@ -141,6 +146,12 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
 
       GraphQLInputObjectType_fields(inFields, build, context) {
         let fields = inFields;
+
+        // Runtime check: only proceed if relation filters are enabled
+        if (!build.options.connectionFilterRelations) {
+          return fields;
+        }
+
         const {
           extend,
           inflection,
