@@ -966,6 +966,63 @@ describe('plugin-injected condition fields', () => {
 
     // The referenced VectorNearbyInput type should be generated as a custom input type
     expect(result.content).toContain('export interface VectorNearbyInput {');
+
+    // Transitively referenced enum type (VectorMetric) should also be generated
+    expect(result.content).toContain('VectorMetric');
+    expect(result.content).toContain('"L2"');
+    expect(result.content).toContain('"INNER_PRODUCT"');
+    expect(result.content).toContain('"COSINE"');
+  });
+
+  it('generates transitively referenced enum types from input fields', () => {
+    // This specifically tests that enum types referenced by input object fields
+    // are followed and generated, not just types ending with "Input".
+    // VectorNearbyInput.metric references VectorMetric (an ENUM),
+    // which must be included in the output.
+    const registry = createTypeRegistry({
+      ContactCondition: {
+        kind: 'INPUT_OBJECT',
+        name: 'ContactCondition',
+        inputFields: [
+          { name: 'id', type: createTypeRef('SCALAR', 'UUID') },
+          { name: 'name', type: createTypeRef('SCALAR', 'String') },
+          {
+            name: 'embeddingNearby',
+            type: createTypeRef('INPUT_OBJECT', 'VectorNearbyInput'),
+          },
+        ],
+      },
+      VectorNearbyInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'VectorNearbyInput',
+        inputFields: [
+          {
+            name: 'vector',
+            type: createNonNull(createTypeRef('SCALAR', 'Vector')),
+          },
+          {
+            name: 'metric',
+            type: createTypeRef('ENUM', 'VectorMetric'),
+          },
+        ],
+      },
+      VectorMetric: {
+        kind: 'ENUM',
+        name: 'VectorMetric',
+        enumValues: ['L2', 'INNER_PRODUCT', 'COSINE'],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+
+    // VectorNearbyInput should be generated (follows *Input pattern)
+    expect(result.content).toContain('export interface VectorNearbyInput {');
+
+    // VectorMetric enum should ALSO be generated (transitive enum resolution)
+    expect(result.content).toMatch(/export type VectorMetric\s*=/);
+    expect(result.content).toContain('"L2"');
+    expect(result.content).toContain('"INNER_PRODUCT"');
+    expect(result.content).toContain('"COSINE"');
   });
 
   it('does not duplicate fields already derived from table columns', () => {
