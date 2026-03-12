@@ -2138,7 +2138,7 @@ exports[`Schema Types Generator generateSchemaTypesFile generates schema types f
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter } from "./types";
+import type { BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 export type UserRole = "ADMIN" | "USER" | "GUEST";
 export interface RegisterInput {
   email: string;
@@ -2165,7 +2165,7 @@ exports[`Schema Types Generator generateSchemaTypesFile generates schema types f
  * DO NOT EDIT - changes will be overwritten
  */
 
-import type { User, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter } from "./types";
+import type { User, BigFloatFilter, BigIntFilter, BitStringFilter, BooleanFilter, DateFilter, DatetimeFilter, FloatFilter, FullTextFilter, IntFilter, IntListFilter, InternetAddressFilter, JSONFilter, StringFilter, StringListFilter, UUIDFilter, UUIDListFilter, VectorFilter } from "./types";
 export type UserRole = "ADMIN" | "USER" | "GUEST";
 export interface RegisterInput {
   email: string;
