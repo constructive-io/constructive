@@ -9,7 +9,7 @@ CRUD operations for UsersModule records via csdk CLI
 ```bash
 csdk users-module list
 csdk users-module get --id <value>
-csdk users-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value> --typeTableId <value> --typeTableName <value>
+csdk users-module create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--typeTableId <value>] [--typeTableName <value>]
 csdk users-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--typeTableId <value>] [--typeTableName <value>]
 csdk users-module delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk users-module list
 ### Create a usersModule
 
 ```bash
-csdk users-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value" --typeTableId "value" --typeTableName "value"
+csdk users-module create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--typeTableId <value>] [--typeTableName <value>]
 ```
 
 ### Get a usersModule by id

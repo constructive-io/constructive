@@ -105,6 +105,9 @@ export class PgPoolCacheManager {
     this.closed = true;
     this.clear();
     await this.waitForDisposals();
+    // Re-open the cache so it can accept new entries if the process
+    // survives the shutdown signal (e.g. during provisioning or restart).
+    this.closed = false;
   }
 
   async waitForDisposals(): Promise<void> {
@@ -141,9 +144,14 @@ export const close = async (verbose = false): Promise<void> => {
   if (closePromise.promise) return closePromise.promise;
 
   closePromise.promise = (async () => {
-    if (verbose) log.info('Closing pg cache...');
-    await pgCache.close();
-    if (verbose) log.success('PG cache disposed.');
+    try {
+      if (verbose) log.info('Closing pg cache...');
+      await pgCache.close();
+      if (verbose) log.success('PG cache disposed.');
+    } finally {
+      // Reset so close() can be called again if the process survives.
+      closePromise.promise = null;
+    }
   })();
 
   return closePromise.promise;

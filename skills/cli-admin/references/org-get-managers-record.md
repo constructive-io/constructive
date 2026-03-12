@@ -25,7 +25,7 @@ csdk org-get-managers-record list
 ### Create a orgGetManagersRecord
 
 ```bash
-csdk org-get-managers-record create --userId "value" --depth "value"
+csdk org-get-managers-record create --userId <value> --depth <value>
 ```
 
 ### Get a orgGetManagersRecord by id

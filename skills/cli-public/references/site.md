@@ -9,7 +9,7 @@ CRUD operations for Site records via csdk CLI
 ```bash
 csdk site list
 csdk site get --id <value>
-csdk site create --databaseId <value> --title <value> --description <value> --ogImage <value> --favicon <value> --appleTouchIcon <value> --logo <value> --dbname <value>
+csdk site create --databaseId <value> [--title <value>] [--description <value>] [--ogImage <value>] [--favicon <value>] [--appleTouchIcon <value>] [--logo <value>] [--dbname <value>]
 csdk site update --id <value> [--databaseId <value>] [--title <value>] [--description <value>] [--ogImage <value>] [--favicon <value>] [--appleTouchIcon <value>] [--logo <value>] [--dbname <value>]
 csdk site delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk site list
 ### Create a site
 
 ```bash
-csdk site create --databaseId "value" --title "value" --description "value" --ogImage "value" --favicon "value" --appleTouchIcon "value" --logo "value" --dbname "value"
+csdk site create --databaseId <value> [--title <value>] [--description <value>] [--ogImage <value>] [--favicon <value>] [--appleTouchIcon <value>] [--logo <value>] [--dbname <value>]
 ```
 
 ### Get a site by id

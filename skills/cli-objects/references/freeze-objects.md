@@ -7,7 +7,7 @@ Execute the freezeObjects mutation
 ## Usage
 
 ```bash
-csdk freeze-objects --input <value>
+csdk freeze-objects --input.clientMutationId <value> --input.databaseId <value> --input.id <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk freeze-objects --input <value>
 ### Run freezeObjects
 
 ```bash
-csdk freeze-objects --input <value>
+csdk freeze-objects --input.clientMutationId <value> --input.databaseId <value> --input.id <value>
 ```

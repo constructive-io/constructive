@@ -9,7 +9,7 @@ CRUD operations for OrgPermissionDefault records via csdk CLI
 ```bash
 csdk org-permission-default list
 csdk org-permission-default get --id <value>
-csdk org-permission-default create --permissions <value> --entityId <value>
+csdk org-permission-default create --entityId <value> [--permissions <value>]
 csdk org-permission-default update --id <value> [--permissions <value>] [--entityId <value>]
 csdk org-permission-default delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk org-permission-default list
 ### Create a orgPermissionDefault
 
 ```bash
-csdk org-permission-default create --permissions "value" --entityId "value"
+csdk org-permission-default create --entityId <value> [--permissions <value>]
 ```
 
 ### Get a orgPermissionDefault by id

@@ -118,7 +118,7 @@ CRUD operations for OrgGetManagersRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `org-get-subordinates-record`
 
@@ -139,7 +139,7 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `app-permission`
 
@@ -163,7 +163,7 @@ CRUD operations for AppPermission records.
 | `bitstr` | BitString |
 | `description` | String |
 
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `org-permission`
 
@@ -187,7 +187,7 @@ CRUD operations for OrgPermission records.
 | `bitstr` | BitString |
 | `description` | String |
 
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `app-level-requirement`
 
@@ -214,7 +214,8 @@ CRUD operations for AppLevelRequirement records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `name`, `level`, `description`, `requiredCount`, `priority`
+**Required create fields:** `name`, `level`
+**Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `org-member`
 
@@ -237,7 +238,8 @@ CRUD operations for OrgMember records.
 | `actorId` | UUID |
 | `entityId` | UUID |
 
-**Create fields:** `isAdmin`, `actorId`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isAdmin`
 
 ### `app-permission-default`
 
@@ -258,7 +260,7 @@ CRUD operations for AppPermissionDefault records.
 | `id` | UUID |
 | `permissions` | BitString |
 
-**Create fields:** `permissions`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `org-permission-default`
 
@@ -280,7 +282,8 @@ CRUD operations for OrgPermissionDefault records.
 | `permissions` | BitString |
 | `entityId` | UUID |
 
-**Create fields:** `permissions`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `app-admin-grant`
 
@@ -305,7 +308,8 @@ CRUD operations for AppAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-owner-grant`
 
@@ -330,7 +334,8 @@ CRUD operations for AppOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-admin-grant`
 
@@ -356,7 +361,8 @@ CRUD operations for OrgAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-owner-grant`
 
@@ -382,7 +388,8 @@ CRUD operations for OrgOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-limit-default`
 
@@ -404,7 +411,8 @@ CRUD operations for AppLimitDefault records.
 | `name` | String |
 | `max` | Int |
 
-**Create fields:** `name`, `max`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
 
 ### `org-limit-default`
 
@@ -426,7 +434,8 @@ CRUD operations for OrgLimitDefault records.
 | `name` | String |
 | `max` | Int |
 
-**Create fields:** `name`, `max`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
 
 ### `membership-type`
 
@@ -449,7 +458,7 @@ CRUD operations for MembershipType records.
 | `description` | String |
 | `prefix` | String |
 
-**Create fields:** `name`, `description`, `prefix`
+**Required create fields:** `name`, `description`, `prefix`
 
 ### `org-chart-edge-grant`
 
@@ -477,7 +486,8 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionLevel` | Int |
 | `createdAt` | Datetime |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`, `grantorId`
+**Optional create fields (backend defaults):** `parentId`, `isGrant`, `positionTitle`, `positionLevel`
 
 ### `app-limit`
 
@@ -501,7 +511,8 @@ CRUD operations for AppLimit records.
 | `num` | Int |
 | `max` | Int |
 
-**Create fields:** `name`, `actorId`, `num`, `max`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `app-achievement`
 
@@ -526,7 +537,8 @@ CRUD operations for AppAchievement records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `app-step`
 
@@ -551,7 +563,8 @@ CRUD operations for AppStep records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `claimed-invite`
 
@@ -576,7 +589,7 @@ CRUD operations for ClaimedInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `data`, `senderId`, `receiverId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `app-grant`
 
@@ -602,7 +615,8 @@ CRUD operations for AppGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `app-membership-default`
 
@@ -628,7 +642,7 @@ CRUD operations for AppMembershipDefault records.
 | `isApproved` | Boolean |
 | `isVerified` | Boolean |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
 
 ### `org-limit`
 
@@ -653,7 +667,8 @@ CRUD operations for OrgLimit records.
 | `max` | Int |
 | `entityId` | UUID |
 
-**Create fields:** `name`, `actorId`, `num`, `max`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `org-claimed-invite`
 
@@ -679,7 +694,8 @@ CRUD operations for OrgClaimedInvite records.
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
-**Create fields:** `data`, `senderId`, `receiverId`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `org-grant`
 
@@ -706,7 +722,8 @@ CRUD operations for OrgGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `org-chart-edge`
 
@@ -733,7 +750,8 @@ CRUD operations for OrgChartEdge records.
 | `positionTitle` | String |
 | `positionLevel` | Int |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`
+**Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
 ### `org-membership-default`
 
@@ -761,7 +779,8 @@ CRUD operations for OrgMembershipDefault records.
 | `deleteMemberCascadeGroups` | Boolean |
 | `createGroupsCascadeMembers` | Boolean |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `entityId`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
 ### `invite`
 
@@ -780,7 +799,7 @@ CRUD operations for Invite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `inviteToken` | String |
 | `inviteValid` | Boolean |
@@ -792,7 +811,7 @@ CRUD operations for Invite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `app-level`
 
@@ -813,12 +832,13 @@ CRUD operations for AppLevel records.
 | `id` | UUID |
 | `name` | String |
 | `description` | String |
-| `image` | ConstructiveInternalTypeImage |
+| `image` | Image |
 | `ownerId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `name`, `description`, `image`, `ownerId`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `app-membership`
 
@@ -853,7 +873,8 @@ CRUD operations for AppMembership records.
 | `actorId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `profileId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `org-membership`
 
@@ -888,7 +909,8 @@ CRUD operations for OrgMembership records.
 | `entityId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `entityId`, `profileId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `org-invite`
 
@@ -907,7 +929,7 @@ CRUD operations for OrgInvite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `receiverId` | UUID |
 | `inviteToken` | String |
@@ -921,7 +943,8 @@ CRUD operations for OrgInvite records.
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
-**Create fields:** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ## Custom Operations
 
@@ -934,7 +957,7 @@ appPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-permissions-get-padded-mask`
 
@@ -945,7 +968,7 @@ orgPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-is-manager-of`
 
@@ -956,10 +979,10 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pUserId` | UUID |
-  | `pMaxDepth` | Int |
+  | `--pEntityId` | UUID |
+  | `--pManagerId` | UUID |
+  | `--pUserId` | UUID |
+  | `--pMaxDepth` | Int |
 
 ### `steps-achieved`
 
@@ -970,8 +993,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
 
 ### `app-permissions-get-mask`
 
@@ -982,7 +1005,7 @@ appPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `org-permissions-get-mask`
 
@@ -993,7 +1016,7 @@ orgPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 
@@ -1004,7 +1027,7 @@ appPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `org-permissions-get-mask-by-names`
 
@@ -1015,7 +1038,7 @@ orgPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `app-permissions-get-by-mask`
 
@@ -1026,10 +1049,10 @@ Reads and enables pagination through a set of `AppPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `org-permissions-get-by-mask`
 
@@ -1040,10 +1063,10 @@ Reads and enables pagination through a set of `OrgPermission`.
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `steps-required`
 
@@ -1054,11 +1077,11 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `submit-invite-code`
 
@@ -1069,7 +1092,8 @@ submitInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `submit-org-invite-code`
 
@@ -1080,7 +1104,8 @@ submitOrgInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitOrgInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ## Output
 
@@ -1089,6 +1114,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

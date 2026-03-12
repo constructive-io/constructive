@@ -7,7 +7,7 @@ Execute the oneTimeToken mutation
 ## Usage
 
 ```bash
-csdk one-time-token --input <value>
+csdk one-time-token --input.clientMutationId <value> --input.email <value> --input.password <value> --input.origin <value> --input.rememberMe <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk one-time-token --input <value>
 ### Run oneTimeToken
 
 ```bash
-csdk one-time-token --input <value>
+csdk one-time-token --input.clientMutationId <value> --input.email <value> --input.password <value> --input.origin <value> --input.rememberMe <value>
 ```
