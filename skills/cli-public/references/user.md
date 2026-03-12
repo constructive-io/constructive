@@ -9,7 +9,7 @@ CRUD operations for User records via csdk CLI
 ```bash
 csdk user list
 csdk user get --id <value>
-csdk user create --username <value> --displayName <value> --profilePicture <value> --searchTsv <value> --type <value> --searchTsvRank <value>
+csdk user create --searchTsvRank <value> [--username <value>] [--displayName <value>] [--profilePicture <value>] [--searchTsv <value>] [--type <value>]
 csdk user update --id <value> [--username <value>] [--displayName <value>] [--profilePicture <value>] [--searchTsv <value>] [--type <value>] [--searchTsvRank <value>]
 csdk user delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk user list
 ### Create a user
 
 ```bash
-csdk user create --username "value" --displayName "value" --profilePicture "value" --searchTsv "value" --type "value" --searchTsvRank "value"
+csdk user create --searchTsvRank <value> [--username <value>] [--displayName <value>] [--profilePicture <value>] [--searchTsv <value>] [--type <value>]
 ```
 
 ### Get a user by id

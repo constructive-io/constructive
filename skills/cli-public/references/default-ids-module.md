@@ -25,7 +25,7 @@ csdk default-ids-module list
 ### Create a defaultIdsModule
 
 ```bash
-csdk default-ids-module create --databaseId "value"
+csdk default-ids-module create --databaseId <value>
 ```
 
 ### Get a defaultIdsModule by id

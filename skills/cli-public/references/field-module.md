@@ -9,7 +9,7 @@ CRUD operations for FieldModule records via csdk CLI
 ```bash
 csdk field-module list
 csdk field-module get --id <value>
-csdk field-module create --databaseId <value> --privateSchemaId <value> --tableId <value> --fieldId <value> --nodeType <value> --data <value> --triggers <value> --functions <value>
+csdk field-module create --databaseId <value> --nodeType <value> [--privateSchemaId <value>] [--tableId <value>] [--fieldId <value>] [--data <value>] [--triggers <value>] [--functions <value>]
 csdk field-module update --id <value> [--databaseId <value>] [--privateSchemaId <value>] [--tableId <value>] [--fieldId <value>] [--nodeType <value>] [--data <value>] [--triggers <value>] [--functions <value>]
 csdk field-module delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk field-module list
 ### Create a fieldModule
 
 ```bash
-csdk field-module create --databaseId "value" --privateSchemaId "value" --tableId "value" --fieldId "value" --nodeType "value" --data "value" --triggers "value" --functions "value"
+csdk field-module create --databaseId <value> --nodeType <value> [--privateSchemaId <value>] [--tableId <value>] [--fieldId <value>] [--data <value>] [--triggers <value>] [--functions <value>]
 ```
 
 ### Get a fieldModule by id

@@ -9,7 +9,7 @@ CRUD operations for Api records via csdk CLI
 ```bash
 csdk api list
 csdk api get --id <value>
-csdk api create --databaseId <value> --name <value> --dbname <value> --roleName <value> --anonRole <value> --isPublic <value>
+csdk api create --databaseId <value> --name <value> [--dbname <value>] [--roleName <value>] [--anonRole <value>] [--isPublic <value>]
 csdk api update --id <value> [--databaseId <value>] [--name <value>] [--dbname <value>] [--roleName <value>] [--anonRole <value>] [--isPublic <value>]
 csdk api delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk api list
 ### Create a api
 
 ```bash
-csdk api create --databaseId "value" --name "value" --dbname "value" --roleName "value" --anonRole "value" --isPublic "value"
+csdk api create --databaseId <value> --name <value> [--dbname <value>] [--roleName <value>] [--anonRole <value>] [--isPublic <value>]
 ```
 
 ### Get a api by id

@@ -100,7 +100,7 @@ CRUD operations for RoleType records.
 | `id` | Int |
 | `name` | String |
 
-**Create fields:** `name`
+**Required create fields:** `name`
 
 ### `crypto-address`
 
@@ -126,7 +126,8 @@ CRUD operations for CryptoAddress records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `address`, `isVerified`, `isPrimary`
+**Required create fields:** `address`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `phone-number`
 
@@ -153,7 +154,8 @@ CRUD operations for PhoneNumber records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `cc`, `number`, `isVerified`, `isPrimary`
+**Required create fields:** `cc`, `number`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `connected-account`
 
@@ -180,7 +182,8 @@ CRUD operations for ConnectedAccount records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `service`, `identifier`, `details`, `isVerified`
+**Required create fields:** `service`, `identifier`, `details`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
 ### `audit-log`
 
@@ -207,7 +210,8 @@ CRUD operations for AuditLog records.
 | `success` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `event`, `actorId`, `origin`, `userAgent`, `ipAddress`, `success`
+**Required create fields:** `event`, `success`
+**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
 ### `email`
 
@@ -233,7 +237,8 @@ CRUD operations for Email records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `email`, `isVerified`, `isPrimary`
+**Required create fields:** `email`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `user`
 
@@ -261,7 +266,8 @@ CRUD operations for User records.
 | `updatedAt` | Datetime |
 | `searchTsvRank` | Float |
 
-**Create fields:** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`, `searchTsvRank`
+**Required create fields:** `searchTsvRank`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
 
 ## Custom Operations
 

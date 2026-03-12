@@ -243,7 +243,7 @@ CRUD operations for OrgGetManagersRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `org-get-subordinates-record`
 
@@ -264,7 +264,7 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `get-all-record`
 
@@ -285,7 +285,7 @@ CRUD operations for GetAllRecord records.
 | `path` | String |
 | `data` | JSON |
 
-**Create fields:** `path`, `data`
+**Required create fields:** `path`, `data`
 
 ### `app-permission`
 
@@ -309,7 +309,7 @@ CRUD operations for AppPermission records.
 | `bitstr` | BitString |
 | `description` | String |
 
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `org-permission`
 
@@ -333,7 +333,7 @@ CRUD operations for OrgPermission records.
 | `bitstr` | BitString |
 | `description` | String |
 
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `object`
 
@@ -360,7 +360,8 @@ CRUD operations for Object records.
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `hashUuid`, `databaseId`, `kids`, `ktree`, `data`, `frzn`
+**Required create fields:** `hashUuid`, `databaseId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `app-level-requirement`
 
@@ -387,7 +388,8 @@ CRUD operations for AppLevelRequirement records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `name`, `level`, `description`, `requiredCount`, `priority`
+**Required create fields:** `name`, `level`
+**Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `database`
 
@@ -414,7 +416,7 @@ CRUD operations for Database records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `schemaHash`, `name`, `label`, `hash`
+**Optional create fields (backend defaults):** `ownerId`, `schemaHash`, `name`, `label`, `hash`
 
 ### `schema`
 
@@ -447,7 +449,8 @@ CRUD operations for Schema records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `name`, `schemaName`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `tags`, `isPublic`
+**Required create fields:** `databaseId`, `name`, `schemaName`
+**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `module`, `scope`, `tags`, `isPublic`
 
 ### `table`
 
@@ -485,7 +488,8 @@ CRUD operations for Table records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `schemaId`, `name`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `inheritsId`
+**Required create fields:** `schemaId`, `name`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `inheritsId`
 
 ### `check-constraint`
 
@@ -518,7 +522,8 @@ CRUD operations for CheckConstraint records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `type`, `fieldIds`, `expr`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `expr`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `field`
 
@@ -561,7 +566,8 @@ CRUD operations for Field records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `label`, `description`, `smartTags`, `isRequired`, `defaultValue`, `defaultValueAst`, `isHidden`, `type`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
+**Required create fields:** `tableId`, `name`, `type`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `defaultValue`, `defaultValueAst`, `isHidden`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
 
 ### `foreign-key-constraint`
 
@@ -598,7 +604,8 @@ CRUD operations for ForeignKeyConstraint records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `description`, `smartTags`, `type`, `fieldIds`, `refTableId`, `refFieldIds`, `deleteAction`, `updateAction`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`, `refTableId`, `refFieldIds`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `deleteAction`, `updateAction`, `category`, `module`, `scope`, `tags`
 
 ### `full-text-search`
 
@@ -626,7 +633,8 @@ CRUD operations for FullTextSearch records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `fieldId`, `fieldIds`, `weights`, `langs`
+**Required create fields:** `tableId`, `fieldId`, `fieldIds`, `weights`, `langs`
+**Optional create fields (backend defaults):** `databaseId`
 
 ### `index`
 
@@ -662,7 +670,8 @@ CRUD operations for Index records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `databaseId`, `tableId`
+**Optional create fields (backend defaults):** `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `policy`
 
@@ -698,7 +707,8 @@ CRUD operations for Policy records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `primary-key-constraint`
 
@@ -730,7 +740,8 @@ CRUD operations for PrimaryKeyConstraint records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `type`, `fieldIds`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `table-grant`
 
@@ -758,7 +769,8 @@ CRUD operations for TableGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `privilege`, `granteeName`, `fieldIds`, `isGrant`
+**Required create fields:** `tableId`, `privilege`, `granteeName`
+**Optional create fields (backend defaults):** `databaseId`, `fieldIds`, `isGrant`
 
 ### `trigger`
 
@@ -790,7 +802,8 @@ CRUD operations for Trigger records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `event`, `functionName`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `name`
+**Optional create fields (backend defaults):** `databaseId`, `event`, `functionName`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `unique-constraint`
 
@@ -823,7 +836,8 @@ CRUD operations for UniqueConstraint records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `description`, `smartTags`, `type`, `fieldIds`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `category`, `module`, `scope`, `tags`
 
 ### `view`
 
@@ -858,7 +872,8 @@ CRUD operations for View records.
 | `scope` | Int |
 | `tags` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `name`, `tableId`, `viewType`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `schemaId`, `name`, `viewType`
+**Optional create fields (backend defaults):** `databaseId`, `tableId`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `view-table`
 
@@ -881,7 +896,8 @@ CRUD operations for ViewTable records.
 | `tableId` | UUID |
 | `joinOrder` | Int |
 
-**Create fields:** `viewId`, `tableId`, `joinOrder`
+**Required create fields:** `viewId`, `tableId`
+**Optional create fields (backend defaults):** `joinOrder`
 
 ### `view-grant`
 
@@ -907,7 +923,8 @@ CRUD operations for ViewGrant records.
 | `withGrantOption` | Boolean |
 | `isGrant` | Boolean |
 
-**Create fields:** `databaseId`, `viewId`, `granteeName`, `privilege`, `withGrantOption`, `isGrant`
+**Required create fields:** `viewId`, `granteeName`, `privilege`
+**Optional create fields (backend defaults):** `databaseId`, `withGrantOption`, `isGrant`
 
 ### `view-rule`
 
@@ -932,7 +949,8 @@ CRUD operations for ViewRule records.
 | `event` | String |
 | `action` | String |
 
-**Create fields:** `databaseId`, `viewId`, `name`, `event`, `action`
+**Required create fields:** `viewId`, `name`, `event`
+**Optional create fields (backend defaults):** `databaseId`, `action`
 
 ### `table-module`
 
@@ -960,7 +978,8 @@ CRUD operations for TableModule records.
 | `data` | JSON |
 | `fields` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `data`, `fields`
+**Required create fields:** `databaseId`, `nodeType`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `useRls`, `data`, `fields`
 
 ### `table-template-module`
 
@@ -988,7 +1007,8 @@ CRUD operations for TableTemplateModule records.
 | `nodeType` | String |
 | `data` | JSON |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`, `nodeType`, `data`
+**Required create fields:** `databaseId`, `tableName`, `nodeType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `data`
 
 ### `secure-table-provision`
 
@@ -1024,7 +1044,8 @@ CRUD operations for SecureTableProvision records.
 | `policyData` | JSON |
 | `outFields` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
 
 ### `relation-provision`
 
@@ -1071,7 +1092,8 @@ CRUD operations for RelationProvision records.
 | `outSourceFieldId` | UUID |
 | `outTargetFieldId` | UUID |
 
-**Create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`, `fieldName`, `deleteAction`, `isRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `nodeType`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
+**Required create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`
+**Optional create fields (backend defaults):** `fieldName`, `deleteAction`, `isRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `nodeType`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
 
 ### `schema-grant`
 
@@ -1096,7 +1118,8 @@ CRUD operations for SchemaGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `schemaId`, `granteeName`
+**Required create fields:** `schemaId`, `granteeName`
+**Optional create fields (backend defaults):** `databaseId`
 
 ### `default-privilege`
 
@@ -1122,7 +1145,8 @@ CRUD operations for DefaultPrivilege records.
 | `granteeName` | String |
 | `isGrant` | Boolean |
 
-**Create fields:** `databaseId`, `schemaId`, `objectType`, `privilege`, `granteeName`, `isGrant`
+**Required create fields:** `schemaId`, `objectType`, `privilege`, `granteeName`
+**Optional create fields (backend defaults):** `databaseId`, `isGrant`
 
 ### `api-schema`
 
@@ -1145,7 +1169,7 @@ CRUD operations for ApiSchema records.
 | `schemaId` | UUID |
 | `apiId` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `apiId`
+**Required create fields:** `databaseId`, `schemaId`, `apiId`
 
 ### `api-module`
 
@@ -1169,7 +1193,7 @@ CRUD operations for ApiModule records.
 | `name` | String |
 | `data` | JSON |
 
-**Create fields:** `databaseId`, `apiId`, `name`, `data`
+**Required create fields:** `databaseId`, `apiId`, `name`, `data`
 
 ### `domain`
 
@@ -1194,7 +1218,8 @@ CRUD operations for Domain records.
 | `subdomain` | Hostname |
 | `domain` | Hostname |
 
-**Create fields:** `databaseId`, `apiId`, `siteId`, `subdomain`, `domain`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiId`, `siteId`, `subdomain`, `domain`
 
 ### `site-metadatum`
 
@@ -1219,7 +1244,8 @@ CRUD operations for SiteMetadatum records.
 | `description` | String |
 | `ogImage` | Image |
 
-**Create fields:** `databaseId`, `siteId`, `title`, `description`, `ogImage`
+**Required create fields:** `databaseId`, `siteId`
+**Optional create fields (backend defaults):** `title`, `description`, `ogImage`
 
 ### `site-module`
 
@@ -1243,7 +1269,7 @@ CRUD operations for SiteModule records.
 | `name` | String |
 | `data` | JSON |
 
-**Create fields:** `databaseId`, `siteId`, `name`, `data`
+**Required create fields:** `databaseId`, `siteId`, `name`, `data`
 
 ### `site-theme`
 
@@ -1266,7 +1292,7 @@ CRUD operations for SiteTheme records.
 | `siteId` | UUID |
 | `theme` | JSON |
 
-**Create fields:** `databaseId`, `siteId`, `theme`
+**Required create fields:** `databaseId`, `siteId`, `theme`
 
 ### `trigger-function`
 
@@ -1291,7 +1317,8 @@ CRUD operations for TriggerFunction records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `name`, `code`
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `code`
 
 ### `api`
 
@@ -1317,7 +1344,8 @@ CRUD operations for Api records.
 | `anonRole` | String |
 | `isPublic` | Boolean |
 
-**Create fields:** `databaseId`, `name`, `dbname`, `roleName`, `anonRole`, `isPublic`
+**Required create fields:** `databaseId`, `name`
+**Optional create fields (backend defaults):** `dbname`, `roleName`, `anonRole`, `isPublic`
 
 ### `site`
 
@@ -1345,7 +1373,8 @@ CRUD operations for Site records.
 | `logo` | Image |
 | `dbname` | String |
 
-**Create fields:** `databaseId`, `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
 
 ### `app`
 
@@ -1373,7 +1402,8 @@ CRUD operations for App records.
 | `appIdPrefix` | String |
 | `playStoreLink` | Url |
 
-**Create fields:** `databaseId`, `siteId`, `name`, `appImage`, `appStoreLink`, `appStoreId`, `appIdPrefix`, `playStoreLink`
+**Required create fields:** `databaseId`, `siteId`
+**Optional create fields (backend defaults):** `name`, `appImage`, `appStoreLink`, `appStoreId`, `appIdPrefix`, `playStoreLink`
 
 ### `connected-accounts-module`
 
@@ -1399,7 +1429,8 @@ CRUD operations for ConnectedAccountsModule records.
 | `ownerTableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `crypto-addresses-module`
 
@@ -1426,7 +1457,8 @@ CRUD operations for CryptoAddressesModule records.
 | `tableName` | String |
 | `cryptoNetwork` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`, `cryptoNetwork`
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `cryptoNetwork`
 
 ### `crypto-auth-module`
 
@@ -1459,7 +1491,8 @@ CRUD operations for CryptoAuthModule records.
 | `signUpWithKey` | String |
 | `signInWithChallenge` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `usersTableId`, `secretsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `addressesTableId`, `userField`, `cryptoNetwork`, `signInRequestChallenge`, `signInRecordFailure`, `signUpWithKey`, `signInWithChallenge`
+**Required create fields:** `databaseId`, `userField`
+**Optional create fields (backend defaults):** `schemaId`, `usersTableId`, `secretsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `addressesTableId`, `cryptoNetwork`, `signInRequestChallenge`, `signInRecordFailure`, `signUpWithKey`, `signInWithChallenge`
 
 ### `default-ids-module`
 
@@ -1480,7 +1513,7 @@ CRUD operations for DefaultIdsModule records.
 | `id` | UUID |
 | `databaseId` | UUID |
 
-**Create fields:** `databaseId`
+**Required create fields:** `databaseId`
 
 ### `denormalized-table-field`
 
@@ -1511,7 +1544,8 @@ CRUD operations for DenormalizedTableField records.
 | `funcName` | String |
 | `funcOrder` | Int |
 
-**Create fields:** `databaseId`, `tableId`, `fieldId`, `setIds`, `refTableId`, `refFieldId`, `refIds`, `useUpdates`, `updateDefaults`, `funcName`, `funcOrder`
+**Required create fields:** `databaseId`, `tableId`, `fieldId`, `refTableId`, `refFieldId`
+**Optional create fields (backend defaults):** `setIds`, `refIds`, `useUpdates`, `updateDefaults`, `funcName`, `funcOrder`
 
 ### `emails-module`
 
@@ -1537,7 +1571,8 @@ CRUD operations for EmailsModule records.
 | `ownerTableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `encrypted-secrets-module`
 
@@ -1561,7 +1596,8 @@ CRUD operations for EncryptedSecretsModule records.
 | `tableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `field-module`
 
@@ -1589,7 +1625,8 @@ CRUD operations for FieldModule records.
 | `triggers` | String |
 | `functions` | String |
 
-**Create fields:** `databaseId`, `privateSchemaId`, `tableId`, `fieldId`, `nodeType`, `data`, `triggers`, `functions`
+**Required create fields:** `databaseId`, `nodeType`
+**Optional create fields (backend defaults):** `privateSchemaId`, `tableId`, `fieldId`, `data`, `triggers`, `functions`
 
 ### `invites-module`
 
@@ -1622,7 +1659,8 @@ CRUD operations for InvitesModule records.
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `prefix`, `membershipType`, `entityTableId`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `prefix`, `entityTableId`
 
 ### `levels-module`
 
@@ -1667,7 +1705,8 @@ CRUD operations for LevelsModule records.
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `stepsTableId`, `stepsTableName`, `achievementsTableId`, `achievementsTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `completedStep`, `incompletedStep`, `tgAchievement`, `tgAchievementToggle`, `tgAchievementToggleBoolean`, `tgAchievementBoolean`, `upsertAchievement`, `tgUpdateAchievements`, `stepsRequired`, `levelAchieved`, `prefix`, `membershipType`, `entityTableId`, `actorTableId`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `stepsTableId`, `stepsTableName`, `achievementsTableId`, `achievementsTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `completedStep`, `incompletedStep`, `tgAchievement`, `tgAchievementToggle`, `tgAchievementToggleBoolean`, `tgAchievementBoolean`, `upsertAchievement`, `tgUpdateAchievements`, `stepsRequired`, `levelAchieved`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `limits-module`
 
@@ -1704,7 +1743,8 @@ CRUD operations for LimitsModule records.
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `prefix`, `membershipType`, `entityTableId`, `actorTableId`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `membership-types-module`
 
@@ -1728,7 +1768,8 @@ CRUD operations for MembershipTypesModule records.
 | `tableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `memberships-module`
 
@@ -1778,7 +1819,8 @@ CRUD operations for MembershipsModule records.
 | `entityIdsByPerm` | String |
 | `entityIdsFunction` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `membershipsTableId`, `membershipsTableName`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `grantsTableId`, `grantsTableName`, `actorTableId`, `limitsTableId`, `defaultLimitsTableId`, `permissionsTableId`, `defaultPermissionsTableId`, `sprtTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `membershipType`, `entityTableId`, `entityTableOwnerId`, `prefix`, `actorMaskCheck`, `actorPermCheck`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `membershipsTableId`, `membershipsTableName`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `grantsTableId`, `grantsTableName`, `actorTableId`, `limitsTableId`, `defaultLimitsTableId`, `permissionsTableId`, `defaultPermissionsTableId`, `sprtTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `entityTableId`, `entityTableOwnerId`, `prefix`, `actorMaskCheck`, `actorPermCheck`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`
 
 ### `permissions-module`
 
@@ -1814,7 +1856,8 @@ CRUD operations for PermissionsModule records.
 | `getByMask` | String |
 | `getMaskByName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `bitlen`, `membershipType`, `entityTableId`, `actorTableId`, `prefix`, `getPaddedMask`, `getMask`, `getByMask`, `getMaskByName`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `bitlen`, `entityTableId`, `actorTableId`, `prefix`, `getPaddedMask`, `getMask`, `getByMask`, `getMaskByName`
 
 ### `phone-numbers-module`
 
@@ -1840,7 +1883,8 @@ CRUD operations for PhoneNumbersModule records.
 | `ownerTableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `profiles-module`
 
@@ -1877,7 +1921,8 @@ CRUD operations for ProfilesModule records.
 | `membershipsTableId` | UUID |
 | `prefix` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `membershipType`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `prefix`
+**Required create fields:** `databaseId`, `membershipType`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `prefix`
 
 ### `rls-module`
 
@@ -1908,7 +1953,8 @@ CRUD operations for RlsModule records.
 | `currentRole` | String |
 | `currentRoleId` | String |
 
-**Create fields:** `databaseId`, `apiId`, `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiId`, `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
 
 ### `secrets-module`
 
@@ -1932,7 +1978,8 @@ CRUD operations for SecretsModule records.
 | `tableId` | UUID |
 | `tableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `sessions-module`
 
@@ -1962,7 +2009,8 @@ CRUD operations for SessionsModule records.
 | `sessionCredentialsTable` | String |
 | `authSettingsTable` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `sessionsTableId`, `sessionCredentialsTableId`, `authSettingsTableId`, `usersTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionCredentialsTable`, `authSettingsTable`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `sessionsTableId`, `sessionCredentialsTableId`, `authSettingsTableId`, `usersTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionCredentialsTable`, `authSettingsTable`
 
 ### `user-auth-module`
 
@@ -2007,7 +2055,8 @@ CRUD operations for UserAuthModule records.
 | `oneTimeTokenFunction` | String |
 | `extendTokenExpires` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `emailsTableId`, `usersTableId`, `secretsTableId`, `encryptedTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `auditsTableName`, `signInFunction`, `signUpFunction`, `signOutFunction`, `setPasswordFunction`, `resetPasswordFunction`, `forgotPasswordFunction`, `sendVerificationEmailFunction`, `verifyEmailFunction`, `verifyPasswordFunction`, `checkPasswordFunction`, `sendAccountDeletionEmailFunction`, `deleteAccountFunction`, `signInOneTimeTokenFunction`, `oneTimeTokenFunction`, `extendTokenExpires`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `emailsTableId`, `usersTableId`, `secretsTableId`, `encryptedTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `auditsTableName`, `signInFunction`, `signUpFunction`, `signOutFunction`, `setPasswordFunction`, `resetPasswordFunction`, `forgotPasswordFunction`, `sendVerificationEmailFunction`, `verifyEmailFunction`, `verifyPasswordFunction`, `checkPasswordFunction`, `sendAccountDeletionEmailFunction`, `deleteAccountFunction`, `signInOneTimeTokenFunction`, `oneTimeTokenFunction`, `extendTokenExpires`
 
 ### `users-module`
 
@@ -2033,7 +2082,8 @@ CRUD operations for UsersModule records.
 | `typeTableId` | UUID |
 | `typeTableName` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`
 
 ### `uuid-module`
 
@@ -2057,7 +2107,8 @@ CRUD operations for UuidModule records.
 | `uuidFunction` | String |
 | `uuidSeed` | String |
 
-**Create fields:** `databaseId`, `schemaId`, `uuidFunction`, `uuidSeed`
+**Required create fields:** `databaseId`, `uuidSeed`
+**Optional create fields (backend defaults):** `schemaId`, `uuidFunction`
 
 ### `database-provision-module`
 
@@ -2090,7 +2141,8 @@ CRUD operations for DatabaseProvisionModule records.
 | `updatedAt` | Datetime |
 | `completedAt` | Datetime |
 
-**Create fields:** `databaseName`, `ownerId`, `subdomain`, `domain`, `modules`, `options`, `bootstrapUser`, `status`, `errorMessage`, `databaseId`, `completedAt`
+**Required create fields:** `databaseName`, `ownerId`, `domain`
+**Optional create fields (backend defaults):** `subdomain`, `modules`, `options`, `bootstrapUser`, `status`, `errorMessage`, `databaseId`, `completedAt`
 
 ### `app-admin-grant`
 
@@ -2115,7 +2167,8 @@ CRUD operations for AppAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-owner-grant`
 
@@ -2140,7 +2193,8 @@ CRUD operations for AppOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-grant`
 
@@ -2166,7 +2220,8 @@ CRUD operations for AppGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `org-membership`
 
@@ -2201,7 +2256,8 @@ CRUD operations for OrgMembership records.
 | `entityId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `entityId`, `profileId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `org-member`
 
@@ -2224,7 +2280,8 @@ CRUD operations for OrgMember records.
 | `actorId` | UUID |
 | `entityId` | UUID |
 
-**Create fields:** `isAdmin`, `actorId`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isAdmin`
 
 ### `org-admin-grant`
 
@@ -2250,7 +2307,8 @@ CRUD operations for OrgAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-owner-grant`
 
@@ -2276,7 +2334,8 @@ CRUD operations for OrgOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-grant`
 
@@ -2303,7 +2362,8 @@ CRUD operations for OrgGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `org-chart-edge`
 
@@ -2330,7 +2390,8 @@ CRUD operations for OrgChartEdge records.
 | `positionTitle` | String |
 | `positionLevel` | Int |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`
+**Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
 ### `org-chart-edge-grant`
 
@@ -2358,7 +2419,8 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionLevel` | Int |
 | `createdAt` | Datetime |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`, `grantorId`
+**Optional create fields (backend defaults):** `parentId`, `isGrant`, `positionTitle`, `positionLevel`
 
 ### `app-limit`
 
@@ -2382,7 +2444,8 @@ CRUD operations for AppLimit records.
 | `num` | Int |
 | `max` | Int |
 
-**Create fields:** `name`, `actorId`, `num`, `max`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `org-limit`
 
@@ -2407,7 +2470,8 @@ CRUD operations for OrgLimit records.
 | `max` | Int |
 | `entityId` | UUID |
 
-**Create fields:** `name`, `actorId`, `num`, `max`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `app-step`
 
@@ -2432,7 +2496,8 @@ CRUD operations for AppStep records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `app-achievement`
 
@@ -2457,7 +2522,8 @@ CRUD operations for AppAchievement records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `invite`
 
@@ -2488,7 +2554,7 @@ CRUD operations for Invite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `claimed-invite`
 
@@ -2513,7 +2579,7 @@ CRUD operations for ClaimedInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `data`, `senderId`, `receiverId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `org-invite`
 
@@ -2546,7 +2612,8 @@ CRUD operations for OrgInvite records.
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
-**Create fields:** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `org-claimed-invite`
 
@@ -2572,7 +2639,8 @@ CRUD operations for OrgClaimedInvite records.
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
-**Create fields:** `data`, `senderId`, `receiverId`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `ref`
 
@@ -2596,7 +2664,8 @@ CRUD operations for Ref records.
 | `storeId` | UUID |
 | `commitId` | UUID |
 
-**Create fields:** `name`, `databaseId`, `storeId`, `commitId`
+**Required create fields:** `name`, `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
 
 ### `store`
 
@@ -2620,7 +2689,8 @@ CRUD operations for Store records.
 | `hash` | UUID |
 | `createdAt` | Datetime |
 
-**Create fields:** `name`, `databaseId`, `hash`
+**Required create fields:** `name`, `databaseId`
+**Optional create fields (backend defaults):** `hash`
 
 ### `app-permission-default`
 
@@ -2641,7 +2711,7 @@ CRUD operations for AppPermissionDefault records.
 | `id` | UUID |
 | `permissions` | BitString |
 
-**Create fields:** `permissions`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `role-type`
 
@@ -2662,7 +2732,7 @@ CRUD operations for RoleType records.
 | `id` | Int |
 | `name` | String |
 
-**Create fields:** `name`
+**Required create fields:** `name`
 
 ### `org-permission-default`
 
@@ -2684,7 +2754,8 @@ CRUD operations for OrgPermissionDefault records.
 | `permissions` | BitString |
 | `entityId` | UUID |
 
-**Create fields:** `permissions`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `crypto-address`
 
@@ -2710,7 +2781,8 @@ CRUD operations for CryptoAddress records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `address`, `isVerified`, `isPrimary`
+**Required create fields:** `address`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `app-limit-default`
 
@@ -2732,7 +2804,8 @@ CRUD operations for AppLimitDefault records.
 | `name` | String |
 | `max` | Int |
 
-**Create fields:** `name`, `max`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
 
 ### `org-limit-default`
 
@@ -2754,7 +2827,8 @@ CRUD operations for OrgLimitDefault records.
 | `name` | String |
 | `max` | Int |
 
-**Create fields:** `name`, `max`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
 
 ### `connected-account`
 
@@ -2781,7 +2855,8 @@ CRUD operations for ConnectedAccount records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `service`, `identifier`, `details`, `isVerified`
+**Required create fields:** `service`, `identifier`, `details`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
 ### `phone-number`
 
@@ -2808,7 +2883,8 @@ CRUD operations for PhoneNumber records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `cc`, `number`, `isVerified`, `isPrimary`
+**Required create fields:** `cc`, `number`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `membership-type`
 
@@ -2831,7 +2907,7 @@ CRUD operations for MembershipType records.
 | `description` | String |
 | `prefix` | String |
 
-**Create fields:** `name`, `description`, `prefix`
+**Required create fields:** `name`, `description`, `prefix`
 
 ### `node-type-registry`
 
@@ -2859,7 +2935,8 @@ CRUD operations for NodeTypeRegistry records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `slug`, `category`, `displayName`, `description`, `parameterSchema`, `tags`
+**Required create fields:** `slug`, `category`
+**Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
 
 ### `app-membership-default`
 
@@ -2885,7 +2962,7 @@ CRUD operations for AppMembershipDefault records.
 | `isApproved` | Boolean |
 | `isVerified` | Boolean |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
 
 ### `commit`
 
@@ -2913,7 +2990,8 @@ CRUD operations for Commit records.
 | `treeId` | UUID |
 | `date` | Datetime |
 
-**Create fields:** `message`, `databaseId`, `storeId`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+**Required create fields:** `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ### `org-membership-default`
 
@@ -2941,7 +3019,8 @@ CRUD operations for OrgMembershipDefault records.
 | `deleteMemberCascadeGroups` | Boolean |
 | `createGroupsCascadeMembers` | Boolean |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `entityId`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
 ### `audit-log`
 
@@ -2968,7 +3047,8 @@ CRUD operations for AuditLog records.
 | `success` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `event`, `actorId`, `origin`, `userAgent`, `ipAddress`, `success`
+**Required create fields:** `event`, `success`
+**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
 ### `app-level`
 
@@ -2994,7 +3074,8 @@ CRUD operations for AppLevel records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `name`, `description`, `image`, `ownerId`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `email`
 
@@ -3020,7 +3101,8 @@ CRUD operations for Email records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `email`, `isVerified`, `isPrimary`
+**Required create fields:** `email`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `sql-migration`
 
@@ -3052,7 +3134,7 @@ CRUD operations for SqlMigration records.
 | `actionId` | UUID |
 | `actorId` | UUID |
 
-**Create fields:** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
+**Optional create fields (backend defaults):** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
 ### `ast-migration`
 
@@ -3084,7 +3166,7 @@ CRUD operations for AstMigration records.
 | `actionId` | UUID |
 | `actorId` | UUID |
 
-**Create fields:** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
 ### `user`
 
@@ -3112,7 +3194,8 @@ CRUD operations for User records.
 | `updatedAt` | Datetime |
 | `searchTsvRank` | Float |
 
-**Create fields:** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`, `searchTsvRank`
+**Required create fields:** `searchTsvRank`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
 
 ### `app-membership`
 
@@ -3147,7 +3230,8 @@ CRUD operations for AppMembership records.
 | `actorId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `profileId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `hierarchy-module`
 
@@ -3186,7 +3270,8 @@ CRUD operations for HierarchyModule records.
 | `isManagerOfFunction` | String |
 | `createdAt` | Datetime |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `chartEdgesTableId`, `chartEdgesTableName`, `hierarchySprtTableId`, `hierarchySprtTableName`, `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `entityTableId`, `usersTableId`, `prefix`, `privateSchemaName`, `sprtTableName`, `rebuildHierarchyFunction`, `getSubordinatesFunction`, `getManagersFunction`, `isManagerOfFunction`
+**Required create fields:** `databaseId`, `entityTableId`, `usersTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `chartEdgesTableId`, `chartEdgesTableName`, `hierarchySprtTableId`, `hierarchySprtTableName`, `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `prefix`, `privateSchemaName`, `sprtTableName`, `rebuildHierarchyFunction`, `getSubordinatesFunction`, `getManagersFunction`, `isManagerOfFunction`
 
 ## Custom Operations
 

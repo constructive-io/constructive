@@ -90,7 +90,7 @@ CRUD operations for GetAllRecord records.
 | `path` | String |
 | `data` | JSON |
 
-**Create fields:** `path`, `data`
+**Required create fields:** `path`, `data`
 
 ### `object`
 
@@ -117,7 +117,8 @@ CRUD operations for Object records.
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `hashUuid`, `databaseId`, `kids`, `ktree`, `data`, `frzn`
+**Required create fields:** `hashUuid`, `databaseId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `ref`
 
@@ -141,7 +142,8 @@ CRUD operations for Ref records.
 | `storeId` | UUID |
 | `commitId` | UUID |
 
-**Create fields:** `name`, `databaseId`, `storeId`, `commitId`
+**Required create fields:** `name`, `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `commitId`
 
 ### `store`
 
@@ -165,7 +167,8 @@ CRUD operations for Store records.
 | `hash` | UUID |
 | `createdAt` | Datetime |
 
-**Create fields:** `name`, `databaseId`, `hash`
+**Required create fields:** `name`, `databaseId`
+**Optional create fields (backend defaults):** `hash`
 
 ### `commit`
 
@@ -193,7 +196,8 @@ CRUD operations for Commit records.
 | `treeId` | UUID |
 | `date` | Datetime |
 
-**Create fields:** `message`, `databaseId`, `storeId`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+**Required create fields:** `databaseId`, `storeId`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations
 

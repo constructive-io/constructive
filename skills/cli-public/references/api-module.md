@@ -25,7 +25,7 @@ csdk api-module list
 ### Create a apiModule
 
 ```bash
-csdk api-module create --databaseId "value" --apiId "value" --name "value" --data "value"
+csdk api-module create --databaseId <value> --apiId <value> --name <value> --data <value>
 ```
 
 ### Get a apiModule by id

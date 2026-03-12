@@ -295,7 +295,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ### \`driver\`
 
@@ -317,7 +317,7 @@ CRUD operations for Driver records.
 | \`name\` | String |
 | \`licenseNumber\` | String |
 
-**Create fields:** \`name\`, \`licenseNumber\`
+**Required create fields:** \`name\`, \`licenseNumber\`
 
 ## Custom Operations
 
@@ -462,7 +462,7 @@ myapp car list
 ### Create a car
 
 \`\`\`bash
-myapp car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 
 ### Get a car by id
@@ -501,7 +501,7 @@ myapp driver list
 ### Create a driver
 
 \`\`\`bash
-myapp driver create --name "value" --licenseNumber "value"
+myapp driver create --name <value> --licenseNumber <value>
 \`\`\`
 
 ### Get a driver by id
@@ -2912,7 +2912,7 @@ CRUD operations for User records.
 | \`email\` | String |
 | \`name\` | String |
 
-**Create fields:** \`email\`, \`name\`
+**Required create fields:** \`email\`, \`name\`
 
 ### \`auth:current-user\`
 
@@ -2955,7 +2955,7 @@ CRUD operations for Member records.
 | \`id\` | UUID |
 | \`role\` | String |
 
-**Create fields:** \`role\`
+**Required create fields:** \`role\`
 
 ## app Commands
 
@@ -2982,7 +2982,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ## Output
 
@@ -3152,7 +3152,7 @@ myapp auth:user list
 ### Create a user
 
 \`\`\`bash
-myapp auth:user create --email "value" --name "value"
+myapp auth:user create --email <value> --name <value>
 \`\`\`
 ",
     "fileName": "cli-auth/references/user.md",
@@ -3280,7 +3280,7 @@ myapp members:member list
 ### Create a member
 
 \`\`\`bash
-myapp members:member create --role "value"
+myapp members:member create --role <value>
 \`\`\`
 ",
     "fileName": "cli-members/references/member.md",
@@ -3359,7 +3359,7 @@ myapp app:car list
 ### Create a car
 
 \`\`\`bash
-myapp app:car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 ",
     "fileName": "cli-app/references/car.md",

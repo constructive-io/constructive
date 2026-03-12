@@ -9,7 +9,7 @@ CRUD operations for AppLevel records via csdk CLI
 ```bash
 csdk app-level list
 csdk app-level get --id <value>
-csdk app-level create --name <value> --description <value> --image <value> --ownerId <value>
+csdk app-level create --name <value> [--description <value>] [--image <value>] [--ownerId <value>]
 csdk app-level update --id <value> [--name <value>] [--description <value>] [--image <value>] [--ownerId <value>]
 csdk app-level delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk app-level list
 ### Create a appLevel
 
 ```bash
-csdk app-level create --name "value" --description "value" --image "value" --ownerId "value"
+csdk app-level create --name <value> [--description <value>] [--image <value>] [--ownerId <value>]
 ```
 
 ### Get a appLevel by id
