@@ -3,25 +3,22 @@
  *
  * Auto-discovers all `vector` columns across all tables and adds:
  *
- * 1. **vectorSearch<TableType>** query fields on Query
- *    - Accepts a query vector, metric, limit, offset
- *    - Returns rows ordered by distance with a `distance` score
- *
- * 2. **<column>Nearby** condition fields on connection condition inputs
+ * 1. **<column>Nearby** filter fields on connection filter inputs
  *    - Accepts { vector, metric?, distance? } to filter by distance threshold
  *    - Computes distance server-side using pgvector operators
+ *    - Lives inside the `filter` argument (via postgraphile-plugin-connection-filter)
  *
- * 3. **<column>Distance** computed fields on output types
- *    - Returns the distance value when a nearby condition is active (null otherwise)
+ * 2. **<column>Distance** computed fields on output types
+ *    - Returns the distance value when a nearby filter is active (null otherwise)
  *
- * 4. **<COLUMN>_DISTANCE_ASC/DESC** orderBy enum values
- *    - Orders results by vector distance when a nearby condition is active
+ * 3. **<COLUMN>_DISTANCE_ASC/DESC** orderBy enum values
+ *    - Orders results by vector distance when a nearby filter is active
  *
  * Uses the Grafast meta system (setMeta/getMeta) to pass data between
- * the condition apply phase and the output field plan, following the
+ * the filter apply phase and the output field plan, following the
  * pattern from Benjie's postgraphile-plugin-fulltext-filter reference.
  *
- * Follows the same patterns as graphile-search-plugin (for tsvector columns).
+ * Requires postgraphile-plugin-connection-filter to be loaded first.
  */
 
 import 'graphile-build';
@@ -133,17 +130,19 @@ export function createVectorSearchPlugin(
   const {
     defaultMetric = 'COSINE',
     maxLimit = 100,
-    conditionPrefix = 'vector',
+    filterPrefix = 'vector',
   } = options;
 
   return {
     name: 'VectorSearchPlugin',
     version: '1.0.0',
     description:
-      'Auto-discovers vector columns and adds search fields, conditions, and orderBy',
+      'Auto-discovers vector columns and adds filter fields, distance computed fields, and orderBy',
     after: [
       'VectorCodecPlugin',
       'PgAttributesPlugin',
+      'PgConnectionArgFilterPlugin',
+      'PgConnectionArgFilterAttributesPlugin',
     ],
 
     // ─── Custom Inflection Methods ─────────────────────────────────────
@@ -454,18 +453,23 @@ export function createVectorSearchPlugin(
         },
 
         /**
-         * Add `<column>Nearby` condition fields on connection condition input types
+         * Add `<column>Nearby` filter fields on connection filter input types
          * for tables with vector columns.
+         *
+         * Uses the connection filter plugin's `isPgConnectionFilter` scope.
+         * The apply function receives a PgCondition wrapping PgSelectStep,
+         * identical to the condition approach — so we can use the same
+         * getQueryBuilder() traversal for selectAndReturnIndex/setMeta/orderBy.
          */
         GraphQLInputObjectType_fields(fields, build, context) {
           const { inflection, sql } = build;
           const {
-            scope: { isPgCondition, pgCodec },
+            scope: { isPgConnectionFilter, pgCodec } = {} as any,
             fieldWithHooks,
           } = context;
 
           if (
-            !isPgCondition ||
+            !isPgConnectionFilter ||
             !pgCodec ||
             !pgCodec.attributes ||
             pgCodec.isAnonymous
@@ -487,7 +491,7 @@ export function createVectorSearchPlugin(
 
           for (const [attributeName] of vectorAttributes) {
             const fieldName = inflection.camelCase(
-              `${conditionPrefix}_${attributeName}`
+              `${filterPrefix}_${attributeName}`
             );
             const baseFieldName = inflection.attribute({
               codec: pgCodec as any,
@@ -501,8 +505,8 @@ export function createVectorSearchPlugin(
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    isPgConnectionConditionInputField: true,
-                  },
+                    isPgConnectionFilterField: true,
+                  } as any,
                   {
                     description: build.wrapDescription(
                       `Vector similarity search on the \`${attributeName}\` column. ` +
@@ -583,7 +587,7 @@ export function createVectorSearchPlugin(
                   }
                 ),
               },
-              `VectorSearchPlugin adding condition field '${fieldName}' for vector column '${attributeName}' on '${pgCodec.name}'`
+              `VectorSearchPlugin adding filter field '${fieldName}' for vector column '${attributeName}' on '${pgCodec.name}'`
             );
           }
 

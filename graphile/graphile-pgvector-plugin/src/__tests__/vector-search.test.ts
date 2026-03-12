@@ -2,6 +2,7 @@ import { join } from 'path';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
+import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
 import { VectorCodecPreset } from '../vector-codec';
 import { createVectorSearchPlugin } from '../vector-search';
 
@@ -30,6 +31,7 @@ describe('VectorSearchPlugin', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
+        PostGraphileConnectionFilterPreset,
         VectorCodecPreset,
         {
           plugins: [createVectorSearchPlugin({ defaultMetric: 'COSINE' })],
@@ -76,11 +78,11 @@ describe('VectorSearchPlugin', () => {
     await db.afterEach();
   });
 
-  describe('condition field (vectorEmbedding)', () => {
+  describe('filter field (vectorEmbedding)', () => {
     it('filters by vector similarity with distance threshold', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(condition: {
+          allDocuments(filter: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: COSINE
@@ -107,10 +109,10 @@ describe('VectorSearchPlugin', () => {
       expect(titles).toContain('Document A');
     });
 
-    it('returns embeddingDistance computed field when condition is active', async () => {
+    it('returns embeddingDistance computed field when filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(condition: {
+          allDocuments(filter: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: COSINE
@@ -140,7 +142,7 @@ describe('VectorSearchPlugin', () => {
       expect(docA!.embeddingDistance).toBeCloseTo(0, 2);
     });
 
-    it('returns null for embeddingDistance when no condition is active', async () => {
+    it('returns null for embeddingDistance when no filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments {
@@ -164,7 +166,7 @@ describe('VectorSearchPlugin', () => {
     it('supports L2 metric', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(condition: {
+          allDocuments(filter: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: L2
@@ -191,7 +193,7 @@ describe('VectorSearchPlugin', () => {
     it('supports IP metric', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(condition: {
+          allDocuments(filter: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: IP
@@ -217,11 +219,11 @@ describe('VectorSearchPlugin', () => {
   });
 
   describe('orderBy (EMBEDDING_DISTANCE_ASC/DESC)', () => {
-    it('orders by distance ascending when condition is active', async () => {
+    it('orders by distance ascending when filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            condition: {
+            filter: {
               vectorEmbedding: {
                 vector: [1, 0, 0]
                 metric: COSINE
@@ -254,11 +256,11 @@ describe('VectorSearchPlugin', () => {
       }
     });
 
-    it('orders by distance descending when condition is active', async () => {
+    it('orders by distance descending when filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            condition: {
+            filter: {
               vectorEmbedding: {
                 vector: [1, 0, 0]
                 metric: COSINE
@@ -298,7 +300,7 @@ describe('VectorSearchPlugin', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            condition: {
+            filter: {
               vectorEmbedding: {
                 vector: [1, 0, 0]
                 metric: COSINE
@@ -340,7 +342,7 @@ describe('VectorSearchPlugin', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            condition: {
+            filter: {
               vectorEmbedding: {
                 vector: [1, 0, 0]
                 metric: COSINE
