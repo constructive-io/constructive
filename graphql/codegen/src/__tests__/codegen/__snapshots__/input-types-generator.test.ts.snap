@@ -173,6 +173,13 @@ export interface VectorFilter {
   distinctFrom?: number[];
   notDistinctFrom?: number[];
 }
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -662,6 +669,13 @@ export interface VectorFilter {
   distinctFrom?: number[];
   notDistinctFrom?: number[];
 }
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -986,6 +1000,13 @@ export interface VectorFilter {
   notEqualTo?: number[];
   distinctFrom?: number[];
   notDistinctFrom?: number[];
+}
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -1323,6 +1344,13 @@ export interface VectorFilter {
   notEqualTo?: number[];
   distinctFrom?: number[];
   notDistinctFrom?: number[];
+}
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -1665,6 +1693,13 @@ export interface VectorFilter {
   notEqualTo?: number[];
   distinctFrom?: number[];
   notDistinctFrom?: number[];
+}
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -2064,6 +2099,13 @@ export interface VectorFilter {
   distinctFrom?: number[];
   notDistinctFrom?: number[];
 }
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -2457,6 +2499,13 @@ export interface VectorFilter {
   notEqualTo?: number[];
   distinctFrom?: number[];
   notDistinctFrom?: number[];
+}
+export interface GeoJSONFilter {
+  isNull?: boolean;
+  equalTo?: unknown;
+  notEqualTo?: unknown;
+  distinctFrom?: unknown;
+  notDistinctFrom?: unknown;
 }
 export interface StringListFilter {
   isNull?: boolean;

@@ -324,6 +324,8 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
   // Vector filter (for pgvector embedding fields)
   { name: 'VectorFilter', tsType: 'number[]', operators: ['equality', 'distinct'] },
+  // PostGIS geometry filter (for geometry/geography/GeoJSON fields)
+  { name: 'GeoJSONFilter', tsType: 'unknown', operators: ['equality', 'distinct'] },
   // List filters (for array fields like string[], int[], uuid[])
   {
     name: 'StringListFilter',

@@ -64,6 +64,11 @@ export const SCALAR_FILTER_MAP: Record<string, string> = {
   Vector: 'VectorFilter',
   FullText: 'FullTextFilter',
   Interval: 'StringFilter',
+  // PostGIS geometry types
+  GeoJSON: 'GeoJSONFilter',
+  Geometry: 'GeoJSONFilter',
+  GeometryPoint: 'GeoJSONFilter',
+  Point: 'GeoJSONFilter',
 };
 
 export const SCALAR_NAMES = new Set(Object.keys(SCALAR_TS_MAP));

@@ -467,6 +467,19 @@ describe('scalar filter types', () => {
     expect(result.content).toContain('distinctFrom?: number[];');
     expect(result.content).toContain('notDistinctFrom?: number[];');
   });
+
+  it('includes GeoJSONFilter for PostGIS geometry fields', () => {
+    const result = generateInputTypesFile(new Map(), new Set(), [userTable]);
+
+    // GeoJSONFilter should be generated as a scalar filter type
+    expect(result.content).toContain('export interface GeoJSONFilter {');
+    expect(result.content).toContain('isNull?: boolean;');
+    // GeoJSON maps to unknown, so equality operators use unknown
+    expect(result.content).toContain('equalTo?: unknown;');
+    expect(result.content).toContain('notEqualTo?: unknown;');
+    expect(result.content).toContain('distinctFrom?: unknown;');
+    expect(result.content).toContain('notDistinctFrom?: unknown;');
+  });
 });
 
 // ============================================================================
