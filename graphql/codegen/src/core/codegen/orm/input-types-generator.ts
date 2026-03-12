@@ -1572,9 +1572,10 @@ function generateCustomInputTypes(
   usedInputTypes: Set<string>,
   tableCrudTypes?: Set<string>,
   comments: boolean = true,
+  alreadyGeneratedTypes?: Set<string>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
-  const generatedTypes = new Set<string>();
+  const generatedTypes = new Set<string>(alreadyGeneratedTypes ?? []);
   const typesToGenerate = new Set(Array.from(usedInputTypes));
 
   // Filter out types we've already generated (exact matches for table CRUD types only)
@@ -1969,7 +1970,9 @@ export function generateInputTypesFile(
   tables?: CleanTable[],
   usedPayloadTypes?: Set<string>,
   comments: boolean = true,
+  options?: { condition?: boolean },
 ): GeneratedInputTypesFile {
+  const conditionEnabled = options?.condition !== false;
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
   const hasTables = tablesList.length > 0;
@@ -2006,7 +2009,9 @@ export function generateInputTypesFile(
     // 4b. Table condition types (simple equality filter)
     // Pass typeRegistry to merge plugin-injected condition fields
     // (e.g., vectorEmbedding from VectorSearchPlugin)
-    statements.push(...generateTableConditionTypes(tablesList, typeRegistry));
+    if (conditionEnabled) {
+      statements.push(...generateTableConditionTypes(tablesList, typeRegistry));
+    }
 
     // 5. OrderBy types
     // Pass typeRegistry to merge plugin-injected orderBy values
@@ -2024,7 +2029,7 @@ export function generateInputTypesFile(
   // 7. Custom input types from TypeRegistry
   // Also include any extra types referenced by plugin-injected condition fields
   const mergedUsedInputTypes = new Set(usedInputTypes);
-  if (hasTables) {
+  if (hasTables && conditionEnabled) {
     const conditionExtraTypes = collectConditionExtraInputTypes(
       tablesList,
       typeRegistry,
@@ -2034,8 +2039,13 @@ export function generateInputTypesFile(
     }
   }
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;
+  // Pass customScalarTypes + enumTypes as already-generated to avoid duplicate declarations
+  const alreadyGenerated = new Set<string>([
+    ...customScalarTypes,
+    ...enumTypes,
+  ]);
   statements.push(
-    ...generateCustomInputTypes(typeRegistry, mergedUsedInputTypes, tableCrudTypes, comments),
+    ...generateCustomInputTypes(typeRegistry, mergedUsedInputTypes, tableCrudTypes, comments, alreadyGenerated),
   );
 
   // 8. Payload/return types for custom operations
