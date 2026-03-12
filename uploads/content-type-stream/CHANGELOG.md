@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.2](https://github.com/constructive-io/constructive/compare/@constructive-io/content-type-stream@2.10.1...@constructive-io/content-type-stream@2.10.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/content-type-stream
+
 ## [2.10.1](https://github.com/constructive-io/constructive/compare/@constructive-io/content-type-stream@2.9.0...@constructive-io/content-type-stream@2.10.1) (2026-03-12)
 
 **Note:** Version bump only for package @constructive-io/content-type-stream
