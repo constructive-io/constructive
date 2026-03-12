@@ -28,6 +28,7 @@ import type {
   PhoneNumberWithRelations,
   PhoneNumberSelect,
   PhoneNumberFilter,
+  PhoneNumberCondition,
   PhoneNumberOrderBy,
   CreatePhoneNumberInput,
   UpdatePhoneNumberInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PhoneNumberModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PhoneNumberSelect>(
-    args: FindManyArgs<S, PhoneNumberFilter, PhoneNumberOrderBy> & {
+    args: FindManyArgs<S, PhoneNumberFilter, PhoneNumberCondition, PhoneNumberOrderBy> & {
       select: S;
     } & StrictSelect<S, PhoneNumberSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class PhoneNumberModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class PhoneNumberModel {
       },
       'PhoneNumberFilter',
       'PhoneNumberOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'PhoneNumberCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class PhoneNumberModel {
     });
   }
   findFirst<S extends PhoneNumberSelect>(
-    args: FindFirstArgs<S, PhoneNumberFilter> & {
+    args: FindFirstArgs<S, PhoneNumberFilter, PhoneNumberCondition> & {
       select: S;
     } & StrictSelect<S, PhoneNumberSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class PhoneNumberModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'PhoneNumberFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'PhoneNumberCondition'
     );
     return new QueryBuilder({
       client: this.client,

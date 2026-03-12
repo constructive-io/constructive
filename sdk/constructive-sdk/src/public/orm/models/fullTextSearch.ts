@@ -28,6 +28,7 @@ import type {
   FullTextSearchWithRelations,
   FullTextSearchSelect,
   FullTextSearchFilter,
+  FullTextSearchCondition,
   FullTextSearchOrderBy,
   CreateFullTextSearchInput,
   UpdateFullTextSearchInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class FullTextSearchModel {
   constructor(private client: OrmClient) {}
   findMany<S extends FullTextSearchSelect>(
-    args: FindManyArgs<S, FullTextSearchFilter, FullTextSearchOrderBy> & {
+    args: FindManyArgs<S, FullTextSearchFilter, FullTextSearchCondition, FullTextSearchOrderBy> & {
       select: S;
     } & StrictSelect<S, FullTextSearchSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class FullTextSearchModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class FullTextSearchModel {
       },
       'FullTextSearchFilter',
       'FullTextSearchOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'FullTextSearchCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class FullTextSearchModel {
     });
   }
   findFirst<S extends FullTextSearchSelect>(
-    args: FindFirstArgs<S, FullTextSearchFilter> & {
+    args: FindFirstArgs<S, FullTextSearchFilter, FullTextSearchCondition> & {
       select: S;
     } & StrictSelect<S, FullTextSearchSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class FullTextSearchModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'FullTextSearchFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'FullTextSearchCondition'
     );
     return new QueryBuilder({
       client: this.client,

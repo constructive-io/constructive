@@ -28,6 +28,7 @@ import type {
   ApiWithRelations,
   ApiSelect,
   ApiFilter,
+  ApiCondition,
   ApiOrderBy,
   CreateApiInput,
   UpdateApiInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ApiModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ApiSelect>(
-    args: FindManyArgs<S, ApiFilter, ApiOrderBy> & {
+    args: FindManyArgs<S, ApiFilter, ApiCondition, ApiOrderBy> & {
       select: S;
     } & StrictSelect<S, ApiSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class ApiModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class ApiModel {
       },
       'ApiFilter',
       'ApiOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'ApiCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class ApiModel {
     });
   }
   findFirst<S extends ApiSelect>(
-    args: FindFirstArgs<S, ApiFilter> & {
+    args: FindFirstArgs<S, ApiFilter, ApiCondition> & {
       select: S;
     } & StrictSelect<S, ApiSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class ApiModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'ApiFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'ApiCondition'
     );
     return new QueryBuilder({
       client: this.client,

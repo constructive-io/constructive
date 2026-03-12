@@ -163,6 +163,13 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -7933,6 +7940,8 @@ export interface UserCondition {
   createdAt?: string | null;
   updatedAt?: string | null;
   searchTsvRank?: number | null;
+  /** Full-text search on the `search_tsv` tsvector column using `websearch_to_tsquery`. */
+  fullTextSearchTsv?: string;
 }
 export interface AppMembershipCondition {
   id?: string | null;

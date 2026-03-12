@@ -28,6 +28,7 @@ import type {
   AppLimitWithRelations,
   AppLimitSelect,
   AppLimitFilter,
+  AppLimitCondition,
   AppLimitOrderBy,
   CreateAppLimitInput,
   UpdateAppLimitInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppLimitModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppLimitSelect>(
-    args: FindManyArgs<S, AppLimitFilter, AppLimitOrderBy> & {
+    args: FindManyArgs<S, AppLimitFilter, AppLimitCondition, AppLimitOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLimitSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AppLimitModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AppLimitModel {
       },
       'AppLimitFilter',
       'AppLimitOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppLimitCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AppLimitModel {
     });
   }
   findFirst<S extends AppLimitSelect>(
-    args: FindFirstArgs<S, AppLimitFilter> & {
+    args: FindFirstArgs<S, AppLimitFilter, AppLimitCondition> & {
       select: S;
     } & StrictSelect<S, AppLimitSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AppLimitModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppLimitFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppLimitCondition'
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,6 +28,7 @@ import type {
   AppWithRelations,
   AppSelect,
   AppFilter,
+  AppCondition,
   AppOrderBy,
   CreateAppInput,
   UpdateAppInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppSelect>(
-    args: FindManyArgs<S, AppFilter, AppOrderBy> & {
+    args: FindManyArgs<S, AppFilter, AppCondition, AppOrderBy> & {
       select: S;
     } & StrictSelect<S, AppSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AppModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AppModel {
       },
       'AppFilter',
       'AppOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AppModel {
     });
   }
   findFirst<S extends AppSelect>(
-    args: FindFirstArgs<S, AppFilter> & {
+    args: FindFirstArgs<S, AppFilter, AppCondition> & {
       select: S;
     } & StrictSelect<S, AppSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AppModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppCondition'
     );
     return new QueryBuilder({
       client: this.client,

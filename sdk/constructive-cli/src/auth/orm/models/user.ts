@@ -28,6 +28,7 @@ import type {
   UserWithRelations,
   UserSelect,
   UserFilter,
+  UserCondition,
   UserOrderBy,
   CreateUserInput,
   UpdateUserInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class UserModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UserSelect>(
-    args: FindManyArgs<S, UserFilter, UserOrderBy> & {
+    args: FindManyArgs<S, UserFilter, UserCondition, UserOrderBy> & {
       select: S;
     } & StrictSelect<S, UserSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class UserModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class UserModel {
       },
       'UserFilter',
       'UserOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'UserCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class UserModel {
     });
   }
   findFirst<S extends UserSelect>(
-    args: FindFirstArgs<S, UserFilter> & {
+    args: FindFirstArgs<S, UserFilter, UserCondition> & {
       select: S;
     } & StrictSelect<S, UserSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class UserModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'UserFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'UserCondition'
     );
     return new QueryBuilder({
       client: this.client,

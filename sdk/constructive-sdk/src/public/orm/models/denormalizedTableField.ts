@@ -28,6 +28,7 @@ import type {
   DenormalizedTableFieldWithRelations,
   DenormalizedTableFieldSelect,
   DenormalizedTableFieldFilter,
+  DenormalizedTableFieldCondition,
   DenormalizedTableFieldOrderBy,
   CreateDenormalizedTableFieldInput,
   UpdateDenormalizedTableFieldInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class DenormalizedTableFieldModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DenormalizedTableFieldSelect>(
-    args: FindManyArgs<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy> & {
+    args: FindManyArgs<
+      S,
+      DenormalizedTableFieldFilter,
+      DenormalizedTableFieldCondition,
+      DenormalizedTableFieldOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, DenormalizedTableFieldSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class DenormalizedTableFieldModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class DenormalizedTableFieldModel {
       },
       'DenormalizedTableFieldFilter',
       'DenormalizedTableFieldOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DenormalizedTableFieldCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class DenormalizedTableFieldModel {
     });
   }
   findFirst<S extends DenormalizedTableFieldSelect>(
-    args: FindFirstArgs<S, DenormalizedTableFieldFilter> & {
+    args: FindFirstArgs<S, DenormalizedTableFieldFilter, DenormalizedTableFieldCondition> & {
       select: S;
     } & StrictSelect<S, DenormalizedTableFieldSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class DenormalizedTableFieldModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'DenormalizedTableFieldFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DenormalizedTableFieldCondition'
     );
     return new QueryBuilder({
       client: this.client,

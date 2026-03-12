@@ -28,6 +28,7 @@ import type {
   OrgGetSubordinatesRecordWithRelations,
   OrgGetSubordinatesRecordSelect,
   OrgGetSubordinatesRecordFilter,
+  OrgGetSubordinatesRecordCondition,
   OrgGetSubordinatesRecordsOrderBy,
   CreateOrgGetSubordinatesRecordInput,
   UpdateOrgGetSubordinatesRecordInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgGetSubordinatesRecordModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgGetSubordinatesRecordSelect>(
-    args: FindManyArgs<S, OrgGetSubordinatesRecordFilter, OrgGetSubordinatesRecordsOrderBy> & {
+    args: FindManyArgs<
+      S,
+      OrgGetSubordinatesRecordFilter,
+      OrgGetSubordinatesRecordCondition,
+      OrgGetSubordinatesRecordsOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, OrgGetSubordinatesRecordSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class OrgGetSubordinatesRecordModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class OrgGetSubordinatesRecordModel {
       },
       'OrgGetSubordinatesRecordFilter',
       'OrgGetSubordinatesRecordsOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgGetSubordinatesRecordCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class OrgGetSubordinatesRecordModel {
     });
   }
   findFirst<S extends OrgGetSubordinatesRecordSelect>(
-    args: FindFirstArgs<S, OrgGetSubordinatesRecordFilter> & {
+    args: FindFirstArgs<S, OrgGetSubordinatesRecordFilter, OrgGetSubordinatesRecordCondition> & {
       select: S;
     } & StrictSelect<S, OrgGetSubordinatesRecordSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class OrgGetSubordinatesRecordModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'OrgGetSubordinatesRecordFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgGetSubordinatesRecordCondition'
     );
     return new QueryBuilder({
       client: this.client,

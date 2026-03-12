@@ -28,6 +28,7 @@ import type {
   AppPermissionWithRelations,
   AppPermissionSelect,
   AppPermissionFilter,
+  AppPermissionCondition,
   AppPermissionOrderBy,
   CreateAppPermissionInput,
   UpdateAppPermissionInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppPermissionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppPermissionSelect>(
-    args: FindManyArgs<S, AppPermissionFilter, AppPermissionOrderBy> & {
+    args: FindManyArgs<S, AppPermissionFilter, AppPermissionCondition, AppPermissionOrderBy> & {
       select: S;
     } & StrictSelect<S, AppPermissionSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AppPermissionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AppPermissionModel {
       },
       'AppPermissionFilter',
       'AppPermissionOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppPermissionCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AppPermissionModel {
     });
   }
   findFirst<S extends AppPermissionSelect>(
-    args: FindFirstArgs<S, AppPermissionFilter> & {
+    args: FindFirstArgs<S, AppPermissionFilter, AppPermissionCondition> & {
       select: S;
     } & StrictSelect<S, AppPermissionSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AppPermissionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppPermissionFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppPermissionCondition'
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,6 +28,7 @@ import type {
   OrgMembershipDefaultWithRelations,
   OrgMembershipDefaultSelect,
   OrgMembershipDefaultFilter,
+  OrgMembershipDefaultCondition,
   OrgMembershipDefaultOrderBy,
   CreateOrgMembershipDefaultInput,
   UpdateOrgMembershipDefaultInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgMembershipDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgMembershipDefaultSelect>(
-    args: FindManyArgs<S, OrgMembershipDefaultFilter, OrgMembershipDefaultOrderBy> & {
+    args: FindManyArgs<
+      S,
+      OrgMembershipDefaultFilter,
+      OrgMembershipDefaultCondition,
+      OrgMembershipDefaultOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, OrgMembershipDefaultSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class OrgMembershipDefaultModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class OrgMembershipDefaultModel {
       },
       'OrgMembershipDefaultFilter',
       'OrgMembershipDefaultOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgMembershipDefaultCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class OrgMembershipDefaultModel {
     });
   }
   findFirst<S extends OrgMembershipDefaultSelect>(
-    args: FindFirstArgs<S, OrgMembershipDefaultFilter> & {
+    args: FindFirstArgs<S, OrgMembershipDefaultFilter, OrgMembershipDefaultCondition> & {
       select: S;
     } & StrictSelect<S, OrgMembershipDefaultSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class OrgMembershipDefaultModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'OrgMembershipDefaultFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgMembershipDefaultCondition'
     );
     return new QueryBuilder({
       client: this.client,

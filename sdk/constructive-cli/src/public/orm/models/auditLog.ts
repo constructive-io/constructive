@@ -28,6 +28,7 @@ import type {
   AuditLogWithRelations,
   AuditLogSelect,
   AuditLogFilter,
+  AuditLogCondition,
   AuditLogOrderBy,
   CreateAuditLogInput,
   UpdateAuditLogInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AuditLogModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AuditLogSelect>(
-    args: FindManyArgs<S, AuditLogFilter, AuditLogOrderBy> & {
+    args: FindManyArgs<S, AuditLogFilter, AuditLogCondition, AuditLogOrderBy> & {
       select: S;
     } & StrictSelect<S, AuditLogSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AuditLogModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AuditLogModel {
       },
       'AuditLogFilter',
       'AuditLogOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AuditLogCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AuditLogModel {
     });
   }
   findFirst<S extends AuditLogSelect>(
-    args: FindFirstArgs<S, AuditLogFilter> & {
+    args: FindFirstArgs<S, AuditLogFilter, AuditLogCondition> & {
       select: S;
     } & StrictSelect<S, AuditLogSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AuditLogModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AuditLogFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AuditLogCondition'
     );
     return new QueryBuilder({
       client: this.client,

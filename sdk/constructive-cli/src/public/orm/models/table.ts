@@ -28,6 +28,7 @@ import type {
   TableWithRelations,
   TableSelect,
   TableFilter,
+  TableCondition,
   TableOrderBy,
   CreateTableInput,
   UpdateTableInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TableModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TableSelect>(
-    args: FindManyArgs<S, TableFilter, TableOrderBy> & {
+    args: FindManyArgs<S, TableFilter, TableCondition, TableOrderBy> & {
       select: S;
     } & StrictSelect<S, TableSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class TableModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class TableModel {
       },
       'TableFilter',
       'TableOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'TableCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class TableModel {
     });
   }
   findFirst<S extends TableSelect>(
-    args: FindFirstArgs<S, TableFilter> & {
+    args: FindFirstArgs<S, TableFilter, TableCondition> & {
       select: S;
     } & StrictSelect<S, TableSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class TableModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'TableFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'TableCondition'
     );
     return new QueryBuilder({
       client: this.client,

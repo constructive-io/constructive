@@ -28,6 +28,7 @@ import type {
   MembershipTypeWithRelations,
   MembershipTypeSelect,
   MembershipTypeFilter,
+  MembershipTypeCondition,
   MembershipTypeOrderBy,
   CreateMembershipTypeInput,
   UpdateMembershipTypeInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class MembershipTypeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends MembershipTypeSelect>(
-    args: FindManyArgs<S, MembershipTypeFilter, MembershipTypeOrderBy> & {
+    args: FindManyArgs<S, MembershipTypeFilter, MembershipTypeCondition, MembershipTypeOrderBy> & {
       select: S;
     } & StrictSelect<S, MembershipTypeSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class MembershipTypeModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class MembershipTypeModel {
       },
       'MembershipTypeFilter',
       'MembershipTypeOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'MembershipTypeCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class MembershipTypeModel {
     });
   }
   findFirst<S extends MembershipTypeSelect>(
-    args: FindFirstArgs<S, MembershipTypeFilter> & {
+    args: FindFirstArgs<S, MembershipTypeFilter, MembershipTypeCondition> & {
       select: S;
     } & StrictSelect<S, MembershipTypeSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class MembershipTypeModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'MembershipTypeFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'MembershipTypeCondition'
     );
     return new QueryBuilder({
       client: this.client,

@@ -163,6 +163,13 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];

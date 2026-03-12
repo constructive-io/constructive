@@ -28,6 +28,7 @@ import type {
   EncryptedSecretsModuleWithRelations,
   EncryptedSecretsModuleSelect,
   EncryptedSecretsModuleFilter,
+  EncryptedSecretsModuleCondition,
   EncryptedSecretsModuleOrderBy,
   CreateEncryptedSecretsModuleInput,
   UpdateEncryptedSecretsModuleInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class EncryptedSecretsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends EncryptedSecretsModuleSelect>(
-    args: FindManyArgs<S, EncryptedSecretsModuleFilter, EncryptedSecretsModuleOrderBy> & {
+    args: FindManyArgs<
+      S,
+      EncryptedSecretsModuleFilter,
+      EncryptedSecretsModuleCondition,
+      EncryptedSecretsModuleOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, EncryptedSecretsModuleSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class EncryptedSecretsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class EncryptedSecretsModuleModel {
       },
       'EncryptedSecretsModuleFilter',
       'EncryptedSecretsModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'EncryptedSecretsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class EncryptedSecretsModuleModel {
     });
   }
   findFirst<S extends EncryptedSecretsModuleSelect>(
-    args: FindFirstArgs<S, EncryptedSecretsModuleFilter> & {
+    args: FindFirstArgs<S, EncryptedSecretsModuleFilter, EncryptedSecretsModuleCondition> & {
       select: S;
     } & StrictSelect<S, EncryptedSecretsModuleSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class EncryptedSecretsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'EncryptedSecretsModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'EncryptedSecretsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

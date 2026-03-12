@@ -28,6 +28,7 @@ import type {
   IndexWithRelations,
   IndexSelect,
   IndexFilter,
+  IndexCondition,
   IndexOrderBy,
   CreateIndexInput,
   UpdateIndexInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class IndexModel {
   constructor(private client: OrmClient) {}
   findMany<S extends IndexSelect>(
-    args: FindManyArgs<S, IndexFilter, IndexOrderBy> & {
+    args: FindManyArgs<S, IndexFilter, IndexCondition, IndexOrderBy> & {
       select: S;
     } & StrictSelect<S, IndexSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class IndexModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class IndexModel {
       },
       'IndexFilter',
       'IndexOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'IndexCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class IndexModel {
     });
   }
   findFirst<S extends IndexSelect>(
-    args: FindFirstArgs<S, IndexFilter> & {
+    args: FindFirstArgs<S, IndexFilter, IndexCondition> & {
       select: S;
     } & StrictSelect<S, IndexSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class IndexModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'IndexFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'IndexCondition'
     );
     return new QueryBuilder({
       client: this.client,

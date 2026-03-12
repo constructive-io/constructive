@@ -28,6 +28,7 @@ import type {
   ForeignKeyConstraintWithRelations,
   ForeignKeyConstraintSelect,
   ForeignKeyConstraintFilter,
+  ForeignKeyConstraintCondition,
   ForeignKeyConstraintOrderBy,
   CreateForeignKeyConstraintInput,
   UpdateForeignKeyConstraintInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class ForeignKeyConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ForeignKeyConstraintSelect>(
-    args: FindManyArgs<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy> & {
+    args: FindManyArgs<
+      S,
+      ForeignKeyConstraintFilter,
+      ForeignKeyConstraintCondition,
+      ForeignKeyConstraintOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, ForeignKeyConstraintSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class ForeignKeyConstraintModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class ForeignKeyConstraintModel {
       },
       'ForeignKeyConstraintFilter',
       'ForeignKeyConstraintOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'ForeignKeyConstraintCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class ForeignKeyConstraintModel {
     });
   }
   findFirst<S extends ForeignKeyConstraintSelect>(
-    args: FindFirstArgs<S, ForeignKeyConstraintFilter> & {
+    args: FindFirstArgs<S, ForeignKeyConstraintFilter, ForeignKeyConstraintCondition> & {
       select: S;
     } & StrictSelect<S, ForeignKeyConstraintSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class ForeignKeyConstraintModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'ForeignKeyConstraintFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'ForeignKeyConstraintCondition'
     );
     return new QueryBuilder({
       client: this.client,

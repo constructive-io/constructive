@@ -28,6 +28,7 @@ import type {
   SecureTableProvisionWithRelations,
   SecureTableProvisionSelect,
   SecureTableProvisionFilter,
+  SecureTableProvisionCondition,
   SecureTableProvisionOrderBy,
   CreateSecureTableProvisionInput,
   UpdateSecureTableProvisionInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class SecureTableProvisionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SecureTableProvisionSelect>(
-    args: FindManyArgs<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy> & {
+    args: FindManyArgs<
+      S,
+      SecureTableProvisionFilter,
+      SecureTableProvisionCondition,
+      SecureTableProvisionOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, SecureTableProvisionSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class SecureTableProvisionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class SecureTableProvisionModel {
       },
       'SecureTableProvisionFilter',
       'SecureTableProvisionOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SecureTableProvisionCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class SecureTableProvisionModel {
     });
   }
   findFirst<S extends SecureTableProvisionSelect>(
-    args: FindFirstArgs<S, SecureTableProvisionFilter> & {
+    args: FindFirstArgs<S, SecureTableProvisionFilter, SecureTableProvisionCondition> & {
       select: S;
     } & StrictSelect<S, SecureTableProvisionSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class SecureTableProvisionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'SecureTableProvisionFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SecureTableProvisionCondition'
     );
     return new QueryBuilder({
       client: this.client,

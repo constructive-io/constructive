@@ -28,6 +28,7 @@ import type {
   OrgPermissionWithRelations,
   OrgPermissionSelect,
   OrgPermissionFilter,
+  OrgPermissionCondition,
   OrgPermissionOrderBy,
   CreateOrgPermissionInput,
   UpdateOrgPermissionInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgPermissionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgPermissionSelect>(
-    args: FindManyArgs<S, OrgPermissionFilter, OrgPermissionOrderBy> & {
+    args: FindManyArgs<S, OrgPermissionFilter, OrgPermissionCondition, OrgPermissionOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgPermissionSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class OrgPermissionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class OrgPermissionModel {
       },
       'OrgPermissionFilter',
       'OrgPermissionOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgPermissionCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class OrgPermissionModel {
     });
   }
   findFirst<S extends OrgPermissionSelect>(
-    args: FindFirstArgs<S, OrgPermissionFilter> & {
+    args: FindFirstArgs<S, OrgPermissionFilter, OrgPermissionCondition> & {
       select: S;
     } & StrictSelect<S, OrgPermissionSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class OrgPermissionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'OrgPermissionFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgPermissionCondition'
     );
     return new QueryBuilder({
       client: this.client,

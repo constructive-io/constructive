@@ -28,6 +28,7 @@ import type {
   DomainWithRelations,
   DomainSelect,
   DomainFilter,
+  DomainCondition,
   DomainOrderBy,
   CreateDomainInput,
   UpdateDomainInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DomainModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DomainSelect>(
-    args: FindManyArgs<S, DomainFilter, DomainOrderBy> & {
+    args: FindManyArgs<S, DomainFilter, DomainCondition, DomainOrderBy> & {
       select: S;
     } & StrictSelect<S, DomainSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class DomainModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class DomainModel {
       },
       'DomainFilter',
       'DomainOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DomainCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class DomainModel {
     });
   }
   findFirst<S extends DomainSelect>(
-    args: FindFirstArgs<S, DomainFilter> & {
+    args: FindFirstArgs<S, DomainFilter, DomainCondition> & {
       select: S;
     } & StrictSelect<S, DomainSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class DomainModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'DomainFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DomainCondition'
     );
     return new QueryBuilder({
       client: this.client,

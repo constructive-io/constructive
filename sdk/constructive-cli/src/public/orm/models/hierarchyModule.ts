@@ -28,6 +28,7 @@ import type {
   HierarchyModuleWithRelations,
   HierarchyModuleSelect,
   HierarchyModuleFilter,
+  HierarchyModuleCondition,
   HierarchyModuleOrderBy,
   CreateHierarchyModuleInput,
   UpdateHierarchyModuleInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class HierarchyModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends HierarchyModuleSelect>(
-    args: FindManyArgs<S, HierarchyModuleFilter, HierarchyModuleOrderBy> & {
+    args: FindManyArgs<
+      S,
+      HierarchyModuleFilter,
+      HierarchyModuleCondition,
+      HierarchyModuleOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, HierarchyModuleSelect>
   ): QueryBuilder<{
@@ -49,6 +55,7 @@ export class HierarchyModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +65,8 @@ export class HierarchyModuleModel {
       },
       'HierarchyModuleFilter',
       'HierarchyModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'HierarchyModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +78,7 @@ export class HierarchyModuleModel {
     });
   }
   findFirst<S extends HierarchyModuleSelect>(
-    args: FindFirstArgs<S, HierarchyModuleFilter> & {
+    args: FindFirstArgs<S, HierarchyModuleFilter, HierarchyModuleCondition> & {
       select: S;
     } & StrictSelect<S, HierarchyModuleSelect>
   ): QueryBuilder<{
@@ -84,9 +92,11 @@ export class HierarchyModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'HierarchyModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'HierarchyModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

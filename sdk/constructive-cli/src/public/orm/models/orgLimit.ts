@@ -28,6 +28,7 @@ import type {
   OrgLimitWithRelations,
   OrgLimitSelect,
   OrgLimitFilter,
+  OrgLimitCondition,
   OrgLimitOrderBy,
   CreateOrgLimitInput,
   UpdateOrgLimitInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgLimitModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgLimitSelect>(
-    args: FindManyArgs<S, OrgLimitFilter, OrgLimitOrderBy> & {
+    args: FindManyArgs<S, OrgLimitFilter, OrgLimitCondition, OrgLimitOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgLimitSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class OrgLimitModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class OrgLimitModel {
       },
       'OrgLimitFilter',
       'OrgLimitOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgLimitCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class OrgLimitModel {
     });
   }
   findFirst<S extends OrgLimitSelect>(
-    args: FindFirstArgs<S, OrgLimitFilter> & {
+    args: FindFirstArgs<S, OrgLimitFilter, OrgLimitCondition> & {
       select: S;
     } & StrictSelect<S, OrgLimitSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class OrgLimitModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'OrgLimitFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgLimitCondition'
     );
     return new QueryBuilder({
       client: this.client,

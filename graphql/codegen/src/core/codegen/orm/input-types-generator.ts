@@ -1572,9 +1572,10 @@ function generateCustomInputTypes(
   usedInputTypes: Set<string>,
   tableCrudTypes?: Set<string>,
   comments: boolean = true,
+  alreadyGeneratedTypes?: Set<string>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
-  const generatedTypes = new Set<string>();
+  const generatedTypes = new Set<string>(alreadyGeneratedTypes ?? []);
   const typesToGenerate = new Set(Array.from(usedInputTypes));
 
   // Filter out types we've already generated (exact matches for table CRUD types only)
@@ -2034,8 +2035,13 @@ export function generateInputTypesFile(
     }
   }
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;
+  // Pass customScalarTypes + enumTypes as already-generated to avoid duplicate declarations
+  const alreadyGenerated = new Set<string>([
+    ...customScalarTypes,
+    ...enumTypes,
+  ]);
   statements.push(
-    ...generateCustomInputTypes(typeRegistry, mergedUsedInputTypes, tableCrudTypes, comments),
+    ...generateCustomInputTypes(typeRegistry, mergedUsedInputTypes, tableCrudTypes, comments, alreadyGenerated),
   );
 
   // 8. Payload/return types for custom operations

@@ -28,6 +28,7 @@ import type {
   AppLimitDefaultWithRelations,
   AppLimitDefaultSelect,
   AppLimitDefaultFilter,
+  AppLimitDefaultCondition,
   AppLimitDefaultOrderBy,
   CreateAppLimitDefaultInput,
   UpdateAppLimitDefaultInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class AppLimitDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppLimitDefaultSelect>(
-    args: FindManyArgs<S, AppLimitDefaultFilter, AppLimitDefaultOrderBy> & {
+    args: FindManyArgs<
+      S,
+      AppLimitDefaultFilter,
+      AppLimitDefaultCondition,
+      AppLimitDefaultOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, AppLimitDefaultSelect>
   ): QueryBuilder<{
@@ -49,6 +55,7 @@ export class AppLimitDefaultModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +65,8 @@ export class AppLimitDefaultModel {
       },
       'AppLimitDefaultFilter',
       'AppLimitDefaultOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppLimitDefaultCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +78,7 @@ export class AppLimitDefaultModel {
     });
   }
   findFirst<S extends AppLimitDefaultSelect>(
-    args: FindFirstArgs<S, AppLimitDefaultFilter> & {
+    args: FindFirstArgs<S, AppLimitDefaultFilter, AppLimitDefaultCondition> & {
       select: S;
     } & StrictSelect<S, AppLimitDefaultSelect>
   ): QueryBuilder<{
@@ -84,9 +92,11 @@ export class AppLimitDefaultModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppLimitDefaultFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppLimitDefaultCondition'
     );
     return new QueryBuilder({
       client: this.client,

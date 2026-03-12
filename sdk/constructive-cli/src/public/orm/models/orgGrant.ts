@@ -28,6 +28,7 @@ import type {
   OrgGrantWithRelations,
   OrgGrantSelect,
   OrgGrantFilter,
+  OrgGrantCondition,
   OrgGrantOrderBy,
   CreateOrgGrantInput,
   UpdateOrgGrantInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgGrantSelect>(
-    args: FindManyArgs<S, OrgGrantFilter, OrgGrantOrderBy> & {
+    args: FindManyArgs<S, OrgGrantFilter, OrgGrantCondition, OrgGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgGrantSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class OrgGrantModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class OrgGrantModel {
       },
       'OrgGrantFilter',
       'OrgGrantOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgGrantCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class OrgGrantModel {
     });
   }
   findFirst<S extends OrgGrantSelect>(
-    args: FindFirstArgs<S, OrgGrantFilter> & {
+    args: FindFirstArgs<S, OrgGrantFilter, OrgGrantCondition> & {
       select: S;
     } & StrictSelect<S, OrgGrantSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class OrgGrantModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'OrgGrantFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'OrgGrantCondition'
     );
     return new QueryBuilder({
       client: this.client,

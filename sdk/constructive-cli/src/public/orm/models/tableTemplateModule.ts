@@ -28,6 +28,7 @@ import type {
   TableTemplateModuleWithRelations,
   TableTemplateModuleSelect,
   TableTemplateModuleFilter,
+  TableTemplateModuleCondition,
   TableTemplateModuleOrderBy,
   CreateTableTemplateModuleInput,
   UpdateTableTemplateModuleInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class TableTemplateModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TableTemplateModuleSelect>(
-    args: FindManyArgs<S, TableTemplateModuleFilter, TableTemplateModuleOrderBy> & {
+    args: FindManyArgs<
+      S,
+      TableTemplateModuleFilter,
+      TableTemplateModuleCondition,
+      TableTemplateModuleOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, TableTemplateModuleSelect>
   ): QueryBuilder<{
@@ -49,6 +55,7 @@ export class TableTemplateModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +65,8 @@ export class TableTemplateModuleModel {
       },
       'TableTemplateModuleFilter',
       'TableTemplateModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'TableTemplateModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +78,7 @@ export class TableTemplateModuleModel {
     });
   }
   findFirst<S extends TableTemplateModuleSelect>(
-    args: FindFirstArgs<S, TableTemplateModuleFilter> & {
+    args: FindFirstArgs<S, TableTemplateModuleFilter, TableTemplateModuleCondition> & {
       select: S;
     } & StrictSelect<S, TableTemplateModuleSelect>
   ): QueryBuilder<{
@@ -84,9 +92,11 @@ export class TableTemplateModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'TableTemplateModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'TableTemplateModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

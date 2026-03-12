@@ -28,6 +28,7 @@ import type {
   RefWithRelations,
   RefSelect,
   RefFilter,
+  RefCondition,
   RefOrderBy,
   CreateRefInput,
   UpdateRefInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RefModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RefSelect>(
-    args: FindManyArgs<S, RefFilter, RefOrderBy> & {
+    args: FindManyArgs<S, RefFilter, RefCondition, RefOrderBy> & {
       select: S;
     } & StrictSelect<S, RefSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class RefModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class RefModel {
       },
       'RefFilter',
       'RefOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'RefCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class RefModel {
     });
   }
   findFirst<S extends RefSelect>(
-    args: FindFirstArgs<S, RefFilter> & {
+    args: FindFirstArgs<S, RefFilter, RefCondition> & {
       select: S;
     } & StrictSelect<S, RefSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class RefModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'RefFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'RefCondition'
     );
     return new QueryBuilder({
       client: this.client,

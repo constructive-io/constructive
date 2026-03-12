@@ -28,6 +28,7 @@ import type {
   LimitsModuleWithRelations,
   LimitsModuleSelect,
   LimitsModuleFilter,
+  LimitsModuleCondition,
   LimitsModuleOrderBy,
   CreateLimitsModuleInput,
   UpdateLimitsModuleInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class LimitsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends LimitsModuleSelect>(
-    args: FindManyArgs<S, LimitsModuleFilter, LimitsModuleOrderBy> & {
+    args: FindManyArgs<S, LimitsModuleFilter, LimitsModuleCondition, LimitsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, LimitsModuleSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class LimitsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class LimitsModuleModel {
       },
       'LimitsModuleFilter',
       'LimitsModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'LimitsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class LimitsModuleModel {
     });
   }
   findFirst<S extends LimitsModuleSelect>(
-    args: FindFirstArgs<S, LimitsModuleFilter> & {
+    args: FindFirstArgs<S, LimitsModuleFilter, LimitsModuleCondition> & {
       select: S;
     } & StrictSelect<S, LimitsModuleSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class LimitsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'LimitsModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'LimitsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

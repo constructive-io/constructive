@@ -28,6 +28,7 @@ import type {
   AppAchievementWithRelations,
   AppAchievementSelect,
   AppAchievementFilter,
+  AppAchievementCondition,
   AppAchievementOrderBy,
   CreateAppAchievementInput,
   UpdateAppAchievementInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppAchievementModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppAchievementSelect>(
-    args: FindManyArgs<S, AppAchievementFilter, AppAchievementOrderBy> & {
+    args: FindManyArgs<S, AppAchievementFilter, AppAchievementCondition, AppAchievementOrderBy> & {
       select: S;
     } & StrictSelect<S, AppAchievementSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AppAchievementModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AppAchievementModel {
       },
       'AppAchievementFilter',
       'AppAchievementOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppAchievementCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AppAchievementModel {
     });
   }
   findFirst<S extends AppAchievementSelect>(
-    args: FindFirstArgs<S, AppAchievementFilter> & {
+    args: FindFirstArgs<S, AppAchievementFilter, AppAchievementCondition> & {
       select: S;
     } & StrictSelect<S, AppAchievementSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AppAchievementModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppAchievementFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppAchievementCondition'
     );
     return new QueryBuilder({
       client: this.client,

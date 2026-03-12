@@ -28,6 +28,7 @@ import type {
   CryptoAddressesModuleWithRelations,
   CryptoAddressesModuleSelect,
   CryptoAddressesModuleFilter,
+  CryptoAddressesModuleCondition,
   CryptoAddressesModuleOrderBy,
   CreateCryptoAddressesModuleInput,
   UpdateCryptoAddressesModuleInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class CryptoAddressesModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CryptoAddressesModuleSelect>(
-    args: FindManyArgs<S, CryptoAddressesModuleFilter, CryptoAddressesModuleOrderBy> & {
+    args: FindManyArgs<
+      S,
+      CryptoAddressesModuleFilter,
+      CryptoAddressesModuleCondition,
+      CryptoAddressesModuleOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, CryptoAddressesModuleSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class CryptoAddressesModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class CryptoAddressesModuleModel {
       },
       'CryptoAddressesModuleFilter',
       'CryptoAddressesModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'CryptoAddressesModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class CryptoAddressesModuleModel {
     });
   }
   findFirst<S extends CryptoAddressesModuleSelect>(
-    args: FindFirstArgs<S, CryptoAddressesModuleFilter> & {
+    args: FindFirstArgs<S, CryptoAddressesModuleFilter, CryptoAddressesModuleCondition> & {
       select: S;
     } & StrictSelect<S, CryptoAddressesModuleSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class CryptoAddressesModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'CryptoAddressesModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'CryptoAddressesModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

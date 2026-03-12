@@ -28,6 +28,7 @@ import type {
   DatabaseProvisionModuleWithRelations,
   DatabaseProvisionModuleSelect,
   DatabaseProvisionModuleFilter,
+  DatabaseProvisionModuleCondition,
   DatabaseProvisionModuleOrderBy,
   CreateDatabaseProvisionModuleInput,
   UpdateDatabaseProvisionModuleInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class DatabaseProvisionModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DatabaseProvisionModuleSelect>(
-    args: FindManyArgs<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy> & {
+    args: FindManyArgs<
+      S,
+      DatabaseProvisionModuleFilter,
+      DatabaseProvisionModuleCondition,
+      DatabaseProvisionModuleOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, DatabaseProvisionModuleSelect>
   ): QueryBuilder<{
@@ -51,6 +57,7 @@ export class DatabaseProvisionModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,7 +67,8 @@ export class DatabaseProvisionModuleModel {
       },
       'DatabaseProvisionModuleFilter',
       'DatabaseProvisionModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DatabaseProvisionModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -72,7 +80,7 @@ export class DatabaseProvisionModuleModel {
     });
   }
   findFirst<S extends DatabaseProvisionModuleSelect>(
-    args: FindFirstArgs<S, DatabaseProvisionModuleFilter> & {
+    args: FindFirstArgs<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleCondition> & {
       select: S;
     } & StrictSelect<S, DatabaseProvisionModuleSelect>
   ): QueryBuilder<{
@@ -86,9 +94,11 @@ export class DatabaseProvisionModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'DatabaseProvisionModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'DatabaseProvisionModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

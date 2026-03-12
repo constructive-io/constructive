@@ -28,6 +28,7 @@ import type {
   LevelsModuleWithRelations,
   LevelsModuleSelect,
   LevelsModuleFilter,
+  LevelsModuleCondition,
   LevelsModuleOrderBy,
   CreateLevelsModuleInput,
   UpdateLevelsModuleInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class LevelsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends LevelsModuleSelect>(
-    args: FindManyArgs<S, LevelsModuleFilter, LevelsModuleOrderBy> & {
+    args: FindManyArgs<S, LevelsModuleFilter, LevelsModuleCondition, LevelsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, LevelsModuleSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class LevelsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class LevelsModuleModel {
       },
       'LevelsModuleFilter',
       'LevelsModuleOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'LevelsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class LevelsModuleModel {
     });
   }
   findFirst<S extends LevelsModuleSelect>(
-    args: FindFirstArgs<S, LevelsModuleFilter> & {
+    args: FindFirstArgs<S, LevelsModuleFilter, LevelsModuleCondition> & {
       select: S;
     } & StrictSelect<S, LevelsModuleSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class LevelsModuleModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'LevelsModuleFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'LevelsModuleCondition'
     );
     return new QueryBuilder({
       client: this.client,

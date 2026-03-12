@@ -28,6 +28,7 @@ import type {
   SchemaWithRelations,
   SchemaSelect,
   SchemaFilter,
+  SchemaCondition,
   SchemaOrderBy,
   CreateSchemaInput,
   UpdateSchemaInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SchemaModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SchemaSelect>(
-    args: FindManyArgs<S, SchemaFilter, SchemaOrderBy> & {
+    args: FindManyArgs<S, SchemaFilter, SchemaCondition, SchemaOrderBy> & {
       select: S;
     } & StrictSelect<S, SchemaSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class SchemaModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class SchemaModel {
       },
       'SchemaFilter',
       'SchemaOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SchemaCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class SchemaModel {
     });
   }
   findFirst<S extends SchemaSelect>(
-    args: FindFirstArgs<S, SchemaFilter> & {
+    args: FindFirstArgs<S, SchemaFilter, SchemaCondition> & {
       select: S;
     } & StrictSelect<S, SchemaSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class SchemaModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'SchemaFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SchemaCondition'
     );
     return new QueryBuilder({
       client: this.client,

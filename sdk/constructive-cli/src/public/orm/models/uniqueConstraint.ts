@@ -28,6 +28,7 @@ import type {
   UniqueConstraintWithRelations,
   UniqueConstraintSelect,
   UniqueConstraintFilter,
+  UniqueConstraintCondition,
   UniqueConstraintOrderBy,
   CreateUniqueConstraintInput,
   UpdateUniqueConstraintInput,
@@ -37,7 +38,12 @@ import { connectionFieldsMap } from '../input-types';
 export class UniqueConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UniqueConstraintSelect>(
-    args: FindManyArgs<S, UniqueConstraintFilter, UniqueConstraintOrderBy> & {
+    args: FindManyArgs<
+      S,
+      UniqueConstraintFilter,
+      UniqueConstraintCondition,
+      UniqueConstraintOrderBy
+    > & {
       select: S;
     } & StrictSelect<S, UniqueConstraintSelect>
   ): QueryBuilder<{
@@ -49,6 +55,7 @@ export class UniqueConstraintModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +65,8 @@ export class UniqueConstraintModel {
       },
       'UniqueConstraintFilter',
       'UniqueConstraintOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'UniqueConstraintCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +78,7 @@ export class UniqueConstraintModel {
     });
   }
   findFirst<S extends UniqueConstraintSelect>(
-    args: FindFirstArgs<S, UniqueConstraintFilter> & {
+    args: FindFirstArgs<S, UniqueConstraintFilter, UniqueConstraintCondition> & {
       select: S;
     } & StrictSelect<S, UniqueConstraintSelect>
   ): QueryBuilder<{
@@ -84,9 +92,11 @@ export class UniqueConstraintModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'UniqueConstraintFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'UniqueConstraintCondition'
     );
     return new QueryBuilder({
       client: this.client,

@@ -189,12 +189,13 @@ export function buildSelections(
 // Document Builders
 // ============================================================================
 
-export function buildFindManyDocument<TSelect, TWhere>(
+export function buildFindManyDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
   select: TSelect,
   args: {
     where?: TWhere;
+    condition?: TCondition;
     orderBy?: string[];
     first?: number;
     last?: number;
@@ -204,7 +205,8 @@ export function buildFindManyDocument<TSelect, TWhere>(
   },
   filterTypeName: string,
   orderByTypeName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  conditionTypeName?: string
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
@@ -214,6 +216,16 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
+  addVariable(
+    {
+      varName: 'condition',
+      typeName: conditionTypeName,
+      value: args.condition,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
   addVariable(
     {
       varName: 'where',
@@ -290,13 +302,14 @@ export function buildFindManyDocument<TSelect, TWhere>(
   return { document: print(document), variables };
 }
 
-export function buildFindFirstDocument<TSelect, TWhere>(
+export function buildFindFirstDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere },
+  args: { where?: TWhere; condition?: TCondition },
   filterTypeName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+  conditionTypeName?: string
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
@@ -309,6 +322,16 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   // Always add first: 1 for findFirst
   addVariable(
     { varName: 'first', typeName: 'Int', value: 1 },
+    variableDefinitions,
+    queryArgs,
+    variables
+  );
+  addVariable(
+    {
+      varName: 'condition',
+      typeName: conditionTypeName,
+      value: args.condition,
+    },
     variableDefinitions,
     queryArgs,
     variables
@@ -728,7 +751,7 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
 interface VariableSpec {
   varName: string;
   argName?: string;
-  typeName: string;
+  typeName?: string;
   value: unknown;
 }
 
@@ -779,7 +802,7 @@ function addVariable(
   args: ArgumentNode[],
   variables: Record<string, unknown>
 ): void {
-  if (spec.value === undefined) return;
+  if (spec.value === undefined || !spec.typeName) return;
 
   definitions.push(
     t.variableDefinition({

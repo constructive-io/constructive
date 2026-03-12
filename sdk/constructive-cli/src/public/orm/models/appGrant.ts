@@ -28,6 +28,7 @@ import type {
   AppGrantWithRelations,
   AppGrantSelect,
   AppGrantFilter,
+  AppGrantCondition,
   AppGrantOrderBy,
   CreateAppGrantInput,
   UpdateAppGrantInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppGrantSelect>(
-    args: FindManyArgs<S, AppGrantFilter, AppGrantOrderBy> & {
+    args: FindManyArgs<S, AppGrantFilter, AppGrantCondition, AppGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, AppGrantSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class AppGrantModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class AppGrantModel {
       },
       'AppGrantFilter',
       'AppGrantOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppGrantCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class AppGrantModel {
     });
   }
   findFirst<S extends AppGrantSelect>(
-    args: FindFirstArgs<S, AppGrantFilter> & {
+    args: FindFirstArgs<S, AppGrantFilter, AppGrantCondition> & {
       select: S;
     } & StrictSelect<S, AppGrantSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class AppGrantModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'AppGrantFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'AppGrantCondition'
     );
     return new QueryBuilder({
       client: this.client,
