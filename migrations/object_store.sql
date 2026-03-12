@@ -302,21 +302,28 @@ COMMENT ON TRIGGER files_after_update_queue_retry ON object_store_public.files I
 ALTER TABLE object_store_public.files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE object_store_public.files FORCE ROW LEVEL SECURITY;
 
--- Policy 1: Tenant isolation (all operations, all authenticated roles)
+-- Policy 1: Tenant isolation (RESTRICTIVE -- always ANDed with all other policies)
+-- Without this being RESTRICTIVE, permissive policies would OR together and
+-- allow cross-tenant access (e.g. a ready file in tenant 2 visible via files_visibility).
 CREATE POLICY files_tenant_isolation ON object_store_public.files
+  AS RESTRICTIVE
   FOR ALL
   USING (database_id = current_setting('app.database_id')::integer)
   WITH CHECK (database_id = current_setting('app.database_id')::integer);
 
--- Policy 2: Creator-only for non-ready files (SELECT)
+-- Policy 2: Visibility for SELECT (authenticated + service_role only)
+-- Non-ready files visible only to the uploader. Uses NULLIF for safe uuid handling
+-- when app.user_id is missing or empty (returns NULL instead of cast error).
+-- Scoped to authenticated/service_role so anonymous only gets public_bucket_read.
 CREATE POLICY files_visibility ON object_store_public.files
   FOR SELECT
+  TO authenticated, service_role
   USING (
     status = 'ready'
-    OR created_by = current_setting('app.user_id')::uuid
+    OR created_by = NULLIF(current_setting('app.user_id', true), '')::uuid
   );
 
--- Policy 3: Public bucket read (SELECT, for anonymous access)
+-- Policy 3: Public bucket read for SELECT (all roles including anonymous)
 CREATE POLICY files_public_bucket_read ON object_store_public.files
   FOR SELECT
   USING (
@@ -329,11 +336,36 @@ CREATE POLICY files_public_bucket_read ON object_store_public.files
     AND status = 'ready'
   );
 
--- Policy 4: Admin override (all operations)
+-- Policy 4: Admin override (all operations, authenticated + service_role)
 CREATE POLICY files_admin_override ON object_store_public.files
   FOR ALL
+  TO authenticated, service_role
   USING (current_setting('app.role', true) = 'administrator')
   WITH CHECK (current_setting('app.role', true) = 'administrator');
+
+-- Policy 5: INSERT access (permissive base so non-admin users can insert)
+CREATE POLICY files_insert_access ON object_store_public.files
+  FOR INSERT
+  TO authenticated, service_role
+  WITH CHECK (true);
+
+-- Policy 6: UPDATE access (replicates visibility for row targeting)
+-- Non-admin users can only update rows they can see (ready or own).
+-- Admin override policy covers admin UPDATE access separately.
+CREATE POLICY files_update_access ON object_store_public.files
+  FOR UPDATE
+  TO authenticated, service_role
+  USING (
+    status = 'ready'
+    OR created_by = NULLIF(current_setting('app.user_id', true), '')::uuid
+  )
+  WITH CHECK (true);
+
+-- Policy 7: DELETE access (service_role only, grants already restrict authenticated)
+CREATE POLICY files_delete_access ON object_store_public.files
+  FOR DELETE
+  TO service_role
+  USING (true);
 
 -- Grants
 GRANT SELECT, INSERT, UPDATE ON object_store_public.files TO authenticated;

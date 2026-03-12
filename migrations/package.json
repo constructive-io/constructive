@@ -1,0 +1,12 @@
+{
+  "name": "@constructive/migrations",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "pgsql-test": "workspace:^"
+  }
+}

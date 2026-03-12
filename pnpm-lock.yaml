@@ -1647,6 +1647,12 @@ importers:
         version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
+  migrations:
+    devDependencies:
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../postgres/pgsql-test/dist
+
   packages/12factor-env:
     dependencies:
       envalid:
