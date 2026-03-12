@@ -57,7 +57,7 @@ export const ConnectionFilterCustomOperatorsPlugin: GraphileConfig.Plugin = {
             : [typeNameOrNames];
 
           for (const typeName of typeNames) {
-            const filterTypeName = inflection.filterType(typeName);
+            const filterTypeName = inflection.filterFieldType(typeName);
             let operatorSpecByFilterName = build[$$filters].get(filterTypeName);
             if (!operatorSpecByFilterName) {
               operatorSpecByFilterName = new Map();
