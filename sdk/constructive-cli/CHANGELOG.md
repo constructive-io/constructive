@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.6.1...@constructive-sdk/cli@0.6.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.6.1](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.5.0...@constructive-sdk/cli@0.6.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.5.0...@constructive-sdk/cli@0.6.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.4.0...@constructive-sdk/cli@0.5.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.3.0...@constructive-sdk/cli@0.4.0) (2026-03-12)
+
+### Bug Fixes
+
+- **codegen:** mark fields with backend defaults as optional in generated docs ([ac6d46e](https://github.com/constructive-io/constructive/commit/ac6d46e6db4a9ed2889d036009aa425e7bf07a9f))
+- **codegen:** strip ConstructiveInternalType prefix from generated docs type names ([bc62778](https://github.com/constructive-io/constructive/commit/bc627789bbfd1bf20c1c42446895e38a9dafbfb7))
+
+### Features
+
+- **codegen:** semantic question types, INPUT_OBJECT dot-notation, --no-tty flag ([46156de](https://github.com/constructive-io/constructive/commit/46156deb156ed9d7adb14ab53b87b570cda072fc))
+- **codegen:** update docs generators with INPUT_OBJECT dot-notation, TypeRegistry threading, and --no-tty docs ([e481604](https://github.com/constructive-io/constructive/commit/e481604c2e161d42b5b3eede54d164db55c5016e))
+- regenerate CLI with inquirerer@4.7.0 (boolean/json types, dot-notation, --no-tty) ([6664ce5](https://github.com/constructive-io/constructive/commit/6664ce5a9fa989d1bcf62e7279b7c36e86aec27a))
+
+### Reverts
+
+- remove regenerated CLI code (needs inquirerer@4.7.0 with boolean/json types) ([bc830ef](https://github.com/constructive-io/constructive/commit/bc830efde66dbe1932e5ea221b31016d1d19d147))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.2.1...@constructive-sdk/cli@0.3.0) (2026-03-05)
 
 ### Bug Fixes

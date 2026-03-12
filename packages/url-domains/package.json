@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/url-domains",
-  "version": "2.7.0",
+  "version": "2.9.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "url domains",
   "main": "index.js",
