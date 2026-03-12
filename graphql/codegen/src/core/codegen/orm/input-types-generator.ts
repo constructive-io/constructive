@@ -1616,12 +1616,13 @@ function generateCustomInputTypes(
           description: stripSmartComments(field.description, comments),
         });
 
-        // Follow nested Input types
+        // Follow nested types (Input objects, Enums, etc.) that exist in the registry
         const baseType = getTypeBaseName(field.type);
         if (
           baseType &&
-          baseType.endsWith('Input') &&
-          !generatedTypes.has(baseType)
+          !SCALAR_NAMES.has(baseType) &&
+          !generatedTypes.has(baseType) &&
+          typeRegistry.has(baseType)
         ) {
           typesToGenerate.add(baseType);
         }
