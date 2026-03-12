@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { getConnectionsObject, seed } from 'graphile-test';
 import type { GraphQLQueryFnObj } from 'graphile-test';
-import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import type { GraphileConfig } from 'graphile-config';
 import { PgSearchPreset } from '../src';
 
@@ -37,7 +37,7 @@ describe('PgSearchPlugin filter (matches operator)', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
-        PostGraphileConnectionFilterPreset,
+        ConnectionFilterPreset(),
         PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
       plugins: [EnableAllFilterColumnsPlugin],
@@ -325,7 +325,7 @@ describe('PgSearchPlugin filter with multiple tsvector columns', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
-        PostGraphileConnectionFilterPreset,
+        ConnectionFilterPreset(),
         PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
       plugins: [EnableAllFilterColumnsPlugin],
@@ -403,7 +403,7 @@ describe('PgSearchPlugin filter with connectionFilterRelations', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
-        PostGraphileConnectionFilterPreset,
+        ConnectionFilterPreset(),
         PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
       plugins: [EnableAllFilterColumnsPlugin],

@@ -2,7 +2,7 @@ import { join } from 'path';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
-import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { VectorCodecPreset } from '../vector-codec';
 import { createVectorSearchPlugin } from '../vector-search';
 
@@ -31,7 +31,7 @@ describe('VectorSearchPlugin', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
-        PostGraphileConnectionFilterPreset,
+        ConnectionFilterPreset(),
         VectorCodecPreset,
         {
           plugins: [createVectorSearchPlugin({ defaultMetric: 'COSINE' })],

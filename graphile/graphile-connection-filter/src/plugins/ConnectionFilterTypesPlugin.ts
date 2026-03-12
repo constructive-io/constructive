@@ -228,7 +228,7 @@ export const ConnectionFilterTypesPlugin: GraphileConfig.Plugin = {
                 isPgConnectionFilter: true,
               },
               () => ({
-                description: `A filter to be used against \`${nodeTypeName}\` object types. All fields are combined with a logical 'and.'`,
+                description: `A filter to be used against \`${nodeTypeName}\` object types. All fields are combined with a logical \u2018and.\u2019`,
               }),
               'ConnectionFilterTypesPlugin'
             );
@@ -324,7 +324,7 @@ export const ConnectionFilterTypesPlugin: GraphileConfig.Plugin = {
                 name: operatorsTypeName,
                 description: `A filter to be used against ${relatedTypeName}${
                   isList ? ' List' : ''
-                } fields. All fields are combined with a logical 'and.'`,
+                } fields. All fields are combined with a logical \u2018and.\u2019`,
               }),
               'ConnectionFilterTypesPlugin'
             );

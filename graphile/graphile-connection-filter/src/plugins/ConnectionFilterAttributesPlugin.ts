@@ -81,7 +81,7 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                   isPgConnectionFilterField: true,
                 },
                 () => ({
-                  description: `Filter by the object's \`${fieldName}\` field.`,
+                  description: `Filter by the object\u2019s \`${fieldName}\` field.`,
                   type: OperatorsType,
                   apply: EXPORTABLE(
                     (

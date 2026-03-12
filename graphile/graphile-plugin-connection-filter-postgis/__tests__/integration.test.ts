@@ -1,7 +1,7 @@
 import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
 import { CONCRETE_SUBTYPES, GisSubtype } from 'graphile-postgis';
-import type { OperatorSpec } from 'postgraphile-plugin-connection-filter/dist/PgConnectionArgFilterOperatorsPlugin';
+import type { ConnectionFilterOperatorSpec as OperatorSpec } from 'graphile-connection-filter';
 import { PgConnectionArgFilterPostgisOperatorsPlugin } from '../src/plugin';
 
 /**
