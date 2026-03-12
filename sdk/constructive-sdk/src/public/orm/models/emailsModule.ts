@@ -28,7 +28,6 @@ import type {
   EmailsModuleWithRelations,
   EmailsModuleSelect,
   EmailsModuleFilter,
-  EmailsModuleCondition,
   EmailsModuleOrderBy,
   CreateEmailsModuleInput,
   UpdateEmailsModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class EmailsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends EmailsModuleSelect>(
-    args: FindManyArgs<S, EmailsModuleFilter, EmailsModuleCondition, EmailsModuleOrderBy> & {
+    args: FindManyArgs<S, EmailsModuleFilter, EmailsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, EmailsModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class EmailsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class EmailsModuleModel {
       },
       'EmailsModuleFilter',
       'EmailsModuleOrderBy',
-      connectionFieldsMap,
-      'EmailsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class EmailsModuleModel {
     });
   }
   findFirst<S extends EmailsModuleSelect>(
-    args: FindFirstArgs<S, EmailsModuleFilter, EmailsModuleCondition> & {
+    args: FindFirstArgs<S, EmailsModuleFilter> & {
       select: S;
     } & StrictSelect<S, EmailsModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class EmailsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'EmailsModuleFilter',
-      connectionFieldsMap,
-      'EmailsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

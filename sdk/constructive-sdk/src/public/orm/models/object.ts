@@ -28,7 +28,6 @@ import type {
   ObjectWithRelations,
   ObjectSelect,
   ObjectFilter,
-  ObjectCondition,
   ObjectOrderBy,
   CreateObjectInput,
   UpdateObjectInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ObjectModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ObjectSelect>(
-    args: FindManyArgs<S, ObjectFilter, ObjectCondition, ObjectOrderBy> & {
+    args: FindManyArgs<S, ObjectFilter, ObjectOrderBy> & {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ObjectModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ObjectModel {
       },
       'ObjectFilter',
       'ObjectOrderBy',
-      connectionFieldsMap,
-      'ObjectCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ObjectModel {
     });
   }
   findFirst<S extends ObjectSelect>(
-    args: FindFirstArgs<S, ObjectFilter, ObjectCondition> & {
+    args: FindFirstArgs<S, ObjectFilter> & {
       select: S;
     } & StrictSelect<S, ObjectSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ObjectModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ObjectFilter',
-      connectionFieldsMap,
-      'ObjectCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

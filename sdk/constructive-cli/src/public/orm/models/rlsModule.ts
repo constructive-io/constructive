@@ -28,7 +28,6 @@ import type {
   RlsModuleWithRelations,
   RlsModuleSelect,
   RlsModuleFilter,
-  RlsModuleCondition,
   RlsModuleOrderBy,
   CreateRlsModuleInput,
   UpdateRlsModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RlsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RlsModuleSelect>(
-    args: FindManyArgs<S, RlsModuleFilter, RlsModuleCondition, RlsModuleOrderBy> & {
+    args: FindManyArgs<S, RlsModuleFilter, RlsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, RlsModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class RlsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class RlsModuleModel {
       },
       'RlsModuleFilter',
       'RlsModuleOrderBy',
-      connectionFieldsMap,
-      'RlsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class RlsModuleModel {
     });
   }
   findFirst<S extends RlsModuleSelect>(
-    args: FindFirstArgs<S, RlsModuleFilter, RlsModuleCondition> & {
+    args: FindFirstArgs<S, RlsModuleFilter> & {
       select: S;
     } & StrictSelect<S, RlsModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class RlsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'RlsModuleFilter',
-      connectionFieldsMap,
-      'RlsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

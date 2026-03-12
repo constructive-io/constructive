@@ -28,7 +28,6 @@ import type {
   NodeTypeRegistryWithRelations,
   NodeTypeRegistrySelect,
   NodeTypeRegistryFilter,
-  NodeTypeRegistryCondition,
   NodeTypeRegistryOrderBy,
   CreateNodeTypeRegistryInput,
   UpdateNodeTypeRegistryInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class NodeTypeRegistryModel {
   constructor(private client: OrmClient) {}
   findMany<S extends NodeTypeRegistrySelect>(
-    args: FindManyArgs<
-      S,
-      NodeTypeRegistryFilter,
-      NodeTypeRegistryCondition,
-      NodeTypeRegistryOrderBy
-    > & {
+    args: FindManyArgs<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy> & {
       select: S;
     } & StrictSelect<S, NodeTypeRegistrySelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class NodeTypeRegistryModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class NodeTypeRegistryModel {
       },
       'NodeTypeRegistryFilter',
       'NodeTypeRegistryOrderBy',
-      connectionFieldsMap,
-      'NodeTypeRegistryCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class NodeTypeRegistryModel {
     });
   }
   findFirst<S extends NodeTypeRegistrySelect>(
-    args: FindFirstArgs<S, NodeTypeRegistryFilter, NodeTypeRegistryCondition> & {
+    args: FindFirstArgs<S, NodeTypeRegistryFilter> & {
       select: S;
     } & StrictSelect<S, NodeTypeRegistrySelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class NodeTypeRegistryModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'NodeTypeRegistryFilter',
-      connectionFieldsMap,
-      'NodeTypeRegistryCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

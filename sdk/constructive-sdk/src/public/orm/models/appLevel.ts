@@ -28,7 +28,6 @@ import type {
   AppLevelWithRelations,
   AppLevelSelect,
   AppLevelFilter,
-  AppLevelCondition,
   AppLevelOrderBy,
   CreateAppLevelInput,
   UpdateAppLevelInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppLevelModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppLevelSelect>(
-    args: FindManyArgs<S, AppLevelFilter, AppLevelCondition, AppLevelOrderBy> & {
+    args: FindManyArgs<S, AppLevelFilter, AppLevelOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLevelSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class AppLevelModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class AppLevelModel {
       },
       'AppLevelFilter',
       'AppLevelOrderBy',
-      connectionFieldsMap,
-      'AppLevelCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class AppLevelModel {
     });
   }
   findFirst<S extends AppLevelSelect>(
-    args: FindFirstArgs<S, AppLevelFilter, AppLevelCondition> & {
+    args: FindFirstArgs<S, AppLevelFilter> & {
       select: S;
     } & StrictSelect<S, AppLevelSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class AppLevelModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'AppLevelFilter',
-      connectionFieldsMap,
-      'AppLevelCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

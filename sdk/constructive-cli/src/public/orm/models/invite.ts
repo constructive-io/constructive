@@ -28,7 +28,6 @@ import type {
   InviteWithRelations,
   InviteSelect,
   InviteFilter,
-  InviteCondition,
   InviteOrderBy,
   CreateInviteInput,
   UpdateInviteInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class InviteModel {
   constructor(private client: OrmClient) {}
   findMany<S extends InviteSelect>(
-    args: FindManyArgs<S, InviteFilter, InviteCondition, InviteOrderBy> & {
+    args: FindManyArgs<S, InviteFilter, InviteOrderBy> & {
       select: S;
     } & StrictSelect<S, InviteSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class InviteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class InviteModel {
       },
       'InviteFilter',
       'InviteOrderBy',
-      connectionFieldsMap,
-      'InviteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class InviteModel {
     });
   }
   findFirst<S extends InviteSelect>(
-    args: FindFirstArgs<S, InviteFilter, InviteCondition> & {
+    args: FindFirstArgs<S, InviteFilter> & {
       select: S;
     } & StrictSelect<S, InviteSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class InviteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'InviteFilter',
-      connectionFieldsMap,
-      'InviteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

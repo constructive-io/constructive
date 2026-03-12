@@ -28,7 +28,6 @@ import type {
   ViewGrantWithRelations,
   ViewGrantSelect,
   ViewGrantFilter,
-  ViewGrantCondition,
   ViewGrantOrderBy,
   CreateViewGrantInput,
   UpdateViewGrantInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewGrantSelect>(
-    args: FindManyArgs<S, ViewGrantFilter, ViewGrantCondition, ViewGrantOrderBy> & {
+    args: FindManyArgs<S, ViewGrantFilter, ViewGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewGrantSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ViewGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ViewGrantModel {
       },
       'ViewGrantFilter',
       'ViewGrantOrderBy',
-      connectionFieldsMap,
-      'ViewGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ViewGrantModel {
     });
   }
   findFirst<S extends ViewGrantSelect>(
-    args: FindFirstArgs<S, ViewGrantFilter, ViewGrantCondition> & {
+    args: FindFirstArgs<S, ViewGrantFilter> & {
       select: S;
     } & StrictSelect<S, ViewGrantSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ViewGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ViewGrantFilter',
-      connectionFieldsMap,
-      'ViewGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

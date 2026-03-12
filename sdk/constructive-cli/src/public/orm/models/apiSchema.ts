@@ -28,7 +28,6 @@ import type {
   ApiSchemaWithRelations,
   ApiSchemaSelect,
   ApiSchemaFilter,
-  ApiSchemaCondition,
   ApiSchemaOrderBy,
   CreateApiSchemaInput,
   UpdateApiSchemaInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ApiSchemaModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ApiSchemaSelect>(
-    args: FindManyArgs<S, ApiSchemaFilter, ApiSchemaCondition, ApiSchemaOrderBy> & {
+    args: FindManyArgs<S, ApiSchemaFilter, ApiSchemaOrderBy> & {
       select: S;
     } & StrictSelect<S, ApiSchemaSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ApiSchemaModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ApiSchemaModel {
       },
       'ApiSchemaFilter',
       'ApiSchemaOrderBy',
-      connectionFieldsMap,
-      'ApiSchemaCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ApiSchemaModel {
     });
   }
   findFirst<S extends ApiSchemaSelect>(
-    args: FindFirstArgs<S, ApiSchemaFilter, ApiSchemaCondition> & {
+    args: FindFirstArgs<S, ApiSchemaFilter> & {
       select: S;
     } & StrictSelect<S, ApiSchemaSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ApiSchemaModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ApiSchemaFilter',
-      connectionFieldsMap,
-      'ApiSchemaCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

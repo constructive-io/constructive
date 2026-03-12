@@ -28,7 +28,6 @@ import type {
   OrgPermissionDefaultWithRelations,
   OrgPermissionDefaultSelect,
   OrgPermissionDefaultFilter,
-  OrgPermissionDefaultCondition,
   OrgPermissionDefaultOrderBy,
   CreateOrgPermissionDefaultInput,
   UpdateOrgPermissionDefaultInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgPermissionDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgPermissionDefaultSelect>(
-    args: FindManyArgs<
-      S,
-      OrgPermissionDefaultFilter,
-      OrgPermissionDefaultCondition,
-      OrgPermissionDefaultOrderBy
-    > & {
+    args: FindManyArgs<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgPermissionDefaultSelect>
   ): QueryBuilder<{
@@ -57,7 +51,6 @@ export class OrgPermissionDefaultModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -67,8 +60,7 @@ export class OrgPermissionDefaultModel {
       },
       'OrgPermissionDefaultFilter',
       'OrgPermissionDefaultOrderBy',
-      connectionFieldsMap,
-      'OrgPermissionDefaultCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -80,7 +72,7 @@ export class OrgPermissionDefaultModel {
     });
   }
   findFirst<S extends OrgPermissionDefaultSelect>(
-    args: FindFirstArgs<S, OrgPermissionDefaultFilter, OrgPermissionDefaultCondition> & {
+    args: FindFirstArgs<S, OrgPermissionDefaultFilter> & {
       select: S;
     } & StrictSelect<S, OrgPermissionDefaultSelect>
   ): QueryBuilder<{
@@ -94,11 +86,9 @@ export class OrgPermissionDefaultModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'OrgPermissionDefaultFilter',
-      connectionFieldsMap,
-      'OrgPermissionDefaultCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

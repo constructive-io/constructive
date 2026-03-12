@@ -28,7 +28,6 @@ import type {
   OrgClaimedInviteWithRelations,
   OrgClaimedInviteSelect,
   OrgClaimedInviteFilter,
-  OrgClaimedInviteCondition,
   OrgClaimedInviteOrderBy,
   CreateOrgClaimedInviteInput,
   UpdateOrgClaimedInviteInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgClaimedInviteModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgClaimedInviteSelect>(
-    args: FindManyArgs<
-      S,
-      OrgClaimedInviteFilter,
-      OrgClaimedInviteCondition,
-      OrgClaimedInviteOrderBy
-    > & {
+    args: FindManyArgs<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgClaimedInviteSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class OrgClaimedInviteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class OrgClaimedInviteModel {
       },
       'OrgClaimedInviteFilter',
       'OrgClaimedInviteOrderBy',
-      connectionFieldsMap,
-      'OrgClaimedInviteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class OrgClaimedInviteModel {
     });
   }
   findFirst<S extends OrgClaimedInviteSelect>(
-    args: FindFirstArgs<S, OrgClaimedInviteFilter, OrgClaimedInviteCondition> & {
+    args: FindFirstArgs<S, OrgClaimedInviteFilter> & {
       select: S;
     } & StrictSelect<S, OrgClaimedInviteSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class OrgClaimedInviteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'OrgClaimedInviteFilter',
-      connectionFieldsMap,
-      'OrgClaimedInviteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

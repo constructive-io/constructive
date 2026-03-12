@@ -28,7 +28,6 @@ import type {
   AppStepWithRelations,
   AppStepSelect,
   AppStepFilter,
-  AppStepCondition,
   AppStepOrderBy,
   CreateAppStepInput,
   UpdateAppStepInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppStepModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppStepSelect>(
-    args: FindManyArgs<S, AppStepFilter, AppStepCondition, AppStepOrderBy> & {
+    args: FindManyArgs<S, AppStepFilter, AppStepOrderBy> & {
       select: S;
     } & StrictSelect<S, AppStepSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class AppStepModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class AppStepModel {
       },
       'AppStepFilter',
       'AppStepOrderBy',
-      connectionFieldsMap,
-      'AppStepCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class AppStepModel {
     });
   }
   findFirst<S extends AppStepSelect>(
-    args: FindFirstArgs<S, AppStepFilter, AppStepCondition> & {
+    args: FindFirstArgs<S, AppStepFilter> & {
       select: S;
     } & StrictSelect<S, AppStepSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class AppStepModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'AppStepFilter',
-      connectionFieldsMap,
-      'AppStepCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

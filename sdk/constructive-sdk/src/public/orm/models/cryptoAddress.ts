@@ -28,7 +28,6 @@ import type {
   CryptoAddressWithRelations,
   CryptoAddressSelect,
   CryptoAddressFilter,
-  CryptoAddressCondition,
   CryptoAddressOrderBy,
   CreateCryptoAddressInput,
   UpdateCryptoAddressInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CryptoAddressModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CryptoAddressSelect>(
-    args: FindManyArgs<S, CryptoAddressFilter, CryptoAddressCondition, CryptoAddressOrderBy> & {
+    args: FindManyArgs<S, CryptoAddressFilter, CryptoAddressOrderBy> & {
       select: S;
     } & StrictSelect<S, CryptoAddressSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class CryptoAddressModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class CryptoAddressModel {
       },
       'CryptoAddressFilter',
       'CryptoAddressOrderBy',
-      connectionFieldsMap,
-      'CryptoAddressCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class CryptoAddressModel {
     });
   }
   findFirst<S extends CryptoAddressSelect>(
-    args: FindFirstArgs<S, CryptoAddressFilter, CryptoAddressCondition> & {
+    args: FindFirstArgs<S, CryptoAddressFilter> & {
       select: S;
     } & StrictSelect<S, CryptoAddressSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class CryptoAddressModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'CryptoAddressFilter',
-      connectionFieldsMap,
-      'CryptoAddressCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

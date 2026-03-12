@@ -28,7 +28,6 @@ import type {
   PermissionsModuleWithRelations,
   PermissionsModuleSelect,
   PermissionsModuleFilter,
-  PermissionsModuleCondition,
   PermissionsModuleOrderBy,
   CreatePermissionsModuleInput,
   UpdatePermissionsModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PermissionsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PermissionsModuleSelect>(
-    args: FindManyArgs<
-      S,
-      PermissionsModuleFilter,
-      PermissionsModuleCondition,
-      PermissionsModuleOrderBy
-    > & {
+    args: FindManyArgs<S, PermissionsModuleFilter, PermissionsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, PermissionsModuleSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class PermissionsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class PermissionsModuleModel {
       },
       'PermissionsModuleFilter',
       'PermissionsModuleOrderBy',
-      connectionFieldsMap,
-      'PermissionsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class PermissionsModuleModel {
     });
   }
   findFirst<S extends PermissionsModuleSelect>(
-    args: FindFirstArgs<S, PermissionsModuleFilter, PermissionsModuleCondition> & {
+    args: FindFirstArgs<S, PermissionsModuleFilter> & {
       select: S;
     } & StrictSelect<S, PermissionsModuleSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class PermissionsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'PermissionsModuleFilter',
-      connectionFieldsMap,
-      'PermissionsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

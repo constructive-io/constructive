@@ -28,7 +28,6 @@ import type {
   SqlMigrationWithRelations,
   SqlMigrationSelect,
   SqlMigrationFilter,
-  SqlMigrationCondition,
   SqlMigrationOrderBy,
   CreateSqlMigrationInput,
   UpdateSqlMigrationInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SqlMigrationModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SqlMigrationSelect>(
-    args: FindManyArgs<S, SqlMigrationFilter, SqlMigrationCondition, SqlMigrationOrderBy> & {
+    args: FindManyArgs<S, SqlMigrationFilter, SqlMigrationOrderBy> & {
       select: S;
     } & StrictSelect<S, SqlMigrationSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SqlMigrationModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SqlMigrationModel {
       },
       'SqlMigrationFilter',
       'SqlMigrationOrderBy',
-      connectionFieldsMap,
-      'SqlMigrationCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SqlMigrationModel {
     });
   }
   findFirst<S extends SqlMigrationSelect>(
-    args: FindFirstArgs<S, SqlMigrationFilter, SqlMigrationCondition> & {
+    args: FindFirstArgs<S, SqlMigrationFilter> & {
       select: S;
     } & StrictSelect<S, SqlMigrationSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SqlMigrationModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SqlMigrationFilter',
-      connectionFieldsMap,
-      'SqlMigrationCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

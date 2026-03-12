@@ -28,7 +28,6 @@ import type {
   SiteWithRelations,
   SiteSelect,
   SiteFilter,
-  SiteCondition,
   SiteOrderBy,
   CreateSiteInput,
   UpdateSiteInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SiteModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SiteSelect>(
-    args: FindManyArgs<S, SiteFilter, SiteCondition, SiteOrderBy> & {
+    args: FindManyArgs<S, SiteFilter, SiteOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SiteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SiteModel {
       },
       'SiteFilter',
       'SiteOrderBy',
-      connectionFieldsMap,
-      'SiteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SiteModel {
     });
   }
   findFirst<S extends SiteSelect>(
-    args: FindFirstArgs<S, SiteFilter, SiteCondition> & {
+    args: FindFirstArgs<S, SiteFilter> & {
       select: S;
     } & StrictSelect<S, SiteSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SiteModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SiteFilter',
-      connectionFieldsMap,
-      'SiteCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

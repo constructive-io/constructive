@@ -332,9 +332,9 @@ export interface GraphQLSDKConfigTarget {
     /**
      * Generate condition types and condition arguments on findMany/findFirst.
      * PostGraphile's native `condition` argument provides simple equality filtering.
-     * Set to `false` to omit condition types and arguments from generated code
-     * (e.g., when using connection-filter's `filter` argument exclusively).
-     * @default true
+     * Set to `true` to include condition types and arguments in generated code.
+     * Set to `false` to omit them (e.g., when using connection-filter's `filter` argument exclusively).
+     * @default false
      */
     condition?: boolean;
   };
@@ -532,7 +532,7 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   codegen: {
     skipQueryField: true,
     comments: true,
-    condition: true,
+    condition: false,
   },
   orm: false,
   reactQuery: false,

@@ -28,7 +28,6 @@ import type {
   AppLevelRequirementWithRelations,
   AppLevelRequirementSelect,
   AppLevelRequirementFilter,
-  AppLevelRequirementCondition,
   AppLevelRequirementOrderBy,
   CreateAppLevelRequirementInput,
   UpdateAppLevelRequirementInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppLevelRequirementModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppLevelRequirementSelect>(
-    args: FindManyArgs<
-      S,
-      AppLevelRequirementFilter,
-      AppLevelRequirementCondition,
-      AppLevelRequirementOrderBy
-    > & {
+    args: FindManyArgs<S, AppLevelRequirementFilter, AppLevelRequirementOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLevelRequirementSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class AppLevelRequirementModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class AppLevelRequirementModel {
       },
       'AppLevelRequirementFilter',
       'AppLevelRequirementOrderBy',
-      connectionFieldsMap,
-      'AppLevelRequirementCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class AppLevelRequirementModel {
     });
   }
   findFirst<S extends AppLevelRequirementSelect>(
-    args: FindFirstArgs<S, AppLevelRequirementFilter, AppLevelRequirementCondition> & {
+    args: FindFirstArgs<S, AppLevelRequirementFilter> & {
       select: S;
     } & StrictSelect<S, AppLevelRequirementSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class AppLevelRequirementModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'AppLevelRequirementFilter',
-      connectionFieldsMap,
-      'AppLevelRequirementCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

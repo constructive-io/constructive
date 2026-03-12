@@ -28,7 +28,6 @@ import type {
   DefaultIdsModuleWithRelations,
   DefaultIdsModuleSelect,
   DefaultIdsModuleFilter,
-  DefaultIdsModuleCondition,
   DefaultIdsModuleOrderBy,
   CreateDefaultIdsModuleInput,
   UpdateDefaultIdsModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DefaultIdsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DefaultIdsModuleSelect>(
-    args: FindManyArgs<
-      S,
-      DefaultIdsModuleFilter,
-      DefaultIdsModuleCondition,
-      DefaultIdsModuleOrderBy
-    > & {
+    args: FindManyArgs<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, DefaultIdsModuleSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class DefaultIdsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class DefaultIdsModuleModel {
       },
       'DefaultIdsModuleFilter',
       'DefaultIdsModuleOrderBy',
-      connectionFieldsMap,
-      'DefaultIdsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class DefaultIdsModuleModel {
     });
   }
   findFirst<S extends DefaultIdsModuleSelect>(
-    args: FindFirstArgs<S, DefaultIdsModuleFilter, DefaultIdsModuleCondition> & {
+    args: FindFirstArgs<S, DefaultIdsModuleFilter> & {
       select: S;
     } & StrictSelect<S, DefaultIdsModuleSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class DefaultIdsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'DefaultIdsModuleFilter',
-      connectionFieldsMap,
-      'DefaultIdsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

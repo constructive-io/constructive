@@ -28,7 +28,6 @@ import type {
   StoreWithRelations,
   StoreSelect,
   StoreFilter,
-  StoreCondition,
   StoreOrderBy,
   CreateStoreInput,
   UpdateStoreInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class StoreModel {
   constructor(private client: OrmClient) {}
   findMany<S extends StoreSelect>(
-    args: FindManyArgs<S, StoreFilter, StoreCondition, StoreOrderBy> & {
+    args: FindManyArgs<S, StoreFilter, StoreOrderBy> & {
       select: S;
     } & StrictSelect<S, StoreSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class StoreModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class StoreModel {
       },
       'StoreFilter',
       'StoreOrderBy',
-      connectionFieldsMap,
-      'StoreCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class StoreModel {
     });
   }
   findFirst<S extends StoreSelect>(
-    args: FindFirstArgs<S, StoreFilter, StoreCondition> & {
+    args: FindFirstArgs<S, StoreFilter> & {
       select: S;
     } & StrictSelect<S, StoreSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class StoreModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'StoreFilter',
-      connectionFieldsMap,
-      'StoreCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

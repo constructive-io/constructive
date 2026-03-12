@@ -28,7 +28,6 @@ import type {
   CheckConstraintWithRelations,
   CheckConstraintSelect,
   CheckConstraintFilter,
-  CheckConstraintCondition,
   CheckConstraintOrderBy,
   CreateCheckConstraintInput,
   UpdateCheckConstraintInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CheckConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CheckConstraintSelect>(
-    args: FindManyArgs<
-      S,
-      CheckConstraintFilter,
-      CheckConstraintCondition,
-      CheckConstraintOrderBy
-    > & {
+    args: FindManyArgs<S, CheckConstraintFilter, CheckConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, CheckConstraintSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class CheckConstraintModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class CheckConstraintModel {
       },
       'CheckConstraintFilter',
       'CheckConstraintOrderBy',
-      connectionFieldsMap,
-      'CheckConstraintCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class CheckConstraintModel {
     });
   }
   findFirst<S extends CheckConstraintSelect>(
-    args: FindFirstArgs<S, CheckConstraintFilter, CheckConstraintCondition> & {
+    args: FindFirstArgs<S, CheckConstraintFilter> & {
       select: S;
     } & StrictSelect<S, CheckConstraintSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class CheckConstraintModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'CheckConstraintFilter',
-      connectionFieldsMap,
-      'CheckConstraintCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,7 +28,6 @@ import type {
   ConnectedAccountWithRelations,
   ConnectedAccountSelect,
   ConnectedAccountFilter,
-  ConnectedAccountCondition,
   ConnectedAccountOrderBy,
   CreateConnectedAccountInput,
   UpdateConnectedAccountInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ConnectedAccountModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ConnectedAccountSelect>(
-    args: FindManyArgs<
-      S,
-      ConnectedAccountFilter,
-      ConnectedAccountCondition,
-      ConnectedAccountOrderBy
-    > & {
+    args: FindManyArgs<S, ConnectedAccountFilter, ConnectedAccountOrderBy> & {
       select: S;
     } & StrictSelect<S, ConnectedAccountSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class ConnectedAccountModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class ConnectedAccountModel {
       },
       'ConnectedAccountFilter',
       'ConnectedAccountOrderBy',
-      connectionFieldsMap,
-      'ConnectedAccountCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class ConnectedAccountModel {
     });
   }
   findFirst<S extends ConnectedAccountSelect>(
-    args: FindFirstArgs<S, ConnectedAccountFilter, ConnectedAccountCondition> & {
+    args: FindFirstArgs<S, ConnectedAccountFilter> & {
       select: S;
     } & StrictSelect<S, ConnectedAccountSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class ConnectedAccountModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ConnectedAccountFilter',
-      connectionFieldsMap,
-      'ConnectedAccountCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,7 +28,6 @@ import type {
   ProfilesModuleWithRelations,
   ProfilesModuleSelect,
   ProfilesModuleFilter,
-  ProfilesModuleCondition,
   ProfilesModuleOrderBy,
   CreateProfilesModuleInput,
   UpdateProfilesModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ProfilesModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ProfilesModuleSelect>(
-    args: FindManyArgs<S, ProfilesModuleFilter, ProfilesModuleCondition, ProfilesModuleOrderBy> & {
+    args: FindManyArgs<S, ProfilesModuleFilter, ProfilesModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ProfilesModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ProfilesModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ProfilesModuleModel {
       },
       'ProfilesModuleFilter',
       'ProfilesModuleOrderBy',
-      connectionFieldsMap,
-      'ProfilesModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ProfilesModuleModel {
     });
   }
   findFirst<S extends ProfilesModuleSelect>(
-    args: FindFirstArgs<S, ProfilesModuleFilter, ProfilesModuleCondition> & {
+    args: FindFirstArgs<S, ProfilesModuleFilter> & {
       select: S;
     } & StrictSelect<S, ProfilesModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ProfilesModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ProfilesModuleFilter',
-      connectionFieldsMap,
-      'ProfilesModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

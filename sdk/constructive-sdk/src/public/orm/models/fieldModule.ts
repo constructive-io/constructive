@@ -28,7 +28,6 @@ import type {
   FieldModuleWithRelations,
   FieldModuleSelect,
   FieldModuleFilter,
-  FieldModuleCondition,
   FieldModuleOrderBy,
   CreateFieldModuleInput,
   UpdateFieldModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class FieldModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends FieldModuleSelect>(
-    args: FindManyArgs<S, FieldModuleFilter, FieldModuleCondition, FieldModuleOrderBy> & {
+    args: FindManyArgs<S, FieldModuleFilter, FieldModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, FieldModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class FieldModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class FieldModuleModel {
       },
       'FieldModuleFilter',
       'FieldModuleOrderBy',
-      connectionFieldsMap,
-      'FieldModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class FieldModuleModel {
     });
   }
   findFirst<S extends FieldModuleSelect>(
-    args: FindFirstArgs<S, FieldModuleFilter, FieldModuleCondition> & {
+    args: FindFirstArgs<S, FieldModuleFilter> & {
       select: S;
     } & StrictSelect<S, FieldModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class FieldModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'FieldModuleFilter',
-      connectionFieldsMap,
-      'FieldModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

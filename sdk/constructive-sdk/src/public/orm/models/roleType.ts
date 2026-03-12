@@ -28,7 +28,6 @@ import type {
   RoleTypeWithRelations,
   RoleTypeSelect,
   RoleTypeFilter,
-  RoleTypeCondition,
   RoleTypeOrderBy,
   CreateRoleTypeInput,
   UpdateRoleTypeInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RoleTypeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RoleTypeSelect>(
-    args: FindManyArgs<S, RoleTypeFilter, RoleTypeCondition, RoleTypeOrderBy> & {
+    args: FindManyArgs<S, RoleTypeFilter, RoleTypeOrderBy> & {
       select: S;
     } & StrictSelect<S, RoleTypeSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class RoleTypeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class RoleTypeModel {
       },
       'RoleTypeFilter',
       'RoleTypeOrderBy',
-      connectionFieldsMap,
-      'RoleTypeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class RoleTypeModel {
     });
   }
   findFirst<S extends RoleTypeSelect>(
-    args: FindFirstArgs<S, RoleTypeFilter, RoleTypeCondition> & {
+    args: FindFirstArgs<S, RoleTypeFilter> & {
       select: S;
     } & StrictSelect<S, RoleTypeSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class RoleTypeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'RoleTypeFilter',
-      connectionFieldsMap,
-      'RoleTypeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

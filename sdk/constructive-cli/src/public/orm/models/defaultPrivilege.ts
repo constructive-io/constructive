@@ -28,7 +28,6 @@ import type {
   DefaultPrivilegeWithRelations,
   DefaultPrivilegeSelect,
   DefaultPrivilegeFilter,
-  DefaultPrivilegeCondition,
   DefaultPrivilegeOrderBy,
   CreateDefaultPrivilegeInput,
   UpdateDefaultPrivilegeInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DefaultPrivilegeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DefaultPrivilegeSelect>(
-    args: FindManyArgs<
-      S,
-      DefaultPrivilegeFilter,
-      DefaultPrivilegeCondition,
-      DefaultPrivilegeOrderBy
-    > & {
+    args: FindManyArgs<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
       select: S;
     } & StrictSelect<S, DefaultPrivilegeSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class DefaultPrivilegeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class DefaultPrivilegeModel {
       },
       'DefaultPrivilegeFilter',
       'DefaultPrivilegeOrderBy',
-      connectionFieldsMap,
-      'DefaultPrivilegeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class DefaultPrivilegeModel {
     });
   }
   findFirst<S extends DefaultPrivilegeSelect>(
-    args: FindFirstArgs<S, DefaultPrivilegeFilter, DefaultPrivilegeCondition> & {
+    args: FindFirstArgs<S, DefaultPrivilegeFilter> & {
       select: S;
     } & StrictSelect<S, DefaultPrivilegeSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class DefaultPrivilegeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'DefaultPrivilegeFilter',
-      connectionFieldsMap,
-      'DefaultPrivilegeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

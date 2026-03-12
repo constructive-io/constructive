@@ -28,7 +28,6 @@ import type {
   MembershipTypesModuleWithRelations,
   MembershipTypesModuleSelect,
   MembershipTypesModuleFilter,
-  MembershipTypesModuleCondition,
   MembershipTypesModuleOrderBy,
   CreateMembershipTypesModuleInput,
   UpdateMembershipTypesModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class MembershipTypesModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends MembershipTypesModuleSelect>(
-    args: FindManyArgs<
-      S,
-      MembershipTypesModuleFilter,
-      MembershipTypesModuleCondition,
-      MembershipTypesModuleOrderBy
-    > & {
+    args: FindManyArgs<S, MembershipTypesModuleFilter, MembershipTypesModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, MembershipTypesModuleSelect>
   ): QueryBuilder<{
@@ -57,7 +51,6 @@ export class MembershipTypesModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -67,8 +60,7 @@ export class MembershipTypesModuleModel {
       },
       'MembershipTypesModuleFilter',
       'MembershipTypesModuleOrderBy',
-      connectionFieldsMap,
-      'MembershipTypesModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -80,7 +72,7 @@ export class MembershipTypesModuleModel {
     });
   }
   findFirst<S extends MembershipTypesModuleSelect>(
-    args: FindFirstArgs<S, MembershipTypesModuleFilter, MembershipTypesModuleCondition> & {
+    args: FindFirstArgs<S, MembershipTypesModuleFilter> & {
       select: S;
     } & StrictSelect<S, MembershipTypesModuleSelect>
   ): QueryBuilder<{
@@ -94,11 +86,9 @@ export class MembershipTypesModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'MembershipTypesModuleFilter',
-      connectionFieldsMap,
-      'MembershipTypesModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
