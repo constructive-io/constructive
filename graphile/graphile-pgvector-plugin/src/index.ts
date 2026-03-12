@@ -11,10 +11,10 @@
  *    - A `Vector` GraphQL scalar (serialized as [Float]) handles I/O
  *
  * 2. **VectorSearchPlugin** — Auto-discovers all vector columns and adds:
- *    - `<column>Nearby` condition fields on connections (filter by distance)
+ *    - `<column>Nearby` filter fields on connections (filter by distance)
  *    - `<column>Distance` computed fields on output types
  *    - `<COLUMN>_DISTANCE_ASC/DESC` orderBy enum values
- *    - `closeTo` connection filter operator for the Vector scalar
+ *    Requires postgraphile-plugin-connection-filter to be loaded first.
  *
  * @example
  * ```typescript

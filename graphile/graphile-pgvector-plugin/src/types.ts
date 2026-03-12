@@ -29,10 +29,15 @@ export interface VectorSearchPluginOptions {
   maxLimit?: number;
 
   /**
-   * Prefix for vector condition fields on connection condition inputs.
+   * Prefix for vector filter fields on connection filter inputs.
    * For example, with prefix 'vector' and a column named 'embedding',
-   * the generated condition field will be 'vectorEmbedding'.
+   * the generated filter field will be 'vectorEmbedding'.
    * @default 'vector'
+   */
+  filterPrefix?: string;
+
+  /**
+   * @deprecated Use `filterPrefix` instead. Kept for backwards compatibility.
    */
   conditionPrefix?: string;
 }

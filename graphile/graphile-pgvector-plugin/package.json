@@ -46,11 +46,7 @@
     "postgraphile": "5.0.0-rc.7",
     "postgraphile-plugin-connection-filter": "3.0.0-rc.1"
   },
-  "peerDependenciesMeta": {
-    "postgraphile-plugin-connection-filter": {
-      "optional": true
-    }
-  },
+  "peerDependenciesMeta": {},
   "keywords": [
     "postgraphile",
     "graphile",
