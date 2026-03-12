@@ -81,6 +81,8 @@ export interface ConnectionFilterOptions {
   connectionFilterSetofFunctions?: boolean;
   /** Allow filtering on computed columns. Default: true */
   connectionFilterComputedColumns?: boolean;
+  /** Allow filtering on related tables via FK relationships. Default: false */
+  connectionFilterRelations?: boolean;
 }
 
 /**

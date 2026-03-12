@@ -33,6 +33,8 @@ import {
   ConnectionFilterCustomOperatorsPlugin,
   ConnectionFilterLogicalOperatorsPlugin,
   ConnectionFilterComputedAttributesPlugin,
+  ConnectionFilterForwardRelationsPlugin,
+  ConnectionFilterBackwardRelationsPlugin,
 } from './plugins';
 
 /**
@@ -45,6 +47,7 @@ const defaultSchemaOptions: ConnectionFilterOptions = {
   connectionFilterAllowEmptyObjectInput: false,
   connectionFilterSetofFunctions: true,
   connectionFilterComputedColumns: true,
+  connectionFilterRelations: false,
 };
 
 /**
@@ -78,6 +81,12 @@ export function ConnectionFilterPreset(
   // Computed columns are opt-in (disabled by default)
   if (mergedOptions.connectionFilterComputedColumns) {
     plugins.push(ConnectionFilterComputedAttributesPlugin);
+  }
+
+  // Relation filters are opt-in (disabled by default)
+  if (mergedOptions.connectionFilterRelations) {
+    plugins.push(ConnectionFilterForwardRelationsPlugin);
+    plugins.push(ConnectionFilterBackwardRelationsPlugin);
   }
 
   return {

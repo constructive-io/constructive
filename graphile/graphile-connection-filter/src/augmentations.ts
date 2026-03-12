@@ -19,6 +19,20 @@ declare global {
       filterFieldType(this: Inflection, typeName: string): string;
       /** Filter field list type name for an array scalar, e.g. "StringListFilter" */
       filterFieldListType(this: Inflection, typeName: string): string;
+      /** Forward relation field name (passthrough) */
+      filterSingleRelationFieldName(this: Inflection, fieldName: string): string;
+      /** Forward relation exists field name, e.g. "clientByClientIdExists" */
+      filterForwardRelationExistsFieldName(this: Inflection, relationFieldName: string): string;
+      /** Backward single relation field name (passthrough) */
+      filterSingleRelationByKeysBackwardsFieldName(this: Inflection, fieldName: string): string;
+      /** Backward single relation exists field name */
+      filterBackwardSingleRelationExistsFieldName(this: Inflection, relationFieldName: string): string;
+      /** Backward many relation field name (passthrough) */
+      filterManyRelationByKeysFieldName(this: Inflection, fieldName: string): string;
+      /** Backward many relation exists field name */
+      filterBackwardManyRelationExistsFieldName(this: Inflection, relationFieldName: string): string;
+      /** Many filter type name, e.g. "ClientToManyOrderFilter" */
+      filterManyType(this: Inflection, table: any, foreignTable: any): string;
     }
 
     interface Build {
@@ -41,6 +55,10 @@ declare global {
       isPgConnectionFilter?: boolean;
       /** Operator type scope data (present on scalar filter types like StringFilter) */
       pgConnectionFilterOperators?: PgConnectionFilterOperatorsScope;
+      /** Foreign table resource (used by many filter types) */
+      foreignTable?: any;
+      /** True if this is a many-relation filter type (e.g. ClientToManyOrderFilter) */
+      isPgConnectionFilterMany?: boolean;
     }
 
     interface ScopeInputObjectFieldsField {
@@ -84,6 +102,8 @@ declare global {
       ConnectionFilterCustomOperatorsPlugin: true;
       ConnectionFilterLogicalOperatorsPlugin: true;
       ConnectionFilterComputedAttributesPlugin: true;
+      ConnectionFilterForwardRelationsPlugin: true;
+      ConnectionFilterBackwardRelationsPlugin: true;
     }
   }
 }

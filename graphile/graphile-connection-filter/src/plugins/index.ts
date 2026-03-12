@@ -6,4 +6,6 @@ export { ConnectionFilterOperatorsPlugin } from './ConnectionFilterOperatorsPlug
 export { ConnectionFilterCustomOperatorsPlugin } from './ConnectionFilterCustomOperatorsPlugin';
 export { ConnectionFilterLogicalOperatorsPlugin } from './ConnectionFilterLogicalOperatorsPlugin';
 export { ConnectionFilterComputedAttributesPlugin } from './ConnectionFilterComputedAttributesPlugin';
+export { ConnectionFilterForwardRelationsPlugin } from './ConnectionFilterForwardRelationsPlugin';
+export { ConnectionFilterBackwardRelationsPlugin } from './ConnectionFilterBackwardRelationsPlugin';
 export { makeApplyFromOperatorSpec } from './operatorApply';

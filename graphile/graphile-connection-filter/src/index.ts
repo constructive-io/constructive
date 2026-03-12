@@ -40,6 +40,8 @@ export {
   ConnectionFilterCustomOperatorsPlugin,
   ConnectionFilterLogicalOperatorsPlugin,
   ConnectionFilterComputedAttributesPlugin,
+  ConnectionFilterForwardRelationsPlugin,
+  ConnectionFilterBackwardRelationsPlugin,
   makeApplyFromOperatorSpec,
 } from './plugins';
 
