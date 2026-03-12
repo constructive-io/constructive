@@ -189,7 +189,7 @@ export function buildSelections(
 // Document Builders
 // ============================================================================
 
-export function buildFindManyDocument<TSelect, TWhere, TCondition>(
+export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   operationName: string,
   queryField: string,
   select: TSelect,
@@ -302,7 +302,7 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition>(
   return { document: print(document), variables };
 }
 
-export function buildFindFirstDocument<TSelect, TWhere, TCondition>(
+export function buildFindFirstDocument<TSelect, TWhere, TCondition = never>(
   operationName: string,
   queryField: string,
   select: TSelect,
